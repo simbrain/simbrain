@@ -1,6 +1,5 @@
 package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
@@ -12,7 +11,6 @@ import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.dialogs.dl4j.MultiLayerTrainerDialog;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.*;
@@ -170,7 +168,7 @@ public class MultiLayerNetworkNode extends ScreenElement {
         Action trainAction = new AbstractAction("Train...") {
 
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Properties.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Properties.png"));
                 putValue(SHORT_DESCRIPTION, "Train multi layer network");
             }
 

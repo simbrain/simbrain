@@ -47,7 +47,7 @@ public final class SaveAsAction extends AbstractAction {
             throw new IllegalArgumentException("component must not be null");
         }
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/SaveAs.png"));
         putValue(SHORT_DESCRIPTION, "Save this component with a new name");
 
         this.guiComponent = guiComponent;

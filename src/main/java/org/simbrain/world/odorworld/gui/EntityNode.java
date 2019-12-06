@@ -25,12 +25,13 @@ import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntityManager;
-import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
-import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.OdorWorldResourceManager;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

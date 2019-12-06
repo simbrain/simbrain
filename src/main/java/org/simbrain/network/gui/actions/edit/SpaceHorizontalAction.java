@@ -37,7 +37,7 @@ public final class SpaceHorizontalAction extends ConditionallyEnabledAction {
      */
     public SpaceHorizontalAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Space Horizontal", EnablingCondition.NEURONS);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("SpaceHorizontal.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/SpaceHorizontal.png"));
         putValue(SHORT_DESCRIPTION, "Space selected neurons horizontally");
     }
 

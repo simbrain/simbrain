@@ -37,7 +37,7 @@ public final class AlignVerticalAction extends ConditionallyEnabledAction {
      */
     public AlignVerticalAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Align Vertical", EnablingCondition.NEURONS);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("AlignVertical.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/AlignVertical.png"));
         putValue(SHORT_DESCRIPTION, "Align selected neurons vertically");
     }
 

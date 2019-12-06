@@ -21,10 +21,9 @@ package org.simbrain.world.odorworld.effectors;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 
-import java.awt.geom.Point2D;
 import java.util.List;
 
 /**

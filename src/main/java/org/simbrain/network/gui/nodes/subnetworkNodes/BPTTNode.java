@@ -75,7 +75,7 @@ public class BPTTNode extends SubnetworkNode {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Trainer.png"));
             putValue(NAME, "Train using backprop through time...");
             putValue(SHORT_DESCRIPTION, "Train using backprop through time...");
         }

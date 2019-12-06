@@ -45,7 +45,7 @@ public final class OpenCouplingListAction extends AbstractAction {
     public OpenCouplingListAction(final SimbrainDesktop desktop) {
         super("Open Coupling List...");
         this.desktop = desktop;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("CouplingList.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/CouplingList.png"));
         putValue(SHORT_DESCRIPTION, "Open coupling list");
     }
 

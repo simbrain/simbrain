@@ -79,7 +79,7 @@ public class ESNNetworkNode extends SubnetworkNode {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Trainer.png"));
             putValue(NAME, "Train offline...");
             putValue(SHORT_DESCRIPTION, "Train offline...");
         }

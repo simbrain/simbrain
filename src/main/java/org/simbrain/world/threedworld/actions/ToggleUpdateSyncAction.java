@@ -23,7 +23,7 @@ public class ToggleUpdateSyncAction extends AbstractAction {
     public ToggleUpdateSyncAction(ThreeDWorld world) {
         super("Sync Update");
         this.world = world;
-        putValue(SMALL_ICON, ResourceManager.getSmallIcon("Clock.png"));
+        putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clock.png"));
         putValue(SHORT_DESCRIPTION, "Synchronize Update to Workspace");
     }
 

@@ -50,7 +50,7 @@ public final class ClampNeuronsAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp_N.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Clamp_N.png"));
         putValue(SHORT_DESCRIPTION, "Clamp Neurons");
     }
 

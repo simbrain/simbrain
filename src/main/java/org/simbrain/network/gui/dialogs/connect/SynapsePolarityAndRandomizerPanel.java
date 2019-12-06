@@ -137,7 +137,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     private final Window parent;
 
-    private final JLabel warning = new JLabel(ResourceManager.getImageIcon("WarningGray.png"));
+    private final JLabel warning = new JLabel(ResourceManager.getImageIcon("menu_icons/WarningGray.png"));
 
     private static final double ERROR_TOLERANCE = 0.05;
 

@@ -16,13 +16,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld.resources;
+package org.simbrain.world.odorworld;
 
+import org.simbrain.util.Utils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,7 +45,7 @@ public class OdorWorldResourceManager {
      * @return the image
      */
     public static Image getRotatingImage(final String name) {
-        return getBufferedImage("rotating/" + name);
+        return getBufferedImage("rotating" + Utils.FS + name);
     }
 
     /**
@@ -55,20 +55,9 @@ public class OdorWorldResourceManager {
      * @return the image
      */
     public static Image getStaticImage(final String name) {
-        return getBufferedImage("static/" + name);
+        return getBufferedImage("static" + Utils.FS + name);
     }
 
-    /**
-     * Retrieve an Image based on its file name.
-     *
-     * @param name name of the image file to retrieve
-     * @return the Image which can be used with Swing components, etc
-     */
-    private static Image getImage(final String name) {
-        URL url = ClassLoader.getSystemClassLoader().getResource(name);
-        java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
-        return toolKit.getImage(url);
-    }
 
     /**
      * Retrieve and load an Image into buffer based on its file name.
@@ -99,7 +88,7 @@ public class OdorWorldResourceManager {
     }
 
     public static URL getFileURL(final String path) {
-        return ClassLoader.getSystemClassLoader().getResource("odorworld" + File.separator + path);
+        return ClassLoader.getSystemClassLoader().getResource("odorworld" + Utils.FS + path);
     }
 
     public static Document getDocument(final String name) {
@@ -126,7 +115,7 @@ public class OdorWorldResourceManager {
     }
 
     public static Document getTileMap(final String name) {
-        return getDocument("tilemap/" + name);
+        return getDocument("tilemap" + Utils.FS + name);
     }
 
     public static Document getTileMap(final File file) {

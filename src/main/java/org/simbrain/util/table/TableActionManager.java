@@ -57,7 +57,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Open.png"));
                 putValue(NAME, "Import (.csv)");
                 putValue(SHORT_DESCRIPTION, "Import table from .csv");
             }
@@ -93,7 +93,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Open.png"));
                 putValue(NAME, "Import (.csv)");
                 putValue(SHORT_DESCRIPTION, "Import table from .csv");
             }
@@ -125,7 +125,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Save.png"));
                 putValue(NAME, "Export (.csv)");
                 putValue(SHORT_DESCRIPTION, "Save table as .csv");
             }
@@ -153,7 +153,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
                 putValue(NAME, "Randomize");
                 putValue(SHORT_DESCRIPTION, "Randomize");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
@@ -205,7 +205,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.gif"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.gif"));
                 putValue(NAME, "Randomization bounds");
                 putValue(SHORT_DESCRIPTION, "Set randomization bounds");
             }
@@ -339,7 +339,7 @@ public class TableActionManager {
             // Initialize
             {
                 // TODO: Throw exception if jtable.getData() is not mutable
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("AddTableRow.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/AddTableRow.png"));
                 putValue(NAME, "Insert row");
                 putValue(SHORT_DESCRIPTION, "Insert row (above)");
             }
@@ -369,7 +369,7 @@ public class TableActionManager {
             // Initialize
             {
                 // TODO: Throw exception if jtable.getData() is not mutable
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("AddTableColumn.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/AddTableColumn.png"));
                 putValue(NAME, "Insert column");
                 putValue(SHORT_DESCRIPTION, "Insert column (to right)");
             }
@@ -396,7 +396,7 @@ public class TableActionManager {
             // Initialize
             {
                 // TODO: Throw exception if jtable.getData() is not mutable
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteRowTable.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png"));
                 putValue(NAME, "Delete row");
                 putValue(SHORT_DESCRIPTION, "Delete row");
             }
@@ -438,7 +438,7 @@ public class TableActionManager {
             // Initialize
             {
                 // TODO: Throw exception if jtable.getData() is not mutable
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteColumnTable.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/DeleteColumnTable.png"));
                 putValue(NAME, "Delete column");
                 putValue(SHORT_DESCRIPTION, "Delete column");
             }
@@ -568,7 +568,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Shuffle.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Shuffle.png"));
                 putValue(NAME, "Shuffle rows");
                 putValue(SHORT_DESCRIPTION, "Randomize the positions of the rows");
             }

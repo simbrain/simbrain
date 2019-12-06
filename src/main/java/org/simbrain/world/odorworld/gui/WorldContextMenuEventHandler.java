@@ -1,6 +1,5 @@
 package org.simbrain.world.odorworld.gui;
 
-import org.piccolo2d.PCamera;
 import org.piccolo2d.PNode;
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;

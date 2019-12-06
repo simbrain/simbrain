@@ -19,7 +19,9 @@
 package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
+import org.simbrain.util.Utils;
 
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

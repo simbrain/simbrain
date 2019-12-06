@@ -150,7 +150,7 @@ public class SOMTrainerControlsPanel extends JPanel {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Play.png"));
             // putValue(NAME, "Open (.csv)");
             putValue(SHORT_DESCRIPTION, "Iterate training until stopping condition met");
         }
@@ -165,7 +165,7 @@ public class SOMTrainerControlsPanel extends JPanel {
             if (trainer.isUpdateCompleted()) {
                 // Start running
                 trainer.setUpdateCompleted(false);
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Stop.png"));
                 Executors.newSingleThreadExecutor().submit(new Runnable() {
                     public void run() {
                         try {
@@ -196,7 +196,7 @@ public class SOMTrainerControlsPanel extends JPanel {
                 trainer.setUpdateCompleted(true);
                 //TODO
                 //panel.getNetwork().fireGroupUpdated(network);
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Play.png"));
             }
 
         }
@@ -210,7 +210,7 @@ public class SOMTrainerControlsPanel extends JPanel {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Step.png"));
             putValue(NAME, "Train network");
             // putValue(SHORT_DESCRIPTION, "Import table from .csv");
         }
@@ -239,7 +239,7 @@ public class SOMTrainerControlsPanel extends JPanel {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Reset.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Reset.png"));
             putValue(NAME, "Reset");
             putValue(SHORT_DESCRIPTION, "Reset network");
         }
@@ -260,7 +260,7 @@ public class SOMTrainerControlsPanel extends JPanel {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
             putValue(NAME, "Randomize");
             putValue(SHORT_DESCRIPTION, "Randomize network");
         }

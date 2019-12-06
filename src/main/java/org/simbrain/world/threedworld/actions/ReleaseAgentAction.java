@@ -14,7 +14,7 @@ public class ReleaseAgentAction extends AbstractAction {
     public ReleaseAgentAction(ThreeDWorld world) {
         super("Release Agent");
         this.world = world;
-        putValue(SMALL_ICON, ResourceManager.getSmallIcon("ControlEmpty.png"));
+        putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/ControlEmpty.png"));
         putValue(SHORT_DESCRIPTION, "Release Agent");
     }
 

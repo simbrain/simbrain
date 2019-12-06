@@ -56,7 +56,7 @@ public class TextWorldActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Import.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Import.png"));
                 putValue(NAME, "Extract dictionary...");
                 putValue(SHORT_DESCRIPTION, "Extract dictionary from text file...");
                 //KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
@@ -79,7 +79,7 @@ public class TextWorldActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Import.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Import.png"));
                 putValue(NAME, "Extract dictionary...");
                 putValue(SHORT_DESCRIPTION, "Extract dictionary from text file...");
                 //KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
@@ -164,7 +164,7 @@ public class TextWorldActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Table.png"));
                 putValue(NAME, "Edit dictionary...");
                 putValue(SHORT_DESCRIPTION, "Edit dictionary...");
             }
@@ -226,7 +226,7 @@ public class TextWorldActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
                 putValue(NAME, "Preferences...");
                 putValue(SHORT_DESCRIPTION, "Show preferences dialog");
             }

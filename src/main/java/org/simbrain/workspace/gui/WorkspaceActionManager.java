@@ -176,9 +176,9 @@ public class WorkspaceActionManager {
 
         openNetworkAction = new OpenNetworkAction(workspace);
         openWorldActions = Arrays.asList(
-                new OpenComponentAction<>(DataWorldComponent.class, "Data Table", "Table.png", workspace),
-                new OpenComponentAction<>(OdorWorldComponent.class, "Odor World", "SwissIcon.png", workspace),
-                new OpenComponentAction<>(ImageAlbumComponent.class, "Image Display", "camera.png", workspace));
+                new OpenComponentAction<>(DataWorldComponent.class, "Data Table", "menu_icons/Table.png", workspace),
+                new OpenComponentAction<>(OdorWorldComponent.class, "Odor World", "menu_icons/SwissIcon.png", workspace),
+                new OpenComponentAction<>(ImageAlbumComponent.class, "Image Display", "menu_icons/camera.png", workspace));
 
         openWorkspaceAction = new OpenWorkspaceAction(desktop);
         saveWorkspaceAction = new SaveWorkspaceAction(desktop);
@@ -189,28 +189,28 @@ public class WorkspaceActionManager {
         newDocViewerAction = new NewDocViewerAction(workspace);
 
         newChartActions = Arrays.asList(
-                createComponentFactoryAction(workspace, "Bar Chart", "BarChart.png"),
-                createComponentFactoryAction(workspace, "Histogram", "BarChart.png"),
-                createComponentFactoryAction(workspace, "Pie Chart", "PieChart.png"),
-                createComponentFactoryAction(workspace, "Projection Plot", "ProjectionIcon.png"),
-                createComponentFactoryAction(workspace, "Raster Plot", "ScatterIcon.png"),
-                createComponentFactoryAction(workspace, "Time Series", "CurveChart.png"));
+                createComponentFactoryAction(workspace, "Bar Chart", "menu_icons/BarChart.png"),
+                createComponentFactoryAction(workspace, "Histogram", "menu_icons/BarChart.png"),
+                createComponentFactoryAction(workspace, "Pie Chart", "menu_icons/PieChart.png"),
+                createComponentFactoryAction(workspace, "Projection Plot", "menu_icons/ProjectionIcon.png"),
+                createComponentFactoryAction(workspace, "Raster Plot", "menu_icons/ScatterIcon.png"),
+                createComponentFactoryAction(workspace, "Time Series", "menu_icons/CurveChart.png"));
 
         newWorldActions = Arrays.asList(
-                createComponentFactoryAction(workspace, "Data Table", "Table.png"),
-                createComponentFactoryAction(workspace, "Odor World", "SwissIcon.png"),
-                createComponentFactoryAction(workspace, "3D World", "World.png"),
-                createComponentFactoryAction(workspace, "Pixel Display", "PaintView.png"),
-                createComponentFactoryAction(workspace, "Image World", "photo.png"),
-                createComponentFactoryAction(workspace, "Text Display", "Text.png"),
-                createComponentFactoryAction(workspace, "Text Reader", "Text.png"));
+                createComponentFactoryAction(workspace, "Data Table", "menu_icons/Table.png"),
+                createComponentFactoryAction(workspace, "Odor World", "menu_icons/SwissIcon.png"),
+                createComponentFactoryAction(workspace, "3D World", "menu_icons/World.png"),
+                createComponentFactoryAction(workspace, "Pixel Display", "menu_icons/PaintView.png"),
+                createComponentFactoryAction(workspace, "Image World", "menu_icons/photo.png"),
+                createComponentFactoryAction(workspace, "Text Display", "menu_icons/Text.png"),
+                createComponentFactoryAction(workspace, "Text Reader", "menu_icons/Text.png"));
                 //createComponentFactoryAction(workspace, "Device Interaction", "Text.png"));
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);
 
         iterateAction = new WorkspaceIterateAction(workspace);
-        runAction = Utils.createAction("Run", "Run Workspace", "Play.png", workspace::run);
-        stopAction = Utils.createAction("Stop", "Stop Workspace", "Stop.png", workspace::stop);
+        runAction = Utils.createAction("Run", "Run Workspace", "menu_icons/Play.png", workspace::run);
+        stopAction = Utils.createAction("Stop", "Stop Workspace", "menu_icons/Stop.png", workspace::stop);
 
         showScriptEditorAction = new ScriptEditorAction(desktop);
         showUpdaterDialog = new ShowWorkspaceUpdaterDialog(desktop);

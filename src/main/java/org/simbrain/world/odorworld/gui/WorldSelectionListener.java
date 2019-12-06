@@ -18,8 +18,6 @@
  */
 package org.simbrain.world.odorworld.gui;
 
-import org.simbrain.network.gui.NetworkSelectionEvent;
-
 import java.util.EventListener;
 
 /**

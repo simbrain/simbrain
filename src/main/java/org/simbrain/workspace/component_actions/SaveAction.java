@@ -49,7 +49,7 @@ public final class SaveAction extends AbstractAction {
             throw new IllegalArgumentException("component must not be null");
         }
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Save.png"));
 
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SHORT_DESCRIPTION, "Save this component");

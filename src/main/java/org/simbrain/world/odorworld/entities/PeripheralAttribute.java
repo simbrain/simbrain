@@ -1,9 +1,7 @@
 package org.simbrain.world.odorworld.entities;
 
-import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.world.odorworld.sensors.Sensor;
 
 /**
  * Interface for effectors and sensors. "Peripheral" is supposed to suggest

@@ -19,7 +19,6 @@
 package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.world.odorworld.OdorWorldPanel;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

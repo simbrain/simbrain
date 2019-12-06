@@ -56,7 +56,7 @@ public class TrainerGuiActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Table.png"));
                 putValue(NAME, "Edit " + name + " Data...");
                 putValue(SHORT_DESCRIPTION, "Edit" + name + " Data...");
             }
@@ -87,7 +87,7 @@ public class TrainerGuiActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Table.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Table.png"));
                 putValue(NAME, "Edit Training Set...");
                 putValue(SHORT_DESCRIPTION, "Edit Training Set...");
             }
@@ -137,7 +137,7 @@ public class TrainerGuiActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Open.png"));
                 putValue(NAME, "Open data (.csv)");
                 putValue(SHORT_DESCRIPTION, "Open .csv data...");
             }
@@ -207,7 +207,7 @@ public class TrainerGuiActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("CurveChart.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/CurveChart.png"));
                 putValue(NAME, "Show error plot");
                 putValue(SHORT_DESCRIPTION, "Show error plot");
             }

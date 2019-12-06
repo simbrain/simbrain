@@ -199,7 +199,7 @@ public class TokenDictionaryPanel extends EditablePanel {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Import.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Import.png"));
                 putValue(NAME, "Extract vector tokens");
                 putValue(SHORT_DESCRIPTION, "Extract tokens from vector dictionary.");
             }

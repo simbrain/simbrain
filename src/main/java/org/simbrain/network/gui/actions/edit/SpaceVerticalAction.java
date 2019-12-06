@@ -37,7 +37,7 @@ public final class SpaceVerticalAction extends ConditionallyEnabledAction {
      */
     public SpaceVerticalAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Space Vertical", EnablingCondition.NEURONS);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("SpaceVertical.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/SpaceVertical.png"));
         putValue(SHORT_DESCRIPTION, "Space selected neurons vertically");
     }
 

@@ -402,7 +402,7 @@ public class WeightMatrixNode extends ScreenElement {
         Action randomizeAction = new AbstractAction("Randomize") {
 
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
                 putValue(SHORT_DESCRIPTION, "Randomize neuro naarray");
             }
 

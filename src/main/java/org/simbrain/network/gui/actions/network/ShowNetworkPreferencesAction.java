@@ -52,7 +52,7 @@ public final class ShowNetworkPreferencesAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SHORT_DESCRIPTION, "Show the network preference dialog");
 

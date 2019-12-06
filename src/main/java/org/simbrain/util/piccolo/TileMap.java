@@ -5,7 +5,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import org.piccolo2d.nodes.PImage;
 import org.simbrain.util.Pair;
-import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
+import org.simbrain.world.odorworld.OdorWorldResourceManager;
 
 import java.awt.*;
 import java.awt.geom.Point2D;

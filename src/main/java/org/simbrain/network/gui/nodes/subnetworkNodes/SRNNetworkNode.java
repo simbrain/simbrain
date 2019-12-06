@@ -84,7 +84,7 @@ public class SRNNetworkNode extends SubnetworkNode {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Trainer.png"));
             putValue(NAME, "Train SRN...");
             putValue(SHORT_DESCRIPTION, "Train SRN...");
         }
@@ -105,7 +105,7 @@ public class SRNNetworkNode extends SubnetworkNode {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
             putValue(NAME, "Clear SRN...");
             putValue(SHORT_DESCRIPTION, "Clear SRN Nodes...");
         }

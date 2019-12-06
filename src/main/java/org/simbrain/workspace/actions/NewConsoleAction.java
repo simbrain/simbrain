@@ -39,7 +39,7 @@ public final class NewConsoleAction extends WorkspaceAction {
      */
     public NewConsoleAction(Workspace workspace) {
         super("New Console", workspace);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Terminal2.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Terminal2.png"));
         putValue(SHORT_DESCRIPTION, "New console");
     }
 

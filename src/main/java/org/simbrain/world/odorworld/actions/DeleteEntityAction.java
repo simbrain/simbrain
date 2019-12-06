@@ -52,7 +52,7 @@ public final class DeleteEntityAction extends AbstractAction {
         super("Delete entity");
         this.worldPanel = worldPanel;
         this.entity = entity;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Delete.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Delete.png"));
         putValue(SHORT_DESCRIPTION, "Delete entity");
     }
 

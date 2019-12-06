@@ -40,7 +40,7 @@ public final class SaveWorkspaceAction extends DesktopAction {
      */
     public SaveWorkspaceAction(SimbrainDesktop desktop) {
         super("Save Workspace", desktop);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Save.png"));
         putValue(SHORT_DESCRIPTION, "Save workspace");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_S, toolkit.getMenuShortcutKeyMask());

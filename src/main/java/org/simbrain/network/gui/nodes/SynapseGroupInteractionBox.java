@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
@@ -237,7 +236,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/grid.png"));
             putValue(NAME, "Show Weight Matrix");
             putValue(SHORT_DESCRIPTION, "Show Weight Matrix");
         }
@@ -267,7 +266,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     protected Action removeAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/RedX_small.png"));
             putValue(NAME, "Remove Group...");
             putValue(SHORT_DESCRIPTION, "Remove synapse group...");
         }

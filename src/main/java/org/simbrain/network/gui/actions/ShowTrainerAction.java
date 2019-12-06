@@ -51,7 +51,7 @@ public final class ShowTrainerAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Trainer.png"));
         updateAction();
 
         // add a selection listener to update state based on selection

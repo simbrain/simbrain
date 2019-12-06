@@ -34,7 +34,7 @@ public final class WandEditModeAction extends EditModeAction {
      */
     public WandEditModeAction(final NetworkPanel networkPanel) {
         super("Wand", networkPanel, EditMode.WAND);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Wand.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Wand.png"));
         putValue(SHORT_DESCRIPTION, "Wand Mode (I)");
         putValue(SHORT_DESCRIPTION, "Enter wand mode (I) for injecting current in to nodes");
 

@@ -18,9 +18,7 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.ErrorListener;
-import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.IterableTrainerTemp;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.util.ResourceManager;
@@ -77,22 +75,22 @@ public class IterativeControlsPanel extends JPanel {
     /**
      * A play action that repeatedly iterates training algorithms.
      */
-    private Action runAction = Utils.createAction("Run", "Iterate training until stop button is pressed.", "Play.png", this::run);
+    private Action runAction = Utils.createAction("Run", "Iterate training until stop button is pressed.", "menu_icons/Play.png", this::run);
 
     /**
      * A step action that iterates learning algorithms one time.
      */
-    private Action stepAction = Utils.createAction("Iterate", "Iterate training once.", "Step.png", this::iterate);
+    private Action stepAction = Utils.createAction("Iterate", "Iterate training once.", "menu_icons/Step.png", this::iterate);
 
     /**
      * Action for randomizing the underlying network.
      */
-    private Action randomizeAction = Utils.createAction("Randomize", "Randomize network.", "Rand.png", this::randomizeNetwork);
+    private Action randomizeAction = Utils.createAction("Randomize", "Randomize network.", "menu_icons/Rand.png", this::randomizeNetwork);
 
     /**
      * Action for setting properties of the trainer.
      */
-    private Action setPropertiesAction = Utils.createAction("Properties", "Edit trainer properties.", "Prefs.png", this::editTrainerProperties);
+    private Action setPropertiesAction = Utils.createAction("Properties", "Edit trainer properties.", "menu_icons/Prefs.png", this::editTrainerProperties);
 
 
     /**
@@ -208,10 +206,10 @@ public class IterativeControlsPanel extends JPanel {
     private void run() {
         if (trainer.isUpdateCompleted()) {
             //TODO: Relation to stop trainer
-            runAction.putValue(Action.SMALL_ICON, ResourceManager.getImageIcon("Stop.png"));
+            runAction.putValue(Action.SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Stop.png"));
             startRunning();
         } else {
-            runAction.putValue(Action.SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+            runAction.putValue(Action.SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Play.png"));
             stopRunning();
         }
     }

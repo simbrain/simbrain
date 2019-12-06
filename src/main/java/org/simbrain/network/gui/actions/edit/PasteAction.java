@@ -57,7 +57,7 @@ public final class PasteAction extends AbstractAction {
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_V, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Paste.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Paste.png"));
         updateAction();
         Clipboard.addClipboardListener(new ClipboardListener() {
 

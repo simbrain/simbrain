@@ -20,11 +20,10 @@ package org.simbrain.world.odorworld.entities;
 
 import org.simbrain.util.piccolo.Animation;
 import org.simbrain.util.piccolo.Animations;
-import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
+import org.simbrain.world.odorworld.OdorWorldResourceManager;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 /**
  * Manages the creation of treemaps for rotating entities.

@@ -18,11 +18,9 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.AbstractNeuronCollection;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -266,7 +264,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     protected Action removeAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/RedX_small.png"));
             putValue(NAME, "Remove Neuron Collection.");
             putValue(SHORT_DESCRIPTION, "Remove neuron collection.");
         }
@@ -295,7 +293,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     protected Action clampNeuronsAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Clamp.png"));
             putValue(NAME, "Clamp Neurons");
             putValue(SHORT_DESCRIPTION, "Clamp all neurons in this group.");
         }
@@ -312,7 +310,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     protected Action unclampNeuronsAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Clamp.png"));
             putValue(NAME, "Unclamp Neurons");
             putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this group.");
         }

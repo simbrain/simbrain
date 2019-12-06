@@ -24,7 +24,7 @@ public class ToggleRunAction extends AbstractAction {
     public ToggleRunAction(ThreeDWorld world) {
         super("Run Physics");
         this.world = world;
-        putValue(SMALL_ICON, ResourceManager.getSmallIcon("physics.png"));
+        putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/physics.png"));
         putValue(SHORT_DESCRIPTION, "Run Physics Simulation");
     }
 

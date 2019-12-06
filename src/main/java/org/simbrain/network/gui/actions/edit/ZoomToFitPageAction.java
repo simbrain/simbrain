@@ -43,7 +43,7 @@ public final class ZoomToFitPageAction extends AbstractAction {
      */
     public ZoomToFitPageAction(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("ZoomFitPage.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/ZoomFitPage.png"));
         putValue(SHORT_DESCRIPTION, "Fit all objects on screen (f)");
         putValue(SHORT_DESCRIPTION, "Zoom to fit all objects on screen (f)");
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('f'), this);

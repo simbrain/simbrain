@@ -240,7 +240,7 @@ public class ESNCreationDialog extends StandardDialog {
         // Links the user to the help page for ESNs in case confusion arises
         // as to the fact that out->out and in->out do not spawn settings
         // panels like out->res.
-        JLabel helpIcon = new JLabel(ResourceManager.getImageIcon("Help.png"));
+        JLabel helpIcon = new JLabel(ResourceManager.getImageIcon("menu_icons/Help.png"));
         chkBxSubPanel.add(new JLabel("* Trained Weights"));
         chkBxSubPanel.add(helpIcon);
         helpIcon.addMouseListener(new MouseAdapter() {

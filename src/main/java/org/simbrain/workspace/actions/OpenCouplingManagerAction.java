@@ -48,7 +48,7 @@ public final class OpenCouplingManagerAction extends AbstractAction {
     public OpenCouplingManagerAction(final SimbrainDesktop desktop) {
         super("Open Coupling Manager...");
         this.desktop = desktop;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Coupling.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Coupling.png"));
         putValue(SHORT_DESCRIPTION, "Open coupling manager");
     }
 

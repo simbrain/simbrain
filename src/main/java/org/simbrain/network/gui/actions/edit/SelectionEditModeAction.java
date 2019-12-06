@@ -35,7 +35,7 @@ public final class SelectionEditModeAction extends EditModeAction {
     public SelectionEditModeAction(final NetworkPanel networkPanel) {
         super("Selection", networkPanel, EditMode.SELECTION);
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Arrow.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Arrow.png"));
         putValue(SHORT_DESCRIPTION, "Selection mode");
 
     }

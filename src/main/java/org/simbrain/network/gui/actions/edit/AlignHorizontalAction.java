@@ -37,7 +37,7 @@ public final class AlignHorizontalAction extends ConditionallyEnabledAction {
      */
     public AlignHorizontalAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Align Horizontal", EnablingCondition.NEURONS);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("AlignHorizontal.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/AlignHorizontal.png"));
         putValue(SHORT_DESCRIPTION, "Align selected neurons horizontally");
 
     }

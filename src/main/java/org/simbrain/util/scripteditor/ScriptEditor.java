@@ -272,7 +272,7 @@ public class ScriptEditor extends JPanel {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Open.png"));
                 putValue(NAME, "Open Script (.bsh)...");
                 putValue(SHORT_DESCRIPTION, "Open");
                 putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -311,7 +311,7 @@ public class ScriptEditor extends JPanel {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Save.png"));
                 putValue(SHORT_DESCRIPTION, "save");
                 putValue(Action.NAME, "Save");
                 putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -351,7 +351,7 @@ public class ScriptEditor extends JPanel {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/SaveAs.png"));
                 putValue(SHORT_DESCRIPTION, "save");
                 putValue(Action.NAME, "Save as...");
             }

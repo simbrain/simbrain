@@ -48,7 +48,7 @@ public final class NewNeuronAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/AddNeuron.png"));
         putValue(SHORT_DESCRIPTION, "Add or \"put\" new node (p)");
 
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('p'), this);

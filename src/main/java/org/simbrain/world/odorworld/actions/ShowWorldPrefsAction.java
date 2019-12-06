@@ -49,7 +49,7 @@ public final class ShowWorldPrefsAction extends AbstractAction {
         }
         this.component = component;
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
         putValue(SHORT_DESCRIPTION, "Odor world preferences...");
     }
 

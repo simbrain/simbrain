@@ -43,7 +43,7 @@ public class ProjectionPlotActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Save.png"));
                 putValue(NAME, "Export hi-d (.csv)");
                 putValue(SHORT_DESCRIPTION, "Export hi-d data (.csv)");
             }
@@ -71,7 +71,7 @@ public class ProjectionPlotActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Save.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Save.png"));
                 putValue(NAME, "Export low-d (.csv)");
                 putValue(SHORT_DESCRIPTION, "Export low-d data (.csv)");
             }
@@ -99,7 +99,7 @@ public class ProjectionPlotActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Open.png"));
                 putValue(NAME, "Import data (.csv)");
                 putValue(SHORT_DESCRIPTION, "Import data (.csv)");
             }

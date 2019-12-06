@@ -21,7 +21,6 @@ package org.simbrain.world.odorworld;
 import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.TileMap;
-import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -30,7 +29,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar

@@ -4,7 +4,6 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.DecayFunction;
 import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;

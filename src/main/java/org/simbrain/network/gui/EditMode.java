@@ -41,12 +41,12 @@ public final class EditMode {
     /**
      * Selection edit mode.
      */
-    public static final EditMode SELECTION = new EditMode("selection", "Arrow.png");
+    public static final EditMode SELECTION = new EditMode("selection", "menu_icons/Arrow.png");
 
     /**
      * Text edit mode.
      */
-    public static final EditMode TEXT = new EditMode("text", "Text.png");
+    public static final EditMode TEXT = new EditMode("text", "menu_icons/Text.png");
 
     /**
      * Default wand radius.

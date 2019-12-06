@@ -48,7 +48,7 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
     public RandomizeObjectsAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Randomize selection", EnablingCondition.ALLITEMS);
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
         putValue(SHORT_DESCRIPTION, "Randomize Selected Weights and Nodes (r)");
 
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('r'), this);

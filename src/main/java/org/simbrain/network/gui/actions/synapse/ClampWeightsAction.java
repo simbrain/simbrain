@@ -50,7 +50,7 @@ public final class ClampWeightsAction extends AbstractAction {
 
         this.networkPanel = networkPanel;
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Clamp_W.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Clamp_W.png"));
         putValue(SHORT_DESCRIPTION, "Clamp Weights");
     }
 

@@ -39,7 +39,7 @@ public final class ShowWeightMatrixAction extends ConditionallyEnabledAction {
     public ShowWeightMatrixAction(final NetworkPanel networkPanel) {
 
         super(networkPanel, "Display / Edit Weight Matrix...", EnablingCondition.SOURCE_AND_TARGET_NEURONS);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("grid.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/grid.png"));
         putValue(SHORT_DESCRIPTION, "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)");
     }
 

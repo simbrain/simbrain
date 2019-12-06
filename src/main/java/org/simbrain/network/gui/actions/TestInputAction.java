@@ -50,7 +50,7 @@ public class TestInputAction extends ConditionallyEnabledAction {
 
         super(networkPanel, "Create Input Table...", EnablingCondition.NEURONS);
         putValue(SHORT_DESCRIPTION, "Create a table whose rows provide input to selected neurons");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/TestInput.png"));
 
         this.networkPanel = networkPanel;
     }

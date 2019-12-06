@@ -47,7 +47,7 @@ public final class ScriptEditorAction extends AbstractAction {
     public ScriptEditorAction(final SimbrainDesktop desktop) {
         super("Edit / Run Script...");
         this.desktop = desktop;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("ScriptEditor.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/ScriptEditor.png"));
         putValue(SHORT_DESCRIPTION, "Edit / Run Script...");
     }
 

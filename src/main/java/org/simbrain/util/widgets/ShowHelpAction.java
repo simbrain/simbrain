@@ -46,7 +46,7 @@ public final class ShowHelpAction extends AbstractAction {
     public ShowHelpAction(final String actionName, final String url) {
         super(actionName);
         this.theURL = url;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Help.png"));
         putValue(SHORT_DESCRIPTION, "Show help via local web page");
     }
 
@@ -59,7 +59,7 @@ public final class ShowHelpAction extends AbstractAction {
     public ShowHelpAction(final String url) {
         super("Help");
         this.theURL = url;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Help.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Help.png"));
         putValue(SHORT_DESCRIPTION, "Show help via local web page");
     }
 

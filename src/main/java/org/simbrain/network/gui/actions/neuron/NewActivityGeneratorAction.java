@@ -48,7 +48,7 @@ public final class NewActivityGeneratorAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("AddNeuron.png")); // TODO
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/AddNeuron.png")); // TODO
 
     }
 

@@ -46,7 +46,7 @@ public final class ShowEntityDialogAction extends AbstractAction {
         // this.putValue(this.ACCELERATOR_KEY,
         // KeyStroke.getKeyStroke(KeyEvent.VK_P,
         // Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
         putValue(SHORT_DESCRIPTION, "Edit entity...");
     }
 

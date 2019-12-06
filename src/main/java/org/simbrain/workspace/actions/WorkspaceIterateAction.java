@@ -41,7 +41,7 @@ public final class WorkspaceIterateAction extends WorkspaceAction {
      */
     public WorkspaceIterateAction(Workspace workspace) {
         super("Iterate", workspace);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Step.png"));
         putValue(SHORT_DESCRIPTION, "Iterate Workspace Once");
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, toolkit.getMenuShortcutKeyMask());

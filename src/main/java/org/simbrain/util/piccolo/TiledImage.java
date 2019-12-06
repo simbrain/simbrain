@@ -4,7 +4,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import java.awt.image.BufferedImage;
-import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
+
+import org.simbrain.world.odorworld.OdorWorldResourceManager;
 
 @XStreamAlias("image")
 public class TiledImage {

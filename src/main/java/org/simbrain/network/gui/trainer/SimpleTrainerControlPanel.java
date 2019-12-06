@@ -78,7 +78,7 @@ public class SimpleTrainerControlPanel extends JPanel {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Play.png"));
             putValue(NAME, "Train network");
             // putValue(SHORT_DESCRIPTION, "Import table from .csv");
         }

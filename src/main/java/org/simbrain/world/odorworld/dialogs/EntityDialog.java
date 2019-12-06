@@ -25,8 +25,6 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
-import javax.swing.plaf.ColorUIResource;
-import java.awt.*;
 
 /**
  * <b>DialogWorldEntity</b> displays the dialog box for settable values of

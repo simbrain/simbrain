@@ -38,7 +38,7 @@ public final class DeleteAction extends ConditionallyEnabledAction {
     public DeleteAction(final NetworkPanel networkPanel) {
         super(networkPanel, "Delete", EnablingCondition.ALLITEMS);
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("DeleteNeuron.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/DeleteNeuron.png"));
         putValue(SHORT_DESCRIPTION, "Delete selected node(s) (\"Backspace\" or \"Delete\")");
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), this);

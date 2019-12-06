@@ -35,7 +35,7 @@ public class TextEditModeAction extends EditModeAction {
      */
     public TextEditModeAction(final NetworkPanel networkPanel) {
         super("Text", networkPanel, EditMode.TEXT);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Text.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Text.png"));
         putValue(SHORT_DESCRIPTION, "Text Mode (t)");
         putValue(SHORT_DESCRIPTION, "Text Mode (t)");
     }

@@ -26,7 +26,7 @@ public class NumericWidget extends JPanel {
     /**
      * The randomization button.
      */
-    private JButton randomizeButton = new JButton(ResourceManager.getImageIcon("Rand.png"));
+    private JButton randomizeButton = new JButton(ResourceManager.getImageIcon("menu_icons/Rand.png"));
 
     /**
      * Construct a numeric widget.

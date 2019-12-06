@@ -48,7 +48,7 @@ public final class ToggleAutoZoom extends JToggleButton {
         this.networkPanel = np;
 
         // Initialize the button
-        setIcon(ResourceManager.getImageIcon("ZoomFitPage.png"));
+        setIcon(ResourceManager.getImageIcon("menu_icons/ZoomFitPage.png"));
         updateButton();
 
         // React to button presses

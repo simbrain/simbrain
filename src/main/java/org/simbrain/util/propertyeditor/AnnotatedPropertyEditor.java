@@ -362,7 +362,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
                 putValue(NAME, "Show properties...");
                 putValue(SHORT_DESCRIPTION, "Show properties");
             }

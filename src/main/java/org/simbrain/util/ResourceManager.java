@@ -23,26 +23,11 @@ import java.awt.*;
 import java.net.URL;
 
 /**
- * <b>ResourceManager</b> provides resources (stored in the same directory) to
- * the rest of the program.
+ * <b>ResourceManager</b> provides convenient access to resource files.
  */
 public class ResourceManager {
 
     private static int smallIconSize = 18;
-
-    /**
-     * @return Returns the size in pixels to which small icons will be scaled.
-     */
-    public static int getSmallIconSize() {
-        return smallIconSize;
-    }
-
-    /**
-     * @param value Assigns the size in pixels to which small icons will be scaled.
-     */
-    public static void setSmallIconSize(int value) {
-        smallIconSize = value;
-    }
 
     /**
      * Retrieve an ImageIcon based on its file name.
@@ -51,24 +36,8 @@ public class ResourceManager {
      * @return the ImageIcon which can be used with Swing components, etc
      */
     public static ImageIcon getImageIcon(final String name) {
-        // TODO: Replace usage of this method with get<SIZE>Icon and create a user
-        // preference for changing the sizes.
         URL url = ClassLoader.getSystemClassLoader().getResource(name);
         return new ImageIcon(url);
-    }
-
-    /**
-     * Load an ImageIcon from the resources directory and scale it if necessary.
-     *
-     * @param name The name of the icon to load within the resources directory.
-     * @return Returns a scaled ImageIcon.
-     */
-    public static ImageIcon getSmallIcon(final String name) {
-        URL url = ClassLoader.getSystemClassLoader().getResource(name);
-        ImageIcon imageIcon = new ImageIcon(url);
-        Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
-        imageIcon.setImage(image);
-        return imageIcon;
     }
 
     /**
@@ -82,4 +51,20 @@ public class ResourceManager {
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
         return toolKit.getImage(url);
     }
+
+    /**
+     * Load an ImageIcon from the resources directory and scale it if necessary.
+     *
+     * @param name The name of the icon to load within the resources directory.
+     * @return Returns a scaled ImageIcon.
+     */
+    public static ImageIcon getSmallIcon(final String name) {
+        URL url = ClassLoader.getSystemClassLoader().getResource( name);
+        ImageIcon imageIcon = new ImageIcon(url);
+        Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
+        imageIcon.setImage(image);
+        return imageIcon;
+    }
+
+
 }

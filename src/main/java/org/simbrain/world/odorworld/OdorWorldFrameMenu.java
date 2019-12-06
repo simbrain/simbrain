@@ -18,8 +18,6 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
@@ -30,10 +28,8 @@ import org.simbrain.world.odorworld.actions.LoadTileMapAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 /**
  * <b>OdorWorldFrameMenu</b>.

@@ -48,7 +48,7 @@ public final class IterateNetworkAction extends AbstractAction {
         }
 
         this.networkPanel = networkPanel;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Step.png"));
         putValue(SHORT_DESCRIPTION, "Step network update algorithm (\"spacebar\")");
 
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(' '), this);

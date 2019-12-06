@@ -47,7 +47,7 @@ public final class ShowWorkspaceUpdaterDialog extends AbstractAction {
         if (desktop == null) {
             throw new IllegalArgumentException("desktop must not be null");
         }
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Sequence.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Sequence.png"));
         this.desktop = desktop;
     }
 

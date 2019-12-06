@@ -222,7 +222,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         }
 
         JButton saveImageButton = new JButton();
-        saveImageButton.setIcon(ResourceManager.getSmallIcon("Save.png"));
+        saveImageButton.setIcon(ResourceManager.getSmallIcon("menu_icons/Save.png"));
         saveImageButton.setToolTipText("Save Image");
         saveImageButton.addActionListener(e -> {
             saveImage();
@@ -230,7 +230,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         sourceToolbar.add(saveImageButton);
 
         JButton clearImageButton = new JButton();
-        clearImageButton.setIcon(ResourceManager.getSmallIcon("Eraser.png"));
+        clearImageButton.setIcon(ResourceManager.getSmallIcon("menu_icons/Eraser.png"));
         clearImageButton.setToolTipText("Clear Image");
         clearImageButton.addActionListener(evt -> world.clearImage());
         // sourceToolbar.add(clearImageButton); // Too destructive.  Don't include on toolbar
@@ -249,7 +249,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         });
 
         // Add Sensor Matrix
-        JButton addSensorMatrix = new JButton(ResourceManager.getImageIcon("plus.png"));
+        JButton addSensorMatrix = new JButton(ResourceManager.getImageIcon("menu_icons/plus.png"));
         addSensorMatrix.setToolTipText("Add Sensor Matrix");
         addSensorMatrix.addActionListener(evt -> {
             SensorMatrixDialog dialog = new SensorMatrixDialog(world);
@@ -259,7 +259,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         sensorToolbar.add(addSensorMatrix);
 
         // Delete sensor matrix
-        JButton deleteSensorMatrix = new JButton(ResourceManager.getImageIcon("minus.png"));
+        JButton deleteSensorMatrix = new JButton(ResourceManager.getImageIcon("menu_icons/minus.png"));
         deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");
         deleteSensorMatrix.addActionListener(evt -> {
             SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
@@ -268,7 +268,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         sensorToolbar.add(deleteSensorMatrix);
 
         // Editor Sensor Matrix
-        JButton editSensorMatrix = new JButton(ResourceManager.getImageIcon("Prefs.png"));
+        JButton editSensorMatrix = new JButton(ResourceManager.getImageIcon("menu_icons/Prefs.png"));
         editSensorMatrix.setToolTipText("Edit Sensor Matrix");
         editSensorMatrix.addActionListener(evt -> {
 
@@ -368,7 +368,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         List<JButton> returnList = new LinkedList<>();
 
         previousImagesButton = new JButton();
-        previousImagesButton.setIcon(ResourceManager.getSmallIcon("TangoIcons-GoPrevious.png"));
+        previousImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoPrevious.png"));
         previousImagesButton.setToolTipText("Previous Image");
         previousImagesButton.addActionListener(e -> {
             ((ImageAlbumWorld)world).previousFrame();
@@ -376,7 +376,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         returnList.add(previousImagesButton);
 
         nextImagesButton = new JButton();
-        nextImagesButton.setIcon(ResourceManager.getSmallIcon("TangoIcons-GoNext.png"));
+        nextImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoNext.png"));
         nextImagesButton.setToolTipText("Next Image");
         nextImagesButton.addActionListener(e -> {
             ((ImageAlbumWorld)world).nextFrame();
@@ -384,7 +384,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         returnList.add(nextImagesButton);
 
         JButton loadImagesButton = new JButton();
-        loadImagesButton.setIcon(ResourceManager.getSmallIcon("photo.png"));
+        loadImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/photo.png"));
         loadImagesButton.setToolTipText("Load Images");
         loadImagesButton.addActionListener(e -> {
             loadImages();
@@ -402,7 +402,7 @@ public class ImageWorldDesktopPanel extends JPanel {
     public List<JButton> getPixelDisplayToolbar() {
         List<JButton> returnList = new LinkedList<>();
         JButton editEmitterButton = new JButton();
-        editEmitterButton.setIcon(ResourceManager.getSmallIcon("resize.png"));
+        editEmitterButton.setIcon(ResourceManager.getSmallIcon("menu_icons/resize.png"));
         editEmitterButton.setToolTipText("Edit Emitter Matrix");
         editEmitterButton.addActionListener(evt -> {
             ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog((PixelDisplayWorld) world);

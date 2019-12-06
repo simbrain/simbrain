@@ -44,7 +44,7 @@ public final class CutAction extends ConditionallyEnabledAction {
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_X, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Cut.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Cut.png"));
         putValue(SHORT_DESCRIPTION, "Cut selected neurons, (connected) synapses, and neuron groups");
 
     }

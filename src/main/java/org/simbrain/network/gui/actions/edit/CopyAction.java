@@ -44,7 +44,7 @@ public final class CopyAction extends ConditionallyEnabledAction {
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_C, toolkit.getMenuShortcutKeyMask());
 
         putValue(ACCELERATOR_KEY, keyStroke);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Copy.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Copy.png"));
         putValue(SHORT_DESCRIPTION, "Copy selected neurons, (connected) synapses, and neuron groups");
 
     }

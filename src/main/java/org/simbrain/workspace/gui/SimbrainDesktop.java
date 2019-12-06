@@ -483,7 +483,7 @@ public class SimbrainDesktop {
 
         /* World menu button. */
         JButton button = new JButton();
-        button.setIcon(ResourceManager.getImageIcon("World.png"));
+        button.setIcon(ResourceManager.getImageIcon("menu_icons/World.png"));
         final JPopupMenu worldMenu = new JPopupMenu();
         for (Action action : actionManager.getNewWorldActions()) {
             worldMenu.add(action);
@@ -500,7 +500,7 @@ public class SimbrainDesktop {
 
         /* Chart menu button. */
         button = new JButton();
-        button.setIcon(ResourceManager.getImageIcon("BarChart.png"));
+        button.setIcon(ResourceManager.getImageIcon("menu_icons/BarChart.png"));
         final JPopupMenu gaugeMenu = new JPopupMenu();
         for (Action action : actionManager.getPlotActions()) {
             gaugeMenu.add(action);
@@ -529,7 +529,7 @@ public class SimbrainDesktop {
                 }
             }
         });
-        runningLabel.setIcon(ResourceManager.getImageIcon("Throbber.gif"));
+        runningLabel.setIcon(ResourceManager.getImageIcon("menu_icons/Throbber.gif"));
         runningLabel.setVisible(false);
         updateTimeLabel();
         bar.add(timeLabel);

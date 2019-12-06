@@ -1,11 +1,9 @@
 package org.simbrain.world.odorworld;
 
 import org.piccolo2d.PCanvas;
-import org.piccolo2d.nodes.PPath;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 

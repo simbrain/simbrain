@@ -49,7 +49,7 @@ public final class OpenAction extends AbstractAction {
             throw new IllegalArgumentException("component must not be null");
         }
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Open.png"));
 
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SHORT_DESCRIPTION, "Open a new component");

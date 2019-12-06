@@ -176,7 +176,7 @@ public class TestInputPanel extends DataPanel {
      */
     private Action advanceRowAction = new AbstractAction() {
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("plus.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/plus.png"));
             putValue(SHORT_DESCRIPTION, "Advance row");
         }
 
@@ -191,7 +191,7 @@ public class TestInputPanel extends DataPanel {
      */
     private Action testRowAction = new AbstractAction() {
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Step.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Step.png"));
             putValue(SHORT_DESCRIPTION, "Test row");
         }
 
@@ -226,7 +226,7 @@ public class TestInputPanel extends DataPanel {
      */
     private Action testTableAction = new AbstractAction() {
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Play.png"));
             putValue(SHORT_DESCRIPTION, "Test table");
         }
 

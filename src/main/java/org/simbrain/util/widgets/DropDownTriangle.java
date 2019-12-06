@@ -232,17 +232,17 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         /**
          * The image icon for the triangle in it's down pointing state.
          */
-        private ImageIcon downTriangle = ResourceManager.getImageIcon("DownTriangle.png");
+        private ImageIcon downTriangle = ResourceManager.getImageIcon("menu_icons/DownTriangle.png");
 
         /**
          * The image icon for the triangle in it's left pointing state.
          */
-        private ImageIcon leftTriangle = ResourceManager.getImageIcon("LeftTriangle.png");
+        private ImageIcon leftTriangle = ResourceManager.getImageIcon("menu_icons/LeftTriangle.png");
 
         /**
          * The image icon for the triangle in it's left pointing state.
          */
-        private ImageIcon rightTriangle = ResourceManager.getImageIcon("RightTriangle.png");
+        private ImageIcon rightTriangle = ResourceManager.getImageIcon("menu_icons/RightTriangle.png");
 
         /**
          * The image icon for the triangle in it's "up" pointing state

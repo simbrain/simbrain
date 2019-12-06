@@ -23,8 +23,8 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import javax.swing.*;
@@ -146,7 +146,7 @@ public class SensorEffectorPanel extends JPanel {
         JPanel buttonBar = new JPanel();
 
         // Add attribute
-        JButton addAttribute = new JButton("Add", ResourceManager.getImageIcon("plus.png"));
+        JButton addAttribute = new JButton("Add", ResourceManager.getImageIcon("menu_icons/plus.png"));
         addAttribute.setToolTipText("Add...");
         buttonBar.add(addAttribute);
         addAttribute.addActionListener(new ActionListener() {
@@ -168,7 +168,7 @@ public class SensorEffectorPanel extends JPanel {
         });
 
         // Delete attribute
-        JButton deleteAttribute = new JButton("Delete", ResourceManager.getImageIcon("minus.png"));
+        JButton deleteAttribute = new JButton("Delete", ResourceManager.getImageIcon("menu_icons/minus.png"));
         deleteAttribute.setToolTipText("Delete...");
         buttonBar.add(deleteAttribute);
         deleteAttribute.addActionListener(new ActionListener() {
@@ -192,7 +192,7 @@ public class SensorEffectorPanel extends JPanel {
         });
 
         // Edit attribute
-        JButton editAttribute = new JButton("Edit", ResourceManager.getImageIcon("Properties.png"));
+        JButton editAttribute = new JButton("Edit", ResourceManager.getImageIcon("menu_icons/Properties.png"));
         editAttribute.setToolTipText("Edit...");
         buttonBar.add(editAttribute);
         editAttribute.addActionListener(new ActionListener() {

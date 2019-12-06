@@ -71,7 +71,7 @@ public class SimbrainScriptEditor extends ScriptEditor {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
                 putValue(SHORT_DESCRIPTION, "Clear all");
                 putValue(Action.NAME, "Clear all");
             }
@@ -96,7 +96,7 @@ public class SimbrainScriptEditor extends ScriptEditor {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Play.png"));
                 putValue(SHORT_DESCRIPTION, "Run Script");
                 putValue(Action.NAME, "Run Script");
             }

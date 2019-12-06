@@ -50,7 +50,7 @@ public final class RunNetworkAction extends AbstractAction {
         }
         this.networkPanel = networkPanel;
         //        networkPanel.getNetwork().setUpdateLock(lock);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Play.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Play.png"));
         putValue(SHORT_DESCRIPTION, "Iterate network update algorithm");
     }
 

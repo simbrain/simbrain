@@ -54,37 +54,37 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
     /**
      * Open button.
      */
-    private JButton openBtn = new JButton(ResourceManager.getImageIcon("Open.png"));
+    private JButton openBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Open.png"));
 
     /**
      * Save button.
      */
-    private JButton saveBtn = new JButton(ResourceManager.getImageIcon("Save.png"));
+    private JButton saveBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Save.png"));
 
     /**
      * Iterate once.
      */
-    protected JButton iterateBtn = new JButton(ResourceManager.getImageIcon("Step.png"));
+    protected JButton iterateBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Step.png"));
 
     /**
      * Play button.
      */
-    private JButton playBtn = new JButton(ResourceManager.getImageIcon("Play.png"));
+    private JButton playBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Play.png"));
 
     /**
      * Preferences button.
      */
-    private JButton prefsBtn = new JButton(ResourceManager.getImageIcon("Prefs.gif"));
+    private JButton prefsBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Prefs.gif"));
 
     /**
      * Clear button.
      */
-    private JButton clearBtn = new JButton(ResourceManager.getImageIcon("Eraser.png"));
+    private JButton clearBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Eraser.png"));
 
     /**
      * Random button.
      */
-    private JButton randomBtn = new JButton(ResourceManager.getImageIcon("Rand.png"));
+    private JButton randomBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Rand.png"));
 
     /**
      * List of projector types.
@@ -139,7 +139,7 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
     /**
      * Warning label.
      */
-    private JLabel warningLabel = new JLabel(ResourceManager.getImageIcon("Warning.png"));
+    private JLabel warningLabel = new JLabel(ResourceManager.getImageIcon("menu_icons/Warning.png"));
 
     /**
      * Panel for showing Sammon step size and label, both with tooltip.
@@ -298,12 +298,12 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (getWorkspaceComponent().getProjectionModel().isRunning()) {
-                    playBtn.setIcon(ResourceManager.getImageIcon("Stop.png"));
+                    playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Stop.png"));
                     playBtn.setToolTipText("Stop iterating projection algorithm");
                     getWorkspaceComponent().getProjectionModel().setRunning(false);
                     Executors.newSingleThreadExecutor().execute(new ProjectionUpdater(getWorkspaceComponent()));
                 } else {
-                    playBtn.setIcon(ResourceManager.getImageIcon("Play.png"));
+                    playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Play.png"));
                     playBtn.setToolTipText("Start iterating projection algorithm");
                     getWorkspaceComponent().getProjectionModel().setRunning(true);
                 }

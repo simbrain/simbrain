@@ -3,7 +3,7 @@ package org.simbrain.util.piccolo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import org.simbrain.world.odorworld.resources.OdorWorldResourceManager;
+import org.simbrain.world.odorworld.OdorWorldResourceManager;
 
 import javax.annotation.Nullable;
 import java.awt.*;

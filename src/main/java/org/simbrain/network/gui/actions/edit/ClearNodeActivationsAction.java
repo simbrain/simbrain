@@ -44,7 +44,7 @@ public final class ClearNodeActivationsAction extends AbstractAction {
         super("Clear activations of all nodes");
         this.networkPanel = networkPanel;
 
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Eraser.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
         putValue(SHORT_DESCRIPTION,
                 "Clear all node activations (k)");
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(

@@ -2,7 +2,6 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.piccolo.TileMap;
-import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 

@@ -51,7 +51,7 @@ public final class ShowAdjustSynapsesDialog extends AbstractAction {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_R, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);

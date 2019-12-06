@@ -1,11 +1,8 @@
 package org.simbrain.world.odorworld;
 
-import org.simbrain.util.Pair;
-
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
-import java.util.List;
 
 public abstract class CollisionBound {
 

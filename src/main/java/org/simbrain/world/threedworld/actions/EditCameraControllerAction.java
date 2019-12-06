@@ -39,7 +39,7 @@ public final class EditCameraControllerAction extends AbstractAction {
     public EditCameraControllerAction(ThreeDWorld world) {
         super("Edit Camera Controller");
         this.world = world;
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Prefs.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
         putValue(SHORT_DESCRIPTION, "Edit Camera Controller");
     }
 

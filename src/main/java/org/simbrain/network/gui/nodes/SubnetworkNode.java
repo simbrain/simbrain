@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
-import org.piccolo2d.nodes.PPath;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
@@ -32,8 +31,6 @@ import org.simbrain.util.piccolo.Outline;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -332,7 +329,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
     protected Action removeAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("RedX_small.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/RedX_small.png"));
             putValue(NAME, "Remove Network...");
             putValue(SHORT_DESCRIPTION, "Remove this subnetwork...");
         }
@@ -365,7 +362,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
     private Action testInputAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("TestInput.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/TestInput.png"));
             putValue(NAME, "Test network...");
             putValue(SHORT_DESCRIPTION, "Test network...");
         }

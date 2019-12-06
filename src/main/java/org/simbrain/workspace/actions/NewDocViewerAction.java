@@ -37,7 +37,7 @@ public final class NewDocViewerAction extends WorkspaceAction {
      */
     public NewDocViewerAction(Workspace workspace) {
         super("New Doc Viewer", workspace);
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Copy.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Copy.png"));
         putValue(SHORT_DESCRIPTION, "New doc viewer");
     }
 

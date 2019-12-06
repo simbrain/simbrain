@@ -14,7 +14,7 @@ public class CameraHomeAction extends AbstractAction {
     public CameraHomeAction(ThreeDWorld world) {
         super("Camera Home");
         this.world = world;
-        putValue(SMALL_ICON, ResourceManager.getSmallIcon("home.png"));
+        putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/home.png"));
         putValue(SHORT_DESCRIPTION, "Move Camera Home");
     }
 

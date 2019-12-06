@@ -27,7 +27,7 @@ public class ImageAlbumWorld extends ImageWorld {
         showGridLines = false;
         imagePanel = new ImagePanel(showGridLines);
         imageSource = new ImageAlbumSource();
-        imageSource.loadImage(ResourceManager.getImageIcon("bobcat.jpg"));
+        imageSource.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
         initializeDefaultSensorMatrices();
     }
 

@@ -47,7 +47,7 @@ public final class ShowNetworkUpdaterDialog extends AbstractAction {
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Sequence.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Sequence.png"));
         putValue(SHORT_DESCRIPTION, "Edit the update sequence for this network");
 
         this.networkPanel = networkPanel;

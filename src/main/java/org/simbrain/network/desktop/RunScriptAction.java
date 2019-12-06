@@ -52,7 +52,7 @@ public final class RunScriptAction extends AbstractAction {
      */
     public RunScriptAction(NetworkPanel networkPanel) {
         super("Run Script...");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("Script.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Script.png"));
         putValue(SHORT_DESCRIPTION, "Open and apply a network .bsh script to this network");
         this.networkPanel = networkPanel;
     }

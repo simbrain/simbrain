@@ -85,7 +85,7 @@ public class LMSNetworkNode extends SubnetworkNode {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Trainer.png"));
             putValue(NAME, "Train iteratively...");
             putValue(SHORT_DESCRIPTION, "Train iteratively...");
         }
@@ -106,7 +106,7 @@ public class LMSNetworkNode extends SubnetworkNode {
 
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("Trainer.png"));
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Trainer.png"));
             putValue(NAME, "Train offline...");
             putValue(SHORT_DESCRIPTION, "Train offline...");
         }

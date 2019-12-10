@@ -27,27 +27,26 @@ import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.connections.QuickConnectionManager;
+import org.simbrain.network.core.*;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
-import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
-import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
-import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
-import org.simbrain.network.gui.nodes.MultiLayerNetworkNode;
-import org.simbrain.network.connections.QuickConnectionManager;
-import org.simbrain.network.core.*;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
+import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
+import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
+import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
+import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
@@ -79,11 +78,10 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Contains a piccolo PCanvas that maintains a visual representation of the network. Creation, deletion, and state
@@ -687,6 +685,11 @@ public class NetworkPanel extends JPanel {
         if (objectNodeMap.get(synapse) != null) {
             return;
         }
+
+        if (synapse.getParentGroup() != null) {
+            return;
+        }
+
         NeuronNode source = (NeuronNode) objectNodeMap.get(synapse.getSource());
         NeuronNode target = (NeuronNode) objectNodeMap.get(synapse.getTarget());
         if ((source == null) || (target == null)) {
@@ -850,110 +853,70 @@ public class NetworkPanel extends JPanel {
      * @param synapseGroup the synapse group to add
      */
     private void addSynapseGroup(final SynapseGroup synapseGroup) {
-        if (synapseGroup.isDisplaySynapses()) {
-            addSynapseGroupVisible(synapseGroup);
+//        if (synapseGroup.isDisplaySynapses()) {
+//            addSynapseGroupVisible(synapseGroup);
+//        } else {
+//            if (synapseGroup.getTargetNeuronGroup().equals(synapseGroup.getSourceNeuronGroup())) {
+//            } else {
+//
+//                // Test if there isn't already a synapse group going in
+//                // the opposite direction. The synapse groups which _originate_
+//                // from this synapse groups's target neuron group
+//                Set<SynapseGroup> targetGroupOutgoing = synapseGroup.getTargetNeuronGroup().getOutgoingSg();
+//                // The synapse groups which _terminate_ at this synapse group's
+//                // source neuron group
+//                Set<SynapseGroup> sourceGroupIncoming = synapseGroup.getSourceNeuronGroup().getIncomingSgs();
+//
+//                // If there exists a synapse group that _originates_ in this
+//                // synapse group's target neuron group and _terminates_ in this
+//                // synapse group's source neuron group, then .retainAll between
+//                // the two above sets will contain that group
+//                targetGroupOutgoing.retainAll(sourceGroupIncoming);
+//
+//                if (targetGroupOutgoing.size() != 0) { // There _is_ a synapse
+//                    // group going in the opposite direction between the same
+//                    // two neuron groups.
+//                    final SynapseGroup reverse = (SynapseGroup) targetGroupOutgoing.toArray()[0];
+//                    if (objectNodeMap.get(reverse) != null) {
+//                        removeGroup(reverse);
+//                        addSynapseGroupBidirectional(synapseGroup, reverse);
+//                    } else {
+//                        addSynapseGroupSimple(synapseGroup);
+//                    }
+//                    return;
+//                } else {
+//                    // Not recurrent, no synapse group going in the
+//                    // opposite direction, and is not displaying individual
+//                    // synapses...
+//                    // add group normally
+//                    addSynapseGroupSimple(synapseGroup);
+//                }
+//            }
+//        }
+
+        SynapseGroupNode synapseGroupNode;
+        if (objectNodeMap.containsKey(synapseGroup)) {
+            return;
         } else {
-            if (synapseGroup.getTargetNeuronGroup().equals(synapseGroup.getSourceNeuronGroup())) {
-                addSynapseGroupRecurrent(synapseGroup);
-            } else {
-
-                // Test if there isn't already a synapse group going in
-                // the opposite direction. The synapse groups which _originate_
-                // from this synapse groups's target neuron group
-                Set<SynapseGroup> targetGroupOutgoing = synapseGroup.getTargetNeuronGroup().getOutgoingSg();
-                // The synapse groups which _terminate_ at this synapse group's
-                // source neuron group
-                Set<SynapseGroup> sourceGroupIncoming = synapseGroup.getSourceNeuronGroup().getIncomingSgs();
-
-                // If there exists a synapse group that _originates_ in this
-                // synapse group's target neuron group and _terminates_ in this
-                // synapse group's source neuron group, then .retainAll between
-                // the two above sets will contain that group
-                targetGroupOutgoing.retainAll(sourceGroupIncoming);
-
-                if (targetGroupOutgoing.size() != 0) { // There _is_ a synapse
-                    // group going in the opposite direction between the same
-                    // two neuron groups.
-                    final SynapseGroup reverse = (SynapseGroup) targetGroupOutgoing.toArray()[0];
-                    if (objectNodeMap.get(reverse) != null) {
-                        removeGroup(reverse);
-                        addSynapseGroupBidirectional(synapseGroup, reverse);
-                    } else {
-                        addSynapseGroupSimple(synapseGroup);
-                    }
-                    return;
-                } else {
-                    // Not recurrent, no synapse group going in the
-                    // opposite direction, and is not displaying individual
-                    // synapses...
-                    // add group normally
-                    addSynapseGroupSimple(synapseGroup);
-                }
-            }
-        }
-        SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap.get(synapseGroup);
-
-        // TODO: Clean up listeners if the synapsegroup is removed.
-        PNode srcNode = objectNodeMap.get(synapseGroup.getSourceNeuronGroup());
-        // System.out.println("Source" + srcNode);
-        if (srcNode != null) {
-            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synapseGroupNode);
-        }
-        PNode tarNode = objectNodeMap.get(synapseGroup.getTargetNeuronGroup());
-        // System.out.println("Target" + tarNode);
-        if (tarNode != null) {
-            tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synapseGroupNode);
+            synapseGroupNode = new SynapseGroupNode(this, synapseGroup);
+            canvas.getLayer().addChild(synapseGroupNode);
+            objectNodeMap.put(synapseGroup, synapseGroupNode);
         }
 
-    }
+//        SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap.get(synapseGroup);
+//
+//        // TODO: Clean up listeners if the synapsegroup is removed.
+//        PNode srcNode = objectNodeMap.get(synapseGroup.getSourceNeuronGroup());
+//        // System.out.println("Source" + srcNode);
+//        if (srcNode != null) {
+//            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synapseGroupNode);
+//        }
+//        PNode tarNode = objectNodeMap.get(synapseGroup.getTargetNeuronGroup());
+//        // System.out.println("Target" + tarNode);
+//        if (tarNode != null) {
+//            tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synapseGroupNode);
+//        }
 
-    /**
-     * Add a synapse group representation for case where all constituent synapses are visible.
-     *
-     * @param synapseGroup the model synapse group being represented
-     */
-    private void addSynapseGroupVisible(SynapseGroup synapseGroup) {
-
-        List<Synapse> allSynapse = Stream.concat(synapseGroup.getExcitatorySynapses().stream(),
-                synapseGroup.getInhibitorySynapses().stream()).collect(Collectors.toList());
-
-        allSynapse.forEach(this::addSynapse);
-
-        // Add synapse nodes to group node
-        SynapseGroupNodeVisible synapseGroupNode = new SynapseGroupNodeVisible(this, synapseGroup);
-        canvas.getLayer().addChild(synapseGroupNode);
-        objectNodeMap.put(synapseGroup, synapseGroupNode);
-
-        // Make this a child node of parent, if any
-        if (synapseGroup.hasParentGroup()) {
-            SubnetworkNode parentNode = (SubnetworkNode) objectNodeMap.get(synapseGroup.getParentGroup());
-            if (parentNode != null) {
-                parentNode.addNode(synapseGroupNode);
-            }
-        }
-
-        synapseGroupNode.getInteractionBox().raiseToTop();
-        synapseGroupNode.raiseToTop();
-    }
-
-    /**
-     * Add a "simple" synapse group representation, in which the constituent synapses are not visible, and are
-     * non-recurrent.
-     *
-     * @param synapseGroup the model synapse group being represented
-     */
-    private void addSynapseGroupSimple(SynapseGroup synapseGroup) {
-        // System.out.println("Add invisible synapse group");
-        SynapseGroupNodeSimple synapseGroupNode = new SynapseGroupNodeSimple(this, synapseGroup);
-        canvas.getLayer().addChild(synapseGroupNode);
-        objectNodeMap.put(synapseGroup, synapseGroupNode);
-        // Make this a child node of parent, if any
-        if (synapseGroup.hasParentGroup()) {
-            SubnetworkNode parentNode = (SubnetworkNode) objectNodeMap.get(synapseGroup.getParentGroup());
-            if (parentNode != null) {
-                parentNode.addNode(synapseGroupNode);
-            }
-        }
     }
 
     /**
@@ -980,28 +943,6 @@ public class NetworkPanel extends JPanel {
 
         // Bidirectional groups do not currently exist in any subnetworks
         // so the "parent check" is not done
-    }
-
-    /**
-     * Add a recurrent synapse group representation to the canvas
-     *
-     * @param sg the recurrent synapse group
-     */
-    private void addSynapseGroupRecurrent(SynapseGroup sg) {
-        SynapseGroupNodeRecurrent synGNR = SynapseGroupNodeRecurrent.createRecurrentSynapseGN(this, sg);
-        objectNodeMap.put(sg, synGNR);
-        canvas.getLayer().addChild(synGNR);
-        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap.get(sg.getSourceNeuronGroup());
-        if (srcNode != null) {
-            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synGNR);
-        }
-        // Make this a child node of parent, if any
-        if (sg.hasParentGroup()) {
-            SubnetworkNode parentNode = (SubnetworkNode) objectNodeMap.get(sg.getParentGroup());
-            if (parentNode != null) {
-                parentNode.addNode(synGNR);
-            }
-        }
     }
 
     /**
@@ -1106,25 +1047,6 @@ public class NetworkPanel extends JPanel {
             }
         }
         repaint();
-    }
-
-    /**
-     * Toggle the visibility of synapses in a synapsegroup. Based the status of the displaySynpases flag in the model
-     * synapseGroup, either a visible or invisible synapse group node is created and added to the canvas.
-     *
-     * @param synapseGroup the synapse group whose visibility should be toggled.
-     */
-    public void toggleSynapseVisibility(SynapseGroup synapseGroup) {
-
-        // Remove existing synapsegroup nodes and synapsenodes
-        removeGroup(synapseGroup);
-        removeSynapseGroupNodes(synapseGroup);
-
-        addSynapseGroup(synapseGroup);
-
-        // System.out.println("Number of pnodes:"
-        // + this.getCanvas().getLayer().getChildrenCount());
-        // `System.out.println("Size of objectNodeMap:" + objectNodeMap.size());
     }
 
     /**

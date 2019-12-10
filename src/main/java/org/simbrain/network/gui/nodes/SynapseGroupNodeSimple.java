@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.piccolo2d.PNode;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -38,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseGroupArrow {
+public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, SynapseGroupNode.Arrow {
 
     private static final float DEFAULT_ARROW_THICKNESS = 30;
 
@@ -62,23 +63,26 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
 
     private final NeuronGroup target;
 
+    private final NetworkPanel networkPanel;
+
     // private final PPath.Float dbLine;
 
     private final AtomicBoolean halt = new AtomicBoolean();
 
     private final SynapseGroup group;
 
+    private final SynapseGroupNode synapseGroupNode;
+
     private final double[] srcZoneBoundaries = new double[4];
 
     /**
      * Create a Synapse Group PNode.
-     *
-     * @param networkPanel parent panel
-     * @param group        the synapse group
      */
-    public SynapseGroupNodeSimple(final NetworkPanel networkPanel, final SynapseGroup group) {
-        super(networkPanel, group);
-        this.group = group;
+    public SynapseGroupNodeSimple(final NetworkPanel networkPanel, final SynapseGroupNode node) {
+        this.networkPanel = networkPanel;
+        this.group = node.getSynapseGroup();
+        this.synapseGroupNode = node;
+
         // this.dbLine = new PPath.Float(new BasicStroke(5,
         // BasicStroke.CAP_ROUND,
         // BasicStroke.JOIN_MITER));
@@ -98,9 +102,10 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
         // this.addChild(dbLine);
     }
 
-    public SynapseGroupNodeSimple(final NetworkPanel networkPanel, final SynapseGroup group, final float thickness) {
-        super(networkPanel, group);
-        this.group = group;
+    public SynapseGroupNodeSimple(final NetworkPanel networkPanel, final SynapseGroupNode node, final float thickness) {
+        this.networkPanel = networkPanel;
+        this.group = node.getSynapseGroup();
+        this.synapseGroupNode = node;
         source = group.getSourceNeuronGroup();
         target = group.getTargetNeuronGroup();
         sourceNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap().get(group.getSourceNeuronGroup());
@@ -176,8 +181,8 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
         // dbLine.reset();
         // dbLine.append(dbL, false);
 
-        interactionBox.centerFullBoundsOnPoint(middle.getX(), middle.getY());
-        interactionBox.raiseToTop();
+        synapseGroupNode.interactionBox.centerFullBoundsOnPoint(middle.getX(), middle.getY());
+        synapseGroupNode.interactionBox.raiseToTop();
 
     }
 
@@ -212,9 +217,6 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
      * Includes start and end of arrow.
      */
     public void determineProperEndPoints() {
-        if (networkPanel.isRunning()) {
-            return;
-        }
         float centerXSrc = (float) source.getCenterX();
         float centerYSrc = (float) source.getCenterY();
         float centerXTar = (float) target.getCenterX();
@@ -403,6 +405,11 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
         return new Point2D.Float(x, y);
     }
 
+    @Override
+    public SynapseGroup getSynapseGroup() {
+        return group;
+    }
+
     public SynapseGroup getGroup() {
         return group;
     }
@@ -428,4 +435,7 @@ public class SynapseGroupNodeSimple extends SynapseGroupNode implements SynapseG
         return arrow.getStrokeWidth() * 2;
     }
 
+    public NetworkPanel getNetworkPanel() {
+        return networkPanel;
+    }
 }

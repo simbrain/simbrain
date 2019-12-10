@@ -91,7 +91,7 @@ public interface SynapseGroupArrow {
     /**
      * @return the synapse group underlying this arrow.
      */
-    SynapseGroup getGroup();
+    SynapseGroup getSynapseGroup();
 
     /**
      * @return the start point for the arrow

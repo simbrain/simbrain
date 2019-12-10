@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.groups.SynapseGroup;
+import org.piccolo2d.PNode;
 import org.simbrain.network.gui.NetworkPanel;
 
 /**
@@ -27,16 +27,27 @@ import org.simbrain.network.gui.NetworkPanel;
  *
  * @author jyoshimi
  */
-public class SynapseGroupNodeVisible extends SynapseGroupNode {
+public class SynapseGroupNodeVisible extends PNode implements SynapseGroupNode.Arrow {
+
+    private SynapseGroupNode parent;
 
     /**
      * Create a Synapse Group PNode.
-     *
-     * @param networkPanel parent panel
-     * @param group        the synapse group
      */
-    public SynapseGroupNodeVisible(final NetworkPanel networkPanel, final SynapseGroup group) {
-        super(networkPanel, group);
+    public SynapseGroupNodeVisible(final NetworkPanel networkPanel, final SynapseGroupNode parent) {
+        this.parent = parent;
+
+
+        parent.getSynapseGroup().getAllSynapses().forEach( s -> {
+            NeuronNode sourceNode = (NeuronNode) networkPanel.getObjectNodeMap().get(s.getSource());
+            NeuronNode targetNode = (NeuronNode) networkPanel.getObjectNodeMap().get(s.getTarget());
+            if (sourceNode != null && targetNode != null) {
+                SynapseNode synapseNode = new SynapseNode(networkPanel, sourceNode, targetNode, s);
+                addChild(synapseNode);
+                synapseNode.setPickable(false);
+            }
+        });
+        lowerToBottom();
     }
 
     /**
@@ -45,13 +56,13 @@ public class SynapseGroupNodeVisible extends SynapseGroupNode {
      */
     @Override
     public void layoutChildren() {
-        double srcX = synapseGroup.getSourceNeuronGroup().getCenterX();
-        double srcY = synapseGroup.getSourceNeuronGroup().getCenterY();
-        double tarX = synapseGroup.getTargetNeuronGroup().getCenterX();
-        double tarY = synapseGroup.getTargetNeuronGroup().getCenterY();
+        double srcX = parent.getSynapseGroup().getSourceNeuronGroup().getCenterX();
+        double srcY = parent.getSynapseGroup().getSourceNeuronGroup().getCenterY();
+        double tarX = parent.getSynapseGroup().getTargetNeuronGroup().getCenterX();
+        double tarY = parent.getSynapseGroup().getTargetNeuronGroup().getCenterY();
         double x = (srcX + tarX) / 2;
         double y = (srcY + tarY) / 2;
-        interactionBox.centerFullBoundsOnPoint(x, y);
+        parent.interactionBox.centerFullBoundsOnPoint(x, y);
     }
 
 }

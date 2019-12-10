@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -573,7 +572,7 @@ public class SynapseGroupNodeBidirectional extends ScreenElement implements Prop
     }
 
     @Override
-    public SynapseGroup getGroup() {
+    public SynapseGroup getSynapseGroup() {
         return synGroup1;
     }
 

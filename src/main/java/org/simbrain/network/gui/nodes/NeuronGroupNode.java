@@ -579,7 +579,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             if (!samePoint) {
 
                 dockingPorts.get(port).put(synGN, tempMap.get(synGN));
-                if (neuronGroup.equals(synGN.getGroup().getSourceNeuronGroup())) {
+                if (neuronGroup.equals(synGN.getSynapseGroup().getSourceNeuronGroup())) {
                     synGN.layoutChildrenQuiet(dockingPorts.get(port).get(synGN), null);
                 } else {
                     synGN.layoutChildrenQuiet(null, dockingPorts.get(port).get(synGN));
@@ -807,7 +807,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      * @return
      */
     public Point2D getTerminus(SynapseGroupArrow synGN) {
-        if (neuronGroup.equals(synGN.getGroup().getSourceNeuronGroup())) {
+        if (neuronGroup.equals(synGN.getSynapseGroup().getSourceNeuronGroup())) {
             if (synGN.getEndPt() != null) {
                 return synGN.getEndPt();
             } else {

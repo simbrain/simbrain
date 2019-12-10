@@ -1732,6 +1732,9 @@ public class NetworkPanel extends JPanel {
      */
     public void addWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
         WeightMatrix matrix = network.addWeightMatrix(source, target);
+        if (matrix == null) {
+            return;
+        }
         if (objectNodeMap.get(matrix) != null) {
             return;
         }
@@ -1788,12 +1791,6 @@ public class NetworkPanel extends JPanel {
         List<ArrayConnectable> targets = getSelectedModels(ArrayConnectable.class);
         for (ArrayConnectable source : sources) {
             for (ArrayConnectable target : targets) {
-
-                // If connection does not involve any ND4J component, don't use weight matrix
-                if ((source instanceof NeuronCollection || source instanceof NeuronGroup)
-                && (target instanceof NeuronCollection || target instanceof NeuronGroup)) {
-                    continue;
-                }
                 addWeightMatrix(source, target);
             }
         }

@@ -22,7 +22,8 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Superclass for all neuron collection and neuron group.
+ * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
+ * neuron update rules and track synapse polarity).
  */
 public abstract class AbstractNeuronCollection extends Group implements AttributeContainer, ArrayConnectable, LocatableModel {
 
@@ -38,36 +39,22 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
      */
     private double[] activations;
 
+    /**
+     * A single outgoing weight matrix is possible, to a neuron collection, group, or array.
+     */
     private WeightMatrix incomingWeightMatrix;
 
+    /**
+     * A neuron collection or group may connect to multiple neuron arrays via weight matrices.
+     */
     private List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
 
+    /**
+     * Default constructor.
+     */
     public AbstractNeuronCollection(Network net) {
         super(net);
     }
-
-    /**
-     * Returns all the neurons in this group within a certain radius of the
-     * given neuron. This method will never return the given neuron as part
-     * of the list of neurons within the given radius, nor will it return
-     * neurons with the exact same position as the given neuron as a part
-     * of the returned list.
-     *
-     * @param n      the neurons
-     * @param radius the radius to search within.
-     * @return neurons in the group within a certain radius
-     */
-    public List<Neuron> getNeuronsInRadius(Neuron n, int radius) {
-        ArrayList<Neuron> ret = new ArrayList<Neuron>((int) (size() / 0.75f));
-        for (Neuron potN : neuronList) {
-            double dist = Network.getEuclideanDist(n, potN);
-            if (dist <= radius && dist != 0) {
-                ret.add(potN);
-            }
-        }
-        return ret;
-    }
-
 
     /**
      * Get the central x coordinate of this group, based on the positions of the neurons that comprise it.
@@ -191,15 +178,26 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         changeSupport.firePropertyChange("moved", null, null);
     }
 
-    public Neuron getNeuron(int neuNo) {
-        return neuronList.get(neuNo);
+    /**
+     * Returns an neuron using a provided index
+     *
+     * @param i index of the neuron in the neuron list
+     */
+    public Neuron getNeuron(int i) {
+        return neuronList.get(i);
     }
 
+    /**
+     * Add a neuron to the collection.
+     */
     public void addNeuron(Neuron neuron) {
         neuronList.add(neuron);
         addListener(neuron);
     }
 
+    /**
+     * Add a collection of neurons.
+     */
     public void addNeurons(Collection<Neuron> neurons) {
         neuronList.addAll(neurons);
         neurons.forEach(this::addListener);
@@ -217,10 +215,18 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
 
     }
 
+    /**
+     * Remove a neuron
+     *
+     * @param neuron the neuron to remove
+     */
     public void removeNeuron(Neuron neuron) {
         neuronList.remove(neuron);
     }
 
+    /**
+     * Remove all neurons.
+     */
     public void removeAllNeurons() {
         neuronList.clear();
     }
@@ -395,7 +401,6 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
             floatActivation[i] = (float) getActivations()[i];
         }
         return Nd4j.create(new int[]{floatActivation.length}, floatActivation);
-
     }
 
     @Override
@@ -724,4 +729,29 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     public double getMaxY() {
         return SimnetUtils.getMaxY(neuronList);
     }
+
+
+    /**
+     * Returns all the neurons in this group within a certain radius of the
+     * given neuron. This method will never return the given neuron as part
+     * of the list of neurons within the given radius, nor will it return
+     * neurons with the exact same position as the given neuron as a part
+     * of the returned list.
+     *
+     * @param n      the neurons
+     * @param radius the radius to search within.
+     * @return neurons in the group within a certain radius
+     */
+    public List<Neuron> getNeuronsInRadius(Neuron n, int radius) {
+        ArrayList<Neuron> ret = new ArrayList<Neuron>((int) (size() / 0.75f));
+        for (Neuron potN : neuronList) {
+            double dist = Network.getEuclideanDist(n, potN);
+            if (dist <= radius && dist != 0) {
+                ret.add(potN);
+            }
+        }
+        return ret;
+    }
+
+
 }

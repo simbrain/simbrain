@@ -23,9 +23,13 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.ResourceManager;
+import org.simbrain.util.SimpleFrame;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.NumericMatrix;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
@@ -116,7 +120,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
      *
      * @return the default context menu
      */
-    public JPopupMenu getDefaultContextMenu() {
+    public JPopupMenu getNCContexMenu() {
 
         JPopupMenu menu = new JPopupMenu();
 
@@ -158,6 +162,30 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
             }
         };
         menu.add(selectOutgoingNodes);
+
+        // Test Input Panel
+        menu.addSeparator();
+        Action testInputs = new AbstractAction("Input Data") {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                // Input panel
+                NumericMatrix matrix = new NumericMatrix() {
+
+                    @Override
+                    public void setData(double[][] data) {
+                        neuronCollection.getInputManager().setData(data);
+                    }
+
+                    @Override
+                    public double[][] getData() {
+                        return neuronCollection.getInputManager().getData();
+                    }
+                };
+                JPanel inputDataPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(), neuronCollection.getNeuronList(), matrix);
+                SimpleFrame.displayPanel(inputDataPanel);
+            }
+        };
+        menu.add(testInputs);
 
         // Clamping actions
         menu.addSeparator();
@@ -232,7 +260,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         @Override
         protected JPopupMenu getContextMenu() {
-            return getDefaultContextMenu();
+            return getNCContexMenu();
         }
 
         @Override

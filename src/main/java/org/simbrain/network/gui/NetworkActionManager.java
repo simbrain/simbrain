@@ -141,7 +141,7 @@ public final class NetworkActionManager {
     /**
      * Align vertical action.
      */
-    private final Action alignVerticalAction;
+    private final AlignVerticalAction alignVerticalAction;
 
     /**
      * Align horizontal action.
@@ -383,81 +383,41 @@ public final class NetworkActionManager {
         showUpdaterDialog = new ShowNetworkUpdaterDialog(networkPanel);
         testInputAction = new TestInputAction(networkPanel);
         addSynapseGroupAction = new AddSynapseGroupAction(networkPanel);
+
     }
 
-    /**
-     * Return the text edit mode action.
-     *
-     * @return the text edit mode action
-     */
     public Action getTextEditModeAction() {
         return textEditModeAction;
     }
 
-    /**
-     * Return the wand edit mode action.
-     *
-     * @return the wand edit mode action
-     */
     public Action getWandEditModeAction() {
         return wandEditModeAction;
     }
 
-    /**
-     * Return a list of network mode actions.
-     *
-     * @return a list of network mode actions
-     */
     public List<Action> getNetworkModeActions() {
         return Arrays.asList(new Action[] {selectionEditModeAction, textEditModeAction, wandEditModeAction});
     }
 
-    /**
-     * Return a list of network control actions.
-     *
-     * @return a list of network control actions
-     */
     public List<Action> getNetworkControlActions() {
         return Arrays.asList(new Action[] {runNetworkAction, stopNetworkAction});
     }
 
-    /**
-     * Return clipboard actions.
-     *
-     * @return a list of clipboard actions
-     */
     public List<Action> getClipboardActions() {
         return Arrays.asList(new Action[] {copyAction, cutAction, pasteAction});
     }
 
-    /**
-     * Return a list of network editing actions.
-     *
-     * @return a list of network editing actions
-     */
     public List<Action> getNetworkEditingActions() {
         return Arrays.asList(new Action[] {newNeuronAction, deleteAction});
     }
 
-    /**
-     * Returns action to create neuron collections
-     */
     public JMenuItem getNeuronCollectionAction() {
         return new JMenuItem(neuronCollectionAction);
     }
 
-    /**
-     * @return connection actions
-     */
     public List<Action> getConnectionActions() {
         return Arrays.asList(new Action[] {allToAll, oneToOne, radial, radialSimple, sparse});
     }
 
-    /**
-     * Returns a menu for setting neuron connections.
-     *
-     * @return the connection menu
-     */
     public JMenu getConnectionMenu() {
         // Connection menu
         JMenu connectionsMenu = new JMenu("Connect Neurons");
@@ -467,25 +427,14 @@ public final class NetworkActionManager {
         return connectionsMenu;
     }
 
-    /**
-     * @return a list of new networks that can be inserted
-     */
     public List<Action> getNewNetworkActions() {
         return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, BackpropCreationDialog.class, "Backprop"), new AddGroupAction(networkPanel, CompetitiveNetworkCreationDialog.class, "Competitive Network"), new AddGroupAction(networkPanel, FeedForwardCreationDialog.class, "Feed Forward Network"), new AddGroupAction(networkPanel, HopfieldCreationDialog.class, "Hopfield"), new AddGroupAction(networkPanel, LMSCreationDialog.class, "LMS (Least Mean Squares)"), new AddGroupAction(networkPanel, SOMNetworkCreationDialog.class, "SOM Network"), new AddGroupAction(networkPanel, SRNCreationDialog.class, "SRN (Simple Recurrent Network)")});
     }
 
-    /**
-     * @return a list of the new neuron groups that can be inserted
-     */
     public List<Action> getNewGroupActions() {
         return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, NeuronGroupDialog.class, "(Bare) Neuron Group"), new AddGroupAction(networkPanel, CompetitiveGroupCreationDialog.class, "Competitive (Group only)"), new AddGroupAction(networkPanel, SOMGroupCreationDialog.class, "SOM (Group only)"), new AddGroupAction(networkPanel, WTACreationDialog.class, "WTA (Winner take all)")});
     }
 
-    /**
-     * Return a JMenu for creating new networks.
-     *
-     * @return the new JMenu.
-     */
     public JMenu getNewNetworkMenu() {
         JMenu ret = new JMenu("Insert Network");
         for (Action action : getNewNetworkActions()) {
@@ -494,11 +443,6 @@ public final class NetworkActionManager {
         return ret;
     }
 
-    /**
-     * Return a JMenu for creating new neuron groups.
-     *
-     * @return the new JMenu.
-     */
     public JMenu getNewGroupMenu() {
         JMenu ret = new JMenu("Insert Neuron Group");
         for (Action action : getNewGroupActions()) {
@@ -507,360 +451,181 @@ public final class NetworkActionManager {
         return ret;
     }
 
-    /**
-     * Return the new neuron action.
-     *
-     * @return the new neuron action
-     */
     public Action getNewNeuronAction() {
         return newNeuronAction;
     }
 
-    /**
-     * Return the clear neurons action.
-     *
-     * @return the clear neurons action
-     */
     public Action getClearNodesAction() {
         return clearNodesAction;
     }
 
-    /**
-     * Return the randomize objects action.
-     *
-     * @return the randomize objects action
-     */
     public Action getRandomizeObjectsAction() {
         return randomizeObjectsAction;
     }
 
-    /**
-     * Return the select all action.
-     *
-     * @return the select all action
-     */
     public Action getSelectAllAction() {
         return selectAllAction;
     }
 
-    /**
-     * Return the iterate network action.
-     *
-     * @return the iterate network action
-     */
     public Action getIterateNetworkAction() {
         return iterateNetworkAction;
     }
 
-    /**
-     * @return Returns the showDebugAction.
-     */
     public Action getShowDebugAction() {
         return showDebugAction;
     }
 
-    /**
-     * Return the run network action.
-     *
-     * @return the run network action
-     */
     public Action getRunNetworkAction() {
         return runNetworkAction;
     }
 
-    /**
-     * Return the stop network action.
-     *
-     * @return the stop network action
-     */
     public Action getStopNetworkAction() {
         return stopNetworkAction;
     }
 
-    /**
-     * Return the show network preferences action.
-     *
-     * @return the network preferences action
-     */
     public Action getShowNetworkPreferencesAction() {
         return showNetworkPreferencesAction;
     }
 
-    /**
-     * Return the clear action.
-     *
-     * @return the clear action
-     */
     public Action getDeleteAction() {
         return deleteAction;
     }
 
-    /**
-     * Return the copy action.
-     *
-     * @return the copy action
-     */
     public Action getCopyAction() {
         return copyAction;
     }
 
-    /**
-     * Return the cut action.
-     *
-     * @return the cut action
-     */
     public Action getCutAction() {
         return cutAction;
     }
 
-    /**
-     * Return the paste action.
-     *
-     * @return the paste action
-     */
     public Action getPasteAction() {
         return pasteAction;
     }
 
-    /**
-     * Return the align horizontal action.
-     *
-     * @return the align horizontal action
-     */
     public Action getAlignHorizontalAction() {
         return alignHorizontalAction;
     }
 
-    /**
-     * Return the align vertical action.
-     *
-     * @return the align vertical action
-     */
     public Action getAlignVerticalAction() {
         return alignVerticalAction;
     }
 
-    /**
-     * Return the space horizontal action.
-     *
-     * @return the space horizontal action
-     */
     public Action getSpaceHorizontalAction() {
         return spaceHorizontalAction;
     }
 
-    /**
-     * Return the space vertical action.
-     *
-     * @return the space vertical action
-     */
     public Action getSpaceVerticalAction() {
         return spaceVerticalAction;
     }
 
-    /**
-     * Return the set auto zoom check box menu item.
-     *
-     * @return the set auto zoom check box menu item
-     */
     public JToggleButton getSetAutoZoomToggleButton() {
         return setAutoZoomAction;
     }
 
-    /**
-     * Return the neuron properties action.
-     *
-     * @return the neuron properties action
-     */
     public Action getSetNeuronPropertiesAction() {
         return setNeuronPropertiesAction;
     }
 
-    /**
-     * Return the synapse properties action.
-     *
-     * @return the synapse properties action
-     */
     public Action getSetSynapsePropertiesAction() {
         return setSynapsePropertiesAction;
     }
 
-    /**
-     * Return the select all neurons action.
-     *
-     * @return the select all neurons action
-     */
     public Action getSelectAllNeuronsAction() {
         return selectAllNeuronsAction;
     }
 
-    /**
-     * Return the select all weights action.
-     *
-     * @return the select all weights action.
-     */
     public Action getSelectAllWeightsAction() {
         return selectAllWeightsAction;
     }
 
-    /**
-     * Return the show edit tool bar menu item.
-     *
-     * @return the show edit tool bar menu item
-     */
     public JCheckBoxMenuItem getShowEditToolBarMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showEditToolBarAction);
         actionWrapper.setSelected(networkPanel.getEditToolBar().isVisible());
         return actionWrapper;
     }
 
-    /**
-     * Return the show main tool bar menu item.
-     *
-     * @return the show main tool bar menu item
-     */
     public JCheckBoxMenuItem getShowMainToolBarMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showMainToolBarAction);
         actionWrapper.setSelected(networkPanel.getMainToolBar().isVisible());
         return actionWrapper;
     }
 
-    /**
-     * Return the run clamp tool bar menu item.
-     *
-     * @return the run clamp tool bar menu item
-     */
     public JCheckBoxMenuItem getShowRunToolBarMenuItem() {
         JCheckBoxMenuItem actionWrapper = new JCheckBoxMenuItem(showRunToolBarAction);
         actionWrapper.setSelected(networkPanel.getRunToolBar().isVisible());
         return actionWrapper;
     }
 
-    /**
-     * Return the set source neurons action.
-     *
-     * @return set source neurons action
-     */
     public Action getSetSourceNeuronsAction() {
         return setSourceNeuronsAction;
     }
 
-    /**
-     * @return the clearSourceNeuronsAction
-     */
     public Action getClearSourceNeuronsAction() {
         return clearSourceNeuronsAction;
     }
 
-    /**
-     * @return the showNodesAction
-     */
     public JCheckBoxMenuItem getShowWeightsAction() {
         showWeightsAction.setSelected(networkPanel.getWeightsVisible());
         return showWeightsAction;
     }
 
-    /**
-     * @return the selectIncomingWeightsAction
-     */
     public Action getSelectIncomingWeightsAction() {
         return selectIncomingWeightsAction;
     }
 
-    /**
-     * @return the selectOutgoingWeightsAction
-     */
     public Action getSelectOutgoingWeightsAction() {
         return selectOutgoingWeightsAction;
     }
 
-    /**
-     * @return the setTextPropertiesAction.
-     */
     public Action getSetTextPropertiesAction() {
         return setTextPropertiesAction;
     }
 
-    /**
-     * @return the ungroupAction
-     */
     public Action getUngroupAction() {
         return ungroupAction;
     }
 
-    /**
-     * @return the groupAction
-     */
     public Action getGroupAction() {
         return groupAction;
     }
 
-    /**
-     * @return the showPrioritiesAction
-     */
     public JCheckBoxMenuItem getShowPrioritiesAction() {
         return showPrioritiesAction;
     }
 
-    /**
-     * @return the show weight matrix action
-     */
     public Action getShowWeightMatrixAction() {
         return showWeightMatrixAction;
     }
 
-    /**
-     * @return the show weight matrix action
-     */
     public Action getShowTrainerAction() {
         return showTrainerAction;
     }
 
-    /**
-     * @return the selectionEditModeAction
-     */
     public Action getSelectionEditModeAction() {
         return selectionEditModeAction;
     }
 
-    /**
-     * @return the showAdjustSynapsesDialog
-     */
     public Action getShowAdjustSynapsesDialog() {
         return showAdjustSynapsesDialog;
     }
 
-    /**
-     * @return the showUpdaterDialog
-     */
     public Action getShowUpdaterDialog() {
         return showUpdaterDialog;
     }
 
-    /**
-     * @return the showAdjustConnectivityDialog
-     */
     public Action getShowAdjustConnectivityDialog() {
         return showAdjustConnectivityDialog;
     }
 
-    /**
-     * @return the testInputAction
-     */
     public Action getTestInputAction() {
         return testInputAction;
     }
 
-    /**
-     * @return the addSynapseGroupAction
-     */
     public Action getAddSynapseGroupAction() {
         return addSynapseGroupAction;
     }
 
-    /**
-     * @return the zoomToFitPageAction
-     */
     public Action getZoomToFitPageAction() {
         return zoomToFitPageAction;
     }

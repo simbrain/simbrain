@@ -208,7 +208,6 @@ public final class NeuronGroupDialog extends StandardDialog {
         // Set up help button
         Action helpAction = new ShowHelpAction("Pages/Network/groups/NeuronGroup.html");
         if (specificNeuronGroupPanel != null) {
-            System.out.println("here");
             helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel).getHelpPath());
         }
         addButton(new JButton(helpAction));

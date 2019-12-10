@@ -292,7 +292,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
         invocationThread = Thread.currentThread();
         // Update input neurons accordingly
         for (int i = 0, n = inputGroups.size(); i < n; i++) {
-            inputGroups.get(i).readNextInputs();
+            inputGroups.get(i).updateInputs();
         }
         try {
             synchronized (taskSet) {

@@ -33,7 +33,6 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
-import org.simbrain.world.odorworld.entities.EntityType;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -73,13 +72,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     @UserParameter(label = "Group Update Rule", useSetter = true, order = 20)
     private UpdateRuleEnum groupUpdateRule;
 
-    /**
-     * Used when reading inputs from an input file, so it knows how to parse
-     * the file. Normally we have a csv whose rows are activation vectors. Here
-     * we have a set of spike times and neuron indices as tuples. See
-     * {@link #readNextInputUnsafe}.
-     */
-    private boolean isSpikingNeuronGroup = false;
 
     /**
      * Default layout for neuron groups.
@@ -114,11 +106,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     private int betweenNeuronInterval = 50;
 
     /**
-     * Data (input vectors) for testing the network.
-     */
-    private double[][] testData;
-
-    /**
      * Whether or not {@link #writeActsToFile()} will write activations as a
      * state matrix or a spike train.
      */
@@ -133,21 +120,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * Whether or not this group is in a state that allows recording.
      */
     private boolean recording;
-
-    /**
-     * Whether or not this neuron group is in input mode. If the group is in
-     * input mode then its update involves either injecting activation or
-     * directly setting the activation of the neurons in the group based on
-     * the values in test data, ignoring all other inputs.
-     */
-    @UserParameter(label = "Input mode", order = 40)
-    private boolean inputMode = false;
-
-    /**
-     * The index in test data the neuron group is currently on if
-     * {@link #inputMode} is true.
-     */
-    private int inputIndex = 0;
 
     /**
      * A counter to keep track of how many times {@link #writeActsToFile()} has
@@ -318,13 +290,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Override
     public void update() {
-        if (inputMode) {
-            if (testData == null) {
-                throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
-            }
-            // Surrounded by checks, so actually safe.
-            readNextInputUnsafe();
-        } else {
+        super.update();
+        if (!inputMode) {
             Network.updateNeurons(getNeuronList());
         }
         if (isRecording()) {
@@ -333,50 +300,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         fireLabelUpdated();
     }
 
-    /**
-     * A forwarding method surrounding {@link #readNextInputUnsafe()} in the
-     * appropriate checks to make it safe. This allows outside classes to
-     * force the neuron group to read in and set activations according to
-     * the value(s) in its input table.
-     */
-    public void readNextInputs() {
-        if (inputMode) {
-            if (testData == null) {
-                throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
-            }
-            // Surrounded by checks, so actually safe.
-            readNextInputUnsafe();
-        } else {
-            throw new IllegalStateException("Neuron Group " + getLabel() + " is not in input mode.");
-        }
-    }
-
-    /**
-     * If this neuron group has an input table reads in the next entry on the
-     * table. If all inputs have been read this method resets the counter and
-     * starts again from the beginning of the table.
-     * <p>
-     * For spiking neuron update rules, values read in are treated as current
-     * being injected into the cell, for non-spiking neurons activations are
-     * set immediately to the value at that index in the table.
-     * <p>
-     * This method is unsafe because it does not check if the group is in
-     * input mode or if the input table is non-null.
-     */
-    private void readNextInputUnsafe() {
-        if (inputIndex >= testData.length) {
-            inputIndex = 0;
-        }
-        if (isSpikingNeuronGroup()) {
-            setInputValues(testData[inputIndex]);
-            for (int i = 0; i < size(); i++) {
-                getNeuron(i).setToBufferVals();
-            }
-        } else {
-            forceSetActivations(testData[inputIndex]);
-        }
-        inputIndex++;
-    }
 
     /**
      * Creates a file which activations will be written to and activates the
@@ -504,7 +427,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * @param base the neuron update rule to set.
      */
     public void setNeuronType(NeuronUpdateRule base) {
-        isSpikingNeuronGroup = base.isSpikingNeuron();
+        inputManager.setInputSpikes(base.isSpikingNeuron());
         for (Neuron neuron : getNeuronList()) {
             neuron.setUpdateRule(base.deepCopy());
         }
@@ -531,7 +454,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void setNeuronType(String rule) {
         try {
             NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + rule).newInstance();
-            isSpikingNeuronGroup = newRule.isSpikingNeuron();
+            inputManager.setInputSpikes(newRule.isSpikingNeuron());
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -891,44 +814,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return outgoingSgs.remove(sg);
     }
 
-    /**
-     * @return the testData
-     */
+    //TODO: Replace these with get/set to input manager
     public double[][] getTestData() {
-        return testData;
+        return inputManager.getData();
     }
-
-    /**
-     * @param testData the testData to set
-     * @throws IllegalArgumentException
-     */
     public void setTestData(double[][] testData) throws IllegalArgumentException {
-        for (int i = 0; i < testData.length; i++) {
-            if (testData[i].length != size()) {
-                if (i == 0) {
-                    throw new IllegalArgumentException("Data Inconsistency:" + " Test data does not have a column number equal" + " to the number of neurons in the group.");
-                } else {
-                    throw new IllegalArgumentException("Data Inconsistency:" + " Test data does not have equal column lengths.");
-                }
-            }
-        }
-        testAndSetIfSpiking();
-        this.testData = testData;
-    }
-
-    /**
-     * Tests if this neuron group can be considered a spiking neuron group
-     * and sets that value to true/false acordingly.
-     */
-    public void testAndSetIfSpiking() {
-        boolean spiking = true;
-        for (Neuron n : getNeuronList()) {
-            if (!n.getUpdateRule().isSpikingNeuron()) {
-                spiking = false;
-                break;
-            }
-        }
-        setSpikingNeuronGroup(spiking);
+        inputManager.setData(testData);
     }
 
     /**
@@ -1006,36 +897,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return inputMode;
     }
 
-    /**
-     * Sets whether or not this neuron group is in input mode. When in input
-     * mode the neuron group will draw activations from its {@link #testData}
-     * field instead of from any impinging synapses or its own neuron update
-     * functions. This function removes the neurons from the neuron set in
-     * ConcurrentBufferedUpdate, preventing it from updating the neurons in
-     * this group, and re-adds those neurons when input mode is turned off.
-     * Thus the update action associated with this neuron group MUST be added
-     * to the network update sequence even if ParallelBufferedUpdate is
-     * selected in order for input values to update the group properly.
-     *
-     * @param inputMode whether or not this group will run in input mode during
-     *                  network and workspace updates.
-     * @throws IllegalArgumentException if input mode is set to true, but the
-     *                                  {@link #testData} field is set to null.
-     */
-    public void setInputMode(boolean inputMode) throws IllegalArgumentException {
-        if (testData == null && inputMode) {
-            throw new IllegalArgumentException("Cannot set input mode to true" + " if there is no input data stored in NeuronGroup field:" + " testData");
-        }
-        this.inputMode = inputMode;
-        fireLabelUpdated();
-    }
 
+    // TODO
     public boolean isSpikingNeuronGroup() {
-        return isSpikingNeuronGroup;
-    }
-
-    public void setSpikingNeuronGroup(boolean isSpikingNeuronGroup) {
-        this.isSpikingNeuronGroup = isSpikingNeuronGroup;
+        return inputManager.isInputSpikes();
     }
 
     /**

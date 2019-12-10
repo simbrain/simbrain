@@ -155,7 +155,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
         return ret;
     }
 
-
     /**
      * Returns the summed hash codes of contained neurons.  Used to prevent creating neuron collections
      * from identical neurons.

@@ -8,8 +8,10 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -50,10 +52,22 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     private List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
 
     /**
+     * Whether or not this neuron group is in input mode. If the group is in
+     * input mode then its update involves either injecting activation or
+     * directly setting the activation of the neurons in the group based on
+     * the values in test data, ignoring all other inputs.
+     */
+    @UserParameter(label = "Input mode", order = 40)
+    protected boolean inputMode = false;
+
+    protected ActivationInputManager inputManager;
+
+    /**
      * Default constructor.
      */
     public AbstractNeuronCollection(Network net) {
         super(net);
+        inputManager = new ActivationInputManager(this);
     }
 
     /**
@@ -690,6 +704,28 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         return neuronList.size();
     }
 
+    /**
+     * Sets whether or not this neuron group is in input mode. When in input
+     * mode the neuron group will draw activations from its {@link ActivationInputManager}
+     * instead of from any impinging synapses or its own neuron update
+     * functions. This function removes the neurons from the neuron set in
+     * ConcurrentBufferedUpdate, preventing it from updating the neurons in
+     * this group, and re-adds those neurons when input mode is turned off.
+     * Thus the update action associated with this neuron group MUST be added
+     * to the network update sequence even if ParallelBufferedUpdate is
+     * selected in order for input values to update the group properly.
+     *
+     * @param inputMode whether or not this group will run in input mode during
+     *                  network and workspace updates.
+     * @throws IllegalArgumentException if input mode is set to true, but there is no data
+     */
+    public void setInputMode(boolean inputMode) throws IllegalArgumentException {
+        if (inputManager.getData() == null && inputMode) {
+            throw new IllegalArgumentException("Cannot set input mode to true" + " if there is no input data stored in NeuronGroup field:" + " testData");
+        }
+        this.inputMode = inputMode;
+        fireLabelUpdated();
+    }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         if (changeSupport == null) {
@@ -753,5 +789,27 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         return ret;
     }
 
+    /**
+     * Generic update operations that can be "doubled" if a neuron is part of multiple collections.
+     */
+    public void update() {
+        if (inputMode) {
+            updateInputs();
+        }
+    }
+
+    /**
+     * Applies input data in {@link ActivationInputManager} to neurons in this group or collection.
+     */
+    public void updateInputs() {
+        if (inputManager.getData() == null) {
+            throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
+        }
+        inputManager.applyCurrentRow();
+    };
+
+    public ActivationInputManager getInputManager() {
+        return inputManager;
+    }
 
 }

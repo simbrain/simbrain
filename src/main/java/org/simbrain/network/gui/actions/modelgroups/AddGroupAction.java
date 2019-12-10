@@ -18,8 +18,12 @@
  */
 package org.simbrain.network.gui.actions.modelgroups;
 
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkSelectionEvent;
+import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;
@@ -89,4 +93,68 @@ public final class AddGroupAction extends AbstractAction {
         }
     }
 
+    /**
+     * Show Trainer object for training selected source and target neurons.
+     */
+    public static final class ShowInputDialog extends AbstractAction {
+
+        /**
+         * Network panel.
+         */
+        private final NetworkPanel networkPanel;
+
+        /**
+         * Construct action.
+         *
+         * @param networkPanel networkPanel, must not be null
+         */
+        public ShowInputDialog(final NetworkPanel networkPanel) {
+
+            super("Show Trainer...");
+
+            if (networkPanel == null) {
+                throw new IllegalArgumentException("networkPanel must not be null");
+            }
+
+            this.networkPanel = networkPanel;
+            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Trainer.png"));
+            updateAction();
+
+            // add a selection listener to update state based on selection
+            networkPanel.addSelectionListener(new NetworkSelectionListener() {
+                /** @see NetworkSelectionListener */
+                public void selectionChanged(final NetworkSelectionEvent event) {
+                    updateAction();
+                }
+            });
+        }
+
+        /**
+         * Only enable the action if there is at least one source and one target
+         * neuron.
+         */
+        private void updateAction() {
+            boolean atLeastOneSourceSelected = (networkPanel.getSourceModels(Neuron.class).size() > 0);
+            boolean atLeastOneTargetSelected = (networkPanel.getSelectedModels().size() > 0);
+            if (atLeastOneSourceSelected && atLeastOneTargetSelected) {
+                setEnabled(true);
+            } else {
+                setEnabled(false);
+            }
+        }
+
+        /**
+         * @param event
+         * @see AbstractAction
+         */
+        public void actionPerformed(final ActionEvent event) {
+            // Trainer trainer = new Trainer(networkPanel.getNetwork(),
+            // networkPanel.getSourceModels(Neuron.class),
+            // networkPanel.getSelectedModels(Neuron.class), new Backprop());
+            // TrainerPanel trainerPanel = new TrainerPanel(networkPanel, trainer);
+            // GenericFrame frame = networkPanel.displayPanel(trainerPanel,
+            // "Trainer panel");
+            // trainerPanel.setFrame(frame);
+        }
+    }
 }

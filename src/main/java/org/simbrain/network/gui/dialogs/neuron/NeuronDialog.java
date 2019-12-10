@@ -66,17 +66,6 @@ public final class NeuronDialog extends StandardDialog {
 
         neuronList = neurons;
 
-        // Not used yet...
-//        long numGenerators = neurons.stream().filter(n -> n.getUpdateRule() instanceof ActivityGenerator).count();
-//        if (numGenerators == 0) {
-//            System.out.println("All neurons");
-//        } else if (numGenerators == neurons.size()) {
-//            System.out.println("All generators");
-//            // create generatorPropertiesPanel = new new AnnotatedPropertyEditor((List<ActivityGenerator>)nd.neuronList);
-//        } else {
-//            System.out.println("Mixed");
-//            // Create error message and somehow prevent dialog from being created
-//        }
         neuronPropertiesPanel = new AnnotatedPropertyEditor(neuronList);
         setTitle(neuronPropertiesPanel.getTitleString());
 

@@ -315,8 +315,6 @@ public class NetworkPanel extends JPanel {
      */
     private NeuronGroup lastNgAdded;
 
-    //TODO: Make constructor private and just use static creation method?
-
     /**
      * Create a new Network panel.
      *
@@ -424,8 +422,6 @@ public class NetworkPanel extends JPanel {
                 repaint();
             }
         });
-
-
     }
 
     /**

@@ -234,10 +234,9 @@ public abstract class Group implements CopyableObject, AttributeContainer {
      * Perform any initialization required when unmarhsalling a group
      */
     public void postUnmarshallingInit() {
-        changeSupport = new PropertyChangeSupport(this);
+        if (changeSupport == null) {
+            changeSupport = new PropertyChangeSupport(this);
+        }
     }
 
-    public void fireUpdated() {
-        changeSupport.firePropertyChange("label", null , null);
-    }
 }

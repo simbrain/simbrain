@@ -64,12 +64,9 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         interactionBox.setText(nc.getLabel());
         setInteractionBox(interactionBox);
 
-        //addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
-
         nc.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                //System.out.println(evt.getPropertyName());
                 if ("delete".equals(evt.getPropertyName())) {
                     NeuronCollectionNode.this.removeFromParent();
                     getOutlinedObjects().update(getNeuronNodes());

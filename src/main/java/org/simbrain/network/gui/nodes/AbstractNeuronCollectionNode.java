@@ -10,6 +10,8 @@ import org.simbrain.util.piccolo.Outline;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 
 public abstract class AbstractNeuronCollectionNode extends ScreenElement implements GroupNode {
@@ -83,6 +85,12 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
     public void addNeuronNodes(Collection<NeuronNode> neuronNodes) {
         this.neuronNodes.addAll(neuronNodes);
         for (NeuronNode neuronNode : neuronNodes) {
+            // Listen directly to neuronnodes for property change events
+            neuronNode.addPropertyChangeListener(evt -> {
+                if (evt.getPropertyName().equalsIgnoreCase("fullBounds")) {
+                    outlinedObjects.update(getNeuronNodes());
+                }
+            });
             Neuron neuron = neuronNode.getNeuron();
             neuron.addPropertyChangeListener(evt -> {
                 if ("delete".equals(evt.getPropertyName())) {

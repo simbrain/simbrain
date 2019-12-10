@@ -62,7 +62,6 @@ public class Network {
      */
     private transient static int synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold");
 
-
     /**
      * Two types of time used in simulations.
      */
@@ -94,7 +93,8 @@ public class Network {
      */
     private Set<WeightMatrix> weightMatrices = new HashSet<>();
 
-    //TODO: Set back to final when backwards compatibility issue fixed
+    // TODO: Set back to final when backwards compatibility issue fixed
+    // TODO: A separate neuron collection set is in conflict with the groupList.
     /**
      * Neuron Collections. Can contain overlapping neurons.
      */

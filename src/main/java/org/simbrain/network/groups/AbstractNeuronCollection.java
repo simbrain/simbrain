@@ -36,7 +36,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
      * Lazy... activations are only written (and this array is only initialized) when {@link #getActivations()} is
      * called.
      */
-    private double [] activations;
+    private double[] activations;
 
     private WeightMatrix incomingWeightMatrix;
 
@@ -197,20 +197,24 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
 
     public void addNeuron(Neuron neuron) {
         neuronList.add(neuron);
-        neuron.addPropertyChangeListener(evt -> {
-            if ("moved".equals(evt.getPropertyName())) {
-                firePositionChanged();
-            }
-        });
+        addListener(neuron);
     }
 
     public void addNeurons(Collection<Neuron> neurons) {
         neuronList.addAll(neurons);
-        neurons.forEach(n -> n.addPropertyChangeListener(evt -> {
+        neurons.forEach(this::addListener);
+    }
+
+    /**
+     * Add listener to indicated neuron.
+     */
+    private void addListener(Neuron n) {
+        n.addPropertyChangeListener(evt -> {
             if ("moved".equals(evt.getPropertyName())) {
                 firePositionChanged();
             }
-        }));
+        });
+
     }
 
     public void removeNeuron(Neuron neuron) {

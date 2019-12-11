@@ -37,14 +37,12 @@ public class SynapseGroupNodeVisible extends PNode implements SynapseGroupNode.A
     public SynapseGroupNodeVisible(final NetworkPanel networkPanel, final SynapseGroupNode parent) {
         this.parent = parent;
 
-
         parent.getSynapseGroup().getAllSynapses().forEach( s -> {
             NeuronNode sourceNode = (NeuronNode) networkPanel.getObjectNodeMap().get(s.getSource());
             NeuronNode targetNode = (NeuronNode) networkPanel.getObjectNodeMap().get(s.getTarget());
             if (sourceNode != null && targetNode != null) {
                 SynapseNode synapseNode = new SynapseNode(networkPanel, sourceNode, targetNode, s);
                 addChild(synapseNode);
-                synapseNode.setPickable(false);
             }
         });
         lowerToBottom();

@@ -230,6 +230,7 @@ public final class SynapseGroupDialog extends StandardDialog {
                 connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
                 sumPanel.fillFieldValues(synapseGroup);
                 adjustmentPanel.fullUpdate();
+                // TODO: Update weight matrix when this is pressed
             });
             JScrollPane connectWrapper = new JScrollPane(connectionApplyPanel);
             connectWrapper.setBorder(null);

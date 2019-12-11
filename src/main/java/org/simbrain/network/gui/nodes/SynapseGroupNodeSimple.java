@@ -32,8 +32,8 @@ import java.awt.geom.Point2D;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * PNode representation of a group of synapses, where the synapses themselves
- * are not visible.
+ * PNode representation of a "green arrow" (representing a group of synapses) from one
+ * NeuronGroup to another.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
@@ -177,10 +177,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
         Point2D.Float bez2 = arrow.getTemplate().getBez2(src, tar, endPort);
         Point2D middle = SimbrainMath.cubicBezierMidpoint(src, bez, bez2, tar);
 
-        // Line2D dbL = new Line2D.Float(src, bez2);
-        // dbLine.reset();
-        // dbLine.append(dbL, false);
-
         synapseGroupNode.interactionBox.centerFullBoundsOnPoint(middle.getX(), middle.getY());
         synapseGroupNode.interactionBox.raiseToTop();
 
@@ -191,27 +187,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
         Point2D.Float bez2 = arrow.getTemplate().getBez2(src, tar, endPort);
         return SimbrainMath.cubicBezierMidpoint(src, bez, bez2, tar);
     }
-
-    // /**
-    // *
-    // * @return
-    // */
-    // private Point2D closestPoint() {
-    // Point2D [] tarPts = target.getFourCorners();
-    // double min = Double.MAX_VALUE;
-    // Point2D closest = null;
-    // Point2D.Float srcPt = new Point2D.Float((float)source.getCenterX(),
-    // (float)source.getCenterY());
-    // for (Point2D pt : tarPts) {
-    // double dist = srcPt.distance(pt);
-    // if (min > dist) {
-    // min = dist;
-    // closest = pt;
-    // }
-    // }
-    // return closest;
-    // }
-    //
 
     /**
      * Includes start and end of arrow.

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Creates a simple synapse group node that represents a recurrent synapse
- * group.
+ * group, using a "green arrow".
  *
  * @author Zoë
  */

@@ -853,96 +853,13 @@ public class NetworkPanel extends JPanel {
      * @param synapseGroup the synapse group to add
      */
     private void addSynapseGroup(final SynapseGroup synapseGroup) {
-//        if (synapseGroup.isDisplaySynapses()) {
-//            addSynapseGroupVisible(synapseGroup);
-//        } else {
-//            if (synapseGroup.getTargetNeuronGroup().equals(synapseGroup.getSourceNeuronGroup())) {
-//            } else {
-//
-//                // Test if there isn't already a synapse group going in
-//                // the opposite direction. The synapse groups which _originate_
-//                // from this synapse groups's target neuron group
-//                Set<SynapseGroup> targetGroupOutgoing = synapseGroup.getTargetNeuronGroup().getOutgoingSg();
-//                // The synapse groups which _terminate_ at this synapse group's
-//                // source neuron group
-//                Set<SynapseGroup> sourceGroupIncoming = synapseGroup.getSourceNeuronGroup().getIncomingSgs();
-//
-//                // If there exists a synapse group that _originates_ in this
-//                // synapse group's target neuron group and _terminates_ in this
-//                // synapse group's source neuron group, then .retainAll between
-//                // the two above sets will contain that group
-//                targetGroupOutgoing.retainAll(sourceGroupIncoming);
-//
-//                if (targetGroupOutgoing.size() != 0) { // There _is_ a synapse
-//                    // group going in the opposite direction between the same
-//                    // two neuron groups.
-//                    final SynapseGroup reverse = (SynapseGroup) targetGroupOutgoing.toArray()[0];
-//                    if (objectNodeMap.get(reverse) != null) {
-//                        removeGroup(reverse);
-//                        addSynapseGroupBidirectional(synapseGroup, reverse);
-//                    } else {
-//                        addSynapseGroupSimple(synapseGroup);
-//                    }
-//                    return;
-//                } else {
-//                    // Not recurrent, no synapse group going in the
-//                    // opposite direction, and is not displaying individual
-//                    // synapses...
-//                    // add group normally
-//                    addSynapseGroupSimple(synapseGroup);
-//                }
-//            }
-//        }
-
         SynapseGroupNode synapseGroupNode;
-        if (objectNodeMap.containsKey(synapseGroup)) {
-            return;
-        } else {
+        if (!objectNodeMap.containsKey(synapseGroup)) {
             synapseGroupNode = new SynapseGroupNode(this, synapseGroup);
             canvas.getLayer().addChild(synapseGroupNode);
             objectNodeMap.put(synapseGroup, synapseGroupNode);
         }
 
-//        SynapseGroupNode synapseGroupNode = (SynapseGroupNode) objectNodeMap.get(synapseGroup);
-//
-//        // TODO: Clean up listeners if the synapsegroup is removed.
-//        PNode srcNode = objectNodeMap.get(synapseGroup.getSourceNeuronGroup());
-//        // System.out.println("Source" + srcNode);
-//        if (srcNode != null) {
-//            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synapseGroupNode);
-//        }
-//        PNode tarNode = objectNodeMap.get(synapseGroup.getTargetNeuronGroup());
-//        // System.out.println("Target" + tarNode);
-//        if (tarNode != null) {
-//            tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synapseGroupNode);
-//        }
-
-    }
-
-    /**
-     * Add a bidirectional synapse group representation. This is not logically different than two simple synapse groups,
-     * but the case is represented by a different PNode object.
-     *
-     * @param sg1 synapse group 1
-     * @param sg2 synapse group 2
-     */
-    private void addSynapseGroupBidirectional(SynapseGroup sg1, SynapseGroup sg2) {
-        SynapseGroupNodeBidirectional synGBD = SynapseGroupNodeBidirectional.createBidirectionalSynapseGN(this, sg1, sg2);
-        canvas.getLayer().addChild(synGBD);
-        objectNodeMap.put(sg1, synGBD);
-        objectNodeMap.put(sg2, synGBD);
-        NeuronGroupNode srcNode = (NeuronGroupNode) objectNodeMap.get(sg1.getSourceNeuronGroup());
-        if (srcNode != null) {
-            srcNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synGBD);
-        }
-        NeuronGroupNode tarNode = (NeuronGroupNode) objectNodeMap.get(sg1.getTargetNeuronGroup());
-        // System.out.println("Target" + tarNode);
-        if (tarNode != null) {
-            tarNode.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, synGBD);
-        }
-
-        // Bidirectional groups do not currently exist in any subnetworks
-        // so the "parent check" is not done
     }
 
     /**
@@ -2589,7 +2506,6 @@ public class NetworkPanel extends JPanel {
     public PlacementManager getPlacementManager() {
         return placementManager;
     }
-
 
     /**
      * Display the provided network in a dialog

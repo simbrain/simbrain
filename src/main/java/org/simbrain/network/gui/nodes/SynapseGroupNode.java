@@ -32,13 +32,12 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * PNode representation of a group of synapses. Superclass of  more specific
- * types of synapsegroupnodes, where the contained synapses are either
- * individually visible or only visible through a single line representing the
- * whole group. For a sense of the design of this class (in to an interaction
- * box and outlined objects) see {@link SubnetworkNode}.
+ * PNode representation of a group of synapses connecting one {@link org.simbrain.network.groups.NeuronGroup}
+ * to another. Has several modes depending on whether loose synapses should be displayed or not,
+ * and whether the connection is recurrent or not.
  *
  * @author Jeff Yoshimi
+ * @author Yulin Li
  */
 public class SynapseGroupNode extends ScreenElement implements GroupNode, PropertyChangeListener {
 
@@ -48,24 +47,41 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
     protected final NetworkPanel networkPanel;
 
     /**
-     * Reference to represented group node.
+     * Reference to represented synapse group
      */
     protected final SynapseGroup synapseGroup;
 
-    private boolean visible = false;
+    /**
+     * If true, show "loose" synapses using {@link SynapseNode}s.
+     */
+    private boolean showIndividualSynapses = false;
+
+    /**
+     * Reference to the currently used PNode type.
+     */
+    private Arrow currentNode;
+
+    /**
+     * PNode that represents an aggregate of visible "loose" {@link SynapseNode}s.
+     * when {@link #showIndividualSynapses} is true.
+     */
+    private SynapseGroupNodeVisible visibleNode;
+
+    /**
+     * PNode that represents a single one-directional green arrow from
+     * one neuron group to another.
+     */
+    private SynapseGroupNodeSimple simpleNode = null;
+
+    /**
+     * PNode that represents a recurrent arrow from a neuron group to itself.
+     */
+    private SynapseGroupNodeRecurrent recurrentNode = null;
 
     /**
      * The interaction box for this neuron group.
      */
     protected SynapseGroupInteractionBox interactionBox;
-
-    private SynapseGroupNodeVisible visibleNode;
-
-    private SynapseGroupNodeSimple simpleNode = null;
-
-    private SynapseGroupNodeRecurrent recurrentNode = null;
-
-    private Arrow currentNode;
 
     /**
      * Create a Synapse Group PNode.
@@ -87,9 +103,6 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
 
         initializeArrow();
         addChild((PNode) currentNode);
-
-        lowerToBottom();
-        interactionBox.raiseToTop();
 
         group.getSourceNeuronGroup().addPropertyChangeListener(evt -> {
             if ("moved".equals(evt.getPropertyName())) {
@@ -121,6 +134,9 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
                 }
             }
         });
+
+        lowerToBottom();
+        interactionBox.raiseToTop();
     }
 
     private void removeArrows() {
@@ -132,7 +148,7 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
     private void refreshVisible() {
         removeChild(visibleNode);
         visibleNode = null;
-        toggleSynapseVisibility(visible);
+        toggleSynapseVisibility(showIndividualSynapses);
     }
 
     private void initializeArrow() {
@@ -150,7 +166,7 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
     }
 
     public void toggleSynapseVisibility(Boolean visible) {
-        this.visible = visible;
+        this.showIndividualSynapses = visible;
         if (visible) {
             removeArrows();
             if (visibleNode == null) {
@@ -272,12 +288,14 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
     @Override
     public void resetColors() {
     }
-
     @Override
     public SynapseGroup getModel() {
         return synapseGroup;
     }
 
+    /**
+     * Interface for all PNodes used in as the main representation for a synapse group.
+     */
     public interface Arrow {
         void layoutChildren();
     }

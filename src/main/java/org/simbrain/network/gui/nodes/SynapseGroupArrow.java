@@ -24,8 +24,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import java.awt.geom.Point2D;
 
 /**
- * An interface that any synapse group node which uses a curved arrow (not an
- * arc) should implement.
+ * An interface for PNodes which represent curved green arrow for synapse groups.
  *
  * @author Zoë Tosi
  */
@@ -37,9 +36,6 @@ public interface SynapseGroupArrow {
      * implemented by a PNode, this method should be called in LayoutChildren.
      * It is also expected that {@link #layoutChildrenQuiet(Point2D, Point2D)}
      * should call this method.
-     *
-     * @param pt1
-     * @param pt2
      */
     void layout(Point2D pt1, Point2D pt2);
 

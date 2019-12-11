@@ -31,6 +31,7 @@ import org.simbrain.custom_sims.simulations.cortex_simple.CortexSimple;
 import org.simbrain.custom_sims.simulations.creatures.CreaturesSim;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
+import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillatoryNetwork;
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;
@@ -79,7 +80,7 @@ public abstract class RegisteredSimulation {
         // TODO: Commented out items are not ready for prime time
         REGISTERED_SIMS.add(new EdgeOfChaos());
         REGISTERED_SIMS.add(new EdgeOfChaosBitStream());
-        // REGISTERED_SIMS.add(new Hippocampus());
+         REGISTERED_SIMS.add(new Hippocampus());
         REGISTERED_SIMS.add(new RL_Sim_Main());
         REGISTERED_SIMS.add(new Cerebellum());
         REGISTERED_SIMS.add(new CreaturesSim());

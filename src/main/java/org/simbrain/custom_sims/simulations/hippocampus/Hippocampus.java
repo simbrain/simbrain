@@ -3,6 +3,8 @@ package org.simbrain.custom_sims.simulations.hippocampus;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.connections.AllToAll;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
@@ -158,7 +160,7 @@ public class Hippocampus extends RegisteredSimulation {
 
         // Initialize with uniform distribution from 0 to .1
         SynapseGroup synGroup = SynapseGroup.createSynapseGroup(source, target,
-            SynapseGroup.DEFAULT_CONNECTION_MANAGER, 1);
+               new AllToAll() , 1);
         synGroup.setLabel(name);
         synGroup.setLowerBound(0, Polarity.EXCITATORY);
         synGroup.setUpperBound(1, Polarity.EXCITATORY);
@@ -396,6 +398,11 @@ public class Hippocampus extends RegisteredSimulation {
         LC2toH.setEnabled(!lesioned);
         RC1toH.setEnabled(!lesioned);
         RC2toH.setEnabled(!lesioned);
+    }
+
+    @Override
+    public String getSubmenuName() {
+        return "Brain";
     }
 
     @Override

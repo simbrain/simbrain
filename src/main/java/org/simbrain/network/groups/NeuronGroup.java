@@ -72,7 +72,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     @UserParameter(label = "Group Update Rule", useSetter = true, order = 20)
     private UpdateRuleEnum groupUpdateRule;
 
-
     /**
      * Default layout for neuron groups.
      */
@@ -128,34 +127,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     private int writeCounter = 0;
 
     /**
-     * Number of subsamples to take. This value is also implicitly a threshold.
-     * If a neuron group has more than this many neurons, and subsampling is
-     * turned on, a vector with this many components is returned by (
-     * {@link #getSubsampledActivations()}
-     */
-    //@UserParameter(label = "Number of subsamples", useSetter = true)
-    // TODO
-    private int numSubSamples = 100;
-
-    /**
-     * Array to hold subsamples to be used when, for example, plotting the
-     * state of large network.
-     */
-    private double[] subSampledValues = {};
-
-    /**
-     * Array to hold activation values for any caller that needs the activation values for this group in array form.
-     * Lazy... activations are only written (and this array is only initialized) when {@link #getActivations()} is
-     * called.
-     */
-    private double [] activations;
-
-    /**
-     * Indices used with subsampling.
-     */
-    private int[] subsamplingIndices = {};
-
-    /**
      * Construct a new neuron group from a list of neurons.
      *
      * @param net     the network
@@ -164,7 +135,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
         super(net);
         addNeurons(neurons);
-        resetSubsamplingIndices();
+        subsamplingManager.resetIndices();
     }
 
     /**
@@ -195,7 +166,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         addNeurons(newNeurons);
         layout.getLayout().setInitialLocation(initialPosition);
         layout.getLayout().layoutNeurons(this.getNeuronList());
-        resetSubsamplingIndices();
+        subsamplingManager.resetIndices();
     }
 
     /**
@@ -209,7 +180,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public NeuronGroup(final Network network, Point2D initialPosition) {
         super(network);
         layout.getLayout().setInitialLocation(initialPosition);
-        resetSubsamplingIndices();
+        subsamplingManager.resetIndices();
     }
 
     /**
@@ -237,9 +208,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
         addNeurons(newNeurons);
         this.setLayout(toCopy.getLayout());
         this.setGroupUpdateRule(toCopy.groupUpdateRule);
-        resetSubsamplingIndices();
+        subsamplingManager.resetIndices();
     }
 
+    /**
+     * Construct a neuron group with a specified number of neurons and id.
+     */
     public NeuronGroup(Network network, int numNeurons, String id) {
         super(network);
         for (int i = 0; i < numNeurons ; i++) {
@@ -399,7 +373,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * @return the name of the neuron update rule used by all the neurons in
+     * Returns the name of the neuron update rule used by all the neurons in
      * this group (or mixed if more than one update rule governs the
      * neurons).
      */
@@ -573,7 +547,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
             }
         }
         if (fireEvent) {
-            resetSubsamplingIndices();
+            subsamplingManager.resetIndices();
         }
     }
 
@@ -616,8 +590,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         //ret += layout.toString();
         return ret;
     }
-
-
 
     /**
      * Returns an array of spike indices used in couplings, (e.g. to a raster
@@ -726,6 +698,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         this.layout.setLayout(layout);
     }
 
+    // TODO: Move to util
     public void setXYZCoordinatesFromFile(String filename) {
         try (Scanner rowSc = new Scanner(new File(filename));) {
             Scanner colSc = null;
@@ -853,30 +826,18 @@ public class NeuronGroup extends AbstractNeuronCollection {
         getLayout().layoutNeurons(getNeuronList());
     }
 
-    /**
-     * @return the betweenNeuronInterval
-     */
     public int getBetweenNeuronInterval() {
         return betweenNeuronInterval;
     }
 
-    /**
-     * @param betweenNeuronInterval the betweenNeuronInterval to set
-     */
     public void setBetweenNeuronInterval(int betweenNeuronInterval) {
         this.betweenNeuronInterval = betweenNeuronInterval;
     }
 
-    /**
-     * @return the gridThreshold
-     */
     public int getGridThreshold() {
         return gridThreshold;
     }
 
-    /**
-     * @param gridThreshold the gridThreshold to set
-     */
     public void setGridThreshold(int gridThreshold) {
         this.gridThreshold = gridThreshold;
     }
@@ -897,44 +858,9 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return inputMode;
     }
 
-
     // TODO
     public boolean isSpikingNeuronGroup() {
         return inputManager.isInputSpikes();
-    }
-
-    /**
-     * Returns a vector of subsampled activations to be used by some object external to the
-     * neuron group. If plotting activations of a thousand
-     * node network, a sample of 100 activations might be returned.
-     *
-     * @return the vector of external activations.
-     */
-    @Producible()
-    public double[] getSubsampledActivations() {
-        if (numSubSamples >= getNeuronList().size()) {
-            return getActivations();
-        }
-
-        if (subSampledValues == null || subSampledValues.length != numSubSamples) {
-            subSampledValues = new double[numSubSamples];
-        }
-        for (int ii = 0; ii < numSubSamples; ii++) {
-            subSampledValues[ii] = getNeuron(subsamplingIndices[ii]).getActivation();
-        }
-        return subSampledValues;
-    }
-
-    public int getNumSubSamples() {
-        return numSubSamples;
-    }
-
-    public void setNumSubSamples(int _numSubSamples) {
-       double [] newSubSamples = new double[_numSubSamples];
-       int len = _numSubSamples > subsamplingIndices.length ? subsamplingIndices.length : _numSubSamples;
-       System.arraycopy(subSampledValues, 0, newSubSamples, 0, len);
-       subSampledValues = newSubSamples;
-       this.numSubSamples = _numSubSamples;
     }
 
     @Override
@@ -942,15 +868,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return this.deepCopy(this.getParentNetwork());
     }
 
-
-    /**
-     * Reset the indices used for subsampling.
-     */
-    public void resetSubsamplingIndices() {
-        if (getNeuronList() != null) {
-            subsamplingIndices = SimbrainMath.randPermute(0, getNeuronList().size());
-        }
-    }
     /**
      * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */

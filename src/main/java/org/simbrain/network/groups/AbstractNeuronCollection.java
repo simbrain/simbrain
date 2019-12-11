@@ -10,6 +10,7 @@ import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.SimnetUtils;
+import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -60,7 +61,15 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     @UserParameter(label = "Input mode", order = 40)
     protected boolean inputMode = false;
 
+    /**
+     * Maintains a matrix of data that can be used to send inputs to this neuron collection.
+     */
     protected ActivationInputManager inputManager;
+
+    /**
+     * Allows activations to be downsampled.
+     */
+    protected SubsamplingManager subsamplingManager;
 
     /**
      * Default constructor.
@@ -68,6 +77,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     public AbstractNeuronCollection(Network net) {
         super(net);
         inputManager = new ActivationInputManager(this);
+        subsamplingManager = new SubsamplingManager(this);
     }
 
     /**
@@ -581,8 +591,6 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
 
     /**
      * Sets the polarities of every neuron in the group.
-     *
-     * @param p
      */
     public void setPolarity(SimbrainConstants.Polarity p) {
         for (Neuron n : neuronList) {
@@ -812,4 +820,15 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         return inputManager;
     }
 
+    /**
+     * Returns a vector of subsampled activations to be used by some object external to the
+     * neuron group. If plotting activations of a thousand
+     * node network, a sample of 100 activations might be returned.
+     *
+     * @return the vector of external activations.
+     */
+    @Producible()
+    public double[] getSubsampledActivations() {
+        return subsamplingManager.getActivations();
+    }
 }

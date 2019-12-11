@@ -57,6 +57,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
         super(net);
         addNeurons(neurons);
         initializeId();
+        subsamplingManager.resetIndices();
         PropertyChangeListener networkListener = evt -> {
             if ("neuronRemoved".equals(evt.getPropertyName())) {
                 Neuron removed = (Neuron) evt.getOldValue();

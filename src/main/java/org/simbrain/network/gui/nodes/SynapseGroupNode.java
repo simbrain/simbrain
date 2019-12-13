@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -52,18 +51,13 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
     protected final SynapseGroup synapseGroup;
 
     /**
-     * If true, show "loose" synapses using {@link SynapseNode}s.
-     */
-    private boolean showIndividualSynapses = false;
-
-    /**
      * Reference to the currently used PNode type.
      */
     private Arrow currentNode;
 
     /**
      * PNode that represents an aggregate of visible "loose" {@link SynapseNode}s.
-     * when {@link #showIndividualSynapses} is true.
+     * when {@link SynapseGroup#isDisplaySynapses()} is true.
      */
     private SynapseGroupNodeVisible visibleNode;
 
@@ -101,8 +95,7 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
         // Must do this after it's added to properly locate it
         interactionBox.updateText();
 
-        initializeArrow();
-        addChild((PNode) currentNode);
+        toggleSynapseVisibility();
 
         group.getSourceNeuronGroup().addPropertyChangeListener(evt -> {
             if ("moved".equals(evt.getPropertyName())) {
@@ -124,7 +117,7 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
                 } else if ("label".equals(evt.getPropertyName())) {
                     SynapseGroupNode.this.updateText();
                 } else if ("synapseVisibilityChanged".equals(evt.getPropertyName())) {
-                    SynapseGroupNode.this.toggleSynapseVisibility((Boolean) evt.getNewValue());
+                    SynapseGroupNode.this.toggleSynapseVisibility();
                 } else if ("synapseAdded".equals(evt.getPropertyName())) {
                     SynapseGroupNode.this.getNetworkPanel().addSynapse(((Synapse) evt.getNewValue()));
                     refreshVisible();
@@ -148,10 +141,18 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
     private void refreshVisible() {
         removeChild(visibleNode);
         visibleNode = null;
-        toggleSynapseVisibility(showIndividualSynapses);
+        toggleSynapseVisibility();
     }
 
     private void initializeArrow() {
+        if (synapseGroup.isDisplaySynapses()) {
+            if (visibleNode == null) {
+                visibleNode = new SynapseGroupNodeVisible(networkPanel, this);
+            }
+            currentNode = visibleNode;
+            return;
+        }
+
         if (getSynapseGroup().isRecurrent()) {
             if (recurrentNode == null) {
                 recurrentNode = new SynapseGroupNodeRecurrent(this);
@@ -165,9 +166,8 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
         }
     }
 
-    public void toggleSynapseVisibility(Boolean visible) {
-        this.showIndividualSynapses = visible;
-        if (visible) {
+    public void toggleSynapseVisibility() {
+        if (synapseGroup.isDisplaySynapses()) {
             removeArrows();
             if (visibleNode == null) {
                 visibleNode = new SynapseGroupNodeVisible(networkPanel, this);
@@ -177,9 +177,15 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
         } else {
             removeArrows();
             if (synapseGroup.isRecurrent()) {
+                if (recurrentNode == null) {
+                    recurrentNode = new SynapseGroupNodeRecurrent(this);
+                }
                 addChild(recurrentNode);
                 currentNode = recurrentNode;
             } else {
+                if (simpleNode == null) {
+                    simpleNode = new SynapseGroupNodeSimple(networkPanel, this);
+                }
                 addChild(simpleNode);
                 currentNode = simpleNode;
             }

@@ -3,6 +3,7 @@ package org.simbrain.util.math;
 import org.junit.Test;
 
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -64,4 +65,15 @@ public class SimbrainMathTest {
         assertArrayEquals(new double[]{0,1.5,3,4.5,-1.5,2.25}, SimbrainMath.addVector(baseVector,baseVector2),0.0);
     }
 
+    @Test
+    public void findMaxEig() {
+        double[][] matrix2By2 = new double[][]{{7,8},{3,9}};
+        //System.out.println(Arrays.deepToString(matrix));
+
+        assertEquals(SimbrainMath.findMaxEig(matrix2By2), 13, 0);
+
+        double[][] matrix3by3 = new double[][]{{1,4,7},{2,5,8}, {3,6,9}};
+        assertEquals(SimbrainMath.findMaxEig(matrix3by3), 16.12, .1);
+
+    }
 }

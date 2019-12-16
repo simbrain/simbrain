@@ -34,10 +34,10 @@ import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.SquashingFunctionEnum;
 
 import java.awt.geom.Point2D;
@@ -234,7 +234,7 @@ public class EchoStateNetwork extends Subnetwork {
         addNeuronGroup(neuronGroup);
         addSynapseGroup(synapseGroup);
         // Scale the reservoir's weights to have the desired spectral radius
-        SimnetUtils.scaleEigenvalue(reservoirLayer.getNeuronList(), reservoirLayer.getNeuronList(), spectralRadius);
+        SimbrainMath.scaleEigenvalue(reservoirLayer.getNeuronList(), reservoirLayer.getNeuronList(), spectralRadius);
     }
 
     /**
@@ -313,7 +313,7 @@ public class EchoStateNetwork extends Subnetwork {
         }
 
         // Scale the reservoir's weights to have the desired spectral radius
-        SimnetUtils.scaleEigenvalue(reservoirLayer.getNeuronList(), reservoirLayer.getNeuronList(), spectralRadius);
+        SimbrainMath.scaleEigenvalue(reservoirLayer.getNeuronList(), reservoirLayer.getNeuronList(), spectralRadius);
 
     }
 

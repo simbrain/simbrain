@@ -18,6 +18,12 @@
  */
 package org.simbrain.util.math;
 
+import org.ojalgo.access.Access2D;
+import org.ojalgo.matrix.BasicMatrix;
+import org.ojalgo.matrix.PrimitiveMatrix;
+import org.ojalgo.scalar.ComplexNumber;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.util.SimnetUtils;
 import umontreal.ssj.rng.LFSR258;
 import umontreal.ssj.rng.RandomStream;
 
@@ -875,4 +881,44 @@ public class SimbrainMath {
         return ((high - clipped) * targetLow + (clipped - low) * targetHigh) / (high - low);
     }
 
+    /**
+     * Find the largest eigenvalue for the provided matrix.
+     *
+     * @param weightMatrix a matrix representation of the weights for use in linear algebraic operations
+     * @return the largest eigenvalue of this matrix by absolute value
+     */
+    public static double findMaxEig(double[][] weightMatrix) {
+
+        BasicMatrix.Factory<?> mf = PrimitiveMatrix.FACTORY;
+
+        Access2D.Builder<?> tmpBuilder = mf.getBuilder(weightMatrix.length, weightMatrix[0].length);
+        for (int i = 0; i < tmpBuilder.countRows(); i++) {
+            for (int j = 0; j < tmpBuilder.countColumns(); j++) {
+                tmpBuilder.set(i, j, weightMatrix[i][j]);
+            }
+        }
+
+        BasicMatrix mat = (BasicMatrix) tmpBuilder.build();
+
+        List<ComplexNumber> eigs = mat.getEigenvalues();
+
+        double maxEig = 0.0;
+        for (int i = 0, n = eigs.size(); i < n; i++) {
+            if (Math.abs(eigs.get(i).getReal()) > maxEig) {
+                maxEig = Math.abs(eigs.get(i).getReal());
+            }
+        }
+
+        return maxEig;
+    }
+
+    /**
+     * @param src          list of source neurons
+     * @param tar          list of target neurons
+     * @param desiredEigen : the new max eig or spectral radius for the weight matrix
+     */
+    public static void scaleEigenvalue(List<Neuron> src, List<Neuron> tar, double desiredEigen) {
+        double maxEigen = findMaxEig(SimnetUtils.getWeights(src, tar));
+        SimnetUtils.scaleWeights(src, tar, desiredEigen / maxEigen);
+    }
 }

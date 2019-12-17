@@ -466,12 +466,12 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
                 @Override
                 public void setData(double[][] data) {
-                    neuronGroup.setTestData(data);
+                    neuronGroup.getInputManager().setData(data);
                 }
 
                 @Override
                 public double[][] getData() {
-                    return neuronGroup.getTestData();
+                    return neuronGroup.getInputManager().getData();
                 }
             };
             final TestInputPanel testInputPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(),

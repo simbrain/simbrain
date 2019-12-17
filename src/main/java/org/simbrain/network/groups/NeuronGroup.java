@@ -243,30 +243,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         fireLabelUpdated();
     }
 
-
-    /**
-     * Returns the name of the neuron update rule used by all the neurons in
-     * this group (or mixed if more than one update rule governs the
-     * neurons).
-     */
-    public String getNeuronType() {
-        String nType = "Mixed";
-        if (size() == 0) {
-            return nType;
-        }
-        Iterator<Neuron> nIter = getNeuronList().iterator();
-        NeuronUpdateRule nur = nIter.next().getUpdateRule();
-        boolean conflict = false;
-        while (nIter.hasNext() && !conflict) {
-            conflict = !(nur.getClass().equals(nIter.next().getUpdateRule().getClass()));
-        }
-        if (conflict) {
-            return nType;
-        } else {
-            return nur.getName();
-        }
-    }
-
     /**
      * Set the update rule for the neurons in this group.
      *
@@ -280,7 +256,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * Set the update rule using a class.
+     * Set the update rule using {@link UpdateRuleEnum}.
      */
     public void setGroupUpdateRule(UpdateRuleEnum rule) {
         groupUpdateRule = rule;
@@ -290,7 +266,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Set the string update rule for the neurons in this group.
@@ -337,73 +312,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * Randomize fan-in for all neurons in group.
-     */
-    public void randomizeIncomingWeights() {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.randomizeFanIn();
-        }
-        getParentNetwork().fireSynapsesUpdated(getIncomingWeights());
-    }
-
-    /**
-     * Randomize fan-out for all neurons in group.
-     */
-    public void randomizeOutgoingWeights() {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.randomizeFanOut();
-        }
-        getParentNetwork().fireSynapsesUpdated(getOutgoingWeights());
-    }
-
-    /**
-     * Return flat list of fanins for all neurons in group.
-     *
-     * @return incoming weights
-     */
-    public List<Synapse> getIncomingWeights() {
-        List<Synapse> retList = new ArrayList<Synapse>();
-        for (Neuron neuron : this.getNeuronList()) {
-            retList.addAll(neuron.getFanIn());
-        }
-        return retList;
-    }
-
-    /**
-     * Return flat list of fanouts for all neurons in group.
-     *
-     * @return outgoing weights
-     */
-    public List<Synapse> getOutgoingWeights() {
-        List<Synapse> retList = new ArrayList<Synapse>();
-        for (Neuron neuron : this.getNeuronList()) {
-            retList.addAll(neuron.getFanOut().values());
-        }
-        return retList;
-    }
-
-    /**
-     * Randomize all neurons in group.
-     */
-    public void randomize() {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.randomize();
-        }
-    }
-
-    /**
-     * Randomize bias for all neurons in group.
-     *
-     * @param lower lower bound for randomization.
-     * @param upper upper bound for randomization.
-     */
-    public void randomizeBiases(double lower, double upper) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.randomizeBias(lower, upper);
-        }
-    }
-
-    /**
      * Add a neuron to group.
      *
      * @param neuron    neuron to add
@@ -430,8 +338,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         super.addNeurons(neurons);
         neurons.forEach(n -> n.setParentGroup(this));
     }
-
-
 
     /**
      * Add neuron to group.
@@ -570,43 +476,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         this.layout.setLayout(layout);
     }
 
-    // TODO: Move to util
-    public void setXYZCoordinatesFromFile(String filename) {
-        try (Scanner rowSc = new Scanner(new File(filename));) {
-            Scanner colSc = null;
-            int i = 0;
-            int j;
-            try {
-                while (rowSc.hasNextLine()) {
-                    colSc = new Scanner(rowSc.nextLine());
-                    colSc.useDelimiter(", *");
-                    j = 0;
-                    while (colSc.hasNext()) {
-                        double coordinate = colSc.nextDouble();
-                        if (i == 0) {
-                            getNeuron(j++).setX(coordinate);
-                        } else if (i == 1) {
-                            getNeuron(j++).setY(coordinate);
-                        } else if (i == 2) {
-                            getNeuron(j++).setZ(coordinate);
-                        } else {
-                            return;
-                        }
-                    }
-                    i++;
-                    colSc.close();
-                }
-            } finally {
-                if (colSc != null) {
-                    colSc.close();
-                }
-            }
-        } catch (IOException ie) {
-            ie.printStackTrace();
-            return;
-        }
-    }
-
     /**
      * Apply this group's layout to its neurons.
      */
@@ -659,14 +528,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return outgoingSgs.remove(sg);
     }
 
-    //TODO: Replace these with get/set to input manager
-    public double[][] getTestData() {
-        return inputManager.getData();
-    }
-    public void setTestData(double[][] testData) throws IllegalArgumentException {
-        inputManager.setData(testData);
-    }
-
     /**
      * If more than gridThreshold neurons use a grid layout, else a horizontal
      * line layout.
@@ -714,7 +575,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         this.gridThreshold = gridThreshold;
     }
 
-
     public boolean isInputMode() {
         return inputMode;
     }
@@ -723,7 +583,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public boolean isSpikingNeuronGroup() {
         return inputManager.isInputSpikes();
     }
-
 
     @Override
     public EditableObject copy() {

@@ -297,7 +297,7 @@ public class TestInputPanel extends DataPanel {
             ((NumericTable) table.getData()).setData(data);
         }
         if (neuronGroup != null) {
-            neuronGroup.setTestData(data);
+            neuronGroup.getInputManager().setData(data);
         }
     }
 

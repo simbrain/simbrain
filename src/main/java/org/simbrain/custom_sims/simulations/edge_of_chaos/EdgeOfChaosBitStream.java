@@ -77,12 +77,12 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
             // Update strength of bitstream signals
             // TODO: Complain if input strength set to 0.
             double new_ubar = Double.parseDouble(input_tf.getText());
-            for (double[] row : bitStream1.getTestData()) {
+            for (double[] row : bitStream1.getInputManager().getData()) {
                 if (row[0] != 0) {
                     row[0] = new_ubar;
                 }
             }
-            for (double[] row : bitStream2.getTestData()) {
+            for (double[] row : bitStream2.getInputManager().getData()) {
                 if (row[0] != 0) {
                     row[0] = new_ubar;
                 }
@@ -129,7 +129,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         BinaryRule b = new BinaryRule(0, u_bar, .5);
         bitStreamInputs.setNeuronType(b);
         bitStreamInputs.setClamped(true);
-        bitStreamInputs.setTestData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
+        bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
         bitStreamInputs.setInputMode(true);
         network.addGroup(bitStreamInputs);
         return bitStreamInputs;

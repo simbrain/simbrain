@@ -192,12 +192,12 @@ public final class NeuronGroupDialog extends StandardDialog {
 
                 @Override
                 public void setData(double[][] data) {
-                    neuronGroup.setTestData(data);
+                    neuronGroup.getInputManager().setData(data);
                 }
 
                 @Override
                 public double[][] getData() {
-                    return neuronGroup.getTestData();
+                    return neuronGroup.getInputManager().getData();
                 }
             };
             JPanel inputDataPanel = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList(), matrix);

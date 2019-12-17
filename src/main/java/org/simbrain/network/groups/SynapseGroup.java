@@ -359,6 +359,8 @@ public class SynapseGroup extends Group implements NetworkModel {
         recurrent = testRecurrent();
         initializeSynapseVisibility();
         initSpikeResponders();
+        source.addOutgoingSg(this);
+        target.addIncomingSg(this);
     }
 
     /**
@@ -1355,6 +1357,18 @@ public class SynapseGroup extends Group implements NetworkModel {
      */
     public boolean isRecurrent() {
         return recurrent;
+    }
+
+    public boolean isBidirectionalAndAlsoNotThePrimarySynapseGroup() {
+        Optional<SynapseGroup> other = targetNeuronGroup.getOutgoingSg().stream()
+                .filter(o -> o.getTargetNeuronGroup().equals(sourceNeuronGroup))
+                .findFirst();
+        return other.filter(synapseGroup -> synapseGroup.id.compareToIgnoreCase(this.id) > 0).isPresent();
+    }
+
+    public boolean isBidirectional() {
+        return targetNeuronGroup.getOutgoingSg().stream()
+                .anyMatch(o -> o.getTargetNeuronGroup().equals(sourceNeuronGroup));
     }
 
     /**

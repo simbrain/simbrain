@@ -173,9 +173,27 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
         }
         arrow.layoutChildren(src, startPort, tar, endPort);
 
-        Point2D.Float bez = arrow.getTemplate().getBez1(src, tar, startPort);
-        Point2D.Float bez2 = arrow.getTemplate().getBez2(src, tar, endPort);
-        Point2D middle = SimbrainMath.cubicBezierMidpoint(src, bez, bez2, tar);
+        Point2D.Float bez;
+        Point2D.Float bez2;
+        Point2D middle;
+
+        if (synapseGroupNode.getSynapseGroup().isBidirectional()) {
+            if (synapseGroupNode.getSynapseGroup().isBidirectionalAndAlsoNotThePrimarySynapseGroup()) {
+                bez = arrow.getTemplate().getBez1(tar, src, endPort);
+                bez2 = arrow.getTemplate().getBez2(tar, src, startPort);
+                middle = SimbrainMath.cubicBezierMidpoint(tar, bez, bez2, src);
+            } else {
+                bez = arrow.getTemplate().getBez1(src, tar, startPort);
+                bez2 = arrow.getTemplate().getBez2(src, tar, endPort);
+                middle = SimbrainMath.cubicBezierMidpoint(src, bez, bez2, tar);
+            }
+        } else {
+            bez = arrow.getTemplate().getBez1(src, tar, startPort);
+            bez2 = arrow.getTemplate().getBez2(src, tar, endPort);
+            middle = SimbrainMath.cubicBezierMidpoint(src, bez, bez2, tar);
+        }
+
+
 
         synapseGroupNode.interactionBox.centerFullBoundsOnPoint(middle.getX(), middle.getY());
         synapseGroupNode.interactionBox.raiseToTop();

@@ -129,18 +129,38 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
         if (group.isMarkedForDeletion()) {
             return;
         }
-        // if((sourceNode == null) || (targetNode == null)) {
-        //     return;
-        // }
+         if((sourceNode == null) || (targetNode == null)) {
+             return;
+         }
 
         determineProperEndPoints();
-        Point2D src = sourceNode.getDockingPoint(startPort, this);
-        Point2D tar = targetNode.getDockingPoint(endPort, this);
-        if (src == null || tar == null) {
-            return;
-        }
+        Point2D src = getDockingPoint(startPort, source);
+
+        Point2D tar = getDockingPoint(endPort, target);
+
         layout(src, tar);
 
+    }
+
+    private Point2D getDockingPoint(Port port, NeuronGroup group) {
+        Point2D dockingPoint = new Point2D.Double();
+
+        switch (port) {
+            case WEST:
+                dockingPoint.setLocation(group.getMinX(), group.getCenterY());
+                break;
+            case EAST:
+                dockingPoint.setLocation(group.getMaxX(), group.getCenterY());
+                break;
+            case NORTH:
+                dockingPoint.setLocation(group.getCenterX(), group.getMaxY());
+                break;
+            case SOUTH:
+                dockingPoint.setLocation(group.getCenterX(), group.getMinY());
+                break;
+        }
+
+        return dockingPoint;
     }
 
     public synchronized void layoutChildrenQuiet(Point2D pt1, Point2D pt2) {
@@ -181,7 +201,7 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
             if (synapseGroupNode.getSynapseGroup().isBidirectionalAndAlsoNotThePrimarySynapseGroup()) {
                 bez = arrow.getTemplate().getBez1(tar, src, endPort);
                 bez2 = arrow.getTemplate().getBez2(tar, src, startPort);
-                middle = SimbrainMath.cubicBezierMidpoint(tar, bez, bez2, src);
+                middle = SimbrainMath.cubicBezierMidpoint(tar, bez2, bez, src);
             } else {
                 bez = arrow.getTemplate().getBez1(src, tar, startPort);
                 bez2 = arrow.getTemplate().getBez2(src, tar, endPort);

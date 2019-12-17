@@ -31,17 +31,17 @@ public class ActivationInputManager {
     /**
      * The collection whose inputs should be set.
      */
-    private final AbstractNeuronCollection parentCollection;
+    private final AbstractNeuronCollection pc;
 
     /**
      * Construct the input manager
      */
     public ActivationInputManager(AbstractNeuronCollection pc) {
-        this.parentCollection = pc;
+        this.pc = pc;
     }
 
     /**
-     * Apply current row of values to {@link #parentCollection} using {@link AbstractNeuronCollection#forceSetActivations(double[])}}},
+     * Apply current row of values to {@link #pc} using {@link AbstractNeuronCollection#forceSetActivations(double[])}}},
      * and iterate current row.
      */
     public void applyCurrentRow() {
@@ -49,19 +49,19 @@ public class ActivationInputManager {
             inputIndex = 0;
         }
         if (inputSpikes) {
-            parentCollection.setInputValues(data[inputIndex]);
-            for (int i = 0; i < parentCollection.getNeuronList().size(); i++) {
-                parentCollection.getNeuron(i).setToBufferVals();
+            pc.setInputValues(data[inputIndex]);
+            for (int i = 0; i < pc.getNeuronList().size(); i++) {
+                pc.getNeuron(i).setToBufferVals();
             }
         } else {
-            parentCollection.forceSetActivations(data[inputIndex]);
+            pc.forceSetActivations(data[inputIndex]);
         }
         inputIndex++;
     }
 
     public void setData(double[][] data) {
         for (int i = 0; i < data.length; i++) {
-            if (data[i].length != parentCollection.size()) {
+            if (data[i].length != pc.size()) {
                 if (i == 0) {
                     throw new IllegalArgumentException("Data Inconsistency:" + " Test data does not have a column number equal" + " to the number of neurons in the group.");
                 } else {
@@ -69,7 +69,7 @@ public class ActivationInputManager {
                 }
             }
         }
-        if (parentCollection instanceof NeuronGroup) {
+        if (pc instanceof NeuronGroup) {
             testAndSetIfSpiking();
         }
         this.data = data;
@@ -81,7 +81,7 @@ public class ActivationInputManager {
      */
     public void testAndSetIfSpiking() {
         boolean spiking = true;
-        for (Neuron n : parentCollection.getNeuronList()) {
+        for (Neuron n : pc.getNeuronList()) {
             if (!n.getUpdateRule().isSpikingNeuron()) {
                 spiking = false;
                 break;

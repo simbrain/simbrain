@@ -45,8 +45,6 @@ import java.util.List;
  */
 public class NeuronCollection extends AbstractNeuronCollection {
 
-    private PropertyChangeListener networkListener;
-
     /**
      * Construct a new neuron group from a list of neurons.
      *
@@ -102,7 +100,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
 
     @Override
     public void update() {
-        // TODO
+        super.update();
     }
 
     /**
@@ -110,7 +108,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
      */
     public void delete() {
         changeSupport.firePropertyChange("delete", this, null);
-        getParentNetwork().removePropertyChangeListener(networkListener);
         fireDeleted();
     }
 
@@ -147,7 +144,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
     public void setLocation(Point2D location) {
         // TODO
     }
-
 
     @Override
     public String toString() {

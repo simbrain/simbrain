@@ -1,17 +1,15 @@
 package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.AbstractNeuronCollection;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.util.SFileChooser;
+import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.Outline;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.*;
 
 public abstract class AbstractNeuronCollectionNode extends ScreenElement implements GroupNode {
@@ -31,12 +29,20 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
      */
     private InteractionBox interactionBox;
 
+    /**
+     * Constitiuent neuron nodes.
+     */
     private Set<NeuronNode> neuronNodes = new HashSet<>();
+
+    /**
+     * Reference to neuron group or collection.
+     */
+    private AbstractNeuronCollection nc;
 
     public AbstractNeuronCollectionNode(NetworkPanel networkPanel, AbstractNeuronCollection group) {
         super(networkPanel);
         this.networkPanel = networkPanel;
-
+        this.nc = group;
         outlinedObjects = new Outline();
         addChild(outlinedObjects);
 
@@ -46,6 +52,10 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
                 outlinedObjects.update(neuronNodes);
             } else if ("moved".equals(evt.getPropertyName())) {
                 outlinedObjects.update(neuronNodes);
+            }  else if ("recordingStarted".equals(evt.getPropertyName())) {
+                updateText();
+            } else if ("recordingStopped".equals(evt.getPropertyName())) {
+                updateText();
             }
         });
     }
@@ -143,7 +153,27 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
         updateText();
     }
 
-    public abstract void updateText();
+    /**
+     * Default text update. Override for more specific behavior.
+     */
+    public void updateText() {
+        // Set text to label by default
+        String text = nc.getLabel();
+
+        // If there is state info, use that instead of a label
+        if (!nc.getStateInfo().isEmpty()) {
+            System.out.println(nc.getStateInfo());
+            text = nc.getStateInfo();
+        }
+
+        // Append "recording" to the
+        if (nc.getActivationRecorder().isRecording()) {
+            text += " -- RECORDING";
+        }
+
+        // Update the text
+        getInteractionBox().setText(text);
+    }
 
     /**
      * Action for editing the group name.
@@ -153,6 +183,27 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
         public void actionPerformed(final ActionEvent event) {
             String newName = JOptionPane.showInputDialog("Name:", getModel().getLabel());
             getModel().setLabel(newName);
+        }
+    };
+
+    class RecordingAction extends AbstractAction {
+
+        public RecordingAction() {
+            super("" + (nc.getActivationRecorder().isRecording() ? "Stop" : "Start")
+                    + " Recording");
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent event) {
+                if (nc.getActivationRecorder().isRecording()) {
+                    nc.getActivationRecorder().stopRecording();
+                } else {
+                    SFileChooser chooser = new SFileChooser(".", "comma-separated-values (csv)", "csv");
+                        File theFile = chooser.showSaveDialog("Recording_" + Utils.getTimeString() + ".csv");
+                    if (theFile != null) {
+                        nc.getActivationRecorder().startRecording(theFile);
+                    }
+                }
         }
     };
 

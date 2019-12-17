@@ -9,6 +9,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.util.ActivationInputManager;
+import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.SimbrainConstants;
@@ -72,12 +73,18 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     protected SubsamplingManager subsamplingManager;
 
     /**
+     * Manage recording activation histories for a network
+     */
+    protected ActivationRecorder activationRecorder;
+
+    /**
      * Default constructor.
      */
     public AbstractNeuronCollection(Network net) {
         super(net);
         inputManager = new ActivationInputManager(this);
         subsamplingManager = new SubsamplingManager(this);
+        activationRecorder = new ActivationRecorder(this);
     }
 
     /**
@@ -804,6 +811,9 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         if (inputMode) {
             updateInputs();
         }
+        if (activationRecorder.isRecording()) {
+            activationRecorder.writeActsToFile();
+        }
     }
 
     /**
@@ -820,6 +830,14 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         return inputManager;
     }
 
+    public SubsamplingManager getSubsamplingManager() {
+        return subsamplingManager;
+    }
+
+    public ActivationRecorder getActivationRecorder() {
+        return activationRecorder;
+    }
+
     /**
      * Returns a vector of subsampled activations to be used by some object external to the
      * neuron group. If plotting activations of a thousand
@@ -831,4 +849,13 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     public double[] getSubsampledActivations() {
         return subsamplingManager.getActivations();
     }
+
+    public void fireRecordingStarted() {
+        changeSupport.firePropertyChange("recordingStarted", null, null);
+    }
+
+    public void fireRecordingStopped() {
+        changeSupport.firePropertyChange("recordingStopped", null, null);
+    }
+
 }

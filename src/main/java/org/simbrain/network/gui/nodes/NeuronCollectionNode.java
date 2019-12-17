@@ -193,7 +193,12 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         menu.add(clampNeuronsAction);
         menu.add(unclampNeuronsAction);
 
+        // Recording action
+        menu.addSeparator();
+        menu.add(new RecordingAction());
+
         // Coupling menu
+        menu.addSeparator();
         JMenu couplingMenu = getNetworkPanel().getCouplingMenu(neuronCollection);
         if (couplingMenu != null) {
             menu.add(couplingMenu);
@@ -274,13 +279,6 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         protected boolean hasToolTipText() {
             return true;
         }
-    }
-
-    /**
-     * Update the text in the interaction box.
-     */
-    public void updateText() {
-        getInteractionBox().updateText();
     }
 
     /**

@@ -239,13 +239,19 @@ public class Network {
      */
     public void update() {
 
+        // TODO: Why is this here and not at end?
         changeSupport.firePropertyChange("updateCompleted", null, false);
 
         // Main update
         updateManager.invokeAllUpdates();
 
+        // TODO: Should this be handled inside the updatemanager?
+
         // Update neuron arrays
         naList.forEach(NeuronArray::update);
+
+        // Update neuron collections
+        neuronCollectionSet.forEach(NeuronCollection::update);
 
         //clearInputs();
         updateTime();

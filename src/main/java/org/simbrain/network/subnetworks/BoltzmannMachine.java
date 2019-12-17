@@ -29,6 +29,7 @@ import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.util.Utils;
 
 import java.awt.geom.Point2D;
 import java.util.Collections;
@@ -141,8 +142,8 @@ public class BoltzmannMachine extends Subnetwork implements Trainable {
             this.temperature = .95 * temperature;
         }
 
-        //TODO
-        //this.getParentNetwork().fireGroupParametersChanged(this);
+        setStateInfo("Temperature: " + Utils.round(getTemperature(), 2));
+        fireLabelUpdated();
     }
 
     @Override
@@ -152,7 +153,6 @@ public class BoltzmannMachine extends Subnetwork implements Trainable {
 
     @Override
     public List<Neuron> getOutputNeurons() {
-        //TODO: implement
         return Collections.emptyList();
     }
 

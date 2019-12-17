@@ -237,7 +237,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
                     evt -> {
                         if ("update".equals(evt.getPropertyName())) {
                             synchronized (outputGroups) {
-                                if (ng.isRecording()) {
+                                if (ng.getActivationRecorder().isRecording()) {
                                     if (!outputGroups.contains(ng)) {
                                         outputGroups.add(ng);
                                     }
@@ -314,7 +314,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
             e1.printStackTrace();
         }
         for (int i = 0, n = outputGroups.size(); i < n; i++) {
-            outputGroups.get(i).writeActsToFile();
+            outputGroups.get(i).getActivationRecorder().writeActsToFile();
         }
     }
 
@@ -481,7 +481,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
         net.setFireUpdates(false);
         net.setTimeStep(0.1);
         NeuronGroup ng = new NeuronGroup(net, numNeurons);
-        ng.setRecordAsSpikes(true);
+        ng.getActivationRecorder().setRecordAsSpikes(true);
         ng.setLabel(beginToken);
         IzhikevichRule upRule = new IzhikevichRule();
         upRule.setiBg(0);
@@ -632,7 +632,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
         //        // net.getUpdateManager().addAction(new NeuronGroupRecorder(ng));
         //        // ng.startRecording();
         start = System.nanoTime();
-        ng.startRecording(new File("outs.csv"));
+        ng.getActivationRecorder().startRecording(new File("outs.csv"));
         for (int i = 0; i < 100000; i++) {
             net.update();
         }

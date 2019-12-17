@@ -113,46 +113,4 @@ public class BoltzmannNode extends SubnetworkNode {
         }
     }
 
-    @Override
-    public void updateText() {
-        BoltzmannMachine bm = (BoltzmannMachine) getSubnetwork();
-        bm.setStateInfo("Temperature: " + Utils.round(((BoltzmannMachine) getSubnetwork()).getTemperature(), 2));
-        getInteractionBoxes().get(0).setText(bm.getStateInfo());
-        getInteractionBoxes().get(0).updateText();
-    }
-
-    ;
-
-    //    /**
-    //     * Sets custom menu for SOM node.
-    //     */
-    //    protected void setCustomMenuItems() {
-    //        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-    //                "Reset SOM Network") {
-    //            public void actionPerformed(final ActionEvent event) {
-    //                SOMGroup group = ((SOMGroup) getNeuronGroup());
-    //                group.reset();
-    //                group.getParentNetwork().fireGroupUpdated(group);
-    //            }
-    //        }));
-    //        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-    //                "Recall SOM Memory") {
-    //            public void actionPerformed(final ActionEvent event) {
-    //                SOMGroup group = ((SOMGroup) getNeuronGroup());
-    //                group.recall();
-    //                group.getParentNetwork().fireGroupUpdated(group);
-    //            }
-    //        }));
-    //        super.addCustomMenuItem(new JMenuItem(new AbstractAction(
-    //                "Randomize SOM Weights") {
-    //            public void actionPerformed(final ActionEvent event) {
-    //                SOMGroup group = ((SOMGroup) getNeuronGroup());
-    //                group.randomizeIncomingWeights();
-    //                group.getParentNetwork().fireGroupUpdated(group);
-    //            }
-    //        }));
-    //    }
-
-
-
 }

@@ -67,18 +67,6 @@ public class SOMGroupNode extends NeuronGroupNode {
         }
     }
 
-    ;
-
-    @Override
-    public void updateText() {
-        SOMGroup group = (SOMGroup) getNeuronGroup();
-        group.setStateInfo("Learning rate (" + Utils.round(group.getAlpha(), 2) + ") N-size (" + Utils.round(group.getNeighborhoodSize(), 2) + ")");
-        getInteractionBox().setText(group.getStateInfo());
-        getInteractionBox().updateText();
-    }
-
-    ;
-
     /**
      * Sets custom menu for SOM node.
      */

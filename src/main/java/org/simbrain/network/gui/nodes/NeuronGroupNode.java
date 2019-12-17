@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.datavec.api.records.Record;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
@@ -113,10 +114,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             if ("delete".equals(evt.getPropertyName())) {
                 NeuronGroupNode.this.removeFromParent();
             } else if ("label".equals(evt.getPropertyName())) {
-                NeuronGroupNode.this.updateText();
-            } else if ("recordingStarted".equals(evt.getPropertyName())) {
-                NeuronGroupNode.this.updateText();
-            } else if ("recordingStopped".equals(evt.getPropertyName())) {
                 NeuronGroupNode.this.updateText();
             } else if ("moved".equals(evt.getPropertyName())) {
                 NeuronGroupNode.this.syncToModel();
@@ -324,21 +321,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         // Recording action
         menu.addSeparator();
-        Action recordingAction = new AbstractAction((neuronGroup.isRecording() ? "Stop" : "Start") + " Recording") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (neuronGroup.isRecording()) {
-                    neuronGroup.stopRecording();
-                } else {
-                    SFileChooser chooser = new SFileChooser(".", "comma-separated-values (csv)", "csv");
-                    File theFile = chooser.showSaveDialog("Recording_" + Utils.getTimeString() + ".csv");
-                    if (theFile != null) {
-                        neuronGroup.startRecording(theFile);
-                    }
-                }
-            }
-        };
-        menu.add(recordingAction);
+        menu.add(new RecordingAction());
 
         // Coupling menu
         JMenu couplingMenu = getNetworkPanel().getCouplingMenu(neuronGroup);
@@ -400,18 +383,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     @Override
     public NeuronGroup getModel() {
         return neuronGroup;
-    }
-
-    /**
-     * Update the text in the interaction box.
-     */
-    public void updateText() {
-        if (neuronGroup.isRecording()) {
-            getInteractionBox().setText(neuronGroup.getLabel() + " -- RECORDING");
-        } else {
-            getInteractionBox().setText(neuronGroup.getLabel());
-        }
-        getInteractionBox().updateText();
     }
 
     /**

@@ -25,6 +25,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,7 +168,6 @@ public class SOMGroup extends NeuronGroup {
         return "Self Organizing Map";
     }
 
-
     /**
      * Randomize all weights coming in to this network. The weights will be
      * between 0 and the upper bound of each synapse.
@@ -265,6 +265,12 @@ public class SOMGroup extends NeuronGroup {
         } else {
             neighborhoodSize = 0;
         }
+
+        // For box
+        String stateInfo = "Learning rate (" + Utils.round(getAlpha(), 2) +
+                ") N-size (" + Utils.round(getNeighborhoodSize(), 2) + ")";
+        setStateInfo(stateInfo);
+        fireLabelUpdated();
     }
 
     /**

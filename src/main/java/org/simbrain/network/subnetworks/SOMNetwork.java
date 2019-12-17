@@ -115,16 +115,10 @@ public class SOMNetwork extends Subnetwork implements Trainable {
         // No implementation
     }
 
-    /**
-     * @return the som
-     */
     public SOMGroup getSom() {
         return som;
     }
 
-    /**
-     * @return the inputLayer
-     */
     public NeuronGroup getInputLayer() {
         return inputLayer;
     }

@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
@@ -499,7 +500,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
     private List<Neuron> getNeuronsInRadius(Neuron source, List<Neuron> neighbors, double radius) {
         ArrayList<Neuron> ret = new ArrayList<Neuron>();
         for (Neuron neuron : neighbors) {
-            if (network.getEuclideanDist(source, neuron) < radius) {
+            if (SimnetUtils.getEuclideanDist(source, neuron) < radius) {
                 ret.add(neuron);
             }
         }

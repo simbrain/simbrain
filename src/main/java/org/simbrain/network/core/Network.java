@@ -315,6 +315,7 @@ public class Network {
         }
     }
 
+    //TODO: Rename to getLooseNeurons?
     /**
      * Return the list of synapses. These are "loose" neurons. For the full set of neurons, including neurons inside of
      * subnetworks and groups, use {@link #getFlatNeuronList()}.
@@ -347,19 +348,6 @@ public class Network {
      */
     public int getSynapseCount() {
         return looseSynapses.size();
-    }
-
-    /**
-     * Calculates the Euclidean distance between two neurons' positions in coordinate space.
-     *
-     * @param n1 The first neuron.
-     * @param n2 The second neuron.
-     */
-    public static double getEuclideanDist(Neuron n1, Neuron n2) {
-        double dx = (n1.getX() - n2.getX());
-        double dy = (n1.getY() - n2.getY());
-        double dz = (n1.getZ() - n2.getZ());
-        return Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
     }
 
     /**

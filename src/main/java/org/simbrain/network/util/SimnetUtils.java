@@ -21,6 +21,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.util.math.SimbrainMath;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -377,5 +378,15 @@ public class SimnetUtils {
      */
     public static double getWidth(List<? extends LocatableModel> models) {
         return getMaxX(models) - getMinX(models);
+    }
+
+    /**
+     * Calculates the Euclidean distance between two neurons' positions in coordinate space.
+     *
+     * @param n1 The first neuron.
+     * @param n2 The second neuron.
+     */
+    public static double getEuclideanDist(Neuron n1, Neuron n2) {
+        return SimbrainMath.distance(n1.getPosition(), n2.getPosition());
     }
 }

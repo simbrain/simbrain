@@ -781,29 +781,6 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         return SimnetUtils.getMaxY(neuronList);
     }
 
-
-    /**
-     * Returns all the neurons in this group within a certain radius of the
-     * given neuron. This method will never return the given neuron as part
-     * of the list of neurons within the given radius, nor will it return
-     * neurons with the exact same position as the given neuron as a part
-     * of the returned list.
-     *
-     * @param n      the neurons
-     * @param radius the radius to search within.
-     * @return neurons in the group within a certain radius
-     */
-    public List<Neuron> getNeuronsInRadius(Neuron n, int radius) {
-        ArrayList<Neuron> ret = new ArrayList<Neuron>((int) (size() / 0.75f));
-        for (Neuron potN : neuronList) {
-            double dist = Network.getEuclideanDist(n, potN);
-            if (dist <= radius && dist != 0) {
-                ret.add(potN);
-            }
-        }
-        return ret;
-    }
-
     /**
      * Generic update operations that can be "doubled" if a neuron is part of multiple collections.
      */

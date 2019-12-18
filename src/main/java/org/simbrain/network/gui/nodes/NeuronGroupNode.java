@@ -51,16 +51,16 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
     private final int buffer = DEFAULT_BUFFER;
 
-    private final HashMap<Port, HashMap<SynapseGroupArrow, Point2D>> dockingPorts = new HashMap<Port, HashMap<SynapseGroupArrow, Point2D>>();
+    private final HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>> dockingPorts = new HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>>();
 
     {
-        dockingPorts.put(Port.NORTH, new HashMap<SynapseGroupArrow, Point2D>());
-        dockingPorts.put(Port.SOUTH, new HashMap<SynapseGroupArrow, Point2D>());
-        dockingPorts.put(Port.EAST, new HashMap<SynapseGroupArrow, Point2D>());
-        dockingPorts.put(Port.WEST, new HashMap<SynapseGroupArrow, Point2D>());
+        dockingPorts.put(Port.NORTH, new HashMap<SynapseGroupNodeSimple, Point2D>());
+        dockingPorts.put(Port.SOUTH, new HashMap<SynapseGroupNodeSimple, Point2D>());
+        dockingPorts.put(Port.EAST, new HashMap<SynapseGroupNodeSimple, Point2D>());
+        dockingPorts.put(Port.WEST, new HashMap<SynapseGroupNodeSimple, Point2D>());
     }
 
-    public HashMap<Port, HashMap<SynapseGroupArrow, Point2D>> getDockingPorts() {
+    public HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>> getDockingPorts() {
         return dockingPorts;
     }
 

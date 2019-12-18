@@ -449,7 +449,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         }
     };
 
-    public void removeSynapseDock(Port port, SynapseGroupArrow synGN) {
+    public void removeSynapseDock(Port port, SynapseGroupNodeSimple synGN) {
         dockingPorts.get(port).remove(synGN);
     }
 

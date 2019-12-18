@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Jeff Yoshimi
  */
 @SuppressWarnings("serial")
-public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, SynapseGroupNode.Arrow {
+public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Arrow {
 
     private static final float DEFAULT_ARROW_THICKNESS = 30;
 
@@ -149,30 +149,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
         return dockingPoint;
     }
 
-    public synchronized void layoutChildrenQuiet(Point2D pt1, Point2D pt2) {
-        if (getNetworkPanel().isRunning()) {
-            return;
-        }
-        halt.getAndSet(true);
-        if (pt1 == null) {
-            if (this.startPt == null) {
-                this.startPt = getOpposingDefaultPosition(target);
-            }
-        } else {
-            this.startPt = pt1;
-        }
-
-        if (pt2 == null) {
-            if (this.endPt == null) {
-                this.endPt = getOpposingDefaultPosition(source);
-            }
-        } else {
-            this.endPt = pt2;
-        }
-        layout(this.startPt, this.endPt);
-        halt.getAndSet(false);
-    }
-
     public void layout(Point2D src, Point2D tar) {
         if (networkPanel.isRunning()) {
             return;
@@ -182,8 +158,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
         Point2D.Float bez = arrow.getTemplate().getBez1(src, tar, startPort);
         Point2D.Float bez2 = arrow.getTemplate().getBez2(src, tar, endPort);
         Point2D middle = SimbrainMath.cubicBezierMidpoint(src, bez, bez2, tar);
-
-
 
         synapseGroupNode.interactionBox.centerFullBoundsOnPoint(middle.getX(), middle.getY());
         synapseGroupNode.interactionBox.raiseToTop();
@@ -388,7 +362,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
         return new Point2D.Float(x, y);
     }
 
-    @Override
     public SynapseGroup getSynapseGroup() {
         return group;
     }
@@ -411,11 +384,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
 
     public NeuronGroup getTarget() {
         return target;
-    }
-
-    @Override
-    public float getRequiredSpacing() {
-        return arrow.getStrokeWidth() * 2;
     }
 
     public NetworkPanel getNetworkPanel() {

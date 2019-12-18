@@ -162,7 +162,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
 
         // If there is state info, use that instead of a label
         if (!nc.getStateInfo().isEmpty()) {
-            System.out.println(nc.getStateInfo());
             text = nc.getStateInfo();
         }
 

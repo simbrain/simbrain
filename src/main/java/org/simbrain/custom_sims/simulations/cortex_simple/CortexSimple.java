@@ -172,8 +172,8 @@ public class CortexSimple extends RegisteredSimulation {
                                    double[] restingPotential, double[] timeConstant, double[] threshold,
                                    double[] resistance) {
 
-        GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE,
-            (int) Math.sqrt(numNeurons));
+        //GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE,
+        //    (int) Math.sqrt(numNeurons));
         List<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
         ThreadLocalRandom locR = ThreadLocalRandom.current();
         for (int i = 0; i < numNeurons; i++) {
@@ -192,8 +192,8 @@ public class CortexSimple extends RegisteredSimulation {
         }
         NeuronGroup ng = new NeuronGroup(network, neurons);
         network.addGroup(ng);
-        ng.setLayout(layout);
-        ng.applyLayout();
+        //ng.setLayout(layout);
+        //ng.applyLayout();
         return ng;
     }
 

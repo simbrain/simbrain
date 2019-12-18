@@ -325,6 +325,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             }
             activationText.setText(String.valueOf((int) Math.round(act)));
         }
+
     }
 
     /**
@@ -404,7 +405,17 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             } else {
                 mainShape.setStrokePaint(SynapseNode.getLineColor());
             }
+
+            // Color stroke paint based on Polarity
+            if(neuron.getPolarity() == SimbrainConstants.Polarity.EXCITATORY) {
+                circle.setStrokePaint(Color.red);
+            } else if (neuron.getPolarity() == SimbrainConstants.Polarity.INHIBITORY) {
+                circle.setStrokePaint(Color.blue);
+            } else {
+                circle.setStrokePaint(DEFAULT_STROKE_PAINT);
+            }
         }
+
     }
 
     /**
@@ -430,7 +441,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             PBounds bounds = mainShape.getBounds();
             bounds.add(labelText.localToParent(labelText.getBounds()));
             setBounds(bounds);
-
         }
     }
 
@@ -698,44 +708,26 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         return getNeuron();
     }
 
-    /**
-     * @return the hotColor
-     */
     public static float getHotColor() {
         return hotColor;
     }
 
-    /**
-     * @param hotColor the hotColor to set
-     */
     public static void setHotColor(float hotColor) {
         NeuronNode.hotColor = hotColor;
     }
 
-    /**
-     * @return the coolColor
-     */
     public static float getCoolColor() {
         return coolColor;
     }
 
-    /**
-     * @param coolColor the coolColor to set
-     */
     public static void setCoolColor(float coolColor) {
         NeuronNode.coolColor = coolColor;
     }
 
-    /**
-     * @return the spikingColor
-     */
     public static Color getSpikingColor() {
         return spikingColor;
     }
 
-    /**
-     * @param spikingColor the spikingColor to set
-     */
     public static void setSpikingColor(Color spikingColor) {
         NeuronNode.spikingColor = spikingColor;
     }
@@ -756,9 +748,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         circle.setStroke(CLAMPED_STROKE);
     }
 
-    /**
-     * @param customColor the customColor to set
-     */
     public void setUsingCustomStrokeColor(boolean customColor) {
         this.customStrokeColor = customColor;
     }

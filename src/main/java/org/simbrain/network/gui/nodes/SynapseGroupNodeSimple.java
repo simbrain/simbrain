@@ -65,8 +65,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
 
     private final NetworkPanel networkPanel;
 
-    // private final PPath.Float dbLine;
-
     private final AtomicBoolean halt = new AtomicBoolean();
 
     private final SynapseGroup group;
@@ -100,18 +98,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
         srcZoneBoundaries[3] = Math.atan2(corners[3].getY(), corners[3].getX());
 
         // this.addChild(dbLine);
-    }
-
-    public SynapseGroupNodeSimple(final NetworkPanel networkPanel, final SynapseGroupNode node, final float thickness) {
-        this.networkPanel = networkPanel;
-        this.group = node.getSynapseGroup();
-        this.synapseGroupNode = node;
-        source = group.getSourceNeuronGroup();
-        target = group.getTargetNeuronGroup();
-        sourceNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap().get(group.getSourceNeuronGroup());
-        targetNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap().get(group.getTargetNeuronGroup());
-        arrow = new DirectedCubicArrow(BezierTemplate.DIRECTED, DEFAULT_COLOR, 0.5f, thickness);
-        this.addChild(arrow);
     }
 
     /**
@@ -339,7 +325,7 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupArrow, 
     }
 
     /**
-     * {@inheritDoc} TODO: Not sure why below is needed. Without the explicit
+     * TODO: Not sure why below is needed. Without the explicit
      * null sets a fatal error occurs in the JRE.
      */
     @Override

@@ -1359,18 +1359,6 @@ public class SynapseGroup extends Group implements NetworkModel {
         return recurrent;
     }
 
-    public boolean isBidirectionalAndAlsoNotThePrimarySynapseGroup() {
-        Optional<SynapseGroup> other = targetNeuronGroup.getOutgoingSg().stream()
-                .filter(o -> o.getTargetNeuronGroup().equals(sourceNeuronGroup))
-                .findFirst();
-        return other.filter(synapseGroup -> synapseGroup.id.compareToIgnoreCase(this.id) > 0).isPresent();
-    }
-
-    public boolean isBidirectional() {
-        return targetNeuronGroup.getOutgoingSg().stream()
-                .anyMatch(o -> o.getTargetNeuronGroup().equals(sourceNeuronGroup));
-    }
-
     /**
      * Tests if this synapse group is in fact recurrent (it's target and source
      * neuron groups are the same).

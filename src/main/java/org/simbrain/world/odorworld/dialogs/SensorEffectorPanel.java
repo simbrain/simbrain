@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
+import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -33,10 +35,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,47 +148,32 @@ public class SensorEffectorPanel extends JPanel {
         JButton addAttribute = new JButton("Add", ResourceManager.getImageIcon("menu_icons/plus.png"));
         addAttribute.setToolTipText("Add...");
         buttonBar.add(addAttribute);
-        addAttribute.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                StandardDialog dialog;
-                if (type == PanelType.Sensor) {
-                    dialog = new AddSensorDialog(parentEntity);
-                } else {
-                    dialog = new AddEffectorDialog(parentEntity);
-                }
-                // Putting these on the side since I can't figure out a way to get this in front of its parent dialog
-                // after trying everything (toFront, alwaysOnTop, etc).
-                SwingUtilities.invokeLater(() -> {
-                    dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
-                });
-                dialog.pack();
-                dialog.setVisible(true);
+        addAttribute.addActionListener(e -> {
+            StandardDialog dialog;
+            if (type == PanelType.Sensor) {
+                dialog = new AddSensorDialog(parentEntity);
+            } else {
+                dialog = new AddEffectorDialog(parentEntity);
             }
+            // Putting these on the side since I can't figure out a way to get this in front of its parent dialog
+            // after trying everything (toFront, alwaysOnTop, etc).
+            SwingUtilities.invokeLater(() -> {
+                dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
+            });
+            dialog.pack();
+            dialog.setVisible(true);
         });
 
         // Delete attribute
-        JButton deleteAttribute = new JButton("Delete", ResourceManager.getImageIcon("menu_icons/minus.png"));
+        JButton deleteAttribute = new JButton();
         deleteAttribute.setToolTipText("Delete...");
         buttonBar.add(deleteAttribute);
-        deleteAttribute.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int[] selectedRows = table.getSelectedRows();
-                List<PeripheralAttribute> toDelete = new ArrayList();
-                for (int i = 0; i < selectedRows.length; i++) {
-                    toDelete.add(model.getAttribute(selectedRows[i]));
-                }
-                for (PeripheralAttribute attribute : toDelete) {
-                    if (attribute != null) {
-                        if (attribute instanceof Sensor) {
-                            parentEntity.removeSensor((Sensor) attribute);
-
-                        } else {
-                            parentEntity.removeEffector((Effector) attribute);
-                        }
-                    }
-                }
-            }
-        });
+        DeleteItems deleteAction = new DeleteItems();
+        deleteAttribute.setAction(deleteAction);
+        // Add a key command to the delete action   
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), this);
+        getActionMap().put(this,  deleteAction);
 
         // Edit attribute
         JButton editAttribute = new JButton("Edit", ResourceManager.getImageIcon("menu_icons/Properties.png"));
@@ -237,6 +221,33 @@ public class SensorEffectorPanel extends JPanel {
         }
 
     }
+
+    class DeleteItems extends AbstractAction {
+
+        public DeleteItems() {
+            super("Delete", ResourceManager.getImageIcon("menu_icons/minus.png"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int[] selectedRows = table.getSelectedRows();
+            List<PeripheralAttribute> toDelete = new ArrayList();
+            for (int i = 0; i < selectedRows.length; i++) {
+                toDelete.add(model.getAttribute(selectedRows[i]));
+            }
+            for (PeripheralAttribute attribute : toDelete) {
+                if (attribute != null) {
+                    if (attribute instanceof Sensor) {
+                        parentEntity.removeSensor((Sensor) attribute);
+
+                    } else {
+                        parentEntity.removeEffector((Effector) attribute);
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Edit an attribute.

@@ -30,15 +30,10 @@ import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -414,18 +409,13 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * @return the spatial positions of the corners of the neuron group
      * (X and Y only)
      */
-    public Point2D[] getFourCorners() {
-        double centerX = getCenterX();
-        double centerY = getCenterY();
-
-        Point2D[] corners = new Point2D[4];
-
-        corners[0] = new Point2D.Double(getMaxX() - centerX, getMaxY() - centerY);
-        corners[3] = new Point2D.Double(getMaxX() - centerX, getMinY() - centerY);
-        corners[2] = new Point2D.Double(getMinX() - centerX, getMinY() - centerY);
-        corners[1] = new Point2D.Double(getMinX() - centerX, getMaxY() - centerY);
-
-        return corners;
+    public List<Point2D> getFourCorners() {
+        return Arrays.asList(
+                new Point2D.Double(getMaxX(), getMaxY()),
+                new Point2D.Double(getMaxX(), getMinY()),
+                new Point2D.Double(getMinX(), getMaxY()),
+                new Point2D.Double(getMinX(), getMinY())
+        );
     }
 
     /**

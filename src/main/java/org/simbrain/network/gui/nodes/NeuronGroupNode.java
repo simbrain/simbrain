@@ -18,24 +18,21 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.datavec.api.records.Record;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
@@ -51,13 +48,13 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
     private final int buffer = DEFAULT_BUFFER;
 
-    private final HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>> dockingPorts = new HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>>();
+    private final HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>> dockingPorts = new HashMap<>();
 
     {
-        dockingPorts.put(Port.NORTH, new HashMap<SynapseGroupNodeSimple, Point2D>());
-        dockingPorts.put(Port.SOUTH, new HashMap<SynapseGroupNodeSimple, Point2D>());
-        dockingPorts.put(Port.EAST, new HashMap<SynapseGroupNodeSimple, Point2D>());
-        dockingPorts.put(Port.WEST, new HashMap<SynapseGroupNodeSimple, Point2D>());
+        dockingPorts.put(Port.NORTH, new HashMap<>());
+        dockingPorts.put(Port.SOUTH, new HashMap<>());
+        dockingPorts.put(Port.EAST, new HashMap<>());
+        dockingPorts.put(Port.WEST, new HashMap<>());
     }
 
     public HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>> getDockingPorts() {

@@ -47,10 +47,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
 
     private DirectedCubicArrow arrow;
 
-    private Point2D startPt;
-
-    private Point2D endPt;
-
     private Port startPort;
 
     private Port endPort;
@@ -71,8 +67,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
 
     private final SynapseGroupNode synapseGroupNode;
 
-    private final double[] srcZoneBoundaries = new double[4];
-
     /**
      * Create a Synapse Group PNode.
      */
@@ -91,11 +85,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
         targetNode = (NeuronGroupNode) getNetworkPanel().getObjectNodeMap().get(group.getTargetNeuronGroup());
         arrow = new DirectedCubicArrow(BezierTemplate.DIRECTED, DEFAULT_COLOR, 0.5f, DEFAULT_ARROW_THICKNESS);
         this.addChild(arrow);
-        Point2D[] corners = source.getFourCorners();
-        srcZoneBoundaries[0] = Math.atan2(corners[0].getY(), corners[0].getX());
-        srcZoneBoundaries[1] = Math.atan2(corners[1].getY(), corners[1].getX());
-        srcZoneBoundaries[2] = Math.atan2(corners[2].getY(), corners[2].getX());
-        srcZoneBoundaries[3] = Math.atan2(corners[3].getY(), corners[3].getX());
 
         // this.addChild(dbLine);
     }
@@ -174,112 +163,27 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
      * Includes start and end of arrow.
      */
     public void determineProperEndPoints() {
-        float centerXSrc = (float) source.getCenterX();
-        float centerYSrc = (float) source.getCenterY();
-        float centerXTar = (float) target.getCenterX();
-        float centerYTar = (float) target.getCenterY();
+        double dx = target.getCenterX() - source.getCenterX();
+        double dy = target.getCenterY() - source.getCenterY();
 
-        float distance = (float) Point2D.distance(centerXSrc, centerYSrc, centerXTar, centerYTar);
-
-        float theta = (float) Math.atan2(centerYSrc - centerYTar, centerXTar - centerXSrc);
-
-        float zoneModifier = distance * distance / 5000;
-
-        if (sourceNode == null || targetNode == null) {
-            return;
-        }
-        boolean left = target.getMaxX() < (source.getMinX() - zoneModifier);
-        boolean right = target.getMinX() > (source.getMaxX() + zoneModifier);
-        boolean above = target.getMinY() > source.getMaxY() + zoneModifier;
-        boolean below = target.getMaxY() < source.getMinY() - zoneModifier;
-
-        if (theta <= srcZoneBoundaries[0] && theta >= srcZoneBoundaries[3]) {
-            startPort = Port.EAST;
-            if (above || below) {
-                if (above) {
-                    endPort = Port.SOUTH;
-                } else {
-                    endPort = Port.NORTH;
-                }
+        if (Math.abs(dx) - Math.abs(dy) > 0) { // x component is longer
+            if (dx < 0) {
+                startPort = Port.WEST;
+                endPort = Port.EAST;
             } else {
-                if (centerXTar < centerXSrc) {
-                    endPort = Port.EAST;
-                } else {
-                    endPort = Port.WEST;
-                }
+                startPort = Port.EAST;
+                endPort = Port.WEST;
             }
-        } else if (theta > srcZoneBoundaries[0] && theta <= srcZoneBoundaries[1]) {
-            startPort = Port.SOUTH;
-            if (left || right) {
-                if (left) { // Offset left (I/IIIa)
-                    endPort = Port.EAST;
-                } else { // Offset right (I/IIIb)
-                    endPort = Port.WEST;
-                }
-            } else { // Not offset I/III
-                if (centerYTar < centerYSrc) {
-                    endPort = Port.NORTH;
-                } else {
-                    endPort = Port.SOUTH;
-                    if (left || right) {
-                        if (left) { // Offset left (I/IIIa)
-                            endPort = Port.EAST;
-                        } else { // Offset right (I/IIIb)
-                            endPort = Port.WEST;
-                        }
-                    } else { // Not offset I/III
-                        if (centerYTar < centerYSrc) {
-                            endPort = Port.NORTH;
-                        } else {
-                            endPort = Port.SOUTH;
-                        }
-                    }
-                }
-            }
-        } else if (theta > srcZoneBoundaries[1] || theta <= srcZoneBoundaries[2]) {
-            startPort = Port.WEST;
-            if (above || below) {
-                if (above) {
-                    endPort = Port.SOUTH;
-                } else {
-                    endPort = Port.NORTH;
-                }
+        } else { // y component is longer
+            if (dy > 0) {
+                startPort = Port.NORTH;
+                endPort = Port.SOUTH;
             } else {
-                if (centerXTar < centerXSrc) {
-                    endPort = Port.EAST;
-                } else {
-                    endPort = Port.WEST;
-                }
-            }
-        } else {
-            startPort = Port.NORTH;
-            if (left || right) {
-                if (left) { // Offset left (I/IIIa)
-                    endPort = Port.EAST;
-                } else { // Offset right (I/IIIb)
-                    endPort = Port.WEST;
-                }
-            } else { // Not offset I/III
-                if (centerYTar < centerYSrc) {
-                    endPort = Port.NORTH;
-                } else {
-                    endPort = Port.SOUTH;
-                    if (left || right) {
-                        if (left) { // Offset left (I/IIIa)
-                            endPort = Port.EAST;
-                        } else { // Offset right (I/IIIb)
-                            endPort = Port.WEST;
-                        }
-                    } else { // Not offset I/III
-                        if (centerYTar < centerYSrc) {
-                            endPort = Port.NORTH;
-                        } else {
-                            endPort = Port.SOUTH;
-                        }
-                    }
-                }
+                startPort = Port.SOUTH;
+                endPort = Port.NORTH;
             }
         }
+
     }
 
     /**
@@ -299,67 +203,12 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
         super.removeFromParent();
     }
 
-    public Point2D getStartPt() {
-        return startPt;
-    }
-
-    public void setStartPt(Point2D.Float startPt) {
-        this.startPt = startPt;
-    }
-
-    public Point2D getEndPt() {
-        return endPt;
-    }
-
-    public void setEndPt(Point2D.Float endPt) {
-        this.endPt = endPt;
-    }
-
     public Port getStartPort() {
         return startPort;
     }
 
     public void setStartPort(Port startPort) {
         this.startPort = startPort;
-    }
-
-    /**
-     * Returns a default position...
-     *
-     * @param ng
-     * @return
-     */
-    public Point2D getOpposingDefaultPosition(NeuronGroup ng) {
-        if (group.getSourceNeuronGroup() != ng && group.getTargetNeuronGroup() != ng) {
-            throw new IllegalArgumentException("Synapse group does not begin" + " or end in this group.");
-        }
-        NeuronGroup opposite;
-        Port opPort;
-        float x = 0;
-        float y = 0;
-        if (group.getSourceNeuronGroup() == ng) {
-            opposite = group.getTargetNeuronGroup();
-            opPort = endPort;
-        } else {
-            opposite = group.getSourceNeuronGroup();
-            opPort = startPort;
-        }
-        if (opPort == Port.NORTH || opPort == Port.SOUTH) {
-            x = (float) opposite.getCenterX();
-            if (opPort == Port.NORTH) {
-                y = (float) opposite.getMaxY();
-            } else {
-                y = (float) opposite.getMinY();
-            }
-        } else {
-            y = (float) opposite.getCenterY();
-            if (opPort == Port.WEST) {
-                x = (float) opposite.getMinX();
-            } else {
-                x = (float) opposite.getMaxX();
-            }
-        }
-        return new Point2D.Float(x, y);
     }
 
     public SynapseGroup getSynapseGroup() {

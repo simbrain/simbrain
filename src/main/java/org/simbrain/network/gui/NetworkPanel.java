@@ -858,6 +858,8 @@ public class NetworkPanel extends JPanel {
             synapseGroupNode = new SynapseGroupNode(this, synapseGroup);
             canvas.getLayer().addChild(synapseGroupNode);
             objectNodeMap.put(synapseGroup, synapseGroupNode);
+
+            synapseGroupNode.lowerToBottom();
         }
 
     }

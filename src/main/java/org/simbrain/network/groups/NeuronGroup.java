@@ -21,6 +21,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
@@ -30,6 +31,7 @@ import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 
@@ -413,9 +415,22 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return Arrays.asList(
                 new Point2D.Double(getMaxX(), getMaxY()),
                 new Point2D.Double(getMaxX(), getMinY()),
-                new Point2D.Double(getMinX(), getMaxY()),
-                new Point2D.Double(getMinX(), getMinY())
+                new Point2D.Double(getMinX(), getMinY()),
+                new Point2D.Double(getMinX(), getMaxY())
         );
+    }
+
+    public Map<NeuronGroupNode.Port, Point2D> getMidPointOfFourEdges() {
+        List<Point2D> c = getFourCorners();
+        Map<NeuronGroupNode.Port, Point2D> portPointMap = new HashMap<>();
+
+        portPointMap.put(NeuronGroupNode.Port.EAST, SimbrainMath.midpoint(c.get(0), c.get(1)));
+        portPointMap.put(NeuronGroupNode.Port.SOUTH, SimbrainMath.midpoint(c.get(1), c.get(2)));
+        portPointMap.put(NeuronGroupNode.Port.WEST, SimbrainMath.midpoint(c.get(2), c.get(3)));
+        portPointMap.put(NeuronGroupNode.Port.NORTH, SimbrainMath.midpoint(c.get(3), c.get(0)));
+
+        return portPointMap;
+
     }
 
     /**

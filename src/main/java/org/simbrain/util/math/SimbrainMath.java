@@ -29,10 +29,7 @@ import umontreal.ssj.rng.RandomStream;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * <b>SimbrainMath</b> is the math functions used in simbrain.
@@ -315,7 +312,11 @@ public class SimbrainMath {
      * @return the midpoint between the two points
      */
     public static Point2D midpoint(Point2D pt1, Point2D pt2) {
-        return new java.awt.geom.Point2D.Double((pt1.getX() + pt2.getX()) / 2, (pt1.getY() + pt2.getY()) / 2);
+        return SimbrainMath.add(
+            new java.awt.geom.Point2D.Double((pt2.getX() - pt1.getX()) / 2, (pt2.getY() - pt1.getY()) / 2),
+            pt1
+        );
+
     }
 
     /**
@@ -336,6 +337,24 @@ public class SimbrainMath {
 
         return new Point2D.Double(-dy / magnitude, dx / magnitude);
     }
+
+    public static double magnitude(Point2D point) {
+        return Math.sqrt(point.getX() * point.getX() + point.getY() * point.getY());
+    }
+
+    public static double magnitudeSq(Point2D point) {
+        return point.getX() * point.getX() + point.getY() * point.getY();
+    }
+
+    public static Comparator<Point2D> distanceComparator = (p1, p2) -> {
+        if (SimbrainMath.magnitudeSq(p1) > SimbrainMath.magnitudeSq(p2)) {
+            return 1;
+        } else if (SimbrainMath.magnitudeSq(p2) < SimbrainMath.magnitudeSq(p2)) {
+            return -1;
+        } else {
+            return 0;
+        }
+    };
 
     /**
      * Component-wise addition of the provided points.

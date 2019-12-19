@@ -23,12 +23,17 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronGroupNode.Port;
+import org.simbrain.util.Pair;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.widgets.DirectedCubicArrow;
 import org.simbrain.util.widgets.DirectedCubicArrow.BezierTemplate;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -50,6 +55,10 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
     private Port startPort;
 
     private Port endPort;
+
+    private Point2D startPoint;
+
+    private Point2D endPoint;
 
     private final NeuronGroupNode sourceNode;
 
@@ -109,11 +118,8 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
          }
 
         determineProperEndPoints();
-        Point2D src = getDockingPoint(startPort, source);
 
-        Point2D tar = getDockingPoint(endPort, target);
-
-        layout(src, tar);
+        layout(startPoint, endPoint);
 
     }
 
@@ -163,25 +169,29 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
      * Includes start and end of arrow.
      */
     public void determineProperEndPoints() {
-        double dx = target.getCenterX() - source.getCenterX();
-        double dy = target.getCenterY() - source.getCenterY();
+        // ((source point, target point) -> vector) pairs
+        List<Pair<Pair<Map.Entry<Port, Point2D>, Map.Entry<Port, Point2D>>, Point2D>> vectors = new ArrayList<>();
 
-        if (Math.abs(dx) - Math.abs(dy) > 0) { // x component is longer
-            if (dx < 0) {
-                startPort = Port.WEST;
-                endPort = Port.EAST;
-            } else {
-                startPort = Port.EAST;
-                endPort = Port.WEST;
+        for (Map.Entry<Port, Point2D> sp : source.getMidPointOfFourEdges().entrySet()) {
+            for (Map.Entry<Port, Point2D> tp : target.getMidPointOfFourEdges().entrySet()) {
+                vectors.add(new Pair<>(new Pair<>(sp, tp), SimbrainMath.subtract(tp.getValue(), sp.getValue())));
             }
-        } else { // y component is longer
-            if (dy > 0) {
-                startPort = Port.NORTH;
-                endPort = Port.SOUTH;
-            } else {
-                startPort = Port.SOUTH;
-                endPort = Port.NORTH;
-            }
+        }
+
+        Optional<Pair<Pair<Map.Entry<Port, Point2D>, Map.Entry<Port, Point2D>>, Point2D>> bestPair = vectors.stream()
+                .filter(v -> SimbrainMath.magnitudeSq(v.getSecond()) > DEFAULT_ARROW_THICKNESS * DEFAULT_ARROW_THICKNESS)
+                .min((p1, p2) -> SimbrainMath.distanceComparator.compare(p1.getSecond(), p2.getSecond()));
+
+        if (bestPair.isPresent()) {
+            startPoint = bestPair.get().getFirst().getFirst().getValue();
+            endPoint = bestPair.get().getFirst().getSecond().getValue();
+            startPort = bestPair.get().getFirst().getFirst().getKey();
+            endPort = bestPair.get().getFirst().getSecond().getKey();
+        } else {
+            startPort = Port.NORTH;
+            endPort = Port.SOUTH;
+            startPoint = source.getMidPointOfFourEdges().get(Port.NORTH);
+            endPoint = target.getMidPointOfFourEdges().get(Port.SOUTH);
         }
 
     }

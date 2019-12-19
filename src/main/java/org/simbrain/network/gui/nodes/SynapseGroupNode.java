@@ -127,9 +127,6 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
                 }
             }
         });
-
-        lowerToBottom();
-        interactionBox.raiseToTop();
     }
 
     private void removeArrows() {

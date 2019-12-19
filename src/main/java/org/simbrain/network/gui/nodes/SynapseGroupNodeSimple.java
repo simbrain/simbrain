@@ -117,33 +117,15 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
              return;
          }
 
-        determineProperEndPoints();
+        determinePortsAndPoints();
 
         layout(startPoint, endPoint);
 
     }
 
-    private Point2D getDockingPoint(Port port, NeuronGroup group) {
-        Point2D dockingPoint = new Point2D.Double();
-
-        switch (port) {
-            case WEST:
-                dockingPoint.setLocation(group.getMinX(), group.getCenterY());
-                break;
-            case EAST:
-                dockingPoint.setLocation(group.getMaxX(), group.getCenterY());
-                break;
-            case NORTH:
-                dockingPoint.setLocation(group.getCenterX(), group.getMaxY());
-                break;
-            case SOUTH:
-                dockingPoint.setLocation(group.getCenterX(), group.getMinY());
-                break;
-        }
-
-        return dockingPoint;
-    }
-
+    /**
+     * Position the arrow given starting and ending ports (N,S,E,W) and points.
+     */
     public void layout(Point2D src, Point2D tar) {
         if (networkPanel.isRunning()) {
             return;
@@ -166,18 +148,23 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
     }
 
     /**
-     * Includes start and end of arrow.
+     * Sets ports (N,S,W,E) and their start and end points, which are used in layout.
      */
-    public void determineProperEndPoints() {
-        // ((source point, target point) -> vector) pairs
-        List<Pair<Pair<Map.Entry<Port, Point2D>, Map.Entry<Port, Point2D>>, Point2D>> vectors = new ArrayList<>();
+    public void determinePortsAndPoints() {
 
+        // Create a list of 16 pairs, one for each combination of (N,S,W,E) ports. Associate each of these
+        // with a vector from the point associated with the source port to the point associated with the target port
+        List<Pair<
+                Pair<Map.Entry<Port, Point2D>, Map.Entry<Port, Point2D>>, // source, target pair
+                Point2D>> vectors = new ArrayList<>();                    // associated vector
         for (Map.Entry<Port, Point2D> sp : source.getMidPointOfFourEdges().entrySet()) {
             for (Map.Entry<Port, Point2D> tp : target.getMidPointOfFourEdges().entrySet()) {
                 vectors.add(new Pair<>(new Pair<>(sp, tp), SimbrainMath.subtract(tp.getValue(), sp.getValue())));
             }
         }
 
+        // Filter out small distances
+        // Get the pair with the minimum distance
         Optional<Pair<Pair<Map.Entry<Port, Point2D>, Map.Entry<Port, Point2D>>, Point2D>> bestPair = vectors.stream()
                 .filter(v -> SimbrainMath.magnitudeSq(v.getSecond()) > DEFAULT_ARROW_THICKNESS * DEFAULT_ARROW_THICKNESS)
                 .min((p1, p2) -> SimbrainMath.distanceComparator.compare(p1.getSecond(), p2.getSecond()));

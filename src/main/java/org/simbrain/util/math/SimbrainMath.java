@@ -347,9 +347,9 @@ public class SimbrainMath {
     }
 
     public static Comparator<Point2D> distanceComparator = (p1, p2) -> {
-        if (SimbrainMath.magnitudeSq(p1) > SimbrainMath.magnitudeSq(p2)) {
+        if (magnitudeSq(p1) > magnitudeSq(p2)) {
             return 1;
-        } else if (SimbrainMath.magnitudeSq(p2) < SimbrainMath.magnitudeSq(p2)) {
+        } else if (magnitudeSq(p2) < magnitudeSq(p2)) {
             return -1;
         } else {
             return 0;

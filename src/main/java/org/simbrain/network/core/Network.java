@@ -87,31 +87,28 @@ public class Network {
      */
     private final Set<Synapse> looseSynapses = new LinkedHashSet<Synapse>();
 
-    //TODO: Set back to final when backwards compatibility issue fixed
+    //TODO: Set all below back to final when backwards compatibility issue fixed
     /**
      * Set of weight matrices.
      */
     private Set<WeightMatrix> weightMatrices = new HashSet<>();
 
-    // TODO: Set back to final when backwards compatibility issue fixed
-    // TODO: A separate neuron collection set is in conflict with the groupList.
     /**
-     * Neuron Collections. Can contain overlapping neurons.
+     * Neuron Collections. Can contain overlapping neurons. A set is used
+     * to prevent identical sets from being created.
      */
     private HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
+    //TODO
     private final List<MultiLayerNet> multiLayerNetworks = new ArrayList<>();
-
-    /**
-     * Since groups span all levels of the hierarchy they are stored here.
-     */
-    private final List<Group> groupList = new ArrayList<Group>();
+    private List<NeuronGroup> neuronGroups  = new ArrayList<>();
+    private List<SynapseGroup> synapseGroups  = new ArrayList<>();
+    private List<Subnetwork> subnetworks  = new ArrayList<>();
 
     /**
      * Text objects.
      */
     private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
-
 
     /**
      * Neuron Array objects (nd4j). Not yet implemented.
@@ -245,13 +242,12 @@ public class Network {
         // Main update
         updateManager.invokeAllUpdates();
 
-        // TODO: Should this be handled inside the updatemanager?
-
-        // Update neuron arrays
+        // TODO
+        neuronGroups.forEach(NeuronGroup::update);
+        subnetworks.forEach(Subnetwork::update);
         naList.forEach(NeuronArray::update);
-
-        // Update neuron collections
         neuronCollectionSet.forEach(NeuronCollection::update);
+        synapseGroups.forEach(SynapseGroup::update);
 
         //clearInputs();
         updateTime();
@@ -315,26 +311,6 @@ public class Network {
         }
     }
 
-    //TODO: Rename to getLooseNeurons?
-    /**
-     * Return the list of synapses. These are "loose" neurons. For the full set of neurons, including neurons inside of
-     * subnetworks and groups, use {@link #getFlatNeuronList()}.
-     *
-     * @return List of neurons in network.
-     */
-    public List<? extends Neuron> getNeuronList() {
-        return Collections.unmodifiableList(looseNeurons);
-    }
-
-    /**
-     * Return the list of synapses. These are "loose" synapses. For the full set of synapses, including synapses inside
-     * of subnetworks and groups, use {@link #getFlatSynapseList()}.
-     *
-     * @return List of synapses in network.
-     */
-    public Collection<Synapse> getSynapseList() {
-        return Collections.unmodifiableCollection(looseSynapses);
-    }
 
     /**
      * @return Number of neurons in network.
@@ -375,90 +351,38 @@ public class Network {
         return null;
     }
 
-    /**
-     * Find a group with a given string id.
-     *
-     * @param id id to search for.
-     * @return group with that id, null otherwise
-     */
-    public Group getGroup(String id) {
-        for (Group group : getFlatGroupList()) {
-            if (group.getId().equalsIgnoreCase(id)) {
-                return group;
-            }
-        }
-        return null;
-    }
 
-    /**
-     * Get a neuron collection given its id
-     *
-     * @param id id of collection
-     * @return the collection with that id
-     */
-    public NeuronCollection getNeuronCollection(String id) {
-        for (NeuronCollection nc : getNeuronCollectionSet()) {
-            if (nc.getId().equalsIgnoreCase(id)) {
-                return nc;
-            }
-        }
-        return null;
-    }
+    ///**
+    // * Find groups with a given label, or null if none found.
+    // *
+    // * @param label label to search for.
+    // * @return list of groups with that label.
+    // */
+    //public List<Group> getGroupsByLabel(String label) {
+    //    List<Group> returnList = new ArrayList<>();
+    //    for (Group group : getFlatGroupList()) {
+    //        if (group.getLabel().equalsIgnoreCase(label)) {
+    //            returnList.add(group);
+    //        }
+    //    }
+    //    return returnList;
+    //}
 
-    /**
-     * Get a neuron collection given its id
-     *
-     * @param label label of collection
-     * @return the collection with that id
-     */
-    public NeuronCollection getNeuronCollectionByLabel(String label) {
-        for (NeuronCollection nc : getNeuronCollectionSet()) {
-            if (nc.getLabel().equalsIgnoreCase(label)) {
-                return nc;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Find groups with a given label, or null if none found.
-     *
-     * @param label label to search for.
-     * @return list of groups with that label.
-     */
-    public List<Group> getGroupsByLabel(String label) {
-        List<Group> returnList = new ArrayList<>();
-        for (Group group : getFlatGroupList()) {
-            if (group.getLabel().equalsIgnoreCase(label)) {
-                returnList.add(group);
-            }
-        }
-        return returnList;
-    }
-
-    /**
-     * Find group with a given label, or null if none found.
-     *
-     * @param label label to search for.
-     * @return list of groups with that label found, null otherwise
-     */
-    public Group getGroupByLabel(String label) {
-        List<Group> returnList = getGroupsByLabel(label);
-        if (returnList.isEmpty()) {
-            return null;
-        } else {
-            return returnList.get(0);
-        }
-    }
-
-    /**
-     * Returns the group list.
-     *
-     * @return the groupList
-     */
-    public List<? extends Group> getGroupList() {
-        return Collections.unmodifiableList(groupList);
-    }
+    //todo
+    ///**
+    // * Find group with a given label, or null if none found.
+    // *
+    // * @param label label to search for.
+    // * @return list of groups with that label found, null otherwise
+    // */
+    //public Group getGroupByLabel(String label) {
+    //    List<Group> returnList = getGroupsByLabel(label);
+    //    if (returnList.isEmpty()) {
+    //        return null;
+    //    } else {
+    //        return returnList.get(0);
+    //    }
+    //}
 
     /**
      * Returns a list of all neuron groups.
@@ -466,33 +390,10 @@ public class Network {
      * @return a neuron group list
      */
     public List<NeuronGroup> getFlatNeuronGroupList() {
-        ArrayList<NeuronGroup> neuronGroups = new ArrayList<>();
-        for (Group group : groupList) {
-            if (group instanceof NeuronGroup) {
-                neuronGroups.add(((NeuronGroup) group));
-            }
-        }
+        ArrayList<NeuronGroup> ret = new ArrayList<>();
+        ret.addAll(neuronGroups);
+        subnetworks.forEach(net -> ret.addAll(net.getNeuronGroupList()));
         return neuronGroups;
-    }
-
-    /**
-     * Returns the synapse group between some source neuron group and some target neuron group, if it exists. Returns
-     * null otherwise.
-     *
-     * @param source the source neuron group
-     * @param target the target neuron group
-     * @return the synapse group between source and target, null if there is none
-     */
-    public SynapseGroup getSynapseGroup(NeuronGroup source, NeuronGroup target) {
-        for (Group group : groupList) {
-            if (group instanceof SynapseGroup) {
-                SynapseGroup synapseGroup = (SynapseGroup) group;
-                if (source == synapseGroup.getSourceNeuronGroup() && target == synapseGroup.getTargetNeuronGroup()) {
-                    return synapseGroup;
-                }
-            }
-        }
-        return null;
     }
 
     /**
@@ -577,9 +478,9 @@ public class Network {
         // Remove the neuron itself. Either from a parent group that holds it,
         // or from the root network.
         if (toDelete.getParentGroup() != null) {
-            ((NeuronGroup) toDelete.getParentGroup()).removeNeuron(toDelete);
+            toDelete.getParentGroup().removeNeuron(toDelete);
             if (toDelete.getParentGroup().isEmpty()) {
-                removeGroup(toDelete.getParentGroup());
+                removeNeuronGroup(toDelete.getParentGroup());
             }
         } else {
             looseNeurons.remove(toDelete);
@@ -590,6 +491,25 @@ public class Network {
             changeSupport.firePropertyChange("neuronRemoved", toDelete, null);
         }
     }
+
+    public void removeNeuronGroup(NeuronGroup ng) {
+        neuronGroups.remove(ng);
+        ng.delete();
+        changeSupport.firePropertyChange("ngRemoved", ng, null);
+    }
+
+    public void removeSynapseGroup(SynapseGroup sg) {
+        neuronGroups.remove(sg);
+        sg.delete();
+        changeSupport.firePropertyChange("sgRemoved", sg, null);
+    }
+
+    public void removeSubnetwork(Subnetwork subnet) {
+        subnetworks.remove(subnet);
+        subnet.delete();
+        changeSupport.firePropertyChange("subnetRemoved", subnet, null);
+    }
+
 
     /**
      * Remove a neuron collection.
@@ -652,18 +572,15 @@ public class Network {
             if (parentGroup.isDisplaySynapses()) {
                 fireSynapseRemoved(toDelete);
             }
-            if (parentGroup.isEmpty()) {
-                removeGroup(toDelete.getParentGroup());
-            }
+            // TODO
+            //if (parentGroup.isEmpty()) {
+            //    removeGroup(toDelete.getParentGroup());
+            //}
         } else {
             looseSynapses.remove(toDelete);
             // Notify listeners that this synapse has been deleted
             fireSynapseRemoved(toDelete);
         }
-    }
-
-    void removeArrayConnectable(ArrayConnectable arrayConnectable) {
-
     }
 
     /**
@@ -675,7 +592,7 @@ public class Network {
 
         // Filter out loose neurons (a neuron is loose if its parent group is null)
         List<Neuron> loose = neuronList.stream()
-                .filter(n -> n.getParentGroup() == null)
+                //.filter(n -> n.getParentGroup() == null)  // TODO
                 .collect(Collectors.toList());
 
         // Only make the neuron collection if some neurons have been selected
@@ -731,7 +648,6 @@ public class Network {
             }
         }
         changeSupport.firePropertyChange("neuronsUpdated", null, this.getFlatNeuronList());
-
     }
 
     /**
@@ -831,7 +747,6 @@ public class Network {
         randomizeLooseWeights();
     }
 
-
     /**
      * Randomize all biased loose neurons.
      *
@@ -867,43 +782,37 @@ public class Network {
         return getLooseNeuron(i).getFanOut().get(getLooseNeuron(j));
     }
 
-    /**
-     * Add a group to the network. This works for both singular groups like neuron groups and synapse groups as well as
-     * for composite groups like any subclass of Subnetwork.
-     *
-     * @param group group of network elements
-     */
-    public void addGroup(final Group group) {
-
-        // Set id for this group and all constituent groups
-        group.initializeId();
-
-        // Only add top level groups to the group list.
-        if (group.isTopLevelGroup()) {
-            groupList.add(group);
-        }
-
-        // Notify listeners (mainly network panel) that the group has been
-        // added.
-        fireGroupAdded(group);
+    public void addSynapseGroup(final SynapseGroup sg) {
+        synapseGroups.add(sg);
+        changeSupport.firePropertyChange("sgAdded", null, sg);
     }
 
-    /**
-     * Remove the specified group.
-     *
-     * @param toDelete the group to delete.
-     */
-    public void removeGroup(final Group toDelete) {
-
-        // Remove from the group list
-        groupList.remove(toDelete);
-
-        // Call delete method on this group being deleted
-        toDelete.delete();
-
-        // Notify listeners that this group has been deleted.
-        fireGroupRemoved(toDelete);
+    public void addNeuronGroup(final NeuronGroup ng) {
+        neuronGroups.add(ng);
+        changeSupport.firePropertyChange("ngAdded", null, ng);
     }
+
+    public void addSubnetwork(Subnetwork net) {
+        subnetworks.add(net);
+        changeSupport.firePropertyChange("subnetAdded", null, net);
+    }
+
+    ///**
+    // * Remove the specified group.
+    // *
+    // * @param toDelete the group to delete.
+    // */
+    //public void removeGroup(final Group toDelete) {
+    //
+    //    // Remove from the group list
+    //    groupList.remove(toDelete);
+    //
+    //    // Call delete method on this group being deleted
+    //    toDelete.delete();
+    //
+    //    // Notify listeners that this group has been deleted.
+    //    fireGroupRemoved(toDelete);
+    //}
 
     /**
      * Returns true if all objects are gone from this network.
@@ -925,21 +834,12 @@ public class Network {
      * @return the flat list
      */
     public List<Neuron> getFlatNeuronList() {
-
         List<Neuron> ret = new ArrayList<Neuron>();
         ret.addAll(looseNeurons);
-
-        // TODO: Base this on an overridable method?
-        for (int i = 0; i < groupList.size(); i++) {
-            if (groupList.get(i) instanceof NeuronGroup) {
-                NeuronGroup group = (NeuronGroup) groupList.get(i);
-                ret.addAll(group.getNeuronList());
-            } else if (groupList.get(i) instanceof Subnetwork) {
-                Subnetwork group = (Subnetwork) groupList.get(i);
-                ret.addAll(group.getFlatNeuronList());
-            }
-        }
-
+        neuronGroups.forEach(ng -> ret.addAll(ng.getNeuronList()));
+        neuronCollectionSet.forEach(nc -> ret.addAll(nc.getNeuronList()));
+        subnetworks.forEach(s -> s.getNeuronGroupList().forEach(
+                        ng -> ret.addAll(ng.getNeuronList())));
         return ret;
     }
 
@@ -951,59 +851,10 @@ public class Network {
     public List<Synapse> getFlatSynapseList() {
         List<Synapse> ret = new ArrayList<Synapse>(10000);
         ret.addAll(looseSynapses);
-        for (int i = 0; i < groupList.size(); i++) {
-            if (groupList.get(i) instanceof SynapseGroup) {
-                SynapseGroup group = (SynapseGroup) groupList.get(i);
-                ret.addAll(group.getAllSynapses());
-            } else if (groupList.get(i) instanceof Subnetwork) {
-                Subnetwork group = (Subnetwork) groupList.get(i);
-                ret.addAll(group.getFlatSynapseList());
-            }
-        }
+        synapseGroups.forEach(sg -> ret.addAll(sg.getAllSynapses()));
+        subnetworks.forEach(s -> s.getSynapseGroupList().forEach(
+                sg -> ret.addAll(sg.getAllSynapses())));
         return ret;
-    }
-
-    /**
-     * Create a "flat" list of groups, which includes the top-level groups plus all subgroups.
-     *
-     * @return the flat list
-     */
-    public List<Group> getFlatGroupList() {
-        List<Group> ret = new ArrayList<Group>();
-        ret.addAll(groupList);
-        for (Group group : groupList) {
-            if (group instanceof Subnetwork) {
-                ret.addAll(((Subnetwork) group).getNeuronGroupList());
-                ret.addAll(((Subnetwork) group).getSynapseGroupList());
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Create a "flat" list of groups, which only includes sub-groups of subnetworks and unbound groups.
-     *
-     * @return the flat list
-     */
-    public List<Group> getFlatGroupListNoSubnets() {
-        List<Group> groups = new ArrayList<Group>();
-        for (Group g : groupList) {
-            if (g instanceof Subnetwork) {
-                List<NeuronGroup> ng = ((Subnetwork) g).getNeuronGroupList();
-                List<SynapseGroup> sg = ((Subnetwork) g).getSynapseGroupList();
-                if (!ng.isEmpty()) {
-                    groups.addAll(ng);
-                }
-                if (!sg.isEmpty()) {
-                    groups.addAll(sg);
-                }
-            } else {
-                if (!g.isEmpty()) {
-                    groups.add(g);
-                }
-            }
-        }
-        return groups;
     }
 
     /**
@@ -1090,26 +941,30 @@ public class Network {
         if (neuronCollectionSet == null) {
             neuronCollectionSet = new HashSet<>();
         }
+        if (synapseGroups == null) {
+            synapseGroups = new ArrayList<>();
+        }
+        if (neuronGroups == null) {
+            neuronGroups = new ArrayList<>();
+        }
+        if (subnetworks == null) {
+            subnetworks = new ArrayList<>();
+        }
 
         changeSupport = new PropertyChangeSupport(this);
 
         // Initialize update manager
         updateManager.postUnmarshallingInit();
 
-        // Initialize neurons
         getFlatNeuronList().forEach(Neuron::postUnmarshallingInit);
-
-        // Initialize text objects
         textList.forEach(NetworkTextObject::postUnmarshallingInit);
-
-        // Uncompress compressed matrix rep if needed
-        getSynapseGroups().forEach(SynapseGroup::postUnmarshallingInit);
-
-        // Generic group unmarshalling
-        getGroupList().forEach(Group::postUnmarshallingInit);
+        synapseGroups.forEach(SynapseGroup::postUnmarshallingInit);
+        neuronGroups.forEach(AbstractNeuronCollection::postUnmarshallingInit);
+        neuronCollectionSet.forEach(AbstractNeuronCollection::postUnmarshallingInit);
+        subnetworks.forEach(Subnetwork::postUnmarshallingInit);
 
         // Re-populate fan-in / fan-out for loose synapses
-        getSynapseList().forEach(Synapse::postUnmarshallingInit);
+        getLooseSynapses().forEach(Synapse::postUnmarshallingInit);
 
         updateCompleted = new AtomicBoolean(false);
         return this;
@@ -1267,7 +1122,7 @@ public class Network {
      * reflected in the GUI.
      */
     public void fireNeuronsUpdated() {
-        changeSupport.firePropertyChange("neuronsUpdated", null, getNeuronList());
+        changeSupport.firePropertyChange("neuronsUpdated", null, getLooseNeurons());
     }
 
     /**
@@ -1303,7 +1158,7 @@ public class Network {
      * reflected in the GUI.
      */
     public void fireSynapsesUpdated() {
-        changeSupport.firePropertyChange("synapsesUpdated", null, getSynapseList());
+        changeSupport.firePropertyChange("synapsesUpdated", null, getLooseSynapses());
     }
 
     /**
@@ -1334,23 +1189,23 @@ public class Network {
         changeSupport.firePropertyChange("textRemoved", deleted, null);
     }
 
-    /**
-     * Fire a group added event to all registered model listeners.
-     *
-     * @param added Group that has been added
-     */
-    public void fireGroupAdded(final Group added) {
-        changeSupport.firePropertyChange("groupAdded", null, added);
-    }
-
-    /**
-     * Fire a group deleted event to all registered model listeners.
-     *
-     * @param deleted Group to be deleted
-     */
-    public void fireGroupRemoved(final Group deleted) {
-        changeSupport.firePropertyChange("groupRemoved", deleted, null);
-    }
+    ///**
+    // * Fire a group added event to all registered model listeners.
+    // *
+    // * @param added Group that has been added
+    // */
+    //public void fireGroupAdded(final Group added) {
+    //    changeSupport.firePropertyChange("groupAdded", null, added);
+    //}
+    //
+    ///**
+    // * Fire a group deleted event to all registered model listeners.
+    // *
+    // * @param deleted Group to be deleted
+    // */
+    //public void fireGroupRemoved(final Group deleted) {
+    //    changeSupport.firePropertyChange("groupRemoved", deleted, null);
+    //}
 
     /**
      * Used by Network thread to ensure that an update cycle is complete before updating again.
@@ -1370,50 +1225,19 @@ public class Network {
         updateCompleted.set(b);
     }
 
-    public HashSet<NeuronCollection> getNeuronCollectionSet() {
-        return neuronCollectionSet;
-    }
-
     @Override
     public String toString() {
 
-        String ret = "Root Network \n================= \n";
-
-        // Loose neurons
-        for (Neuron n : this.getNeuronList()) {
-            ret += (n + "\n");
-        }
-
-        if (this.getSynapseList().size() > 0) {
-            Iterator<Synapse> synapseIterator = looseSynapses.iterator();
-            for (int i = 0; i < getSynapseList().size(); i++) {
-                Synapse tempRef = synapseIterator.next();
-                ret += tempRef;
-            }
-        }
-
-        for (int i = 0; i < getGroupList().size(); i++) {
-            Group group = getGroupList().get(i);
-            ret += group.toString();
-        }
-
-        for (NeuronCollection nc : neuronCollectionSet) {
-            ret += nc.toString();
-        }
-
-        for (NeuronArray na : naList) {
-            ret += na.toString();
-        }
-
-        for (WeightMatrix wm : weightMatrices) {
-            ret += wm.toString();
-        }
-
-        for (NetworkTextObject text : textList) {
-            ret += (text + "\n");
-        }
-
-        return ret;
+        final StringBuilder ret = new StringBuilder("Root Network \n================= \n");
+        looseNeurons.forEach(ret::append);
+        looseSynapses.forEach(ret::append);
+        neuronGroups.forEach(ret::append);
+        synapseGroups.forEach(ret::append);
+        subnetworks.forEach(ret::append);
+        naList.forEach(ret::append);
+        weightMatrices.forEach(ret::append);
+        textList.forEach(ret::append);
+        return ret.toString();
     }
 
     /**
@@ -1546,7 +1370,7 @@ public class Network {
             } else if (object instanceof NetworkTextObject) {
                 addText((NetworkTextObject) object);
             } else if (object instanceof NeuronGroup) {
-                addGroup((NeuronGroup) object);
+                addNeuronGroup((NeuronGroup) object);
             } else if (object instanceof NeuronArray) {
                 addNeuronArray((NeuronArray) object);
             }
@@ -1575,7 +1399,7 @@ public class Network {
      */
     public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng, final ConnectionStrategy connection) {
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng, connection);
-        addGroup(group);
+        addSynapseGroup(group);
     }
 
     /**
@@ -1614,48 +1438,9 @@ public class Network {
             group.setFrozen(freeze, Polarity.BOTH);
         }
         // Freeze loose synapses
-        for (Synapse synapse : this.getSynapseList()) {
+        for (Synapse synapse : this.getLooseSynapses()) {
             synapse.setFrozen(freeze);
         }
-    }
-
-    /**
-     * Convenience method to return a list of synapse groups in the network. Note this is a "flat" list of synapse
-     * groups because there is no such thing as a "loose" synapse group.
-     *
-     * @return list of all synapse groups
-     */
-    public List<SynapseGroup> getSynapseGroups() {
-        List<SynapseGroup> retList = new ArrayList<SynapseGroup>();
-        for (Group group : this.getFlatGroupList()) {
-            if (group instanceof SynapseGroup) {
-                retList.add((SynapseGroup) group);
-            }
-        }
-        return retList;
-    }
-
-    /**
-     * Convenience method to return a list of neuron groups in the network.
-     *
-     * @return list of all neuron groups
-     */
-    public List<NeuronGroup> getNeuronGroups() {
-        List<NeuronGroup> retList = new ArrayList<NeuronGroup>();
-        for (Group group : this.getGroupList()) {
-            if (group instanceof NeuronGroup) {
-                retList.add((NeuronGroup) group);
-            }
-        }
-        return retList;
-    }
-
-    public List<NeuronArray> getNaList() {
-        return naList;
-    }
-
-    public Set<WeightMatrix> getWeightMatrices() {
-        return weightMatrices;
     }
 
     public static int getSynapseVisibilityThreshold() {
@@ -1725,6 +1510,50 @@ public class Network {
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
+    }
+
+    public List<MultiLayerNet> getMultiLayerNetworks() {
+        return  Collections.unmodifiableList(multiLayerNetworks);
+    }
+
+    public List<Subnetwork> getSubnetworks() {
+        return Collections.unmodifiableList(subnetworks);
+    }
+
+    public List<SynapseGroup> getSynapseGroups() {
+        return Collections.unmodifiableList(synapseGroups);
+    }
+
+    public List<NeuronGroup> getNeuronGroups() {
+        return Collections.unmodifiableList(neuronGroups);
+    }
+
+    public List<NeuronArray> getNaList() {
+        return Collections.unmodifiableList(naList);
+    }
+
+    public Set<WeightMatrix> getWeightMatrices() {
+        return Collections.unmodifiableSet(weightMatrices);
+    }
+
+    /**
+     * Return the list of synapses. These are "loose" neurons. For the full set of neurons, including neurons inside of
+     * subnetworks and groups, use {@link #getFlatNeuronList()}.
+     */
+    public List<? extends Neuron> getLooseNeurons() {
+        return Collections.unmodifiableList(looseNeurons);
+    }
+
+    /**
+     * Return the list of synapses. These are "loose" synapses. For the full set of synapses, including synapses inside
+     * of subnetworks and groups, use {@link #getFlatSynapseList()}.
+     */
+    public Collection<Synapse> getLooseSynapses() {
+        return Collections.unmodifiableCollection(looseSynapses);
+    }
+
+    public HashSet<NeuronCollection> getNeuronCollectionSet() {
+        return neuronCollectionSet;
     }
 
 }

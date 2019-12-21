@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.update_actions.*;
 
 import java.beans.PropertyChangeEvent;
@@ -121,15 +120,16 @@ public class NetworkUpdateManager {
     private void addListeners() {
         network.addPropertyChangeListener(
             evt -> {
-                if ("groupAdded".equals(evt.getPropertyName())) {
-                    Group group = (Group) evt.getNewValue();
-                    if (group.isTopLevelGroup()) {
-                        addAction(new UpdateGroup(group));
-                    }
-                } else if ("groupRemoved".equals(evt.getPropertyName())) {
-                    Group group = (Group) evt.getOldValue();
-                    removeGroupAction(group);
-                }
+                // TODO
+                //if ("groupAdded".equals(evt.getPropertyName())) {
+                //    Group group = (Group) evt.getNewValue();
+                //    if (group.isTopLevelGroup()) {
+                //        addAction(new UpdateGroup(group));
+                //    }
+                //} else if ("groupRemoved".equals(evt.getPropertyName())) {
+                //    Group group = (Group) evt.getOldValue();
+                //    removeGroupAction(group);
+                //}
             });
 
     }
@@ -147,34 +147,36 @@ public class NetworkUpdateManager {
         availableActionList.add(new PriorityUpdate(network));
         availableActionList.add(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
 
+        // TODO
         // Add update actions for all groups available
-        for (Group group : network.getGroupList()) {
-            if (group.isTopLevelGroup()) {
-                availableActionList.add(new UpdateGroup(group));
-            }
-        }
+        //for (Group group : network.getGroupList()) {
+        //    if (group.isTopLevelGroup()) {
+        //        availableActionList.add(new UpdateGroup(group));
+        //    }
+        //}
 
         return availableActionList;
     }
 
-    /**
-     * Remove action (if one exists) associated with the provided group.
-     *
-     * @param group the group being removed
-     */
-    private void removeGroupAction(Group group) {
-        NetworkUpdateAction toDelete = null;
-        for (NetworkUpdateAction action : actionList) {
-            if (action instanceof UpdateGroup) {
-                if (((UpdateGroup) action).getGroup() == group) {
-                    toDelete = action;
-                }
-            }
-        }
-        if (toDelete != null) {
-            removeAction(toDelete);
-        }
-    }
+    // TODO
+    ///**
+    // * Remove action (if one exists) associated with the provided group.
+    // *
+    // * @param group the group being removed
+    // */
+    //private void removeGroupAction(Group group) {
+    //    NetworkUpdateAction toDelete = null;
+    //    for (NetworkUpdateAction action : actionList) {
+    //        if (action instanceof UpdateGroup) {
+    //            if (((UpdateGroup) action).getGroup() == group) {
+    //                toDelete = action;
+    //            }
+    //        }
+    //    }
+    //    if (toDelete != null) {
+    //        removeAction(toDelete);
+    //    }
+    //}
 
     /**
      * Listen for updates to the update manager.

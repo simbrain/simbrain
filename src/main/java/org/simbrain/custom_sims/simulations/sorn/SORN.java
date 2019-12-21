@@ -103,14 +103,14 @@ public class SORN extends RegisteredSimulation {
         NeuronGroup ng = new NeuronGroup(network, neurons);
         GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math.sqrt(numNeurons));
         ng.setLabel("Excitatory");
-        network.addGroup(ng);
+        network.addNeuronGroup(ng);
         ng.setLayout(layout);
         ng.applyLayout(new Point(10, 10));
 
         NeuronGroup ngIn = new NeuronGroup(network, inhibitoryNeurons);
         layout = new GridLayout(gridSpace*2, gridSpace*2, (int) Math.sqrt(0.2 * numNeurons));
         ngIn.setLabel("Inhibitory");
-        network.addGroup(ngIn);
+        network.addNeuronGroup(ngIn);
         ngIn.setLayout(layout);
         System.out.println(ngIn.size());
         int x_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 300);
@@ -150,7 +150,7 @@ public class SORN extends RegisteredSimulation {
         NeuronGroup input = new NeuronGroup(network, inNeurons);
         layout = new GridLayout(gridSpace, gridSpace, (int) Math.sqrt(0.4 * numNeurons));
         input.setLabel("Input");
-        network.addGroup(input);
+        network.addNeuronGroup(input);
         input.setLayout(layout);
         // Todo; get current location of ng above
         int y_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 200);
@@ -162,7 +162,7 @@ public class SORN extends RegisteredSimulation {
         input_ee.setLabel("Input -> Excitatory");
         input_ee.setLearningRule(stdp, Polarity.BOTH);
         input_ee.setSpikeResponder(new Step(), Polarity.BOTH);
-        network.addGroup(input_ee);
+        network.addSynapseGroup(input_ee);
 
 //        Sparse ee_input_con = new Sparse(0.01, false, false);
 //        SynapseGroup ee_input = SynapseGroup.createSynapseGroup(ng, input, ee_input_con, 1.0, exRand, inRand);
@@ -176,7 +176,8 @@ public class SORN extends RegisteredSimulation {
                 input_ie_con, 1.0, defWtPD, defWtPD);
         input_ie.setLabel("Input -> Inhibitory");
         input_ie.setSpikeResponder(new Step(), Polarity.BOTH);
-        network.addGroup(input_ie);
+
+        network.addSynapseGroup(input_ie);
 
 //        Sparse ie_input_con = new Sparse(0.01, true, false);
 //        SynapseGroup ie_input = SynapseGroup.createSynapseGroup(ngIn, input, input_ie_con, 1.0, exRand, inRand);
@@ -220,7 +221,7 @@ public class SORN extends RegisteredSimulation {
         sg.setLabel(label);
         sg.setSpikeResponder(new Step(),
                 SimbrainConstants.Polarity.BOTH);
-        network.addGroup(sg);
+        network.addSynapseGroup(sg);
         return sg;
     }
 

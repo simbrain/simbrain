@@ -25,6 +25,7 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -192,8 +193,19 @@ public class FeedForward extends Subnetwork {
     }
 
     @Override
-    public String getUpdateMethodDescription() {
-        return "Layered update";
+    public String getName() {
+        return null;
     }
+
+    @Override
+    public void onCommit() {
+
+    }
+
+    // TODO
+    //@Override
+    //public String getUpdateMethodDescription() {
+    //    return "Layered update";
+    //}
 
 }

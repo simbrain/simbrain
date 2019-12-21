@@ -13,9 +13,9 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -63,7 +63,7 @@ public class BackpropNetwork extends FeedForward implements Trainable {
     }
 
     @Override
-    public Group getNetwork() {
+    public NetworkModel getNetwork() {
         return this;
     }
 

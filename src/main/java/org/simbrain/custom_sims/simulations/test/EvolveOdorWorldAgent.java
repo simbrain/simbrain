@@ -157,13 +157,14 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
             mouse.addEffector(new Turning(mouse, Turning.RIGHT));
         }
 
+        // TODO
         // Create couplings
-        NeuronGroup outputs = (NeuronGroup) network.getGroupByLabel("outputs");
-        theSim.couple(outputs.getNeuron(0), mouse.getEffector("Move straight"));
-        theSim.couple(outputs.getNeuron(1), mouse.getEffector("Turn left"));
-        theSim.couple(outputs.getNeuron(2), mouse.getEffector("Turn right"));
-        outputs.setClamped(false);
-        NeuronGroup inputs = (NeuronGroup) network.getGroupByLabel("inputs");
+        //NeuronGroup outputs = (NeuronGroup) network.getGroupByLabel("outputs");
+        //theSim.couple(outputs.getNeuron(0), mouse.getEffector("Move straight"));
+        //theSim.couple(outputs.getNeuron(1), mouse.getEffector("Turn left"));
+        //theSim.couple(outputs.getNeuron(2), mouse.getEffector("Turn right"));
+        //outputs.setClamped(false);
+        //NeuronGroup inputs = (NeuronGroup) network.getGroupByLabel("inputs");
         // TODO: Why not always at least 2 sensors?
 
         for (int i = 0; i < mouse.getSensors().size(); i++) {
@@ -172,7 +173,8 @@ public class EvolveOdorWorldAgent extends RegisteredSimulation {
                 SmellSensor smellSensor = (SmellSensor) sensor;
             } else {
 
-                theSim.couple((ObjectSensor) sensor, inputs.getNeuron(i));
+                // TODO
+                //theSim.couple((ObjectSensor) sensor, inputs.getNeuron(i));
             }
         }
 

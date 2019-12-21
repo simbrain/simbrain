@@ -257,7 +257,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
             private final SubnetworkPanel panel;
 
             {
-                panel = new SubnetworkPanel(getNetworkPanel(), (Subnetwork) SubnetworkNode.this.getSubnetwork(), this);
+                panel = new SubnetworkPanel(getNetworkPanel(), SubnetworkNode.this.getSubnetwork(), this);
                 setContentPane(panel);
             }
 
@@ -336,7 +336,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            getNetworkPanel().getNetwork().removeGroup(subnetwork);
+            getNetworkPanel().getNetwork().removeSubnetwork(subnetwork);
         }
     };
 

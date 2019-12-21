@@ -18,20 +18,23 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,7 +55,6 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     public static final int DEFAULT_NUM_UNITS = 36;
 
-
     /**
      * The update function used by this Hopfield network.
      */
@@ -66,13 +68,14 @@ public class Hopfield extends Subnetwork implements Trainable {
     /**
      * The update function used by this Hopfield network.
      */
+    @UserParameter(label = "Update function")
     private HopfieldUpdate updateFunc = DEFAULT_UPDATE;
-
 
     /**
      * If true, if the network's update order is sequential, it will update in
      * order of priority.
      */
+    @UserParameter(label = "Sequential (vs. Random) Update")
     private boolean byPriority = DEFAULT_PRIORITY;
 
     /**
@@ -164,8 +167,8 @@ public class Hopfield extends Subnetwork implements Trainable {
     }
 
     @Override
-    public String getUpdateMethodDescription() {
-        return updateFunc.getDescription();
+    public NetworkModel getNetwork() {
+        return this;
     }
 
     @Override
@@ -237,10 +240,12 @@ public class Hopfield extends Subnetwork implements Trainable {
         this.byPriority = byPriority;
     }
 
-    @Override
-    public Group getNetwork() {
-        return this;
-    }
+    // todo
+    //
+    //@Override
+    //public Group getNetwork() {
+    //    return this;
+    //}
 
     /**
      * Main forms of Hopfield update rule.
@@ -350,6 +355,23 @@ public class Hopfield extends Subnetwork implements Trainable {
         public abstract String getDescription();
 
         public abstract String getName();
+    }
+
+    /**
+     * Helper class for creating new Hopfield nets using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
+     */
+    public static class HopfieldCreator implements EditableObject {
+
+        @UserParameter(label = "Number of neurons", description = "How many neurons this Hofield net should have", order = -1)
+        int numNeurons = DEFAULT_NUM_UNITS;
+
+        /**
+         * Create the hopfield net
+         */
+        public Hopfield create(Network network) {
+            return new Hopfield(network, numNeurons);
+        }
+
     }
 
 }

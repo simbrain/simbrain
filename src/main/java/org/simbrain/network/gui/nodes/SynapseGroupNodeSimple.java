@@ -110,9 +110,6 @@ public class SynapseGroupNodeSimple extends PNode implements SynapseGroupNode.Ar
         if (halt.get()) {
             return;
         }
-        if (group.isMarkedForDeletion()) {
-            return;
-        }
          if((sourceNode == null) || (targetNode == null)) {
              return;
          }

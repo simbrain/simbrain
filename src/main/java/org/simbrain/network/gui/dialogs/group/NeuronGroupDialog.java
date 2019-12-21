@@ -21,13 +21,7 @@ package org.simbrain.network.gui.dialogs.group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
-import org.simbrain.network.gui.dialogs.network.CompetitivePropertiesPanel;
-import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel;
-import org.simbrain.network.gui.dialogs.network.WTAPropertiesPanel;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.subnetworks.CompetitiveGroup;
-import org.simbrain.network.subnetworks.SOMGroup;
-import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -207,9 +201,11 @@ public final class NeuronGroupDialog extends StandardDialog {
 
         // Set up help button
         Action helpAction = new ShowHelpAction("Pages/Network/groups/NeuronGroup.html");
-        if (specificNeuronGroupPanel != null) {
-            helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel).getHelpPath());
-        }
+
+        // TODO
+        //if (specificNeuronGroupPanel != null) {
+        //    helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel).getHelpPath());
+        //}
         addButton(new JButton(helpAction));
 
         // Tab-change events
@@ -282,7 +278,7 @@ public final class NeuronGroupDialog extends StandardDialog {
             neuronGroup.setLayoutObject(layoutObject);
             layoutPanel.commitChanges();
             neuronGroup.applyLayout();
-            networkPanel.getNetwork().addGroup(neuronGroup);
+            networkPanel.getNetwork().addNeuronGroup(neuronGroup);
             networkPanel.getPlacementManager().addNewModelObject(neuronGroup);
         } else {
             summaryPanel.commitChanges();
@@ -320,15 +316,17 @@ public final class NeuronGroupDialog extends StandardDialog {
      * type of the neuron group being edited if it has one.
      */
     private EditablePanel getSpecificGroupPanel() {
-        if (neuronGroup instanceof CompetitiveGroup) {
-            return CompetitivePropertiesPanel.createCompetitivePropertiesPanel(networkPanel, (CompetitiveGroup) neuronGroup);
-        } else if (neuronGroup instanceof WinnerTakeAll) {
-            return new WTAPropertiesPanel(networkPanel, (WinnerTakeAll) neuronGroup);
-        } else if (neuronGroup instanceof SOMGroup) {
-            return new SOMPropertiesPanel(networkPanel, (SOMGroup) neuronGroup);
-        } else {
-            return null;
-        }
+        return null;
+        // TODO
+        //if (neuronGroup instanceof CompetitiveGroup) {
+        //    return CompetitivePropertiesPanel.createCompetitivePropertiesPanel(networkPanel, (CompetitiveGroup) neuronGroup);
+        //} else if (neuronGroup instanceof WinnerTakeAll) {
+        //    return new WTAPropertiesPanel(networkPanel, (WinnerTakeAll) neuronGroup);
+        //} else if (neuronGroup instanceof SOMGroup) {
+        //    return new SOMPropertiesPanel(networkPanel, (SOMGroup) neuronGroup);
+        //} else {
+        //    return null;
+        //}
     }
 
 }

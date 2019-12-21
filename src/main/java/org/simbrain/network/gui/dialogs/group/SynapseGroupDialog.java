@@ -102,15 +102,17 @@ public final class SynapseGroupDialog extends StandardDialog {
      */
     private ArrayList<Component> storedComponents = new ArrayList<Component>();
 
-    /**
-     * See {@link SynapseGroup#useGroupLevelSettings}.
-     */
-    private boolean setUseGroupLevelSettings;
+    ///**
+    // * See {@link SynapseGroup#useGroupLevelSettings}.
+    // */
+    //private boolean setUseGroupLevelSettings;
 
     /**
      * Summary information panel
      */
-    private SummaryPanel sumPanel;
+
+    // TODO
+    //private SummaryPanel sumPanel;
 
     /**
      * When editing the connection strategy must be explicitly applied with a button press.
@@ -197,19 +199,19 @@ public final class SynapseGroupDialog extends StandardDialog {
         JPanel tabSummaryInfo = new JPanel();
         if (isCreationDialog) {
             synapseGroup = new SynapseGroup(sourceNeuronGroup, targetNeuronGroup);
-            sumPanel = new SummaryPanel(synapseGroup);
+            //sumPanel = new SummaryPanel(synapseGroup);
             JPanel container = new JPanel();
-            container.add(sumPanel);
+            //container.add(sumPanel);
             tabSummaryInfo = container;
         } else {
-            sumPanel = new SummaryPanel(synapseGroup);
-            tabSummaryInfo = ApplyPanel.createApplyPanel(sumPanel);
-            ((ApplyPanel) tabSummaryInfo).addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setUseGroupLevelSettings = sumPanel.getUseGlobalSettingsChkBx().isSelected();
-                }
-            });
+            //sumPanel = new SummaryPanel(synapseGroup);
+            //tabSummaryInfo = ApplyPanel.createApplyPanel(sumPanel);
+            //((ApplyPanel) tabSummaryInfo).addActionListener(new ActionListener() {
+            //    @Override
+            //    public void actionPerformed(ActionEvent e) {
+            //        //setUseGroupLevelSettings = sumPanel.getUseGlobalSettingsChkBx().isSelected();
+            //    }
+            //});
         }
         JScrollPane summaryScrollWrapper = new JScrollPane(tabSummaryInfo);
         summaryScrollWrapper.setBorder(null);
@@ -228,7 +230,7 @@ public final class SynapseGroupDialog extends StandardDialog {
             connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
                     (ActionEvent e) -> {
                 connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
-                sumPanel.fillFieldValues(synapseGroup);
+                //sumPanel.fillFieldValues(synapseGroup); // TODO
                 adjustmentPanel.fullUpdate();
                 // TODO: Update weight matrix when this is pressed
             });
@@ -259,8 +261,9 @@ public final class SynapseGroupDialog extends StandardDialog {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            sumPanel.fillFieldValues(synapseGroup);
-                            sumPanel.repaint();
+                            // TODO
+                            //sumPanel.fillFieldValues(synapseGroup);
+                            //sumPanel.repaint();
                             repaint();
                             adjustmentPanel.fullUpdate();
                         }
@@ -355,17 +358,15 @@ public final class SynapseGroupDialog extends StandardDialog {
     public void commitChanges() {
         if (isCreationDialog) {
             connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
-            synapseGroup.setConnectionManager(connectionPanel.getSelectedConnector());
-
-            sumPanel.commitChanges();
+            //sumPanel.commitChanges();
             editSynapsesPanel.commitChanges();
-
-            networkPanel.getNetwork().addGroup(synapseGroup);
+            networkPanel.getNetwork().addSynapseGroup(synapseGroup);
             networkPanel.repaint();
         } else {
             // Must be set ONLY after dialog is closed otherwise changes won't
             // take effect
-            synapseGroup.setUseGroupLevelSettings(setUseGroupLevelSettings);
+            // TODO
+            //synapseGroup.setUseGroupLevelSettings(setUseGroupLevelSettings);
             // When editing a synpase group most edits are handled by apply buttons
         }
     }

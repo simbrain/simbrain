@@ -79,7 +79,8 @@ public class LMSCreationDialog extends StandardDialog {
                 outputLayer.getNumNeurons(), networkPanel.getPlacementManager().getLocationAndIncrement());
         lms.getInputLayer().setNeuronType(inputLayer.getNeuronType());
         lms.getOutputLayer().setNeuronType(outputLayer.getNeuronType());
-        networkPanel.getNetwork().addGroup(lms);
+
+        networkPanel.getNetwork().addSubnetwork(lms);
 
         networkPanel.repaint();
         super.closeDialogOk();

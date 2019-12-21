@@ -47,21 +47,22 @@ public class Xor {
     public static Double eval(Agent<NetworkGenome, Network> agent) {
 
         double sse = 0.0;
-        NeuronGroup ig = (NeuronGroup) agent.getPhenotype().getGroupByLabel("inputs");
-        NeuronGroup og  = (NeuronGroup) agent.getPhenotype().getGroupByLabel("outputs");
-        for(int row = 0; row < trainingSet.getSize(); row++ ) {
-            double[] inputs = trainingSet.getInput(row);
-            ig.forceSetActivations(inputs);
-            // Add to error over a few iterations to penalize for instability
-            for (int i = 0; i < 3; i++) {
-                agent.getPhenotype().update();
-                double[] targets = trainingSet.getTarget(row);
-                for (int n = 0; n < targets.length; n++) {
-                    double error =  og.getNeuron(n).getActivation() - targets[n];
-                    sse += (error * error);
-                }
-            }
-        }
+        // TODO
+        //NeuronGroup ig = (NeuronGroup) agent.getPhenotype().getGroupByLabel("inputs");
+        //NeuronGroup og  = (NeuronGroup) agent.getPhenotype().getGroupByLabel("outputs");
+        //for(int row = 0; row < trainingSet.getSize(); row++ ) {
+        //    double[] inputs = trainingSet.getInput(row);
+        //    ig.forceSetActivations(inputs);
+        //    // Add to error over a few iterations to penalize for instability
+        //    for (int i = 0; i < 3; i++) {
+        //        agent.getPhenotype().update();
+        //        double[] targets = trainingSet.getTarget(row);
+        //        for (int n = 0; n < targets.length; n++) {
+        //            double error =  og.getNeuron(n).getActivation() - targets[n];
+        //            sse += (error * error);
+        //        }
+        //    }
+        //}
         return -sse;
     }
 

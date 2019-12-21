@@ -19,10 +19,10 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -47,7 +47,7 @@ public class SOMNetworkNode extends SubnetworkNode {
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new SOMTrainingDialog(getNetworkPanel(), (SOMNetwork) getSubnetwork());
+        return AnnotatedPropertyEditor.getDialog(getSubnetwork());
     }
 
     /**

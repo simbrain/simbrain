@@ -129,7 +129,7 @@ public class TestSim extends RegisteredSimulation {
         }
         NeuronGroup ng1 = new NeuronGroup(network, neurons);
         ng1.setLabel("CorticalBranching");
-        network.addGroup(ng1);
+        network.addNeuronGroup(ng1);
         ng1.setLayout(layout);
         ng1.applyLayout(new Point2D.Double(0.0, 0.0));
 
@@ -150,7 +150,7 @@ public class TestSim extends RegisteredSimulation {
 //        RadialSimpleConstrainedKIn con = new RadialSimpleConstrainedKIn(KIN, RADIUS);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, null, 1.0, exRand, inRand);
         sg.setLabel("Recurrent Synapses");
-        network.addGroup(sg);
+        network.addSynapseGroup(sg);
 //        for (Neuron n : ng1.getNeuronList()) {
 //            ((TimedAccumulatorRule) n.getUpdateRule()).init(n);
 //        }

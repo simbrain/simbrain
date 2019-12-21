@@ -17,13 +17,13 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -413,7 +413,7 @@ public class EchoStateNetwork extends Subnetwork {
             }
 
             @Override
-            public Group getNetwork() {
+            public NetworkModel getNetwork() {
                 return EchoStateNetwork.this;
             }
 
@@ -653,10 +653,11 @@ public class EchoStateNetwork extends Subnetwork {
         this.noise = noise;
     }
 
-    @Override
-    public String getUpdateMethodDescription() {
-        return "Input layer, reservoir, output layer";
-    }
+    // TODO
+    //@Override
+    //public String getUpdateMethodDescription() {
+    //    return "Input layer, reservoir, output layer";
+    //}
 
     public TimeType getTimeType() {
         return timeType;

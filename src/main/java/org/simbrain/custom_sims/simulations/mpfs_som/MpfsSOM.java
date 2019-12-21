@@ -55,10 +55,10 @@ public class MpfsSOM extends RegisteredSimulation {
         // Build network
         netWrapper = (NetworkDesktopWrapper) sim.addNetwork(144, 11, 550, 680, "Moral-Political SOM");
         network = netWrapper.getNetwork();
-        som = new SOMNetwork(network, numSOMNodes, 29, new Point2D.Double(0, 0));
+        som = new SOMNetwork(network, numSOMNodes, 29);
         som.getSom().setLayout(new HexagonalGridLayout(40, 40, 5));
         som.getSom().applyLayout();
-        network.addGroup(som);
+        network.addSubnetwork(som);
         som.getInputLayer().setLayout(new GridLayout(70, 60, 5));
         som.getInputLayer().applyLayout();
 

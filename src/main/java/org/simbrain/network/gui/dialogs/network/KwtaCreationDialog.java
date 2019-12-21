@@ -92,7 +92,7 @@ public class KwtaCreationDialog extends StandardDialog {
         Layout layout = layoutObject.getLayout();
         layout.setInitialLocation(networkPanel.getPlacementManager().getLocationAndIncrement());
         layout.layoutNeurons(kWTA.getNeuronList());
-        networkPanel.getNetwork().addGroup(kWTA);
+        networkPanel.getNetwork().addNeuronGroup(kWTA);
         networkPanel.repaint();
         super.closeDialogOk();
     }

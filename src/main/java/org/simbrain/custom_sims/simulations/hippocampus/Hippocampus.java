@@ -148,7 +148,7 @@ public class Hippocampus extends RegisteredSimulation {
         cg.applyLayout();
         cg.setLocation(x, y);
         cg.setUpdateMethod("AS");
-        network.addGroup(cg);
+        network.addNeuronGroup(cg);
         return cg;
     }
 
@@ -164,7 +164,7 @@ public class Hippocampus extends RegisteredSimulation {
         synGroup.setLabel(name);
         synGroup.setLowerBound(0, Polarity.EXCITATORY);
         synGroup.setUpperBound(1, Polarity.EXCITATORY);
-        network.addGroup(synGroup);
+        network.addSynapseGroup(synGroup);
         return synGroup;
     }
 

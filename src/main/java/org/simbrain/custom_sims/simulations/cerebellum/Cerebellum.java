@@ -107,7 +107,7 @@ public class Cerebellum extends RegisteredSimulation {
         cortex.setNeuronType(generalRule);
         cortex.setLocation(50, 0);
         cortex.setLowerBound(0);
-        network.addGroup(cortex);
+        network.addNeuronGroup(cortex);
 
         // Red Nucleus
         NeuronGroup redNucleus = new NeuronGroup(network, 2);
@@ -115,7 +115,7 @@ public class Cerebellum extends RegisteredSimulation {
         redNucleus.setNeuronType(generalRule);
         redNucleus.setLocation(50, 200);
         redNucleus.setLowerBound(0);
-        network.addGroup(redNucleus);
+        network.addNeuronGroup(redNucleus);
 
         // Cortex to Red Nucleus
         network.addLooseSynapse(new Synapse(cortex.getNeuronList().get(0),
@@ -140,7 +140,7 @@ public class Cerebellum extends RegisteredSimulation {
         toSpinalCord.setNeuronType(generalRule);
         toSpinalCord.setLocation(-25, 275);
         toSpinalCord.setLowerBound(0);
-        network.addGroup(toSpinalCord);
+        network.addNeuronGroup(toSpinalCord);
 
         // Cortex to Spinal Cord
         network.addLooseSynapse(new Synapse(cortex.getNeuronList().get(0),
@@ -181,7 +181,7 @@ public class Cerebellum extends RegisteredSimulation {
         cerebellum.setLabel("Cerebellum");
         cerebellum.setNeuronType(generalRule);
         cerebellum.setLocation(175, 125);
-        network.addGroup(cerebellum);
+        network.addNeuronGroup(cerebellum);
         cerebellum.getNeuronList().get(0).setLabel("Purkinje");
         cerebellum.getNeuronList().get(0).offset(25, 0);
         cerebellum.getNeuronList().get(0).forceSetActivation(0.4);
@@ -234,7 +234,7 @@ public class Cerebellum extends RegisteredSimulation {
         fromSpinalCord.setNeuronType(generalRule);
         fromSpinalCord.setLocation(275, 300);
         fromSpinalCord.setLowerBound(0);
-        network.addGroup(fromSpinalCord);
+        network.addNeuronGroup(fromSpinalCord);
         fromSpinalCord.getNeuronList().get(0).setLabel("Go");
         fromSpinalCord.getNeuronList().get(1).setLabel("No Go");
 
@@ -366,54 +366,58 @@ public class Cerebellum extends RegisteredSimulation {
      */
     void setUpControlPanel() {
         panel = ControlPanel.makePanel(sim, "Train / Test", 5, 10);
-        NeuronGroup inputs = (NeuronGroup) network
-            .getGroupByLabel("From Spinal Cord");
+        //NeuronGroup inputs = (NeuronGroup) network
+        //    .getGroupByLabel("From Spinal Cord");
         Neuron target = network.getNeuronByLabel("Target");
         Neuron dopamine = network.getNeuronByLabel("Basal Ganglia (GPi)");
 
         // Just give the input of each to the model, without giving it a target
         // (and hence no Dopamine)
         panel.addButton("No Dopamine", () -> {
-            inputs.getNeuronList().get(0).forceSetActivation(1);
-            inputs.getNeuronList().get(1).forceSetActivation(0);
-            // Turn off dopamine!
-            dopamine.forceSetActivation(0);
-            dopamine.setClamped(true);
-            // Turn off learning
-            toggleLearning = false;
-            sim.iterate(currentTrialLength / 2);
-
-            inputs.getNeuronList().get(0).forceSetActivation(0);
-            inputs.getNeuronList().get(1).forceSetActivation(1);
-            sim.iterate(currentTrialLength / 2);
-            dopamine.setClamped(false);
-            toggleLearning = true;
+            // TODO
+            //inputs.getNeuronList().get(0).forceSetActivation(1);
+            //inputs.getNeuronList().get(1).forceSetActivation(0);
+            //// Turn off dopamine!
+            //dopamine.forceSetActivation(0);
+            //dopamine.setClamped(true);
+            //// Turn off learning
+            //toggleLearning = false;
+            //sim.iterate(currentTrialLength / 2);
+            //
+            //inputs.getNeuronList().get(0).forceSetActivation(0);
+            //inputs.getNeuronList().get(1).forceSetActivation(1);
+            //sim.iterate(currentTrialLength / 2);
+            //dopamine.setClamped(false);
+            //toggleLearning = true;
 
         });
 
         panel.addButton("Test", () -> {
-            inputs.getNeuronList().get(0).forceSetActivation(1);
-            inputs.getNeuronList().get(1).forceSetActivation(0);
-            target.forceSetActivation(1);
-            sim.iterate(currentTrialLength / 2);
 
-            inputs.getNeuronList().get(0).forceSetActivation(0);
-            inputs.getNeuronList().get(1).forceSetActivation(1);
-            target.forceSetActivation(0);
-            sim.iterate(currentTrialLength / 2);
+            // TODO
+            //inputs.getNeuronList().get(0).forceSetActivation(1);
+            //inputs.getNeuronList().get(1).forceSetActivation(0);
+            //target.forceSetActivation(1);
+            //sim.iterate(currentTrialLength / 2);
+            //
+            //inputs.getNeuronList().get(0).forceSetActivation(0);
+            //inputs.getNeuronList().get(1).forceSetActivation(1);
+            //target.forceSetActivation(0);
+            //sim.iterate(currentTrialLength / 2);
         });
 
         panel.addButton("10 Trials", () -> {
             for (int ii = 0; ii <= 10; ii++) {
-                inputs.getNeuronList().get(0).forceSetActivation(1);
-                inputs.getNeuronList().get(1).forceSetActivation(0);
-                target.forceSetActivation(1);
-                sim.iterate(currentTrialLength / 2);
-
-                inputs.getNeuronList().get(0).forceSetActivation(0);
-                inputs.getNeuronList().get(1).forceSetActivation(1);
-                target.forceSetActivation(0);
-                sim.iterate(currentTrialLength / 2);
+                // TODO
+                //inputs.getNeuronList().get(0).forceSetActivation(1);
+                //inputs.getNeuronList().get(1).forceSetActivation(0);
+                //target.forceSetActivation(1);
+                //sim.iterate(currentTrialLength / 2);
+                //
+                //inputs.getNeuronList().get(0).forceSetActivation(0);
+                //inputs.getNeuronList().get(1).forceSetActivation(1);
+                //target.forceSetActivation(0);
+                //sim.iterate(currentTrialLength / 2);
             }
         });
 

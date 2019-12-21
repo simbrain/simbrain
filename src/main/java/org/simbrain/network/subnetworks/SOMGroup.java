@@ -25,6 +25,8 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.network.util.SimnetUtils;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 
 import java.util.ArrayList;
@@ -66,23 +68,27 @@ public class SOMGroup extends NeuronGroup {
     /**
      * Initial Learning Rate.
      */
+    @UserParameter(label = "Initial alpha")
     private double initAlpha = DEFAULT_ALPHA;
 
     /**
      * Learning rate.
      */
+    @UserParameter(label = "alpha")
     private double alpha = DEFAULT_ALPHA;
 
     /**
      * Current Neighborhood Size. With a circular neighborhood, neighborhoodSize
      * connotes radius.
      */
+    @UserParameter(label = "Neighborhood size")
     private double neighborhoodSize = DEFAULT_INIT_NSIZE;
 
     /**
      * The initial neighborhoodSize. neighborhoodSize is set back to this
      * whenever network is reset.
      */
+    @UserParameter(label = "Initial neighborhood size")
     private double initNeighborhoodSize = DEFAULT_INIT_NSIZE;
 
     /**
@@ -90,11 +96,6 @@ public class SOMGroup extends NeuronGroup {
      * method.
      */
     private double winDistance, distance, val;
-
-    /**
-     * Number of neurons.
-     */
-    private int numNeurons = 16;
 
     /**
      * Reference to winning neuron.
@@ -109,11 +110,13 @@ public class SOMGroup extends NeuronGroup {
     /**
      * The rate at which the learning rate decays.
      */
+    @UserParameter(label = "Alpha decay rate")
     private double alphaDecayRate = DEFAULT_DECAY_RATE;
 
     /**
      * The amount that the neighborhood decrements.
      */
+    @UserParameter(label = "Neighborhood decay rate")
     private double neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
 
     /**
@@ -248,7 +251,7 @@ public class SOMGroup extends NeuronGroup {
         // neuron.
         for (int i = 0; i < getNeuronList().size(); i++) {
             Neuron neuron = getNeuronList().get(i);
-            physicalDistance = findPhysicalDistance(neuron, winner);
+            physicalDistance = SimnetUtils.getEuclideanDist(neuron, winner);
             // The center of the neuron is within the update region.
             if (physicalDistance <= neighborhoodSize) {
                 for (Synapse incoming : neuron.getFanIn()) {
@@ -306,17 +309,6 @@ public class SOMGroup extends NeuronGroup {
         return ret;
     }
 
-    /**
-     * Finds the physical Euclidian Distance between two neurons.
-     *
-     * @param neuron1 First neuron.
-     * @param neuron2 Second neuron.
-     * @return physical distance between two neurons in Simbrain.
-     */
-    private double findPhysicalDistance(final Neuron neuron1, final Neuron neuron2) {
-        double ret = Math.sqrt(Math.pow(neuron2.getX() - neuron1.getX(), 2) + Math.pow(neuron2.getY() - neuron1.getY(), 2));
-        return ret;
-    }
 
     /**
      * get Alpha.
@@ -327,104 +319,37 @@ public class SOMGroup extends NeuronGroup {
         return alpha;
     }
 
-    /**
-     * Get alphaDecayRate.
-     *
-     * @return alphaDecayRate
-     */
     public double getAlphaDecayRate() {
         return alphaDecayRate;
     }
 
-    /**
-     * Get the Batch Size.
-     *
-     * @return batchSize
-     */
     public int getBatchSize() {
         return batchSize;
     }
 
-    /**
-     * Returns the default SOM neuron.
-     *
-     * @return ret default som neuron
-     */
-    private Neuron getDefaultSOMNeuron() {
-        LinearRule rule = new LinearRule();
-        Neuron ret = new Neuron(getParentNetwork(), rule);
-        ret.setIncrement(1);
-        rule.setLowerBound(0);
-        return ret;
-    }
-
-    /**
-     * get Initial Alpha.
-     *
-     * @return initAlpha
-     */
     public double getInitAlpha() {
         return initAlpha;
     }
 
-    /**
-     * Get the initial neighborhoodsize.
-     *
-     * @return initNeighborhoodSize
-     */
     public double getInitNeighborhoodSize() {
         return initNeighborhoodSize;
     }
 
-    /**
-     * Get neighborhoodDecayAmount.
-     *
-     * @return neighborhoodDecayAmount
-     */
     public double getNeighborhoodDecayAmount() {
         return neighborhoodDecayAmount;
     }
 
-    /**
-     * Get the current neighborhood size.
-     *
-     * @return neighborhoodSize
-     */
+
     public double getNeighborhoodSize() {
         return neighborhoodSize;
     }
 
-    /**
-     * Get the number of neurons.
-     *
-     * @return numNeurons
-     */
-    public int getNumNeurons() {
-        return numNeurons;
-    }
-
-    /**
-     * Set alphaDecayRate.
-     *
-     * @param alphaDecayRate decay rate
-     */
     public void setAlphaDecayRate(final double alphaDecayRate) {
         this.alphaDecayRate = alphaDecayRate;
     }
 
     /**
-     * Set the Batch Size.
-     *
-     * @param batchSize Batch Size
-     */
-    public void setBatchSize(final int batchSize) {
-        this.batchSize = batchSize;
-    }
-
-    /**
      * Set the initial value for alpha (learning rate).
-     *
-     * @param initAlpha initial alpha
      */
     public void setInitAlpha(final double initAlpha) {
         this.initAlpha = initAlpha;
@@ -432,36 +357,17 @@ public class SOMGroup extends NeuronGroup {
     }
 
     /**
-     * Set the initial neighborhood size.
-     *
-     * @param initNeighborhoodSize initial neighborhood size Resets SOM if new.
+     * Set the initial neighborhood size. Resets SOM if new.
      */
     public void setInitNeighborhoodSize(final double initNeighborhoodSize) {
         this.initNeighborhoodSize = initNeighborhoodSize;
         neighborhoodSize = initNeighborhoodSize;
     }
 
-    /**
-     * Set neighborhoodDecayAmount.
-     *
-     * @param neighborhoodDecayAmount decay amount
-     */
     public void setNeighborhoodDecayAmount(final double neighborhoodDecayAmount) {
         this.neighborhoodDecayAmount = neighborhoodDecayAmount;
     }
 
-    /**
-     * Set the number of neurons.
-     *
-     * @param numNeurons number of neurons.
-     */
-    public void setNumNeurons(final int numNeurons) {
-        this.numNeurons = numNeurons;
-    }
-
-    /**
-     * @return the winner
-     */
     public Neuron getWinner() {
         return winner;
     }

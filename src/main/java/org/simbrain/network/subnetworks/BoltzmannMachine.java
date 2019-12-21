@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.trainers.Trainable;
@@ -142,7 +142,7 @@ public class BoltzmannMachine extends Subnetwork implements Trainable {
             this.temperature = .95 * temperature;
         }
 
-        setStateInfo("Temperature: " + Utils.round(getTemperature(), 2));
+        //setStateInfo("Temperature: " + Utils.round(getTemperature(), 2));
         fireLabelUpdated();
     }
 
@@ -180,7 +180,7 @@ public class BoltzmannMachine extends Subnetwork implements Trainable {
     }
 
     @Override
-    public Group getNetwork() {
+    public NetworkModel getNetwork() {
         return this;
     }
 

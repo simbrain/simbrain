@@ -18,16 +18,18 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -63,13 +65,12 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
      *                              holder for param values.
      * @param numCompetitiveNeurons number of neurons in the Competitive layer
      * @param numInputNeurons       number of neurons in the input layer
-     * @param initialPosition       bottom corner where network will be placed.
      */
-    public CompetitiveNetwork(Network net, int numCompetitiveNeurons, int numInputNeurons, Point2D initialPosition) {
+    public CompetitiveNetwork(Network net, int numCompetitiveNeurons, int numInputNeurons) {
         super(net);
         this.setLabel("Competitive Network");
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
-        inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
+        inputLayer = new NeuronGroup(net, numInputNeurons);
         this.addNeuronGroup(competitive);
         this.addNeuronGroup(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {
@@ -122,15 +123,33 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         return competitive;
     }
 
-    /**
-     * @return the inputLayer
-     */
     public NeuronGroup getInputLayer() {
         return inputLayer;
     }
 
     @Override
-    public Group getNetwork() {
+    public NetworkModel getNetwork() {
         return this;
+    }
+
+
+    /**
+     * Helper class for creating new competitive nets using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
+     */
+    public static class CompetitiveCreator implements EditableObject {
+
+        @UserParameter(label = "Number of inputs")
+        int numIn = 10;
+
+        @UserParameter(label = "Number of competitive neurons")
+        int numComp = 20;
+
+        /**
+         * Create the competitive net
+         */
+        public CompetitiveNetwork create(Network network) {
+            return new CompetitiveNetwork(network, numIn, numComp);
+        }
+
     }
 }

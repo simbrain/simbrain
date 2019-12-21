@@ -168,7 +168,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
             RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
             50);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(sourceNg, targetNg, radialConnection);
-        network.addGroup(sg);
+        network.addSynapseGroup(sg);
         sg.setDisplaySynapses(false);
         return sg;
     }
@@ -177,11 +177,10 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
         Sparse sparse = new Sparse();
         sparse.setConnectionDensity(density);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(sourceNg, targetNg, sparse, exRatio, null, null);
-        network.addGroup(sg);
+        network.addSynapseGroup(sg);
         sg.setDisplaySynapses(false);
         return sg;
     }
-
 
     private void setUpWorld() {
 

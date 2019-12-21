@@ -117,14 +117,14 @@ public class EdgeOfChaos extends RegisteredSimulation {
         sensorNodes.setLocation(229, 561);
         sensorNodes.setLabel("Sensors");
         sensorNodes.setClamped(true);
-        network.addGroup(sensorNodes);
+        network.addNeuronGroup(sensorNodes);
         // Make custom connections from sensor nodes to upper-left and
         // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.
         cheeseToRes = sensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .8, 1);
-        network.addGroup(cheeseToRes);
+        network.addSynapseGroup(cheeseToRes);
         flowersToRes = sensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .8, 3);
-        network.addGroup(flowersToRes);
+        network.addSynapseGroup(flowersToRes);
     }
 
     static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
@@ -137,7 +137,8 @@ public class EdgeOfChaos extends RegisteredSimulation {
             neurons.add(neuron);
         }
         NeuronGroup ng = new NeuronGroup(parentNet, neurons);
-        parentNet.addGroup(ng);
+        parentNet.addNeuronGroup(ng);
+
         ng.setLayout(layout);
         ng.applyLayout(new Point2D.Double(x, y));
         return ng;
@@ -169,7 +170,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con,
                 0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
-        parentNet.addGroup(reservoir);
+        parentNet.addSynapseGroup(reservoir);
 
         reservoir.setUpperBound(200, Polarity.EXCITATORY);
         reservoir.setLowerBound(0, Polarity.EXCITATORY);

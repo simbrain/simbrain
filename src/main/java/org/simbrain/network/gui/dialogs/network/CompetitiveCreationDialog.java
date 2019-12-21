@@ -20,19 +20,19 @@ package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.subnetworks.Hopfield;
+import org.simbrain.network.subnetworks.CompetitiveGroup;
+import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
- * <b>DiscreteHopfieldDialog</b> is a dialog box for creating discrete Hopfield
+ * <b>CompetitiveDialog</b> is used as an assistant to create Competitive
  * networks.
  */
-public class HopfieldCreationDialog extends StandardDialog {
+public class CompetitiveCreationDialog extends StandardDialog {
 
     /**
      * Tabbed pane.
@@ -50,19 +50,21 @@ public class HopfieldCreationDialog extends StandardDialog {
     private JPanel tabLayout = new JPanel();
 
     /**
+     * Competitive properties panel.
+     */
+    private AnnotatedPropertyEditor competitivePanel;
+
+    /**
      * Creator object
      */
-    private Hopfield.HopfieldCreator hc = new Hopfield.HopfieldCreator();
+    private CompetitiveNetwork.CompetitiveCreator
+            cc = new  CompetitiveNetwork.CompetitiveCreator();
+
 
     /**
-     * Logic panel.
+     * Layout object.
      */
-    private AnnotatedPropertyEditor hopPropertiesPanel;
-
-    /**
-     * Layout to use in property editor.
-     */
-    private Layout.LayoutObject layoutObject = new Layout.LayoutObject(Hopfield.DEFAULT_LAYOUT);
+    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
 
     /**
      * Layout panel.
@@ -79,42 +81,38 @@ public class HopfieldCreationDialog extends StandardDialog {
      *
      * @param networkPanel Network panel
      */
-    public HopfieldCreationDialog(final NetworkPanel networkPanel) {
+    public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
+        this.networkPanel = networkPanel;
+        setTitle("New Competitive Network");
+        competitivePanel = new AnnotatedPropertyEditor(cc);
+        tabLogic.add(competitivePanel);
         layoutPanel = new AnnotatedPropertyEditor(layoutObject);
-
-        setTitle("New Hopfield Network");
-
-        // Logic Panel
-        hopPropertiesPanel = new AnnotatedPropertyEditor(hc);
-        tabLogic.setLayout(new FlowLayout());
-        tabLogic.add(hopPropertiesPanel);
-
-        // Layout panel
+        layoutObject.setLayout(CompetitiveGroup.DEFAULT_LAYOUT);
         tabLayout.add(layoutPanel);
-        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
-
-        // Set it all up
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
 
-        // Help action
-        Action helpAction = new ShowHelpAction("Pages/Network/network/hopfieldnetwork.html");
+        Action helpAction = new ShowHelpAction("Pages/Network/network/competitive.html");
         addButton(new JButton(helpAction));
 
     }
 
+    /**
+     * Called when dialog closes.
+     */
     @Override
     protected void closeDialogOk() {
-        hopPropertiesPanel.commitChanges();
-        Hopfield hopfield = hc.create(networkPanel.getNetwork());
+        competitivePanel.commitChanges();
+        CompetitiveNetwork cn = cc.create(networkPanel.getNetwork());
         layoutPanel.commitChanges();
-        layoutObject.getLayout().setInitialLocation(networkPanel.getPlacementManager().getLocationAndIncrement());
-        hopfield.getNeuronGroup().setLayout(layoutObject.getLayout());
-        hopfield.getNeuronGroup().applyLayout();
-        networkPanel.getNetwork().addSubnetwork(hopfield);
-        networkPanel.repaint();
+        cn.getCompetitive().setLayout(layoutObject.getLayout());
+        cn.getCompetitive().applyLayout();
+        networkPanel.getNetwork().addSubnetwork(cn);
+        networkPanel.getPlacementManager().addNewModelObject(cn);
         super.closeDialogOk();
+
     }
+
 }

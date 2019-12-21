@@ -54,7 +54,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
     public NeuronCollection(final Network net, final List<Neuron> neurons) {
         super(net);
         addNeurons(neurons);
-        initializeId();
+        //initializeId(); // TODO
         subsamplingManager.resetIndices();
         PropertyChangeListener networkListener = evt -> {
             if ("neuronRemoved".equals(evt.getPropertyName())) {
@@ -109,12 +109,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
     public void delete() {
         changeSupport.firePropertyChange("delete", this, null);
         fireDeleted();
-    }
-
-    @Override
-    public String getUpdateMethodDescription() {
-        // TODO
-        return null;
     }
 
     /**

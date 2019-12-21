@@ -180,7 +180,7 @@ public class NetworkWrapper {
      */
     public SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target) {
         SynapseGroup sg = SynapseGroup.createSynapseGroup(source, target);
-        network.addGroup(sg);
+        network.addSynapseGroup(sg);
         return sg;
     }
 
@@ -196,7 +196,7 @@ public class NetworkWrapper {
         ng = new NeuronGroup(network, new Point2D.Double(x, y), numNeurons);
         ng.setNeuronType(rule);
 
-        network.addGroup(ng);
+        network.addNeuronGroup(ng);
         layoutNeuronGroup(ng, x, y, layoutName);
         return ng;
 
@@ -257,7 +257,7 @@ public class NetworkWrapper {
         WinnerTakeAll wta = new WinnerTakeAll(network, numNeurons);
         wta.setLocation(x, y);
         layoutNeuronGroup(wta, x, y, "line");
-        network.addGroup(wta);
+        network.addNeuronGroup(wta);
         return wta;
     }
 

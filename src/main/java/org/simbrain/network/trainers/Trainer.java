@@ -19,7 +19,7 @@
 package org.simbrain.network.trainers;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 
@@ -152,9 +152,9 @@ public abstract class Trainer {
      */
     public void revalidateSynapseGroups() {
         if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
-            for (SynapseGroup group : ((Subnetwork) getTrainableNetwork().getNetwork()).getSynapseGroupList()) {
-                if (group != null) {
-                    group.revalidateSynapseSets();
+            for (SynapseGroup sg : ((Subnetwork) getTrainableNetwork().getNetwork()).getSynapseGroupList()) {
+                if (sg != null) {
+                    sg.revalidateSynapseSets();
                 }
             }
         }
@@ -170,9 +170,9 @@ public abstract class Trainer {
      * @param targetData    the target data
      * @return the trainable object
      */
-    public static Trainable getTrainable(final Group trainedGroup, final List<Neuron> inputNeurons, final List<Neuron> outputNeurons, final double[][] inputData, final double[][] targetData) {
+    public static Trainable getTrainable(final NeuronGroup trainedGroup, final List<Neuron> inputNeurons, final List<Neuron> outputNeurons, final double[][] inputData, final double[][] targetData) {
         Trainable newTrainer = new Trainable() {
-            public Group getNetwork() {
+            public NeuronGroup getNetwork() {
                 return trainedGroup;
             }
 

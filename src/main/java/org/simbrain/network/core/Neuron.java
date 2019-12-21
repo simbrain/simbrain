@@ -20,7 +20,7 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.groups.Group;
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
@@ -192,10 +192,10 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     private double lastActivation;
 
     /**
-     * Parent {@link Group}, if any (null if none).  Does not apply to {@link org.simbrain.network.groups.NeuronCollection},
+     * Parent {@link NeuronGroup}, if any (null if none).  Does not apply to {@link org.simbrain.network.groups.NeuronCollection},
      * which is not a subclass of group.
      */
-    private Group parentGroup;
+    private NeuronGroup parentGroup;
 
     /**
      * Sequence in which the update function should be called for this neuron.
@@ -1090,11 +1090,12 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         return neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
     }
 
-    public Group getParentGroup() {
+    // Search for old commented out uses
+    public NeuronGroup getParentGroup() {
         return parentGroup;
     }
 
-    public void setParentGroup(Group parentGroup) {
+    public void setParentGroup(NeuronGroup parentGroup) {
         this.parentGroup = parentGroup;
     }
 

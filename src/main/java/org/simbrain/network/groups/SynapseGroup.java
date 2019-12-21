@@ -28,12 +28,17 @@ import org.simbrain.network.util.io_utilities.GroupSerializer;
 import org.simbrain.network.util.io_utilities.GroupSerializer.Precision;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,7 +53,30 @@ import java.util.function.Function;
  *
  * @author Zoë Tosi
  */
-public class SynapseGroup extends Group implements NetworkModel {
+public class SynapseGroup implements NetworkModel, CopyableObject, AttributeContainer {
+
+    /**
+     * Reference to the network this group is a part of.
+     */
+    private final Network parentNetwork;
+
+    /**
+     * Id of this group.
+     */
+    @UserParameter(label = "ID", description = "Id of this synapse group", order = -1, editable = false)
+    protected String id;
+
+    /**
+     * Name of this group. Null strings lead to default labeling conventions.
+     */
+    @UserParameter(label = "Label", description = "Synapse group label", useSetter = true,
+            order = 10)
+    private String label = "TODO";
+
+    /**
+     * Support for property change events.
+     */
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      * The <b>default>/b> polarized randomizer associated with excitatory.
@@ -87,7 +115,7 @@ public class SynapseGroup extends Group implements NetworkModel {
     /**
      * A set containing all the inhibitory (wt < 0) synapses in the group.
      */
-    private Set<Synapse> inSynapseSet = new HashSet<Synapse>();
+    private Set<Synapse> inSynapseSet = new HashSet<>();
 
     /**
      * A temporary set containing all the excitatory synapses in the group. Used
@@ -353,7 +381,7 @@ public class SynapseGroup extends Group implements NetworkModel {
      * @param target the target neuron group.
      */
     public SynapseGroup(final NeuronGroup source, final NeuronGroup target) {
-        super(source.getParentNetwork());
+        parentNetwork = source.getParentNetwork();
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
         recurrent = testRecurrent();
@@ -374,7 +402,7 @@ public class SynapseGroup extends Group implements NetworkModel {
      * @param connectionManager a connection object which builds this group
      */
     private SynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager) {
-        super(source.getParentNetwork());
+        parentNetwork = source.getParentNetwork();
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
         this.connectionManager = connectionManager;
@@ -524,39 +552,37 @@ public class SynapseGroup extends Group implements NetworkModel {
         }
     }
 
-    @Override
     public int size() {
         return exSynapseSet.size() + inSynapseSet.size();
     }
 
-    @Override
     public boolean isEmpty() {
         return exSynapseSet.isEmpty() && inSynapseSet.isEmpty();
     }
 
-    @Override
     public void delete() {
-        if (isMarkedForDeletion()) {
-            return;
-        } else {
-            setMarkedForDeletion(true);
-        }
-        clear();
-        getParentNetwork().removeGroup(this);
-        if (hasParentGroup()) {
-            if (getParentGroup() instanceof Subnetwork) {
-                ((Subnetwork) getParentGroup()).removeSynapseGroup(this);
-            }
-            if (getParentGroup().isEmpty()) {
-                getParentNetwork().removeGroup(getParentGroup());
-            }
-        }
-        if (!targetNeuronGroup.isMarkedForDeletion()) {
-            targetNeuronGroup.removeIncomingSg(this);
-        }
-        if (!sourceNeuronGroup.isMarkedForDeletion()) {
-            sourceNeuronGroup.removeOutgoingSg(this);
-        }
+        //TODO
+        //if (isMarkedForDeletion()) {
+        //    return;
+        //} else {
+        //    setMarkedForDeletion(true);
+        //}
+        //clear();
+        //getParentNetwork().removeGroup(this);
+        //if (hasParentGroup()) {
+        //    if (getParentGroup() instanceof Subnetwork) {
+        //        ((Subnetwork) getParentGroup()).removeSynapseGroup(this);
+        //    }
+        //    if (getParentGroup().isEmpty()) {
+        //        getParentNetwork().removeGroup(getParentGroup());
+        //    }
+        //}
+        //if (!targetNeuronGroup.isMarkedForDeletion()) {
+        //    targetNeuronGroup.removeIncomingSg(this);
+        //}
+        //if (!sourceNeuronGroup.isMarkedForDeletion()) {
+        //    sourceNeuronGroup.removeOutgoingSg(this);
+        //}
         Runtime.getRuntime().gc();
         changeSupport.firePropertyChange("delete", this, null);
     }
@@ -567,11 +593,6 @@ public class SynapseGroup extends Group implements NetworkModel {
         ret += ("Synapse Group [" + getLabel() + "]. Contains " + this.size() + " synapse(s)." + " Connects " + getSourceNeuronGroup().getId() + " [" + getSourceNeuronGroup().getLabel() + "]" + " to " + getTargetNeuronGroup().getId() + " [" + getTargetNeuronGroup().getLabel() + "]\n");
 
         return ret;
-    }
-
-    @Override
-    public String getUpdateMethodDescription() {
-        return "Update synapses";
     }
 
     /**
@@ -1841,4 +1862,38 @@ public class SynapseGroup extends Group implements NetworkModel {
     private void fireSynapseRemoved(Synapse synapse) {
         changeSupport.firePropertyChange("synapseRemoved", synapse, null);
     }
+
+    @Consumable(defaultVisibility = false)
+    public void setLabel(String label) {
+        String oldLabel = this.label;
+        this.label = label;
+        changeSupport.firePropertyChange("label", oldLabel , label);
+    }
+
+    @Producible(defaultVisibility = false)
+    public String getLabel() {
+        return label;
+    }
+
+    public Network getParentNetwork() {
+        return parentNetwork;
+    }
+
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (changeSupport == null) {
+            changeSupport = new PropertyChangeSupport(this);
+        }
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
+    public void fireDeleted() {
+        changeSupport.firePropertyChange("delete", null, displaySynapses);
+    }
+
+
 }

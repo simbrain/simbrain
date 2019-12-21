@@ -89,14 +89,15 @@ public class TestEvolution extends RegisteredSimulation {
         createOdorWorld();
 
         // Create couplings
-        NeuronGroup outputs = (NeuronGroup) winner.getGroupByLabel("outputs");
-        sim.couple(outputs.getNeuron(0), mouse.getEffector("Move straight"));
-        sim.couple(outputs.getNeuron(1), mouse.getEffector("Turn left"));
-        sim.couple(outputs.getNeuron(2), mouse.getEffector("Turn right"));
-        NeuronGroup inputs = (NeuronGroup) winner.getGroupByLabel("inputs");
-        sim.couple((ObjectSensor) mouse.getSensors().get(0), inputs.getNeuron(0));
-        sim.couple((ObjectSensor) mouse.getSensors().get(1), inputs.getNeuron(1));
-        sim.couple((ObjectSensor) mouse.getSensors().get(2), inputs.getNeuron(2));
+        // TODO
+        //NeuronGroup outputs = (NeuronGroup) winner.getGroupByLabel("outputs");
+        //sim.couple(outputs.getNeuron(0), mouse.getEffector("Move straight"));
+        //sim.couple(outputs.getNeuron(1), mouse.getEffector("Turn left"));
+        //sim.couple(outputs.getNeuron(2), mouse.getEffector("Turn right"));
+        //NeuronGroup inputs = (NeuronGroup) winner.getGroupByLabel("inputs");
+        //sim.couple((ObjectSensor) mouse.getSensors().get(0), inputs.getNeuron(0));
+        //sim.couple((ObjectSensor) mouse.getSensors().get(1), inputs.getNeuron(1));
+        //sim.couple((ObjectSensor) mouse.getSensors().get(2), inputs.getNeuron(2));
 
         // TODO: When the mouse gets the cheese, respawn to a new location
 
@@ -145,21 +146,22 @@ public class TestEvolution extends RegisteredSimulation {
 
         for (int i = 0; i < maxMove; i++) {
 
-            // sensing
-            NeuronGroup inputs = (NeuronGroup) agent.getPhenotype().getGroupByLabel("inputs");
-            for (int j = 0; j < inputs.size(); j++) {
-                ObjectSensor os = (ObjectSensor) mouse.getSensors().get(j);
-                inputs.getNeuronList().get(j).forceSetActivation(os.getCurrentValue());
-            }
-
-            // "planning"
-            agent.getPhenotype().update();
-
-            // acting
-            NeuronGroup outputs = (NeuronGroup) agent.getPhenotype().getGroupByLabel("outputs");
-            ((StraightMovement) mouse.getEffector("Move Straight")).setAmount(outputs.getActivations()[0]);
-            ((Turning) mouse.getEffector("Turn Left")).setAmount(outputs.getActivations()[1]);
-            ((Turning) mouse.getEffector("Turn Right")).setAmount(outputs.getActivations()[2]);
+            // TODO
+            //// sensing
+            //NeuronGroup inputs = (NeuronGroup) agent.getPhenotype().getGroupByLabel("inputs");
+            //for (int j = 0; j < inputs.size(); j++) {
+            //    ObjectSensor os = (ObjectSensor) mouse.getSensors().get(j);
+            //    inputs.getNeuronList().get(j).forceSetActivation(os.getCurrentValue());
+            //}
+            //
+            //// "planning"
+            //agent.getPhenotype().update();
+            //
+            //// acting
+            //NeuronGroup outputs = (NeuronGroup) agent.getPhenotype().getGroupByLabel("outputs");
+            //((StraightMovement) mouse.getEffector("Move Straight")).setAmount(outputs.getActivations()[0]);
+            //((Turning) mouse.getEffector("Turn Left")).setAmount(outputs.getActivations()[1]);
+            //((Turning) mouse.getEffector("Turn Right")).setAmount(outputs.getActivations()[2]);
 
             odorWorld.update();
 

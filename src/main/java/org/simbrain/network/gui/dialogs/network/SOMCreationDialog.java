@@ -19,9 +19,9 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.SOMPropertiesPanel.SOMPropsPanelType;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.SOMGroup;
+import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -31,7 +31,7 @@ import javax.swing.*;
 /**
  * <b>SOMDialog</b> is used as an assistant to create SOM networks.
  */
-public class SOMGroupCreationDialog extends StandardDialog {
+public class SOMCreationDialog extends StandardDialog {
 
     /**
      * Tabbed pane.
@@ -51,8 +51,16 @@ public class SOMGroupCreationDialog extends StandardDialog {
     /**
      * SOM properties panel.
      */
-    private SOMPropertiesPanel somPanel;
+    private AnnotatedPropertyEditor somPanel;
 
+    /**
+     * Creator object
+     */
+    private SOMNetwork.SOMCreator sc = new  SOMNetwork.SOMCreator();
+
+    /**
+     * Layout object.
+     */
     private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
 
     /**
@@ -70,21 +78,10 @@ public class SOMGroupCreationDialog extends StandardDialog {
      *
      * @param networkPanel Network panel
      */
-    public SOMGroupCreationDialog(final NetworkPanel networkPanel) {
+    public SOMCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
-        init();
-    }
-
-    /**
-     * Initializes all components used in dialog.
-     */
-    private void init() {
-
-        setTitle("New SOM Group");
-        somPanel = new SOMPropertiesPanel(networkPanel, SOMPropsPanelType.CREATE_GROUP);
-
-        // Set up tab panels
+        setTitle("New SOM Network");
+        somPanel = new AnnotatedPropertyEditor(sc);
         tabLogic.add(somPanel);
         layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         layoutObject.setLayout(SOMGroup.DEFAULT_LAYOUT);
@@ -93,10 +90,8 @@ public class SOMGroupCreationDialog extends StandardDialog {
         tabbedPane.addTab("Layout", layoutPanel);
         setContentPane(tabbedPane);
 
-        // Help action
-        Action helpAction = new ShowHelpAction(somPanel.getHelpPath());
+        Action helpAction = new ShowHelpAction("Pages/Network/network/somnetwork.html");
         addButton(new JButton(helpAction));
-
     }
 
     /**
@@ -105,14 +100,13 @@ public class SOMGroupCreationDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         somPanel.commitChanges();
-        SOMGroup som = (SOMGroup) somPanel.getGroup();
+        SOMNetwork som = sc.create(networkPanel.getNetwork());
         layoutPanel.commitChanges();
-        som.setLayout(layoutObject.getLayout());
-        networkPanel.getNetwork().addGroup(som);
-        som.applyLayout();
+        som.getSom().setLayout(layoutObject.getLayout());
+        som.getSom().applyLayout();
+        networkPanel.getNetwork().addSubnetwork(som);
         networkPanel.getPlacementManager().addNewModelObject(som);
         super.closeDialogOk();
-
     }
 
 }

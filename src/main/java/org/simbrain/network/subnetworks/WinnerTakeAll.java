@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.UserParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,22 +49,27 @@ public class WinnerTakeAll extends NeuronGroup {
     /**
      * Winning value.
      */
+    @UserParameter(label = "Win value")
     private double winValue = 1;
 
     /**
      * Losing value.
      */
+    @UserParameter(label = "Lose value")
     private double loseValue = 0;
 
     /**
      * If true, sometimes set the winner randomly.
      */
+    @UserParameter(label = "Random winner")
     private boolean useRandom;
 
     /**
      * Probability of setting the winner randomly, when useRandom is true.
      */
+    @UserParameter(label = "Random prob")
     private double randomProb = .1;
+    // todo; conditonal on userandom
 
     /**
      * Random number generator.

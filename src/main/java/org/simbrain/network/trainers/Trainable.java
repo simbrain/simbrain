@@ -13,8 +13,8 @@
  */
 package org.simbrain.network.trainers;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.Group;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public interface Trainable {
      *
      * @return the network being trained.
      */
-    Group getNetwork();
+    NetworkModel getNetwork();
 
     /**
      * Returns the list of input neurons.

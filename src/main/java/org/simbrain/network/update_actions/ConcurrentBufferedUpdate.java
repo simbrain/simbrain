@@ -20,7 +20,6 @@ package org.simbrain.network.update_actions;
 
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.*;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -208,84 +207,87 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
                             }
                         }
                     }
-                } else if ("groupAdded".equals(evt.getPropertyName())) {
-                    System.out.println("GROUP ADDED");
-                    Group group = (Group) evt.getNewValue();
-                    groupAdded(group);
-                } else if ("groupRemoved".equals(evt.getPropertyName())) {
-                    System.out.println("GROUP REMOVED");
-                    Group group = (Group) evt.getNewValue();
-                    groupRemoved(group);
                 }
+                //else if ("groupAdded".equals(evt.getPropertyName())) {
+                //    System.out.println("GROUP ADDED");
+                //    Group group = (Group) evt.getNewValue();
+                //    groupAdded(group);
+                //} else if ("groupRemoved".equals(evt.getPropertyName())) {
+                //    System.out.println("GROUP REMOVED");
+                //    Group group = (Group) evt.getNewValue();
+                //    groupRemoved(group);
+                //}
 
             }
         );
     }
 
-    private void groupAdded(Group group) {
-        if (group instanceof NeuronGroup) {
-            NeuronGroup ng = (NeuronGroup) group;
-            pendingOperations.incrementAndGet();
-            synchronized (neurons) {
-                for (Neuron n : ng.getNeuronList()) {
-                    neurons.add(n);
-                }
-                taskSet.populateList(neurons);
-            }
-            decrementPendingOperations();
-            ng.addPropertyChangeListener(
-                    evt -> {
-                        if ("update".equals(evt.getPropertyName())) {
-                            synchronized (outputGroups) {
-                                if (ng.getActivationRecorder().isRecording()) {
-                                    if (!outputGroups.contains(ng)) {
-                                        outputGroups.add(ng);
-                                    }
-                                } else {
-                                    if (outputGroups.contains(ng)) {
-                                        outputGroups.remove(ng);
-                                    }
-                                }
-                            }
-                            synchronized (inputGroups) {
-                                if (ng.isInputMode()) {
-                                    if (!inputGroups.contains(ng)) {
-                                        inputGroups.add(ng);
-                                    }
-                                } else {
-                                    if (inputGroups.contains(ng)) {
-                                        inputGroups.remove(ng);
-                                    }
-                                }
-                            }
-                        }
-                    });
-        } else if (group instanceof  Subnetwork) {
-            for(NeuronGroup ng : ((Subnetwork) group).getNeuronGroupList()) {
-                groupAdded(ng);
-            }
-        }
-    }
+    //TODO
 
-    private void groupRemoved(Group group) {
-        if (group instanceof NeuronGroup) {
-            pendingOperations.incrementAndGet();
-            synchronized (neurons) {
-                for (Neuron n : ((NeuronGroup) group).getNeuronList()) {
-                    neurons.remove(n);
-                }
-            }
-            taskSet.populateList(neurons);
-            decrementPendingOperations();
-        } else if (group instanceof Subnetwork) {
-            List<NeuronGroup> neuronGroups = ((Subnetwork) group).getNeuronGroupList();
-            for (NeuronGroup ng : neuronGroups) {
-                groupRemoved(ng);
-            }
-        } else {
-            return;
-        }
-    }
+    //private void groupAdded(Group group) {
+    //    if (group instanceof NeuronGroup) {
+    //        NeuronGroup ng = (NeuronGroup) group;
+    //        pendingOperations.incrementAndGet();
+    //        synchronized (neurons) {
+    //            for (Neuron n : ng.getNeuronList()) {
+    //                neurons.add(n);
+    //            }
+    //            taskSet.populateList(neurons);
+    //        }
+    //        decrementPendingOperations();
+    //        ng.addPropertyChangeListener(
+    //                evt -> {
+    //                    if ("update".equals(evt.getPropertyName())) {
+    //                        synchronized (outputGroups) {
+    //                            if (ng.getActivationRecorder().isRecording()) {
+    //                                if (!outputGroups.contains(ng)) {
+    //                                    outputGroups.add(ng);
+    //                                }
+    //                            } else {
+    //                                if (outputGroups.contains(ng)) {
+    //                                    outputGroups.remove(ng);
+    //                                }
+    //                            }
+    //                        }
+    //                        synchronized (inputGroups) {
+    //                            if (ng.isInputMode()) {
+    //                                if (!inputGroups.contains(ng)) {
+    //                                    inputGroups.add(ng);
+    //                                }
+    //                            } else {
+    //                                if (inputGroups.contains(ng)) {
+    //                                    inputGroups.remove(ng);
+    //                                }
+    //                            }
+    //                        }
+    //                    }
+    //                });
+    //    } else if (group instanceof  Subnetwork) {
+    //        for(NeuronGroup ng : ((Subnetwork) group).getNeuronGroupList()) {
+    //            groupAdded(ng);
+    //        }
+    //    }
+    //}
+    //
+    //private void groupRemoved(Group group) {
+    //    if (group instanceof NeuronGroup) {
+    //        pendingOperations.incrementAndGet();
+    //        synchronized (neurons) {
+    //            for (Neuron n : ((NeuronGroup) group).getNeuronList()) {
+    //                neurons.remove(n);
+    //            }
+    //        }
+    //        taskSet.populateList(neurons);
+    //        decrementPendingOperations();
+    //    } else if (group instanceof Subnetwork) {
+    //        List<NeuronGroup> neuronGroups = ((Subnetwork) group).getNeuronGroupList();
+    //        for (NeuronGroup ng : neuronGroups) {
+    //            groupRemoved(ng);
+    //        }
+    //    } else {
+    //        return;
+    //    }
+    //}
 
     @Override
     public void invoke() {
@@ -552,8 +554,10 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
         //STDPRule stdp = new STDPRule();
         //stdp.setLearningRate(0.0001);
         //sg.setLearningRule(stdp, Polarity.BOTH);
-        net.addGroup(ng);
-        net.addGroup(sg);
+
+        // TODO
+        //net.addGroup(ng);
+        //net.addGroup(sg);
         long end = System.nanoTime();
         System.out.println("End Network construction");
         System.out.println("Time: " + SimbrainMath.roundDouble((end - start) / Math.pow(10, 9), 6));

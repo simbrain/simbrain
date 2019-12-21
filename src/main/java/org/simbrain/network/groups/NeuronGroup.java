@@ -29,12 +29,16 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.subnetworks.CompetitiveGroup;
+import org.simbrain.network.subnetworks.SOMGroup;
+import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 
+import javax.swing.*;
 import java.awt.geom.Point2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -201,24 +205,21 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return new NeuronGroup(newParent, this);
     }
 
-    @Override
     public void delete() {
-        if (isMarkedForDeletion()) {
-            return;
-        } else {
-            setMarkedForDeletion(true);
-        }
+
         for (Neuron neuron : getNeuronList()) {
             neuron.getNetwork().removeNeuron(neuron, true);
         }
-        if (hasParentGroup()) {
-            if (getParentGroup() instanceof Subnetwork) {
-                ((Subnetwork) getParentGroup()).removeNeuronGroup(this);
-            }
-            if (getParentGroup().isEmpty()) {
-                getParentNetwork().removeGroup(getParentGroup());
-            }
-        }
+
+        // TODO:
+        //if (hasParentGroup()) {
+        //    if (getParentGroup() instanceof Subnetwork) {
+        //        ((Subnetwork) getParentGroup()).removeNeuronGroup(this);
+        //    }
+        //    if (getParentGroup().isEmpty()) {
+        //        getParentNetwork().removeGroup(getParentGroup());
+        //    }
+        //}
 
         activationRecorder.stopRecording();
         removeAllNeurons();
@@ -237,7 +238,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         if (!inputMode) {
             Network.updateNeurons(getNeuronList());
         }
-        fireLabelUpdated();
+        //fireLabelUpdated(); // TODO
     }
 
     /**
@@ -451,11 +452,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         setLocation(point.getX(), point.getY());
     }
 
-    @Override
-    public String getUpdateMethodDescription() {
-        return "Update neurons";
-    }
-
     /**
      * Apply any input values to the activations of the neurons in this group.
      */
@@ -616,6 +612,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
          */
         @UserParameter(label = "Update Rule")
         private UpdateRuleEnum updateRule = UpdateRuleEnum.LINEAR;
+        //todo conditional enable based on group type
+
+        @UserParameter(label = "Group type")
+        private GroupEnum groupType = GroupEnum.DEFAULT;
 
         /**
          * Create the template with a proposed label
@@ -633,11 +633,18 @@ public class NeuronGroup extends AbstractNeuronCollection {
          * @return the created neuron array
          */
         public NeuronGroup create(Network network) {
-            NeuronGroup ng = new NeuronGroup(network, numNeurons,
-                    network.getArrayIdGenerator().getId());
-            ng.setLabel(label);
-            ng.setGroupUpdateRule(updateRule);
-            ng.applyLayout();
+            NeuronGroup ng = null;
+            if (groupType == GroupEnum.DEFAULT) {
+                ng = new NeuronGroup(network, numNeurons,
+                        network.getArrayIdGenerator().getId());
+                ng.setGroupUpdateRule(updateRule);
+            } else if (groupType == GroupEnum.WTA) {
+                ng = new WinnerTakeAll(network, numNeurons);
+            } else if (groupType == GroupEnum.COMPETITIVE) {
+                ng = new CompetitiveGroup(network, numNeurons);
+            } else if (groupType == GroupEnum.SOM) {
+                ng = new SOMGroup(network, numNeurons);
+            }
             return ng;
         }
 
@@ -652,6 +659,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
         public String getName() {
             return "Neuron Group";
         }
+    }
+
+    // TODO
+    public enum GroupEnum {
+        DEFAULT, WTA, COMPETITIVE, SOM;
+
     }
 
 }

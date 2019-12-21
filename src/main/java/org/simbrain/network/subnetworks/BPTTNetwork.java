@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
@@ -102,13 +102,14 @@ public final class BPTTNetwork extends FeedForward implements Trainable {
         this.stepsPerSequences = stepsPerSequences;
     }
 
-    @Override
-    public String getUpdateMethodDescription() {
-        return "Hidden layer, output layer, copy output to input";
-    }
+    // TODO
+    //@Override
+    //public String getUpdateMethodDescription() {
+    //    return "Hidden layer, output layer, copy output to input";
+    //}
 
     @Override
-    public Group getNetwork() {
+    public NetworkModel getNetwork() {
         return this;
     }
 }

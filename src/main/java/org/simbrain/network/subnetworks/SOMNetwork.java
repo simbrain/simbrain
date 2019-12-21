@@ -18,15 +18,17 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.NetworkLayoutManager;
 import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -62,16 +64,15 @@ public class SOMNetwork extends Subnetwork implements Trainable {
      *                        holder for param values.
      * @param numSOMNeurons   number of neurons in the SOM layer
      * @param numInputNeurons number of neurons in the input layer
-     * @param initialPosition bottom corner where network will be placed.
      */
-    public SOMNetwork(Network net, int numSOMNeurons, int numInputNeurons, Point2D initialPosition) {
+    public SOMNetwork(Network net, int numSOMNeurons, int numInputNeurons) {
         super(net);
         this.setLabel("SOM Network");
         som = new SOMGroup(net, numSOMNeurons);
         this.addNeuronGroup(som);
         som.applyLayout();
 
-        inputLayer = new NeuronGroup(net, initialPosition, numInputNeurons);
+        inputLayer = new NeuronGroup(net, numInputNeurons);
         inputLayer.setLayoutBasedOnSize();
         if (net == null) {
             return;
@@ -124,7 +125,28 @@ public class SOMNetwork extends Subnetwork implements Trainable {
     }
 
     @Override
-    public Group getNetwork() {
+    public NetworkModel getNetwork() {
         return this;
     }
+
+    /**
+     * Helper class for creating new Hopfield nets using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
+     */
+    public static class SOMCreator implements EditableObject {
+
+        @UserParameter(label = "Number of inputs")
+        int numIn = 16;
+
+        @UserParameter(label = "Number of som neurons")
+        int numSom = 20;
+
+        /**
+         * Create the som net
+         */
+        public SOMNetwork create(Network network) {
+            return new SOMNetwork(network, numIn, numSom);
+        }
+
+    }
+
 }

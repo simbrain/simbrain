@@ -19,11 +19,11 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.HopfieldEditTrainDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -50,7 +50,7 @@ public class HopfieldNode extends SubnetworkNode {
 
     @Override
     protected StandardDialog getPropertyDialog() {
-        return new HopfieldEditTrainDialog(getNetworkPanel(), (Hopfield) getSubnetwork());
+        return AnnotatedPropertyEditor.getDialog(getSubnetwork());
     }
 
     /**
@@ -79,8 +79,7 @@ public class HopfieldNode extends SubnetworkNode {
         menu.add(randomizeNet);
         Action clearWeights = new AbstractAction("Set weights to zero") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getSubnetwork()).getSynapseGroup().setStrength(0, Polarity.BOTH);
-                ;
+                getSubnetwork().getSynapseGroup().setStrength(0, Polarity.BOTH);
             }
         };
         menu.add(clearWeights);

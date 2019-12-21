@@ -185,7 +185,7 @@ public class EvolvePursuer extends RegisteredSimulation {
         poison.randomizeLocationInRange(50);
 
         // Create couplings
-        NeuronGroup outputs = (NeuronGroup) network.getGroupByLabel("outputs");
+        NeuronGroup outputs = null; // TODO: (NeuronGroup) network.getGroupByLabel("outputs");
         theSim.couple(outputs.getNeuron(0), mouse.getEffector("Move straight"));
         theSim.couple(outputs.getNeuron(1), mouse.getEffector("Turn left"));
         theSim.couple(outputs.getNeuron(2), mouse.getEffector("Turn right"));
@@ -193,7 +193,7 @@ public class EvolvePursuer extends RegisteredSimulation {
         outputs.getNeuron(1).setLabel("Left");
         outputs.getNeuron(2).setLabel("Right");
         outputs.setClamped(false);
-        NeuronGroup inputs = (NeuronGroup) network.getGroupByLabel("inputs");
+        NeuronGroup inputs = null; // todo (NeuronGroup) network.getGroupByLabel("inputs");
         LineLayout layout = (LineLayout) inputs.getLayout();
         layout.setSpacing(100);
         inputs.applyLayout();

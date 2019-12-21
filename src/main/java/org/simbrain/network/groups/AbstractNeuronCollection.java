@@ -15,6 +15,8 @@ import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -29,7 +31,36 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
  * neuron update rules and track synapse polarity).
  */
-public abstract class AbstractNeuronCollection extends Group implements AttributeContainer, ArrayConnectable, LocatableModel {
+public abstract class AbstractNeuronCollection implements CopyableObject, AttributeContainer, ArrayConnectable, LocatableModel {
+
+    /**
+     * Reference to the network this group is a part of.
+     */
+    private final Network parentNetwork;
+
+    /**
+     * Id of this group.
+     */
+    @UserParameter(label = "ID", description = "Id of this neuron collection", order = -1, editable = false)
+    protected String id;
+
+    /**
+     * Name of this group. Null strings lead to default labeling conventions.
+     */
+    @UserParameter(label = "Label", description = "Neuron collection  label", useSetter = true,
+            order = 10)
+    private String label = "TODO";
+
+    /**
+     * Optional information about the current state of the group. For display in
+     * GUI.
+     */
+    private String stateInfo = "";
+
+    /**
+     * Support for property change events.
+     */
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      * References to neurons in this collection
@@ -81,7 +112,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
      * Default constructor.
      */
     public AbstractNeuronCollection(Network net) {
-        super(net);
+        parentNetwork = net;
         inputManager = new ActivationInputManager(this);
         subsamplingManager = new SubsamplingManager(this);
         activationRecorder = new ActivationRecorder(this);
@@ -133,6 +164,11 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
     @Override
     public void setCenterY(double newy) {
         //todo
+    }
+
+    @Override
+    public Point2D getLocation() {
+        return null; //todo
     }
 
     /**
@@ -705,16 +741,19 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         return getParentNetwork();
     }
 
+    @Override
+    public void fireDeleted() {
+        // todo
+    }
+
     public List<Neuron> getNeuronList() {
         return Collections.unmodifiableList(neuronList);
     }
 
-    @Override
     public boolean isEmpty() {
         return neuronList.isEmpty();
     }
 
-    @Override
     public int size() {
         return neuronList.size();
     }
@@ -739,7 +778,7 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
             throw new IllegalArgumentException("Cannot set input mode to true" + " if there is no input data stored in NeuronGroup field:" + " testData");
         }
         this.inputMode = inputMode;
-        fireLabelUpdated();
+        //fireLabelUpdated();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -835,4 +874,62 @@ public abstract class AbstractNeuronCollection extends Group implements Attribut
         changeSupport.firePropertyChange("recordingStopped", null, null);
     }
 
+    @Consumable(defaultVisibility = false)
+    public void setLabel(String label) {
+        String oldLabel = this.label;
+        this.label = label;
+        changeSupport.firePropertyChange("label", oldLabel , label);
+    }
+
+    @Producible(defaultVisibility = false)
+    public String getLabel() {
+        return label;
+    }
+
+    public Network getParentNetwork() {
+        return parentNetwork;
+    }
+
+    @Override
+    public EditableObject copy() {
+        //TODO
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return null; //TODO
+    }
+
+    @Override
+    public void onCommit() {
+        //todo
+
+    }
+
+    @Override
+    public String getId() {
+        return null;
+    }
+
+    /**
+     * Label update needs to be reflected in GUI.
+     */
+    public void fireLabelUpdated() {
+        changeSupport.firePropertyChange("label", null , null);
+    }
+
+    public String getStateInfo() {
+        return stateInfo;
+    }
+
+    public void setStateInfo(String stateInfo) {
+        this.stateInfo = stateInfo;
+    }
+
+    public void postUnmarshallingInit() {
+        if (changeSupport == null) {
+            changeSupport = new PropertyChangeSupport(this);
+        }
+    }
 }

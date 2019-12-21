@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.update_actions;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -32,46 +32,49 @@ import org.simbrain.network.groups.SynapseGroup;
  */
 public class UpdateGroup implements NetworkUpdateAction {
 
+    // TODO: Rethink group and subnet update
+
     /**
      * Reference to group.
      */
-    private final Group group;
+    private final NetworkModel group;
 
     /**
      * @param group group to update
      */
-    public UpdateGroup(Group group) {
+    public UpdateGroup(NetworkModel group) {
         this.group = group;
     }
 
     @Override
     public void invoke() {
-        group.update();
+        //group.update();
     }
 
     @Override
     public String getDescription() {
-        String groupUpdateDescription = group.getUpdateMethodDescription();
-        if (group instanceof Subnetwork) {
-            return "Subnetwork:" + group.getLabel() + " (" + groupUpdateDescription + ")";
-        } else if (group instanceof NeuronGroup) {
-            return "NeuronGroup:" + group.getLabel() + " (" + groupUpdateDescription + ")";
-        } else if (group instanceof SynapseGroup) {
-            return "SynapseGroup:" + group.getLabel() + " (" + groupUpdateDescription + ")";
-        } else {
-            return "Group:" + group.getLabel() + " (" + groupUpdateDescription + ")";
-        }
+        //String groupUpdateDescription = group.getUpdateMethodDescription();
+        //if (group instanceof Subnetwork) {
+        //    return "Subnetwork:" + group.getLabel() + " (" + groupUpdateDescription + ")";
+        //} else if (group instanceof NeuronGroup) {
+        //    return "NeuronGroup:" + group.getLabel() + " (" + groupUpdateDescription + ")";
+        //} else if (group instanceof SynapseGroup) {
+        //    return "SynapseGroup:" + group.getLabel() + " (" + groupUpdateDescription + ")";
+        //} else {
+        //    return "Group:" + group.getLabel() + " (" + groupUpdateDescription + ")";
+        //}
+        return "";
     }
 
     @Override
     public String getLongDescription() {
-        return "Update " + group.getLabel();
+        return "Update "; // TODO + group.getLabel();
     }
 
     /**
      * @return the group
      */
-    public Group getGroup() {
+    public NetworkModel getGroup() {
         return group;
     }
 

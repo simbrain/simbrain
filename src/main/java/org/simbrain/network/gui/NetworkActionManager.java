@@ -27,7 +27,6 @@ import org.simbrain.network.gui.actions.edit.*;
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction;
 import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction;
 import org.simbrain.network.gui.actions.network.*;
-import org.simbrain.network.gui.actions.neuron.NewActivityGeneratorAction;
 import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction;
@@ -41,7 +40,9 @@ import org.simbrain.network.gui.dialogs.network.*;
 
 import javax.swing.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Network action manager.
@@ -298,6 +299,8 @@ public final class NetworkActionManager {
      */
     private final NetworkPanel networkPanel;
 
+    private transient Map<String, AbstractAction> actions = new HashMap<>();
+
     /**
      * Create a new network action manager for the specified network panel.
      *
@@ -310,6 +313,9 @@ public final class NetworkActionManager {
         }
 
         this.networkPanel = networkPanel;
+
+        actions.put("NewGroup", new AddGroupAction(networkPanel,
+                NeuronGroupDialog.class, "Add Neuron Group"));
 
         selectionEditModeAction = new SelectionEditModeAction(networkPanel);
         textEditModeAction = new TextEditModeAction(networkPanel);
@@ -428,24 +434,18 @@ public final class NetworkActionManager {
     }
 
     public List<Action> getNewNetworkActions() {
-        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, BackpropCreationDialog.class, "Backprop"), new AddGroupAction(networkPanel, CompetitiveNetworkCreationDialog.class, "Competitive Network"), new AddGroupAction(networkPanel, FeedForwardCreationDialog.class, "Feed Forward Network"), new AddGroupAction(networkPanel, HopfieldCreationDialog.class, "Hopfield"), new AddGroupAction(networkPanel, LMSCreationDialog.class, "LMS (Least Mean Squares)"), new AddGroupAction(networkPanel, SOMNetworkCreationDialog.class, "SOM Network"), new AddGroupAction(networkPanel, SRNCreationDialog.class, "SRN (Simple Recurrent Network)")});
-    }
-
-    public List<Action> getNewGroupActions() {
-        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, NeuronGroupDialog.class, "(Bare) Neuron Group"), new AddGroupAction(networkPanel, CompetitiveGroupCreationDialog.class, "Competitive (Group only)"), new AddGroupAction(networkPanel, SOMGroupCreationDialog.class, "SOM (Group only)"), new AddGroupAction(networkPanel, WTACreationDialog.class, "WTA (Winner take all)")});
+        return Arrays.asList(new Action[] {new AddGroupAction(networkPanel, BackpropCreationDialog.class, "Backprop"),
+                new AddGroupAction(networkPanel, CompetitiveCreationDialog.class, "Competitive Network"),
+                new AddGroupAction(networkPanel, FeedForwardCreationDialog.class, "Feed Forward Network"),
+                new AddGroupAction(networkPanel, HopfieldCreationDialog.class, "Hopfield"),
+                new AddGroupAction(networkPanel, LMSCreationDialog.class, "LMS (Least Mean Squares)"),
+                new AddGroupAction(networkPanel, SOMCreationDialog.class, "SOM Network"),
+                new AddGroupAction(networkPanel, SRNCreationDialog.class, "SRN (Simple Recurrent Network)")});
     }
 
     public JMenu getNewNetworkMenu() {
         JMenu ret = new JMenu("Insert Network");
         for (Action action : getNewNetworkActions()) {
-            ret.add(action);
-        }
-        return ret;
-    }
-
-    public JMenu getNewGroupMenu() {
-        JMenu ret = new JMenu("Insert Neuron Group");
-        for (Action action : getNewGroupActions()) {
             ret.add(action);
         }
         return ret;
@@ -632,6 +632,13 @@ public final class NetworkActionManager {
 
     public Action getLayoutNeuronsAction() {
         return layoutNeurons;
+    }
+
+    /**
+     * Get action based on name
+     */
+    public Action getAction(String name) {
+        return actions.get(name);
     }
 
 

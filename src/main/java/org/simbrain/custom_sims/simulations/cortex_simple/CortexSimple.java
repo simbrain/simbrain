@@ -191,7 +191,7 @@ public class CortexSimple extends RegisteredSimulation {
             neurons.add(neuron);
         }
         NeuronGroup ng = new NeuronGroup(network, neurons);
-        network.addGroup(ng);
+        network.addNeuronGroup(ng);
         //ng.setLayout(layout);
         //ng.applyLayout();
         return ng;
@@ -227,7 +227,7 @@ public class CortexSimple extends RegisteredSimulation {
 
         sg.setSpikeResponder(new UDF(), Polarity.BOTH);
 
-        network.addGroup(sg);
+        network.addSynapseGroup(sg);
 
         return sg;
 

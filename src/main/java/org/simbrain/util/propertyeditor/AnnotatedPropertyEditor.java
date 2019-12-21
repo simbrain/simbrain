@@ -18,6 +18,7 @@
  */
 package org.simbrain.util.propertyeditor;
 
+import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Parameter;
@@ -510,6 +511,14 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 .filter(ObjectTypeEditor.class::isInstance)
                 .map(ObjectTypeEditor.class::cast)
                 .forEach(oe -> oe.setDetailTriangleOpen(open));
+    }
+
+    /**
+     * Utility to create and return a property editor on an editable object.
+     */
+    public static StandardDialog getDialog(EditableObject object) {
+        AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(object);
+        return ape.getDialog();
     }
 
 }

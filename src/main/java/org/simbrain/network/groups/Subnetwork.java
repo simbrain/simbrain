@@ -12,6 +12,7 @@
  */
 package org.simbrain.network.groups;
 
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectionStrategy;
@@ -19,18 +20,49 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.trainers.Trainable;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * A collection of neuron groups and synapse groups which functions as a
- * subnetwork within the main root network, with its own update rules.
+ * A collection of neuron groups and synapse groups which functions as a subnetwork within the main root network, with
+ * its own update rules. Note that no neurons or synapses or other objects are contained in a subnet (as of now), it
+ * only contains neuron and synapse groups.
  */
-public abstract class Subnetwork extends Group implements NetworkModel {
+public abstract class Subnetwork implements CopyableObject, LocatableModel, AttributeContainer {
+
+    /**
+     * Reference to the network this group is a part of.
+     */
+    private final Network parentNetwork;
+
+    /**
+     * Id of this group.
+     */
+    @UserParameter(label = "ID", description = "Id of this subnetwork", order = -1, editable = false)
+    protected String id;
+
+    /**
+     * Name of this group. Null strings lead to default labeling conventions.
+     */
+    @UserParameter(label = "Label", description = "Subnetwork label", useSetter = true,
+            order = 10)
+    private String label = "";
+
+    /**
+     * Support for property change events.
+     */
+    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /**
      * List of neuron groups.
@@ -43,18 +75,11 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
 
     /**
-     * Whether the GUI should display neuron groups contained in this
-     * subnetwork. This will usually be true, but in cases where a subnetwork
-     * has just one neuron group it is redundant to display both. So this flag
-     * indicates to the GUI that neuron groups in this subnetwork need not be
-     * displayed.
+     * Whether the GUI should display neuron groups contained in this subnetwork. This will usually be true, but in
+     * cases where a subnetwork has just one neuron group it is redundant to display both. So this flag indicates to the
+     * GUI that neuron groups in this subnetwork need not be displayed.
      */
     private boolean displayNeuronGroups = true;
-
-    /**
-     * The number of neurons and synapses in this group.
-     */
-    private int numMembers;
 
     /**
      * Create subnetwork group.
@@ -62,27 +87,26 @@ public abstract class Subnetwork extends Group implements NetworkModel {
      * @param net parent network.
      */
     public Subnetwork(final Network net) {
-        super(net);
+        parentNetwork = net;
         setLabel("Subnetwork");
     }
 
-    @Override
     public void delete() {
-        if (isMarkedForDeletion()) {
-            return;
-        } else {
-            setMarkedForDeletion(true);
-        }
-        for (NeuronGroup neuronGroup : neuronGroupList) {
-            getParentNetwork().removeGroup(neuronGroup);
-        }
-        for (SynapseGroup synapseGroup : synapseGroupList) {
-            getParentNetwork().removeGroup(synapseGroup);
-        }
+        // TODO
+        //if (isMarkedForDeletion()) {
+        //    return;
+        //} else {
+        //    setMarkedForDeletion(true);
+        //}
+        //for (NeuronGroup neuronGroup : neuronGroupList) {
+        //    getParentNetwork().removeGroup(neuronGroup);
+        //}
+        //for (SynapseGroup synapseGroup : synapseGroupList) {
+        //    getParentNetwork().removeGroup(synapseGroup);
+        //}
         changeSupport.firePropertyChange("delete", this, null);
     }
 
-    @Override
     public boolean isEmpty() {
         boolean neuronGroupsEmpty = neuronGroupList.isEmpty();
         boolean synapseGroupsEmpty = synapseGroupList.isEmpty();
@@ -107,9 +131,8 @@ public abstract class Subnetwork extends Group implements NetworkModel {
      * @param group the synapse group to add
      */
     public void addSynapseGroup(SynapseGroup group) {
-        numMembers += group.size();
         synapseGroupList.add(group);
-        group.setParentGroup(this);
+        //group.setParentGroup(this); //todo
     }
 
     /**
@@ -118,14 +141,12 @@ public abstract class Subnetwork extends Group implements NetworkModel {
      * @param group the neuron group to add
      */
     public void addNeuronGroup(NeuronGroup group) {
-        numMembers += group.size();
         neuronGroupList.add(group);
-        group.setParentGroup(this);
+        //group.setParentGroup(this);  //todo
     }
 
     /**
-     * Connects one group of neurons to another group of neurons using an All to
-     * All connection.
+     * Connects one group of neurons to another group of neurons using an All to All connection.
      *
      * @param source the source group
      * @param target the target group
@@ -150,8 +171,8 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * Connects two groups of neurons according to some connection style, and
-     * allows for custom labels of the neuron groups within the weights label.
+     * Connects two groups of neurons according to some connection style, and allows for custom labels of the neuron
+     * groups within the weights label.
      *
      * @param source      the source group
      * @param target      the target group
@@ -168,9 +189,8 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * Utility method for labeling synapse groups based on the neuron groups
-     * they connect. A forward arrow is used for feed-forward synapse groups, a
-     * circular arrow for recurrent synapse groups.
+     * Utility method for labeling synapse groups based on the neuron groups they connect. A forward arrow is used for
+     * feed-forward synapse groups, a circular arrow for recurrent synapse groups.
      *
      * @param source      source neuron group
      * @param target      target neuron group
@@ -188,8 +208,7 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * Adds an already constructed synapse group to the subnetwork and provides
-     * it with an appropriate label.
+     * Adds an already constructed synapse group to the subnetwork and provides it with an appropriate label.
      *
      * @param synGrp group to add
      */
@@ -206,9 +225,8 @@ public abstract class Subnetwork extends Group implements NetworkModel {
      * @param neuronGroup group to remove
      */
     public void removeNeuronGroup(NeuronGroup neuronGroup) {
-        numMembers -= neuronGroup.size();
         neuronGroupList.remove(neuronGroup);
-        getParentNetwork().fireGroupRemoved(neuronGroup);
+        //getParentNetwork().fireGroupRemoved(neuronGroup);
     }
 
     /**
@@ -217,9 +235,9 @@ public abstract class Subnetwork extends Group implements NetworkModel {
      * @param synapseGroup group to remove
      */
     public void removeSynapseGroup(SynapseGroup synapseGroup) {
-        numMembers -= synapseGroup.size();
         synapseGroupList.remove(synapseGroup);
-        getParentNetwork().fireGroupRemoved(synapseGroup);
+        // todo
+        //getParentNetwork().fireGroupRemoved(synapseGroup);
     }
 
     /**
@@ -263,8 +281,7 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * Get the first neuron group in the list. Convenience method when there is
-     * just one neuron group.
+     * Get the first neuron group in the list. Convenience method when there is just one neuron group.
      *
      * @return the neuron group.
      */
@@ -324,8 +341,7 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * Get the first synapse group in the list. Convenience method when there is
-     * just one synapse group.
+     * Get the first synapse group in the list. Convenience method when there is just one synapse group.
      *
      * @return the synapse group.
      */
@@ -352,8 +368,7 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * Return a "flat" list containing every neuron in every neuron group in
-     * this subnetwork.
+     * Return a "flat" list containing every neuron in every neuron group in this subnetwork.
      *
      * @return the flat neuron list.
      */
@@ -366,9 +381,8 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * Returns a "flat" list containing every neuron in every neuron group in
-     * this subnetwork. This list <b>is</b> modifiable, but this method is
-     * protected... use with care.
+     * Returns a "flat" list containing every neuron in every neuron group in this subnetwork. This list <b>is</b>
+     * modifiable, but this method is protected... use with care.
      *
      * @return flat neuron list
      */
@@ -381,8 +395,7 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * Return a "flat" list containing every synapse in every synapse group in
-     * this subnetwork.
+     * Return a "flat" list containing every synapse in every synapse group in this subnetwork.
      *
      * @return the flat synapse list.
      */
@@ -412,15 +425,7 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     }
 
     /**
-     * @return the number of synapses and neurons in this subnetwork.
-     */
-    public int size() {
-        return numMembers;
-    }
-
-    /**
-     * Get long description for info box, formmated in html. Override for more
-     * detailed description.
+     * Get long description for info box, formmated in html. Override for more detailed description.
      *
      * @return the long description.
      */
@@ -448,11 +453,13 @@ public abstract class Subnetwork extends Group implements NetworkModel {
     public void setEnabled(boolean enabled) {
     }
 
-    @Override
+    /**
+     * Default subnetwork update just updates all neuron and synapse groups. Subclasses with custom update should
+     * override this.
+     */
     public void update() {
-        for (NeuronGroup neuronGroup : neuronGroupList) {
-            neuronGroup.update();
-        }
+        neuronGroupList.forEach(NeuronGroup::update);
+        synapseGroupList.forEach(SynapseGroup::update);
     }
 
     /**
@@ -478,18 +485,11 @@ public abstract class Subnetwork extends Group implements NetworkModel {
         }
     }
 
-    @Override
-    public String getUpdateMethodDescription() {
-        return "Unspecified";
-    }
-
     /**
-     * If this subnetwork is trainable, then add the current activation of the
-     * "input" neuron group to the input data of the training set. Assumes the
-     * input neuron group is that last in the list of neuron groups (as is the
-     * case with Hopfield, Competitive, and SOM). Only makes sense with
-     * unsupervised learning, since only input data (and no target data) are
-     * added.
+     * If this subnetwork is trainable, then add the current activation of the "input" neuron group to the input data of
+     * the training set. Assumes the input neuron group is that last in the list of neuron groups (as is the case with
+     * Hopfield, Competitive, and SOM). Only makes sense with unsupervised learning, since only input data (and no
+     * target data) are added.
      */
     public void addRowToTrainingSet() {
         if (this instanceof Trainable) {
@@ -497,22 +497,89 @@ public abstract class Subnetwork extends Group implements NetworkModel {
         }
     }
 
-    @Override
-    public void initializeId() {
-        // Set id for subnetwork
-        super.initializeId();
-        // Set ids for neuron groups
-        for (Group ng : neuronGroupList) {
-            ng.initializeId();
-        }
-        // Set ids for synapse groups
-        for (Group sg : synapseGroupList) {
-            sg.initializeId();
-        }
+    //@Override
+    //public void initializeId() {
+    //    // Set id for subnetwork
+    //    super.initializeId();
+    //    // Set ids for neuron groups
+    //    for (Group ng : neuronGroupList) {
+    //        ng.initializeId();
+    //    }
+    //    // Set ids for synapse groups
+    //    for (Group sg : synapseGroupList) {
+    //        sg.initializeId();
+    //    }
+    //}
+
+    @Consumable(defaultVisibility = false)
+    public void setLabel(String label) {
+        String oldLabel = this.label;
+        this.label = label;
+        changeSupport.firePropertyChange("label", oldLabel, label);
     }
+
+    @Producible(defaultVisibility = false)
+    public String getLabel() {
+        return label;
+    }
+
+    public Network getParentNetwork() {
+        return parentNetwork;
+    }
+
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        if (changeSupport == null) {
+            changeSupport = new PropertyChangeSupport(this);
+        }
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * Label update needs to be reflected in GUI.
+     */
+    public void fireLabelUpdated() {
+        changeSupport.firePropertyChange("label", null, null);
+    }
+
 
     @Override
     public EditableObject copy() {
         return null;
+    }
+
+
+    public void fireDeleted() {
+        changeSupport.firePropertyChange("delete", null, null);
+    }
+    public void postUnmarshallingInit() {
+        if (changeSupport == null) {
+            changeSupport = new PropertyChangeSupport(this);
+        }
+    }
+
+    // todo
+    @Override
+    public double getCenterX() {
+        return 0;
+    }
+
+    @Override
+    public double getCenterY() {
+        return 0;
+    }
+
+    @Override
+    public void setCenterX(double newx) {
+
+    }
+
+    @Override
+    public void setCenterY(double newy) {
+
     }
 }

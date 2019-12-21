@@ -344,16 +344,16 @@ public class PatternsOfActivity extends RegisteredSimulation {
         sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), sensoryNetR);
 
         // Add everything to the network
-        network.addGroup(recurrentNetwork);
-        network.addGroup(inpSynGL);
-        network.addGroup(inpSynGR);
-        network.addGroup(recSyns);
-        network.addGroup(outGroup);
-        network.addGroup(rec2out);
-        network.addGroup(outputNeurons);
-        network.addGroup(out2read);
-        network.addGroup(sensoryNetL);
-        network.addGroup(sensoryNetR);
+        network.addNeuronGroup(recurrentNetwork);
+        network.addSynapseGroup(inpSynGL);
+        network.addSynapseGroup(inpSynGR);
+        network.addSynapseGroup(recSyns);
+        network.addNeuronGroup(outGroup);
+        network.addSynapseGroup(rec2out);
+        network.addNeuronGroup(outputNeurons);
+        network.addSynapseGroup(out2read);
+        network.addNeuronGroup(sensoryNetL);
+        network.addNeuronGroup(sensoryNetR);
 
         // Set up concurrent buffered update
         network.getUpdateManager().clear();

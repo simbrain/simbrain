@@ -102,7 +102,7 @@ public class Vehicle {
         rightTurn.setLabel("Right");
         setNodeDefaults(rightTurn, vehicle);
 
-        net.getNetwork().addGroup(vehicle);
+        net.getNetwork().addNeuronGroup(vehicle);
 
         // Set weights here
         if (vehicleType == VehicleType.PURSUER) {

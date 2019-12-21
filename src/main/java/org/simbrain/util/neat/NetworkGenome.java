@@ -111,8 +111,8 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
             }
         });
 
-        network.addGroup(inputGroup);
-        network.addGroup(outputGroup);
+        network.addNeuronGroup(inputGroup);
+        network.addNeuronGroup(outputGroup);
         inputGroup.setLabel("inputs");
         inputGroup.applyLayout();
         inputGroup.offset(0, 300);

@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -270,19 +270,15 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
         return outputLayer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getUpdateMethodDescription() {
-        return "Hidden layer, copy hidden to context, update layer";
-    }
 
-    /**
-     * {@inheritDoc}
-     */
+    // TOODO
+    //@Override
+    //public String getUpdateMethodDescription() {
+    //    return "Hidden layer, copy hidden to context, update layer";
+    //}
+
     @Override
-    public Group getNetwork() {
+    public NetworkModel getNetwork() {
         return this;
     }
 }

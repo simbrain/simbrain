@@ -19,8 +19,9 @@ package org.simbrain.network;
 
 import org.simbrain.network.core.*;
 import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.groups.Group;
 import org.simbrain.network.groups.NeuronCollection;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -87,13 +88,16 @@ public final class NetworkComponent extends WorkspaceComponent {
                     setChangedSinceLastSave(true);
                 } else if ("textRemoved".equals(evt.getPropertyName())) {
                     setChangedSinceLastSave(true);
-                } else if ("groupAdded".equals(evt.getPropertyName())) {
+                } else if ("ngAdded".equals(evt.getPropertyName())) {
                     setChangedSinceLastSave(true);
-                    fireAttributeContainerAdded((Group) evt.getNewValue());
-                } else if ("groupRemoved".equals(evt.getPropertyName())) {
+                    fireAttributeContainerAdded((NeuronGroup) evt.getNewValue());
+                } else if ("subnetAdded".equals(evt.getPropertyName())) {
                     setChangedSinceLastSave(true);
-                    fireAttributeContainerRemoved((Group) evt.getOldValue());
-                } else if ("ncAdded".equals(evt.getPropertyName())) {
+                    fireAttributeContainerAdded((Subnetwork) evt.getNewValue());
+                }  else if ("ngRemoved".equals(evt.getPropertyName())) {
+                    setChangedSinceLastSave(true);
+                    fireAttributeContainerRemoved((NeuronGroup) evt.getOldValue());
+                }  else if ("ncAdded".equals(evt.getPropertyName())) {
                     setChangedSinceLastSave(true);
                     fireAttributeContainerAdded((NeuronCollection) evt.getNewValue());
                 } else if ("ncRemoved".equals(evt.getPropertyName())) {
@@ -111,16 +115,13 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     }
 
+    // TODO: Implement new stuff
     @Override
     public AttributeContainer getObjectFromKey(String objectKey) {
         if (objectKey.startsWith("Neuron_")) {
             return this.getNetwork().getLooseNeuron(objectKey);
         } else if (objectKey.startsWith("Synapse_")) {
             return this.getNetwork().getLooseSynapse(objectKey);
-        } else if (objectKey.startsWith("Group_")) {
-            return this.getNetwork().getGroup(objectKey);
-        } else if (objectKey.startsWith("Group_")) {
-            return this.getNetwork().getNeuronCollection(objectKey);
         }
         return null;
     }
@@ -130,8 +131,8 @@ public final class NetworkComponent extends WorkspaceComponent {
         List<AttributeContainer> retList = new ArrayList<>();
         //retList.add(network);
         retList.addAll(network.getFlatNeuronList());
-        retList.addAll(network.getSynapseList());
-        retList.addAll(network.getFlatGroupList());
+        retList.addAll(network.getLooseSynapses());
+        //retList.addAll(network.getFlatGroupList()); // TODO
         retList.addAll(network.getNeuronCollectionSet());
         retList.addAll(network.getNaList());
         // TODO: Temp code to handle xstream backwards compatibility issues

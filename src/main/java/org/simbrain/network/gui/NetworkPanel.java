@@ -427,58 +427,37 @@ public class NetworkPanel extends JPanel {
      */
     private void addNetworkListeners() {
 
-        network.addPropertyChangeListener(
-                evt -> {
-                    if ("neuronAdded".equals(evt.getPropertyName())) {
-                        addNeuron((Neuron) evt.getNewValue());
-                    } else if ("neuronRemoved".equals(evt.getPropertyName())) {
-                        ((Neuron) evt.getOldValue()).fireDeleted();
-                    } else if ("neuronsUpdated".equals(evt.getPropertyName())) {
-                        if (!isGuiOn()) {
-                            return;
-                        }
-                        NetworkPanel.this.updateNeuronNodes((List<Neuron>) evt.getNewValue());
-                    } else if ("synapseAdded".equals(evt.getPropertyName())) {
-                        addSynapse((Synapse) evt.getNewValue());
-                    } else if ("synapseRemoved".equals(evt.getPropertyName())) {
-                        ((Synapse) evt.getOldValue()).fireDeleted();
-                    } else if ("textAdded".equals(evt.getPropertyName())) {
-                        addTextObject((NetworkTextObject) evt.getNewValue());
-                    } else if ("textRemoved".equals(evt.getPropertyName())) {
-                        ((NetworkTextObject) evt.getOldValue()).fireDeleted();
-                    } else if ("ngAdded".equals(evt.getPropertyName())) {
-                        NeuronGroup ng = (NeuronGroup) evt.getNewValue();
-                        addNeuronGroup(ng);
-                    } else if ("ngRemoved".equals(evt.getPropertyName())) {
-                        ((NeuronGroup) evt.getOldValue()).fireDeleted();
-                    }  else if ("sgRemoved".equals(evt.getPropertyName())) {
-                        ((SynapseGroup) evt.getOldValue()).fireDeleted();
-                    }  else if ("subnetRemoved".equals(evt.getPropertyName())) {
-                        ((Subnetwork) evt.getOldValue()).fireDeleted();
-                    } else if ("sgAdded".equals(evt.getPropertyName())) {
-                        SynapseGroup sg = (SynapseGroup) evt.getNewValue();
-                        addSynapseGroup(sg);
-                    } else if ("subnetAdded".equals(evt.getPropertyName())) {
-                        Subnetwork net = (Subnetwork) evt.getNewValue();
-                        addSubnetwork(net);
-                    } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
-                        addNeuronArray((NeuronArray) evt.getNewValue());
-                    } else if ("multiLayerNetworkAdded".equals(evt.getPropertyName())) {
-                        addMultiLayerNetwork((MultiLayerNet) evt.getNewValue());
-                    } else if ("naRemoved".equals(evt.getPropertyName())) {
-                        ((NeuronArray) evt.getOldValue()).fireDeleted();
-                    } else if ("wmRemoved".equals(evt.getPropertyName())) {
-                        ((WeightMatrix) evt.getOldValue()).fireDeleted();
-                    } else if ("ncAdded".equals(evt.getPropertyName())) {
-                        addNeuronCollection((NeuronCollection) evt.getNewValue());
-                    } else if ("updateTimeDisplay".equals(evt.getPropertyName())) {
-                        updateTime();
-                    } else if ("updateCompleted".equals(evt.getPropertyName())) {
-                        NetworkPanel.this.setUpdateComplete((Boolean) evt.getNewValue());
-                        repaint();
-                    }
-                }
-        );
+        Network.Event event = network.getEvent();
+
+        event.onNeuronAdded(this::addNeuron);
+        event.onNeuronRemoved(Neuron::fireDeleted); // TODO: [event] should not be handled here
+
+        event.onNeuronsUpdated(l -> {
+            if (isGuiOn()) {
+                NetworkPanel.this.updateNeuronNodes(l);
+            }
+        });
+
+        event.onSynapseAdded(this::addSynapse);
+        event.onSynapseRemoved(Synapse::fireDeleted); // TODO: [event] should not be handled here
+        event.onTextAdded(this::addTextObject);
+        event.onTextRemoved(NetworkTextObject::fireDeleted); // TODO: [event] should not be handled here
+        event.onNeuronGroupAdded(this::addNeuronGroup);
+        event.onNeuronGroupRemoved(AbstractNeuronCollection::fireDeleted); // TODO: [event]
+        event.onSynapseGroupAdded(this::addSynapseGroup);
+        event.onSynapseGroupRemoved(SynapseGroup::fireDeleted); // TODO: [event]
+        event.onSubnetworkAdded(this::addSubnetwork);
+        event.onSubnetworkRemoved(Subnetwork::fireDeleted); // TODO: [event]
+        event.onNeuronArrayAdded(this::addNeuronArray);
+        event.onNeuronArrayRemoved(NeuronArray::fireDeleted);
+        event.onMultiLayerNetworkAdded(this::addMultiLayerNetwork);
+        event.onNeuronCollectionAdded(this::addNeuronCollection);
+        event.onWeightMatrixRemoved(WeightMatrix::fireDeleted);
+        event.onUpdateTimeDisplay(d -> updateTime());
+        event.onUpdateCompleted(c -> {
+            NetworkPanel.this.setUpdateComplete(c);
+            repaint();
+        });
 
     }
 
@@ -503,7 +482,7 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Update visible state of nodes corresponding to specified neurons.
+     * Update visible state of nodes corresponding to specified neurons. // TODO: [event] should not be handled here
      *
      * @param neurons the neurons whose corresponding pnode should be updated.
      */
@@ -638,7 +617,7 @@ public class NetworkPanel extends JPanel {
 
         layout.layoutNeurons(getSelectedModels(Neuron.class));
 
-        network.fireNeuronsUpdated(getSelectedModels(Neuron.class));
+//        network.fireNeuronsUpdated(getSelectedModels(Neuron.class)); // TODO: [event]
         repaint();
 
     }
@@ -862,7 +841,7 @@ public class NetworkPanel extends JPanel {
 
         // Update neuron positions. Must do this before synapse groups so neurons
         // are properly positioned
-        network.fireNeuronsUpdated(subnet.getFlatNeuronList());
+//        network.fireNeuronsUpdated(subnet.getFlatNeuronList()); // TODO: [event]
 
         // Add neuron and synapse group nodes to subnetwork node
         SubnetworkNode subnetNode = createSubnetworkNode(subnet);

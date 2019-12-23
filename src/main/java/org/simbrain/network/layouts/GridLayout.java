@@ -147,8 +147,8 @@ public class GridLayout implements Layout {
             if (i % numCols == 0) {
                 rowNum++;
             }
-            neuron.setX(initialX + (i % numCols) * hSpacing);
-            neuron.setY(initialY + rowNum * vSpacing);
+            neuron.setX(initialX + (i % numCols) * hSpacing, false);
+            neuron.setY(initialY + rowNum * vSpacing, false);
         }
     }
 

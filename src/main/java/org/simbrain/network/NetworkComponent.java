@@ -17,11 +17,7 @@
  */
 package org.simbrain.network;
 
-import org.simbrain.network.core.*;
-import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.core.Network;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -68,50 +64,53 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        network.addPropertyChangeListener(
-            evt -> {
-                if ("neuronAdded".equals(evt.getPropertyName())) {
-                     setChangedSinceLastSave(true);
-                     fireAttributeContainerAdded((Neuron) evt.getNewValue());
-                } else if ("neuronRemoved".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerRemoved((Neuron) evt.getNewValue());
-                } else if ("neuronsUpdated".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                } else if ("synapseAdded".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerAdded((Synapse) evt.getNewValue());
-                } else if ("synapseRemoved".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerRemoved((Synapse) evt.getNewValue());
-                } else if ("textAdded".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                } else if ("textRemoved".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                } else if ("ngAdded".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerAdded((NeuronGroup) evt.getNewValue());
-                } else if ("subnetAdded".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerAdded((Subnetwork) evt.getNewValue());
-                }  else if ("ngRemoved".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerRemoved((NeuronGroup) evt.getOldValue());
-                }  else if ("ncAdded".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerAdded((NeuronCollection) evt.getNewValue());
-                } else if ("ncRemoved".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerRemoved((NeuronCollection) evt.getOldValue());
-                } else if ("naRemoved".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerRemoved((NeuronArray) evt.getOldValue());
-                } else if ("neuronArrayAdded".equals(evt.getPropertyName())) {
-                    setChangedSinceLastSave(true);
-                    fireAttributeContainerAdded((NeuronArray) evt.getNewValue());
-                }
-            }
-        );
+        Network.Event event = network.getEvent();
+
+        event.onNeuronAdded(n -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerAdded(n);
+        });
+
+        event.onNeuronRemoved(n -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerRemoved(n);
+        });
+
+        event.onNeuronsUpdated(l -> setChangedSinceLastSave(true));
+
+        event.onSynapseAdded(s -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerAdded(s);
+        });
+
+        event.onSynapseRemoved(s -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerRemoved(s);
+        });
+
+        event.onTextAdded(t -> setChangedSinceLastSave(true));
+
+        event.onTextRemoved(t -> setChangedSinceLastSave(true));
+
+        event.onNeuronCollectionAdded(nc -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerAdded(nc);
+        });
+
+        event.onNeuronCollectionRemoved(nc -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerRemoved(nc);
+        });
+
+        event.onNeuronArrayAdded(na -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerAdded(na);
+        });
+
+        event.onNeuronArrayRemoved(na -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerRemoved(na);
+        });
 
     }
 

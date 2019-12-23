@@ -666,7 +666,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
             toDelete.getSource().removeEfferent(toDelete);
             toDelete.getTarget().removeAfferent(toDelete);
             if (isDisplaySynapses()) {
-                toDelete.getNetwork().fireSynapseRemoved(toDelete);
+//                toDelete.getNetwork().fireSynapseRemoved(toDelete); // TODO: [event]
             }
 
         }
@@ -674,7 +674,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
             toDelete.getSource().removeEfferent(toDelete);
             toDelete.getTarget().removeAfferent(toDelete);
             if (isDisplaySynapses()) {
-                toDelete.getNetwork().fireSynapseRemoved(toDelete);
+//                toDelete.getNetwork().fireSynapseRemoved(toDelete); // TODO: [event]
             }
         }
         exSynapseSet.clear();

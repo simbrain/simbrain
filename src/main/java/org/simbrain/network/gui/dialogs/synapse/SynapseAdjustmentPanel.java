@@ -383,7 +383,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                     }
                 }
                 fullUpdate();
-                networkPanel.getNetwork().fireSynapsesUpdated(synapses);
+//                networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
             }
         });
 
@@ -434,7 +434,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                     }
                 }
                 fullUpdate();
-                networkPanel.getNetwork().fireSynapsesUpdated(synapses);
+//                networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
             }
         });
 
@@ -773,7 +773,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                         }
                     }
                     fullUpdate();
-                    networkPanel.getNetwork().fireSynapsesUpdated(synapses);
+//                    networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
                 }
             });
 
@@ -790,7 +790,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                         }
                     }
                     fullUpdate();
-                    networkPanel.getNetwork().fireSynapsesUpdated(synapses);
+//                    networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
                 }
             });
         }
@@ -831,7 +831,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                         }
                     }
                     fullUpdate();
-                    networkPanel.getNetwork().fireSynapsesUpdated(synapses);
+//                    networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
                 }
             });
         }

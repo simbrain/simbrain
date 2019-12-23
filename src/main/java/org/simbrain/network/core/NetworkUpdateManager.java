@@ -18,10 +18,11 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.update_actions.*;
+import org.simbrain.network.update_actions.BufferedUpdate;
+import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
+import org.simbrain.network.update_actions.CustomUpdate;
+import org.simbrain.network.update_actions.PriorityUpdate;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -118,19 +119,19 @@ public class NetworkUpdateManager {
      * removed.
      */
     private void addListeners() {
-        network.addPropertyChangeListener(
-            evt -> {
-                // TODO
-                //if ("groupAdded".equals(evt.getPropertyName())) {
-                //    Group group = (Group) evt.getNewValue();
-                //    if (group.isTopLevelGroup()) {
-                //        addAction(new UpdateGroup(group));
-                //    }
-                //} else if ("groupRemoved".equals(evt.getPropertyName())) {
-                //    Group group = (Group) evt.getOldValue();
-                //    removeGroupAction(group);
-                //}
-            });
+//        network.addPropertyChangeListener(
+//            evt -> {
+//                // TODO
+//                //if ("groupAdded".equals(evt.getPropertyName())) {
+//                //    Group group = (Group) evt.getNewValue();
+//                //    if (group.isTopLevelGroup()) {
+//                //        addAction(new UpdateGroup(group));
+//                //    }
+//                //} else if ("groupRemoved".equals(evt.getPropertyName())) {
+//                //    Group group = (Group) evt.getOldValue();
+//                //    removeGroupAction(group);
+//                //}
+//            }); // TODO: [event]
 
     }
 

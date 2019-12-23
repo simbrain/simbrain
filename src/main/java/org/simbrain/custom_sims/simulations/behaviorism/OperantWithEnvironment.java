@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
@@ -112,7 +111,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         for(Synapse s : syns) {
             s.setStrength(0);
         }
-        network.fireSynapsesUpdated();
+//        network.fireSynapsesUpdated(); // TODO: [event]
 
         // Create the odor world
         world = sim.addOdorWorld(730,7,315,383, "Three Objects");

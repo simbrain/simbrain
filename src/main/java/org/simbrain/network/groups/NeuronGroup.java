@@ -38,7 +38,6 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 
-import javax.swing.*;
 import java.awt.geom.Point2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -139,6 +138,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         addNeurons(newNeurons);
         layout.getLayout().setInitialLocation(initialPosition);
         layout.getLayout().layoutNeurons(this.getNeuronList());
+        firePositionChanged();
         subsamplingManager.resetIndices();
     }
 
@@ -321,7 +321,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         if (getParentNetwork() != null) {
             neuron.setId(getParentNetwork().getNeuronIdGenerator().getId());
             if (fireEvent) {
-                getParentNetwork().fireNeuronAdded(neuron);
+//                getParentNetwork().fireNeuronAdded(neuron); // TODO: [event] let synapse handle this
             }
         }
         if (fireEvent) {

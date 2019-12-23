@@ -4,15 +4,14 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants.Polarity;
+import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
@@ -300,7 +299,7 @@ public class Hippocampus extends RegisteredSimulation {
         for (Synapse synapse : synapses) {
             synapse.setStrength(.2 * Math.random());
         }
-        network.fireSynapsesUpdated(synapses);
+//        network.fireSynapsesUpdated(synapses); // TODO: [event]
     }
 
     /**

@@ -417,7 +417,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         for (Synapse synapse : value.getFanIn()) {
             synapse.setStrength(0);
         }
-        network.fireNeuronsUpdated();
+//        network.fireNeuronsUpdated(); // TODO: [event]
         if (updateMethod != null) {
             // TODO: Is this needed?
             updateMethod.initMap();

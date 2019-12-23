@@ -19,9 +19,11 @@
 package org.simbrain.network.update_actions;
 
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.*;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkUpdateAction;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
@@ -29,14 +31,13 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAn
 import org.simbrain.network.update_actions.concurrency_tools.BufferedUpdateTask;
 import org.simbrain.network.update_actions.concurrency_tools.Task;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.math.SimbrainMath;
 
 import java.io.File;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -181,45 +182,36 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
     }
 
     private void initListeners() {
-        network.addPropertyChangeListener(
-            evt -> {
-                if ("neuronAdded".equals(evt.getPropertyName())) {
-                    pendingOperations.incrementAndGet();
-                    synchronized (collectionInProgress) {
-                        neurons.add((Neuron) evt.getNewValue());
-                        ops++;
-                        if (!collectionInProgress.get()) {
-                            collectionInProgress.getAndSet(true);
-                            synchronized (lock) {
-                                lock.notify();
-                            }
-                        }
-                    }
-                } else if ("neuronRemoved".equals(evt.getPropertyName())) {
-                    pendingOperations.incrementAndGet();
-                    synchronized (collectionInProgress) {
-                        neurons.remove(evt.getNewValue());
-                        ops++;
-                        if (!collectionInProgress.get()) {
-                            collectionInProgress.getAndSet(true);
-                            synchronized (lock) {
-                                lock.notify();
-                            }
-                        }
+
+        Network.Event event = network.getEvent();
+
+        event.onNeuronAdded(n -> {
+            pendingOperations.incrementAndGet();
+            synchronized (collectionInProgress) {
+                neurons.add(n);
+                ops++;
+                if (!collectionInProgress.get()) {
+                    collectionInProgress.getAndSet(true);
+                    synchronized (lock) {
+                        lock.notify();
                     }
                 }
-                //else if ("groupAdded".equals(evt.getPropertyName())) {
-                //    System.out.println("GROUP ADDED");
-                //    Group group = (Group) evt.getNewValue();
-                //    groupAdded(group);
-                //} else if ("groupRemoved".equals(evt.getPropertyName())) {
-                //    System.out.println("GROUP REMOVED");
-                //    Group group = (Group) evt.getNewValue();
-                //    groupRemoved(group);
-                //}
-
             }
-        );
+        });
+
+        event.onNeuronRemoved(n -> {
+            pendingOperations.incrementAndGet();
+            synchronized (collectionInProgress) {
+                neurons.remove(n);
+                ops++;
+                if (!collectionInProgress.get()) {
+                    collectionInProgress.getAndSet(true);
+                    synchronized (lock) {
+                        lock.notify();
+                    }
+                }
+            }
+        });
     }
 
     //TODO

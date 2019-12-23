@@ -107,7 +107,7 @@ public class OperantConditioning extends RegisteredSimulation {
         for(Synapse s : syns) {
             s.setStrength(0);
         }
-        network.fireSynapsesUpdated();
+//        network.fireSynapsesUpdated(); // TODO: [event]
 
         // Add custom network update action
         network.getUpdateManager().addAction(new NetworkUpdateAction() {

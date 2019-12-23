@@ -24,7 +24,10 @@ import org.simbrain.workspace.Producible;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -436,7 +439,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomizeFanIn();
         }
-        getParentNetwork().fireSynapsesUpdated(getIncomingWeights());
+//        getParentNetwork().fireSynapsesUpdated(getIncomingWeights()); // TODO: [event] let synapse handle this
     }
 
     /**
@@ -446,7 +449,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomizeFanOut();
         }
-        getParentNetwork().fireSynapsesUpdated(getOutgoingWeights());
+//        getParentNetwork().fireSynapsesUpdated(getOutgoingWeights()); // TODO: [event] let synapse handle this
     }
 
     public abstract void setNeuronType(String rule);

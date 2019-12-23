@@ -188,7 +188,7 @@ public class AgentTrails extends RegisteredSimulation {
             straightNeuron.forceSetActivation(1);
             sim.iterate(dispersion*2);
             straightNeuron.forceSetActivation(0);
-            networkWrapper.getNetwork().fireNeuronsUpdated();
+//            networkWrapper.getNetwork().fireNeuronsUpdated(); // TODO: [event]
         });
 
         // Move past flower
@@ -199,7 +199,7 @@ public class AgentTrails extends RegisteredSimulation {
             straightNeuron.forceSetActivation(1);
             sim.iterate(dispersion*2);
             straightNeuron.forceSetActivation(0);
-            networkWrapper.getNetwork().fireNeuronsUpdated();
+//            networkWrapper.getNetwork().fireNeuronsUpdated(); // TODO: [event]
         });
 
         // Cheese > Fish
@@ -214,7 +214,7 @@ public class AgentTrails extends RegisteredSimulation {
             rightNeuron.forceSetActivation(0);
             sim.iterate(220);
             straightNeuron.forceSetActivation(0);
-            networkWrapper.getNetwork().fireNeuronsUpdated();
+//            networkWrapper.getNetwork().fireNeuronsUpdated(); // TODO: [event]
         });
 
         // Cheese > Flower
@@ -229,7 +229,7 @@ public class AgentTrails extends RegisteredSimulation {
             leftNeuron.forceSetActivation(0);
             sim.iterate(220);
             straightNeuron.forceSetActivation(0);
-            networkWrapper.getNetwork().fireNeuronsUpdated();
+//            networkWrapper.getNetwork().fireNeuronsUpdated(); // TODO: [event]
         });
 
         panel.addButton("Solar System", () -> {
@@ -250,7 +250,7 @@ public class AgentTrails extends RegisteredSimulation {
             flower.setVelocityY(0);
             fish.setVelocityX(0);
             fish.setVelocityY(0);
-            networkWrapper.getNetwork().fireNeuronsUpdated();
+//            networkWrapper.getNetwork().fireNeuronsUpdated(); // TODO: [event]
         });
 
       //// Save File

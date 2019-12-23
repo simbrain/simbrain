@@ -259,10 +259,10 @@ public class TestInputPanel extends DataPanel {
         }
         if (network != null) {
             network.update();
-            network.fireNeuronsUpdated(inputNeurons);
+//            network.fireNeuronsUpdated(inputNeurons); // TODO: [event]
         } else {
             inputNeurons.get(0).getNetwork().update();
-            inputNeurons.get(0).getNetwork().fireNeuronsUpdated(inputNeurons);
+//            inputNeurons.get(0).getNetwork().fireNeuronsUpdated(inputNeurons); // TODO: [event]
         }
         if (iterationMode) {
             advanceRow();

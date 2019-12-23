@@ -31,10 +31,10 @@ import org.simbrain.util.SimpleId;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +76,234 @@ public class Network {
          */
         CONTINUOUS;
     }
+
+    public class Event {
+        /**
+         * Support for property change events.
+         */
+        private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(Network.this);
+
+        void fireUpdateCompleted(boolean completed) {
+            changeSupport.firePropertyChange("updateCompleted", null, completed);
+        }
+
+        public void onUpdateCompleted(Consumer<Boolean> handler) {
+            changeSupport.addPropertyChangeListener(
+                    "updateCompleted",
+                    evt -> handler.accept((boolean) evt.getNewValue())
+            );
+        }
+
+        void fireUpdateTimeDisplay(boolean display) {
+            changeSupport.firePropertyChange("updateTimeDisplay", null, display);
+        }
+
+        public void onUpdateTimeDisplay(Consumer<Boolean> handler) {
+            changeSupport.addPropertyChangeListener("updateTimeDisplay", evt ->
+                    handler.accept((boolean) evt.getNewValue())
+            );
+        }
+
+        void fireNeuronArrayAdded(NeuronArray neuronArray) {
+            changeSupport.firePropertyChange("neuronArrayAdded", null, neuronArray);
+        }
+
+        public void onNeuronArrayAdded(Consumer<NeuronArray> handler) {
+            changeSupport.addPropertyChangeListener("neuronArrayAdded", evt ->
+                    handler.accept((NeuronArray) evt.getNewValue())
+            );
+        }
+
+        void fireMultiLayerNetworkAdded(MultiLayerNet multiLayerNet) {
+            changeSupport.firePropertyChange("multiLayerNetworkAdded", null, multiLayerNet);
+        }
+
+        public void onMultiLayerNetworkAdded(Consumer<MultiLayerNet> handler) {
+            changeSupport.addPropertyChangeListener("multiLayerNetworkAdded", evt ->
+                    handler.accept((MultiLayerNet) evt.getNewValue())
+            );
+        }
+
+        void fireNeuronRemoved(Neuron neuron) {
+            changeSupport.firePropertyChange("neuronRemoved", neuron, null);
+        }
+
+        public void onNeuronRemoved(Consumer<Neuron> handler) {
+            changeSupport.addPropertyChangeListener("neuronRemoved", evt ->
+                    handler.accept((Neuron) evt.getOldValue())
+            );
+        }
+
+        public void onNeuronGroupAdded(Consumer<NeuronGroup> handler) {
+            changeSupport.addPropertyChangeListener("NeuronGroupAdded", evt ->
+                    handler.accept((NeuronGroup) evt.getNewValue()));
+        }
+
+        void fireNeuronGroupAdded(NeuronGroup neuronGroup) {
+            changeSupport.firePropertyChange("NeuronGroupAdded", null, neuronGroup);
+        }
+
+        public void onSynapseGroupAdded(Consumer<SynapseGroup> handler) {
+            changeSupport.addPropertyChangeListener("SynapseGroupAdded", evt ->
+                    handler.accept((SynapseGroup) evt.getNewValue()));
+        }
+
+        void fireSynapseGroupAdded(SynapseGroup synapseGroup) {
+            changeSupport.firePropertyChange("SynapseGroupAdded", null, synapseGroup);
+        }
+
+        public void onSubnetworkAdded(Consumer<Subnetwork> handler) {
+            changeSupport.addPropertyChangeListener("SubnetworkAdded", evt ->
+                    handler.accept((Subnetwork) evt.getNewValue()));
+        }
+
+        void fireSubnetworkAdded(Subnetwork subnetwork) {
+            changeSupport.firePropertyChange("SubnetworkAdded", null, subnetwork);
+        }
+
+        public void onNeuronGroupRemoved(Consumer<NeuronGroup> handler) {
+            changeSupport.addPropertyChangeListener("NeuronGroupRemoved", evt ->
+                    handler.accept((NeuronGroup) evt.getOldValue()));
+        }
+
+        void fireNeuronGroupRemoved(NeuronGroup neuronGroup) {
+            changeSupport.firePropertyChange("NeuronGroupRemoved", neuronGroup, null);
+        }
+
+        public void onSynapseGroupRemoved(Consumer<SynapseGroup> handler) {
+            changeSupport.addPropertyChangeListener("SynapseGroupRemoved", evt ->
+                    handler.accept((SynapseGroup) evt.getOldValue()));
+        }
+
+        void fireSynapseGroupRemoved(SynapseGroup synapseGroup) {
+            changeSupport.firePropertyChange("SynapseGroupRemoved", synapseGroup, null);
+        }
+
+
+        public void onSubnetworkRemoved(Consumer<Subnetwork> handler) {
+            changeSupport.addPropertyChangeListener("SubnetworkRemoved", evt ->
+                    handler.accept((Subnetwork) evt.getOldValue()));
+        }
+
+        void fireSubnetworkRemoved(Subnetwork subnetwork) {
+            changeSupport.firePropertyChange("SubnetworkRemoved", subnetwork, null);
+        }
+
+        void fireNeuronCollectionRemoved(NeuronCollection neuronCollection) {
+            changeSupport.firePropertyChange("neuronCollectionRemoved", neuronCollection, null);
+        }
+
+        public void onNeuronCollectionRemoved(Consumer<NeuronCollection> handler) {
+            changeSupport.addPropertyChangeListener("neuronCollectionRemoved", evt ->
+                    handler.accept((NeuronCollection) evt.getOldValue()));
+        }
+
+        public void onNeuronArrayRemoved(Consumer<NeuronArray> handler) {
+            changeSupport.addPropertyChangeListener("NeuronArrayRemoved", evt ->
+                    handler.accept((NeuronArray) evt.getOldValue()));
+        }
+
+        void fireNeuronArrayRemoved(NeuronArray neuronArray) {
+            changeSupport.firePropertyChange("NeuronArrayRemoved", neuronArray, null);
+        }
+
+        public void onWeightMatrixRemoved(Consumer<WeightMatrix> handler) {
+            changeSupport.addPropertyChangeListener("WeightMatrixRemoved", evt ->
+                    handler.accept((WeightMatrix) evt.getOldValue()));
+        }
+
+        void fireWeightMatrixRemoved(WeightMatrix weightMatrix) {
+            changeSupport.firePropertyChange("WeightMatrixRemoved", weightMatrix, null);
+        }
+
+        public void onNeuronCollectionAdded(Consumer<NeuronCollection> handler) {
+            changeSupport.addPropertyChangeListener("NeuronCollectionAdded", evt ->
+                    handler.accept((NeuronCollection) evt.getNewValue()));
+        }
+
+        void fireNeuronCollectionAdded(NeuronCollection neuronCollection) {
+            changeSupport.firePropertyChange("NeuronCollectionAdded", null, neuronCollection);
+        }
+
+        @SuppressWarnings("unchecked")
+        public void onNeuronsUpdated(Consumer<List<Neuron>> handler) {
+            changeSupport.addPropertyChangeListener("NeuronsUpdated", evt ->
+                    handler.accept((List<Neuron>) evt.getNewValue()));
+        }
+
+        void fireNeuronsUpdated() {
+            changeSupport.firePropertyChange("NeuronsUpdated", null, Network.this.getFlatNeuronList());
+        }
+
+        void fireNeuronsUpdated(List<Neuron> neurons) {
+            changeSupport.firePropertyChange("NeuronsUpdated", null, neurons);
+        }
+
+        public void onNeuronAdded(Consumer<Neuron> handler) {
+            changeSupport.addPropertyChangeListener("NeuronAdded", evt ->
+                    handler.accept((Neuron) evt.getNewValue()));
+        }
+
+        void fireNeuronAdded(Neuron neuron) {
+            changeSupport.firePropertyChange("NeuronAdded", null, neuron);
+        }
+
+        public void onSynapseAdded(Consumer<Synapse> handler) {
+            changeSupport.addPropertyChangeListener("SynapseAdded", evt ->
+                    handler.accept((Synapse) evt.getNewValue()));
+        }
+
+        void fireSynapseAdded(Synapse synapse) {
+            changeSupport.firePropertyChange("SynapseAdded", null, synapse);
+        }
+
+        public void onSynapseRemoved(Consumer<Synapse> handler) {
+            changeSupport.addPropertyChangeListener("SynapseRemoved", evt ->
+                    handler.accept((Synapse) evt.getOldValue()));
+        }
+
+        void fireSynapseRemoved(Synapse synapse) {
+            changeSupport.firePropertyChange("SynapseRemoved", synapse, null);
+        }
+
+        @SuppressWarnings("unchecked")
+        public void onSynapseUpdated(Consumer<Collection<Synapse>> handler) {
+            changeSupport.addPropertyChangeListener("SynapseUpdated", evt ->
+                    handler.accept((Collection<Synapse>) evt.getNewValue()));
+        }
+
+        void fireSynapseUpdated() {
+            changeSupport.firePropertyChange("SynapseUpdated", null, Network.this.getFlatSynapseList());
+        }
+
+        void fireSynapseUpdated(Collection<Synapse> synapses) {
+            changeSupport.firePropertyChange("SynapseUpdated", null, synapses);
+        }
+
+        public void onTextAdded(Consumer<NetworkTextObject> handler) {
+            changeSupport.addPropertyChangeListener("TextAdded", evt ->
+                    handler.accept((NetworkTextObject) evt.getNewValue()));
+        }
+
+        void fireTextAdded(NetworkTextObject networkTextObject) {
+            changeSupport.firePropertyChange("TextAdded", null, networkTextObject);
+        }
+
+        public void onTextRemoved(Consumer<NetworkTextObject> handler) {
+            changeSupport.addPropertyChangeListener("TextRemoved", evt ->
+                    handler.accept((NetworkTextObject) evt.getOldValue()));
+        }
+
+        void fireTextRemoved(NetworkTextObject networkTextObject) {
+            changeSupport.firePropertyChange("TextRemoved", networkTextObject, null);
+        }
+
+
+
+
+    }
+
+    private transient Event event = new Event();
 
     /**
      * List of "loose neurons" (as opposed to neurons in neuron groups)
@@ -216,11 +444,6 @@ public class Network {
     private boolean oneOffRun = false;
 
     /**
-     * Support for property change events.
-     */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
-    /**
      * Used to create an instance of network (Default constructor).
      */
     public Network() {
@@ -237,7 +460,7 @@ public class Network {
     public void update() {
 
         // TODO: Why is this here and not at end?
-        changeSupport.firePropertyChange("updateCompleted", null, false);
+        event.fireUpdateCompleted(false);
 
         // Main update
         updateManager.invokeAllUpdates();
@@ -251,7 +474,7 @@ public class Network {
 
         //clearInputs();
         updateTime();
-        changeSupport.firePropertyChange("updateTimeDisplay", null, false);
+        event.fireUpdateTimeDisplay(false);
         iterCount++;
         setUpdateCompleted(true);
 
@@ -419,7 +642,7 @@ public class Network {
     public void addLooseNeuron(Neuron neuron) {
         looseNeurons.add(neuron);
         updatePriorityList();
-        fireNeuronAdded(neuron);
+        event.fireNeuronAdded(neuron);
     }
 
     /**
@@ -427,12 +650,12 @@ public class Network {
      */
     public void addNeuronArray(NeuronArray na) {
         naList.add(na);
-        changeSupport.firePropertyChange("neuronArrayAdded", null, na);
+        event.fireNeuronArrayAdded(na);
     }
 
     public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
         multiLayerNetworks.add(network);
-        changeSupport.firePropertyChange("multiLayerNetworkAdded", null, network);
+        event.fireMultiLayerNetworkAdded(network);
     }
 
     /**
@@ -444,7 +667,7 @@ public class Network {
         synapse.initSpikeResponder();
         looseSynapses.add(synapse);
         synapse.setId(getSynapseIdGenerator().getId());
-        fireSynapseAdded(synapse);
+        event.fireSynapseAdded(synapse);
     }
 
     /**
@@ -488,26 +711,26 @@ public class Network {
 
         // Notify listeners that this neuron has been deleted
         if (fireEvent) {
-            changeSupport.firePropertyChange("neuronRemoved", toDelete, null);
+            event.fireNeuronRemoved(toDelete);
         }
     }
 
     public void removeNeuronGroup(NeuronGroup ng) {
         neuronGroups.remove(ng);
         ng.delete();
-        changeSupport.firePropertyChange("ngRemoved", ng, null);
+        event.fireNeuronGroupRemoved(ng);
     }
 
     public void removeSynapseGroup(SynapseGroup sg) {
-        neuronGroups.remove(sg);
+        synapseGroups.remove(sg);
         sg.delete();
-        changeSupport.firePropertyChange("sgRemoved", sg, null);
+        event.fireSynapseGroupRemoved(sg);
     }
 
     public void removeSubnetwork(Subnetwork subnet) {
         subnetworks.remove(subnet);
         subnet.delete();
-        changeSupport.firePropertyChange("subnetRemoved", subnet, null);
+        event.fireSubnetworkRemoved(subnet);
     }
 
 
@@ -519,7 +742,7 @@ public class Network {
     public void removeNeuronCollection(NeuronCollection nc) {
         neuronCollectionSet.remove(nc);
         nc.delete();
-        changeSupport.firePropertyChange("ncRemoved", nc, null);
+        event.fireNeuronCollectionRemoved(nc);
     }
 
     /**
@@ -527,7 +750,7 @@ public class Network {
      */
     public void removeNeuronArray(NeuronArray na) {
         naList.remove(na);
-        changeSupport.firePropertyChange("naRemoved", na, null);
+        event.fireNeuronArrayRemoved(na);
     }
 
     /**
@@ -538,7 +761,7 @@ public class Network {
             return;
         }
         weightMatrices.remove(wm);
-        changeSupport.firePropertyChange("wmRemoved", wm, null);
+        event.fireWeightMatrixRemoved(wm);
     }
 
     /**
@@ -570,7 +793,7 @@ public class Network {
             SynapseGroup parentGroup = toDelete.getParentGroup();
             parentGroup.removeSynapse(toDelete);
             if (parentGroup.isDisplaySynapses()) {
-                fireSynapseRemoved(toDelete);
+                event.fireSynapseRemoved(toDelete);
             }
             // TODO
             //if (parentGroup.isEmpty()) {
@@ -579,7 +802,7 @@ public class Network {
         } else {
             looseSynapses.remove(toDelete);
             // Notify listeners that this synapse has been deleted
-            fireSynapseRemoved(toDelete);
+            event.fireSynapseRemoved(toDelete);
         }
     }
 
@@ -626,7 +849,7 @@ public class Network {
             }
         }
         neuronCollectionSet.add(nc);
-        changeSupport.firePropertyChange("ncAdded", null, nc);
+        event.fireNeuronCollectionAdded(nc);
     }
 
     /**
@@ -647,7 +870,8 @@ public class Network {
                 ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
             }
         }
-        changeSupport.firePropertyChange("neuronsUpdated", null, this.getFlatNeuronList());
+        event.fireNeuronsUpdated();
+
     }
 
     /**
@@ -784,17 +1008,17 @@ public class Network {
 
     public void addSynapseGroup(final SynapseGroup sg) {
         synapseGroups.add(sg);
-        changeSupport.firePropertyChange("sgAdded", null, sg);
+        event.fireSynapseGroupAdded(sg);
     }
 
     public void addNeuronGroup(final NeuronGroup ng) {
         neuronGroups.add(ng);
-        changeSupport.firePropertyChange("ngAdded", null, ng);
+        event.fireNeuronGroupAdded(ng);
     }
 
     public void addSubnetwork(Subnetwork net) {
         subnetworks.add(net);
-        changeSupport.firePropertyChange("subnetAdded", null, net);
+        event.fireSubnetworkAdded(net);
     }
 
     ///**
@@ -951,7 +1175,7 @@ public class Network {
             subnetworks = new ArrayList<>();
         }
 
-        changeSupport = new PropertyChangeSupport(this);
+        event = new Event();
 
         // Initialize update manager
         updateManager.postUnmarshallingInit();
@@ -1109,105 +1333,6 @@ public class Network {
     }
 
     /**
-     * Fire a neuron added event to all registered model listeners.
-     *
-     * @param added neuron which was added
-     */
-    public void fireNeuronAdded(final Neuron added) {
-        changeSupport.firePropertyChange("neuronAdded", null, added);
-    }
-
-    /**
-     * Fire this event when the visible state of a neuron (e.g. its activation) has been changed and this should be
-     * reflected in the GUI.
-     */
-    public void fireNeuronsUpdated() {
-        changeSupport.firePropertyChange("neuronsUpdated", null, getLooseNeurons());
-    }
-
-    /**
-     * Fire this event when the visible state of a specified list of neuron (e.g. their activations) has been changed
-     * and this should be reflected in the GUI.
-     *
-     * @param neurons the neurons whose state has changed
-     */
-    public void fireNeuronsUpdated(Collection<Neuron> neurons) {
-        changeSupport.firePropertyChange("neuronsUpdated", null, neurons);
-    }
-
-    /**
-     * Fire a synapse added event to all registered model listeners.
-     *
-     * @param added synapse which was added
-     */
-    public void fireSynapseAdded(final Synapse added) {
-        changeSupport.firePropertyChange("synapseAdded", null, added);
-    }
-
-    /**
-     * Fire a synapse deleted event to all registered model listeners.
-     *
-     * @param deleted synapse which was deleted
-     */
-    public void fireSynapseRemoved(final Synapse deleted) {
-        changeSupport.firePropertyChange("synapseRemoved", deleted, null);
-    }
-
-    /**
-     * Fire this event when the visible state of a synapse (e.g. its strength) has been changed and this should be
-     * reflected in the GUI.
-     */
-    public void fireSynapsesUpdated() {
-        changeSupport.firePropertyChange("synapsesUpdated", null, getLooseSynapses());
-    }
-
-    /**
-     * Fire this event when the visible state of a specified list of synapses (e.g. their strengths) has been changed
-     * and this should be reflected in the GUI.
-     *
-     * @param synapses the synapses whose state has changed
-     */
-    public void fireSynapsesUpdated(Collection<Synapse> synapses) {
-        changeSupport.firePropertyChange("synapsesUpdated", null, synapses);
-    }
-
-    /**
-     * Fire a text added event to all registered model listeners.
-     *
-     * @param added text which was deleted
-     */
-    public void fireTextAdded(final NetworkTextObject added) {
-        changeSupport.firePropertyChange("textAdded", null, added);
-    }
-
-    /**
-     * Fire a text deleted event to all registered model listeners.
-     *
-     * @param deleted text which was deleted
-     */
-    public void fireTextRemoved(final NetworkTextObject deleted) {
-        changeSupport.firePropertyChange("textRemoved", deleted, null);
-    }
-
-    ///**
-    // * Fire a group added event to all registered model listeners.
-    // *
-    // * @param added Group that has been added
-    // */
-    //public void fireGroupAdded(final Group added) {
-    //    changeSupport.firePropertyChange("groupAdded", null, added);
-    //}
-    //
-    ///**
-    // * Fire a group deleted event to all registered model listeners.
-    // *
-    // * @param deleted Group to be deleted
-    // */
-    //public void fireGroupRemoved(final Group deleted) {
-    //    changeSupport.firePropertyChange("groupRemoved", deleted, null);
-    //}
-
-    /**
      * Used by Network thread to ensure that an update cycle is complete before updating again.
      *
      * @return whether the network has been updated or not
@@ -1317,7 +1442,7 @@ public class Network {
      */
     public void addText(final NetworkTextObject text) {
         textList.add(text);
-        this.fireTextAdded(text);
+        event.fireTextAdded(text);
     }
 
     /**
@@ -1327,7 +1452,7 @@ public class Network {
      */
     public void deleteText(final NetworkTextObject text) {
         textList.remove(text);
-        this.fireTextRemoved(text);
+        event.fireTextRemoved(text);
     }
 
     /**
@@ -1501,15 +1626,8 @@ public class Network {
         return oneOffRun;
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        if (changeSupport == null) {
-            changeSupport = new PropertyChangeSupport(this);
-        }
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
+    public Event getEvent() {
+        return event;
     }
 
     public List<MultiLayerNet> getMultiLayerNetworks() {

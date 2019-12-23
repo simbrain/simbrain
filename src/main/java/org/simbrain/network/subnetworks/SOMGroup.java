@@ -201,7 +201,7 @@ public class SOMGroup extends NeuronGroup {
                 incoming.getSource().forceSetActivation(incoming.getStrength());
                 incomingNeurons.add(incoming.getSource());
             }
-            getParentNetwork().fireNeuronsUpdated(incomingNeurons);
+//            getParentNetwork().fireNeuronsUpdated(incomingNeurons); // TODO: [event]
         }
     }
 

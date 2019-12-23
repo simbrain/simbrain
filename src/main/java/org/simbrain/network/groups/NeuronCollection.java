@@ -17,25 +17,13 @@
  */
 package org.simbrain.network.groups;
 
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-import org.simbrain.network.LocatableModel;
-import org.simbrain.network.core.*;
-import org.simbrain.network.dl4j.ArrayConnectable;
-import org.simbrain.network.dl4j.WeightMatrix;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.UserParameter;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -56,17 +44,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
         addNeurons(neurons);
         //initializeId(); // TODO
         subsamplingManager.resetIndices();
-        PropertyChangeListener networkListener = evt -> {
-            if ("neuronRemoved".equals(evt.getPropertyName())) {
-                Neuron removed = (Neuron) evt.getOldValue();
-                removeNeuron(removed);
-                firePositionChanged();
-                // If that was the last neuron in the list, remove the neuron collection
-                if (isEmpty()) {
-                    delete();
-                }
-            }
-        };
+
         neurons.forEach(n -> {
             n.addPropertyChangeListener(evt -> {
                 if ("moved".equals(evt.getPropertyName())) {
@@ -74,7 +52,14 @@ public class NeuronCollection extends AbstractNeuronCollection {
                 }
             });
         });
-        net.addPropertyChangeListener(networkListener);
+
+        net.getEvent().onNeuronRemoved(n -> {
+            removeNeuron(n);
+            firePositionChanged();
+            if (isEmpty()) {
+                delete();
+            }
+        });
     }
 
     /**

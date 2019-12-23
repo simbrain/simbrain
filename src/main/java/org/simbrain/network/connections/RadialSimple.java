@@ -291,12 +291,12 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
                 }
                 degreeCounter++;
                 if(degreeCounter >= inhCons) {
-                    network.fireSynapsesUpdated();
+//                    network.fireSynapsesUpdated(); // TODO: [event]
                     break;
                 }
             }
             if (network != null) {
-                network.fireSynapsesUpdated();
+//                network.fireSynapsesUpdated(); // TODO: [event]
             }
         }
     }

@@ -45,7 +45,7 @@ public class CompetitiveGroupNode extends NeuronGroupNode {
             public void actionPerformed(final ActionEvent event) {
                 CompetitiveGroup group = ((CompetitiveGroup) getNeuronGroup());
                 group.randomize();
-                group.getParentNetwork().fireSynapsesUpdated(group.getIncomingWeights());
+//                group.getParentNetwork().fireSynapsesUpdated(group.getIncomingWeights()); // TODO: [event]
             }
         }));
 

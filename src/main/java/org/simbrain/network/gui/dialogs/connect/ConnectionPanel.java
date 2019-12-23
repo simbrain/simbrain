@@ -27,7 +27,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor.ObjectTypeEditor;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.EditablePanel;
 
@@ -201,7 +200,7 @@ public final class ConnectionPanel extends JPanel {
                 ConnectionUtilities.randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
             }
         }
-        networkPanel.getNetwork().fireSynapsesUpdated(synapses);
+//        networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
     }
 
     /**

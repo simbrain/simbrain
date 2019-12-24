@@ -7,7 +7,7 @@ import org.simbrain.network.*;
 //
 setNodeLabels(String networkComponentName, String groupLabel, String[] labels) {
 	Network network = getNetwork(networkComponentName);
-	NeuronGroup neuronGroup = network.getGroupByLabel(groupLabel);
+	NeuronGroup neuronGroup = network.getNeuronGroupByLabel(groupLabel);
 	int i = 0;
 	for(Neuron neuron : neuronGroup.getNeuronList()) {
 		if (i < labels.length) {

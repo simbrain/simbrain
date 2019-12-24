@@ -18,7 +18,7 @@ private NetworkUpdateAction action;
 
 	// Change this name to match the label of the group to log
 	String groupLabel  = "Group_1";
-	NeuronGroup neuronGroup =  network.getGroupByLabel(groupLabel);
+	NeuronGroup neuronGroup =  network.getNeuronGroupByLabel(groupLabel);
 
 	// The custom action 
 	this.action = new NetworkUpdateAction() {

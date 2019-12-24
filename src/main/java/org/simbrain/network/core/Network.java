@@ -550,39 +550,6 @@ public class Network {
         return null;
     }
 
-
-    ///**
-    // * Find groups with a given label, or null if none found.
-    // *
-    // * @param label label to search for.
-    // * @return list of groups with that label.
-    // */
-    //public List<Group> getGroupsByLabel(String label) {
-    //    List<Group> returnList = new ArrayList<>();
-    //    for (Group group : getFlatGroupList()) {
-    //        if (group.getLabel().equalsIgnoreCase(label)) {
-    //            returnList.add(group);
-    //        }
-    //    }
-    //    return returnList;
-    //}
-
-    //todo
-    ///**
-    // * Find group with a given label, or null if none found.
-    // *
-    // * @param label label to search for.
-    // * @return list of groups with that label found, null otherwise
-    // */
-    //public Group getGroupByLabel(String label) {
-    //    List<Group> returnList = getGroupsByLabel(label);
-    //    if (returnList.isEmpty()) {
-    //        return null;
-    //    } else {
-    //        return returnList.get(0);
-    //    }
-    //}
-
     /**
      * Returns a list of all neuron groups.
      *
@@ -1360,6 +1327,20 @@ public class Network {
      */
     public Neuron getNeuronByLabel(String label) {
         return getFlatNeuronList().stream()
+                .filter(n -> n.getLabel().equalsIgnoreCase(label))
+                .findFirst().get();
+    }
+
+    /**
+     * Returns a neurongroup with a matching label.  If more than one
+     * group has a matching label, the first one found is returned.
+     * If there are no matches, a {@link NoSuchElementException} is thrown.
+     *
+     * @param label label of NeuronGroup to search for
+     * @return matched NeuronGroup, if any
+     */
+    public NeuronGroup getNeuronGroupByLabel(String label) {
+        return neuronGroups.stream()
                 .filter(n -> n.getLabel().equalsIgnoreCase(label))
                 .findFirst().get();
     }

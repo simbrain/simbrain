@@ -13,6 +13,8 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 /**
@@ -346,7 +348,8 @@ public class Cerebellum extends RegisteredSimulation {
         network.addUpdateAction(networkUpdateAction);
 
         // Moves the custom update to the top of the update sequence
-        network.getUpdateManager().swapElements(6, 0);
+        // TODO
+        //network.getUpdateManager().swapElements(6, 0);
     }
 
     //
@@ -366,81 +369,76 @@ public class Cerebellum extends RegisteredSimulation {
      */
     void setUpControlPanel() {
         panel = ControlPanel.makePanel(sim, "Train / Test", 5, 10);
-        //NeuronGroup inputs = (NeuronGroup) network
-        //    .getGroupByLabel("From Spinal Cord");
+        
+        NeuronGroup inputs = network.getNeuronGroupByLabel("From Spinal Cord");
         Neuron target = network.getNeuronByLabel("Target");
         Neuron dopamine = network.getNeuronByLabel("Basal Ganglia (GPi)");
 
         // Just give the input of each to the model, without giving it a target
         // (and hence no Dopamine)
         panel.addButton("No Dopamine", () -> {
-            // TODO
-            //inputs.getNeuronList().get(0).forceSetActivation(1);
-            //inputs.getNeuronList().get(1).forceSetActivation(0);
-            //// Turn off dopamine!
-            //dopamine.forceSetActivation(0);
-            //dopamine.setClamped(true);
-            //// Turn off learning
-            //toggleLearning = false;
-            //sim.iterate(currentTrialLength / 2);
-            //
-            //inputs.getNeuronList().get(0).forceSetActivation(0);
-            //inputs.getNeuronList().get(1).forceSetActivation(1);
-            //sim.iterate(currentTrialLength / 2);
-            //dopamine.setClamped(false);
-            //toggleLearning = true;
+            inputs.getNeuronList().get(0).forceSetActivation(1);
+            inputs.getNeuronList().get(1).forceSetActivation(0);
+            // Turn off dopamine!
+            dopamine.forceSetActivation(0);
+            dopamine.setClamped(true);
+            // Turn off learning
+            toggleLearning = false;
+            sim.iterate(currentTrialLength / 2);
 
+            inputs.getNeuronList().get(0).forceSetActivation(0);
+            inputs.getNeuronList().get(1).forceSetActivation(1);
+            sim.iterate(currentTrialLength / 2);
+            dopamine.setClamped(false);
+            toggleLearning = true;
         });
 
         panel.addButton("Test", () -> {
+            inputs.getNeuronList().get(0).forceSetActivation(1);
+            inputs.getNeuronList().get(1).forceSetActivation(0);
+            target.forceSetActivation(1);
+            sim.iterate(currentTrialLength / 2);
 
-            // TODO
-            //inputs.getNeuronList().get(0).forceSetActivation(1);
-            //inputs.getNeuronList().get(1).forceSetActivation(0);
-            //target.forceSetActivation(1);
-            //sim.iterate(currentTrialLength / 2);
-            //
-            //inputs.getNeuronList().get(0).forceSetActivation(0);
-            //inputs.getNeuronList().get(1).forceSetActivation(1);
-            //target.forceSetActivation(0);
-            //sim.iterate(currentTrialLength / 2);
+            inputs.getNeuronList().get(0).forceSetActivation(0);
+            inputs.getNeuronList().get(1).forceSetActivation(1);
+            target.forceSetActivation(0);
+            sim.iterate(currentTrialLength / 2);
         });
 
         panel.addButton("10 Trials", () -> {
             for (int ii = 0; ii <= 10; ii++) {
-                // TODO
-                //inputs.getNeuronList().get(0).forceSetActivation(1);
-                //inputs.getNeuronList().get(1).forceSetActivation(0);
-                //target.forceSetActivation(1);
-                //sim.iterate(currentTrialLength / 2);
-                //
-                //inputs.getNeuronList().get(0).forceSetActivation(0);
-                //inputs.getNeuronList().get(1).forceSetActivation(1);
-                //target.forceSetActivation(0);
-                //sim.iterate(currentTrialLength / 2);
+                inputs.getNeuronList().get(0).forceSetActivation(1);
+                inputs.getNeuronList().get(1).forceSetActivation(0);
+                target.forceSetActivation(1);
+                sim.iterate(currentTrialLength / 2);
+
+                inputs.getNeuronList().get(0).forceSetActivation(0);
+                inputs.getNeuronList().get(1).forceSetActivation(1);
+                target.forceSetActivation(0);
+                sim.iterate(currentTrialLength / 2);
             }
         });
 
-        // // Individual trial runs
-        // JButton button2 = new JButton("Train Pattern 1");
-        // button2.addActionListener(new ActionListener() {
-        // public void actionPerformed(ActionEvent arg0) {
-        // inputs.getNeuronList().get(0).forceSetActivation(1);
-        // inputs.getNeuronList().get(1).forceSetActivation(0);
-        // target.forceSetActivation(1);
-        // workspace.iterate(currentTrialLength/2);
-        // }});
-        // //panel.addItem("Pattern 1", button2);
+         // Individual trial runs
+         JButton button2 = new JButton("Train Pattern 1");
+         button2.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent arg0) {
+         inputs.getNeuronList().get(0).forceSetActivation(1);
+         inputs.getNeuronList().get(1).forceSetActivation(0);
+         target.forceSetActivation(1);
+             sim.getWorkspace().iterate(currentTrialLength/2);
+         }});
+         //panel.addItem("Pattern 1", button2);
 
-        // JButton button3 = new JButton("Train Pattern 2");
-        // button3.addActionListener(new ActionListener() {
-        // public void actionPerformed(ActionEvent arg0) {
-        // inputs.getNeuronList().get(0).forceSetActivation(0);
-        // inputs.getNeuronList().get(1).forceSetActivation(1);
-        // target.forceSetActivation(0);
-        // workspace.iterate(currentTrialLength/2);
-        // }});
-        // //panel.addItem("Pattern 2", button3);
+         JButton button3 = new JButton("Train Pattern 2");
+         button3.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent arg0) {
+         inputs.getNeuronList().get(0).forceSetActivation(0);
+         inputs.getNeuronList().get(1).forceSetActivation(1);
+         target.forceSetActivation(0);
+             sim.getWorkspace().iterate(currentTrialLength/2);
+         }});
+         //panel.addItem("Pattern 2", button3);
 
         // JSlider to manually set for how long it runs for
         JSlider trialLengthSlider = new JSlider(JSlider.HORIZONTAL, 0, 400,

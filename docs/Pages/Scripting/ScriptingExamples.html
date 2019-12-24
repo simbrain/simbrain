@@ -92,7 +92,7 @@
             <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; public void invoke() {
             <br>
             <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // Log hidden unit activations
-            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; BackpropNetwork backpropNet = network.getGroupByLabel("Backprop");
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; BackpropNetwork backpropNet = network.getNeuronGroupByLabel("Backprop");
             <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; NeuronGroup hiddenLayer = backpropNet.getNeuronGroupByLabel("Layer 2");
             <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; for (Neuron neuron: hiddenLayer.getNeuronList()) {
             <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System.out.print(neuron.getActivation() + " ");
@@ -127,7 +127,7 @@
 
 
         <p style="margin-left: 40px;" class="command">&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; // Randomize hidden unit activations
-            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; BackpropNetwork backpropNet = network.getGroupByLabel("Backprop");
+            <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; BackpropNetwork backpropNet = network.getNeuronGroupByLabel("Backprop");
             <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; NeuronGroup inputLayer = backpropNet.getNeuronGroupByLabel("Layer 1");
             <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; for (Neuron neuron: inputLayer.getNeuronList()) {
             <br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; neuron.forceSetActivation(Math.random());

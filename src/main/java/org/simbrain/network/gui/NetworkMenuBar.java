@@ -88,20 +88,20 @@ public class NetworkMenuBar {
         // returnMenu.add(fileMenu);
 
         JMenu editMenu = new JMenu("Edit");
-        editMenu.add(actionManager.getCutAction());
-        editMenu.add(actionManager.getCopyAction());
-        editMenu.add(actionManager.getPasteAction());
+        editMenu.add(actionManager.getAction("cut"));
+        editMenu.add(actionManager.getAction("copy"));
+        editMenu.add(actionManager.getAction("paste"));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getDeleteAction());
+        editMenu.add(actionManager.getAction("delete"));
         JMenu selectionMenu = new JMenu("Select");
-        selectionMenu.add(actionManager.getSelectAllAction());
-        selectionMenu.add(actionManager.getSelectAllWeightsAction());
-        selectionMenu.add(actionManager.getSelectAllNeuronsAction());
-        selectionMenu.add(actionManager.getSelectIncomingWeightsAction());
-        selectionMenu.add(actionManager.getSelectOutgoingWeightsAction());
+        selectionMenu.add(actionManager.getAction("selectAll"));
+        selectionMenu.add(actionManager.getAction("selectAllWeights"));
+        selectionMenu.add(actionManager.getAction("selectAllNeurons"));
+        selectionMenu.add(actionManager.getAction("selectIncomingWeights"));
+        selectionMenu.add(actionManager.getAction("selectOutgoingWeights"));
         editMenu.add(selectionMenu);
         editMenu.addSeparator();
-        editMenu.add(actionManager.getClearNodesAction());
+        editMenu.add(actionManager.getAction("clearNodes"));
         editMenu.addSeparator();
         editMenu.addSeparator();
         //editMenu.add(actionManager.getGroupAction());
@@ -111,28 +111,28 @@ public class NetworkMenuBar {
         editMenu.add(networkPanel.createSpacingMenu());
         editMenu.addSeparator();
         // editMenu.add(actionManager.getShowIOInfoMenuItem());
-        editMenu.add(actionManager.getSetAutoZoomToggleButton());
+        // TODO
+        //editMenu.add(actionManager.getSetAutoZoomToggleButton());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getSetNeuronPropertiesAction());
-        editMenu.add(actionManager.getSetSynapsePropertiesAction());
+        editMenu.add(actionManager.getAction("setNeuronProperties"));
+        editMenu.add(actionManager.getAction("setSynapseProperties"));
         returnMenu.add(editMenu);
 
         JMenu insertMenu = new JMenu("Insert");
-        insertMenu.add(actionManager.getNewNeuronAction());
-        insertMenu.add(actionManager.getAction("NewGroup"));
+        insertMenu.add(actionManager.getAction("newNeuron"));
+        insertMenu.add(actionManager.getAction("newNeuronGroup"));
         insertMenu.add(actionManager.getNewNetworkMenu());
         returnMenu.add(insertMenu);
 
         JMenu viewMenu = new JMenu("View");
         JMenu toolbarMenu = new JMenu("Toolbars");
-        toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
-        toolbarMenu.add(actionManager.getShowRunToolBarMenuItem());
-        toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
+        toolbarMenu.add(actionManager.getMenuItem("showMainToolbar"), networkPanel.getMainToolBar().isVisible());
+        toolbarMenu.add(actionManager.getMenuItem("showRunToolbar"), networkPanel.getRunToolBar().isVisible());
+        toolbarMenu.add(actionManager.getMenuItem("showEditToolbar"), networkPanel.getEditToolBar().isVisible());
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
-        viewMenu.add(actionManager.getShowPrioritiesAction());
-        // viewMenu.add(actionManager.getShowNetworkHierarchyPanel());
-        viewMenu.add(actionManager.getShowWeightsAction());
+        viewMenu.add(actionManager.getAction("showPriorities"));
+        viewMenu.add(actionManager.getAction("showWeights"));
         returnMenu.add(viewMenu);
 
         JMenu helpMenu = new JMenu("Help");

@@ -122,27 +122,28 @@ public class NetworkPanelDesktop extends NetworkPanel {
 
         JMenu editMenu = new JMenu("Edit");
 
-        editMenu.add(actionManager.getCutAction());
-        editMenu.add(actionManager.getCopyAction());
-        editMenu.add(actionManager.getPasteAction());
-        editMenu.add(actionManager.getDeleteAction());
+        editMenu.add(actionManager.getAction("cut"));
+        editMenu.add(actionManager.getAction("copy"));
+        editMenu.add(actionManager.getAction("paste"));
+        editMenu.add(actionManager.getAction("delete"));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getClearSourceNeuronsAction());
-        editMenu.add(actionManager.getSetSourceNeuronsAction());
+        editMenu.add(actionManager.getAction("clearSourceNeurons"));
+        editMenu.add(actionManager.getAction("setSourceNeurons"));
         editMenu.add(actionManager.getConnectionMenu());
-        editMenu.add(actionManager.getAddSynapseGroupAction());
+        editMenu.add(actionManager.getAction("addSynapseGroup"));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getRandomizeObjectsAction());
-        editMenu.add(actionManager.getShowAdjustSynapsesDialog());
+        editMenu.add(actionManager.getAction("randomizeObjects"));
+        editMenu.add(actionManager.getAction("showAdjustSynapsesDialog"));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getLayoutNeuronsAction());
-        editMenu.add(actionManager.getNeuronCollectionAction());
+        editMenu.add(actionManager.getAction("showLayoutDialog"));
+        editMenu.addSeparator();
+        editMenu.add(actionManager.getAction("addNeuronCollection"));
         editMenu.addSeparator();
         editMenu.add(createAlignMenu());
         editMenu.add(createSpacingMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getSetNeuronPropertiesAction());
-        editMenu.add(actionManager.getSetSynapsePropertiesAction());
+        editMenu.add(actionManager.getAction("setNeuronProperties"));
+        editMenu.add(actionManager.getAction("setSynapseProperties"));
         editMenu.addSeparator();
         editMenu.add(createSelectionMenu());
 
@@ -157,8 +158,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createInsertMenu() {
 
         JMenu insertMenu = new JMenu("Insert");
-        insertMenu.add(actionManager.getNewNeuronAction());
-        insertMenu.add(actionManager.getAction("NewGroup"));
+        insertMenu.add(actionManager.getAction("newNeuron"));
+        insertMenu.add(actionManager.getAction("newNeuronGroup"));
         insertMenu.addSeparator();
         insertMenu.add(new AddNeuronsAction(this));
         insertMenu.add(new AddNeuronArrayAction(this));
@@ -166,8 +167,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
         insertMenu.addSeparator();
         insertMenu.add(actionManager.getNewNetworkMenu());
         insertMenu.addSeparator();
-        insertMenu.add(actionManager.getTestInputAction());
-        insertMenu.add(actionManager.getShowWeightMatrixAction());
+        insertMenu.add(actionManager.getAction("testInput"));
+        insertMenu.add(actionManager.getAction("showWeightMatrix"));
         return insertMenu;
     }
 
@@ -179,15 +180,15 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
         JMenu toolbarMenu = new JMenu("Toolbars");
-        toolbarMenu.add(actionManager.getShowMainToolBarMenuItem());
-        toolbarMenu.add(actionManager.getShowRunToolBarMenuItem());
-        toolbarMenu.add(actionManager.getShowEditToolBarMenuItem());
+        toolbarMenu.add(actionManager.getAction("showMainToolbar"));
+        toolbarMenu.add(actionManager.getAction("showRunToolbar"));
+        toolbarMenu.add(actionManager.getAction("showEditToolbar"));
+
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
         // viewMenu.add(actionManager.getShowGUIAction());
-        viewMenu.add(actionManager.getShowPrioritiesAction());
-        // viewMenu.add(actionManager.getShowNetworkHierarchyPanel());
-        viewMenu.add(actionManager.getShowWeightsAction());
+        viewMenu.add(actionManager.getAction("showPriorities"));
+        viewMenu.add(actionManager.getAction("showWeights"));
 
         return viewMenu;
     }
@@ -199,11 +200,11 @@ public class NetworkPanelDesktop extends NetworkPanel {
      */
     public JMenu createSelectionMenu() {
         JMenu selectionMenu = new JMenu("Select");
-        selectionMenu.add(actionManager.getSelectAllAction());
-        selectionMenu.add(actionManager.getSelectAllWeightsAction());
-        selectionMenu.add(actionManager.getSelectAllNeuronsAction());
-        selectionMenu.add(actionManager.getSelectIncomingWeightsAction());
-        selectionMenu.add(actionManager.getSelectOutgoingWeightsAction());
+        selectionMenu.add(actionManager.getAction("selectAll"));
+        selectionMenu.add(actionManager.getAction("selectAllWeights"));
+        selectionMenu.add(actionManager.getAction("selectAllNeurons"));
+        selectionMenu.add(actionManager.getAction("selectIncomingWeights"));
+        selectionMenu.add(actionManager.getAction("selectOutgoingWeights"));
         return selectionMenu;
     }
 

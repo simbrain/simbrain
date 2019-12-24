@@ -301,7 +301,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             }
         };
         menu.add(clearSource);
-        Action makeConnection = getNetworkPanel().getActionManager().getAddSynapseGroupAction();
+        Action makeConnection = getNetworkPanel().getActionManager().getAction("addSynapseGroup");
         menu.add(makeConnection);
 
         // Add any custom menus for this type

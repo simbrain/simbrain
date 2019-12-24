@@ -225,12 +225,12 @@ public class KeyBindings {
         // Text Mode
         inputMap.put(KeyStroke.getKeyStroke("T"), "textMode");
         panel.getActionMap().put("textMode",
-                panel.getActionManager().getTextEditModeAction());
+                panel.getActionManager().getAction("textEditMode"));
 
         // Wand Mode
         inputMap.put(KeyStroke.getKeyStroke("I"), "wandMode");
         panel.getActionMap().put("wandMode",
-            panel.getActionManager().getWandEditModeAction());
+            panel.getActionManager().getAction("wandEditMode"));
 
         // TODO: (Temporary) Add neuron array
         inputMap.put(KeyStroke.getKeyStroke("Y"), "neuronArray");
@@ -259,11 +259,11 @@ public class KeyBindings {
 
         inputMap.put(KeyStroke.getKeyStroke("3"), "selectIncoming");
         panel.getActionMap().put("selectIncoming",
-                panel.getActionManager().getSelectIncomingWeightsAction());
+                panel.getActionManager().getAction("selectIncomingWeights"));
 
         inputMap.put(KeyStroke.getKeyStroke("4"), "selectOutgoing");
         panel.getActionMap().put("selectOutgoing",
-                panel.getActionManager().getSelectOutgoingWeightsAction());
+                panel.getActionManager().getAction("selectOutgoingWeights"));
 
         inputMap.put(KeyStroke.getKeyStroke("5"), "showSynapses");
         panel.getActionMap().put("showSynapses", new AbstractAction() {

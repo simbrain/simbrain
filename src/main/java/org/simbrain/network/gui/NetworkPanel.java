@@ -37,10 +37,7 @@ import org.simbrain.network.groups.*;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
 import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
-import org.simbrain.network.gui.actions.edit.CopyAction;
-import org.simbrain.network.gui.actions.edit.CutAction;
-import org.simbrain.network.gui.actions.edit.DeleteAction;
-import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.gui.actions.edit.*;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
@@ -991,7 +988,7 @@ public class NetworkPanel extends JPanel {
         contextMenu = new JPopupMenu();
 
         // Insert actions
-        contextMenu.add(actionManager.getNewNeuronAction());
+        contextMenu.add(actionManager.getAction("newNeuron"));
         contextMenu.add(new AddNeuronsAction(this));
         contextMenu.add(new AddNeuronArrayAction(this));
         contextMenu.add(new AddMultiLayerNet(this));
@@ -1005,12 +1002,12 @@ public class NetworkPanel extends JPanel {
         contextMenu.addSeparator();
 
         // Connection actions
-        contextMenu.add(actionManager.getClearSourceNeuronsAction());
-        contextMenu.add(actionManager.getSetSourceNeuronsAction());
+        contextMenu.add(actionManager.getAction("clearSourceNeurons"));
+        contextMenu.add(actionManager.getAction("setSourceNeurons"));
         contextMenu.addSeparator();
 
         // Preferences
-        contextMenu.add(actionManager.getShowNetworkPreferencesAction());
+        contextMenu.add(actionManager.getAction("showNetworkPreferences"));
 
         return contextMenu;
     }
@@ -1038,7 +1035,7 @@ public class NetworkPanel extends JPanel {
 
         CustomToolBar runTools = new CustomToolBar();
 
-        runTools.add(actionManager.getIterateNetworkAction());
+        runTools.add(actionManager.getAction("iterateNetwork"));
         runTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
 
         return runTools;
@@ -1058,7 +1055,7 @@ public class NetworkPanel extends JPanel {
         }
 
         mainTools.addSeparator();
-        mainTools.add(actionManager.getSetAutoZoomToggleButton());
+        mainTools.add(new ToggleAutoZoom(this));
 
         return mainTools;
     }
@@ -1075,8 +1072,8 @@ public class NetworkPanel extends JPanel {
         for (Action action : actionManager.getNetworkEditingActions()) {
             editTools.add(action);
         }
-        editTools.add(actionManager.getClearNodesAction());
-        editTools.add(actionManager.getRandomizeObjectsAction());
+        editTools.add(actionManager.getAction("clearNodes"));
+        editTools.add(actionManager.getAction("randomizeObjects"));
 
         return editTools;
     }
@@ -1089,8 +1086,8 @@ public class NetworkPanel extends JPanel {
     public JMenu createAlignMenu() {
 
         JMenu alignSubMenu = new JMenu("Align");
-        alignSubMenu.add(actionManager.getAlignHorizontalAction());
-        alignSubMenu.add(actionManager.getAlignVerticalAction());
+        alignSubMenu.add(actionManager.getAction("alignHorizontal"));
+        alignSubMenu.add(actionManager.getAction("alignVertical"));
         return alignSubMenu;
 
     }
@@ -1103,8 +1100,8 @@ public class NetworkPanel extends JPanel {
     public JMenu createSpacingMenu() {
 
         JMenu spaceSubMenu = new JMenu("Space");
-        spaceSubMenu.add(actionManager.getSpaceHorizontalAction());
-        spaceSubMenu.add(actionManager.getSpaceVerticalAction());
+        spaceSubMenu.add(actionManager.getAction("spaceHorizontal"));
+        spaceSubMenu.add(actionManager.getAction("spaceVertical"));
         return spaceSubMenu;
 
     }
@@ -1897,7 +1894,8 @@ public class NetworkPanel extends JPanel {
 
     public void setAutoZoomMode(final boolean autoZoomMode) {
         this.autoZoomMode = autoZoomMode;
-        actionManager.getSetAutoZoomToggleButton().setSelected(autoZoomMode);
+        // TODO
+        //actionManager.getSetAutoZoomToggleButton().setSelected(autoZoomMode);
         repaint();
     }
 
@@ -2041,7 +2039,7 @@ public class NetworkPanel extends JPanel {
      */
     public void setWeightsVisible(final boolean weightsVisible) {
         this.looseWeightsVisible = weightsVisible;
-        actionManager.getShowWeightsAction().setState(looseWeightsVisible);
+        //actionManager.getMenuItem("showWeights", looseWeightsVisible);
         for (SynapseNode node : getNodes(SynapseNode.class)) {
             if (node != null) {
                 node.setVisible(weightsVisible);
@@ -2063,7 +2061,6 @@ public class NetworkPanel extends JPanel {
      */
     public void setPrioritiesVisible(final boolean prioritiesOn) {
         this.prioritiesVisible = prioritiesOn;
-        actionManager.getShowPrioritiesAction().setState(prioritiesOn);
         for (Iterator<NeuronNode> neuronNodes = this.getNodes(NeuronNode.class).iterator(); neuronNodes.hasNext(); ) {
             NeuronNode node = neuronNodes.next();
             node.setPriorityView(prioritiesVisible);
@@ -2333,12 +2330,13 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(new PasteAction(this));
         contextMenu.add(new DeleteAction(this));
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getClearSourceNeuronsAction());
-        contextMenu.add(actionManager.getSetSourceNeuronsAction());
+        contextMenu.add(actionManager.getAction("clearSourceNeurons"));
+        contextMenu.add(actionManager.getAction("setSourceNeurons"));
         contextMenu.add(actionManager.getConnectionMenu());
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getLayoutNeuronsAction());
-        contextMenu.add(actionManager.getNeuronCollectionAction());
+        contextMenu.add(actionManager.getAction("showLayoutDialog"));
+        contextMenu.addSeparator();
+        contextMenu.add(actionManager.getAction("showNetworkPreferences"));
         contextMenu.addSeparator();
         // Add align and space menus if objects are selected
         if (this.getSelectedNodes(NeuronNode.class).size() > 1) {
@@ -2349,12 +2347,12 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(new SetNeuronPropertiesAction(this));
         contextMenu.addSeparator();
         JMenu nodeSelectionMenu = new JMenu("Select");
-        nodeSelectionMenu.add(actionManager.getSelectIncomingWeightsAction());
-        nodeSelectionMenu.add(actionManager.getSelectOutgoingWeightsAction());
+        nodeSelectionMenu.add(actionManager.getAction("selectIncomingWeights"));
+        nodeSelectionMenu.add(actionManager.getAction("selectOutgoingWeights"));
         contextMenu.add(nodeSelectionMenu);
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getTestInputAction());
-        contextMenu.add(actionManager.getShowWeightMatrixAction());
+        contextMenu.add(actionManager.getAction("testInput"));
+        contextMenu.add(actionManager.getAction("showWeightMatrix"));
         return contextMenu;
     }
 
@@ -2372,7 +2370,6 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(new SetSynapsePropertiesAction(this));
         return contextMenu;
     }
-
 
     /**
      * Creates the coupling menu for the provided attribute container. Null if the network panel is not in a desktop

@@ -9,6 +9,4 @@ package org.simbrain.network;
  */
 public interface NetworkModel {
 
-    // TODO: Possibly handle deletion here
-
 }

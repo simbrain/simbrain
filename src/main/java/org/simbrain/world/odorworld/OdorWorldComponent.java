@@ -129,7 +129,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public AttributeContainer getObjectFromKey(String objectKey) {
+    public AttributeContainer getAttributeContainer(String objectKey) {
 
         //System.out.println("-->" + objectKey);
         if (objectKey.startsWith("Entity")) {

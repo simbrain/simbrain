@@ -62,7 +62,7 @@ public class HistogramComponent extends WorkspaceComponent {
 
 
     @Override
-    public AttributeContainer getObjectFromKey(String objectKey) {
+    public AttributeContainer getAttributeContainer(String objectKey) {
         return model;
     }
 

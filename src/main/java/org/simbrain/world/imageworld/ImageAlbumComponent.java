@@ -48,7 +48,7 @@ public class ImageAlbumComponent extends WorkspaceComponent {
     }
 
     @Override
-    public AttributeContainer getObjectFromKey(String objectKey) {
+    public AttributeContainer getAttributeContainer(String objectKey) {
         for (SensorMatrix sensor : world.getSensorMatrices()) {
             if (objectKey.equals(sensor.getName())) {
                 return sensor;

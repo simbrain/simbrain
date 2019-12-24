@@ -203,7 +203,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     }
 
     @Override
-    public AttributeContainer getObjectFromKey(String objectKey) {
+    public AttributeContainer getAttributeContainer(String objectKey) {
         return this;
     }
 

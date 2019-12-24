@@ -124,7 +124,7 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public AttributeContainer getObjectFromKey(String objectKey) {
+    public AttributeContainer getAttributeContainer(String objectKey) {
         if (objectKey == null || objectKey.isEmpty()) {
             return null;
         }

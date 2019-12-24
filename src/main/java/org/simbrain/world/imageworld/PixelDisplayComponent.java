@@ -71,7 +71,7 @@ public class PixelDisplayComponent extends WorkspaceComponent {
     }
 
     @Override
-    public AttributeContainer getObjectFromKey(String objectKey) {
+    public AttributeContainer getAttributeContainer(String objectKey) {
         if (objectKey.equalsIgnoreCase("EmitterMatrix")) {
             return world.getImageSource();
         }

@@ -160,7 +160,7 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     }
 
     @Override
-    public AttributeContainer getObjectFromKey(String objectKey) {
+    public AttributeContainer getAttributeContainer(String objectKey) {
         if (objectKey.equals("DataTable")) {
             return this;
         } else {

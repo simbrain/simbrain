@@ -171,9 +171,9 @@ public abstract class WorkspaceComponent {
      * unique id (relative to that component) for deserializing to work.
      *
      * @param objectKey String key
-     * @return the corresponding object
+     * @return the corresponding AttributeContainer
      */
-    public AttributeContainer getObjectFromKey(String objectKey) {
+    public AttributeContainer getAttributeContainer(String objectKey) {
         return null;
     }
 

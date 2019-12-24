@@ -713,8 +713,8 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
      *                group and have its parameters set based on the parameters
      *                of this group.
      */
-    public void addNewExcitatorySynapse(final Synapse synapse) {
-        synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
+    public void addNewExcitatorySynapse(final Synapse synapse)  {
+        synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
         synapse.setParentGroup(this);
         if (exciteRand != null) {
             synapse.setStrength(exciteRand.getRandom());
@@ -739,7 +739,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
      *                of this group.
      */
     public void addNewInhibitorySynapse(final Synapse synapse) {
-        synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
+        synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
         synapse.setParentGroup(this);
         if (inhibRand != null) {
             synapse.setStrength(inhibRand.getRandom());
@@ -795,7 +795,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         exSynapseSet.add(synapse);
         excitatoryRatio = exSynapseSet.size() / (double) size();
         if (getParentNetwork() != null) {
-            synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
+            synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
             synapse.setParentGroup(this);
         }
         fireSynapseAdded(synapse);
@@ -812,7 +812,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         inSynapseSet.add(synapse);
         excitatoryRatio = exSynapseSet.size() / (double) size();
         if (getParentNetwork() != null) {
-            synapse.setId(getParentNetwork().getSynapseIdGenerator().getId());
+            synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
             synapse.setParentGroup(this);
         }
         fireSynapseAdded(synapse);

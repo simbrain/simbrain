@@ -5,6 +5,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -102,9 +103,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * @param net parent net
      * @param numNodes number of nodes
      */
-    public NeuronArray(Network net, int numNodes, String id) {
+    public NeuronArray(Network net, int numNodes) {
         parent = net;
-        this.id = id;
+        this.id = net.getIdManager().getId(NeuronArray.class);
         this.numNodes = numNodes;
         randomize();
     }
@@ -117,8 +118,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * @return the deep copy
      */
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
-        NeuronArray copy = new NeuronArray(newParent,
-                orig.getNumNodes(), newParent.getArrayIdGenerator().getId());
+        NeuronArray copy = new NeuronArray(newParent, orig.getNumNodes());
         copy.setLabel(copy.getId());
         copy.setCenterX(orig.getCenterX());
         copy.setCenterY(orig.getCenterY());
@@ -318,8 +318,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
          * @return the created neuron array
          */
         public NeuronArray create(Network network) {
-            NeuronArray na = new NeuronArray(network, numNodes,
-                    network.getArrayIdGenerator().getId());
+            NeuronArray na = new NeuronArray(network, numNodes);
             na.label = label;
             return na;
         }

@@ -16,7 +16,7 @@ public class NeuronArrayTest {
     @Before
     public void setUp() {
         Network network = new Network();
-        neuronArray = new NeuronArray(network, 10, "Neuron_1");
+        neuronArray = new NeuronArray(network, 10);
     }
 
     @Test

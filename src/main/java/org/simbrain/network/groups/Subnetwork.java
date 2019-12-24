@@ -39,7 +39,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * its own update rules. Note that no neurons or synapses or other objects are contained in a subnet (as of now), it
  * only contains neuron and synapse groups.
  */
-public abstract class Subnetwork implements CopyableObject, LocatableModel, AttributeContainer {
+public abstract class Subnetwork implements EditableObject, LocatableModel, AttributeContainer {
 
     /**
      * Reference to the network this group is a part of.
@@ -545,14 +545,7 @@ public abstract class Subnetwork implements CopyableObject, LocatableModel, Attr
     public void fireLabelUpdated() {
         changeSupport.firePropertyChange("label", null, null);
     }
-
-
-    @Override
-    public EditableObject copy() {
-        return null;
-    }
-
-
+    
     public void fireDeleted() {
         changeSupport.firePropertyChange("delete", null, null);
     }

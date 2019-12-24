@@ -2186,7 +2186,7 @@ public class NetworkPanel extends JPanel {
 
     public void showNeuronArrayCreationDialog() {
         NeuronArray.CreationTemplate creationTemplate =
-                new NeuronArray.CreationTemplate(network.getArrayIdGenerator().getProposedId());
+                new NeuronArray.CreationTemplate(network.getIdManager().getProposedId(NeuronArray.class));
         StandardDialog and = new AnnotatedPropertyEditor(creationTemplate).getDialog();
         and.addClosingTask(() -> SwingUtilities.invokeLater(() -> {
             Network network = getNetwork();

@@ -225,7 +225,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
         this.parent = parent;
         setUpdateRule(updateRule);
-        id = parent.getNeuronIdGenerator().getId();
+        id = parent.getIdManager().getId(Neuron.class);
     }
 
     /**
@@ -249,7 +249,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public Neuron(final Network parent, final String updateRule) {
         this.parent = parent;
         setUpdateRule(updateRule);
-        id = parent.getNeuronIdGenerator().getId();
+        id = parent.getIdManager().getId(Neuron.class);
     }
 
 
@@ -262,7 +262,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      */
     public Neuron(final Network parent, final Neuron n) {
         this.parent = parent;
-        setId(parent.getNeuronIdGenerator().getId());
+        setId(parent.getIdManager().getId(Neuron.class));
         setClamped(n.isClamped());
         setUpdateRule(n.getUpdateRule().deepCopy());
         setIncrement(n.getIncrement());

@@ -27,7 +27,7 @@ import org.simbrain.network.groups.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.SimpleId;
+import org.simbrain.util.SimpleIdManager;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -328,7 +328,7 @@ public class Network {
     private HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
     //TODO
-    private final List<MultiLayerNet> multiLayerNetworks = new ArrayList<>();
+    private List<MultiLayerNet> multiLayerNetworks = new ArrayList<>();
     private List<NeuronGroup> neuronGroups  = new ArrayList<>();
     private List<SynapseGroup> synapseGroups  = new ArrayList<>();
     private List<Subnetwork> subnetworks  = new ArrayList<>();
@@ -341,7 +341,7 @@ public class Network {
     /**
      * Neuron Array objects (nd4j). Not yet implemented.
      */
-    private final List<NeuronArray> naList = new ArrayList();
+    private List<NeuronArray> naList = new ArrayList();
 
     /**
      * The update manager for this network.
@@ -384,34 +384,9 @@ public class Network {
     private PriorityComparator priorityComparator = new PriorityComparator();
 
     /**
-     * Neuron Id generator.
+     * Manage ids for all network elements.
      */
-    private SimpleId neuronIdGenerator = new SimpleId("Neuron", 1);
-
-    /**
-     * Synapse Id generator.
-     */
-    private SimpleId synapseIdGenerator = new SimpleId("Synapse", 1);
-
-    /**
-     * Group Id generator.
-     */
-    private SimpleId groupIdGenerator = new SimpleId("Group", 1);
-
-    /**
-     * Collection Id generator.
-     */
-    private SimpleId collectionIdGenerator = new SimpleId("Collection", 1);
-
-    /**
-     * Array Id generator.
-     */
-    private SimpleId arrayIdGenerator = new SimpleId("Array", 1);
-
-    /**
-     * Weight Matrix Id generator.
-     */
-    private SimpleId weightMatrixGenerator = new SimpleId("Weight Matrix", 1);
+    SimpleIdManager idManager = new SimpleIdManager();
 
     /**
      * A variable telling the network not to fire events to any listeners during update.
@@ -451,6 +426,7 @@ public class Network {
         current_id++;
         updateManager = new NetworkUpdateManager(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
+        initIdManager();
     }
 
     /**
@@ -666,7 +642,7 @@ public class Network {
     public void addLooseSynapse(Synapse synapse) {
         synapse.initSpikeResponder();
         looseSynapses.add(synapse);
-        synapse.setId(getSynapseIdGenerator().getId());
+        synapse.setId(idManager.getId(Synapse.class));
         event.fireSynapseAdded(synapse);
     }
 
@@ -1174,6 +1150,15 @@ public class Network {
         if (subnetworks == null) {
             subnetworks = new ArrayList<>();
         }
+        if (multiLayerNetworks == null) {
+            multiLayerNetworks = new ArrayList<>();
+        }
+        if (naList == null) {
+            naList = new ArrayList<>();
+        }
+
+
+        initIdManager();
 
         event = new Event();
 
@@ -1366,73 +1351,17 @@ public class Network {
     }
 
     /**
-     * Return the generator for neuron ids.
+     * Returns a neuron with a matching label.  If more than one
+     * neuron has a matching label, the first found is returned.
+     * If there are no matches, a {@link NoSuchElementException} is thrown.
      *
-     * @return the generator
-     */
-    public SimpleId getNeuronIdGenerator() {
-        return neuronIdGenerator;
-    }
-
-    /**
-     * Return the generator for synapse ids.
-     *
-     * @return the generator.
-     */
-    public SimpleId getSynapseIdGenerator() {
-        return synapseIdGenerator;
-    }
-
-    /**
-     * Search for a neuron by label. If there are more than one with the same label only the first one found is
-     * returned.
-     *
-     * @param inputString label of neuron to search for
-     * @return list of matched neurons, or null if none are found
-     */
-    public List<Neuron> getNeuronsByLabel(String inputString) {
-        ArrayList<Neuron> foundNeurons = new ArrayList<Neuron>();
-        for (Neuron neuron : this.getFlatNeuronList()) {
-            if (neuron.getLabel().equalsIgnoreCase(inputString)) {
-                foundNeurons.add(neuron);
-            }
-        }
-        if (foundNeurons.size() == 0) {
-            return null;
-        } else {
-            return foundNeurons;
-        }
-    }
-
-    /**
-     * Returns the first neuron in the array returned by getNeuronsByLabel.
-     *
-     * @param inputString label of neuron to search for
+     * @param label label of neuron to search for
      * @return matched Neuron, if any
      */
-    public Neuron getNeuronByLabel(String inputString) {
-        List<Neuron> foundNeurons = getNeuronsByLabel(inputString);
-        if (foundNeurons == null) {
-            return null;
-        } else {
-            return foundNeurons.get(0);
-        }
-    }
-
-    public SimpleId getGroupIdGenerator() {
-        return groupIdGenerator;
-    }
-
-    public SimpleId getCollectionIdGenerator() {
-        return collectionIdGenerator;
-    }
-
-    public SimpleId getArrayIdGenerator() {
-        return arrayIdGenerator;
-    }
-
-    public SimpleId getWeightMatrixGenerator() {
-        return weightMatrixGenerator;
+    public Neuron getNeuronByLabel(String label) {
+        return getFlatNeuronList().stream()
+                .filter(n -> n.getLabel().equalsIgnoreCase(label))
+                .findFirst().get();
     }
 
     /**
@@ -1558,6 +1487,7 @@ public class Network {
      * @param freeze frozen if true; unfrozen if false
      */
     public void freezeSynapses(final boolean freeze) {
+
         // Freeze synapses in synapse groups
         for (SynapseGroup group : getSynapseGroups()) {
             group.setFrozen(freeze, Polarity.BOTH);
@@ -1672,6 +1602,28 @@ public class Network {
 
     public HashSet<NeuronCollection> getNeuronCollectionSet() {
         return neuronCollectionSet;
+    }
+
+    /**
+     * Initialize all id managers.
+     */
+    private void initIdManager() {
+        if (idManager == null) {
+            idManager = new SimpleIdManager();
+        }
+        idManager.initId(Neuron.class, looseNeurons.size() + 1);
+        idManager.initId(Synapse.class, looseSynapses.size() + 1);
+        idManager.initId(NeuronGroup.class, neuronGroups.size() + 1);
+        idManager.initId(NeuronCollection.class, neuronCollectionSet.size() + 1);
+        idManager.initId(SynapseGroup.class, synapseGroups.size() + 1);
+        idManager.initId(Subnetwork.class, subnetworks.size() + 1);
+        idManager.initId(NeuronArray.class, naList.size() + 1);
+        idManager.initId(WeightMatrix.class, weightMatrices.size() + 1);
+        idManager.initId(MultiLayerNet.class, multiLayerNetworks.size() + 1);
+    }
+
+    public SimpleIdManager getIdManager() {
+        return idManager;
     }
 
 }

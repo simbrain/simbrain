@@ -21,6 +21,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
@@ -106,6 +107,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
         super(net);
+        id = net.getIdManager().getId(NeuronGroup.class);
         addNeurons(neurons);
         subsamplingManager.resetIndices();
     }
@@ -129,6 +131,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, Point2D initialPosition, final int numNeurons) {
         super(net);
+        id = net.getIdManager().getId(NeuronGroup.class);
         List<Neuron> newNeurons = new ArrayList<>();
         for (int i = 0; i < numNeurons; i++) {
             Neuron newNeuron = new Neuron(net);
@@ -152,6 +155,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network network, Point2D initialPosition) {
         super(network);
+        id = network.getIdManager().getId(NeuronGroup.class);
         layout.getLayout().setInitialLocation(initialPosition);
         subsamplingManager.resetIndices();
     }
@@ -163,6 +167,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network network) {
         super(network);
+        id = network.getIdManager().getId(NeuronGroup.class);
     }
 
     /**
@@ -174,6 +179,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network network, final NeuronGroup toCopy) {
         super(network);
+        id = network.getIdManager().getId(NeuronGroup.class);
         List<Neuron> newNeurons = new ArrayList<>();
         for (Neuron neuron : toCopy.getNeuronList()) {
             newNeurons.add(new Neuron(network, neuron));
@@ -319,7 +325,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         super.addNeuron(neuron);
         neuron.setParentGroup(this);
         if (getParentNetwork() != null) {
-            neuron.setId(getParentNetwork().getNeuronIdGenerator().getId());
+            neuron.setId(getParentNetwork().getIdManager().getId(Neuron.class));
             if (fireEvent) {
 //                getParentNetwork().fireNeuronAdded(neuron); // TODO: [event] let synapse handle this
             }
@@ -636,7 +642,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
             NeuronGroup ng = null;
             if (groupType == GroupEnum.DEFAULT) {
                 ng = new NeuronGroup(network, numNeurons,
-                        network.getArrayIdGenerator().getId());
+                        network.getIdManager().getId(NeuronGroup.class));
                 ng.setGroupUpdateRule(updateRule);
             } else if (groupType == GroupEnum.WTA) {
                 ng = new WinnerTakeAll(network, numNeurons);

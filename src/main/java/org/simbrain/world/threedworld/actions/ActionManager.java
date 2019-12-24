@@ -8,7 +8,9 @@ import java.util.Map;
 
 public class ActionManager {
     public static Map<String, AbstractAction> createActions(ThreeDWorld world) {
+
         Map<String, AbstractAction> actions = new HashMap<String, AbstractAction>();
+
         putAction(actions, new AddEntityAction(world));
         putAction(actions, new AddBlockAction(world));
         putAction(actions, new AddAgentAction(world));

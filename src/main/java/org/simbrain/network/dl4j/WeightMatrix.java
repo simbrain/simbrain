@@ -6,6 +6,7 @@ import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -106,7 +107,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      * on the id is also set.
      */
     public void initializeId() {
-        id = parent.getWeightMatrixGenerator().getId();
+        id = parent.getIdManager().getId(WeightMatrix.class);
         label = id.replaceAll("_", " ");
     }
     /**

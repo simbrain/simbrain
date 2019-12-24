@@ -39,11 +39,11 @@ public class SimpleId {
      * Construct simpleId.
      *
      * @param rootName root name.
-     * @param index    beginning index.
+     * @param initialIndex    beginning index.
      */
-    public SimpleId(final String rootName, final int index) {
+    public SimpleId(final String rootName, final int initialIndex) {
         this.rootName = rootName;
-        this.index = new AtomicInteger(index);
+        this.index = new AtomicInteger(initialIndex);
     }
 
     /**
@@ -61,6 +61,13 @@ public class SimpleId {
      */
     public String getProposedId() {
         return rootName + "_" + index;
+    }
+
+    /**
+     * "Peek" at the current index.
+     */
+    public int getCurrentIndex() {
+        return index.get();
     }
 
 }

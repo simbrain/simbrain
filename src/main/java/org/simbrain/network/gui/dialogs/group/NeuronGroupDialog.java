@@ -151,7 +151,8 @@ public final class NeuronGroupDialog extends StandardDialog {
 
         } else {
             ngCreator =
-                new NeuronGroup.NeuronGroupCreator(networkPanel.getNetwork().getGroupIdGenerator().getProposedId());
+                new NeuronGroup.NeuronGroupCreator(
+                        networkPanel.getNetwork().getIdManager().getProposedId(NeuronGroup.class));
             neuronGroupCreationEditor = new AnnotatedPropertyEditor(ngCreator);
             firstTab = neuronGroupCreationEditor;
         }

@@ -313,12 +313,12 @@ public class NetworkPanel extends JPanel {
     /**
      * Create a new Network panel.
      *
-     * @param Network the network panel being created.
+     * @param network the network panel being created.
      */
-    public NetworkPanel(final Network Network) {
+    public NetworkPanel(final Network network) {
         super();
 
-        this.network = Network;
+        this.network = network;
         canvas = new PCanvas();
 
         // Always render in high quality
@@ -1744,7 +1744,7 @@ public class NetworkPanel extends JPanel {
 
     @Override
     public String toString() {
-        return this.getName();
+        return "Network Panel for " + network.getName();
     }
 
     public String debugString() {

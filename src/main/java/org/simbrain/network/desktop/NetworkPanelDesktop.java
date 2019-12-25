@@ -180,15 +180,19 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
         JMenu toolbarMenu = new JMenu("Toolbars");
-        toolbarMenu.add(actionManager.getAction("showMainToolbar"));
-        toolbarMenu.add(actionManager.getAction("showRunToolbar"));
-        toolbarMenu.add(actionManager.getAction("showEditToolbar"));
+        toolbarMenu.add(actionManager.getMenuItem("showMainToolbar",
+                getMainToolBar().isVisible()));
+        toolbarMenu.add(actionManager.getMenuItem("showRunToolbar",
+                getRunToolBar().isVisible()));
+        toolbarMenu.add(actionManager.getMenuItem("showEditToolbar",
+                getEditToolBar().isVisible()));
 
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
-        // viewMenu.add(actionManager.getShowGUIAction());
-        viewMenu.add(actionManager.getAction("showPriorities"));
-        viewMenu.add(actionManager.getAction("showWeights"));
+        viewMenu.add(actionManager.getMenuItem("showPriorities",
+                getPrioritiesVisible()));
+        viewMenu.add(actionManager.getMenuItem("showWeights",
+                getWeightsVisible()));
 
         return viewMenu;
     }

@@ -97,9 +97,9 @@ public final class NetworkActionManager {
         actions.put("selectAllWeights", new SelectAllWeightsAction(networkPanel));
         actions.put("selectAllNeurons", new SelectAllNeuronsAction(networkPanel));
         actions.put("selectAll", new SelectAllAction(networkPanel));
-        actions.put("showMainToolBar", new ShowMainToolBarAction(networkPanel));
-        actions.put("showEditToolBar", new ShowEditToolBarAction(networkPanel));
-        actions.put("showRunToolBar", new ShowRunToolBarAction(networkPanel));
+        actions.put("showMainToolbar", new ShowMainToolBarAction(networkPanel));
+        actions.put("showEditToolbar", new ShowEditToolBarAction(networkPanel));
+        actions.put("showRunToolbar", new ShowRunToolBarAction(networkPanel));
         actions.put("clearSourceNeurons", new ClearSourceNeurons(networkPanel));
         actions.put("setSourceNeurons", new SetSourceNeurons(networkPanel));
         actions.put("selectIncomingWeights", new SelectIncomingWeightsAction(networkPanel));
@@ -187,7 +187,8 @@ public final class NetworkActionManager {
     }
 
     /**
-     * Gets an action within a {@link JCheckBoxMenuItem}
+     * Gets an action within a {@link JCheckBoxMenuItem}.  Can just be
+     * used as a menu item without using the checkbox.
      */
     public JCheckBoxMenuItem getMenuItem(String name) {
         return new JCheckBoxMenuItem(getAction(name));

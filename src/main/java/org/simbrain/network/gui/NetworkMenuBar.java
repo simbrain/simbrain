@@ -126,13 +126,18 @@ public class NetworkMenuBar {
 
         JMenu viewMenu = new JMenu("View");
         JMenu toolbarMenu = new JMenu("Toolbars");
-        toolbarMenu.add(actionManager.getMenuItem("showMainToolbar"), networkPanel.getMainToolBar().isVisible());
-        toolbarMenu.add(actionManager.getMenuItem("showRunToolbar"), networkPanel.getRunToolBar().isVisible());
-        toolbarMenu.add(actionManager.getMenuItem("showEditToolbar"), networkPanel.getEditToolBar().isVisible());
+        toolbarMenu.add(actionManager.getMenuItem("showMainToolbar",
+                networkPanel.getMainToolBar().isVisible()));
+        toolbarMenu.add(actionManager.getMenuItem("showRunToolbar",
+                networkPanel.getRunToolBar().isVisible()));
+        toolbarMenu.add(actionManager.getMenuItem("showEditToolbar",
+                networkPanel.getEditToolBar().isVisible()));
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
-        viewMenu.add(actionManager.getAction("showPriorities"));
-        viewMenu.add(actionManager.getAction("showWeights"));
+        viewMenu.add(actionManager.getMenuItem("showPriorities",
+                networkPanel.getPrioritiesVisible()));
+        viewMenu.add(actionManager.getMenuItem("showWeights",
+                networkPanel.getWeightsVisible()));
         returnMenu.add(viewMenu);
 
         JMenu helpMenu = new JMenu("Help");

@@ -32,7 +32,6 @@ import org.simbrain.util.SimpleIdManager;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 
-import java.beans.PropertyChangeSupport;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -77,9 +76,7 @@ public class Network {
         CONTINUOUS;
     }
 
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
-    private transient NetwrokEvents event = new NetwrokEvents(changeSupport);
+    private transient NetwrokEvents event = new NetwrokEvents(this);
 
     /**
      * List of "loose neurons" (as opposed to neurons in neuron groups)
@@ -904,9 +901,7 @@ public class Network {
 
         initIdManager();
 
-        changeSupport = new PropertyChangeSupport(this);
-
-        event = new NetwrokEvents(changeSupport);
+        event = new NetwrokEvents(this);
 
         // Initialize update manager
         updateManager.postUnmarshallingInit();

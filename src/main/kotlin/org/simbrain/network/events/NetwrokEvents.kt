@@ -1,5 +1,6 @@
 package org.simbrain.network.events
 
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
@@ -14,7 +15,7 @@ import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
-class NetwrokEvents(changeSupport: PropertyChangeSupport) : Event(changeSupport) {
+class NetwrokEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 
     fun onUpdateCompleted(handler: Consumer<Boolean>) = "UpdateCompleted".itemAddedEvent(handler)
     fun fireUpdateCompleted(completed: Boolean) = "UpdateCompleted"(new = completed)

@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.events.SynapseEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 
@@ -30,8 +30,6 @@ import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -151,16 +149,12 @@ public final class SynapseNode extends ScreenElement {
         circle.setPickable(true);
         line.setPickable(false);
 
-        synapse.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("delete".equals(evt.getPropertyName())) {
-                    SynapseNode.this.removeFromParent();
-                } else if ("strength".equals(evt.getPropertyName())) {
-                    SynapseNode.this.updateColor();
-                    SynapseNode.this.updateDiameter();
-                }
-            }
+        SynapseEvents events = synapse.getEvents();
+
+        events.onDelete(s -> removeFromParent());
+        events.onStrengthUpdate(() -> {
+            updateColor();
+            updateDiameter();
         });
     }
 

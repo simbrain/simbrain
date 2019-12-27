@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.events.SynapseEvents;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
@@ -32,8 +32,6 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -200,7 +198,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
     /**
      * Support for property change events.
      */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private transient SynapseEvents events = new SynapseEvents(this);
 
     /** Initialize properties */
     static {
@@ -496,7 +494,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
     public void forceSetStrength(final double wt) {
         double oldweight = strength;
         strength = wt;
-        fireStrengthUpdated();
+        events.fireStrengthUpdate();
     }
 
     /**
@@ -513,7 +511,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
      */
     public void setUpperBound(final double d) {
         upperBound = d;
-        fireStrengthUpdated(); // to force a graphics update
+        events.fireStrengthUpdate(); // to force a graphics update
     }
 
     /**
@@ -530,7 +528,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
      */
     public void setLowerBound(final double d) {
         lowerBound = d;
-        fireStrengthUpdated(); // to force a graphics update
+        events.fireStrengthUpdate(); // to force a graphics update
     }
 
     /**
@@ -857,10 +855,10 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         // TODO: Needed for calls to SynapseGroup.postUnmashallingInit, which calls
         // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
         // change support initialized.
-        if (changeSupport == null) {
-            changeSupport = new PropertyChangeSupport(this);
+        if (events == null) {
+            events = new SynapseEvents(this);
         }
-        changeSupport.firePropertyChange("rule", oldRule, newLearningRule);
+        events.fireLearningRuleUpdate(oldRule, learningRule);
     }
 
     /**
@@ -1017,7 +1015,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
      * Called after a synapse is de-serialized, to repopulate fan-in and fan-out lists.
      */
     public void postUnmarshallingInit() {
-        changeSupport = new PropertyChangeSupport(this);
+        events = new SynapseEvents(this);
         if (getTarget() != null) {
             if (getTarget().getFanIn() != null) {
                 getTarget().addAfferent(this);
@@ -1052,26 +1050,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         }
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
+    public SynapseEvents getEvents() {
+        return events;
     }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-
-    /**
-     * Notify listeners that this object has been deleted.
-     */
-    public void fireDeleted() {
-        changeSupport.firePropertyChange("delete", this, null);
-    }
-
-    /**
-     * Label update needs to be reflected in GUI.
-     */
-    public void fireStrengthUpdated() {
-        changeSupport.firePropertyChange("strength", null, null);
-    }
-
 }

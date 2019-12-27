@@ -45,13 +45,9 @@ public class NeuronCollection extends AbstractNeuronCollection {
         //initializeId(); // TODO
         subsamplingManager.resetIndices();
 
-        neurons.forEach(n -> {
-            n.addPropertyChangeListener(evt -> {
-                if ("moved".equals(evt.getPropertyName())) {
-                    firePositionChanged();
-                }
-            });
-        });
+        neurons.forEach(n -> n.getEvents().onLocationChange((ol, nl) -> {
+            firePositionChanged();
+        }));
 
         net.getEvent().onNeuronRemoved(n -> {
             removeNeuron(n);

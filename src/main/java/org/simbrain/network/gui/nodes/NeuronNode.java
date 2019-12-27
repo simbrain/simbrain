@@ -24,6 +24,7 @@ import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
@@ -36,7 +37,6 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -208,25 +208,18 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         PBounds bounds = mainShape.getBounds();
         setBounds(bounds);
 
-        neuron.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("delete".equals(evt.getPropertyName())) {
-                    NeuronNode.this.removeFromParent();
-                } else if ("activation".equals(evt.getPropertyName())) {
-                    NeuronNode.this.updateColor();
-                    NeuronNode.this.updateText();
-                } else if ("label".equals(evt.getPropertyName())) {
-                    NeuronNode.this.updateTextLabel();
-                } else if ("clamped".equals(evt.getPropertyName())) {
-                    NeuronNode.this.updateClampStatus();
-                } else if ("moved".equals(evt.getPropertyName())) {
-                    NeuronNode.this.pullViewPositionFromModel();
-                } else if ("updateRule".equals(evt.getPropertyName())) {
-                    NeuronNode.this.updateShape();
-                }
-            }
+        NeuronEvents events = neuron.getEvents();
+
+        events.onDelete(n -> removeFromParent());
+        events.onActivationChange((o, n) -> {
+            NeuronNode.this.updateColor();
+            NeuronNode.this.updateText();
         });
+        events.onLabelChange((o, n) -> updateText());
+        events.onClammedChange((o, n) -> updateClampStatus());
+        events.onLocationChange((o, n) -> pullViewPositionFromModel());
+        events.onUpdateRuleChange((o, n) -> updateShape());
+
 
     }
 

@@ -18,6 +18,7 @@
 package org.simbrain.network;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.events.NetwrokEvents;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -64,7 +65,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        Network.Event event = network.getEvent();
+        NetwrokEvents event = network.getEvent();
 
         event.onNeuronAdded(n -> {
             setChangedSinceLastSave(true);
@@ -76,7 +77,7 @@ public final class NetworkComponent extends WorkspaceComponent {
             fireAttributeContainerRemoved(n);
         });
 
-        event.onNeuronsUpdated(l -> setChangedSinceLastSave(true));
+//        event.onNeuronsUpdated(l -> setChangedSinceLastSave(true));
 
         event.onSynapseAdded(s -> {
             setChangedSinceLastSave(true);
@@ -87,10 +88,10 @@ public final class NetworkComponent extends WorkspaceComponent {
             setChangedSinceLastSave(true);
             fireAttributeContainerRemoved(s);
         });
-
-        event.onTextAdded(t -> setChangedSinceLastSave(true));
-
-        event.onTextRemoved(t -> setChangedSinceLastSave(true));
+//
+//        event.onTextAdded(t -> setChangedSinceLastSave(true));
+//
+//        event.onTextRemoved(t -> setChangedSinceLastSave(true));
 
         event.onNeuronCollectionAdded(nc -> {
             setChangedSinceLastSave(true);

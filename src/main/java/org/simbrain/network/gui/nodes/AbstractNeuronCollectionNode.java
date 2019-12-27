@@ -102,11 +102,9 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
                 }
             });
             Neuron neuron = neuronNode.getNeuron();
-            neuron.addPropertyChangeListener(evt -> {
-                if ("delete".equals(evt.getPropertyName())) {
-                    this.neuronNodes.remove(neuronNode);
-                    outlinedObjects.update(this.neuronNodes);
-                }
+            neuron.getEvents().onDelete(n -> {
+                this.neuronNodes.remove(neuronNode);
+                outlinedObjects.update(this.neuronNodes);
             });
         }
         outlinedObjects.update(neuronNodes);

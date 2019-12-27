@@ -33,6 +33,7 @@ import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.events.NetwrokEvents;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
@@ -424,19 +425,19 @@ public class NetworkPanel extends JPanel {
      */
     private void addNetworkListeners() {
 
-        Network.Event event = network.getEvent();
+        NetwrokEvents event = network.getEvent();
 
         event.onNeuronAdded(this::addNeuron);
-        event.onNeuronRemoved(Neuron::fireDeleted); // TODO: [event] should not be handled here
+//        event.onNeuronRemoved(Neuron::fireDeleted); // TODO: [event] moved to Network for now. consider design
 
-        event.onNeuronsUpdated(l -> {
-            if (isGuiOn()) {
-                NetworkPanel.this.updateNeuronNodes(l);
-            }
-        });
+//        event.onNeuronsUpdated(l -> {
+//            if (isGuiOn()) {
+//                NetworkPanel.this.updateNeuronNodes(l);
+//            }
+//        });
 
         event.onSynapseAdded(this::addSynapse);
-        event.onSynapseRemoved(Synapse::fireDeleted); // TODO: [event] should not be handled here
+//        event.onSynapseRemoved(Synapse::fireDeleted); // TODO: [event] moved to Network for now. consider design
         event.onTextAdded(this::addTextObject);
         event.onTextRemoved(NetworkTextObject::fireDeleted); // TODO: [event] should not be handled here
         event.onNeuronGroupAdded(this::addNeuronGroup);

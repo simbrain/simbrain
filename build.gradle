@@ -2,12 +2,16 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.60'
     // id 'checkstyle'
 
     // Build executable jar using <code>gradle shadowJar</code>. The result is placed in be in build/libs
     id 'com.github.johnrengelman.shadow' version '5.2.0'
 
 }
+
+
+compileJava.options.encoding = 'UTF-8'
 
 def versionName = "Simbrain4Beta"
 def jmonkeyengine_version = '3.2.2-stable'
@@ -23,6 +27,9 @@ repositories {
 }
 
 dependencies {
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2'
 
     // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
     compile group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
@@ -97,6 +104,14 @@ task printStuff {
         println rootProject
         println projectDir
     }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 // Uncomment to minimize the JAR.  Currently only reduces < 10%, and the jar does not execute.

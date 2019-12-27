@@ -277,12 +277,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * Add listener to indicated neuron.
      */
     private void addListener(Neuron n) {
-        n.addPropertyChangeListener(evt -> {
-            if ("moved".equals(evt.getPropertyName())) {
-                firePositionChanged();
-            }
-        });
-
+        n.getEvents().onLocationChange((ol, nl) -> firePositionChanged());
     }
 
     /**

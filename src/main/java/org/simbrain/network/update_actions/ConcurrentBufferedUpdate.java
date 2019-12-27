@@ -23,6 +23,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.events.NetwrokEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
@@ -183,7 +184,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
 
     private void initListeners() {
 
-        Network.Event event = network.getEvent();
+        NetwrokEvents event = network.getEvent();
 
         event.onNeuronAdded(n -> {
             pendingOperations.incrementAndGet();

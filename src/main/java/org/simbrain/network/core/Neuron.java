@@ -20,11 +20,12 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.groups.AbstractNeuronCollection;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.util.Point3D;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -32,12 +33,8 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -147,21 +144,13 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     private transient ArrayList<Synapse> fanIn = new ArrayList<Synapse>(PRE_ALLOCATED_NUM_SYNAPSES);
 
     /**
-     * x-coordinate of this neuron in 2-space.
-     */
-    private double x;
-
-    /**
-     * y-coordinate of this neuron in 2-space.
-     */
-    private double y;
-
-    /**
-     * z-coordinate of this neuron in 3-space. Currently no GUI implementation,
+     * Center location of thie neuron.
+     *
+     * Currently the z-coordinate of this neuron in 3-space has no GUI implementation,
      * but fully useable for scripting. Like polarity this will get a full
      * implementation in the next development cycle... probably by 4.0.
      */
-    private double z;
+    private Point3D location = new Point3D();
 
     /**
      * If true then do not update this neuron.
@@ -213,7 +202,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     /**
      * Support for property change events.
      */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private transient NeuronEvents events = new NeuronEvents(this);
 
     /**
      * Construct a specific type of neuron.
@@ -288,7 +277,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * parent network has been added.
      */
     public void postUnmarshallingInit() {
-        changeSupport = new PropertyChangeSupport(this);
+        events = new NeuronEvents(this);
         fanOut = new HashMap<Neuron, Synapse>();
         fanIn = new ArrayList<Synapse>();
         if (polarity == null) {
@@ -360,7 +349,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
         if (getNetwork() != null) {
             getNetwork().updateTimeType();
-            changeSupport.firePropertyChange("updateRule", oldRule, updateRule);
+            events.fireUpdateRuleChange(oldRule, updateRule);
         }
     }
 
@@ -390,7 +379,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         } else {
             activation = act;
         }
-        changeSupport.firePropertyChange("activation", lastActivation, act);
+        events.fireActivationChange(lastActivation, act);
     }
 
     /**
@@ -416,7 +405,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public void forceSetActivation(final double act) {
         lastActivation = getActivation();
         activation = act;
-        changeSupport.firePropertyChange("activation", lastActivation, act);
+        events.fireActivationChange(lastActivation, act);
     }
 
     @Producible()
@@ -802,12 +791,12 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     @Override
     public double getCenterX() {
-        return x;
+        return location.getX();
     }
 
     @Override
     public double getCenterY() {
-        return y;
+        return location.getY();
     }
 
     @Override
@@ -822,22 +811,22 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     // TODO: Remove below / replace with get centerX/Y
     public double getX() {
-        return x;
+        return location.getX();
     }
 
     public double getY() {
-        return y;
+        return location.getY();
     }
 
     public double getZ() {
-        return z;
+        return location.getZ();
     }
 
     public void setX(final double x, boolean fireEvent) {
-        double old_x = this.x;
-        this.x = x;
+        Point3D oldLocation = location;
+        location = location.setCopyX(x);
         if(fireEvent) {
-            changeSupport.firePropertyChange("moved", old_x, x);
+            events.fireLocationChange(oldLocation, location);
         }
     }
 
@@ -846,10 +835,10 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     public void setY(final double y, boolean fireEvent) {
-        double old_y = this.y;
-        this.y = y;
+        Point3D oldLocation = location;
+        location = location.setCopyY(y);
         if(fireEvent) {
-            changeSupport.firePropertyChange("moved", old_y, y);
+            events.fireLocationChange(oldLocation, location);
         }
     }
 
@@ -858,9 +847,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     public void setZ(final double z) {
-        double old_z = this.z;
-        this.z = z;
-        changeSupport.firePropertyChange("moved", old_z, z);
+        Point3D oldLocation = location;
+        location = location.setCopyZ(z);
+        events.fireLocationChange(oldLocation, location);
     }
 
     /**
@@ -954,7 +943,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     @Override
     public String toString() {
-        return "Neuron [" + getId() + "] " + getType() + "  Activation = " + this.getActivation() + "  Location = (" + this.x + "," + this.y + ")\n";
+        return "Neuron [" + getId() + "] " + getType() + "  Activation = " + this.getActivation() + "  Location = (" + location.getX() + "," + location.getY() + ")\n";
     }
 
     /**
@@ -1011,8 +1000,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @param clamped Whether this neuron is to be clamped.
      */
     public void setClamped(final boolean clamped) {
+        boolean old = clamped;
         this.clamped = clamped;
-        changeSupport.firePropertyChange("clamped", null, clamped);
+        events.fireClammedChange(old, clamped);
     }
 
     @Producible(defaultVisibility = false)
@@ -1024,7 +1014,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public void setLabel(final String label) {
         String oldLabel = this.label;
         this.label = label;
-        changeSupport.firePropertyChange("label", oldLabel , label);
+        events.fireLabelChange(oldLabel, label);
     }
 
     /**
@@ -1033,7 +1023,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @return point representation of neuron position.
      */
     public Point2D getPosition() {
-        return new Point((int) this.getX(), (int) this.getY());
+        return location.getPoint2D();
     }
 
     /**
@@ -1042,8 +1032,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @param position point location of neuron
      */
     public void setPosition(Point2D position) {
-        this.setX(position.getX());
-        this.setY(position.getY());
+        Point3D previousLocation = location;
+        location = location.setCopy2D(position);
+        events.fireLocationChange(previousLocation, location);
     }
 
     /**
@@ -1249,7 +1240,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * {x, y, z} in that order.
      */
     public double [] getPosition3D() {
-        return new double[]{x, y, z};
+        return new double[]{location.getX(), location.getY(), location.getZ()};
     }
 
     @Override
@@ -1257,33 +1248,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         return getId();
     }
 
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-
-    /**
-     * Notify listeners that this object has been deleted.
-     */
-    public void fireDeleted() {
-        changeSupport.firePropertyChange("delete", this, null);
-    }
-
-    /**
-     * Label update needs to be reflected in GUI.
-     */
-    public void fireActivationUpdated() {
-        changeSupport.firePropertyChange("activation", null , null);
-    }
-
-    /**
-     * Neuron position changed and GUI should be notified of this.
-     */
-    public void firePositionChanged() {
-        changeSupport.firePropertyChange("moved", null, null);
+    public NeuronEvents getEvents() {
+        return events;
     }
 }

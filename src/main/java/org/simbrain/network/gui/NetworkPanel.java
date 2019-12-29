@@ -33,7 +33,7 @@ import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
-import org.simbrain.network.events.NetwrokEvents;
+import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
@@ -425,7 +425,7 @@ public class NetworkPanel extends JPanel {
      */
     private void addNetworkListeners() {
 
-        NetwrokEvents event = network.getEvent();
+        NetworkEvents event = network.getEvent();
 
         event.onNeuronAdded(this::addNeuron);
 //        event.onNeuronRemoved(Neuron::fireDeleted); // TODO: [event] moved to Network for now. consider design

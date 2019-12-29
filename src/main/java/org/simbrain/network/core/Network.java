@@ -23,7 +23,7 @@ import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
-import org.simbrain.network.events.NetwrokEvents;
+import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -76,7 +76,7 @@ public class Network {
         CONTINUOUS;
     }
 
-    private transient NetwrokEvents event = new NetwrokEvents(this);
+    private transient NetworkEvents event = new NetworkEvents(this);
 
     /**
      * List of "loose neurons" (as opposed to neurons in neuron groups)
@@ -901,7 +901,7 @@ public class Network {
 
         initIdManager();
 
-        event = new NetwrokEvents(this);
+        event = new NetworkEvents(this);
 
         // Initialize update manager
         updateManager.postUnmarshallingInit();
@@ -1311,7 +1311,7 @@ public class Network {
         return oneOffRun;
     }
 
-    public NetwrokEvents getEvent() {
+    public NetworkEvents getEvent() {
         return event;
     }
 

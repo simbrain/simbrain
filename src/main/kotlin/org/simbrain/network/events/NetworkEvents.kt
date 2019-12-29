@@ -15,7 +15,7 @@ import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
-class NetwrokEvents(network: Network) : Event(PropertyChangeSupport(network)) {
+class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 
     fun onUpdateCompleted(handler: Consumer<Boolean>) = "UpdateCompleted".itemAddedEvent(handler)
     fun fireUpdateCompleted(completed: Boolean) = "UpdateCompleted"(new = completed)

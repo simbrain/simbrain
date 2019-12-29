@@ -18,7 +18,7 @@
 package org.simbrain.network;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.events.NetwrokEvents;
+import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -65,7 +65,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        NetwrokEvents event = network.getEvent();
+        NetworkEvents event = network.getEvent();
 
         event.onNeuronAdded(n -> {
             setChangedSinceLastSave(true);

@@ -1002,7 +1002,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public void setClamped(final boolean clamped) {
         boolean old = clamped;
         this.clamped = clamped;
-        events.fireClammedChange(old, clamped);
+        events.fireClampedChange(old, clamped);
     }
 
     @Producible(defaultVisibility = false)

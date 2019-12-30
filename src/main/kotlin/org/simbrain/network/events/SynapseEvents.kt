@@ -7,6 +7,9 @@ import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
+/**
+ * @see NetworkEvents
+ */
 class SynapseEvents(val synapse: Synapse) : Event(PropertyChangeSupport(synapse)) {
 
     fun onDelete(handler: Consumer<Synapse>) = "Delete".itemRemovedEvent(handler)

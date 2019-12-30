@@ -15,6 +15,13 @@ import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
+/**
+ * All Network events are defined here. They are organized into "fire" functions to broadcast events and "onX" events
+ * to handle them.  They are placed next to each other so it is easy to track how event broadcasting and event handling
+ * are related.  Also note that the matching Strings are only used here.
+ *
+ * Add events are all handled here but delete events are within the object event classes.
+ */
 class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 
     fun onUpdateCompleted(handler: Consumer<Boolean>) = "UpdateCompleted".itemAddedEvent(handler)

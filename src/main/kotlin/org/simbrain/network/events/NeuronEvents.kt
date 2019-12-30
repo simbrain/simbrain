@@ -8,7 +8,11 @@ import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
+/**
+ * @see NetworkEvents
+ */
 class NeuronEvents(val neuron: Neuron) : Event(PropertyChangeSupport(neuron)) {
+
     fun onDelete(handler: Consumer<Neuron>) = "Delete".itemRemovedEvent(handler)
     fun fireDelete() = "Delete"(old = neuron)
 
@@ -21,8 +25,8 @@ class NeuronEvents(val neuron: Neuron) : Event(PropertyChangeSupport(neuron)) {
     fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
     fun fireLabelChange(old: String, new: String) = "LabelChange"(old = old, new = new)
 
-    fun onClammedChange(handler: BiConsumer<Boolean, Boolean>) = "ClammedChange".itemChangedEvent(handler)
-    fun fireClammedChange(old: Boolean, new: Boolean) = "ClammedChange"(old = old, new = new)
+    fun onClampedChange(handler: BiConsumer<Boolean, Boolean>) = "ClampedChange".itemChangedEvent(handler)
+    fun fireClampedChange(old: Boolean, new: Boolean) = "ClampedChange"(old = old, new = new)
 
     fun onUpdateRuleChange(handler: BiConsumer<NeuronUpdateRule, NeuronUpdateRule>) = "UpdateRuleChange".itemChangedEvent(handler)
     fun fireUpdateRuleChange(old: NeuronUpdateRule?, new: NeuronUpdateRule) = "UpdateRuleChange"(old = old, new = new)

@@ -19,9 +19,9 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.LocatableModel;
+import org.simbrain.network.events.NetworkTextEvents;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import java.awt.geom.Point2D;
 
 /**
  * <b>NetworkTextObject</b> is a string of text in a neural network, typically
@@ -73,7 +73,7 @@ public class NetworkTextObject implements LocatableModel {
     /**
      * Support for property change events.
      */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private transient NetworkTextEvents events = new NetworkTextEvents(this);
 
     /**
      * Construct the text object.
@@ -164,19 +164,11 @@ public class NetworkTextObject implements LocatableModel {
         this.bold = bold;
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-
     /**
      * Notify listeners that this object has been deleted.
      */
     public void fireDeleted() {
-        changeSupport.firePropertyChange("delete", this, null);
+        events.fireDelete();
     }
 
     /**
@@ -184,7 +176,7 @@ public class NetworkTextObject implements LocatableModel {
      * parent network has been added.
      */
     public void postUnmarshallingInit() {
-        changeSupport = new PropertyChangeSupport(this);
+        events = new NetworkTextEvents(this);
     }
 
     @Override
@@ -200,12 +192,16 @@ public class NetworkTextObject implements LocatableModel {
     @Override
     public void setCenterX(double newx) {
         x = newx;
-        changeSupport.firePropertyChange("moved", null, x);
+        events.fireLocationChange(getLocation(), new Point2D.Double(newx, y));
     }
 
     @Override
     public void setCenterY(double newy) {
         y = newy;
-        changeSupport.firePropertyChange("moved", null, y);
+        events.fireLocationChange(getLocation(), new Point2D.Double(x, newy));
+    }
+
+    public NetworkTextEvents getEvents() {
+        return events;
     }
 }

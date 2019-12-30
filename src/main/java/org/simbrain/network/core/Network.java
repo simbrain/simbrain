@@ -76,6 +76,9 @@ public class Network {
         CONTINUOUS;
     }
 
+    /**
+     * Network events are managed by this object.
+     */
     private transient NetworkEvents event = new NetworkEvents(this);
 
     /**

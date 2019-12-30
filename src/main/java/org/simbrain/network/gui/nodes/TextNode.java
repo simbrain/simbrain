@@ -19,17 +19,16 @@
 
 package org.simbrain.network.gui.nodes;
 
-import org.piccolo2d.PNode;
 import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.NetworkTextObject;
+import org.simbrain.network.events.NetworkTextEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -66,16 +65,11 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         this.addChild(pStyledText);
         this.setBounds(pStyledText.getBounds());
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
-        text.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("delete".equals(evt.getPropertyName())) {
-                    TextNode.this.removeFromParent();
-                } else if ("moved".equals(evt.getPropertyName())) {
-                    TextNode.this.pullViewPositionFromModel();
-                }
-            }
-        });
+
+        NetworkTextEvents events = text.getEvents();
+        events.onDelete(n -> removeFromParent());
+        events.onLocationChange((o, n) -> pullViewPositionFromModel());
+
         update();
         pushViewPositionToModel();
     }

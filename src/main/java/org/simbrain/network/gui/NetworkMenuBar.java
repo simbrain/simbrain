@@ -18,6 +18,17 @@
  */
 package org.simbrain.network.gui;
 
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.gui.actions.edit.*;
+import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
+import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
+import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction;
+import org.simbrain.network.gui.actions.selection.*;
+import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
+import org.simbrain.network.gui.actions.synapse.ShowWeightsAction;
+import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
+import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
+import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -88,20 +99,17 @@ public class NetworkMenuBar {
         // returnMenu.add(fileMenu);
 
         JMenu editMenu = new JMenu("Edit");
-        editMenu.add(actionManager.getAction("cut"));
-        editMenu.add(actionManager.getAction("copy"));
-        editMenu.add(actionManager.getAction("paste"));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction("delete"));
+        editMenu.add(actionManager.getAction(DeleteAction.class));
         JMenu selectionMenu = new JMenu("Select");
-        selectionMenu.add(actionManager.getAction("selectAll"));
-        selectionMenu.add(actionManager.getAction("selectAllWeights"));
-        selectionMenu.add(actionManager.getAction("selectAllNeurons"));
-        selectionMenu.add(actionManager.getAction("selectIncomingWeights"));
-        selectionMenu.add(actionManager.getAction("selectOutgoingWeights"));
+        selectionMenu.add(actionManager.getAction(SelectAllAction.class));
+        selectionMenu.add(actionManager.getAction(SelectAllWeightsAction.class));
+        selectionMenu.add(actionManager.getAction(SelectAllNeuronsAction.class));
+        selectionMenu.add(actionManager.getAction(SelectIncomingWeightsAction.class));
+        selectionMenu.add(actionManager.getAction(SelectOutgoingWeightsAction.class));
         editMenu.add(selectionMenu);
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction("clearNodes"));
+        editMenu.add(actionManager.getAction(ClearNodeActivationsAction.class));
         editMenu.addSeparator();
         editMenu.addSeparator();
         //editMenu.add(actionManager.getGroupAction());
@@ -114,29 +122,29 @@ public class NetworkMenuBar {
         // TODO
         //editMenu.add(actionManager.getSetAutoZoomToggleButton());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction("setNeuronProperties"));
-        editMenu.add(actionManager.getAction("setSynapseProperties"));
+        editMenu.add(actionManager.getAction(SetNeuronPropertiesAction.class));
+        editMenu.add(actionManager.getAction(SetSynapsePropertiesAction.class));
         returnMenu.add(editMenu);
 
         JMenu insertMenu = new JMenu("Insert");
-        insertMenu.add(actionManager.getAction("newNeuron"));
-        insertMenu.add(actionManager.getAction("newNeuronGroup"));
+        insertMenu.add(actionManager.getAction(NewNeuronAction.class));
+        insertMenu.add(actionManager.getAction(NeuronGroup.class));
         insertMenu.add(actionManager.getNewNetworkMenu());
         returnMenu.add(insertMenu);
 
         JMenu viewMenu = new JMenu("View");
         JMenu toolbarMenu = new JMenu("Toolbars");
-        toolbarMenu.add(actionManager.getMenuItem("showMainToolbar",
+        toolbarMenu.add(actionManager.getMenuItem(ShowMainToolBarAction.class,
                 networkPanel.getMainToolBar().isVisible()));
-        toolbarMenu.add(actionManager.getMenuItem("showRunToolbar",
+        toolbarMenu.add(actionManager.getMenuItem(ShowRunToolBarAction.class,
                 networkPanel.getRunToolBar().isVisible()));
-        toolbarMenu.add(actionManager.getMenuItem("showEditToolbar",
+        toolbarMenu.add(actionManager.getMenuItem(ShowEditToolBarAction.class,
                 networkPanel.getEditToolBar().isVisible()));
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
-        viewMenu.add(actionManager.getMenuItem("showPriorities",
+        viewMenu.add(actionManager.getMenuItem(ShowPrioritiesAction.class,
                 networkPanel.getPrioritiesVisible()));
-        viewMenu.add(actionManager.getMenuItem("showWeights",
+        viewMenu.add(actionManager.getMenuItem(ShowWeightsAction.class,
                 networkPanel.getWeightsVisible()));
         returnMenu.add(viewMenu);
 

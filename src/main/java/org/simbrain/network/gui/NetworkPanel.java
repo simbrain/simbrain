@@ -36,13 +36,23 @@ import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
+import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
+import org.simbrain.network.gui.actions.TestInputAction;
+import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
+import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
 import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
 import org.simbrain.network.gui.actions.edit.*;
+import org.simbrain.network.gui.actions.network.IterateNetworkAction;
+import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
+import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
+import org.simbrain.network.gui.actions.selection.SelectIncomingWeightsAction;
+import org.simbrain.network.gui.actions.selection.SelectOutgoingWeightsAction;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
+import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
@@ -989,7 +999,7 @@ public class NetworkPanel extends JPanel {
         contextMenu = new JPopupMenu();
 
         // Insert actions
-        contextMenu.add(actionManager.getAction("newNeuron"));
+        contextMenu.add(actionManager.getAction(NewNeuronAction.class));
         contextMenu.add(new AddNeuronsAction(this));
         contextMenu.add(new AddNeuronArrayAction(this));
         contextMenu.add(new AddMultiLayerNet(this));
@@ -1003,12 +1013,12 @@ public class NetworkPanel extends JPanel {
         contextMenu.addSeparator();
 
         // Connection actions
-        contextMenu.add(actionManager.getAction("clearSourceNeurons"));
-        contextMenu.add(actionManager.getAction("setSourceNeurons"));
+        contextMenu.add(actionManager.getAction(ClearSourceNeurons.class));
+        contextMenu.add(actionManager.getAction(SetSourceNeurons.class));
         contextMenu.addSeparator();
 
         // Preferences
-        contextMenu.add(actionManager.getAction("showNetworkPreferences"));
+        contextMenu.add(actionManager.getAction(ShowNetworkPreferencesAction.class));
 
         return contextMenu;
     }
@@ -1036,7 +1046,7 @@ public class NetworkPanel extends JPanel {
 
         CustomToolBar runTools = new CustomToolBar();
 
-        runTools.add(actionManager.getAction("iterateNetwork"));
+        runTools.add(actionManager.getAction(IterateNetworkAction.class));
         runTools.add(new ToggleButton(actionManager.getNetworkControlActions()));
 
         return runTools;
@@ -1073,8 +1083,8 @@ public class NetworkPanel extends JPanel {
         for (Action action : actionManager.getNetworkEditingActions()) {
             editTools.add(action);
         }
-        editTools.add(actionManager.getAction("clearNodes"));
-        editTools.add(actionManager.getAction("randomizeObjects"));
+        editTools.add(actionManager.getAction(ClearNodeActivationsAction.class));
+        editTools.add(actionManager.getAction(RandomizeObjectsAction.class));
 
         return editTools;
     }
@@ -1087,8 +1097,8 @@ public class NetworkPanel extends JPanel {
     public JMenu createAlignMenu() {
 
         JMenu alignSubMenu = new JMenu("Align");
-        alignSubMenu.add(actionManager.getAction("alignHorizontal"));
-        alignSubMenu.add(actionManager.getAction("alignVertical"));
+        alignSubMenu.add(actionManager.getAction(AlignHorizontalAction.class));
+        alignSubMenu.add(actionManager.getAction(AlignVerticalAction.class));
         return alignSubMenu;
 
     }
@@ -1101,8 +1111,8 @@ public class NetworkPanel extends JPanel {
     public JMenu createSpacingMenu() {
 
         JMenu spaceSubMenu = new JMenu("Space");
-        spaceSubMenu.add(actionManager.getAction("spaceHorizontal"));
-        spaceSubMenu.add(actionManager.getAction("spaceVertical"));
+        spaceSubMenu.add(actionManager.getAction(SpaceHorizontalAction.class));
+        spaceSubMenu.add(actionManager.getAction(SpaceVerticalAction.class));
         return spaceSubMenu;
 
     }
@@ -2331,13 +2341,13 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(new PasteAction(this));
         contextMenu.add(new DeleteAction(this));
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getAction("clearSourceNeurons"));
-        contextMenu.add(actionManager.getAction("setSourceNeurons"));
+        contextMenu.add(actionManager.getAction(ClearSourceNeurons.class));
+        contextMenu.add(actionManager.getAction(SetSourceNeurons.class));
         contextMenu.add(actionManager.getConnectionMenu());
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getAction("showLayoutDialog"));
+        contextMenu.add(actionManager.getAction(ShowLayoutDialogAction.class));
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getAction("showNetworkPreferences"));
+        contextMenu.add(actionManager.getAction(ShowNetworkPreferencesAction.class));
         contextMenu.addSeparator();
         // Add align and space menus if objects are selected
         if (this.getSelectedNodes(NeuronNode.class).size() > 1) {
@@ -2348,12 +2358,12 @@ public class NetworkPanel extends JPanel {
         contextMenu.add(new SetNeuronPropertiesAction(this));
         contextMenu.addSeparator();
         JMenu nodeSelectionMenu = new JMenu("Select");
-        nodeSelectionMenu.add(actionManager.getAction("selectIncomingWeights"));
-        nodeSelectionMenu.add(actionManager.getAction("selectOutgoingWeights"));
+        nodeSelectionMenu.add(actionManager.getAction(SelectIncomingWeightsAction.class));
+        nodeSelectionMenu.add(actionManager.getAction(SelectOutgoingWeightsAction.class));
         contextMenu.add(nodeSelectionMenu);
         contextMenu.addSeparator();
-        contextMenu.add(actionManager.getAction("testInput"));
-        contextMenu.add(actionManager.getAction("showWeightMatrix"));
+        contextMenu.add(actionManager.getAction(TestInputAction.class));
+        contextMenu.add(actionManager.getAction(ShowWeightMatrixAction.class));
         return contextMenu;
     }
 

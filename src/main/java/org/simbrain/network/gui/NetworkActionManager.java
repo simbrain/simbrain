@@ -19,6 +19,9 @@
 package org.simbrain.network.gui;
 
 import org.simbrain.network.connections.*;
+import org.simbrain.network.groups.NeuronCollection;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.actions.*;
 import org.simbrain.network.gui.actions.connection.ApplyConnectionAction;
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
@@ -42,12 +45,9 @@ import javax.swing.*;
 import java.util.*;
 
 /**
- * Network action manager.
- * <p>
- * This class contains references to all the actions for a NetworkPanel. In some cases, related actions are grouped
- * together, see e.g.
- * <code>getNetworkModeActions()</code>.
- * </p>
+ * Contains instances of actions, some of them which maintain state, for common
+ * reference across Simbrain. They are accessed using the name of the action class
+ * or a related class. Simply inspect the code if not sure.
  */
 public final class NetworkActionManager {
 
@@ -57,9 +57,9 @@ public final class NetworkActionManager {
     private final NetworkPanel networkPanel;
 
     /**
-     * Map storing string -> action associations
+     * Map storing class -> action associations
      */
-    private transient Map<String, AbstractAction> actions = new HashMap<>();
+    private transient Map<Class, AbstractAction> actions = new HashMap<>();
 
     /**
      * Create a new network action manager for the specified network panel.
@@ -74,89 +74,90 @@ public final class NetworkActionManager {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
 
-        actions.put("zoomToFitPage", new ZoomToFitPageAction(networkPanel));
-        actions.put("newNeuron", new NewNeuronAction(networkPanel));
-        actions.put("clearNodes", new ClearNodeActivationsAction(networkPanel));
-        actions.put("randomizeObjects", new RandomizeObjectsAction(networkPanel));
-        actions.put("selectAll", new SelectAllAction(networkPanel));
-        actions.put("delete", new DeleteAction(networkPanel));
-        actions.put("copy", new CopyAction(networkPanel));
-        actions.put("cut", new CutAction(networkPanel));
-        actions.put("paste", new PasteAction(networkPanel));
-        actions.put("iterateNetwork", new IterateNetworkAction(networkPanel));
-        actions.put("runNetwork", new RunNetworkAction(networkPanel));
-        actions.put("stopNetwork", new StopNetworkAction(networkPanel));
-        actions.put("showDebug", new ShowDebugAction(networkPanel));
-        actions.put("showNetworkPreferences", new ShowNetworkPreferencesAction(networkPanel));
-        actions.put("alignHorizontal", new AlignHorizontalAction(networkPanel));
-        actions.put("alignVertical", new AlignVerticalAction(networkPanel));
-        actions.put("spaceVertical", new SpaceVerticalAction(networkPanel));
-        actions.put("spaceHorizontal", new SpaceHorizontalAction(networkPanel));
-        actions.put("setNeuronProperties", new SetNeuronPropertiesAction(networkPanel));
-        actions.put("setSynapseProperties", new SetSynapsePropertiesAction(networkPanel));
-        actions.put("selectAllWeights", new SelectAllWeightsAction(networkPanel));
-        actions.put("selectAllNeurons", new SelectAllNeuronsAction(networkPanel));
-        actions.put("selectAll", new SelectAllAction(networkPanel));
-        actions.put("showMainToolbar", new ShowMainToolBarAction(networkPanel));
-        actions.put("showEditToolbar", new ShowEditToolBarAction(networkPanel));
-        actions.put("showRunToolbar", new ShowRunToolBarAction(networkPanel));
-        actions.put("clearSourceNeurons", new ClearSourceNeurons(networkPanel));
-        actions.put("setSourceNeurons", new SetSourceNeurons(networkPanel));
-        actions.put("selectIncomingWeights", new SelectIncomingWeightsAction(networkPanel));
-        actions.put("selectOutgoingWeights", new SelectOutgoingWeightsAction(networkPanel));
-        actions.put("setTextProperties", new SetTextPropertiesAction(networkPanel));
-        actions.put("showWeightMatrix", new ShowWeightMatrixAction(networkPanel));
-        actions.put("showAdjustSynapsesDialog", new ShowAdjustSynapsesDialog(networkPanel));
-        actions.put("showAdjustConnectivityDialog", new ShowAdjustConnectivityDialog(networkPanel));
-        actions.put("showUpdaterDialog", new ShowNetworkUpdaterDialog(networkPanel));
-        actions.put("testInput", new TestInputAction(networkPanel));
-        actions.put("showLayoutDialog", new ShowLayoutDialogAction(networkPanel));
-        actions.put("setSourceNeurons", new SetSourceNeurons(networkPanel));
-        actions.put("clearSourceNeurons", new ClearSourceNeurons(networkPanel));
-        actions.put("showPriorities", new ShowPrioritiesAction(networkPanel));
+        // Could have used reflection but it would only make things simpler on this page and the code below is easy to
+        // follow, and this class is easy to use externally
 
-        actions.put("conn_allToAll", new ApplyConnectionAction(networkPanel, new AllToAll(), "All to all"));
-        actions.put("conn_oneToOne", new ApplyConnectionAction(networkPanel, new OneToOne(), "One-to-one"));
-        actions.put("conn_radial", new ApplyConnectionAction(networkPanel, new RadialGaussian(), "Radial (Gaussian)"));
-        actions.put("conn_radialSimple", new ApplyConnectionAction(networkPanel, new RadialSimple(), "Radial (Simple)"));
-        actions.put("conn_sparse", new ApplyConnectionAction(networkPanel, new Sparse(), "Sparse"));
-        actions.put("showWeights", new ShowWeightsAction(networkPanel));
+        actions.put(ZoomToFitPageAction.class, new ZoomToFitPageAction(networkPanel));
+        actions.put(NewNeuronAction.class, new NewNeuronAction(networkPanel));
+        actions.put(ClearNodeActivationsAction.class, new ClearNodeActivationsAction(networkPanel));
+        actions.put(RandomizeObjectsAction.class, new RandomizeObjectsAction(networkPanel));
+        actions.put(SelectAllAction.class, new SelectAllAction(networkPanel));
+        actions.put(DeleteAction.class, new DeleteAction(networkPanel));
+        actions.put(CopyAction.class, new CopyAction(networkPanel));
+        actions.put(CutAction.class, new CutAction(networkPanel));
+        actions.put(PasteAction.class, new PasteAction(networkPanel));
+        actions.put(IterateNetworkAction.class, new IterateNetworkAction(networkPanel));
+        actions.put(RunNetworkAction.class, new RunNetworkAction(networkPanel));
+        actions.put(StopNetworkAction.class, new StopNetworkAction(networkPanel));
+        actions.put(ShowDebugAction.class, new ShowDebugAction(networkPanel));
+        actions.put(ShowNetworkPreferencesAction.class, new ShowNetworkPreferencesAction(networkPanel));
+        actions.put(AlignHorizontalAction.class, new AlignHorizontalAction(networkPanel));
+        actions.put(AlignVerticalAction.class, new AlignVerticalAction(networkPanel));
+        actions.put(SpaceVerticalAction.class, new SpaceVerticalAction(networkPanel));
+        actions.put(SpaceHorizontalAction.class, new SpaceHorizontalAction(networkPanel));
+        actions.put(SetNeuronPropertiesAction.class, new SetNeuronPropertiesAction(networkPanel));
+        actions.put(SetSynapsePropertiesAction.class, new SetSynapsePropertiesAction(networkPanel));
+        actions.put(SelectAllWeightsAction.class, new SelectAllWeightsAction(networkPanel));
+        actions.put(SelectAllNeuronsAction.class, new SelectAllNeuronsAction(networkPanel));
+        actions.put(ShowMainToolBarAction.class, new ShowMainToolBarAction(networkPanel));
+        actions.put(ShowEditToolBarAction.class, new ShowEditToolBarAction(networkPanel));
+        actions.put(ShowRunToolBarAction.class, new ShowRunToolBarAction(networkPanel));
+        actions.put(SelectIncomingWeightsAction.class, new SelectIncomingWeightsAction(networkPanel));
+        actions.put(SelectOutgoingWeightsAction.class, new SelectOutgoingWeightsAction(networkPanel));
+        actions.put(SetTextPropertiesAction.class, new SetTextPropertiesAction(networkPanel));
+        actions.put(ShowWeightMatrixAction.class, new ShowWeightMatrixAction(networkPanel));
+        actions.put(ShowAdjustSynapsesDialog.class, new ShowAdjustSynapsesDialog(networkPanel));
+        actions.put(ShowAdjustConnectivityDialog.class, new ShowAdjustConnectivityDialog(networkPanel));
+        actions.put(ShowNetworkUpdaterDialog.class, new ShowNetworkUpdaterDialog(networkPanel));
+        actions.put(TestInputAction.class, new TestInputAction(networkPanel));
+        actions.put(ShowLayoutDialogAction.class, new ShowLayoutDialogAction(networkPanel));
+        actions.put(SetSourceNeurons.class, new SetSourceNeurons(networkPanel));
+        actions.put(ClearSourceNeurons.class, new ClearSourceNeurons(networkPanel));
+        actions.put(ShowPrioritiesAction.class, new ShowPrioritiesAction(networkPanel));
+        actions.put(ShowWeightsAction.class, new ShowWeightsAction(networkPanel));
+        actions.put(SelectionEditModeAction.class, new SelectionEditModeAction(networkPanel));
+        actions.put(TextEditModeAction.class, new TextEditModeAction(networkPanel));
+        actions.put(WandEditModeAction.class, new WandEditModeAction(networkPanel));
 
-        actions.put("newNeuronGroup", new AddGroupAction(networkPanel,
+        actions.put(AllToAll.class, new ApplyConnectionAction(networkPanel, new AllToAll(), "All to all"));
+        actions.put(OneToOne.class, new ApplyConnectionAction(networkPanel, new OneToOne(), "One-to-one"));
+        actions.put(RadialGaussian.class, new ApplyConnectionAction(networkPanel, new RadialGaussian(), "Radial (Gaussian)"));
+        actions.put(RadialSimple.class, new ApplyConnectionAction(networkPanel, new RadialSimple(), "Radial (Simple)"));
+        actions.put(Sparse.class, new ApplyConnectionAction(networkPanel, new Sparse(), "Sparse"));
+
+        actions.put(NeuronGroup.class, new AddGroupAction(networkPanel,
                 NeuronGroupDialog.class, "Add Neuron Group"));
-        actions.put("addSynapseGroup", new AddSynapseGroupAction(networkPanel));
-        actions.put("addNeuronCollection", new NeuronCollectionAction(networkPanel));
+        actions.put(SynapseGroup.class, new AddSynapseGroupAction(networkPanel));
+        actions.put(NeuronCollection.class, new NeuronCollectionAction(networkPanel));
 
-        actions.put("selectionEditMode", new SelectionEditModeAction(networkPanel));
-        actions.put("textEditMode", new TextEditModeAction(networkPanel));
-        actions.put("wandEditMode", new WandEditModeAction(networkPanel));
 
     }
 
     public List<Action> getNetworkModeActions() {
-        return Arrays.asList(new Action[]{actions.get("selectionEditMode"), actions.get("textEditMode"),
-                actions.get("wandEditMode")});
+        return Arrays.asList(new Action[]{actions.get(SelectionEditModeAction.class), actions.get(TextEditModeAction.class),
+                actions.get(WandEditModeAction.class)});
     }
 
     public List<Action> getNetworkControlActions() {
-        return Arrays.asList(new Action[]{actions.get("runNetworkAction"), actions.get("stopNetworkAction")});
+        return Arrays.asList(new Action[]{actions.get(RunNetworkAction.class), actions.get(StopNetworkAction.class)});
     }
 
     public List<Action> getClipboardActions() {
-        return Arrays.asList(new Action[]{actions.get("copy"), actions.get("cut"), actions.get("paste")});
+        return Arrays.asList(new Action[]{actions.get(CopyAction.class), actions.get(CutAction.class),
+                actions.get(PasteAction.class)});
     }
 
     public List<Action> getNetworkEditingActions() {
-        return Arrays.asList(new Action[]{actions.get("newNeuron"), actions.get("delete")});
+        return Arrays.asList(new Action[]{actions.get(NewNeuronAction.class), actions.get(DeleteAction.class)});
     }
 
     public JMenu getConnectionMenu() {
         JMenu cm = new JMenu("Connect Neurons");
-        cm.add(getMenuItem("conn_allToAll"));
-        cm.add(getMenuItem("conn_oneToOne"));
-        cm.add(getMenuItem("conn_radial"));
-        cm.add(getMenuItem("conn_radialSimple"));
-        cm.add(getMenuItem("conn_sparse"));
+        cm.add(getMenuItem(AllToAll.class));
+        cm.add(getMenuItem(OneToOne.class));
+        cm.add(getMenuItem(RadialGaussian.class));
+        cm.add(getMenuItem(RadialSimple.class));
+        cm.add(getMenuItem(Sparse.class));
         return cm;
     }
 
@@ -181,26 +182,26 @@ public final class NetworkActionManager {
     /**
      * Returns on action based on its associated name (see above)
      */
-    public Action getAction(String name) {
-        return actions.get(name);
+    public Action getAction(Class clazz) {
+        return actions.get(clazz);
     }
 
     /**
      * Gets an action within a {@link JCheckBoxMenuItem}.  Can just be
      * used as a menu item without using the checkbox.
      */
-    public JCheckBoxMenuItem getMenuItem(String name) {
-        return new JCheckBoxMenuItem(getAction(name));
+    public JCheckBoxMenuItem getMenuItem(Class clazz) {
+        return new JCheckBoxMenuItem(getAction(clazz));
     }
 
     /**
      * Gets an action within a {@link JCheckBoxMenuItem}.
      *
-     * @param name    name of action
+     * @param clazz    class associated with action
      * @param checked whether it should initially be checked.
      */
-    public JCheckBoxMenuItem getMenuItem(String name, boolean checked) {
-        JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(getAction(name));
+    public JCheckBoxMenuItem getMenuItem(Class clazz, boolean checked) {
+        JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(getAction(clazz));
         menuItem.setSelected(checked);
         return menuItem;
     }

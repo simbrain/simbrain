@@ -21,16 +21,26 @@ package org.simbrain.network.desktop;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronCollection;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
+import org.simbrain.network.gui.actions.TestInputAction;
+import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
+import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
-import org.simbrain.network.gui.actions.edit.CopyAction;
-import org.simbrain.network.gui.actions.edit.CutAction;
-import org.simbrain.network.gui.actions.edit.DeleteAction;
-import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.gui.actions.edit.*;
 import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
-import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction;
+import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
+import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
+import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction;
+import org.simbrain.network.gui.actions.selection.*;
+import org.simbrain.network.gui.actions.synapse.*;
+import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
+import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
+import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
@@ -121,29 +131,28 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createEditMenu() {
 
         JMenu editMenu = new JMenu("Edit");
-
-        editMenu.add(actionManager.getAction("cut"));
-        editMenu.add(actionManager.getAction("copy"));
-        editMenu.add(actionManager.getAction("paste"));
-        editMenu.add(actionManager.getAction("delete"));
+        editMenu.add(actionManager.getAction(CutAction.class));
+        editMenu.add(actionManager.getAction(CopyAction.class));
+        editMenu.add(actionManager.getAction(PasteAction.class));
+        editMenu.add(actionManager.getAction(DeleteAction.class));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction("clearSourceNeurons"));
-        editMenu.add(actionManager.getAction("setSourceNeurons"));
+        editMenu.add(actionManager.getAction(ClearSourceNeurons.class));
+        editMenu.add(actionManager.getAction(SetSourceNeurons.class));
         editMenu.add(actionManager.getConnectionMenu());
-        editMenu.add(actionManager.getAction("addSynapseGroup"));
+        editMenu.add(actionManager.getAction(AddSynapseGroupAction.class));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction("randomizeObjects"));
-        editMenu.add(actionManager.getAction("showAdjustSynapsesDialog"));
+        editMenu.add(actionManager.getAction(RandomizeObjectsAction.class));
+        editMenu.add(actionManager.getAction(ShowAdjustSynapsesDialog.class));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction("showLayoutDialog"));
+        editMenu.add(actionManager.getAction(ShowLayoutDialogAction.class));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction("addNeuronCollection"));
+        editMenu.add(actionManager.getAction(NeuronCollection.class));
         editMenu.addSeparator();
         editMenu.add(createAlignMenu());
         editMenu.add(createSpacingMenu());
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction("setNeuronProperties"));
-        editMenu.add(actionManager.getAction("setSynapseProperties"));
+        editMenu.add(actionManager.getAction(SetNeuronPropertiesAction.class));
+        editMenu.add(actionManager.getAction(SetSynapsePropertiesAction.class));
         editMenu.addSeparator();
         editMenu.add(createSelectionMenu());
 
@@ -158,8 +167,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createInsertMenu() {
 
         JMenu insertMenu = new JMenu("Insert");
-        insertMenu.add(actionManager.getAction("newNeuron"));
-        insertMenu.add(actionManager.getAction("newNeuronGroup"));
+        insertMenu.add(actionManager.getAction(NewNeuronAction.class));
+        insertMenu.add(actionManager.getAction(NeuronGroup.class));
         insertMenu.addSeparator();
         insertMenu.add(new AddNeuronsAction(this));
         insertMenu.add(new AddNeuronArrayAction(this));
@@ -167,8 +176,8 @@ public class NetworkPanelDesktop extends NetworkPanel {
         insertMenu.addSeparator();
         insertMenu.add(actionManager.getNewNetworkMenu());
         insertMenu.addSeparator();
-        insertMenu.add(actionManager.getAction("testInput"));
-        insertMenu.add(actionManager.getAction("showWeightMatrix"));
+        insertMenu.add(actionManager.getAction(TestInputAction.class));
+        insertMenu.add(actionManager.getAction(ShowWeightMatrixAction.class));
         return insertMenu;
     }
 
@@ -180,18 +189,18 @@ public class NetworkPanelDesktop extends NetworkPanel {
     JMenu createViewMenu() {
         JMenu viewMenu = new JMenu("View");
         JMenu toolbarMenu = new JMenu("Toolbars");
-        toolbarMenu.add(actionManager.getMenuItem("showMainToolbar",
-                getMainToolBar().isVisible()));
-        toolbarMenu.add(actionManager.getMenuItem("showRunToolbar",
+        toolbarMenu.add(actionManager.getMenuItem(ShowRunToolBarAction.class,
                 getRunToolBar().isVisible()));
-        toolbarMenu.add(actionManager.getMenuItem("showEditToolbar",
+        toolbarMenu.add(actionManager.getMenuItem(ShowMainToolBarAction.class,
+                getMainToolBar().isVisible()));
+        toolbarMenu.add(actionManager.getMenuItem(ShowEditToolBarAction.class,
                 getEditToolBar().isVisible()));
 
         viewMenu.add(toolbarMenu);
         viewMenu.addSeparator();
-        viewMenu.add(actionManager.getMenuItem("showPriorities",
+        viewMenu.add(actionManager.getMenuItem(ShowPrioritiesAction.class,
                 getPrioritiesVisible()));
-        viewMenu.add(actionManager.getMenuItem("showWeights",
+        viewMenu.add(actionManager.getMenuItem(ShowWeightsAction.class,
                 getWeightsVisible()));
 
         return viewMenu;
@@ -204,11 +213,11 @@ public class NetworkPanelDesktop extends NetworkPanel {
      */
     public JMenu createSelectionMenu() {
         JMenu selectionMenu = new JMenu("Select");
-        selectionMenu.add(actionManager.getAction("selectAll"));
-        selectionMenu.add(actionManager.getAction("selectAllWeights"));
-        selectionMenu.add(actionManager.getAction("selectAllNeurons"));
-        selectionMenu.add(actionManager.getAction("selectIncomingWeights"));
-        selectionMenu.add(actionManager.getAction("selectOutgoingWeights"));
+        selectionMenu.add(actionManager.getAction(SelectAllAction.class));
+        selectionMenu.add(actionManager.getAction(SelectAllWeightsAction.class));
+        selectionMenu.add(actionManager.getAction(SelectAllNeuronsAction.class));
+        selectionMenu.add(actionManager.getAction(SelectIncomingWeightsAction.class));
+        selectionMenu.add(actionManager.getAction(SelectOutgoingWeightsAction.class));
         return selectionMenu;
     }
 

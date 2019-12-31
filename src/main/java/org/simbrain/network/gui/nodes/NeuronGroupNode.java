@@ -24,6 +24,7 @@ import org.simbrain.network.events.NetworkTextEvents;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
@@ -297,7 +298,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             }
         };
         menu.add(clearSource);
-        Action makeConnection = getNetworkPanel().getActionManager().getAction("addSynapseGroup");
+        Action makeConnection = getNetworkPanel().getActionManager().getAction(AddSynapseGroupAction.class);
         menu.add(makeConnection);
 
         // Add any custom menus for this type

@@ -896,7 +896,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * Label update needs to be reflected in GUI.
      */
     public void fireLabelUpdated() {
-        events.fireLabelChange( null , null);
+        events.fireLabelChange( null , label);
     }
 
     public String getStateInfo() {

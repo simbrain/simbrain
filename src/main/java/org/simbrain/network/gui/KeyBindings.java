@@ -18,6 +18,10 @@
  */
 package org.simbrain.network.gui;
 
+import org.simbrain.network.gui.actions.edit.TextEditModeAction;
+import org.simbrain.network.gui.actions.edit.WandEditModeAction;
+import org.simbrain.network.gui.actions.selection.SelectIncomingWeightsAction;
+import org.simbrain.network.gui.actions.selection.SelectOutgoingWeightsAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.piccolo.SceneGraphBrowser;
 
@@ -225,12 +229,12 @@ public class KeyBindings {
         // Text Mode
         inputMap.put(KeyStroke.getKeyStroke("T"), "textMode");
         panel.getActionMap().put("textMode",
-                panel.getActionManager().getAction("textEditMode"));
+                panel.getActionManager().getAction(TextEditModeAction.class));
 
         // Wand Mode
         inputMap.put(KeyStroke.getKeyStroke("I"), "wandMode");
         panel.getActionMap().put("wandMode",
-            panel.getActionManager().getAction("wandEditMode"));
+            panel.getActionManager().getAction(WandEditModeAction.class));
 
         // TODO: (Temporary) Add neuron array
         inputMap.put(KeyStroke.getKeyStroke("Y"), "neuronArray");
@@ -259,11 +263,11 @@ public class KeyBindings {
 
         inputMap.put(KeyStroke.getKeyStroke("3"), "selectIncoming");
         panel.getActionMap().put("selectIncoming",
-                panel.getActionManager().getAction("selectIncomingWeights"));
+                panel.getActionManager().getAction(SelectIncomingWeightsAction.class));
 
         inputMap.put(KeyStroke.getKeyStroke("4"), "selectOutgoing");
         panel.getActionMap().put("selectOutgoing",
-                panel.getActionManager().getAction("selectOutgoingWeights"));
+                panel.getActionManager().getAction(SelectOutgoingWeightsAction.class));
 
         inputMap.put(KeyStroke.getKeyStroke("5"), "showSynapses");
         panel.getActionMap().put("showSynapses", new AbstractAction() {

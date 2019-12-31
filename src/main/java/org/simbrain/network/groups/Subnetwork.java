@@ -92,19 +92,12 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         setLabel("Subnetwork");
     }
 
+    /**
+     * Delete this subnetwork and its children.
+     */
     public void delete() {
-        // TODO
-        //if (isMarkedForDeletion()) {
-        //    return;
-        //} else {
-        //    setMarkedForDeletion(true);
-        //}
-        //for (NeuronGroup neuronGroup : neuronGroupList) {
-        //    getParentNetwork().removeGroup(neuronGroup);
-        //}
-        //for (SynapseGroup synapseGroup : synapseGroupList) {
-        //    getParentNetwork().removeGroup(synapseGroup);
-        //}
+        neuronGroupList.forEach(ng -> getParentNetwork().removeNeuronGroup(ng));
+        synapseGroupList.forEach(sg -> getParentNetwork().removeSynapseGroup(sg));
         events.fireDelete();
     }
 

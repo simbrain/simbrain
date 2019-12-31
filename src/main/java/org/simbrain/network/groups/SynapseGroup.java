@@ -562,29 +562,15 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
     }
 
     public void delete() {
-        //TODO
-        //if (isMarkedForDeletion()) {
-        //    return;
-        //} else {
-        //    setMarkedForDeletion(true);
-        //}
-        //clear();
-        //getParentNetwork().removeGroup(this);
+        clear();
+        // Remove synapse group from any subnetwork it is a part of
         //if (hasParentGroup()) {
         //    if (getParentGroup() instanceof Subnetwork) {
         //        ((Subnetwork) getParentGroup()).removeSynapseGroup(this);
         //    }
-        //    if (getParentGroup().isEmpty()) {
-        //        getParentNetwork().removeGroup(getParentGroup());
-        //    }
         //}
-        //if (!targetNeuronGroup.isMarkedForDeletion()) {
-        //    targetNeuronGroup.removeIncomingSg(this);
-        //}
-        //if (!sourceNeuronGroup.isMarkedForDeletion()) {
-        //    sourceNeuronGroup.removeOutgoingSg(this);
-        //}
-        Runtime.getRuntime().gc();
+        targetNeuronGroup.removeIncomingSg(this);
+        sourceNeuronGroup.removeOutgoingSg(this);
         events.fireDelete();
     }
 

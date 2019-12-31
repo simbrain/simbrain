@@ -563,12 +563,6 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
 
     public void delete() {
         clear();
-        // Remove synapse group from any subnetwork it is a part of
-        //if (hasParentGroup()) {
-        //    if (getParentGroup() instanceof Subnetwork) {
-        //        ((Subnetwork) getParentGroup()).removeSynapseGroup(this);
-        //    }
-        //}
         targetNeuronGroup.removeIncomingSg(this);
         sourceNeuronGroup.removeOutgoingSg(this);
         events.fireDelete();

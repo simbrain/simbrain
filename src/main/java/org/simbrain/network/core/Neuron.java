@@ -144,13 +144,21 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     private transient ArrayList<Synapse> fanIn = new ArrayList<Synapse>(PRE_ALLOCATED_NUM_SYNAPSES);
 
     /**
-     * Center location of thie neuron.
-     *
-     * Currently the z-coordinate of this neuron in 3-space has no GUI implementation,
+     * x-coordinate of this neuron in 2-space.
+     */
+    private double x;
+
+    /**
+     * y-coordinate of this neuron in 2-space.
+     */
+    private double y;
+
+    /**
+     * z-coordinate of this neuron in 3-space. Currently no GUI implementation,
      * but fully useable for scripting. Like polarity this will get a full
      * implementation in the next development cycle... probably by 4.0.
      */
-    private Point3D location = new Point3D();
+    private double z;
 
     /**
      * If true then do not update this neuron.
@@ -791,12 +799,12 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     @Override
     public double getCenterX() {
-        return location.getX();
+        return x;
     }
 
     @Override
     public double getCenterY() {
-        return location.getY();
+        return y;
     }
 
     @Override
@@ -811,22 +819,23 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     // TODO: Remove below / replace with get centerX/Y
     public double getX() {
-        return location.getX();
+        return x;
     }
 
     public double getY() {
-        return location.getY();
+        return y;
     }
 
     public double getZ() {
-        return location.getZ();
+        return z;
     }
 
     public void setX(final double x, boolean fireEvent) {
-        Point3D oldLocation = location;
-        location = location.setCopyX(x);
+        Point3D oldLocation = new Point3D(this.x, y, z);
+        Point3D newLocation = new Point3D(x, y, z);
+        this.x = x;
         if(fireEvent) {
-            events.fireLocationChange(oldLocation, location);
+            events.fireLocationChange(oldLocation, newLocation);
         }
     }
 
@@ -835,10 +844,11 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     public void setY(final double y, boolean fireEvent) {
-        Point3D oldLocation = location;
-        location = location.setCopyY(y);
+        Point3D oldLocation = new Point3D(x, this.y, z);
+        Point3D newLocation = new Point3D(x, y, z);
+        this.y = y;
         if(fireEvent) {
-            events.fireLocationChange(oldLocation, location);
+            events.fireLocationChange(oldLocation, newLocation);
         }
     }
 
@@ -847,9 +857,10 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     public void setZ(final double z) {
-        Point3D oldLocation = location;
-        location = location.setCopyZ(z);
-        events.fireLocationChange(oldLocation, location);
+        Point3D oldLocation = new Point3D(x, y, this.z);
+        Point3D newLocation = new Point3D(x, y, z);
+        this.z = z;
+        events.fireLocationChange(oldLocation, newLocation);
     }
 
     /**
@@ -943,7 +954,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     @Override
     public String toString() {
-        return "Neuron [" + getId() + "] " + getType() + "  Activation = " + this.getActivation() + "  Location = (" + location.getX() + "," + location.getY() + ")\n";
+        return "Neuron [" + getId() + "] " + getType() + "  Activation = " + this.getActivation() + "  Location = (" + x + "," + y + ")\n";
     }
 
     /**
@@ -1023,7 +1034,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @return point representation of neuron position.
      */
     public Point2D getPosition() {
-        return location.getPoint2D();
+        return new Point2D.Double(x, y);
     }
 
     /**
@@ -1032,9 +1043,11 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @param position point location of neuron
      */
     public void setPosition(Point2D position) {
-        Point3D previousLocation = location;
-        location = location.setCopy2D(position);
-        events.fireLocationChange(previousLocation, location);
+        Point3D previousLocation = new Point3D(x, y, z);
+        x = position.getX();
+        y = position.getY();
+        Point3D newLocation = new Point3D(x, y, z);
+        events.fireLocationChange(previousLocation, newLocation);
     }
 
     /**
@@ -1240,7 +1253,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * {x, y, z} in that order.
      */
     public double [] getPosition3D() {
-        return new double[]{location.getX(), location.getY(), location.getZ()};
+        return new double[]{x, y, z};
     }
 
     @Override

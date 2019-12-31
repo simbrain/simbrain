@@ -19,6 +19,7 @@ import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
@@ -60,9 +61,9 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     private String label = "";
 
     /**
-     * Support for property change events.
+     * Event support.
      */
-    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    protected transient SubnetworkEvents events = new SubnetworkEvents(this);
 
     /**
      * List of neuron groups.
@@ -104,7 +105,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         //for (SynapseGroup synapseGroup : synapseGroupList) {
         //    getParentNetwork().removeGroup(synapseGroup);
         //}
-        changeSupport.firePropertyChange("delete", this, null);
+        events.fireDelete();
     }
 
     public boolean isEmpty() {
@@ -515,7 +516,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     public void setLabel(String label) {
         String oldLabel = this.label;
         this.label = label;
-        changeSupport.firePropertyChange("label", oldLabel, label);
+        events.fireLabelChange(oldLabel , label);
     }
 
     @Producible(defaultVisibility = false)
@@ -527,32 +528,9 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         return parentNetwork;
     }
 
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        if (changeSupport == null) {
-            changeSupport = new PropertyChangeSupport(this);
-        }
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-
-    /**
-     * Label update needs to be reflected in GUI.
-     */
-    public void fireLabelUpdated() {
-        changeSupport.firePropertyChange("label", null, null);
-    }
     
-    public void fireDeleted() {
-        changeSupport.firePropertyChange("delete", null, null);
-    }
     public void postUnmarshallingInit() {
-        if (changeSupport == null) {
-            changeSupport = new PropertyChangeSupport(this);
-        }
+        events = new SubnetworkEvents(this);
     }
 
     // todo
@@ -568,11 +546,13 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
 
     @Override
     public void setCenterX(double newx) {
-
     }
 
     @Override
     public void setCenterY(double newy) {
+    }
 
+    public SubnetworkEvents getEvents() {
+        return events;
     }
 }

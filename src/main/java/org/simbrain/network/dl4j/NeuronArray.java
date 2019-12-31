@@ -6,6 +6,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.events.NeuronArrayEvents;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -93,9 +94,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     private boolean renderActivations = true;
 
     /**
-     * Support for property change events.
+     * Event support.
      */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private transient NeuronArrayEvents events = new NeuronArrayEvents(this);
 
     /**
      * Construct a neuron array.
@@ -145,7 +146,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public void setLabel(String label) {
         String oldLabel = this.label;
         this.label = label;
-        changeSupport.firePropertyChange("label", oldLabel , label);
+        events.fireLabelChange(oldLabel , label);
     }
 
     /**
@@ -153,7 +154,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     public void randomize() {
         neuronArray = Nd4j.rand(1, numNodes).subi(0.5).mul(2);
-        changeSupport.firePropertyChange("updated", null , null);
+        events.fireUpdated();
     }
 
     public void update() {
@@ -161,7 +162,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         // TODO: This is just a place holder. Do something useful.
         // neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
 
-        changeSupport.firePropertyChange("updated", null, null);
+        events.fireUpdated();
     }
 
     public int getNumNodes() {
@@ -226,10 +227,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         this.outgoingWeightMatrices.remove(weightMatrix);
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
     public void setNeuronArray(INDArray data) {
         neuronArray = data;
         numNodes = data.columns();
@@ -237,7 +234,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Override
     public void onCommit() {
-        changeSupport.firePropertyChange("labelChanged", null, label);
+        events.fireLabelChange(null, label);
     }
 
     public String getLabel() {
@@ -254,7 +251,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     public void fireDeleted() {
         ArrayConnectable.super.fireDeleted();
-        changeSupport.firePropertyChange("delete", this, null);
+        events.fireDelete();
     }
 
     /**
@@ -266,7 +263,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public void offset(final double offsetX, final double offsetY) {
         x += offsetX;
         y += offsetY;
-        changeSupport.firePropertyChange("updated", null , null);
+        events.fireUpdated();
     }
 
     /**
@@ -274,7 +271,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      */
     public void clear() {
         neuronArray.assign(0);
-        changeSupport.firePropertyChange("updated", null , null);
+        events.fireUpdated();
     }
 
     /**
@@ -375,16 +372,16 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     public void fireLocationChange() {
-        changeSupport.firePropertyChange("moved", null, this.getLocation());
+        events.fireUpdated();
     }
 
     @Override
     public void onLocationChange(Runnable task) {
-        addPropertyChangeListener(evt -> {
-            if ("moved".equals(evt.getPropertyName())) {
-                task.run();
-            }
-        });
+        //addPropertyChangeListener(evt -> {
+        //    if ("moved".equals(evt.getPropertyName())) {
+        //        task.run();
+        //    }
+        //});
     }
 
     @Override
@@ -403,5 +400,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     @Override
     public String toString() {
         return "Array [" + getId() + "] with " + inputSize() + " components\n";
+    }
+
+    public NeuronArrayEvents getEvents() {
+        return events;
     }
 }

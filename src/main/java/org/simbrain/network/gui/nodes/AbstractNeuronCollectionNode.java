@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.SFileChooser;
@@ -46,18 +47,13 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
         outlinedObjects = new Outline();
         addChild(outlinedObjects);
 
-        group.addPropertyChangeListener(evt -> {
-            //System.out.println(evt.getPropertyName());
-            if ("delete".equals(evt.getPropertyName())) {
-                outlinedObjects.update(neuronNodes);
-            } else if ("moved".equals(evt.getPropertyName())) {
-                outlinedObjects.update(neuronNodes);
-            }  else if ("recordingStarted".equals(evt.getPropertyName())) {
-                updateText();
-            } else if ("recordingStopped".equals(evt.getPropertyName())) {
-                updateText();
-            }
-        });
+        NeuronCollectionEvents events = nc.getEvents();
+        events.onDelete(n -> removeFromParent());
+        events.onLabelChange((o,n) -> updateText());
+        //events.onMoved((o,n) -> syncToModel());
+        events.onRecordingStarted(this::updateText);
+        events.onRecordingStopped(this::updateText);
+
     }
 
     /**

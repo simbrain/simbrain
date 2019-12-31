@@ -208,8 +208,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         PBounds bounds = mainShape.getBounds();
         setBounds(bounds);
 
+        // Handle events
         NeuronEvents events = neuron.getEvents();
-
         events.onDelete(n -> removeFromParent());
         events.onActivationChange((o, n) -> {
             NeuronNode.this.updateColor();
@@ -219,7 +219,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         events.onClampedChange((o, n) -> updateClampStatus());
         events.onLocationChange((o, n) -> pullViewPositionFromModel());
         events.onUpdateRuleChange((o, n) -> updateShape());
-
 
     }
 

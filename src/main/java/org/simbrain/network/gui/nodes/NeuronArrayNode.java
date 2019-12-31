@@ -25,6 +25,8 @@ import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.dl4j.NeuronArray;
+import org.simbrain.network.events.NeuronArrayEvents;
+import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
@@ -114,19 +116,17 @@ public class NeuronArrayNode extends ScreenElement {
         this.neuronArray = na;
         networkPanel = np;
 
-        neuronArray.addPropertyChangeListener(evt -> {
-            if ("updated".equals(evt.getPropertyName())) {
-                renderArrayToActivationsImage();
-                updateInfoText();
-            } else if("labelChanged".equals(evt.getPropertyName())) {
-                //interactionBox.setText((String) evt.getNewValue());
-                //interactionBox.updateText();
-            } else if("delete".equals(evt.getPropertyName())) {
-                NeuronArrayNode.this.removeFromParent();
-            } else if ("moved".equals(evt.getPropertyName())) {
-                pullViewPositionFromModel();
-            }
+        NeuronArrayEvents events = neuronArray.getEvents();
+        events.onDelete(n -> removeFromParent());
+        events.onUpdated(() -> {
+            renderArrayToActivationsImage();
+            updateInfoText();
         });
+        events.onLabelChange((o,n) -> {
+            //interactionBox.setText((String) evt.getNewValue());
+            //interactionBox.updateText();
+        });
+        // TODO: Handle move events
 
         // Set up main items
         borderBox.setPickable(true);

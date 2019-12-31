@@ -133,7 +133,6 @@ public final class NetworkActionManager {
 
     }
 
-
     public List<Action> getNetworkModeActions() {
         return Arrays.asList(new Action[]{actions.get("selectionEditMode"), actions.get("textEditMode"),
                 actions.get("wandEditMode")});

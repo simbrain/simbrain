@@ -14,7 +14,7 @@ class NetworkTextEvents(val text: NetworkTextObject) : Event(PropertyChangeSuppo
 
     fun onDelete(handler: Consumer<NetworkTextObject>) = "Delete".itemRemovedEvent(handler)
     fun fireDelete() = "Delete"(old = text)
-    
+
     fun onLocationChange(handler: BiConsumer<Point2D, Point2D>) = "LocationChange".itemChangedEvent(handler)
     fun fireLocationChange(old: Point2D, new: Point2D) = "LocationChange"(old = old, new = new)
 

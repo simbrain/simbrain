@@ -143,7 +143,7 @@ public class BoltzmannMachine extends Subnetwork implements Trainable {
         }
 
         //setStateInfo("Temperature: " + Utils.round(getTemperature(), 2));
-        fireLabelUpdated();
+        // fireLabelUpdated();
     }
 
     @Override

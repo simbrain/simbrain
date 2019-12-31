@@ -49,7 +49,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
             firePositionChanged();
         }));
 
-        net.getEvent().onNeuronRemoved(n -> {
+        net.getEvents().onNeuronRemoved(n -> {
             removeNeuron(n);
             firePositionChanged();
             if (isEmpty()) {
@@ -75,7 +75,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
     public void addNeuron(Neuron neuron, boolean fireEvent) {
         addNeuron(neuron);
         if (fireEvent) {
-            changeSupport.firePropertyChange("add", this, null);
+            events.fireNeuronAdded(neuron);
         }
     }
 
@@ -88,8 +88,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
      * Call after deleting neuron collection from parent network.
      */
     public void delete() {
-        changeSupport.firePropertyChange("delete", this, null);
-        fireDeleted();
+        events.fireDelete();
     }
 
     /**

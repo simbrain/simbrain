@@ -65,7 +65,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        NetworkEvents event = network.getEvent();
+        NetworkEvents event = network.getEvents();
 
         event.onNeuronAdded(n -> {
             setChangedSinceLastSave(true);

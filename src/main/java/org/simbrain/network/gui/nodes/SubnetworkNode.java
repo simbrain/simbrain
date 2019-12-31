@@ -20,6 +20,9 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.events.NetworkTextEvents;
+import org.simbrain.network.events.SubnetworkEvents;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
@@ -90,13 +93,10 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
 
         setContextMenu(this.getDefaultContextMenu());
 
-        group.addPropertyChangeListener(evt -> {
-            if ("delete".equals(evt.getPropertyName())) {
-                SubnetworkNode.this.removeFromParent();
-            } else if ("label".equals(evt.getPropertyName())) {
-                SubnetworkNode.this.updateText();
-            }
-        });
+        SubnetworkEvents events = subnetwork.getEvents();
+        events.onDelete(n -> removeFromParent());
+        events.onLabelChange((o,n) -> updateText());
+
     }
 
     /**
@@ -117,20 +117,18 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
         outlinedObjects.add(node);
         if (node instanceof SynapseGroupNode) {
             node.lowerToBottom();
-            ((SynapseGroupNode) node).getSynapseGroup().addPropertyChangeListener(evt -> {
-                if ("delete".equals(evt.getPropertyName())) {
-                    outlinedObjects.remove(node);
-                    outline.update(outlinedObjects);
-                }
+            ((SynapseGroupNode) node).getSynapseGroup().getEvents().onDelete(sg -> {
+                outlinedObjects.remove(node);
+                outline.update(outlinedObjects);
             });
         } else if (node instanceof NeuronGroupNode) {
-            ((NeuronGroupNode) node).getNeuronGroup().addPropertyChangeListener(evt -> {
-                if ("delete".equals(evt.getPropertyName())) {
-                    outlinedObjects.remove(node);
-                    outline.update(outlinedObjects);
-                } else if ("moved".equals(evt.getPropertyName())) {
-                    outline.update(outlinedObjects);
-                }
+            NeuronGroup ng = ((NeuronGroupNode) node).getNeuronGroup();
+            ng.getEvents().onDelete(n -> {
+                outlinedObjects.remove(node);
+                outline.update(outlinedObjects);
+            });
+            ng.getEvents().onLocationChange((o,n) -> {
+                outline.update(outlinedObjects);
             });
         }
     }

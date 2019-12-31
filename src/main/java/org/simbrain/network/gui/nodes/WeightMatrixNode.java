@@ -7,6 +7,8 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.events.NetworkTextEvents;
+import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
@@ -162,17 +164,13 @@ public class WeightMatrixNode extends ScreenElement {
 
         setBounds(box.getFullBounds());
 
-        weightMatrix.addPropertyChangeListener(evt -> {
-            if ("updated".equals(evt.getPropertyName())) {
-                renderMatrixToImage();
-            } else if ("delete".equals(evt.getPropertyName())) {
-                WeightMatrixNode.this.removeFromParent();
-            } else if ("lineUpdated".equals(evt.getPropertyName())) {
-                updateLine();
-                updateImageBoxLocation();
-            }
+        WeightMatrixEvents events = weightMatrix.getEvents();
+        events.onDelete(w -> removeFromParent());
+        events.onUpdated(() -> renderMatrixToImage());
+        events.onLineUpdated(() -> {
+            updateLine();
+            updateImageBoxLocation();
         });
-
 
     }
 

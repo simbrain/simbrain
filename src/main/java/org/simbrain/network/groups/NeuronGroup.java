@@ -229,7 +229,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
 
         activationRecorder.stopRecording();
         removeAllNeurons();
-        changeSupport.firePropertyChange("delete", this, null);
+        events.fireDelete();
     }
 
     /**

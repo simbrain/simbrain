@@ -20,6 +20,8 @@ package org.simbrain.network.gui.nodes;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.events.NetworkTextEvents;
+import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -106,19 +108,13 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         // Must do this after it's added to properly locate it
         getInteractionBox().updateText();
 
-        group.addPropertyChangeListener(evt -> {
-
-            if ("delete".equals(evt.getPropertyName())) {
-                NeuronGroupNode.this.removeFromParent();
-            } else if ("label".equals(evt.getPropertyName())) {
-                NeuronGroupNode.this.updateText();
-            } else if ("moved".equals(evt.getPropertyName())) {
-                NeuronGroupNode.this.syncToModel();
-            }
-        });
+        NeuronCollectionEvents events = neuronGroup.getEvents();
+        // TODO: Aren't these repeats of AbstractNeuronCollectionNode?
+        events.onDelete(n -> removeFromParent());
+        events.onLabelChange((o,n) -> updateText());
+        //events.onMoved((o,n) -> syncToModel());
 
     }
-
 
     /**
      * Select the neurons in this group.

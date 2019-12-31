@@ -8,6 +8,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SimnetUtils;
@@ -63,7 +64,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     /**
      * Support for property change events.
      */
-    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    protected transient NeuronCollectionEvents events = new NeuronCollectionEvents(this);
 
     /**
      * References to neurons in this collection
@@ -245,7 +246,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * change.
      */
     public void firePositionChanged() {
-        changeSupport.firePropertyChange("moved", null, null);
+        //changeSupport.firePropertyChange("moved", null, null);
     }
 
     /**
@@ -517,11 +518,11 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
 
     @Override
     public void onLocationChange(Runnable task) {
-        changeSupport.addPropertyChangeListener(evt -> {
-            if ("moved".equals(evt.getPropertyName())) {
-                task.run();
-            }
-        });
+        //changeSupport.addPropertyChangeListener(evt -> {
+        //    if ("moved".equals(evt.getPropertyName())) {
+        //        task.run();
+        //    }
+        //});
     }
 
     /**
@@ -779,17 +780,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         //fireLabelUpdated();
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        if (changeSupport == null) {
-            changeSupport = new PropertyChangeSupport(this);
-        }
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-
     /**
      * See {@link SimnetUtils#getMinX(List)}
      */
@@ -864,19 +854,11 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         return subsamplingManager.getActivations();
     }
 
-    public void fireRecordingStarted() {
-        changeSupport.firePropertyChange("recordingStarted", null, null);
-    }
-
-    public void fireRecordingStopped() {
-        changeSupport.firePropertyChange("recordingStopped", null, null);
-    }
-
     @Consumable(defaultVisibility = false)
     public void setLabel(String label) {
         String oldLabel = this.label;
         this.label = label;
-        changeSupport.firePropertyChange("label", oldLabel , label);
+        events.fireLabelChange(oldLabel, label);
     }
 
     @Producible(defaultVisibility = false)
@@ -914,7 +896,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * Label update needs to be reflected in GUI.
      */
     public void fireLabelUpdated() {
-        changeSupport.firePropertyChange("label", null , null);
+        events.fireLabelChange( null , null);
     }
 
     public String getStateInfo() {
@@ -926,8 +908,10 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     }
 
     public void postUnmarshallingInit() {
-        if (changeSupport == null) {
-            changeSupport = new PropertyChangeSupport(this);
-        }
+        events = new NeuronCollectionEvents(this);
+    }
+
+    public NeuronCollectionEvents getEvents() {
+        return events;
     }
 }

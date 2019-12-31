@@ -7,6 +7,8 @@ import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.events.NeuronArrayEvents;
+import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -70,9 +72,9 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     private boolean enableRendering = true;
 
     /**
-     * Support for property change events.
+     * Event support.
      */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private transient WeightMatrixEvents events = new WeightMatrixEvents(this);
 
     /**
      * Construct the matrix.
@@ -98,7 +100,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
             // For now randomize new matrices between arrays
             randomize();
         }
-
 
     }
 
@@ -126,7 +127,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     public void setLabel(String label) {
         String oldLabel = this.label;
         this.label = label;
-        changeSupport.firePropertyChange("label", oldLabel , label);
+        events.fireLabelChange(oldLabel , label);
     }
 
     @Override
@@ -135,10 +136,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         ret += weightMatrix.rows() + "x" + weightMatrix.columns() + " matrix [" + getId() + "] ";
         ret += "  Connects " + source.getId() + " to " + target.getId() + "\n";
         return ret;
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
     }
 
     public ArrayConnectable getSource() {
@@ -164,13 +161,13 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
 
     public void setUseCurve(boolean useCurve) {
         this.useCurve = useCurve;
-        changeSupport.firePropertyChange("lineUpdated", null , null);
+        events.fireLineUpdated();
     }
 
     @Consumable
     public void setWeights(double[] newWeights) {
         weightMatrix.data().setData(newWeights);
-        changeSupport.firePropertyChange("updated", null , null);
+        events.fireUpdated();
     }
 
     public boolean isEnableRendering() {
@@ -198,7 +195,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
                     m.setUseCurve(false);
                     setUseCurve(false);
                 });
-        changeSupport.firePropertyChange("delete", this, null);
+        events.fireDelete();
     }
 
     /**
@@ -206,7 +203,11 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      */
     public void randomize() {
         weightMatrix = Nd4j.rand((int) source.outputSize(), (int) target.inputSize()).subi(0.5).mul(2);
-        changeSupport.firePropertyChange("updated", null , null);
+        events.fireUpdated();
+    }
+
+    public WeightMatrixEvents getEvents() {
+        return events;
     }
 
     //public Layer asLayer() {

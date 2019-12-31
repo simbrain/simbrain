@@ -425,7 +425,7 @@ public class NetworkPanel extends JPanel {
      */
     private void addNetworkListeners() {
 
-        NetworkEvents event = network.getEvent();
+        NetworkEvents event = network.getEvents();
 
         event.onNeuronAdded(this::addNeuron);
 //        event.onNeuronRemoved(Neuron::fireDeleted); // TODO: [event] moved to Network for now. consider design
@@ -443,9 +443,9 @@ public class NetworkPanel extends JPanel {
         event.onNeuronGroupAdded(this::addNeuronGroup);
         event.onNeuronGroupRemoved(AbstractNeuronCollection::fireDeleted); // TODO: [event]
         event.onSynapseGroupAdded(this::addSynapseGroup);
-        event.onSynapseGroupRemoved(SynapseGroup::fireDeleted); // TODO: [event]
+        //event.onSynapseGroupRemoved(SynapseGroup::fireDeleted); // TODO: [event]
         event.onSubnetworkAdded(this::addSubnetwork);
-        event.onSubnetworkRemoved(Subnetwork::fireDeleted); // TODO: [event]
+        //event.onSubnetworkRemoved(Subnetwork::fireDeleted); // TODO: [event]
         event.onNeuronArrayAdded(this::addNeuronArray);
         event.onNeuronArrayRemoved(NeuronArray::fireDeleted);
         event.onMultiLayerNetworkAdded(this::addMultiLayerNetwork);
@@ -839,7 +839,7 @@ public class NetworkPanel extends JPanel {
 
         // Update neuron positions. Must do this before synapse groups so neurons
         // are properly positioned
-//        network.fireNeuronsUpdated(subnet.getFlatNeuronList()); // TODO: [event]
+        // network.fireNeuronsUpdated(subnet.getFlatNeuronList()); // TODO: [event]
 
         // Add neuron and synapse group nodes to subnetwork node
         SubnetworkNode subnetNode = createSubnetworkNode(subnet);
@@ -861,7 +861,7 @@ public class NetworkPanel extends JPanel {
             synapseGroupNode.raiseToTop();
         }
 
-        subnet.fireLabelUpdated();
+        // subnet.fireLabelUpdated();
 
         // Update canvas
         repaint();

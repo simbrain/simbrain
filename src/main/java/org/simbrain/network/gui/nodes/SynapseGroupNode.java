@@ -19,6 +19,8 @@
 package org.simbrain.network.gui.nodes;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.events.NeuronEvents;
+import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel;
@@ -97,36 +99,23 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
 
         toggleSynapseVisibility();
 
-        group.getSourceNeuronGroup().addPropertyChangeListener(evt -> {
-            if ("moved".equals(evt.getPropertyName())) {
-                layoutChildren();
-            }
+        group.getSourceNeuronGroup().getEvents().onLocationChange((o,n) -> layoutChildren());
+        group.getTargetNeuronGroup().getEvents().onLocationChange((o,n) -> layoutChildren());
+
+        // Handle events
+        SynapseGroupEvents events = synapseGroup.getEvents();
+        events.onDelete(s -> removeFromParent());
+        events.onLabelChange((o,n) -> updateText());
+        events.onVisibilityChange(this::toggleSynapseVisibility);
+        events.onSynapseAdded(s -> {
+            SynapseGroupNode.this.getNetworkPanel().addSynapse(s);
+            refreshVisible();
+        });
+        events.onSynapseRemoved(s -> {
+            SynapseGroupNode.this.getNetworkPanel().removeSynapse(s);
+            refreshVisible();
         });
 
-        group.getTargetNeuronGroup().addPropertyChangeListener(evt -> {
-            if ("moved".equals(evt.getPropertyName())) {
-                layoutChildren();
-            }
-        });
-
-        group.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("delete".equals(evt.getPropertyName())) {
-                    SynapseGroupNode.this.removeFromParent();
-                } else if ("label".equals(evt.getPropertyName())) {
-                    SynapseGroupNode.this.updateText();
-                } else if ("synapseVisibilityChanged".equals(evt.getPropertyName())) {
-                    SynapseGroupNode.this.toggleSynapseVisibility();
-                } else if ("synapseAdded".equals(evt.getPropertyName())) {
-                    SynapseGroupNode.this.getNetworkPanel().addSynapse(((Synapse) evt.getNewValue()));
-                    refreshVisible();
-                } else if ("synapseRemoved".equals(evt.getPropertyName())) {
-                    SynapseGroupNode.this.getNetworkPanel().removeSynapse((Synapse) evt.getOldValue());
-                    refreshVisible();
-                }
-            }
-        });
     }
 
     private void removeArrows() {

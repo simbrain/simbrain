@@ -77,9 +77,9 @@ public class Network {
     }
 
     /**
-     * Network events are managed by this object.
+     * Handle network events.
      */
-    private transient NetworkEvents event = new NetworkEvents(this);
+    private transient NetworkEvents events = new NetworkEvents(this);
 
     /**
      * List of "loose neurons" (as opposed to neurons in neuron groups)
@@ -212,7 +212,7 @@ public class Network {
     public void update() {
 
         // TODO: Why is this here and not at end?
-        event.fireUpdateCompleted(false);
+        events.fireUpdateCompleted(false);
 
         // Main update
         updateManager.invokeAllUpdates();
@@ -226,7 +226,7 @@ public class Network {
 
         //clearInputs();
         updateTime();
-        event.fireUpdateTimeDisplay(false);
+        events.fireUpdateTimeDisplay(false);
         iterCount++;
         setUpdateCompleted(true);
 
@@ -361,7 +361,7 @@ public class Network {
     public void addLooseNeuron(Neuron neuron) {
         looseNeurons.add(neuron);
         updatePriorityList();
-        event.fireNeuronAdded(neuron);
+        events.fireNeuronAdded(neuron);
     }
 
     /**
@@ -369,12 +369,12 @@ public class Network {
      */
     public void addNeuronArray(NeuronArray na) {
         naList.add(na);
-        event.fireNeuronArrayAdded(na);
+        events.fireNeuronArrayAdded(na);
     }
 
     public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
         multiLayerNetworks.add(network);
-        event.fireMultiLayerNetworkAdded(network);
+        events.fireMultiLayerNetworkAdded(network);
     }
 
     /**
@@ -386,7 +386,7 @@ public class Network {
         synapse.initSpikeResponder();
         looseSynapses.add(synapse);
         synapse.setId(idManager.getId(Synapse.class));
-        event.fireSynapseAdded(synapse);
+        events.fireSynapseAdded(synapse);
     }
 
     /**
@@ -430,7 +430,7 @@ public class Network {
 
         // Notify listeners that this neuron has been deleted
         if (fireEvent) {
-            event.fireNeuronRemoved(toDelete);
+            events.fireNeuronRemoved(toDelete);
             toDelete.getEvents().fireDelete();
         }
     }
@@ -438,19 +438,19 @@ public class Network {
     public void removeNeuronGroup(NeuronGroup ng) {
         neuronGroups.remove(ng);
         ng.delete();
-        event.fireNeuronGroupRemoved(ng);
+        events.fireNeuronGroupRemoved(ng);
     }
 
     public void removeSynapseGroup(SynapseGroup sg) {
         synapseGroups.remove(sg);
         sg.delete();
-        event.fireSynapseGroupRemoved(sg);
+        events.fireSynapseGroupRemoved(sg);
     }
 
     public void removeSubnetwork(Subnetwork subnet) {
         subnetworks.remove(subnet);
         subnet.delete();
-        event.fireSubnetworkRemoved(subnet);
+        events.fireSubnetworkRemoved(subnet);
     }
 
 
@@ -462,7 +462,7 @@ public class Network {
     public void removeNeuronCollection(NeuronCollection nc) {
         neuronCollectionSet.remove(nc);
         nc.delete();
-        event.fireNeuronCollectionRemoved(nc);
+        events.fireNeuronCollectionRemoved(nc);
     }
 
     /**
@@ -470,7 +470,7 @@ public class Network {
      */
     public void removeNeuronArray(NeuronArray na) {
         naList.remove(na);
-        event.fireNeuronArrayRemoved(na);
+        events.fireNeuronArrayRemoved(na);
     }
 
     /**
@@ -481,7 +481,7 @@ public class Network {
             return;
         }
         weightMatrices.remove(wm);
-        event.fireWeightMatrixRemoved(wm);
+        events.fireWeightMatrixRemoved(wm);
     }
 
     /**
@@ -513,7 +513,7 @@ public class Network {
             SynapseGroup parentGroup = toDelete.getParentGroup();
             parentGroup.removeSynapse(toDelete);
             if (parentGroup.isDisplaySynapses()) {
-                event.fireSynapseRemoved(toDelete);
+                events.fireSynapseRemoved(toDelete);
             }
             // TODO
             //if (parentGroup.isEmpty()) {
@@ -522,7 +522,7 @@ public class Network {
         } else {
             looseSynapses.remove(toDelete);
             // Notify listeners that this synapse has been deleted
-            event.fireSynapseRemoved(toDelete);
+            events.fireSynapseRemoved(toDelete);
             toDelete.getEvents().fireDelete();
         }
     }
@@ -570,7 +570,7 @@ public class Network {
             }
         }
         neuronCollectionSet.add(nc);
-        event.fireNeuronCollectionAdded(nc);
+        events.fireNeuronCollectionAdded(nc);
     }
 
     /**
@@ -728,17 +728,17 @@ public class Network {
 
     public void addSynapseGroup(final SynapseGroup sg) {
         synapseGroups.add(sg);
-        event.fireSynapseGroupAdded(sg);
+        events.fireSynapseGroupAdded(sg);
     }
 
     public void addNeuronGroup(final NeuronGroup ng) {
         neuronGroups.add(ng);
-        event.fireNeuronGroupAdded(ng);
+        events.fireNeuronGroupAdded(ng);
     }
 
     public void addSubnetwork(Subnetwork net) {
         subnetworks.add(net);
-        event.fireSubnetworkAdded(net);
+        events.fireSubnetworkAdded(net);
     }
 
     ///**
@@ -904,7 +904,7 @@ public class Network {
 
         initIdManager();
 
-        event = new NetworkEvents(this);
+        events = new NetworkEvents(this);
 
         // Initialize update manager
         updateManager.postUnmarshallingInit();
@@ -1129,7 +1129,7 @@ public class Network {
      */
     public void addText(final NetworkTextObject text) {
         textList.add(text);
-        event.fireTextAdded(text);
+        events.fireTextAdded(text);
     }
 
     /**
@@ -1139,7 +1139,7 @@ public class Network {
      */
     public void deleteText(final NetworkTextObject text) {
         textList.remove(text);
-        event.fireTextRemoved(text);
+        events.fireTextRemoved(text);
     }
 
     /**
@@ -1314,8 +1314,8 @@ public class Network {
         return oneOffRun;
     }
 
-    public NetworkEvents getEvent() {
-        return event;
+    public NetworkEvents getEvents() {
+        return events;
     }
 
     public List<MultiLayerNet> getMultiLayerNetworks() {

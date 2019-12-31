@@ -184,7 +184,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
 
     private void initListeners() {
 
-        NetworkEvents event = network.getEvent();
+        NetworkEvents event = network.getEvents();
 
         event.onNeuronAdded(n -> {
             pendingOperations.incrementAndGet();

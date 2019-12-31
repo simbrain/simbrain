@@ -20,6 +20,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
@@ -74,9 +75,9 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
     private String label = "TODO";
 
     /**
-     * Support for property change events.
+     * Event support
      */
-    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    protected transient SynapseGroupEvents events = new SynapseGroupEvents(this);
 
     /**
      * The <b>default>/b> polarized randomizer associated with excitatory.
@@ -451,7 +452,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
             delete();
             throw new IllegalStateException(errMessage);
         }
-        changeSupport.firePropertyChange("synapseVisibilityChanged", null, displaySynapses);
+        events.fireVisibilityChange();
     }
 
     /**
@@ -584,7 +585,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         //    sourceNeuronGroup.removeOutgoingSg(this);
         //}
         Runtime.getRuntime().gc();
-        changeSupport.firePropertyChange("delete", this, null);
+        events.fireDelete();
     }
 
     @Override
@@ -613,7 +614,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
 
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
-        changeSupport.firePropertyChange("synapseVisibilityChanged", null, displaySynapses);
+        events.fireVisibilityChange();
     }
 
     public boolean isDisplaySynapses() {
@@ -1753,7 +1754,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
      */
     public void postUnmarshallingInit() {
 
-        changeSupport = new PropertyChangeSupport(this);
+        events = new SynapseGroupEvents(this);
 
         // Rebuild weight matrix if needed.
         if (this.isUseGroupLevelSettings() && compressedMatrixRep != null) {
@@ -1851,7 +1852,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
      * @param synapse synapse to add
      */
     private void fireSynapseAdded(Synapse synapse) {
-        changeSupport.firePropertyChange("synapseAdded", this, synapse);
+        events.fireSynapseAdded(synapse);
     }
 
     /**
@@ -1860,14 +1861,14 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
      * @param synapse synapse to remove
      */
     private void fireSynapseRemoved(Synapse synapse) {
-        changeSupport.firePropertyChange("synapseRemoved", synapse, null);
+        events.fireSynapseRemoved(synapse);
     }
 
     @Consumable(defaultVisibility = false)
     public void setLabel(String label) {
         String oldLabel = this.label;
         this.label = label;
-        changeSupport.firePropertyChange("label", oldLabel , label);
+        events.fireLabelChange(oldLabel , label);
     }
 
     @Producible(defaultVisibility = false)
@@ -1879,21 +1880,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         return parentNetwork;
     }
 
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        if (changeSupport == null) {
-            changeSupport = new PropertyChangeSupport(this);
-        }
-        changeSupport.addPropertyChangeListener(listener);
+    public SynapseGroupEvents getEvents() {
+        return events;
     }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-
-    public void fireDeleted() {
-        changeSupport.firePropertyChange("delete", null, displaySynapses);
-    }
-
-
 }

@@ -20,7 +20,6 @@ package org.simbrain.network.gui.nodes;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.NetworkTextEvents;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -388,9 +387,9 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/RedX_small.png"));
             putValue(NAME, "Remove Neuron Group");
             putValue(SHORT_DESCRIPTION, "Remove neuron group");
-            getNetworkPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
-            getNetworkPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), this);
-            getNetworkPanel().getActionMap().put(this, this);
+            // getNetworkPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
+            // getNetworkPanel().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), this);
+            // getNetworkPanel().getActionMap().put(this, this);
 
         }
 

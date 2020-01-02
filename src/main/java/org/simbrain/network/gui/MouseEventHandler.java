@@ -29,8 +29,10 @@ import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
-import org.simbrain.network.LocatableModel;
-import org.simbrain.network.gui.nodes.*;
+import org.simbrain.network.gui.nodes.InteractionBox;
+import org.simbrain.network.gui.nodes.NeuronNode;
+import org.simbrain.network.gui.nodes.ScreenElement;
+import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.SelectionMarquee;
@@ -145,7 +147,7 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
         // Cases where nothing was clicked on
         if (noObjectWasClickedOn()) {
             if (event.isShiftDown()) {
-                priorSelection = new ArrayList(networkPanel.getSelectedNodes());
+                priorSelection = new ArrayList<>(networkPanel.getSelectedNodes());
             } else {
                 // Don't clear selection when panning screen
                 if (!event.isMetaDown()) {
@@ -276,6 +278,8 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
                 }
             }
         }
+
+        networkPanel.getNetwork().getEvents().fireBatchLocationUpdateCompleted();
 
     }
 

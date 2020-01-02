@@ -23,8 +23,6 @@ import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -232,21 +230,13 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      */
     public void offset(final double offsetX, final double offsetY) {
         for (Neuron neuron : neuronList) {
-            neuron.setX(neuron.getX() + offsetX);
-            neuron.setY(neuron.getY() + offsetY);
+            neuron.setX(neuron.getX() + offsetX, false);
+            neuron.setY(neuron.getY() + offsetY, false);
             // TODO Below improves performance but there is a problem when creating neuron groups
             //neuron.setX(neuron.getX() + offsetX, false);
             //neuron.setY(neuron.getY() + offsetY, false);
         }
-        firePositionChanged();
-    }
-
-    /**
-     * Node positions within group changed and GUI should be notified of this
-     * change.
-     */
-    public void firePositionChanged() {
-        //changeSupport.firePropertyChange("moved", null, null);
+        events.fireLocationChange(new Point2D.Double(), new Point2D.Double(offsetX, offsetY));
     }
 
     /**
@@ -278,7 +268,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * Add listener to indicated neuron.
      */
     private void addListener(Neuron n) {
-        n.getEvents().onLocationChange((ol, nl) -> firePositionChanged());
+        n.getEvents().onLocationChange((ol, nl) -> events.fireLocationChange(ol.getPoint2D(), nl.getPoint2D()));
     }
 
     /**

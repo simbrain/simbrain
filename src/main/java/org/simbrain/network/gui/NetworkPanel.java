@@ -839,7 +839,7 @@ public class NetworkPanel extends JPanel {
      */
     private void addSubnetwork(Subnetwork subnet) {
 
-        Set<PNode> nodes = new HashSet<PNode>();
+        Set<ScreenElement> nodes = new HashSet<>();
         // Add neuron groups
         for (NeuronGroup neuronGroup : subnet.getNeuronGroupList()) {
             addNeuronGroup(neuronGroup);
@@ -853,7 +853,7 @@ public class NetworkPanel extends JPanel {
 
         // Add neuron and synapse group nodes to subnetwork node
         SubnetworkNode subnetNode = createSubnetworkNode(subnet);
-        for (PNode node : nodes) {
+        for (ScreenElement node : nodes) {
             subnetNode.addNode(node);
         }
 
@@ -866,7 +866,7 @@ public class NetworkPanel extends JPanel {
             addSynapseGroup(synapseGroup);
         }
         for (SynapseGroup synapseGroup : subnet.getSynapseGroupList()) {
-            PNode synapseGroupNode = objectNodeMap.get(synapseGroup);
+            ScreenElement synapseGroupNode = objectNodeMap.get(synapseGroup);
             nodes.add(synapseGroupNode);
             synapseGroupNode.raiseToTop();
         }
@@ -1203,6 +1203,9 @@ public class NetworkPanel extends JPanel {
             }
 
         }
+
+        network.getEvents().fireBatchDeletionCompleted();
+
         // Zoom events are costly so only zoom after main deletion events
         zoomToFitPage(true);
 

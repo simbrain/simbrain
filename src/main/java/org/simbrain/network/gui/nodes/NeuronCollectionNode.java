@@ -29,14 +29,11 @@ import org.simbrain.util.SimpleFrame;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -96,7 +93,6 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     @Override
     public void offset(double dx, double dy) {
         super.offset(dx, dy);
-        neuronCollection.firePositionChanged();
     }
 
     @Override

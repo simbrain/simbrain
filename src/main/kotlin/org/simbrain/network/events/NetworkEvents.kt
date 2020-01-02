@@ -80,5 +80,11 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
     fun onWeightMatrixRemoved(handler: Consumer<WeightMatrix>) = "WeightMatrixRemoved".itemRemovedEvent(handler)
     fun fireWeightMatrixRemoved(weightMatrix: WeightMatrix) = "WeightMatrixRemoved"(old = weightMatrix)
 
+    fun onBatchDeletionCompleted(handler: Runnable) = "BatchDeletionCompleted".event(handler)
+    fun fireBatchDeletionCompleted() = "BatchDeletionCompleted"()
+
+    fun onBatchLocationUpdateCompleted(handler: Runnable) = "BatchLocationUpdateCompleted".event(handler)
+    fun fireBatchLocationUpdateCompleted() = "BatchLocationUpdateCompleted"()
+
 
 }

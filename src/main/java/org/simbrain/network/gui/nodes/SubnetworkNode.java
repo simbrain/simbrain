@@ -20,7 +20,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.NetworkTextEvents;
+import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -72,7 +72,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
     /**
      * The outlined objects
      */
-    private List<PNode> outlinedObjects = new ArrayList<>();
+    private List<ScreenElement> outlinedObjects = new ArrayList<>();
 
     /**
      * Create a subnetwork node.
@@ -97,6 +97,10 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
         events.onDelete(n -> removeFromParent());
         events.onLabelChange((o,n) -> updateText());
 
+        NetworkEvents networkEvents = networkPanel.getNetwork().getEvents();
+        networkEvents.onBatchDeletionCompleted(outline::processUpdate);
+        networkEvents.onBatchLocationUpdateCompleted(outline::processUpdate);
+
     }
 
     /**
@@ -104,7 +108,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
      */
     @Override
     public void layoutChildren() {
-        outline.update(outlinedObjects);
+        outline.enqueueUpdate(outlinedObjects);
         interactionBox.setOffset(outline.getFullBounds().getX()
                 + Outline.ARC_SIZE / 2,
                 outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
@@ -113,24 +117,26 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
     /**
      * Need to maintain a list of nodes which are outlined
      */
-    public void addNode(PNode node) {
+    public void addNode(ScreenElement node) {
         outlinedObjects.add(node);
         if (node instanceof SynapseGroupNode) {
             node.lowerToBottom();
             ((SynapseGroupNode) node).getSynapseGroup().getEvents().onDelete(sg -> {
                 outlinedObjects.remove(node);
-                outline.update(outlinedObjects);
+                outline.enqueueUpdate(outlinedObjects);
             });
         } else if (node instanceof NeuronGroupNode) {
             NeuronGroup ng = ((NeuronGroupNode) node).getNeuronGroup();
             ng.getEvents().onDelete(n -> {
                 outlinedObjects.remove(node);
-                outline.update(outlinedObjects);
+                outline.enqueueUpdate(outlinedObjects);
             });
             ng.getEvents().onLocationChange((o,n) -> {
-                outline.update(outlinedObjects);
+                outline.enqueueUpdate(outlinedObjects);
             });
         }
+        outline.enqueueUpdate(outlinedObjects);
+        outline.processUpdate();
     }
 
     /**
@@ -398,7 +404,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
                 node.offset(dx, dy);
             }
         }
-        outline.update(outlinedObjects);
+        outline.enqueueUpdate(outlinedObjects);
     }
 
     @Override

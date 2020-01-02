@@ -46,12 +46,12 @@ public class NeuronCollection extends AbstractNeuronCollection {
         subsamplingManager.resetIndices();
 
         neurons.forEach(n -> n.getEvents().onLocationChange((ol, nl) -> {
-            firePositionChanged();
+            events.fireLocationChange(ol.getPoint2D(), nl.getPoint2D());
         }));
 
         net.getEvents().onNeuronRemoved(n -> {
             removeNeuron(n);
-            firePositionChanged();
+            events.fireLocationChange(new Point2D.Double(), new Point2D.Double());
             if (isEmpty()) {
                 delete();
             }
@@ -66,10 +66,10 @@ public class NeuronCollection extends AbstractNeuronCollection {
      */
     public void offset(final double offsetX, final double offsetY) {
         for (Neuron neuron : getNeuronList()) {
-            neuron.setX(neuron.getX() + offsetX);
-            neuron.setY(neuron.getY() + offsetY);
+            neuron.setX(neuron.getX() + offsetX, false);
+            neuron.setY(neuron.getY() + offsetY, false);
         }
-        firePositionChanged();
+        events.fireLocationChange(new Point2D.Double(), new Point2D.Double(offsetX, offsetY));
     }
 
     public void addNeuron(Neuron neuron, boolean fireEvent) {

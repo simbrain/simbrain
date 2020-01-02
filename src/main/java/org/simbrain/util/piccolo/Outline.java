@@ -3,6 +3,7 @@ package org.simbrain.util.piccolo;
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
+import org.simbrain.network.gui.nodes.ScreenElement;
 
 import java.awt.*;
 import java.util.Collection;
@@ -27,6 +28,8 @@ public class Outline extends PNode {
      */
     private PPath outline = PPath.createRoundRectangle(0, 0, 0, 0, ARC_SIZE, ARC_SIZE);
 
+    private Collection<? extends ScreenElement> outlinedNodes = null;
+
     /**
      * Construct the outline object.
      */
@@ -37,20 +40,28 @@ public class Outline extends PNode {
         setPickable(false);
     }
 
+    public void processUpdate() {
+        if (outlinedNodes != null) {
+            PBounds bounds = new PBounds();
+            for (ScreenElement node : outlinedNodes) {
+                bounds.add(node.getFullBoundsReference());
+            }
+            updateBound(bounds.x, bounds.y, bounds.width, bounds.height);
+            outlinedNodes = null;
+        }
+    }
+
     /**
      * Update the bounds of the outlined objects, which are passed in as an argument.
      */
-    public void update(Collection<? extends PNode> outlinedNodes) {
-        PBounds bounds = new PBounds();
-        for (PNode node : outlinedNodes) {
-            bounds.add(node.getFullBoundsReference());
-        }
-        updateBound(bounds.x, bounds.y, bounds.width, bounds.height);
+    public void enqueueUpdate(Collection<? extends ScreenElement> outlinedNodes) {
+        this.outlinedNodes = outlinedNodes;
     }
 
     private void updateBound(double x, double y, double width, double height) {
         removeChild(outline);
-        outline = PPath.createRoundRectangle(x - outlinePadding,
+        outline = PPath.createRoundRectangle(
+                x - outlinePadding,
                 y - outlinePadding,
                 width + outlinePadding * 2,
                 height + outlinePadding * 2,

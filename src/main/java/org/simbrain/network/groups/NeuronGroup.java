@@ -21,7 +21,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
@@ -141,7 +140,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         addNeurons(newNeurons);
         layout.getLayout().setInitialLocation(initialPosition);
         layout.getLayout().layoutNeurons(this.getNeuronList());
-        firePositionChanged();
+
         subsamplingManager.resetIndices();
     }
 
@@ -212,12 +211,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     public void delete() {
+        events.fireDelete();
         for (Neuron neuron : getNeuronList()) {
             neuron.getNetwork().removeNeuron(neuron, true);
         }
         activationRecorder.stopRecording();
         removeAllNeurons();
-        events.fireDelete();
     }
 
     /**
@@ -468,7 +467,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public void applyLayout() {
         layout.getLayout().layoutNeurons(getNeuronList());
-        firePositionChanged();
     }
 
     /**
@@ -480,7 +478,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void applyLayout(Point2D initialPosition) {
         layout.getLayout().setInitialLocation(initialPosition);
         layout.getLayout().layoutNeurons(getNeuronList());
-        firePositionChanged();
     }
 
     public HashSet<SynapseGroup> getIncomingSgs() {

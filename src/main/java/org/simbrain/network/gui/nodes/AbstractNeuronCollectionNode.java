@@ -1,7 +1,8 @@
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.core.Neuron;
+import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.events.NeuronCollectionEvents;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.SFileChooser;
@@ -40,15 +41,25 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
      */
     private AbstractNeuronCollection nc;
 
+    private boolean batchOperation = false;
+
     public AbstractNeuronCollectionNode(NetworkPanel networkPanel, AbstractNeuronCollection group) {
         super(networkPanel);
         this.networkPanel = networkPanel;
         this.nc = group;
         outlinedObjects = new Outline();
+
+        NetworkEvents networkEvents = networkPanel.getNetwork().getEvents();
+        networkEvents.onBatchDeletionCompleted(outlinedObjects::processUpdate);
+        networkEvents.onBatchLocationUpdateCompleted(outlinedObjects::processUpdate);
+
         addChild(outlinedObjects);
 
         NeuronCollectionEvents events = nc.getEvents();
-        events.onDelete(n -> removeFromParent());
+        events.onDelete(n ->  {
+            batchOperation = true;
+            removeFromParent();
+        });
         events.onLabelChange((o,n) -> updateText());
         //events.onMoved((o,n) -> syncToModel());
         events.onRecordingStarted(this::updateText);
@@ -85,25 +96,21 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.offset(dx, dy);
         }
-        outlinedObjects.update(neuronNodes);
     }
 
     public void addNeuronNodes(Collection<NeuronNode> neuronNodes) {
         this.neuronNodes.addAll(neuronNodes);
         for (NeuronNode neuronNode : neuronNodes) {
             // Listen directly to neuronnodes for property change events
-            neuronNode.addPropertyChangeListener(evt -> {
-                if (evt.getPropertyName().equalsIgnoreCase("fullBounds")) {
-                    outlinedObjects.update(getNeuronNodes());
-                }
-            });
-            Neuron neuron = neuronNode.getNeuron();
-            neuron.getEvents().onDelete(n -> {
+            NeuronEvents events = neuronNode.getNeuron().getEvents();
+            events.onDelete(n -> {
                 this.neuronNodes.remove(neuronNode);
-                outlinedObjects.update(this.neuronNodes);
+                outlinedObjects.enqueueUpdate(this.neuronNodes);
             });
+            events.onLocationChange((o, n) -> outlinedObjects.enqueueUpdate(this.neuronNodes));
         }
-        outlinedObjects.update(neuronNodes);
+        outlinedObjects.enqueueUpdate(this.neuronNodes);
+        outlinedObjects.processUpdate();
     }
 
     public void removeNeuronNode(NeuronNode neuronNode) {

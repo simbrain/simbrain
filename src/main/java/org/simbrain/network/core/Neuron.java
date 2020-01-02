@@ -37,6 +37,8 @@ import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.simbrain.util.PerformanceKt.count;
+
 /**
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
  * the neural network occurs here, in the update function. Subclasses must
@@ -844,6 +846,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     public void setX(final double x) {
         setX(x, true);
+        count("neuron");
     }
 
     public void setY(final double y, boolean fireEvent) {

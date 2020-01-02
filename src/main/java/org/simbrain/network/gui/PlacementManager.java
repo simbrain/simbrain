@@ -1,7 +1,6 @@
 package org.simbrain.network.gui;
 
 import org.simbrain.network.LocatableModel;
-import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
@@ -13,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+
+import static org.simbrain.util.PerformanceKt.getCounters;
 
 /**
  * Manage intelligent placement of new model elements in a {@link org.simbrain.network.gui.NetworkPanel}.
@@ -103,6 +104,7 @@ public class PlacementManager {
         }
         model.setLocation(nextLocation);
         anchorPoint = model::getLocation;
+        System.out.println(getCounters().get("neuron"));
         return nextLocation;
     }
 

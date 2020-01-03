@@ -80,6 +80,9 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
     fun onWeightMatrixRemoved(handler: Consumer<WeightMatrix>) = "WeightMatrixRemoved".itemRemovedEvent(handler)
     fun fireWeightMatrixRemoved(weightMatrix: WeightMatrix) = "WeightMatrixRemoved"(old = weightMatrix)
 
+    // Batch events only fire when a "batch" is completed, e.g. when deleting a group of
+    // neurons no event should be fired until they are all deleted.
+
     fun onBatchDeletionCompleted(handler: Runnable) = "BatchDeletionCompleted".event(handler)
     fun fireBatchDeletionCompleted() = "BatchDeletionCompleted"()
 

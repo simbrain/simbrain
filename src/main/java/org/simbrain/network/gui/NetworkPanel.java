@@ -451,7 +451,7 @@ public class NetworkPanel extends JPanel {
         event.onTextAdded(this::addTextObject);
         event.onTextRemoved(NetworkTextObject::fireDeleted); // TODO: [event] should not be handled here
         event.onNeuronGroupAdded(this::addNeuronGroup);
-        event.onNeuronGroupRemoved(AbstractNeuronCollection::fireDeleted); // TODO: [event]
+        event.onNeuronGroupRemoved(anc -> anc.getEvents().fireDelete());
         event.onSynapseGroupAdded(this::addSynapseGroup);
         //event.onSynapseGroupRemoved(SynapseGroup::fireDeleted); // TODO: [event]
         event.onSubnetworkAdded(this::addSubnetwork);

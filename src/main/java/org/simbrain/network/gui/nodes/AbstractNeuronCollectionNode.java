@@ -41,8 +41,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
      */
     private AbstractNeuronCollection nc;
 
-    private boolean batchOperation = false;
-
     public AbstractNeuronCollectionNode(NetworkPanel networkPanel, AbstractNeuronCollection group) {
         super(networkPanel);
         this.networkPanel = networkPanel;
@@ -50,14 +48,13 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
         outlinedObjects = new Outline();
 
         NetworkEvents networkEvents = networkPanel.getNetwork().getEvents();
-        networkEvents.onBatchDeletionCompleted(outlinedObjects::processUpdate);
-        networkEvents.onBatchLocationUpdateCompleted(outlinedObjects::processUpdate);
+        networkEvents.onBatchDeletionCompleted(outlinedObjects::updateBounds);
+        networkEvents.onBatchLocationUpdateCompleted(outlinedObjects::updateBounds);
 
         addChild(outlinedObjects);
 
         NeuronCollectionEvents events = nc.getEvents();
         events.onDelete(n ->  {
-            batchOperation = true;
             removeFromParent();
         });
         events.onLabelChange((o,n) -> updateText());
@@ -105,12 +102,12 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
             NeuronEvents events = neuronNode.getNeuron().getEvents();
             events.onDelete(n -> {
                 this.neuronNodes.remove(neuronNode);
-                outlinedObjects.enqueueUpdate(this.neuronNodes);
+                outlinedObjects.setOutlinedNodes(this.neuronNodes);
             });
-            events.onLocationChange((o, n) -> outlinedObjects.enqueueUpdate(this.neuronNodes));
+            events.onLocationChange((o, n) -> outlinedObjects.setOutlinedNodes(this.neuronNodes));
         }
-        outlinedObjects.enqueueUpdate(this.neuronNodes);
-        outlinedObjects.processUpdate();
+        outlinedObjects.setOutlinedNodes(this.neuronNodes);
+        outlinedObjects.updateBounds();
     }
 
     public void removeNeuronNode(NeuronNode neuronNode) {

@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static org.simbrain.util.PerformanceKt.getCounters;
-
 /**
  * Manage intelligent placement of new model elements in a {@link org.simbrain.network.gui.NetworkPanel}.
  * <br>
@@ -104,7 +102,6 @@ public class PlacementManager {
         }
         model.setLocation(nextLocation);
         anchorPoint = model::getLocation;
-        System.out.println(getCounters().get("neuron"));
         return nextLocation;
     }
 

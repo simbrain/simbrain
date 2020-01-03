@@ -90,16 +90,16 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     public Subnetwork(final Network net) {
         parentNetwork = net;
         setLabel("Subnetwork");
-        net.getEvents().onNeuronGroupRemoved(ng -> removeNeuronGroup(ng));
-        net.getEvents().onSynapseGroupRemoved(sg -> removeSynapseGroup(sg));
+        net.getEvents().onNeuronGroupRemoved(this::removeNeuronGroup);
+        net.getEvents().onSynapseGroupRemoved(this::removeSynapseGroup);
     }
 
     /**
      * Delete this subnetwork and its children.
      */
     public void delete() {
-        neuronGroupList.forEach(ng -> removeNeuronGroup(ng));
-        synapseGroupList.forEach(sg -> removeSynapseGroup(sg));
+        neuronGroupList.forEach(this::removeNeuronGroup);
+        synapseGroupList.forEach(this::removeSynapseGroup);
         events.fireDelete();
     }
 
@@ -223,6 +223,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      */
     public void removeNeuronGroup(NeuronGroup neuronGroup) {
         neuronGroupList.remove(neuronGroup);
+        neuronGroup.delete();
         if (isEmpty()) {
             delete();
         }
@@ -235,6 +236,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      */
     public void removeSynapseGroup(SynapseGroup synapseGroup) {
         synapseGroupList.remove(synapseGroup);
+        synapseGroup.delete();
     }
 
     /**

@@ -28,14 +28,13 @@ import org.simbrain.util.piccolo.SceneGraphBrowser;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent  ;
+import java.awt.event.KeyEvent;
 
 /**
- * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
- * not found here are in the action classes.
- *
- * TODO: - Migrate some of the local actions here to "official" actions in the
- * action package
+ * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings not found here are in the action
+ * classes.
+ * <p>
+ * TODO: - Migrate some of the local actions here to "official" actions in the action package
  */
 public class KeyBindings {
 
@@ -97,6 +96,15 @@ public class KeyBindings {
             }
         });
 
+        // Delete selected objects
+        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "delete");
+        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "delete");
+        panel.getActionMap().put("delete", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.deleteSelectedObjects();
+            }
+        });
+
         // Contextual increment / decrement
         inputMap.put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_UP, ActionEvent.ALT_MASK),
@@ -130,11 +138,11 @@ public class KeyBindings {
                 panel.toggleClamping();
             }
         });
-        
+
         // Duplicate selected objects
         KeyStroke cmdD = KeyStroke.getKeyStroke(KeyEvent.VK_D,
-            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-        inputMap.put(cmdD,"duplicate");
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+        inputMap.put(cmdD, "duplicate");
         panel.getActionMap().put("duplicate", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.duplicate();
@@ -143,8 +151,8 @@ public class KeyBindings {
 
         // Unselect current selection using the escape key
         inputMap.put(
-            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            "unselectAll");
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                "unselectAll");
         panel.getActionMap().put("unselectAll", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.unselectAll();
@@ -153,8 +161,8 @@ public class KeyBindings {
 
         // Set selected objects to zero
         inputMap.put(
-            KeyStroke.getKeyStroke("C"),
-            "zeroSelection");
+                KeyStroke.getKeyStroke("C"),
+                "zeroSelection");
         panel.getActionMap().put("zeroSelection", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.clearSelectedObjects();
@@ -214,12 +222,12 @@ public class KeyBindings {
         // Select neurons in neuron group
         inputMap.put(KeyStroke.getKeyStroke("S"), "selectNeuronsNG");
         panel.getActionMap().put("selectNeuronsNG",
-            new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    panel.selectNeuronsInNeuronGroups();
-                }
-            });
+                new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        panel.selectNeuronsInNeuronGroups();
+                    }
+                });
 
         // Selection Mode
         // inputMap.put(KeyStroke.getKeyStroke("S"), "selectionMode");
@@ -234,7 +242,7 @@ public class KeyBindings {
         // Wand Mode
         inputMap.put(KeyStroke.getKeyStroke("I"), "wandMode");
         panel.getActionMap().put("wandMode",
-            panel.getActionManager().getAction(WandEditModeAction.class));
+                panel.getActionManager().getAction(WandEditModeAction.class));
 
         // TODO: (Temporary) Add neuron array
         inputMap.put(KeyStroke.getKeyStroke("Y"), "neuronArray");

@@ -730,11 +730,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         return getParentNetwork();
     }
 
-    @Override
-    public void fireDeleted() {
-        // todo
-    }
-
     public List<Neuron> getNeuronList() {
         return Collections.unmodifiableList(neuronList);
     }

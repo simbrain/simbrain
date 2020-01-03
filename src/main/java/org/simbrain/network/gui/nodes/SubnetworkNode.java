@@ -98,8 +98,8 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
         events.onLabelChange((o,n) -> updateText());
 
         NetworkEvents networkEvents = networkPanel.getNetwork().getEvents();
-        networkEvents.onBatchDeletionCompleted(outline::processUpdate);
-        networkEvents.onBatchLocationUpdateCompleted(outline::processUpdate);
+        networkEvents.onBatchDeletionCompleted(outline::updateBounds);
+        networkEvents.onBatchLocationUpdateCompleted(outline::updateBounds);
 
     }
 
@@ -108,7 +108,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
      */
     @Override
     public void layoutChildren() {
-        outline.enqueueUpdate(outlinedObjects);
+        outline.setOutlinedNodes(outlinedObjects);
         interactionBox.setOffset(outline.getFullBounds().getX()
                 + Outline.ARC_SIZE / 2,
                 outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
@@ -123,20 +123,20 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
             node.lowerToBottom();
             ((SynapseGroupNode) node).getSynapseGroup().getEvents().onDelete(sg -> {
                 outlinedObjects.remove(node);
-                outline.enqueueUpdate(outlinedObjects);
+                outline.setOutlinedNodes(outlinedObjects);
             });
         } else if (node instanceof NeuronGroupNode) {
             NeuronGroup ng = ((NeuronGroupNode) node).getNeuronGroup();
             ng.getEvents().onDelete(n -> {
                 outlinedObjects.remove(node);
-                outline.enqueueUpdate(outlinedObjects);
+                outline.setOutlinedNodes(outlinedObjects);
             });
             ng.getEvents().onLocationChange((o,n) -> {
-                outline.enqueueUpdate(outlinedObjects);
+                outline.setOutlinedNodes(outlinedObjects);
             });
         }
-        outline.enqueueUpdate(outlinedObjects);
-        outline.processUpdate();
+        outline.setOutlinedNodes(outlinedObjects);
+        outline.updateBounds();
     }
 
     /**
@@ -404,7 +404,7 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
                 node.offset(dx, dy);
             }
         }
-        outline.enqueueUpdate(outlinedObjects);
+        outline.setOutlinedNodes(outlinedObjects);
     }
 
     @Override

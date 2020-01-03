@@ -40,7 +40,18 @@ public class Outline extends PNode {
         setPickable(false);
     }
 
-    public void processUpdate() {
+    /**
+     * No event is fired when setting outlined nodes. Update only occurs after {@link #updateBounds()} is
+     * called.
+     */
+    public void setOutlinedNodes(Collection<? extends ScreenElement> outlinedNodes) {
+        this.outlinedNodes = outlinedNodes;
+    }
+
+    /**
+     * Update the bounds of this outline object based on the locations of its {@link #outlinedNodes}.
+     */
+    public void updateBounds() {
         if (outlinedNodes != null) {
             PBounds bounds = new PBounds();
             for (ScreenElement node : outlinedNodes) {
@@ -52,12 +63,8 @@ public class Outline extends PNode {
     }
 
     /**
-     * Update the bounds of the outlined objects, which are passed in as an argument.
+     * Update the outline object to specified bounds.
      */
-    public void enqueueUpdate(Collection<? extends ScreenElement> outlinedNodes) {
-        this.outlinedNodes = outlinedNodes;
-    }
-
     private void updateBound(double x, double y, double width, double height) {
         removeChild(outline);
         outline = PPath.createRoundRectangle(

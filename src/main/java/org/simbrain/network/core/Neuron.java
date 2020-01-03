@@ -199,6 +199,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * By default, this is set to 0 for all the neurons. If you want a subset of
      * neurons to fire before other neurons, assign it a smaller priority value.
      */
+    @UserParameter(label = "Update Priority",  description = "What order neurons should be updated" +
+            "in, starting with lower values. <br> Only used with priority-based network update",
+            order = 20)
     private int updatePriority;
 
     /**

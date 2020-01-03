@@ -459,14 +459,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return layout.getLayout();
     }
 
-    public Layout.LayoutObject getLayoutObject() {
-        return layout;
-    }
-
-    public void setLayoutObject(Layout.LayoutObject layoutObject) {
-        this.layout = layoutObject;
-    }
-
     public void setLayout(Layout layout) {
         this.layout.setLayout(layout);
     }

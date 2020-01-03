@@ -389,4 +389,22 @@ public class SimnetUtils {
     public static double getEuclideanDist(Neuron n1, Neuron n2) {
         return SimbrainMath.distance(n1.getPosition(), n2.getPosition());
     }
+
+
+    /**
+     * Return a list of excNeurons in a specific radius of a specified neuron.
+     *
+     * @param source the source neuron.
+     * @param radius the radius to search within.
+     * @return list of excNeurons in the given radius.
+     */
+    public static List<Neuron> getNeuronsInRadius(Neuron source, List<Neuron> neighbors, double radius) {
+        ArrayList<Neuron> ret = new ArrayList<Neuron>();
+        for (Neuron neuron : neighbors) {
+            if (getEuclideanDist(source, neuron) < radius) {
+                ret.add(neuron);
+            }
+        }
+        return ret;
+    }
 }

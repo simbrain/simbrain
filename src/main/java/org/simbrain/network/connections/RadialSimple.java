@@ -243,8 +243,8 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      */
     private void makeInhibitory(final Neuron neuron, List<Synapse> syns, boolean looseSynapses) {
         int degreeCounter = 0;
-        List<Neuron> neusInRadius = getNeuronsInRadius(neuron, inhNeurons, inhibitoryRadius);
-        neusInRadius.addAll(getNeuronsInRadius(neuron, nonPolarNeurons, inhibitoryRadius));
+        List<Neuron> neusInRadius = SimnetUtils.getNeuronsInRadius(neuron, inhNeurons, inhibitoryRadius);
+        neusInRadius.addAll(SimnetUtils.getNeuronsInRadius(neuron, nonPolarNeurons, inhibitoryRadius));
         if (conMethod == ConnectStyle.DETERMINISTIC) {
             Collections.shuffle(neusInRadius);
         }
@@ -309,8 +309,8 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      */
     private void makeExcitatory(final Neuron neuron, List<Synapse> syns, boolean looseSynapses) {
         int degreeCounter = 0;
-        List<Neuron> neusInRadius = getNeuronsInRadius(neuron, excNeurons, excitatoryRadius);
-        neusInRadius.addAll(getNeuronsInRadius(neuron, nonPolarNeurons, excitatoryRadius));
+        List<Neuron> neusInRadius = SimnetUtils.getNeuronsInRadius(neuron, excNeurons, excitatoryRadius);
+        neusInRadius.addAll(SimnetUtils.getNeuronsInRadius(neuron, nonPolarNeurons, excitatoryRadius));
         if (conMethod == ConnectStyle.DETERMINISTIC) {
             Collections.shuffle(neusInRadius);
         }
@@ -397,7 +397,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
      */
     public List<Synapse> makeConnects(Neuron neu, List<Neuron> others, List<Synapse> retList) {
 
-        others = getNeuronsInRadius(neu, others, getExcitatoryRadius());
+        others = SimnetUtils.getNeuronsInRadius(neu, others, getExcitatoryRadius());
         if(others.isEmpty()) {
             return retList;
         }
@@ -488,23 +488,6 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
             makeInhibitory(src, createdSyns, true);
         }
         return createdSyns;
-    }
-
-    /**
-     * Return a list of excNeurons in a specific radius of a specified neuron.
-     *
-     * @param source the source neuron.
-     * @param radius the radius to search within.
-     * @return list of excNeurons in the given radius.
-     */
-    private List<Neuron> getNeuronsInRadius(Neuron source, List<Neuron> neighbors, double radius) {
-        ArrayList<Neuron> ret = new ArrayList<Neuron>();
-        for (Neuron neuron : neighbors) {
-            if (SimnetUtils.getEuclideanDist(source, neuron) < radius) {
-                ret.add(neuron);
-            }
-        }
-        return ret;
     }
 
     public void setConMethod(ConnectStyle conMethod) {

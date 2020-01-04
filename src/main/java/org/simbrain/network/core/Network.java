@@ -162,7 +162,7 @@ public class Network {
     /**
      * Manage ids for all network elements.
      */
-    SimpleIdManager idManager = new SimpleIdManager();
+    private SimpleIdManager idManager = new SimpleIdManager();
 
     /**
      * A variable telling the network not to fire events to any listeners during update.
@@ -202,7 +202,6 @@ public class Network {
         current_id++;
         updateManager = new NetworkUpdateManager(this);
         prioritySortedNeuronList = new ArrayList<Neuron>();
-        initIdManager();
     }
 
     /**
@@ -879,6 +878,7 @@ public class Network {
         fireUpdates = true;
 
         // TODO: Temp code to handle xstream backwards compatibility issues
+        // Remove after converting all old sims
         if(weightMatrices == null) {
             weightMatrices = new HashSet<>();
         }
@@ -900,9 +900,10 @@ public class Network {
         if (naList == null) {
             naList = new ArrayList<>();
         }
-
-
-        initIdManager();
+        if (idManager == null) {
+            idManager = new SimpleIdManager();
+            tempInitIdManager();
+        }
 
         events = new NetworkEvents(this);
 
@@ -921,6 +922,19 @@ public class Network {
 
         updateCompleted = new AtomicBoolean(false);
         return this;
+    }
+
+    // TODO: For converting old sims.  Remove once all is converted
+    private void tempInitIdManager() {
+        idManager.initId(Neuron.class, looseNeurons.size() + 1);
+        idManager.initId(Synapse.class, looseSynapses.size() + 1);
+        idManager.initId(NeuronGroup.class, neuronGroups.size() + 1);
+        idManager.initId(NeuronCollection.class, neuronCollectionSet.size() + 1);
+        idManager.initId(SynapseGroup.class, synapseGroups.size() + 1);
+        idManager.initId(Subnetwork.class, subnetworks.size() + 1);
+        idManager.initId(NeuronArray.class, naList.size() + 1);
+        idManager.initId(WeightMatrix.class, weightMatrices.size() + 1);
+        idManager.initId(MultiLayerNet.class, multiLayerNetworks.size() + 1);
     }
 
     /**
@@ -1360,24 +1374,6 @@ public class Network {
 
     public HashSet<NeuronCollection> getNeuronCollectionSet() {
         return neuronCollectionSet;
-    }
-
-    /**
-     * Initialize all id managers.
-     */
-    private void initIdManager() {
-        if (idManager == null) {
-            idManager = new SimpleIdManager();
-        }
-        idManager.initId(Neuron.class, looseNeurons.size() + 1);
-        idManager.initId(Synapse.class, looseSynapses.size() + 1);
-        idManager.initId(NeuronGroup.class, neuronGroups.size() + 1);
-        idManager.initId(NeuronCollection.class, neuronCollectionSet.size() + 1);
-        idManager.initId(SynapseGroup.class, synapseGroups.size() + 1);
-        idManager.initId(Subnetwork.class, subnetworks.size() + 1);
-        idManager.initId(NeuronArray.class, naList.size() + 1);
-        idManager.initId(WeightMatrix.class, weightMatrices.size() + 1);
-        idManager.initId(MultiLayerNet.class, multiLayerNetworks.size() + 1);
     }
 
     public SimpleIdManager getIdManager() {

@@ -201,7 +201,8 @@ public class Network {
         name = "Network" + current_id;
         current_id++;
         updateManager = new NetworkUpdateManager(this);
-        prioritySortedNeuronList = new ArrayList<Neuron>();
+        prioritySortedNeuronList = new ArrayList<>();
+        initIdManager();
     }
 
     /**
@@ -902,7 +903,7 @@ public class Network {
         }
         if (idManager == null) {
             idManager = new SimpleIdManager();
-            tempInitIdManager();
+            initIdManager();
         }
 
         events = new NetworkEvents(this);
@@ -924,8 +925,10 @@ public class Network {
         return this;
     }
 
-    // TODO: For converting old sims.  Remove once all is converted
-    private void tempInitIdManager() {
+    /**
+     * Initialize all ids in the {@link SimpleIdManager}.
+     */
+    private void initIdManager() {
         idManager.initId(Neuron.class, looseNeurons.size() + 1);
         idManager.initId(Synapse.class, looseSynapses.size() + 1);
         idManager.initId(NeuronGroup.class, neuronGroups.size() + 1);

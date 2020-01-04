@@ -156,6 +156,7 @@ public class PlacementManager {
     /**
      * When an explicit location is needed. TODO: Phase out use of this method and remove when no longer called.
      */
+    @Deprecated
     public Point2D getLocationAndIncrement() {
         Point2D nextLocation;
         if (useLastClickedLocation) {

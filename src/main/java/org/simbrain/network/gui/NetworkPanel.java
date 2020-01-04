@@ -760,15 +760,11 @@ public class NetworkPanel extends JPanel {
         // Add neuron group to canvas
         canvas.getLayer().addChild(neuronGroupNode);
         objectNodeMap.put(neuronGroup, neuronGroupNode);
+        neuronGroup.applyLayout();
 
-        // Position new neuron group (but not if it's inside a subnetwork)
-        // TODO
-        //if (neuronGroup.isTopLevelGroup()) {
-            Point2D location = neuronGroup.getLocation();
-            neuronGroup.getLayout().setInitialLocation(location);
-            neuronGroup.applyLayout();
-            lastNgAdded = neuronGroup;
-        //}
+        // Place the object at the appropriate location
+        //placementManager.addNewModelObject(neuronGroup);
+        lastNgAdded = neuronGroup;
 
         repaint();
     }

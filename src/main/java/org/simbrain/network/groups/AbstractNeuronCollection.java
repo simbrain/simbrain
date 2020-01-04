@@ -232,9 +232,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         for (Neuron neuron : neuronList) {
             neuron.setX(neuron.getX() + offsetX, false);
             neuron.setY(neuron.getY() + offsetY, false);
-            // TODO Below improves performance but there is a problem when creating neuron groups
-            //neuron.setX(neuron.getX() + offsetX, false);
-            //neuron.setY(neuron.getY() + offsetY, false);
         }
         events.fireLocationChange(new Point2D.Double(), new Point2D.Double(offsetX, offsetY));
     }

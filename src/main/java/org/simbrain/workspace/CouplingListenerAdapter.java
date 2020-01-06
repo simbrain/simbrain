@@ -26,12 +26,12 @@ import java.util.List;
 public class CouplingListenerAdapter implements CouplingListener {
 
     @Override
-    public void couplingAdded(Coupling<?> coupling) {};
+    public void couplingAdded(Coupling coupling) {};
 
     @Override
-    public void couplingRemoved(Coupling<?> coupling) {};
+    public void couplingRemoved(Coupling coupling) {};
 
     @Override
-    public void couplingsRemoved(List<Coupling<?>> couplings) {};
+    public void couplingsRemoved(List<Coupling> couplings) {};
 
 }

@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import org.pmw.tinylog.Logger
 import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -15,6 +16,7 @@ open class Event(private val changeSupport: PropertyChangeSupport) {
      */
     protected operator fun <T> String.invoke(old: T? = null, new: T? = null) {
         changeSupport.firePropertyChange(this, old, new)
+        Logger.debug("${this}Event")
     }
 
     /**
@@ -22,6 +24,7 @@ open class Event(private val changeSupport: PropertyChangeSupport) {
      */
     protected operator fun String.invoke() {
         changeSupport.firePropertyChange(this, null, null)
+        Logger.debug("${this}Event")
     }
 
     /**

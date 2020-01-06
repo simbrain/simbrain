@@ -19,7 +19,9 @@
 package org.simbrain.plot.piechart;
 
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,12 +52,10 @@ public class PieChartComponent extends WorkspaceComponent {
     public void setWorkspace(Workspace workspace) {
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
-        getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
-            @Override
-            public void couplingAdded(Coupling<?> coupling) {
-                if (coupling.getConsumer().getBaseObject() == model) {
-                    model.setSliceNames(coupling.getProducer().getLabelArray());
-                }
+
+        getWorkspace().getCouplingManager().getEvents().onCouplingAdded(c -> {
+            if (c.getConsumer().getBaseObject() == model) {
+                model.setSliceNames(c.getProducer().getLabelArray());
             }
         });
     }

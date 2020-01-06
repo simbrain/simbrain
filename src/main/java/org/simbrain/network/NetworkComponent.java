@@ -93,6 +93,18 @@ public final class NetworkComponent extends WorkspaceComponent {
 //
 //        event.onTextRemoved(t -> setChangedSinceLastSave(true));
 
+        event.onNeuronGroupAdded(ng -> {
+            setChangedSinceLastSave(true);
+            fireAttributeContainerAdded(ng);
+            ng.getNeuronList().forEach(this::fireAttributeContainerAdded);
+        });
+
+        event.onNeuronGroupRemoved(ng -> {
+            setChangedSinceLastSave(true);
+            ng.getNeuronList().forEach(this::fireAttributeContainerRemoved);
+            fireAttributeContainerRemoved(ng);
+        });
+
         event.onNeuronCollectionAdded(nc -> {
             setChangedSinceLastSave(true);
             fireAttributeContainerAdded(nc);

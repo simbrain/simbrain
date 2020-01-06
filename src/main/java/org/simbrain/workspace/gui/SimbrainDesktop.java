@@ -34,7 +34,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.util.widgets.ToggleButton;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceListener;
+import org.simbrain.workspace.events.WorkspaceEvents;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.InterceptingEventQueue;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
@@ -196,57 +196,6 @@ public class SimbrainDesktop {
     private HashMap<String, JMenu> submenuMap = new HashMap<>();
 
     /**
-     * Listener on the workspace.
-     */
-    private final WorkspaceListener workspaceListener = new WorkspaceListener() {
-
-        /**
-         * Clear the Simbrain desktop.
-         */
-        @Override
-        public void workspaceCleared() {
-            guiComponents.clear();
-            desktop.removeAll();
-            desktop.repaint();
-            frame.setTitle(FRAME_TITLE);
-            lastTimestep = 0;
-            updateTimeLabel();
-        }
-
-        /**
-         * Add a new <c>SimbrainComponent</c>.
-         */
-        @Override
-        @SuppressWarnings("unchecked")
-        public void componentAdded(final WorkspaceComponent workspaceComponent) {
-            addDesktopComponent(workspaceComponent);
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public void componentRemoved(final WorkspaceComponent workspaceComponent) {
-            GuiComponent<?> component = guiComponents.get(workspaceComponent);
-            if (component == null) {
-                return;
-            }
-            guiComponents.remove(component);
-            component.getParentFrame().dispose();
-            if (!lastFocusedStack.isEmpty()) {
-                lastFocusedStack.remove(component);
-            }
-            moveLastFocusedComponentToFront();
-        }
-
-        @Override
-        public void newWorkspaceOpened() {
-            frame.setTitle(workspace.getCurrentFile().getName());
-            lastTimestep = 0;
-            updateTimeLabel();
-        }
-
-    };
-
-    /**
      * Listens for workspace updater events.
      */
     private final WorkspaceUpdaterListener updaterListener = new WorkspaceUpdaterListener() {
@@ -305,7 +254,38 @@ public class SimbrainDesktop {
         createAndAttachMenus();
         wsToolBar = createToolBar();
         createContextMenu();
-        workspace.addListener(workspaceListener);
+        WorkspaceEvents events = workspace.getEvents();
+
+        events.onWorkspaceCleared(() -> {
+            guiComponents.clear();
+            desktop.removeAll();
+            desktop.repaint();
+            frame.setTitle(FRAME_TITLE);
+            lastTimestep = 0;
+            updateTimeLabel();
+        });
+
+        events.onComponentAdded(this::addDesktopComponent);
+
+        events.onComponentRemoved(wc -> {
+            GuiComponent<?> component = guiComponents.get(wc);
+            if (component == null) {
+                return;
+            }
+            guiComponents.remove(component);
+            component.getParentFrame().dispose();
+            if (!lastFocusedStack.isEmpty()) {
+                lastFocusedStack.remove(component);
+            }
+            moveLastFocusedComponentToFront();
+        });
+
+        events.onNewWorkspaceOpened(() -> {
+            frame.setTitle(workspace.getCurrentFile().getName());
+            lastTimestep = 0;
+            updateTimeLabel();
+        });
+
         workspace.getUpdater().addUpdaterListener(updaterListener);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         workspaceBounds = new Rectangle(WORKSPACE_INSET, WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2), screenSize.height - (WORKSPACE_INSET * 2));

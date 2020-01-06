@@ -24,7 +24,6 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.WorkspaceComponentAdapter;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
@@ -90,12 +89,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
 
         // Toggle the network panel's visiblity if the workspace component is
         // set to "gui off"
-        component.addListener(new WorkspaceComponentAdapter() {
-            @Override
-            public void guiToggled() {
-                networkPanel.setGuiOn(getWorkspaceComponent().isGuiOn());
-            }
-        });
+        component.getEvents().onGUIToggled(() -> networkPanel.setGuiOn(getWorkspaceComponent().isGuiOn()));
     }
 
     /**

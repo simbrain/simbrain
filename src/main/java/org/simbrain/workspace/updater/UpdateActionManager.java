@@ -19,9 +19,9 @@
 package org.simbrain.workspace.updater;
 
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingListener;
+import org.simbrain.workspace.CouplingEvents;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceListener;
+import org.simbrain.workspace.events.WorkspaceEvents;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,7 +85,7 @@ public class UpdateActionManager {
      * Keep track of relations between coupling and coupling actions so they can
      * be cleaned up.
      */
-    private HashMap<Coupling<?>, UpdateCoupling> couplingActionMap = new HashMap<>();
+    private HashMap<Coupling, UpdateCoupling> couplingActionMap = new HashMap<>();
 
     /**
      * Keep track of relations between component and component actions so they
@@ -116,49 +116,27 @@ public class UpdateActionManager {
      */
     private void addListeners() {
         // Add / remove component actions as needed
-        workspaceUpdater.getWorkspace().addListener(new WorkspaceListener() {
+        WorkspaceEvents events = workspaceUpdater.getWorkspace().getEvents();
 
-            @Override
-            public void workspaceCleared() {
-            }
-
-            @Override
-            public void newWorkspaceOpened() {
-            }
-
-            @Override
-            public void componentAdded(WorkspaceComponent component) {
-                UpdateComponent componentAction = new UpdateComponent(workspaceUpdater, component);
-                componentActionMap.put(component, componentAction);
-            }
-
-            @Override
-            public void componentRemoved(WorkspaceComponent component) {
-                removeAction(componentActionMap.remove(component));
-            }
-
+        events.onComponentAdded(wc -> {
+            UpdateComponent componentAction = new UpdateComponent(workspaceUpdater, wc);
+            componentActionMap.put(wc, componentAction);
         });
+
+        events.onComponentRemoved(wc -> removeAction(componentActionMap.remove(wc)));
 
         // Add / remove coupling actions as needed
-        workspaceUpdater.getWorkspace().getCouplingManager().addCouplingListener(new CouplingListener() {
-            @Override
-            public void couplingAdded(Coupling<?> coupling) {
-                UpdateCoupling couplingAction = new UpdateCoupling(coupling);
-                couplingActionMap.put(coupling, couplingAction);
-            }
+        CouplingEvents couplingEvents = workspaceUpdater.getWorkspace().getCouplingManager().getEvents();
 
-            @Override
-            public void couplingRemoved(Coupling<?> coupling) {
-                removeAction(couplingActionMap.remove(coupling));
-            }
-
-            @Override
-            public void couplingsRemoved(List<Coupling<?>> couplings) {
-                for (Coupling coupling : couplings) {
-                    removeAction(couplingActionMap.remove(coupling));
-                }
-            }
+        couplingEvents.onCouplingAdded(c -> {
+            UpdateCoupling couplingAction = new UpdateCoupling(c);
+            couplingActionMap.put(c, couplingAction);
         });
+
+        couplingEvents.onCouplingRemoved(c -> removeAction(couplingActionMap.remove(c)));
+
+        couplingEvents.onCouplingsRemoved(cl -> cl.forEach(c -> removeAction(couplingActionMap.remove(c))));
+
     }
 
     /**

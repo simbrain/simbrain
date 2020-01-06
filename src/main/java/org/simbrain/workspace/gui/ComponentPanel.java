@@ -19,7 +19,7 @@
 package org.simbrain.workspace.gui;
 
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceListener;
+import org.simbrain.workspace.events.WorkspaceEvents;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 import javax.swing.*;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
  * of the represented component. Once it's fixed, the test of this will be
  * setting component properties via terminal and seeing the change reflected.
  */
-public class ComponentPanel extends JPanel implements WorkspaceListener, WorkspaceUpdaterListener {
+public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
 
     /**
      * Table representing workspace components.
@@ -66,7 +66,6 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
      */
     public ComponentPanel(final SimbrainDesktop desktop) {
         super(new BorderLayout());
-        desktop.getWorkspace().addListener(this);
         desktop.getWorkspace().getUpdater().addUpdaterListener(this);
         this.desktop = desktop;
 
@@ -87,39 +86,17 @@ public class ComponentPanel extends JPanel implements WorkspaceListener, Workspa
         panel.add("North", updateLabel);
 
         add(panel);
+
+        WorkspaceEvents events = desktop.getWorkspace().getEvents();
+        events.onWorkspaceCleared(model::clear);
+        events.onComponentAdded(model::addRow);
+        events.onComponentRemoved(model::removeRow);
     }
 
     /**
      * Update the panel.
      */
     private void update() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void componentAdded(WorkspaceComponent component) {
-        model.addRow(component);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void componentRemoved(WorkspaceComponent component) {
-        model.removeRow(component);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void workspaceCleared() {
-        model.clear();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void newWorkspaceOpened() {
     }
 
     /**

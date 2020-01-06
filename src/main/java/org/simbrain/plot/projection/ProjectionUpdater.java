@@ -48,7 +48,7 @@ public class ProjectionUpdater implements Runnable {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         component.getProjector().iterate();
-                        component.fireUpdateEvent();
+                        component.getEvents().fireComponentUpdated();
                     }
                 });
                 while (!component.getProjectionModel().isUpdateCompleted()) {

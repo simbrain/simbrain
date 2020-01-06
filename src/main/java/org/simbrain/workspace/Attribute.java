@@ -188,7 +188,7 @@ public abstract class Attribute {
         this.description = description;
     }
 
-    public Object getBaseObject() {
+    public AttributeContainer getBaseObject() {
         return baseObject;
     }
 

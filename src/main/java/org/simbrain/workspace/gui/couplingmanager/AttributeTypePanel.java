@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
 
 import javax.swing.*;
@@ -26,7 +26,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,12 +70,12 @@ public class AttributeTypePanel extends JPanel {
     private void addAttributeTypesToModel(WorkspaceComponent component, ProducerOrConsumer poc) {
         if (poc == ProducerOrConsumer.Consuming) {
             setBorder(BorderFactory.createTitledBorder("Consumers in " + component.getName()));
-            component.getAttributeMethods(Consumable.class)
-                    .forEach(a -> model.addRow(a));
+            component.getWorkspace().getCouplingManager().getConsumerMethods(component)
+                    .forEach(model::addRow);
         } else {
             setBorder(BorderFactory.createTitledBorder("Producers in " + component.getName()));
-            component.getAttributeMethods(Producible.class)
-                    .forEach(a -> model.addRow(a));
+            component.getWorkspace().getCouplingManager().getProducerMethods(component)
+                    .forEach(model::addRow);
         }
     }
 
@@ -125,7 +125,7 @@ public class AttributeTypePanel extends JPanel {
                     return data.get(row).getReturnType().getSimpleName();
                 }
             case 3:
-                return workspaceComponent.getAttributeTypeVisibilityMap().get(data.get(row));
+                return workspaceComponent.getCouplingManager().getVisibleMethods().contains(data.get(row));
             default:
                 return null;
             }
@@ -140,7 +140,7 @@ public class AttributeTypePanel extends JPanel {
             case 2:
                 break;
             case 3:
-                workspaceComponent.getAttributeTypeVisibilityMap().put(data.get(row), (Boolean) value);
+                workspaceComponent.getCouplingManager().setVisibility(data.get(row), (Boolean) value);
                 fireTableDataChanged();
                 break;
             }

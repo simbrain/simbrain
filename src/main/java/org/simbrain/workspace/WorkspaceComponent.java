@@ -19,19 +19,15 @@
 package org.simbrain.workspace;
 
 import org.pmw.tinylog.Logger;
+import org.simbrain.workspace.events.WorkspaceComponentEvents;
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.GuiComponent;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.simbrain.workspace.CouplingUtils.getConsumersFromContainer;
-import static org.simbrain.workspace.CouplingUtils.getProducersFromContainers;
 
 /**
  * Represents a component in a Simbrain {@link Workspace}. Extend this class to
@@ -49,10 +45,7 @@ public abstract class WorkspaceComponent {
      */
     private Workspace workspace;
 
-    /**
-     * The set of all WorkspaceComponentListeners on this component.
-     */
-    private Collection<WorkspaceComponentListener> listeners;
+    transient private WorkspaceComponentEvents events = new WorkspaceComponentEvents(this);
 
     /**
      * The attribute type method to visibility map. If a given method
@@ -102,10 +95,6 @@ public abstract class WorkspaceComponent {
      */
     private int serializePriority = 0;
 
-    /** Initializer */ {
-        listeners = new HashSet<WorkspaceComponentListener>();
-    }
-
     /**
      * Construct a workspace component.
      *
@@ -140,7 +129,7 @@ public abstract class WorkspaceComponent {
      * calls the haschanged dialog.
      */
     public void tryClosing() {
-        fireComponentClosing();
+        events.fireComponentClosing();
         //TODO: If there is no Gui then close must be called directly
     }
 
@@ -185,74 +174,8 @@ public abstract class WorkspaceComponent {
         return new ArrayList<>();
     }
 
-    /**
-     * Get all {@link Producible} or {@link Consumable} methods in this workspace component.
-     *
-     * @param annotation Annotation of the methods. Expect {@link Producible} or {@link Consumable}.
-     * @return a list of all attribute methods in this component.
-     */
-    public final List<Method> getAttributeMethods(Class<? extends Annotation> annotation) {
-        if (annotation != Producible.class && annotation != Consumable.class) {
-            return null;
-        }
-        return getAttributeContainers().stream()
-                .map(Object::getClass)
-                .distinct()
-                .flatMap(c -> Arrays.stream(c.getMethods()))
-                .filter(m -> m.isAnnotationPresent(annotation))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Get all visible producers on a specified component.
-     *
-     * @return the visible producers
-     */
-    public List<Producer<?>> getVisibleProducers() {
-        getProducers().stream()
-                .map(Attribute::getMethod)
-                .filter(m -> !attributeTypeVisibilityMap.containsKey(m))
-                .forEach(m -> attributeTypeVisibilityMap.put(m, m.getAnnotation(Producible.class).defaultVisibility()));
-        return getProducers().stream()
-                .filter(a -> attributeTypeVisibilityMap.get(a.getMethod()))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Get all visible consumers on a specified component.
-     *
-     * @return the visible consumers
-     */
-    public List<Consumer<?>> getVisibleConsumers() {
-        getConsumers().stream()
-                .map(Attribute::getMethod)
-                .filter(m -> !attributeTypeVisibilityMap.containsKey(m))
-                .forEach(m -> attributeTypeVisibilityMap.put(m, m.getAnnotation(Consumable.class).defaultVisibility()));
-        return getConsumers().stream()
-                .filter(a -> attributeTypeVisibilityMap.get(a.getMethod()))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Get all the potential producers for a given WorkspaceComponent.
-     *
-     * @return A list of potential producers.
-     */
-    public List<Producer<?>> getProducers() {
-        return getAttributeContainers().stream()
-                .flatMap(ac -> getProducersFromContainers(ac).stream())
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Get all the potential consumers for a given WorkspaceComponent.
-     *
-     * @return A list of potential consumers.
-     */
-    public List<Consumer<?>> getConsumers() {
-        return getAttributeContainers().stream()
-                .flatMap(ac -> getConsumersFromContainer(ac).stream())
-                .collect(Collectors.toList());
+    public CouplingManager getCouplingManager() {
+        return workspace.getCouplingManager();
     }
 
     /**
@@ -272,70 +195,32 @@ public abstract class WorkspaceComponent {
     protected void stopped() {
     }
 
-    /**
-     * Notify listeners that the component has been updated.
-     */
-    public void fireUpdateEvent() {
-        for (WorkspaceComponentListener listener : listeners) {
-            listener.componentUpdated();
-        }
-    }
-
-    /**
-     * Notify listeners that the gui has been turned on or off.
-     */
-    public void fireGuiToggleEvent() {
-        for (WorkspaceComponentListener listener : listeners) {
-            listener.guiToggled();
-        }
-    }
-
-    /**
-     * Notify listeners that the component has been turned on or off.
-     */
-    public void fireComponentToggleEvent() {
-        for (WorkspaceComponentListener listener : listeners) {
-            listener.componentOnOffToggled();
-        }
-    }
-
-    /**
-     * Notify listeners that the component is closing.
-     */
-    public void fireComponentClosing() {
-        for (WorkspaceComponentListener listener : listeners) {
-            listener.componentClosing();
-        }
-    }
-
-    /**
-     * Update the visibility map when new attribute type is added.
-     *
-     * @param updatedContainer the new attribute container added to this workspace
-     */
-    public void updateVisibilityMap(AttributeContainer updatedContainer) {
-        CouplingUtils.getConsumableMethodsFromContainer(updatedContainer)
-                .forEach(m -> {
-                    if (!attributeTypeVisibilityMap.containsKey(m)) {
-                        attributeTypeVisibilityMap.put(m, m.getAnnotation(Consumable.class).defaultVisibility());
-                    }
-                });
-        CouplingUtils.getProducibleMethodsFromContainer(updatedContainer)
-                .forEach(m -> {
-                    if (!attributeTypeVisibilityMap.containsKey(m)) {
-                        attributeTypeVisibilityMap.put(m, m.getAnnotation(Producible.class).defaultVisibility());
-                    }
-                });
-    }
+    // /**
+    //  * Update the visibility map when new attribute type is added.
+    //  *
+    //  * @param updatedContainer the new attribute container added to this workspace
+    //  */
+    // public void updateVisibilityMap(AttributeContainer updatedContainer) {
+    //     CouplingUtils.getConsumableMethodsFromContainer(updatedContainer)
+    //             .forEach(m -> {
+    //                 if (!attributeTypeVisibilityMap.containsKey(m)) {
+    //                     attributeTypeVisibilityMap.put(m, m.getAnnotation(Consumable.class).defaultVisibility());
+    //                 }
+    //             });
+    //     CouplingUtils.getProducibleMethodsFromContainer(updatedContainer)
+    //             .forEach(m -> {
+    //                 if (!attributeTypeVisibilityMap.containsKey(m)) {
+    //                     attributeTypeVisibilityMap.put(m, m.getAnnotation(Producible.class).defaultVisibility());
+    //                 }
+    //             });
+    // }
 
     /**
      * Notify listeners that an {@link AttributeContainer} has been added to the component.
      */
     public void fireAttributeContainerAdded(AttributeContainer addedContainer) {
-        for (WorkspaceComponentListener listener : listeners) {
-            listener.attributeContainerAdded(addedContainer);
-        }
-        updateVisibilityMap(addedContainer);
+        events.fireAttributeContainerAdded(addedContainer);
+        // updateVisibilityMap(addedContainer);
     }
 
     /**
@@ -343,18 +228,7 @@ public abstract class WorkspaceComponent {
      * component.
      */
     public void fireAttributeContainerRemoved(AttributeContainer removedContainer) {
-        for (WorkspaceComponentListener listener : listeners) {
-            listener.attributeContainerRemoved(removedContainer);
-        }
-    }
-
-    /**
-     * Notify listeners that an {@link AttributeContainer} has been changed in the component.
-     */
-    public void fireAttributeContainerChanged(AttributeContainer updatedContainer) {
-        for (WorkspaceComponentListener listener : listeners) {
-            listener.attributeContainerChanged(updatedContainer);
-        }
+        events.fireAttributeContainerRemoved(removedContainer);
     }
 
     /**
@@ -362,33 +236,6 @@ public abstract class WorkspaceComponent {
      */
     void doStopped() {
         stopped();
-    }
-
-    /**
-     * Returns the WorkspaceComponentListeners on this component.
-     *
-     * @return The WorkspaceComponentListeners on this component.
-     */
-    public Collection<WorkspaceComponentListener> getListeners() {
-        return Collections.unmodifiableCollection(listeners);
-    }
-
-    /**
-     * Adds a listener to this component.
-     *
-     * @param listener the WorkspaceComponentListener to add.
-     */
-    public void addListener(WorkspaceComponentListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Adds a listener to this component.
-     *
-     * @param listener the WorkspaceComponentListener to add.
-     */
-    public void removeListener(WorkspaceComponentListener listener) {
-        listeners.remove(listener);
     }
 
     /**
@@ -454,10 +301,6 @@ public abstract class WorkspaceComponent {
         this.workspace = workspace;
     }
 
-    public Map<Method, Boolean> getAttributeTypeVisibilityMap() {
-        return attributeTypeVisibilityMap;
-    }
-
     /**
      * The file extension for a component type, e.g. By default, "xml".
      *
@@ -500,7 +343,7 @@ public abstract class WorkspaceComponent {
 
     public void setGuiOn(boolean guiOn) {
         this.guiOn = guiOn;
-        this.fireGuiToggleEvent();
+        events.fireGUIToggled();
     }
 
     public boolean getUpdateOn() {
@@ -512,7 +355,7 @@ public abstract class WorkspaceComponent {
      */
     public void setUpdateOn(boolean updateOn) {
         this.updateOn = updateOn;
-        this.fireComponentToggleEvent();
+        events.fireComponentOnOffToggled();
     }
 
     /**
@@ -544,6 +387,10 @@ public abstract class WorkspaceComponent {
      */
     protected void setSerializePriority(int serializePriority) {
         this.serializePriority = serializePriority;
+    }
+
+    public WorkspaceComponentEvents getEvents() {
+        return events;
     }
 
     /**

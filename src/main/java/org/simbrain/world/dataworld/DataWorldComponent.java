@@ -90,13 +90,11 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     public void setWorkspace(Workspace workspace) {
         // Workspace object is not available in the constructor.
         super.setWorkspace(workspace);
-        getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
-            @Override
-            public void couplingAdded(Coupling<?> coupling) {
-                if (coupling.getConsumer().getBaseObject() == DataWorldComponent.this) {
-                    if (coupling.getProducer().getLabelArray() != null) {
-                        dataTable.setColumnHeadings(Arrays.asList(coupling.getProducer().getLabelArray()));
-                    }
+
+        getWorkspace().getCouplingManager().getEvents().onCouplingAdded(c -> {
+            if (c.getConsumer().getBaseObject() == DataWorldComponent.this) {
+                if (c.getProducer().getLabelArray() != null) {
+                    dataTable.setColumnHeadings(Arrays.asList(c.getProducer().getLabelArray()));
                 }
             }
         });
@@ -171,7 +169,7 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     @Override
     public void update() {
         dataTable.updateCurrentRow();
-        this.fireUpdateEvent();
+        this.getEvents().fireComponentUpdated();
     }
 
     @Override

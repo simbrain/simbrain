@@ -259,14 +259,14 @@ public class Simulation {
      * Helper for obtaining producers.
      */
     public Producer getProducer(AttributeContainer container, String methodName) {
-        return CouplingUtils.getProducer(container, methodName);
+        return workspace.getCouplingManager().getProducer(container, methodName);
     }
 
     /**
      * Helper for obtaining consumers.
      */
     public Consumer getConsumer(AttributeContainer container, String methodName) {
-        return CouplingUtils.getConsumer(container, methodName);
+        return workspace.getCouplingManager().getConsumer(container, methodName);
     }
 
     /**
@@ -281,9 +281,9 @@ public class Simulation {
      * Couple a neuron to a specific scalar time series in a time series
      * plot.
      */
-    public Coupling<?> couple(Neuron neuron, TimeSeriesModel.ScalarTimeSeries sts) {
-        Producer neuronProducer = CouplingUtils.getProducer(neuron, "getActivation");
-        Consumer timeSeriesConsumer = CouplingUtils.getConsumer(sts, "setValue");
+    public Coupling couple(Neuron neuron, TimeSeriesModel.ScalarTimeSeries sts) {
+        Producer neuronProducer = getProducer(neuron, "getActivation");
+        Consumer timeSeriesConsumer = getConsumer(sts, "setValue");
         return tryCoupling(neuronProducer, timeSeriesConsumer);
     }
 
@@ -291,8 +291,8 @@ public class Simulation {
      * Couple a synapse to a specific time series in a time series plot
      */
     public Coupling couple(Synapse synapse, TimeSeriesModel.ScalarTimeSeries ts) {
-        Producer producer = CouplingUtils.getProducer(synapse, "getStrength");
-        Consumer consumer = CouplingUtils.getConsumer(ts, "setValue");
+        Producer producer = getProducer(synapse, "getStrength");
+        Consumer consumer = getConsumer(ts, "setValue");
         return tryCoupling(producer, consumer);
     }
 
@@ -300,8 +300,8 @@ public class Simulation {
      * Couple a neuron group to a projection plot.
      */
     public void couple(NeuronGroup ng, ProjectionComponent plot) {
-        Producer ngProducer = CouplingUtils.getProducer(ng, "getActivations");
-        Consumer projConsumer = CouplingUtils.getConsumer(plot, "addPoint");
+        Producer ngProducer = getProducer(ng, "getActivations");
+        Consumer projConsumer = getConsumer(plot, "addPoint");
         tryCoupling(ngProducer, projConsumer);
     }
 
@@ -309,8 +309,8 @@ public class Simulation {
      * Copuple a neuron collection to a projection plot
      */
     public void couple(NeuronCollection nc, ProjectionComponent plot) {
-        Producer ngProducer = CouplingUtils.getProducer(nc, "getActivations");
-        Consumer projConsumer = CouplingUtils.getConsumer(plot, "addPoint");
+        Producer ngProducer = getProducer(nc, "getActivations");
+        Consumer projConsumer = getConsumer(plot, "addPoint");
         tryCoupling(ngProducer, projConsumer);
     }
 
@@ -322,12 +322,12 @@ public class Simulation {
      * @param forceSet if true, assume the neuron is clamped and use forceSet
      */
     public void couple(ObjectSensor sensor, Neuron neuron, boolean forceSet) {
-        Producer sensoryProducer = CouplingUtils.getProducer(sensor, "getCurrentValue");
+        Producer sensoryProducer = workspace.getCouplingManager().getProducer(sensor, "getCurrentValue");
         Consumer sensoryConsumer;
         if(forceSet) {
-            sensoryConsumer = CouplingUtils.getConsumer(neuron, "forceSetActivation");
+            sensoryConsumer = getConsumer(neuron, "forceSetActivation");
         } else {
-            sensoryConsumer = CouplingUtils.getConsumer(neuron, "setInputValue");
+            sensoryConsumer = getConsumer(neuron, "setInputValue");
         }
         tryCoupling(sensoryProducer, sensoryConsumer);
     }
@@ -343,14 +343,14 @@ public class Simulation {
      * Couple a smell sensor to a neuron group.
      */
     public void couple(SmellSensor sensor, NeuronGroup ng) {
-        Producer sensoryProducer = CouplingUtils.getProducer(sensor, "getCurrentValues");
+        Producer sensoryProducer = getProducer(sensor, "getCurrentValues");
         Consumer sensoryConsumer;
         // TODO: Rules for this not clear? add a parameter for forced or not
         if (ng.isSpikingNeuronGroup()) {
-            sensoryConsumer = CouplingUtils.getConsumer(ng, "setInputValues");
+            sensoryConsumer = getConsumer(ng, "setInputValues");
 
         } else {
-            sensoryConsumer = CouplingUtils.getConsumer(ng, "setInputValues");
+            sensoryConsumer = getConsumer(ng, "setInputValues");
         }
         tryCoupling(sensoryProducer, sensoryConsumer);
     }
@@ -360,8 +360,8 @@ public class Simulation {
      * Couple a neuron to an effector on an odor world agent.
      */
     public void couple(Neuron neuron, Effector effector) {
-        Producer effectorNeuron = CouplingUtils.getProducer(neuron, "getActivation");
-        Consumer agentEffector = CouplingUtils.getConsumer(effector, "setAmount");
+        Producer effectorNeuron = getProducer(neuron, "getActivation");
+        Consumer agentEffector = getConsumer(effector, "setAmount");
         tryCoupling(effectorNeuron, agentEffector);
     }
 
@@ -369,8 +369,8 @@ public class Simulation {
      * Couple a hearing sensor to a neuron
      */
     public void couple(Hearing sensor, Neuron neuron) {
-        Producer agentSensor = CouplingUtils.getProducer(sensor, "getValue");
-        Consumer sensoryNeuron = CouplingUtils.getConsumer(neuron, "forceSetActivation");
+        Producer agentSensor = getProducer(sensor, "getValue");
+        Consumer sensoryNeuron = getConsumer(neuron, "forceSetActivation");
         tryCoupling(agentSensor, sensoryNeuron);
     }
 

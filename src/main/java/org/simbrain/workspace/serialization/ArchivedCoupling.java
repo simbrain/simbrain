@@ -39,15 +39,15 @@ class ArchivedCoupling {
     }
 
     public Producer createProducer(Workspace workspace) {
-        AttributeContainer object = getObjectFromWorkspace(workspace, producer);
+        AttributeContainer container = getObjectFromWorkspace(workspace, producer);
         String method = producer.getMethodName();
-        return CouplingUtils.getProducer(object, method);
+        return workspace.getCouplingManager().getProducer(container, method);
     }
 
     public Consumer createConsumer(Workspace workspace) {
         AttributeContainer container = getObjectFromWorkspace(workspace, consumer);
         String method = consumer.getMethodName();
-        return CouplingUtils.getConsumer(container, method);
+        return workspace.getCouplingManager().getConsumer(container, method);
     }
 
     /**

@@ -27,7 +27,7 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.WorkspaceComponentAdapter;
+import org.simbrain.workspace.events.WorkspaceComponentEvents;
 import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -86,19 +86,11 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         }
 
         // Add a default update listener
-        workspaceComponent.addListener(new WorkspaceComponentAdapter() {
-            public void componentUpdated() {
-                GuiComponent.this.update();
-            }
+        WorkspaceComponentEvents events = workspaceComponent.getEvents();
 
-            public void guiToggled() {
-                GuiComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn());
-            }
-
-            public void componentClosing() {
-                close();
-            }
-        });
+        events.onComponentUpdated(GuiComponent.this::update);
+        events.onGUIToggled(() -> GuiComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn()));
+        events.onComponentClosing(this::close);
 
         Logger.trace(this.getClass().getCanonicalName() + " created");
     }

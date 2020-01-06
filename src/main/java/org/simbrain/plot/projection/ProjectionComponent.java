@@ -22,7 +22,10 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
+import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -112,7 +115,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     @Override
     public void update() {
         // Notify Gui that this component was updated.
-        fireUpdateEvent();
+        getEvents().fireComponentUpdated();
     }
 
     /**

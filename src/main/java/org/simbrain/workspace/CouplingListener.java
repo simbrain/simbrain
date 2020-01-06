@@ -30,20 +30,20 @@ public interface CouplingListener {
      *
      * @param coupling the new coupling
      */
-    public void couplingAdded(Coupling<?> coupling);
+    public void couplingAdded(Coupling coupling);
 
     /**
      * Called when a coupling is removed.
      *
      * @param coupling the coupling that is being removed
      */
-    public void couplingRemoved(Coupling<?> coupling);
+    public void couplingRemoved(Coupling coupling);
 
     /**
      * Called whenever more than one coupling is removed.
      *
      * @param couplings the couplings that were removed.
      */
-    public void couplingsRemoved(List<Coupling<?>> couplings);
+    public void couplingsRemoved(List<Coupling> couplings);
 
 }

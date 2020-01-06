@@ -23,7 +23,6 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +32,7 @@ import java.util.List;
  *
  * @author jyoshimi
  */
-public abstract class SynapseUpdateRule implements CopyableObject, AttributeContainer {
+public abstract class SynapseUpdateRule implements CopyableObject {
 
     /**
      * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}

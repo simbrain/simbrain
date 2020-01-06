@@ -30,14 +30,14 @@ public class UpdateCoupling implements UpdateAction {
     /**
      * of couplings to update.
      */
-    private final transient Coupling<?> coupling;
+    private final transient Coupling coupling;
 
     /**
      * Construct the action.
      *
      * @param coupling coupling to update
      */
-    public UpdateCoupling(Coupling<?> coupling) {
+    public UpdateCoupling(Coupling coupling) {
         this.coupling = coupling;
     }
 
@@ -64,7 +64,7 @@ public class UpdateCoupling implements UpdateAction {
         }
     }
 
-    public Coupling<?> getCoupling() {
+    public Coupling getCoupling() {
         return coupling;
     }
 

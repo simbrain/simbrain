@@ -10,26 +10,19 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
-import org.simbrain.plot.projection.ProjectionPlotActions;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
-import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.projection.ProjectCoordinate;
-import org.simbrain.util.projection.ProjectionMethod;
 import org.simbrain.util.projection.Projector;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.updater.UpdateActionManager;
 import org.simbrain.workspace.updater.UpdateComponent;
-import org.simbrain.workspace.updater.UpdateCoupling;
 import org.simbrain.workspace.updater.WorkspaceUpdater;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * Create a Braitenberg pursuer with a projection plot to sensor neurons.
@@ -141,8 +134,8 @@ public class RandomizedPursuer extends RegisteredSimulation {
         tsPlot.getModel().removeAllScalarTimeSeries();
         TimeSeriesModel.ScalarTimeSeries ts1 = tsPlot.getModel().addScalarTimeSeries("Current State Probability / Fulfillment");
 
-        Producer probability = CouplingUtils.getProducer(projComp, "getCurrentStateProbability");
-        Consumer timeSeries = CouplingUtils.getConsumer(ts1, "setValue");
+        Producer probability = sim.getProducer(projComp, "getCurrentStateProbability");
+        Consumer timeSeries = sim.getConsumer(ts1, "setValue");
         sim.tryCoupling(probability, timeSeries);
 
     }

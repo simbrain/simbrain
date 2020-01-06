@@ -18,7 +18,9 @@
  */
 package org.simbrain.plot.timeseries;
 
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,16 +64,13 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     public void setWorkspace(Workspace workspace) {
         // Workspace object is not available in the constructor.
         super.setWorkspace(workspace);
-        getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
-            @Override
-            public void couplingAdded(Coupling<?> coupling) {
 
-                // A new array coupling is being added to this time series
-                if (coupling.getConsumer().getBaseObject() == model) {
+        getWorkspace().getCouplingManager().getEvents().onCouplingAdded(c -> {
+            // A new array coupling is being added to this time series
+            if (c.getConsumer().getBaseObject() == model) {
 
-                    // Initialize series with provided names, e.g neuron labels
-                    model.initializeArrayMode(coupling.getProducer().getLabelArray());
-                }
+                // Initialize series with provided names, e.g neuron labels
+                model.initializeArrayMode(c.getProducer().getLabelArray());
             }
         });
 

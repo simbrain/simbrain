@@ -32,8 +32,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Method;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -184,7 +184,7 @@ public class WorkspaceSerializer {
      */
     private void serializeCouplings(ArchivedWorkspace archive) {
         HashMap<Object, WorkspaceComponent> couplingComponents = mapCouplingComponents();
-        for (Coupling<?> coupling : workspace.getCouplings()) {
+        for (Coupling coupling : workspace.getCouplings()) {
             serializeCoupling(couplingComponents, coupling, archive);
         }
     }
@@ -209,7 +209,7 @@ public class WorkspaceSerializer {
      * @param coupling           the coupling to save
      * @param archive            the archive object to save to
      */
-    private void serializeCoupling(HashMap<Object, WorkspaceComponent> couplingComponents, Coupling<?> coupling, ArchivedWorkspace archive) {
+    private void serializeCoupling(HashMap<Object, WorkspaceComponent> couplingComponents, Coupling coupling, ArchivedWorkspace archive) {
         ArchivedAttribute producer = new ArchivedAttribute(couplingComponents.get(coupling.getProducer().getBaseObject()), coupling.getProducer());
         ArchivedAttribute consumer = new ArchivedAttribute(couplingComponents.get(coupling.getConsumer().getBaseObject()), coupling.getConsumer());
         archive.addCoupling(new ArchivedCoupling(producer, consumer));

@@ -163,8 +163,8 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
      * Add couplings using the selected method.
      */
     private void addCouplings() {
-        List<Producer<?>> producers = (List<Producer<?>>) producerPanel.getSelectedAttributes();
-        List<Consumer<?>> consumers = (List<Consumer<?>>) consumerPanel.getSelectedAttributes();
+        List<Producer> producers = (List<Producer>) producerPanel.getSelectedAttributes();
+        List<Consumer> consumers = (List<Consumer>) consumerPanel.getSelectedAttributes();
 
         if ((producers.size() == 0) || (consumers.size() == 0)) {
             JOptionPane.showMessageDialog(null, "You must select at least one consuming and producing attribute\nto create couplings.", "No Attributes Selected Warning", JOptionPane.WARNING_MESSAGE);

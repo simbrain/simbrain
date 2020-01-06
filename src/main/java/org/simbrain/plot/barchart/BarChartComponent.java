@@ -18,7 +18,9 @@
  */
 package org.simbrain.plot.barchart;
 
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -65,12 +67,9 @@ public class BarChartComponent extends WorkspaceComponent {
 
         // When couplings are added, if the consumer is this bar chart, set the bar labels to the label array, if any
         // of the producer
-        getWorkspace().getCouplingManager().addCouplingListener(new CouplingListenerAdapter() {
-            @Override
-            public void couplingAdded(Coupling<?> coupling) {
-                if (coupling.getConsumer().getBaseObject() == model) {
-                    model.setBarNames(coupling.getProducer().getLabelArray());
-                }
+        getWorkspace().getCouplingManager().getEvents().onCouplingAdded(c -> {
+            if (c.getConsumer().getBaseObject() == model) {
+                model.setBarNames(c.getProducer().getLabelArray());
             }
         });
     }

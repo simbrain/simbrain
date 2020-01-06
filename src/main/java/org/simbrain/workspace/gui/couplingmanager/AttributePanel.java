@@ -19,6 +19,8 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
 import org.simbrain.workspace.*;
+import org.simbrain.workspace.events.WorkspaceComponentEvents;
+import org.simbrain.workspace.events.WorkspaceEvents;
 
 import javax.swing.*;
 import java.awt.*;
@@ -132,24 +134,18 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      * @param component component to listen to
      */
     private void addAttributeListener(WorkspaceComponent component) {
-        component.addListener(new WorkspaceComponentAdapter() {
-            public void attributeContainerAdded(AttributeContainer model) {
-                if (isSelectedComponent(component)) {
-                    component.updateVisibilityMap(model);
-                    refresh(component);
-                }
-            }
 
-            public void attributeContainerRemoved(AttributeContainer model) {
-                if (isSelectedComponent(component)) {
-                    refresh(component);
-                }
-            }
+        WorkspaceComponentEvents events = component.getEvents();
 
-            public void attributeContainerChanged(AttributeContainer model) {
-                if (isSelectedComponent(component)) {
-                    refresh(component);
-                }
+        events.onAttributeContainerAdded(ac -> {
+            if (isSelectedComponent(component)) {
+                refresh(component);
+            }
+        });
+
+        events.onAttributeContainerRemoved(ac -> {
+            if (isSelectedComponent(component)) {
+                refresh(component);
             }
         });
 
@@ -186,13 +182,9 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
         if (component != null) {
             model.clear();
             if (producerOrConsumer == ProducerOrConsumer.Producing) {
-                for (Producer<?> producer : component.getVisibleProducers()) {
-                    model.addElement(producer);
-                }
+                component.getCouplingManager().getVisibleProducers(component).forEach(model::addElement);
             } else {
-                for (Consumer<?> consumer : component.getVisibleConsumers()) {
-                    model.addElement(consumer);
-                }
+                component.getCouplingManager().getVisibleConsumers(component).forEach(model::addElement);
             }
             attributeTypePanel = new AttributeTypePanel(component, producerOrConsumer);
         }
@@ -210,17 +202,17 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      *
      * @return list of selected attributes.
      */
-    public List getSelectedAttributes() {
+    public List<? extends Attribute> getSelectedAttributes() {
         if (producerOrConsumer == ProducerOrConsumer.Producing) {
-            List<Producer<?>> ret = new ArrayList<>();
+            List<Producer> ret = new ArrayList<>();
             for (Object object : attributeList.getSelectedValuesList()) {
-                ret.add((Producer<?>) object);
+                ret.add((Producer) object);
             }
             return ret;
         } else if (producerOrConsumer == ProducerOrConsumer.Consuming) {
-            List<Consumer<?>> ret = new ArrayList<>();
+            List<Consumer> ret = new ArrayList<>();
             for (Object object : attributeList.getSelectedValuesList()) {
-                ret.add((Consumer<?>) object);
+                ret.add((Consumer) object);
             }
             return ret;
         }
@@ -260,7 +252,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
     /**
      * A JComboBox which listens to the workspace and updates accordingly.
      */
-    private class ComponentDropDownBox extends JComboBox implements WorkspaceListener {
+    private class ComponentDropDownBox extends JComboBox {
 
         /**
          * Reference to workspace.
@@ -279,31 +271,29 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
                 this.setSelectedIndex(0);
                 AttributePanel.this.refresh((WorkspaceComponent) this.getItemAt(0));
             }
-            workspace.addListener(this);
+
+            WorkspaceEvents events = workspace.getEvents();
+
+            events.onComponentAdded(wc -> {
+                this.addItem(wc);
+                addAttributeListener(wc);
+            });
+
+            events.onComponentRemoved(wc -> {
+                this.removeItem(wc);
+                if (this.getItemCount() == 0) {
+                    AttributePanel.this.clearList();
+                }
+            });
+
+            events.onWorkspaceCleared(() -> {
+                this.removeAllItems();
+                AttributePanel.this.clearList();
+            });
         }
 
         public boolean clearWorkspace() {
             return false;
-        }
-
-        public void componentAdded(final WorkspaceComponent component) {
-            this.addItem(component);
-            addAttributeListener(component);
-        }
-
-        public void componentRemoved(final WorkspaceComponent component) {
-            this.removeItem(component);
-            if (this.getItemCount() == 0) {
-                AttributePanel.this.clearList();
-            }
-        }
-
-        public void workspaceCleared() {
-            this.removeAllItems();
-            AttributePanel.this.clearList();
-        }
-
-        public void newWorkspaceOpened() {
         }
     }
 }

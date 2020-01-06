@@ -7,9 +7,8 @@ import java.lang.reflect.Type;
 /**
  * The part of a {@link Coupling} that send values to a {@link Consumable}.
  *
- * @param <V> The type of value to be produced.  Mostly double or double[].
  */
-public class Producer<V> extends Attribute {
+public class Producer extends Attribute {
 
     /**
      * See {@link Producible#arrayDescriptionMethod()}.
@@ -44,9 +43,9 @@ public class Producer<V> extends Attribute {
      *
      * @return current value
      */
-    V getValue() {
+    Object getValue() {
         try {
-            return (V) method.invoke(baseObject);
+            return method.invoke(baseObject);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             // Should never happen
             throw new RuntimeException(ex);

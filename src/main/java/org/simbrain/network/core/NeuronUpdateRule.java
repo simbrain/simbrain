@@ -19,13 +19,15 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.neuron_update_rules.*;
+import org.simbrain.network.neuron_update_rules.AdExIFRule;
+import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
+import org.simbrain.network.neuron_update_rules.IzhikevichRule;
+import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -37,7 +39,7 @@ import java.util.stream.Collectors;
  *
  * @author jyoshimi
  */
-public abstract class NeuronUpdateRule implements CopyableObject, AttributeContainer {
+public abstract class NeuronUpdateRule implements CopyableObject {
 
     /**
      * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor} to set the update rule

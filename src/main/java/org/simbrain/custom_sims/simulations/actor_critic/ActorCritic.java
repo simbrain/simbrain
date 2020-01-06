@@ -13,9 +13,7 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
-import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.DecayFunction;
-import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumer;
@@ -109,8 +107,8 @@ public class ActorCritic extends RegisteredSimulation {
     /**
      * Couplings.
      */
-    List<Coupling<?>> effectorCouplings = new ArrayList<>();
-    List<Coupling<?>> sensorCouplings = new ArrayList<>();
+    List<Coupling> effectorCouplings = new ArrayList<>();
+    List<Coupling> sensorCouplings = new ArrayList<>();
 
     /**
      * Neural net variables.

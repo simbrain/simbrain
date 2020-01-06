@@ -20,6 +20,7 @@ package org.simbrain.workspace;
 
 import org.pmw.tinylog.Logger;
 import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.workspace.events.WorkspaceEvents;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.TaskSynchronizationManager;
@@ -28,7 +29,6 @@ import org.simbrain.workspace.updater.WorkspaceUpdater;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
@@ -96,7 +96,7 @@ public class Workspace {
      * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
      * because writes to this list are uncommon.
      */
-    private transient CopyOnWriteArrayList<WorkspaceListener> listeners = new CopyOnWriteArrayList<WorkspaceListener>();
+    private transient WorkspaceEvents events = new WorkspaceEvents(this);
 
     /**
      * Mapping from workspace component types to integers which show how many
@@ -133,65 +133,6 @@ public class Workspace {
     }
 
     /**
-     * Adds a listener to the workspace.
-     *
-     * @param listener the Listener to add.
-     */
-    public void addListener(WorkspaceListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Removes the listener from the workspace.
-     *
-     * @param listener The listener to remove.
-     */
-    public void removeListener(WorkspaceListener listener) {
-        listeners.remove(listener);
-    }
-
-    /**
-     * Fire a new workspace opened event.
-     */
-    private void fireNewWorkspaceOpened() {
-        for (WorkspaceListener listener : listeners) {
-            listener.newWorkspaceOpened();
-        }
-    }
-
-    /**
-     * Fire a workspace cleared event
-     */
-    private void fireWorkspaceCleared() {
-        for (WorkspaceListener listener : listeners) {
-            listener.workspaceCleared();
-        }
-    }
-
-    /**
-     * Fire a component added event.
-     *
-     * @param component the component added
-     */
-    private void fireWorkspaceComponentAdded(WorkspaceComponent component) {
-        for (WorkspaceListener listener : listeners) {
-            listener.componentAdded(component);
-        }
-    }
-
-    /**
-     * Fire a component removed event.
-     *
-     * @param component the component added
-     */
-    private void fireWorkspaceComponentRemoved(WorkspaceComponent component) {
-        component.getAttributeTypeVisibilityMap().clear();
-        for (WorkspaceListener listener : listeners) {
-            listener.componentRemoved(component);
-        }
-    }
-
-    /**
      * Adds a workspace component to the workspace.
      *
      * @param component The component to add.
@@ -220,7 +161,7 @@ public class Workspace {
             component.setName(component.getSimpleName() + componentNameIndices.get(component.getClass()));
         }
 
-        fireWorkspaceComponentAdded(component);
+        events.fireComponentAdded(component);
 
 
     }
@@ -237,7 +178,7 @@ public class Workspace {
         // this.getCouplingManager().removeCouplings(component);
         componentList.remove(component);
         this.setWorkspaceChanged(true);
-        fireWorkspaceComponentRemoved(component);
+        events.fireComponentRemoved(component);
     }
 
     /**
@@ -325,8 +266,8 @@ public class Workspace {
         resetTime();
         this.setWorkspaceChanged(false);
         currentFile = null;
-        getCouplings().clear();
-        fireWorkspaceCleared();
+        couplingManager = new CouplingManager(this);
+        events.fireWorkspaceCleared();
         this.getUpdater().getUpdateManager().setDefaultUpdateActions();
     }
 
@@ -554,7 +495,7 @@ public class Workspace {
                 serializer.deserialize(new FileInputStream(theFile));
                 setCurrentFile(theFile);
                 setWorkspaceChanged(false);
-                fireNewWorkspaceOpened();
+                events.fireNewWorkspaceOpened();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -577,11 +518,14 @@ public class Workspace {
         return couplingManager;
     }
 
+    public WorkspaceEvents getEvents() {
+        return events;
+    }
 
     /**
      * Convenience method which gets the couplings the coupling manager stores.
      */
-    public List<Coupling<?>> getCouplings() {
+    public Collection<Coupling> getCouplings() {
         return couplingManager.getCouplings();
     }
 }

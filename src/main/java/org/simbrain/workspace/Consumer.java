@@ -7,9 +7,8 @@ import java.lang.reflect.Type;
 /**
  * The part of a {@link Coupling} that receives values from a {@link Producer}.
  *
- * @param <V> The type of value to be consumed.  Mostly double or double[].
  */
-public class Consumer<V> extends Attribute {
+public class Consumer extends Attribute {
 
     /**
      * Contruct a consumer.
@@ -37,7 +36,7 @@ public class Consumer<V> extends Attribute {
      *
      * @param value the value to set
      */
-    void setValue(V value) {
+    void setValue(Object value) {
         try {
             method.invoke(baseObject, value);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {

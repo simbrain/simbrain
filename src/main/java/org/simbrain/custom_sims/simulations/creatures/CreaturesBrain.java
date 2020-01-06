@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
@@ -116,7 +115,7 @@ public class CreaturesBrain {
      * A method for coupling the activation of nodes from one lobe to the activation
      * of the nodes of another lobe.
      */
-    private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe, int index, List<Coupling<?>> list) {
+    private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe, int index, List<Coupling> list) {
         // Check to see if the sizes are in safe parameters
         if (producerLobe.size() <= consumerLobe.size() - index) {
             for (int i = index, j = 0; j < producerLobe.size(); i++, j++) {

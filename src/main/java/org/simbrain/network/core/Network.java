@@ -591,7 +591,6 @@ public class Network {
                 ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
             }
         }
-//        event.fireNeuronsUpdated(); // TODO: [event]
     }
 
     /**
@@ -601,7 +600,6 @@ public class Network {
      */
     public void setActivations(final double value) {
         for (Neuron neuron : this.getFlatNeuronList()) {
-            //TODO
             neuron.setActivation(value);
         }
     }
@@ -740,23 +738,6 @@ public class Network {
         subnetworks.add(net);
         events.fireSubnetworkAdded(net);
     }
-
-    ///**
-    // * Remove the specified group.
-    // *
-    // * @param toDelete the group to delete.
-    // */
-    //public void removeGroup(final Group toDelete) {
-    //
-    //    // Remove from the group list
-    //    groupList.remove(toDelete);
-    //
-    //    // Call delete method on this group being deleted
-    //    toDelete.delete();
-    //
-    //    // Notify listeners that this group has been deleted.
-    //    fireGroupRemoved(toDelete);
-    //}
 
     /**
      * Returns true if all objects are gone from this network.

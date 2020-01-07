@@ -175,6 +175,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         }
         ScalarTimeSeries sts = new ScalarTimeSeries(addXYSeries(description));
         timeSeriesList.add(sts);
+        changeSupport.firePropertyChange("scalarTimeSeriesAdded", null, sts);
         return sts;
     }
 
@@ -254,7 +255,6 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         dataset.addSeries(xy);
         return xy;
     }
-
 
     /**
      * Remove all {@link ScalarTimeSeries} objects.

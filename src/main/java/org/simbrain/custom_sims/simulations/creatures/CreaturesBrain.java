@@ -127,7 +127,7 @@ public class CreaturesBrain {
                 Consumer consumer = parentSim.getSim().getConsumer(consumerLobe.getNeuronList().get(i), "forceSetActivation");
 
                 // Create the coupling and add it to the list
-                Coupling coupling = parentSim.getSim().tryCoupling(producer, consumer);
+                Coupling coupling = parentSim.getSim().createCoupling(producer, consumer);
                 list.add(coupling);
             }
         } else {

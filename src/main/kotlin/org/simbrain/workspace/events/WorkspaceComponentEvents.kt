@@ -6,6 +6,9 @@ import org.simbrain.workspace.WorkspaceComponent
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
+/**
+ * Events relating to workspace components.
+ */
 class WorkspaceComponentEvents(wc: WorkspaceComponent) : Event(PropertyChangeSupport(wc)) {
 
     fun onComponentUpdated(handler: Runnable) = "ComponentUpdated".event(handler)

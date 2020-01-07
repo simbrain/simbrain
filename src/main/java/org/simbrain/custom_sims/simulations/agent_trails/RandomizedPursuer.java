@@ -136,7 +136,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
 
         Producer probability = sim.getProducer(projComp, "getCurrentStateProbability");
         Consumer timeSeries = sim.getConsumer(ts1, "setValue");
-        sim.tryCoupling(probability, timeSeries);
+        sim.createCoupling(probability, timeSeries);
 
     }
 

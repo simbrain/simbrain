@@ -33,20 +33,18 @@ import java.awt.Color;
     NeuronGroup ng = new NeuronGroup(network, numNeurons);
     ng.setNeuronType("DecayRule");
     ng.setUpperBound(10);
-    network.addGroup(ng);
+    network.addNeuronGroup(ng);
     ng.randomize();
 
     // LAYOUT NEURONS
     LineLayout layout = new LineLayout(10,10,50, LineOrientation.HORIZONTAL);
-    layout.layoutNeurons(network.getNeuronList());
+    layout.layoutNeurons(network.getLooseNeurons());
 
     // CREATE SYNAPSES 
     Sparse.connectSparse(network.getFlatNeuronList(),
             network.getFlatNeuronList(), sparsity, false, false, true);
-    ConnectionUtilities.randomizeAndPolarizeSynapses(network.getSynapseList(), excitatoryRatio);
+    ConnectionUtilities.randomizeAndPolarizeSynapses(network.getLooseSynapses(), excitatoryRatio);
     network.randomizeNeurons();
-    network.fireNeuronsUpdated();
-    network.fireSynapsesUpdated();
 
     //MAKE BARCHART
     BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network");
@@ -57,9 +55,9 @@ import java.awt.Color;
     desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500,20,537,345);
 
     // COUPLING NETWORK TO BARCHART
-    Producer neuronProducer = CouplingUtils.getProducer(ng, "getActivations");
-    Consumer barChartConsumer = CouplingUtils.getConsumer(barChart.getModel(), "setBarValues"); 
-    workspace.getCouplingManager().tryCoupling(neuronProducer, barChartConsumer);
+    Producer neuronProducer = workspace.getCouplingManager().getProducer(ng, "getActivations");
+    Consumer barChartConsumer =  workspace.getCouplingManager().getConsumer(barChart.getModel(), "setBarValues");
+    workspace.getCouplingManager().createCoupling(neuronProducer, barChartConsumer);
 
     workspace.iterate();
 }

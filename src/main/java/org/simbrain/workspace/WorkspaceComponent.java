@@ -195,32 +195,11 @@ public abstract class WorkspaceComponent {
     protected void stopped() {
     }
 
-    // /**
-    //  * Update the visibility map when new attribute type is added.
-    //  *
-    //  * @param updatedContainer the new attribute container added to this workspace
-    //  */
-    // public void updateVisibilityMap(AttributeContainer updatedContainer) {
-    //     CouplingUtils.getConsumableMethodsFromContainer(updatedContainer)
-    //             .forEach(m -> {
-    //                 if (!attributeTypeVisibilityMap.containsKey(m)) {
-    //                     attributeTypeVisibilityMap.put(m, m.getAnnotation(Consumable.class).defaultVisibility());
-    //                 }
-    //             });
-    //     CouplingUtils.getProducibleMethodsFromContainer(updatedContainer)
-    //             .forEach(m -> {
-    //                 if (!attributeTypeVisibilityMap.containsKey(m)) {
-    //                     attributeTypeVisibilityMap.put(m, m.getAnnotation(Producible.class).defaultVisibility());
-    //                 }
-    //             });
-    // }
-
     /**
      * Notify listeners that an {@link AttributeContainer} has been added to the component.
      */
     public void fireAttributeContainerAdded(AttributeContainer addedContainer) {
         events.fireAttributeContainerAdded(addedContainer);
-        // updateVisibilityMap(addedContainer);
     }
 
     /**

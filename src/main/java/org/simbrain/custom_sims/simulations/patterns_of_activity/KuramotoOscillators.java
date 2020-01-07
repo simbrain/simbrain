@@ -186,12 +186,12 @@ public class KuramotoOscillators extends RegisteredSimulation {
         //plot.getProjectionModel().getProjector().setUseColorManager(false);
         Producer inputProducer = sim.getProducer(reservoirNet, "getActivations");
         Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
-        sim.tryCoupling(inputProducer, plotConsumer);
+        sim.createCoupling(inputProducer, plotConsumer);
 
         // Text of nearest world object to projection plot current dot
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
         Consumer plotText = sim.getConsumer(plot, "setLabel");
-        sim.tryCoupling(currentObject, plotText);
+        sim.createCoupling(currentObject, plotText);
 
     }
 

@@ -14,7 +14,6 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 /**
  * Each instance of this class represents one particular creature in the simulation.
@@ -454,7 +453,7 @@ public class Creature {
         NetworkComponent nc = brain.getNetworkWrapper().getNetworkComponent();
         Producer chemicalAmount = parentSim.getSim().getProducer(chem, "getAmount");
         Consumer chemReceptor = parentSim.getSim().getConsumer(neuron, "forceSetActivation");
-        parentSim.getSim().tryCoupling(chemicalAmount, chemReceptor);
+        parentSim.getSim().createCoupling(chemicalAmount, chemReceptor);
     }
 
     public void approachBehavior(double strength) {

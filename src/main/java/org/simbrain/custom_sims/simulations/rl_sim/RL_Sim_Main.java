@@ -602,13 +602,13 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         plot.getProjectionModel().getProjector().setTolerance(.01);
         Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
         Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
-        sim.tryCoupling(inputProducer, plotConsumer);
+        sim.createCoupling(inputProducer, plotConsumer);
         sim.getWorkspace().addUpdateAction(new ColorPlot(this));
 
         // Label PCA points based on closest object
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
         Consumer plotText = sim.getConsumer(plot, "setLabel");
-        sim.tryCoupling(currentObject, plotText);
+        sim.createCoupling(currentObject, plotText);
     }
 
     @Override

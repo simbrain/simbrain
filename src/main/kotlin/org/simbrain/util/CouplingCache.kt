@@ -6,6 +6,10 @@ import java.lang.reflect.Type
 
 typealias JConsumer<T> = java.util.function.Consumer<T>
 
+/**
+ * A cache of all [Attribute] and [Coupling] objects in the [Workspace]. Used to provide
+ * fast indexed access to producers, consumers, couplings, etc., and to filter these quickly.
+ */
 class CouplingCache(workspace: Workspace) {
 
     val producers = ProducerCache()
@@ -60,6 +64,9 @@ class CouplingCache(workspace: Workspace) {
 
     }
 
+    /**
+     * Adds a coupling to the cache.
+     */
     fun add(coupling: Coupling) {
         val producerContainer = coupling.producer.baseObject
         val consumerContainer = coupling.consumer.baseObject
@@ -77,6 +84,9 @@ class CouplingCache(workspace: Workspace) {
         }
     }
 
+    /**
+     * Removes a coupling from the cache
+     */
     fun remove(coupling: Coupling) {
         val producerContainer = coupling.producer.baseObject
         val consumerContainer = coupling.consumer.baseObject
@@ -85,6 +95,9 @@ class CouplingCache(workspace: Workspace) {
         couplingsByContainer.remove(consumerContainer)
     }
 
+    /**
+     * Sets an [Attribute.method] to being visible, i.e. visible in the GUI.
+     */
     fun setVisible(method: Method, visible: Boolean) {
         val cache = when {
             method.isProducible() -> producers
@@ -99,26 +112,9 @@ class CouplingCache(workspace: Workspace) {
         }
     }
 
-    inner class ProducerCache : AttributeCache<Producer>() {
-        override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
-            addAttributes(component, container.producers)
-            container.producibles
-                    .filter { it !in visibleMethods }
-                    .filter { it.getAnnotation(Producible::class.java).defaultVisibility }
-                    .let { visibleMethods.addAll(it) }
-        }
-    }
-
-    inner class ConsumerCache : AttributeCache<Consumer>() {
-        override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
-            addAttributes(component, container.consumers)
-            container.consumables
-                    .filter { it !in visibleMethods }
-                    .filter { it.getAnnotation(Consumable::class.java).defaultVisibility }
-                    .let { visibleMethods.addAll(it) }
-        }
-    }
-
+    /**
+     * Cache of an [Attribute].
+     */
     abstract class AttributeCache<T : Attribute> {
 
         private val all = HashSet<T>()
@@ -180,5 +176,23 @@ class CouplingCache(workspace: Workspace) {
 
     }
 
+    inner class ProducerCache : AttributeCache<Producer>() {
+        override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
+            addAttributes(component, container.producers)
+            container.producibles
+                    .filter { it !in visibleMethods }
+                    .filter { it.getAnnotation(Producible::class.java).defaultVisibility }
+                    .let { visibleMethods.addAll(it) }
+        }
+    }
 
+    inner class ConsumerCache : AttributeCache<Consumer>() {
+        override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
+            addAttributes(component, container.consumers)
+            container.consumables
+                    .filter { it !in visibleMethods }
+                    .filter { it.getAnnotation(Consumable::class.java).defaultVisibility }
+                    .let { visibleMethods.addAll(it) }
+        }
+    }
 }

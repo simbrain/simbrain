@@ -144,7 +144,7 @@ public final class NetworkComponent extends WorkspaceComponent {
         //retList.add(network);
         retList.addAll(network.getFlatNeuronList());
         retList.addAll(network.getLooseSynapses());
-        //retList.addAll(network.getFlatGroupList()); // TODO
+        retList.addAll(network.getNeuronGroups());
         retList.addAll(network.getNeuronCollectionSet());
         retList.addAll(network.getNaList());
         // TODO: Temp code to handle xstream backwards compatibility issues

@@ -65,6 +65,6 @@ import org.simbrain.plot.timeseries.*;
     // Couple network to chart
     Producer neuronProducer = CouplingUtils.getProducer(network.getNeuronByLabel("Spiking Neuron"), "getActivation");
     Consumer timeSeriesConsumer =  CouplingUtils.getConsumer(chart.getModel().getTimeSeriesList().get(0), "setValue");
-    workspace.getCouplingManager().tryCoupling(neuronProducer, timeSeriesConsumer);
+    workspace.getCouplingManager().createCoupling(neuronProducer, timeSeriesConsumer);
     
 }

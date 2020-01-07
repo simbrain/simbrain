@@ -336,9 +336,9 @@ public class PatternsOfActivity extends RegisteredSimulation {
         out2read.setLowerBound(-1000000000, Polarity.BOTH);
 
         // Make couplings
-        sim.tryCoupling(sim.getProducer(outputNeurons.getNeuron(0), "getActivation"),
+        sim.createCoupling(sim.getProducer(outputNeurons.getNeuron(0), "getActivation"),
             sim.getConsumer(mouse, "setVelocityX"));
-        sim.tryCoupling(sim.getProducer(outputNeurons.getNeuron(1), "getActivation"),
+        sim.createCoupling(sim.getProducer(outputNeurons.getNeuron(1), "getActivation"),
             sim.getConsumer(mouse, "setVelocityY"));
         sim.couple((SmellSensor) mouse.getSensor("Smell-Left"), sensoryNetL);
         sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), sensoryNetR);
@@ -526,12 +526,12 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Coupling
         Producer inputProducer = sim.getProducer(toPlot, methodName);
         Consumer plotConsumer = sim.getConsumer(pc, "addPoint");
-        sim.tryCoupling(inputProducer, plotConsumer);
+        sim.createCoupling(inputProducer, plotConsumer);
 
         // Text of nearest world object to projection plot current dot
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
         Consumer plotText = sim.getConsumer(pc, "setLabel");
-        sim.tryCoupling(currentObject, plotText);
+        sim.createCoupling(currentObject, plotText);
 
 
     }

@@ -83,6 +83,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
                     // Changed from array to scalar mode
                     fireAttributeContainerRemoved(model);
                 }
+            } else if ("scalarTimeSeriesAdded".equals(evt.getPropertyName())) {
+                fireAttributeContainerAdded((AttributeContainer) evt.getNewValue());
             } else if ("scalarTimeSeriesRemoved".equals(evt.getPropertyName())) {
                 fireAttributeContainerRemoved((AttributeContainer) evt.getOldValue());
             }

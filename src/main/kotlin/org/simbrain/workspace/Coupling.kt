@@ -21,7 +21,7 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
     /**
      * This is the main action!  Set the value of the consumer based on the
      * value of the producer.
-     * <br></br>
+     * <br>
      * Note that values are passed by reference, so that it is up to the producing or
      * consuming methods to make defensive copies as needed.
      * (cf http://www.javapractices.com/topic/TopicAction.do?Id=15)).
@@ -78,7 +78,6 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
         }
     }
 
-
 }
 
 /**
@@ -121,7 +120,6 @@ fun AttributeContainer.getConsumer(methodName: String): Consumer {
 
 }
 
-
 /**
  * Get a specific producer from the [AttributeContainer] object.
  *
@@ -137,7 +135,6 @@ fun AttributeContainer.getProducer(methodName: String): Producer {
         throw IllegalArgumentException(ex)
     }
 }
-
 
 /**
  * Return whether the specified method is producible.

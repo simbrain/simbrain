@@ -16,7 +16,6 @@ import java.lang.reflect.Method
  */
 class CouplingManager(workspace: Workspace) {
 
-
     /**
      * All couplings for the workspace.
      */
@@ -104,7 +103,6 @@ class CouplingManager(workspace: Workspace) {
         }
     }
 
-
     fun removeCouplings(couplings: List<Coupling>) {
         couplings.forEach(couplingCache::remove)
         // What to do here?
@@ -152,6 +150,9 @@ class CouplingManager(workspace: Workspace) {
         events.fireCouplingRemoved(coupling)
     }
 
+    /**
+     * Add a coupling to the cache.
+     */
     private operator fun Coupling.unaryPlus(): Coupling {
         couplingCache.add(this)
         events.fireCouplingAdded(this)

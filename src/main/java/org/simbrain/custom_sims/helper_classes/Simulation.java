@@ -270,10 +270,10 @@ public class Simulation {
     }
 
     /**
-     * Helper for tryCoupling in the associated Workspace. Couples the producer
+     * Helper for creating coupligns in the associated Workspace. Couples the producer
      * to the consumer if possible, ignores mismatch exceptions for simplicity.
      */
-    public Coupling tryCoupling(Producer producer, Consumer consumer) {
+    public Coupling createCoupling(Producer producer, Consumer consumer) {
         return workspace.getCouplingManager().createCoupling(producer, consumer);
     }
 
@@ -284,7 +284,7 @@ public class Simulation {
     public Coupling couple(Neuron neuron, TimeSeriesModel.ScalarTimeSeries sts) {
         Producer neuronProducer = getProducer(neuron, "getActivation");
         Consumer timeSeriesConsumer = getConsumer(sts, "setValue");
-        return tryCoupling(neuronProducer, timeSeriesConsumer);
+        return createCoupling(neuronProducer, timeSeriesConsumer);
     }
 
     /**
@@ -293,7 +293,7 @@ public class Simulation {
     public Coupling couple(Synapse synapse, TimeSeriesModel.ScalarTimeSeries ts) {
         Producer producer = getProducer(synapse, "getStrength");
         Consumer consumer = getConsumer(ts, "setValue");
-        return tryCoupling(producer, consumer);
+        return createCoupling(producer, consumer);
     }
 
     /**
@@ -302,7 +302,7 @@ public class Simulation {
     public void couple(NeuronGroup ng, ProjectionComponent plot) {
         Producer ngProducer = getProducer(ng, "getActivations");
         Consumer projConsumer = getConsumer(plot, "addPoint");
-        tryCoupling(ngProducer, projConsumer);
+        createCoupling(ngProducer, projConsumer);
     }
 
     /**
@@ -311,7 +311,7 @@ public class Simulation {
     public void couple(NeuronCollection nc, ProjectionComponent plot) {
         Producer ngProducer = getProducer(nc, "getActivations");
         Consumer projConsumer = getConsumer(plot, "addPoint");
-        tryCoupling(ngProducer, projConsumer);
+        createCoupling(ngProducer, projConsumer);
     }
 
     /**
@@ -329,7 +329,7 @@ public class Simulation {
         } else {
             sensoryConsumer = getConsumer(neuron, "setInputValue");
         }
-        tryCoupling(sensoryProducer, sensoryConsumer);
+        createCoupling(sensoryProducer, sensoryConsumer);
     }
 
     /**
@@ -352,7 +352,7 @@ public class Simulation {
         } else {
             sensoryConsumer = getConsumer(ng, "setInputValues");
         }
-        tryCoupling(sensoryProducer, sensoryConsumer);
+        createCoupling(sensoryProducer, sensoryConsumer);
     }
 
 
@@ -362,7 +362,7 @@ public class Simulation {
     public void couple(Neuron neuron, Effector effector) {
         Producer effectorNeuron = getProducer(neuron, "getActivation");
         Consumer agentEffector = getConsumer(effector, "setAmount");
-        tryCoupling(effectorNeuron, agentEffector);
+        createCoupling(effectorNeuron, agentEffector);
     }
 
     /**
@@ -371,7 +371,7 @@ public class Simulation {
     public void couple(Hearing sensor, Neuron neuron) {
         Producer agentSensor = getProducer(sensor, "getValue");
         Consumer sensoryNeuron = getConsumer(neuron, "forceSetActivation");
-        tryCoupling(agentSensor, sensoryNeuron);
+        createCoupling(agentSensor, sensoryNeuron);
     }
 
     /**

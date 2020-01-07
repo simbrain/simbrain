@@ -56,6 +56,12 @@ class CouplingManager(workspace: Workspace) {
     val Producer.compatibleConsumers
         get() = couplingCache.consumers[this.type].filter { it.method.isVisible }.sortedBy { it.id }
 
+    fun Consumer.compatiblesOfComponent(component: WorkspaceComponent)
+            = compatibleProducers.filter { it in couplingCache.producers[component] }
+
+    fun Producer.compatiblesOfComponent(component: WorkspaceComponent)
+            = compatibleConsumers.filter { it in couplingCache.consumers[component] }
+
     /**
      * Create a coupling from a producer and consumer of the same type.
      *
@@ -114,11 +120,9 @@ class CouplingManager(workspace: Workspace) {
      */
     fun getCoupling(id: String) = couplings.find { it.id.equals(id, ignoreCase = true) }
 
-    fun AttributeContainer.getProducer(methodName: String)
-            = couplingCache.producers[this].find { it.method.name == methodName }
+    fun AttributeContainer.getProducer(methodName: String) = couplingCache.producers[this].find { it.method.name == methodName }
 
-    fun AttributeContainer.getConsumer(methodName: String)
-            = couplingCache.consumers[this].find { it.method.name == methodName }
+    fun AttributeContainer.getConsumer(methodName: String) = couplingCache.consumers[this].find { it.method.name == methodName }
 
     fun Method.setVisibility(visible: Boolean) = couplingCache.setVisible(this, visible)
 

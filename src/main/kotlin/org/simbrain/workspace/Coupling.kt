@@ -69,7 +69,9 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
          * @return the coupling
          */
         @Throws(MismatchedAttributesException::class)
-        fun create(producer: Producer, consumer: Consumer) = if (consumer.type == producer.type) {
+        fun create(producer: Producer?, consumer: Consumer?) = if (producer == null || consumer == null) {
+            throw IllegalArgumentException("Producer and Consumer cannot be null")
+        } else if (consumer.type == producer.type) {
             Coupling(producer, consumer)
         } else {
             throw MismatchedAttributesException(
@@ -77,7 +79,6 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
             )
         }
     }
-
 }
 
 /**
@@ -97,7 +98,6 @@ val AttributeContainer.consumers
 
 val AttributeContainer.producers
     get() = this.producibles.map { this.getProducer(it) }
-
 
 /**
  * Get a specific consumer from a specified [AttributeContainer].

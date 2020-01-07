@@ -62,6 +62,12 @@ class CouplingManager(workspace: Workspace) {
     fun Producer.compatiblesOfComponent(component: WorkspaceComponent)
             = compatibleConsumers.filter { it in couplingCache.consumers[component] }
 
+    fun AttributeContainer.consumerByName(name: String)
+            = couplingCache.consumers[this].find { it.method.name == name }
+
+    fun AttributeContainer.producerByName(name: String)
+            = couplingCache.producers[this].find { it.method.name == name }
+
     /**
      * Create a coupling from a producer and consumer of the same type.
      *
@@ -69,7 +75,8 @@ class CouplingManager(workspace: Workspace) {
      * @param consumer consumer part of the coupling
      * @return the newly creating coupling
      */
-    fun createCoupling(producer: Producer, consumer: Consumer) = +Coupling.create(producer, consumer)
+    fun createCoupling(producer: Producer?, consumer: Consumer?) = +Coupling.create(producer, consumer)
+    infix fun Producer?.couple(consumer: Consumer?) = createCoupling(this, consumer)
 
     /**
      * Create a coupling from each producer to every consumer of the same type.

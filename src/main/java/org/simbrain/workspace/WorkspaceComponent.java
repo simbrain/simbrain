@@ -26,8 +26,10 @@ import org.simbrain.workspace.gui.GuiComponent;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents a component in a Simbrain {@link Workspace}. Extend this class to
@@ -46,13 +48,6 @@ public abstract class WorkspaceComponent {
     private Workspace workspace;
 
     transient private WorkspaceComponentEvents events = new WorkspaceComponentEvents(this);
-
-    /**
-     * The attribute type method to visibility map. If a given method
-     * should be invisible in the {@link org.simbrain.workspace.gui.couplingmanager.AttributePanel}
-     * (for example if synapse couplings are visible this can crowd that panel).
-     */
-    private final Map<Method, Boolean> attributeTypeVisibilityMap = new HashMap<>();
 
     /**
      * Whether this component has changed since last save.

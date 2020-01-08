@@ -34,7 +34,10 @@ import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.NetworkEvents;
-import org.simbrain.network.groups.*;
+import org.simbrain.network.groups.NeuronCollection;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.UndoManager.UndoableAction;
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
 import org.simbrain.network.gui.actions.TestInputAction;
@@ -743,6 +746,8 @@ public class NetworkPanel extends JPanel {
      */
     private void addNeuronGroup(NeuronGroup neuronGroup) {
 
+        neuronGroup.applyLayout();
+
         List<NeuronNode> neuronNodes = new ArrayList<NeuronNode>();
 
         // Create neuron nodes and add them to the canvas. This is done
@@ -760,7 +765,6 @@ public class NetworkPanel extends JPanel {
         // Add neuron group to canvas
         canvas.getLayer().addChild(neuronGroupNode);
         objectNodeMap.put(neuronGroup, neuronGroupNode);
-        neuronGroup.applyLayout();
 
         // Place the object at the appropriate location
         //placementManager.addNewModelObject(neuronGroup);

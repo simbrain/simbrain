@@ -29,6 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static org.simbrain.network.gui.PlacementManagerKt.getTopLeftLocation;
+import static org.simbrain.util.PointKt.plus;
+
 /**
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
  * neuron update rules and track synapse polarity).
@@ -170,7 +173,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
 
     @Override
     public Point2D getLocation() {
-        return null; //todo
+        return getTopLeftLocation(neuronList);
     }
 
     /**
@@ -496,7 +499,10 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     }
 
     @Override
-    public abstract void setLocation(Point2D location);
+    public void setLocation(Point2D location) {
+        neuronList.forEach(n -> n.setLocation(plus(n.getLocation(), location)));
+        events.fireLocationChange(new Point2D.Double(), location);
+    }
 
     @Override
     public Point2D getAttachmentPoint() {

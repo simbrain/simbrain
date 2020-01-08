@@ -186,6 +186,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         for (Neuron neuron : toCopy.getNeuronList()) {
             newNeurons.add(new Neuron(network, neuron));
         }
+
         addNeurons(newNeurons);
         this.setLayout(toCopy.getLayout());
         this.setGroupUpdateRule(toCopy.groupUpdateRule);
@@ -435,17 +436,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * @param y y coordinate for neuron group
      */
     public void setLocation(final double x, final double y) {
-        offset(-this.getMinX(), -this.getMinY());
-        offset(x, y);
-    }
-
-    @Override
-    public Point2D getLocation() {
-        return new Point2D.Double(getMinX(), getMinY());
-    }
-
-    public void setLocation(Point2D point) {
-        setLocation(point.getX(), point.getY());
+        super.setLocation(new Point2D.Double(x, y));
     }
 
     /**

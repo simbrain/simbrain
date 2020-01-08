@@ -268,8 +268,8 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         setIncrement(n.getIncrement());
         forceSetActivation(n.getActivation());
         setInputValue(n.getInputValue());
-        setX(n.getX());
-        setY(n.getY());
+        x = n.x;
+        y = n.y;
         setUpdatePriority(n.getUpdatePriority());
         setLabel(n.getLabel());
     }

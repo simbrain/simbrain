@@ -19,7 +19,7 @@ def dl4j_version = "1.0.0-beta4" // beta5 not working on mac
 
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
-sourceCompatibility = 1.9
+sourceCompatibility = 1.10
 
 repositories {
     mavenCentral()

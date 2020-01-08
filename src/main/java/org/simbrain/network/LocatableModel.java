@@ -1,11 +1,14 @@
 package org.simbrain.network;
 
+import org.simbrain.network.core.Neuron;
+
 import java.awt.geom.Point2D;
 
 /**
- *  Model elements that have a center location should implement this interface.  Typically these
- *  will be at the top of a graphical hierarchy.  Graphical representations should be set up
- *  accordingly. As an example see {@link org.simbrain.network.gui.nodes.NeuronArrayNode}
+ * Model elements that have a location should implement this interface.  Note that locations are mostly based on
+ * {@link Neuron} location. Neurons have point locations but not width or height.  Thus the width  of a {@link org.simbrain.network.groups.NeuronGroup}
+ * neuron group, for example, is the distance between the point locations of the neurons within it which are farthest
+ * apart.
  */
 public interface LocatableModel extends NetworkModel {
 

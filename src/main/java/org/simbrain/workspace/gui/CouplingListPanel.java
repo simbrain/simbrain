@@ -20,7 +20,7 @@ package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingListener;
+import org.simbrain.workspace.CouplingEvents;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
 
 import javax.swing.*;
@@ -28,12 +28,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Displays a list of the current couplings in the network.
  */
-public class CouplingListPanel extends JPanel implements CouplingListener {
+public class CouplingListPanel extends JPanel {
 
     /**
      * List of network couplings.
@@ -116,6 +115,14 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
         add(listScroll, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
         couplingFrame.setContentPane(this);
+
+        CouplingEvents events = desktop.getWorkspace().getCouplingManager().getEvents();
+
+        events.onCouplingAdded(c -> updateCouplingsList());
+        events.onCouplingRemoved(c -> updateCouplingsList());
+        events.onCouplingsRemoved(cl -> updateCouplingsList());
+
+
     }
 
     /**
@@ -137,21 +144,6 @@ public class CouplingListPanel extends JPanel implements CouplingListener {
             ret.add((Coupling) object);
         }
         return ret;
-    }
-
-    @Override
-    public void couplingAdded(Coupling coupling) {
-        updateCouplingsList();
-    }
-
-    @Override
-    public void couplingRemoved(Coupling coupling) {
-        updateCouplingsList();
-    }
-
-    @Override
-    public void couplingsRemoved(List<Coupling> couplings) {
-        updateCouplingsList();
     }
 
     /**

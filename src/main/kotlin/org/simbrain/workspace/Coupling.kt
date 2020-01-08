@@ -34,10 +34,10 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
         get() = producer.type
 
     val id: String
-        get() = "${consumer.id} > ${producer.id}"
+        get() = "${producer.id} > ${consumer.id}"
 
     val description: String
-        get() = "$consumer > $producer"
+        get() = "$producer > $consumer"
 
     override fun toString() = description
 

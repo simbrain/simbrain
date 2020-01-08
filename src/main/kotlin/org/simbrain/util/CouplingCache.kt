@@ -20,7 +20,7 @@ class CouplingCache(workspace: Workspace) {
         get() = producers.visibleMethods + consumers.visibleMethods
 
     val couplings
-        get() = couplingsByContainer.values.flatten()
+        get() = couplingsByContainer.values.flatten().toSet().sortedBy { it.id }
 
     private val couplingsByContainer = HashMap<AttributeContainer, HashSet<Coupling>>()
 
@@ -91,8 +91,8 @@ class CouplingCache(workspace: Workspace) {
         val producerContainer = coupling.producer.baseObject
         val consumerContainer = coupling.consumer.baseObject
 
-        couplingsByContainer.remove(producerContainer)
-        couplingsByContainer.remove(consumerContainer)
+        couplingsByContainer[producerContainer]?.remove(coupling)
+        couplingsByContainer[consumerContainer]?.remove(coupling)
     }
 
     /**

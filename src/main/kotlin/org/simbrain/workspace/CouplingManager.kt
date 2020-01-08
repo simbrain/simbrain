@@ -39,10 +39,12 @@ class CouplingManager(workspace: Workspace) {
         get() = couplingCache.consumers[this].map { it.method }.toSet().sortedBy { it.name }
 
     val WorkspaceComponent.visibleProducers
-        get() = couplingCache.producers[this].filter { it.method.isVisible }.sortedBy { it.id }
+        get() = couplingCache.producers[this].filter { it.method.isVisible }
+                .sortedBy { it.method.name }.sortedBy { it.id }
 
     val WorkspaceComponent.visibleConsumers
-        get() = couplingCache.consumers[this].filter { it.method.isVisible }.sortedBy { it.id }
+        get() = couplingCache.consumers[this].filter { it.method.isVisible }
+                .sortedBy { it.method.name }.sortedBy { it.id }
 
     val AttributeContainer.visibleProducers
         get() = couplingCache.producers[this].filter { it.method.isVisible }.sortedBy { it.id }

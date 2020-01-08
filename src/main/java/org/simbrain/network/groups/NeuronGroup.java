@@ -42,6 +42,9 @@ import java.awt.geom.Point2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static org.simbrain.util.PointKt.plus;
+import static org.simbrain.util.PointKt.point;
+
 /**
  * A group of neurons. A primary abstraction for larger network structures.
  * Layers in feed-forward networks are neuron groups. Self-organizing-maps
@@ -418,10 +421,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
         List<Point2D> c = getFourCorners();
         Map<NeuronGroupNode.Port, Point2D> portPointMap = new HashMap<>();
 
-        portPointMap.put(NeuronGroupNode.Port.EAST, SimbrainMath.midpoint(c.get(0), c.get(1)));
-        portPointMap.put(NeuronGroupNode.Port.SOUTH, SimbrainMath.midpoint(c.get(1), c.get(2)));
-        portPointMap.put(NeuronGroupNode.Port.WEST, SimbrainMath.midpoint(c.get(2), c.get(3)));
-        portPointMap.put(NeuronGroupNode.Port.NORTH, SimbrainMath.midpoint(c.get(3), c.get(0)));
+        portPointMap.put(NeuronGroupNode.Port.EAST, plus(SimbrainMath.midpoint(c.get(0), c.get(1)), point(-0.01, 0)));
+        portPointMap.put(NeuronGroupNode.Port.SOUTH, plus(SimbrainMath.midpoint(c.get(1), c.get(2)), point(0, -0.01)));
+        portPointMap.put(NeuronGroupNode.Port.WEST, plus(SimbrainMath.midpoint(c.get(2), c.get(3)), point(0.01, 0)));
+        portPointMap.put(NeuronGroupNode.Port.NORTH, plus(SimbrainMath.midpoint(c.get(3), c.get(0)), point(0, 0.01)));
 
         return portPointMap;
 

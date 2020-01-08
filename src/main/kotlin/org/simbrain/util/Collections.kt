@@ -1,7 +1,13 @@
 package org.simbrain.util
 
-data class Difference<T>(val disjoint: Set<T>, val excess: Set<T>) {
-    fun isIdentical() = disjoint.isEmpty() && excess.isEmpty()
+/**
+ * Consider sets A and B.  "Left complement" is in A but not B.  "Right complement" is in B but not A.
+ */
+data class SetDifference<T>(val leftComp: Set<T>, val rightComp: Set<T>) {
+    fun isIdentical() = leftComp.isEmpty() && rightComp.isEmpty()
 }
 
-infix fun <T> Set<T>.diff(other: Set<T>) = Difference(this - other, other - this)
+/**
+ * Custom infix relative complementation operator.
+ */
+infix fun <T> Set<T>.complement(other: Set<T>) = SetDifference(this - other, other - this)

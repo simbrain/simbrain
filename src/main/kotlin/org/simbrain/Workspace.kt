@@ -6,6 +6,9 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Extends [Workspace] functionality
+ */
 suspend fun Workspace.iterateAndRun(block: () -> Unit): Unit =
         suspendCoroutine { cont ->
             this.updater.addUpdaterListener(object : WorkspaceUpdaterListener {

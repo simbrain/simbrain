@@ -8,7 +8,7 @@ import org.simbrain.iterateAndRun
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.util.diff
+import org.simbrain.util.complement
 
 class CouplingTest {
 
@@ -27,7 +27,7 @@ class CouplingTest {
         networkComponent.couplingManager.run {
             val expected = setOf("getLabel", "getActivation")
             val actual = neuron.producers.map { it.method.name }.toSet()
-            val diff = expected diff actual
+            val diff = expected complement actual
             assertTrue("$diff", diff.isIdentical())
         }
     }
@@ -39,7 +39,7 @@ class CouplingTest {
         networkComponent.couplingManager.run {
             val expected = setOf("setActivation", "forceSetActivation", "setInputValue", "addInputValue", "setLabel")
             val actual = neuron.consumers.map { it.method.name }.toSet()
-            val diff = expected diff actual
+            val diff = expected complement actual
 
             assertTrue("$diff", diff.isIdentical())
         }

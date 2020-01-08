@@ -322,6 +322,10 @@ public final class SynapseNode extends ScreenElement {
         double targetX = tar.getX();
         double targetY = tar.getY();
 
+        if (sourceX == targetX && sourceY == targetY) {
+            return new Point2D.Double(0, 0);
+        }
+
         double x = Math.abs(sourceX - targetX);
         double y = Math.abs(sourceY - targetY);
         double alpha = Math.atan(y / x);

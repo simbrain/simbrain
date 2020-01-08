@@ -473,7 +473,6 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
         String beginToken = keyboard.next();
         long start = System.nanoTime();
         Network net = new Network();
-        net.setFireUpdates(false);
         net.setTimeStep(0.1);
         NeuronGroup ng = new NeuronGroup(net, numNeurons);
         ng.getActivationRecorder().setRecordAsSpikes(true);

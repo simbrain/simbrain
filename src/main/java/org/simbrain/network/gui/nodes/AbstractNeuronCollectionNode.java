@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.*;
 
-public abstract class AbstractNeuronCollectionNode extends ScreenElement implements GroupNode {
+public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
     /**
      * Parent network panel.
@@ -130,26 +130,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement impleme
         this.removeChild(interactionBox);
         this.interactionBox = newBox;
         this.addChild(interactionBox);
-    }
-
-    public Outline getOutlinedObjects() {
-        return outlinedObjects;
-    }
-
-    @Override
-    public List<InteractionBox> getInteractionBoxes() {
-        return Collections.singletonList(interactionBox);
-    }
-
-    @Override
-    public void updateConstituentNodes() {
-        for (NeuronNode neuronNode : neuronNodes) {
-            neuronNode.update();
-        }
-        if (getNetworkPanel().isRunning()) {
-            return;
-        }
-        updateText();
     }
 
     /**

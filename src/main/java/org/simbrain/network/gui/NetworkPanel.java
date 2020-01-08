@@ -473,42 +473,10 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Update visible state of all neurons nodes. This is not used much internally, because it is preferred to updated
-     * the specific nodes that need to be updated. It is here mainly for convenience (e.g. for use in scripts).
-     */
-    private void updateNeuronNodes() {
-        // System.out.println("In update neuron nodes");
-        for (NeuronNode node : getNodes(NeuronNode.class)) {
-            node.update();
-        }
-        timeLabel.update();
-        updateComplete.decrementAndGet();
-    }
-
-    /**
      * Update the time label.
      */
     public void updateTime() {
         timeLabel.update();
-    }
-
-    /**
-     * Update visible state of nodes corresponding to specified neurons. // TODO: [event] should not be handled here
-     *
-     * @param neurons the neurons whose corresponding pnode should be updated.
-     */
-    private void updateNeuronNodes(Collection<Neuron> neurons) {
-        // TODO: Refactor or remove this
-        for (Neuron neuron : neurons) {
-            NeuronNode neuronNode = ((NeuronNode) objectNodeMap.get(neuron));
-            if (neuronNode != null) {
-                // TODO: Possibly separate color update from position update
-                neuronNode.pullViewPositionFromModel();
-                neuronNode.update();
-            }
-        }
-        timeLabel.update();
-        updateComplete.decrementAndGet();
     }
 
     /**
@@ -1956,7 +1924,6 @@ public class NetworkPanel extends JPanel {
 
         for (NeuronNode neuronNode : getSelectedNodes(NeuronNode.class)) {
             neuronNode.getNeuron().getUpdateRule().decrementActivation(neuronNode.getNeuron());
-            neuronNode.update();
         }
 
         for (SynapseNode synapseNode : getSelectedNodes(SynapseNode.class)) {
@@ -2092,12 +2059,9 @@ public class NetworkPanel extends JPanel {
     public void setGuiOn(final boolean guiOn) {
         if (guiOn) {
             this.setUpdateComplete(false);
-            this.updateNeuronNodes();
+            //this.updateNeuronNodes();
             this.updateSynapseNodes();
             updateComplete.decrementAndGet();
-            network.setFireUpdates(true);
-        } else {
-            network.setFireUpdates(false);
         }
         this.guiOn = guiOn;
     }

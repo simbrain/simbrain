@@ -47,7 +47,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public class SubnetworkNode extends ScreenElement implements GroupNode {
+public class SubnetworkNode extends ScreenElement {
 
     /**
      * Parent network panel.
@@ -382,22 +382,6 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
     };
 
     @Override
-    public void updateConstituentNodes() {
-        for (Object object : outline.getChildrenReference()) {
-            if (object instanceof GroupNode) {
-                ((GroupNode) object).updateConstituentNodes();
-            }
-        }
-        //        for (SynapseGroup sg : this.getSubnetwork().getSynapseGroupList()) {
-        //            if (sg.isDisplaySynapses()) {
-        //                SynapseGroupNodeFull sgf = (SynapseGroupNodeFull) networkPanel
-        //                        .getObjectNodeMap().get(sg);
-        //                sgf.updateConstituentNodes();
-        //            }
-        //        }
-    }
-
-    @Override
     public void offset(double dx, double dy) {
         for (PNode node : outlinedObjects) {
             if (node instanceof NeuronGroupNode) {
@@ -405,11 +389,6 @@ public class SubnetworkNode extends ScreenElement implements GroupNode {
             }
         }
         outline.setOutlinedNodes(outlinedObjects);
-    }
-
-    @Override
-    public List<InteractionBox> getInteractionBoxes() {
-        return Collections.singletonList((InteractionBox) interactionBox);
     }
 
 }

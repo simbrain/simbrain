@@ -198,7 +198,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         addChild(labelBackground);
 
         resetColors();
-        update();
 
         setPickable(true);
 
@@ -220,18 +219,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         events.onLocationChange((o, n) -> pullViewPositionFromModel());
         events.onUpdateRuleChange((o, n) -> updateShape());
 
-    }
-
-    /**
-     * Update the neuron view based on the model neuron.
-     * <p>
-     * This should not be called on every update but only when the neuron is
-     * changed.
-     */
-    public void update() {
-        updateColor();
-        updateText();
-        updateClampStatus();
     }
 
     /**

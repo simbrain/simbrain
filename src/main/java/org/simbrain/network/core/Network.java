@@ -165,11 +165,6 @@ public class Network {
     private SimpleIdManager idManager = new SimpleIdManager();
 
     /**
-     * A variable telling the network not to fire events to any listeners during update.
-     */
-    private volatile boolean fireUpdates = true;
-
-    /**
      * An internal id giving networks unique numbers within the same simbrain session.
      */
     private static int current_id = 0;
@@ -857,8 +852,6 @@ public class Network {
      */
     private Object readResolve() {
 
-        fireUpdates = true;
-
         // TODO: Temp code to handle xstream backwards compatibility issues
         // Remove after converting all old sims
         if(weightMatrices == null) {
@@ -1260,14 +1253,6 @@ public class Network {
 
     public static void setSynapseVisibilityThreshold(int svt) {
         Network.synapseVisibilityThreshold = svt;
-    }
-
-    public boolean isFireUpdates() {
-        return fireUpdates;
-    }
-
-    public void setFireUpdates(boolean fireUpdates) {
-        this.fireUpdates = fireUpdates;
     }
 
     public String getName() {

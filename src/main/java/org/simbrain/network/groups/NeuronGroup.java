@@ -615,6 +615,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
                 ng = new NeuronGroup(network, numNeurons,
                         network.getIdManager().getId(NeuronGroup.class));
                 ng.setGroupUpdateRule(updateRule);
+                ng.setLabel(label);
             } else if (groupType == GroupEnum.WTA) {
                 ng = new WinnerTakeAll(network, numNeurons);
             } else if (groupType == GroupEnum.COMPETITIVE) {

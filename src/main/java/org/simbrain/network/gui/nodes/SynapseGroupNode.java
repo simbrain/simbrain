@@ -40,7 +40,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Yulin Li
  */
-public class SynapseGroupNode extends ScreenElement implements GroupNode, PropertyChangeListener {
+public class SynapseGroupNode extends ScreenElement implements PropertyChangeListener {
 
     /**
      * Parent network panel.
@@ -207,17 +207,6 @@ public class SynapseGroupNode extends ScreenElement implements GroupNode, Proper
     public void updateText() {
         interactionBox.setText(synapseGroup.getLabel());
         interactionBox.updateText();
-    }
-
-    @Override
-    public void updateConstituentNodes() {
-        // Do nothing since there are no constituent nodes. Synapses are
-        // invisible.
-    }
-
-    @Override
-    public List<InteractionBox> getInteractionBoxes() {
-        return Collections.singletonList((InteractionBox) interactionBox);
     }
 
     /**

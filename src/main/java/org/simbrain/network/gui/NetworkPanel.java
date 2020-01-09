@@ -135,11 +135,6 @@ public class NetworkPanel extends JPanel {
     private Network network;
 
     /**
-     * Main splitter pane: network in middle, hierarchy on left.
-     */
-    private JSplitPane splitPane;
-
-    /**
      * Default edit mode.
      */
     private static final EditMode DEFAULT_BUILD_MODE = EditMode.SELECTION;
@@ -280,11 +275,6 @@ public class NetworkPanel extends JPanel {
     private boolean prioritiesVisible = false;
 
     /**
-     * Whether to display the network hierarchy panel.
-     */
-    private boolean showNetworkHierarchyPanel;
-
-    /**
      * Text object event handler.
      */
     private TextEventHandler textHandle;
@@ -318,11 +308,6 @@ public class NetworkPanel extends JPanel {
      * Manages placement of new nodes, groups, etc.
      */
     private PlacementManager placementManager = new PlacementManager();
-
-    /**
-     * Reference to last neuronGroup added.  For setting distances between neuron groups when adding them.
-     */
-    private NeuronGroup lastNgAdded;
 
     /**
      * Create a new Network panel.
@@ -734,10 +719,6 @@ public class NetworkPanel extends JPanel {
         canvas.getLayer().addChild(neuronGroupNode);
         objectNodeMap.put(neuronGroup, neuronGroupNode);
 
-        // Place the object at the appropriate location
-        //placementManager.addNewModelObject(neuronGroup);
-        lastNgAdded = neuronGroup;
-
         repaint();
     }
 
@@ -842,65 +823,6 @@ public class NetworkPanel extends JPanel {
         // subnet.fireLabelUpdated();
 
         // Update canvas
-        repaint();
-    }
-
-    //TODO
-    ///**
-    // * Removes a group from the network panel, but not necessarily the network model.
-    // *
-    // * @param group the group to remove
-    // */
-    //private void removeGroup(Group group) {
-    //    PNode node = objectNodeMap.get(group);
-    //    if (node != null) {
-    //        if (node instanceof GroupNode) {
-    //            for (InteractionBox box : ((GroupNode) node).getInteractionBoxes()) {
-    //                // TODO: property listener list is not visible in pnode,
-    //                // so have not tested to make sure this cleanup is working
-    //                canvas.getCamera().removePropertyChangeListener(box.getZoomListener());
-    //            }
-    //        }
-    //        node.removeFromParent();
-    //        objectNodeMap.remove(group);
-    //        // If this node is a child of a parent group, remove it from the
-    //        // parent group
-    //        if (!group.isTopLevelGroup()) {
-    //            PNode parentGroupNode = objectNodeMap.get(group.getParentGroup());
-    //            if (parentGroupNode != null) {
-    //                if (parentGroupNode instanceof SubnetworkNode) {
-    //                    ((SubnetworkNode) parentGroupNode).getOutline().removeChild(node);
-    //                }
-    //            }
-    //        }
-    //    }
-    //    zoomToFitPage(false);
-    //}
-
-    /**
-     * Remove all synapse group nodes associated with a synapse group. Used when toggling the visibility of synapses in
-     * a synapse group node.
-     *
-     * @param group the synapse group whose synapses should be removed
-     */
-    private void removeSynapseGroupNodes(SynapseGroup group) {
-        SynapseNode node;
-        for (Synapse synapse : group.getExcitatorySynapses()) {
-            node = (SynapseNode) objectNodeMap.get(synapse);
-            if (node != null) {
-                selectionModel.remove(node);
-                objectNodeMap.remove(synapse);
-                node.removeFromParent();
-            }
-        }
-        for (Synapse synapse : group.getInhibitorySynapses()) {
-            node = (SynapseNode) objectNodeMap.get(synapse);
-            if (node != null) {
-                selectionModel.remove(node);
-                objectNodeMap.remove(synapse);
-                node.removeFromParent();
-            }
-        }
         repaint();
     }
 

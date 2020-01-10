@@ -103,7 +103,6 @@ public class BoltzmannMachineDialog extends StandardDialog {
         layoutPanel.commitChanges();
 
         networkPanel.getNetwork().addSubnetwork(boltzmannMachine);
-        networkPanel.syncToModel(); //TODO
         super.closeDialogOk();
     }
 

@@ -182,6 +182,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public NeuronGroup(final Network network, final NeuronGroup toCopy) {
         super(network);
         id = network.getIdManager().getId(NeuronGroup.class);
+        setLabel(id); // Don't copy existing labels but reset them to id. Avoids many headaches.
         List<Neuron> newNeurons = new ArrayList<>();
         for (Neuron neuron : toCopy.getNeuronList()) {
             newNeurons.add(new Neuron(network, neuron));

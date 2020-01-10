@@ -273,7 +273,7 @@ public class SOMGroup extends NeuronGroup {
         String stateInfo = "Learning rate (" + Utils.round(getAlpha(), 2) +
                 ") N-size (" + Utils.round(getNeighborhoodSize(), 2) + ")";
         setStateInfo(stateInfo);
-        fireLabelUpdated();
+        events.fireLabelChange( null , stateInfo);
     }
 
     /**

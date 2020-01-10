@@ -32,6 +32,7 @@ import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
 import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
 import org.simbrain.network.gui.actions.edit.*;
 import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
+import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction;
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
 import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
@@ -146,7 +147,7 @@ public class NetworkPanelDesktop extends NetworkPanel {
         editMenu.addSeparator();
         editMenu.add(actionManager.getAction(ShowLayoutDialogAction.class));
         editMenu.addSeparator();
-        editMenu.add(actionManager.getAction(NeuronCollection.class));
+        editMenu.add(actionManager.getAction(NeuronCollectionAction.class));
         editMenu.addSeparator();
         editMenu.add(createAlignMenu());
         editMenu.add(createSpacingMenu());

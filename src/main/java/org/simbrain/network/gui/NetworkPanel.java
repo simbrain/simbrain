@@ -454,7 +454,9 @@ public class NetworkPanel extends JPanel {
             NetworkPanel.this.setUpdateComplete(c);
             repaint();
         });
-
+        event.onBatchLocationUpdateCompleted(() -> {
+            getNodes(NeuronNode.class).forEach(NeuronNode::pullViewPositionFromModel);
+        });
     }
 
     /**
@@ -1700,9 +1702,9 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
-     * Synchronize model and view.
+     * Create a {@link ScreenElement} for every {@link NetworkModel} in the network.
      */
-    public void syncToModel() {
+    public void initScreenElements() {
         network.getLooseNeurons().forEach(n -> addNeuron(n));
         // Synapses must be added _after_ groups are added so that all neurons
         // in groups are
@@ -2365,7 +2367,7 @@ public class NetworkPanel extends JPanel {
     public static void showNetwork(Network network) {
         // TODO: Creation outside of desktop lacks menus
         NetworkPanel np = new NetworkPanel(network);
-        np.syncToModel();
+        np.initScreenElements();
         JFrame frame = new JFrame();
         frame.setContentPane(np);
         frame.setPreferredSize(new Dimension(500, 500));

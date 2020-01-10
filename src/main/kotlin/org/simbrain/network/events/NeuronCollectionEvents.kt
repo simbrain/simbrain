@@ -20,7 +20,7 @@ class NeuronCollectionEvents(val nc: AbstractNeuronCollection) : Event(PropertyC
     fun fireLocationChange(old: Point2D, new: Point2D) = "LocationChange"(old = old, new = new)
 
     fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
-    fun fireLabelChange(old: String, new: String) = "LabelChange"(old = old, new = new)
+    fun fireLabelChange(old: String?, new: String) = "LabelChange"(old = old, new = new)
 
     fun onUpdated(handler: Runnable) = "Updated".event(handler)
     fun fireUpdated() = "Updated"()

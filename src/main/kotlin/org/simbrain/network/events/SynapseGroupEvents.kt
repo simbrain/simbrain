@@ -20,7 +20,7 @@ class SynapseGroupEvents(val sg: SynapseGroup) : Event(PropertyChangeSupport(sg)
     fun fireLocationChange(old: Point2D, new: Point2D) = "LocationChange"(old = old, new = new)
 
     fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
-    fun fireLabelChange(old: String, new: String) = "LabelChange"(old = old, new = new)
+    fun fireLabelChange(old: String?, new: String) = "LabelChange"(old = old, new = new)
 
     fun onSynapseAdded(handler: Consumer<Synapse>) = "SynapseAdded".itemAddedEvent(handler)
     fun fireSynapseAdded(syn: Synapse) = "SynapseAdded"(new = syn)

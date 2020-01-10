@@ -55,9 +55,8 @@ public abstract class InteractionBox extends ScreenElement {
     private JPopupMenu contextMenu;
 
     /**
-     * This is the largest amount an interaction box's scale can be zoomed when
-     * the scale gets small. Easiest to understand by changing the value and
-     * "zooming  out" of a network containing a neuron group.
+     * This is the largest amount an interaction box's scale can be zoomed when the scale gets small. Easiest to
+     * understand by changing the value and "zooming  out" of a network containing a neuron group.
      */
     private final double largestZoomRescaleFactor = 4;
 
@@ -86,18 +85,15 @@ public abstract class InteractionBox extends ScreenElement {
 
         // Add listener to camera which causes the interaction box
         // to re-scale when the canvas is "zoomed out" (view scale below 1)
-        zoomListener = new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                double viewScale = net.getCanvas().getCamera().getViewScale();
-                if (viewScale < 1) {
-                    // Rescale based on linear equation so that as view scale
-                    // goes from 1 to 0 rescaleAmount goes from 1 to "largestZoomRescaleFactor"
-                    double rescaleAmount = (1 - largestZoomRescaleFactor) * viewScale + largestZoomRescaleFactor;
-                    setScale(rescaleAmount);
-                } else {
-                    setScale(1);
-                }
+        zoomListener = evt -> {
+            double viewScale = net.getCanvas().getCamera().getViewScale();
+            if (viewScale < 1) {
+                // Rescale based on linear equation so that as view scale
+                // goes from 1 to 0 rescaleAmount goes from 1 to "largestZoomRescaleFactor"
+                double rescaleAmount = (1 - largestZoomRescaleFactor) * viewScale + largestZoomRescaleFactor;
+                setScale(rescaleAmount);
+            } else {
+                setScale(1);
             }
         };
         net.getCanvas().getCamera().addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener);
@@ -113,30 +109,18 @@ public abstract class InteractionBox extends ScreenElement {
         if (text == null) {
             return;
         }
-        if (textLabel.getScale() == 1) {
-            textLabel.scaleAboutPoint(.8, getBounds().getCenter2D().getX(), getBounds().getCenter2D().getY());
-        }
-        textLabel.setText(text);
-        textLabel.resetBounds();
-        updateText();
-    }
 
-    /**
-     * Update the text label bounds.
-     */
-    public void updateText() {
-        // TODO: Appears to be one source of performance drains.
-        // This is called multiple times at each iteration and it calls repaint
-        // Reduce number of times this is called
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                // Reset box bounds
-                textLabel.centerFullBoundsOnPoint(getBounds().getCenter2D().getX(), getBounds().getCenter2D().getY());
-                setBounds(textLabel.getBounds());
-                getNetworkPanel().repaint();
-            }
-        });
+        textLabel.setText(text);
+
+        // Make smaller than interaction box if scale is 1
+        // (Otherwise it keeps getting smaller when editing)
+        if (textLabel.getScale() == 1) {
+            textLabel.scaleAboutPoint(.8, getBounds().getCenter2D().getX(),
+                    getBounds().getCenter2D().getY());
+        }
+
+        // Set interaction box bounds to text bounds
+        setBounds(textLabel.getBounds());
     }
 
     @Override

@@ -88,8 +88,6 @@ public class SubnetworkNode extends ScreenElement {
         interactionBox.setText(group.getLabel());
         addChild(outline);
         addChild(interactionBox);
-        // Must do this after it's added to properly locate the text
-        interactionBox.updateText();
 
         setContextMenu(this.getDefaultContextMenu());
 
@@ -156,7 +154,6 @@ public class SubnetworkNode extends ScreenElement {
      */
     public void updateText() {
         interactionBox.setText(subnetwork.getLabel());
-        interactionBox.updateText();
     }
 
     @Override

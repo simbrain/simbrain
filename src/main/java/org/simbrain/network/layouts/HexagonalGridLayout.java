@@ -111,6 +111,11 @@ public class HexagonalGridLayout implements Layout {
 
     @Override
     public void layoutNeurons(final List<Neuron> neurons) {
+
+        if(neurons.size() == 0) {
+            return;
+        }
+
         if (autoColumns) {
             numColumns = (int) Math.sqrt(neurons.size());
         }
@@ -121,12 +126,13 @@ public class HexagonalGridLayout implements Layout {
                 rowNum++;
             }
             if (rowNum % 2 == 0) {
-                neuron.setX(initialX + hSpacing / 2 + (i % numColumns) * hSpacing);
+                neuron.setX(initialX + hSpacing / 2 + (i % numColumns) * hSpacing, false);
             } else {
-                neuron.setX(initialX + (i % numColumns) * hSpacing);
+                neuron.setX(initialX + (i % numColumns) * hSpacing, false);
             }
-            neuron.setY(initialY + rowNum * vSpacing);
+            neuron.setY(initialY + rowNum * vSpacing, false);
         }
+        neurons.get(0).getNetwork().getEvents().fireBatchLocationUpdateCompleted();
     }
 
     /**

@@ -64,21 +64,6 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         NeuronCollectionInteractionBox interactionBox = new NeuronCollectionInteractionBox(networkPanel);
         interactionBox.setText(nc.getLabel());
         setInteractionBox(interactionBox);
-
-        // TODO: Superclass handles these?
-        //nc.addPropertyChangeListener(evt -> {
-        //    if ("delete".equals(evt.getPropertyName())) {
-        //        NeuronCollectionNode.this.removeFromParent();
-        //        getOutlinedObjects().update(getNeuronNodes());
-        //    } else if ("label".equals(evt.getPropertyName())) {
-        //        interactionBox.setText(nc.getLabel());
-        //        NeuronCollectionNode.this.updateText();
-        //    } else if ("moved".equals(evt.getPropertyName())) {
-        //        NeuronCollectionNode.this.syncToModel();
-        //        getOutlinedObjects().update(getNeuronNodes());
-        //    }
-        //});
-
     }
 
     /**
@@ -234,7 +219,6 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
             super(net);
             setPaint(BOX_COLOR);
             //setTransparency(.2f);
-            updateText();
         }
 
         @Override

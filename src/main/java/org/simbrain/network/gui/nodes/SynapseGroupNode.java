@@ -94,8 +94,6 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
         interactionBox = new SynapseGroupInteractionBox(networkPanel, group, this);
         interactionBox.setText(synapseGroup.getLabel());
         addChild(interactionBox);
-        // Must do this after it's added to properly locate it
-        interactionBox.updateText();
 
         toggleSynapseVisibility();
 
@@ -206,7 +204,6 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
      */
     public void updateText() {
         interactionBox.setText(synapseGroup.getLabel());
-        interactionBox.updateText();
     }
 
     /**

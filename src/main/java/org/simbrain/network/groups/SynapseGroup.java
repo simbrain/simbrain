@@ -72,7 +72,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
      */
     @UserParameter(label = "Label", description = "Synapse group label", useSetter = true,
             order = 10)
-    private String label = "TODO";
+    private String label;
 
     /**
      * Event support
@@ -386,6 +386,8 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
         recurrent = testRecurrent();
+        id = parentNetwork.getIdManager().getId(SynapseGroup.class);
+        setLabel(id);
         initializeSynapseVisibility();
         initSpikeResponders();
         source.addOutgoingSg(this);
@@ -408,6 +410,8 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         this.targetNeuronGroup = target;
         this.connectionManager = connectionManager;
         recurrent = testRecurrent();
+        id = parentNetwork.getIdManager().getId(SynapseGroup.class);
+        setLabel(id);
         initializeSynapseVisibility();
         initSpikeResponders();
     }

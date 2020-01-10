@@ -122,21 +122,26 @@ public class LineLayout implements Layout {
 
     @Override
     public void layoutNeurons(final List<Neuron> neurons) {
+        if(neurons.size() == 0) {
+            return;
+        }
         if (orientation == LineOrientation.VERTICAL) {
             double ypos = initialY;
             for (Neuron neuron : neurons) {
-                neuron.setX(initialX);
-                neuron.setY(ypos);
+                neuron.setX(initialX, false);
+                neuron.setY(ypos, false);
                 ypos += spacing;
             }
         } else if (orientation == LineOrientation.HORIZONTAL) {
             double xpos = initialX;
             for (Neuron neuron : neurons) {
-                neuron.setX(xpos);
-                neuron.setY(initialY);
+                neuron.setX(xpos, false);
+                neuron.setY(initialY, false);
                 xpos += spacing;
             }
         }
+        neurons.get(0).getNetwork().getEvents().fireBatchLocationUpdateCompleted();
+
     }
 
     @Override

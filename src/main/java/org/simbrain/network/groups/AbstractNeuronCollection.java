@@ -52,9 +52,9 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     /**
      * Name of this group. Null strings lead to default labeling conventions.
      */
-    @UserParameter(label = "Label", description = "Neuron collection  label", useSetter = true,
+    @UserParameter(label = "Label", description = "Neuron collection label", useSetter = true,
             order = 10)
-    private String label = "TODO";
+    private String label;
 
     /**
      * Optional information about the current state of the group. For display in
@@ -878,13 +878,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     @Override
     public String getId() {
         return null;
-    }
-
-    /**
-     * Label update needs to be reflected in GUI.
-     */
-    public void fireLabelUpdated() {
-        events.fireLabelChange( null , label);
     }
 
     public String getStateInfo() {

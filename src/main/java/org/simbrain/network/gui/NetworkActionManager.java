@@ -127,8 +127,8 @@ public final class NetworkActionManager {
 
         actions.put(NeuronGroup.class, new AddGroupAction(networkPanel,
                 NeuronGroupDialog.class, "Add Neuron Group"));
-        actions.put(SynapseGroup.class, new AddSynapseGroupAction(networkPanel));
-        actions.put(NeuronCollection.class, new NeuronCollectionAction(networkPanel));
+        actions.put(AddSynapseGroupAction.class, new AddSynapseGroupAction(networkPanel));
+        actions.put(NeuronCollectionAction.class, new NeuronCollectionAction(networkPanel));
 
 
     }

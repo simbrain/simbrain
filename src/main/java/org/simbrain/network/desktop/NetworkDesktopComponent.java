@@ -143,7 +143,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         if (networkPanel.getNetwork() != this.getWorkspaceComponent().getNetwork()) {
             networkPanel.setNetwork(this.getWorkspaceComponent().getNetwork());
         }
-        networkPanel.syncToModel();
+        networkPanel.initScreenElements();
         networkPanel.initGui();
     }
 

@@ -22,6 +22,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.ResourceManager;
@@ -99,21 +100,10 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      * @param group        the neuron group
      */
     public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
-
         super(networkPanel, group);
         this.neuronGroup = group;
-
         setInteractionBox(new NeuronGroupInteractionBox(networkPanel));
         getInteractionBox().setText(neuronGroup.getLabel());
-        // Must do this after it's added to properly locate it
-        getInteractionBox().updateText();
-
-        NeuronCollectionEvents events = neuronGroup.getEvents();
-        // TODO: Aren't these repeats of AbstractNeuronCollectionNode?
-        events.onDelete(n -> removeFromParent());
-        events.onLabelChange((o,n) -> updateText());
-        //events.onMoved((o,n) -> syncToModel());
-
     }
 
     /**
@@ -212,7 +202,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
     @Override
     public void resetColors() {
-
     }
 
     /**
@@ -317,6 +306,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         menu.add(new RecordingAction());
 
         // Coupling menu
+        menu.addSeparator();
         JMenu couplingMenu = getNetworkPanel().getCouplingMenu(neuronGroup);
         if (couplingMenu != null) {
             menu.add(couplingMenu);

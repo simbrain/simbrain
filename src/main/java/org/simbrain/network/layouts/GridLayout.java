@@ -129,6 +129,10 @@ public class GridLayout implements Layout {
     @Override
     public void layoutNeurons(final List<Neuron> neurons) {
 
+        if(neurons.size() == 0) {
+            return;
+        }
+
         int numCols = numColumns;
 
         // If auto-columns set numcolumns automatically
@@ -150,6 +154,7 @@ public class GridLayout implements Layout {
             neuron.setX(initialX + (i % numCols) * hSpacing, false);
             neuron.setY(initialY + rowNum * vSpacing, false);
         }
+        neurons.get(0).getNetwork().getEvents().fireBatchLocationUpdateCompleted();
     }
 
     /**

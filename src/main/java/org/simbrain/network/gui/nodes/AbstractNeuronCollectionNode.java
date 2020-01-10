@@ -57,12 +57,13 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         events.onDelete(n ->  {
             removeFromParent();
         });
-        events.onLabelChange((o,n) -> updateText());
+        events.onLabelChange((o,n) -> {
+            updateText();
+            syncToModel();
+        });
         events.onLocationChange((o, n) -> outlinedObjects.updateBounds());
-        //events.onMoved((o,n) -> syncToModel());
         events.onRecordingStarted(this::updateText);
         events.onRecordingStopped(this::updateText);
-
     }
 
     /**

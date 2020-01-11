@@ -23,7 +23,6 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.EditableObject;
 
-import java.awt.geom.Point2D;
 import java.util.List;
 
 /**
@@ -46,13 +45,13 @@ public class NeuronCollection extends AbstractNeuronCollection {
         setLabel(id);
         subsamplingManager.resetIndices();
 
-        neurons.forEach(n -> n.getEvents().onLocationChange((ol, nl) -> {
-            events.fireLocationChange(ol.getPoint2D(), nl.getPoint2D());
+        neurons.forEach(n -> n.getEvents().onLocationChange(() -> {
+            events.fireLocationChange();
         }));
 
         net.getEvents().onNeuronRemoved(n -> {
             removeNeuron(n);
-            events.fireLocationChange(new Point2D.Double(), new Point2D.Double());
+            events.fireLocationChange();
             if (isEmpty()) {
                 delete();
             }
@@ -67,10 +66,9 @@ public class NeuronCollection extends AbstractNeuronCollection {
      */
     public void offset(final double offsetX, final double offsetY) {
         for (Neuron neuron : getNeuronList()) {
-            neuron.setX(neuron.getX() + offsetX, false);
-            neuron.setY(neuron.getY() + offsetY, false);
+            neuron.offset(offsetX, offsetY, false);
         }
-        events.fireLocationChange(new Point2D.Double(), new Point2D.Double(offsetX, offsetY));
+        events.fireLocationChange();
     }
 
     public void addNeuron(Neuron neuron, boolean fireEvent) {
@@ -115,10 +113,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
         }
     }
 
-    @Override
-    public void setLocation(Point2D location) {
-        // TODO
-    }
 
     @Override
     public String toString() {

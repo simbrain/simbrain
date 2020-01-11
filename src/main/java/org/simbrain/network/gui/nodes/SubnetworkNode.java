@@ -129,9 +129,7 @@ public class SubnetworkNode extends ScreenElement {
                 outlinedObjects.remove(node);
                 outline.setOutlinedNodes(outlinedObjects);
             });
-            ng.getEvents().onLocationChange((o,n) -> {
-                outline.setOutlinedNodes(outlinedObjects);
-            });
+            ng.getEvents().onLocationChange(() -> outline.setOutlinedNodes(outlinedObjects));
         }
         outline.setOutlinedNodes(outlinedObjects);
         outline.updateBounds();

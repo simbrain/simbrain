@@ -27,6 +27,8 @@ import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.simbrain.util.PointKt.plus;
+
 /**
  * <b>SimnetUtils</b> provides utility classes relating to Simbrain networks.
  *
@@ -134,38 +136,6 @@ public class SimnetUtils {
     }
 
     /**
-     * Return the center position of the upper-left-most object in a list of network objects.
-     */
-    public static Point2D getUpperLeft(final List<NetworkModel> networkObjects) {
-
-        double x = Double.POSITIVE_INFINITY;
-        double y = Double.POSITIVE_INFINITY;
-
-        List<LocatableModel> locatableModels =
-                networkObjects.stream()
-                .filter(LocatableModel.class::isInstance)
-                .map(LocatableModel.class::cast)
-                .collect(Collectors.toList());
-
-        for (LocatableModel model : locatableModels) {
-            if (model.getCenterX() < x) {
-                x = model.getCenterX();
-            }
-            if (model.getCenterY() < y) {
-                y = model.getCenterY();
-            }
-
-            if (x == Double.POSITIVE_INFINITY) {
-                x = 0;
-            }
-            if (y == Double.POSITIVE_INFINITY) {
-                y = 0;
-            }
-        }
-        return new Point2D.Double(x, y);
-    }
-
-    /**
      * Translate a set of network model object.
      */
     public static void translate(final List<NetworkModel> networkObjects, final Point2D translation) {
@@ -176,10 +146,7 @@ public class SimnetUtils {
                         .collect(Collectors.toList());
 
         for (LocatableModel model : locatableModels) {
-            //System.out.println(model.getCenterX() + "," + model.getCenterY()
-            //        + ":" + translation.getX() + "," + translation.getY());
-            model.setCenterX(model.getCenterX() + translation.getX());
-            model.setCenterY(model.getCenterY() + translation.getY());
+            model.setLocation(plus(model.getLocation(), translation));
         }
     }
 
@@ -387,7 +354,7 @@ public class SimnetUtils {
      * @param n2 The second neuron.
      */
     public static double getEuclideanDist(Neuron n1, Neuron n2) {
-        return SimbrainMath.distance(n1.getPosition(), n2.getPosition());
+        return SimbrainMath.distance(n1.getLocation(), n2.getLocation());
     }
 
 

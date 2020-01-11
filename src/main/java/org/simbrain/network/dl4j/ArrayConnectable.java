@@ -1,18 +1,16 @@
 package org.simbrain.network.dl4j;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Classes that implement this interface can be the source or target of an
  * ND4J weight matrix (or other layer-to-layer connector, if we add them).
  */
-public interface ArrayConnectable {
+public interface ArrayConnectable extends LocatableModel {
 
     /**
      * Set input activations.
@@ -62,29 +60,10 @@ public interface ArrayConnectable {
     String getId();
 
     /**
-     * Set the upper-left location of this object.
-     */
-    void setLocation(Point2D location);
-
-    /**
-     * Get a graphical attachment point for this object, where the line representing a {@link WeightMatrix} will attach.
-     */
-    Point2D getAttachmentPoint();
-
-    /**
      * Register a callback function to run when the location of this object is updated.
      */
     void onLocationChange(Runnable task);
 
     Network getNetwork();
-
-    /**
-     * Call this when deleting the object.
-     */
-    default void fireDeleted() {
-        getNetwork().removeWeightMatrix(getIncomingWeightMatrix());
-        List<WeightMatrix> toDelete = new ArrayList<>(getOutgoingWeightMatrices());
-        toDelete.forEach(WeightMatrix::fireDeleted);
-    }
 
 }

@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
@@ -60,15 +59,13 @@ public class ClassicalConditioning extends RegisteredSimulation {
 
         // Construct the network
         Neuron bellDetectorNeuron = new Neuron(network);
-        bellDetectorNeuron.setX(295);
-        bellDetectorNeuron.setY(194);
+        bellDetectorNeuron.setLocation(295, 194);
         bellDetectorNeuron.setLabel("Bell Detector");
         bellDetectorNeuron.setClamped(true);
         network.addLooseNeuron(bellDetectorNeuron);
 
         Neuron cheeseDetectorNeuron = new Neuron(network);
-        cheeseDetectorNeuron.setX(160);
-        cheeseDetectorNeuron.setY(194);
+        cheeseDetectorNeuron.setLocation(160, 194);
         cheeseDetectorNeuron.setLabel("Cheese Detector");
         cheeseDetectorNeuron.setClamped(false);
         network.addLooseNeuron(cheeseDetectorNeuron);
@@ -77,8 +74,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
         responseRule.setThreshold(.5);
         responseRule.setLowerBound(0);
         Neuron salivationResponse = new Neuron(network, responseRule);
-        salivationResponse.setX(160);
-        salivationResponse.setY(60);
+        salivationResponse.setLocation(160, 60);
         salivationResponse.setLabel("Salivation");
         network.addLooseNeuron(salivationResponse);
 

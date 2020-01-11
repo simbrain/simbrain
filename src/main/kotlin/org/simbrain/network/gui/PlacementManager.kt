@@ -5,6 +5,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.dl4j.NeuronArray
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.gui.PlacementManager.DefaultOffsets
+import org.simbrain.network.topLeftLocation
 import org.simbrain.util.minus
 import org.simbrain.util.plus
 import org.simbrain.util.point
@@ -150,5 +151,3 @@ class PlacementManager {
     }
 }
 
-val List<LocatableModel>.topLeftLocation
-    get() = Point2D.Double(map { it.location.x }.min() ?: 0.0, map { it.location.y }.min() ?: 0.0)

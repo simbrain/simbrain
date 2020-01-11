@@ -105,8 +105,10 @@ public class NetworkGenome extends Genome<NetworkGenome, Network> {
                 outputGroup.addNeuron(neuron);
             } else {
                 // Set locations based on where the input and outputs are set
-                neuron.setX(SimbrainRandomizer.rand.nextDouble(-200, 200));
-                neuron.setY(SimbrainRandomizer.rand.nextDouble(0, 300));
+                neuron.setLocation(
+                        SimbrainRandomizer.rand.nextDouble(-200, 200),
+                        SimbrainRandomizer.rand.nextDouble(0, 300)
+                );
                 network.addLooseNeuron(neuron);
             }
         });

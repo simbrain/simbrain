@@ -7,7 +7,6 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.WeightMatrix;
-import org.simbrain.network.events.NetworkTextEvents;
 import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
@@ -123,8 +122,8 @@ public class WeightMatrixNode extends ScreenElement {
         ArrayConnectable source = wm.getSource();
         ArrayConnectable target = wm.getTarget();
 
-        Point2D sourceLocation = source.getAttachmentPoint();
-        Point2D targetLocation = target.getAttachmentPoint();
+        Point2D sourceLocation = source.getLocation();
+        Point2D targetLocation = target.getLocation();
         Point2D midLocation = SimbrainMath.midpoint(sourceLocation, targetLocation);
 
         line2D = new QuadCurve2D.Double(
@@ -196,8 +195,8 @@ public class WeightMatrixNode extends ScreenElement {
     }
 
     private void updateDirectionalLine() {
-        Point2D source = weightMatrix.getSource().getAttachmentPoint();
-        Point2D target = weightMatrix.getTarget().getAttachmentPoint();
+        Point2D source = weightMatrix.getSource().getLocation();
+        Point2D target = weightMatrix.getTarget().getLocation();
         Point2D mid = SimbrainMath.add(
                 SimbrainMath.midpoint(source, target),
                 getCurveControlVector()
@@ -223,7 +222,7 @@ public class WeightMatrixNode extends ScreenElement {
     }
 
     private void updateSelfDirectedLine() {
-        Point2D source = weightMatrix.getSource().getAttachmentPoint();
+        Point2D source = weightMatrix.getSource().getLocation();
         selfDirectedLine = PPath.createEllipse(source.getX(), source.getY() - selfDirectedLineRadius,
                 selfDirectedLineRadius * 2, selfDirectedLineRadius * 2);
         selfDirectedLine.setStroke(new BasicStroke(3.0f));
@@ -254,8 +253,8 @@ public class WeightMatrixNode extends ScreenElement {
      */
     private Point2D getCurveControlVector() {
         float offset = weightMatrix.isUseCurve() ? 200 : 0;
-        Point2D source = weightMatrix.getSource().getAttachmentPoint();
-        Point2D target = weightMatrix.getTarget().getAttachmentPoint();
+        Point2D source = weightMatrix.getSource().getLocation();
+        Point2D target = weightMatrix.getTarget().getLocation();
         Point2D unitNormal = SimbrainMath.getUnitNormalVector(source, target);
         return SimbrainMath.scale(unitNormal, offset);
     }
@@ -265,8 +264,8 @@ public class WeightMatrixNode extends ScreenElement {
      */
     private void updateImageBoxLocation() {
 
-        Point2D source = weightMatrix.getSource().getAttachmentPoint();
-        Point2D target = weightMatrix.getTarget().getAttachmentPoint();
+        Point2D source = weightMatrix.getSource().getLocation();
+        Point2D target = weightMatrix.getTarget().getLocation();
         boolean isSelfDirected = weightMatrix.getSource() == weightMatrix.getTarget();
 
         Point2D midPoint = SimbrainMath.midpoint(source, target);

@@ -1,8 +1,10 @@
 package org.simbrain.network.groups;
 
+import org.jetbrains.annotations.NotNull;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.LocatableModel;
+import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -23,13 +25,15 @@ import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static org.simbrain.network.gui.PlacementManagerKt.getTopLeftLocation;
+import static org.simbrain.network.LocatableModelKt.getCenterLocation;
+import static org.simbrain.util.PointKt.minus;
 import static org.simbrain.util.PointKt.plus;
 
 /**
@@ -129,18 +133,10 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * @return the center x coordinate.
      */
     public double getCenterX() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() < min) {
-                min = neuron.getX();
-            }
-            if (neuron.getX() > max) {
-                max = neuron.getX();
-            }
-        }
-        return min + (max - min) / 2;
+        return getCenterLocation(neuronList).x;
     }
+
+
 
     /**
      * Get the central y coordinate of this group, based on the positions of the neurons that comprise it.
@@ -148,33 +144,23 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * @return the center y coordinate.
      */
     public double getCenterY() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getY() < min) {
-                min = neuron.getY();
-            }
-            if (neuron.getY() > max) {
-                max = neuron.getY();
-            }
-        }
-        return min + (max - min) / 2;
+        return getCenterLocation(neuronList).y;
     }
 
-    @Override
-    public void setCenterX(double newx) {
-        // todo
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-        //todo
-    }
 
     @Override
     public Point2D getLocation() {
-        return getTopLeftLocation(neuronList);
+        return getCenterLocation(neuronList);
     }
+
+    @Override
+    public void setLocation(@NotNull Point2D location) {
+        Point2D delta = minus(location, getLocation());
+        neuronList.forEach(n -> n.setLocation(plus(n.getLocation(), delta)));
+        events.fireLocationChange();
+    }
+
+    public Rectangle2D getBound() { return LocatableModelKt.getBound(neuronList); }
 
     /**
      * Return the width of this group, based on the positions of the neurons that comprise it.
@@ -182,17 +168,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * @return the width of the group
      */
     public double getWidth() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getX() < min) {
-                min = neuron.getX();
-            }
-            if (neuron.getX() > max) {
-                max = neuron.getX();
-            }
-        }
-        return max - min;
+        return getBound().getWidth();
     }
 
     /**
@@ -201,17 +177,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * @return the height of the group
      */
     public double getHeight() {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
-        for (Neuron neuron : neuronList) {
-            if (neuron.getY() < min) {
-                min = neuron.getY();
-            }
-            if (neuron.getY() > max) {
-                max = neuron.getY();
-            }
-        }
-        return max - min;
+        return getBound().getHeight();
     }
 
     /**
@@ -233,10 +199,9 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      */
     public void offset(final double offsetX, final double offsetY) {
         for (Neuron neuron : neuronList) {
-            neuron.setX(neuron.getX() + offsetX, false);
-            neuron.setY(neuron.getY() + offsetY, false);
+            neuron.offset(offsetX, offsetY, false);
         }
-        events.fireLocationChange(new Point2D.Double(), new Point2D.Double(offsetX, offsetY));
+        events.fireLocationChange();
     }
 
     /**
@@ -268,7 +233,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
      * Add listener to indicated neuron.
      */
     private void addListener(Neuron n) {
-        n.getEvents().onLocationChange((ol, nl) -> events.fireLocationChange(ol.getPoint2D(), nl.getPoint2D()));
+        n.getEvents().onLocationChange(() -> events.fireLocationChange());
     }
 
     /**
@@ -499,23 +464,8 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     }
 
     @Override
-    public void setLocation(Point2D location) {
-        neuronList.forEach(n -> n.setLocation(plus(n.getLocation(), location)));
-        events.fireLocationChange(new Point2D.Double(), location);
-    }
-
-    @Override
-    public Point2D getAttachmentPoint() {
-        return new Point2D.Double(SimnetUtils.getMinX(neuronList), SimnetUtils.getMinY(neuronList));
-    }
-
-    @Override
     public void onLocationChange(Runnable task) {
-        //changeSupport.addPropertyChangeListener(evt -> {
-        //    if ("moved".equals(evt.getPropertyName())) {
-        //        task.run();
-        //    }
-        //});
+        events.onLocationChange(task);
     }
 
     /**

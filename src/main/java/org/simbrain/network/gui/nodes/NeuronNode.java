@@ -216,7 +216,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         });
         events.onLabelChange((o, n) -> updateText());
         events.onClampedChange((o, n) -> updateClampStatus());
-        events.onLocationChange((o, n) -> pullViewPositionFromModel());
+        events.onLocationChange(this::pullViewPositionFromModel);
         events.onUpdateRuleChange((o, n) -> updateShape());
 
     }
@@ -596,8 +596,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        getNeuron().setX(p.getX());
-        getNeuron().setY(p.getY());
+        getNeuron().setLocation(p);
     }
 
     /**

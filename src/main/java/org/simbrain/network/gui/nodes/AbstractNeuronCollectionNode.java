@@ -61,7 +61,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             updateText();
             syncToModel();
         });
-        events.onLocationChange((o, n) -> outlinedObjects.updateBounds());
+        events.onLocationChange(outlinedObjects::updateBounds);
         events.onRecordingStarted(this::updateText);
         events.onRecordingStopped(this::updateText);
     }
@@ -106,7 +106,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
                 this.neuronNodes.remove(neuronNode);
                 outlinedObjects.setOutlinedNodes(this.neuronNodes);
             });
-            events.onLocationChange((o, n) -> outlinedObjects.setOutlinedNodes(this.neuronNodes));
+            events.onLocationChange(() -> outlinedObjects.setOutlinedNodes(this.neuronNodes));
         }
         outlinedObjects.setOutlinedNodes(this.neuronNodes);
         outlinedObjects.updateBounds();

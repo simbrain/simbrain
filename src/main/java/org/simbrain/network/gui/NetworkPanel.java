@@ -445,7 +445,7 @@ public class NetworkPanel extends JPanel {
         event.onSubnetworkAdded(this::addSubnetwork);
         //event.onSubnetworkRemoved(Subnetwork::fireDeleted); // TODO: [event]
         event.onNeuronArrayAdded(this::addNeuronArray);
-        event.onNeuronArrayRemoved(NeuronArray::fireDeleted);
+        // event.onNeuronArrayRemoved(NeuronArray::fireDeleted);
         event.onMultiLayerNetworkAdded(this::addMultiLayerNetwork);
         event.onNeuronCollectionAdded(this::addNeuronCollection);
         event.onWeightMatrixRemoved(WeightMatrix::fireDeleted);

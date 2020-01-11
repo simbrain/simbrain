@@ -1,11 +1,11 @@
 package org.simbrain.network.dl4j;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.NeuronArrayEvents;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -15,8 +15,6 @@ import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,8 +119,8 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
         NeuronArray copy = new NeuronArray(newParent, orig.getNumNodes());
         copy.setLabel(copy.getId());
-        copy.setCenterX(orig.getCenterX());
-        copy.setCenterY(orig.getCenterY());
+        copy.x = orig.x;
+        copy.y = orig.y;
         copy.setValues(orig.getValues());
         return copy;
     }
@@ -173,25 +171,16 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         return neuronArray;
     }
 
+    @NotNull
     @Override
-    public double getCenterX() {
-        return x;
+    public Point2D getLocation() {
+        return new Point2D.Double(x, y);
     }
 
     @Override
-    public double getCenterY() {
-        return y;
-    }
-
-    @Override
-    public void setCenterX(double newx) {
-        x = newx;
-        fireLocationChange();
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-        y = newy;
+    public void setLocation(Point2D location) {
+        this.x = location.getX();
+        this.y = location.getY();
         fireLocationChange();
     }
 
@@ -244,14 +233,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     @Override
     public String getName() {
         return "Neuron Array";
-    }
-
-    /**
-     * Notify listeners that this object has been deleted.
-     */
-    public void fireDeleted() {
-        ArrayConnectable.super.fireDeleted();
-        events.fireDelete();
     }
 
     /**
@@ -359,43 +340,19 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         return id;
     }
 
-    @Override
-    public void setLocation(Point2D location) {
-        this.x = location.getX();
-        this.y = location.getY();
-        fireLocationChange();
-    }
-
-    @Override
-    public Point2D getAttachmentPoint() {
-        return new Point2D.Double(x, y);
-    }
-
     public void fireLocationChange() {
-        events.fireUpdated();
+        events.fireLocationChange();
     }
 
     @Override
     public void onLocationChange(Runnable task) {
-        //addPropertyChangeListener(evt -> {
-        //    if ("moved".equals(evt.getPropertyName())) {
-        //        task.run();
-        //    }
-        //});
+        events.onLocationChange(task);
     }
 
     @Override
     public Network getNetwork() {
         return parent;
     }
-
-    //public Layer asLayer() {
-    //    return new OutputLayer.Builder(LossFunctions.LossFunction.NEGATIVELOGLIKELIHOOD)
-    //            .nOut(inputSize())
-    //            .activation(Activation.SOFTMAX)
-    //            .weightInit(new UniformDistribution(0, 1))
-    //            .build();
-    //}
 
     @Override
     public String toString() {

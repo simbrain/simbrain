@@ -6,7 +6,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -31,33 +30,27 @@ public class ReadSim extends RegisteredSimulation {
 
         Network net_Network1 = netComp_Network1.getNetwork();
         Neuron nrn_Neuron_1 = new Neuron(net_Network1);
-        nrn_Neuron_1.setX(0.0);
-        nrn_Neuron_1.setY(0.0);
+        nrn_Neuron_1.setLocation(0, 0);
         nrn_Neuron_1.setLabel("");
         net_Network1.addLooseNeuron(nrn_Neuron_1);
         Neuron nrn_Neuron_2 = new Neuron(net_Network1);
-        nrn_Neuron_2.setX(45.0);
-        nrn_Neuron_2.setY(0.0);
+        nrn_Neuron_2.setLocation(45, 0);
         nrn_Neuron_2.setLabel("");
         net_Network1.addLooseNeuron(nrn_Neuron_2);
         Neuron nrn_Neuron_3 = new Neuron(net_Network1);
-        nrn_Neuron_3.setX(90.0);
-        nrn_Neuron_3.setY(0.0);
+        nrn_Neuron_3.setLocation(90, 0);
         nrn_Neuron_3.setLabel("");
         net_Network1.addLooseNeuron(nrn_Neuron_3);
         Neuron nrn_Neuron_4 = new Neuron(net_Network1);
-        nrn_Neuron_4.setX(135.0);
-        nrn_Neuron_4.setY(0.0);
+        nrn_Neuron_4.setLocation(135, 0);
         nrn_Neuron_4.setLabel("");
         net_Network1.addLooseNeuron(nrn_Neuron_4);
         Neuron nrn_Neuron_5 = new Neuron(net_Network1);
-        nrn_Neuron_5.setX(180.0);
-        nrn_Neuron_5.setY(0.0);
+        nrn_Neuron_5.setLocation(180, 0);
         nrn_Neuron_5.setLabel("");
         net_Network1.addLooseNeuron(nrn_Neuron_5);
         Neuron nrn_Neuron_6 = new Neuron(net_Network1);
-        nrn_Neuron_6.setX(225.0);
-        nrn_Neuron_6.setY(0.0);
+        nrn_Neuron_6.setLocation(225, 0);
         nrn_Neuron_6.setLabel("");
         net_Network1.addLooseNeuron(nrn_Neuron_6);
         Synapse syn_Synapse_1 = new Synapse(net_Network1.getLooseNeuron("Neuron_1"),net_Network1.getLooseNeuron("Neuron_2"),1.0119140764489423);

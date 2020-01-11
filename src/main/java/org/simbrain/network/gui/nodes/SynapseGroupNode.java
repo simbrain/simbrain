@@ -18,8 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -97,8 +95,8 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
 
         toggleSynapseVisibility();
 
-        group.getSourceNeuronGroup().getEvents().onLocationChange((o,n) -> layoutChildren());
-        group.getTargetNeuronGroup().getEvents().onLocationChange((o,n) -> layoutChildren());
+        group.getSourceNeuronGroup().getEvents().onLocationChange(this::layoutChildren);
+        group.getTargetNeuronGroup().getEvents().onLocationChange(this::layoutChildren);
 
         // Handle events
         SynapseGroupEvents events = synapseGroup.getEvents();

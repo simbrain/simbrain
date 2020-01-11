@@ -33,7 +33,6 @@ import org.simbrain.network.gui.nodes.InteractionBox;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.SelectionMarquee;
 
@@ -303,7 +302,6 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
         pickedNode = null;
 
         // End of an object dragging event. Set the target location of paste delta
-        Point2D upperLeft = SimnetUtils.getUpperLeft(networkPanel.getSelectedModels());
 
         priorSelection = Collections.EMPTY_LIST;
         networkPanel.repaint();

@@ -8,6 +8,7 @@ import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.Layer;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.jetbrains.annotations.NotNull;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
@@ -16,6 +17,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.pmw.tinylog.Logger;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.events.MultiLayerNetEvents;
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainerTemp;
 import org.simbrain.network.trainers.Trainer;
@@ -23,8 +25,6 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,14 +73,14 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
     private List<Integer> topology;
 
     /**
-     * Location of the upper-left of the network.
+     * Center location the network.
      */
     private Point2D location = new Point2D.Double();
 
     /**
      * Support for property change events.
      */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private MultiLayerNetEvents events = new MultiLayerNetEvents(this);
 
     // todo
     private DataSet dataset;
@@ -116,7 +116,7 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
         dataset = new DataSet(input, getOutputArray());
     }
 
-    public MultiLayerNetwork getMultiLayernet() {
+    public MultiLayerNetwork getMultiLayerNet() {
         return network;
     }
 
@@ -176,36 +176,13 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
     }
 
     @Override
-    public void setLocation(Point2D location) {
-        this.location = location;
-        fireLocationChange();
-    }
-
-    @Override
-    public Point2D getAttachmentPoint() {
-        return new Point2D.Double(location.getX(), location.getY());
-    }
-
-    @Override
     public void onLocationChange(Runnable task) {
-        addPropertyChangeListener(evt -> {
-            if ("moved".equals(evt.getPropertyName())) {
-                task.run();
-            }
-        });
+        events.onLocationChange(task);
     }
 
     @Override
     public Network getNetwork() {
         return parent;
-    }
-
-    public void fireLocationChange() {
-        changeSupport.firePropertyChange("moved", null, null);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
     }
 
     @Override
@@ -285,27 +262,20 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
 
     }
 
-    // TODO
+    @NotNull
     @Override
-    public double getCenterX() {
-        return location.getX();
+    public Point2D getLocation() {
+        return location;
     }
 
     @Override
-    public double getCenterY() {
-        return location.getY();
+    public void setLocation(@NotNull Point2D location) {
+        this.location = location;
+        events.fireLocationChange();
     }
 
-    @Override
-    public void setCenterX(double newx) {
-        location.setLocation(newx, location.getY());
-        fireLocationChange();
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-        location.setLocation(location.getX(), newy);
-        fireLocationChange();
+    public MultiLayerNetEvents getEvents() {
+        return events;
     }
 
     /**

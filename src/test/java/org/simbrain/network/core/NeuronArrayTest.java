@@ -7,6 +7,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.dl4j.NeuronArray;
 
+import java.awt.geom.Point2D;
+
 import static org.junit.Assert.*;
 
 public class NeuronArrayTest {
@@ -53,11 +55,9 @@ public class NeuronArrayTest {
 
     @Test
     public void testSetLocation() {
-        double x = neuronArray.getCenterX();
-        double y = neuronArray.getCenterY();
-        neuronArray.setCenterX(neuronArray.getCenterX());
-        neuronArray.setCenterY(neuronArray.getCenterY());
-        assertEquals(x, neuronArray.getCenterX(), 0.001);
-        assertEquals(y, neuronArray.getCenterY(), 0.001);
+        Point2D location = neuronArray.getLocation();
+        neuronArray.setLocation(location);
+        assertEquals(location.getX(), neuronArray.getLocation().getX(), 0.001);
+        assertEquals(location.getY(), neuronArray.getLocation().getY(), 0.001);
     }
 }

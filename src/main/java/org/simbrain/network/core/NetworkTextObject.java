@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.core;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.events.NetworkTextEvents;
 
@@ -179,26 +180,17 @@ public class NetworkTextObject implements LocatableModel {
         events = new NetworkTextEvents(this);
     }
 
+    @NotNull
     @Override
-    public double getCenterX() {
-        return x;
+    public Point2D getLocation() {
+        return new Point2D.Double(x, y);
     }
 
     @Override
-    public double getCenterY() {
-        return y;
-    }
-
-    @Override
-    public void setCenterX(double newx) {
-        x = newx;
-        events.fireLocationChange(getLocation(), new Point2D.Double(newx, y));
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-        y = newy;
-        events.fireLocationChange(getLocation(), new Point2D.Double(x, newy));
+    public void setLocation(@NotNull Point2D location) {
+        x = location.getX();
+        y = location.getY();
+        events.fireLocationChange();
     }
 
     public NetworkTextEvents getEvents() {

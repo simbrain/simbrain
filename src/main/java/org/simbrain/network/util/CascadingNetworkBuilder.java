@@ -110,7 +110,7 @@ public final class CascadingNetworkBuilder {
 
         Neuron firstNeuron = new Neuron(network, DEFAULT_NEURON_TYPE);
         List<Neuron> currentLayer = new ArrayList<Neuron>();
-        firstNeuron.setPosition(initialPosition);
+        firstNeuron.setLocation(initialPosition);
         currentLayer.add(firstNeuron);
 
         // Layout values

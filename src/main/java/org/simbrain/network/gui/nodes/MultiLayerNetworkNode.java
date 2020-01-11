@@ -18,6 +18,8 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.stream.Collectors;
 
+import static org.simbrain.util.PointKt.minus;
+
 /**
  * GUI representation of dl4j network.
  */
@@ -75,13 +77,9 @@ public class MultiLayerNetworkNode extends ScreenElement {
         infoText.offset(8, 8);
         updateInfoText();
 
-        this.centerFullBoundsOnPoint(net.getCenterX(), net.getCenterY());
+        this.centerFullBoundsOnPoint(net.getLocation().getX(), net.getLocation().getY());
 
-        net.addPropertyChangeListener(evt -> {
-            if ("moved".equals(evt.getPropertyName())) {
-                pullViewPositionFromModel();
-            }
-        });
+        net.getEvents().onLocationChange(this::pullViewPositionFromModel);
 
         pushViewPositionToModel();
     }
@@ -214,8 +212,8 @@ public class MultiLayerNetworkNode extends ScreenElement {
     }
 
     public void pullViewPositionFromModel() {
-        Point2D p = new Point2D.Double(net.getCenterX() - boxWidth / 2, net.getCenterY() - boxHeight / 2);
-        this.setGlobalTranslation(p);
+        Point2D point = minus(net.getLocation(), new Point2D.Double(boxWidth / 2, boxHeight / 2));
+        this.setGlobalTranslation(point);
     }
 
     /**
@@ -224,9 +222,10 @@ public class MultiLayerNetworkNode extends ScreenElement {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        net.setCenterX(p.getX() + boxWidth / 2);
-        net.setCenterY(p.getY() + boxHeight / 2);
+        net.setLocation(new Point2D.Double(p.getX() + boxWidth / 2, p.getY() + boxHeight / 2));
     }
+
+
 
     @Override
     public void offset(double dx, double dy) {

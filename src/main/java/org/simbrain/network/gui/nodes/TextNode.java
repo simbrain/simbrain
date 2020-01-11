@@ -36,6 +36,9 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import static org.simbrain.util.PointKt.minus;
+import static org.simbrain.util.PointKt.plus;
+
 /**
  * An editable text element, which wraps a PStyledText object.
  */
@@ -68,7 +71,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
 
         NetworkTextEvents events = text.getEvents();
         events.onDelete(n -> removeFromParent());
-        events.onLocationChange((o, n) -> pullViewPositionFromModel());
+        events.onLocationChange(this::pullViewPositionFromModel);
 
         update();
         pushViewPositionToModel();
@@ -183,8 +186,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
         PBounds bound = this.getFullBounds();
-        getTextObject().setCenterX(p.getX() + bound.getWidth() / 2);
-        getTextObject().setCenterY(p.getY() + bound.getHeight() / 2);
+        getTextObject().setLocation(plus(p, new Point2D.Double(bound.getWidth() / 2, bound.getHeight() / 2)));
     }
 
     @Override
@@ -199,10 +201,11 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      */
     private void pullViewPositionFromModel() {
         PBounds bound = this.getFullBounds();
-        Point2D p = new Point2D.Double(
-                getTextObject().getCenterX() - bound.getWidth() / 2,
-                getTextObject().getCenterY() - bound.getHeight() / 2);
-        this.setGlobalTranslation(p);
+        Point2D point = minus(
+                getTextObject().getLocation(),
+                new Point2D.Double(bound.getWidth() / 2, bound.getHeight() / 2)
+        );
+        this.setGlobalTranslation(point);
     }
 
     /**

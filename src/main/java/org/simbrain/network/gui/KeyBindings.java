@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.gui.actions.edit.TextEditModeAction;
 import org.simbrain.network.gui.actions.edit.WandEditModeAction;
 import org.simbrain.network.gui.actions.selection.SelectIncomingWeightsAction;
@@ -338,9 +339,9 @@ public class KeyBindings {
         panel.getActionMap().put("printCenterXY", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                panel.getSelectedLocatableModels().forEach(m -> {
-                    System.out.println(m.getCenterX() + ", " + m.getCenterY());
-                });
+                panel.getSelectedLocatableModels().stream()
+                        .map(LocatableModel::getLocation)
+                        .forEach(System.out::println);
             }
         });
 

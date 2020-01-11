@@ -26,7 +26,6 @@ import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.events.NeuronArrayEvents;
-import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
@@ -45,6 +44,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.*;
+
+import static org.simbrain.util.PointKt.minus;
+import static org.simbrain.util.PointKt.plus;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -145,7 +147,7 @@ public class NeuronArrayNode extends ScreenElement {
         infoText.offset(8, 8);
         updateInfoText();
 
-        this.centerFullBoundsOnPoint(na.getCenterX(), na.getCenterY());
+        this.centerFullBoundsOnPoint(na.getLocation().getX(), na.getLocation().getY());
 
         // Image array
         renderArrayToActivationsImage();
@@ -153,8 +155,8 @@ public class NeuronArrayNode extends ScreenElement {
     }
 
     public void pullViewPositionFromModel() {
-        Point2D p = new Point2D.Double(neuronArray.getCenterX() - boxWidth / 2, neuronArray.getCenterY() - boxHeight / 2);
-        this.setGlobalTranslation(p);
+        Point2D point = minus(neuronArray.getLocation(), new Point2D.Double(boxWidth / 2, boxHeight / 2));
+        this.setGlobalTranslation(point);
     }
 
     /**
@@ -163,8 +165,7 @@ public class NeuronArrayNode extends ScreenElement {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        neuronArray.setCenterX(p.getX() + boxWidth / 2);
-        neuronArray.setCenterY(p.getY() + boxHeight / 2);
+        neuronArray.setLocation(plus(p, new Point2D.Double(boxWidth / 2, boxHeight / 2)));
     }
 
     @Override

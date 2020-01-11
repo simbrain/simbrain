@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.core;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.events.NeuronEvents;
@@ -25,7 +26,6 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.util.Point3D;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -36,6 +36,9 @@ import org.simbrain.workspace.Producible;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.simbrain.util.PointKt.plus;
+import static org.simbrain.util.PointKt.point;
 
 /**
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
@@ -783,8 +786,8 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public double getTotalInput() {
         double ret = 0;
 
-        for (int i = 0; i < fanIn.size(); i++) {
-            ret += fanIn.get(i).getSource().getActivation();
+        for (Synapse synapse : fanIn) {
+            ret += synapse.getSource().getActivation();
         }
 
         return ret;
@@ -798,26 +801,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      */
     public boolean isConnected(final Synapse s) {
         return (fanIn.contains(s) || fanOut.get(s.getTarget()) != null);
-    }
-
-    @Override
-    public double getCenterX() {
-        return x;
-    }
-
-    @Override
-    public double getCenterY() {
-        return y;
-    }
-
-    @Override
-    public void setCenterX(double newx) {
-        setX(newx);
-    }
-
-    @Override
-    public void setCenterY(double newy) {
-        setY(newy);
     }
 
     // TODO: Remove below / replace with get centerX/Y
@@ -834,11 +817,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     public void setX(final double x, boolean fireEvent) {
-        Point3D oldLocation = new Point3D(this.x, y, z);
-        Point3D newLocation = new Point3D(x, y, z);
         this.x = x;
         if(fireEvent) {
-            events.fireLocationChange(oldLocation, newLocation);
+            events.fireLocationChange();
         }
     }
 
@@ -847,11 +828,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     public void setY(final double y, boolean fireEvent) {
-        Point3D oldLocation = new Point3D(x, this.y, z);
-        Point3D newLocation = new Point3D(x, y, z);
         this.y = y;
         if(fireEvent) {
-            events.fireLocationChange(oldLocation, newLocation);
+            events.fireLocationChange();
         }
     }
 
@@ -860,10 +839,8 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     public void setZ(final double z) {
-        Point3D oldLocation = new Point3D(x, y, this.z);
-        Point3D newLocation = new Point3D(x, y, z);
         this.z = z;
-        events.fireLocationChange(oldLocation, newLocation);
+        events.fireLocationChange();
     }
 
     /**
@@ -873,8 +850,11 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @param y y coordinate for neuron
      */
     public void setLocation(final double x, final double y) {
-        setX(x);
-        setY(y);
+        setLocation(x, y, true);
+    }
+
+    public void setLocation(final double x, final double y, boolean fireEvent) {
+        setLocation(point(x, y), fireEvent);
     }
 
     /**
@@ -884,8 +864,12 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @param delta_y y amount to translate neuron
      */
     public void offset(final double delta_x, final double delta_y) {
-        setX(getX() + delta_x);
-        setY(getY() + delta_y);
+        offset(delta_x, delta_y, true);
+    }
+
+    public void offset(final double delta_x, final double delta_y, boolean fireEvent) {
+        Point2D delta = point(delta_x, delta_y);
+        setLocation(plus(getLocation(), delta), fireEvent);
     }
 
     /**
@@ -1036,7 +1020,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      *
      * @return point representation of neuron position.
      */
-    public Point2D getPosition() {
+    @NotNull
+    @Override
+    public Point2D getLocation() {
         return new Point2D.Double(x, y);
     }
 
@@ -1045,12 +1031,17 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      *
      * @param position point location of neuron
      */
-    public void setPosition(Point2D position) {
-        Point3D previousLocation = new Point3D(x, y, z);
+    @Override
+    public void setLocation(@NotNull Point2D position) {
+        setLocation(position, true);
+    }
+
+    public void setLocation(Point2D position, boolean fireEvent) {
         x = position.getX();
         y = position.getY();
-        Point3D newLocation = new Point3D(x, y, z);
-        events.fireLocationChange(previousLocation, newLocation);
+        if (fireEvent) {
+            events.fireLocationChange();
+        }
     }
 
     /**

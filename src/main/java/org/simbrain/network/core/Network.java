@@ -432,6 +432,7 @@ public class Network {
 
     public void removeNeuronGroup(NeuronGroup ng) {
         neuronGroups.remove(ng);
+        removeArrayConnectable(ng);
         ng.delete();
         events.fireNeuronGroupRemoved(ng);
     }
@@ -456,6 +457,7 @@ public class Network {
      */
     public void removeNeuronCollection(NeuronCollection nc) {
         neuronCollectionSet.remove(nc);
+        removeArrayConnectable(nc);
         nc.delete();
         events.fireNeuronCollectionRemoved(nc);
     }
@@ -465,7 +467,15 @@ public class Network {
      */
     public void removeNeuronArray(NeuronArray na) {
         naList.remove(na);
+        removeArrayConnectable(na);
+        na.getEvents().fireDelete();
         events.fireNeuronArrayRemoved(na);
+    }
+
+    private void removeArrayConnectable(ArrayConnectable ac) {
+        removeWeightMatrix(ac.getIncomingWeightMatrix());
+        List<WeightMatrix> toDelete = new ArrayList<>(ac.getOutgoingWeightMatrices());
+        toDelete.forEach(this::removeWeightMatrix);
     }
 
     /**
@@ -1188,8 +1198,7 @@ public class Network {
      */
     public void translate(final double offsetX, final double offsetY) {
         for (Neuron neuron : this.getFlatNeuronList()) {
-            neuron.setX(neuron.getX() + offsetX);
-            neuron.setY(neuron.getY() + offsetY);
+            neuron.offset(offsetX, offsetY);
         }
     }
 

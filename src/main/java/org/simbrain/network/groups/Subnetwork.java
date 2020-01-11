@@ -12,8 +12,8 @@
  */
 package org.simbrain.network.groups;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
@@ -22,18 +22,19 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static org.simbrain.network.LocatableModelKt.getCenterLocation;
+import static org.simbrain.util.PointKt.minus;
 
 /**
  * A collection of neuron groups and synapse groups which functions as a subnetwork within the main root network, with
@@ -530,23 +531,16 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         events = new SubnetworkEvents(this);
     }
 
-    // todo
     @Override
-    public double getCenterX() {
-        return 0;
+    public void setLocation(@NotNull Point2D location) {
+        Point2D.Double delta = minus(getLocation(), location);
+        neuronGroupList.forEach(ng -> ng.offset(delta.x, delta.y));
     }
 
+    @NotNull
     @Override
-    public double getCenterY() {
-        return 0;
-    }
-
-    @Override
-    public void setCenterX(double newx) {
-    }
-
-    @Override
-    public void setCenterY(double newy) {
+    public Point2D getLocation() {
+        return getCenterLocation(neuronGroupList);
     }
 
     public SubnetworkEvents getEvents() {

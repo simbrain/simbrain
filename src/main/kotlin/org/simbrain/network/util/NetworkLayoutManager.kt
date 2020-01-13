@@ -51,12 +51,10 @@ enum class Direction {
  * @param amount    the amount by which to offset the second group
  */
 fun offsetNeuronGroup(group1: NeuronGroup, group2: NeuronGroup, direction: Direction, amount: Double) {
-    val target = when(direction) {
-        Direction.NORTH -> group1.location - point(0.0, group1.height / 2 - amount - group2.height / 2)
-        Direction.SOUTH -> group1.location + point(0.0, group1.height / 2 + amount + group2.height / 2)
-        Direction.EAST  -> group1.location + point(group1.width / 2 + amount + group2.width / 2, 0.0)
-        Direction.WEST  -> group1.location - point(group1.width / 2 - amount - group2.width / 2, 0.0)
+    group2.location = when(direction) {
+        Direction.NORTH -> group1.location - point(0.0, group1.height / 2 + group2.height / 2 + amount)
+        Direction.SOUTH -> group1.location + point(0.0, group1.height / 2 + group2.height / 2 + amount)
+        Direction.EAST  -> group1.location + point(group1.width / 2 + group2.width / 2 + amount, 0.0)
+        Direction.WEST  -> group1.location - point(group1.width / 2 + group2.width / 2 + amount, 0.0)
     }
-    val offset = target - group2.location
-    group2.offset(offset.x, offset.y)
 }

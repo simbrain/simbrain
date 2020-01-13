@@ -41,6 +41,7 @@ import java.awt.geom.Point2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static org.simbrain.network.LocatableModelKt.getTopLeftLocation;
 import static org.simbrain.util.PointKt.plus;
 import static org.simbrain.util.PointKt.point;
 
@@ -462,7 +463,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * Apply this group's layout to its neurons.
      */
     public void applyLayout() {
-        layout.getLayout().setInitialLocation(getLocation());
+        layout.getLayout().setInitialLocation(getTopLeftLocation(getNeuronList()));
         layout.getLayout().layoutNeurons(getNeuronList());
     }
 

@@ -34,7 +34,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.simbrain.network.LocatableModelKt.getCenterLocation;
 import static org.simbrain.util.PointKt.minus;
-import static org.simbrain.util.PointKt.plus;
 
 /**
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
@@ -156,7 +155,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     @Override
     public void setLocation(@NotNull Point2D location) {
         Point2D delta = minus(location, getLocation());
-        neuronList.forEach(n -> n.setLocation(plus(n.getLocation(), delta)));
+        neuronList.forEach(n -> n.offset(delta.getX(), delta.getY(), false));
         events.fireLocationChange();
     }
 

@@ -20,9 +20,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.ResourceManager;
@@ -353,8 +351,8 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         @Override
         protected String getToolTipText() {
             return "NeuronGroup: " + neuronGroup.getId()
-                + " Location: (" + Utils.round(neuronGroup.getPosition().getX(),2) + ","
-                + Utils.round(neuronGroup.getPosition().getY(),2) + ")";
+                + " Location: (" + Utils.round(neuronGroup.getLocation().getX(),2) + ","
+                + Utils.round(neuronGroup.getLocation().getY(),2) + ")";
         }
 
         @Override

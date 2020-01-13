@@ -20,7 +20,6 @@ package org.simbrain.network.groups;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.List;
@@ -116,9 +115,12 @@ public class NeuronCollection extends AbstractNeuronCollection {
 
     @Override
     public String toString() {
-        String ret = new String();
-        ret += ("Neuron Collection [" + getLabel() + "]. Neuron collection with " + this.getNeuronList().size() + " neuron(s)" + ". Located at (" + Utils.round(this.getPosition().x, 2) + "," + Utils.round(this.getPosition().y, 2) + ").\n");
-        return ret;
+        return String.format("Neuron Collection [%s]. Neuron group with %d  neuron(s). Located at (%2.2f, %2.2f).\n",
+                getLabel(),
+                this.getNeuronList().size(),
+                getLocation().getX(),
+                getLocation().getY()
+        );
     }
 
     /**

@@ -469,15 +469,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     }
 
     /**
-     * Return current position (upper left corner of neuron in the farthest north-west position.
-     *
-     * @return position upper left position of group
-     */
-    public Point2D.Double getPosition() {
-        return new Point2D.Double(SimnetUtils.getMinX(neuronList), SimnetUtils.getMaxX(neuronList));
-    }
-
-    /**
      * Returns true if all the neurons in this group are clamped.
      *
      * @return true if all neurons are clamped, false otherwise

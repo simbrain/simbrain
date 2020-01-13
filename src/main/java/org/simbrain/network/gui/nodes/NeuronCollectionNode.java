@@ -249,8 +249,8 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         @Override
         protected String getToolTipText() {
             return "NeuronCollection: " + neuronCollection.getId()
-                    + " Location: (" + Utils.round(neuronCollection.getPosition().getX(), 2) + ","
-                    + Utils.round(neuronCollection.getPosition().getY(), 2) + ")";
+                    + " Location: (" + Utils.round(neuronCollection.getLocation().getX(), 2) + ","
+                    + Utils.round(neuronCollection.getLocation().getY(), 2) + ")";
         }
 
         @Override

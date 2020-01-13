@@ -115,7 +115,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
 
     @Override
     public String toString() {
-        return String.format("Neuron Collection [%s]. Neuron group with %d  neuron(s). Located at (%2.2f, %2.2f).\n",
+        return String.format("Neuron Collection [%s]. Neuron group with %d neuron(s). Located at (%2.2f, %2.2f).\n",
                 getLabel(),
                 this.getNeuronList().size(),
                 getLocation().getX(),

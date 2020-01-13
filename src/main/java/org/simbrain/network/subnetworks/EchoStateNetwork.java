@@ -32,8 +32,7 @@ import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.network.util.NetworkLayoutManager;
-import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.network.util.Direction;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -43,6 +42,8 @@ import org.simbrain.util.math.SquashingFunctionEnum;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
 
 /**
  * Builds an Echo-State Network with options for all valid weight
@@ -257,8 +258,8 @@ public class EchoStateNetwork extends Subnetwork {
      * an aesthetically pleasing arrangement.
      */
     public void positionLayers() {
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, reservoirLayer, Direction.NORTH, betweenLayerInterval);
-        NetworkLayoutManager.offsetNeuronGroup(reservoirLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
+        offsetNeuronGroup(inputLayer, reservoirLayer, Direction.NORTH, betweenLayerInterval);
+        offsetNeuronGroup(reservoirLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
         reservoirLayer.offset(-2 * reservoirLayer.getWidth() / 3, 0);
     }
 

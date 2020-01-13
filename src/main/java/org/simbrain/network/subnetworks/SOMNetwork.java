@@ -25,13 +25,13 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.network.util.NetworkLayoutManager;
-import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.network.util.Direction;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
-import java.awt.geom.Point2D;
 import java.util.List;
+
+import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
 
 /**
  * <b>SOMNetwork</b> is a small network encompassing an SOM group. An input
@@ -93,7 +93,7 @@ public class SOMNetwork extends Subnetwork implements Trainable {
      */
     public void layoutNetwork() {
         // TODO: Would be easy to set the layout and redo it...
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, som, Direction.NORTH, 250);
+        offsetNeuronGroup(inputLayer, som, Direction.NORTH, 250);
     }
 
     @Override

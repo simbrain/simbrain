@@ -30,12 +30,13 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.network.util.NetworkLayoutManager;
-import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.network.util.Direction;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
 
 /**
  * Implements a simple recurrent network (See, e.g, Elman 1991). While the
@@ -134,7 +135,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
         hiddenLayer.setLowerBound(-1);
         hiddenLayer.setUpperBound(1);
         hiddenLayer.setLayoutBasedOnSize();
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
+        offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
 
         // Context Layer
         // Initial context layer values set to 0.5 (as in Elman 1991). TODO
@@ -143,14 +144,14 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
         contextLayer.setLabel("Context Layer");
         addNeuronGroup(contextLayer);
         contextLayer.setLayoutBasedOnSize();
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST, betweenLayerInterval);
+        offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST, betweenLayerInterval);
 
         // Output layer
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
         addNeuronGroup(outputLayer);
         outputLayer.setLabel("Output layer");
         outputLayer.setLayoutBasedOnSize();
-        NetworkLayoutManager.offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
+        offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
 
         // Connect the layers
         SynapseGroup inToHid = SynapseGroup.createSynapseGroup(inputLayer, hiddenLayer, new AllToAll(false), 0.5);

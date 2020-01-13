@@ -23,13 +23,13 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.network.util.NetworkLayoutManager;
-import org.simbrain.network.util.NetworkLayoutManager.Direction;
-import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.network.util.Direction;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
 
 /**
  * A standard feed-forward network, where a succession of neuron groups and
@@ -125,7 +125,7 @@ public class FeedForward extends Subnetwork {
             NeuronGroup hiddenLayer = new NeuronGroup(network, hiddenLayerNeurons);
             hiddenLayer.setLayoutBasedOnSize();
             addNeuronGroup(hiddenLayer);
-            NetworkLayoutManager.offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
+            offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
 
             AllToAll connection = new AllToAll();
             SynapseGroup lh = connectNeuronGroups(lastLayer, hiddenLayer, connection);

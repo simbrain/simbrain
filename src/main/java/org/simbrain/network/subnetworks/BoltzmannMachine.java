@@ -27,14 +27,14 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.network.util.NetworkLayoutManager;
-import org.simbrain.network.util.NetworkLayoutManager.Direction;
-import org.simbrain.util.Utils;
+import org.simbrain.network.util.Direction;
 
 import java.awt.geom.Point2D;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
 
 /**
  * <b>BoltzmannMachine</b> An input layer and input data
@@ -98,7 +98,7 @@ public class BoltzmannMachine extends Subnetwork implements Trainable {
         visibleUnits.setLabel("Visible Units");
 
         // Layout groups
-        NetworkLayoutManager.offsetNeuronGroup(visibleUnits, hiddenUnits, Direction.EAST, 100);
+        offsetNeuronGroup(visibleUnits, hiddenUnits, Direction.EAST, 100);
 
         // Wire up network
         AllToAll recurrentHidden = new AllToAll();

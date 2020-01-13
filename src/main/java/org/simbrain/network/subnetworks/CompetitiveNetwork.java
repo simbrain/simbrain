@@ -26,13 +26,13 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.network.util.NetworkLayoutManager;
-import org.simbrain.network.util.NetworkLayoutManager.Direction;
+import org.simbrain.network.util.Direction;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
-import java.awt.geom.Point2D;
 import java.util.List;
+
+import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
 
 /**
  * <b>CompetitiveNetwork</b> is a small network encompassing a Competitive
@@ -93,7 +93,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
     public void layoutNetwork() {
         inputLayer.setLayoutBasedOnSize();
         competitive.setLayoutBasedOnSize();
-        NetworkLayoutManager.offsetNeuronGroup(inputLayer, competitive, Direction.NORTH, 100);
+        offsetNeuronGroup(inputLayer, competitive, Direction.NORTH, 100);
     }
 
     @Override

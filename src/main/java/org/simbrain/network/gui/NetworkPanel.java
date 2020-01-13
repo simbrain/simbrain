@@ -819,7 +819,6 @@ public class NetworkPanel extends JPanel {
         for (SynapseGroup synapseGroup : subnet.getSynapseGroupList()) {
             ScreenElement synapseGroupNode = objectNodeMap.get(synapseGroup);
             nodes.add(synapseGroupNode);
-            synapseGroupNode.raiseToTop();
         }
 
         // subnet.fireLabelUpdated();

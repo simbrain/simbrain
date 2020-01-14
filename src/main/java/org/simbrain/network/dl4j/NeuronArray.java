@@ -60,12 +60,12 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     private INDArray neuronArray;
 
     /**
-     * x-coordinate of this neuron in 2-space.
+     * Center of the neuron array.
      */
     private double x;
 
     /**
-     * y-coordinate of this neuron in 2-space.
+     * Center of the neuron array.
      */
     private double y;
 

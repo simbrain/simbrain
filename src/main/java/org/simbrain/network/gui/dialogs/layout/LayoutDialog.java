@@ -19,6 +19,8 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
+import static org.simbrain.network.LocatableModelKt.getCenterLocation;
+
 /**
  * <b>LayoutPanel</b> allows the user to define the layout of a network.
  */
@@ -59,7 +61,7 @@ public class LayoutDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
-        //layoutObject.getLayout().setInitialLocation(networkPanel.getLastClickedPosition()); //TODO: Think
+        layoutObject.getLayout().setInitialLocation(getCenterLocation(networkPanel.getSelectedModels(Neuron.class)));
         layoutObject.getLayout().layoutNeurons(networkPanel.getSelectedModels(Neuron.class));
         networkPanel.repaint();
     }

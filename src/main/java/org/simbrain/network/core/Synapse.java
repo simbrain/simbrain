@@ -54,7 +54,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
      */
     public static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new ConvolvedJumpAndDecay();
 
-
     /**
      * Default upper bound.
      */

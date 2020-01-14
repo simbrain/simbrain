@@ -135,8 +135,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         return getCenterLocation(neuronList).x;
     }
 
-
-
     /**
      * Get the central y coordinate of this group, based on the positions of the neurons that comprise it.
      *
@@ -145,7 +143,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     public double getCenterY() {
         return getCenterLocation(neuronList).y;
     }
-
 
     @Override
     public Point2D getLocation() {

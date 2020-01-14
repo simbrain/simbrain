@@ -25,6 +25,8 @@ import org.simbrain.network.layouts.Layout;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
+import static org.simbrain.network.LocatableModelKt.getCenterLocation;
+
 /**
  * Apply specified layout to selected neurons.
  */
@@ -53,6 +55,7 @@ public final class ApplyLayoutAction extends ConditionallyEnabledAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
+        layout.setInitialLocation(getCenterLocation(networkPanel.getSelectedModels(Neuron.class)));
         layout.layoutNeurons(networkPanel.getSelectedModels(Neuron.class));
         networkPanel.repaint();
     }

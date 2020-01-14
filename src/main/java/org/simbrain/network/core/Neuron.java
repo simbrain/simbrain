@@ -803,75 +803,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         return (fanIn.contains(s) || fanOut.get(s.getTarget()) != null);
     }
 
-    // TODO: Remove below / replace with get centerX/Y
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getZ() {
-        return z;
-    }
-
-    public void setX(final double x, boolean fireEvent) {
-        this.x = x;
-        if(fireEvent) {
-            events.fireLocationChange();
-        }
-    }
-
-    public void setX(final double x) {
-        setX(x, true);
-    }
-
-    public void setY(final double y, boolean fireEvent) {
-        this.y = y;
-        if(fireEvent) {
-            events.fireLocationChange();
-        }
-    }
-
-    public void setY(final double y) {
-        setY(y, true);
-    }
-
-    public void setZ(final double z) {
-        this.z = z;
-        events.fireLocationChange();
-    }
-
-    /**
-     * Set x, y position of a neuron.
-     *
-     * @param x x coordinate for neuron
-     * @param y y coordinate for neuron
-     */
-    public void setLocation(final double x, final double y) {
-        setLocation(x, y, true);
-    }
-
-    public void setLocation(final double x, final double y, boolean fireEvent) {
-        setLocation(point(x, y), fireEvent);
-    }
-
-    /**
-     * Translate the neuron by a specified amount.
-     *
-     * @param delta_x x amount to translate neuron
-     * @param delta_y y amount to translate neuron
-     */
-    public void offset(final double delta_x, final double delta_y) {
-        offset(delta_x, delta_y, true);
-    }
-
-    public void offset(final double delta_x, final double delta_y, boolean fireEvent) {
-        Point2D delta = point(delta_x, delta_y);
-        setLocation(plus(getLocation(), delta), fireEvent);
-    }
-
     /**
      * Delete connected synapses and remove them from the network and any other
      * structures.
@@ -1013,35 +944,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         String oldLabel = this.label;
         this.label = label;
         events.fireLabelChange(oldLabel, label);
-    }
-
-    /**
-     * Returns position as a 2-d point.
-     *
-     * @return point representation of neuron position.
-     */
-    @NotNull
-    @Override
-    public Point2D getLocation() {
-        return new Point2D.Double(x, y);
-    }
-
-    /**
-     * Set position of neuron using a point object.
-     *
-     * @param position point location of neuron
-     */
-    @Override
-    public void setLocation(@NotNull Point2D position) {
-        setLocation(position, true);
-    }
-
-    public void setLocation(Point2D position, boolean fireEvent) {
-        x = position.getX();
-        y = position.getY();
-        if (fireEvent) {
-            events.fireLocationChange();
-        }
     }
 
     /**
@@ -1221,6 +1123,37 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         return lastActivation;
     }
 
+    @NotNull
+    @Override
+    public Point2D getLocation() {
+        return new Point2D.Double(x, y);
+    }
+
+    @Override
+    public void setLocation(@NotNull Point2D position) {
+        setLocation(position, true);
+    }
+
+    public void setLocation(Point2D position, boolean fireEvent) {
+        x = position.getX();
+        y = position.getY();
+        if (fireEvent) {
+            events.fireLocationChange();
+        }
+    }
+
+    public void setLocation(final double x, final double y) {
+        setLocation(x, y, true);
+    }
+
+    public void setLocation(final double x, final double y, boolean fireEvent) {
+        setLocation(point(x, y), fireEvent);
+    }
+
+    public double [] getPosition3D() {
+        return new double[]{x, y, z};
+    }
+
     /**
      * Convenience method for setting the xyz coordinates from
      * an array with (at least) 3 values. Elements beyond position
@@ -1242,12 +1175,58 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         setZ(z);
     }
 
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public void setX(final double x, boolean fireEvent) {
+        this.x = x;
+        if(fireEvent) {
+            events.fireLocationChange();
+        }
+    }
+
+    public void setX(final double x) {
+        setX(x, true);
+    }
+
+    public void setY(final double y, boolean fireEvent) {
+        this.y = y;
+        if(fireEvent) {
+            events.fireLocationChange();
+        }
+    }
+
+    public void setY(final double y) {
+        setY(y, true);
+    }
+
+    public void setZ(final double z) {
+        this.z = z;
+        events.fireLocationChange();
+    }
+
     /**
-     * @return an array containing this neuron's position in 3-space
-     * {x, y, z} in that order.
+     * Translate the neuron by a specified amount.
+     *
+     * @param delta_x x amount to translate neuron
+     * @param delta_y y amount to translate neuron
      */
-    public double [] getPosition3D() {
-        return new double[]{x, y, z};
+    public void offset(final double delta_x, final double delta_y) {
+        offset(delta_x, delta_y, true);
+    }
+
+    public void offset(final double delta_x, final double delta_y, boolean fireEvent) {
+        Point2D delta = point(delta_x, delta_y);
+        setLocation(plus(getLocation(), delta), fireEvent);
     }
 
     @Override

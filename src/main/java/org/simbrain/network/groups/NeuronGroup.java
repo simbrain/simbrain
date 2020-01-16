@@ -26,7 +26,6 @@ import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
@@ -40,6 +39,9 @@ import org.simbrain.workspace.Producible;
 import java.awt.geom.Point2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.simbrain.network.LocatableModelKt.getTopLeftLocation;
 import static org.simbrain.util.PointKt.plus;
@@ -102,14 +104,21 @@ public class NeuronGroup extends AbstractNeuronCollection {
     private int betweenNeuronInterval = 50;
 
     /**
+     * Create a neuron group without any initial neurons.
+     */
+    public NeuronGroup(final Network net) {
+        super(net);
+        id = net.getIdManager().getId(NeuronGroup.class);
+    }
+
+    /**
      * Construct a new neuron group from a list of neurons.
      *
      * @param net     the network
      * @param neurons the neurons
      */
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
-        super(net);
-        id = net.getIdManager().getId(NeuronGroup.class);
+        this(net);
         addNeurons(neurons);
         subsamplingManager.resetIndices();
     }
@@ -121,88 +130,21 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * @param numNeurons how many neurons it will have
      */
     public NeuronGroup(final Network net, final int numNeurons) {
-        this(net, new Point2D.Double(0, 0), numNeurons);
-    }
-
-    /**
-     * Construct a new neuron group with a specified number of neurons.
-     *
-     * @param net             parent network
-     * @param initialPosition initial location of the group
-     * @param numNeurons      how many neurons it will have
-     */
-    public NeuronGroup(final Network net, Point2D initialPosition, final int numNeurons) {
-        super(net);
-        id = net.getIdManager().getId(NeuronGroup.class);
-        List<Neuron> newNeurons = new ArrayList<>();
-        for (int i = 0; i < numNeurons; i++) {
-            Neuron newNeuron = new Neuron(net);
-            newNeurons.add(newNeuron);
-        }
-        // Very slow to add to a copy on write array list so do it this way
-        addNeurons(newNeurons);
-        layout.getLayout().setInitialLocation(initialPosition);
-        layout.getLayout().layoutNeurons(this.getNeuronList());
-
-        subsamplingManager.resetIndices();
-    }
-
-    /**
-     * Create a neuron group without any initial neurons and an initial
-     * position.
-     *
-     * @param network         parent network
-     * @param initialPosition the starting position from which to lay-out the neurons in the
-     *                        group whenever they are added.
-     */
-    public NeuronGroup(final Network network, Point2D initialPosition) {
-        super(network);
-        id = network.getIdManager().getId(NeuronGroup.class);
-        layout.getLayout().setInitialLocation(initialPosition);
-        subsamplingManager.resetIndices();
-    }
-
-    /**
-     * Create a neuron group without any initial neurons.
-     *
-     * @param network parent network
-     */
-    public NeuronGroup(final Network network) {
-        super(network);
-        id = network.getIdManager().getId(NeuronGroup.class);
+        this(net, Stream.generate(() -> new Neuron(net)).limit(numNeurons).collect(Collectors.toList()));
     }
 
     /**
      * Copy constructor. pass in network for cases where a group is pasted from
      * one network to another
      *
-     * @param network parent network
+     * @param net parent network
      * @param toCopy  the neuron group this will become a (deep) copy of.
      */
-    public NeuronGroup(final Network network, final NeuronGroup toCopy) {
-        super(network);
-        id = network.getIdManager().getId(NeuronGroup.class);
+    public NeuronGroup(final Network net, final NeuronGroup toCopy) {
+        this(net, toCopy.getNeuronList().stream().map(Neuron::deepCopy).collect(Collectors.toList()));
         setLabel(id); // Don't copy existing labels but reset them to id. Avoids many headaches.
-        List<Neuron> newNeurons = new ArrayList<>();
-        for (Neuron neuron : toCopy.getNeuronList()) {
-            newNeurons.add(new Neuron(network, neuron));
-        }
-
-        addNeurons(newNeurons);
         this.setLayout(toCopy.getLayout());
         this.setGroupUpdateRule(toCopy.groupUpdateRule);
-        subsamplingManager.resetIndices();
-    }
-
-    /**
-     * Construct a neuron group with a specified number of neurons and id.
-     */
-    public NeuronGroup(Network network, int numNeurons, String id) {
-        super(network);
-        for (int i = 0; i < numNeurons ; i++) {
-            addNeuron(new Neuron(network, new LinearRule()));
-        }
-        super.id = id;
     }
 
     /**
@@ -215,6 +157,9 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return new NeuronGroup(newParent, this);
     }
 
+    /**
+     * Delete this neuron group.
+     */
     public void delete() {
         events.fireDelete();
         for (Neuron neuron : getNeuronList()) {
@@ -616,8 +561,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         public NeuronGroup create(Network network) {
             NeuronGroup ng = null;
             if (groupType == GroupEnum.DEFAULT) {
-                ng = new NeuronGroup(network, numNeurons,
-                        network.getIdManager().getId(NeuronGroup.class));
+                ng = new NeuronGroup(network, numNeurons);
                 ng.setGroupUpdateRule(updateRule);
                 ng.setLabel(label);
             } else if (groupType == GroupEnum.WTA) {

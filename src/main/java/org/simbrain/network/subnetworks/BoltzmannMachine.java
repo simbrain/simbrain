@@ -86,13 +86,15 @@ public class BoltzmannMachine extends Subnetwork implements Trainable {
         this.setLabel("Boltzmann Machine");
 
         // Boltzmann machine
-        hiddenUnits = new NeuronGroup(net, initialPosition, numHiddenNeurons);
+        hiddenUnits = new NeuronGroup(net, numHiddenNeurons);
+        hiddenUnits.setLocation(initialPosition);
         hiddenUnits.setLayoutBasedOnSize();
         hiddenUnits.setLabel("Hidden Units");
         this.addNeuronGroup(hiddenUnits);
 
         // Set up input layer
-        visibleUnits = new NeuronGroup(net, initialPosition, numVisibleNeurons);
+        visibleUnits = new NeuronGroup(net, numVisibleNeurons);
+        visibleUnits.setLocation(initialPosition);
         visibleUnits.setLayoutBasedOnSize();
         this.addNeuronGroup(visibleUnits);
         visibleUnits.setLabel("Visible Units");

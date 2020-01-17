@@ -59,9 +59,10 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         });
         events.onLabelChange((o,n) -> {
             updateText();
-            syncToModel();
         });
-        events.onLocationChange(outlinedObjects::updateBounds);
+        events.onLocationChange(() -> {
+            outlinedObjects.updateBounds();
+        });
         events.onRecordingStarted(this::updateText);
         events.onRecordingStopped(this::updateText);
     }
@@ -81,7 +82,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
     /**
      * Sync all neuron nodes in the group to the model.
      */
-    public void syncToModel() {
+    public void pullPositionFromModel() {
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.pullViewPositionFromModel();
         }

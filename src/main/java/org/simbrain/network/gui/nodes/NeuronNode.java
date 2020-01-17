@@ -608,9 +608,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         this.setGlobalTranslation(p);
     }
 
-    /**
-     * @return Returns the DIAMETER.
-     */
     public static int getDIAMETER() {
         return DIAMETER;
     }

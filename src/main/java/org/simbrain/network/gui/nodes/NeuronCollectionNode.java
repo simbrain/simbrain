@@ -69,7 +69,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     /**
      * Sync all neuron nodes in the group to the model.
      */
-    public void syncToModel() {
+    public void pullPositionFromModel() {
         for (NeuronNode neuronNode : getNeuronNodes()) {
             neuronNode.pullViewPositionFromModel();
         }

@@ -152,7 +152,11 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     @Override
     public void setLocation(@NotNull Point2D location) {
         Point2D delta = minus(location, getLocation());
-        neuronList.forEach(n -> n.offset(delta.getX(), delta.getY(), false));
+        neuronList.forEach(n -> {
+            // TODO: Performance drain for > 20K neurons.  Must fine-tune batch event handling
+            // before this works properly
+            n.offset(delta.getX(), delta.getY(), true);
+        });
         events.fireLocationChange();
     }
 

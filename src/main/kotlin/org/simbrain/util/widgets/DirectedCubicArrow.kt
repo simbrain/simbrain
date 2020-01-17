@@ -33,7 +33,7 @@ class DirectedCubicArrow(
      *
      * @return the updated center location of this arrow
      */
-    fun update(sourceOutlines: RectangleOutlines, targetOutlines: RectangleOutlines): Point2D {
+    fun update(sourceOutlines: RectangleOutlines, targetOutlines: RectangleOutlines): Point2D? {
 
         // 0. clear old arrow
         removeAllChildren()
@@ -43,7 +43,7 @@ class DirectedCubicArrow(
             // make sure the curve does not bent backward
             val line = target.headOffset - source.tailOffset
             line dot source.normal > 0 && line dot target.normal < 0
-        }.minBy { (source, target) -> source.midPoint distanceSqTo target.midPoint } ?: return point(0, 0)
+        }.minBy { (source, target) -> source.midPoint distanceSqTo target.midPoint } ?: return null
 
         // 2. compute the vector from source to target
         val deltaVector = targetSide.headOffset - sourceSide.tailOffset

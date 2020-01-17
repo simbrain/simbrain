@@ -2,6 +2,8 @@ package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
 import org.simbrain.network.gui.nodes.SynapseGroupNode
+import org.simbrain.util.line
+import org.simbrain.util.midPoint
 import org.simbrain.util.widgets.DirectedCubicArrow
 
 /**
@@ -31,6 +33,12 @@ class SynapseGroupNodeSimple(private val synapseGroupNode: SynapseGroupNode) : P
                 synapseGroupNode.synapseGroup.targetNeuronGroup.outlines
         )
 
-        synapseGroupNode.interactionBox.centerFullBoundsOnPoint(midPoint.x, midPoint.y)
+        if (midPoint == null) {
+            with(synapseGroupNode.synapseGroup) {
+                line(sourceNeuronGroup.location, targetNeuronGroup.location).midPoint
+            }.let { synapseGroupNode.interactionBox.centerFullBoundsOnPoint(it.x, it.y) }
+        } else {
+            synapseGroupNode.interactionBox.centerFullBoundsOnPoint(midPoint.x, midPoint.y)
+        }
     }
 }

@@ -1,6 +1,7 @@
 package org.simbrain.network
 
 import org.simbrain.network.events.LocationEvents
+import org.simbrain.util.*
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 
@@ -38,14 +39,46 @@ val List<LocatableModel>.centerLocation
     get() = Point2D.Double(bound.x + bound.width / 2, bound.y + bound.height / 2)
 
 /**
+ * Top-left and bottom-right locations padded with a small delta to make sure the bound has some size
+ */
+val List<LocatableModel>.minMax
+    get() = point(map { it.location.x }.min() ?: 0.0, map { it.location.y }.min() ?: 0.0) - point(0.001, 0.001) to
+            point(map { it.location.x }.max() ?: 0.0, map { it.location.y }.max() ?: 0.0) + point(0.001, 0.001)
+
+/**
+ * The four vertices of the bound in the order of topLeft, topRight, bottomLeft, bottomRight
+ */
+val List<LocatableModel>.vertices : RectangleVertices
+    get() {
+        val (min, max) = minMax
+        return RectangleVertices(
+                point(min.x, min.y),
+                point(max.x, min.y),
+                point(min.x, max.y),
+                point(max.x, max.y)
+        )
+    }
+
+/**
+ * The four sides of the bound
+ */
+val List<LocatableModel>.outlines : RectangleOutlines
+    get() {
+        val (topLeft, topRight, bottomLeft, bottomRight) = vertices
+        return RectangleOutlines(
+                line(topRight, topLeft),
+                line(bottomRight, topRight),
+                line(bottomLeft, bottomRight),
+                line(topLeft, bottomLeft)
+        )
+    }
+
+/**
  * Return bounding box for a list of [LocatableModel] objects.
  */
 val List<LocatableModel>.bound: Rectangle2D
     get() {
-        val minX = map { it.location.x }.min() ?: 0.0
-        val minY = map { it.location.y }.min() ?: 0.0
-        val maxX = map { it.location.x }.max() ?: 0.0
-        val maxY = map { it.location.y }.max() ?: 0.0
-        return Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY)
+        val (min, max) = minMax
+        return rectangle(min, max)
     }
 

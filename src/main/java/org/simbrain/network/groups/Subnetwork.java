@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.simbrain.network.LocatableModelKt.getCenterLocation;
-import static org.simbrain.util.PointKt.minus;
+import static org.simbrain.util.GeomKt.minus;
 
 /**
  * A collection of neuron groups and synapse groups which functions as a subnetwork within the main root network, with
@@ -533,8 +533,8 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
 
     @Override
     public void setLocation(@NotNull Point2D location) {
-        Point2D.Double delta = minus(getLocation(), location);
-        neuronGroupList.forEach(ng -> ng.offset(delta.x, delta.y));
+        Point2D delta = minus(getLocation(), location);
+        neuronGroupList.forEach(ng -> ng.offset(delta.getX(), delta.getY()));
     }
 
     @NotNull

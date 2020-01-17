@@ -21,7 +21,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
@@ -32,7 +31,6 @@ import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 
@@ -44,8 +42,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.simbrain.network.LocatableModelKt.getTopLeftLocation;
-import static org.simbrain.util.PointKt.plus;
-import static org.simbrain.util.PointKt.point;
 
 /**
  * A group of neurons. A primary abstraction for larger network structures.
@@ -353,31 +349,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return retArray;
     }
 
-    /**
-     * @return the spatial positions of the corners of the neuron group
-     * (X and Y only)
-     */
-    public List<Point2D> getFourCorners() {
-        return Arrays.asList(
-                new Point2D.Double(getMaxX(), getMaxY()),
-                new Point2D.Double(getMaxX(), getMinY()),
-                new Point2D.Double(getMinX(), getMinY()),
-                new Point2D.Double(getMinX(), getMaxY())
-        );
-    }
-
-    public Map<NeuronGroupNode.Port, Point2D> getMidPointOfFourEdges() {
-        List<Point2D> c = getFourCorners();
-        Map<NeuronGroupNode.Port, Point2D> portPointMap = new HashMap<>();
-
-        portPointMap.put(NeuronGroupNode.Port.EAST, plus(SimbrainMath.midpoint(c.get(0), c.get(1)), point(-0.01, 0)));
-        portPointMap.put(NeuronGroupNode.Port.SOUTH, plus(SimbrainMath.midpoint(c.get(1), c.get(2)), point(0, -0.01)));
-        portPointMap.put(NeuronGroupNode.Port.WEST, plus(SimbrainMath.midpoint(c.get(2), c.get(3)), point(0.01, 0)));
-        portPointMap.put(NeuronGroupNode.Port.NORTH, plus(SimbrainMath.midpoint(c.get(3), c.get(0)), point(0, 0.01)));
-
-        return portPointMap;
-
-    }
 
     /**
      * @param x x coordinate for neuron group

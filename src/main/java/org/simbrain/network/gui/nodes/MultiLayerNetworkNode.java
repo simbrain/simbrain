@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.stream.Collectors;
 
-import static org.simbrain.util.PointKt.minus;
+import static org.simbrain.util.GeomKt.minus;
 
 /**
  * GUI representation of dl4j network.

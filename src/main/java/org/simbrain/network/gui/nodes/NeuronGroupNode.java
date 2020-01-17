@@ -32,7 +32,6 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -48,38 +47,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     private static final int DEFAULT_BUFFER = 10;
 
     private final int buffer = DEFAULT_BUFFER;
-
-    private final HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>> dockingPorts = new HashMap<>();
-
-    {
-        dockingPorts.put(Port.NORTH, new HashMap<>());
-        dockingPorts.put(Port.SOUTH, new HashMap<>());
-        dockingPorts.put(Port.EAST, new HashMap<>());
-        dockingPorts.put(Port.WEST, new HashMap<>());
-    }
-
-    public HashMap<Port, HashMap<SynapseGroupNodeSimple, Point2D>> getDockingPorts() {
-        return dockingPorts;
-    }
-
-    public enum Port {
-        NORTH, SOUTH, EAST, WEST,;
-
-        public static Port opposite(Port p) {
-            switch (p) {
-                case NORTH:
-                    return SOUTH;
-                case SOUTH:
-                    return NORTH;
-                case EAST:
-                    return WEST;
-                case WEST:
-                    return EAST;
-                default:
-                    throw new IllegalArgumentException("No such port");
-            }
-        }
-    }
 
     /**
      * Reference to represented group node.
@@ -429,10 +396,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             neuronGroup.setClamped(false);
         }
     };
-
-    public void removeSynapseDock(Port port, SynapseGroupNodeSimple synGN) {
-        dockingPorts.get(port).remove(synGN);
-    }
 
     private boolean samePoint(Point2D a, Point2D b) {
         return a.getX() == b.getX() && a.getY() == b.getY();

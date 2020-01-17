@@ -37,8 +37,8 @@ import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.simbrain.util.PointKt.plus;
-import static org.simbrain.util.PointKt.point;
+import static org.simbrain.util.GeomKt.plus;
+import static org.simbrain.util.GeomKt.point;
 
 /**
  * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of

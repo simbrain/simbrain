@@ -36,8 +36,8 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import static org.simbrain.util.PointKt.minus;
-import static org.simbrain.util.PointKt.plus;
+import static org.simbrain.util.GeomKt.minus;
+import static org.simbrain.util.GeomKt.plus;
 
 /**
  * An editable text element, which wraps a PStyledText object.

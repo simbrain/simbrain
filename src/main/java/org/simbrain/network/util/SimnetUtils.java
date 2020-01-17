@@ -27,7 +27,7 @@ import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.simbrain.util.PointKt.plus;
+import static org.simbrain.util.GeomKt.plus;
 
 /**
  * <b>SimnetUtils</b> provides utility classes relating to Simbrain networks.

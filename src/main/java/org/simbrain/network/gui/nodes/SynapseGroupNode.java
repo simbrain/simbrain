@@ -21,14 +21,13 @@ package org.simbrain.network.gui.nodes;
 import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.SynapseGroupNodeSimple;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * PNode representation of a group of synapses connecting one {@link org.simbrain.network.groups.NeuronGroup}
@@ -142,7 +141,7 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
             currentNode = recurrentNode;
         } else {
             if (simpleNode == null) {
-                simpleNode = new SynapseGroupNodeSimple(networkPanel, this);
+                simpleNode = new SynapseGroupNodeSimple(this);
             }
             currentNode = simpleNode;
         }
@@ -166,7 +165,7 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
                 currentNode = recurrentNode;
             } else {
                 if (simpleNode == null) {
-                    simpleNode = new SynapseGroupNodeSimple(networkPanel, this);
+                    simpleNode = new SynapseGroupNodeSimple(this);
                 }
                 addChild(simpleNode);
                 currentNode = simpleNode;

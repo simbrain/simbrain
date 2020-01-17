@@ -15,6 +15,7 @@ import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.network.util.SubsamplingManager;
+import org.simbrain.util.RectangleOutlines;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.simbrain.network.LocatableModelKt.getCenterLocation;
-import static org.simbrain.util.PointKt.minus;
+import static org.simbrain.util.GeomKt.minus;
 
 /**
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
@@ -161,6 +162,8 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     }
 
     public Rectangle2D getBound() { return LocatableModelKt.getBound(neuronList); }
+
+    public RectangleOutlines getOutlines() { return LocatableModelKt.getOutlines(neuronList); }
 
     /**
      * Return the width of this group, based on the positions of the neurons that comprise it.

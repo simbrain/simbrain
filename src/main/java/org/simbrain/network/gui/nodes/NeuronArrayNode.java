@@ -45,8 +45,8 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.*;
 
-import static org.simbrain.util.PointKt.minus;
-import static org.simbrain.util.PointKt.plus;
+import static org.simbrain.util.GeomKt.minus;
+import static org.simbrain.util.GeomKt.plus;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural

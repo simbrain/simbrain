@@ -15,7 +15,7 @@ import java.awt.geom.Point2D
  */
 class DirectedCubicArrow(
         val thickness: Float = 20.0f,
-        val color: Color = Color(0, 255, 0, 128),
+        val color: Color = Color.GREEN,
         var t: Double = 0.5
 ) : PNode() {
 
@@ -26,7 +26,7 @@ class DirectedCubicArrow(
     private val arrowTip = listOf(point(0, 0), point(0.5, -0.866025), point(-0.5, -0.866025))
             .map { it * (thickness * 2.0) }.toPolygon()
             .let { polygon -> PArea(polygon, null) }
-            .apply { paint = Color.GREEN }
+            .apply { paint = color }
 
     /**
      * Update the shape of the arrow base on the outlines of source and target.
@@ -66,6 +66,7 @@ class DirectedCubicArrow(
         val curveView = PPath.Double(curveModel, BasicStroke(thickness)).apply {
             paint = null
             strokePaint = color
+            transparency = 0.5f
         }
 
         // 5. add shape to node

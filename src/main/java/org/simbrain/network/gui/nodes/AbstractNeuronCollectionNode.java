@@ -12,7 +12,9 @@ import org.simbrain.util.piccolo.Outline;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
@@ -48,8 +50,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         outlinedObjects = new Outline();
 
         NetworkEvents networkEvents = networkPanel.getNetwork().getEvents();
-        networkEvents.onBatchDeletionCompleted(outlinedObjects::updateBounds);
-        networkEvents.onBatchLocationUpdateCompleted(outlinedObjects::updateBounds);
 
         addChild(outlinedObjects);
 

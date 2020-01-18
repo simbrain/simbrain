@@ -128,17 +128,16 @@ public class LineLayout implements Layout {
         if (orientation == LineOrientation.VERTICAL) {
             double ypos = initialY;
             for (Neuron neuron : neurons) {
-                neuron.setLocation(initialX, ypos, false);
+                neuron.setLocation(initialX, ypos);
                 ypos += spacing;
             }
         } else if (orientation == LineOrientation.HORIZONTAL) {
             double xpos = initialX;
             for (Neuron neuron : neurons) {
-                neuron.setLocation(xpos, initialY, false);
+                neuron.setLocation(xpos, initialY);
                 xpos += spacing;
             }
         }
-        neurons.get(0).getNetwork().getEvents().fireBatchLocationUpdateCompleted();
 
     }
 

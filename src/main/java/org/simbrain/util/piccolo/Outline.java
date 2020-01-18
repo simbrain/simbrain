@@ -46,12 +46,11 @@ public class Outline extends PNode {
      */
     public void setOutlinedNodes(Collection<? extends ScreenElement> outlinedNodes) {
         this.outlinedNodes = outlinedNodes;
+        invalidateFullBounds();
     }
 
-    /**
-     * Update the bounds of this outline object based on the locations of its {@link #outlinedNodes}.
-     */
-    public void updateBounds() {
+    @Override
+    public boolean validateFullBounds() {
         if (outlinedNodes != null) {
             PBounds bounds = new PBounds();
             for (ScreenElement node : outlinedNodes) {
@@ -60,7 +59,17 @@ public class Outline extends PNode {
             updateBound(bounds.x, bounds.y, bounds.width, bounds.height);
             outlinedNodes = null;
         }
+        return super.validateFullBounds();
     }
+
+    /**
+     * Update the bounds of this outline object based on the locations of its {@link #outlinedNodes}.
+     */
+    public void updateBounds() {
+        invalidateFullBounds();
+    }
+
+
 
     /**
      * Update the outline object to specified bounds.

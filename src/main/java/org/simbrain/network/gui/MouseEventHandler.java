@@ -277,9 +277,6 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
                 }
             }
         }
-
-        networkPanel.getNetwork().getEvents().fireBatchLocationUpdateCompleted();
-
     }
 
     @Override

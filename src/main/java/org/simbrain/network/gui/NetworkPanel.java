@@ -454,9 +454,6 @@ public class NetworkPanel extends JPanel {
             NetworkPanel.this.setUpdateComplete(c);
             repaint();
         });
-        event.onBatchLocationUpdateCompleted(() -> {
-            getNodes(NeuronNode.class).forEach(NeuronNode::pullViewPositionFromModel);
-        });
     }
 
     /**
@@ -1094,9 +1091,6 @@ public class NetworkPanel extends JPanel {
             }
 
         }
-
-        network.getEvents().fireBatchDeletionCompleted();
-
         // Zoom events are costly so only zoom after main deletion events
         zoomToFitPage(true);
 

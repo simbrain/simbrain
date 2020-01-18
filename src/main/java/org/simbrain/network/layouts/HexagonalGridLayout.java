@@ -129,10 +129,9 @@ public class HexagonalGridLayout implements Layout {
                 neuron.setLocation(initialX + hSpacing / 2 + (i % numColumns) * hSpacing,
                         initialY + rowNum * vSpacing, false);
             } else {
-                neuron.setLocation(initialX + (i % numColumns) * hSpacing, initialY + rowNum * vSpacing, false);
+                neuron.setLocation(initialX + (i % numColumns) * hSpacing, initialY + rowNum * vSpacing);
             }
         }
-        neurons.get(0).getNetwork().getEvents().fireBatchLocationUpdateCompleted();
     }
 
     /**

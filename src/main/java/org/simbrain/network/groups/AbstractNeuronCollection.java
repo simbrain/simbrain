@@ -156,7 +156,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         neuronList.forEach(n -> {
             // TODO: Performance drain for > 20K neurons.  Must fine-tune batch event handling
             // before this works properly
-            n.offset(delta.getX(), delta.getY(), true);
+            n.offset(delta.getX(), delta.getY());
         });
         events.fireLocationChange();
     }

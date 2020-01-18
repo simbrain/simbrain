@@ -20,7 +20,6 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -35,7 +34,6 @@ import org.simbrain.util.piccolo.Outline;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -94,11 +92,6 @@ public class SubnetworkNode extends ScreenElement {
         SubnetworkEvents events = subnetwork.getEvents();
         events.onDelete(n -> removeFromParent());
         events.onLabelChange((o,n) -> updateText());
-
-        NetworkEvents networkEvents = networkPanel.getNetwork().getEvents();
-        networkEvents.onBatchDeletionCompleted(outline::updateBounds);
-        networkEvents.onBatchLocationUpdateCompleted(outline::updateBounds);
-
     }
 
     /**

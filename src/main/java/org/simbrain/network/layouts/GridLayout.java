@@ -153,7 +153,6 @@ public class GridLayout implements Layout {
             }
             neuron.setLocation(initialX + (i % numCols) * hSpacing, initialY + rowNum * vSpacing);
         }
-        neurons.get(0).getNetwork().getEvents().fireBatchLocationUpdateCompleted();
     }
 
     /**

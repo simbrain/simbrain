@@ -38,17 +38,21 @@ val List<LocatableModel>.topLeftLocation
 val List<LocatableModel>.centerLocation
     get() = Point2D.Double(bound.x + bound.width / 2, bound.y + bound.height / 2)
 
+val List<LocatableModel>.minX get() = map { it.location.x }.min() ?: 0.0
+val List<LocatableModel>.minY get() = map { it.location.y }.min() ?: 0.0
+val List<LocatableModel>.maxX get() = map { it.location.x }.max() ?: 0.0
+val List<LocatableModel>.maxY get() = map { it.location.y }.max() ?: 0.0
+
 /**
  * Top-left and bottom-right locations padded with a small delta to make sure the bound has some size
  */
 val List<LocatableModel>.minMax
-    get() = point(map { it.location.x }.min() ?: 0.0, map { it.location.y }.min() ?: 0.0) - point(0.001, 0.001) to
-            point(map { it.location.x }.max() ?: 0.0, map { it.location.y }.max() ?: 0.0) + point(0.001, 0.001)
+    get() = point(minX, minY) - point(0.001, 0.001) to point(maxX, maxY) + point(0.001, 0.001)
 
 /**
  * The four vertices of the bound in the order of topLeft, topRight, bottomLeft, bottomRight
  */
-val List<LocatableModel>.vertices : RectangleVertices
+val List<LocatableModel>.vertices: RectangleVertices
     get() {
         val (min, max) = minMax
         return RectangleVertices(
@@ -62,7 +66,7 @@ val List<LocatableModel>.vertices : RectangleVertices
 /**
  * The four sides of the bound
  */
-val List<LocatableModel>.outlines : RectangleOutlines
+val List<LocatableModel>.outlines: RectangleOutlines
     get() {
         val (topLeft, topRight, bottomLeft, bottomRight) = vertices
         return RectangleOutlines(
@@ -81,4 +85,7 @@ val List<LocatableModel>.bound: Rectangle2D
         val (min, max) = minMax
         return rectangle(min, max)
     }
+
+fun List<LocatableModel>.translate(vector: Point2D) = forEach { it.location = it.location + vector }
+fun List<LocatableModel>.translate(dx: Double, dy: Double) = translate(point(dx, dy))
 

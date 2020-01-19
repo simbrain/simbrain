@@ -23,11 +23,7 @@ import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.math.SimbrainMath;
 
-import java.awt.geom.Point2D;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.simbrain.util.GeomKt.plus;
 
 /**
  * <b>SimnetUtils</b> provides utility classes relating to Simbrain networks.
@@ -132,21 +128,6 @@ public class SimnetUtils {
                     Network.getLooseSynapse(source, target).forceSetStrength(weight.getStrength() * scalar);
                 }
             }
-        }
-    }
-
-    /**
-     * Translate a set of network model object.
-     */
-    public static void translate(final List<NetworkModel> networkObjects, final Point2D translation) {
-        List<LocatableModel> locatableModels =
-                networkObjects.stream()
-                        .filter(LocatableModel.class::isInstance)
-                        .map(LocatableModel.class::cast)
-                        .collect(Collectors.toList());
-
-        for (LocatableModel model : locatableModels) {
-            model.setLocation(plus(model.getLocation(), translation));
         }
     }
 
@@ -303,48 +284,6 @@ public class SimnetUtils {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Returns the minimum X position of these model elements
-     */
-    public static double getMinX(List<? extends LocatableModel> models) {
-        return models.stream().map(m -> m.getLocation().getX()).min(Double::compareTo).orElse(0.0);
-    }
-
-    /**
-     * Returns the maximum X position of these model elements
-     */
-    public static double getMaxX(List<? extends LocatableModel> models) {
-        return models.stream().map(m -> m.getLocation().getX()).max(Double::compareTo).orElse(0.0);
-    }
-
-    /**
-     * Returns the min Y position of these model elements
-     */
-    public static double getMinY(List<? extends LocatableModel> models) {
-        return models.stream().map(m -> m.getLocation().getY()).min(Double::compareTo).orElse(0.0);
-    }
-
-    /**
-     * Returns the max Y position of these model elements
-     */
-    public static double getMaxY(List<? extends LocatableModel> models) {
-        return models.stream().map(m -> m.getLocation().getY()).max(Double::compareTo).orElse(0.0);
-    }
-
-    /**
-     * Returns the height (max y - min y) of a list of objects
-     */
-    public static double getHeight(List<? extends LocatableModel> models) {
-        return getMaxY(models) - getMinY(models);
-    }
-
-    /**
-     * Returns the height (max x - min x) of a list of objects
-     */
-    public static double getWidth(List<? extends LocatableModel> models) {
-        return getMaxX(models) - getMinX(models);
     }
 
     /**

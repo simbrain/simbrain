@@ -13,7 +13,6 @@ import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.RectangleOutlines;
 import org.simbrain.util.SimbrainConstants;
@@ -711,33 +710,20 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         this.inputMode = inputMode;
         //fireLabelUpdated();
     }
-
-    /**
-     * See {@link SimnetUtils#getMinX(List)}
-     */
     public double getMinX() {
-        return SimnetUtils.getMinX(neuronList);
+        return LocatableModelKt.getMinX(neuronList);
     }
 
-    /**
-     * See {@link SimnetUtils#getMaxX(List)}
-     */
     public double getMaxX() {
-        return SimnetUtils.getMaxX(neuronList);
+        return LocatableModelKt.getMaxX(neuronList);
     }
 
-    /**
-     * See {@link SimnetUtils#getMinY(List)}
-     */
     public double getMinY() {
-        return SimnetUtils.getMinY(neuronList);
+        return LocatableModelKt.getMinY(neuronList);
     }
 
-    /**
-     * See {@link SimnetUtils#getMaxY(List)}
-     */
     public double getMaxY() {
-        return SimnetUtils.getMaxY(neuronList);
+        return LocatableModelKt.getMaxY(neuronList);
     }
 
     /**

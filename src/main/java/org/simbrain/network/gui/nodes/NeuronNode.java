@@ -604,6 +604,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
      * model neuron.
      */
     public void pullViewPositionFromModel() {
+        // This is not necessarily a performance drain.  These updates do not automatically cause the
+        // canvas to repaint.  See PRoot#processInputs
         Point2D p = new Point2D.Double(getNeuron().getX(), getNeuron().getY());
         this.setGlobalTranslation(p);
     }

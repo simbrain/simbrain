@@ -59,8 +59,6 @@ public class CompetitiveCreationDialog extends StandardDialog {
      */
     private CompetitiveNetwork.CompetitiveCreator
             cc = new  CompetitiveNetwork.CompetitiveCreator();
-
-
     /**
      * Layout object.
      */

@@ -64,7 +64,7 @@ val List<LocatableModel>.vertices: RectangleVertices
     }
 
 /**
- * The four sides of the bound
+ * The four sides of the bound.
  */
 val List<LocatableModel>.outlines: RectangleOutlines
     get() {

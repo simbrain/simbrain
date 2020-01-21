@@ -10,13 +10,23 @@ import java.awt.geom.Line2D
 import java.awt.geom.Point2D
 
 /**
+ * Represents a Bezier curved with a single arrow at its end. Where it is located on its
+ * source can be set, but it's target location is automatically determined.
+ *
+ * Terminology: a source and target [LocatableModel] are connected by a directed bezier
+ * curve with a tail and tip.
+ *
+ * @param thickness thickness of the arrow in pixels
+ * @param color color the arrow
+ * @param sourceEdgePercentage where on the source edge the tail of the arrow is located. Starting is 0 and end is 1.
+ *
  * @author Zoë Tosi
  * @author Leo Yulin Li
  */
-class DirectedCubicArrow(
+class BezierArrow(
         val thickness: Float = 20.0f,
         val color: Color = Color.GREEN,
-        var t: Double = 0.5
+        var sourceEdgePercentage: Double = 0.5
 ) : PNode() {
 
     /**
@@ -82,17 +92,17 @@ class DirectedCubicArrow(
      * Given a side of a rectangle bound, find the location of where an arrow tail would go.
      */
     private val Line2D.tailOffset
-        get() = p(t) + unitNormal * (thickness * 2.5)
+        get() = p(sourceEdgePercentage) + unitNormal * (thickness * 2.5)
 
     /**
      * Given a side of a rectangle bound, find the location of where an arrow head would go.
      */
     private val Line2D.headOffset
-        get() = p(1 - t) + unitNormal * (thickness * 2.5)
+        get() = p(1 - sourceEdgePercentage) + unitNormal * (thickness * 2.5)
 
     /**
      * Given a side of a rectangle bound, find the location of where the tip of an arrow would go.
      */
     private val Line2D.tipOffset
-        get() = p(1 - t) + unitNormal * (thickness * 1.0)
+        get() = p(1 - sourceEdgePercentage) + unitNormal * (thickness * 1.0)
 }

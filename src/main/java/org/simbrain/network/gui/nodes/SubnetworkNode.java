@@ -92,6 +92,7 @@ public class SubnetworkNode extends ScreenElement {
         SubnetworkEvents events = subnetwork.getEvents();
         events.onDelete(n -> removeFromParent());
         events.onLabelChange((o,n) -> updateText());
+        events.onLocationChange(this::layoutChildren);
     }
 
     /**

@@ -84,16 +84,10 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
             synapse.setLowerBound(0);
         }
 
-        layoutNetwork();
-    }
-
-    /**
-     * Lay out groups
-     */
-    public void layoutNetwork() {
+        // Lay out network
         inputLayer.setLayoutBasedOnSize();
         competitive.setLayoutBasedOnSize();
-        offsetNeuronGroup(inputLayer, competitive, Direction.NORTH, 100);
+        offsetNeuronGroup(inputLayer, competitive, Direction.NORTH, 200);
     }
 
     @Override

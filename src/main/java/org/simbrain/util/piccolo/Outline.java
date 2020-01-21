@@ -69,8 +69,6 @@ public class Outline extends PNode {
         invalidateFullBounds();
     }
 
-
-
     /**
      * Update the outline object to specified bounds.
      */

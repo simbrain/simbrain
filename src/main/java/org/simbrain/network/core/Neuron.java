@@ -368,7 +368,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     /**
-     * Updates neuron.
+     * Updates neuron buffers.
      */
     public void update() {
         if (isClamped()) {

@@ -79,7 +79,8 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     public abstract TimeType getTimeType();
 
     /**
-     * Apply the update rule.
+     * Apply the update rule.  Generally applies it to the buffer, so activation is _not_ updated
+     * unless setActivation(getBuffer()) is called.  Supports asynhronous update.
      *
      * @param neuron parent neuron
      */

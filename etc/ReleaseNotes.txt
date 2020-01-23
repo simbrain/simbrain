@@ -1,3 +1,8 @@
+Release Notes for Simbrain 3.04 (Spring 2020)
+- Added a series of behaviorism demos
+- Drag is now ctrl-drag on PCs
+- Some improvements to synapse selection
+
 Release Notes for Simbrain 3.03 (Summer 2018)
 
 - This is a last or nearly last release in the Simbrain 3.0 series. Development efforts are shifting to 3.1

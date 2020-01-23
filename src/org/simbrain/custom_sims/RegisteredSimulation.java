@@ -74,7 +74,7 @@ public abstract class RegisteredSimulation {
         // REGISTERED_SIMS.add(new SimpleOperant());
         // REGISTERED_SIMS.add(new OperantConditioning());
         REGISTERED_SIMS.add(new OperantWithEnvironment());
-        REGISTERED_SIMS.add(new ConvertSim());
+        // REGISTERED_SIMS.add(new ConvertSim());
 
         // Alphabetize
         REGISTERED_SIMS

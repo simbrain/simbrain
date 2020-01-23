@@ -54,10 +54,6 @@ public class Splasher {
         // // and feel.
         // }
 
-        // TODO find a better solution
-        Logger.getLogger("com.jme").setLevel(Level.OFF);
-        Logger.getLogger("com.jmex").setLevel(Level.OFF);
-
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
         SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop",
             args);

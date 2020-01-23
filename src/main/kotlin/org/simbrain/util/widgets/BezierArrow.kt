@@ -6,8 +6,8 @@ import org.piccolo2d.nodes.PPath
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.geom.CubicCurve2D
 import java.awt.geom.Line2D
-import java.awt.geom.Point2D
 
 /**
  * Represents a Bezier curved with a single arrow at its end. Where it is located on its
@@ -41,9 +41,9 @@ class BezierArrow(
     /**
      * Update the shape of the arrow base on the outlines of source and target.
      *
-     * @return the updated center location of this arrow
+     * @return the updated curve model
      */
-    fun update(sourceOutlines: RectangleOutlines, targetOutlines: RectangleOutlines): Point2D? {
+    fun update(sourceOutlines: RectangleOutlines, targetOutlines: RectangleOutlines): CubicCurve2D? {
 
         // 0. clear old arrow
         removeAllChildren()
@@ -84,7 +84,7 @@ class BezierArrow(
         addChild(curveView)
 
         // 6. return the new location of this arrow
-        return curveModel.midpoint
+        return curveModel
 
     }
 

@@ -75,7 +75,7 @@ val Line2D.normalTheta
     }
 
 val Line2D.midPoint
-    get() = point(p1.x + (p2.x - p1.x) / 2, p1.y + (p2.y - p1.y) / 2)
+    get() = p(0.5)
 
 fun Line2D.p(t: Double) = point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t)
 
@@ -116,13 +116,15 @@ fun cubicBezier(p0: Point2D, p1: Point2D, p2: Point2D, p3: Point2D)
     = CubicCurve2D.Double(p0.x, p0.y, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y)
 
 val CubicCurve2D.midpoint: Point2D
-    get() {
-        val m11 = line(p1, ctrlP1).midPoint
-        val m12 = line(ctrlP1, ctrlP2).midPoint
-        val m13 = line(ctrlP2, p2).midPoint
+    get() = p(0.5)
 
-        val m21 = line(m11, m12).midPoint
-        val m22 = line(m12, m13).midPoint
+fun CubicCurve2D.p(t: Double): Point2D {
+    val m11 = line(p1, ctrlP1).p(t)
+    val m12 = line(ctrlP1, ctrlP2).p(t)
+    val m13 = line(ctrlP2, p2).p(t)
 
-        return line(m21, m22).midPoint
-    }
+    val m21 = line(m11, m12).p(t)
+    val m22 = line(m12, m13).p(t)
+
+    return line(m21, m22).p(t)
+}

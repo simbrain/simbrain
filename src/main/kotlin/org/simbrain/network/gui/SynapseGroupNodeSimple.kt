@@ -3,7 +3,7 @@ package org.simbrain.network.gui
 import org.piccolo2d.PNode
 import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.util.line
-import org.simbrain.util.midPoint
+import org.simbrain.util.p
 import org.simbrain.util.widgets.BezierArrow
 
 /**
@@ -21,24 +21,23 @@ class SynapseGroupNodeSimple(private val synapseGroupNode: SynapseGroupNode) : P
     override fun layoutChildren() {
 
         // check bidirectional
-        if (synapseGroupNode.synapseGroup.targetNeuronGroup.outgoingSg
-                        .any { it.targetNeuronGroup == synapseGroupNode.synapseGroup.sourceNeuronGroup }) {
-            arrow.sourceEdgePercentage = 0.35
-        } else {
-            arrow.sourceEdgePercentage = 0.5
-        }
+        val isBidirectional = synapseGroupNode.synapseGroup.targetNeuronGroup.outgoingSg
+                .any { it.targetNeuronGroup == synapseGroupNode.synapseGroup.sourceNeuronGroup }
 
-        val midPoint = arrow.update(
+        arrow.sourceEdgePercentage = if (isBidirectional) 0.35 else 0.5
+
+        val curve = arrow.update(
                 synapseGroupNode.synapseGroup.sourceNeuronGroup.outlines,
                 synapseGroupNode.synapseGroup.targetNeuronGroup.outlines
         )
 
-        if (midPoint == null) {
+        val percentageOnCurve = if (isBidirectional) 0.75 else 0.5
+        if (curve == null) {
             with(synapseGroupNode.synapseGroup) {
-                line(sourceNeuronGroup.location, targetNeuronGroup.location).midPoint
-            }.let { synapseGroupNode.interactionBox.centerFullBoundsOnPoint(it.x, it.y) }
+                line(sourceNeuronGroup.location, targetNeuronGroup.location).p(percentageOnCurve)
+            }
         } else {
-            synapseGroupNode.interactionBox.centerFullBoundsOnPoint(midPoint.x, midPoint.y)
-        }
+            curve.p(percentageOnCurve)
+        }.let { synapseGroupNode.interactionBox.centerFullBoundsOnPoint(it.x, it.y) }
     }
 }

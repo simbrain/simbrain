@@ -7,7 +7,17 @@ import org.simbrain.util.SimpleId
 import org.simbrain.util.clip
 import kotlin.random.Random
 
-abstract class Environment<A: Agent2<G>, G : Genome2>(seed: Long, name: String, val eval: G.() -> Double) {
+/**
+ * The top level object for evolutionary simulations.
+ *
+ * An environment contains an [Agent2] and a [Genome2].  It is initialized with a seed, a name, and an
+ * [eval] function that associates genomes with fitness values in that environment.  A configuration object
+ * may also be needed for implementing classes at this level.
+ *
+ * Some functions that seem like they should be at the genome level (e.g. [mutate]) are at this level since config
+ * objects are maintained at this level.
+ */
+abstract class Environment<A : Agent2<G>, G : Genome2>(seed: Long, name: String, val eval: G.() -> Double) {
 
     protected abstract val initialPopulation: List<A>
 
@@ -21,6 +31,9 @@ abstract class Environment<A: Agent2<G>, G : Genome2>(seed: Long, name: String, 
 
     protected fun IntRange.random() = this.random(geneticsRandom)
 
+    /**
+     * See https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)#Single-point_crossover
+     */
     protected infix fun <G : Gene2> List<G>.singlePointCrossOver(other: List<G>):
             List<G> {
         val maxSize = maxOf(this.size, other.size)
@@ -37,8 +50,16 @@ abstract class Environment<A: Agent2<G>, G : Genome2>(seed: Long, name: String, 
         it.eval(optimizeFor).eliminateLeastFit(0.5).replenish()
     }
 
+    /**
+     * Cross one genome over with another.
+     *
+     * https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm))
+     */
     protected abstract infix fun G.crossOver(other: G): G
 
+    /**
+     * Mutate the genome.
+     */
     protected abstract fun G.mutate(): G
 
     /**
@@ -59,9 +80,11 @@ abstract class Environment<A: Agent2<G>, G : Genome2>(seed: Long, name: String, 
      *
      * @param eliminateRate the percentage of agents to eliminate. Ranges from 0 to 1.
      */
-    protected fun List<A>.eliminateLeastFit(eliminateRate: Double)
-            = this.take(((config.populationSize * (1 - (eliminateRate.clip(0.0, 1.0)))).toInt()))
+    protected fun List<A>.eliminateLeastFit(eliminateRate: Double) = this.take(((config.populationSize * (1 - (eliminateRate.clip(0.0, 1.0)))).toInt()))
 
+    /**
+     * Convert a genome into an agent.
+     */
     protected abstract fun G.express(): A
 
     /**
@@ -69,8 +92,14 @@ abstract class Environment<A: Agent2<G>, G : Genome2>(seed: Long, name: String, 
      */
     protected fun Sequence<G>.init() = map { it.express() }.toList()
 
-    protected abstract fun A.eval() : A
+    /**
+     * Evaluates an agent's fitness.
+     */
+    protected abstract fun A.eval(): A
 
+    /**
+     * Evaluates fitness of a list of agents.
+     */
     protected fun List<A>.eval(optimizeFor: Optimize) = runBlocking {
         val result = map { async { it.eval() } }.toList().awaitAll()
         when (optimizeFor) {
@@ -78,35 +107,27 @@ abstract class Environment<A: Agent2<G>, G : Genome2>(seed: Long, name: String, 
             Optimize.big -> result.sortedDescending()
         }
     }
-
 }
 
+/**
+ * Used for stopping condition.
+ */
 enum class Optimize {
-    big, small
+    // Optimizing for a larger fitness score
+    big,
+    // Optimizing for a smaller fitness score
+    small
 }
 
-interface EnvironmentConfig {
-    val populationSize: Int
-}
-
-abstract class Agent2<G : Genome2> : Comparable<Agent2<G>> {
-    abstract val genome: G
-    abstract val fitness: Double
-
-    override fun compareTo(other: Agent2<G>) = fitness.compareTo(other.fitness)
-}
-
-abstract class Genome2 {
-    abstract val id: String
-}
-
-abstract class Chromosome2<G : Gene2> {
-    abstract val genes: List<G>
-}
-
-abstract class Gene2
-
+/**
+ * Util to evolve up to the indicated generation
+ */
 fun <A : Agent2<G>, G : Genome2> Sequence<List<A>>.upToGeneration(n: Int) = take(n)
+
+/**
+ * Util to get the best in a list.
+ */
+fun <A : Agent2<G>, G : Genome2> List<A>.best() = first()
 
 /**
  * Take from sequence until the fitness it reaches the goal.
@@ -124,4 +145,40 @@ fun <A : Agent2<G>, G : Genome2> Sequence<List<A>>.untilFitnessScore(predicate: 
     }
 }
 
-fun <A : Agent2<G>, G : Genome2> List<A>.best() = first()
+/**
+ * Configuration information for an environment.
+ */
+interface EnvironmentConfig {
+    val populationSize: Int
+}
+
+/**
+ * A genome together with a fitness value.  Implementing classes can contain additional structures like sensors and
+ * effectors.
+ */
+abstract class Agent2<G : Genome2> : Comparable<Agent2<G>> {
+    abstract val genome: G
+    abstract val fitness: Double
+
+    override fun compareTo(other: Agent2<G>) = fitness.compareTo(other.fitness)
+}
+
+/**
+ * It is left up to the implementing class to use chromosomes and / or genes to encode a genome.
+ */
+abstract class Genome2 {
+    abstract val id: String
+}
+
+/**
+ * A list of genes.
+ */
+abstract class Chromosome2<G : Gene2> {
+    abstract val genes: List<G>
+}
+
+/**
+ * Implementing class encodes features of the phenotype in question. E.g. a neuron gene could contain information about a
+ * neuron like it's bias value, threshold, update rule, etc.
+ */
+abstract class Gene2

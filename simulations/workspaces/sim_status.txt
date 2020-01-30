@@ -1,0 +1,30 @@
+SIMBRAIN 3 SIMULATIONS THAT HAVE NOT BEEN CONVERTED
+vehicle2Objects.zip  
+PDP1_PatternAssociation.zip
+
+course_materials/chasing*
+
+3ObjectDetector.zip
+IAC_Full.zip (need conversion script)
+iac_allstars/*  (need conversion script)
+somNetSmells.zip
+srn_temporalXOR.zip
+backropLetters.zip
+
+CONVERTED BUT BROKEN
+chartExamples.zip
+competitiveNetSmells.zip
+hopfieldNet.zip
+lmsLetters.zip
+somLetters.zip
+course_materials/auto*
+
+
+NOT FINISHED
+PDP_TheCat.zip
+
+OTHER SIMS WE SHOULD MAKE
+use image stuff (cf caltech101_iterator.zip )
+use new odor world features
+use new array based things
+3d when done

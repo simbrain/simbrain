@@ -175,13 +175,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         super(net);
         this.neuron = neuron;
         this.centerFullBoundsOnPoint(neuron.getX(), neuron.getY());
-        init();
-    }
-
-    /**
-     * Initialize the NeuronNode.
-     */
-    private void init() {
 
         if (neuron.getUpdateRule() instanceof ActivityGenerator) {
             mainShape = square;

@@ -929,7 +929,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * @param clamped Whether this neuron is to be clamped.
      */
     public void setClamped(final boolean clamped) {
-        boolean old = clamped;
+        boolean old = this.clamped;
         this.clamped = clamped;
         events.fireClampedChange(old, clamped);
     }

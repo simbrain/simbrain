@@ -1,12 +1,11 @@
 SIMBRAIN 3 SIMULATIONS THAT HAVE NOT BEEN CONVERTED
 vehicle2Objects.zip  
-PDP1_PatternAssociation.zip
-
 course_materials/chasing*
-
-3ObjectDetector.zip
 IAC_Full.zip (need conversion script)
 iac_allstars/*  (need conversion script)
+
+PDP1_PatternAssociation.zip
+3ObjectDetector.zip
 somNetSmells.zip
 srn_temporalXOR.zip
 backropLetters.zip

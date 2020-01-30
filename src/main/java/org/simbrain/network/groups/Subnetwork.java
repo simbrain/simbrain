@@ -529,6 +529,8 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     
     public void postUnmarshallingInit() {
         events = new SubnetworkEvents(this);
+        neuronGroupList.forEach(AbstractNeuronCollection::postUnmarshallingInit);
+        synapseGroupList.forEach(SynapseGroup::postUnmarshallingInit);
     }
 
     @Override

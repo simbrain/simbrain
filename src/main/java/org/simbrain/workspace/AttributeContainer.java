@@ -38,7 +38,7 @@ public interface AttributeContainer {
      */
     default String getId() {
         // TODO: Remove default.
-        return null;
+        return "TODO";
     }
 
 }

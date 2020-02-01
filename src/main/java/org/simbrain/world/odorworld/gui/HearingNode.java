@@ -102,8 +102,8 @@ public class HearingNode extends EntityAttributeNode {
             }
         });
 
-        entity.addPropertyChangeListener(evt -> {
-            if ("propertiesChanged".equals(evt.getPropertyName())) {
+        entity.getEvents().onSensorChanged((o,n) -> {
+            if(n==sensor) {
                 updateText();
                 updateLocation();
             }

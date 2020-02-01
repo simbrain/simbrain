@@ -88,38 +88,54 @@ public class EntityNode extends PNode {
         updateEntityAttributeModel();
 
         setOffset(entity.getX(), entity.getY());
-        entity.addPropertyChangeListener(evt -> {
-            if ("propertiesChanged".equals(evt.getPropertyName())) {
-                updateImage();
-                if (this.entity.isShowSensors()) {
-                    visualizableAttributeMap.values().forEach(n -> n.setVisible(true));
-                } else {
-                    visualizableAttributeMap.values().forEach(n -> n.setVisible(false));
-                }
-            } else if ("deleted".equals(evt.getPropertyName())) {
-                this.removeFromParent();
-            } else if ("moved".equals(evt.getPropertyName())) {
-                updateFlag = true;
-                // TODO: The call below makes the updateFlag redundant.
-                // leave it here for now until there is time for a good
-                // performance tuning.  If the call below is removed some
-                // simulations like agent trails fail to update properly
-                update();
-            } else if ("updated".equals(evt.getPropertyName())) {
-                update();
-            } else if ("sensorAdded".equals(evt.getPropertyName()) || "effectorAdded".equals(evt.getPropertyName())) {
-                if (evt.getNewValue() instanceof VisualizableEntityAttribute) {
-                    VisualizableEntityAttribute toAdd = (VisualizableEntityAttribute) evt.getNewValue();
-                    addAttribute(toAdd);
-                }
-            } else if ("sensorRemoved".equals(evt.getPropertyName())
-                    || "effectorRemoved".equals(evt.getPropertyName())) {
-                if (evt.getNewValue() instanceof VisualizableEntityAttribute) {
-                    VisualizableEntityAttribute toRemove = (VisualizableEntityAttribute) evt.getNewValue();
-                    removeAttribute(toRemove);
-                }
+
+        entity.getEvents().onDeleted(e -> removeFromParent());
+
+        entity.getEvents().onMoved(() -> {
+            updateFlag = true;
+            // TODO: The call below makes the updateFlag redundant.
+            // leave it here for now until there is time for a good
+            // performance tuning.  If the call below is removed some
+            // simulations like agent trails fail to update properly
+            update();
+        });
+
+        entity.getEvents().onTypeChanged((o, n) -> updateImage());
+
+        entity.getEvents().onUpdateSensorVisiblity(() -> {
+            if (this.entity.isShowSensors()) {
+                visualizableAttributeMap.values().forEach(n -> n.setVisible(true));
+            } else {
+                visualizableAttributeMap.values().forEach(n -> n.setVisible(false));
             }
         });
+
+        entity.getEvents().onUpdated(this::update);
+        entity.getEvents().onSensorAdded((s) -> {
+            if (s instanceof VisualizableEntityAttribute) {
+                VisualizableEntityAttribute toAdd = (VisualizableEntityAttribute) s;
+                addAttribute(toAdd);
+            }
+        });
+        entity.getEvents().onEffectorAdded((e) -> {
+            if (e instanceof VisualizableEntityAttribute) {
+                VisualizableEntityAttribute toAdd = (VisualizableEntityAttribute) e;
+                addAttribute(toAdd);
+            }
+        });
+        entity.getEvents().onSensorRemoved((s) -> {
+            if (s instanceof VisualizableEntityAttribute) {
+                VisualizableEntityAttribute toRemove = (VisualizableEntityAttribute) s;
+                removeAttribute(toRemove);
+            }
+        });
+        entity.getEvents().onEffectorRemoved((e) -> {
+            if (e instanceof VisualizableEntityAttribute) {
+                VisualizableEntityAttribute toRemove = (VisualizableEntityAttribute) e;
+                removeAttribute(toRemove);
+            }
+        });
+
     }
 
     /**
@@ -145,8 +161,7 @@ public class EntityNode extends PNode {
     }
 
     /**
-     * Update the position of the model neuron based on the global coordinates
-     * of this pnode.
+     * Update the position of the model neuron based on the global coordinates of this pnode.
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
@@ -155,8 +170,7 @@ public class EntityNode extends PNode {
     }
 
     /**
-     * Sync all visualizable entity attributes to this node.
-     * Should only be called on initialization or deserialization
+     * Sync all visualizable entity attributes to this node. Should only be called on initialization or deserialization
      */
     private void updateEntityAttributeModel() {
 
@@ -194,8 +208,7 @@ public class EntityNode extends PNode {
     }
 
     /**
-     * Initialize the image associated with the object. Only called when
-     * changing the image.
+     * Initialize the image associated with the object. Only called when changing the image.
      */
     private void updateImage() {
 

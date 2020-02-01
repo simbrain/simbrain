@@ -31,6 +31,7 @@ import org.simbrain.world.odorworld.RectangleCollisionBound;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
+import org.simbrain.world.odorworld.events.EntityEvents;
 import org.simbrain.world.odorworld.sensors.GridSensor;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.Sensor;
@@ -49,11 +50,6 @@ import java.util.stream.Collectors;
  * Parent class for all Odor World objects.
  */
 public class OdorWorldEntity implements EditableObject, AttributeContainer {
-
-    /**
-     * Support for property change events.
-     */
-    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     @UserParameter(label = "Type", order = 2)
     private EntityType entityType = EntityType.SWISS;
@@ -226,6 +222,11 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     private TileCollision tileCollision = new TileCollision();
 
     /**
+     * Event support.
+     */
+    protected transient EntityEvents events = new EntityEvents(this);
+
+    /**
      * Construct an entity.
      *
      * @param world parent world of entity
@@ -275,7 +276,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             updateHeadingBasedOnVelocity();
         }
 
-        changeSupport.firePropertyChange("update", null, this);
+        events.fireUpdated();
 
     }
 
@@ -283,8 +284,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         if (manualMode) {
             updateCollisionBound();
             simpleMotion();
-            changeSupport.firePropertyChange("updated", null, this);
-            changeSupport.firePropertyChange("manuallyUpdated", null, this);
+            events.fireUpdated();
         }
     }
 
@@ -368,7 +368,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         updateCollisionBound();
         updateSensors();
         updateEffectors();
-        changeSupport.firePropertyChange("moved", null, null);
+        events.fireMoved();
     }
 
     /**
@@ -395,7 +395,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         updateCollisionBound();
         updateSensors();
         updateEffectors();
-        changeSupport.firePropertyChange("moved", null, null);
+        events.fireMoved();
     }
 
     /**
@@ -496,7 +496,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         // if (effector.getApplicableTypes().contains(this.getClass()))...
         effectors.add(effector);
         effector.setId(parentWorld.getEffectorIDGenerator().getId());
-        changeSupport.firePropertyChange("effectorAdded", null, effector);
+        events.fireEffectorAdded(effector);
     }
 
     /**
@@ -506,8 +506,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public void removeEffector(final Effector effector) {
         effectors.remove(effector);
-        changeSupport.firePropertyChange("effectorRemoved", null, effector);
-
+        events.fireEffectorRemoved(effector);
     }
 
     /**
@@ -526,7 +525,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             sensor.setId(parentWorld.getSensorIDGenerator().getId());
         }
 
-        changeSupport.firePropertyChange("sensorAdded", null, sensor);
+        events.fireSensorAdded(sensor);
     }
 
     /**
@@ -568,7 +567,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public void removeSensor(final Sensor sensor) {
         sensors.remove(sensor);
-        changeSupport.firePropertyChange("sensorRemoved", null, sensor);
+        events.fireSensorRemoved(sensor);
     }
 
     /**
@@ -710,7 +709,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      * Perform initialization of objects after de-serializing.
      */
     public void postSerializationInit() {
-        changeSupport = new PropertyChangeSupport(this);
+        events = new EntityEvents(this);
         motionEventListeners = new ArrayList<>();
         collisionEventHandlers = new ArrayList<>();
         currentlyHeardPhrases = new ArrayList<>();
@@ -881,19 +880,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         return entityType;
     }
 
-    // TODO: Make finer grained. entityTypeChange?
-    public void commitEditorChanges() {
-        changeSupport.firePropertyChange("propertiesChanged", null, this);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
-    }
-
     public double getX() {
         return x;
     }
@@ -907,7 +893,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public void delete() {
         parentWorld.deleteEntity(this);
-        changeSupport.firePropertyChange("deleted", null, this);
+        events.fireDeleted();
     }
 
     /**
@@ -936,7 +922,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             newHeading += 360;
         }
         heading = newHeading;
-        changeSupport.firePropertyChange("moved", null, null);
+        events.fireMoved();
     }
 
 
@@ -979,8 +965,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             return;
         }
         setHeading(heading + amount);
-        changeSupport.firePropertyChange("moved", null, null);
-
+        events.fireMoved();
     }
 
     /**
@@ -1003,7 +988,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
         double radians = getHeadingRadians();
         dx = amount * Math.cos(radians);
         dy = -amount * Math.sin(radians);
-        changeSupport.firePropertyChange("moved", null, null);
+        events.fireMoved();
     }
 
     public void goStraight() {
@@ -1434,7 +1419,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public void clearSensors() {
         for (Sensor sensor : sensors) {
-            changeSupport.firePropertyChange("sensorRemoved", null, sensor);
+            events.fireSensorRemoved(sensor);
         }
         sensors.clear();
     }
@@ -1445,7 +1430,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
      */
     public void clearEffectors() {
         for (Effector effector : effectors) {
-            changeSupport.firePropertyChange("effectorRemoved", null, effector);
+            events.fireEffectorRemoved(effector);
         }
         effectors.clear();
     }
@@ -1472,5 +1457,9 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
 
     public void setCalories(double calories) {
         this.calories = calories;
+    }
+
+    public EntityEvents getEvents() {
+        return events;
     }
 }

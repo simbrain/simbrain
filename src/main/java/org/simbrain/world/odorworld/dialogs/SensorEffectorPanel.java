@@ -203,21 +203,11 @@ public class SensorEffectorPanel extends JPanel {
 
         // Set up event listeners
         if (type == PanelType.Sensor) {
-            parentEntity.addPropertyChangeListener(evt -> {
-                if ("sensorAdded".equals(evt.getPropertyName())) {
-                    model.addAttribute((Sensor) evt.getNewValue());
-                } else if ("sensorRemoved".equals(evt.getPropertyName())) {
-                    model.removeAttribute((Sensor) evt.getNewValue());
-                }
-            });
+            parentEntity.getEvents().onSensorAdded(s -> model.addAttribute(s));
+            parentEntity.getEvents().onSensorRemoved(s -> model.removeAttribute(s));
         } else {
-            parentEntity.addPropertyChangeListener(evt -> {
-                if ("effectorAdded".equals(evt.getPropertyName())) {
-                    model.addAttribute((Effector) evt.getNewValue());
-                } else if ("effectorRemoved".equals(evt.getPropertyName())) {
-                    model.removeAttribute((Effector) evt.getNewValue());
-                }
-            });
+            parentEntity.getEvents().onEffectorAdded(e -> model.addAttribute(e));
+            parentEntity.getEvents().onEffectorRemoved(e -> model.removeAttribute(e));
         }
 
     }

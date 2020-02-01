@@ -213,68 +213,74 @@ public class OdorWorldPanel extends JPanel {
 
         // PCamera camera = canvas.getCamera();
 
-        world.addPropertyChangeListener(evt -> {
-            if ("entityAdded".equals(evt.getPropertyName())) {
-                EntityNode node = new EntityNode(world, (OdorWorldEntity) evt.getNewValue());
-                canvas.getLayer().addChild(node);
-                selectionModel.setSelection(Collections.singleton(node)); // not working
-                repaint();
-            } else if ("entityDeleted".equals(evt.getPropertyName())) {
-                repaint();
-            } else if ("worldUpdated".equals(evt.getPropertyName())) {
-                centerCameraToSelectedEntity();
-            } else if ("advance".equals(evt.getPropertyName())) {
-                canvas.getLayer().getChildrenReference().stream()
+        world.getEvents().onEntityAdded(e -> {
+            EntityNode node = new EntityNode(world, e);
+            canvas.getLayer().addChild(node);
+            selectionModel.setSelection(Collections.singleton(node)); // not working
+            repaint();
+        });
+        world.getEvents().onEntityRemoved(e -> {
+            repaint();
+        });
+        world.getEvents().onUpdated(this::centerCameraToSelectedEntity);
+        world.getEvents().onFrameAdvance(() -> {
+            canvas.getLayer().getChildrenReference().stream()
                     .filter(i -> i instanceof EntityNode)
                     .forEach(i -> ((EntityNode) i).advance());
-                repaint();
-            } else if ("stopAnimation".equals(evt.getPropertyName())) {
-                // When movement is stopped use the "static" animation so we don't show entities in strange
-                // intermediate states
-                canvas.getLayer().getChildrenReference().stream()
+            repaint();
+        });
+        world.getEvents().onAnimationStopped(() -> {
+            // When movement is stopped use the "static" animation so we don't show entities in strange
+            // intermediate states
+            canvas.getLayer().getChildrenReference().stream()
                     .filter(i -> i instanceof EntityNode)
                     .forEach(i -> ((EntityNode) i).resetToStaticFrame());
-                repaint();
-            } else if ("tileMapChanged".equals(evt.getPropertyName())) {
-                canvas.getLayer().removeAllChildren();
-                layerImageList = world.getTileMap().createImageList();
-                canvas.getLayer().addChildren(layerImageList);
-                this.world.getTileMap().addPropertyChangeListener(e -> {
-                    if ("layerImageChanged".equals(e.getPropertyName())) {
-                        PImage oldImage = (PImage) e.getOldValue();
-                        PImage newImage = (PImage) e.getNewValue();
-                        canvas.getLayer().removeChild(oldImage);
-                        canvas.getLayer().addChild(newImage);
-                    }
-                });
-                syncToModel();
-                repaint();
-            } else if ("worldStarted".equals(evt.getPropertyName())) {
-                if (movementTimer != null) {
-                    movementTimer.cancel();
-                    movementTimer = null;
-                }
-                animationTimer = new Timer();
-                animationTimer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        world.advance();
-                    }
-                }, 50, 50);
+            repaint();
+        });
 
-            } else if ("worldStopped".equals(evt.getPropertyName())) {
-                movementTimer = new Timer();
-                movementTimer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        manualMovementUpdate();
-                    }
-                }, 10, 10);
-                if (animationTimer != null) {
-                    animationTimer.cancel();
+        world.getEvents().onTileMapChanged(() -> {
+            canvas.getLayer().removeAllChildren();
+            layerImageList = world.getTileMap().createImageList();
+            canvas.getLayer().addChildren(layerImageList);
+            this.world.getTileMap().addPropertyChangeListener(e -> {
+                if ("layerImageChanged".equals(e.getPropertyName())) {
+                    PImage oldImage = (PImage) e.getOldValue();
+                    PImage newImage = (PImage) e.getNewValue();
+                    canvas.getLayer().removeChild(oldImage);
+                    canvas.getLayer().addChild(newImage);
                 }
+            });
+            syncToModel();
+            repaint();
+        });
+
+        world.getEvents().onWorldStarted(() -> {
+            if (movementTimer != null) {
+                movementTimer.cancel();
+                movementTimer = null;
+            }
+            animationTimer = new Timer();
+            animationTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    world.getEvents().fireFrameAdvance();
+                }
+            }, 50, 50);
+        });
+
+        world.getEvents().onWorldStopped(() -> {
+            movementTimer = new Timer();
+            movementTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    manualMovementUpdate();
+                }
+            }, 10, 10);
+            if (animationTimer != null) {
+                animationTimer.cancel();
             }
         });
+
 
         world.getTileMap().addPropertyChangeListener(e -> {
             if ("layerImageChanged".equals(e.getPropertyName())) {

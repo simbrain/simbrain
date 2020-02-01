@@ -16,17 +16,7 @@ import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
 /**
- * All Network events are defined here. This is also the main javadoc for the
- * event design.
- *
- * Events are organized into "fire" functions to broadcast events and "onX" events
- * to handle them.  They are placed next to each other so it is easy to track how event broadcasting and event handling
- * are related.
- *
- * Advantages of this design are: externally no need for strings so all references can be autocompleted.  Also,
- * since the fireX and onX methods are (by convention) next to each other, it's easy
- * to get from the code where an event is fired in the code to where it is handled.
- *
+ * All Network events are defined here.  Main docs at [Event]
  */
 class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 

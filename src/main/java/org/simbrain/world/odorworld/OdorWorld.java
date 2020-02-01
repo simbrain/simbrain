@@ -26,12 +26,11 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.events.OdorWorldEvents;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -92,9 +91,9 @@ public class OdorWorld implements EditableObject {
     private SimpleId agentIdGenerator = new SimpleId("Agent", 1);
 
     /**
-     * Support for property change events.
+     * Event support
      */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    protected transient OdorWorldEvents events = new OdorWorldEvents(this);
 
     /**
      * Last clicked position.
@@ -119,22 +118,15 @@ public class OdorWorld implements EditableObject {
             entity.updateSmellSource();
             entity.update();
         }
-        changeSupport.firePropertyChange("worldUpdated", null, null);
-    }
-
-    /**
-     * Advance animation.
-     */
-    public void advance() {
-        changeSupport.firePropertyChange("advance", null, null);
+        events.fireUpdated();
     }
 
     /**
      * Stop animation.
      */
     public void stopAnimation() {
-        changeSupport.firePropertyChange("stopAnimation", null, null);
-        changeSupport.firePropertyChange("worldStopped", null, null);
+        events.fireAnimationStopped();
+        events.fireWorldStopped();
     }
 
     /**
@@ -158,7 +150,7 @@ public class OdorWorld implements EditableObject {
 
         entity.setParentWorld(this);
 
-        changeSupport.firePropertyChange("entityAdded", null, entity);
+        events.fireEntityAdded(entity);
 
         // Recompute max stimulus length
         recomputeMaxVectorNorm();
@@ -324,7 +316,7 @@ public class OdorWorld implements EditableObject {
                 //fireEffectorRemoved(effector);
             }
             recomputeMaxVectorNorm();
-            changeSupport.firePropertyChange("entityDeleted", null, entity);
+            events.fireEntityRemoved(entity);
         }
 
     }
@@ -361,7 +353,7 @@ public class OdorWorld implements EditableObject {
             agentIdGenerator = new SimpleId("Agent", 1);
         }
 
-        changeSupport = new PropertyChangeSupport(this);
+        events = new OdorWorldEvents(this);
 
         for (OdorWorldEntity entity : entityList) {
             entity.postSerializationInit();
@@ -432,15 +424,6 @@ public class OdorWorld implements EditableObject {
      */
     public List<OdorWorldEntity> getEntityList() {
         return entityList;
-    }
-
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
     }
 
     public boolean getWrapAround() {
@@ -519,11 +502,11 @@ public class OdorWorld implements EditableObject {
         worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
                 0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
         ));
-        changeSupport.firePropertyChange("tileMapChanged", null, null);
+        events.fireTileMapChanged();
     }
 
     public void start() {
-        changeSupport.firePropertyChange("worldStarted", null, null);
+        events.fireWorldStarted();
     }
 
     public Point2D getLastClickedPosition() {
@@ -543,4 +526,7 @@ public class OdorWorld implements EditableObject {
         return "Odor World";
     }
 
+    public OdorWorldEvents getEvents() {
+        return events;
+    }
 }

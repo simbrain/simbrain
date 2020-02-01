@@ -25,8 +25,6 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -34,8 +32,7 @@ import java.util.List;
 
 /**
  * <b>WorldPanel</b> is the container for the world component. Handles toolbar
- * buttons, and serializing of world data. The main environment codes is in
- * {@link OdorWorldPanel}.
+ * buttons, and serializing of world data. The main environment codes is in {@link OdorWorldPanel}.
  */
 public class OdorWorldComponent extends WorkspaceComponent {
 
@@ -68,35 +65,22 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     private void init() {
-        world.addPropertyChangeListener(evt -> {
-            // Add / remove entities
-            if ("entityAdded".equals(evt.getPropertyName())) {
-                OdorWorldEntity entity = (OdorWorldEntity) evt.getNewValue();
-                fireAttributeContainerAdded(entity);
-                setChangedSinceLastSave(true);
-                // Add / remove sensors to an entity
-                entity.addPropertyChangeListener(new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent entityEvent) {
-                        if ("sensorAdded".equals(entityEvent.getPropertyName())
-                            || "effectorAdded".equals(entityEvent.getPropertyName())
-                        )
-                        {
-                            fireAttributeContainerAdded((AttributeContainer) entityEvent.getNewValue());
-                        } else if ("sensorRemoved".equals(entityEvent.getPropertyName())
-                            || "effectorRemoved".equals(entityEvent.getPropertyName())
-                        )
-                        {
-                            fireAttributeContainerRemoved((AttributeContainer) entityEvent.getNewValue());
-                        }
-                    }
-                });
-            }
-            if ("entityDeleted".equals(evt.getPropertyName())) {
-                fireAttributeContainerRemoved((AttributeContainer) evt.getNewValue());
-                setChangedSinceLastSave(true);
-            }
+        world.getEvents().onEntityAdded(entity -> {
+            fireAttributeContainerAdded(entity);
+            setChangedSinceLastSave(true);
+            entity.getEvents().onSensorAdded(this::fireAttributeContainerAdded);
+            entity.getEvents().onEffectorAdded(this::fireAttributeContainerAdded);
+            entity.getEvents().onSensorRemoved(this::fireAttributeContainerRemoved);
+            entity.getEvents().onEffectorRemoved(this::fireAttributeContainerRemoved);
+            setChangedSinceLastSave(true);
+
         });
+
+        world.getEvents().onEntityRemoved(e -> {
+            fireAttributeContainerRemoved(e);
+            setChangedSinceLastSave(true);
+        });
+
     }
 
     @Override

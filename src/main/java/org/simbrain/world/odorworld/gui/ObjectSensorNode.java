@@ -55,11 +55,13 @@ public class ObjectSensorNode extends EntityAttributeNode {
         updateLabel();
         shape.addChild(labelText);
 
-        sensor.getParent().addPropertyChangeListener(evt -> {
-            if ("propertiesChanged".equals(evt.getPropertyName())) {
+        sensor.getParent().getEvents().onSensorChanged((o,n) -> {
+            if (n == sensor) {
+                System.out.println("ObjectSensorNode.ObjectSensorNode");
                 updateLabel();
             }
         });
+
     }
 
     @Override

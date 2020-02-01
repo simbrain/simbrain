@@ -8,7 +8,7 @@ import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 /**
- * @see NetworkEvents
+ * @see Event
  */
 class NeuronEvents(val neuron: Neuron) : Event(PropertyChangeSupport(neuron)), LocationEvents {
 

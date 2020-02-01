@@ -8,7 +8,7 @@ import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 /**
- * @see NetworkEvents
+ * @see Event
  */
 class WeightMatrixEvents(val wm: WeightMatrix) : Event(PropertyChangeSupport(wm)) {
 

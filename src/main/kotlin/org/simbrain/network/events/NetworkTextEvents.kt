@@ -6,7 +6,7 @@ import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
 /**
- * @see NetworkEvents
+ * @see Event
  */
 class NetworkTextEvents(val text: NetworkTextObject) : Event(PropertyChangeSupport(text)), LocationEvents {
 

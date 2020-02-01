@@ -7,7 +7,7 @@ import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 /**
- * @see NetworkEvents
+ * @see Event
  */
 class SubnetworkEvents(val subnet: Subnetwork) : Event(PropertyChangeSupport(subnet)), LocationEvents {
 

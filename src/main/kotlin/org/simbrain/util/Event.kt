@@ -8,6 +8,31 @@ import java.util.function.Consumer
 /**
  * Kotlin wrapper for java PropertyChangeSupport functionality. Extend this class to create
  * events. Syntactic sugar to make it easy to create and invoke add, remove, and change events.
+ *
+ * This is the main doc for all classes using this event structures. Suggest reading this while inspecting a subclass
+ * of this class.
+ *
+ * Events are organized into "fireX" functions to broadcast events and "onX" events
+ * to handle them.  They are placed next to each other in subclasses so it is easy to track how event broadcasting
+ * and event.
+ *
+ * Advantages of this design are: externally no need for strings, so all references can be autocompleted in the IDE.
+ * Also, since the fireX and onX methods are (by convention) next to each other, it's easy
+ * to get from the code where an event is fired in the code to where it is handled, and conversely.
+ *
+ * A live template that makes event creation easier is in `etc\event_shortcuts.zip`
+ * Import this into intellij and then you can create these pairs of functions using these abbreviations, which
+ * stand for "Simbrain event":
+ *
+ *  - `sevt0` (event with no argument),
+ *  - `sevtn` (event to create something)
+ *  - `sevto` (event to remove something)
+ *  - `sevtc` (event to change something)
+ *  - `sevtar` (create both add & remove events).
+ *
+ *  They can be used just like other intellij built-in shortcuts, e.g `sout`.
+ *
+ *  @author Yulin Li
  */
 open class Event(private val changeSupport: PropertyChangeSupport) {
 

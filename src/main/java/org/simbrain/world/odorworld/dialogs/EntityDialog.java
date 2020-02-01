@@ -22,6 +22,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.environment.SmellSourcePanel;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
@@ -98,8 +99,9 @@ public class EntityDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
-        mainEditor.commitChanges(); // Note this must get called before entityRef, which checks the entity type, which may have changed
-        entityRef.commitEditorChanges();
+        EntityType oldType = entityRef.getEntityType();
+        mainEditor.commitChanges();
+        entityRef.getEvents().fireTypeChanged(oldType, entityRef.getEntityType());
         if (smellPanel != null) {
             smellPanel.commitChanges();
         }

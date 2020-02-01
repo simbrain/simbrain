@@ -9,7 +9,7 @@ import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 /**
- * @see NetworkEvents
+ * @see Event
  */
 class SynapseGroupEvents(val sg: SynapseGroup) : Event(PropertyChangeSupport(sg)) {
 

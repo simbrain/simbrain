@@ -818,6 +818,11 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
 
     public void postUnmarshallingInit() {
         events = new NeuronCollectionEvents(this);
+
+        // TODO: Resave and remove
+        if (activationRecorder == null) {
+            activationRecorder = new ActivationRecorder(this);
+        }
     }
 
     public NeuronCollectionEvents getEvents() {

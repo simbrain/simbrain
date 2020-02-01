@@ -42,8 +42,8 @@ public class SpeechNode extends EntityAttributeNode {
     private PPath speechBubbleTriangle;
 
     /**
-     * A white patch to cover the top part of the {@link #speechBubbleTriangle}.
-     * Not the best way to draw a speech bubble but good enough for now.
+     * A white patch to cover the top part of the {@link #speechBubbleTriangle}. Not the best way to draw a speech
+     * bubble but good enough for now.
      */
     private PPath speechBubblePatch;
 
@@ -86,12 +86,7 @@ public class SpeechNode extends EntityAttributeNode {
         trianglePath.lineTo(15, speechBubbleBottomLeftLocation.getY() - 4);
         trianglePath.closePath();
         this.speechBubbleTriangle = new PPath.Float(trianglePath);
-        this.speechBubblePatch = PPath.createRectangle(
-                2,
-                speechBubbleBottomLeftLocation.getY() - 5,
-                15,
-                3
-        );
+        this.speechBubblePatch = PPath.createRectangle(2, speechBubbleBottomLeftLocation.getY() - 5, 15, 3);
         this.speechBubblePatch.setStroke(new BasicStroke());
         this.speechBubblePatch.setStrokePaint(Color.white);
         this.speechText = new PText();
@@ -116,12 +111,13 @@ public class SpeechNode extends EntityAttributeNode {
             }
         });
 
-        entity.addPropertyChangeListener(evt -> {
-            if ("propertiesChanged".equals(evt.getPropertyName())) {
+        entity.getEvents().onEffectorChanged((o, n) -> {
+            if (effector == n) {
                 updateText();
                 updateLocation();
             }
         });
+
     }
 
     @Override
@@ -145,17 +141,11 @@ public class SpeechNode extends EntityAttributeNode {
             this.speechTextString = effector.getPhrase();
             speechText.setText(Utils.getWrapAroundString(speechTextString, effector.getCharactersPerRow()));
             shape.removeChild(speechBubble);
-            speechBubble =
-                    PPath.createRoundRectangle(
-                            speechBubbleBottomLeftLocation.getX(),
-                            speechBubbleBottomLeftLocation.getY() - speechText.getHeight() - (paddingTopBottom * 2),
-                            speechText.getWidth() + (paddingLeftRight * 2),
-                            speechText.getHeight() + (paddingTopBottom * 2),
-                            8,
-                            8
-                    );
-            this.speechText.setOffset(
-                    speechBubbleBottomLeftLocation.getX() + paddingLeftRight,
+            speechBubble = PPath.createRoundRectangle(speechBubbleBottomLeftLocation.getX(),
+                    speechBubbleBottomLeftLocation.getY() - speechText.getHeight() - (paddingTopBottom * 2),
+                    speechText.getWidth() + (paddingLeftRight * 2), speechText.getHeight() + (paddingTopBottom * 2),
+                    8, 8);
+            this.speechText.setOffset(speechBubbleBottomLeftLocation.getX() + paddingLeftRight,
                     speechBubbleBottomLeftLocation.getY() - speechText.getHeight() - paddingTopBottom);
             shape.addChild(speechBubble);
             speechBubbleTriangle.raiseToTop();

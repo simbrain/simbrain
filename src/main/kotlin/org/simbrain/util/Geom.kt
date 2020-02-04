@@ -7,6 +7,9 @@ import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import kotlin.math.*
 
+fun Int.toRadian() = Math.toRadians(this.toDouble())
+fun Double.toRadian() = Math.toRadians(this)
+
 // Points / Vectors
 fun point(x: Double, y: Double): Point2D = Point2D.Double(x, y)
 
@@ -53,6 +56,9 @@ val Point2D.magnitude
 val Point2D.abs
     get() = point(x.absoluteValue, y.absoluteValue)
 
+operator fun Point2D.component1() = x
+operator fun Point2D.component2() = y
+
 // Lines
 fun line(p1: Point2D, p2: Point2D) = Line2D.Double(p1, p2)
 
@@ -83,6 +89,15 @@ fun Line2D.p(t: Double) = point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) *
 // Rectangles
 fun rectangle(p1: Point2D, p2: Point2D) = Rectangle2D.Double(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y)
 
+val Rectangle2D.vertices get() = RectangleVertices(
+        point(x, y),
+        point(x + width, y),
+        point(x, y + height),
+        point(x + width, y + height)
+)
+
+val Rectangle2D.outlines get() = vertices.outlines
+
 data class RectangleVertices(
         val topLeft: Point2D,
         val topRight: Point2D,
@@ -93,6 +108,13 @@ data class RectangleVertices(
 data class RectangleOutlines(val top: Line2D, val right: Line2D, val bottom: Line2D, val left: Line2D) {
     fun toList() = listOf(top, right, bottom, left)
 }
+
+val RectangleVertices.outlines get() = RectangleOutlines(
+        line(topRight, topLeft),
+        line(bottomRight, topRight),
+        line(bottomLeft, bottomRight),
+        line(topLeft, bottomLeft)
+)
 
 // Polygons
 fun polygon(vararg points: Point2D) = points.toList().toPolygon()

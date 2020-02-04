@@ -15,6 +15,7 @@ import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,6 +183,11 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         this.x = location.getX();
         this.y = location.getY();
         fireLocationChange();
+    }
+
+    @Override
+    public Rectangle2D getBound() {
+        return new Rectangle2D.Double(x - 150 / 2, y - 50 / 2, 150, 50);
     }
 
     public boolean isRenderActivations() {

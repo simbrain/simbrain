@@ -25,6 +25,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -272,6 +273,11 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
     public void setLocation(@NotNull Point2D location) {
         this.location = location;
         events.fireLocationChange();
+    }
+
+    @Override
+    public Rectangle2D getBound() {
+        return new Rectangle2D.Double(location.getX() - 150 / 2, location.getY() - 50 / 2, 150, 50);
     }
 
     public MultiLayerNetEvents getEvents() {

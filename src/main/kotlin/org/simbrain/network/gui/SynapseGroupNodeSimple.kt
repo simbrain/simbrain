@@ -2,9 +2,11 @@ package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
 import org.simbrain.network.gui.nodes.SynapseGroupNode
+import org.simbrain.util.component1
+import org.simbrain.util.component2
 import org.simbrain.util.line
 import org.simbrain.util.p
-import org.simbrain.util.widgets.BezierArrow
+import org.simbrain.util.widgets.bezierArrow
 
 /**
  * PNode representation of a "green arrow" (representing a group of synapses) from one
@@ -16,28 +18,24 @@ import org.simbrain.util.widgets.BezierArrow
  */
 class SynapseGroupNodeSimple(private val synapseGroupNode: SynapseGroupNode) : PNode(), SynapseGroupNode.Arrow {
 
-    private val arrow = BezierArrow().also { addChild(it) }
+    private val source = synapseGroupNode.synapseGroup.sourceNeuronGroup
+    private val target = synapseGroupNode.synapseGroup.targetNeuronGroup
+    private fun isBidirectional() = target.outgoingSg.any { it.targetNeuronGroup == source }
 
-    override fun layoutChildren() {
+    private val arrow = bezierArrow {
 
-        // check bidirectional
-        val isBidirectional = synapseGroupNode.synapseGroup.targetNeuronGroup.outgoingSg
-                .any { it.targetNeuronGroup == synapseGroupNode.synapseGroup.sourceNeuronGroup }
+        lateralOffset {
+            if (isBidirectional()) 0.35 else 0.5
+        }
 
-        arrow.sourceEdgePercentage = if (isBidirectional) 0.35 else 0.5
+        onUpdated { curve ->
+            val offset = if (isBidirectional()) 0.75 else 0.5
+            val (x, y) = curve?.p(offset) ?: line(source.location, target.location).p(offset)
+            synapseGroupNode.interactionBox.centerFullBoundsOnPoint(x, y)
+        }
 
-        val curve = arrow.update(
-                synapseGroupNode.synapseGroup.sourceNeuronGroup.outlines,
-                synapseGroupNode.synapseGroup.targetNeuronGroup.outlines
-        )
+    }.also { addChild(it) }
 
-        val percentageOnCurve = if (isBidirectional) 0.75 else 0.5
-        if (curve == null) {
-            with(synapseGroupNode.synapseGroup) {
-                line(sourceNeuronGroup.location, targetNeuronGroup.location).p(percentageOnCurve)
-            }
-        } else {
-            curve.p(percentageOnCurve)
-        }.let { synapseGroupNode.interactionBox.centerFullBoundsOnPoint(it.x, it.y) }
-    }
+    override fun layoutChildren() = arrow.update(source.outlines, target.outlines, isBidirectional())
+
 }

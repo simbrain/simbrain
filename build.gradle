@@ -81,6 +81,8 @@ dependencies {
     compile "org.jmonkeyengine:jme3-jogl:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-bullet:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-bullet-native:$jmonkeyengine_version"
+    compile "org.jmonkeyengine:jme3-plugins:$jmonkeyengine_version"
 
 }
 

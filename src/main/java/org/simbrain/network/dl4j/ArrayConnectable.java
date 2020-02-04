@@ -4,6 +4,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 /**
@@ -65,5 +66,7 @@ public interface ArrayConnectable extends LocatableModel {
     void onLocationChange(Runnable task);
 
     Network getNetwork();
+
+    Rectangle2D getBound();
 
 }

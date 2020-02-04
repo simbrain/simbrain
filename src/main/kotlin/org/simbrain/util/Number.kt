@@ -3,6 +3,9 @@ package org.simbrain.util
 fun <T : Comparable<T>> T.clip(lowerBound: T, upperBound: T) =
         maxOf(minOf(lowerBound, upperBound), minOf(maxOf(upperBound, lowerBound), this))
 
+fun <T : Comparable<T>> T.clip(range: ClosedRange<T>) =
+        maxOf(minOf(range.start, range.endInclusive), minOf(maxOf(range.endInclusive, range.start), this))
+
 /**
  * Reference: https://stackoverflow.com/a/23088000
  */

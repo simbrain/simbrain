@@ -66,16 +66,7 @@ val List<LocatableModel>.vertices: RectangleVertices
 /**
  * The four sides of the bound.
  */
-val List<LocatableModel>.outlines: RectangleOutlines
-    get() {
-        val (topLeft, topRight, bottomLeft, bottomRight) = vertices
-        return RectangleOutlines(
-                line(topRight, topLeft),
-                line(bottomRight, topRight),
-                line(bottomLeft, bottomRight),
-                line(topLeft, bottomLeft)
-        )
-    }
+val List<LocatableModel>.outlines get() = vertices.outlines
 
 /**
  * Return bounding box for a list of [LocatableModel] objects.

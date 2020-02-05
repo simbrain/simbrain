@@ -1,56 +1,10 @@
-package org.simbrain.util.geneticalgorithm.integer
+package org.simbrain.util.geneticalgorithm
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import org.simbrain.custom_sims.RegisteredSimulation
 import org.simbrain.util.clip
 import org.simbrain.util.format
-import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.nextBoolean
-import org.simbrain.workspace.gui.SimbrainDesktop
-import kotlin.math.abs
-import kotlin.math.sqrt
-import kotlin.run as run1
-
-class IntEvolution(desktop: SimbrainDesktop? = null) : RegisteredSimulation(desktop) {
-
-    override fun run() {
-
-        val config = IntegerGeneticConfig(
-                min = 0,
-                max = 20,
-                initialLength = 10,
-                populationSize = 100
-        )
-
-        val env = IntegerEnvironment(config) {
-
-            // Try to get the ints to sum to exactly 8
-            // abs(chromosome.genes.map { it.value }.sum().toDouble()-8)
-
-            // Try to get the ints to sum to exactly 125
-            abs(chromosome.genes.map { it.value }.sum().toDouble()-125)
-
-            // TODO: Make it easy to add more options here
-        }
-
-        var counter = 0
-
-        val thing = env.newEvolution(optimizeFor = Optimize.small)
-                .upToGeneration(500)
-                .untilFitnessScore { it < 1 }
-                .onEach { println("|${++counter}|${it.best()}") }
-                .last()
-                .best()
-
-        println("FINAL RESULT -> $thing")
-    }
-
-    override fun getName() = "Int Evolution Kotlin"
-    override fun getSubmenuName() = "Evolution"
-    override fun instantiate(desktop: SimbrainDesktop?) = IntEvolution(desktop)
-
-}
 
 class IntegerEnvironment(override val config: IntegerGeneticConfig, eval: IntegerGenome.() -> Double)
     : Environment<IntegerAgent, IntegerGenome>(
@@ -65,11 +19,12 @@ class IntegerEnvironment(override val config: IntegerGeneticConfig, eval: Intege
             generateSequence {
                 IntegerGenome(
                         id = simpleId.id,
-                        chromosome = config.defaultChromosome ?: IntegerChromosome(
-                                genes = List(config.initialLength) {
-                                    IntegerGene((config.min..config.max).random())
-                                }
-                        ),
+                        chromosome = config.defaultChromosome
+                                ?: IntegerChromosome(
+                                        genes = List(config.initialLength) {
+                                            IntegerGene((config.min..config.max).random())
+                                        }
+                                ),
                         config = config
                 )
             }.take(config.populationSize).init()
@@ -134,12 +89,4 @@ data class IntegerChromosome(override val genes: List<IntegerGene>) : Chromosome
 
 data class IntegerGene(val value: Int = 0, val mutable: Boolean = true) : Gene2() {
     override fun toString() = value.toString()
-}
-
-/**
- * Test main.
- */
-fun main() {
-    val ie = IntEvolution()
-    ie.run()
 }

@@ -43,6 +43,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -146,12 +147,12 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * Sensors.
      */
-    private List<Sensor> sensors = new ArrayList<Sensor>();
+    private List<Sensor> sensors = new ArrayList<>();
 
     /**
      * Effectors.
      */
-    private List<Effector> effectors = new ArrayList<Effector>();
+    private List<Effector> effectors = new ArrayList<>();
 
     /**
      * Smell Source (if any). Initialize to random smell source with 10
@@ -180,7 +181,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     /**
      * Things currently being said by talking entities.
      */
-    private List<String> currentlyHeardPhrases = new ArrayList<String>();
+    private List<String> currentlyHeardPhrases = new ArrayList<>();
 
     /**
      * If true, the agent's heading is always updated based on its velocity.
@@ -856,7 +857,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
     }
 
     public List<String> getCurrentlyHeardPhrases() {
-        return currentlyHeardPhrases;
+        // Return a copy to avoid concurrent modification errors.
+        return new ArrayList<>(currentlyHeardPhrases);
     }
 
     /**

@@ -23,6 +23,7 @@ import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
+import org.simbrain.world.odorworld.events.AttributeEvents;
 
 import java.util.List;
 
@@ -67,6 +68,11 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
     @UserParameter(label = "Label", description = "Optional string description associated with this effector",
             initialValueMethod = "getLabel", order = 2)
     private String label = "";
+
+    /**
+     * Handle events.
+     */
+    private AttributeEvents events = new AttributeEvents(this);
 
     /**
      * Construct an effector.
@@ -162,8 +168,13 @@ public abstract class Effector implements CopyableObject, PeripheralAttribute {
      * if needed.
      */
     public void postSerializationInit() {
+        events = new AttributeEvents(this);
     }
 
+    @Override
+    public AttributeEvents getEvents() {
+        return events;
+    }
 
     public static class EffectorCreator implements EditableObject {
 

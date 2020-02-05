@@ -55,12 +55,7 @@ public class ObjectSensorNode extends EntityAttributeNode {
         updateLabel();
         shape.addChild(labelText);
 
-        sensor.getParent().getEvents().onSensorChanged((o,n) -> {
-            if (n == sensor) {
-                System.out.println("ObjectSensorNode.ObjectSensorNode");
-                updateLabel();
-            }
-        });
+        sensor.getEvents().onUpdate(this::updateLabel);
 
     }
 
@@ -76,6 +71,7 @@ public class ObjectSensorNode extends EntityAttributeNode {
      * Update the label for this node
      */
     public void updateLabel() {
+        // TODO: If there is more than one sensor in one spot, labels are on top of each others
         if (sensor.isShowLabel()) {
             labelText.setText(Utils.getWrapAroundString(sensor.getLabel(), 10));
             labelText.setOffset(

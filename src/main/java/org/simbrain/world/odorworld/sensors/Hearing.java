@@ -80,11 +80,6 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     private int lingerTime = 10;
 
     /**
-     * Support for property change events.
-     */
-    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
-    /**
      * Construct the hearing sensor.
      *
      * @param parent       parent entity
@@ -126,13 +121,13 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     @Override
     public void update() {
 
-        // TODO: Only hear if in range of speaker
+        // TODO: Only hear if in range of speaker.  Will need some new range variable.
 
         for (String heardPhrase : this.getParent().getCurrentlyHeardPhrases()) {
             if (phrase.equalsIgnoreCase(heardPhrase)) {
                 if (!activated) {
                     activated = true;
-                    changeSupport.firePropertyChange("activationChanged", null, true);
+                    getEvents().fireUpdate();
                 }
                 time = lingerTime;
             }
@@ -141,7 +136,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         if (!(time > 0)) {
             if (activated) {
                 activated = false;
-                changeSupport.firePropertyChange("activationChanged", null, false);
+                getEvents().fireUpdate();
             }
         }
     }
@@ -152,8 +147,8 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
 
     @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setPhrase(String phrase) {
-        changeSupport.firePropertyChange("phraseChanged", null, null);
         this.phrase = phrase;
+        getEvents().fireUpdate();
     }
 
     public boolean isActivated() {
@@ -167,16 +162,6 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         } else {
             return 0;
         }
-    }
-
-    @Override
-    public void postSerializationInit() {
-        changeSupport = new PropertyChangeSupport(this);
-        super.postSerializationInit();
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
     }
 
     @Override

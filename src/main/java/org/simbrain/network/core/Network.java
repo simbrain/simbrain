@@ -1235,7 +1235,6 @@ public class Network {
         WeightMatrix newMatrix = new WeightMatrix(this, source, target);
         newMatrix.initializeId();
         weightMatrices.add(newMatrix);
-        //changeSupport.firePropertyChange("weightMatrixAdded", null, newMatrix);
         return newMatrix;
     }
 

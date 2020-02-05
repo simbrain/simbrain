@@ -94,11 +94,6 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     private double amount;
 
     /**
-     * Support for property change events.
-     */
-    protected transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
-    /**
      * Construct the speech effector.
      *
      * @param parent    parent entity
@@ -144,13 +139,13 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         if (amount > threshold) {
             if (!activated) {
                 activated = true;
-                changeSupport.firePropertyChange("activationChanged", null, true);
+                getEvents().fireUpdate();
             }
             amount = 0; // reset
         } else {
             if (activated) {
                 activated = false;
-                changeSupport.firePropertyChange("activationChanged", null, false);
+                getEvents().fireUpdate();
             }
         }
         if (activated) {
@@ -201,11 +196,6 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         this.threshold = threshold;
     }
 
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
-
     @Override
     public Speech copy() {
         return new Speech(this);
@@ -223,13 +213,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     public void setCharactersPerRow(int charactersPerRow) {
         this.charactersPerRow = charactersPerRow;
     }
-
-    @Override
-    public void postSerializationInit() {
-        changeSupport = new PropertyChangeSupport(this);
-        super.postSerializationInit();
-    }
-
+    
     @Override
     public String getLabel() {
         if (super.getLabel().isEmpty()) {

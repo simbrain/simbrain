@@ -249,10 +249,13 @@ public class SensorEffectorPanel extends JPanel {
             return;
         }
 
-        AnnotatedPropertyEditor attributePanel = new AnnotatedPropertyEditor((EditableObject) attribute);
+        AnnotatedPropertyEditor attributePanel = new AnnotatedPropertyEditor(attribute);
         StandardDialog dialog = attributePanel.getDialog();
         SwingUtilities.invokeLater(() -> {
             dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
+        });
+        dialog.addClosingTask(() -> {
+            attribute.getEvents().fireUpdate();
         });
         dialog.pack();
         dialog.setVisible(true);

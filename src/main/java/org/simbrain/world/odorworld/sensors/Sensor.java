@@ -23,6 +23,7 @@ import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
+import org.simbrain.world.odorworld.events.AttributeEvents;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;
@@ -100,6 +101,11 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     @UserParameter(label = "Label", description = "Optional string description associated with this sensor",
             initialValueMethod = "getLabel", order = 1)
     private String label = "";
+
+    /**
+     * Handle events.
+     */
+    private AttributeEvents events = new AttributeEvents(this);
 
     /**
      * Construct a sensor.
@@ -187,6 +193,7 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
     @Override
     public void setLabel(String label) {
         this.label = label;
+        getEvents().fireUpdate();
     }
 
     /**
@@ -249,10 +256,15 @@ public abstract class Sensor implements CopyableObject, PeripheralAttribute {
      */
     public void postSerializationInit() {
         relativeLocation = new Point2D.Double();
+        events = new AttributeEvents(this);
     }
 
     @Override
     public abstract Sensor copy();
+
+    public AttributeEvents getEvents() {
+        return events;
+    }
 
     public static class SensorCreator implements EditableObject {
 

@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld.entities;
 
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.world.odorworld.events.AttributeEvents;
 
 /**
  * Interface for effectors and sensors. "Peripheral" is supposed to suggest
@@ -12,13 +13,15 @@ import org.simbrain.workspace.AttributeContainer;
  */
 public interface PeripheralAttribute extends AttributeContainer, EditableObject {
 
-    public String getLabel();
+    String getLabel();
 
-    public OdorWorldEntity getParent();
+    OdorWorldEntity getParent();
 
-    public void setParent(OdorWorldEntity parent);
+    void setParent(OdorWorldEntity parent);
 
-    public void setLabel(String label);
+    void setLabel(String label);
+
+    AttributeEvents getEvents();
 
     /**
      * Called by reflection to return a custom description for the {@link

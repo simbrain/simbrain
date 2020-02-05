@@ -34,7 +34,7 @@ public class SpeechNode extends EntityAttributeNode {
     /**
      * The shape of the main part of the speech bubble
      */
-    private PPath speechBubble;
+    private PPath speechBubble = new PPath.Double();
 
     /**
      * The triangle pointing to the speaker
@@ -90,7 +90,7 @@ public class SpeechNode extends EntityAttributeNode {
         this.speechBubblePatch.setStroke(new BasicStroke());
         this.speechBubblePatch.setStrokePaint(Color.white);
         this.speechText = new PText();
-        updateText();
+        updateEffector();
         shape.addChild(speechBubbleTriangle);
         shape.addChild(speechBubblePatch);
         shape.addChild(speechText);
@@ -103,19 +103,9 @@ public class SpeechNode extends EntityAttributeNode {
         speechText.setPickable(false);
         shape.setVisible(false);
 
-        effector.addPropertyChangeListener(evt -> {
-            if ("activationChanged".equals(evt.getPropertyName())) {
-                shape.setVisible((Boolean) evt.getNewValue());
-            } else if ("phraseChanged".equals(evt.getPropertyName())) {
-                updateText();
-            }
-        });
-
-        entity.getEvents().onEffectorChanged((o, n) -> {
-            if (effector == n) {
-                updateText();
-                updateLocation();
-            }
+        effector.getEvents().onUpdate(() -> {
+            updateEffector();
+            updateLocation();
         });
 
     }
@@ -132,11 +122,14 @@ public class SpeechNode extends EntityAttributeNode {
         setOffset(entity.getEntityType().getImageWidth() / 2 - 18, 0);
     }
 
-
     /**
      * Update the text and the size speech bubble.
      */
-    private void updateText() {
+    private void updateEffector() {
+        shape.setVisible(effector.isActivated());
+        if(!shape.getVisible()) {
+            return;
+        }
         if (!effector.getPhrase().equals(speechTextString)) {
             this.speechTextString = effector.getPhrase();
             speechText.setText(Utils.getWrapAroundString(speechTextString, effector.getCharactersPerRow()));

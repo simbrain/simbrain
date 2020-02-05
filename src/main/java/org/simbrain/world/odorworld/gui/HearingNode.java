@@ -33,7 +33,7 @@ public class HearingNode extends EntityAttributeNode {
     /**
      * The shape of the main part of the hearing bubble
      */
-    private PPath hearingBubble;
+    private PPath hearingBubble = new PPath.Double();
 
     /**
      * The larger circle under the {@link #hearingBubble}
@@ -81,7 +81,7 @@ public class HearingNode extends EntityAttributeNode {
         this.hearingBubbleTrailLarge = PPath.createEllipse(10, -20, 10, 10);
         this.hearingBubbleTrailSmall = PPath.createEllipse(10, -8, 5, 5);
         this.hearingText = new PText();
-        updateText();
+        updateSensor();
         shape.addChild(hearingBubbleTrailLarge);
         shape.addChild(hearingBubbleTrailSmall);
         shape.addChild(hearingText);
@@ -94,19 +94,9 @@ public class HearingNode extends EntityAttributeNode {
         hearingText.setPickable(false);
         shape.setVisible(false);
 
-        sensor.addPropertyChangeListener(evt -> {
-            if ("activationChanged".equals(evt.getPropertyName())) {
-                shape.setVisible((Boolean) evt.getNewValue());
-            } else if ("phraseChanged".equals(evt.getPropertyName())) {
-                updateText();
-            }
-        });
-
-        entity.getEvents().onSensorChanged((o,n) -> {
-            if(n==sensor) {
-                updateText();
-                updateLocation();
-            }
+        sensor.getEvents().onUpdate(() -> {
+            updateSensor();
+            updateLocation();
         });
     }
 
@@ -125,7 +115,11 @@ public class HearingNode extends EntityAttributeNode {
     /**
      * Update the text and the size hearing bubble.
      */
-    private void updateText() {
+    private void updateSensor() {
+        shape.setVisible(sensor.isActivated());
+        if(!shape.getVisible()) {
+            return;
+        }
         if (!sensor.getPhrase().equals(hearingTextString)) {
             this.hearingTextString = sensor.getPhrase();
             hearingText.setText(Utils.getWrapAroundString(hearingTextString, sensor.getCharactersPerRow()));

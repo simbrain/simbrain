@@ -4,6 +4,7 @@ import org.simbrain.util.Event
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.entities.PeripheralAttribute
 import org.simbrain.world.odorworld.sensors.Sensor
 import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
@@ -32,9 +33,6 @@ class EntityEvents(val entity: OdorWorldEntity):Event(PropertyChangeSupport(enti
     fun onSensorRemoved(handler: Consumer<Sensor>) = "SensorRemoved".itemRemovedEvent(handler)
     fun fireSensorRemoved(sensor: Sensor) = "SensorRemoved"(old = sensor)
 
-    fun onSensorChanged(handler: BiConsumer<Sensor, Sensor>) = "SensorChanged".itemChangedEvent(handler)
-    fun fireSensorChanged(old: Sensor, new: Sensor) = "SensorChanged"(old = old, new = new)
-
     fun onUpdateSensorVisiblity(handler: Runnable) = "UpdateSensorVisiblity".event(handler)
     fun fireUpdateSensorVisiblity() = "UpdateSensorVisiblity"()
 
@@ -44,7 +42,14 @@ class EntityEvents(val entity: OdorWorldEntity):Event(PropertyChangeSupport(enti
     fun onEffectorRemoved(handler: Consumer<Effector>) = "EffectorRemoved".itemRemovedEvent(handler)
     fun fireEffectorRemoved(effector: Effector) = "EffectorRemoved"(old = effector)
 
-    fun onEffectorChanged(handler: BiConsumer<Effector, Effector>) = "EffectorChanged".itemChangedEvent(handler)
-    fun fireEffectorChanged(old: Effector, new: Effector) = "EffectorChanged"(old = old, new = new)
+}
+
+/**
+ * [Sensor] and [Effector] events.
+ */
+class AttributeEvents(val attribute: PeripheralAttribute):Event(PropertyChangeSupport(attribute)) {
+
+    fun onUpdate(handler: Runnable) = "Update".event(handler)
+    fun fireUpdate() = "Update"()
 
 }

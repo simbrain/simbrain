@@ -339,6 +339,7 @@ public class KeyBindings {
         panel.getActionMap().put("printCenterXY", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                panel.getNetwork().getEvents().fireDebug();
                 panel.getSelectedLocatableModels().stream()
                         .map(LocatableModel::getLocation)
                         .forEach(System.out::println);

@@ -76,4 +76,7 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
     fun onWeightMatrixRemoved(handler: Consumer<WeightMatrix>) = "WeightMatrixRemoved".itemRemovedEvent(handler)
     fun fireWeightMatrixRemoved(weightMatrix: WeightMatrix) = "WeightMatrixRemoved"(old = weightMatrix)
 
+    fun onDebug(handler: Runnable) = "Debug".event(handler)
+    fun fireDebug() = "Debug"()
+
 }

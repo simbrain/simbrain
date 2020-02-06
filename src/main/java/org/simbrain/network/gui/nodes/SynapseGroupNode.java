@@ -177,7 +177,6 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
 
     @Override
     protected void layoutChildren() {
-        super.layoutChildren();
         currentNode.layoutChildren();
     }
 

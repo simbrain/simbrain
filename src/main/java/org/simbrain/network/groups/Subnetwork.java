@@ -535,7 +535,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
 
     @Override
     public void setLocation(@NotNull Point2D location) {
-        Point2D delta = minus(getLocation(), location);
+        Point2D delta = minus(location, getLocation());
         neuronGroupList.forEach(ng -> ng.offset(delta.getX(), delta.getY()));
     }
 

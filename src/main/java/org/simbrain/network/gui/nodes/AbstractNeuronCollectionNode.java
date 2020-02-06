@@ -61,6 +61,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             updateText();
         });
         events.onLocationChange(() -> {
+            pullPositionFromModel();
             outlinedObjects.updateBounds();
         });
         events.onRecordingStarted(this::updateText);
@@ -86,6 +87,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.pullViewPositionFromModel();
         }
+        outlinedObjects.setOutlinedNodes(neuronNodes);
     }
 
     @Override

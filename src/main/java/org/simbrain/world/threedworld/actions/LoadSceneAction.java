@@ -36,7 +36,7 @@ public class LoadSceneAction extends AbstractAction {
         fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileNameExtensionFilter("jME3 Geometry", "j3o"));
         fileChooser.setCurrentDirectory(new File(world.getEngine().getAssetDirectory(), "/Scenes"));
-        fileChooser.setSelectedFile(new File(world.getScene().getName()));
+        fileChooser.setSelectedFile(new File(world.getScene().getSceneName()));
         int result = fileChooser.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
@@ -44,7 +44,7 @@ public class LoadSceneAction extends AbstractAction {
             String sceneName = assetDirectory.toURI().relativize(file.toURI()).toString();
             if (!sceneName.equals(world.getScene())) {
                 world.getEngine().queueState(ThreeDEngine.State.SystemPause, true);
-                world.getScene().setName(sceneName);
+                world.getScene().setSceneName(sceneName);
                 world.getScene().load(world.getEngine());
                 world.getEngine().queueState(ThreeDEngine.State.RunAll, false);
             }

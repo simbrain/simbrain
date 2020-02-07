@@ -25,9 +25,9 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import java.util.List;
 
 /**
- * A collection of loose neurons (neurons in a {@link NeuronGroup} can be added to a collection).
- * Allows them to be labelled, moved around as a unit, coupled to, etc.   However no special processing
- * occurs in neuron collections.  They are a convenience.  NeuronCollections can overlap each other.
+ * A collection of loose neurons (neurons in a {@link NeuronGroup} can be added to a collection). Allows them to be
+ * labelled, moved around as a unit, coupled to, etc.   However no special processing occurs in neuron collections. They
+ * are a convenience.  NeuronCollections can overlap each other.
  */
 public class NeuronCollection extends AbstractNeuronCollection {
 
@@ -44,9 +44,9 @@ public class NeuronCollection extends AbstractNeuronCollection {
         setLabel(id);
         subsamplingManager.resetIndices();
 
-        neurons.forEach(n -> n.getEvents().onLocationChange(() -> {
-            events.fireLocationChange();
-        }));
+        neurons.forEach(n -> {
+            n.getEvents().onLocationChange(() -> events.fireLocationChange());
+        });
 
         net.getEvents().onNeuronRemoved(n -> {
             removeNeuron(n);
@@ -105,7 +105,8 @@ public class NeuronCollection extends AbstractNeuronCollection {
      */
     public void setNeuronType(String rule) {
         try {
-            NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + rule).newInstance();
+            NeuronUpdateRule newRule =
+                    (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + rule).newInstance();
             setNeuronType(newRule);
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -116,16 +117,12 @@ public class NeuronCollection extends AbstractNeuronCollection {
     @Override
     public String toString() {
         return String.format("Neuron Collection [%s]. Neuron group with %d neuron(s). Located at (%2.2f, %2.2f).\n",
-                getLabel(),
-                this.getNeuronList().size(),
-                getLocation().getX(),
-                getLocation().getY()
-        );
+                getLabel(), this.getNeuronList().size(), getLocation().getX(), getLocation().getY());
     }
 
     /**
-     * Returns the summed hash codes of contained neurons.  Used to prevent creating neuron collections
-     * from identical neurons.
+     * Returns the summed hash codes of contained neurons.  Used to prevent creating neuron collections from identical
+     * neurons.
      *
      * @return summed hash
      */

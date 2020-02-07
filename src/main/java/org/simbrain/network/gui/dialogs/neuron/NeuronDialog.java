@@ -132,8 +132,11 @@ public final class NeuronDialog extends StandardDialog {
 
         neuronPropertiesPanel.commitChanges();
 
-        // Notify the network that changes have been made
-//        neuronList.get(0).getNetwork().fireNeuronsUpdated(neuronList); // TODO: [event]
+        neuronList.forEach(n ->{
+            n.getEvents().fireActivationChange(0, n.getActivation());
+            n.getEvents().fireLabelChange();
+            n.getEvents().fireClampedChange(false, n.isClamped() );
+        });
 
     }
 

@@ -177,7 +177,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         if (!inputMode) {
             Network.updateNeurons(getNeuronList());
         }
-        //fireLabelUpdated(); // TODO
     }
 
     /**

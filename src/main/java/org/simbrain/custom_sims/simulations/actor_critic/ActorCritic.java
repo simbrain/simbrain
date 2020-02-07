@@ -268,6 +268,7 @@ public class ActorCritic extends RegisteredSimulation {
 
         // Set up location sensor neurons
         sensorNeurons = networkWrapper.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid", "Linear");
+        sensorNeurons.setLabel("Sensor Nodes");
         List<Synapse> wts = networkWrapper.connectAllToAll(sensorNeurons, value, 0);
         wts.forEach(w -> w.setLowerBound(0));
         List<Synapse> wts2 =  networkWrapper.connectAllToAll(sensorNeurons, outputs, 0);

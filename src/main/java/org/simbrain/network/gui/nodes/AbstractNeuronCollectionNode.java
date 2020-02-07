@@ -49,8 +49,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         this.nc = group;
         outlinedObjects = new Outline();
 
-        NetworkEvents networkEvents = networkPanel.getNetwork().getEvents();
-
         addChild(outlinedObjects);
 
         NeuronCollectionEvents events = nc.getEvents();
@@ -64,8 +62,10 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             pullPositionFromModel();
             outlinedObjects.updateBounds();
         });
+
         events.onRecordingStarted(this::updateText);
         events.onRecordingStopped(this::updateText);
+
     }
 
     /**
@@ -100,6 +100,9 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         }
     }
 
+    /**
+     * Set what neuron nodes will be outlined.
+     */
     public void addNeuronNodes(Collection<NeuronNode> neuronNodes) {
         this.neuronNodes.addAll(neuronNodes);
         for (NeuronNode neuronNode : neuronNodes) {
@@ -110,6 +113,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
                 outlinedObjects.setOutlinedNodes(this.neuronNodes);
             });
             events.onLocationChange(() -> outlinedObjects.setOutlinedNodes(this.neuronNodes));
+            events.onLabelChange(() -> outlinedObjects.setOutlinedNodes(this.neuronNodes));
         }
         outlinedObjects.setOutlinedNodes(this.neuronNodes);
         outlinedObjects.updateBounds();

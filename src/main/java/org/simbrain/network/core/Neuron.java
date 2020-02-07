@@ -941,9 +941,8 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     @Consumable(defaultVisibility = false)
     public void setLabel(final String label) {
-        String oldLabel = this.label;
         this.label = label;
-        events.fireLabelChange(oldLabel, label);
+        events.fireLabelChange();
     }
 
     /**

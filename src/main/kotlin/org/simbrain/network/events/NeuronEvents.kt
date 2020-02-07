@@ -21,8 +21,8 @@ class NeuronEvents(val neuron: Neuron) : Event(PropertyChangeSupport(neuron)), L
     override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
     override fun fireLocationChange() = "LocationChange"()
 
-    fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
-    fun fireLabelChange(old: String, new: String) = "LabelChange"(old = old, new = new)
+    fun onLabelChange(handler: Runnable) = "LabelChange".event(handler)
+    fun fireLabelChange() = "LabelChange"()
 
     fun onClampedChange(handler: BiConsumer<Boolean, Boolean>) = "ClampedChange".itemChangedEvent(handler)
     fun fireClampedChange(old: Boolean, new: Boolean) = "ClampedChange"(old = old, new = new)

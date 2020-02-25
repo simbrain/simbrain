@@ -31,6 +31,16 @@ abstract class Environment<A : Agent2<G>, G : Genome2>(seed: Long, name: String,
 
     protected fun IntRange.random() = this.random(geneticsRandom)
 
+    protected fun Double.rand(range: Double) = geneticsRandom.nextDouble(-range, range) + this
+
+    protected fun <T> T.applyRandomly(probability: Double, block: (T) -> Unit): T {
+        return if (geneticsRandom.nextDouble() > probability) {
+            apply(block)
+        } else {
+            this
+        }
+    }
+
     /**
      * See https://en.wikipedia.org/wiki/Crossover_(genetic_algorithm)#Single-point_crossover
      */

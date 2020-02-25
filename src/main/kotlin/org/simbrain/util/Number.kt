@@ -10,3 +10,9 @@ fun <T : Comparable<T>> T.clip(range: ClosedRange<T>) =
  * Reference: https://stackoverflow.com/a/23088000
  */
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
+
+infix fun Iterable<Double>.sse(other: Iterable<Double>)
+        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.sum()
+
+infix fun Iterable<Double>.mse(other: Iterable<Double>)
+        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.average()

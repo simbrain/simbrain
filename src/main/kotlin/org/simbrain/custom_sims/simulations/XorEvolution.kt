@@ -25,11 +25,12 @@ fun main() {
         }
     }
 
-    environment.newEvolution()
+    environment.runEvolution()
             .upToGeneration(500)
             .untilFitnessScore { it < 0.1 }
             .onEach { println(it.best()) }
             .last()
             .best()
+
 }
 

@@ -10,12 +10,22 @@ import kotlin.random.Random
 /**
  * The top level object for evolutionary simulations.
  *
- * An environment contains an [Agent2] and a [Genome2].  It is initialized with a seed, a name, and an
- * [eval] function that associates genomes with fitness values in that environment.  A configuration object
- * may also be needed for implementing classes at this level.
+ * An environment contains a list or "population" of agents (see [initialPopulation])
  *
- * Some functions that seem like they should be at the genome level (e.g. [mutate]) are at this level since config
- * objects are maintained at this level.
+ * Each [Agent2] has a [Genome2] and a [Agent2.fitness]. A genome is used to generate an Agent.
+ *
+ * The environment contains an [eval] function.  At each generation, each agent is evaluated using that [eval] function.
+ * At each iteration of [runEvolution] the population is replenished using the most fit agents, by crossing over their
+ * genomes.
+ *
+ * Examples
+ *  - A Simbrain Network is the Agent, and the environment is just a training dataset.
+ *  - A Simbrain Network and OdorWorldEntity make up the Agent, and an OdorWorld is the environment.
+ *  - A list of integers is the agent, and all that's used in the environment is the eval function
+ *
+ * Notice that currently agents are always evaluated within a single environment.
+ * Possible future use case: an environment can be shared across agents during evolution.
+ *
  */
 abstract class Environment<A : Agent2<G>, G : Genome2>(seed: Long, name: String, val eval: G.() -> Double) {
 
@@ -56,7 +66,7 @@ abstract class Environment<A : Agent2<G>, G : Genome2>(seed: Long, name: String,
     /**
      * Create a new evolution from the given configuration
      */
-    fun newEvolution(optimizeFor: Optimize = Optimize.small) = generateSequence(initialPopulation) {
+    fun runEvolution(optimizeFor: Optimize = Optimize.small) = generateSequence(initialPopulation) {
         it.eval(optimizeFor).eliminateLeastFit(0.5).replenish()
     }
 
@@ -170,6 +180,9 @@ abstract class Agent2<G : Genome2> : Comparable<Agent2<G>> {
     abstract val genome: G
     abstract val fitness: Double
 
+    /**
+     * To compare fitness scores
+     */
     override fun compareTo(other: Agent2<G>) = fitness.compareTo(other.fitness)
 }
 

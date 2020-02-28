@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
 import org.simbrain.util.geneticalgorithm.*
 
 fun main() {
@@ -16,7 +15,7 @@ fun main() {
                                 "Neuron2" }))
                 )),
                 connections = listOf(ConnectionChromosome(
-                        listOf(ConnectionGene("Neuron1", "Neuron2", Synapse(null, null, 1.0)))
+                        listOf(connectionGene("Neuron1", "Neuron2"))
                 )),
                 id = "Network1"
         )

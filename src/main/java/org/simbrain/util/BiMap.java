@@ -18,38 +18,42 @@
  */
 package org.simbrain.util;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Set;
 
 /**
  * Two directional map, that allows inverses.
- *
+ * <p>
  * https://stackoverflow.com/questions/9783020/bidirectional-map
  *
  * @param <K>
  * @param <V>
  */
-public class BiMap<K,V> {
+public class BiMap<K, V> extends AbstractMap<K, V> {
 
     /**
      * The main map.
      */
-    HashMap<K,V> map = new HashMap<K, V>();
+    HashMap<K, V> map = new HashMap<K, V>();
 
     /**
      * The inverse map.
      */
-    HashMap<V,K> inversedMap = new HashMap<V, K>();
+    HashMap<V, K> inversedMap = new HashMap<V, K>();
 
     /**
      * Standard put operation.
-     *
-     * @param k key
+     *  @param k key
      * @param v value
+     * @return
      */
-    public void put(K k, V v) {
+    public V put(K k, V v) {
         map.put(k, v);
         inversedMap.put(v, k);
+        return v;
     }
 
     /**
@@ -58,7 +62,7 @@ public class BiMap<K,V> {
      * @param k key
      * @return associated value
      */
-    public V get(K k) {
+    public V get(Object k) {
         return map.get(k);
     }
 
@@ -72,7 +76,14 @@ public class BiMap<K,V> {
         return inversedMap.get(v);
     }
 
+    @NotNull
     public Set<K> keySet() {
         return map.keySet();
+    }
+
+    @NotNull
+    @Override
+    public Set<Entry<K, V>> entrySet() {
+        return map.entrySet();
     }
 }

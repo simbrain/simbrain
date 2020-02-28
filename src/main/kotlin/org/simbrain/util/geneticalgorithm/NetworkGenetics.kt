@@ -87,7 +87,7 @@ data class NodeChromosome(override val genes: List<NodeGene>) : Chromosome2<Node
 
 data class ConnectionGene(val source: String, val target: String, val prototype: Synapse) : Gene2()
 
-fun connectionGene(source: String, target: String, config: Synapse.() -> Unit = { })
+fun createConnectionChromosome(source: String, target: String, config: Synapse.() -> Unit = { })
     = ConnectionGene(source, target, Synapse(null, null, 1.0).apply(config))
 
 data class NodeGene(val prototype: Neuron) : Gene2()

@@ -15,7 +15,7 @@ fun main() {
                                 "Neuron2" }))
                 )),
                 connections = listOf(ConnectionChromosome(
-                        listOf(connectionGene("Neuron1", "Neuron2"))
+                        listOf(createConnectionChromosome("Neuron1", "Neuron2"))
                 )),
                 id = "Network1"
         )

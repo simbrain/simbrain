@@ -78,6 +78,8 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
         world.getEvents().onEntityRemoved(e -> {
             fireAttributeContainerRemoved(e);
+            e.getSensors().forEach(this::fireAttributeContainerRemoved);
+            e.getEffectors().forEach(this::fireAttributeContainerRemoved);
             setChangedSinceLastSave(true);
         });
 

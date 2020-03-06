@@ -172,6 +172,7 @@ public class OdorWorld implements EditableObject {
     public OdorWorldEntity addAgent() {
 
         OdorWorldEntity entity = new OdorWorldEntity(this, EntityType.MOUSE);
+        addEntity(entity);
         entity.setEntityType(EntityType.MOUSE);
         double x = lastClickedPosition.getX();
         if (x > tileMap.getMapWidth() - EntityType.MOUSE.getImageWidth()) {
@@ -183,7 +184,6 @@ public class OdorWorld implements EditableObject {
         }
         entity.setLocation(x, y);
         entity.addDefaultSensorsEffectors();
-        addEntity(entity);
         return entity;
     }
 

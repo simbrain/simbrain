@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import org.simbrain.workspace.*
+import org.simbrain.world.odorworld.entities.PeripheralAttribute
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 
@@ -68,8 +69,12 @@ class CouplingCache(workspace: Workspace) {
      * Adds a coupling to the cache.
      */
     fun add(coupling: Coupling) {
-        val producerContainer = coupling.producer.baseObject
-        val consumerContainer = coupling.consumer.baseObject
+        val producerContainer = coupling.producer.baseObject.run {
+            if (this is PeripheralAttribute) this.parent else this
+        }
+        val consumerContainer = coupling.consumer.baseObject.run {
+            if (this is PeripheralAttribute) this.parent else this
+        }
 
         if (producerContainer in couplingsByContainer) {
             couplingsByContainer[producerContainer]!!.add(coupling)
@@ -88,8 +93,12 @@ class CouplingCache(workspace: Workspace) {
      * Removes a coupling from the cache
      */
     fun remove(coupling: Coupling) {
-        val producerContainer = coupling.producer.baseObject
-        val consumerContainer = coupling.consumer.baseObject
+        val producerContainer = coupling.producer.baseObject.run {
+            if (this is PeripheralAttribute) this.parent else this
+        }
+        val consumerContainer = coupling.consumer.baseObject.run {
+            if (this is PeripheralAttribute) this.parent else this
+        }
 
         couplingsByContainer[producerContainer]?.remove(coupling)
         couplingsByContainer[consumerContainer]?.remove(coupling)

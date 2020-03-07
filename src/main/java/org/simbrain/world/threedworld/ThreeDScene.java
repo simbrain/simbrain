@@ -2,9 +2,16 @@ package org.simbrain.world.threedworld;
 
 import com.jme3.light.AmbientLight;
 import com.jme3.light.Light;
+import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Quad;
+import com.jme3.util.SkyFactory;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
 /**
@@ -48,6 +55,27 @@ public class ThreeDScene {
         if (sceneNode != null) {
             unload(engine);
         }
+
+        // TODO: These are fixes just to get something, but they are not really integrated
+        // into the framework Tim set up
+
+        // Add a sky
+        engine.getRootNode().attachChild(SkyFactory.createSky(
+                engine. getAssetManager(), "Materials/BrightSky.dds",
+                SkyFactory.EnvMapType.CubeMap));
+
+        // Trying to add a floor. No idea how to orient it or make it solid.
+        Geometry floor = new Geometry("OurMesh", new Quad(1000f,1000f));
+        Material greenMat = new Material(engine.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        greenMat.setColor("Color", ColorRGBA.Green);
+        floor.setMaterial(greenMat);
+        floor.setLocalTranslation(10,-10,10);
+        Quaternion rotate = new Quaternion();
+        rotate.fromAngleAxis(FastMath.PI, new Vector3f(0,1,0));
+        floor.setLocalRotation(rotate);
+        engine.getRootNode().attachChild(floor);
+
+
         Spatial model = engine.getAssetManager().loadModel(sceneName);
         if (model instanceof Node) {
             sceneNode = (Node) model;

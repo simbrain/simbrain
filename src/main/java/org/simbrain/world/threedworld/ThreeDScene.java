@@ -1,16 +1,14 @@
 package org.simbrain.world.threedworld;
 
+import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.Light;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Quad;
+import com.jme3.scene.shape.Box;
 import com.jme3.util.SkyFactory;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
@@ -65,14 +63,13 @@ public class ThreeDScene {
                 SkyFactory.EnvMapType.CubeMap));
 
         // Trying to add a floor. No idea how to orient it or make it solid.
-        Geometry floor = new Geometry("OurMesh", new Quad(1000f,1000f));
+        Geometry floor = new Geometry("OurMesh", new Box(100f, 0.1f, 100f));
         Material greenMat = new Material(engine.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         greenMat.setColor("Color", ColorRGBA.Green);
         floor.setMaterial(greenMat);
-        floor.setLocalTranslation(10,-10,10);
-        Quaternion rotate = new Quaternion();
-        rotate.fromAngleAxis(FastMath.PI, new Vector3f(0,1,0));
-        floor.setLocalRotation(rotate);
+        final var floorPhysics = new RigidBodyControl(0.0f);
+        floor.addControl(floorPhysics);
+        engine.getPhysicsSpace().add(floorPhysics);
         engine.getRootNode().attachChild(floor);
 
 
@@ -98,7 +95,7 @@ public class ThreeDScene {
         //AssetManager assetManager = engine.getAssetManager();
         //
         ///** create a blue box at coordinates (1,-1,1) */
-        //Box box1 = new Box(1,1,1);
+        Box box1 = new Box(1,1,1);
         //Geometry blue = new Geometry("Box", box1);
         //blue.setLocalTranslation(new Vector3f(1,-1,1));
         //Material mat1 = new Material(assetManager,

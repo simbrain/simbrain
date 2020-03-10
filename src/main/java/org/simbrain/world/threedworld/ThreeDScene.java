@@ -9,6 +9,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
+import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
@@ -65,7 +66,9 @@ public class ThreeDScene {
         // Trying to add a floor. No idea how to orient it or make it solid.
         Geometry floor = new Geometry("OurMesh", new Box(100f, 0.1f, 100f));
         Material greenMat = new Material(engine.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        greenMat.setColor("Color", ColorRGBA.Green);
+        //greenMat.setColor("Color", ColorRGBA.Green);
+        Texture grass = engine.getAssetManager().loadTexture("Textures/grass.jpg");
+        greenMat.setTexture("ColorMap", grass);
         floor.setMaterial(greenMat);
         final var floorPhysics = new RigidBodyControl(0.0f);
         floor.addControl(floorPhysics);
@@ -80,8 +83,8 @@ public class ThreeDScene {
             sceneNode = new Node("scene");
             sceneNode.attachChild(model);
         }
-        engine.getRootNode().attachChild(sceneNode);
-        engine.getPhysicsSpace().addAll(sceneNode);
+        //engine.getRootNode().attachChild(sceneNode);
+        //engine.getPhysicsSpace().addAll(sceneNode);
 
         AmbientLight ambientLight = new AmbientLight();
         ambientLight.setColor(ColorRGBA.White);

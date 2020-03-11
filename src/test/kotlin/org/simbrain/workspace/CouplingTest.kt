@@ -4,7 +4,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.simbrain.iterateAndRun
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -58,6 +57,7 @@ class CouplingTest {
         }
         neuron1.activation = 1.0
         neuron2.isClamped = true
-        workspace.iterateAndRun { assertEquals(1.0, neuron2.activation, 0.01) }
+        workspace.simpleIterate()
+        assertEquals(1.0, neuron2.activation, 0.01)
     }
 }

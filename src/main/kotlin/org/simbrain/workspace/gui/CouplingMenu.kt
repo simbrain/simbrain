@@ -60,8 +60,6 @@ class CouplingMenu(
         }.flatten().createSubmenu("${producer.simpleDescription} send to")
     }
 
-    // Note: this is not currently used.  It is enough to build all couplings using a producer / "send" menu.
-    // However, if it is reinvoked it should be updated to be similar to the createProducerMenu
     private fun createConsumerSubmenu(consumer: org.simbrain.workspace.Consumer) {
         sourceComponent.workspace.componentList.map { wc ->
             wc.couplingManager.run {

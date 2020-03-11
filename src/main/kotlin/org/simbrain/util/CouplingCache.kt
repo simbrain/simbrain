@@ -13,20 +13,32 @@ typealias JConsumer<T> = java.util.function.Consumer<T>
  */
 class CouplingCache(workspace: Workspace) {
 
+    /**
+     * A collection of all producers in the current workspace
+     */
     val producers = ProducerCache()
 
+    /**
+     * A collection of all consumers in the current workspace
+     */
     val consumers = ConsumerCache()
 
+    /**
+     * A collection of all couplings grouped by [AttributeContainer]s
+     */
+    private val couplingsByContainer = HashMap<AttributeContainer, HashSet<Coupling>>()
+
+    /**
+     * A collection of all producible and consumable methods that are visible
+     */
     val visibleMethods
         get() = producers.visibleMethods + consumers.visibleMethods
 
+    /**
+     * A collection of all couplings. This is mainly for serialization.
+     */
     val couplings
         get() = couplingsByContainer.values.flatten().toSet().sortedBy { it.id }
-
-    private val couplingsByContainer = HashMap<AttributeContainer, HashSet<Coupling>>()
-
-    val Collection<Attribute>.visible
-        get() = this.filter { it.method in visibleMethods }
 
     init {
         workspace.events.apply {
@@ -120,88 +132,92 @@ class CouplingCache(workspace: Workspace) {
             cache.visibleMethods.remove(method)
         }
     }
+}
 
-    /**
-     * Cache of an [Attribute].
-     */
-    abstract class AttributeCache<T : Attribute> {
+/**
+ * Cache of an [Attribute]. This supports 4 access patterns:
+ * - by [AttributeContainer]
+ * - by [WorkspaceComponent]
+ * - by the [Type] which an attribute produces or consumes
+ * - by [Attribute.visibility]
+ */
+sealed class AttributeCache<T : Attribute> {
 
-        private val all = HashSet<T>()
+    private val all = HashSet<T>()
 
-        private val byType = HashMap<Type, HashSet<T>>()
+    private val byContainer = HashMap<AttributeContainer, HashSet<T>>()
 
-        private val byContainer = HashMap<AttributeContainer, HashSet<T>>()
+    private val byComponent = HashMap<WorkspaceComponent, HashSet<T>>()
 
-        private val byComponent = HashMap<WorkspaceComponent, HashSet<T>>()
+    private val byType = HashMap<Type, HashSet<T>>()
 
-        val visibleMethods = HashSet<Method>()
+    val visibleMethods = HashSet<Method>()
 
-        operator fun get(type: Type) = byType[type] ?: hashSetOf()
+    operator fun get(type: Type) = byType[type] ?: hashSetOf()
 
-        operator fun get(container: AttributeContainer) = byContainer[container] ?: hashSetOf()
+    operator fun get(container: AttributeContainer) = byContainer[container] ?: hashSetOf()
 
-        operator fun get(component: WorkspaceComponent) = byComponent[component] ?: hashSetOf()
+    operator fun get(component: WorkspaceComponent) = byComponent[component] ?: hashSetOf()
 
-        abstract fun addContainer(component: WorkspaceComponent, container: AttributeContainer)
+    abstract fun addContainer(component: WorkspaceComponent, container: AttributeContainer)
 
-        protected fun addAttributes(component: WorkspaceComponent, attributes: Collection<T>) {
+    protected fun addAttributes(component: WorkspaceComponent, attributes: Collection<T>) {
 
-            all.addAll(attributes)
+        all.addAll(attributes)
 
-            attributes.groupBy { it.type }.forEach {
+        attributes.groupBy { it.type }.forEach {
 
-                if (it.key !in byType) {
-                    byType[it.key] = it.value.toHashSet()
-                } else {
-                    byType[it.key]!!.addAll(it.value)
-                }
-            }
-
-            attributes.groupBy { it.baseObject as AttributeContainer }.forEach {
-                if (it.key !in byContainer) {
-                    byContainer[it.key] = it.value.toHashSet()
-                } else {
-                    byContainer[it.key]!!.addAll(it.value)
-                }
-            }
-
-
-            if (component in byComponent) {
-                byComponent[component]!!.addAll(attributes)
+            if (it.key !in byType) {
+                byType[it.key] = it.value.toHashSet()
             } else {
-                byComponent[component] = attributes.toHashSet()
+                byType[it.key]!!.addAll(it.value)
             }
         }
 
-        fun removeContainer(component: WorkspaceComponent, attributeContainer: AttributeContainer) {
-            val attributes = byContainer[attributeContainer]
-            if (attributes != null) {
-                all.removeAll(attributes)
-                byType.values.forEach { it.removeAll(attributes) }
-                byComponent[component]?.removeAll(attributes)
-                byContainer.remove(attributeContainer)
+        attributes.groupBy { it.baseObject as AttributeContainer }.forEach {
+            if (it.key !in byContainer) {
+                byContainer[it.key] = it.value.toHashSet()
+            } else {
+                byContainer[it.key]!!.addAll(it.value)
             }
         }
 
-    }
 
-    inner class ProducerCache : AttributeCache<Producer>() {
-        override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
-            addAttributes(component, container.producers)
-            container.producibles
-                    .filter { it !in visibleMethods }
-                    .filter { it.getAnnotation(Producible::class.java).defaultVisibility }
-                    .let { visibleMethods.addAll(it) }
+        if (component in byComponent) {
+            byComponent[component]!!.addAll(attributes)
+        } else {
+            byComponent[component] = attributes.toHashSet()
         }
     }
 
-    inner class ConsumerCache : AttributeCache<Consumer>() {
-        override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
-            addAttributes(component, container.consumers)
-            container.consumables
-                    .filter { it !in visibleMethods }
-                    .filter { it.getAnnotation(Consumable::class.java).defaultVisibility }
-                    .let { visibleMethods.addAll(it) }
+    fun removeContainer(component: WorkspaceComponent, attributeContainer: AttributeContainer) {
+        val attributes = byContainer[attributeContainer]
+        if (attributes != null) {
+            all.removeAll(attributes)
+            byType.values.forEach { it.removeAll(attributes) }
+            byComponent[component]?.removeAll(attributes)
+            byContainer.remove(attributeContainer)
         }
+    }
+
+}
+
+class ProducerCache : AttributeCache<Producer>() {
+    override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
+        addAttributes(component, container.producers)
+        container.producibles
+                .filter { it !in visibleMethods }
+                .filter { it.getAnnotation(Producible::class.java).defaultVisibility }
+                .let { visibleMethods.addAll(it) }
+    }
+}
+
+class ConsumerCache : AttributeCache<Consumer>() {
+    override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
+        addAttributes(component, container.consumers)
+        container.consumables
+                .filter { it !in visibleMethods }
+                .filter { it.getAnnotation(Consumable::class.java).defaultVisibility }
+                .let { visibleMethods.addAll(it) }
     }
 }

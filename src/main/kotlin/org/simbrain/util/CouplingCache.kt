@@ -14,12 +14,12 @@ typealias JConsumer<T> = java.util.function.Consumer<T>
 class CouplingCache(workspace: Workspace) {
 
     /**
-     * A collection of all producers in the current workspace
+     * A cache of all producers in the current workspace
      */
     val producers = ProducerCache()
 
     /**
-     * A collection of all consumers in the current workspace
+     * A cache of all consumers in the current workspace
      */
     val consumers = ConsumerCache()
 
@@ -135,7 +135,7 @@ class CouplingCache(workspace: Workspace) {
 }
 
 /**
- * Cache of an [Attribute]. This supports 4 access patterns:
+ * Cache of [Attribute]s.  Basically a [Consumer] cache or a [Producer] cache.  This supports 4 access patterns:
  * - by [AttributeContainer]
  * - by [WorkspaceComponent]
  * - by the [Type] which an attribute produces or consumes
@@ -143,24 +143,54 @@ class CouplingCache(workspace: Workspace) {
  */
 sealed class AttributeCache<T : Attribute> {
 
+    /**
+     * All attributes.
+     */
     private val all = HashSet<T>()
 
+    /**
+     * Map from [AttributeContainer]s to attributes.
+     */
     private val byContainer = HashMap<AttributeContainer, HashSet<T>>()
 
+    /**
+     * Map from [WorkspaceComponent]s to attributes.
+     */
     private val byComponent = HashMap<WorkspaceComponent, HashSet<T>>()
 
+    /**
+     * Map from [Type]s to attributes.
+     */
     private val byType = HashMap<Type, HashSet<T>>()
 
+    /**
+     * Which attributes are visible
+     */
     val visibleMethods = HashSet<Method>()
 
+    /**
+     * Get by type.
+     */
     operator fun get(type: Type) = byType[type] ?: hashSetOf()
 
+    /**
+     * Get by attributecontainer
+     */
     operator fun get(container: AttributeContainer) = byContainer[container] ?: hashSetOf()
 
+    /**
+     * Get by WorkspaceComponent
+     */
     operator fun get(component: WorkspaceComponent) = byComponent[component] ?: hashSetOf()
 
+    /**
+     * Add a [AttributeContainer] to the cache.
+     */
     abstract fun addContainer(component: WorkspaceComponent, container: AttributeContainer)
 
+    /**
+     * Add a [Consumer] or [Producer] to the cache.
+     */
     protected fun addAttributes(component: WorkspaceComponent, attributes: Collection<T>) {
 
         all.addAll(attributes)
@@ -190,6 +220,9 @@ sealed class AttributeCache<T : Attribute> {
         }
     }
 
+    /**
+     * Remove an attribute container (must pass in workspace component)
+     */
     fun removeContainer(component: WorkspaceComponent, attributeContainer: AttributeContainer) {
         val attributes = byContainer[attributeContainer]
         if (attributes != null) {
@@ -202,6 +235,9 @@ sealed class AttributeCache<T : Attribute> {
 
 }
 
+/**
+ * Producer cache.
+ */
 class ProducerCache : AttributeCache<Producer>() {
     override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
         addAttributes(component, container.producers)
@@ -212,6 +248,9 @@ class ProducerCache : AttributeCache<Producer>() {
     }
 }
 
+/**
+ * Consumer cache.
+ */
 class ConsumerCache : AttributeCache<Consumer>() {
     override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
         addAttributes(component, container.consumers)

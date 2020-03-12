@@ -14,6 +14,7 @@ import java.lang.reflect.Type
  *
  * @author Jeff Yoshimi
  * @author Tim Shea
+ * @author Yulin Li
  * @author Matt Watson
  */
 class Coupling private constructor(val producer: Producer, val consumer: Consumer) {
@@ -21,7 +22,7 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
     /**
      * This is the main action!  Set the value of the consumer based on the
      * value of the producer.
-     * <br>
+     *
      * Note that values are passed by reference, so that it is up to the producing or
      * consuming methods to make defensive copies as needed.
      * (cf http://www.javapractices.com/topic/TopicAction.do?Id=15)).
@@ -60,6 +61,7 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
     }
 
     companion object {
+
         /**
          * Main creation  method for couplings.
          *
@@ -88,14 +90,21 @@ val AttributeContainer.consumables
     get() = javaClass.methods.filter { it.isConsumable() }
 
 /**
- * All methods that are annotated with [Producible] in a attribute container.
+ * Get all methods of the [AttributeContainer] annotated as [Producible]
  */
 val AttributeContainer.producibles
     get() = javaClass.methods.filter { it.isProducible() }
 
+/**
+ * TODO: Yulin will evaluate and rewrite appropriate javadoc.
+ * Get all consumers from the container.
+ */
 val AttributeContainer.consumers
     get() = this.consumables.map { this.getConsumer(it) }
 
+/**
+ * TODO: Yulin will evaluate and rewrite appropriate javadoc.
+ */
 val AttributeContainer.producers
     get() = this.producibles.map { this.getProducer(it) }
 

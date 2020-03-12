@@ -16,10 +16,13 @@ import java.lang.reflect.Method
  */
 class CouplingManager(workspace: Workspace) {
 
+    /**
+     * Cache of all couplings in the workspace.
+     */
     private val couplingCache = CouplingCache(workspace)
 
     /**
-     * All couplings for the workspace.
+     * Returns all couplings
      */
     val couplings
         get() = couplingCache.couplings
@@ -129,6 +132,10 @@ class CouplingManager(workspace: Workspace) {
      * @return the newly creating coupling
      */
     fun createCoupling(producer: Producer?, consumer: Consumer?) = +Coupling.create(producer, consumer)
+
+    /**
+     * Convenience operator for creating couplings.
+     */
     infix fun Producer?.couple(consumer: Consumer?) = createCoupling(this, consumer)
 
     /**

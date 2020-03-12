@@ -23,7 +23,7 @@ class CouplingTest {
         network.addLooseNeuron(neuron)
         val expected = setOf("getLabel", "getActivation")
         val actual = neuron.producers.map { it.method.name }.toSet()
-        val diff = expected complement actual
+        val diff = expected complement actual // For error message if test fails
         assertTrue("$diff", diff.isIdentical())
     }
 
@@ -34,7 +34,6 @@ class CouplingTest {
         val expected = setOf("setActivation", "forceSetActivation", "setInputValue", "addInputValue", "setLabel")
         val actual = neuron.consumers.map { it.method.name }.toSet()
         val diff = expected complement actual
-
         assertTrue("$diff", diff.isIdentical())
     }
 

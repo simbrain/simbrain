@@ -1,6 +1,5 @@
 package org.simbrain.workspace
 
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -11,48 +10,43 @@ import org.simbrain.util.complement
 
 class CouplingTest {
 
-    val workspace = Workspace()
+    private val workspace = Workspace()
 
-    val networkComponent = NetworkComponent("net1", Network())
+    private val network = Network().also { workspace.addWorkspaceComponent(NetworkComponent("net1", it)) }
 
-    init {
-        workspace.addWorkspaceComponent(networkComponent)
-    }
+    private val couplingManager
+        get() = workspace.couplingManager
 
     @Test
     fun `check if all producers are created on a neuron`() {
-        val neuron = Neuron(networkComponent.network)
-        networkComponent.network.addLooseNeuron(neuron)
-        networkComponent.couplingManager.run {
-            val expected = setOf("getLabel", "getActivation")
-            val actual = neuron.producers.map { it.method.name }.toSet()
-            val diff = expected complement actual
-            assertTrue("$diff", diff.isIdentical())
-        }
+        val neuron = Neuron(network)
+        network.addLooseNeuron(neuron)
+        val expected = setOf("getLabel", "getActivation")
+        val actual = neuron.producers.map { it.method.name }.toSet()
+        val diff = expected complement actual
+        assertTrue("$diff", diff.isIdentical())
     }
 
     @Test
     fun `check if all consumers are created on a neuron`() {
-        val neuron = Neuron(networkComponent.network)
-        networkComponent.network.addLooseNeuron(neuron)
-        networkComponent.couplingManager.run {
-            val expected = setOf("setActivation", "forceSetActivation", "setInputValue", "addInputValue", "setLabel")
-            val actual = neuron.consumers.map { it.method.name }.toSet()
-            val diff = expected complement actual
+        val neuron = Neuron(network)
+        network.addLooseNeuron(neuron)
+        val expected = setOf("setActivation", "forceSetActivation", "setInputValue", "addInputValue", "setLabel")
+        val actual = neuron.consumers.map { it.method.name }.toSet()
+        val diff = expected complement actual
 
-            assertTrue("$diff", diff.isIdentical())
-        }
+        assertTrue("$diff", diff.isIdentical())
     }
 
     @Test
-    fun `check neuron getActivation coupling with neuron forceSetActivation`() = runBlocking {
-        val neuron1 = Neuron(networkComponent.network)
-        val neuron2 = Neuron(networkComponent.network)
-        networkComponent.network.apply {
+    fun `check neuron getActivation coupling with neuron forceSetActivation`() {
+        val neuron1 = Neuron(network)
+        val neuron2 = Neuron(network)
+        network.apply {
             addLooseNeuron(neuron1)
             addLooseNeuron(neuron2)
         }
-        networkComponent.couplingManager.run {
+        with(couplingManager) {
             neuron1.producerByName("getActivation") couple neuron2.consumerByName("forceSetActivation")
         }
         neuron1.activation = 1.0

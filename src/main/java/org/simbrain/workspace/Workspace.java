@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace;
 
+import org.jetbrains.annotations.NotNull;
 import org.pmw.tinylog.Logger;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.events.WorkspaceEvents;
@@ -514,6 +515,7 @@ public class Workspace {
     }
 
     /* Get the CouplingFactory for this workspace. */
+    @NotNull
     public CouplingManager getCouplingManager() {
         return couplingManager;
     }

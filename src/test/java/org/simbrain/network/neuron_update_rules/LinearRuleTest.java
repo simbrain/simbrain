@@ -22,19 +22,35 @@ public class LinearRuleTest {
 
     @Test
     public void testClipping() {
-
         LinearRule lr = new LinearRule();
         lr.setUpperBound(10);
         lr.setLowerBound(-10);
 
         // Test clipping upper bound
         assertEquals(10, lr.clip(100), 0);
-
         // Test no clipping
         assertEquals(5, lr.clip(5), 0);
-
         // Test clipping lower bound
         assertEquals(-10, lr.clip(-20), 0);
-
     }
+
+    @Test
+    public void testDerivative() {
+
+        LinearRule lr = new LinearRule();
+        lr.setUpperBound(10);
+        lr.setLowerBound(-10);
+        lr.setSlope(5.0);
+
+        // Above upper bound should return 0
+        assertEquals(0, lr.getDerivative(11), 0);
+
+        // Below lower bound should return 0
+        assertEquals(0, lr.getDerivative(-11), 0);
+
+        // Between lower and upper bound returns the slope
+        assertEquals(5.0, lr.getDerivative(0), 0);
+    }
+
+
 }

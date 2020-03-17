@@ -5,6 +5,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.Light;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -68,6 +69,8 @@ public class ThreeDScene {
         Material greenMat = new Material(engine.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
         //greenMat.setColor("Color", ColorRGBA.Green);
         Texture grass = engine.getAssetManager().loadTexture("Textures/grass.jpg");
+        grass.setWrap(Texture.WrapMode.Repeat);
+        floor.getMesh().scaleTextureCoordinates(new Vector2f(100f, 100f));
         greenMat.setTexture("ColorMap", grass);
         floor.setMaterial(greenMat);
         final var floorPhysics = new RigidBodyControl(0.0f);

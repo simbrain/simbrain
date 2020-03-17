@@ -6,6 +6,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
+import org.simbrain.world.threedworld.events.EntityEvents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Agent implements Entity {
     private ModelEntity model;
     private List<Sensor> sensors = new ArrayList<Sensor>();
     private List<Effector> effectors = new ArrayList<Effector>();
+    private EntityEvents events = new EntityEvents((this));
 
     /**
      * Construct a new Agent.
@@ -31,10 +33,12 @@ public class Agent implements Entity {
 
     public void addSensor(Sensor sensor) {
         sensors.add(sensor);
+        events.fireSensorAdded(sensor);
     }
 
     public void removeSensor(Sensor sensor) {
         sensors.remove(sensor);
+        events.fireSensorRemoved(sensor);
     }
 
     /**
@@ -69,10 +73,12 @@ public class Agent implements Entity {
 
     public void addEffector(Effector effector) {
         effectors.add(effector);
+        events.fireEffectorAdded(effector);
     }
 
     public void removeEffector(Effector effector) {
         effectors.remove(effector);
+        events.fireEffectorRemoved(effector);
     }
 
     /**
@@ -197,5 +203,9 @@ public class Agent implements Entity {
     @Override
     public Editor getEditor() {
         return model.getEditor();
+    }
+
+    public EntityEvents getEvents() {
+        return events;
     }
 }

@@ -10,7 +10,9 @@ import org.simbrain.world.threedworld.controllers.CameraController;
 import org.simbrain.world.threedworld.controllers.ClipboardController;
 import org.simbrain.world.threedworld.controllers.SelectionController;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
+import org.simbrain.world.threedworld.entities.Agent;
 import org.simbrain.world.threedworld.entities.Entity;
+import org.simbrain.world.threedworld.events.ThreeDWorldEvents;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ThreeDWorld implements AppState {
 
-    // TODO: Add javadocs with Tim
+    // TODO: Add javadocs 
 
     private transient boolean initialized;
     private ThreeDEngine engine;
@@ -35,10 +37,11 @@ public class ThreeDWorld implements AppState {
     private transient SelectionController selectionController;
     private transient AgentController agentController;
     private transient ClipboardController clipboardController;
-    private transient List<Listener> listeners;
     private transient Map<String, AbstractAction> actions;
     private transient ContextMenu contextMenu;
     private AtomicInteger idCounter;
+
+    private ThreeDWorldEvents events = new ThreeDWorldEvents(this);
 
     /**
      * Construct a new default ThreeDWorld().
@@ -51,25 +54,26 @@ public class ThreeDWorld implements AppState {
         selectionController = new SelectionController(this);
         agentController = new AgentController(this);
         clipboardController = new ClipboardController(this);
-        listeners = new ArrayList<>();
         scene = new ThreeDScene();
         entities = new ArrayList<>();
         actions = ActionManager.createActions(this);
         contextMenu = new ContextMenu(this);
         idCounter = new AtomicInteger();
+
+
     }
 
     /**
      * @return A deserialized ThreeDWorld.
      */
     public Object readResolve() {
+        events = new ThreeDWorldEvents(this);
         initialized = false;
         engine.getStateManager().attach(this);
         //cameraController = new CameraController(this);
         selectionController = new SelectionController(this);
         agentController = new AgentController(this);
         clipboardController = new ClipboardController(this);
-        listeners = new ArrayList<Listener>();
         actions = ActionManager.createActions(this);
         contextMenu = new ContextMenu(this);
         return this;
@@ -116,24 +120,6 @@ public class ThreeDWorld implements AppState {
      */
     public ClipboardController getClipboardController() {
         return clipboardController;
-    }
-
-    /**
-     * Add a listener to this ThreeDWorld to receive initialize and update notifications.
-     *
-     * @param listener The listener to notify.
-     */
-    public void addListener(Listener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Remove a listener from this ThreeDWorld.
-     *
-     * @param listener The listener to remove.
-     */
-    public void removeListener(Listener listener) {
-        listeners.remove(listener);
     }
 
     /**
@@ -191,7 +177,7 @@ public class ThreeDWorld implements AppState {
         agentController.registerInput();
         scene.load(engine);
         initialized = true;
-        listeners.forEach(l -> l.onWorldInitialize(this));
+        events.fireInitialized();
         engine.queueState(ThreeDEngine.State.RenderOnly, false);
     }
 
@@ -218,7 +204,7 @@ public class ThreeDWorld implements AppState {
             for (Entity entity : getEntities()) {
                 entity.update(tpf);
             }
-            listeners.forEach(l -> l.onWorldUpdate(this));
+            events.fireUpdated();
         }
     }
 
@@ -239,7 +225,7 @@ public class ThreeDWorld implements AppState {
         } catch (Exception ex) {
             // Ignore exceptions during shutdown
         }
-        listeners.forEach(l -> l.onWorldClosing(this));
+        events.fireClosed();
     }
 
     /**
@@ -253,24 +239,14 @@ public class ThreeDWorld implements AppState {
         return null;
     }
 
-    /**
-     * Listener receives notifications when a ThreeDWorld is initialized or updated.
-     */
-    public interface Listener {
-        /**
-         * @param world The world which has been initialized.
-         */
-        void onWorldInitialize(ThreeDWorld world);
-
-        /**
-         * @param world The world which has been updated.
-         */
-        void onWorldUpdate(ThreeDWorld world);
-
-        /**
-         * @param world The world which is closing.
-         */
-        void onWorldClosing(ThreeDWorld world);
+    public void addAgent(Agent agent) {
+        entities.add(agent);
+        events.fireAgentAdded(agent);
     }
 
+    // TODO: Add agent removed
+
+    public ThreeDWorldEvents getEvents() {
+        return events;
+    }
 }

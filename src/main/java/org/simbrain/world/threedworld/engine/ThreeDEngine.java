@@ -235,11 +235,6 @@ public class ThreeDEngine extends LegacyApplication {
         try {
             super.initialize();
 
-//            String rootDirectory = (System.getProperty("os.name").toLowerCase().contains("windows") ? "C:/" : "/");
-//            getAssetManager().registerLocator(rootDirectory, FileLocator.class);
-//
-//            assetDirectory = (new File("Simbrain.jar").exists() ? "threedassets/assets" : "src/org/simbrain/world/threedworld/threedassets/assets");
-//            getAssetManager().registerLocator(assetDirectory, FileLocator.class);
             assetDirectory = "src/main/resources/threedworld/assets";
             getAssetManager().registerLocator(assetDirectory, FileLocator.class);
 
@@ -260,7 +255,8 @@ public class ThreeDEngine extends LegacyApplication {
             setState(State.RunAll);
             update();
 
-            //getStateManager().attach(bulletAppState);
+            // getStateManager().attach(bulletAppState);
+
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Failed to initialize 3D World.");
             setState(State.SystemPause);

@@ -32,12 +32,12 @@ public class AddMouseAction extends AbstractAction {
             CollisionShape shape = CollisionShapeFactory.createBoxShape(model.getNode());
             model.setBody(new RigidBodyControl(shape, 1));
             Agent agent = new Agent(model);
+            world.addAgent(agent); // Must come before sensors and effectors are added to fire events
             VisionSensor sensor = new VisionSensor(agent);
             sensor.setHeadOffset(new Vector3f(0, 1.25f, 2.25f));
             sensor.setFilterType(VisionSensor.FilterType.GRAY);
             WalkingEffector effector = new WalkingEffector(agent);
             effector.setWalkAnimSpeed(3);
-            world.getEntities().add(agent);
             world.getSelectionController().select(agent);
             if (world.getSelectionController().getCursorContact(false) != null)
                 world.getSelectionController().translateToCursor();

@@ -44,22 +44,16 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     private static final double DEFAULT_FLOOR = -1.0;
 
     /**
-     * Relative.
+     * Update type.
      */
-    public static final int RELATIVE = 0;
+    public enum UpdateType {Relative, Absolute};
 
-    /**
-     * Absolute.
-     */
-    public static final int ABSOLUTE = 1;
+    @UserParameter(
+            label = "Update Type",
+            description = "Relative (percentage decay of current activation) vs. absolute (fixed decay amount)",
+            order = 1)
+    private UpdateType updateType = UpdateType.Relative;
 
-    //TODO: add drop down back
-    /**
-     * Relative absolute.
-     */
-    private int relAbs = RELATIVE;
-
-  //TODO: disable when RELATIVE
     /**
      * Decay amount.
      */
@@ -69,7 +63,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             increment = .1, order = 3)
     private double decayAmount = .1;
 
-    //TODO: disable when ABSOLUTE
     /**
      * Decay fraction.
      */
@@ -77,7 +70,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             label = "Decay fraction",
             description = "The proportion of the distance between the current value and the base-line value, "
                     + "by which the activation is changed each iteration if relative decay is chosen.",
-
             increment = .1, order = 4)
     private double decayFraction = .1;
 
@@ -120,9 +112,9 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
         double val = neuron.getActivation() + neuron.getInput();
         double decayVal = 0;
 
-        if (relAbs == RELATIVE) {
+        if (updateType == UpdateType.Relative) {
             decayVal = decayFraction * Math.abs(val - baseLine);
-        } else if (relAbs == ABSOLUTE) {
+        } else  {
             decayVal = decayAmount;
         }
 
@@ -154,6 +146,13 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
         neuron.setBuffer(val);
     }
 
+    public UpdateType getUpdateType() {
+        return updateType;
+    }
+
+    public void setUpdateType(UpdateType updateType) {
+        this.updateType = updateType;
+    }
 
     @Override
     public TimeType getTimeType() {
@@ -163,7 +162,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     @Override
     public DecayRule deepCopy() {
         DecayRule dn = new DecayRule();
-        dn.setRelAbs(getRelAbs());
+        dn.setUpdateType(getUpdateType());
         dn.setDecayAmount(getDecayAmount());
         dn.setDecayFraction(getDecayFraction());
         dn.setClipped(isClipped());
@@ -229,14 +228,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
 
     public void setDecayFraction(final double decayFraction) {
         this.decayFraction = decayFraction;
-    }
-
-    public int getRelAbs() {
-        return relAbs;
-    }
-
-    public void setRelAbs(final int relAbs) {
-        this.relAbs = relAbs;
     }
 
     @Override

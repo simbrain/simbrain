@@ -166,6 +166,9 @@ public @interface UserParameter {
     /**
      * Name of a method whose value determines whether this component is {@link java.awt.Component#setEnabled(boolean)}
      */
+    // TODO: Note that this only works for initial enabling of items, and even then does not always work properly.
+    //        A problem with this is that the editor checks the object itself but while editing the object does not
+    //        change it.  Unclear how to implement this properly, and a low priority item regardless.
     String conditionalEnablingMethod() default "";
 
     /**

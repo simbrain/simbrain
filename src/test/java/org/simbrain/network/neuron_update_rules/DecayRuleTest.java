@@ -19,7 +19,7 @@ public class DecayRuleTest {
 
         // Set decay method to absolute
         DecayRule dr = (DecayRule) n.getUpdateRule();
-        dr.setRelAbs(DecayRule.ABSOLUTE);
+        dr.setUpdateType(DecayRule.UpdateType.Absolute);
 
         // Set to 1 and decay by .2
         n.setActivation(1);

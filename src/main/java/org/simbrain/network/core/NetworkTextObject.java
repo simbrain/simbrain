@@ -196,4 +196,14 @@ public class NetworkTextObject implements LocatableModel {
     public NetworkTextEvents getEvents() {
         return events;
     }
+
+    @Override
+    public String getLabel() {
+        return text;
+    }
+
+    @Override
+    public void update() {
+        // No implementation
+    }
 }

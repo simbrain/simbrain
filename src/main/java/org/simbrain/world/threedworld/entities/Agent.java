@@ -20,7 +20,7 @@ public class Agent implements Entity {
     private ModelEntity model;
     private List<Sensor> sensors = new ArrayList<Sensor>();
     private List<Effector> effectors = new ArrayList<Effector>();
-    private EntityEvents events = new EntityEvents((this));
+    private transient EntityEvents events = new EntityEvents((this));
 
     /**
      * Construct a new Agent.

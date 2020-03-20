@@ -128,7 +128,6 @@ public class StandardDialog extends GenericJDialog {
     public StandardDialog(JFrame parent, String title) {
         super(parent, title);
         init();
-        setModal(false);
     }
 
     /**
@@ -141,7 +140,6 @@ public class StandardDialog extends GenericJDialog {
             JOptionPane.showMessageDialog(null, "WARNING: You are modifying system parameters while a simulation is running. \n " + "It is reccomended that you first stop the simulation using the stop button.\n" + " Some functions may not behave as they are supposed to.", "Warning!", JOptionPane.WARNING_MESSAGE);
         }
 
-        setModal(true);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         // Setup the internal content pane to hold the user content pane

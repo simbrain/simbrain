@@ -125,16 +125,10 @@ public class CustomUpdate implements NetworkUpdateAction {
         return theAction.getLongDescription();
     }
 
-    /**
-     * @return the scriptString
-     */
     public String getScriptString() {
         return scriptString;
     }
 
-    /**
-     * @param scriptString the scriptString to set
-     */
     public void setScriptString(String scriptString) {
         this.scriptString = scriptString;
     }

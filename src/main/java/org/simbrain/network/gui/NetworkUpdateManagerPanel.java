@@ -15,7 +15,6 @@ package org.simbrain.network.gui;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.core.NetworkUpdateManager.Listener;
 import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -96,73 +95,57 @@ public class NetworkUpdateManagerPanel extends JPanel {
         // TODO: Make movement actions apply to multiple selections
         JButton upButton = new JButton(ResourceManager.getImageIcon("menu_icons/Up.png"));
         upButton.setToolTipText("Move selected action up in sequence");
-        upButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int moveMe = currentActionJList.getSelectedIndex();
-                if (moveMe != 0) {
-                    swap(moveMe, moveMe - 1);
-                    currentActionJList.setSelectedIndex(moveMe - 1);
-                    currentActionJList.ensureIndexIsVisible(moveMe - 1);
-                }
+        upButton.addActionListener(e -> {
+            int moveMe = currentActionJList.getSelectedIndex();
+            if (moveMe != 0) {
+                swap(moveMe, moveMe - 1);
+                currentActionJList.setSelectedIndex(moveMe - 1);
+                currentActionJList.ensureIndexIsVisible(moveMe - 1);
             }
         });
         buttonPanel.add(upButton);
         JButton upFullButton = new JButton(ResourceManager.getImageIcon("menu_icons/UpFull.png"));
         upFullButton.setToolTipText("Move selected action to top of sequence");
-        upFullButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int moveMe = currentActionJList.getSelectedIndex();
-                if (moveMe != 0) {
-                    swap(moveMe, 0);
-                    currentActionJList.setSelectedIndex(0);
-                    currentActionJList.ensureIndexIsVisible(0);
-                }
+        upFullButton.addActionListener(e -> {
+            int moveMe = currentActionJList.getSelectedIndex();
+            if (moveMe != 0) {
+                swap(moveMe, 0);
+                currentActionJList.setSelectedIndex(0);
+                currentActionJList.ensureIndexIsVisible(0);
             }
         });
         buttonPanel.add(upFullButton);
         JButton downButton = new JButton(ResourceManager.getImageIcon("menu_icons/Down.png"));
         downButton.setToolTipText("Move selected action down in sequence");
-        downButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int moveMe = currentActionJList.getSelectedIndex();
-                if (moveMe != currentActionListModel.getSize() - 1) {
-                    swap(moveMe, moveMe + 1);
-                    currentActionJList.setSelectedIndex(moveMe + 1);
-                    currentActionJList.ensureIndexIsVisible(moveMe + 1);
-                }
+        downButton.addActionListener(e -> {
+            int moveMe = currentActionJList.getSelectedIndex();
+            if (moveMe != currentActionListModel.getSize() - 1) {
+                swap(moveMe, moveMe + 1);
+                currentActionJList.setSelectedIndex(moveMe + 1);
+                currentActionJList.ensureIndexIsVisible(moveMe + 1);
             }
         });
         buttonPanel.add(downButton);
         JButton downFullButton = new JButton(ResourceManager.getImageIcon("menu_icons/DownFull.png"));
         downFullButton.setToolTipText("Move selected action to bottom of sequence");
-        downFullButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int moveMe = currentActionJList.getSelectedIndex();
-                int lastIndex = currentActionListModel.getSize() - 1;
-                if (moveMe != lastIndex) {
-                    swap(moveMe, lastIndex);
-                    currentActionJList.setSelectedIndex(lastIndex);
-                    currentActionJList.ensureIndexIsVisible(lastIndex);
-                }
+        downFullButton.addActionListener(e -> {
+            int moveMe = currentActionJList.getSelectedIndex();
+            int lastIndex = currentActionListModel.getSize() - 1;
+            if (moveMe != lastIndex) {
+                swap(moveMe, lastIndex);
+                currentActionJList.setSelectedIndex(lastIndex);
+                currentActionJList.ensureIndexIsVisible(lastIndex);
             }
         });
         buttonPanel.add(downFullButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
 
+        network.getEvents().onUpdateActionsChanged(this::updateCurrentActionsList);
+
         // Help button
         Action helpAction = new ShowHelpAction("Pages/Network/update.html");
         parentDialog.addButton(new JButton(helpAction));
-
-        // Listen for network updates
-        network.getUpdateManager().addListener(listener);
-
-        // TODO: Handle closing event
-        // Should remove listener from update manager when this is closed
 
     }
 
@@ -183,31 +166,27 @@ public class NetworkUpdateManagerPanel extends JPanel {
     /**
      * Renderer for lists in this panel
      */
-    private ListCellRenderer listRenderer = new ListCellRenderer() {
-        public Component getListCellRendererComponent(JList list, Object updateAction, int index, boolean isSelected, boolean cellHasFocus) {
+    private ListCellRenderer listRenderer = (list, updateAction, index, isSelected, cellHasFocus) -> {
 
-            JLabel label = new JLabel((index + 1) + ": " + ((NetworkUpdateAction) updateAction).getDescription());
-            label.setToolTipText(((NetworkUpdateAction) updateAction).getLongDescription());
-            if (index == 0) {
-                label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.LIGHT_GRAY));
-            } else {
-                label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
-            }
-            label.setBackground(null);
-            if (isSelected) {
-                label.setForeground(list.getSelectionForeground());
-                label.setBackground(list.getSelectionBackground());
-            } else {
-                label.setForeground(list.getForeground());
-                label.setBackground(list.getBackground());
-            }
-            label.setEnabled(list.isEnabled());
-            label.setFont(list.getFont());
-            label.setOpaque(true);
-            return label;
+        JLabel label = new JLabel((index + 1) + ": " + ((NetworkUpdateAction) updateAction).getDescription());
+        label.setToolTipText(((NetworkUpdateAction) updateAction).getLongDescription());
+        if (index == 0) {
+            label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.LIGHT_GRAY));
+        } else {
+            label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         }
-
-        ;
+        label.setBackground(null);
+        if (isSelected) {
+            label.setForeground(list.getSelectionForeground());
+            label.setBackground(list.getSelectionBackground());
+        } else {
+            label.setForeground(list.getForeground());
+            label.setBackground(list.getBackground());
+        }
+        label.setEnabled(list.isEnabled());
+        label.setFont(list.getFont());
+        label.setOpaque(true);
+        return label;
     };
 
     /**
@@ -378,25 +357,6 @@ public class NetworkUpdateManagerPanel extends JPanel {
         }
         repaint();
     }
-
-    /**
-     * Listener for update manager changes.
-     */
-    private Listener listener = new Listener() {
-
-        public void actionAdded(NetworkUpdateAction action) {
-            updateCurrentActionsList();
-        }
-
-        public void actionRemoved(NetworkUpdateAction action) {
-            updateCurrentActionsList();
-        }
-
-        public void actionOrderChanged() {
-            updateCurrentActionsList();
-        }
-
-    };
 
     /**
      * Handle drag and drop events

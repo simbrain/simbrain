@@ -79,4 +79,6 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
     fun onDebug(handler: Runnable) = "Debug".event(handler)
     fun fireDebug() = "Debug"()
 
+    fun onUpdateActionsChanged(handler: Runnable) = "UpdateActionsChanged".event(handler)
+    fun fireUpdateActionsChanged() = "UpdateActionsChanged"()
 }

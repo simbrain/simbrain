@@ -284,6 +284,16 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
         return events;
     }
 
+    @Override
+    public String getLabel() {
+        return "Todo: labels in multiLayerNet";
+    }
+
+    @Override
+    public void update() {
+        // TODO
+    }
+
     /**
      * For creation using an {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */

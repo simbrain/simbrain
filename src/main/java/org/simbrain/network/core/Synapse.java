@@ -1052,4 +1052,10 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
     public SynapseEvents getEvents() {
         return events;
     }
+
+    @Override
+    public String getLabel() {
+        // Label not used for synapse currently
+        return "";
+    }
 }

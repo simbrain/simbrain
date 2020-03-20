@@ -111,6 +111,13 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         id = parent.getIdManager().getId(WeightMatrix.class);
         label = id.replaceAll("_", " ");
     }
+
+    @Override
+    public String getLabel() {
+        // Label not used for weight matrix currently
+        return id;
+    }
+
     /**
      * Default update simply matrix multiplies source times matrix and sets
      * result to target.

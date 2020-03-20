@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.dl4j.ArrayConnectable;
 import org.simbrain.network.dl4j.MultiLayerNet;
@@ -35,6 +36,7 @@ import org.simbrain.util.math.SimbrainMath;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * <b>Network</b> provides core neural network functionality and is the the
@@ -206,18 +208,11 @@ public class Network {
      */
     public void update() {
 
-        // TODO: Why is this here and not at end?
+        // TODO: Why no fireupdatecompleted(true) at end?
         events.fireUpdateCompleted(false);
 
         // Main update
         updateManager.invokeAllUpdates();
-
-        // TODO
-        neuronGroups.forEach(NeuronGroup::update);
-        subnetworks.forEach(Subnetwork::update);
-        naList.forEach(NeuronArray::update);
-        neuronCollectionSet.forEach(NeuronCollection::update);
-        synapseGroups.forEach(SynapseGroup::update);
 
         //clearInputs();
         updateTime();
@@ -434,7 +429,6 @@ public class Network {
         neuronGroups.remove(ng);
         removeArrayConnectable(ng);
         ng.delete();
-        events.fireNeuronGroupRemoved(ng);
     }
 
     public void removeSynapseGroup(SynapseGroup sg) {
@@ -1235,6 +1229,7 @@ public class Network {
         WeightMatrix newMatrix = new WeightMatrix(this, source, target);
         newMatrix.initializeId();
         weightMatrices.add(newMatrix);
+        events.fireWeightMatrixAdded(newMatrix);
         return newMatrix;
     }
 
@@ -1325,7 +1320,7 @@ public class Network {
         return Collections.unmodifiableList(neuronGroups);
     }
 
-    public List<NeuronArray> getNaList() {
+    public List<NeuronArray> getNeuronArrays() {
         return Collections.unmodifiableList(naList);
     }
 

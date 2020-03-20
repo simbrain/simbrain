@@ -41,7 +41,7 @@ public class ThreeDWorld implements AppState {
     private transient ContextMenu contextMenu;
     private AtomicInteger idCounter;
 
-    private ThreeDWorldEvents events = new ThreeDWorldEvents(this);
+    private transient ThreeDWorldEvents events = new ThreeDWorldEvents(this);
 
     /**
      * Construct a new default ThreeDWorld().

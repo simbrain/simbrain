@@ -5,6 +5,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.SigmoidalRule
@@ -45,6 +46,9 @@ fun main() {
             .onEach { println("[${it.fitness}] ${it.network}") }
             .toList()
 
+    val winner: Network = result.last().network;
+    NetworkPanel.showNetwork(winner)
+
 }
 
 class XorAgent(val xorGenome: XorGenome) {
@@ -79,6 +83,7 @@ class XorAgent(val xorGenome: XorGenome) {
     }
 
 }
+
 
 class XorGenome(
         val nodeChromosome: HashMap<Int, NodeGene4> = hashMapOf(

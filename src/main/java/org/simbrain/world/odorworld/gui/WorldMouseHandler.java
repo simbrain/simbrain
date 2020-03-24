@@ -27,8 +27,11 @@ import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
+import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.SelectionMarquee;
+import org.simbrain.util.piccolo.Tile;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.dialogs.EntityDialog;
@@ -146,18 +149,15 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             } else {
-                // Later expand below to allow within-Simbrain editing of tiles.
-                // For now, editing must be done using the Tiled app
-
-                // Tile tile = odorWorldPanel.getTile(event.getPosition());
-                // if (tile == null) {
-                //     return;
-                // }
-                // AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(tile);
-                // StandardDialog dialog = ape.getDialog();
-                // dialog.setLocationRelativeTo(null);
-                // dialog.pack();
-                // dialog.setVisible(true);
+                 Tile tile = odorWorldPanel.getTile(event.getPosition());
+                 if (tile == null) {
+                     return;
+                 }
+                 AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(tile);
+                 StandardDialog dialog = ape.getDialog();
+                 dialog.setLocationRelativeTo(null);
+                 dialog.pack();
+                 dialog.setVisible(true);
             }
             return;
         }

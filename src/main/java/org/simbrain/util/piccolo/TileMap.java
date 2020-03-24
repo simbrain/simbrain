@@ -159,6 +159,7 @@ public class TileMap {
     }
 
     public void addTile(int tileID, int x, int y, boolean collision) {
+        // C = colliding, U + underneath
         String layerName = collision ? "c_program" : "u_program";
         TileMapLayer layerToAdd;
         if (programmaticLayers.get(layerName) == null) {

@@ -25,5 +25,5 @@ public class ProjectCoordinateTest {
         assertEquals(1, downstairs.getComponent(1,1), 0);
     }
 
-    //TODO: Test autofind, and initializtion of the projector
+    //TODO: Test auto-find, and initialization of the projector
 }

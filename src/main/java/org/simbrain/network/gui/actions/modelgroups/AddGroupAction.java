@@ -82,13 +82,7 @@ public final class AddGroupAction extends AbstractAction {
             // Not sure why call below needed, but for some reason the ok button
             // sometimes goes out of focus when creating a new dialog.
             dialog.getRootPane().setDefaultButton(dialog.getOkButton());
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
@@ -143,10 +137,7 @@ public final class AddGroupAction extends AbstractAction {
             }
         }
 
-        /**
-         * @param event
-         * @see AbstractAction
-         */
+
         public void actionPerformed(final ActionEvent event) {
             // Trainer trainer = new Trainer(networkPanel.getNetwork(),
             // networkPanel.getSourceModels(Neuron.class),

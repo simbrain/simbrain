@@ -354,6 +354,12 @@ public class Network {
         events.fireNeuronAdded(neuron);
     }
 
+    public void addLooseNeurons(Collection<Neuron> neurons) {
+        looseNeurons.addAll(neurons);
+        updatePriorityList();
+        neurons.forEach(events::fireNeuronAdded);
+    }
+
     /**
      * Add an ND4J array object.
      */

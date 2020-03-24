@@ -228,7 +228,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
         this.parent = parent;
         setUpdateRule(updateRule);
-        id = parent.getIdManager().getId(Neuron.class);
+        if (parent != null) {
+            id = parent.getIdManager().getId(Neuron.class);
+        }
     }
 
     /**
@@ -934,6 +936,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         events.fireClampedChange(old, clamped);
     }
 
+    @NotNull
     @Producible(defaultVisibility = false)
     public String getLabel() {
         return label;

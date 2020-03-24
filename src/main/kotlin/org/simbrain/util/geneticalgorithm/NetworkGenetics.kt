@@ -3,6 +3,7 @@ package org.simbrain.util.geneticalgorithm
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.clip
 
 class NetworkEnvironmentBuilder {
@@ -47,7 +48,7 @@ class NetworkEnvironment(eval: NetworkGenome.() -> Double, initialTemplate: List
     )
 
     fun NodeGene.mutate(): NodeGene {
-        return this
+        return copy(prototype = prototype.deepCopy().apply { (updateRule as LinearRule).bias = -1.0 })
     }
 
     fun ConnectionGene.mutate() = copy(

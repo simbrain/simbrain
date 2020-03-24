@@ -1,11 +1,14 @@
 package org.simbrain.util.geneticalgorithm
 
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.util.BiMap
 import org.simbrain.util.clip
+import org.simbrain.workspace.Workspace
 import kotlin.random.Random
 
 @DslMarker
@@ -14,7 +17,7 @@ annotation class NetworkDSLMarker
 // This may be used by a future NetworkGenome. Or it will become NetworkGenome.
 
 @NetworkDSLMarker
-class NetworkWrapper {
+open class NetworkWrapper {
 
     /**
      * Temnplate network used for all genes.  Node and connection genes have references to neurons and synapses
@@ -55,6 +58,8 @@ class NetworkWrapper {
      * node chromosomes.  They are like neuron groups.
      */
     private val nodeChromosomes = mutableListOf<NodeChromosome3>()
+
+    var eval: EvalEnvironment.() -> Double = { 0.0 }
 
     /**
      * Convenient extension to [Neuron] for adding them to a network.
@@ -126,7 +131,7 @@ class NetworkWrapper {
         newNet.mutableNodeGenes.addAll(mutableNodeGenes.map { neuron -> newNet.nodeGenes[nodeGenes[neuron]] })
         newNet.combinations = combinations.map { it.copy { neuron -> newNet.nodeGenes[nodeGenes[neuron]] } }.toMutableList()
         newNet.connectionGenes = connectionGenes.copy {
-            Synapse(newNet.nodeGenes[nodeGenes[it.source]], newNet.nodeGenes[nodeGenes[it.target]]).addToNetwork();
+            Synapse(newNet.nodeGenes[nodeGenes[it.source]], newNet.nodeGenes[nodeGenes[it.target]]).addToNetwork()
         }
     }
 
@@ -163,9 +168,12 @@ class NetworkWrapper {
         }
     }
 
-    override fun toString(): String {
-        return "Combinations:\n${combinations.joinToString("\n")}\n\nNetwork: $network"
-    }
+    override fun toString() = """
+        Combinations:
+        ${combinations.joinToString("\n")}
+        
+        Network: $network
+        """.trimIndent()
 }
 
 class NodeChromosome3(val nodes: MutableList<Neuron>)
@@ -230,10 +238,53 @@ class NeuronGroupBuilder(val network: Network) {
     inline fun neuron(config: Neuron.() -> Unit = { }) = Neuron(network).apply(config).also { neuronGroup.addNeuron(it) }
 }
 
+fun Collection<Neuron>.applyActivation(vararg activations: Double) {
+    (this zip activations.toList()).forEach { (neuron, activation) ->
+        neuron.forceSetActivation(activation)
+    }
+}
+
+class EvalEnvironment {
+
+    private val workspace by lazy { Workspace() }
+
+    /**
+     * Temnplate network used for all genes.  Node and connection genes have references to neurons and synapses
+     * which must exist in a network.  This is that network.
+     */
+    val network by lazy { Network() }.also { NetworkComponent("") }
+
+    private val component by lazy { NetworkComponent("Network", network).also { workspace.addWorkspaceComponent(it) } }
+
+    val mapping = HashMap<(Network) -> NetworkModel, NetworkModel>()
+
+    fun iterate() = workspace.simpleIterate()
+
+    operator fun ((Network) -> Neuron).invoke() = if (this in mapping) {
+        mapping[this]!! as Neuron
+    } else {
+        this(network).also { mapping[this] = it }
+    }
+
+    var Collection<(Network) -> Neuron>.activations
+        get() = map{ it() }.map { it.activation }
+        set(activations) = (map{ it() } zip activations.toList()).forEach { (neuron, activation) ->
+            neuron.forceSetActivation(activation)
+        }
+
+}
+
+class XORNetwork : NetworkWrapper() {
+    val inputs = listOf(neuron(), neuron())
+}
+
 /**
  * Test main.
  */
 fun main() {
+
+    val xor = XORNetwork()
+
 
     val baseNetwork = NetworkWrapper().apply {
         // Create separate lists for input and output neurons (which don't mutate)
@@ -250,7 +301,8 @@ fun main() {
     }
 
     // Mutate the network 10 times
-    val newNet = baseNetwork.copy().apply { repeat(10) { mutate() } }
+    val newNet = baseNetwork.copy().apply { mutate() }
+//    println(baseNetwork.eval())
 
     println(newNet)
 }

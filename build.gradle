@@ -114,6 +114,7 @@ task printStuff {
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.experimental.ExperimentalTypeInference"
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.contracts.ExperimentalContracts"
 }
 
 compileTestKotlin {

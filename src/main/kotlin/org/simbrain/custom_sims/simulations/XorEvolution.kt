@@ -1,8 +1,10 @@
 package org.simbrain.custom_sims.simulations
 
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.util.geneticalgorithm.*
+import org.simbrain.workspace.Workspace
 
 fun main() {
 
@@ -20,14 +22,16 @@ fun main() {
                 id = "Network1"
         )
         eval = {
-            neuron1.activation - 1.0
+            val workspace = Workspace().also { it.addWorkspaceComponent(NetworkComponent("net", network)) }
+            workspace.simpleIterate()
+            neuron1.activation + 1.0
         }
     }
 
     environment.runEvolution()
-            .upToGeneration(500)
+            .upToGeneration(50)
             .untilFitnessScore { it < 0.1 }
-            .onEach { println(it.best()) }
+            .onEach { println("${it.best().fitness} -> ${it.best().network}") }
             .last()
             .best()
 

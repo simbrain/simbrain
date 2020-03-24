@@ -19,7 +19,6 @@ import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.MultiLayerNetEvents;
 import org.simbrain.network.trainers.ErrorListener;
-import org.simbrain.network.trainers.IterableTrainerTemp;
 import org.simbrain.network.trainers.Trainer;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;

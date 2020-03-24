@@ -19,7 +19,7 @@
 package org.simbrain.network.gui.trainer;
 
 import org.simbrain.network.trainers.ErrorListener;
-import org.simbrain.network.trainers.IterableTrainerTemp;
+import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
@@ -44,7 +44,7 @@ public class IterativeControlsPanel extends JPanel {
     /**
      * Reference to trainer object.
      */
-    private IterableTrainerTemp trainer;
+    private IterableTrainer trainer;
 
     /**
      * Current number of iterations.
@@ -98,7 +98,7 @@ public class IterativeControlsPanel extends JPanel {
      *
      * @param trainer      the trainer this panel represents
      */
-    public IterativeControlsPanel(IterableTrainerTemp trainer) {
+    public IterativeControlsPanel(IterableTrainer trainer) {
         this.trainer = trainer;
 
         //setBorder(BorderFactory.createTitledBorder("Controls"));
@@ -237,8 +237,6 @@ public class IterativeControlsPanel extends JPanel {
     private void randomizeNetwork() {
         initTrainer(true);
         trainer.randomize();
-        //TODO
-        //panel.getNetwork().fireGroupUpdated(trainer.getTrainableNetwork().getNetwork());
     }
 
     private void editTrainerProperties() {

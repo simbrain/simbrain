@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author jyoshimi
  */
-public abstract class IterableTrainer extends Trainer implements IterableTrainerTemp {
+public abstract class IterableTrainer extends Trainer {
 
     //TODO: Fine-tune the useparameter annotations to optimize the editor dialog
 

@@ -24,6 +24,7 @@ import org.simbrain.network.events.TrainerEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +36,7 @@ import java.util.List;
  *
  * @author jeffyoshimi
  */
-public abstract class Trainer {
+public abstract class Trainer implements EditableObject {
 
     /**
      * Listener list.

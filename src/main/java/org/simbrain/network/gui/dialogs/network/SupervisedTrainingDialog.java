@@ -175,8 +175,9 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
                         validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).asDoubleArray());
                     }
                 }
-                updateData();
                 pack();
+                //setLocationRelativeTo(null);
+                updateData();
             }
         };
 

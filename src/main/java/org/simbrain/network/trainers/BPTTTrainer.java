@@ -149,8 +149,7 @@ public class BPTTTrainer extends IterableTrainer {
 
         // Update MSE/ TODO: Think about this error rep...
         mse = mse / (numRows * network.getOutputNeurons().size());
-        fireErrorUpdated();
-
+        getEvents().fireErrorUpdated();
     }
 
     /**

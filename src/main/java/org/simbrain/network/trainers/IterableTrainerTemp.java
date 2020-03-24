@@ -1,16 +1,12 @@
 package org.simbrain.network.trainers;
 
+import org.simbrain.network.events.TrainerEvents;
 import org.simbrain.util.propertyeditor.EditableObject;
 
 // TODO: Rename after refactor all trainerX classes...
 public interface IterableTrainerTemp extends EditableObject {
 
-    
-    void removeErrorListener(ErrorListener errorListener);
-
     int getIteration();
-
-    void addErrorListener(ErrorListener e);
 
     double getError();
 
@@ -25,4 +21,6 @@ public interface IterableTrainerTemp extends EditableObject {
     void randomize();
 
     void revalidateSynapseGroups();
+
+    TrainerEvents getEvents();
 }

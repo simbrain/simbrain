@@ -65,9 +65,9 @@ public class MultiLayerTrainerDialog extends JDialog {
         // Set to modeless so the dialog can be left open
         setModalityType(ModalityType.MODELESS);
 
-        // Add training tab
-        IterativeControlsPanel iterativeControls = new IterativeControlsPanel(multiLayer);
-        addTab("Train", iterativeControls);
+        // Add training tab (TODO)
+        //IterativeControlsPanel iterativeControls = new IterativeControlsPanel(multiLayer);
+        //addTab("Train", iterativeControls);
 
         // Set up initial data
         INDArray inputs = Nd4j.zeros(100, multiLayer.inputSize());

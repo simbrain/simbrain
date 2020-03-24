@@ -107,7 +107,7 @@ public class LMSIterative extends IterableTrainer {
             }
             rmsError = rmsError / (numInputs * numOutputs);
         }
-        fireErrorUpdated();
+        getEvents().fireErrorUpdated();
         incrementIteration();
     }
 

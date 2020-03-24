@@ -152,17 +152,7 @@ public class IterativeControlsPanel extends JPanel {
         propsBox.add(graphPanel);
 
         add(propsBox);
-        addErrorListener();
-    }
-
-    /**
-     * Add an error listener to the trainer to update error views.
-     */
-    private void addErrorListener() {
-        if (errorListener != null) {
-            trainer.removeErrorListener(errorListener);
-        }
-        trainer.addErrorListener(() -> {
+        trainer.getEvents().onErrorUpdated(() -> {
             iterationsLabel.setText("" + trainer.getIteration());
             updateError();
         });

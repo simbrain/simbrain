@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  *
  * @see {https://deeplearning4j.org/docs/latest/deeplearning4j-nn-multilayernetwork}
  */
-public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, LocatableModel {
+public class MultiLayerNet implements ArrayConnectable, LocatableModel {
 
     /**
      * The main dl4j object being wrapped
@@ -191,21 +191,11 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
         return Arrays.stream(network.getLayers()).map(l -> l.getClass().getSimpleName()).collect(Collectors.joining(", "));
     }
 
-    @Override
     public void iterate() throws Trainer.DataNotInitializedException {
         network.fit(dataset);
         iteration++;
         fireErrorUpdated();
     }
-
-    @Override
-    public void addErrorListener(final ErrorListener errorListener) {
-        if (errorListeners == null) {
-            errorListeners = new ArrayList<ErrorListener>();
-        }
-        errorListeners.add(errorListener);
-    }
-
 
     /**
      * Notify listeners that the error value has been updated. Only makes sense
@@ -217,50 +207,10 @@ public class MultiLayerNet implements ArrayConnectable, IterableTrainerTemp, Loc
         }
     }
 
-    @Override
-    public void removeErrorListener(ErrorListener errorListener) {
-        errorListeners.remove(errorListener);
-    }
-
-    @Override
-    public int getIteration() {
-        return iteration;
-    }
-
-    @Override
-    public double getError() {
-        return network.score();
-    }
-
-    @Override
-    public boolean isUpdateCompleted() {
-        return updateCompleted;
-    }
-
-    @Override
-    public void setUpdateCompleted(boolean uc) {
-        this.updateCompleted = uc;
-    }
-
     // TODO
     public void initData(INDArray input, INDArray targets) {
         dataset.setFeatures(input);
         dataset.setLabels(targets);
-    }
-
-    @Override
-    public void commitChanges() {
-        System.out.println("MultiLayerNet.commitChanges");
-    }
-
-    @Override
-    public void randomize() {
-        // todo
-    }
-
-    @Override
-    public void revalidateSynapseGroups() {
-
     }
 
     @NotNull

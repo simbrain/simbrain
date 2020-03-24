@@ -19,6 +19,8 @@
 package org.simbrain.network.trainers;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.events.NetworkEvents;
+import org.simbrain.network.events.TrainerEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -46,6 +48,11 @@ public abstract class Trainer {
     protected final Trainable network;
 
     /**
+     * Handle trainer events.
+     */
+    private transient TrainerEvents events = new TrainerEvents(this);
+
+    /**
      * Construct the trainer and pass in a reference to the trainable element.
      *
      * @param network the network to be trained
@@ -60,67 +67,6 @@ public abstract class Trainer {
      * @throws DataNotInitializedException when input or target data have not been set.
      */
     public abstract void apply() throws DataNotInitializedException;
-
-    /**
-     * Add a trainer listener.
-     *
-     * @param trainerListener the listener to add
-     */
-    public void addListener(final TrainerListener trainerListener) {
-        if (listeners == null) {
-            listeners = new ArrayList<TrainerListener>();
-        }
-        listeners.add(trainerListener);
-    }
-
-    /**
-     * Remove a trainer listener.
-     *
-     * @param trainerListener the listener to add
-     */
-    public void removeListener(final TrainerListener trainerListener) {
-        if (listeners != null) {
-            listeners.remove(trainerListener);
-        }
-    }
-
-    /**
-     * @return the listeners
-     */
-    public List<TrainerListener> getListeners() {
-        return Collections.unmodifiableList(listeners);
-    }
-
-    /**
-     * Notify listeners that training has begin.
-     */
-    public void fireTrainingBegin() {
-        for (TrainerListener listener : getListeners()) {
-            listener.beginTraining();
-        }
-    }
-
-    /**
-     * Notify listeners that training has ended.
-     */
-    public void fireTrainingEnd() {
-        for (TrainerListener listener : getListeners()) {
-            listener.endTraining();
-        }
-    }
-
-    /**
-     * Notify listeners of an update in training progress. Used by GUI progress
-     * bars.
-     *
-     * @param progressUpdate  string description of current state
-     * @param percentComplete how far along the training is.
-     */
-    public void fireProgressUpdate(String progressUpdate, int percentComplete) {
-        for (TrainerListener listener : getListeners()) {
-            listener.progressUpdated(progressUpdate, percentComplete);
-        }
-    }
 
     /**
      * @return the network
@@ -194,4 +140,7 @@ public abstract class Trainer {
         return newTrainer;
     }
 
+    public TrainerEvents getEvents() {
+        return events;
+    }
 }

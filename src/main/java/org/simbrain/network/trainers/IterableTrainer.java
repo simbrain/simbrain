@@ -38,11 +38,6 @@ public abstract class IterableTrainer extends Trainer implements IterableTrainer
     private boolean updateCompleted = true;
 
     /**
-     * Listener list.
-     */
-    private List<ErrorListener> errorListeners = new ArrayList<ErrorListener>();
-
-    /**
      * Iteration number. An epoch.
      */
     private int iteration;
@@ -151,7 +146,7 @@ public abstract class IterableTrainer extends Trainer implements IterableTrainer
             throw new DataNotInitializedException("Target data not initalized");
         }
 
-        fireTrainingBegin();
+        getEvents().fireBeginTraining();
         switch (stoppingCondition) {
             case NONE:
                 apply();
@@ -176,87 +171,28 @@ public abstract class IterableTrainer extends Trainer implements IterableTrainer
             default:
                 break;
         }
-        fireTrainingEnd();
+        getEvents().fireEndTraining();
 
     }
 
-    /**
-     * Notify listeners that the error value has been updated. Only makes sense
-     * for iterable methods.
-     */
-    public void fireErrorUpdated() {
-        for (ErrorListener listener : getErrorListeners()) {
-            listener.errorUpdated();
-        }
-    }
-
-    /**
-     * @return boolean updated completed.
-     */
     public boolean isUpdateCompleted() {
         return updateCompleted;
     }
 
-    /**
-     * Sets updated completed value.
-     *
-     * @param updateCompleted Updated completed value to be set
-     */
     public void setUpdateCompleted(final boolean updateCompleted) {
         this.updateCompleted = updateCompleted;
     }
 
-    /**
-     * Increment the iteration number by 1.
-     */
     public void incrementIteration() {
         iteration++;
     }
 
-    /**
-     * @param iteration the iteration to set
-     */
     public void setIteration(int iteration) {
         this.iteration = iteration;
     }
 
-    /**
-     * Return the current iteration.
-     *
-     * @return current iteration.
-     */
     public int getIteration() {
         return iteration;
-    }
-
-    /**
-     * @return the errorListener
-     */
-    public List<ErrorListener> getErrorListeners() {
-        return Collections.unmodifiableList(errorListeners);
-    }
-
-    /**
-     * Add an error listener.
-     *
-     * @param errorListener the listener to add
-     */
-    public void addErrorListener(final ErrorListener errorListener) {
-        if (errorListeners == null) {
-            errorListeners = new ArrayList<ErrorListener>();
-        }
-        errorListeners.add(errorListener);
-    }
-
-    /**
-     * Remove an error listener.
-     *
-     * @param errorListener the listener to remove
-     */
-    public void removeErrorListener(final ErrorListener errorListener) {
-        if (errorListeners != null) {
-            errorListeners.remove(errorListener);
-        }
     }
 
     /**

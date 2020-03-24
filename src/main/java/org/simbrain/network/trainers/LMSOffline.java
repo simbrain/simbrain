@@ -25,6 +25,7 @@ package org.simbrain.network.trainers;
 //import java.util.Collections;
 
 import Jama.Matrix;
+import kotlin.Pair;
 import org.ojalgo.access.Access2D.Builder;
 import org.ojalgo.access.*;
 
@@ -124,7 +125,7 @@ public class LMSOffline extends Trainer {
             throw new DataNotInitializedException("Target data not initalized");
         }
 
-        fireTrainingBegin();
+        getEvents().fireBeginTraining();
 
         int index = 0;
         for (Neuron n : network.getOutputNeurons()) {
@@ -171,7 +172,7 @@ public class LMSOffline extends Trainer {
             }
         }
 
-        fireTrainingEnd();
+        getEvents().fireEndTraining();
         revalidateSynapseGroups();
 
     }
@@ -211,13 +212,14 @@ public class LMSOffline extends Trainer {
 
             BasicMatrix teachMat = (BasicMatrix) tmpBuilder.build();
 
-            fireProgressUpdate("Correlating State Matrix (R = S'S)...", 0);
+            getEvents().fireProgressUpdated("Correlating State Matrix (R = S'S)...", 0);
             teachMat = stateMat.transpose().multiplyRight(teachMat);
 
-            fireProgressUpdate("Cross-Correlating States with Teacher data (P = S'D)...", 15);
+
+            getEvents().fireProgressUpdated("Cross-Correlating States with Teacher data (P = S'D)...", 15);
             stateMat = stateMat.transpose().multiplyRight(stateMat);
 
-            fireProgressUpdate("Computing Inverse Correlation Matrix...", 30);
+            getEvents().fireProgressUpdated("Computing Inverse Correlation Matrix...", 30);
 
             if (ridgeRegression) {
                 tmpBuilder = mf.getBuilder((int) stateMat.countRows(), (int) stateMat.countColumns());
@@ -230,7 +232,7 @@ public class LMSOffline extends Trainer {
 
             stateMat = stateMat.invert();
 
-            fireProgressUpdate("Computing Weights...", 80);
+            getEvents().fireProgressUpdated("Computing Weights", 80);
             tmpBuilder = stateMat.multiplyRight(teachMat).copyToBuilder();
             BasicMatrix finalMat = (BasicMatrix) tmpBuilder.build();
             double[][] wOut = new double[(int) tmpBuilder.countRows()]
@@ -240,14 +242,14 @@ public class LMSOffline extends Trainer {
                     wOut[i][j] = finalMat.doubleValue(i, j);
                 }
             }
-            fireProgressUpdate("Setting Weights...", 95);
+            getEvents().fireProgressUpdated("Set weights...", 95);
             SimnetUtils.setWeights(network.getInputNeurons(), network.getOutputNeurons(), wOut);
-            fireProgressUpdate("Done!", 100);
+            getEvents().fireProgressUpdated("Done!", 100);
 
             // TODO: What error does JAMA actually throw for singular Matrices?
         } catch (RuntimeException e) {
             JOptionPane.showMessageDialog(new JFrame(), "" + "State Correlation Matrix is Singular." + "\nCheck that target values are in range of output units." + "\nOtherwise, input matrix is rank-deficient.", "Training Failed", JOptionPane.ERROR_MESSAGE);
-            fireProgressUpdate("Training Failed", 0);
+            getEvents().fireProgressUpdated("Training Failed", 0);
         }
 
         trainingMatrix = null;
@@ -266,16 +268,16 @@ public class LMSOffline extends Trainer {
         Matrix inputMatrix = new Matrix(network.getTrainingSet().getInputData());
         Matrix trainingMatrix = new Matrix(network.getTrainingSet().getTargetData());
 
-        fireProgressUpdate("Computing Moore-Penrose Pseudoinverse...", 0);
+        getEvents().fireProgressUpdated("Computing Moore-Penrose Pseudoinverse...", 0);
         // Computes Moore-Penrose Pseudoinverse
         inputMatrix = Matrices.pinv(inputMatrix);
 
-        fireProgressUpdate("Computing Weights...", 50);
+        getEvents().fireProgressUpdated("Computing Weights...", 50);
         double[][] wOut = inputMatrix.times(trainingMatrix).getArray();
 
-        fireProgressUpdate("Setting Weights...", 75);
+        getEvents().fireProgressUpdated("Setting Weights...", 75);
         SimnetUtils.setWeights(network.getInputNeurons(), network.getOutputNeurons(), wOut);
-        fireProgressUpdate("Done!", 100);
+        getEvents().fireProgressUpdated("Done!", 100);
 
         inputMatrix = null;
         trainingMatrix = null;

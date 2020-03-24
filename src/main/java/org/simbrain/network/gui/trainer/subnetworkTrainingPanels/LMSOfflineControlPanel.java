@@ -269,37 +269,29 @@ public class LMSOfflineControlPanel extends JPanel {
      */
     public void addTrainerListeners() {
 
-        // Adds listeners which update the progress bars values during training
-        trainer.addListener(new TrainerListener() {
-
-            @Override
-            public void beginTraining() {
-                // System.out.println("Training Begin");
-                // progressBar.setIndeterminate(true);
-                progressBar.setValue(0);
-                setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            }
-
-            @Override
-            public void endTraining() {
-                progressBar.setIndeterminate(false);
-                progressBar.setValue(100);
-                setCursor(null); // Turn off wait cursor
-
-                // BELOW causes hard crash
-                //                networkPanel.getNetwork().fireGroupUpdated(
-                //                        ((LMSNetwork) trainer.getTrainableNetwork()
-                //                                .getNetwork()).getSynapseGroup());
-            }
-
-            @Override
-            public void progressUpdated(String progressUpdate, int percentComplete) {
-                // System.out.println(progressUpdate + " -- " + percentComplete
-                // + "%");
-                progressBar.setValue(percentComplete);
-                // progressBar.setString(progressUpdate);
-            }
+        trainer.getEvents().onBeginTraining(() -> {
+            // System.out.println("Training Begin");
+            // progressBar.setIndeterminate(true);
+            progressBar.setValue(0);
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         });
+
+        trainer.getEvents().onEndTraining(() -> {
+            progressBar.setIndeterminate(false);
+            progressBar.setValue(100);
+            setCursor(null); // Turn off wait cursor
+
+            // BELOW causes hard crash
+            //                networkPanel.getNetwork().fireGroupUpdated(
+            //                        ((LMSNetwork) trainer.getTrainableNetwork()
+            //                                .getNetwork()).getSynapseGroup());
+
+        });
+
+        trainer.getEvents().onProgressUpdated(report -> {
+            progressBar.setValue(report.getSecond());
+        });
+
     }
 
     // Various things being made visible here so ESN can set the training panel

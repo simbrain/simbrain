@@ -800,12 +800,11 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     @Override
     public void onCommit() {
         //todo
-
     }
 
     @Override
     public String getId() {
-        return null;
+        return id;
     }
 
     public String getStateInfo() {

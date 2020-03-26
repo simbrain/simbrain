@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.test;
 
+import kotlin.Pair;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.helper_classes.Simulation;
@@ -7,7 +8,6 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.*;
-import org.simbrain.util.Pair;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
 import org.simbrain.util.geneticalgorithm.odorworld.NetworkEntityGenome;

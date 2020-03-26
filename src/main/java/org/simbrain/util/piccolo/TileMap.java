@@ -3,8 +3,8 @@ package org.simbrain.util.piccolo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import kotlin.Pair;
 import org.piccolo2d.nodes.PImage;
-import org.simbrain.util.Pair;
 import org.simbrain.world.odorworld.OdorWorldResourceManager;
 
 import java.awt.*;
@@ -112,7 +112,6 @@ public class TileMap {
      * @return Initialized object.
      */
     private Object readResolve() {
-        programmaticLayers = new HashMap<>();
         changeSupport = new PropertyChangeSupport(this);
         return this;
     }
@@ -239,7 +238,7 @@ public class TileMap {
             return stack;
         }
 
-        for (TileMapLayer l : getAllLayers()) {
+        for (TileMapLayer l : layers) {
             Tile tile = tilesets.stream()
                     .map(t -> t.getTile(l.getTileIdAt(x, y)))
                     .filter(Objects::nonNull)
@@ -344,11 +343,8 @@ public class TileMap {
      *
      * @return a list of layers including the
      */
-    public List<TileMapLayer> getAllLayers() {
-        List<TileMapLayer> ret = new ArrayList<>();
-        ret.addAll(layers);
-        ret.addAll(programmaticLayers.values().stream().map(Pair::getFirst).collect(Collectors.toList()));
-        return ret;
+    public List<TileMapLayer> getLayers() {
+        return Collections.unmodifiableList(layers);
     }
 
     /**
@@ -365,7 +361,7 @@ public class TileMap {
         this.width = width;
         this.height = height;
 
-        getAllLayers().stream()
+        getLayers().stream()
                 .peek(l -> l.empty(width, height))
                 .forEach(l -> l.renderImage(tilesets, true));
 

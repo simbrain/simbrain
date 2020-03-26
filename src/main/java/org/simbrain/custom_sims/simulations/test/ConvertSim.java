@@ -1,31 +1,13 @@
 package org.simbrain.custom_sims.simulations.test;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
-import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.neuron_update_rules.*;
-import org.simbrain.util.Pair;
-import org.simbrain.util.geneticalgorithm.Agent;
-import org.simbrain.util.geneticalgorithm.Population;
-import org.simbrain.util.geneticalgorithm.odorworld.NetworkEntityGenome;
-import org.simbrain.util.math.SimbrainRandomizer;
-import org.simbrain.util.neat.NetworkGenome;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.effectors.StraightMovement;
-import org.simbrain.world.odorworld.effectors.Turning;
-import org.simbrain.world.odorworld.entities.EntityType;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.ObjectSensor;
-
-import java.util.Arrays;
 
 /**
  * Utility to convert older workspace files to new ones. Developing the code here and then will use it

@@ -40,7 +40,7 @@ public class OdorWorldTest {
     @Test
     public void testEditingExistingTile() {
         world.getTileMap().setTile("Tile Layer 1", 25, 4, 4, false);
-        assertEquals(25, world.getTileMap().getAllLayers().get(0).getTileIdAt(4, 4).intValue());
+        assertEquals(25, world.getTileMap().getLayers().get(0).getTileIdAt(4, 4).intValue());
     }
 
     @Test

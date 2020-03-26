@@ -1,17 +1,11 @@
 package org.simbrain.util.geneticalgorithm.odorworld;
 
-import org.simbrain.custom_sims.helper_classes.Simulation;
+import kotlin.Pair;
 import org.simbrain.custom_sims.simulations.test.EvolveOdorWorldAgent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.util.Pair;
 import org.simbrain.util.geneticalgorithm.Genome;
 import org.simbrain.util.neat.NetworkGenome;
-import org.simbrain.util.neat.NodeGene;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.Sensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import java.util.function.Supplier;
 

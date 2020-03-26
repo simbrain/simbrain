@@ -5,7 +5,8 @@ import org.junit.Test;
 import org.simbrain.util.piccolo.Tile;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 // Another example of a simple test.  To be updated and improved.  Still in initial experimentation with unit tests...
 public class OdorWorldTest {
@@ -32,19 +33,25 @@ public class OdorWorldTest {
 
     @Test
     public void testOdorWorldSetTile() {
-        world.getTileMap().addTile(5, 4, 4, true);
+        world.getTileMap().setTile(5, 4, 4, true);
         assert(world.getTileMap().getTileStackAt(4, 4).stream().map(Tile::getId).anyMatch(id -> id == 5));
     }
 
     @Test
+    public void testEditingExistingTile() {
+        world.getTileMap().setTile("Tile Layer 1", 25, 4, 4, false);
+        assertEquals(25, world.getTileMap().getAllLayers().get(0).getTileIdAt(4, 4).intValue());
+    }
+
+    @Test
     public void testOdorWorldSetTileCollision() {
-        world.getTileMap().addTile(5, 4, 4, true);
+        world.getTileMap().setTile(5, 4, 4, true);
         assert(world.getTileMap().hasCollisionTile(4, 4));
     }
 
     @Test
     public void testOdorWorldSetTileNonCollision() {
-        world.getTileMap().addTile(5, 4, 4, false);
+        world.getTileMap().setTile(5, 4, 4, false);
         assert(!world.getTileMap().hasCollisionTile(4, 4));
     }
 

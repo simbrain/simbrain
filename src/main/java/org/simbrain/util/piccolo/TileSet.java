@@ -3,6 +3,7 @@ package org.simbrain.util.piccolo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import org.simbrain.util.ImageKt;
 import org.simbrain.world.odorworld.OdorWorldResourceManager;
 
 import java.awt.*;
@@ -88,7 +89,7 @@ public class TileSet {
     /**
      * Texture to use when the tile id is out of range.
      */
-    private transient BufferedImage transparentTexture = null;
+    private transient Image transparentTexture = null;
 
     /**
      * A globally accessible transparent texture.
@@ -129,7 +130,7 @@ public class TileSet {
         if (missingTexture == null) {
             missingTexture = OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png");
             // TODO: find better transparent texture solution
-            transparentTexture = OdorWorldResourceManager.getBufferedImage("tilemap/transparent32x32.png");
+            transparentTexture = ImageKt.transparentImage(tilewidth, tileheight);
         }
 
         index -= firstgid;

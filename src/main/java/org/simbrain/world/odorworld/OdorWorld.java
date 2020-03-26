@@ -188,7 +188,7 @@ public class OdorWorld implements EditableObject {
     }
 
     public void addTile() {
-        tileMap.addTile(
+        tileMap.setTile(
                 61,
                 (int) lastClickedPosition.getX() / tileMap.getTilewidth(),
                 (int) lastClickedPosition.getY() / tileMap.getTileheight(),

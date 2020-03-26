@@ -3,13 +3,11 @@ package org.simbrain.util.piccolo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.extended.NamedMapConverter;
 import org.piccolo2d.nodes.PImage;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -187,5 +185,9 @@ public class TileMapLayer {
         this.width = width;
         this.height = height;
         data = new TiledData(width, height);
+    }
+
+    public PImage getLayer() {
+        return layer;
     }
 }

@@ -95,7 +95,7 @@ public class WeightMatrixNode extends ScreenElement {
 
         if (weightMatrix.isEnableRendering()) {
             float[] activations = Nd4j.toFlattened(weightMatrix.getWeightMatrix()).toFloatVector();
-            img = ImageKt.toImage(
+            img = ImageKt.toSimbrainColorImage(
                     activations,
                     weightMatrix.getWeightMatrix().columns(),
                     weightMatrix.getWeightMatrix().rows()

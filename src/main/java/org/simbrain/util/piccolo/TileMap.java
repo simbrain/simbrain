@@ -13,8 +13,8 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -86,11 +86,6 @@ public class TileMap {
     private ArrayList<TileMapLayer> layers = new ArrayList<>();
 
     /**
-     * Layers of the rendered map images
-     */
-    private transient ArrayList<PImage> renderedLayers = null;
-
-    /**
      * Layers used when user adds tiles by hand, e.g. using a script or by right clicking
      * and adding a tile.
      */
@@ -101,6 +96,8 @@ public class TileMap {
      * (Not used for now)
      */
     private Color backgroundcolor;
+
+    private boolean guiEnabled = false;
 
     /**
      * Support for property change events.
@@ -148,43 +145,31 @@ public class TileMap {
      * Get a list of images of each layer of this map.
      * @return the list of layer images
      */
-    public ArrayList<PImage> createImageList() {
-        if (renderedLayers == null) {
-            renderedLayers = new ArrayList<>();
-            for (TileMapLayer l : layers) {
-                renderedLayers.add(l.renderImage(tilesets));
-            }
-        }
-        return renderedLayers;
+    public List<PImage> createImageList() {
+        guiEnabled = true;
+        return layers.stream().map(l -> l.renderImage(tilesets)).collect(Collectors.toList());
     }
 
-    public void addTile(int tileID, int x, int y, boolean collision) {
-        // C = colliding, U + underneath
-        String layerName = collision ? "c_program" : "u_program";
-        TileMapLayer layerToAdd;
-        if (programmaticLayers.get(layerName) == null) {
-            layerToAdd = new TileMapLayer(layerName, width, height, collision);
-            layers.add(layerToAdd);
-        } else {
-            layerToAdd = programmaticLayers.get(layerName).getFirst();
-        }
+    public void setTile(int tileID, int x, int y, boolean collision) {
+        setTile(collision ? "c_program" : "u_program", tileID, x, y, collision);
+    }
+
+    public void setTile(String layerName, int tileID, int x, int y, boolean collision) {
+        TileMapLayer layerToAdd = layers.stream()
+                .filter(l -> l.getName().equals(layerName))
+                .findFirst()
+                .orElseGet(() -> {
+                    var newLayer = new TileMapLayer(layerName, width, height, collision);
+                    layers.add(newLayer);
+                    return newLayer;
+                });
         layerToAdd.setTileID(tileID, x, y);
 
-        // update rendered image only when renderedLayers exists (which implies GUI is running)
-        if (renderedLayers != null) {
-            PImage oldRenderedImage = null;
-            if (programmaticLayers.containsKey(layerName)) {
-                oldRenderedImage = programmaticLayers.get(layerName).getSecond();
-                renderedLayers.remove(oldRenderedImage);
-            }
-
-            PImage newRenderedImage = layerToAdd.renderImage(tilesets, true);
-            programmaticLayers.put(layerName, new Pair<>(layerToAdd, newRenderedImage));
-            renderedLayers.add(newRenderedImage);
-
+        if (guiEnabled) {
+            var oldRenderedImage = layerToAdd.getLayer();
+            var newRenderedImage = layerToAdd.renderImage(tilesets, true);
             changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage);
         }
-
 
     }
 
@@ -380,11 +365,9 @@ public class TileMap {
         this.width = width;
         this.height = height;
 
-        renderedLayers = new ArrayList<>();
-
         getAllLayers().stream()
                 .peek(l -> l.empty(width, height))
-                .forEach(l -> renderedLayers.add(l.renderImage(tilesets, true)));
+                .forEach(l -> l.renderImage(tilesets, true));
 
     }
 

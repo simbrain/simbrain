@@ -5,7 +5,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.CharArrayReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -119,7 +122,7 @@ public class TiledData {
      * @param width the width of the tile map layer
      */
     public void setTileID(int tileID, int x, int y, int width) {
-        gid.set(x + y * width, tileID);
+        getGid().set(x + y * width, tileID);
     }
 
 }

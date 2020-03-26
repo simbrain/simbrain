@@ -25,8 +25,8 @@ public class OdorWorldTest {
     public void testOdorWorldSetEntityCenterLocation() {
         OdorWorldEntity entity = new OdorWorldEntity(world);
         entity.setCenterLocation(10,20);
-        assert(entity.getCenterLocation()[0] == 10);
-        assert(entity.getCenterLocation()[1] == 20);
+        assertEquals(10, entity.getCenterLocation()[0],0.01);
+        assertEquals(20, entity.getCenterLocation()[1], 0.01);
     }
 
     @Test

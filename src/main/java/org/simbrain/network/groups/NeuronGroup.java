@@ -65,7 +65,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * "Prototype" update rule.
      */
     @UserParameter(label = "Group Update Rule", useSetter = true, order = 20)
-    private UpdateRuleEnum groupUpdateRule;
+    private UpdateRuleEnum groupUpdateRule = UpdateRuleEnum.LINEAR;
 
     /**
      * Default layout for neuron groups.

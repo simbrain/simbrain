@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
+import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 
 import static org.junit.Assert.*;
 
@@ -18,7 +19,9 @@ public class NeuronGroupTest {
             ng.addNeuron(new Neuron(net));
         }
         NeuronGroup ng2 = ng.deepCopy(net);
-        assertTrue(ng2.getNeuronList().size() == 10);
+        assertEquals(10, ng2.getNeuronList().size());
+        // Labels should not be copied
+        assertNotEquals("test", ng2.getLabel());
     }
 
     @Test

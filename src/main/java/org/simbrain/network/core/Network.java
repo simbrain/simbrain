@@ -1227,11 +1227,6 @@ public class Network {
             removeWeightMatrix(target.getIncomingWeightMatrix());
         }
 
-        // Don't allow weight matrices between neuron collections and neuron groups
-        if (((source instanceof NeuronCollection || source instanceof NeuronGroup)
-                && (target instanceof NeuronCollection || target instanceof NeuronGroup))) {
-            return null;
-        }
         WeightMatrix newMatrix = new WeightMatrix(this, source, target);
         newMatrix.initializeId();
         weightMatrices.add(newMatrix);

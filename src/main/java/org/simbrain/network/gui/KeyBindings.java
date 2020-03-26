@@ -289,51 +289,12 @@ public class KeyBindings {
             }
         });
 
-        // inputMap.put(KeyStroke.getKeyStroke("6"), "createDL4JGroup");
-        // panel.getActionMap().put("createDL4JGroup", new AbstractAction() {
-        //     public void actionPerformed(ActionEvent e) {
-        //         List<WeightMatrix> matrices = panel.getWeightMatricesFromSelectedNeuronArrays();
-        //         if (matrices.size() < 1) {
-        //             return;
-        //         }
-        //         List<Layer> layers = MultiLayerNet.getLayerFromWeightMatrices(matrices);
-        //         MultiLayerNet newNetwork = new MultiLayerNet(layers);
-        //
-        //         System.out.println(newNetwork);
-        //
-        //         if (matrices.get(0).getSource().getIncomingWeightMatrix() == null) {
-        //             return;
-        //         }
-        //
-        //         ArrayConnectable source = matrices.get(0).getSource().getIncomingWeightMatrix().getSource();
-        //
-        //         if (source != null) {
-        //             panel.addWeightMatrix(source, newNetwork);
-        //             System.out.println("Connected to source");
-        //         }
-        //
-        //         if (matrices.get(matrices.size() - 1).getTarget().getOutgoingWeightMatrix() == null) {
-        //             return;
-        //         }
-        //
-        //         ArrayConnectable target =
-        //                 matrices.get(matrices.size() - 1).getTarget().getOutgoingWeightMatrix().getTarget();
-        //
-        //         if (target != null) {
-        //             panel.addWeightMatrix(newNetwork, target);
-        //             System.out.println("Connected to target");
-        //         }
-        //
-        //         panel.getSelectedModelNeuronArrays();
-        //     }
-        // });
-
-        //inputMap.put(KeyStroke.getKeyStroke("7"), "multiLayerNet");
-        //panel.getActionMap().put("multiLayerNet", new AbstractAction() {
-        //    public void actionPerformed(ActionEvent e) {
-        //        panel.showMultiLayerNetworkCreationDialog();
-        //    }
-        //});
+        inputMap.put(KeyStroke.getKeyStroke("6"), "weightMatrix");
+        panel.getActionMap().put("weightMatrix", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                panel.connectWithWeightMatrix();
+            }
+        });
 
         inputMap.put(KeyStroke.getKeyStroke("8"), "printCenterXY");
         panel.getActionMap().put("printCenterXY", new AbstractAction() {

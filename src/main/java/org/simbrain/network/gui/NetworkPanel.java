@@ -1442,6 +1442,13 @@ public class NetworkPanel extends JPanel {
     }
 
     /**
+     * Connect all selected {@link ArrayConnectable}s with {@link WeightMatrix} objects.
+     */
+    public void connectWithWeightMatrix() {
+        addWeightMatricesFromSelection();
+    }
+
+    /**
      * Connect source and target model items.
      * <br>
      * If a either source or target model items are ND4J, connect with a weight matrix
@@ -1453,9 +1460,6 @@ public class NetworkPanel extends JPanel {
      * connect to the neurons "inside" of neuron group).
      */
     public void connectSelectedModels() {
-
-        // Handle weight matrices to and from nd4j objects
-        addWeightMatricesFromSelection();
 
         // Handle adding synapse groups between neuron groups
         if(AddSynapseGroupAction.displaySynapseGroupDialog(this)) {

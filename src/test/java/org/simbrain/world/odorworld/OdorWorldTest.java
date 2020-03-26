@@ -2,11 +2,9 @@ package org.simbrain.world.odorworld;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.simbrain.util.piccolo.Tile;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 // Another example of a simple test.  To be updated and improved.  Still in initial experimentation with unit tests...
 public class OdorWorldTest {
@@ -32,27 +30,9 @@ public class OdorWorldTest {
     }
 
     @Test
-    public void testOdorWorldSetTile() {
-        world.getTileMap().setTile(5, 4, 4, true);
-        assert(world.getTileMap().getTileStackAt(4, 4).stream().map(Tile::getId).anyMatch(id -> id == 5));
-    }
-
-    @Test
     public void testEditingExistingTile() {
-        world.getTileMap().setTile("Tile Layer 1", 25, 4, 4, false);
+        world.getTileMap().editTile("Tile Layer 1", 25, 4, 4);
         assertEquals(25, world.getTileMap().getLayers().get(0).getTileIdAt(4, 4).intValue());
-    }
-
-    @Test
-    public void testOdorWorldSetTileCollision() {
-        world.getTileMap().setTile(5, 4, 4, true);
-        assert(world.getTileMap().hasCollisionTile(4, 4));
-    }
-
-    @Test
-    public void testOdorWorldSetTileNonCollision() {
-        world.getTileMap().setTile(5, 4, 4, false);
-        assert(!world.getTileMap().hasCollisionTile(4, 4));
     }
 
     @Test
@@ -60,5 +40,11 @@ public class OdorWorldTest {
         world.getTileMap().updateMapSize(20, 10);
         assert(world.getTileMap().getMapWidthInTiles() == 20);
         assert(world.getTileMap().getMapHeightInTiles() == 10);
+    }
+
+    @Test
+    public void testSetCollisionProperty() {
+        world.getTileMap().getLayer("Tile Layer 1").setProperty("collide", "true");
+        assertTrue(world.getTileMap().getLayer("Tile Layer 1").isCollideLayer());
     }
 }

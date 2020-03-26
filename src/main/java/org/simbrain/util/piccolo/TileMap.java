@@ -3,7 +3,6 @@ package org.simbrain.util.piccolo;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
-import kotlin.Pair;
 import org.piccolo2d.nodes.PImage;
 import org.simbrain.world.odorworld.OdorWorldResourceManager;
 
@@ -86,12 +85,6 @@ public class TileMap {
     private ArrayList<TileMapLayer> layers = new ArrayList<>();
 
     /**
-     * Layers used when user adds tiles by hand, e.g. using a script or by right clicking
-     * and adding a tile.
-     */
-    private transient Map<String, Pair<TileMapLayer, PImage>> programmaticLayers = new HashMap<>();
-
-    /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)
      * (Not used for now)
      */
@@ -149,24 +142,12 @@ public class TileMap {
         return layers.stream().map(l -> l.renderImage(tilesets)).collect(Collectors.toList());
     }
 
-    public void setTile(int tileID, int x, int y, boolean collision) {
-        setTile(collision ? "c_program" : "u_program", tileID, x, y, collision);
-    }
-
-    public void setTile(String layerName, int tileID, int x, int y, boolean collision) {
-        TileMapLayer layerToAdd = layers.stream()
-                .filter(l -> l.getName().equals(layerName))
-                .findFirst()
-                .orElseGet(() -> {
-                    var newLayer = new TileMapLayer(layerName, width, height, collision);
-                    layers.add(newLayer);
-                    return newLayer;
-                });
-        layerToAdd.setTileID(tileID, x, y);
-
+    public void editTile(String layerName, int tileID, int x, int y) {
+        var layer = getLayer(layerName);
+        layer.setTileID(tileID, x, y);
         if (guiEnabled) {
-            var oldRenderedImage = layerToAdd.getLayer();
-            var newRenderedImage = layerToAdd.renderImage(tilesets, true);
+            var oldRenderedImage = layer.getLayerImage();
+            var newRenderedImage = layer.renderImage(tilesets, true);
             changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage);
         }
 
@@ -339,12 +320,23 @@ public class TileMap {
     }
 
     /**
-     * Get a list of tile map layer including the {@link #programmaticLayers}.
+     * Get a list of tile map layers.
      *
      * @return a list of layers including the
      */
     public List<TileMapLayer> getLayers() {
         return Collections.unmodifiableList(layers);
+    }
+
+    /**
+     * Get layer by name.
+     */
+    public TileMapLayer getLayer(String name) {
+        return layers.stream()
+                .filter(l -> name.equals(l.getName()))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalArgumentException(name + " not a tile layer name "));
     }
 
     /**

@@ -187,7 +187,17 @@ public class TileMapLayer {
         data = new TiledData(width, height);
     }
 
-    public PImage getLayer() {
+    /**
+     * Return the rendered image.  See {@link #renderImage}
+     */
+    public PImage getLayerImage() {
         return layer;
+    }
+
+    public void setProperty(String propertyName, String propertyValue) {
+        if (properties == null) {
+            this.properties = new HashMap<>();
+        }
+        properties.put(propertyName, propertyValue);
     }
 }

@@ -190,7 +190,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
      * @param newPoint the new point
      */
     @Consumable
-        public void addPoint(double[] newPoint) {
+    public void addPoint(double[] newPoint) {
         if (newPoint.length != projectionModel.getProjector().getDimensions()) {
             projectionModel.getProjector().init(newPoint.length);
         }

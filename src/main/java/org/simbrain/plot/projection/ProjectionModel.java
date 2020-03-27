@@ -86,45 +86,11 @@ public class ProjectionModel implements AttributeContainer {
         }
         //fireChartInitialized(projector.getDimensions());
         resetData();
-        addListeners();
+        projector.getEvents().onDatasetInitialized(this::resetData);
+        projector.getEvents().onPointAdded(this::resetData);
+        projector.getEvents().onProjectionMethodChanged(this::resetData);
     }
 
-    /**
-     * Add listener to model projection component. For the most part the purpose
-     * here is to update the chart data points to sync them with the projector
-     * object when a change happens in the projector object.
-     */
-    private void addListeners() {
-        projector.addListener(new ProjectorListener() {
-
-            @Override
-            public void projectionMethodChanged() {
-                // System.out.println("ProjectionModel: In method changed");
-                resetData();
-            }
-
-            @Override
-            public void projectorDataChanged() {
-                // System.out.println("ProjectionModel: In data changed");
-                resetData();
-            }
-
-            @Override
-            public void datapointAdded() {
-                // System.out.println("ProjectionModel: In data added");
-                // TODO: For some projection methods full data reset is not
-                // really required...
-                resetData();
-            }
-
-            @Override
-            public void projectorColorsChanged() {
-                // System.out.println("ProjectionModel: In color changed");
-            }
-
-        });
-
-    }
 
     /**
      * Returns the projector.
@@ -146,7 +112,6 @@ public class ProjectionModel implements AttributeContainer {
         dataset = new XYSeriesCollection();
         dataset.addSeries(new XYSeries("Data", false, true));
         projector.postOpenInit();
-        addListeners();
         return this;
     }
 

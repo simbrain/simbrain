@@ -373,7 +373,28 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
 
         // Other initialization
         initializeComboBoxes();
-        addListeners();
+
+        Projector proj = getWorkspaceComponent().getProjectionModel().getProjector();
+        proj.getEvents().onDatasetInitialized(this::update);
+        proj.getEvents().onProjectionMethodChanged(this::update);
+        proj.getEvents().onColorsChanged(() -> {
+            proj.resetColors();
+            update();
+        });
+
+        // Epsilon field should update the model whenever a user clicks out of
+        // it.
+        sammonStepSize.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                ProjectionMethod proj = getWorkspaceComponent().getProjector().getProjectionMethod();
+                if (proj != null) {
+                    if (proj instanceof ProjectSammon) {
+                        ((ProjectSammon) proj).setEpsilon(Utils.doubleParsable(sammonStepSize.getText()));
+                    }
+                }
+            }
+        });
         updateToolBar();
         update();
 
@@ -410,7 +431,7 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
                     if (proj instanceof ProjectCoordinate) {
                         ((ProjectCoordinate) proj).setHiD1(adjustDimension1.getSelectedIndex());
                         ((ProjectCoordinate) proj).project();
-                        getWorkspaceComponent().getProjector().fireProjectorDataChanged();
+                        getWorkspaceComponent().getProjector().getEvents().fireDatasetInitialized();
                     }
                 }
             }
@@ -426,7 +447,7 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
                     if (proj instanceof ProjectCoordinate) {
                         ((ProjectCoordinate) proj).setHiD2(adjustDimension2.getSelectedIndex());
                         ((ProjectCoordinate) proj).project();
-                        getWorkspaceComponent().getProjector().fireProjectorDataChanged();
+                        getWorkspaceComponent().getProjector().getEvents().fireDatasetInitialized();
                     }
                 }
             }
@@ -483,57 +504,6 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
 
     }
 
-    /**
-     * Add listeners. The chart listener mainly concerns workspace and gui level
-     * stuff. The projector listener concerns the underlying projection model.
-     */
-    private void addListeners() {
-
-        // Listen to events from the underlying projector model.
-        // Currently the main action is to just update the labels at the bottom.
-        getWorkspaceComponent().getProjectionModel().getProjector().addListener(new ProjectorListener() {
-
-            @Override
-            public void projectionMethodChanged() {
-                // System.out.println("ProjectionGui: In method changed");
-                update();
-            }
-
-            @Override
-            public void projectorDataChanged() {
-                // System.out.println("ProjectionGui: In data changed");
-                update();
-            }
-
-            @Override
-            public void datapointAdded() {
-                // System.out.println("ProjectionGui: In data added");
-            }
-
-            @Override
-            public void projectorColorsChanged() {
-                // System.out.println("ProjectionGui: In colors changed");
-                getWorkspaceComponent().getProjectionModel().getProjector().resetColors();
-                update();
-            }
-
-        });
-
-        // Epsilon field should update the model whenever a user clicks out of
-        // it.
-        sammonStepSize.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                ProjectionMethod proj = getWorkspaceComponent().getProjector().getProjectionMethod();
-                if (proj != null) {
-                    if (proj instanceof ProjectSammon) {
-                        ((ProjectSammon) proj).setEpsilon(Utils.doubleParsable(sammonStepSize.getText()));
-                    }
-                }
-            }
-        });
-
-    }
 
     /**
      * Update the Coordinate projection combo boxes.

@@ -20,6 +20,11 @@ package org.simbrain.util.projection;
 
 import Jama.Matrix;
 import com.Ostermiller.util.CSVPrinter;
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.api.buffer.DataType;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.NDArrayFactory;
+import org.nd4j.linalg.factory.Nd4j;
 import org.pmw.tinylog.Logger;
 
 import java.io.File;
@@ -185,7 +190,7 @@ public class Dataset {
     }
 
     /**
-     * Set the refererence to the current point and also the reference to the last point.
+     * Set the reference to the current point and also the reference to the last point.
      */
     private void setCurrentPoint(DataPoint newCurrent) {
         lastPoint = currentPoint;
@@ -838,5 +843,40 @@ public class Dataset {
 
     public DataPoint getLastPoint() {
         return lastPoint;
+    }
+
+    /**
+     * Returns the data as a double array.
+     */
+    public double[][] getDoubleArray() {
+        double[][] ret = new double[getNumPoints()][getDimensions()];
+        for (int i = 0; i < getNumPoints(); i++) {
+            ret[i] = getPoint(i).getVector();
+        }
+        return ret;
+    }
+
+    /**
+     * Set data using double array
+     */
+    public void setData(final double[][] data) {
+        clear();
+        for (double[] row : data) {
+            this.addPoint(new DataPoint(row));
+        }
+    }
+
+    /**
+     * Get ND4J representation of the data
+     */
+    public INDArray getArray() {
+        INDArray array = Nd4j.zeros(getNumPoints(),dimensions);
+        for (int i = 0; i < getNumPoints(); i++) {
+            double[] arr = getPoint(i).getVector();
+            for (int j = 0; j < dimensions; j++) {
+                array.put(i,j,(float) arr[j]);
+            }
+        }
+        return array;
     }
 }

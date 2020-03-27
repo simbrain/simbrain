@@ -24,7 +24,6 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,11 +40,6 @@ import java.util.*;
  * Cf. {@url https://en.wikipedia.org/wiki/Dimensionality_reduction}
  */
 public class Projector implements AttributeContainer {
-
-    /**
-     * Listener list.
-     */
-    private transient List<ProjectorListener> listeners;
 
     /**
      * A set of hi-d datapoints, each of which is an array of doubles The data
@@ -75,7 +69,7 @@ public class Projector implements AttributeContainer {
     /**
      * Distance within which added points are considered old and are thus not added.
      */
-    protected double tolerance;
+    protected double tolerance = SimbrainPreferences.getDouble("projectorTolerance");;
 
     /**
      * References to projection objects.
@@ -89,7 +83,7 @@ public class Projector implements AttributeContainer {
     private boolean useColorManager = true;
 
     /**
-     * List of Neuron update rules; used in Gui Combo boxes.
+     * List of projection methods; used in Gui Combo boxes.
      */
     private final HashMap<Class<?>, String> projectionMethods = new LinkedHashMap<Class<?>, String>();
 
@@ -99,13 +93,17 @@ public class Projector implements AttributeContainer {
     private OneStepPrediction predictor = new OneStepPrediction();
 
     /**
+     * Handle network events.
+     */
+    private transient ProjectorEvents events = new ProjectorEvents(this);
+
+    /**
      * Probability of the current state relative to the {@link #predictor} object.
      */
     private double currentStateProbabilty = 0;
 
     // Initialization
     {
-        listeners = new ArrayList<ProjectorListener>();
         colorManager = new DataColoringManager(this);
 
         projectionMethods.put(ProjectCoordinate.class, "Coordinate Projection");
@@ -114,7 +112,6 @@ public class Projector implements AttributeContainer {
         projectionMethods.put(ProjectTriangulate.class, "Triangulation");
         projectionMethods.put(ProjectSammon.class, "Sammon Map");
 
-        tolerance = SimbrainPreferences.getDouble("projectorTolerance");
     }
 
     /**
@@ -141,18 +138,6 @@ public class Projector implements AttributeContainer {
     }
 
     /**
-     * Add a projector listener.
-     *
-     * @param projectorListener the listener to add
-     */
-    public void addListener(final ProjectorListener projectorListener) {
-        if (listeners == null) {
-            listeners = new ArrayList<ProjectorListener>();
-        }
-        listeners.add(projectorListener);
-    }
-
-    /**
      * Initialize projector to accept data of a specified dimension.
      *
      * @param dims dimensionality of the high dimensional dataset
@@ -161,14 +146,14 @@ public class Projector implements AttributeContainer {
         // TODO: This seems to be called twice when adding a projection component.
         upstairs = new Dataset(dims);
         downstairs = new Dataset(2);
-        fireProjectorDataChanged();
+        events.fireDatasetInitialized();
     }
 
     /**
      * Updates datasets from persistent forms of data.
      */
     public void postOpenInit() {
-        listeners = new ArrayList<ProjectorListener>();
+        events = new ProjectorEvents(this);
         upstairs.postOpenInit();
         downstairs.postOpenInit();
     }
@@ -178,7 +163,7 @@ public class Projector implements AttributeContainer {
      *
      * @param point the upstairs point to add
      */
-    public void addDatapoint(final DataPointColored point) {
+    public void addDatapoint(final DataPoint point) {
 
         Logger.debug("addDatapoint called");
         if (point.getDimension() != this.getDimensions() || (projectionMethod == null) || (getUpstairs() == null)) {
@@ -211,7 +196,7 @@ public class Projector implements AttributeContainer {
             }
             downstairs.addPoint(newPoint);
             projectionMethod.project();
-            fireDataPointAdded();
+            events.firePointAdded();
         }
 
         if (useColorManager) {
@@ -239,7 +224,7 @@ public class Projector implements AttributeContainer {
     public void setProjectionMethod(final ProjectionMethod method) {
         projectionMethod = method;
         method.init();
-        this.fireProjectionMethodChanged();
+        events.fireProjectionMethodChanged();
         projectionMethod.project();
     }
 
@@ -294,7 +279,7 @@ public class Projector implements AttributeContainer {
         }
         projectionMethod.init();
         projectionMethod.project();
-        fireProjectorDataChanged();
+        events.fireDatasetInitialized();
     }
 
     /**
@@ -316,42 +301,6 @@ public class Projector implements AttributeContainer {
             return 0;
         }
         return upstairs.getDimensions();
-    }
-
-    /**
-     * Notify listeners that a new datapoint has been added to the projector.
-     */
-    public void fireDataPointAdded() {
-        for (ProjectorListener listener : listeners) {
-            listener.datapointAdded();
-        }
-    }
-
-    /**
-     * Notify listeners that the projection method has been changed.
-     */
-    public void fireProjectionMethodChanged() {
-        for (ProjectorListener listener : listeners) {
-            listener.projectionMethodChanged();
-        }
-    }
-
-    /**
-     * Notify listeners that the colors of some datapoints have changed but nothing else.
-     */
-    public void fireProjectorColorsChanged() {
-        for (ProjectorListener listener : listeners) {
-            listener.projectorColorsChanged();
-        }
-    }
-
-    /**
-     * Notify listeners that data (in particular the underlying points) have been changed.
-     */
-    public void fireProjectorDataChanged() {
-        for (ProjectorListener listener : listeners) {
-            listener.projectorDataChanged();
-        }
     }
 
     /**
@@ -395,7 +344,7 @@ public class Projector implements AttributeContainer {
     public void reset() {
         upstairs.clear();
         downstairs.clear();
-        fireProjectorDataChanged();
+        events.fireDatasetInitialized();
         predictor.clear();
         // getCurrentProjectionMethod().resetColorIndices();
     }
@@ -443,7 +392,7 @@ public class Projector implements AttributeContainer {
      */
     public void randomize(int upperBound) {
         downstairs.randomize(upperBound);
-        this.fireProjectorDataChanged();
+        events.fireDatasetInitialized();
     }
 
     public DataColoringManager getColorManager() {
@@ -508,5 +457,9 @@ public class Projector implements AttributeContainer {
     @Override
     public String getId() {
         return "Projector";
+    }
+
+    public ProjectorEvents getEvents() {
+        return events;
     }
 }

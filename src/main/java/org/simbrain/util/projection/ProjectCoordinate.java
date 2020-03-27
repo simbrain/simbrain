@@ -120,7 +120,7 @@ public class ProjectCoordinate extends ProjectionMethod {
         if (autoFind) {
             init();
             project();
-            projector.fireProjectorDataChanged();
+            projector.getEvents().fireDatasetInitialized();
         }
     }
 }

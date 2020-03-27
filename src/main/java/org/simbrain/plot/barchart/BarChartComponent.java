@@ -79,11 +79,6 @@ public class BarChartComponent extends WorkspaceComponent {
         return model;
     }
 
-    /**
-     * Returns model.
-     *
-     * @return the model.
-     */
     public BarChartModel getModel() {
         return model;
     }

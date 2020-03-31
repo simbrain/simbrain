@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import java.awt.Point
 import java.awt.Polygon
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Line2D
@@ -58,6 +59,9 @@ val Point2D.abs
 
 operator fun Point2D.component1() = x
 operator fun Point2D.component2() = y
+
+operator fun Point.component1() = x
+operator fun Point.component2() = y
 
 // Lines
 fun line(p1: Point2D, p2: Point2D) = Line2D.Double(p1, p2)

@@ -15,7 +15,7 @@ import org.simbrain.network.neuron_update_rules.KuramotoRule;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -156,7 +156,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         // Set up odor world
         OdorWorldWrapper world = sim.addOdorWorld(338, 10, 436, 516, "World");
         world.getWorld().setObjectsBlockMovement(false);
-        world.getWorld().setTileMap(TileMap.create("empty.tmx"));
+        world.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
 
         // Mouse
         mouse = world.addEntity(202, 176, EntityType.MOUSE);

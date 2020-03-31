@@ -13,7 +13,7 @@ import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -174,7 +174,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         world = worldBuilder.getWorld();
         world.setObjectsBlockMovement(false);
         //world.setWrapAround(false);
-        world.setTileMap(TileMap.create("empty.tmx"));
+        world.setTileMap(TMXUtils.loadTileMap("empty.tmx"));
         initializeWorldObjects();
 
         // Add all simulations (first added is default)

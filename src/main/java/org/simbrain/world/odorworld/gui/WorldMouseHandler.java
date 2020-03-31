@@ -27,11 +27,8 @@ import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
-import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.SelectionMarquee;
-import org.simbrain.util.piccolo.Tile;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.dialogs.EntityDialog;
@@ -42,6 +39,9 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+
+import static org.simbrain.util.SwingKt.present;
+import static org.simbrain.util.piccolo.TMXUtils.editor;
 
 /**
  * Handle simbrain drag events, which pan the canvas, create lassos for
@@ -149,15 +149,7 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             } else {
-                 Tile tile = odorWorldPanel.getTile(event.getPosition());
-                 if (tile == null) {
-                     return;
-                 }
-                 AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(tile);
-                 StandardDialog dialog = ape.getDialog();
-                 dialog.setLocationRelativeTo(null);
-                 dialog.pack();
-                 dialog.setVisible(true);
+                present(editor(odorWorldPanel.getWorld().getTileMap(), event.getPosition()));
             }
             return;
         }

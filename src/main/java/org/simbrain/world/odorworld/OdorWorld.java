@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld;
 import org.simbrain.util.SimpleId;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
@@ -50,7 +51,7 @@ public class OdorWorld implements EditableObject {
     /**
      * Basic tilemap that determines the size and basic features of the world.
      */
-    private TileMap tileMap = TileMap.create("empty.tmx");
+    private TileMap tileMap = TMXUtils.loadTileMap("empty.tmx");
 
     /**
      * Sum of lengths of smell vectors for all smelly objects in the world.
@@ -190,8 +191,8 @@ public class OdorWorld implements EditableObject {
     public void addTile() {
         tileMap.editTile(
                 "program_layer", 61,
-                (int) lastClickedPosition.getX() / tileMap.getTilewidth(),
-                (int) lastClickedPosition.getY() / tileMap.getTileheight());
+                (int) lastClickedPosition.getX() / tileMap.getTileWidth(),
+                (int) lastClickedPosition.getY() / tileMap.getTileHeight());
     }
 
     /**

@@ -123,14 +123,14 @@ public class OdorWorldPanel extends JPanel {
 
         if (tileSelectionBox == null) {
             int tileCoordinateX =
-                    (int) (world.getLastClickedPosition().getX() / world.getTileMap().getTilewidth());
+                    (int) (world.getLastClickedPosition().getX() / world.getTileMap().getTileWidth());
             int tileCoordinateY =
-                    (int) (world.getLastClickedPosition().getY() / world.getTileMap().getTileheight());
+                    (int) (world.getLastClickedPosition().getY() / world.getTileMap().getTileHeight());
             tileSelectionModel = new Rectangle(
-                    tileCoordinateX * world.getTileMap().getTilewidth(),
-                    tileCoordinateY * world.getTileMap().getTileheight(),
-                    world.getTileMap().getTilewidth(),
-                    world.getTileMap().getTileheight()
+                    tileCoordinateX * world.getTileMap().getTileWidth(),
+                    tileCoordinateY * world.getTileMap().getTileHeight(),
+                    world.getTileMap().getTileWidth(),
+                    world.getTileMap().getTileHeight()
             );
             tileSelectionBox = PPath.createRectangle(
                     tileSelectionModel.getX(),
@@ -343,7 +343,7 @@ public class OdorWorldPanel extends JPanel {
         }
     }
 
-    public List<Tile> getTileStack(Point point) {
+    public List<Tile> getTileStack(Point2D point) {
         return world.getTileMap().getTileStackAtPixel(point);
     }
 

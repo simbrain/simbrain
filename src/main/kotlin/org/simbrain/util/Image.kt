@@ -17,6 +17,13 @@ fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor()
     BufferedImage(colorModel, raster, false, null)
 }
 
+fun IntArray.toRGBImage(width: Int, height: Int): BufferedImage {
+    val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
+    val sampleModel = colorModel.createCompatibleSampleModel(width, height)
+    val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(this, size), null)
+    return BufferedImage(colorModel, raster, false, null)
+}
+
 fun FloatArray.toGrayScaleImage(width: Int, height: Int) = this
         .map { (it.clip(0.0f, 1.0f) * 255).toByte() }
         .toByteArray()

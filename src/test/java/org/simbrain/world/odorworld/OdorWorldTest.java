@@ -32,19 +32,19 @@ public class OdorWorldTest {
     @Test
     public void testEditingExistingTile() {
         world.getTileMap().editTile("Tile Layer 1", 25, 4, 4);
-        assertEquals(25, world.getTileMap().getLayers().get(0).getTileIdAt(4, 4).intValue());
+        assertEquals(25, world.getTileMap().getLayers().get(0).get(4, 4));
     }
 
     @Test
     public void testUpdateMapSize() {
         world.getTileMap().updateMapSize(20, 10);
-        assert(world.getTileMap().getMapWidthInTiles() == 20);
-        assert(world.getTileMap().getMapHeightInTiles() == 10);
+        assert(world.getTileMap().getWidth() == 20);
+        assert(world.getTileMap().getHeight() == 10);
     }
 
     @Test
     public void testSetCollisionProperty() {
         world.getTileMap().getLayer("Tile Layer 1").setProperty("collide", "true");
-        assertTrue(world.getTileMap().getLayer("Tile Layer 1").isCollideLayer());
+        assertTrue(world.getTileMap().getLayer("Tile Layer 1").getCollision());
     }
 }

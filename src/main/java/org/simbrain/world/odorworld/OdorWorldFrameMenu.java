@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -134,7 +134,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
         loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Empty World") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("empty.tmx"));
+                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
             }
         }));
 
@@ -142,14 +142,14 @@ public class OdorWorldFrameMenu extends JMenuBar {
         loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Ari's World") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("aris_world.tmx"));
+                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("aris_world.tmx"));
             }
         }));
 
         loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Yulin's World") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TileMap.create("yulins_world.tmx"));
+                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("yulins_world.tmx"));
             }
         }));
 

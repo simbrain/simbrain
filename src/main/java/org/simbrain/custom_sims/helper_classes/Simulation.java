@@ -12,6 +12,7 @@ import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.Utils;
+import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -205,11 +206,11 @@ public class Simulation {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
         workspace.addWorkspaceComponent(odorWorldComponent);
 
-        TileMap tileMap = TileMap.create(tmxFile);
+        TileMap tileMap = TMXUtils.loadTileMap(tmxFile);
 
         // The following operation will clear the content of all layers, so do it only if the tmx is empty.tmx
         if (tmxFile.equals("empty.tmx")) {
-            tileMap.updateMapSize(width / tileMap.getTilewidth(), height / tileMap.getTileheight());
+            tileMap.updateMapSize(width / tileMap.getTileWidth(), height / tileMap.getTileHeight());
         }
 
         odorWorldComponent.getWorld().setTileMap(tileMap);
@@ -223,7 +224,7 @@ public class Simulation {
     public OdorWorldWrapper addOdorWorldTMX(int x, int y, String tmxFile) {
         OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
         workspace.addWorkspaceComponent(odorWorldComponent);
-        odorWorldComponent.getWorld().setTileMap(TileMap.create(tmxFile));
+        odorWorldComponent.getWorld().setTileMap(TMXUtils.loadTileMap(tmxFile));
         return createOdorWorldWrapper(x, y, odorWorldComponent);
     }
 

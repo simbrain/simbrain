@@ -23,7 +23,7 @@ import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -137,7 +137,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Set up odor world
         OdorWorldWrapper world = sim.addOdorWorld(547, 5, 504, 548, "World");
         world.getWorld().setObjectsBlockMovement(false);
-        world.getWorld().setTileMap(TileMap.create("empty.tmx"));
+        world.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
         OdorWorldEntity mouse = world.addEntity(120, 245, EntityType.MOUSE);
         mouse.setUpdateHeadingBasedOnVelocity(true);
         mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/5, 40));

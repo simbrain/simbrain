@@ -24,9 +24,10 @@ public class OdorWorldTest {
     @Test
     public void testOdorWorldSetEntityCenterLocation() {
         OdorWorldEntity entity = new OdorWorldEntity(world);
-        entity.setCenterLocation(10,20);
-        assertEquals(10, entity.getCenterLocation()[0],0.01);
-        assertEquals(20, entity.getCenterLocation()[1], 0.01);
+        // Keep in mind mouse is 35 pixels
+        entity.setCenterLocation(40,60);
+        assertEquals(40, entity.getCenterLocation()[0],0.01);
+        assertEquals(60, entity.getCenterLocation()[1], 0.01);
     }
 
     @Test

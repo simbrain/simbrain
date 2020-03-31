@@ -54,6 +54,9 @@ fun loadTileMap(filename: String): TileMap {
             File.separator + filename)) as TileMap
 }
 
+/**
+ * Returns a dialog that is used to pick a tile image.
+ */
 fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDialog().apply {
 
     var pickedTiled = currentGid
@@ -100,6 +103,9 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
     }
 }
 
+/**
+ * Returns the main editor dialog.
+ */
 fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
 
     BoxLayout(this, BoxLayout.LINE_AXIS)
@@ -137,15 +143,15 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
             val labelField = JTextField().apply { preferredSize = Dimension(240, 24) }
             val typeField = JTextField().apply { preferredSize = Dimension(240, 24) }
 
-            val labelInherit = JCheckBox("inherit?")
-            val typeInherit = JCheckBox("inherit?")
+            //val labelInherit = JCheckBox("inherit?")
+            //val typeInherit = JCheckBox("inherit?")
 
             add(labelLabel)
             add(labelField)
-            add(labelInherit)
+            //add(labelInherit)
             add(typeLabel)
             add(typeField)
-            add(typeInherit)
+            //add(typeInherit)
 
             layout = GroupLayout(this).apply {
                 autoCreateGaps = true
@@ -162,23 +168,23 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
                                                 .addComponent(labelField)
                                                 .addComponent(typeField)
                                 )
-                                .addGroup(
-                                        createParallelGroup()
-                                                .addComponent(labelInherit)
-                                                .addComponent(typeInherit)
-                                )
+                                //.addGroup(
+                                //        createParallelGroup()
+                                //                .addComponent(labelInherit)
+                                //                .addComponent(typeInherit)
+                                //)
                 )
                 setVerticalGroup(
                         createSequentialGroup()
                                 .addGroup(createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(labelLabel)
                                         .addComponent(labelField)
-                                        .addComponent(labelInherit)
+                                        //.addComponent(labelInherit)
                                 )
                                 .addGroup(createParallelGroup(GroupLayout.Alignment.BASELINE)
                                         .addComponent(typeLabel)
                                         .addComponent(typeField)
-                                        .addComponent(typeInherit)
+                                        //.addComponent(typeInherit)
                                 )
                 )
             }

@@ -105,7 +105,7 @@ class TileMapLayer(
      * @param x the x coordinate on map
      * @param y the y coordinate on map
      */
-    operator fun set(tileID: Int, x: Int, y: Int) {
+    operator fun set(x: Int, y: Int, tileID: Int) {
         data.gid[x + y * width] = tileID
     }
 

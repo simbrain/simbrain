@@ -3,18 +3,19 @@ package org.simbrain.network.gui
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
+import org.simbrain.util.scale
 import java.awt.BasicStroke
 import java.awt.Color
-import java.awt.Image
+import java.awt.image.BufferedImage
 import javax.swing.SwingUtilities
 
 class ImageBox(val width: Int, val height: Int, thickness: Float) : PNode() {
 
-    var image: Image? = null
+    var image: BufferedImage? = null
         set(image) {
             field = image
             SwingUtilities.invokeLater {
-                pImage.image = image
+                pImage.image = image!!.scale(100, 100)
                 setBounds(0.0, 0.0, width.toDouble(), height.toDouble())
             }
         }

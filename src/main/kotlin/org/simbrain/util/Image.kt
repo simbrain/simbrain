@@ -45,3 +45,8 @@ fun BufferedImage.scale(factor: Double) = BufferedImage(width, height, BufferedI
     AffineTransformOp(AffineTransform().apply { scale(factor, factor) }, AffineTransformOp.TYPE_NEAREST_NEIGHBOR)
             .filter(this, it)!!
 }
+
+fun BufferedImage.scale(w: Int, h: Int) = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB).let {
+    AffineTransformOp(AffineTransform().also { it.scale(w.toDouble() / width, h.toDouble() / height) },
+            AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(this, it)!!
+}

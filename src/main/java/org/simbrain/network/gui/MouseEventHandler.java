@@ -29,10 +29,7 @@ import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PDimension;
 import org.piccolo2d.util.PNodeFilter;
-import org.simbrain.network.gui.nodes.InteractionBox;
-import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.ScreenElement;
-import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.network.gui.nodes.*;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.SelectionMarquee;
 
@@ -179,6 +176,11 @@ final class MouseEventHandler extends PDragSequenceEventHandler {
             // NeuronNode's moving flag no longer used. See NeuronNode comments.
             //((NeuronNode) pickedNode).setMoving(true);
         }
+
+        if (pickedNode.getParent() != null && pickedNode.getParent().getParent() instanceof WeightMatrixNode) {
+            pickedNode = pickedNode.getParent().getParent();
+        }
+
 
         if (! (pickedNode instanceof ScreenElement)) {
             return;

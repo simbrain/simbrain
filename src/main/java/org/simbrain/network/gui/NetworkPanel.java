@@ -1074,7 +1074,7 @@ public class NetworkPanel extends JPanel {
                 network.removeNeuronArray(arrayNode.getNeuronArray());
             } else if (selectedNode instanceof WeightMatrixNode) {
                 WeightMatrixNode wmNode = (WeightMatrixNode) selectedNode;
-                network.removeWeightMatrix(wmNode.getWeightMatrix());
+                network.removeWeightMatrix(wmNode.getModel());
             } else if (selectedNode instanceof TextNode) {
                 TextNode selectedTextNode = (TextNode) selectedNode;
                 network.deleteText(selectedTextNode.getTextObject());

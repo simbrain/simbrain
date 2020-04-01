@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.nd4j.linalg.factory.Nd4j;
+import org.piccolo2d.PNode;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.WeightMatrixEvents;
@@ -23,11 +24,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * A visual representation of a weight matrix
  */
-public class WeightMatrixNode extends ScreenElement {
+public class WeightMatrixNode extends ScreenElement implements PropertyChangeListener {
 
     /**
      * The weight matrix this node represents
@@ -48,7 +51,6 @@ public class WeightMatrixNode extends ScreenElement {
      * Height of the {@link #imageBox}
      */
     private int imageHeight = 100;
-
 
     /**
      * Parent network panel.
@@ -72,8 +74,9 @@ public class WeightMatrixNode extends ScreenElement {
 
         imageBox = new ImageBox(imageWidth, imageHeight, 4);
         addChild(imageBox);
-
         renderMatrixToImage();
+        setBounds(imageBox.getBounds());
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
         setPickable(true);
 
@@ -85,6 +88,10 @@ public class WeightMatrixNode extends ScreenElement {
 
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent arg0) {
+        setBounds(imageBox.getFullBounds());
+    }
 
     /**
      * Render the weight matrix to the {@link #imageBox}.
@@ -243,7 +250,4 @@ public class WeightMatrixNode extends ScreenElement {
         return weightMatrix;
     }
 
-    public WeightMatrix getWeightMatrix() {
-        return weightMatrix;
-    }
 }

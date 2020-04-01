@@ -12,8 +12,8 @@ import java.awt.Color
 
 class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode() {
 
-    private val source get() = weightMatrixNode.weightMatrix.source
-    private val target get() = weightMatrixNode.weightMatrix.target
+    private val source get() = weightMatrixNode.model.source
+    private val target get() = weightMatrixNode.model.target
     private fun isBidirectional() = target.outgoingWeightMatrices.any { it.target == source }
 
     private val arrow = if (source == target) {

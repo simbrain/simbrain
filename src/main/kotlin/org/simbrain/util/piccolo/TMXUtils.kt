@@ -10,9 +10,7 @@ import org.simbrain.util.Utils
 import org.simbrain.util.present
 import org.simbrain.util.transparentImage
 import org.simbrain.world.odorworld.OdorWorldResourceManager
-import java.awt.BasicStroke
-import java.awt.Color
-import java.awt.Dimension
+import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
@@ -22,6 +20,7 @@ import javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
 import javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
 import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
+
 
 val zeroTile by lazy { Tile(0) }
 
@@ -109,19 +108,22 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
  */
 fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
 
-    BoxLayout(this, BoxLayout.LINE_AXIS)
+    val gbc = GridBagConstraints()
 
     title = "Set tile(s) at (${pixelCoordinate.x}, ${pixelCoordinate.y})"
 
+    preferredSize = Dimension(250,350)
+
     val mainPanel = JPanel().apply {
-        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        layout = GridBagLayout()
+        gbc.fill = GridBagConstraints.HORIZONTAL
+        gbc.weightx = 1.0
+        gbc.gridx = 0
     }
 
     fun tilePanel(name: String, tile: Tile) = JPanel(SpringLayout()).apply titlePanel@{
 
-        border = TitledBorder(MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY), name)
-
-        background = Color.red;
+        border = TitledBorder(MatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY), name)
 
         val image = tileImage(tile.id)
 
@@ -141,61 +143,6 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
             })
         }
 
-        val propertiesPanel = JPanel().apply propertiesPanel@{
-            val labelLabel = JLabel("Label")
-            val typeLabel = JLabel("Type")
-
-            val labelField = JTextField().apply { preferredSize = Dimension(240, 24) }
-            val typeField = JTextField().apply { preferredSize = Dimension(240, 24) }
-
-            //val labelInherit = JCheckBox("inherit?")
-            //val typeInherit = JCheckBox("inherit?")
-
-            add(labelLabel)
-            add(labelField)
-            //add(labelInherit)
-            add(typeLabel)
-            add(typeField)
-            //add(typeInherit)
-
-            layout = GroupLayout(this).apply {
-                autoCreateGaps = true
-
-                setHorizontalGroup(
-                        createSequentialGroup()
-                                .addGroup(
-                                        createParallelGroup()
-                                                .addComponent(labelLabel)
-                                                .addComponent(typeLabel)
-                                )
-                                .addGroup(
-                                        createParallelGroup()
-                                                .addComponent(labelField)
-                                                .addComponent(typeField)
-                                )
-                                //.addGroup(
-                                //        createParallelGroup()
-                                //                .addComponent(labelInherit)
-                                //                .addComponent(typeInherit)
-                                //)
-                )
-                setVerticalGroup(
-                        createSequentialGroup()
-                                .addGroup(createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(labelLabel)
-                                        .addComponent(labelField)
-                                        //.addComponent(labelInherit)
-                                )
-                                .addGroup(createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(typeLabel)
-                                        .addComponent(typeField)
-                                        //.addComponent(typeInherit)
-                                )
-                )
-            }
-
-        }
-
         layout = GroupLayout(this).apply {
 
             autoCreateGaps = true
@@ -204,24 +151,25 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
             setHorizontalGroup(
                     createSequentialGroup()
                             .addComponent(tileViewer)
-                            //.addComponent(propertiesPanel)
+                    //.addComponent(propertiesPanel)
             )
             setVerticalGroup(
                     createParallelGroup(GroupLayout.Alignment.CENTER)
                             .addComponent(tileViewer)
-                            //.addComponent(propertiesPanel)
+                    //.addComponent(propertiesPanel)
             )
         }
 
         add(tileViewer)
-        //add(propertiesPanel)
+
     }
 
     (layers.map { it.name } zip getTileStackAtPixel(pixelCoordinate)).reversed().forEach { (name, tile) ->
-        mainPanel.add(tilePanel(name, tile))
+        mainPanel.add(tilePanel(name, tile), gbc)
     }
 
-    contentPane = mainPanel
+    contentPane = JScrollPane(mainPanel)
 
     pack()
+    setLocationRelativeTo(null)
 }

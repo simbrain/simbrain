@@ -60,6 +60,7 @@ fun loadTileMap(filename: String): TileMap {
 fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDialog().apply {
 
     var pickedTiled = currentGid
+    title = "Pick / Edit Tile"
 
     fun PLayer.renderTileSet(tileSet: TileSet) {
         with(tileSet) {
@@ -110,6 +111,8 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
 
     BoxLayout(this, BoxLayout.LINE_AXIS)
 
+    title = "Set tile(s) at (${pixelCoordinate.x}, ${pixelCoordinate.y})"
+
     val mainPanel = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
     }
@@ -117,6 +120,8 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
     fun tilePanel(name: String, tile: Tile) = JPanel(SpringLayout()).apply titlePanel@{
 
         border = TitledBorder(MatteBorder(1, 0, 0, 0, Color.LIGHT_GRAY), name)
+
+        background = Color.red;
 
         val image = tileImage(tile.id)
 
@@ -199,17 +204,17 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
             setHorizontalGroup(
                     createSequentialGroup()
                             .addComponent(tileViewer)
-                            .addComponent(propertiesPanel)
+                            //.addComponent(propertiesPanel)
             )
             setVerticalGroup(
                     createParallelGroup(GroupLayout.Alignment.CENTER)
                             .addComponent(tileViewer)
-                            .addComponent(propertiesPanel)
+                            //.addComponent(propertiesPanel)
             )
         }
 
         add(tileViewer)
-        add(propertiesPanel)
+        //add(propertiesPanel)
     }
 
     (layers.map { it.name } zip getTileStackAtPixel(pixelCoordinate)).reversed().forEach { (name, tile) ->

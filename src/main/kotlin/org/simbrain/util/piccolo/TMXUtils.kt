@@ -5,13 +5,9 @@ package org.simbrain.util.piccolo
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PLayer
 import org.piccolo2d.nodes.PPath
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Utils
-import org.simbrain.util.present
-import org.simbrain.util.transparentImage
+import org.simbrain.util.*
 import org.simbrain.world.odorworld.OdorWorldResourceManager
 import java.awt.*
-import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
 import java.io.File
@@ -112,7 +108,9 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
 
     val gbc = GridBagConstraints()
 
-    title = with(pixelCoordinate.toTileCoordinate()) { "Set tile(s) at ($x, $y)" }
+    val (x, y) = pixelCoordinate.toTileCoordinate()
+
+    title = "Set tile(s) at ($x, $y)"
 
     preferredSize = Dimension(250,350)
 
@@ -123,7 +121,9 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
         gbc.gridx = 0
     }
 
-    fun tilePanel(name: String, tile: Tile) = JPanel(SpringLayout()).apply titlePanel@{
+    class TilePanel(var onCommit: () -> Unit = { }) : JPanel()
+
+    fun tilePanel(name: String, tile: Tile, change: (Int) -> Unit) = TilePanel().apply titlePanel@{
 
         border = TitledBorder(MatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY), name)
 
@@ -134,15 +134,12 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
             preferredSize = Dimension(image.getWidth(null) + 8, image.getHeight(null) + 8)
             isContentAreaFilled = false
             isFocusPainted = true
-            addMouseListener(object : MouseAdapter() {
-                override fun mouseClicked(e: MouseEvent?) {
-                    if (e?.clickCount == 2) {
-                        tileSets.tilePicker(tile.id) {
-                            this@button.icon = ImageIcon(tileImage(it))
-                        }.also { it.pack() }.present()
-                    }
-                }
-            })
+            onDoubleClick {
+                tileSets.tilePicker(tile.id) {
+                    this@button.icon = ImageIcon(tileImage(it))
+                    onCommit = { change(it) }
+                }.also { it.pack() }.present()
+            }
         }
 
         layout = GroupLayout(this).apply {
@@ -166,9 +163,11 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
 
     }
 
-    (layers.map { it.name } zip getTileStackAtPixel(pixelCoordinate)).reversed().forEach { (name, tile) ->
-        mainPanel.add(tilePanel(name, tile), gbc)
-    }
+    val panels = (layers zip getTileStackAt(x, y)).reversed()
+            .map { (layer, tile) -> tilePanel(layer.name, tile) { layer.editTile(x, y, it) } }
+            .onEach { mainPanel.add(it, gbc) }
+
+    addClosingTask { panels.forEach { it.onCommit() } }
 
     contentPane = JScrollPane(mainPanel)
 

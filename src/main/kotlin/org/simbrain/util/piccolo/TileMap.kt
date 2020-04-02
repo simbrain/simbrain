@@ -123,12 +123,19 @@ class TileMap {
         return layers.map { it.renderImage(tileSets) }
     }
 
-    fun editTile(layerName: String, tileID: Int, x: Int, y: Int) {
-        val layer = getLayer(layerName)
-        layer[x, y] = tileID
+    fun renderLayer(layer: TileMapLayer) {
+        layer.renderImage(tileSets)
+    }
+
+    fun editTile(layerName: String, x: Int, y: Int, tileID: Int) {
+        getLayer(layerName).editTile(x, y, tileID)
+    }
+
+    fun TileMapLayer.editTile(x: Int, y: Int, tileID: Int) {
+        this[x, y] = tileID
         if (guiEnabled) {
-            val oldRenderedImage = layer.layerImage
-            val newRenderedImage = layer.renderImage(tileSets, true)
+            val oldRenderedImage = layerImage
+            val newRenderedImage = renderImage(tileSets, true)
             changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage)
         }
     }
@@ -146,7 +153,7 @@ class TileMap {
             getTileStackAtPixel(x, y).any { t: Tile -> t.id == id }
 
 
-    private fun getTile(gid: Int) = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
+    fun getTile(gid: Int) = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
             .firstOrNull { (range, _) -> gid in range }
             ?.let { (_, tileSet) -> tileSet[gid] } ?: zeroTile
 
@@ -222,9 +229,7 @@ class TileMap {
      * @param p pixel location
      * @return the corresponding tile location
      */
-    fun pixelToTileCoordinate(p: Point2D): Point {
-        return pixelToTileCoordinate(p.x, p.y)
-    }
+    fun Point2D.toTileCoordinate() = pixelToTileCoordinate(x, y)
 
     /**
      * Get layer by name.

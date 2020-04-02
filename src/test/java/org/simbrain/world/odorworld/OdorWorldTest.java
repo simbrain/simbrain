@@ -32,7 +32,7 @@ public class OdorWorldTest {
 
     @Test
     public void testEditingExistingTile() {
-        world.getTileMap().editTile("Tile Layer 1", 25, 4, 4);
+        world.getTileMap().editTile("Tile Layer 1", 4, 4, 25);
         assertEquals(25, world.getTileMap().getLayers().get(0).get(4, 4));
     }
 

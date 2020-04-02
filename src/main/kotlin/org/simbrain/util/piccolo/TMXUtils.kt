@@ -91,7 +91,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
                                 paint = null
                             })
                             remover = { it.removeAllChildren() }
-                            block(it.gid)
+                            pickedTiled = it.gid
                         }
                     }
                 }
@@ -101,6 +101,8 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
             })
         }
     }
+
+    addClosingTask { block(pickedTiled) }
 }
 
 /**
@@ -110,7 +112,7 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
 
     val gbc = GridBagConstraints()
 
-    title = "Set tile(s) at (${pixelCoordinate.x}, ${pixelCoordinate.y})"
+    title = with(pixelCoordinate.toTileCoordinate()) { "Set tile(s) at ($x, $y)" }
 
     preferredSize = Dimension(250,350)
 

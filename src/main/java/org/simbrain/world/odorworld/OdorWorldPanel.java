@@ -246,8 +246,13 @@ public class OdorWorldPanel extends JPanel {
                 if ("layerImageChanged".equals(e.getPropertyName())) {
                     PImage oldImage = (PImage) e.getOldValue();
                     PImage newImage = (PImage) e.getNewValue();
+                    int index = canvas.getLayer().indexOfChild(oldImage);
                     canvas.getLayer().removeChild(oldImage);
-                    canvas.getLayer().addChild(newImage);
+                    if (index != -1) {
+                        canvas.getLayer().addChild(index, newImage);
+                    } else {
+                        canvas.getLayer().addChild(newImage);
+                    }
                 }
             });
             syncToModel();

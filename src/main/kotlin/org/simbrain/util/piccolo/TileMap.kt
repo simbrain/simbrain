@@ -131,6 +131,7 @@ class TileMap {
         getLayer(layerName).editTile(x, y, tileID)
     }
 
+    // TODO: should not be able to edit tile map layers that don't belong to this map
     fun TileMapLayer.editTile(x: Int, y: Int, tileID: Int) {
         this[x, y] = tileID
         if (guiEnabled) {

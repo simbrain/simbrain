@@ -24,7 +24,7 @@ import java.util.*
  * Simbrain wrapper for a [TileMap] tile.
  */
 @XStreamAlias("tile")
-class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0) var id: Int) : EditableObject {
+class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, editable = false) var id: Int) : EditableObject {
 
     /**
      * Custom properties defined in tmx.
@@ -38,18 +38,18 @@ class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0) var id: I
     private val properties = HashMap<String, String>()
 
     /**
-     * Label for this tile
+     * Type of this tile. This way multiple tiles can be associated with the same type.
      */
     @Transient
-    @UserParameter(label = "Label", description = "label", order = 1)
-    private var label: String = "Tile $id"
+    @UserParameter(label = "Type", description = "type", order = 20)
+    private var type: String = "Type $id"
 
     /**
      * Type of this tile. Multiple tiles can be associated with the same type.
      */
     @Transient
-    @UserParameter(label = "Type", description = "type", order = 2)
-    private var type: String = "Type $id"
+    @UserParameter(label = "Collision", useSetter = true, description = "If true, objects will collide with tiles that have this id", order = 30)
+    var collision: Boolean = false
 
     /**
      * Standard method call made to objects after they are deserialized. See:
@@ -59,8 +59,12 @@ class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0) var id: I
      * @return Initialized object.
      */
     private fun readResolve(): Any {
-        label = properties["label"] ?: "Tile$id"
         type = properties["type"] ?: "$id"
+        collision = properties["collision"]?.toBoolean() ?: false
         return this
+    }
+
+    override fun getName(): String {
+        return "$id"
     }
 }

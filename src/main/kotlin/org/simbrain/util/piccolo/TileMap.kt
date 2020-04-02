@@ -173,14 +173,15 @@ class TileMap {
 
 
     /**
-     * Check if a give tile location contains any tiles in a collision layer (layer that contains "c_").
+     * Check if a given tile location contains any tiles or layers that with the collision property.
      *
      * @param x x in tile coordinate
      * @param y y in tile coordinate
      * @return true if the given location has a collision tile
      */
-    fun hasCollisionTile(x: Int, y: Int) =
-            layers.filter { it.collision }.map { getTile(it[x, y]) }.any { it.id != 0 }
+    fun collidingAt(x: Int, y: Int) =
+            layers.filter { it.collision }.map { getTile(it[x, y]) }.any { it.id != 0 } ||
+                    layers.map{ getTile(it[x,y]) }.any{ it.collision }
 
     /**
      * Get a Rectangle2D region of a given tile

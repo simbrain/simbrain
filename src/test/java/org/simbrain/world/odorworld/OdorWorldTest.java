@@ -45,7 +45,7 @@ public class OdorWorldTest {
 
     @Test
     public void testSetCollisionProperty() {
-        world.getTileMap().getLayer("Tile Layer 1").setProperty("collide", "true");
+        world.getTileMap().getLayer("Tile Layer 1").setProperty("collision", "true");
         assertTrue(world.getTileMap().getLayer("Tile Layer 1").getCollision());
     }
 }

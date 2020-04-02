@@ -5,8 +5,13 @@
  </editorsettings>
  <tileset firstgid="1" name="tileset_kenney" tilewidth="32" tileheight="32" spacing="2" tilecount="1767" columns="57">
   <image source="tilesets/tileset_kenney.png" width="1936" height="1052"/>
+  <tile id="62">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
+   </properties>
+  </tile>
  </tileset>
- <layer id="1" name="non blocking" width="40" height="25" visible="0">
+ <layer id="1" name="non blocking" width="40" height="25">
   <data encoding="csv">
 6,6,6,6,6,6,6,179,6,6,6,6,6,179,179,179,544,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,527,527,527,527,527,
 6,6,6,6,6,6,6,179,6,6,6,179,179,179,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,

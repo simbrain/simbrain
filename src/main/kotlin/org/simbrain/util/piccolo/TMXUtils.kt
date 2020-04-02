@@ -6,6 +6,7 @@ import org.piccolo2d.PCanvas
 import org.piccolo2d.PLayer
 import org.piccolo2d.nodes.PPath
 import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.world.odorworld.OdorWorldResourceManager
 import java.awt.*
 import java.awt.event.MouseEvent
@@ -54,9 +55,12 @@ fun loadTileMap(filename: String): TileMap {
  */
 fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDialog().apply {
 
-    var pickedTiled = currentGid
+    var pickedTile = currentGid
     title = "Pick / Edit Tile"
 
+    /**
+     * Make a PNode for every tile in a tileset and add to the canvas.
+     */
     fun PLayer.renderTileSet(tileSet: TileSet) {
         with(tileSet) {
             (firstgid until firstgid + tilecount).map { PTiledImage(getTileImage(it), it) }
@@ -72,22 +76,34 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
         }
     }
 
-    var remover: () -> Unit = { }
+    var selectionBoxRemover: () -> Unit = { }
 
+    // Set content pane to a set of tabs, each showing a tileset
     contentPane = JTabbedPane().apply {
         this@tilePicker.forEach { tileSet ->
+            // Add a new tab for each tileset
             addTab(tileSet.name, PCanvas().apply {
                 layer.renderTileSet(tileSet)
+                // Respond to clicks
                 addInputEventListener { event, type ->
                     event.pickedNode.let {
                         if (it is PTiledImage && type == MouseEvent.MOUSE_CLICKED) {
-                            remover()
+                            // Remove any previous black rectangle
+                            selectionBoxRemover()
+                            // Add black rectangle around selected tile
                             it.addChild(PPath.createRectangle(-1.0, -1.0, 32.0, 32.0).apply {
                                 stroke = BasicStroke(2.0f)
                                 paint = null
                             })
-                            remover = { it.removeAllChildren() }
-                            pickedTiled = it.gid
+                            selectionBoxRemover = { it.removeAllChildren() }
+                            pickedTile = it.gid
+                        } else if (it is PTiledImage && event.clickCount == 2) {
+                            AnnotatedPropertyEditor.getDialog(tileSet[pickedTile]).apply {
+                                pack()
+                                isModal = true;
+                                setLocationRelativeTo(null)
+                                setVisible(true)
+                            }
                         }
                     }
                 }
@@ -98,7 +114,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
         }
     }
 
-    addClosingTask { block(pickedTiled) }
+    addClosingTask { block(pickedTile) }
 }
 
 /**

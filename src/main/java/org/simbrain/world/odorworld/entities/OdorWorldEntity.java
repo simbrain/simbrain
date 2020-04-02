@@ -39,11 +39,8 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -1340,7 +1337,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer {
             for (int i = 0; i < 9; i++) {
                 int tileX = x + (i % 3) - 1;
                 int tileY = y + (i / 3) - 1;
-                if (parentWorld.getTileMap().hasCollisionTile(tileX, tileY)) {
+                if (parentWorld.getTileMap().collidingAt(tileX, tileY)) {
                     eightNeighborCollisionBounds.add(new RectangleCollisionBound(parentWorld.getTileMap().getTileBound(tileX, tileY)));
                 }
             }

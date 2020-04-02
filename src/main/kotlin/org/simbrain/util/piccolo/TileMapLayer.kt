@@ -82,7 +82,7 @@ class TileMapLayer(
      * @return true if tiles are blocking
      */
     val collision: Boolean
-        get() = properties["collide"] == "true"
+        get() = properties["collision"] == "true"
 
     /**
      * Get the id of a tile at the given tile coordinate location.
@@ -130,7 +130,7 @@ class TileMapLayer(
     }
 
     init {
-        properties["collide"] = if (collision) "true" else "false"
+        properties["collision"] = if (collision) "true" else "false"
         data = TiledData(width, height)
     }
 

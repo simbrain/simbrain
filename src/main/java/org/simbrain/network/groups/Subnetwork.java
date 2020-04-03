@@ -19,6 +19,7 @@ import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.UserParameter;
@@ -75,6 +76,11 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      * List of synapse groups.
      */
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
+
+    /**
+     * List of weight matrices
+     */
+    private final List<WeightMatrix> weightMatrixList = new CopyOnWriteArrayList<>();
 
     /**
      * Whether the GUI should display neuron groups contained in this subnetwork. This will usually be true, but in
@@ -368,6 +374,13 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     }
 
     /**
+     * Unomodifiable weight matrix list.
+     */
+    public List<WeightMatrix> getWeightMatrixList() {
+        return weightMatrixList;
+    }
+
+    /**
      * Return a "flat" list containing every neuron in every neuron group in this subnetwork.
      *
      * @return the flat neuron list.
@@ -460,20 +473,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     public void update() {
         neuronGroupList.forEach(NeuronGroup::update);
         synapseGroupList.forEach(SynapseGroup::update);
-    }
-
-    /**
-     * @return the displayNeuronGroups
-     */
-    public boolean displayNeuronGroups() {
-        return displayNeuronGroups;
-    }
-
-    /**
-     * @param displayNeuronGroups the displayNeuronGroups to set
-     */
-    public void setDisplayNeuronGroups(boolean displayNeuronGroups) {
-        this.displayNeuronGroups = displayNeuronGroups;
+        weightMatrixList.forEach(WeightMatrix::update);
     }
 
     /**
@@ -548,4 +548,5 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     public SubnetworkEvents getEvents() {
         return events;
     }
+
 }

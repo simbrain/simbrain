@@ -445,6 +445,7 @@ public class NetworkPanel extends JPanel {
         event.onSubnetworkAdded(this::addSubnetwork);
         //event.onSubnetworkRemoved(Subnetwork::fireDeleted); // TODO: [event]
         event.onNeuronArrayAdded(this::addNeuronArray);
+        event.onWeightMatrixAdded(this::addWeightMatrix);
         // event.onNeuronArrayRemoved(NeuronArray::fireDeleted);
         event.onMultiLayerNetworkAdded(this::addMultiLayerNetwork);
         event.onNeuronCollectionAdded(this::addNeuronCollection);
@@ -1420,15 +1421,11 @@ public class NetworkPanel extends JPanel {
             }
         }
     }
-    
+
     /**
      * Create a new weight matrix from a source and target.
-     *
-     * @param source the source of the connection
-     * @param target the target of the connection
      */
-    public void addWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
-        WeightMatrix matrix = network.addWeightMatrix(source, target);
+    public void addWeightMatrix(WeightMatrix matrix) {
         if (matrix == null) {
             return;
         }
@@ -1494,11 +1491,10 @@ public class NetworkPanel extends JPanel {
         List<ArrayConnectable> targets = getSelectedModels(ArrayConnectable.class);
         for (ArrayConnectable source : sources) {
             for (ArrayConnectable target : targets) {
-                addWeightMatrix(source, target);
+                network.createWeightMatrix(source, target);
             }
         }
     }
-
 
     /**
      * Returns selected {@link NetworkModel} items.

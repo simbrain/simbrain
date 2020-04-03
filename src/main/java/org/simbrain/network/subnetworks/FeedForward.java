@@ -17,6 +17,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -42,7 +43,7 @@ public class FeedForward extends Subnetwork {
     /**
      * Space to put between layers.
      */
-    private int betweenLayerInterval = 200;
+    private int betweenLayerInterval = 300;
 
     /**
      * Construct a feed-forward network.
@@ -103,11 +104,6 @@ public class FeedForward extends Subnetwork {
         addNeuronGroup(inputLayer);
         inputLayer.setLayoutBasedOnSize(initialPosition);
 
-        // Prepare base synapse for connecting layers
-        Synapse synapse = Synapse.getTemplateSynapse(new StaticSynapseRule());
-        synapse.setLowerBound(-1);
-        synapse.setUpperBound(1);
-
         // Memory of last layer created
         NeuronGroup lastLayer = inputLayer;
 
@@ -127,9 +123,10 @@ public class FeedForward extends Subnetwork {
             addNeuronGroup(hiddenLayer);
             offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
 
-            AllToAll connection = new AllToAll();
-            SynapseGroup lh = connectNeuronGroups(lastLayer, hiddenLayer, connection);
-            lh.randomizeConnectionWeights();
+            // Add weight matrix
+            WeightMatrix wm = getParentNetwork().createWeightMatrix(lastLayer, hiddenLayer);
+            wm.randomize();
+            getWeightMatrixList().add(wm);
 
             // Reset last layer
             lastLayer = hiddenLayer;

@@ -92,70 +92,64 @@ public class SquashingFunctionsTest {
 
         // Check that the matrix forms are approximately equal to the singular forms
         double epsilon = 0.001;
-        INDArray inputs = Nd4j.linspace(-10, 10, 1000);
+        INDArray inputs = Nd4j.linspace(-10, 10, 100);
         inputs.putScalar(0, 0);
         inputs.putScalar(1, -1e9);
         inputs.putScalar(2, 1e9);
 
-        INDArray actuals = Nd4j.zeros(1000);
-        INDArray actualDerivs = Nd4j.zeros(1000);
-        INDArray expecteds = Nd4j.zeros(1000);
-        INDArray expectedDerivs = Nd4j.zeros(1000);
-
-        SquashingFunctions.logistic(inputs, actuals, 1, 0, 1);
-        SquashingFunctions.derivLogistic(inputs, actualDerivs, 1, 0, 1);
-        for (int i = 0; i < 1000; ++i) {
-            assertEquals(actuals.getDouble(i), SquashingFunctions.logistic(inputs.getDouble(i), 1, 0, 1), epsilon);
-            assertEquals(actualDerivs.getDouble(i), SquashingFunctions.derivLogistic(inputs.getDouble(i), 1, 0, 1), epsilon);
+        // Logistic
+        INDArray outputs = Nd4j.zeros(100);
+        INDArray derivs = Nd4j.zeros(100);
+        SquashingFunctions.logistic(inputs, outputs, 1, 0, 1);
+        SquashingFunctions.derivLogistic(inputs, derivs, 1, 0, 1);
+        for (int i = 0; i < 100; ++i) {
+            assertEquals(SquashingFunctions.logistic(inputs.getDouble(i), 1, 0, 1), outputs.getDouble(i), epsilon);
+            assertEquals(SquashingFunctions.derivLogistic(inputs.getDouble(i), 1, 0, 1), derivs.getDouble(i), epsilon);
         }
-        expecteds = actuals.dup();
-        expectedDerivs = actualDerivs.dup();
-        SquashingFunctions.logisticWithDerivative(inputs, actuals, actualDerivs, 1, 0, 1);
 
-        assertArrayEquals(actuals.toDoubleVector(), expecteds.toDoubleVector(), epsilon);
-        assertArrayEquals(actualDerivs.toDoubleVector(), expectedDerivs.toDoubleVector(), epsilon);
+        // Logistic with derivative
+        INDArray expectedOutputs = Nd4j.zeros(100);
+        INDArray expectedDerivs = Nd4j.zeros(100);
+        expectedOutputs = outputs.dup();
+        expectedDerivs = derivs.dup();
+        SquashingFunctions.logisticWithDerivative(inputs, outputs, derivs, 1, 0, 1);
+        assertArrayEquals(expectedOutputs.toDoubleVector(), outputs.toDoubleVector(), epsilon);
+        assertArrayEquals(expectedDerivs.toDoubleVector(), derivs.toDoubleVector(), epsilon);
 
-        SquashingFunctions.atan(inputs, actuals, 1, 0, 1);
-        SquashingFunctions.derivAtan(inputs, actualDerivs, 1, 0, 1);
-        for (int i = 0; i < 1000; ++i) {
+        // Atan
+        SquashingFunctions.atan(inputs, outputs, 1, 0, 1);
+        SquashingFunctions.derivAtan(inputs, derivs, 1, 0, 1);
+        for (int i = 0; i < 100; ++i) {
             double expected = SquashingFunctions.atan(inputs.getDouble(i), 1, 0, 1);
             double expectedDeriv = SquashingFunctions.derivAtan(inputs.getDouble(i), 1, 0, 1);
-            assertEquals(actuals.getDouble(i), expected, epsilon);
-            assertEquals(actualDerivs.getDouble(i), expectedDeriv, epsilon);
+            assertEquals(expected, outputs.getDouble(i), epsilon);
+            assertEquals(expectedDeriv, derivs.getDouble(i), epsilon);
         }
 
-        SquashingFunctions.tanh(inputs, actuals, 1, 0, 1);
-        SquashingFunctions.derivTanh(inputs, actualDerivs, 1, 0, 1);
-        for (int i = 0; i < 1000; ++i) {
+        // Tanh
+        SquashingFunctions.tanh(inputs, outputs, 1, 0, 1);
+        SquashingFunctions.derivTanh(inputs, derivs, 1, 0, 1);
+        for (int i = 0; i < 100; ++i) {
             double expected = SquashingFunctions.tanh(inputs.getDouble(i), 1, 0, 1);
             double expectedDeriv = SquashingFunctions.derivTanh(inputs.getDouble(i), 1, 0, 1);
-            assertEquals(actuals.getDouble(i), expected, epsilon);
-            assertEquals(actualDerivs.getDouble(i), expectedDeriv, epsilon);
+            assertEquals(expected, outputs.getDouble(i), epsilon);
+            assertEquals(expectedDeriv, derivs.getDouble(i), epsilon);
         }
     }
 
-    // TODO: Remove scratch work below
 
     @Test
-    public void quickTest() {
+    public void simpleArrayTest() {
+
+        // Also useful scratch pad
         INDArray in = Nd4j.ones(1);
         INDArray out = Nd4j.zeros(1);
-        System.out.println(in);
-        System.out.println(out);
+        double expected = SquashingFunctions.atan(1,1,0,1);
         SquashingFunctions.atan(in, out, 1,0,1);
-        System.out.println(in);
-        System.out.println(out);
+        //System.out.println(out);
+        //System.out.println(expected);
+        assertEquals(expected, out.sumNumber().doubleValue(),.002);
+
     }
 
-    @Test
-    public void test2() {
-        INDArray in = Nd4j.ones(1);
-        System.out.println(in);
-        add2(in);
-        System.out.println(in);
-    }
-
-     void add2(INDArray test) {
-        test.addi(2);
-    }
 }

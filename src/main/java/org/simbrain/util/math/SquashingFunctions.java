@@ -50,10 +50,8 @@ public class SquashingFunctions {
     public static void tanh(INDArray in, INDArray out, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
-        if (in != out) {
-            out = in.dup();
-        }
-        out = Transforms.tanh(out.muli(a));
+        in.muli(a,out);
+        out = Transforms.tanh(out, false);
         out.muli(diff / 2);
         out.addi((ceil + floor) / 2);
     }
@@ -97,7 +95,7 @@ public class SquashingFunctions {
         // Same as double form above
         double s = 4 * slope / (ceil - floor);
         in.muli(s, out);
-        out = Transforms.exp(out.negi()).addi(1).rdivi(1);
+        out = Transforms.exp(out.negi(), false).addi(1).rdivi(1);
         out.muli(ceil - floor).addi(floor);
     }
 
@@ -121,11 +119,9 @@ public class SquashingFunctions {
     public static void atan(INDArray in, INDArray out, double ceil, double floor, double slope) {
         double diff = ceil - floor;
         double a = (Math.PI * slope) / diff;
-        if (in != out) {
-            out = in.dup();
-        }
-        out.muli(a);
-        out = Transforms.atan(out);
+        in.muli(a,out);
+        // Copy = false makes it overrwrite out
+        out = Transforms.atan(out, false);
         out.muli(diff / Math.PI);
         out.addi((ceil + floor) / 2);
     }
@@ -250,8 +246,8 @@ public class SquashingFunctions {
         double diff = ceil - floor;
         double a = (2 * slope) / diff;
         in.muli(a, out);
-        out = Transforms.cosh(out).rdivi(1);
-        out = Transforms.pow(out, 2);
+        out = Transforms.cosh(out, false).rdivi(1);
+        out = Transforms.pow(out, 2, false);
         out.muli(a * diff / 2);
     }
 
@@ -285,12 +281,12 @@ public class SquashingFunctions {
      * @param slope The slope of the logistic function.
      */
     public static void derivLogistic(INDArray in, INDArray out, double ceil, double floor, double slope) {
-        if (in != out) {
-            out = in.dup();
-        }
-        for (int ii = 0; ii < out.length(); ++ii) {
-            out.putScalar(ii, derivLogistic(out.getDouble(ii), ceil, floor, slope));
-        }
+        logistic(in, out, ceil, floor, slope);
+        INDArray temp = out.sub(floor);
+        double scalar = (4 * slope) / ((ceil - floor) * (ceil - floor));
+        out.rsubi(ceil, out);
+        out.muli(temp, out);
+        out.muli(scalar, out);
     }
 
     /**

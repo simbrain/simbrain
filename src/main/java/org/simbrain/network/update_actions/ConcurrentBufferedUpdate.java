@@ -53,6 +53,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * ConcurrentBufferedUpdate contains an internal representation of the neurons
  * in the network which it parses out into smaller tasks to be executed in parallel.
  * This model updates itself based on changes to the network.
+ * <p>
  * @author Zoë Tosi
  */
 public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
@@ -154,6 +155,12 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
         ConcurrentBufferedUpdate cbu = new ConcurrentBufferedUpdate(network);
         cbu.collectorThread.start();
         return cbu;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Concurrent Buffered Update:\n" + taskSet;
     }
 
     /**
@@ -438,6 +445,21 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
                 size += but.getHosts().length;
             }
             return size;
+        }
+
+
+        @Override
+        public String toString() {
+            StringBuilder ret = new StringBuilder();
+            // Number of tasks should be an even multiple of processors
+            ret.append("Task list contains " + size() + " neurons across " + taskPartition + " processors\n");
+            int i = 1;
+            for (Callable<Task> task : getCallableTasks()) {
+                ret.append("Task " +  i + " handles " + ((BufferedUpdateTask)((CallableTask)task).t).getHosts().length +
+                        " neurons \n");
+                i++;
+            }
+            return ret.toString();
         }
 
     }

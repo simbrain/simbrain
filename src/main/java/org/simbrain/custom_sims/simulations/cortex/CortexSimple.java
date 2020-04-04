@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations.cortex_simple;
+package org.simbrain.custom_sims.simulations.cortex;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
@@ -9,7 +9,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.UDF;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;

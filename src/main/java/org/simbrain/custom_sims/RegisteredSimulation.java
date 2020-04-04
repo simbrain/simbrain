@@ -27,7 +27,8 @@ import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment;
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant;
 import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum;
-import org.simbrain.custom_sims.simulations.cortex_simple.CortexSimple;
+import org.simbrain.custom_sims.simulations.cortex.CortexSimple;
+import org.simbrain.custom_sims.simulations.cortex.CorticalBranching;
 import org.simbrain.custom_sims.simulations.creatures.CreaturesSim;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
@@ -89,6 +90,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new ClassicalConditioning());
         REGISTERED_SIMS.add(new OperantConditioning());
         REGISTERED_SIMS.add(new SimpleOperant());
+        REGISTERED_SIMS.add(new CorticalBranching());
         REGISTERED_SIMS.add(new CortexSimple());
         REGISTERED_SIMS.add(new ConvertSim());
         REGISTERED_SIMS.add(new ReadSim());

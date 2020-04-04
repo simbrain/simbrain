@@ -89,7 +89,7 @@ public enum SquashingFunctionEnum {
         @Override
         public void valueAndDeriv(INDArray in, INDArray out, INDArray deriv, double ceil, double floor, double slope) {
             valueOf(in, out, ceil, floor, slope);
-            derivVal(in, out, ceil, floor, slope);
+            derivVal(in, deriv, ceil, floor, slope);
         }
 
     },
@@ -216,7 +216,7 @@ public enum SquashingFunctionEnum {
         @Override
         public void valueAndDeriv(INDArray in, INDArray out, INDArray deriv, double ceil, double floor, double slope) {
             SquashingFunctions.tanh(in, out, ceil, floor, slope);
-            SquashingFunctions.derivTanh(in, out, ceil, floor, slope);
+            SquashingFunctions.derivTanh(in, deriv, ceil, floor, slope);
         }
 
     },

@@ -142,6 +142,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         String ret = new String();
         ret += weightMatrix.rows() + "x" + weightMatrix.columns() + " matrix [" + getId() + "] ";
         ret += "  Connects " + source.getId() + " to " + target.getId() + "\n";
+        ret += weightMatrix;
         return ret;
     }
 

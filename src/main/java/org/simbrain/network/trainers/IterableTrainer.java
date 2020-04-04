@@ -47,33 +47,20 @@ public abstract class IterableTrainer extends Trainer {
      */
     @UserParameter(
         label = "Stopping condition",
-        description = "Stopping condition", order = 2)
+        description = "Stopping condition", order = 100)
     private StoppingCondition stoppingCondition = StoppingCondition.NONE;
-
-    /**
-     * Iterate through the dataset polling random rows.
-     */
-    // TODO: use this
-    @UserParameter(label = "Stochastic Iteration")
-    private boolean stochasticIteration = false;
-
-    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000)
-    private ProbabilityDistribution randomizer = UniformDistribution.create();
-
-    /** If used, stopped iterating if validation error is below this. */
-    //private double validationErrorThreshold = .2;
 
     /**
      * If used, stop iterating if error is below this value.
      */
-    @UserParameter(label = "Error Threshold")
+    @UserParameter(label = "Error Threshold", order = 110)
     private double errorThreshold = .2;
 
     /**
      * When stopping condition is based on iterations, stop when iterations
      * exceeds this value.
      */
-    @UserParameter(label = "Iterations for Before Stopping")
+    @UserParameter(label = "Iterations for Before Stopping", order = 120)
     private int iterationsBeforeStopping = 1000;
 
     /**
@@ -83,10 +70,6 @@ public abstract class IterableTrainer extends Trainer {
         THRESHOLD_ERROR {
             public String toString() {
                 return "Threshold error";
-            }
-        }, THRESHOLD_VALIDATION_ERROR {
-            public String toString() {
-                return "Threshold error in validation set";
             }
         }, NUM_ITERATIONS {
             public String toString() {
@@ -98,6 +81,10 @@ public abstract class IterableTrainer extends Trainer {
             }
         }
     }
+
+
+    @UserParameter(label = "Randomizer", isObjectType = true, order = 200)
+    private ProbabilityDistribution randomizer = UniformDistribution.create();
 
     /**
      * Construct the iterable trainer.
@@ -121,15 +108,6 @@ public abstract class IterableTrainer extends Trainer {
      * "restart" training.
      */
     public abstract void randomize();
-
-    /**
-     * Get the current MSE error.
-     *
-     * @return the current MSE error
-     */
-    public double getValidationError() {
-        return 0;
-    }
 
     /**
      * Iterate the training algorithm and stop iteration based on the selected
@@ -165,8 +143,6 @@ public abstract class IterableTrainer extends Trainer {
                     apply();
                 } while ((getError() > errorThreshold) && (!updateCompleted));
                 setUpdateCompleted(true);
-                break;
-            case THRESHOLD_VALIDATION_ERROR:
                 break;
             default:
                 break;
@@ -212,48 +188,6 @@ public abstract class IterableTrainer extends Trainer {
         } else {
             return targetRows;
         }
-    }
-
-    /**
-     * @return the stoppingCondition
-     */
-    public StoppingCondition getStoppingCondition() {
-        return stoppingCondition;
-    }
-
-    /**
-     * @param stoppingCondition the stoppingCondition to set
-     */
-    public void setStoppingCondition(StoppingCondition stoppingCondition) {
-        this.stoppingCondition = stoppingCondition;
-    }
-
-    /**
-     * @return the iterationsBeforeStopping
-     */
-    public int getIterationsBeforeStopping() {
-        return iterationsBeforeStopping;
-    }
-
-    /**
-     * @param iterationsBeforeStopping the number of iterations before stopping.
-     */
-    public void setIterationsBeforeStopping(int iterationsBeforeStopping) {
-        this.iterationsBeforeStopping = iterationsBeforeStopping;
-    }
-
-    /**
-     * @return the errorThreshold
-     */
-    public double getErrorThreshold() {
-        return errorThreshold;
-    }
-
-    /**
-     * @param errorThreshold the errorThreshold to set
-     */
-    public void setErrorThreshold(double errorThreshold) {
-        this.errorThreshold = errorThreshold;
     }
 
     /**

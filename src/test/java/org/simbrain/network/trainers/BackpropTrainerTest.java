@@ -5,6 +5,7 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
@@ -13,6 +14,7 @@ import org.simbrain.util.Utils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
@@ -109,12 +111,18 @@ public class BackpropTrainerTest {
 
         BackpropTrainer trainer = new BackpropTrainer(network);
 
-        float[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toFloatMatrix();
+        float[][] inHidJBlas = trainer
+                .getNetwork().getWeightMatrixList()
+                .stream().map(WeightMatrix::getWeightMatrix).collect(Collectors.toList())
+                .get(0).transpose().toFloatMatrix();
         //System.out.println(Arrays.deepToString(inpHidStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(inHidJBlas));
         //System.out.println("-----");
-        float[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toFloatMatrix();
+        float[][] hidOutJBlas = trainer
+                .getNetwork().getWeightMatrixList()
+                .stream().map(WeightMatrix::getWeightMatrix).collect(Collectors.toList())
+                .get(1).transpose().toFloatMatrix();
         //System.out.println(Arrays.deepToString(hidOutStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutJBlas));
@@ -196,13 +204,19 @@ public class BackpropTrainerTest {
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutStrs));
 
-        float[][] inHidJBlas = trainer.getWeightMatrices().get(0).transpose().toFloatMatrix();
+        float[][] inHidJBlas = trainer
+                .getNetwork().getWeightMatrixList()
+                .stream().map(WeightMatrix::getWeightMatrix).collect(Collectors.toList())
+                .get(0).transpose().toFloatMatrix();
         //System.out.println(Arrays.deepToString(inpHidStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(inHidJBlas));
         //System.out.println("-----");
 
-        float[][] hidOutJBlas = trainer.getWeightMatrices().get(1).transpose().toFloatMatrix();
+        float[][] hidOutJBlas = trainer
+                .getNetwork().getWeightMatrixList()
+                .stream().map(WeightMatrix::getWeightMatrix).collect(Collectors.toList())
+                .get(1).transpose().toFloatMatrix();
         //System.out.println(Arrays.deepToString(hidOutStrs));
         //System.out.println();
         //System.out.println(Arrays.deepToString(hidOutJBlas));

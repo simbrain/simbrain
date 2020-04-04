@@ -21,6 +21,8 @@ package org.simbrain.util.math;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 
 import static org.junit.Assert.*;
 
@@ -109,6 +111,7 @@ public class SquashingFunctionsTest {
         expecteds = actuals.dup();
         expectedDerivs = actualDerivs.dup();
         SquashingFunctions.logisticWithDerivative(inputs, actuals, actualDerivs, 1, 0, 1);
+
         assertArrayEquals(actuals.toDoubleVector(), expecteds.toDoubleVector(), epsilon);
         assertArrayEquals(actualDerivs.toDoubleVector(), expectedDerivs.toDoubleVector(), epsilon);
 
@@ -129,5 +132,30 @@ public class SquashingFunctionsTest {
             assertEquals(actuals.getDouble(i), expected, epsilon);
             assertEquals(actualDerivs.getDouble(i), expectedDeriv, epsilon);
         }
+    }
+
+    // TODO: Remove scratch work below
+
+    @Test
+    public void quickTest() {
+        INDArray in = Nd4j.ones(1);
+        INDArray out = Nd4j.zeros(1);
+        System.out.println(in);
+        System.out.println(out);
+        SquashingFunctions.atan(in, out, 1,0,1);
+        System.out.println(in);
+        System.out.println(out);
+    }
+
+    @Test
+    public void test2() {
+        INDArray in = Nd4j.ones(1);
+        System.out.println(in);
+        add2(in);
+        System.out.println(in);
+    }
+
+     void add2(INDArray test) {
+        test.addi(2);
     }
 }

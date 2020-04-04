@@ -51,6 +51,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * Current implementation.
      */
+    @UserParameter(label = "Implementation", order = -10)
     protected SquashingFunctionEnum sFunction;
 
     /**

@@ -35,8 +35,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
- * Array-backed backprop. To be supplanted by new nd4j objects, but still allows backprop with "loose" neurons and
- * old style neuron groups, which has some pedagogical purpose.
+ * Array-backed backprop. To be supplanted by new nd4j objects, but still allows backprop with "loose" neurons and old
+ * style neuron groups, which has some pedagogical purpose.
  * <p>
  *
  * @author Zoë Tosi
@@ -110,8 +110,7 @@ public class BackpropTrainer extends IterableTrainer {
     private List<INDArray> derivs = new ArrayList<INDArray>();
 
     /**
-     * Input layer. Holds current input vector from input dataset. Separate for
-     * simpler indexing on other lists.
+     * Input layer. Holds current input vector from input dataset. Separate for simpler indexing on other lists.
      */
     private INDArray inputLayer;
 
@@ -135,19 +134,14 @@ public class BackpropTrainer extends IterableTrainer {
      */
     private List<TransferFunction> updateRules = new ArrayList<TransferFunction>();
 
-    @UserParameter(
-            label = "Learning Rate",
-            description = "Learning Rate",
-            minimumValue = 0, maximumValue = 10,
+    @UserParameter(label = "Learning Rate", description = "Learning Rate", minimumValue = 0, maximumValue = 10,
             order = 1)
     private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
      * Current update method.
      */
-   @UserParameter(
-        label = "Update Method",
-        description = "Update Method", order = 10)
+    @UserParameter(label = "Update Method", description = "Update Method", order = 10)
     private UpdateMethod updateMethod = UpdateMethod.EPOCH;
 
     /**
@@ -163,7 +157,9 @@ public class BackpropTrainer extends IterableTrainer {
                 return "Stochastic (random row per iteration)";
             }
         }, SINGLE {
-            public String toString() {return "Single (one row per iteration)";}
+            public String toString() {
+                return "Single (one row per iteration)";
+            }
         }
     }
     // TODO: Mini-batch
@@ -171,11 +167,7 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Momentum. Must be between 0 and 1.
      */
-    @UserParameter(
-        label = "Momentum",
-        description = "Momentum",
-        minimumValue = 0, maximumValue = 10,
-        order = 50)
+    @UserParameter(label = "Momentum", description = "Momentum", minimumValue = 0, maximumValue = 10, order = 50)
     private double momentum = DEFAULT_MOMENTUM;
 
     /**
@@ -192,11 +184,9 @@ public class BackpropTrainer extends IterableTrainer {
         super(network);
         net = network;
 
-            // Synapse group list is ordered from input to output layers
+        // Synapse group list is ordered from input to output layers
         for (WeightMatrix wm : net.getWeightMatrixList()) {
-            lastWeightUpdates.add(Nd4j.zeros(
-                    wm.getWeightMatrix().rows(),
-                    wm.getWeightMatrix().columns()));
+            lastWeightUpdates.add(Nd4j.zeros(wm.getWeightMatrix().rows(), wm.getWeightMatrix().columns()));
         }
 
         // Initialize layers
@@ -223,7 +213,6 @@ public class BackpropTrainer extends IterableTrainer {
         setMomentum(DEFAULT_MOMENTUM);
     }
 
-    //TODO: Here to appease SRNTrainer.  Not yet re-implemented.
     /**
      * Construct the backprop trainer.
      *
@@ -231,6 +220,7 @@ public class BackpropTrainer extends IterableTrainer {
      * @param layers  the layers to train
      */
     public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
+        //TODO: Here to appease SRNTrainer.  Not yet re-implemented.
         super(network);
     }
 
@@ -270,7 +260,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Update weights and biases
         updateParameters();
         // Return the MSE for the row
-        return (double) batchErrors.mul(batchErrors).sumNumber()/ network.getOutputNeurons().size();
+        return (double) batchErrors.mul(batchErrors).sumNumber() / network.getOutputNeurons().size();
     }
 
     /**
@@ -306,7 +296,7 @@ public class BackpropTrainer extends IterableTrainer {
     private void updateNetwork() {
 
         for (int i = 0; i < net.getWeightMatrixList().size(); i++) {
-           // Set up variables for easy reading
+            // Set up variables for easy reading
             INDArray inputs;
             if (i == 0) {
                 inputs = inputLayer;
@@ -318,37 +308,32 @@ public class BackpropTrainer extends IterableTrainer {
 
             // Multiply weight matrix times inputs and store in next layer netInput
             net.getWeightMatrixList().get(i)
-                    .getWeightMatrix().mmuli(inputs, netInput);
+                    .getWeightMatrix().mmuli(inputs.transpose(), netInput);
 
             // Add biases to the net input
             netInput.addi(biasVec);
 
             // Apply the transfer function to net input to get the activation values for the next layer and store
             // that value in the activations vector, also calculate derivatives.
-            // TODO Below leads to blow up in derivs when using logistic activation function
-                updateRules.get(i).applyFunctionAndDerivative(netInput,
-                    activations.get(i),
-                    derivs.get(i));
+            updateRules.get(i).applyFunctionAndDerivative(netInput, activations.get(i), derivs.get(i));
         }
     }
 
     /**
-     * Set error values using backprop (roughly output errors times intervening
-     * weights, going "backwards" from output towards input).
+     * Set error values using backprop (roughly output errors times intervening weights, going "backwards" from output
+     * towards input).
      */
     private void backpropagateError() {
         int maxLayerIndex = activations.size() - 1;
         // calc output deltas from error and derivative
         batchErrors.muli(derivs.get(maxLayerIndex), deltas.get(maxLayerIndex));
-        backwardPropagate(deltas.get(maxLayerIndex),
-                net.getWeightMatrixList().get(maxLayerIndex).getWeightMatrix(),
+        backwardPropagate(deltas.get(maxLayerIndex), net.getWeightMatrixList().get(maxLayerIndex).getWeightMatrix(),
                 deltas.get(maxLayerIndex - 1));
         // Deltas for 2nd to last layer
         deltas.get(maxLayerIndex - 1).muli(derivs.get(maxLayerIndex - 1));
         // For multiple hidden layers
         for (int layerIndex = maxLayerIndex - 1; layerIndex > 0; layerIndex--) {
-            backwardPropagate(deltas.get(layerIndex),
-                    net.getWeightMatrixList().get(layerIndex).getWeightMatrix(),
+            backwardPropagate(deltas.get(layerIndex), net.getWeightMatrixList().get(layerIndex).getWeightMatrix(),
                     deltas.get(layerIndex - 1));
             deltas.get(layerIndex - 1).muli(derivs.get(layerIndex - 1));
         }
@@ -377,20 +362,21 @@ public class BackpropTrainer extends IterableTrainer {
             int kk = 0;
             for (int ii = 0; ii < prevLayer.length(); ii++) {
                 for (int jj = 0; jj < currentLayer.length(); jj++) {
-                    float deltaVal = (float) (learningRate * deltas.get(layerIndex).getDouble(jj)
-                                                * prevLayer.getDouble(ii) + (momentum * lastDeltas.getDouble(kk)));
+                    float deltaVal =
+                            (float) (learningRate * deltas.get(layerIndex).getDouble(jj) * prevLayer.getDouble(ii) + (momentum * lastDeltas.getDouble(kk)));
                     wm.putScalar(kk, wm.getDouble(kk) + deltaVal);
-                    lastDeltas.putScalar(kk,deltaVal);
+                    lastDeltas.putScalar(kk, deltaVal);
                     kk++;
                 }
             }
             // Update biases
             for (int ii = 0; ii < biasVector.length(); ii++) {
-                float deltaVal = (float) (learningRate * deltas.get(layerIndex).getDouble(ii)
-                                        + (momentum * lastBiasDeltas.getDouble(ii)));
+                float deltaVal =
+                        (float) (learningRate * deltas.get(layerIndex).getDouble(ii) + (momentum * lastBiasDeltas.getDouble(ii)));
                 biasVector.putScalar(ii, biasVector.getDouble(ii) + deltaVal);
                 lastBiasDeltas.putScalar(ii, deltaVal);
             }
+            weightMatrix.getEvents().fireUpdated();
             layerIndex++;
         }
     }
@@ -414,7 +400,7 @@ public class BackpropTrainer extends IterableTrainer {
         // TODO: Separate bias randomizer
         for (int kk = 0; kk < biases.size(); ++kk) {
             for (int ii = 0; ii < biases.get(kk).length(); ii++) {
-                biases.get(kk).putScalar(ii,(Math.random() * 0.1) - 0.05);
+                biases.get(kk).putScalar(ii, (Math.random() * 0.1) - 0.05);
             }
         }
     }
@@ -457,15 +443,12 @@ public class BackpropTrainer extends IterableTrainer {
     public void initData() {
         // Store data as columns since that's what everything else deals with so there is no need to transpose later.
         if (network.getTrainingSet().getInputData() != null) {
-            inputData =
-                    Nd4j.create(
-                            Utils.castToFloat(network.getTrainingSet().getInputData())).
-                            transpose();
+            inputData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getInputData())).
+                    transpose();
         }
         if (network.getTrainingSet().getTargetData() != null) {
-            targetData = Nd4j.create(
-                    Utils.castToFloat(network.getTrainingSet().getTargetData())).
-                            transpose();
+            targetData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getTargetData())).
+                    transpose();
         }
     }
 
@@ -515,19 +498,16 @@ public class BackpropTrainer extends IterableTrainer {
     //}
 
     /**
-     * Convenience method for in place "Backward" matrix multiplication
-     * (backward if vectors are assumed to be column-major) e.g.: x^TA=y^T
-     * Transposes x and/or y if needed to make this the specific operation that
-     * happens (left multiply), and then transposes them back afterward. Thus
-     * the operation is unambiguous and one does not have to care if x/y are
-     * rows or columns. That is, regardless of if x or y are rows/columns xA=y
-     * is performed, which can be considered a "backward" propagation in a
-     * column-major paradigm.
+     * Convenience method for in place "Backward" matrix multiplication (backward if vectors are assumed to be
+     * column-major) e.g.: x^TA=y^T Transposes x and/or y if needed to make this the specific operation that happens
+     * (left multiply), and then transposes them back afterward. Thus the operation is unambiguous and one does not have
+     * to care if x/y are rows or columns. That is, regardless of if x or y are rows/columns xA=y is performed, which
+     * can be considered a "backward" propagation in a column-major paradigm.
      *
      * @param _x the left-hand vector MUST be a vector
      * @param _A the matrix
-     * @param _y the result of a matrix-vector multiply MUST be a vector of the
-     *           same number of elements as _x, can be equal to _x.
+     * @param _y the result of a matrix-vector multiply MUST be a vector of the same number of elements as _x, can be
+     *           equal to _x.
      */
     public static void backwardPropagate(INDArray _x, INDArray _A, INDArray _y) {
         boolean wasColX = false;
@@ -548,8 +528,8 @@ public class BackpropTrainer extends IterableTrainer {
         }
 
         // TODO: Performance issue? Move outside of this method at the very least.
-        _x = _x.reshape(1,_x.length());
-        _y = _y.reshape(1,_y.length());
+        _x = _x.reshape(1, _x.length());
+        _y = _y.reshape(1, _y.length());
         _x.mmuli(_A, _y);
 
         if (wasColX) {

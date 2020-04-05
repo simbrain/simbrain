@@ -449,7 +449,7 @@ public class NetworkPanel extends JPanel {
         // event.onNeuronArrayRemoved(NeuronArray::fireDeleted);
         event.onMultiLayerNetworkAdded(this::addMultiLayerNetwork);
         event.onNeuronCollectionAdded(this::addNeuronCollection);
-        event.onWeightMatrixRemoved(WeightMatrix::fireDeleted);
+        event.onWeightMatrixRemoved(WeightMatrix::delete);
         event.onUpdateTimeDisplay(d -> updateTime());
         event.onUpdateCompleted(c -> {
             NetworkPanel.this.setUpdateComplete(c);
@@ -1826,11 +1826,13 @@ public class NetworkPanel extends JPanel {
         for (Neuron neuron : getSelectedModels(Neuron.class)) {
             neuron.getUpdateRule().incrementActivation(neuron);
         }
-
         for (SynapseNode synapseNode : getSelectedNodes(SynapseNode.class)) {
             synapseNode.getSynapse().incrementWeight();
             synapseNode.updateColor();
             synapseNode.updateDiameter();
+        }
+        for (WeightMatrix wm : getSelectedModels(WeightMatrix.class)) {
+            wm.increment();
         }
     }
 
@@ -1842,11 +1844,13 @@ public class NetworkPanel extends JPanel {
         for (NeuronNode neuronNode : getSelectedNodes(NeuronNode.class)) {
             neuronNode.getNeuron().getUpdateRule().decrementActivation(neuronNode.getNeuron());
         }
-
         for (SynapseNode synapseNode : getSelectedNodes(SynapseNode.class)) {
             synapseNode.getSynapse().decrementWeight();
             synapseNode.updateColor();
             synapseNode.updateDiameter();
+        }
+        for (WeightMatrix wm : getSelectedModels(WeightMatrix.class)) {
+            wm.decrement();
         }
     }
 

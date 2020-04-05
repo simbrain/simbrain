@@ -377,7 +377,17 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      * Unomodifiable weight matrix list.
      */
     public List<WeightMatrix> getWeightMatrixList() {
-        return weightMatrixList;
+        return Collections.unmodifiableList(weightMatrixList);
+    }
+
+    /**
+     * Add a weight matrix to the subnet.
+     */
+    public void addWeightMatrix(WeightMatrix wm) {
+        weightMatrixList.add(wm);
+        parentNetwork.getEvents().onWeightMatrixRemoved(w -> {
+            weightMatrixList.remove(w);
+        });
     }
 
     /**
@@ -471,9 +481,11 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      * override this.
      */
     public void update() {
+
         neuronGroupList.forEach(NeuronGroup::update);
         synapseGroupList.forEach(SynapseGroup::update);
         weightMatrixList.forEach(WeightMatrix::update);
+
     }
 
     /**

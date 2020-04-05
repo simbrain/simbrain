@@ -79,11 +79,11 @@ public class LayeredNetworkCreationPanel extends JPanel {
     static {
         DEFAULT_NEURON_TYPES.put("Linear", new LinearRule());
         SigmoidalRule sig0 = new SigmoidalRule();
-        sig0.setSquashFunctionType(SquashingFunctionEnum.ARCTAN);
-        DEFAULT_NEURON_TYPES.put("Logistic", sig0);
+        sig0.setSquashFunctionType(SquashingFunctionEnum.LOGISTIC);
+        DEFAULT_NEURON_TYPES.put("Sigmoid", sig0);
         SigmoidalRule sig1 = new SigmoidalRule();
-        sig1.setSquashFunctionType(SquashingFunctionEnum.ARCTAN);
-        DEFAULT_NEURON_TYPES.put("Logistic", sig1);
+        sig1.setSquashFunctionType(SquashingFunctionEnum.LOGISTIC);
+        DEFAULT_NEURON_TYPES.put("Sigmoid", sig1);
     }
 
     /**
@@ -137,14 +137,14 @@ public class LayeredNetworkCreationPanel extends JPanel {
                 layer.setComboBox("Linear");
             } else if (i == numLayers) {
                 layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES, "Output Layer", 5);
-
+                layer.setComboBox("Sigmoid");
             } else {
                 if (numLayers == 3) {
                     layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES, "Hidden Layer", 5);
                 } else {
                     layer = new LayerCreationPanel(DEFAULT_NEURON_TYPES, "Hidden Layer " + (i - 1), 5);
                 }
-                layer.setComboBox("Logistic");
+                layer.setComboBox("Sigmoid");
             }
             layerList.add(layer);
             layerPanel.add(layer);
@@ -240,7 +240,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
             numNeuronsField.setText("" + numNeurons);
 
             // Set up combo box
-            neuronTypeComboBox = new JComboBox<String>(neuronTypeMap.keySet().toArray(new String[neuronTypeMap.size()]));
+            neuronTypeComboBox = new JComboBox<>(neuronTypeMap.keySet().toArray(new String[neuronTypeMap.size()]));
 
             // Lay out all components horizontally
             Box component = Box.createHorizontalBox();

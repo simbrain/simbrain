@@ -50,9 +50,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     /**
      * A label for this Neuron Array for display purpose.
      */
-    @UserParameter(
-            label = "Label"
-    )
+    @UserParameter(label = "Label", order = 10)
     private String label = "";
 
     /**
@@ -60,6 +58,9 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      */
     @UserParameter(label = "ID", description = "Id of this weight matrix", order = -1, editable = false)
     private String id;
+
+    @UserParameter(label = "Increment amount", increment = .1, order = 20)
+    private double increment = .1;
 
     /**
      * The weight matrix object.
@@ -94,8 +95,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         // Default for "adapter" cases is 1-1
         if (source instanceof NeuronCollection || target instanceof NeuronCollection) {
             weightMatrix = Nd4j.create(source.outputSize(), target.inputSize());
-            INDArray id = Nd4j.eye(Math.min(source.outputSize(), target.inputSize()));
-            weightMatrix.get(NDArrayIndex.createCoveringShape(id.shape())).assign(id);
+            diagonalize();
         } else {
             // For now randomize new matrices between arrays
             randomize();
@@ -194,7 +194,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     /**
      * Notify listeners that this object has been deleted.
      */
-    public void fireDeleted() {
+    public void delete() {
         source.removeOutgoingWeightMatrix(this);
         target.setIncomingWeightMatrix(null);
         target.getOutgoingWeightMatrices().stream()
@@ -216,6 +216,40 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
 
     public WeightMatrixEvents getEvents() {
         return events;
+    }
+
+    /**
+     * Add increment to every entry in weight matrix
+     */
+    public void increment() {
+        weightMatrix.addi(increment);
+        events.fireUpdated();
+    }
+
+    /**
+     * Subtract increment from every entry in weight matrix
+     */
+    public void decrement() {
+        weightMatrix.subi(increment);
+        events.fireUpdated();
+    }
+
+    /**
+     * Set all entries to 0.
+     */
+    public void clear() {
+        weightMatrix.assign(0);
+        events.fireUpdated();
+    }
+
+    /**
+     * Diagonalize the matrix.
+     */
+    public void diagonalize() {
+        clear();
+        INDArray id = Nd4j.eye(Math.min(source.outputSize(), target.inputSize()));
+        weightMatrix.get(NDArrayIndex.createCoveringShape(id.shape())).assign(id);
+        events.fireUpdated();
     }
 
     //public Layer asLayer() {

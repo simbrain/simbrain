@@ -436,7 +436,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
 
     @Override
     public void setInputArray(INDArray activations) {
-        setActivations(activations.toDoubleVector());
+        setInputValues(activations.toDoubleVector());
     }
 
     @Override

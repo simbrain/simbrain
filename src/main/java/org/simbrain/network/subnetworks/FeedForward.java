@@ -126,7 +126,7 @@ public class FeedForward extends Subnetwork {
             // Add weight matrix
             WeightMatrix wm = getParentNetwork().createWeightMatrix(lastLayer, hiddenLayer);
             wm.randomize();
-            getWeightMatrixList().add(wm);
+            addWeightMatrix(wm);
 
             // Reset last layer
             lastLayer = hiddenLayer;
@@ -196,13 +196,21 @@ public class FeedForward extends Subnetwork {
 
     @Override
     public void onCommit() {
-
     }
 
-    // TODO
-    //@Override
-    //public String getUpdateMethodDescription() {
-    //    return "Layered update";
-    //}
-
+    @Override
+    public void update() {
+        //getNeuronGroupList().get(0).update();
+        for (int i = 0; i < getNeuronGroupList().size() ; i++) {
+            if(getSynapseGroupList().size() > i) {
+                getSynapseGroupList().get(i).update();
+            }
+            if(getWeightMatrixList().size() > i) {
+                getWeightMatrixList().get(i).update();
+            }
+            if (i > 0) {
+                getNeuronGroupList().get(i).update();
+            }
+        }
+    }
 }

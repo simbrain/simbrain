@@ -102,11 +102,8 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         if (weightMatrix.isEnableRendering()) {
             float[] activations = Nd4j.toFlattened(weightMatrix.getWeightMatrix()).toFloatVector();
-            img = ImageKt.toSimbrainColorImage(
-                    activations,
-                    weightMatrix.getWeightMatrix().columns(),
-                    weightMatrix.getWeightMatrix().rows()
-            );
+            img = ImageKt.toSimbrainColorImage(activations, weightMatrix.getWeightMatrix().columns(),
+                    weightMatrix.getWeightMatrix().rows());
         }
 
         imageBox.setImage(img);
@@ -114,7 +111,8 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
     @Override
     protected void paint(PPaintContext paintContext) {
-        paintContext.getGraphics().setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        paintContext.getGraphics().setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         super.paint(paintContext);
     }
 
@@ -144,7 +142,8 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
     @Override
     protected String getToolTipText() {
-        return weightMatrix.toString();
+        return
+                weightMatrix.toString();
     }
 
     @Override
@@ -174,10 +173,9 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         contextMenu.addSeparator();
         Action randomizeAction = new AbstractAction("Randomize") {
-
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
-                putValue(SHORT_DESCRIPTION, "Randomize neuro naarray");
+                putValue(SHORT_DESCRIPTION, "Randomize neuron array");
             }
 
             @Override
@@ -186,6 +184,30 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
             }
         };
         contextMenu.add(randomizeAction);
+
+        Action clearAction = new AbstractAction("Clear") {
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
+                putValue(SHORT_DESCRIPTION, "Clear neuron array");
+            }
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                weightMatrix.clear();
+            }
+        };
+        contextMenu.add(clearAction);
+
+        Action diagAction = new AbstractAction("Diagonalize") {
+            {
+                //putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/"));
+                putValue(SHORT_DESCRIPTION, "Diagonalize array");
+            }
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                weightMatrix.diagonalize();
+            }
+        };
+        contextMenu.add(diagAction);
 
         contextMenu.addSeparator();
         Action editComponents = new AbstractAction("Edit Components...") {

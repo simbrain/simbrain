@@ -308,7 +308,7 @@ public class BackpropTrainer extends IterableTrainer {
 
             // Multiply weight matrix times inputs and store in next layer netInput
             net.getWeightMatrixList().get(i)
-                    .getWeightMatrix().mmuli(inputs.transpose(), netInput);
+                    .getWeightMatrix().mmuli(inputs, netInput);
 
             // Add biases to the net input
             netInput.addi(biasVec);

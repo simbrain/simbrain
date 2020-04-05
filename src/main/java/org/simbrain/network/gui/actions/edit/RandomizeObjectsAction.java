@@ -70,10 +70,5 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
         for (WeightMatrix wm: networkPanel.getSelectedModels(WeightMatrix.class)) {
             wm.randomize();
         }
-        // Show Synapse Group Randomization dialog for one synapse group only
-        Optional<SynapseGroupNode> sg = networkPanel.getSelectedNodes(SynapseGroupNode.class).stream().findFirst();
-        sg.ifPresent(SynapseGroupNode::showRandomizationDialog);
-//        networkPanel.getNetwork().fireNeuronsUpdated(networkPanel.getSelectedModels(Neuron.class)); // TODO: [event]
-//        networkPanel.getNetwork().fireSynapsesUpdated(networkPanel.getSelectedModels(Synapse.class)); // TODO: [event]
     }
 }

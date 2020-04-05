@@ -24,6 +24,9 @@ class NeuronEvents(val neuron: Neuron) : Event(PropertyChangeSupport(neuron)), L
     fun onLabelChange(handler: Runnable) = "LabelChange".event(handler)
     fun fireLabelChange() = "LabelChange"()
 
+    fun onColorChange(handler: Runnable) = "ColorChange".event(handler)
+    fun fireColorChange() = "ColorChange"()
+
     fun onClampedChange(handler: BiConsumer<Boolean, Boolean>) = "ClampedChange".itemChangedEvent(handler)
     fun fireClampedChange(old: Boolean, new: Boolean) = "ClampedChange"(old = old, new = new)
 

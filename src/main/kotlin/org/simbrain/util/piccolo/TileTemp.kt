@@ -1,5 +1,8 @@
 package org.simbrain.util.piccolo
 
+// TODO: Parameter.setFieldValue fails on collision.  Once that is resolved remove Tile.java which is being used for
+// now until refleciton issue is sorted out
+
 import com.thoughtworks.xstream.annotations.XStreamAlias
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import com.thoughtworks.xstream.annotations.XStreamConverter
@@ -24,7 +27,7 @@ import java.util.*
  * Simbrain wrapper for a [TileMap] tile.
  */
 @XStreamAlias("tile")
-class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, editable = false) var id: Int) : EditableObject {
+class TileTemp(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, editable = false) var id: Int) : EditableObject {
 
     /**
      * Custom properties defined in tmx.

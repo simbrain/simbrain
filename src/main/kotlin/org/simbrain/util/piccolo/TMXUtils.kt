@@ -13,8 +13,6 @@ import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
 import java.io.File
 import javax.swing.*
-import javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-import javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
 import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
 
@@ -76,7 +74,21 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
         }
     }
 
+    // For selector
     var selectionBoxRemover: () -> Unit = { }
+
+    /**
+     * Black rectangle around tile
+     */
+    fun PTiledImage.select(){
+        // Remove any previous black rectangle
+        selectionBoxRemover()
+        addChild(PPath.createRectangle(-1.0, -1.0, 32.0, 32.0).apply {
+            stroke = BasicStroke(2.0f)
+            paint = null
+        })
+        selectionBoxRemover = { removeAllChildren() }
+    }
 
     // Set content pane to a set of tabs, each showing a tileset
     contentPane = JTabbedPane().apply {
@@ -84,18 +96,19 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
             // Add a new tab for each tileset
             addTab(tileSet.name, PCanvas().apply {
                 layer.renderTileSet(tileSet)
+
+                // Select the tile that was initially clicked on
+                this.layer.allNodes.filterIsInstance<PTiledImage>().find { it.gid == pickedTile}?.let{
+                    it.select()
+                    //camera.centerBoundsOnPoint(it.bounds.centerX, it.bounds.centerY)
+                    // TODO: Figure out what to center on what.
+                }
+
                 // Respond to clicks
                 addInputEventListener { event, type ->
                     event.pickedNode.let {
                         if (it is PTiledImage && type == MouseEvent.MOUSE_CLICKED) {
-                            // Remove any previous black rectangle
-                            selectionBoxRemover()
-                            // Add black rectangle around selected tile
-                            it.addChild(PPath.createRectangle(-1.0, -1.0, 32.0, 32.0).apply {
-                                stroke = BasicStroke(2.0f)
-                                paint = null
-                            })
-                            selectionBoxRemover = { it.removeAllChildren() }
+                            it.select()
                             pickedTile = it.gid
                         } else if (it is PTiledImage && event.clickCount == 2) {
                             AnnotatedPropertyEditor.getDialog(tileSet[pickedTile]).apply {
@@ -107,10 +120,8 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
                         }
                     }
                 }
-            }.let {
-                JScrollPane(it, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_NEVER)
-                        .apply { preferredSize = Dimension(320, 640) }
-            })
+            }.apply {
+                preferredSize = Dimension(300,600) })
         }
     }
 

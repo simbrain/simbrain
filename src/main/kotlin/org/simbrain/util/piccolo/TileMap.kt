@@ -153,7 +153,6 @@ class TileMap {
     fun hasTileIdAtPixel(id: Int, x: Double, y: Double) =
             getTileStackAtPixel(x, y).any { t: Tile -> t.id == id }
 
-
     fun getTile(gid: Int) = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
             .firstOrNull { (range, _) -> gid in range }
             ?.let { (_, tileSet) -> tileSet[gid] } ?: zeroTile

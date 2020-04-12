@@ -23,6 +23,7 @@ import com.Ostermiller.util.CSVPrinter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.pmw.tinylog.Logger;
 
 import javax.swing.*;
@@ -818,6 +819,13 @@ public class Utils {
             }
         }
         return newArray;
+    }
+
+    /**
+     * Convert nd4j shape array into printable string
+     */
+    public static String shapeString(INDArray arr) {
+        return "(" + arr.rows() + "," + arr.columns() + " rank = " + arr.rank() + " )";
     }
 
 

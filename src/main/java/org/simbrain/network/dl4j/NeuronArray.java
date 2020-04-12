@@ -152,7 +152,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Simple randomization for now.
      */
     public void randomize() {
-        neuronArray = Nd4j.rand(1, numNodes).subi(0.5).mul(2);
+        neuronArray = Nd4j.rand(1, numNodes).subi(0.5).mul(2); // row vector
         events.fireUpdated();
     }
 

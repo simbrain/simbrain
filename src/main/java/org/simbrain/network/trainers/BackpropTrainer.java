@@ -193,22 +193,24 @@ public class BackpropTrainer extends IterableTrainer {
         int ii = 0;
         for (NeuronGroup neuronGroup : net.getNeuronGroupList()) {
             if (ii > 0) {
-                activations.add(Nd4j.zeros(neuronGroup.size()));
-                netInputs.add(Nd4j.zeros(neuronGroup.size()));
-                deltas.add(Nd4j.zeros(neuronGroup.size()));
-                INDArray bs = Nd4j.create(Utils.castToFloat(neuronGroup.getBiases()));
+                activations.add(Nd4j.zeros(1,neuronGroup.size()));
+                netInputs.add(Nd4j.zeros(1,neuronGroup.size()));
+                deltas.add(Nd4j.zeros(1,neuronGroup.size()));
+                INDArray bs = Nd4j
+                        .create(Utils.castToFloat(neuronGroup.getBiases()))
+                        .reshape(1, neuronGroup.getBiases().length);
                 biases.add(bs);
                 lastBiasUpdates.add(Nd4j.zeros(bs.rows(), bs.columns()));
                 updateRules.add((TransferFunction) neuronGroup.getNeuronList().get(0).getUpdateRule());
                 neuronGroups.add(neuronGroup);
-                derivs.add(Nd4j.zeros(neuronGroup.size()));
+                derivs.add(Nd4j.zeros(1,neuronGroup.size()));
             } else {
-                inputLayer = Nd4j.zeros(neuronGroup.size());
+                inputLayer = Nd4j.zeros(1,neuronGroup.size());
             }
             ii++;
         }
-        errors = Nd4j.zeros(getOutputLayer().length());
-        batchErrors = Nd4j.zeros(getOutputLayer().length());
+        errors = Nd4j.zeros(1, getOutputLayer().length());
+        batchErrors = Nd4j.zeros(1, getOutputLayer().length());
         setLearningRate(DEFAULT_LEARNING_RATE);
         setMomentum(DEFAULT_MOMENTUM);
     }
@@ -250,10 +252,12 @@ public class BackpropTrainer extends IterableTrainer {
     private double trainRow(int row) {
         batchErrors.muli(0);
         // Get the inputs and feed them forward
-        inputLayer = inputData.getColumn(row);
+        inputLayer = inputData.getColumn(row)
+                .reshape(1,inputData.getColumn(row).length());
         updateNetwork();
         // Backpropagate error
-        targetVector = targetData.getColumn(row);
+        targetVector = targetData.getColumn(row)
+                .reshape(1,targetData.getColumn(row).length());
         targetVector.subi(getOutputLayer(), errors);
         batchErrors.addi(errors);
         backpropagateError();
@@ -272,10 +276,11 @@ public class BackpropTrainer extends IterableTrainer {
         // Get inputs and feed them forward row-by-row
         batchErrors.muli(0);
         for (int row = firstRow; row < lastRow; row++) {
+
             // Get the inputs and feed them forward
-            inputLayer = inputData.getColumn(row);
+            inputLayer = inputData.getColumn(row).reshape(1,inputData.getColumn(row).length());
             updateNetwork();
-            targetVector = targetData.getColumn(row);
+            targetVector = targetData.getColumn(row).reshape(1,targetData.getColumn(row).length());;
             targetVector.subi(getOutputLayer(), errors);
 
             // Calculate batch errors
@@ -296,19 +301,22 @@ public class BackpropTrainer extends IterableTrainer {
     private void updateNetwork() {
 
         for (int i = 0; i < net.getWeightMatrixList().size(); i++) {
+
             // Set up variables for easy reading
+            INDArray netInput = netInputs.get(i);
+            INDArray biasVec = biases.get(i);
+            INDArray weights = net.getWeightMatrixList().get(i).getWeightMatrix();
+
+            // Set inputs
             INDArray inputs;
             if (i == 0) {
                 inputs = inputLayer;
             } else {
                 inputs = activations.get(i - 1);
             }
-            INDArray netInput = netInputs.get(i);
-            INDArray biasVec = biases.get(i);
 
             // Multiply weight matrix times inputs and store in next layer netInput
-            net.getWeightMatrixList().get(i)
-                    .getWeightMatrix().mmuli(inputs, netInput);
+            inputs.mmuli(weights, netInput);
 
             // Add biases to the net input
             netInput.addi(biasVec);
@@ -325,16 +333,18 @@ public class BackpropTrainer extends IterableTrainer {
      */
     private void backpropagateError() {
         int maxLayerIndex = activations.size() - 1;
-        // calc output deltas from error and derivative
+
+        // Calculate output deltas from error and derivative
         batchErrors.muli(derivs.get(maxLayerIndex), deltas.get(maxLayerIndex));
-        backwardPropagate(deltas.get(maxLayerIndex), net.getWeightMatrixList().get(maxLayerIndex).getWeightMatrix(),
-                deltas.get(maxLayerIndex - 1));
+        INDArray wts = net.getWeightMatrixList().get(maxLayerIndex).getWeightMatrix();
+        deltas.get(maxLayerIndex).mmuli(wts.transpose(),deltas.get(maxLayerIndex - 1));
+
         // Deltas for 2nd to last layer
         deltas.get(maxLayerIndex - 1).muli(derivs.get(maxLayerIndex - 1));
         // For multiple hidden layers
         for (int layerIndex = maxLayerIndex - 1; layerIndex > 0; layerIndex--) {
-            backwardPropagate(deltas.get(layerIndex), net.getWeightMatrixList().get(layerIndex).getWeightMatrix(),
-                    deltas.get(layerIndex - 1));
+            wts = net.getWeightMatrixList().get(layerIndex).getWeightMatrix();
+            deltas.get(layerIndex).mmuli(wts.transpose(),deltas.get(layerIndex - 1));
             deltas.get(layerIndex - 1).muli(derivs.get(layerIndex - 1));
         }
     }
@@ -395,9 +405,10 @@ public class BackpropTrainer extends IterableTrainer {
 
     @Override
     public void randomize() {
+        // Randomize weights
         net.getWeightMatrixList().forEach(WeightMatrix::randomize);
-
-        // TODO: Separate bias randomizer
+        // Randomize biases
+        // TODO: Move randomization of ndarrays to utility method
         for (int kk = 0; kk < biases.size(); ++kk) {
             for (int ii = 0; ii < biases.get(kk).length(); ii++) {
                 biases.get(kk).putScalar(ii, (Math.random() * 0.1) - 0.05);
@@ -408,7 +419,7 @@ public class BackpropTrainer extends IterableTrainer {
     /**
      * Print debug info.
      */
-    private void printDebugInfo() {
+    public void printDebugInfo() {
         System.out.println("---------------------------");
         System.out.println("Node Layer 1");
         System.out.println("\tActivations:" + inputLayer);
@@ -420,10 +431,25 @@ public class BackpropTrainer extends IterableTrainer {
             System.out.println("\tBiases: " + biases.get(i));
             System.out.println("\tDeltas: " + deltas.get(i));
             System.out.println("\tNet inputs: " + netInputs.get(i));
-            System.out.println("\tDerivatives: " + derivs);
+            System.out.println("\tDerivatives: " + derivs.get(i));
         }
-        System.out.println("Targets: " + targetVector);
-        System.out.println("Errors: " + errors);
+        System.out.println("MSE:" + getError());
+    }
+
+    public void printShapes() {
+        System.out.println("---------------------------");
+        System.out.println("Node Layer 1");
+        System.out.println("\tActivations:" + Utils.shapeString(inputLayer));
+        for (int i = 0; i < activations.size(); i++) {
+            System.out.println("Weight Layer " + (i + 1) + " --> " + (i + 2));
+            System.out.println("\tWeights:" + Utils.shapeString(net.getWeightMatrixList().get(i).getWeightMatrix()));
+            System.out.println("Node Layer " + (i + 2));
+            System.out.println("\tActivations: " + Utils.shapeString(activations.get(i)));
+            System.out.println("\tBiases: " + Utils.shapeString(biases.get(i)));
+            System.out.println("\tDeltas: " + Utils.shapeString(deltas.get(i)));
+            System.out.println("\tNet inputs: " + Utils.shapeString(netInputs.get(i)));
+            System.out.println("\tDerivatives: " + Utils.shapeString(derivs.get(i)));
+        }
         System.out.println("MSE:" + getError());
     }
 
@@ -449,100 +475,6 @@ public class BackpropTrainer extends IterableTrainer {
         if (network.getTrainingSet().getTargetData() != null) {
             targetData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getTargetData())).
                     transpose();
-        }
-    }
-
-    ///**
-    // * Convenience method for in place "Forward" matrix multiplication (forward
-    // * if vectors are assumed to be column-major) e.g.: Ax=y Transposes x and/or
-    // * y if needed to make this the specific operation that happens (right
-    // * multiply), and then transposes them back afterward. Thus the operation is
-    // * unambiguous and one does not have to care if x/y are rows or columns.
-    // * That is, regardless of if x or y are rows/columns Ax=y is performed,
-    // * which can be considered a "forward" propagation in a column-major
-    // * paradigm.
-    // *
-    // * @param inputs  the right-hand vector MUST be a vector
-    // * @param weights the matrix
-    // * @param outputs the result of a matrix-vector multiply MUST be a vector of the
-    // *                same number of elements as inputs, can be equal to inputs.
-    // */
-    //public static void forwardPropagate(INDArray inputs, INDArray weights, INDArray outputs) {
-    //    boolean wasRowX = false;
-    //    boolean wasRowY = false;
-    //    if (inputs.isRowVector()) {
-    //        // Fast transpose
-    //        inputs.rows = inputs.columns;
-    //        inputs.columns = 1;
-    //        wasRowX = true;
-    //    }
-    //    if (inputs != outputs && outputs.isRowVector()) {
-    //        // Fast transpose
-    //        outputs.rows = outputs.columns;
-    //        outputs.columns = 1;
-    //        wasRowY = true;
-    //    }
-    //
-    //    weights.mmuli(inputs, outputs);
-    //
-    //    if (wasRowX) {
-    //        // Fast transpose back
-    //        inputs.columns = inputs.rows;
-    //        inputs.rows = 1;
-    //    }
-    //    if (wasRowY) {
-    //        // Fast transpose back
-    //        outputs.columns = outputs.rows;
-    //        outputs.rows = 1;
-    //    }
-    //}
-
-    /**
-     * Convenience method for in place "Backward" matrix multiplication (backward if vectors are assumed to be
-     * column-major) e.g.: x^TA=y^T Transposes x and/or y if needed to make this the specific operation that happens
-     * (left multiply), and then transposes them back afterward. Thus the operation is unambiguous and one does not have
-     * to care if x/y are rows or columns. That is, regardless of if x or y are rows/columns xA=y is performed, which
-     * can be considered a "backward" propagation in a column-major paradigm.
-     *
-     * @param _x the left-hand vector MUST be a vector
-     * @param _A the matrix
-     * @param _y the result of a matrix-vector multiply MUST be a vector of the same number of elements as _x, can be
-     *           equal to _x.
-     */
-    public static void backwardPropagate(INDArray _x, INDArray _A, INDArray _y) {
-        boolean wasColX = false;
-        boolean wasColY = false;
-        if (_x.isColumnVector()) {
-            _x.transposei();
-            //// Fast transpose
-            //_x.columns = _x.rows;
-            //_x.rows = 1;
-            wasColX = true;
-        }
-        if (_x != _y && _y.isColumnVector()) {
-            // Fast transpose
-            _y.transposei();
-            //_y.columns = _y.rows;
-            //_y.rows = 1;
-            wasColY = true;
-        }
-
-        // TODO: Performance issue? Move outside of this method at the very least.
-        _x = _x.reshape(1, _x.length());
-        _y = _y.reshape(1, _y.length());
-        _x.mmuli(_A, _y);
-
-        if (wasColX) {
-            // Fast transpose back
-            //_x.rows = _x.columns;
-            //_x.columns = 1;
-            _x.transposei();
-        }
-        if (wasColY) {
-            // Fast transpose back
-            //_y.rows = _y.columns;
-            //_y.columns = 1;
-            _y.transposei();
         }
     }
 

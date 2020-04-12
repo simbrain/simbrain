@@ -44,15 +44,12 @@ import java.util.stream.Stream;
 import static org.simbrain.network.LocatableModelKt.getTopLeftLocation;
 
 /**
- * A group of neurons. A primary abstraction for larger network structures.
- * Layers in feed-forward networks are neuron groups. Self-organizing-maps
- * subclass this class. Etc.
- *<br>
- * Updating is done using a collection of neurons, but in a NeuronGroup they must all be the same type. This allows
- * the group to be characterized as spiking vs. non-spiking, for example, and serves other functions.
- * Because this constraint was added after neuron groups were first introduced, it is not yet rigorously enforced
- * in the code.
- *
+ * A group of neurons. A primary abstraction for larger network structures. Layers in feed-forward networks are neuron
+ * groups. Self-organizing-maps subclass this class. Etc.
+ * <br>
+ * Updating is done using a collection of neurons, but in a NeuronGroup they must all be the same type. This allows the
+ * group to be characterized as spiking vs. non-spiking, for example, and serves other functions. Because this
+ * constraint was added after neuron groups were first introduced, it is not yet rigorously enforced in the code.
  */
 public class NeuronGroup extends AbstractNeuronCollection {
 
@@ -88,9 +85,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
     private final HashSet<SynapseGroup> outgoingSgs = new HashSet<SynapseGroup>();
 
     /**
-     * In method setLayoutBasedOnSize, this is used as the threshold number of
-     * neurons in the group, above which to use grid layout instead of line
-     * layout.
+     * In method setLayoutBasedOnSize, this is used as the threshold number of neurons in the group, above which to use
+     * grid layout instead of line layout.
      */
     private int gridThreshold = 9;
 
@@ -122,7 +118,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     /**
      * Construct a new neuron group with a specified number of neurons.
      *
-     * @param net parent network
+     * @param net        parent network
      * @param numNeurons how many neurons it will have
      */
     public NeuronGroup(final Network net, final int numNeurons) {
@@ -130,11 +126,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * Copy constructor. pass in network for cases where a group is pasted from
-     * one network to another
+     * Copy constructor. pass in network for cases where a group is pasted from one network to another
      *
-     * @param net parent network
-     * @param toCopy  the neuron group this will become a (deep) copy of.
+     * @param net    parent network
+     * @param toCopy the neuron group this will become a (deep) copy of.
      */
     public NeuronGroup(final Network net, final NeuronGroup toCopy) {
         this(net, toCopy.getNeuronList().stream().map(Neuron::deepCopy).collect(Collectors.toList()));
@@ -166,10 +161,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * Updates all the neurons in the neuron group according to their
-     * NeuronUpdateRule(s). If the group is in input mode reads in the next
-     * set of values from the input table and sets the neuron values
-     * accordingly.
+     * Updates all the neurons in the neuron group according to their NeuronUpdateRule(s). If the group is in input mode
+     * reads in the next set of values from the input table and sets the neuron values accordingly.
      */
     @Override
     public void update() {
@@ -210,7 +203,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public void setNeuronType(String rule) {
         try {
-            NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + rule).newInstance();
+            NeuronUpdateRule newRule =
+                    (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + rule).newInstance();
             inputManager.setInputSpikes(newRule.isSpikingNeuron());
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -221,8 +215,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * Return a human-readable name for this type of neuron group. Subclasses
-     * should override this. Used in the Gui for various purposes.
+     * Return a human-readable name for this type of neuron group. Subclasses should override this. Used in the Gui for
+     * various purposes.
      *
      * @return the name of this type of neuron group.
      */
@@ -231,8 +225,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * Returns true if the provided synapse is in the fan-in weight vector of
-     * some node in this neuron group.
+     * Returns true if the provided synapse is in the fan-in weight vector of some node in this neuron group.
      *
      * @param synapse the synapse to check
      * @return true if it's attached to a neuron in this group
@@ -259,7 +252,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         if (getParentNetwork() != null) {
             neuron.setId(getParentNetwork().getIdManager().getId(Neuron.class));
             if (fireEvent) {
-//                getParentNetwork().fireNeuronAdded(neuron); // TODO: [event] let synapse handle this
+                //                getParentNetwork().fireNeuronAdded(neuron); // TODO: [event] let synapse handle this
             }
         }
         if (fireEvent) {
@@ -299,18 +292,16 @@ public class NeuronGroup extends AbstractNeuronCollection {
 
     @Override
     public String toString() {
-        return String.format("Neuron Group [%s]. Neuron group with %d neuron(s). Located at (%2.2f, %2.2f).\n",
-                getLabel(),
-                this.getNeuronList().size(),
-                getLocation().getX(),
-                getLocation().getY()
-        );
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Neuron Group [%s]. Neuron group with %d neuron(s). Located at (%2.2f, %2.2f).\n",
+                getLabel(), this.getNeuronList().size(), getLocation().getX(), getLocation().getY()));
+        sb.append("\tActivations:").append(getOutputArray()).append("\n");
+        return sb.toString();
     }
 
     /**
-     * Returns an array of spike indices used in couplings, (e.g. to a raster
-     * plot). For example, if a neuron group has 9 neurons, and neurons 1 and 4
-     * just spiked, the producer will send the list (1,0,0,4,0,0,0,0,0).
+     * Returns an array of spike indices used in couplings, (e.g. to a raster plot). For example, if a neuron group has
+     * 9 neurons, and neurons 1 and 4 just spiked, the producer will send the list (1,0,0,4,0,0,0,0,0).
      *
      * @return the spike index array
      */
@@ -383,8 +374,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * Apply this group's layout to its neurons based on a specified initial
-     * position.
+     * Apply this group's layout to its neurons based on a specified initial position.
      *
      * @param initialPosition the position from which to begin the layout.
      */
@@ -426,16 +416,14 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * If more than gridThreshold neurons use a grid layout, else a horizontal
-     * line layout.
+     * If more than gridThreshold neurons use a grid layout, else a horizontal line layout.
      */
     public void setLayoutBasedOnSize() {
         setLayoutBasedOnSize(new Point2D.Double(0, 0));
     }
 
     /**
-     * If more than gridThreshold neurons use a grid layout, else a horizontal
-     * line layout.
+     * If more than gridThreshold neurons use a grid layout, else a horizontal line layout.
      *
      * @param initialPosition the initial Position for the layout
      */
@@ -487,20 +475,19 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
-     * Helper class for creating new neuron groups using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
+     * Helper class for creating new neuron groups using
+     * {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */
     public static class NeuronGroupCreator implements EditableObject {
 
-        @UserParameter(label = "Number of neurons", description = "How many neurons this neuron group should have", order = -1)
+        @UserParameter(label = "Number of neurons", description = "How many neurons this neuron group should have",
+                order = -1)
         int numNeurons = 20;
 
         /**
          * A label for this Neuron Group for display purposes.
          */
-        @UserParameter(
-                label = "Label",
-                initialValueMethod = "getLabel"
-        )
+        @UserParameter(label = "Label", initialValueMethod = "getLabel")
         private String label;
 
         /**
@@ -525,7 +512,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
          * Editor.
          *
          * @param network the network this neuron array adds to
-         *
          * @return the created neuron array
          */
         public NeuronGroup create(Network network) {

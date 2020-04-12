@@ -18,6 +18,7 @@ import org.simbrain.workspace.Producible;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Arrays;
 
 /**
  * An ND4J weight matrix that connects a source and target {@link ArrayConnectable}
@@ -142,7 +143,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         String ret = new String();
         ret += weightMatrix.rows() + "x" + weightMatrix.columns() + " matrix [" + getId() + "] ";
         ret += "  Connects " + source.getId() + " to " + target.getId() + "\n";
-        ret += weightMatrix;
+        ret += "\t\t" + Arrays.deepToString(weightMatrix.toDoubleMatrix()) + "\n";
         return ret;
     }
 

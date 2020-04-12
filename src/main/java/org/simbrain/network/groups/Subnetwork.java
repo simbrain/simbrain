@@ -432,19 +432,19 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
 
     @Override
     public String toString() {
-        String ret = new String();
-        ret += ("Subnetwork Group [" + getLabel() + "] Subnetwork with " + neuronGroupList.size() + " neuron group(s) and ");
-        ret += (synapseGroupList.size() + " synapse group(s)");
-        if ((getNeuronGroupCount() + getSynapseGroupCount()) > 0) {
-            ret += "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Subnetwork Group [" + getLabel() + "] Subnetwork with " + neuronGroupList.size() + " neuron " +
+                "group(s) and ");
+        sb.append(synapseGroupList.size()).append(" synapse group(s) and ")
+                .append(weightMatrixList.size()).append(" weight matrices\n");
+        neuronGroupList.forEach(sb::append);
+        if(synapseGroupList.size() > 0) {
+            synapseGroupList.forEach(sb::append);
         }
-        for (NeuronGroup neuronGroup : neuronGroupList) {
-            ret += "   " + neuronGroup.toString();
+        if(weightMatrixList.size() > 0) {
+            weightMatrixList.forEach(sb::append);
         }
-        for (SynapseGroup synapseGroup : synapseGroupList) {
-            ret += "   " + synapseGroup.toString();
-        }
-        return ret;
+        return sb.toString();
     }
 
     /**

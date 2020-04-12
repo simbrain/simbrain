@@ -8,6 +8,7 @@ import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.gui.ImageBox;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixArrow;
+import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
@@ -142,8 +143,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
     @Override
     protected String getToolTipText() {
-        return
-                weightMatrix.toString();
+        return weightMatrix.toString();
     }
 
     @Override
@@ -244,12 +244,21 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
      * Returns the dialog for editing this weight matrix
      */
     private StandardDialog getMatrixDialog() {
-        StandardDialog dialog = new AnnotatedPropertyEditor(weightMatrix).getDialog();
+        StandardDialog dialog = new StandardDialog();
+        dialog.setTitle("Edit Weight Matrix");
+        JTabbedPane tabs= new JTabbedPane();
+
+        // Property Editor
+        AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(weightMatrix);
+        tabs.addTab("Properties", ape);
+
+        // Weight matrix
+        tabs.addTab("Weight Matrix", new JLabel("Coming soon"));
+        // TODO
+
+        dialog.setContentPane(tabs);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
-        //dialog.addClosingTask(() -> {
-        //    NeuronArrayNode.this.updateInfoText();
-        //});
         return dialog;
     }
 

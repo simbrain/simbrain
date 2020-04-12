@@ -200,16 +200,13 @@ public class FeedForward extends Subnetwork {
 
     @Override
     public void update() {
-        //getNeuronGroupList().get(0).update();
         for (int i = 0; i < getNeuronGroupList().size() ; i++) {
+            getNeuronGroupList().get(i).update();
             if(getSynapseGroupList().size() > i) {
                 getSynapseGroupList().get(i).update();
             }
             if(getWeightMatrixList().size() > i) {
                 getWeightMatrixList().get(i).update();
-            }
-            if (i > 0) {
-                getNeuronGroupList().get(i).update();
             }
         }
     }

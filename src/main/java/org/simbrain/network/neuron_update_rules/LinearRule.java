@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -29,7 +30,8 @@ import org.simbrain.util.math.ProbabilityDistribution;
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
+public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule,
+        BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule, TransferFunction {
 
     /**
      * The Default upper bound.
@@ -244,4 +246,25 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
         this.clipping = clipping;
     }
 
+    // TODO
+
+    @Override
+    public void applyFunctionInPlace(INDArray input) {
+
+    }
+
+    @Override
+    public void applyFunction(INDArray input, INDArray output) {
+
+    }
+
+    @Override
+    public void getDerivative(INDArray input, INDArray output) {
+
+    }
+
+    @Override
+    public void applyFunctionAndDerivative(INDArray input, INDArray output, INDArray derivative) {
+
+    }
 }

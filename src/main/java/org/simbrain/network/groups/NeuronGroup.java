@@ -179,6 +179,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public void setNeuronType(NeuronUpdateRule base) {
         inputManager.setInputSpikes(base.isSpikingNeuron());
+        groupUpdateRule = UpdateRuleEnum.get(base);
         for (Neuron neuron : getNeuronList()) {
             neuron.setUpdateRule(base.deepCopy());
         }

@@ -28,6 +28,9 @@ public class BackpropTrainerTest {
         return trainer;
     }
 
+    // TODO: Test Different UpdateMethods
+    // TODO: XOR
+
     @Test
     public void testConvergence() {
 
@@ -58,6 +61,7 @@ public class BackpropTrainerTest {
         //System.out.println(bp);
         //System.out.println(trainer2.getError());
 
+        //TODO: Other activation rules
     }
 
     // @Test

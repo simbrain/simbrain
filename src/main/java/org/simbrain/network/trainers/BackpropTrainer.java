@@ -142,7 +142,7 @@ public class BackpropTrainer extends IterableTrainer {
      * Current update method.
      */
     @UserParameter(label = "Update Method", description = "Update Method", order = 10)
-    private UpdateMethod updateMethod = UpdateMethod.EPOCH;
+    private UpdateMethod updateMethod = UpdateMethod.SINGLE;
 
     /**
      * Specifies the method for batching data when calculating network outputs and errors.
@@ -252,12 +252,10 @@ public class BackpropTrainer extends IterableTrainer {
     private double trainRow(int row) {
         batchErrors.muli(0);
         // Get the inputs and feed them forward
-        inputLayer = inputData.getColumn(row)
-                .reshape(1,inputData.getColumn(row).length());
+        inputLayer = inputData.getRow(row, true);
         updateNetwork();
         // Backpropagate error
-        targetVector = targetData.getColumn(row)
-                .reshape(1,targetData.getColumn(row).length());
+        targetVector = targetData.getRow(row, true);
         targetVector.subi(getOutputLayer(), errors);
         batchErrors.addi(errors);
         backpropagateError();
@@ -278,13 +276,14 @@ public class BackpropTrainer extends IterableTrainer {
         for (int row = firstRow; row < lastRow; row++) {
 
             // Get the inputs and feed them forward
-            inputLayer = inputData.getColumn(row).reshape(1,inputData.getColumn(row).length());
+            inputLayer = inputData.getRow(row, true);
             updateNetwork();
-            targetVector = targetData.getColumn(row).reshape(1,targetData.getColumn(row).length());;
+            targetVector = targetData.getRow(row, true);
             targetVector.subi(getOutputLayer(), errors);
 
             // Calculate batch errors
             batchErrors.addi(errors);
+            System.out.println(batchErrors);
         }
         batchErrors.divi(lastRow - firstRow);
         // Back propagate batch errors
@@ -469,12 +468,10 @@ public class BackpropTrainer extends IterableTrainer {
     public void initData() {
         // Store data as columns since that's what everything else deals with so there is no need to transpose later.
         if (network.getTrainingSet().getInputData() != null) {
-            inputData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getInputData())).
-                    transpose();
+            inputData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getInputData()));
         }
         if (network.getTrainingSet().getTargetData() != null) {
-            targetData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getTargetData())).
-                    transpose();
+            targetData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getTargetData()));
         }
     }
 

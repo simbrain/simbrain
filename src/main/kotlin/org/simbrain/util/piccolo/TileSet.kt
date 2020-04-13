@@ -126,7 +126,7 @@ class TileSet {
     }
 
     private fun cacheNewTile(localId: Int): Tile = when (localId) {
-        in 0..tilecount -> (idTileMap.get(localId) ?: Tile(localId)).also { idTileMap[localId] = it }
+        in 0..tilecount -> (idTileMap[localId] ?: Tile(localId).also { idTileMap[localId] = it })
         else -> throw IllegalArgumentException("Tile set has only $tilecount tiles, but requesting tile $localId.")
     }
 

@@ -504,6 +504,30 @@ public class Workspace {
     }
 
     /**
+     * Helper method to save a specified file.
+     *
+     * @param file file to save.
+     */
+    public void save(File file) {
+        if (file != null) {
+            try {
+                FileOutputStream ostream = new FileOutputStream(file);
+                try {
+                    WorkspaceSerializer serializer = new WorkspaceSerializer(this);
+                    serializer.serialize(ostream);
+                    setWorkspaceChanged(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    ostream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * Convenience method for adding an update action to the workspace's action
      * list (the sequence of actions invoked on each iteration of the
      * workspace).

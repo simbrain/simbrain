@@ -243,6 +243,7 @@ public class WorkspaceSerializer {
         deserializeCouplings(archive);
         deserializeUpdateActions(archive, deserializer);
         deserializeWorkspaceParameters(archive);
+
     }
 
     private Map<String, byte[]> processInputStream(InputStream stream) throws IOException {
@@ -396,29 +397,6 @@ public class WorkspaceSerializer {
         }
     }
 
-    /**
-     * Helper method to save a specified file.
-     *
-     * @param file      file to save.
-     * @param workspace reference to workspace
-     */
-    public static void save(File file, Workspace workspace) {
-        if (file != null) {
-            try {
-                FileOutputStream ostream = new FileOutputStream(file);
-                try {
-                    WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
-                    serializer.serialize(ostream);
-                    workspace.setWorkspaceChanged(false);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    ostream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 
 }

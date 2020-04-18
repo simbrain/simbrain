@@ -381,9 +381,8 @@ public class Simulation {
      * @param fileName name of file to save.
      */
     public void saveWorkspace(String fileName) {
-        WorkspaceSerializer.save(new File(fileName), workspace);
+        workspace.save(new File(fileName));
     }
-
 
     /**
      * Iterate the simulation once.
@@ -414,6 +413,5 @@ public class Simulation {
     public Workspace getWorkspace() {
         return workspace;
     }
-
 
 }

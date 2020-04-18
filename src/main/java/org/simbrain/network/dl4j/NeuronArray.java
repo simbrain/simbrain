@@ -47,12 +47,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     /**
      * Number of columns in the under laying ND4J Array.
      */
-    @UserParameter(
-            label = "Nodes",
-            description = "Number of nodes",
-            editable = false,
-            order = 1
-    )
+    @UserParameter(label = "Nodes", description = "Number of nodes", editable = false, order = 1)
     private int numNodes = 100;
 
     /**
@@ -71,9 +66,8 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     private double y;
 
     /**
-     * Reference to incoming weight matrix.
-     * TODO: Consider making this a list, prior to implementing serialization. But note that
-     * there is no support currently for many-to-one connections.
+     * Reference to incoming weight matrix. TODO: Consider making this a list, prior to implementing serialization. But
+     * note that there is no support currently for many-to-one connections.
      */
     private WeightMatrix incomingWeightMatrix;
 
@@ -85,11 +79,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     /**
      * Render an image showing each activation when true.
      */
-    @UserParameter(
-            label = "Show activations",
-            description = "Whether to show activations as a pixel image",
-            order = 4
-    )
+    @UserParameter(label = "Show activations", description = "Whether to show activations as a pixel image", order = 4)
     private boolean renderActivations = true;
 
     /**
@@ -100,7 +90,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     /**
      * Construct a neuron array.
      *
-     * @param net parent net
+     * @param net      parent net
      * @param numNodes number of nodes
      */
     public NeuronArray(Network net, int numNodes) {
@@ -114,7 +104,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Make a deep copy of this array.
      *
      * @param newParent the new parent network
-     * @param orig the array to copy
+     * @param orig      the array to copy
      * @return the deep copy
      */
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
@@ -138,14 +128,14 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     /**
-     * Set the label. This prevents the group id being used as the label for
-     * new groups.  If null or empty labels are sent in then the group label is used.
+     * Set the label. This prevents the group id being used as the label for new groups.  If null or empty labels are
+     * sent in then the group label is used.
      */
     @Consumable(defaultVisibility = false)
     public void setLabel(String label) {
         String oldLabel = this.label;
         this.label = label;
-        events.fireLabelChange(oldLabel , label);
+        events.fireLabelChange(oldLabel, label);
     }
 
     /**
@@ -269,21 +259,13 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         /**
          * Number of columns in the under laying ND4J Array.
          */
-        @UserParameter(
-                label = "Nodes",
-                description = "Number of nodes",
-                order = 1
-        )
+        @UserParameter(label = "Nodes", description = "Number of nodes", order = 1)
         private int numNodes = 100;
 
         /**
          * A label for this Neuron Array for display purpose.
          */
-        @UserParameter(
-                label = "Label",
-                description = "If left blank, a default label will be created.",
-                initialValueMethod = "getLabel"
-        )
+        @UserParameter(label = "Label", description = "If left blank, a default label will be created.", initialValueMethod = "getLabel")
         private String label;
 
         /**
@@ -298,7 +280,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
          * Editor.
          *
          * @param network the network this neuron array adds to
-         *
          * @return the created neuron array
          */
         public NeuronArray create(Network network) {
@@ -368,4 +349,10 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public NeuronArrayEvents getEvents() {
         return events;
     }
+
+    private Object readResolve() {
+        events = new NeuronArrayEvents(this);
+        return this;
+    }
+
 }

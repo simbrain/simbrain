@@ -17,9 +17,11 @@
  */
 package org.simbrain.network;
 
+import com.thoughtworks.xstream.XStream;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.util.Utils;
+import org.simbrain.util.nd4j.Nd4jConverter;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -155,15 +157,24 @@ public final class NetworkComponent extends WorkspaceComponent {
     }
 
     public static NetworkComponent open(final InputStream input, final String name, final String format) {
-        Network newNetwork = (Network) Utils.getSimbrainXStream().fromXML(input);
+        Network newNetwork = (Network) getNetworkXStream().fromXML(input);
         return new NetworkComponent(name, newNetwork);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
         network.preSaveInit();
-        Utils.getSimbrainXStream().toXML(network, output);
+        getNetworkXStream().toXML(network, output);
         network.postSaveReInit();
+    }
+
+    /**
+     * Get Xstream with custom converters
+     */
+    private static XStream getNetworkXStream() {
+        XStream xstream = Utils.getSimbrainXStream();
+        xstream.registerConverter(new Nd4jConverter());
+        return xstream;
     }
 
     /**

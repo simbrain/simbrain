@@ -17,6 +17,8 @@ import kotlin.streams.toList
 
 fun main() {
 
+    // This all works and is pretty easy to read
+
     val trainingSet = mapOf(
             listOf(0.0, 0.0) to listOf(0.0),
             listOf(0.0, 1.0) to listOf(1.0),
@@ -51,6 +53,8 @@ fun main() {
 
 }
 
+// This is the part that is hard to read and write
+
 class XorAgent(val xorGenome: XorGenome) {
 
     private val mapping: Map<Int, Neuron>
@@ -74,6 +78,7 @@ class XorAgent(val xorGenome: XorGenome) {
         }.forEach { addLooseSynapse(it) }
     }
 
+    // In a run where the workspace is not needed, don't create the workspace
     private val workspace by lazy {
         Workspace().apply { addWorkspaceComponent(NetworkComponent("net", network)) }
     }

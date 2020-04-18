@@ -84,13 +84,13 @@ public class WorkspaceTest {
         assertEquals(4, workspace.getComponentList().size());
         assertEquals(1, workspace.getCouplingManager().getCouplings().size());
 
-        // Cant reuse n1 and n2 because it'sbeen deserialized
+        // Cant reuse n1 and n2 because it's been deserialized
         Neuron newN1 = ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getLooseNeuron(0);
         Neuron newN2 = ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getLooseNeuron(0);
         newN1.forceSetActivation(.8);
         workspace.simpleIterate();
         assertEquals(.8, newN2.getActivation(), .0001);
-        
+
     }
 
 

@@ -1698,15 +1698,16 @@ public class NetworkPanel extends JPanel {
      * Create a {@link ScreenElement} for every {@link NetworkModel} in the network.
      */
     public void initScreenElements() {
-        network.getLooseNeurons().forEach(n -> addNeuron(n));
+        network.getLooseNeurons().forEach(this::addNeuron);
         // Synapses must be added _after_ groups are added so that all neurons
         // in groups are
         // in place.
-        network.getLooseSynapses().forEach(s -> addSynapse(s));
-        network.getNeuronCollectionSet().forEach(nc -> addNeuronCollection(nc));
-        network.getNeuronGroups().forEach(ng -> addNeuronGroup(ng));
-        network.getSubnetworks().forEach(sub -> addSubnetwork(sub));
-        network.getTextList().forEach(text  -> addTextObject(text));
+        network.getLooseSynapses().forEach(this::addSynapse);
+        network.getNeuronCollectionSet().forEach(this::addNeuronCollection);
+        network.getNeuronGroups().forEach(this::addNeuronGroup);
+        network.getSubnetworks().forEach(this::addSubnetwork);
+        network.getNeuronArrays().forEach(this::addNeuronArray);
+        network.getTextList().forEach(this::addTextObject);
     }
 
     /**

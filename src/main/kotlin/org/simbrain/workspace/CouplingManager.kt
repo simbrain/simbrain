@@ -10,6 +10,11 @@ import java.lang.reflect.Method
  *
  * This is a transient field of [Workspace] which is thus not persisted.
  *
+ * Couplings can be created in a many-to-many fashion. One to many coupligns were not allowed in earlier versions of
+ * Simbrain, because they can produce unexpected behaviors, where one producer will overrwrite the value of another.
+ * However, many-to-one couplings can be useful, and are handled by special consumers, e.g. Neuron.addInputValue
+ * or OdorWorld's effectors like StraightMovement, which has an addAmount method.
+ *
  * Coupling creation should rely on the factory methods here
  * rather than by invoking constructors on Coupling directly so that couplings will
  * be properly managed and serialized.

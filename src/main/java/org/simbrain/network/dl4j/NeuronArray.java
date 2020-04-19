@@ -50,6 +50,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     @UserParameter(label = "Nodes", description = "Number of nodes", editable = false, order = 1)
     private int numNodes = 100;
 
+    @UserParameter(label = "Increment amount", increment = .1, order = 20)
+    private double increment = .1;
+
     /**
      * ND4J Array backing this object
      */
@@ -219,7 +222,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Override
     public void onCommit() {
-        events.fireLabelChange(null, label);
+        events.fireLabelChange("", label);
     }
 
     public String getLabel() {
@@ -240,6 +243,22 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public void offset(final double offsetX, final double offsetY) {
         x += offsetX;
         y += offsetY;
+        events.fireUpdated();
+    }
+
+    /**
+     * Add increment to every entry in weight matrix
+     */
+    public void increment() {
+        neuronArray.addi(increment);
+        events.fireUpdated();
+    }
+
+    /**
+     * Subtract increment from every entry in weight matrix
+     */
+    public void decrement() {
+        neuronArray.subi(increment);
         events.fireUpdated();
     }
 

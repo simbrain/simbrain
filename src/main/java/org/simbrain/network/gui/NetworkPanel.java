@@ -1833,9 +1833,8 @@ public class NetworkPanel extends JPanel {
             synapseNode.updateColor();
             synapseNode.updateDiameter();
         }
-        for (WeightMatrix wm : getSelectedModels(WeightMatrix.class)) {
-            wm.increment();
-        }
+        getSelectedModels(WeightMatrix.class).forEach(WeightMatrix::increment);
+        getSelectedModels(NeuronArray.class).forEach(NeuronArray::increment);
     }
 
     /**
@@ -1851,9 +1850,8 @@ public class NetworkPanel extends JPanel {
             synapseNode.updateColor();
             synapseNode.updateDiameter();
         }
-        for (WeightMatrix wm : getSelectedModels(WeightMatrix.class)) {
-            wm.decrement();
-        }
+        getSelectedModels(WeightMatrix.class).forEach(WeightMatrix::decrement);
+        getSelectedModels(NeuronArray.class).forEach(NeuronArray::decrement);
     }
 
     /**

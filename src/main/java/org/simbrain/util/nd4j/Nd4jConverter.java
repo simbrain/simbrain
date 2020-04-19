@@ -10,31 +10,56 @@ import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 /**
- * Custon conversion of INDArrays
+ * Custom conversion of INDArrays
  */
 public class Nd4jConverter implements Converter {
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         INDArray array = (INDArray) source;
-        writer.startNode("values");
-        context.convertAnother(array.toFloatVector());
+        writer.startNode("isMatrix");
+        context.convertAnother(array.isMatrix());
         writer.endNode();
-        writer.startNode("shape");
-        context.convertAnother(array.shape());
+        writer.startNode("values");
+        if(array.isMatrix()) {
+            context.convertAnother(array.toFloatMatrix());
+        } else {
+            context.convertAnother(array.toFloatVector());
+        }
+        writer.endNode();
+        writer.startNode("rows");
+        context.convertAnother(array.rows());
+        writer.endNode();
+        writer.startNode("columns");
+        context.convertAnother(array.columns());
         writer.endNode();
     }
 
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+        Object values;
         reader.moveDown();
-        float[] values = (float[]) context.convertAnother(null, float[].class);
+        boolean isMatrix = (boolean) context.convertAnother(null, boolean.class);
         reader.moveUp();
         reader.moveDown();
-        long[] shape = (long[]) context.convertAnother(null, long[].class);
+        if(isMatrix) {
+            values = (float[][]) context.convertAnother(null, float[][].class);
+        } else {
+            values = (float[]) context.convertAnother(null, float[].class);
+        }
         reader.moveUp();
-
-        INDArray array = Nd4j.createFromArray(values);
-        array.reshape(shape);
+        reader.moveDown();
+        long rows = (long) context.convertAnother(null, long.class);
+        reader.moveUp();
+        reader.moveDown();
+        long columns = (long) context.convertAnother(null, long.class);
+        reader.moveUp();
+        INDArray array;
+        if(isMatrix) {
+            array = Nd4j.createFromArray((float[][])values);
+        } else {
+            array = Nd4j.createFromArray((float[])values);
+        }
+        array.reshape(rows, columns);
         return array;
     }
 

@@ -253,6 +253,11 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         events.fireUpdated();
     }
 
+    private Object readResolve() {
+        events = new WeightMatrixEvents(this);
+        return this;
+    }
+
     //public Layer asLayer() {
     //    return new DenseLayer.Builder().nIn(source.arraySize()).nOut(target.arraySize())
     //            .activation(Activation.SOFTMAX)

@@ -86,7 +86,6 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         events.onUpdated(this::renderMatrixToImage);
         wm.getSource().getEvents().onLocationChange(arrow::invalidateFullBounds);
         wm.getTarget().getEvents().onLocationChange(arrow::invalidateFullBounds);
-
     }
 
     @Override

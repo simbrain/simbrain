@@ -1707,6 +1707,7 @@ public class NetworkPanel extends JPanel {
         network.getNeuronGroups().forEach(this::addNeuronGroup);
         network.getSubnetworks().forEach(this::addSubnetwork);
         network.getNeuronArrays().forEach(this::addNeuronArray);
+        network.getWeightMatrices().forEach(this::addWeightMatrix);
         network.getTextList().forEach(this::addTextObject);
     }
 

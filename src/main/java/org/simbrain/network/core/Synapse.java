@@ -374,6 +374,16 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         }
     }
 
+    @Override
+    public void setBufferValues() {
+        update();
+    }
+
+    @Override
+    public void applyBufferValues() {
+        // Not needed?
+    }
+
     /**
      * For spiking source neurons, returns the spike-responder's value times the synapse strength. For non-spiking
      * neurons, returns the pre-synaptic activation times the synapse strength.

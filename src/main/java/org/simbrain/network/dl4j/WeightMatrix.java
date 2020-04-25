@@ -127,6 +127,17 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         target.setInputArray(source.getOutputArray().mmul(weightMatrix));
     }
 
+    @Override
+    public void setBufferValues() {
+        // TODO
+        update();
+    }
+
+    @Override
+    public void applyBufferValues() {
+        // No implementation?
+    }
+
     /**
      * Set the label. This prevents the group id being used as the label for
      * new groups.  If null or empty labels are sent in then the group label is used.

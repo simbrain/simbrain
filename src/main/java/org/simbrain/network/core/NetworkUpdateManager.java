@@ -51,40 +51,8 @@ public class NetworkUpdateManager {
     public NetworkUpdateManager(Network network) {
         this.network = network;
 
-        // Default update method
+        // By default, only do a buffered update
         addAction(new BufferedUpdate(network));
-
-        //  These are the items that are automatically wrapped in an update action
-        network.getEvents().onNeuronGroupAdded(ng -> {
-            UpdateNetworkModel updateAction = new UpdateNetworkModel(ng);
-            addAction(updateAction);
-            ng.getEvents().onDelete(ng2 -> removeAction(updateAction));
-        });
-        network.getEvents().onSynapseGroupAdded(sg -> {
-            UpdateNetworkModel updateAction = new UpdateNetworkModel(sg);
-            addAction(updateAction);
-            sg.getEvents().onDelete(sg2 -> removeAction(updateAction));
-        });
-        network.getEvents().onSubnetworkAdded(sn -> {
-            UpdateNetworkModel updateAction = new UpdateNetworkModel(sn);
-            addAction(updateAction);
-            sn.getEvents().onDelete(sn2 -> removeAction(updateAction));
-        });
-        network.getEvents().onNeuronArrayAdded(na -> {
-            UpdateNetworkModel updateAction = new UpdateNetworkModel(na);
-            addAction(updateAction);
-            na.getEvents().onDelete(na2 -> removeAction(updateAction));
-        });
-        network.getEvents().onWeightMatrixAdded(wm -> {
-            UpdateNetworkModel updateAction = new UpdateNetworkModel(wm);
-            addAction(updateAction);
-            wm.getEvents().onDelete(wm2 -> removeAction(updateAction));
-        });
-        network.getEvents().onMultiLayerNetworkAdded(mln -> {
-            UpdateNetworkModel updateNetworkModelAction = new UpdateNetworkModel(mln);
-            addAction(updateNetworkModelAction);
-            //mln.getEvents().onDelete(mln2 -> removeAction(updateGroupAction)); // TODO
-        });
 
     }
 

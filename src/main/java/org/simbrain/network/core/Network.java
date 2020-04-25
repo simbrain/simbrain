@@ -255,12 +255,22 @@ public class Network {
      */
     public void bufferedUpdateAllNeurons() {
 
+        // TODO: Rename
+        // TODO: use a getNetworkModels function (then it may be reusable in networkpanel)
+
         // First update the activation buffers
-        looseNeurons.forEach(Neuron::update);
+        looseNeurons.forEach(NetworkModel::update);
+        neuronGroups.forEach(NetworkModel::update);
+        weightMatrices.forEach(NetworkModel::update);
+        getNeuronArrays().forEach(NetworkModel::update);
+        neuronCollectionSet.forEach(NetworkModel::update);
 
         // Then update the activations themselves
-        looseNeurons.forEach(Neuron::setToBufferVals);
-
+        looseNeurons.forEach(NetworkModel::applyBufferValues);
+        neuronGroups.forEach(NetworkModel::applyBufferValues);
+        weightMatrices.forEach(NetworkModel::applyBufferValues);
+        getNeuronArrays().forEach(NetworkModel::applyBufferValues);
+        neuronCollectionSet.forEach(NetworkModel::applyBufferValues);
     }
 
     /**

@@ -379,6 +379,18 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         updateRule.update(this);
     }
 
+    @Override
+    public void setBufferValues() {
+        // TODO: renames around here might be needed.
+        update();
+    }
+
+    @Override
+    public void applyBufferValues() {
+        // TODO: More renames at some point
+        setToBufferVals();
+    }
+
     /**
      * Sets the activation of the neuron if it is not clamped. To unequivocally
      * set the activation use {@link #forceSetActivation(double)

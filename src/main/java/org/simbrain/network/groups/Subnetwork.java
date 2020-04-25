@@ -562,4 +562,14 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         return events;
     }
 
+    @Override
+    public void setBufferValues() {
+        // TODO
+    }
+
+    @Override
+    public void applyBufferValues() {
+        // TODO
+    }
+
 }

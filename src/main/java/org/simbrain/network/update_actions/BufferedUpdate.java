@@ -22,8 +22,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 
 /**
- * Buffered update of loose items (neurons and synapses), i.e. items not in
- * groups. (Buffered update means order of update does not matter).
+ * Buffered update of all network models.  Write values to appropriate buffers.  Then read all values from them,
+ * which allows for deterministic updating independently of update order.
  *
  * @author jyoshimi
  */
@@ -43,10 +43,8 @@ public class BufferedUpdate implements NetworkUpdateAction {
 
     @Override
     public void invoke() {
-        network.bufferedUpdateAllNeurons();
-        network.updateNeuronArrayConnections();
-        network.updateLooseSynapses();
-        network.clearInputs();
+        network.bufferedUpdateAllNeurons(); // TODO: Rename this
+        //network.clearInputs();
     }
 
     @Override

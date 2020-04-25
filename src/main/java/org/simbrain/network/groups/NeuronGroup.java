@@ -547,7 +547,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     // TODO
     public enum GroupEnum {
         DEFAULT, WTA, COMPETITIVE, SOM;
-
     }
 
 }

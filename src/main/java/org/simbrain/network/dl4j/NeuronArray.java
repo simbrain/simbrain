@@ -59,6 +59,11 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     private INDArray neuronArray;
 
     /**
+     * For buffered update.
+     */
+    private INDArray arrayBuffer;
+
+    /**
      * Center of the neuron array.
      */
     private double x;
@@ -122,6 +127,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     @Consumable()
     public void setValues(double[] values) {
         float[] floatValues = Utils.castToFloat(values);
+        // TODO: Deal with the float issue, and make this set values in place of a float array, rather than
+        //  re-creating it every time! However there may be an nd4j optimization such that under the hood
+        //  not much object creation is happening
         neuronArray = Nd4j.create(floatValues).reshape(neuronArray.rows(), neuronArray.columns());
     }
 
@@ -213,11 +221,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     @Override
     public void removeOutgoingWeightMatrix(WeightMatrix weightMatrix) {
         this.outgoingWeightMatrices.remove(weightMatrix);
-    }
-
-    public void setNeuronArray(INDArray data) {
-        neuronArray = data;
-        numNodes = data.columns();
     }
 
     @Override
@@ -337,9 +340,28 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Override
     public void setInputArray(INDArray activations) {
-        setNeuronArray(activations);
-        //update();
+        neuronArray = activations;
+        numNodes = activations.columns();
+
     }
+
+    @Override
+    public void setInputBuffer(INDArray activations) {
+        arrayBuffer = activations;
+    }
+
+    @Override
+    public void setBufferValues() {
+        // Not needed; Weight matrix does this.
+    }
+
+    @Override
+    public void applyBufferValues() {
+        if (arrayBuffer != null) {
+            setInputArray(arrayBuffer.dup());
+        }
+    }
+
 
     @Override
     public String getId() {

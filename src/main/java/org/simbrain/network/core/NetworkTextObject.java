@@ -206,4 +206,14 @@ public class NetworkTextObject implements LocatableModel {
     public void update() {
         // No implementation
     }
+
+    @Override
+    public void setBufferValues() {
+        // No implementaiton
+    }
+
+    @Override
+    public void applyBufferValues() {
+        // No implementaiton
+    }
 }

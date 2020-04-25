@@ -243,6 +243,22 @@ public class MultiLayerNet implements ArrayConnectable, LocatableModel {
         // TODO
     }
 
+    @Override
+    public void setBufferValues() {
+        // TODO
+    }
+
+    @Override
+    public void applyBufferValues() {
+        // TODO
+    }
+
+    @Override
+    public void setInputBuffer(INDArray activations) {
+        //TODO
+    }
+
+
     /**
      * For creation using an {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */

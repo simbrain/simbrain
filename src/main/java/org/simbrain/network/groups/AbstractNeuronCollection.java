@@ -83,6 +83,11 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     private double[] activations;
 
     /**
+     * For buffered update relative to weight matrices.
+     */
+    private INDArray arrayBuffer;
+
+    /**
      * A single outgoing weight matrix is possible, to a neuron collection, group, or array.
      */
     private WeightMatrix incomingWeightMatrix;
@@ -826,5 +831,22 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
 
     public NeuronCollectionEvents getEvents() {
         return events;
+    }
+
+    @Override
+    public void setBufferValues() {
+        update(); // For loose neurons. Weight matrix buffered update handled by weight matrix
+    }
+
+    @Override
+    public void applyBufferValues() {
+        if (arrayBuffer != null) {
+            setInputArray(arrayBuffer.dup());
+        }
+    }
+
+    @Override
+    public void setInputBuffer(INDArray activations) {
+        arrayBuffer = activations;
     }
 }

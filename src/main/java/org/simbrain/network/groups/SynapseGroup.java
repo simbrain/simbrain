@@ -545,6 +545,16 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         }
     }
 
+    @Override
+    public void setBufferValues() {
+        update();
+    }
+
+    @Override
+    public void applyBufferValues() {
+        // No implementation
+    }
+
     private void updateExcitatorySynapses() {
         for (Synapse synapse : exSynapseSet) {
             synapse.update();

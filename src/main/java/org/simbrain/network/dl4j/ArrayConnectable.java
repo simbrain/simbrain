@@ -19,6 +19,11 @@ public interface ArrayConnectable extends LocatableModel {
     void setInputArray(INDArray activations);
 
     /**
+     * Set input buffer to support buffered update.
+     */
+    void setInputBuffer(INDArray activations);
+
+    /**
      * Returns "output" activations.
      */
     INDArray getOutputArray();

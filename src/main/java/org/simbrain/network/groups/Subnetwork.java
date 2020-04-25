@@ -385,6 +385,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      */
     public void addWeightMatrix(WeightMatrix wm) {
         weightMatrixList.add(wm);
+        parentNetwork.getEvents().fireWeightMatrixAdded(wm);
         parentNetwork.getEvents().onWeightMatrixRemoved(w -> {
             weightMatrixList.remove(w);
         });

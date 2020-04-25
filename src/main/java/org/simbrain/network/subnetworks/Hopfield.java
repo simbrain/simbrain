@@ -23,6 +23,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.GridLayout;
@@ -126,10 +127,7 @@ public class Hopfield extends Subnetwork implements Trainable {
         neuronGroup.setIncrement(1);
 
         // Connect the neurons together
-        AllToAll connection = new AllToAll();
-        connection.setSelfConnectionAllowed(false);
-        connectNeuronGroups(neuronGroup, neuronGroup, connection);
-        getSynapseGroup().setStrength(0, Polarity.BOTH);
+        addWeightMatrix(new WeightMatrix(getParentNetwork(), neuronGroup, neuronGroup));
 
     }
 
@@ -146,19 +144,7 @@ public class Hopfield extends Subnetwork implements Trainable {
      * Randomize weights symmetrically.
      */
     public void randomize() {
-        for (int i = 0; i < getNeuronGroup().getNeuronList().size(); i++) {
-            for (int j = 0; j < i; j++) {
-                Synapse w = Network.getLooseSynapse(getNeuronGroup().getNeuronList().get(i), getNeuronGroup().getNeuronList().get(j));
-                if (w != null) {
-                    w.randomize();
-                    w.setStrength(Math.round(w.getStrength()));
-                }
-                Synapse w2 = Network.getLooseSynapse(getNeuronGroup().getNeuronList().get(j), getNeuronGroup().getNeuronList().get(i));
-                if (w2 != null) {
-                    w2.setStrength(w.getStrength());
-                }
-            }
-        }
+        getWeightMatrixList().get(0).randomize();
     }
 
     @Override

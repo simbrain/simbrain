@@ -48,7 +48,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
         }}.also { addChild(it) }
 
     override fun layoutChildren() = when (arrow) {
-        is RecurrentArrow -> arrow.update(source.location) { (x, y) -> weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y) }
+        is RecurrentArrow -> arrow.update(source.location) { (x, y) -> weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y)}
         is BezierArrow -> arrow.update(source.bound.outlines, target.bound.outlines, isBidirectional())
         else -> Unit
     }

@@ -1,5 +1,8 @@
 package org.simbrain.util
 
+/**
+ * Kotlin utility classes for 2d geometry.
+ */
 import java.awt.Point
 import java.awt.Polygon
 import java.awt.geom.CubicCurve2D
@@ -44,7 +47,6 @@ fun Point2D.rotate(radian: Double)
 fun Point2D.rotate(radian: Double, pivot: Point2D = point(0, 0))
     = ((this - pivot).rotate(radian)) + pivot
 
-
 val Point2D.norm
     get() = this / magnitude
 
@@ -88,7 +90,6 @@ val Line2D.midPoint
     get() = p(0.5)
 
 fun Line2D.p(t: Double) = point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t)
-
 
 // Rectangles
 fun rectangle(p1: Point2D, p2: Point2D) = Rectangle2D.Double(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y)

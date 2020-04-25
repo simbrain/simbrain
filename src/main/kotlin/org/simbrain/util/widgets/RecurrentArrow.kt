@@ -11,6 +11,12 @@ import java.awt.geom.Point2D
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Represents a self directed connection from a neuron group to itself via a weight matrix.
+ * Could potentially generalize this to be used by synapse groups too.
+ *
+ * Centered by default on 0,0.  Can be offset by whoever calls this.
+ */
 class RecurrentArrow : PNode() {
 
     private val radius = 100.0
@@ -18,7 +24,7 @@ class RecurrentArrow : PNode() {
     private val endDeg = 300.0
 
     /**
-     * The triangle at the tip of the arrow. This triangle is constructed only once, and during [update] the this
+     * The triangle at the tip of the arrow. This triangle is constructed only once, and during [update] this
      * triangle will be placed onto the correct location
      */
     private val arrowTip = listOf(point(0, 0), point(0.5, -0.866025), point(-0.5, -0.866025))
@@ -27,6 +33,9 @@ class RecurrentArrow : PNode() {
             .let { polygon -> PArea(polygon, null) }
             .apply { paint = Color.ORANGE }
 
+    /**
+     * Pass in where you want to center the recurrent arrow, and then any additional action to perform
+     */
     fun update(location: Point2D, callback: (Point2D) -> Unit) {
         removeAllChildren()
         val (x, y) = location + point(-radius, 0.0)
@@ -43,6 +52,6 @@ class RecurrentArrow : PNode() {
             rotate(arrowTipRadian + 265.toRadian())
         }
         addChild(arrowTip)
-        callback(location - point(200, 0))
+        callback(location - point(2*radius, 0.0))
     }
 }

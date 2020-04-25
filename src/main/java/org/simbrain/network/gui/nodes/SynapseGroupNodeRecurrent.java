@@ -35,6 +35,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @SuppressWarnings("serial")
 public class SynapseGroupNodeRecurrent extends PNode implements SynapseGroupNode.Arrow {
 
+    // TODO: If RecurrentArrow.kt is further developed, update this
+
     private SynapseGroupNode parent;
 
     private PPath arrowHead;

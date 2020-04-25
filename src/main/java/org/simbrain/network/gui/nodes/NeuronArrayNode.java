@@ -124,11 +124,13 @@ public class NeuronArrayNode extends ScreenElement {
             renderArrayToActivationsImage();
             updateInfoText();
         });
+        events.onLocationChange(() -> {
+            pullViewPositionFromModel();
+        });
         events.onLabelChange((o,n) -> {
             //interactionBox.setText((String) evt.getNewValue());
             //interactionBox.updateText();
         });
-        // TODO: Handle move events
 
         // Set up main items
         borderBox.setPickable(true);

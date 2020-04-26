@@ -358,7 +358,7 @@ public class NetworkPanel extends JPanel {
 
         // Event listeners
         removeDefaultEventListeners();
-        canvas.addInputEventListener(new KMouseEventHandler(this));
+        canvas.addInputEventListener(new MouseEventHandler(this));
         canvas.addInputEventListener(new ContextMenuEventHandler(this));
         PMouseWheelZoomEventHandler zoomHandler = new PMouseWheelZoomEventHandler();
         zoomHandler.zoomAboutMouse();

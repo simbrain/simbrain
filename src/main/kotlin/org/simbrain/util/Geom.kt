@@ -92,7 +92,13 @@ val Line2D.midPoint
 fun Line2D.p(t: Double) = point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t)
 
 // Rectangles
-fun rectangle(p1: Point2D, p2: Point2D) = Rectangle2D.Double(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y)
+fun rectangle(p1: Point2D, p2: Point2D): Rectangle2D {
+    val x = min(p1.x, p2.x)
+    val y = min(p1.y, p2.y)
+    val w = abs(p2.x - p1.x)
+    val h = abs(p2.y - p1.y)
+    return Rectangle2D.Double(x, y, w, h)
+}
 
 val Rectangle2D.vertices get() = RectangleVertices(
         point(x, y),

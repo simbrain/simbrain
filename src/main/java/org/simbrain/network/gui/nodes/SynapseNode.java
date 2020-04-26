@@ -28,6 +28,7 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
@@ -607,5 +608,16 @@ public final class SynapseNode extends ScreenElement {
 
     public Line2D.Float getLineBound() {
         return lineBound;
+    }
+
+    @Override
+    public boolean isIntersecting(PBounds bound) {
+        if (isSelfConnection()) {
+            final var boundArea = new Area(bound);
+            boundArea.intersect(new Area((arcBound)));
+            return !boundArea.isEmpty();
+        } else {
+            return bound.intersectsLine(lineBound);
+        }
     }
 }

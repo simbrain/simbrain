@@ -23,7 +23,7 @@ import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.nodes.PPath;
-import org.simbrain.network.LocatableModel;
+import org.piccolo2d.util.PBounds;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.gui.NetworkPanel;
 
@@ -374,5 +374,9 @@ public abstract class ScreenElement extends PPath.Float {
      */
     public ScreenElement getSelectionTarget() {
         return this;
+    }
+
+    public boolean isIntersecting(PBounds bound) {
+        return getGlobalBounds().intersects(bound);
     }
 }

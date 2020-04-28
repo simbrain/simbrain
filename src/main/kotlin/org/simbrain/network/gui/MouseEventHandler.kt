@@ -55,20 +55,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
     }
 
-    override fun mouseClicked(event: PInputEvent) {
-
-        val pickedNode: PNode? = event.pickedNode
-
-        pickedNode?.firstScreenElement?.let { pickedScreenElement ->
-            if (event.isShiftDown) {
-                networkPanel.toggleSelection(pickedScreenElement)
-            } else {
-                networkPanel.setSelection(listOf(pickedScreenElement))
-            }
-        }
-
-    }
-
     override fun startDrag(event: PInputEvent) {
 
         super.startDrag(event)
@@ -93,7 +79,18 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 networkPanel.textHandle.startEditing(event, pickedNode)
                 mode = Mode.SELECTION
             }
-            pickedScreenElement != null -> mode = Mode.DRAG
+            pickedScreenElement != null -> {
+                mode = Mode.DRAG
+                if (pickedScreenElement !in networkPanel.selectedNodes) {
+                    pickedScreenElement?.let {
+                        if (event.isShiftDown) {
+                            networkPanel.toggleSelection(it)
+                        } else {
+                            networkPanel.setSelection(listOf(it))
+                        }
+                    }
+                }
+            }
         }
 
     }

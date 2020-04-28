@@ -24,6 +24,7 @@ import org.piccolo2d.PLayer
 import org.piccolo2d.PNode
 import org.piccolo2d.event.PDragSequenceEventHandler
 import org.piccolo2d.event.PInputEvent
+import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
@@ -33,6 +34,7 @@ import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.isDoubleClick
 import org.simbrain.util.rectangle
+import java.awt.event.InputEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 
@@ -159,6 +161,20 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
     }
 
     private val PInputEvent.isPanKeyDown get() = if (SystemUtils.IS_OS_MAC) isMetaDown else isControlDown
+
+    init {
+        eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
+            override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
+                val editMode = networkPanel.editMode
+                return if (editMode.isSelection && super.acceptsEvent(event, type)) {
+                    networkPanel.textHandle.stopEditing()
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
 
     /**
      * A filter that determines whether a given pnode is selectable or not. Bounds are updated as the lasso tool is

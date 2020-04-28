@@ -60,7 +60,17 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         super.startDrag(event)
 
         val pickedNode: PNode? = event.pickedNode
-        val pickedScreenElement by lazy { pickedNode?.firstScreenElement }
+
+        pickedNode?.firstScreenElement?.let { pickedScreenElement ->
+            mode = Mode.DRAG
+            if (pickedScreenElement !in networkPanel.selectedNodes) {
+                if (event.isShiftDown) {
+                    networkPanel.toggleSelection(pickedScreenElement)
+                } else {
+                    networkPanel.setSelection(listOf(pickedScreenElement))
+                }
+            }
+        }
 
         priorSelection = networkPanel.selectedNodes.toMutableSet()
         marqueeStartPosition = event.position
@@ -78,18 +88,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 networkPanel.clearSelection()
                 networkPanel.textHandle.startEditing(event, pickedNode)
                 mode = Mode.SELECTION
-            }
-            pickedScreenElement != null -> {
-                mode = Mode.DRAG
-                if (pickedScreenElement !in networkPanel.selectedNodes) {
-                    pickedScreenElement?.let {
-                        if (event.isShiftDown) {
-                            networkPanel.toggleSelection(it)
-                        } else {
-                            networkPanel.setSelection(listOf(it))
-                        }
-                    }
-                }
             }
         }
 

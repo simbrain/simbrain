@@ -20,13 +20,11 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PCamera;
 import org.piccolo2d.nodes.PText;
-import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.NetworkPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
@@ -163,7 +161,7 @@ public abstract class InteractionBox extends ScreenElement {
      */
     @Override
     public boolean isDraggable() {
-        return true;
+        return false;
     }
 
     @Override

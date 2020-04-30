@@ -126,11 +126,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     }
 
     @Override
-    public boolean isDraggable() {
-        return false;
-    }
-
-    @Override
     protected boolean hasToolTipText() {
         return false;
     }

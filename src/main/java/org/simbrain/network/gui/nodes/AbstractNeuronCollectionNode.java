@@ -1,6 +1,5 @@
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.groups.AbstractNeuronCollection;
@@ -210,7 +209,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
     @Override
     public boolean isDraggable() {
-        return false;
+        return true;
     }
 
     @Override

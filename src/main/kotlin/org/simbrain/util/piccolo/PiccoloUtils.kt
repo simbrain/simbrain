@@ -9,8 +9,11 @@ import java.awt.event.MouseEvent
 val PNode.ancestors
     get() = generateSequence(parent) { it.parent }
 
+val PNode.screenElements
+    get() = generateSequence(this) { it.parent }.filterIsInstance<ScreenElement>()
+
 val PNode.firstScreenElement
-    get() = generateSequence(this) { it.parent }.filterIsInstance<ScreenElement>().firstOrNull()
+    get() = screenElements.firstOrNull()
 
 val PNode?.hasScreenElement
     get() = this?.ancestors?.any { it is ScreenElement } ?: false

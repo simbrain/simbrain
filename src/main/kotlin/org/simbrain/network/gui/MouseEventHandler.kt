@@ -33,6 +33,7 @@ import org.simbrain.util.minus
 import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.isDoubleClick
+import org.simbrain.util.piccolo.screenElements
 import org.simbrain.util.rectangle
 import java.awt.event.InputEvent
 import java.awt.geom.Point2D
@@ -156,8 +157,8 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
     private fun dragItems(event: PInputEvent) {
         val delta = event.position - marqueeEndPosition
-        networkPanel.selectedNodes.filter { it.isDraggable }
-                .forEach { it.offset(delta.x, delta.y) }
+        networkPanel.selectedNodes.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
+                .forEach { it?.offset(delta.x, delta.y) }
     }
 
     private val PInputEvent.isPanKeyDown get() = if (SystemUtils.IS_OS_MAC) isMetaDown else isControlDown

@@ -58,20 +58,19 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
     }
 
+    /**
+     * Handles beginnings of drag as well as single-click events.
+     */
     override fun startDrag(event: PInputEvent) {
 
         super.startDrag(event)
-
         val pickedNode: PNode? = event.pickedNode
-
         pickedNode?.firstScreenElement?.let { pickedScreenElement ->
             mode = Mode.DRAG
-            if (pickedScreenElement !in networkPanel.selectedNodes) {
-                if (event.isShiftDown) {
-                    networkPanel.toggleSelection(pickedScreenElement)
-                } else {
-                    networkPanel.setSelection(listOf(pickedScreenElement))
-                }
+            if (event.isShiftDown) {
+                networkPanel.toggleSelection(pickedScreenElement)
+            } else {
+                networkPanel.setSelection(listOf(pickedScreenElement))
             }
         }
 
@@ -93,21 +92,16 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 mode = Mode.SELECTION
             }
         }
-
     }
 
     override fun drag(event: PInputEvent) {
-
         super.drag(event)
-
         when (mode) {
             Mode.PAN -> pan(event)
             Mode.SELECTION -> select(event)
             Mode.DRAG -> dragItems(event)
         }
-
         marqueeEndPosition = event.position
-
     }
 
     override fun endDrag(event: PInputEvent) {
@@ -117,6 +111,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         } else {
             priorSelection = setOf()
         }
+        networkPanel.zoomToFitPage(false)
     }
 
     /**
@@ -150,9 +145,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         } else {
             selectedNodes
         }
-
         networkPanel.setSelection(finalSelection)
-
     }
 
     private fun dragItems(event: PInputEvent) {

@@ -342,7 +342,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public void setInputArray(INDArray activations) {
         neuronArray = activations;
         numNodes = activations.columns();
-
     }
 
     @Override

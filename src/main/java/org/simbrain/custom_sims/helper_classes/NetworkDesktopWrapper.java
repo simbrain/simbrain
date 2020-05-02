@@ -9,13 +9,13 @@ import org.simbrain.network.gui.nodes.NeuronNode;
  * A {@link NetworkWrapper}, with additional access to GUI stuff, e.g.
  * org.simbrain.network.gui.NetworkPanel} which can be used to set the position of a window in the Simbrain desktop.
  */
+// TODO: Consider removing this
 public class NetworkDesktopWrapper extends NetworkWrapper {
 
     /**
      * The desktop component with full graphical access.
      */
     private NetworkDesktopComponent desktopComponent;
-
 
     /**
      * Create an instance of the wrapper.
@@ -36,7 +36,8 @@ public class NetworkDesktopWrapper extends NetworkWrapper {
      * Get a reference to the network panel.
      */
     public NetworkPanelDesktop getNetworkPanel() {
-        return (NetworkPanelDesktop) desktopComponent.getNetworkPanel();
+        return null; // todo
+        //return (NetworkPanelDesktop) desktopComponent.getNetworkPanel();
     }
 
 

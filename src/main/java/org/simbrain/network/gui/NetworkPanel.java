@@ -296,7 +296,7 @@ public class NetworkPanel extends JPanel {
     private final QuickConnectionManager quickConnector = new QuickConnectionManager();
 
     /**
-     * Map associating network model objects with Piccolo Pnodes.
+     * Map associating network model objects with PNodes.
      */
     private final Map<NetworkModel, ScreenElement> objectNodeMap = Collections.synchronizedMap(new HashMap<>());
 
@@ -384,7 +384,6 @@ public class NetworkPanel extends JPanel {
         canvas.getCamera().addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener);
 
         selectionModel.addSelectionListener(new NetworkSelectionListener() {
-            /** @see NetworkSelectionListener */
             public void selectionChanged(final NetworkSelectionEvent e) {
                 updateNodeHandles(e);
             }

@@ -20,7 +20,7 @@ package org.simbrain.network.desktop;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkPanel2;
 import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
 import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -42,7 +42,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
     /**
      * Network panel.
      */
-    private final NetworkPanelDesktop networkPanel;
+    private final NetworkPanel2 networkPanel;
 
     /**
      * Menu bar.
@@ -75,7 +75,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         super(frame, component);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-        networkPanel = new NetworkPanelDesktop(this, component.getNetwork());
+        networkPanel = new NetworkPanel2(this, component.getNetwork());
 
         // component.setCurrentFile(currentFile);
 
@@ -102,7 +102,8 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         menuBar.add(networkPanel.createEditMenu());
         menuBar.add(networkPanel.createInsertMenu());
         menuBar.add(networkPanel.createViewMenu());
-        menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
+        // TODO
+        //menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
         // menuBar.add(createAttributeMenu());
         menuBar.add(networkPanel.createHelpMenu());
         getParentFrame().setJMenuBar(menuBar);
@@ -121,8 +122,8 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         fileMenu.add(new SaveAction(this));
         fileMenu.add(new SaveAsAction(this));
         fileMenu.addSeparator();
-        fileMenu.add(new ShowNetworkUpdaterDialog(networkPanel));
-        fileMenu.add(new ShowNetworkPreferencesAction(networkPanel));
+        //fileMenu.add(new ShowNetworkUpdaterDialog(networkPanel));
+        //fileMenu.add(new ShowNetworkPreferencesAction(networkPanel));
         fileMenu.addSeparator();
 
         fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
@@ -135,16 +136,18 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         if (this.getParentFrame().getJMenuBar() == null) {
             createAndAttachMenus();
         }
-        networkPanel.getNetwork().setName(this.getName());
 
-        // TODO: Below only needs to happen when opening; but currently it
-        // happens also when creating a new network
-        networkPanel.clearPanel();
-        if (networkPanel.getNetwork() != this.getWorkspaceComponent().getNetwork()) {
-            networkPanel.setNetwork(this.getWorkspaceComponent().getNetwork());
-        }
-        networkPanel.initScreenElements();
-        networkPanel.initGui();
+        // TODO
+        //networkPanel.getNetwork().setName(this.getName());
+        //
+        //// TODO: Below only needs to happen when opening; but currently it
+        //// happens also when creating a new network
+        //networkPanel.clearPanel();
+        //if (networkPanel.getNetwork() != this.getWorkspaceComponent().getNetwork()) {
+        //    networkPanel.setNetwork(this.getWorkspaceComponent().getNetwork());
+        //}
+        //networkPanel.initScreenElements();
+        //networkPanel.initGui();
     }
 
     /**
@@ -152,7 +155,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
      *
      * @return the network panel for this network frame
      */
-    public NetworkPanel getNetworkPanel() {
+    public NetworkPanel2 getNetworkPanel() {
         return networkPanel;
     }
 

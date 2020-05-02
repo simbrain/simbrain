@@ -119,7 +119,8 @@ import java.util.stream.Collectors;
  * <br>
  * <p>
  * Also note that NetworkPanel can be used separately from the Simbrain workspace, e.g. in an applet. Thus all
- * dependencies on workspace classes (e.g. handling coupling menus) are in {@link org.simbrain.network.desktop.NetworkPanelDesktop},
+ * dependencies on workspace classes (e.g. handling coupling menus) are in
+ * {@link org.simbrain.network.desktop.NetworkPanelDesktop},
  * which explains some of the methods here that are stubs overridden in that class.
  */
 public class NetworkPanel extends JPanel {
@@ -426,16 +427,17 @@ public class NetworkPanel extends JPanel {
         NetworkEvents event = network.getEvents();
 
         event.onNeuronAdded(this::addNeuron);
-//        event.onNeuronRemoved(Neuron::fireDeleted); // TODO: [event] moved to Network for now. consider design
+        //        event.onNeuronRemoved(Neuron::fireDeleted); // TODO: [event] moved to Network for now. consider design
 
-//        event.onNeuronsUpdated(l -> {
-//            if (isGuiOn()) {
-//                NetworkPanel.this.updateNeuronNodes(l);
-//            }
-//        });
+        //        event.onNeuronsUpdated(l -> {
+        //            if (isGuiOn()) {
+        //                NetworkPanel.this.updateNeuronNodes(l);
+        //            }
+        //        });
 
         event.onSynapseAdded(this::addSynapse);
-//        event.onSynapseRemoved(Synapse::fireDeleted); // TODO: [event] moved to Network for now. consider design
+        //        event.onSynapseRemoved(Synapse::fireDeleted); // TODO: [event] moved to Network for now. consider
+        //         design
         event.onTextAdded(this::addTextObject);
         event.onTextRemoved(NetworkTextObject::fireDeleted); // TODO: [event] should not be handled here
         event.onNeuronGroupAdded(this::addNeuronGroup);
@@ -581,7 +583,7 @@ public class NetworkPanel extends JPanel {
 
         layout.layoutNeurons(getSelectedModels(Neuron.class));
 
-//        network.fireNeuronsUpdated(getSelectedModels(Neuron.class)); // TODO: [event]
+        //        network.fireNeuronsUpdated(getSelectedModels(Neuron.class)); // TODO: [event]
         repaint();
 
     }
@@ -1133,7 +1135,7 @@ public class NetworkPanel extends JPanel {
      * Copy to the clipboard.
      */
     public void copy() {
-        if(getSelectedModels().isEmpty()) {
+        if (getSelectedModels().isEmpty()) {
             return;
         }
         Clipboard.clear();
@@ -1160,7 +1162,7 @@ public class NetworkPanel extends JPanel {
      * Duplicates selected objects.
      */
     public void duplicate() {
-        if(getSelectedModels().isEmpty()) {
+        if (getSelectedModels().isEmpty()) {
             return;
         }
         copy();
@@ -1334,10 +1336,7 @@ public class NetworkPanel extends JPanel {
     @SuppressWarnings("unchecked")
     public List<ScreenElement> getSelectedNodes() {
         Collection<PNode> nodes = selectionModel.getSelection();
-        return nodes.stream()
-                .filter(ScreenElement.class::isInstance)
-                .map(ScreenElement.class::cast)
-                .collect(Collectors.toList());
+        return nodes.stream().filter(ScreenElement.class::isInstance).map(ScreenElement.class::cast).collect(Collectors.toList());
     }
 
     /**
@@ -1409,14 +1408,11 @@ public class NetworkPanel extends JPanel {
         for (PNode node : selection) {
             if (node instanceof ScreenElement) {
                 ScreenElement screenElement = (ScreenElement) node;
-                if (screenElement.showNodeHandle()) {
-                    if (screenElement instanceof InteractionBox) {
-                        SwingUtilities.invokeLater(
-                                () -> NodeHandle.addSelectionHandleTo(node, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
-                        );
-                    } else {
-                        SwingUtilities.invokeLater(() -> NodeHandle.addSelectionHandleTo(node));
-                    }
+                if (screenElement instanceof InteractionBox) {
+                    SwingUtilities.invokeLater(() -> NodeHandle.addSelectionHandleTo(node,
+                            NodeHandle.INTERACTION_BOX_SELECTION_STYLE));
+                } else {
+                    SwingUtilities.invokeLater(() -> NodeHandle.addSelectionHandleTo(node));
                 }
             }
         }
@@ -1452,17 +1448,18 @@ public class NetworkPanel extends JPanel {
      * <br>
      * If a pair of source and target items are neuron groups, connect with a synapse group
      * <br>
-     * If either member of a pair is a neuron collection or a set of loose neurons, then connect using
-     * neurons on both sides, using quick connect (e.g. if connecting neuron collection to neuron group,
-     * connect to the neurons "inside" of neuron group).
+     * If either member of a pair is a neuron collection or a set of loose neurons, then connect using neurons on both
+     * sides, using quick connect (e.g. if connecting neuron collection to neuron group, connect to the neurons "inside"
+     * of neuron group).
      */
     public void connectSelectedModels() {
 
         // Handle adding synapse groups between neuron groups
-        if(AddSynapseGroupAction.displaySynapseGroupDialog(this)) {
+        if (AddSynapseGroupAction.displaySynapseGroupDialog(this)) {
             // TODO: Document, think about the boolean return on that.
             return;
-        };
+        }
+        ;
 
         // Handle loose neurons and neuron collections
         List<Neuron> sourceNeurons = getSourceModels(Neuron.class);
@@ -1500,81 +1497,63 @@ public class NetworkPanel extends JPanel {
      * Returns selected {@link NetworkModel} items.
      */
     public List<NetworkModel> getSelectedModels() {
-        return getSelectedNodes().stream()
-                .filter(Objects::nonNull)
-                .map(ScreenElement::getModel)
-                .collect(Collectors.toList());
+        return getSelectedNodes().stream().filter(Objects::nonNull).map(ScreenElement::getModel).collect(Collectors.toList());
     }
 
     /**
      * Returns selected {@link LocatableModel} items.
      */
     public List<LocatableModel> getSelectedLocatableModels() {
-        return getSelectedNodes().stream()
-                .filter(Objects::nonNull)
-                .map(ScreenElement::getModel)
-                .filter(LocatableModel.class::isInstance)
-                .map(LocatableModel.class::cast)
-                .collect(Collectors.toList());
+        return getSelectedNodes().stream().filter(Objects::nonNull).map(ScreenElement::getModel).filter(LocatableModel.class::isInstance).map(LocatableModel.class::cast).collect(Collectors.toList());
     }
 
     /**
      * Get a list of selected network element models.
+     *
      * @param cls the class of the model
      * @return the list of selected network element models
      */
     public <T> List<T> getSelectedModels(Class<T> cls) {
-        return getSelectedModels().stream()
-                .filter(cls::isInstance)
-                .map(cls::cast)
-                .collect(Collectors.toList());
+        return getSelectedModels().stream().filter(cls::isInstance).map(cls::cast).collect(Collectors.toList());
     }
 
     /**
      * Get a list of network element nodes.
+     *
      * @param cls the class of the node
      */
     public <T extends PNode> List<T> getSelectedNodes(Class<T> cls) {
-        return getSelectedNodes().stream()
-                .map(ScreenElement::getNode)
-                .filter(Objects::nonNull)  // TODO: remove. here because of synapse interaction box
-                .filter(cls::isInstance)
-                .map(cls::cast)
-                .collect(Collectors.toList());
+        return getSelectedNodes().stream().map(ScreenElement::getNode).filter(Objects::nonNull)  // TODO: remove.
+                // here because of synapse interaction box
+                .filter(cls::isInstance).map(cls::cast).collect(Collectors.toList());
     }
 
     /**
      * Get a list of network element nodes of a specific type.
+     *
      * @param cls the class of the type of node to get
      * @return the list of network element nodes.
      */
     @SuppressWarnings("unchecked")
     public <T extends ScreenElement> List<T> getNodes(Class<T> cls) {
         Collection<PNode> nodes = canvas.getLayer().getAllNodes();
-        return nodes.stream()
-                .filter(cls::isInstance)
-                .map(cls::cast)
-                .collect(Collectors.toList());
+        return nodes.stream().filter(cls::isInstance).map(cls::cast).collect(Collectors.toList());
     }
 
     /**
      * Get a list of all network elements that are marked as source
      */
     public List<Object> getSourceModels() {
-        return sourceElements.stream()
-                .map(ScreenElement::getModel)
-                .collect(Collectors.toList());
+        return sourceElements.stream().map(ScreenElement::getModel).collect(Collectors.toList());
     }
 
     /**
      * Get a list of network elements model of a specific type.
+     *
      * @param cls the class of the type of node to get
      */
     public <T> List<T> getSourceModels(Class<T> cls) {
-        return getSourceModels().stream()
-                .filter(cls::isInstance)
-                .map(cls::cast)
-                .collect(Collectors.toList());
+        return getSourceModels().stream().filter(cls::isInstance).map(cls::cast).collect(Collectors.toList());
     }
 
 
@@ -1582,9 +1561,7 @@ public class NetworkPanel extends JPanel {
      * Return a collection of all selectable {@link ScreenElement}
      */
     public List<ScreenElement> getSelectableNodes() {
-        return getNodes(ScreenElement.class).stream()
-                .filter(ScreenElement::isSelectable)
-                .collect(Collectors.toList());
+        return getNodes(ScreenElement.class).stream().filter(ScreenElement::isSelectable).collect(Collectors.toList());
     }
 
     /**
@@ -1624,7 +1601,7 @@ public class NetworkPanel extends JPanel {
         canvas.setBackground(backgroundColor);
         for (Object obj : canvas.getLayer().getChildrenReference()) {
             if (obj instanceof ScreenElement) {
-                ((ScreenElement) obj).resetColors();
+                ((ScreenElement) obj).resetToDefault();
             }
         }
         repaint();
@@ -1677,7 +1654,6 @@ public class NetworkPanel extends JPanel {
     }
 
 
-
     /**
      * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
      *
@@ -1689,7 +1665,8 @@ public class NetworkPanel extends JPanel {
         // TODO: Add a check to see if network is running
         if ((autoZoomMode && editMode.isSelection()) || forceZoom) {
             PBounds filtered = canvas.getLayer().getUnionOfChildrenBounds(null);
-            PBounds adjustedFiltered = new PBounds(filtered.getX() - 10, filtered.getY() - 10, filtered.getWidth() + 20, filtered.getHeight() + 20);
+            PBounds adjustedFiltered = new PBounds(filtered.getX() - 10, filtered.getY() - 10,
+                    filtered.getWidth() + 20, filtered.getHeight() + 20);
             camera.setViewBounds(adjustedFiltered);
         }
     }
@@ -1722,7 +1699,7 @@ public class NetworkPanel extends JPanel {
             element.setPickable(true);
             if (selectConstituents) {
                 selectionModel.add(element);
-                element.setGrouped(false);
+                //element.setGrouped(false);
             }
         }
         vgn.removeFromParent();
@@ -1752,7 +1729,7 @@ public class NetworkPanel extends JPanel {
         for (ScreenElement element : toSearch) {
             if (element.isDraggable()) {
                 elements.add(element);
-                element.setGrouped(true);
+                //element.setGrouped(true);
             }
         }
 

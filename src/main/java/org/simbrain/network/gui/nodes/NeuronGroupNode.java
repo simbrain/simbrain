@@ -120,36 +120,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         return false;
     }
 
-    @Override
-    public boolean showNodeHandle() {
-        return false;
-    }
-
-    @Override
-    protected boolean hasToolTipText() {
-        return false;
-    }
-
-    @Override
-    protected String getToolTipText() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasContextMenu() {
-        return false;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasPropertyDialog() {
-        return false;
-    }
-
     /**
      * Helper class to create the neuron group property dialog (since it is
      * needed in two places.).
@@ -158,10 +128,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      */
     public StandardDialog getPropertyDialog() {
         return getNetworkPanel().getNeuronGroupDialog(this);
-    }
-
-    @Override
-    public void resetColors() {
     }
 
     /**
@@ -286,11 +252,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         }
 
         @Override
-        protected JDialog getPropertyDialog() {
-            return NeuronGroupNode.this.getPropertyDialog();
-        }
-
-        @Override
         public NeuronGroupNode getNode() {
             return NeuronGroupNode.this;
         }
@@ -301,25 +262,15 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         }
 
         @Override
-        protected boolean hasPropertyDialog() {
-            return true;
-        }
-
-        @Override
-        protected JPopupMenu getContextMenu() {
+        public JPopupMenu getContextMenu() {
             return getDefaultContextMenu();
         }
 
         @Override
-        protected String getToolTipText() {
+        public String getToolTipText() {
             return "NeuronGroup: " + neuronGroup.getId()
                 + " Location: (" + Utils.round(neuronGroup.getLocation().getX(),2) + ","
                 + Utils.round(neuronGroup.getLocation().getY(),2) + ")";
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
         }
     }
 

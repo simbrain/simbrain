@@ -65,7 +65,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     }
 
     @Override
-    protected JDialog getPropertyDialog() {
+    public JDialog getPropertyDialog() {
         return this.getNetworkPanel().getSynapseGroupDialog(this);
     }
 
@@ -80,17 +80,12 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     }
 
     @Override
-    protected boolean hasPropertyDialog() {
-        return true;
-    }
-
-    @Override
     public boolean isDraggable() {
         return false;
     }
 
     @Override
-    protected JPopupMenu getContextMenu() {
+    public JPopupMenu getContextMenu() {
         return getDefaultContextMenu();
     }
 
@@ -382,15 +377,8 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     };
 
     @Override
-    protected String getToolTipText() {
+    public String getToolTipText() {
         return "Synapses: " + synapseGroup.size() + " Density: " + (double) synapseGroup.size() / (synapseGroup.getSourceNeuronGroup().size() * synapseGroup.getTargetNeuronGroup().size());
     }
-
-    @Override
-    protected boolean hasToolTipText() {
-        return true;
-    }
-
-
 
 }

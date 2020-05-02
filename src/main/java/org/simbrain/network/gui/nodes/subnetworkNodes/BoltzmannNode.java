@@ -49,7 +49,7 @@ public class BoltzmannNode extends SubnetworkNode {
     }
 
     @Override
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return new BoltzmannTrainingDialog(getNetworkPanel(), (BoltzmannMachine) getSubnetwork());
     }
 
@@ -93,13 +93,8 @@ public class BoltzmannNode extends SubnetworkNode {
         }
 
         @Override
-        protected String getToolTipText() {
+        public String getToolTipText() {
             return "Temperature: " + Utils.round(((BoltzmannMachine) getSubnetwork()).getTemperature(), 2);
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
         }
 
         @Override

@@ -73,60 +73,19 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
 
     @Override
     public boolean isSelectable() {
-        // TODO Auto-generated method stub
-        return true;
-    }
-
-    @Override
-    public boolean showNodeHandle() {
-        // TODO Auto-generated method stub
         return true;
     }
 
     @Override
     public boolean isDraggable() {
-        // TODO Auto-generated method stub
         return true;
     }
 
     @Override
-    protected boolean hasToolTipText() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    protected String getToolTipText() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected boolean hasContextMenu() {
-        return true;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
+    public JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
         contextMenu.add(new UngroupAction(getNetworkPanel(), this));
         return contextMenu;
-    }
-
-    @Override
-    protected boolean hasPropertyDialog() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    protected JDialog getPropertyDialog() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void resetColors() {
     }
 
     @Override

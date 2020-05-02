@@ -122,43 +122,10 @@ public abstract class InteractionBox extends ScreenElement {
     }
 
     @Override
-    protected void singleClickEvent() {
-        //groupNode.selectAllNodes();
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
+    public JPopupMenu getContextMenu() {
         return contextMenu;
     }
 
-    @Override
-    protected JDialog getPropertyDialog() {
-        return null;
-    }
-
-    @Override
-    protected String getToolTipText() {
-        return "";
-    }
-
-    @Override
-    protected boolean hasContextMenu() {
-        return true;
-    }
-
-    @Override
-    protected boolean hasPropertyDialog() {
-        return false;
-    }
-
-    @Override
-    protected boolean hasToolTipText() {
-        return false;
-    }
-
-    /**
-     * Return true if the _parent_ this interaction box is attached to is draggable.
-     */
     @Override
     public boolean isDraggable() {
         return false;
@@ -169,23 +136,12 @@ public abstract class InteractionBox extends ScreenElement {
         return true;
     }
 
-    @Override
-    public void resetColors() {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public boolean showNodeHandle() {
-        return true;
-    }
-
     /**
      * @param contextMenu the contextMenu to set
      */
     public void setContextMenu(final JPopupMenu contextMenu) {
         this.contextMenu = contextMenu;
     }
-
 
     /**
      * @return the zoomListener

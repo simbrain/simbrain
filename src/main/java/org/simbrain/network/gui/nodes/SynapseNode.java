@@ -363,14 +363,6 @@ public final class SynapseNode extends ScreenElement {
      * @return
      * @see ScreenElement
      */
-    public boolean showNodeHandle() {
-        return true;
-    }
-
-    /**
-     * @return
-     * @see ScreenElement
-     */
     public boolean isDraggable() {
         return false;
     }
@@ -382,25 +374,13 @@ public final class SynapseNode extends ScreenElement {
         return true;
     }
 
-    /**
-     * @see ScreenElement
-     */
-    protected String getToolTipText() {
+    @Override
+    public String getToolTipText() {
         return String.valueOf(synapse.getToolTipText());
     }
 
-    /**
-     * @return
-     * @see ScreenElement
-     */
-    public boolean hasContextMenu() {
-        return true;
-    }
-
-    /**
-     * @see ScreenElement
-     */
-    protected JPopupMenu getContextMenu() {
+    @Override
+    public JPopupMenu getContextMenu() {
 
         // JPopupMenu contextMenu = new JPopupMenu();
         //
@@ -427,17 +407,8 @@ public final class SynapseNode extends ScreenElement {
         return this.getNetworkPanel().getSynapseContextMenu(synapse);
     }
 
-    /**
-     * @see ScreenElement
-     */
-    protected boolean hasPropertyDialog() {
-        return true;
-    }
-
-    /**
-     * @see ScreenElement
-     */
-    protected JDialog getPropertyDialog() {
+    @Override
+    public JDialog getPropertyDialog() {
         SynapseDialog dialog =
                 (SynapseDialog) getNetworkPanel().getSynapseDialog(getNetworkPanel().getSelectedNodes(SynapseNode.class));
         return dialog;
@@ -499,7 +470,7 @@ public final class SynapseNode extends ScreenElement {
     /**
      * @see ScreenElement
      */
-    public void resetColors() {
+    public void resetToDefault() {
         line.setStrokePaint(lineColor);
         updateColor();
         updateDiameter();

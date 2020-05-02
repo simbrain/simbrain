@@ -66,7 +66,7 @@ public class BackpropNetworkNode extends SubnetworkNode {
     }
 
     @Override
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return new BackpropEditorDialog(getNetworkPanel(), (BackpropNetwork) getSubnetwork());
     }
 

@@ -190,7 +190,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         labelBackground.addChild(labelText);
         addChild(labelBackground);
 
-        resetColors();
+        resetToDefault();
 
         setPickable(true);
 
@@ -331,7 +331,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             addChild(activationText);
             addChild(labelBackground);
             setPriorityView(getNetworkPanel().getPrioritiesVisible());
-            resetColors();
+            resetToDefault();
             updateText();
             updateTextLabel();
         } else {
@@ -462,14 +462,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     }
 
     /**
-     * @return screen element show a selection handle
-     * @see ScreenElement
-     */
-    public boolean showNodeHandle() {
-        return true;
-    }
-
-    /**
      * @return able to drag screen element
      * @see ScreenElement
      */
@@ -477,27 +469,11 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         return true;
     }
 
-    /**
-     * @see ScreenElement
-     */
-    protected boolean hasToolTipText() {
-        return true;
-    }
-
-    /**
-     * @see ScreenElement
-     */
-    protected String getToolTipText() {
+    @Override
+    public String getToolTipText() {
         String ret = new String();
         ret += neuron.getToolTipText();
         return ret;
-    }
-
-    /**
-     * @see ScreenElement
-     */
-    protected boolean hasContextMenu() {
-        return true;
     }
 
     /**
@@ -509,24 +485,13 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         return mainShape.getGlobalBounds().getCenter2D();
     }
 
-    /**
-     * @see ScreenElement
-     */
-    protected JPopupMenu getContextMenu() {
+    @Override
+    public JPopupMenu getContextMenu() {
         return getNetworkPanel().getNeuronContextMenu(neuron);
     }
 
-    /**
-     * @see ScreenElement
-     */
-    protected boolean hasPropertyDialog() {
-        return true;
-    }
-
-    /**
-     * @see ScreenElement
-     */
-    protected JDialog getPropertyDialog() {
+    @Override
+    public JDialog getPropertyDialog() {
         NeuronDialog dialog = getNetworkPanel().getNeuronDialog();
         return dialog;
     }
@@ -656,7 +621,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     }
 
     @Override
-    public void resetColors() {
+    public void resetToDefault() {
         if (!customStrokeColor) {
             mainShape.setStrokePaint(SynapseNode.getLineColor());
         }
@@ -665,13 +630,13 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         updateColor();
     }
 
-    @Override
-    public void setGrouped(final boolean isGrouped) {
-        super.setGrouped(isGrouped);
-        for (SynapseNode synapseNode : connectedSynapses) {
-            synapseNode.setGrouped(isGrouped);
-        }
-    }
+    //@Override
+    //public void setGrouped(final boolean isGrouped) {
+    //    super.setGrouped(isGrouped);
+    //    for (SynapseNode synapseNode : connectedSynapses) {
+    //        synapseNode.setGrouped(isGrouped);
+    //    }
+    //}
 
     @Override
     public Neuron getModel() {

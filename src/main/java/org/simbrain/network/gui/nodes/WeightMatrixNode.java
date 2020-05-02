@@ -1,14 +1,12 @@
 package org.simbrain.network.gui.nodes;
 
 import org.nd4j.linalg.factory.Nd4j;
-import org.piccolo2d.PNode;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.gui.ImageBox;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixArrow;
-import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
@@ -126,32 +124,17 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
     }
 
     @Override
-    public boolean showNodeHandle() {
-        return true;
-    }
-
-    @Override
     public boolean isDraggable() {
         return false;
     }
 
     @Override
-    protected boolean hasToolTipText() {
-        return true;
-    }
-
-    @Override
-    protected String getToolTipText() {
+    public String getToolTipText() {
         return weightMatrix.toString();
     }
 
     @Override
-    protected boolean hasContextMenu() {
-        return true;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
+    public JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
 
         contextMenu.add(new CutAction(getNetworkPanel()));
@@ -262,17 +245,8 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
     }
 
     @Override
-    protected boolean hasPropertyDialog() {
-        return true;
-    }
-
-    @Override
-    protected JDialog getPropertyDialog() {
+    public JDialog getPropertyDialog() {
         return getMatrixDialog();
-    }
-
-    @Override
-    public void resetColors() {
     }
 
     @Override

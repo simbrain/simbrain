@@ -196,14 +196,8 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         return neuronNodes;
     }
 
-
     @Override
     public boolean isSelectable() {
-        return false;
-    }
-
-    @Override
-    public boolean showNodeHandle() {
         return false;
     }
 
@@ -211,41 +205,5 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
     public boolean isDraggable() {
         return true;
     }
-
-    @Override
-    protected boolean hasToolTipText() {
-        return false;
-    }
-
-    @Override
-    protected String getToolTipText() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasContextMenu() {
-        return false;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasPropertyDialog() {
-        return false;
-    }
-
-    @Override
-    protected JDialog getPropertyDialog() {
-        return null;
-    }
-
-    @Override
-    public void resetColors() {
-
-    }
-
 
 }

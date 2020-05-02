@@ -50,7 +50,7 @@ public class SRNNetworkNode extends SubnetworkNode {
     }
 
     @Override
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return new SRNEditorDialog(this.getNetworkPanel(), (SimpleRecurrentNetwork) getSubnetwork());
     }
 

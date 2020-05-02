@@ -47,7 +47,7 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
     }
 
     @Override
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return new CompetitiveTrainingDialog(getNetworkPanel(),
                 (CompetitiveNetwork) getSubnetwork());
     }

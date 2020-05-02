@@ -50,7 +50,7 @@ public class HopfieldNode extends SubnetworkNode {
     }
 
     @Override
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return new HopfieldEditTrainDialog(getNetworkPanel(), (Hopfield) getSubnetwork());
     }
 

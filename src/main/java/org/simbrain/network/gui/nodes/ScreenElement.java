@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.PNode;
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
@@ -33,8 +34,8 @@ import java.awt.geom.Point2D;
 
 /**
  * <b>ScreenElement</b> extends a Piccolo node with property change, tool tip,
- * and property dialog, and support. Screen elements are automatically support
- * the primary user interactions in the network panel.
+ * and property dialog, and support. Screen elements are automatically support the primary user interactions in the
+ * network panel.
  */
 public abstract class ScreenElement extends PPath.Float {
 
@@ -44,232 +45,67 @@ public abstract class ScreenElement extends PPath.Float {
     private NetworkPanel networkPanel;
 
     /**
-     * Is this element a member of a view group?.
-     */
-    private boolean isGrouped = false;
-
-    /**
      * Create a new abstract screen element with the specified network panel.
-     *
-     * @param networkPanel network panel for this screen element
      */
-    protected ScreenElement(final NetworkPanel networkPanel) {
+    protected ScreenElement(final NetworkPanel np) {
         super();
-        setNetworkPanel(networkPanel);
-        init();
-    }
-
-    /**
-     * Initialize this <code>ScreenElement</code>.
-     */
-    private void init() {
-
-        if (hasContextMenu()) {
-            addInputEventListener(new ContextMenuEventHandler());
-        }
-
-        if (hasPropertyDialog()) {
-            addInputEventListener(new PropertyDialogEventHandler());
-        }
-
-        if (hasToolTipText()) {
-            addInputEventListener(new ToolTipTextUpdater(networkPanel) {
-
-                /** @see ToolTipTextUpdater */
-                protected String getToolTipText() {
-                    return ScreenElement.this.getToolTipText();
-                }
-            });
-        }
-
-        // Basic event handler for single clicks. Only register regular clicks
-        // (not right clicks).
-        addInputEventListener(new PBasicInputEventHandler() {
-            /** @see PBasicInputEventHandler */
-            public void mousePressed(final PInputEvent event) {
-                // System.out.println("Mouse Pressed: " + event);
-                if (!isRightClick(event)) {
-                    singleClickEvent();
-                }
+        networkPanel = np;
+        addInputEventListener(new ContextMenuEventHandler());
+        addInputEventListener(new PropertyDialogEventHandler());
+        addInputEventListener(new ToolTipTextUpdater(networkPanel) {
+            protected String getToolTipText() {
+                return ScreenElement.this.getToolTipText();
             }
-
-            /** @see PBasicInputEventHandler */
-            public void mouseClicked(final PInputEvent event) {
-                // System.out.println("Mouse Clicked: " + event);
-                if (!isRightClick(event)) {
-                    singleClickEvent();
-                }
-            }
-
         });
     }
 
     /**
-     * Helper method to abstract between genuine right clicks on control-down
-     * events (which are often treated as right clicks when there is no right
-     * click button).
-     *
-     * @param event the input event
-     * @return whether it is a "right click" or not
+     * Returns a reference to the model object this node represents.
      */
-    private boolean isRightClick(final PInputEvent event) {
-
-        if (event.isRightMouseButton()) {
-            return true;
-        } else if (event.isControlDown()) {
-            return true;
-        }
-        return false;
-    }
+    public abstract NetworkModel getModel();
 
     /**
-     * Return <code>true</code> if this screen element is selectable.
-     * <p>
-     * Being selectable requires that this screen element is pickable as far as
-     * the Piccolo API is concerned, so if this method returns <code>true</code>
-     * , be sure that this class also returns <code>true</code> for its
-     * <code>getPickable()</code> method.
-     * </p>
+     * Return true if this screen element is selectable.
      *
-     * @return true if this screen element is selectable
-     * @see org.piccolo2d.PNode#getPickable
-     * @see org.piccolo2d.PNode#setPickable
+     * Being selectable requires that this screen element is pickable as far as the Piccolo API is concerned, so if this
+     * method returns true, be sure that this class also returns true for PNode.getPickable
      */
     public abstract boolean isSelectable();
 
     /**
-     * Return <code>true</code> if this screen element should show a selection
-     * handle.
-     * <p>
-     * Showing a selection handle requires that this screen element is pickable
-     * as far as the Piccolo API is concerned, so if this method returns
-     * <code>true</code>, be sure that this class also returns <code>true</code>
-     * for its <code>getPickable()</code> method.
-     * </p>
-     * <p>
-     * Showing a selection handle also requires that this screen element is
-     * selectable, so if this method returns <code>true</code>, be sure that
-     * this class also returns <code>true</code> for its
-     * <code>isSelectable()</code> method.
-     * </p>
-     *
-     * @return true if this screen element should show a selection handle
-     * @see org.piccolo2d.PNode#getPickable
-     * @see org.piccolo2d.PNode#setPickable
-     * @see #isSelectable
-     */
-    public abstract boolean showNodeHandle();
-
-    /**
-     * Return <code>true</code> if this screen element is draggable.
-     * <p>
-     * Being draggable requires that this screen element is pickable as far as
-     * the Piccolo API is concerned, so if this method returns <code>true</code>
-     * , be sure that this class also returns <code>true</code> for its
-     * <code>getPickable()</code> method.
-     * </p>
-     * <p>
-     * Being draggable also requires that this screen element is selectable, so
-     * if this method returns <code>true</code>, be sure that this class also
-     * returns <code>true</code> for its <code>isSelectable()</code> method.
-     * </p>
-     *
-     * @return true if this screen element is draggable
-     * @see org.piccolo2d.PNode#getPickable
-     * @see org.piccolo2d.PNode#setPickable
-     * @see #isSelectable
+     * Return true if this screen element is draggable. Assumes {@link #isSelectable()} is also true.
      */
     public abstract boolean isDraggable();
 
     /**
-     * Return <code>true</code> if this screen element has tool tip text. If
-     * this screen element does not have tool tip text, a tool tip event handler
-     * will not be registered.
-     *
-     * @return true if this screen element has tool tip text
-     * @see #getToolTipText
+     * Return a String to use as tool tip text for this screen element. Return null if this
+     * screen element does not have tool tip text.
      */
-    protected abstract boolean hasToolTipText();
+    @Nullable
+    public String getToolTipText() {return null;}
 
     /**
-     * Return a <code>String</code> to use as tool tip text for this screen
-     * element. Return <code>null</code> if this screen element does not have
-     * tool tip text or to temporarily prevent the tool tip from displaying.
-     *
-     * @return a <code>String</code> to use as tool tip text for this screen
-     * element
-     * @see #hasToolTipText
+     * Return a context menu specific to this screen element or null if none.
      */
-    protected abstract String getToolTipText();
+    @Nullable
+    public JPopupMenu getContextMenu() { return null;}
 
     /**
-     * Return <code>true</code> if this screen element has a context menu. If
-     * this screen element does not have a context menu, a context menu event
-     * handler will not be registered.
-     *
-     * @return true if this screen element has a context menu.
-     * @see #getContextMenu
+     * Return a property dialog for this screen element, or null if it does not have one.
      */
-    protected abstract boolean hasContextMenu();
-
-    /**
-     * Return a context menu specific to this screen element. Return
-     * <code>null</code> if this screen element does not have a context menu.
-     *
-     * @return a context menu specific to this screen element
-     * @see #hasContextMenu
-     */
-    protected abstract JPopupMenu getContextMenu();
-
-    /**
-     * Return <code>true</code> if this screen element has a property dialog. If
-     * this screen element does not have a property dialog, a property dialog
-     * event handler will not be registered.
-     *
-     * @return true if this screen element has a property dialog
-     * @see #getPropertyDialog
-     */
-    protected abstract boolean hasPropertyDialog();
-
-    /**
-     * Return a property dialog for this screen element. Return
-     * <code>null</code> if this screen element does not have a property dialog.
-     *
-     * @return a property dialog for this screen element
-     * @see #hasPropertyDialog
-     */
-    protected abstract JDialog getPropertyDialog();
-
-    /**
-     * Reset colors when default colors have been changed in
-     * <code>NetworkPreferences</code>.
-     */
-    public abstract void resetColors();
-
-    /**
-     * Return the network panel for this screen element.
-     *
-     * @return the network panel for this screen element
-     */
-    public final NetworkPanel getNetworkPanel() {
-        return networkPanel;
+    @Nullable
+    public JDialog getPropertyDialog() {
+        return null;
     }
 
     /**
-     * Set the network panel for this screen element to
-     * <code>networkPanel</code>.
-     * <p>
-     * <p>
-     * This is a bound property.
-     * </p>
-     *
-     * @param networkPanel network panel for this screen element
+     * Supports "reset to default" in
+     * {@link org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction}.
      */
-    public final void setNetworkPanel(final NetworkPanel networkPanel) {
+    public void resetToDefault() {};
 
-        NetworkPanel oldNetworkPanel = this.networkPanel;
-        this.networkPanel = networkPanel;
-        firePropertyChange(-1, "networkPanel", oldNetworkPanel, this.networkPanel);
+    public final NetworkPanel getNetworkPanel() {
+        return networkPanel;
     }
 
     /**
@@ -279,22 +115,17 @@ public abstract class ScreenElement extends PPath.Float {
 
         /**
          * Show the context menu.
-         *
-         * @param event event
          */
         private void showContextMenu(final PInputEvent event) {
-
             event.setHandled(true);
             JPopupMenu contextMenu = getContextMenu();
             Point2D canvasPosition = event.getCanvasPosition();
-            // TODO
             //networkPanel.getPlacementManager().setLastClickedPosition(canvasPosition);
             contextMenu.show(networkPanel.getCanvas(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
         }
 
         @Override
         public void mousePressed(final PInputEvent event) {
-
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }
@@ -302,7 +133,6 @@ public abstract class ScreenElement extends PPath.Float {
 
         @Override
         public void mouseReleased(final PInputEvent event) {
-
             if (event.isPopupTrigger()) {
                 showContextMenu(event);
             }
@@ -310,20 +140,10 @@ public abstract class ScreenElement extends PPath.Float {
     }
 
     /**
-     * Called when element is single clicked on. Override to provide custom
-     * behaviors in that case.
-     */
-    protected void singleClickEvent() {
-    }
-
-    /**
      * Property dialog event handler.
      */
     private class PropertyDialogEventHandler extends PBasicInputEventHandler {
 
-        /**
-         * Create a new property dialog event handler.
-         */
         public PropertyDialogEventHandler() {
             super();
             setEventFilter(new PInputEventFilter(InputEvent.BUTTON1_MASK));
@@ -331,51 +151,36 @@ public abstract class ScreenElement extends PPath.Float {
 
         @Override
         public void mouseClicked(final PInputEvent event) {
-
             if (event.getClickCount() == 2) {
                 event.setHandled(true);
-                SwingUtilities.invokeLater(new Runnable() {
-                    /** @see Runnable */
-                    public void run() {
-                        JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
-                        propertyDialog.pack();
-                        propertyDialog.setLocationRelativeTo(null);
-                        propertyDialog.setVisible(true);
-                    }
+                SwingUtilities.invokeLater(() -> {
+                    JDialog propertyDialog = ScreenElement.this.getPropertyDialog();
+                    propertyDialog.pack();
+                    propertyDialog.setLocationRelativeTo(null);
+                    propertyDialog.setVisible(true);
                 });
             }
         }
     }
 
-    public boolean isGrouped() {
-        return isGrouped;
-    }
-
-    public void setGrouped(boolean isGrouped) {
-        this.isGrouped = isGrouped;
-    }
-
     /**
-     * Returns a reference to the the top level PNode of this Screen Element.
-     * Usually the ScreenElement is the top level PNode, but in some cases
-     * e.g. an interaction box, it's not.  Override in those cases.
+     * Returns a reference to the the top level PNode of this Screen Element. Usually the ScreenElement is the top level
+     * PNode, but in some cases e.g. an interaction box, it's not.  Override in those cases.
      */
     public PNode getNode() {
         return this;
     }
 
     /**
-     * Returns a reference to the model object this node represents.
-     */
-    public abstract NetworkModel getModel();
-
-    /**
-     * Override if selection events should select something besides this PNode.
+     * Override if selection events should select something besides the PNode that overrides ScreenElement.
      */
     public ScreenElement getSelectionTarget() {
         return this;
     }
 
+    /**
+     * Returns true if the provided bounds intersect this screen element
+     */
     public boolean isIntersecting(PBounds bound) {
         return getGlobalBounds().intersects(bound);
     }

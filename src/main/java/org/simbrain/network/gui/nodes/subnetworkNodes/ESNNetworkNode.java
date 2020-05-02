@@ -67,7 +67,7 @@ public class ESNNetworkNode extends SubnetworkNode {
     }
 
     @Override
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return new ESNTrainingDialog(getNetworkPanel(), (EchoStateNetwork) getSubnetwork());
     }
 

@@ -57,13 +57,8 @@ public class SOMGroupNode extends NeuronGroupNode {
         }
 
         @Override
-        protected String getToolTipText() {
+        public String getToolTipText() {
             return "Current learning rate: " + Utils.round(((SOMGroup) getNeuronGroup()).getAlpha(), 2) + "  Current neighborhood size: " + Utils.round(((SOMGroup) getNeuronGroup()).getNeighborhoodSize(), 2);
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
         }
     }
 

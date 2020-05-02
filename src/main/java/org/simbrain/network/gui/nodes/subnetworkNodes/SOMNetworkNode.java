@@ -47,7 +47,7 @@ public class SOMNetworkNode extends SubnetworkNode {
     }
 
     @Override
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return
                 new SOMTrainingDialog(getNetworkPanel(),
                         (SOMNetwork) getSubnetwork());

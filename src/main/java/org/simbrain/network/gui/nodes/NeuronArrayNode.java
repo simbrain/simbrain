@@ -246,32 +246,17 @@ public class NeuronArrayNode extends ScreenElement {
     }
 
     @Override
-    public boolean showNodeHandle() {
-        return true;
-    }
-
-    @Override
     public boolean isDraggable() {
         return true;
     }
 
     @Override
-    protected boolean hasToolTipText() {
-        return true;
-    }
-
-    @Override
-    protected String getToolTipText() {
+    public String getToolTipText() {
         return neuronArray.toString();
     }
 
     @Override
-    protected boolean hasContextMenu() {
-        return true;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
+    public JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
 
         contextMenu.add(new CutAction(getNetworkPanel()));
@@ -347,19 +332,8 @@ public class NeuronArrayNode extends ScreenElement {
     }
 
     @Override
-    protected boolean hasPropertyDialog() {
-        return true;
-    }
-
-    @Override
-    protected JDialog getPropertyDialog() {
+    public JDialog getPropertyDialog() {
         return getArrayDialog();
-    }
-
-
-
-    @Override
-    public void resetColors() {
     }
 
     @Override

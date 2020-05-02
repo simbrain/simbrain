@@ -25,7 +25,6 @@ import org.simbrain.network.gui.SynapseGroupNodeSimple;
 import org.simbrain.network.gui.dialogs.connect.SynapsePolarityAndRandomizerPanel;
 import org.simbrain.util.StandardDialog;
 
-import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -220,48 +219,10 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
     }
 
     @Override
-    public boolean showNodeHandle() {
-        return false;
-    }
-
-    @Override
     public boolean isDraggable() {
         return false;
     }
 
-    @Override
-    protected boolean hasToolTipText() {
-        return false;
-    }
-
-    @Override
-    protected String getToolTipText() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasContextMenu() {
-        return false;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasPropertyDialog() {
-        return false;
-    }
-
-    @Override
-    protected JDialog getPropertyDialog() {
-        return null;
-    }
-
-    @Override
-    public void resetColors() {
-    }
     @Override
     public SynapseGroup getModel() {
         return synapseGroup;

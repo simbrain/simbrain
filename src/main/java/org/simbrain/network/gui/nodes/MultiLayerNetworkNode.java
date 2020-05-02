@@ -102,32 +102,12 @@ public class MultiLayerNetworkNode extends ScreenElement {
     }
 
     @Override
-    public boolean showNodeHandle() {
-        return true;
-    }
-
-    @Override
     public boolean isDraggable() {
         return true;
     }
 
     @Override
-    protected boolean hasToolTipText() {
-        return false;
-    }
-
-    @Override
-    protected String getToolTipText() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasContextMenu() {
-        return true;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
+    public JPopupMenu getContextMenu() {
 
         JPopupMenu contextMenu = new JPopupMenu();
 
@@ -189,21 +169,6 @@ public class MultiLayerNetworkNode extends ScreenElement {
         //}
 
         return contextMenu;
-    }
-
-    @Override
-    protected boolean hasPropertyDialog() {
-        return false;
-    }
-
-    @Override
-    protected JDialog getPropertyDialog() {
-        return null;
-    }
-
-    @Override
-    public void resetColors() {
-
     }
 
     @Override

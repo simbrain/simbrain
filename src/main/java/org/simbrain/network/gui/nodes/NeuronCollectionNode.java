@@ -222,7 +222,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         }
 
         @Override
-        protected JDialog getPropertyDialog() {
+        public JDialog getPropertyDialog() {
             return NeuronCollectionNode.this.getPropertyDialog();
         }
 
@@ -237,25 +237,15 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         }
 
         @Override
-        protected boolean hasPropertyDialog() {
-            return false;
-        }
-
-        @Override
-        protected JPopupMenu getContextMenu() {
+        public JPopupMenu getContextMenu() {
             return getNCContexMenu();
         }
 
         @Override
-        protected String getToolTipText() {
+        public String getToolTipText() {
             return "NeuronCollection: " + neuronCollection.getId()
                     + " Location: (" + Utils.round(neuronCollection.getLocation().getX(), 2) + ","
                     + Utils.round(neuronCollection.getLocation().getY(), 2) + ")";
-        }
-
-        @Override
-        protected boolean hasToolTipText() {
-            return true;
         }
     }
 

@@ -74,7 +74,7 @@ public class LMSNetworkNode extends SubnetworkNode {
     }
 
     @Override
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
         return new LMSEditorDialog(this.getNetworkPanel(), (LMSNetwork) getSubnetwork());
     }
 

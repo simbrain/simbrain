@@ -177,7 +177,7 @@ public class SubnetworkNode extends ScreenElement {
         }
 
         @Override
-        protected JDialog getPropertyDialog() {
+        public JDialog getPropertyDialog() {
             return SubnetworkNode.this.getPropertyDialog();
         }
 
@@ -191,11 +191,6 @@ public class SubnetworkNode extends ScreenElement {
             return SubnetworkNode.this.getSubnetwork();
         }
 
-        @Override
-        protected boolean hasPropertyDialog() {
-            return true;
-        }
-
     }
 
     @Override
@@ -204,37 +199,7 @@ public class SubnetworkNode extends ScreenElement {
     }
 
     @Override
-    public boolean showNodeHandle() {
-        return false;
-    }
-
-    @Override
     public boolean isDraggable() {
-        return false;
-    }
-
-    @Override
-    protected boolean hasToolTipText() {
-        return false;
-    }
-
-    @Override
-    protected String getToolTipText() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasContextMenu() {
-        return false;
-    }
-
-    @Override
-    protected JPopupMenu getContextMenu() {
-        return null;
-    }
-
-    @Override
-    protected boolean hasPropertyDialog() {
         return false;
     }
 
@@ -244,7 +209,7 @@ public class SubnetworkNode extends ScreenElement {
      *
      * @return the neuron group property dialog.
      */
-    protected StandardDialog getPropertyDialog() {
+    public StandardDialog getPropertyDialog() {
 
         StandardDialog dialog = new StandardDialog() {
             private final SubnetworkPanel panel;
@@ -261,12 +226,6 @@ public class SubnetworkNode extends ScreenElement {
         };
         return dialog;
     }
-
-    @Override
-    public void resetColors() {
-
-    }
-
 
     /**
      * Set a custom context menu for the interaction box.

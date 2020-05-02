@@ -67,10 +67,15 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         val pickedNode: PNode? = event.pickedNode
         pickedNode?.firstScreenElement?.let { pickedScreenElement ->
             mode = Mode.DRAG
+            // Toggle selection
             if (event.isShiftDown) {
                 networkPanel.toggleSelection(pickedScreenElement)
-            } else {
-                networkPanel.setSelection(listOf(pickedScreenElement))
+            }
+            // Required so that clicking to drag does not de-select all other nodes
+            if (pickedScreenElement !in networkPanel.selectedNodes) {
+                if(!event.isShiftDown) {
+                    networkPanel.setSelection(listOf(pickedScreenElement))
+                }
             }
         }
 

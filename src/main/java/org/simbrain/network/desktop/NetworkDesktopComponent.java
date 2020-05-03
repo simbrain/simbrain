@@ -20,9 +20,7 @@ package org.simbrain.network.desktop;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.gui.NetworkPanel2;
-import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction;
-import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -42,7 +40,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
     /**
      * Network panel.
      */
-    private final NetworkPanel2 networkPanel;
+    private final NetworkPanel networkPanel;
 
     /**
      * Menu bar.
@@ -75,7 +73,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         super(frame, component);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
 
-        networkPanel = new NetworkPanel2(this, component.getNetwork());
+        networkPanel = new NetworkPanel(this, component.getNetwork());
 
         // component.setCurrentFile(currentFile);
 
@@ -155,7 +153,7 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
      *
      * @return the network panel for this network frame
      */
-    public NetworkPanel2 getNetworkPanel() {
+    public NetworkPanel getNetworkPanel() {
         return networkPanel;
     }
 

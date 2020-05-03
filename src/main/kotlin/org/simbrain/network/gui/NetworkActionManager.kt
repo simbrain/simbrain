@@ -72,7 +72,30 @@ class NetworkActionManager(val networkPanel: NetworkPanel) {
 
     inline fun <reified T : AbstractAction> getAction() = actions[T::class.java]
 
-    val networkModeAction
+    //TODO: Yulin please check these.  Could use reified below?
+    /**
+     * Gets an action within a [JCheckBoxMenuItem].  Can just be
+     * used as a menu item without using the checkbox.
+     */
+     inline fun <reified T : AbstractAction> getMenuItem(): JCheckBoxMenuItem {
+        return JCheckBoxMenuItem(this.getAction<T>());
+    }
+    inline fun <reified T : AbstractAction> getMenuItem(checked:Boolean): JCheckBoxMenuItem {
+        val menuItem = getMenuItem<T>()
+        menuItem.setSelected(checked);
+        return menuItem;
+    }
+    val clipboardActions
+        get() = listOf(getAction<CopyAction>(),getAction<CutAction>(),getAction<PasteAction>())
+
+    val networkControlActions
+        get() = listOf(getAction<RunNetworkAction>(),getAction<StopNetworkAction>())
+
+    val networkEditingActions
+        get() = listOf(getAction<NewNeuronAction>(),getAction<DeleteAction>())
+
+    // TODO: Yulin, isn't the below more verbose than the above?
+    val networkModeActions
         get() = listOf<Class<out AbstractAction>>(
                 SelectionEditModeAction::class.java,
                 TextEditModeAction::class.java,

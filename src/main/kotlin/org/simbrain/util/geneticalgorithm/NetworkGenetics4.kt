@@ -49,7 +49,7 @@ fun main() {
             .toList()
 
     val winner: Network = result.last().network;
-    NetworkPanel.showNetwork(winner)
+    //NetworkPanel.showNetwork(winner) // TODO
 
 }
 

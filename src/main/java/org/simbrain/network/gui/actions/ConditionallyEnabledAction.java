@@ -83,11 +83,12 @@ public abstract class ConditionallyEnabledAction extends AbstractAction {
         this.networkPanel = networkPanel;
 
         updateAction();
-        networkPanel.addSelectionListener(new NetworkSelectionListener() {
-            public void selectionChanged(final NetworkSelectionEvent event) {
-                updateAction();
-            }
-        });
+        //TODO
+        //networkPanel.addSelectionListener(new NetworkSelectionListener() {
+        //    public void selectionChanged(final NetworkSelectionEvent event) {
+        //        updateAction();
+        //    }
+        //});
     }
 
     /**

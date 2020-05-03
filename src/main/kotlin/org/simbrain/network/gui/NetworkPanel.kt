@@ -57,72 +57,72 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
     /**
      * Selection model.
      */
-    private val selectionModel = NetworkSelectionModel(this)
+    val selectionModel = NetworkSelectionModel(this)
 
     /**
      * Cached context menu.
      */
-    private var contextMenu: JPopupMenu = createNetworkContextMenu()
+    var contextMenu: JPopupMenu = createNetworkContextMenu()
 
     /**
      * Cached alternate context menu.
      */
-    private val contextMenuAlt: JPopupMenu? = null
+    val contextMenuAlt: JPopupMenu? = null
 
     /**
      * Last selected Neuron.
      */
-    private val lastSelectedNeuron: NeuronNode? = null
+    val lastSelectedNeuron: NeuronNode? = null
 
     /**
      * Label which displays current time.
      */
-    private val timeLabel: TimeLabel? = null
+    val timeLabel: TimeLabel? = null
 
     /**
      * Reference to bottom NetworkPanelToolBar.
      */
-    private val southBar: CustomToolBar? = null
+    val southBar: CustomToolBar? = null
 
     /**
      * Show input labels.
      */
-    private val inOutMode = true
+    val inOutMode = true
 
     /**
      * Use auto zoom.
      */
-    private val autoZoomMode = true
+    val autoZoomMode = true
 
     /**
      * Show subnet outline.
      */
-    private val showSubnetOutline = false
+    val showSubnetOutline = false
 
     /**
      * Show time.
      */
-    private val showTime = true
+    val showTime = true
 
     /**
      * Main tool bar.
      */
-    private val mainToolBar: CustomToolBar = createMainToolBar()
+    val mainToolBar: CustomToolBar = createMainToolBar()
 
     /**
      * Run tool bar.
      */
-    private val runToolBar: CustomToolBar = createRunToolBar()
+    val runToolBar: CustomToolBar = createRunToolBar()
 
     /**
      * Edit tool bar.
      */
-    private val editToolBar: CustomToolBar = createEditToolBar()
+    val editToolBar: CustomToolBar = createEditToolBar()
 
     /**
      * Color of background.
      */
-    private val backgroundColor = Color.white
+    val backgroundColor = Color.white
 
     /**
      * How much to nudge objects per key click.
@@ -137,17 +137,17 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
     /**
      * Toggle button for neuron clamping.
      */
-    private var neuronClampButton = JToggleButton()
+    var neuronClampButton = JToggleButton()
 
     /**
      * Toggle button for weight clamping.
      */
-    private var synapseClampButton = JToggleButton()
+    var synapseClampButton = JToggleButton()
 
     /**
      * Menu item for neuron clamping.
      */
-    private var neuronClampMenuItem = JCheckBoxMenuItem()
+    var neuronClampMenuItem = JCheckBoxMenuItem()
 
     /**
      * Menu item for weight clamping.
@@ -157,12 +157,12 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
     /**
      * Whether loose synapses are visible or not.
      */
-    private val looseWeightsVisible = true
+    val looseWeightsVisible = true
 
     /**
      * Whether to display update priorities.
      */
-    private val prioritiesVisible = false
+    val prioritiesVisible = false
 
     /**
      * Text object event handler.
@@ -187,7 +187,7 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
     /**
      * Action manager.
      */
-    private val actionManager: NetworkActionManager = NetworkActionManager(this) // TODO
+    val actionManager: NetworkActionManager = NetworkActionManager(this) // TODO
 
 
     /**
@@ -231,7 +231,7 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
             addSeparator()
             add(getAction<ClearSourceNeurons>())
             add(getAction<SetSourceNeurons>())
-            add(connectionMenu)
+            //add(connectionMenu) // TODO
             add(getAction<AddSynapseGroupAction>())
             addSeparator()
             add(getAction<RandomizeObjectsAction>())
@@ -280,11 +280,11 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
     fun createViewMenu(): JMenu? {
         val viewMenu = JMenu("View")
         val toolbarMenu = JMenu("Toolbars")
-        toolbarMenu.add(actionManager.getMenuItem(ShowRunToolBarAction::class.java,
+        toolbarMenu.add(actionManager.getMenuItem<ShowRunToolBarAction>(
                 runToolBar.isVisible()))
-        toolbarMenu.add(actionManager.getMenuItem(ShowMainToolBarAction::class.java,
+        toolbarMenu.add(actionManager.getMenuItem<ShowMainToolBarAction>(
                 mainToolBar.isVisible()))
-        toolbarMenu.add(actionManager.getMenuItem(ShowEditToolBarAction::class.java,
+        toolbarMenu.add(actionManager.getMenuItem<ShowEditToolBarAction>(
                 editToolBar.isVisible()))
         viewMenu.add(toolbarMenu)
         viewMenu.addSeparator()
@@ -303,14 +303,13 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
      */
     fun createSelectionMenu(): JMenu? {
         val selectionMenu = JMenu("Select")
-        selectionMenu.add(actionManager.getAction(SelectAllAction::class.java))
-        selectionMenu.add(actionManager.getAction(SelectAllWeightsAction::class.java))
-        selectionMenu.add(actionManager.getAction(SelectAllNeuronsAction::class.java))
-        selectionMenu.add(actionManager.getAction(SelectIncomingWeightsAction::class.java))
-        selectionMenu.add(actionManager.getAction(SelectOutgoingWeightsAction::class.java))
+        selectionMenu.add(actionManager.getAction<SelectAllAction>())
+        selectionMenu.add(actionManager.getAction<SelectAllWeightsAction>())
+        selectionMenu.add(actionManager.getAction<SelectAllNeuronsAction>())
+        selectionMenu.add(actionManager.getAction<SelectIncomingWeightsAction>())
+        selectionMenu.add(actionManager.getAction<SelectOutgoingWeightsAction>())
         return selectionMenu
     }
-
 
     /**
      * Return the align sub menu.
@@ -319,8 +318,8 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
      */
     fun createAlignMenu(): JMenu? {
         val alignSubMenu = JMenu("Align")
-        alignSubMenu.add(actionManager.getAction(AlignHorizontalAction::class.java))
-        alignSubMenu.add(actionManager.getAction(AlignVerticalAction::class.java))
+        alignSubMenu.add(actionManager.getAction<AlignHorizontalAction>())
+        alignSubMenu.add(actionManager.getAction<AlignVerticalAction>())
         return alignSubMenu
     }
 
@@ -331,8 +330,8 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
      */
     fun createSpacingMenu(): JMenu? {
         val spaceSubMenu = JMenu("Space")
-        spaceSubMenu.add(actionManager.getAction(SpaceHorizontalAction::class.java))
-        spaceSubMenu.add(actionManager.getAction(SpaceVerticalAction::class.java))
+        spaceSubMenu.add(actionManager.getAction<SpaceHorizontalAction>())
+        spaceSubMenu.add(actionManager.getAction<SpaceVerticalAction>())
         return spaceSubMenu
     }
 
@@ -348,7 +347,6 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
         return helpMenu
     }
 
-
     /**
      * Create a new context menu for this Network panel.
      *
@@ -358,7 +356,7 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
         contextMenu = JPopupMenu()
 
         // Insert actions
-        contextMenu.add(actionManager.getAction(NewNeuronAction::class.java))
+        contextMenu.add(actionManager.getAction<NewNeuronAction>())
         contextMenu.add(AddNeuronsAction(null)) // todo
         contextMenu.add(AddNeuronArrayAction(null)) // todo
         contextMenu.add(AddMultiLayerNet(null))  // todo
@@ -372,12 +370,12 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
         contextMenu.addSeparator()
 
         // Connection actions
-        contextMenu.add(actionManager.getAction(ClearSourceNeurons::class.java))
-        contextMenu.add(actionManager.getAction(SetSourceNeurons::class.java))
+        contextMenu.add(actionManager.getAction<ClearSourceNeurons>())
+        contextMenu.add(actionManager.getAction<SetSourceNeurons>())
         contextMenu.addSeparator()
 
         // Preferences
-        contextMenu.add(actionManager.getAction(ShowNetworkPreferencesAction::class.java))
+        contextMenu.add(actionManager.getAction<ShowNetworkPreferencesAction>())
         return contextMenu
     }
 
@@ -389,7 +387,7 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
      */
     protected fun createRunToolBar(): CustomToolBar {
         val runTools = CustomToolBar()
-        runTools.add(actionManager.getAction(IterateNetworkAction::class.java))
+        runTools.add(actionManager.getAction<IterateNetworkAction>())
         runTools.add(ToggleButton(actionManager.networkControlActions))
         return runTools
     }
@@ -419,8 +417,8 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
         for (action in actionManager.networkEditingActions) {
             editTools.add(action)
         }
-        editTools.add(actionManager.getAction(ClearNodeActivationsAction::class.java))
-        editTools.add(actionManager.getAction(RandomizeObjectsAction::class.java))
+        editTools.add(actionManager.getAction<ClearNodeActivationsAction>())
+        editTools.add(actionManager.getAction<RandomizeObjectsAction>())
         return editTools
     }
 
@@ -460,5 +458,25 @@ class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network
         }
     }
 
+    /**
+     * Display the provided network in a dialog
+     *
+     * @param network the model network to show
+     */
+    companion object showNetwork {
+        //val np = NetworkPanel(, net); // TODO: How to do this? Mock up a Desktop Component
+        //np.initScreenElements();
+        val frame = JFrame()
+        //frame.setContentPane(np)
+        //frame.setPreferredSize(new Dimension(500, 500));
+        //frame.pack();
+        //frame.setVisible(true);
+        //frame.addWindowListener(new WindowAdapter() {
+        //    public void windowClosing(WindowEvent we) {
+        //        System.exit(0);
+        //    }
+        //});
+        //System.out.println(np.debugString());
+    }
 
 }

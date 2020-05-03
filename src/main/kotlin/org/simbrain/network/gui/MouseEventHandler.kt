@@ -74,7 +74,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             // Required so that clicking to drag does not de-select all other nodes
             if (pickedScreenElement !in networkPanel.selectedNodes) {
                 if(!event.isShiftDown) {
-                    networkPanel.setSelection(listOf(pickedScreenElement))
+                    networkPanel.setSelection(pickedScreenElement)
                 }
             }
         }

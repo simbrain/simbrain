@@ -101,7 +101,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
 
-        if (getNetworkPanel().getSelectedNodes(TextNode.class).size() > 0) {
+        if (getNetworkPanel().getSelectedNodes().stream().anyMatch( se -> se instanceof TextNode)) {
             contextMenu.addSeparator();
             contextMenu.add(new SetTextPropertiesAction(getNetworkPanel()));
         }

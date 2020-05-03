@@ -1,10 +1,10 @@
 package org.simbrain.network.gui
 
 import org.piccolo2d.PCanvas
+import org.piccolo2d.util.PBounds
 import org.simbrain.network.connections.QuickConnectionManager
 import org.simbrain.network.core.Network
 import org.simbrain.network.desktop.NetworkDesktopComponent
-import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons
@@ -18,9 +18,11 @@ import org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction
 import org.simbrain.network.gui.actions.neuron.NewNeuronAction
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction
-import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction
 import org.simbrain.network.gui.actions.selection.*
-import org.simbrain.network.gui.actions.synapse.*
+import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction
+import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction
+import org.simbrain.network.gui.actions.synapse.ShowAdjustSynapsesDialog
+import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction
@@ -37,22 +39,25 @@ import javax.swing.*
 /**
  * Should eventually replace NetworkPanel and NetworkPanelDesktop
  */
-class NetworkPanel2(networkDesktop: NetworkDesktopComponent, val network: Network) : JPanel() {
+class NetworkPanel(networkDesktop: NetworkDesktopComponent, val network: Network) : JPanel() {
 
     /**
      * The Piccolo PCanvas.
      */
-    private val canvas: PCanvas? = null
+    val canvas = PCanvas()
+
+    val selectedNodes get() = selectionModel.selection
 
     /**
      * Build mode.
      */
-    private val editMode: EditMode = EditMode.SELECTION
+    var editMode: EditMode = EditMode.SELECTION
+        private set
 
     /**
      * Selection model.
      */
-    private val selectionModel = NetworkSelectionModel(null) // TODO
+    private val selectionModel = NetworkSelectionModel(this)
 
     /**
      * Cached context menu.
@@ -162,7 +167,7 @@ class NetworkPanel2(networkDesktop: NetworkDesktopComponent, val network: Networ
     /**
      * Text object event handler.
      */
-    private val textHandle: TextEventHandler = TextEventHandler(null) // todo
+    val textHandle: TextEventHandler = TextEventHandler(this)
 
     /**
      * Toolbar panel.
@@ -177,12 +182,12 @@ class NetworkPanel2(networkDesktop: NetworkDesktopComponent, val network: Networ
     /**
      * Manages placement of new nodes, groups, etc.
      */
-    private val placementManager = PlacementManager()
+    val placementManager = PlacementManager()
 
     /**
      * Action manager.
      */
-    private var actionManager: NetworkActionManager = NetworkActionManager(null) // TODO
+    private val actionManager: NetworkActionManager = NetworkActionManager(this) // TODO
 
 
     /**
@@ -194,14 +199,14 @@ class NetworkPanel2(networkDesktop: NetworkDesktopComponent, val network: Networ
      * Turn GUI on or off.
      */
     var guiOn = true
-    set(guiOn) {
-        if (guiOn) {
-            this.setUpdateComplete(false)
-            //this.updateSynapseNodes()
-            updateComplete.decrementAndGet()
+        set(guiOn) {
+            if (guiOn) {
+                this.setUpdateComplete(false)
+                //this.updateSynapseNodes()
+                updateComplete.decrementAndGet()
+            }
+            field = guiOn
         }
-        field = guiOn
-    }
 
 
     fun setUpdateComplete(updateComplete: Boolean) {
@@ -217,33 +222,33 @@ class NetworkPanel2(networkDesktop: NetworkDesktopComponent, val network: Networ
      *
      * @return a new Edit menu for this Network panel
      */
-    fun createEditMenu(): JMenu? {
-        val editMenu = JMenu("Edit")
-        editMenu.add(actionManager.getAction(CutAction::class.java))
-        editMenu.add(actionManager.getAction(CopyAction::class.java))
-        editMenu.add(actionManager.getAction(PasteAction::class.java))
-        editMenu.add(actionManager.getAction(DeleteAction::class.java))
-        editMenu.addSeparator()
-        editMenu.add(actionManager.getAction(ClearSourceNeurons::class.java))
-        editMenu.add(actionManager.getAction(SetSourceNeurons::class.java))
-        editMenu.add(actionManager.getConnectionMenu())
-        editMenu.add(actionManager.getAction(AddSynapseGroupAction::class.java))
-        editMenu.addSeparator()
-        editMenu.add(actionManager.getAction(RandomizeObjectsAction::class.java))
-        editMenu.add(actionManager.getAction(ShowAdjustSynapsesDialog::class.java))
-        editMenu.addSeparator()
-        editMenu.add(actionManager.getAction(ShowLayoutDialogAction::class.java))
-        editMenu.addSeparator()
-        editMenu.add(actionManager.getAction(NeuronCollectionAction::class.java))
-        editMenu.addSeparator()
-        editMenu.add(createAlignMenu())
-        editMenu.add(createSpacingMenu())
-        editMenu.addSeparator()
-        editMenu.add(actionManager.getAction(SetNeuronPropertiesAction::class.java))
-        editMenu.add(actionManager.getAction(SetSynapsePropertiesAction::class.java))
-        editMenu.addSeparator()
-        editMenu.add(createSelectionMenu())
-        return editMenu
+    fun createEditMenu() = with(actionManager) {
+        JMenu("Edit").apply {
+            add(getAction<CutAction>())
+            add(getAction<CopyAction>())
+            add(getAction<PasteAction>())
+            add(getAction<DeleteAction>())
+            addSeparator()
+            add(getAction<ClearSourceNeurons>())
+            add(getAction<SetSourceNeurons>())
+            add(connectionMenu)
+            add(getAction<AddSynapseGroupAction>())
+            addSeparator()
+            add(getAction<RandomizeObjectsAction>())
+            add(getAction<ShowAdjustSynapsesDialog>())
+            addSeparator()
+            add(getAction<ShowLayoutDialogAction>())
+            addSeparator()
+            add(getAction<NeuronCollectionAction>())
+            addSeparator()
+            add(createAlignMenu())
+            add(createSpacingMenu())
+            addSeparator()
+            add(getAction<SetNeuronPropertiesAction>())
+            add(getAction<SetSynapsePropertiesAction>())
+            addSeparator()
+            add(createSelectionMenu())
+        }
     }
 
     /**
@@ -253,17 +258,17 @@ class NetworkPanel2(networkDesktop: NetworkDesktopComponent, val network: Networ
      */
     fun createInsertMenu(): JMenu? {
         val insertMenu = JMenu("Insert")
-        insertMenu.add(actionManager.getAction(NewNeuronAction::class.java))
-        insertMenu.add(actionManager.getAction(NeuronGroup::class.java))
+        insertMenu.add(actionManager.getAction<NewNeuronAction>())
+        insertMenu.add(actionManager.neuronGroupAction)
         insertMenu.addSeparator()
-        insertMenu.add(AddNeuronsAction(null)) // todo
-        insertMenu.add(AddNeuronArrayAction(null)) // todo
-        insertMenu.add(AddMultiLayerNet(null)) // todo
+        insertMenu.add(AddNeuronsAction(this))
+        insertMenu.add(AddNeuronArrayAction(this))
+        insertMenu.add(AddMultiLayerNet(this))
         insertMenu.addSeparator()
-        insertMenu.add(actionManager.getNewNetworkMenu())
+        insertMenu.add(actionManager.newNetworkMenu)
         insertMenu.addSeparator()
-        insertMenu.add(actionManager.getAction(TestInputAction::class.java))
-        insertMenu.add(actionManager.getAction(ShowWeightMatrixAction::class.java))
+        insertMenu.add(actionManager.getAction<TestInputAction>())
+        insertMenu.add(actionManager.getAction<ShowWeightMatrixAction>())
         return insertMenu
     }
 
@@ -417,6 +422,42 @@ class NetworkPanel2(networkDesktop: NetworkDesktopComponent, val network: Networ
         editTools.add(actionManager.getAction(ClearNodeActivationsAction::class.java))
         editTools.add(actionManager.getAction(RandomizeObjectsAction::class.java))
         return editTools
+    }
+
+    fun setSelection(screenElement: ScreenElement) {
+        selectionModel.setSelection(screenElement)
+    }
+
+    fun setSelection(screenElements: Collection<ScreenElement>) {
+        selectionModel.setSelection(screenElements)
+    }
+
+    fun toggleSelection(screenElement: ScreenElement) {
+        if (screenElement in selectionModel) {
+            selectionModel.remove(screenElement)
+        } else {
+            selectionModel.add(screenElement)
+        }
+    }
+
+
+    fun clearSelection() {
+        selectionModel.clear()
+    }
+
+    /**
+     * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
+     *
+     * @param forceZoom if true force the zoom to happen
+     */
+    fun zoomToFitPage(forceZoom: Boolean) {
+        // TODO: Add a check to see if network is running
+        if (autoZoomMode && editMode.isSelection || forceZoom) {
+            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
+            val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
+                    filtered.getWidth() + 20, filtered.getHeight() + 20)
+            canvas.camera.setViewBounds(adjustedFiltered)
+        }
     }
 
 

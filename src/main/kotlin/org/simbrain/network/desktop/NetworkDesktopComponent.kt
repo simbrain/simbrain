@@ -40,22 +40,6 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
 
     val networkPanel = NetworkPanel(this, component.network)
 
-    private val menuBar: JMenuBar = JMenuBar().apply {
-        with(networkPanel) {
-            add(createFileMenu())
-            add(createEditMenu())
-            add(insertMenu)
-            add(createViewMenu())
-            // TODO: todo copied from old code
-            // TODO
-            //menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
-            // menuBar.add(createAttributeMenu());
-            add(helpMenu)
-        }
-        parentFrame.jMenuBar = this
-    }
-
-
     /**
      * Create and return a new File menu for this Network panel.
      *
@@ -162,6 +146,21 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
 
         // Put it all together
         add("Center", networkPanel)
+
+        with(networkPanel) {
+            JMenuBar().apply {
+                add(createFileMenu())
+                add(createEditMenu())
+                add(insertMenu)
+                add(createViewMenu())
+                // TODO: todo copied from old code
+                // TODO
+                //menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
+                // menuBar.add(createAttributeMenu());
+                add(this@with.helpMenu)
+                parentFrame.jMenuBar = this
+            }
+        }
 
         // Toggle the network panel's visiblity if the workspace component is
         // set to "gui off"

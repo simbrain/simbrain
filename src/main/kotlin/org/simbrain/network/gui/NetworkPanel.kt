@@ -38,7 +38,9 @@ import java.awt.FlowLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.util.concurrent.atomic.AtomicInteger
-import javax.swing.*
+import javax.swing.JInternalFrame
+import javax.swing.JPanel
+import javax.swing.ToolTipManager
 import javax.swing.event.InternalFrameAdapter
 import javax.swing.event.InternalFrameEvent
 
@@ -53,6 +55,27 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     val canvas = PCanvas()
 
     var editMode: EditMode = EditMode.SELECTION
+
+    /**
+     * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
+     * when the lasso is pulled over them.  Also keeps track of source nodes (but those events are
+     * handled by keybindings).
+     */
+    val selectionManager = NetworkSelectionManager(this).apply {
+        events.onSelection { old, new ->
+            val (removed, added) = old complement new
+            removed.forEach { NodeHandle.removeSelectionHandleFrom(it) }
+            added.forEach {
+                if (it is InteractionBox) {
+                    NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
+                } else {
+                    NodeHandle.addSelectionHandleTo(it)
+                }
+            }
+        }
+    }
+
+    val networkActions = NetworkActions(this)
 
     @Deprecated("Consider removing")
     val neuronNodeMapping: Map<Neuron, NeuronNode> = HashMap()
@@ -90,8 +113,6 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
      */
      val quickConnector = QuickConnectionManager()
 
-    val networkActions = NetworkActions(this)
-
     /**
      * Manages placement of new nodes, groups, etc.
      */
@@ -119,25 +140,6 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             field = value
             getScreenElements<NeuronNode>().forEach { it.setPriorityView(value) }
         }
-
-    /**
-     * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
-     * when the lasso is pulled over them.  Also keeps track of source nodes (but those events are
-     * handled by keybindings).
-     */
-    val selectionManager = NetworkSelectionManager(this).apply {
-        events.onSelection { old, new ->
-            val (removed, added) = old complement new
-            removed.forEach { NodeHandle.removeSelectionHandleFrom(it) }
-            added.forEach {
-                if (it is InteractionBox) {
-                    NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
-                } else {
-                    NodeHandle.addSelectionHandleTo(it)
-                }
-            }
-        }
-    }
 
     /**
      * Turn GUI on or off.
@@ -196,9 +198,9 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             })
         }
 
-        add("North", toolbars)
+//        add("North", toolbars)
         add("Center", canvas)
-        add("South", JToolBar().apply { add(timeLabel) })
+//        add("South", JToolBar().apply { add(timeLabel) })
 
         // Register support for tool tips
         // TODO: might be a memory leak, if not unregistered when the parent frame is removed

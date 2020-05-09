@@ -7,10 +7,7 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronUpdateRule
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.dl4j.ArrayConnectable
 import org.simbrain.network.dl4j.MultiLayerNet
@@ -38,8 +35,10 @@ import java.awt.FlowLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Consumer
 import javax.swing.JInternalFrame
 import javax.swing.JPanel
+import javax.swing.JToolBar
 import javax.swing.ToolTipManager
 import javax.swing.event.InternalFrameAdapter
 import javax.swing.event.InternalFrameEvent
@@ -184,7 +183,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         }
 
         // Init network change listeners
-        // addNetworkListeners()
+         addNetworkListeners()
 
         toolbars.apply {
             cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
@@ -198,9 +197,9 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             })
         }
 
-//        add("North", toolbars)
+        add("North", toolbars)
         add("Center", canvas)
-//        add("South", JToolBar().apply { add(timeLabel) })
+        add("South", JToolBar().apply { add(timeLabel) })
 
         // Register support for tool tips
         // TODO: might be a memory leak, if not unregistered when the parent frame is removed
@@ -320,6 +319,10 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         SynapseGroupNode(this, synapseGroup)
     }.also { it.lowerToBottom() }
 
+    fun add(weightMatrix: WeightMatrix) = addScreenElement {
+        WeightMatrixNode(this, weightMatrix).also { it.lower() }
+    }
+
     fun add(subnetwork: Subnetwork) = addScreenElement {
         fun createSubNetwork() = when (subnetwork) {
             is Hopfield -> HopfieldNode(this, subnetwork)
@@ -342,6 +345,11 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         }
 
     }
+
+    /**
+     * Add representation of specified text to network panel.
+     */
+    fun add(text: NetworkTextObject) = addScreenElement { TextNode(this, text) }
 
     // TODO: refactor network remove model
     // better to have a series of remove methods, similar to the add methods
@@ -608,6 +616,31 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             addSeparator()
             add(ToggleAutoZoom(this@NetworkPanel))
         }
+    }
+
+    private fun addNetworkListeners() {
+        val event = network.events
+        event.onNeuronAdded(Consumer { add(it) })
+        event.onSynapseAdded(Consumer { add(it) })
+        event.onTextAdded(Consumer { add(it) })
+        event.onTextRemoved(Consumer { it.fireDeleted() }) // TODO: [event] should not be handled here
+        event.onNeuronGroupAdded(Consumer { add(it) })
+        event.onNeuronGroupRemoved(Consumer { it.events.fireDelete() })
+        event.onSynapseGroupAdded(Consumer { add(it) })
+        //event.onSynapseGroupRemoved(SynapseGroup::fireDeleted); // TODO: [event]
+        event.onSubnetworkAdded(Consumer { add(it) })
+        //event.onSubnetworkRemoved(Subnetwork::fireDeleted); // TODO: [event]
+        event.onNeuronArrayAdded(Consumer { add(it) })
+        event.onWeightMatrixAdded(Consumer { add(it) })
+        // event.onNeuronArrayRemoved(NeuronArray::fireDeleted);
+        event.onMultiLayerNetworkAdded(Consumer { add(it) })
+        event.onNeuronCollectionAdded(Consumer { add(it) })
+        event.onWeightMatrixRemoved(Consumer { it.delete() })
+//        event.onUpdateTimeDisplay(Consumer { d: Boolean? -> updateTime() })
+//        event.onUpdateCompleted(Consumer {
+//            updateComplete = it
+//            repaint()
+//        })
     }
 
 }

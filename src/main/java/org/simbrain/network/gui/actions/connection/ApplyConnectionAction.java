@@ -72,7 +72,7 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
             connectionPanel = new AnnotatedPropertyEditor((RadialSimple) connection);
         }
 
-        ConnectionDialog dialog = new ConnectionDialog(networkPanel, connection);
+        ConnectionDialog dialog = new ConnectionDialog(getNetworkPanel(), connection);
         dialog.setTitle(title);
         dialog.setLocationRelativeTo(null);
         dialog.pack();

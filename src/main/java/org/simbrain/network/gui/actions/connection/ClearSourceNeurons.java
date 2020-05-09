@@ -41,7 +41,7 @@ public final class ClearSourceNeurons extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.clearSourceElements();
-
+        // TODO: the behavior before refactoring was also clearing all sources. Does not match the text description...
+        getNetworkPanel().getSelectionManager().clearAllSource();
     }
 }

@@ -41,6 +41,6 @@ public final class SetSourceNeurons extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.setSourceElements();
+        getNetworkPanel().getSelectionManager().markAllAsSource();
     }
 }

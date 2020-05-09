@@ -59,7 +59,7 @@ public final class RunNetworkAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.setRunning(true);
+        networkPanel.getNetwork().setRunning(true);
         networkPanel.getNetwork().setOneOffRun(false);
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             public void run() {

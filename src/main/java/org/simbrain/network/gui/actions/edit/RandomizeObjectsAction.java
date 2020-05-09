@@ -24,13 +24,11 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
 import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.SynapseGroupNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.Optional;
 
 /**
  * Randomize screen elements action.
@@ -55,19 +53,19 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        for (NeuronNode node : networkPanel.getSelectedNodes(NeuronNode.class)) {
+        for (NeuronNode node : getNetworkPanel().getSelectedNodes(NeuronNode.class)) {
             node.getNeuron().randomize();
         }
-        for (SynapseNode node : networkPanel.getSelectedNodes(SynapseNode.class)) {
+        for (SynapseNode node : getNetworkPanel().getSelectedNodes(SynapseNode.class)) {
             node.getSynapse().randomize();
         }
-        for (NeuronGroupNode node : networkPanel.getSelectedNodes(NeuronGroupNode.class)) {
+        for (NeuronGroupNode node : getNetworkPanel().getSelectedNodes(NeuronGroupNode.class)) {
             node.getNeuronGroup().randomize();
         }
-        for (NeuronArray na: networkPanel.getSelectedModels(NeuronArray.class)) {
+        for (NeuronArray na: getNetworkPanel().getSelectedModels(NeuronArray.class)) {
             na.randomize();
         }
-        for (WeightMatrix wm: networkPanel.getSelectedModels(WeightMatrix.class)) {
+        for (WeightMatrix wm: getNetworkPanel().getSelectedModels(WeightMatrix.class)) {
             wm.randomize();
         }
     }

@@ -5,9 +5,11 @@ import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.dl4j.ArrayConnectable
@@ -213,9 +215,17 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
     val selectedNodes
         get() = selectionManager.selection
 
+    @Deprecated("User selectionManager instead", ReplaceWith("selectionManager.selectionOf(clazz)"))
+    fun <T: ScreenElement> getSelectedNodes(clazz: Class<T>) =
+            selectionManager.selectionOf(clazz)
+
     @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModels"))
     val selectedModels
         get() = selectionManager.selection.map { it.model!! }
+
+    @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModelsOf(clazz)"))
+    fun <T: NetworkModel> getSelectedModels(clazz: Class<T>) =
+            selectionManager.selectedModels.filterIsInstance(clazz)
 
     private inline fun <reified T : ScreenElement> getScreenElements() = canvas.layer.allNodes.filterIsInstance<T>()
 
@@ -396,6 +406,32 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         repaint()
     }
 
+    fun spaceHorizontal() {
+        val neurons = selectionManager.selectedModelsOf<Neuron>()
+        if (neurons.size > 1) {
+            val sortedNeurons = neurons.sortedBy { it.x }
+            val min = neurons.first().x
+            val max = neurons.last().x
+            val spacing = (max - min) / neurons.size - 1
+
+            sortedNeurons.forEachIndexed { i, neuron -> neuron.x = min + spacing * i }
+        }
+        repaint()
+    }
+
+    fun spaceVertical() {
+        val neurons = selectionManager.selectedModelsOf<Neuron>()
+        if (neurons.size > 1) {
+            val sortedNeurons = neurons.sortedBy { it.y }
+            val min = neurons.first().y
+            val max = neurons.last().y
+            val spacing = (max - min) / neurons.size - 1
+
+            sortedNeurons.forEachIndexed { i, neuron -> neuron.y = min + spacing * i }
+        }
+        repaint()
+    }
+
     fun nudge(dx: Int, dy: Int) {
         selectionManager.selectedModelsOf<Neuron>()
                 .forEach { it.offset(dx * nudgeAmount, dy * nudgeAmount) }
@@ -459,6 +495,18 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
 
     fun selectNeuronsInNeuronGroups() {
         selectionManager.selectionOf<NeuronGroupNode>().forEach { it.selectNeurons() }
+    }
+
+    @Deprecated("Consider removing / add from Network instead")
+    fun addNeuron(updateRule: NeuronUpdateRule) {
+        val neuron = Neuron(network, updateRule)
+        placementManager.addNewModelObject(neuron)
+        neuron.forceSetActivation(0.0)
+        network.addLooseNeuron(neuron)
+    }
+
+    fun clearNeurons() {
+        getScreenElements<NeuronNode>().forEach { it.neuron.clear() }
     }
 
     /**

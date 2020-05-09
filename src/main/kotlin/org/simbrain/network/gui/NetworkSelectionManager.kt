@@ -13,11 +13,15 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     val sourceSelection: Set<ScreenElement> = CopyOnWriteArraySet()
     inline fun <reified T: ScreenElement> selectionOf() = selection.filterIsInstance<T>()
     inline fun <reified T: ScreenElement> sourceSelectionOf() = sourceSelection.filterIsInstance<T>()
+    fun <T: ScreenElement> selectionOf(clazz: Class<T>) = selection.filterIsInstance(clazz)
+    fun <T: ScreenElement> sourceSelectionOf(clazz: Class<T>) = sourceSelection.filterIsInstance(clazz)
 
     val selectedModels = selection.map { it.model!! }
     val sourceModels = sourceSelection.map { it.model!! }
     inline fun <reified T: NetworkModel> selectedModelsOf() = selectedModels.filterIsInstance<T>()
     inline fun <reified T: NetworkModel> sourceModelsOf() = sourceModels.filterIsInstance<T>()
+    fun <T: NetworkModel> selectedModelsOf(clazz: Class<T>) = selectedModels.filterIsInstance(clazz)
+    fun <T: NetworkModel> sourceModelsOf(clazz: Class<T>) = sourceModels.filterIsInstance(clazz)
 
     val isEmpty get() = selection.isEmpty()
     val isNotEmpty get() = !isEmpty

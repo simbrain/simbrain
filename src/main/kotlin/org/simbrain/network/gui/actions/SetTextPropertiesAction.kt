@@ -38,18 +38,10 @@ class SetTextPropertiesAction(private val networkPanel: NetworkPanel, private va
         // TODO: why is this empty?
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
     override fun actionPerformed(event: ActionEvent) {
         networkPanel.showTextPropertyDialog(textNodes)
     }
 
-    /**
-     * Create a new set neuron properties action with the specified network
-     * panel.
-     */
     init {
         putValue(Action.SHORT_DESCRIPTION, "Set the properties of this text, e.g. font and size")
         updateAction()

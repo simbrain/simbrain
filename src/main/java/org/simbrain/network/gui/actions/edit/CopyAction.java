@@ -54,6 +54,6 @@ public final class CopyAction extends ConditionallyEnabledAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.copy();
+        getNetworkPanel().copy();
     }
 }

@@ -5,6 +5,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.dl4j.NeuronArray
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
@@ -51,6 +52,14 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
         }
         pack()
         setLocationRelativeTo(this@showNeuronArrayCreationDialog)
+        isVisible = true
+    }
+}
+
+fun NetworkPanel.showMultiLayerNetworkCreationDialog() {
+    MultiLayerNetCreationDialog(this).apply {
+        pack()
+        setLocationRelativeTo(this)
         isVisible = true
     }
 }

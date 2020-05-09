@@ -55,6 +55,6 @@ public final class StopNetworkAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.setRunning(false);
+        networkPanel.getNetwork().setRunning(false);
     }
 }

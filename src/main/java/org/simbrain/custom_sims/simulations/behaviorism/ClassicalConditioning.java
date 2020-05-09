@@ -88,7 +88,8 @@ public class ClassicalConditioning extends RegisteredSimulation {
         association.setUpperBound(1);
 
         network.addLooseSynapse(association);
-        networkWrapper.getNetworkPanel().clearSelection(); // todo: why needed?
+        // TODO
+        networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
 
         // Create the odor world
         world = sim.addOdorWorld(340,13,377,442, "Environment");

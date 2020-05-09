@@ -1,4 +1,4 @@
-///*
+// /*
 // * Part of Simbrain--a java-based neural network kit
 // * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
 // *
@@ -16,56 +16,56 @@
 // * along with this program; if not, write to the Free Software
 // * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // */
-//package org.simbrain.network.desktop;
+// package org.simbrain.network.desktop;
 //
-//import org.simbrain.network.core.Network;
-//import org.simbrain.network.core.Neuron;
-//import org.simbrain.network.core.Synapse;
-//import org.simbrain.network.groups.NeuronCollection;
-//import org.simbrain.network.groups.NeuronGroup;
-//import org.simbrain.network.gui.EditMode;
-//import org.simbrain.network.gui.NetworkPanel;
-//import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
-//import org.simbrain.network.gui.actions.TestInputAction;
-//import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
-//import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
-//import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
-//import org.simbrain.network.gui.actions.edit.*;
-//import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
-//import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction;
-//import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
-//import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
-//import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
-//import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction;
-//import org.simbrain.network.gui.actions.selection.*;
-//import org.simbrain.network.gui.actions.synapse.*;
-//import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
-//import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
-//import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
-//import org.simbrain.network.gui.dialogs.NetworkDialog;
-//import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
-//import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
-//import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
-//import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
-//import org.simbrain.network.gui.nodes.NeuronGroupNode;
-//import org.simbrain.network.gui.nodes.NeuronNode;
-//import org.simbrain.network.gui.nodes.SynapseGroupInteractionBox;
-//import org.simbrain.network.gui.nodes.SynapseNode;
-//import org.simbrain.util.SimbrainPreferences;
-//import org.simbrain.util.StandardDialog;
-//import org.simbrain.util.genericframe.GenericFrame;
-//import org.simbrain.util.genericframe.GenericJInternalFrame;
-//import org.simbrain.util.widgets.ShowHelpAction;
-//import org.simbrain.workspace.AttributeContainer;
-//import org.simbrain.workspace.Workspace;
-//import org.simbrain.workspace.gui.CouplingMenu;
-//import org.simbrain.workspace.gui.SimbrainDesktop;
+// import org.simbrain.network.core.Network;
+// import org.simbrain.network.core.Neuron;
+// import org.simbrain.network.core.Synapse;
+// import org.simbrain.network.groups.NeuronCollection;
+// import org.simbrain.network.groups.NeuronGroup;
+// import org.simbrain.network.gui.EditMode;
+// import org.simbrain.network.gui.NetworkPanel;
+// import org.simbrain.network.gui.actions.ShowLayoutDialogAction;
+// import org.simbrain.network.gui.actions.TestInputAction;
+// import org.simbrain.network.gui.actions.connection.ClearSourceNeurons;
+// import org.simbrain.network.gui.actions.connection.SetSourceNeurons;
+// import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet;
+// import org.simbrain.network.gui.actions.edit.*;
+// import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction;
+// import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction;
+// import org.simbrain.network.gui.actions.neuron.AddNeuronsAction;
+// import org.simbrain.network.gui.actions.neuron.NewNeuronAction;
+// import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction;
+// import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction;
+// import org.simbrain.network.gui.actions.selection.*;
+// import org.simbrain.network.gui.actions.synapse.*;
+// import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction;
+// import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction;
+// import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction;
+// import org.simbrain.network.gui.dialogs.NetworkDialog;
+// import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog;
+// import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
+// import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
+// import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
+// import org.simbrain.network.gui.nodes.NeuronGroupNode;
+// import org.simbrain.network.gui.nodes.NeuronNode;
+// import org.simbrain.network.gui.nodes.SynapseGroupInteractionBox;
+// import org.simbrain.network.gui.nodes.SynapseNode;
+// import org.simbrain.util.SimbrainPreferences;
+// import org.simbrain.util.StandardDialog;
+// import org.simbrain.util.genericframe.GenericFrame;
+// import org.simbrain.util.genericframe.GenericJInternalFrame;
+// import org.simbrain.util.widgets.ShowHelpAction;
+// import org.simbrain.workspace.AttributeContainer;
+// import org.simbrain.workspace.Workspace;
+// import org.simbrain.workspace.gui.CouplingMenu;
+// import org.simbrain.workspace.gui.SimbrainDesktop;
 //
-//import javax.swing.*;
-//import java.awt.*;
-//import java.util.Collection;
+// import javax.swing.*;
+// import java.awt.*;
+// import java.util.Collection;
 //
-///**
+// /**
 // * Extension of Network Panel with functions used in a desktop setting. This is
 // * separate mainly so that network panel can also be used in applets, which do
 // * not talk to other workspace components. Thus in this subclass static values
@@ -76,7 +76,7 @@
 // *
 // * @author Jeff Yoshimi
 // */
-//public class NetworkPanelDesktop extends NetworkPanel {
+// public class NetworkPanelDesktop extends NetworkPanel {
 //
 //    /**
 //     * Reference to Desktop Component.
@@ -378,4 +378,4 @@
 //        return null;
 //    }
 //
-//}
+// }

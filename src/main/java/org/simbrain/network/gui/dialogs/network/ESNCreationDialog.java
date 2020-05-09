@@ -746,11 +746,11 @@ public class ESNCreationDialog extends StandardDialog {
      *
      * @param args
      */
-    public static void main(String[] args) {
-        ESNCreationDialog dialog = ESNCreationDialog.createESNDialog(new NetworkPanel(new Network()));
-        dialog.setLocationRelativeTo(null);
-        dialog.pack();
-        dialog.setVisible(true);
-    }
+    // public static void main(String[] args) {
+    //     ESNCreationDialog dialog = ESNCreationDialog.createESNDialog(new NetworkPanel(new Network()));
+    //     dialog.setLocationRelativeTo(null);
+    //     dialog.pack();
+    //     dialog.setVisible(true);
+    // }
 
 }

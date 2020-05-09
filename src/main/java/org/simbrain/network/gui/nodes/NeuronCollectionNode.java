@@ -120,26 +120,16 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         Action selectIncomingNodes = new AbstractAction("Select Incoming Synapses") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                List<SynapseNode> incomingNodes = new ArrayList<SynapseNode>();
-                for (Synapse synapse : neuronCollection.getIncomingWeights()) {
-                    incomingNodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
-
-                }
-                getNetworkPanel().clearSelection();
-                getNetworkPanel().setSelection(incomingNodes);
+                getNetworkPanel().getSelectionManager().clear();
+                neuronCollection.getIncomingWeights().forEach(Synapse::select);
             }
         };
         menu.add(selectIncomingNodes);
         Action selectOutgoingNodes = new AbstractAction("Select Outgoing Synapses") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                List<SynapseNode> outgoingNodes = new ArrayList<SynapseNode>();
-                for (Synapse synapse : neuronCollection.getOutgoingWeights()) {
-                    outgoingNodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
-
-                }
-                getNetworkPanel().clearSelection();
-                getNetworkPanel().setSelection(outgoingNodes);
+                getNetworkPanel().getSelectionManager().clear();
+                neuronCollection.getOutgoingWeights().forEach(Synapse::select);
             }
         };
         menu.add(selectOutgoingNodes);

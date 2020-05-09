@@ -245,7 +245,7 @@ public class NetworkPropertiesPanel extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 JSlider j = (JSlider) e.getSource();
                 SynapseNode.setMaxDiameter(j.getValue());
-                networkPanel.resetSynapseDiameters();
+                networkPanel.getScreenElements(SynapseNode.class).forEach(SynapseNode::updateDiameter);
             }
         });
         weightSizeMinSlider.addChangeListener(new ChangeListener() {
@@ -253,7 +253,7 @@ public class NetworkPropertiesPanel extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 JSlider j = (JSlider) e.getSource();
                 SynapseNode.setMinDiameter(j.getValue());
-                networkPanel.resetSynapseDiameters();
+                networkPanel.getScreenElements(SynapseNode.class).forEach(SynapseNode::updateDiameter);
             }
         });
         cbChangeColor.addActionListener(new ActionListener() {
@@ -273,7 +273,7 @@ public class NetworkPropertiesPanel extends JPanel {
         Color theColor = showColorChooser();
         if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
             if (theColor != null) {
-                NetworkPanel.setBackgroundColor(theColor);
+                networkPanel.setBackgroundColor(theColor);
             }
         } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
             if (theColor != null) {
@@ -304,7 +304,8 @@ public class NetworkPropertiesPanel extends JPanel {
                 SynapseNode.setZeroWeightColor(theColor);
             }
         }
-        networkPanel.resetColors();
+        //TODO
+        //networkPanel.resetColors();
         setIndicatorColor();
     }
 
@@ -318,7 +319,7 @@ public class NetworkPropertiesPanel extends JPanel {
         wandRadiusField.setText(Integer.toString(EditMode.getWandRadius()));
         timeStepField.setText(Double.toString(networkPanel.getNetwork().getTimeStep()));
         iterUpdateField.setText(Integer.toString(networkPanel.getNetwork().getUpdateFreq()));
-        nudgeAmountField.setText(Double.toString(NetworkPanel.getNudgeAmount()));
+        nudgeAmountField.setText(Double.toString(networkPanel.getNudgeAmount()));
         tfSynapseVisibilityThreshold.setText(Integer.toString(Network.getSynapseVisibilityThreshold()));
     }
 
@@ -331,12 +332,13 @@ public class NetworkPropertiesPanel extends JPanel {
         int upF = Integer.parseInt(iterUpdateField.getText());
         upF = upF < 1 ? 1 : upF;
         networkPanel.getNetwork().setUpdateFreq(upF);
-        NetworkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
+        networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
         Network.setSynapseVisibilityThreshold(Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
         EditMode.setWandRadius(Integer.parseInt(wandRadiusField.getText()));
         if (networkPanel.getEditMode().isWand()) {
             networkPanel.getEditMode().resetWandCursor();
-            networkPanel.updateCursor();
+            // TODO
+            //networkPanel.updateCursor();
         }
         networkPanel.setShowTime(showTimeBox.isSelected());
         networkPanel.repaint();
@@ -360,7 +362,7 @@ public class NetworkPropertiesPanel extends JPanel {
      */
     public void setIndicatorColor() {
         if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
-            colorIndicator.setBackground(NetworkPanel.getBackgroundColor());
+            colorIndicator.setBackground(networkPanel.getBackgroundColor());
         } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
             colorIndicator.setBackground(SynapseNode.getLineColor());
         } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {

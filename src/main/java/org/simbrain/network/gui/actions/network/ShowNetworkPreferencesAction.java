@@ -18,7 +18,9 @@
  */
 package org.simbrain.network.gui.actions.network;
 
+import org.simbrain.network.gui.NetworkDialogsKt;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.NetworkPanelMenusKt;
 import org.simbrain.network.gui.dialogs.NetworkDialog;
 import org.simbrain.util.ResourceManager;
 
@@ -58,21 +60,14 @@ public final class ShowNetworkPreferencesAction extends AbstractAction {
 
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            /** @see Runnable */
-            public void run() {
-                NetworkDialog dialog = networkPanel.getNetworkDialog(networkPanel);
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            NetworkDialog dialog = new NetworkDialog(networkPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
         });
     }
 }

@@ -184,4 +184,11 @@ public abstract class ScreenElement extends PPath.Float {
     public boolean isIntersecting(PBounds bound) {
         return getGlobalBounds().intersects(bound);
     }
+
+    /**
+     * Select this element.
+     */
+    public void select() {
+        networkPanel.getSelectionManager().add(this);
+    }
 }

@@ -104,7 +104,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         updateNodeLabels();
 
         // Clear selection
-        networkWrapper.getNetworkPanel().clearSelection(); // todo: why needed?
+        networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
 
         // Connect the layers together
         List<Synapse> syns = networkWrapper.connectAllToAll(stimulusNet, behaviorNet);

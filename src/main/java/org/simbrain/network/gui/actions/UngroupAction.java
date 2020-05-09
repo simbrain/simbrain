@@ -89,6 +89,6 @@ public final class UngroupAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.unGroup(node, true);
+        // networkPanel.unGroup(node, true);
     }
 }

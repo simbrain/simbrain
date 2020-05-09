@@ -131,7 +131,7 @@ public class AddNeuronsDialog extends StandardDialog {
     private AddNeuronsDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         baseNeuron = new Neuron(networkPanel.getNetwork(), DEFAULT_NEURON);
-        networkPanel.clearSelection();
+        networkPanel.getSelectionManager().clear();
     }
 
     /**
@@ -198,7 +198,8 @@ public class AddNeuronsDialog extends StandardDialog {
                 ng.applyLayout();
                 ng.setLabel(groupPanel.tfGroupName.getText());
             } else {
-                networkPanel.addNeuronsToPanel(addedNeurons, layoutObject.getLayout());
+                // TODO
+                //networkPanel.addNeuronsToPanel(addedNeurons, layoutObject.getLayout());
             }
         }
     }

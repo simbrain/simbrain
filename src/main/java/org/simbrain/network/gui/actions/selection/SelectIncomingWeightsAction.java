@@ -61,19 +61,10 @@ public final class SelectIncomingWeightsAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Select All Incoming Weights");
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
-        List<Neuron> list = networkPanel.getSelectedModels(Neuron.class);
-        List<SynapseNode> sourceWeights = new ArrayList<SynapseNode>();
-        for (Neuron neuron : list) {
-            for (Synapse synapse : neuron.getFanIn()) {
-                sourceWeights.add((SynapseNode) networkPanel.getObjectNodeMap().get(synapse));
-            }
-        }
-        networkPanel.clearSelection();
-        networkPanel.setSelection(sourceWeights);
+        networkPanel.getSelectionManager().clear();
+        networkPanel.getSelectionManager()
+                .selectedModelsOf(Neuron.class).forEach(n -> n.getFanIn().forEach(Synapse::select));
     }
 }

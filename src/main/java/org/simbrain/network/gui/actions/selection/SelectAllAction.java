@@ -57,6 +57,6 @@ public final class SelectAllAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.selectAll();
+        networkPanel.getSelectionManager().selectAll();
     }
 }

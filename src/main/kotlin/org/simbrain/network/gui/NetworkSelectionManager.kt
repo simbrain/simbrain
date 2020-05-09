@@ -5,6 +5,10 @@ import org.simbrain.network.events.NetworkSelectionEvent
 import org.simbrain.network.gui.nodes.ScreenElement
 import java.util.concurrent.CopyOnWriteArraySet
 
+/**
+ * Manges network selection. E.g. when you select a group of nodes it tracks which nodes were selected.
+ * Keeps track of source vs. selected nodes.
+ */
 class NetworkSelectionManager(val networkPanel: NetworkPanel) {
 
     val events = NetworkSelectionEvent(this)
@@ -79,6 +83,10 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
         val old = HashSet(selection)
         (selection as CopyOnWriteArraySet).block()
         events.fireSelection(old, selection)
+    }
+
+    fun selectAll() {
+        // TODO.  Consider a new method in network panel that gets all screen elements without filtering
     }
 
 }

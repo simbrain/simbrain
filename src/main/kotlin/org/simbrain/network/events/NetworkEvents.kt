@@ -1,5 +1,6 @@
 package org.simbrain.network.events
 
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
@@ -25,6 +26,11 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 
     fun onUpdateTimeDisplay(handler: Consumer<Boolean>) = "UpdateTimeDisplay".itemAddedEvent(handler)
     fun fireUpdateTimeDisplay(display: Boolean) = "UpdateTimeDisplay"(new = display)
+
+    // TODO
+    // fun onAdded(handler: Consumer<NetworkModel>) = "Added".itemAddedEvent(handler)
+    // fun fireAdded(model: NetworkModel) = "Added"(new = model)
+
 
     fun onNeuronAdded(handler: Consumer<Neuron>) = "NeuronAdded".itemAddedEvent(handler)
     fun fireNeuronAdded(neuron: Neuron) = "NeuronAdded"(new = neuron)

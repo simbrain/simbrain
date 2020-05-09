@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 
 /**
@@ -9,6 +10,7 @@ import org.simbrain.network.gui.nodes.NeuronNode;
  * org.simbrain.network.gui.NetworkPanel} which can be used to set the position of a window in the Simbrain desktop.
  */
 // TODO: Consider removing this
+@Deprecated
 public class NetworkDesktopWrapper extends NetworkWrapper {
 
     /**
@@ -28,7 +30,13 @@ public class NetworkDesktopWrapper extends NetworkWrapper {
      * Get a reference to a graphical {@link NeuronNode}.
      */
     public NeuronNode getNode(Neuron neuron) {
-        return getNetworkPanel().getNode(neuron);
+        // TODO
+        return null;
+    }
+
+    @Deprecated
+    public NetworkPanel getNetworkPanel() {
+        return desktopComponent.getNetworkPanel();
     }
 
 

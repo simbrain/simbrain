@@ -132,13 +132,7 @@ public final class SynapseNode extends ScreenElement {
         source.getConnectedSynapses().add(this);
 
         this.synapse = synapse;
-        init();
-    }
 
-    /**
-     * Initialize the SynapseNode.
-     */
-    private void init() {
         updatePosition();
         this.addChild(circle);
         this.addChild(line);
@@ -159,6 +153,10 @@ public final class SynapseNode extends ScreenElement {
             updateColor();
             updateDiameter();
         });
+        events.onSelected(s -> {
+            getNetworkPanel().getSelectionManager().add(this);
+        });
+
     }
 
     /**

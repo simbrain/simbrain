@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
+import org.simbrain.network.gui.NetworkDialogsKt;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
@@ -48,7 +49,7 @@ public final class ShowWeightMatrixAction extends ConditionallyEnabledAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        JPanel panel = WeightMatrixViewer.getWeightMatrixPanel(new WeightMatrixViewer(networkPanel));
-        networkPanel.displayPanel(panel, "Weight matrix viewer");
+        JPanel panel = WeightMatrixViewer.getWeightMatrixPanel(new WeightMatrixViewer(getNetworkPanel()));
+        NetworkDialogsKt.displayPanel(getNetworkPanel(), panel, "Weight matrix viewer");
     }
 }

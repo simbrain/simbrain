@@ -61,7 +61,7 @@ public final class ShowWeightsAction extends AbstractAction {
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
 
         // Determine status
-        networkPanel.setWeightsVisible(cb.isSelected());
+        networkPanel.setLooseWeightsVisible(cb.isSelected());
 
     }
 }

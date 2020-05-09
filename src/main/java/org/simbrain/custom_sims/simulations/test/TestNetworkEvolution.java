@@ -5,6 +5,8 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
 
+import static org.simbrain.network.gui.NetworkDialogsKt.showNetwork;
+
 /**
  * Evolve networks to produce varous characteristic activities using
  * fitness functions in {@link NetworkFitnessFunctions}.
@@ -66,13 +68,13 @@ public class TestNetworkEvolution  {
             //System.out.println(population.getFittestAgent().getGenome().getIntChromosome());
             if (bestFitness > fitnessThreshold) {
                 Network winner =  population.getFittestAgent().getPhenotype();
-                NetworkPanel.showNetwork(winner);
+                showNetwork(winner);
                 return;
             }
             population.replenish();
         }
         Network winner =  population.getFittestAgent().getPhenotype();
-        NetworkPanel.showNetwork(winner);
+        showNetwork(winner);
 
     }
 

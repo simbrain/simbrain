@@ -183,7 +183,7 @@ val NetworkPanel.synapseContextMenu get() = with(networkActions) {
     }
 }
 
-fun NetworkPanel.createCouplingMenu(container: AttributeContainer) = component.workspaceComponent?.let {
+fun NetworkPanel.createCouplingMenu(container: AttributeContainer) = component?.workspaceComponent?.let {
     CouplingMenu(it, container)
 }
 

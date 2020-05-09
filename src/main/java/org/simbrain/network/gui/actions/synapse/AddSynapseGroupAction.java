@@ -69,15 +69,16 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
      */
     public static boolean displaySynapseGroupDialog(NetworkPanel networkPanel) {
 
-        // There must be at least one source and target neuron group selected
-        if (!ConditionallyEnabledAction
-                .sourceAndTargetNeuronGroupsSelected(networkPanel)) {
-            return false;
-        }
+        // TODO
+        // // There must be at least one source and target neuron group selected
+        // if (!ConditionallyEnabledAction
+        //         .sourceAndTargetNeuronGroupsSelected(networkPanel)) {
+        //     return false;
+        // }
 
         // Placed as a separate method since it is reused elsewhere.
-        NeuronGroup src = networkPanel.getSourceModels(NeuronGroup.class).get(0);
-        NeuronGroup tar = networkPanel.getSelectedModels(NeuronGroup.class).get(0);
+        NeuronGroup src = networkPanel.getSelectionManager().sourceModelsOf(NeuronGroup.class).get(0);
+        NeuronGroup tar = networkPanel.getSelectionManager().selectedModelsOf(NeuronGroup.class).get(0);
         JDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(networkPanel, src, tar);
         dialog.setLocationRelativeTo(null);
         dialog.pack();

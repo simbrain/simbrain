@@ -51,7 +51,7 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
     private void showContextMenu(final PInputEvent event) {
 
         event.setHandled(true); // seems to confuse zoom event handler??
-        JPopupMenu contextMenu = networkPanel.getContextMenu();
+        JPopupMenu contextMenu =  NetworkPanelMenusKt.creatContextMenu(networkPanel);
         Point2D canvasPosition = event.getCanvasPosition();
         contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
         networkPanel.getCanvas().getCamera().localToView(canvasPosition);
@@ -59,24 +59,18 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
         networkPanel.getPlacementManager().setLastClickedLocation(canvasPosition);
     }
 
-    /**
-     * @param event
-     * @see PBasicInputEventHandler
-     */
+    @Override
     public void mousePressed(final PInputEvent event) {
         if (event.isPopupTrigger()) {
-            networkPanel.createNetworkContextMenu();
+            NetworkPanelMenusKt.creatContextMenu(networkPanel);
             showContextMenu(event);
         }
     }
 
-    /**
-     * @param event
-     * @see PBasicInputEventHandler
-     */
+    @Override
     public void mouseReleased(final PInputEvent event) {
         if (event.isPopupTrigger()) {
-            networkPanel.createNetworkContextMenu();
+            NetworkPanelMenusKt.creatContextMenu(networkPanel);
             showContextMenu(event);
         }
     }

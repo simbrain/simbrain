@@ -37,17 +37,18 @@ import java.awt.Cursor
 import java.awt.FlowLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.*
 import javax.swing.event.InternalFrameAdapter
 import javax.swing.event.InternalFrameEvent
-import kotlin.collections.HashMap
 
 /**
- * Should eventually replace NetworkPanel and NetworkPanelDesktop
+ * Todo: Should eventually replace NetworkPanel and NetworkPanelDesktop
  */
-class NetworkPanel(val component: NetworkDesktopComponent, val network: Network) : JPanel() {
+class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network) : JPanel() {
+
+    // TODO: Think about null component
+    //TODO: Change javadocs to single line
 
     val canvas = PCanvas()
 
@@ -58,27 +59,48 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
 
     val timeLabel = TimeLabel(this).apply { update() }
 
-    var useAutoZoom = true
-    var showSubnetOutline = false
+    var autoZoom = true
+        set(value) {
+            field = value
+            repaint()
+        }
     var showTime = true
 
     val mainToolBar = createMainToolBar()
     val runToolBar = createRunToolBar()
     val editToolBar = createEditToolBar()
 
-    val backgroundColor = Color.white
+    var backgroundColor = Color.white
 
-    val isRunning = network.isRunning
+    val isRunning
+            get()  = network.isRunning
+
+    /** How much to nudge objects per key click. */
+    var nudgeAmount = 2.0
 
     /**
-     * How much to nudge objects per key click.
+     * Text object event handler.
      */
-    private val nudgeAmount = 2.0
+    val textHandle: TextEventHandler = TextEventHandler(this)
+
+    private val toolbars: JPanel = JPanel(BorderLayout())
 
     /**
-     * Source elements (when setting a source node or group and then connecting to a target).
+     * Manages keyboard-based connections.
      */
-    private val sourceElements: List<ScreenElement> = ArrayList()
+     val quickConnector = QuickConnectionManager()
+
+    val networkActions = NetworkActions(this)
+
+    /**
+     * Manages placement of new nodes, groups, etc.
+     */
+    val placementManager = PlacementManager()
+
+    /**
+     * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update is complete.
+     */
+    private val updateComplete = AtomicInteger(0)
 
     /**
      * Whether loose synapses are visible or not.
@@ -99,24 +121,10 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         }
 
     /**
-     * Text object event handler.
+     * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
+     * when the lasso is pulled over them.  Also keeps track of source nodes (but those events are
+     * handled by keybindings).
      */
-    val textHandle: TextEventHandler = TextEventHandler(this)
-
-    private val toolbars: JPanel = JPanel(BorderLayout())
-
-    /**
-     * Manages keyboard-based connections.
-     */
-    private val quickConnector = QuickConnectionManager()
-
-    val networkActions = NetworkActions(this)
-
-    /**
-     * Manages placement of new nodes, groups, etc.
-     */
-    val placementManager = PlacementManager()
-
     val selectionManager = NetworkSelectionManager(this).apply {
         events.onSelection { old, new ->
             val (removed, added) = old complement new
@@ -131,12 +139,6 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         }
     }
 
-
-    /**
-     * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update is complete.
-     */
-    private val updateComplete = AtomicInteger(0)
-
     /**
      * Turn GUI on or off.
      */
@@ -150,6 +152,9 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
             field = guiOn
         }
 
+    /**
+     * Main initialization of the network panel.
+     */
     init {
         super.setLayout(BorderLayout())
 
@@ -177,7 +182,7 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         }
 
         // Init network change listeners
-//        addNetworkListeners()
+        // addNetworkListeners()
 
         toolbars.apply {
             cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
@@ -216,7 +221,7 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         get() = selectionManager.selection
 
     @Deprecated("User selectionManager instead", ReplaceWith("selectionManager.selectionOf(clazz)"))
-    fun <T: ScreenElement> getSelectedNodes(clazz: Class<T>) =
+    fun <T : ScreenElement> getSelectedNodes(clazz: Class<T>) =
             selectionManager.selectionOf(clazz)
 
     @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModels"))
@@ -224,18 +229,16 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         get() = selectionManager.selection.map { it.model!! }
 
     @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModelsOf(clazz)"))
-    fun <T: NetworkModel> getSelectedModels(clazz: Class<T>) =
+    fun <T : NetworkModel> getSelectedModels(clazz: Class<T>) =
             selectionManager.selectedModels.filterIsInstance(clazz)
 
-    private inline fun <reified T : ScreenElement> getScreenElements() = canvas.layer.allNodes.filterIsInstance<T>()
-
+    /** TODO: Javadoc. */
     fun setUpdateComplete(updateComplete: Boolean) {
         if (!updateComplete && this.updateComplete.get() != 0) {
             return
         }
         this.updateComplete.set(if (updateComplete) 0 else 3)
     }
-
 
     /**
      * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
@@ -244,7 +247,7 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
      */
     fun zoomToFitPage(forceZoom: Boolean) {
         // TODO: Add a check to see if network is running
-        if (useAutoZoom && editMode.isSelection || forceZoom) {
+        if (autoZoom && editMode.isSelection || forceZoom) {
             val filtered = canvas.layer.getUnionOfChildrenBounds(null)
             val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
                     filtered.getWidth() + 20, filtered.getHeight() + 20)
@@ -252,9 +255,22 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         }
     }
 
+    inline fun <reified T : ScreenElement> getScreenElements() = canvas.layer.allNodes.filterIsInstance<T>()
+
+    fun <T : ScreenElement> getScreenElements(clazz: Class<T>) =
+            canvas.layer.allNodes.filterIsInstance(clazz)
+
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also {
         canvas.layer.addChild(it)
         repaint()
+    }
+
+    @Deprecated("Consider removing / add from Network instead")
+    fun addNeuron(updateRule: NeuronUpdateRule) {
+        val neuron = Neuron(network, updateRule)
+        placementManager.addNewModelObject(neuron)
+        neuron.forceSetActivation(0.0)
+        network.addLooseNeuron(neuron)
     }
 
     fun add(neuron: Neuron) = addScreenElement {
@@ -326,6 +342,7 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
     }
 
     // TODO: refactor network remove model
+    // better to have a series of remove methods, similar to the add methods
     fun deleteSelectedObjects() {
 
         fun deleteGroup(interactionBox: InteractionBox) {
@@ -497,13 +514,6 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         selectionManager.selectionOf<NeuronGroupNode>().forEach { it.selectNeurons() }
     }
 
-    @Deprecated("Consider removing / add from Network instead")
-    fun addNeuron(updateRule: NeuronUpdateRule) {
-        val neuron = Neuron(network, updateRule)
-        placementManager.addNewModelObject(neuron)
-        neuron.forceSetActivation(0.0)
-        network.addLooseNeuron(neuron)
-    }
 
     fun clearNeurons() {
         getScreenElements<NeuronNode>().forEach { it.neuron.clear() }
@@ -556,6 +566,7 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         }
     }
 
+    // TODO: Move to NetworkDialogs.kt
     @Deprecated("Consider removing or refactor out of NetworkPanel")
     fun displayPanel(panel: JPanel, title: String) = GenericJDialog().apply {
         if (this is JInternalFrame) {
@@ -573,6 +584,7 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
         isVisible = true
     }
 
+    // TODO: Move to NetworkDialogs.kt
     @Deprecated("Consider removing or refactor out of NetworkPanel")
     fun displayPanelInWindow(panel: JPanel, title: String) = GenericJDialog().apply {
         this.title = title
@@ -594,27 +606,6 @@ class NetworkPanel(val component: NetworkDesktopComponent, val network: Network)
             addSeparator()
             add(ToggleAutoZoom(this@NetworkPanel))
         }
-    }
-
-    /**
-     * Display the provided network in a dialog
-     *
-     * @param network the model network to show
-     */
-    companion object showNetwork {
-        //val np = NetworkPanel(, net); // TODO: How to do this? Mock up a Desktop Component
-        //np.initScreenElements();
-        val frame = JFrame()
-        //frame.setContentPane(np)
-        //frame.setPreferredSize(new Dimension(500, 500));
-        //frame.pack();
-        //frame.setVisible(true);
-        //frame.addWindowListener(new WindowAdapter() {
-        //    public void windowClosing(WindowEvent we) {
-        //        System.exit(0);
-        //    }
-        //});
-        //System.out.println(np.debugString());
     }
 
 }

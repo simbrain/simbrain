@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.actions.selection;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.SynapseNode;
 
 import javax.swing.*;
@@ -53,12 +54,9 @@ public final class SelectAllWeightsAction extends AbstractAction {
         networkPanel.getActionMap().put(this, this);
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.clearSelection();
-        networkPanel.setSelection(networkPanel.getNodes(SynapseNode.class));
+        networkPanel.getSelectionManager().clear();
+        networkPanel.getSelectionManager().set(networkPanel.getScreenElements(SynapseNode.class));
     }
 }

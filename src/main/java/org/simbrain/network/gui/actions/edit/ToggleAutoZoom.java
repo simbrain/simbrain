@@ -55,9 +55,9 @@ public final class ToggleAutoZoom extends JToggleButton {
         this.addActionListener(e -> {
             JToggleButton button = (JToggleButton)e.getSource();
             if (button.isSelected()) {
-                networkPanel.setAutoZoomMode(true);
+                networkPanel.setAutoZoom(true);
             } else {
-                networkPanel.setAutoZoomMode(false);
+                networkPanel.setAutoZoom(false);
             }
             updateButton();
         });
@@ -69,13 +69,13 @@ public final class ToggleAutoZoom extends JToggleButton {
      * tooltip text.
      */
     private void updateButton() {
-        setSelected(networkPanel.getUseAutoZoom());
-        if (networkPanel.getUseAutoZoom()) {
+        setSelected(networkPanel.getAutoZoom());
+        if (networkPanel.getAutoZoom()) {
             setBorder(BorderFactory.createLoweredBevelBorder());
         } else {
             setBorder(BorderFactory.createEmptyBorder());
         }
-        String onOff = networkPanel.getUseAutoZoom() ? "on" : "off";
+        String onOff = networkPanel.getAutoZoom() ? "on" : "off";
         setToolTipText("Autozoom is " + onOff);
     }
 

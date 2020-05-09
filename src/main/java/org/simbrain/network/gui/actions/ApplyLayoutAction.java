@@ -24,6 +24,7 @@ import org.simbrain.network.layouts.Layout;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.stream.Collectors;
 
 import static org.simbrain.network.LocatableModelKt.getCenterLocation;
 
@@ -55,8 +56,14 @@ public final class ApplyLayoutAction extends ConditionallyEnabledAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        layout.setInitialLocation(getCenterLocation(networkPanel.getSelectedModels(Neuron.class)));
-        layout.layoutNeurons(networkPanel.getSelectedModels(Neuron.class));
-        networkPanel.repaint();
+
+        final var neurons = getNetworkPanel().getSelectionManager().getSelectedModels().stream()
+                .filter(Neuron.class::isInstance)
+                .map(Neuron.class::cast)
+                .collect(Collectors.toList());
+
+        layout.setInitialLocation(getCenterLocation(neurons));
+        layout.layoutNeurons(neurons);
+        getNetworkPanel().repaint();
     }
 }

@@ -18,20 +18,15 @@
  */
 package org.simbrain.util.propertyeditor;
 
-import org.simbrain.network.subnetworks.Hopfield;
-import org.simbrain.util.ResourceManager;
-import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.Parameter;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.UserParameter;
+import org.simbrain.util.*;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ParameterWidget;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -383,7 +378,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
     /**
      * Extension of Standard Dialog for Editor Panel
      */
-    private class EditorDialog extends StandardDialog {
+    public class EditorDialog extends StandardDialog {
 
         @Override
         protected void closeDialogOk() {

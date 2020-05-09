@@ -23,7 +23,6 @@ import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.SynapseEvents;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.synapse.SynapseDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,6 +30,9 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+
+import static org.simbrain.network.gui.NetworkDialogsKt.getSynapseDialog;
+import static org.simbrain.network.gui.NetworkPanelMenusKt.getSynapseContextMenu;
 
 /**
  * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -404,14 +406,12 @@ public final class SynapseNode extends ScreenElement {
         // contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
         //
         // return contextMenu;
-        return this.getNetworkPanel().getSynapseContextMenu(synapse);
+        return getSynapseContextMenu(getNetworkPanel());
     }
 
     @Override
     public JDialog getPropertyDialog() {
-        SynapseDialog dialog =
-                (SynapseDialog) getNetworkPanel().getSynapseDialog(getNetworkPanel().getSelectedNodes(SynapseNode.class));
-        return dialog;
+        return getSynapseDialog(getNetworkPanel());
     }
 
     /**

@@ -91,4 +91,15 @@ open class Event(private val changeSupport: PropertyChangeSupport) {
         }
     }
 
+    /**
+     * Handle a change event.  If old and new states are the same no action is taken.
+     * Note: For Kotlin
+     */
+    @Suppress("UNCHECKED_CAST")
+    protected fun <T> String.itemChangedEvent(handler: (T, T) -> Unit) {
+        changeSupport.addPropertyChangeListener(this) {
+            handler(it.oldValue as T, it.newValue as T)
+        }
+    }
+
 }

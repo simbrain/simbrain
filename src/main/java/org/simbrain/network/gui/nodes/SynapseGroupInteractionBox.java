@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.nodes;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
@@ -30,8 +29,11 @@ import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.simbrain.network.gui.NetworkDialogsKt.createSynapseGroupDialog;
+import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 
 /**
  * Interaction box for synapse groups.
@@ -66,7 +68,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
     @Override
     public JDialog getPropertyDialog() {
-        return this.getNetworkPanel().getSynapseGroupDialog(this);
+        return createSynapseGroupDialog(getNetworkPanel(), getSynapseGroup());
     }
 
     @Override
@@ -119,25 +121,20 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         menu.add(selectSynapses);
         Action selectIncomingNodes = new AbstractAction("Select Incoming Neurons") {
             public void actionPerformed(final ActionEvent event) {
-                List<NeuronNode> incomingNodes = new ArrayList<NeuronNode>();
-                for (Neuron neuron : synapseGroup.getSourceNeurons()) {
-                    incomingNodes.add((NeuronNode) getNetworkPanel().getObjectNodeMap().get(neuron));
-
-                }
-                getNetworkPanel().clearSelection();
-                getNetworkPanel().setSelection(incomingNodes);
+                List<NeuronNode> incomingNodes = synapseGroup.getSourceNeurons().stream()
+                        .map(getNetworkPanel().getNeuronNodeMapping()::get).collect(Collectors.toList());
+                getNetworkPanel().getSelectionManager().clear();
+                getNetworkPanel().getSelectionManager().set(incomingNodes);
             }
         };
         menu.add(selectIncomingNodes);
         Action selectOutgoingNodes = new AbstractAction("Select Outgoing Neurons") {
             public void actionPerformed(final ActionEvent event) {
-                List<NeuronNode> outgoingNodes = new ArrayList<NeuronNode>();
-                for (Neuron neuron : synapseGroup.getTargetNeurons()) {
-                    outgoingNodes.add((NeuronNode) getNetworkPanel().getObjectNodeMap().get(neuron));
+                List<NeuronNode> outgoingNodes = synapseGroup.getTargetNeurons().stream()
+                        .map(getNetworkPanel().getNeuronNodeMapping()::get).collect(Collectors.toList());
 
-                }
-                getNetworkPanel().clearSelection();
-                getNetworkPanel().setSelection(outgoingNodes);
+                getNetworkPanel().getSelectionManager().clear();
+                getNetworkPanel().getSelectionManager().set(outgoingNodes);
             }
         };
         menu.add(selectOutgoingNodes);
@@ -199,7 +196,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         menu.add(tsvCheckBox);
 
         // Coupling menu
-        JMenu couplingMenu = this.getNetworkPanel().getCouplingMenu(synapseGroup);
+        JMenu couplingMenu = createCouplingMenu(getNetworkPanel(), synapseGroup);
         if (couplingMenu != null) {
             menu.addSeparator();
             menu.add(couplingMenu);
@@ -211,17 +208,18 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * Select the synapses in this group.
      */
     private void selectSynapses() {
-        List<SynapseNode> nodes = new ArrayList<SynapseNode>();
-        for (Synapse synapse : synapseGroup.getExcitatorySynapses()) {
-            nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
-
-        }
-        for (Synapse synapse : synapseGroup.getInhibitorySynapses()) {
-            nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
-
-        }
-        getNetworkPanel().clearSelection();
-        getNetworkPanel().setSelection(nodes);
+        // TODO: fix getObjectNodeMap
+        // List<SynapseNode> nodes = new ArrayList<SynapseNode>();
+        // for (Synapse synapse : synapseGroup.getExcitatorySynapses()) {
+        //     nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
+        //
+        // }
+        // for (Synapse synapse : synapseGroup.getInhibitorySynapses()) {
+        //     nodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
+        //
+        // }
+        // getNetworkPanel().clearSelection();
+        // getNetworkPanel().setSelection(nodes);
     }
 
     /**

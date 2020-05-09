@@ -26,6 +26,8 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
+
 /**
  * A visual representation of a weight matrix
  */
@@ -213,7 +215,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         // Coupling menu
         contextMenu.addSeparator();
-        JMenu couplingMenu = networkPanel.getCouplingMenu(weightMatrix);
+        JMenu couplingMenu = createCouplingMenu(networkPanel, weightMatrix);
         if (couplingMenu != null) {
             contextMenu.add(couplingMenu);
         }

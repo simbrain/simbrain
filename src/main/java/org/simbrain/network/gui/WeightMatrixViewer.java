@@ -29,6 +29,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Widget to display the synaptic connections between two layers of neurons as a
@@ -84,8 +85,16 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
     public WeightMatrixViewer(NetworkPanel panel) {
 
         // Get source and target lists
-        List<Neuron> sourceList = panel.getSourceModels(Neuron.class);
-        List<Neuron> targetList = panel.getSelectedModels(Neuron.class);
+        List<Neuron> sourceList = panel.getSelectionManager().getSourceModels().stream()
+                .filter(Neuron.class::isInstance)
+                .map(Neuron.class::cast)
+                .collect(Collectors.toList());
+
+        List<Neuron> targetList = panel.getSelectionManager().getSelectedModels().stream()
+                .filter(Neuron.class::isInstance)
+                .map(Neuron.class::cast)
+                .collect(Collectors.toList());
+
         init(sourceList, targetList, panel);
     }
 

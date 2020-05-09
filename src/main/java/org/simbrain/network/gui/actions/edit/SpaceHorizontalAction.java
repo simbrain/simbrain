@@ -46,6 +46,6 @@ public final class SpaceHorizontalAction extends ConditionallyEnabledAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.spaceHorizontal();
+        getNetworkPanel().spaceHorizontal();
     }
 }

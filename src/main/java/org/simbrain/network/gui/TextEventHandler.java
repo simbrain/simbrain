@@ -24,7 +24,6 @@ import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.extras.event.PStyledTextEventHandler;
 import org.piccolo2d.extras.nodes.PStyledText;
-import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.gui.nodes.TextNode;
 
 import javax.swing.text.BadLocationException;
@@ -65,14 +64,14 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
             this.reshapeEditorLater();
             startEditing(inputEvent, (PStyledText) pickedNode);
         } else if (pickedNode instanceof PCamera) {
-
-            // Make a new text object and then edit it
-            NetworkTextObject text = new NetworkTextObject(networkPanel.getNetwork(), inputEvent.getPosition().getX(), inputEvent.getPosition().getY());
-            networkPanel.getNetwork().addText(text);
-            TextNode node = (TextNode) networkPanel.getObjectNodeMap().get(text);
-            if (node != null) {
-                startEditing(inputEvent, node.getPStyledText());
-            }
+            // TODO: fix getObjectNodeMap
+            // // Make a new text object and then edit it
+            // NetworkTextObject text = new NetworkTextObject(networkPanel.getNetwork(), inputEvent.getPosition().getX(), inputEvent.getPosition().getY());
+            // networkPanel.getNetwork().addText(text);
+            // TextNode node = (TextNode) networkPanel.getObjectNodeMap().get(text);
+            // if (node != null) {
+            //     startEditing(inputEvent, node.getPStyledText());
+            // }
         }
     }
 

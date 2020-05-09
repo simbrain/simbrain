@@ -35,6 +35,7 @@ import javax.swing.text.*;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.stream.Collectors;
 
 import static org.simbrain.util.GeomKt.minus;
 import static org.simbrain.util.GeomKt.plus;
@@ -101,9 +102,14 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
 
-        if (getNetworkPanel().getSelectedNodes().stream().anyMatch( se -> se instanceof TextNode)) {
+        final var textNodes = getNetworkPanel().getSelectedNodes().stream()
+                .filter(TextNode.class::isInstance)
+                .map(TextNode.class::cast)
+                .collect(Collectors.toList());
+
+        if (!textNodes.isEmpty()) {
             contextMenu.addSeparator();
-            contextMenu.add(new SetTextPropertiesAction(getNetworkPanel()));
+            contextMenu.add(new SetTextPropertiesAction(getNetworkPanel(), textNodes));
         }
 
         return contextMenu;

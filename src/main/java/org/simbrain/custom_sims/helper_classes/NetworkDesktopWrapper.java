@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
-import org.simbrain.network.desktop.NetworkPanelDesktop;
 import org.simbrain.network.gui.nodes.NeuronNode;
 
 /**
@@ -30,14 +29,6 @@ public class NetworkDesktopWrapper extends NetworkWrapper {
      */
     public NeuronNode getNode(Neuron neuron) {
         return getNetworkPanel().getNode(neuron);
-    }
-
-    /**
-     * Get a reference to the network panel.
-     */
-    public NetworkPanelDesktop getNetworkPanel() {
-        return null; // todo
-        //return (NetworkPanelDesktop) desktopComponent.getNetworkPanel();
     }
 
 

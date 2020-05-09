@@ -2,7 +2,6 @@ package org.simbrain.util.neat.testsims;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.geneticalgorithm.Agent;
 import org.simbrain.util.geneticalgorithm.Population;
@@ -90,7 +89,7 @@ public class Xor {
             System.out.println(i + ", fitness = " + bestFitness);
             if (bestFitness > fitnessThreshold) {
                 Network winner =  population.getFittestAgent().getPhenotype();
-                NetworkPanel.showNetwork(winner);
+                // NetworkPanel.showNetwork(winner);
                 break;
             }
             population.replenish();

@@ -45,6 +45,7 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.*;
 
+import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 import static org.simbrain.util.GeomKt.minus;
 import static org.simbrain.util.GeomKt.plus;
 
@@ -312,7 +313,7 @@ public class NeuronArrayNode extends ScreenElement {
 
         // Coupling menu
         contextMenu.addSeparator();
-        JMenu couplingMenu = networkPanel.getCouplingMenu(neuronArray);
+        JMenu couplingMenu = createCouplingMenu(networkPanel, neuronArray);
         if (couplingMenu != null) {
             contextMenu.add(couplingMenu);
         }

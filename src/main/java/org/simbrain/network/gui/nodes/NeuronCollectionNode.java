@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronCollection;
@@ -35,6 +34,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 
 /**
  * PNode representation of a {@link NeuronCollection}.
@@ -178,7 +180,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         // Coupling menu
         menu.addSeparator();
-        JMenu couplingMenu = getNetworkPanel().getCouplingMenu(neuronCollection);
+        JMenu couplingMenu = createCouplingMenu(getNetworkPanel(), neuronCollection);
         if (couplingMenu != null) {
             menu.add(couplingMenu);
         }
@@ -190,12 +192,12 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
      * Select the neurons in this group.
      */
     public void selectNeurons() {
-        List<NeuronNode> nodes = new ArrayList<NeuronNode>();
-        for (Neuron neuron : neuronCollection.getNeuronList()) {
-            nodes.add((NeuronNode) getNetworkPanel().getObjectNodeMap().get(neuron));
-        }
-        getNetworkPanel().clearSelection();
-        getNetworkPanel().setSelection(nodes);
+        List<NeuronNode> nodes = neuronCollection.getNeuronList().stream()
+                .map(getNetworkPanel().getNeuronNodeMapping()::get)
+                .collect(Collectors.toList());
+
+        getNetworkPanel().getSelectionManager().clear();
+        getNetworkPanel().getSelectionManager().set(nodes);
     }
 
     public NeuronCollection getNeuronCollection() {

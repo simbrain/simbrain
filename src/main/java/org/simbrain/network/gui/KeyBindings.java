@@ -19,10 +19,6 @@
 package org.simbrain.network.gui;
 
 import org.simbrain.network.LocatableModel;
-import org.simbrain.network.gui.actions.edit.TextEditModeAction;
-import org.simbrain.network.gui.actions.edit.WandEditModeAction;
-import org.simbrain.network.gui.actions.selection.SelectIncomingWeightsAction;
-import org.simbrain.network.gui.actions.selection.SelectOutgoingWeightsAction;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.piccolo.SceneGraphBrowser;
 
@@ -30,6 +26,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
+import static org.simbrain.network.gui.NetworkDialogsKt.showNeuronArrayCreationDialog;
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings not found here are in the action
@@ -156,7 +154,8 @@ public class KeyBindings {
                 "unselectAll");
         panel.getActionMap().put("unselectAll", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                panel.unselectAll();
+                panel.getSelectionManager().clear();
+                panel.getSelectionManager().clearAllSource();
             }
         });
 
@@ -238,18 +237,18 @@ public class KeyBindings {
         // Text Mode
         inputMap.put(KeyStroke.getKeyStroke("T"), "textMode");
         panel.getActionMap().put("textMode",
-                panel.getActionManager().getAction(TextEditModeAction.class));
+                panel.getNetworkActions().getTextEditModeAction());
 
         // Wand Mode
         inputMap.put(KeyStroke.getKeyStroke("I"), "wandMode");
         panel.getActionMap().put("wandMode",
-                panel.getActionManager().getAction(WandEditModeAction.class));
+                panel.getNetworkActions().getWandEditModeAction());
 
         // TODO: (Temporary) Add neuron array
         inputMap.put(KeyStroke.getKeyStroke("Y"), "neuronArray");
         panel.getActionMap().put("neuronArray", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                panel.showNeuronArrayCreationDialog();
+                showNeuronArrayCreationDialog(panel);
             }
         });
 
@@ -257,7 +256,7 @@ public class KeyBindings {
         inputMap.put(KeyStroke.getKeyStroke("1"), "setSource");
         panel.getActionMap().put("setSource", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                panel.setSourceElements();
+                panel.getSelectionManager().markAllAsSource();
                 // TODO: This does not work when I use the action manager's
                 // action. Not sure why not.
             }
@@ -272,20 +271,16 @@ public class KeyBindings {
 
         inputMap.put(KeyStroke.getKeyStroke("3"), "selectIncoming");
         panel.getActionMap().put("selectIncoming",
-                panel.getActionManager().getAction(SelectIncomingWeightsAction.class));
+                panel.getNetworkActions().getSelectIncomingWeightsAction());
 
         inputMap.put(KeyStroke.getKeyStroke("4"), "selectOutgoing");
         panel.getActionMap().put("selectOutgoing",
-                panel.getActionManager().getAction(SelectOutgoingWeightsAction.class));
+                panel.getNetworkActions().getSelectOutgoingWeightsAction());
 
         inputMap.put(KeyStroke.getKeyStroke("5"), "showSynapses");
         panel.getActionMap().put("showSynapses", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (panel.getWeightsVisible()) {
-                    panel.setWeightsVisible(false);
-                } else {
-                    panel.setWeightsVisible(true);
-                }
+                panel.setLooseWeightsVisible(!panel.getLooseWeightsVisible());
             }
         });
 
@@ -301,7 +296,9 @@ public class KeyBindings {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.getNetwork().getEvents().fireDebug();
-                panel.getSelectedLocatableModels().stream()
+                panel.getSelectionManager().getSelectedModels().stream()
+                        .filter(LocatableModel.class::isInstance)
+                        .map(LocatableModel.class::cast)
                         .map(LocatableModel::getLocation)
                         .forEach(System.out::println);
             }

@@ -26,7 +26,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.neuron.NeuronDialog;
+import org.simbrain.network.gui.NetworkPanelMenusKt;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.Utils;
@@ -39,6 +39,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.simbrain.network.gui.NetworkDialogsKt.getNeuronDialog;
 
 /**
  * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -487,13 +489,12 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
     @Override
     public JPopupMenu getContextMenu() {
-        return getNetworkPanel().getNeuronContextMenu(neuron);
+        return NetworkPanelMenusKt.getNeuronContextMenu(getNetworkPanel());
     }
 
     @Override
     public JDialog getPropertyDialog() {
-        NeuronDialog dialog = getNetworkPanel().getNeuronDialog();
-        return dialog;
+        return getNeuronDialog(getNetworkPanel());
     }
 
     /**
@@ -626,7 +627,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             mainShape.setStrokePaint(SynapseNode.getLineColor());
         }
         // TODO: Check if change only?
-        labelBackground.setPaint(NetworkPanel.getBackgroundColor());
+        labelBackground.setPaint(getNetworkPanel().getBackgroundColor());
         updateColor();
     }
 

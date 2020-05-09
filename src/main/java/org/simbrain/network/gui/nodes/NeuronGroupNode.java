@@ -18,11 +18,8 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
@@ -31,8 +28,11 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.simbrain.network.gui.NetworkDialogsKt.createNeuronGroupDialog;
+import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
@@ -75,13 +75,12 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      * Select the neurons in this group.
      */
     public void selectNeurons() {
-        List<NeuronNode> nodes = new ArrayList<NeuronNode>();
-        for (Neuron neuron : neuronGroup.getNeuronList()) {
-            nodes.add((NeuronNode) getNetworkPanel().getObjectNodeMap().get(neuron));
+        final var nodes = neuronGroup.getNeuronList().stream()
+                .map(getNetworkPanel().getNeuronNodeMapping()::get)
+                .collect(Collectors.toList());
 
-        }
-        getNetworkPanel().clearSelection();
-        getNetworkPanel().setSelection(nodes);
+        getNetworkPanel().getSelectionManager().clear();
+        getNetworkPanel().getSelectionManager().set(nodes);
     }
 
     /**
@@ -127,7 +126,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      * @return the neuron group property dialog.
      */
     public StandardDialog getPropertyDialog() {
-        return getNetworkPanel().getNeuronGroupDialog(this);
+        return createNeuronGroupDialog(getNetworkPanel(), this.neuronGroup);
     }
 
     /**
@@ -164,26 +163,28 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         Action selectIncomingNodes = new AbstractAction("Select Incoming Synapses") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                List<SynapseNode> incomingNodes = new ArrayList<SynapseNode>();
-                for (Synapse synapse : neuronGroup.getIncomingWeights()) {
-                    incomingNodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
-
-                }
-                getNetworkPanel().clearSelection();
-                getNetworkPanel().setSelection(incomingNodes);
+                // TODO: restore functionality
+                // List<SynapseNode> incomingNodes = new ArrayList<SynapseNode>();
+                // for (Synapse synapse : neuronGroup.getIncomingWeights()) {
+                //     incomingNodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
+                //
+                // }
+                // getNetworkPanel().clearSelection();
+                // getNetworkPanel().setSelection(incomingNodes);
             }
         };
         menu.add(selectIncomingNodes);
         Action selectOutgoingNodes = new AbstractAction("Select Outgoing Synapses") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                List<SynapseNode> outgoingNodes = new ArrayList<SynapseNode>();
-                for (Synapse synapse : neuronGroup.getOutgoingWeights()) {
-                    outgoingNodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
-
-                }
-                getNetworkPanel().clearSelection();
-                getNetworkPanel().setSelection(outgoingNodes);
+                // TODO: restore functionality
+                // List<SynapseNode> outgoingNodes = new ArrayList<SynapseNode>();
+                // for (Synapse synapse : neuronGroup.getOutgoingWeights()) {
+                //     outgoingNodes.add((SynapseNode) getNetworkPanel().getObjectNodeMap().get(synapse));
+                //
+                // }
+                // getNetworkPanel().clearSelection();
+                // getNetworkPanel().setSelection(outgoingNodes);
             }
         };
         menu.add(selectOutgoingNodes);
@@ -199,20 +200,21 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         Action setSource = new AbstractAction("Set Group as Source") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                getNetworkPanel().clearSelection();
-                getNetworkPanel().setSelection(Collections.singleton(NeuronGroupNode.this.getInteractionBox()));
-                getNetworkPanel().setSourceElements();
+                getNetworkPanel().getSelectionManager().clear();
+                getNetworkPanel().getSelectionManager().set(NeuronGroupNode.this.getInteractionBox());
+                getNetworkPanel().getSelectionManager().markAllAsSource();
             }
         };
         menu.add(setSource);
         Action clearSource = new AbstractAction("Clear Source Neuron Groups") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                getNetworkPanel().clearSourceElements();
+                // TODO: behavior does not match description: this clear all source selection
+                getNetworkPanel().getSelectionManager().clearAllSource();
             }
         };
         menu.add(clearSource);
-        Action makeConnection = getNetworkPanel().getActionManager().getAction(AddSynapseGroupAction.class);
+        Action makeConnection = getNetworkPanel().getNetworkActions().getAddSynapseGroupAction();
         menu.add(makeConnection);
 
         // Add any custom menus for this type
@@ -233,7 +235,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         // Coupling menu
         menu.addSeparator();
-        JMenu couplingMenu = getNetworkPanel().getCouplingMenu(neuronGroup);
+        JMenu couplingMenu = createCouplingMenu(getNetworkPanel(), neuronGroup);
         if (couplingMenu != null) {
             menu.add(couplingMenu);
         }
@@ -269,8 +271,8 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         @Override
         public String getToolTipText() {
             return "NeuronGroup: " + neuronGroup.getId()
-                + " Location: (" + Utils.round(neuronGroup.getLocation().getX(),2) + ","
-                + Utils.round(neuronGroup.getLocation().getY(),2) + ")";
+                    + " Location: (" + Utils.round(neuronGroup.getLocation().getX(), 2) + ","
+                    + Utils.round(neuronGroup.getLocation().getY(), 2) + ")";
         }
     }
 

@@ -16,123 +16,68 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.desktop;
+package org.simbrain.network.desktop
 
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.GuiComponent;
-
-import javax.swing.*;
-import java.awt.*;
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.gui.*
+import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.workspace.component_actions.CloseAction
+import org.simbrain.workspace.component_actions.OpenAction
+import org.simbrain.workspace.component_actions.SaveAction
+import org.simbrain.workspace.component_actions.SaveAsAction
+import org.simbrain.workspace.gui.GuiComponent
+import java.awt.BorderLayout
+import java.awt.Dimension
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JOptionPane
 
 /**
  * Network desktop component. An extension of the Gui component for this class
  * which is used in the Simbrain desktop.
  */
-public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent> {
+class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent) : GuiComponent<NetworkComponent?>(frame, component) {
 
-    /**
-     * Network panel.
-     */
-    private final NetworkPanel networkPanel;
+    val networkPanel = NetworkPanel(this, component.network)
 
-    /**
-     * Menu bar.
-     */
-    private JMenuBar menuBar;
-
-    /**
-     * Default height.
-     */
-    private static final int DEFAULT_HEIGHT = 450;
-
-    /**
-     * Default width.
-     */
-    private static final int DEFAULT_WIDTH = 450;
-
-    /**
-     * If a synapse group has more than this many synapses and does not have
-     * "compression" turned on, show user a warning.
-     */
-    private static final int saveWarningThreshold = 200;
-
-    /**
-     * Create a new network frame.
-     *
-     * @param frame     frame of network
-     * @param component network component
-     */
-    public NetworkDesktopComponent(final GenericFrame frame, final NetworkComponent component) {
-        super(frame, component);
-        this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
-
-        networkPanel = new NetworkPanel(this, component.getNetwork());
-
-        // component.setCurrentFile(currentFile);
-
-        // Place networkPanel in a buffer so that toolbars don't get in the way
-        // of canvas elements
-        setLayout(new BorderLayout());
-
-        // Put it all together
-        add("Center", networkPanel);
-        createAndAttachMenus();
-
-        // Toggle the network panel's visiblity if the workspace component is
-        // set to "gui off"
-        component.getEvents().onGUIToggled(() -> networkPanel.setGuiOn(getWorkspaceComponent().isGuiOn()));
+    private val menuBar: JMenuBar = JMenuBar().apply {
+        with(networkPanel) {
+            add(createFileMenu())
+            add(createEditMenu())
+            add(insertMenu)
+            add(createViewMenu())
+            // TODO: todo copied from old code
+            // TODO
+            //menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
+            // menuBar.add(createAttributeMenu());
+            add(helpMenu)
+        }
+        parentFrame.jMenuBar = this
     }
 
-    /**
-     * Create and attach the menus for this network frame.
-     */
-    private void createAndAttachMenus() {
-
-        menuBar = new JMenuBar();
-        menuBar.add(createFileMenu());
-        menuBar.add(networkPanel.createEditMenu());
-        menuBar.add(networkPanel.createInsertMenu());
-        menuBar.add(networkPanel.createViewMenu());
-        // TODO
-        //menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
-        // menuBar.add(createAttributeMenu());
-        menuBar.add(networkPanel.createHelpMenu());
-        getParentFrame().setJMenuBar(menuBar);
-    }
 
     /**
      * Create and return a new File menu for this Network panel.
      *
      * @return a new File menu for this Network panel
      */
-    JMenu createFileMenu() {
-
-        JMenu fileMenu = new JMenu("File");
-
-        fileMenu.add(new OpenAction(this));
-        fileMenu.add(new SaveAction(this));
-        fileMenu.add(new SaveAsAction(this));
-        fileMenu.addSeparator();
+    fun createFileMenu(): JMenu {
+        val fileMenu = JMenu("File")
+        fileMenu.add(OpenAction(this))
+        fileMenu.add(SaveAction(this))
+        fileMenu.add(SaveAsAction(this))
+        fileMenu.addSeparator()
         //fileMenu.add(new ShowNetworkUpdaterDialog(networkPanel));
         //fileMenu.add(new ShowNetworkPreferencesAction(networkPanel));
-        fileMenu.addSeparator();
-
-        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
-
-        return fileMenu;
+        fileMenu.addSeparator()
+        fileMenu.add(CloseAction(workspaceComponent))
+        return fileMenu
     }
 
-    @Override
-    public void postAddInit() {
-        if (this.getParentFrame().getJMenuBar() == null) {
-            createAndAttachMenus();
+    override fun postAddInit() {
+        if (parentFrame.jMenuBar == null) {
+//            createAndAttachMenus()
+            // TODO: watch out! menus are created with constructor now
         }
 
         // TODO
@@ -148,31 +93,17 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
         //networkPanel.initGui();
     }
 
-    /**
-     * Return the network panel for this network frame.
-     *
-     * @return the network panel for this network frame
-     */
-    public NetworkPanel getNetworkPanel() {
-        return networkPanel;
-    }
+    public override fun closing() {}
 
-    @Override
-    public void closing() {
-    }
-
-    @Override
-    public void showSaveFileDialog() {
+    override fun showSaveFileDialog() {
         if (showUncompressedSynapseGroupWarning()) {
-            super.showSaveFileDialog();
+            super.showSaveFileDialog()
         }
-
     }
 
-    @Override
-    public void save() {
+    override fun save() {
         if (showUncompressedSynapseGroupWarning()) {
-            super.save();
+            super.save()
         }
     }
 
@@ -183,22 +114,57 @@ public final class NetworkDesktopComponent extends GuiComponent<NetworkComponent
      * @return true if the save operation should proceed, false if the save
      * operation should be cancelled.
      */
-    private boolean showUncompressedSynapseGroupWarning() {
-        boolean showPanel = false;
-        for (SynapseGroup group : networkPanel.getNetwork().getSynapseGroups()) {
-            if (group.getAllSynapses().size() > saveWarningThreshold) {
-                if (!group.isUseGroupLevelSettings()) {
-                    showPanel = true;
-                }
-            }
+    private fun showUncompressedSynapseGroupWarning(): Boolean {
+        val showPanel = networkPanel.network.synapseGroups.any {
+            it.allSynapses.size > saveWarningThreshold && !it.isUseFullRepOnSave
         }
         if (showPanel) {
-            int n = JOptionPane.showConfirmDialog(null, "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. " + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that " + "their weight matrices are compressed.   Otherwise the save will take a " + "long time and the saved file will be large. Click Cancel to go ahead with the save, " + "and OK to return to the network and change settings.</body></html>", "Save Warning", JOptionPane.OK_CANCEL_OPTION);
+            val n = JOptionPane.showConfirmDialog(null, "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. " + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that " + "their weight matrices are compressed.   Otherwise the save will take a " + "long time and the saved file will be large. Click Cancel to go ahead with the save, " + "and OK to return to the network and change settings.</body></html>", "Save Warning", JOptionPane.OK_CANCEL_OPTION)
             if (n == JOptionPane.OK_OPTION) {
-                return false;
+                return false
             }
         }
-        return true;
+        return true
     }
 
+    companion object {
+        /**
+         * Default height.
+         */
+        private const val DEFAULT_HEIGHT = 450
+
+        /**
+         * Default width.
+         */
+        private const val DEFAULT_WIDTH = 450
+
+        /**
+         * If a synapse group has more than this many synapses and does not have
+         * "compression" turned on, show user a warning.
+         */
+        private const val saveWarningThreshold = 200
+    }
+
+    /**
+     * Create a new network frame.
+     *
+     * @param frame     frame of network
+     * @param component network component
+     */
+    init {
+        this.preferredSize = Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)
+
+        // component.setCurrentFile(currentFile);
+
+        // Place networkPanel in a buffer so that toolbars don't get in the way
+        // of canvas elements
+        layout = BorderLayout()
+
+        // Put it all together
+        add("Center", networkPanel)
+
+        // Toggle the network panel's visiblity if the workspace component is
+        // set to "gui off"
+        component.events.onGUIToggled(Runnable { networkPanel.guiOn = workspaceComponent!!.isGuiOn })
+    }
 }

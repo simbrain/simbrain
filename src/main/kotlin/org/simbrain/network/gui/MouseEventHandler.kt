@@ -69,12 +69,12 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             mode = Mode.DRAG
             // Toggle selection
             if (event.isShiftDown) {
-                networkPanel.toggleSelection(pickedScreenElement)
+                networkPanel.selectionManager.toggle(pickedScreenElement)
             }
             // Required so that clicking to drag does not de-select all other nodes
             if (pickedScreenElement !in networkPanel.selectedNodes) {
                 if(!event.isShiftDown) {
-                    networkPanel.setSelection(pickedScreenElement)
+                    networkPanel.selectionManager.set(pickedScreenElement)
                 }
             }
         }
@@ -88,11 +88,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             event.isPanKeyDown -> mode = Mode.PAN
             pickedNode is PCamera -> {
                 networkPanel.placementManager.lastClickedLocation = event.position
-                if (!event.isShiftDown) networkPanel.clearSelection()
+                if (!event.isShiftDown) networkPanel.selectionManager.clear()
                 mode = Mode.SELECTION
             }
             pickedNode is PStyledText && event.isDoubleClick -> {
-                networkPanel.clearSelection()
+                networkPanel.selectionManager.clear()
                 networkPanel.textHandle.startEditing(event, pickedNode)
                 mode = Mode.SELECTION
             }
@@ -150,7 +150,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         } else {
             selectedNodes
         }
-        networkPanel.setSelection(finalSelection)
+        networkPanel.selectionManager.set(finalSelection)
     }
 
     private fun dragItems(event: PInputEvent) {

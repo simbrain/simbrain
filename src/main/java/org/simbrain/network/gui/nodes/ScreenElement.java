@@ -42,7 +42,7 @@ public abstract class ScreenElement extends PPath.Float {
     /**
      * Network panel.
      */
-    private NetworkPanel networkPanel;
+    private final NetworkPanel networkPanel;
 
     /**
      * Create a new abstract screen element with the specified network panel.

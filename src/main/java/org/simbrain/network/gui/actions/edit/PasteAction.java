@@ -19,9 +19,7 @@
 package org.simbrain.network.gui.actions.edit;
 
 import org.simbrain.network.gui.Clipboard;
-import org.simbrain.network.gui.ClipboardListener;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.NetworkSelectionListener;
 import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
@@ -59,13 +57,7 @@ public final class PasteAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, keyStroke);
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Paste.png"));
         updateAction();
-        Clipboard.addClipboardListener(new ClipboardListener() {
-
-            /** @see NetworkSelectionListener */
-            public void clipboardChanged() {
-                updateAction();
-            }
-        });
+        Clipboard.addClipboardListener(() -> updateAction());
     }
 
     /**

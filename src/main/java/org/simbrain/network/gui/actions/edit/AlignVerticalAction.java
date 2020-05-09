@@ -22,7 +22,6 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.util.ResourceManager;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -43,7 +42,7 @@ public final class AlignVerticalAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.alignVertical();
+        getNetworkPanel().alignVertical();
     }
 
 }

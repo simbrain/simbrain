@@ -598,7 +598,7 @@
 //         NeuronNode node = new NeuronNode(this, neuron);
 //         canvas.getLayer().addChild(node);
 //         objectNodeMap.put(neuron, node);
-//         selectionModel.setSelection(Collections.singleton(node));
+//         selectionModel.set(Collections.singleton(node));
 //     }
 //
 //     /**
@@ -1344,7 +1344,7 @@
 //      * @param elements elements
 //      */
 //     public void setSelection(final Collection<? extends ScreenElement> elements) {
-//         selectionModel.setSelection(elements);
+//         selectionModel.set(elements);
 //     }
 //
 //     /**

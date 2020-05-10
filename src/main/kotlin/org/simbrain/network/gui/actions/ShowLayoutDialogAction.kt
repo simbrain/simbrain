@@ -25,7 +25,7 @@ class ShowLayoutDialogAction(networkPanel: NetworkPanel)
     : ConditionallyEnabledAction(networkPanel, "Layout Neurons...", EnablingCondition.NEURONS) {
 
     override fun actionPerformed(e: ActionEvent) {
-        LayoutDialog(networkPanel).apply {
+        LayoutDialog(getNetworkPanel()).apply {
             pack()
             setLocationRelativeTo(null)
             isVisible = true

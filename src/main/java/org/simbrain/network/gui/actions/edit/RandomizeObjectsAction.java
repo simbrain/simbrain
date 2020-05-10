@@ -38,17 +38,15 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
     /**
      * Create a new randomize screen elements action with the specified network
      * panel.
-     *
-     * @param networkPanel network panel, must not be null
      */
-    public RandomizeObjectsAction(final NetworkPanel networkPanel) {
-        super(networkPanel, "Randomize selection", EnablingCondition.ALLITEMS);
+    public RandomizeObjectsAction(final NetworkPanel np) {
+        super(np, "Randomize selection", EnablingCondition.ALLITEMS);
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
         putValue(SHORT_DESCRIPTION, "Randomize Selected Weights and Nodes (r)");
 
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('r'), this);
-        networkPanel.getActionMap().put(this, this);
+        np.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('r'), this);
+        np.getActionMap().put(this, this);
     }
 
     @Override

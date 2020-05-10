@@ -76,6 +76,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     fun clearAllSource() = modifySourceSelection { clear() }
 
     private fun modifySourceSelection(block: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
+        print(sourceSelection)
         (sourceSelection as CopyOnWriteArraySet).block()
     }
 

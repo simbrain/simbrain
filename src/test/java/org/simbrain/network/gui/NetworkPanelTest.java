@@ -5,6 +5,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class NetworkPanelTest {
@@ -12,18 +14,17 @@ public class NetworkPanelTest {
     @Test
     public void basicTest() {
         Network net = new Network();
-        NetworkPanel np = new NetworkPanel(net);
+        NetworkPanel np = new NetworkPanel(null, net);
 
         Neuron n1 = new Neuron(net);
         Neuron n2 = new Neuron(net);
         net.addLooseNeuron(n1);
         net.addLooseNeuron(n2);
 
-        NeuronNode nn1 = np.getNode(n1);
-        NeuronNode nn2 = np.getNode(n2);
+        List<NeuronNode> nodes =  np.getScreenElements(NeuronNode.class);
 
-        System.out.println(nn1);
-        System.out.println(nn2);
+        System.out.println(nodes.get(0));
+        System.out.println(nodes.get(1));
 
     }
 }

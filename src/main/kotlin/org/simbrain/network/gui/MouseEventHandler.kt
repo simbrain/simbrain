@@ -113,10 +113,10 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         super.endDrag(event)
         if (mode == Mode.SELECTION) {
             selectionMarquee.visible = false
+            networkPanel.zoomToFitPage()
         } else {
             priorSelection = setOf()
         }
-        networkPanel.zoomToFitPage(false)
     }
 
     /**

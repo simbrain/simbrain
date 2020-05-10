@@ -18,7 +18,6 @@ import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.actions.edit.ToggleAutoZoom
-import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
@@ -84,7 +83,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     var autoZoom = true
         set(value) {
             field = value
-            repaint()
+            zoomToFitPage()
         }
     var showTime = true
 
@@ -174,7 +173,6 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
             addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
             addInputEventListener(TextEventHandler(this@NetworkPanel))
-            addInputEventListener(TextEventHandler(this@NetworkPanel))
 
             // Don't show text when the canvas is sufficiently zoomed in
             camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
@@ -183,13 +181,12 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         }
 
         // Init network change listeners
-         addNetworkListeners()
+        addNetworkListeners()
 
         toolbars.apply {
+
             cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
-
-            val flowLayout = FlowLayout().apply { hgap = 0; vgap = 0 }
-
+            val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
             add("Center", JPanel(flowLayout).apply {
                 add(mainToolBar)
                 add(runToolBar)
@@ -211,7 +208,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         // Repaint whenever window is opened or changed.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                repaint()
+                zoomToFitPage()
             }
         })
 
@@ -241,6 +238,10 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         this.updateComplete.set(if (updateComplete) 0 else 3)
     }
 
+    fun zoomToFitPage() {
+        zoomToFitPage(false)
+    }
+
     /**
      * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
      *
@@ -263,7 +264,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also {
         canvas.layer.addChild(it)
-        repaint()
+        zoomToFitPage()
     }
 
     @Deprecated("Consider removing / add from Network instead")
@@ -272,12 +273,14 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         placementManager.addNewModelObject(neuron)
         neuron.forceSetActivation(0.0)
         network.addLooseNeuron(neuron)
+        zoomToFitPage()
     }
 
     fun add(neuron: Neuron) = addScreenElement {
         NeuronNode(this, neuron).also {
             (neuronNodeMapping as HashMap)[neuron] = it
             selectionManager.set(it)
+            zoomToFitPage()
         }
     }
 
@@ -339,6 +342,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         val neuronGroupNodes = subnetwork.neuronGroupList.map { group -> add(group) }
         val synapseGroupNodes = subnetwork.synapseGroupList.map { group -> add(group) }
 
+        //todo
         createSubNetwork().apply {
             neuronGroupNodes.forEach { addNode(it) }
             synapseGroupNodes.forEach { addNode(it) }
@@ -391,6 +395,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         with(networkActions) {
             networkEditingActions.forEach { add(it) }
             add(clearNodeActivationsAction)
+            // TODO
             add(randomizeObjectsAction)
         }
     }
@@ -541,12 +546,13 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
      * of neuron group).
      */
     fun connectSelectedModels() {
+        print("-->" + selectionManager)
 
         // Handle adding synapse groups between neuron groups
-        if (AddSynapseGroupAction.displaySynapseGroupDialog(this)) {
-            // TODO: Document, think about the boolean return on that.
-            return
-        }
+        //if (AddSynapseGroupAction.displaySynapseGroupDialog(this)) {
+        //    // TODO: Document, think about the boolean return on that.
+        //    return
+        //}
 
         with(selectionManager) {
             val sourceNeurons = sourceModelsOf<Neuron>() +
@@ -603,18 +609,18 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         isVisible = true
     }
 
-    private fun createRunToolBar() = CustomToolBar().apply {
-        with(networkActions) {
-            add(iterateNetworkAction)
-            add(ToggleButton(networkControlActions))
-        }
-    }
-
     private fun createMainToolBar() = CustomToolBar().apply {
         with(networkActions) {
             networkModeActions.forEach { add(it) }
             addSeparator()
             add(ToggleAutoZoom(this@NetworkPanel))
+        }
+    }
+
+    private fun createRunToolBar() = CustomToolBar().apply {
+        with(networkActions) {
+            add(iterateNetworkAction)
+            add(ToggleButton(networkControlActions))
         }
     }
 

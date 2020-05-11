@@ -77,7 +77,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
                 removed.forEach { NodeHandle.removeSourceHandleFrom(it) }
                 added.forEach {
                     if (it is InteractionBox) {
-                        NodeHandle.addSourceHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
+                        NodeHandle.addSourceHandleTo(it, NodeHandle.INTERACTION_BOX_SOURCE_STYLE)
                     } else {
                         NodeHandle.addSourceHandleTo(it)
                     }
@@ -98,13 +98,14 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             field = value
             zoomToFitPage()
         }
+
     var showTime = true
 
     val mainToolBar = createMainToolBar()
     val runToolBar = createRunToolBar()
     val editToolBar = createEditToolBar()
 
-    var backgroundColor = Color.white
+    var backgroundColor = Color.white!!
 
     val isRunning
             get()  = network.isRunning

@@ -6,6 +6,11 @@ import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 
 class NetworkSelectionEvent(selectionManager: NetworkSelectionManager) : Event(PropertyChangeSupport(selectionManager)) {
-    fun onSelection(handler: (Set<ScreenElement>, Set<ScreenElement>) -> Unit) = "Selection".itemChangedEvent(handler)
+    fun onSelection(handler: (old: Set<ScreenElement>, new: Set<ScreenElement>) -> Unit) =
+            "Selection".itemChangedEvent(handler)
     fun fireSelection(old: Set<ScreenElement>, new: Set<ScreenElement>) = "Selection"(old = old, new = new)
+
+    fun onSourceSelection(handler: (old: Set<ScreenElement>, new: Set<ScreenElement>) -> Unit) =
+            "SourceSelection".itemChangedEvent(handler)
+    fun fireSourceSelection(old: Set<ScreenElement>, new: Set<ScreenElement>) = "SourceSelection"(old = old, new = new)
 }

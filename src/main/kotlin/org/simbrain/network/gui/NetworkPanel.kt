@@ -60,14 +60,27 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
      * handled by keybindings).
      */
     val selectionManager = NetworkSelectionManager(this).apply {
-        events.onSelection { old, new ->
-            val (removed, added) = old complement new
-            removed.forEach { NodeHandle.removeSelectionHandleFrom(it) }
-            added.forEach {
-                if (it is InteractionBox) {
-                    NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
-                } else {
-                    NodeHandle.addSelectionHandleTo(it)
+        events.apply {
+            onSelection { old, new ->
+                val (removed, added) = old complement new
+                removed.forEach { NodeHandle.removeSelectionHandleFrom(it) }
+                added.forEach {
+                    if (it is InteractionBox) {
+                        NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
+                    } else {
+                        NodeHandle.addSelectionHandleTo(it)
+                    }
+                }
+            }
+            onSourceSelection { old, new ->
+                val (removed, added) = old complement new
+                removed.forEach { NodeHandle.removeSourceHandleFrom(it) }
+                added.forEach {
+                    if (it is InteractionBox) {
+                        NodeHandle.addSourceHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
+                    } else {
+                        NodeHandle.addSourceHandleTo(it)
+                    }
                 }
             }
         }

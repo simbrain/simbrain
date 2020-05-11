@@ -72,12 +72,16 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
 
     fun toggle(screenElements: Collection<ScreenElement>) = screenElements.forEach { toggle(it) }
 
-    fun markAllAsSource() = modifySourceSelection { addAll(selection) }
+    fun markAllAsSource() = modifySourceSelection {
+        clear()
+        addAll(selection)
+    }
     fun clearAllSource() = modifySourceSelection { clear() }
 
     private fun modifySourceSelection(block: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
-        print(sourceSelection)
+        val old = HashSet(sourceSelection)
         (sourceSelection as CopyOnWriteArraySet).block()
+        events.fireSourceSelection(old, sourceSelection)
     }
 
     private fun modifySelection(block: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {

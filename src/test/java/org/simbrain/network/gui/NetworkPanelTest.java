@@ -7,8 +7,6 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 public class NetworkPanelTest {
 
     @Test
@@ -21,7 +19,7 @@ public class NetworkPanelTest {
         net.addLooseNeuron(n1);
         net.addLooseNeuron(n2);
 
-        List<NeuronNode> nodes =  np.getScreenElements(NeuronNode.class);
+        List<NeuronNode> nodes =  np.getScreenElementsOf(NeuronNode.class);
 
         System.out.println(nodes.get(0));
         System.out.println(nodes.get(1));

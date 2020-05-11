@@ -23,10 +23,10 @@ import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.NodeHandle;
-import org.simbrain.util.piccolo.SelectionMarquee;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.Utils;
+import org.simbrain.util.piccolo.SelectionMarquee;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -245,7 +245,7 @@ public class NetworkPropertiesPanel extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 JSlider j = (JSlider) e.getSource();
                 SynapseNode.setMaxDiameter(j.getValue());
-                networkPanel.getScreenElements(SynapseNode.class).forEach(SynapseNode::updateDiameter);
+                networkPanel.getScreenElementsOf(SynapseNode.class).forEach(SynapseNode::updateDiameter);
             }
         });
         weightSizeMinSlider.addChangeListener(new ChangeListener() {
@@ -253,7 +253,7 @@ public class NetworkPropertiesPanel extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 JSlider j = (JSlider) e.getSource();
                 SynapseNode.setMinDiameter(j.getValue());
-                networkPanel.getScreenElements(SynapseNode.class).forEach(SynapseNode::updateDiameter);
+                networkPanel.getScreenElementsOf(SynapseNode.class).forEach(SynapseNode::updateDiameter);
             }
         });
         cbChangeColor.addActionListener(new ActionListener() {

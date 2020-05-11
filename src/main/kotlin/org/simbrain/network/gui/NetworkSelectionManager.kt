@@ -91,7 +91,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     }
 
     fun selectAll() {
-        // TODO.  Consider a new method in network panel that gets all screen elements without filtering
+        add(networkPanel.screenElements)
     }
 
 }

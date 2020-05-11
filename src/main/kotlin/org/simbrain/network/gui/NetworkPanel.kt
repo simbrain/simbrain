@@ -140,7 +140,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     var looseWeightsVisible = true
         set(value) {
             field = value
-            getScreenElements<SynapseNode>().forEach { it.visible = value }
+            getScreenElementsOf<SynapseNode>().forEach { it.visible = value }
         }
 
     /**
@@ -149,7 +149,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     var prioritiesVisible = false
         set(value) {
             field = value
-            getScreenElements<NeuronNode>().forEach { it.setPriorityView(value) }
+            getScreenElementsOf<NeuronNode>().forEach { it.setPriorityView(value) }
         }
 
     /**
@@ -189,7 +189,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 
             // Don't show text when the canvas is sufficiently zoomed in
             camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                getScreenElements<NeuronNode>().forEach { it.updateTextVisibility() }
+                getScreenElementsOf<NeuronNode>().forEach { it.updateTextVisibility() }
             }
         }
 
@@ -270,9 +270,9 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         }
     }
 
-    inline fun <reified T : ScreenElement> getScreenElements() = canvas.layer.allNodes.filterIsInstance<T>()
-
-    fun <T : ScreenElement> getScreenElements(clazz: Class<T>) =
+    val screenElements get() = canvas.layer.allNodes.filterIsInstance<ScreenElement>()
+    inline fun <reified T : ScreenElement> getScreenElementsOf() = canvas.layer.allNodes.filterIsInstance<T>()
+    fun <T : ScreenElement> getScreenElementsOf(clazz: Class<T>) =
             canvas.layer.allNodes.filterIsInstance(clazz)
 
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also {
@@ -544,7 +544,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 
 
     fun clearNeurons() {
-        getScreenElements<NeuronNode>().forEach { it.neuron.clear() }
+        getScreenElementsOf<NeuronNode>().forEach { it.neuron.clear() }
     }
 
     /**

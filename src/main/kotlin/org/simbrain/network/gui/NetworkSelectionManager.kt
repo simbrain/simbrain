@@ -20,8 +20,8 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     fun <T: ScreenElement> selectionOf(clazz: Class<T>) = selection.filterIsInstance(clazz)
     fun <T: ScreenElement> sourceSelectionOf(clazz: Class<T>) = sourceSelection.filterIsInstance(clazz)
 
-    val selectedModels = selection.map { it.model!! }
-    val sourceModels = sourceSelection.map { it.model!! }
+    val selectedModels get() = selection.map { it.model!! }
+    val sourceModels get() = sourceSelection.map { it.model!! }
     inline fun <reified T: NetworkModel> selectedModelsOf() = selectedModels.filterIsInstance<T>()
     inline fun <reified T: NetworkModel> sourceModelsOf() = sourceModels.filterIsInstance<T>()
     fun <T: NetworkModel> selectedModelsOf(clazz: Class<T>) = selectedModels.filterIsInstance(clazz)

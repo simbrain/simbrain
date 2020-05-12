@@ -217,7 +217,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         // TODO: copy from old code. Re-verify.
         ToolTipManager.sharedInstance().registerComponent(this)
 
-        KeyBindings.addBindings(this)
+        addKeyBindings()
 
         // Repaint whenever window is opened or changed.
         addComponentListener(object : ComponentAdapter() {

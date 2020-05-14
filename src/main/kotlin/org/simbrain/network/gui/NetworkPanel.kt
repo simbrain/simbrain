@@ -187,6 +187,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
             addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
             addInputEventListener(TextEventHandler(this@NetworkPanel))
+            addInputEventListener(WandEventHandler(this@NetworkPanel));
 
             // Don't show text when the canvas is sufficiently zoomed in
             camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
@@ -656,7 +657,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         event.onMultiLayerNetworkAdded(Consumer { add(it) })
         event.onNeuronCollectionAdded(Consumer { add(it) })
         event.onWeightMatrixRemoved(Consumer { it.delete() })
-//        event.onUpdateTimeDisplay(Consumer { d: Boolean? -> updateTime() })
+        event.onUpdateTimeDisplay(Consumer { d: Boolean? -> timeLabel.update() })
 //        event.onUpdateCompleted(Consumer {
 //            updateComplete = it
 //            repaint()

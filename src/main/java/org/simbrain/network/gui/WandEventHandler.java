@@ -60,10 +60,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         this.networkPanel = networkPanel;
     }
 
-    /**
-     * @param event
-     * @see PDragSequenceEventHandler
-     */
+    @Override
     public void mousePressed(final PInputEvent event) {
         super.mousePressed(event);
         //networkPanel.setLastClickedPosition(event.getPosition());
@@ -72,10 +69,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         //}
     }
 
-    /**
-     * @param event
-     * @see PDragSequenceEventHandler
-     */
+    @Override
     public void mouseClicked(final PInputEvent event) {
 
         super.mouseClicked(event);
@@ -90,16 +84,12 @@ final class WandEventHandler extends PDragSequenceEventHandler {
         }
     }
 
-    /**
-     * @see PDragSequenceEventHandler
-     */
+    @Override
     protected void startDrag(final PInputEvent event) {
         super.startDrag(event);
     }
 
-    /**
-     * @see PDragSequenceEventHandler
-     */
+    @Override
     protected void drag(final PInputEvent event) {
 
         super.drag(event);
@@ -123,9 +113,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
 
     }
 
-    /**
-     * @see PDragSequenceEventHandler
-     */
+    @Override
     protected void endDrag(final PInputEvent event) {
         super.endDrag(event);
     }
@@ -173,11 +161,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
             return (isPickable && boundsIntersects && !isLayer && !isCamera);
         }
 
-        /**
-         * @param node
-         * @return
-         * @see PNodeFilter
-         */
+        @Override
         public boolean acceptChildrenOf(final PNode node) {
             boolean areChildrenPickable = node.getChildrenPickable();
             boolean isCamera = (node instanceof PCamera);
@@ -199,12 +183,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
             super(InputEvent.BUTTON1_MASK);
         }
 
-        /**
-         * @param event
-         * @param type
-         * @return
-         * @see PInputEventFilter
-         */
+        @Override
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
             EditMode editMode = networkPanel.getEditMode();

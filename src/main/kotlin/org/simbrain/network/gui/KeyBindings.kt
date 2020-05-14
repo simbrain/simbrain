@@ -6,6 +6,7 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import java.awt.event.ActionEvent
+import java.awt.event.InputEvent
 import java.awt.event.KeyEvent.*
 import javax.swing.AbstractAction
 import javax.swing.ActionMap
@@ -17,15 +18,15 @@ import javax.swing.KeyStroke
  * classes.
  */
 fun NetworkPanel.addKeyBindings() {
+    bind(VK_UP) { contextualIncrementSelectedObjects() }
+    bind(VK_DOWN) { contextualDecrementSelectedObjects() }
     bind(Shift + VK_UP) { nudge(0, -1) }
     bind(Shift + VK_DOWN) { nudge(0, 1) }
     bind(Shift + VK_LEFT) { nudge(-1, 0) }
     bind(Shift + VK_RIGHT) { nudge(1, 0) }
     bind("delete", "back_space") { deleteSelectedObjects() }
-    bind(Alt + VK_LEFT, Alt + VK_DOWN) { contextualDecrementSelectedObjects() }
-    bind(Alt + VK_RIGHT, Alt + VK_UP) { contextualIncrementSelectedObjects() }
     bind(Shift + 'F') { toggleClamping() }
-    bind(Opt + 'D') { duplicate() }
+    bind(Meta + 'D') { duplicate() }
     bind(VK_ESCAPE) { selectionManager.clear(); selectionManager.clearAllSource() }
     bind("C") { clearSelectedObjects() }
     bind(Alt + 'D') { println(network) }
@@ -64,6 +65,10 @@ sealed class KeyMask {
     operator fun plus(keyMask: KeyMask) = KeyCombination(modifiers = keyMask.keyCode)
 
     abstract val keyCode: Int
+}
+
+object Meta : KeyMask() {
+    override val keyCode = InputEvent.META_DOWN_MASK
 }
 
 object Alt : KeyMask() {

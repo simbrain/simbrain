@@ -245,7 +245,7 @@ public class NetworkPropertiesPanel extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 JSlider j = (JSlider) e.getSource();
                 SynapseNode.setMaxDiameter(j.getValue());
-                networkPanel.getScreenElementsOf(SynapseNode.class).forEach(SynapseNode::updateDiameter);
+                networkPanel.filterScreenElements(SynapseNode.class).forEach(SynapseNode::updateDiameter);
             }
         });
         weightSizeMinSlider.addChangeListener(new ChangeListener() {
@@ -253,7 +253,7 @@ public class NetworkPropertiesPanel extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 JSlider j = (JSlider) e.getSource();
                 SynapseNode.setMinDiameter(j.getValue());
-                networkPanel.getScreenElementsOf(SynapseNode.class).forEach(SynapseNode::updateDiameter);
+                networkPanel.filterScreenElements(SynapseNode.class).forEach(SynapseNode::updateDiameter);
             }
         });
         cbChangeColor.addActionListener(new ActionListener() {

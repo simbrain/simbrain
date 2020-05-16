@@ -183,7 +183,7 @@ public final class ConnectionPanel extends JPanel {
 
         commitSettings();
         List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(),
-                networkPanel.getSelectionManager().sourceModelsOf(Neuron.class), networkPanel.getSelectedModels(Neuron.class));
+                networkPanel.getSelectionManager().filterSelectedSourceModels(Neuron.class), networkPanel.getSelectedModels(Neuron.class));
         if (synapses.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Chosen connection" +
                             " parameters resulted in no synapses being created." +

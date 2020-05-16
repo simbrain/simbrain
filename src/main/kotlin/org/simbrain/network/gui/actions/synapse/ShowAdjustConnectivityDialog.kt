@@ -32,8 +32,8 @@ class ShowAdjustConnectivityDialog(val networkPanel: NetworkPanel) : AbstractAct
 
     private fun updateAction() {
         with(networkPanel.selectionManager) {
-            val atLeastOneSourceSelected = sourceModelsOf<Neuron>().isNotEmpty()
-            val atLeastOneTargetSelected = selectedModelsOf<Neuron>().isNotEmpty()
+            val atLeastOneSourceSelected = filterSelectedSourceModels<Neuron>().isNotEmpty()
+            val atLeastOneTargetSelected = filterSelectedModels<Neuron>().isNotEmpty()
             isEnabled = atLeastOneSourceSelected && atLeastOneTargetSelected
         }
     }

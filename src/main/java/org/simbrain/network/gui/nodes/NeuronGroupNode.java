@@ -202,7 +202,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             public void actionPerformed(final ActionEvent event) {
                 getNetworkPanel().getSelectionManager().clear();
                 getNetworkPanel().getSelectionManager().set(NeuronGroupNode.this.getInteractionBox());
-                getNetworkPanel().getSelectionManager().markAllAsSource();
+                getNetworkPanel().getSelectionManager().convertSelectedNodesToSourceNodes();
             }
         };
         menu.add(setSource);

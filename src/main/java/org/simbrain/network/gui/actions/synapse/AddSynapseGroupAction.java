@@ -77,8 +77,8 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
         // }
 
         // Placed as a separate method since it is reused elsewhere.
-        NeuronGroup src = networkPanel.getSelectionManager().sourceModelsOf(NeuronGroup.class).get(0);
-        NeuronGroup tar = networkPanel.getSelectionManager().selectedModelsOf(NeuronGroup.class).get(0);
+        NeuronGroup src = networkPanel.getSelectionManager().filterSelectedSourceModels(NeuronGroup.class).get(0);
+        NeuronGroup tar = networkPanel.getSelectionManager().filterSelectedModels(NeuronGroup.class).get(0);
         JDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(networkPanel, src, tar);
         dialog.setLocationRelativeTo(null);
         dialog.pack();

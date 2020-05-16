@@ -56,6 +56,6 @@ public final class SelectAllNeuronsAction extends AbstractAction {
     @Override
     public void actionPerformed(final ActionEvent event) {
         networkPanel.getSelectionManager().clear();
-        networkPanel.getSelectionManager().set(networkPanel.getScreenElementsOf(NeuronNode.class));
+        networkPanel.getSelectionManager().set(networkPanel.filterScreenElements(NeuronNode.class));
     }
 }

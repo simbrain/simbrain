@@ -154,7 +154,7 @@ val NetworkPanel.neuronContextMenu get() = with(networkActions) {
         addSeparator()
         add(showNetworkPreferencesAction)
         addSeparator()
-        if (selectionManager.selectionOf<NeuronNode>().size > 1) {
+        if (selectionManager.filterSelectedNodes<NeuronNode>().size > 1) {
             add(alignMenu)
             add(spaceMenu)
             addSeparator()

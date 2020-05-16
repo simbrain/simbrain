@@ -39,7 +39,7 @@ class ShowAdjustSynapsesDialog(val networkPanel: NetworkPanel) : AbstractAction(
      * Only enable the action if there is at least one synapse selected.
      */
     private fun updateAction() {
-        val atLeastOneSynapseSelected = networkPanel.selectionManager.selectedModelsOf<Synapse>().isNotEmpty()
+        val atLeastOneSynapseSelected = networkPanel.selectionManager.filterSelectedModels<Synapse>().isNotEmpty()
         isEnabled = atLeastOneSynapseSelected
     }
 
@@ -52,7 +52,7 @@ class ShowAdjustSynapsesDialog(val networkPanel: NetworkPanel) : AbstractAction(
             title = "Adjust selected synapses"
             contentPane = SynapseAdjustmentPanel.createSynapseAdjustmentPanel(
                             networkPanel,
-                            networkPanel.selectionManager.selectedModelsOf<Synapse>()
+                            networkPanel.selectionManager.filterSelectedModels<Synapse>()
             )
             pack()
             setLocationRelativeTo(networkPanel)

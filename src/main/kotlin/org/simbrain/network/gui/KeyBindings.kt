@@ -2,11 +2,8 @@ package org.simbrain.network.gui
 
 import org.intellij.lang.annotations.MagicConstant
 import org.simbrain.network.LocatableModel
-import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
-import org.simbrain.util.piccolo.SceneGraphBrowser
 import java.awt.event.ActionEvent
-import java.awt.event.InputEvent
 import java.awt.event.KeyEvent.*
 import javax.swing.AbstractAction
 import javax.swing.ActionMap
@@ -26,25 +23,16 @@ fun NetworkPanel.addKeyBindings() {
     bind(Shift + VK_RIGHT) { nudge(1, 0) }
     bind("delete", "back_space") { deleteSelectedObjects() }
     bind(Shift + 'F') { toggleClamping() }
-    bind(Meta + 'D') { duplicate() }
+    bind(CmdOrCtrl + 'D') { duplicate() }
     bind(VK_ESCAPE) { selectionManager.clear(); selectionManager.clearAllSource() }
     bind("C") { clearSelectedObjects() }
     bind(Alt + 'D') { println(network) }
-    bind(Alt + 'P') {
-        StandardDialog().apply {
-            contentPane = SceneGraphBrowser(canvas.root)
-            title = "Piccolo Scenegraph Browser"
-            isModal = false
-            pack()
-            setLocationRelativeTo(null)
-            isVisible = true
-        }
-    }
+    bind(Alt + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
     bindTo("I", networkActions.wandEditModeAction)
     bind("Y") { showNeuronArrayCreationDialog() }
-    bind("1") { selectionManager.markAllAsSource() }
+    bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModels() }
     bindTo("3", networkActions.selectIncomingWeightsAction)
     bindTo("4", networkActions.selectOutgoingWeightsAction)
@@ -67,10 +55,6 @@ sealed class KeyMask {
     abstract val keyCode: Int
 }
 
-object Meta : KeyMask() {
-    override val keyCode = InputEvent.META_DOWN_MASK
-}
-
 object Alt : KeyMask() {
     override val keyCode = ALT_DOWN_MASK
 }
@@ -83,6 +67,7 @@ object Ctrl : KeyMask() {
     override val keyCode = CTRL_DOWN_MASK
 }
 
+// Command on Mac, Control on other systems
 object CmdOrCtrl : KeyMask() {
     override val keyCode = if (Utils.isMacOSX()) META_DOWN_MASK else CTRL_DOWN_MASK
 }

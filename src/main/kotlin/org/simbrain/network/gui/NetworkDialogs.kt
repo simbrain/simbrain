@@ -13,8 +13,10 @@ import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.TextNode
+import org.simbrain.util.StandardDialog
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
+import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import java.awt.Dialog
 import java.awt.Dimension
@@ -31,7 +33,7 @@ fun NetworkPanel.showTextPropertyDialog(textNodes: List<TextNode>) {
 }
 
 fun NetworkPanel.showSelectedNeuronProperties() {
-    NeuronDialog(selectionManager.selectedModelsOf<Neuron>()).apply {
+    NeuronDialog(selectionManager.filterSelectedModels<Neuron>()).apply {
         modalityType = Dialog.ModalityType.MODELESS
         pack()
         setLocationRelativeTo(this@showSelectedNeuronProperties)
@@ -40,7 +42,7 @@ fun NetworkPanel.showSelectedNeuronProperties() {
 }
 
 fun NetworkPanel.showSelectedSynapseProperties() {
-    SynapseDialog.createSynapseDialog(selectionManager.selectedModelsOf<Synapse>()).apply {
+    SynapseDialog.createSynapseDialog(selectionManager.filterSelectedModels<Synapse>()).apply {
         modalityType = Dialog.ModalityType.MODELESS
         pack()
         setLocationRelativeTo(this@showSelectedSynapseProperties)
@@ -71,7 +73,7 @@ fun NetworkPanel.showMultiLayerNetworkCreationDialog() {
     }
 }
 
-val NetworkPanel.neuronDialog get() = selectionManager.selectedModelsOf<Neuron>().let { neurons ->
+val NetworkPanel.neuronDialog get() = selectionManager.filterSelectedModels<Neuron>().let { neurons ->
     if (neurons.isEmpty()) {
         null
     } else {
@@ -80,7 +82,7 @@ val NetworkPanel.neuronDialog get() = selectionManager.selectedModelsOf<Neuron>(
 }
 
 val NetworkPanel.synapseDialog get() =
-    SynapseDialog.createSynapseDialog(selectionManager.selectedModelsOf<Synapse>())
+    SynapseDialog.createSynapseDialog(selectionManager.filterSelectedModels<Synapse>())
 
 fun NetworkPanel.createNeuronGroupDialog(neuronGroup: NeuronGroup) =
         NeuronGroupDialog(this, neuronGroup).apply {
@@ -128,4 +130,16 @@ fun NetworkPanel.displayPanel(panel: JPanel?, title: String?): GenericFrame? {
     frame.title = title
     frame.isVisible = true
     return frame
+}
+
+
+fun NetworkPanel.showPiccoloDebugger() {
+    StandardDialog().apply {
+        contentPane = SceneGraphBrowser(canvas.root)
+        title = "Piccolo Scenegraph Browser"
+        isModal = false
+        pack()
+        setLocationRelativeTo(null)
+        isVisible = true
+    }
 }

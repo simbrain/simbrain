@@ -141,7 +141,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     var looseWeightsVisible = true
         set(value) {
             field = value
-            getScreenElementsOf<SynapseNode>().forEach { it.visible = value }
+            filterScreenElements<SynapseNode>().forEach { it.visible = value }
         }
 
     /**
@@ -150,7 +150,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     var prioritiesVisible = false
         set(value) {
             field = value
-            getScreenElementsOf<NeuronNode>().forEach { it.setPriorityView(value) }
+            filterScreenElements<NeuronNode>().forEach { it.setPriorityView(value) }
         }
 
     /**
@@ -191,7 +191,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 
             // Don't show text when the canvas is sufficiently zoomed in
             camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                getScreenElementsOf<NeuronNode>().forEach { it.updateTextVisibility() }
+                filterScreenElements<NeuronNode>().forEach { it.updateTextVisibility() }
             }
         }
 
@@ -235,7 +235,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 
     @Deprecated("User selectionManager instead", ReplaceWith("selectionManager.selectionOf(clazz)"))
     fun <T : ScreenElement> getSelectedNodes(clazz: Class<T>) =
-            selectionManager.selectionOf(clazz)
+            selectionManager.filterSelectedNodes(clazz)
 
     @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModels"))
     val selectedModels
@@ -272,11 +272,21 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         }
     }
 
+    /**
+     * Returns all nodes in the canvas.
+     */
     val screenElements get() = canvas.layer.allNodes.filterIsInstance<ScreenElement>()
-    inline fun <reified T : ScreenElement> getScreenElementsOf() = canvas.layer.allNodes.filterIsInstance<T>()
-    fun <T : ScreenElement> getScreenElementsOf(clazz: Class<T>) =
+
+    /**
+     * Filter [ScreenElement]s using a generic type.
+     */
+    inline fun <reified T : ScreenElement> filterScreenElements() = canvas.layer.allNodes.filterIsInstance<T>()
+    fun <T : ScreenElement> filterScreenElements(clazz: Class<T>) =
             canvas.layer.allNodes.filterIsInstance(clazz)
 
+    /**
+     * Add a screen element to the network panel and rezoom the page.
+     */
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also {
         canvas.layer.addChild(it)
         zoomToFitPage()
@@ -440,21 +450,21 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     }
 
     fun alignHorizontal() {
-        val neurons = selectionManager.selectedModelsOf<Neuron>()
+        val neurons = selectionManager.filterSelectedModels<Neuron>()
         val minY = neurons.map { it.y }.min() ?: Double.MAX_VALUE
         neurons.forEach { it.y = minY }
         repaint()
     }
 
     fun alignVertical() {
-        val neurons = selectionManager.selectedModelsOf<Neuron>()
+        val neurons = selectionManager.filterSelectedModels<Neuron>()
         val minX = neurons.map { it.x }.min() ?: Double.MAX_VALUE
         neurons.forEach { it.x = minX }
         repaint()
     }
 
     fun spaceHorizontal() {
-        val neurons = selectionManager.selectedModelsOf<Neuron>()
+        val neurons = selectionManager.filterSelectedModels<Neuron>()
         if (neurons.size > 1) {
             val sortedNeurons = neurons.sortedBy { it.x }
             val min = neurons.first().x
@@ -467,7 +477,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     }
 
     fun spaceVertical() {
-        val neurons = selectionManager.selectedModelsOf<Neuron>()
+        val neurons = selectionManager.filterSelectedModels<Neuron>()
         if (neurons.size > 1) {
             val sortedNeurons = neurons.sortedBy { it.y }
             val min = neurons.first().y
@@ -480,13 +490,13 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     }
 
     fun nudge(dx: Int, dy: Int) {
-        selectionManager.selectedModelsOf<Neuron>()
+        selectionManager.filterSelectedModels<Neuron>()
                 .forEach { it.offset(dx * nudgeAmount, dy * nudgeAmount) }
     }
 
     fun toggleClamping() {
-        selectionManager.selectedModelsOf<Neuron>().forEach { it.isClamped = !it.isClamped }
-        selectionManager.selectionOf<SynapseNode>().forEach {
+        selectionManager.filterSelectedModels<Neuron>().forEach { it.isClamped = !it.isClamped }
+        selectionManager.filterSelectedNodes<SynapseNode>().forEach {
             with(it.synapse) { isFrozen = !isFrozen }
 
             // TODO: this should happen via an event
@@ -499,54 +509,54 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 
     fun incrementSelectedObjects() {
         with(selectionManager) {
-            selectedModelsOf<Neuron>().forEach { it.updateRule.incrementActivation(it) }
-            selectionOf<SynapseNode>().forEach {
+            filterSelectedModels<Neuron>().forEach { it.updateRule.incrementActivation(it) }
+            filterSelectedNodes<SynapseNode>().forEach {
                 it.synapse.incrementWeight()
                 it.updateColor()
                 it.updateDiameter()
             }
-            selectedModelsOf<NeuronArray>().forEach { it.increment() }
-            selectedModelsOf<WeightMatrix>().forEach { it.increment() }
+            filterSelectedModels<NeuronArray>().forEach { it.increment() }
+            filterSelectedModels<WeightMatrix>().forEach { it.increment() }
         }
     }
 
     fun decrementSelectedObjects() {
         with(selectionManager) {
-            selectedModelsOf<Neuron>().forEach { it.updateRule.decrementActivation(it) }
-            selectionOf<SynapseNode>().forEach {
+            filterSelectedModels<Neuron>().forEach { it.updateRule.decrementActivation(it) }
+            filterSelectedNodes<SynapseNode>().forEach {
                 it.synapse.decrementWeight()
                 it.updateColor()
                 it.updateDiameter()
             }
-            selectedModelsOf<NeuronArray>().forEach { it.decrement() }
-            selectedModelsOf<WeightMatrix>().forEach { it.decrement() }
+            filterSelectedModels<NeuronArray>().forEach { it.decrement() }
+            filterSelectedModels<WeightMatrix>().forEach { it.decrement() }
         }
     }
 
     fun contextualIncrementSelectedObjects() {
-        selectionManager.selectedModelsOf<Neuron>().forEach { it.updateRule.contextualIncrement(it) }
+        selectionManager.filterSelectedModels<Neuron>().forEach { it.updateRule.contextualIncrement(it) }
     }
 
     fun contextualDecrementSelectedObjects() {
-        selectionManager.selectedModelsOf<Neuron>().forEach { it.updateRule.contextualDecrement(it) }
+        selectionManager.filterSelectedModels<Neuron>().forEach { it.updateRule.contextualDecrement(it) }
     }
 
     fun clearSelectedObjects() {
         with(selectionManager) {
-            selectedModelsOf<Neuron>().forEach { it.clear() }
-            selectedModelsOf<Synapse>().forEach { it.forceSetStrength(0.0) }
-            selectedModelsOf<NeuronArray>().forEach { it.clear() }
-            selectedModelsOf<NeuronGroup>().forEach { it.clearActivations() }
+            filterSelectedModels<Neuron>().forEach { it.clear() }
+            filterSelectedModels<Synapse>().forEach { it.forceSetStrength(0.0) }
+            filterSelectedModels<NeuronArray>().forEach { it.clear() }
+            filterSelectedModels<NeuronGroup>().forEach { it.clearActivations() }
         }
     }
 
     fun selectNeuronsInNeuronGroups() {
-        selectionManager.selectionOf<NeuronGroupNode>().forEach { it.selectNeurons() }
+        selectionManager.filterSelectedNodes<NeuronGroupNode>().forEach { it.selectNeurons() }
     }
 
 
     fun clearNeurons() {
-        getScreenElementsOf<NeuronNode>().forEach { it.neuron.clear() }
+        filterScreenElements<NeuronNode>().forEach { it.neuron.clear() }
     }
 
     /**
@@ -561,7 +571,6 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
      * of neuron group).
      */
     fun connectSelectedModels() {
-        print("-->" + selectionManager)
 
         // Handle adding synapse groups between neuron groups
         //if (AddSynapseGroupAction.displaySynapseGroupDialog(this)) {
@@ -570,12 +579,12 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         //}
 
         with(selectionManager) {
-            val sourceNeurons = sourceModelsOf<Neuron>() +
-                    sourceModelsOf<NeuronCollection>().flatMap { it.neuronList } +
-                    sourceModelsOf<NeuronGroup>().flatMap { it.neuronList }
-            val targetNeurons = selectedModelsOf<Neuron>() +
-                    selectedModelsOf<NeuronCollection>().flatMap { it.neuronList } +
-                    selectedModelsOf<NeuronGroup>().flatMap { it.neuronList }
+            val sourceNeurons = filterSelectedSourceModels<Neuron>() +
+                    filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
+                    filterSelectedSourceModels<NeuronGroup>().flatMap { it.neuronList }
+            val targetNeurons = filterSelectedModels<Neuron>() +
+                    filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
+                    filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
 
             quickConnector.applyCurrentConnection(network, sourceNeurons, targetNeurons)
         }
@@ -586,8 +595,8 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
      */
     fun connectWithWeightMatrix() {
         with(selectionManager) {
-            val sources = sourceModelsOf<ArrayConnectable>()
-            val targets = selectedModelsOf<ArrayConnectable>()
+            val sources = filterSelectedSourceModels<ArrayConnectable>()
+            val targets = filterSelectedModels<ArrayConnectable>()
 
             for (source in sources) {
                 for (target in targets) {

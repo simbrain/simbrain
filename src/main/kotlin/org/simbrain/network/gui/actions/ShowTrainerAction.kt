@@ -34,7 +34,7 @@ class ShowTrainerAction(val networkPanel: NetworkPanel) : AbstractAction("Show T
      * Only enable the action if there is at least one source and one target neuron.
      */
     private fun updateAction() {
-        val atLeastOneSourceSelected = networkPanel.selectionManager.sourceModelsOf<Neuron>().isNotEmpty()
+        val atLeastOneSourceSelected = networkPanel.selectionManager.filterSelectedSourceModels<Neuron>().isNotEmpty()
         val atLeastOneTargetSelected = networkPanel.selectionManager.selectedModels.isNotEmpty()
         isEnabled = atLeastOneSourceSelected && atLeastOneTargetSelected
     }

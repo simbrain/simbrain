@@ -56,6 +56,6 @@ public final class SelectAllWeightsAction extends AbstractAction {
     @Override
     public void actionPerformed(final ActionEvent event) {
         networkPanel.getSelectionManager().clear();
-        networkPanel.getSelectionManager().set(networkPanel.getScreenElementsOf(SynapseNode.class));
+        networkPanel.getSelectionManager().set(networkPanel.filterScreenElements(SynapseNode.class));
     }
 }

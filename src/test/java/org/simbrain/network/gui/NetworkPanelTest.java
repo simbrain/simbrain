@@ -19,7 +19,7 @@ public class NetworkPanelTest {
         net.addLooseNeuron(n1);
         net.addLooseNeuron(n2);
 
-        List<NeuronNode> nodes =  np.getScreenElementsOf(NeuronNode.class);
+        List<NeuronNode> nodes =  np.filterScreenElements(NeuronNode.class);
 
         System.out.println(nodes.get(0));
         System.out.println(nodes.get(1));

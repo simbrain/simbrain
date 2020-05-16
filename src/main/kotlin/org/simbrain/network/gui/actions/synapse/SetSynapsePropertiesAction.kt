@@ -38,7 +38,7 @@ class SetSynapsePropertiesAction(val networkPanel: NetworkPanel) : AbstractActio
      * Set action text based on number of selected neurons.
      */
     private fun updateAction() {
-        val numSynapses = networkPanel.selectionManager.selectedModelsOf<Synapse>().size
+        val numSynapses = networkPanel.selectionManager.filterSelectedModels<Synapse>().size
         isEnabled = if (numSynapses > 0) {
             putValue(Action.NAME, "Edit $numSynapses Selected ${if (numSynapses > 1) "Synapses" else "Synapse"}")
             true

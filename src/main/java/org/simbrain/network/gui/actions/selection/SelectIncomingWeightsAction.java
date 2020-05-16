@@ -21,12 +21,9 @@ package org.simbrain.network.gui.actions.selection;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.nodes.SynapseNode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Select incoming weights action weights action.
@@ -65,6 +62,6 @@ public final class SelectIncomingWeightsAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         networkPanel.getSelectionManager().clear();
         networkPanel.getSelectionManager()
-                .selectedModelsOf(Neuron.class).forEach(n -> n.getFanIn().forEach(Synapse::select));
+                .filterSelectedModels(Neuron.class).forEach(n -> n.getFanIn().forEach(Synapse::select));
     }
 }

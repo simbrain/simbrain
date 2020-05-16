@@ -1069,7 +1069,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         return "";
     }
 
-    //TODO: Move to NetworkModel
     public void select() {
         events.fireSelected();
     }

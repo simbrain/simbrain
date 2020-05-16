@@ -1,67 +1,132 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.dl4j.NeuronArray
 import org.simbrain.network.events.NetworkSelectionEvent
+import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.gui.nodes.NeuronArrayNode
+import org.simbrain.network.gui.nodes.NeuronCollectionNode
+import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.ScreenElement
 import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * Manges network selection. E.g. when you select a group of nodes it tracks which nodes were selected.
- * Keeps track of source vs. selected nodes.
+ * Keeps track of source vs. selected nodes.  When [#modifySelection] or [#modifySourceSelection] are  called an
+ * event is fired which is handled in [NetworkPanel] where the selection manager is set up.
  */
 class NetworkSelectionManager(val networkPanel: NetworkPanel) {
 
+    /**
+     * Handle network selection events.
+     */
     val events = NetworkSelectionEvent(this)
 
+    /**
+     * "Green" selection from lasso.
+     */
     val selection: Set<ScreenElement> = CopyOnWriteArraySet()
-    val sourceSelection: Set<ScreenElement> = CopyOnWriteArraySet()
-    inline fun <reified T: ScreenElement> selectionOf() = selection.filterIsInstance<T>()
-    inline fun <reified T: ScreenElement> sourceSelectionOf() = sourceSelection.filterIsInstance<T>()
-    fun <T: ScreenElement> selectionOf(clazz: Class<T>) = selection.filterIsInstance(clazz)
-    fun <T: ScreenElement> sourceSelectionOf(clazz: Class<T>) = sourceSelection.filterIsInstance(clazz)
 
+    /**
+     * "Red" source selection.
+     */
+    val sourceSelection: Set<ScreenElement> = CopyOnWriteArraySet()
+
+    /**
+     * Filter selected network models using a generic type.  With a helper for java code (which requires a class
+     * object).
+     */
+    inline fun <reified T: NetworkModel> filterSelectedModels() = selectedModels.filterIsInstance<T>()
+    fun <T: NetworkModel> filterSelectedModels(clazz: Class<T>) = selectedModels.filterIsInstance(clazz)
+
+    /**
+     * Filter selected network models.
+     */
+    inline fun <reified T: NetworkModel> filterSelectedSourceModels() = sourceModels.filterIsInstance<T>()
+    fun <T: NetworkModel> filterSelectedSourceModels(clazz: Class<T>) = sourceModels.filterIsInstance(clazz)
+
+    /**
+     * Filter selected [ScreenElement]s
+     */
+    inline fun <reified T: ScreenElement> filterSelectedNodes() = selection.filterIsInstance<T>()
+    fun <T: ScreenElement> filterSelectedNodes(clazz: Class<T>) = selection.filterIsInstance(clazz)
+
+    /**
+     * Filter selected [ScreenElement] source nodes.
+     */
+    inline fun <reified T: ScreenElement> filterSelectedSourceNodes() = sourceSelection.filterIsInstance<T>()
+    fun <T: ScreenElement> filterSelectedSourceNodes(clazz: Class<T>) = sourceSelection.filterIsInstance(clazz)
+
+    /**
+     * Getter for selected models.
+     */
     val selectedModels get() = selection.map { it.model!! }
+
+    /**
+     * Getter for source models.
+     */
     val sourceModels get() = sourceSelection.map { it.model!! }
-    inline fun <reified T: NetworkModel> selectedModelsOf() = selectedModels.filterIsInstance<T>()
-    inline fun <reified T: NetworkModel> sourceModelsOf() = sourceModels.filterIsInstance<T>()
-    fun <T: NetworkModel> selectedModelsOf(clazz: Class<T>) = selectedModels.filterIsInstance(clazz)
-    fun <T: NetworkModel> sourceModelsOf(clazz: Class<T>) = sourceModels.filterIsInstance(clazz)
 
     val isEmpty get() = selection.isEmpty()
     val isNotEmpty get() = !isEmpty
 
     operator fun contains(screenElement: ScreenElement) = screenElement in selection
 
+    /**
+     * Clear the "green" selection
+     */
     fun clear() = modifySelection {
         clear()
     }
 
+    /**
+     * Add a single node to the selection.
+     */
     fun add(screenElement: ScreenElement) = modifySelection {
         add(screenElement)
     }
 
+    /**
+     * Add a collection of nodes to the selection.
+     */
     fun add(screenElements: Collection<ScreenElement>) = modifySelection {
         addAll(screenElements.map { it.selectionTarget })
     }
 
+    /**
+     * Remove a single node from the selection.
+     */
     fun remove(screenElement: ScreenElement) = modifySelection {
         remove(screenElement)
     }
 
+    /**
+     * Remove a collection of screen elements
+     */
     fun remove(screenElements: Collection<ScreenElement>) = modifySelection {
         removeAll(screenElements)
     }
 
+    /**
+     * Set the selection to a provided collection
+     */
     fun set(screenElements: Collection<ScreenElement>) = modifySelection {
         clear()
         addAll(screenElements)
     }
 
+    /**
+     * Set the selection to a single provided node.
+     */
     fun set(screenElement: ScreenElement) = modifySelection {
         clear()
         add(screenElement)
     }
 
+    /**
+     * Toggle a single node's selection.
+     */
     fun toggle(screenElement: ScreenElement) = modifySelection {
         if (screenElement in selection) {
             remove(screenElement)
@@ -70,28 +135,48 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
         }
     }
 
+    /**
+     * Toggle a collection of nodes.
+     */
     fun toggle(screenElements: Collection<ScreenElement>) = screenElements.forEach { toggle(it) }
 
-    fun markAllAsSource() = modifySourceSelection {
+    /**
+     * Convert all selected nodes to selected source "red" nodes.
+     */
+    fun convertSelectedNodesToSourceNodes() = modifySourceSelection {
         clear()
-        addAll(selection)
+        addAll(selection.filter { it is NeuronNode || it is NeuronCollectionNode || it is NeuronArrayNode })
     }
+
+    /**
+     * Clear all "red" source handles.
+     */
     fun clearAllSource() = modifySourceSelection { clear() }
 
+    /**
+     * Select all selectable nodes in the network panel.
+     */
+    fun selectAll() {
+        add(networkPanel.screenElements)
+    }
+
+    /**
+     * Core function which tells the Network Panel to updated provided ScreenElements. Modifies the [selection].
+     */
     private fun modifySourceSelection(block: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
         val old = HashSet(sourceSelection)
         (sourceSelection as CopyOnWriteArraySet).block()
         events.fireSourceSelection(old, sourceSelection)
     }
 
-    private fun modifySelection(block: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
+    /**
+     * Core function which tells the Network Panel to updated provided ScreenElements. Modifies the [selection].
+     */
+    private fun modifySelection(action: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
         val old = HashSet(selection)
-        (selection as CopyOnWriteArraySet).block()
+        // Invoke provided action
+        (selection as CopyOnWriteArraySet).action()
         events.fireSelection(old, selection)
-    }
-
-    fun selectAll() {
-        add(networkPanel.screenElements)
     }
 
 }

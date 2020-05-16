@@ -83,9 +83,8 @@ object Ctrl : KeyMask() {
     override val keyCode = CTRL_DOWN_MASK
 }
 
-// TODO: better name
-object Opt : KeyMask() {
-    override val keyCode = if (Utils.isMacOSX()) ALT_DOWN_MASK else CTRL_DOWN_MASK
+object CmdOrCtrl : KeyMask() {
+    override val keyCode = if (Utils.isMacOSX()) META_DOWN_MASK else CTRL_DOWN_MASK
 }
 
 class KeyCombination(

@@ -86,12 +86,9 @@ public class Clipboard {
         net.getNetwork().addObjects(copy);
 
         // Select copied objects after pasting them
-        // TODO
-        // List<ScreenElement> toSelect = copy.stream()
-        //         .map(net.getObjectNodeMap()::get)
-        //         .collect(Collectors.toList());
-        // net.setSelection(toSelect);
+        copy.forEach(NetworkModel::select);
 
+        // Paste objects intelligently using placement
         net.getPlacementManager().pasteObjects(copy.stream()
                 .filter(LocatableModel.class::isInstance)
                 .map(LocatableModel.class::cast)

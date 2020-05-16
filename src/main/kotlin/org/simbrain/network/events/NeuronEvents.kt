@@ -10,7 +10,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class NeuronEvents(val neuron: Neuron) : Event(PropertyChangeSupport(neuron)), LocationEvents {
+class NeuronEvents(val neuron: Neuron) : NetworkModelEvents(neuron), LocationEvents {
 
     fun onDelete(handler: Consumer<Neuron>) = "Delete".itemRemovedEvent(handler)
     fun fireDelete() = "Delete"(old = neuron)

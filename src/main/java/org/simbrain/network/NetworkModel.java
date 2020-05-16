@@ -31,4 +31,15 @@ public interface NetworkModel {
      */
     void applyBufferValues();
 
+    /**
+     * Return a reference to that model type's instance of [NetworkModelEvent]
+     */
+    NetworkModelEvents getEvents();
+
+    /**
+     * Select this network model.
+     */
+    default void select() {
+        getEvents().fireSelected();
+    }
 }

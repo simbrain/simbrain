@@ -35,7 +35,6 @@ abstract class ConditionallyEnabledAction(
 
     private fun updateAction() {
         isEnabled = with(networkPanel.selectionManager) {
-            print(selection)
             when (updateType) {
                 EnablingCondition.NEURONS -> selection.any { it is NeuronNode }
                 EnablingCondition.SYNAPSES -> selection.any { it is SynapseNode }

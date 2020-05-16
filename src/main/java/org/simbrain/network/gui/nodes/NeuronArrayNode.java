@@ -132,7 +132,10 @@ public class NeuronArrayNode extends ScreenElement {
             //interactionBox.setText((String) evt.getNewValue());
             //interactionBox.updateText();
         });
-
+        events.onSelected(s -> {
+            getNetworkPanel().getSelectionManager().add(this);
+        });
+        
         // Set up main items
         borderBox.setPickable(true);
         addChild(backgroundImage);

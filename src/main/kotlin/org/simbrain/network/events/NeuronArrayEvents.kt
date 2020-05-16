@@ -9,7 +9,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class NeuronArrayEvents(val neuronArray: NeuronArray) : Event(PropertyChangeSupport(neuronArray)), LocationEvents {
+class NeuronArrayEvents(val neuronArray: NeuronArray) : NetworkModelEvents(neuronArray), LocationEvents {
 
     fun onDelete(handler: Consumer<NeuronArray>) = "Delete".itemRemovedEvent(handler)
     fun fireDelete() = "Delete"(old = neuronArray)

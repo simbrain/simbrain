@@ -8,7 +8,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class NetworkTextEvents(val text: NetworkTextObject) : Event(PropertyChangeSupport(text)), LocationEvents {
+class NetworkTextEvents(val text: NetworkTextObject) : NetworkModelEvents(text), LocationEvents {
 
     fun onDelete(handler: Consumer<NetworkTextObject>) = "Delete".itemRemovedEvent(handler)
     fun fireDelete() = "Delete"(old = text)

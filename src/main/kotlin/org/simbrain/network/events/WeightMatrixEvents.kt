@@ -10,7 +10,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class WeightMatrixEvents(val wm: WeightMatrix) : Event(PropertyChangeSupport(wm)) {
+class WeightMatrixEvents(val wm: WeightMatrix) : NetworkModelEvents(wm) {
 
     fun onDelete(handler: Consumer<WeightMatrix>) = "Delete".itemRemovedEvent(handler)
     fun fireDelete() = "Delete"(old = wm)

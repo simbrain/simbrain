@@ -558,7 +558,8 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         return getCenterLocation(neuronGroupList);
     }
 
-    public SubnetworkEvents getEvents() {
+    public SubnetworkEvents
+    getEvents() {
         return events;
     }
 

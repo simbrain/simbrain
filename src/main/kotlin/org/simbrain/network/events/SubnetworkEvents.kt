@@ -9,7 +9,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class SubnetworkEvents(val subnet: Subnetwork) : Event(PropertyChangeSupport(subnet)), LocationEvents {
+class SubnetworkEvents(val subnet: Subnetwork) : NetworkModelEvents(subnet), LocationEvents {
 
     fun onDelete(handler: Consumer<Subnetwork>) = "Delete".itemRemovedEvent(handler)
     fun fireDelete() = "Delete"(old = subnet)

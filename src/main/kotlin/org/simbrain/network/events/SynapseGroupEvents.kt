@@ -11,7 +11,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class SynapseGroupEvents(val sg: SynapseGroup) : Event(PropertyChangeSupport(sg)) {
+class SynapseGroupEvents(val sg: SynapseGroup) : NetworkModelEvents(sg) {
 
     fun onDelete(handler: Consumer<SynapseGroup>) = "Delete".itemRemovedEvent(handler)
     fun fireDelete() = "Delete"(old = sg)

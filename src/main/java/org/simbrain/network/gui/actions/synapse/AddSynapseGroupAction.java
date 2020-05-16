@@ -53,10 +53,7 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
 
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         displaySynapseGroupDialog(networkPanel);
     }
@@ -68,13 +65,6 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
      * @param networkPanel the network panel in which to add the group.
      */
     public static boolean displaySynapseGroupDialog(NetworkPanel networkPanel) {
-
-        // TODO
-        // // There must be at least one source and target neuron group selected
-        // if (!ConditionallyEnabledAction
-        //         .sourceAndTargetNeuronGroupsSelected(networkPanel)) {
-        //     return false;
-        // }
 
         // Placed as a separate method since it is reused elsewhere.
         NeuronGroup src = networkPanel.getSelectionManager().filterSelectedSourceModels(NeuronGroup.class).get(0);

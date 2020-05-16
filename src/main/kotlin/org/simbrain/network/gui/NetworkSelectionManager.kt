@@ -5,10 +5,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.dl4j.NeuronArray
 import org.simbrain.network.events.NetworkSelectionEvent
 import org.simbrain.network.groups.AbstractNeuronCollection
-import org.simbrain.network.gui.nodes.NeuronArrayNode
-import org.simbrain.network.gui.nodes.NeuronCollectionNode
-import org.simbrain.network.gui.nodes.NeuronNode
-import org.simbrain.network.gui.nodes.ScreenElement
+import org.simbrain.network.gui.nodes.*
 import java.util.concurrent.CopyOnWriteArraySet
 
 /**
@@ -84,7 +81,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      * Add a single node to the selection.
      */
     fun add(screenElement: ScreenElement) = modifySelection {
-        add(screenElement)
+        add(screenElement.selectionTarget)
     }
 
     /**
@@ -113,7 +110,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      */
     fun set(screenElements: Collection<ScreenElement>) = modifySelection {
         clear()
-        addAll(screenElements)
+        addAll(screenElements.map{it.selectionTarget})
     }
 
     /**
@@ -121,7 +118,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      */
     fun set(screenElement: ScreenElement) = modifySelection {
         clear()
-        add(screenElement)
+        add(screenElement.selectionTarget)
     }
 
     /**
@@ -145,7 +142,9 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      */
     fun convertSelectedNodesToSourceNodes() = modifySourceSelection {
         clear()
-        addAll(selection.filter { it is NeuronNode || it is NeuronCollectionNode || it is NeuronArrayNode })
+        addAll(selection.filter { it is NeuronNode || it is NeuronCollectionNode || it is NeuronArrayNode || it is
+                InteractionBox
+        })
     }
 
     /**

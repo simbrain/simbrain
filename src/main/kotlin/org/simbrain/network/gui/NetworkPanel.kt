@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
+import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkModel
@@ -48,11 +49,9 @@ import javax.swing.event.InternalFrameEvent
 class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network) : JPanel() {
 
     // TODO: Think about null component
-    //TODO: Change javadocs to single line
+    // TODO: Change javadocs to single line
 
     val canvas = PCanvas()
-
-    var editMode: EditMode = EditMode.SELECTION
 
     /**
      * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
@@ -186,7 +185,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             addInputEventListener(MouseEventHandler(this@NetworkPanel))
             addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
             addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
-            addInputEventListener(TextEventHandler(this@NetworkPanel))
+            addInputEventListener(textHandle)
             addInputEventListener(WandEventHandler(this@NetworkPanel));
 
             // Don't show text when the canvas is sufficiently zoomed in
@@ -378,7 +377,11 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
     /**
      * Add representation of specified text to network panel.
      */
-    fun add(text: NetworkTextObject) = addScreenElement { TextNode(this, text) }
+    fun add(text: NetworkTextObject) = addScreenElement {
+        TextNode(this, text).apply{
+            textHandle.startEditing(null, this.pStyledText);
+        }
+    }
 
     // TODO: refactor network remove model
     // better to have a series of remove methods, similar to the add methods
@@ -404,6 +407,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
                     is SynapseNode -> removeSynapse(screenElement.synapse)
                     is NeuronArrayNode -> removeNeuronArray(screenElement.neuronArray)
                     is WeightMatrixNode -> removeWeightMatrix(screenElement.model)
+                    is MultiLayerNetworkNode -> removeMultiLayer(screenElement.model)
                     is TextNode -> deleteText(screenElement.textObject)
                     is InteractionBox -> deleteGroup(screenElement)
                 }
@@ -535,10 +539,14 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 
     fun contextualIncrementSelectedObjects() {
         selectionManager.filterSelectedModels<Neuron>().forEach { it.updateRule.contextualIncrement(it) }
+        selectionManager.filterSelectedModels<NeuronArray>().forEach { it.increment() }
+        selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.increment() }
     }
 
     fun contextualDecrementSelectedObjects() {
         selectionManager.filterSelectedModels<Neuron>().forEach { it.updateRule.contextualDecrement(it) }
+        selectionManager.filterSelectedModels<NeuronArray>().forEach { it.decrement() }
+        selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.decrement() }
     }
 
     fun clearSelectedObjects() {
@@ -547,6 +555,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
             filterSelectedModels<Synapse>().forEach { it.forceSetStrength(0.0) }
             filterSelectedModels<NeuronArray>().forEach { it.clear() }
             filterSelectedModels<NeuronGroup>().forEach { it.clearActivations() }
+            filterSelectedModels<WeightMatrix>().forEach { it.clear() }
         }
     }
 
@@ -671,6 +680,17 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 //            updateComplete = it
 //            repaint()
 //        })
+    }
+
+    var editMode: EditMode = EditMode.SELECTION
+        set(newEditMode) {
+        val oldEditMode = editMode
+        field = newEditMode
+        if (editMode == EditMode.WAND) {
+            editMode.resetWandCursor()
+        }
+        firePropertyChange("editMode", oldEditMode, editMode)
+        cursor = editMode.cursor
     }
 
 }

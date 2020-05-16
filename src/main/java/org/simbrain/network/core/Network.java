@@ -482,6 +482,16 @@ public class Network {
         events.fireNeuronArrayRemoved(na);
     }
 
+    /**
+     * Remove a multi-layer network
+     */
+    public void removeMultiLayer(MultiLayerNet mln) {
+        multiLayerNetworks.remove(mln);
+        removeArrayConnectable(mln);
+        //mln.getEvents().fireDelete();
+        events.fireMultiLayerNetworkRemoved(mln);
+    }
+
     private void removeArrayConnectable(ArrayConnectable ac) {
         removeWeightMatrix(ac.getIncomingWeightMatrix());
         List<WeightMatrix> toDelete = new ArrayList<>(ac.getOutgoingWeightMatrices());
@@ -498,6 +508,8 @@ public class Network {
         weightMatrices.remove(wm);
         events.fireWeightMatrixRemoved(wm);
     }
+
+
 
     /**
      * Deletes a neuron from the network.

@@ -43,7 +43,7 @@ abstract class ConditionallyEnabledAction(
                 EnablingCondition.SOURCE_AND_TARGET_NEURONS ->
                     sourceSelection.any { it is NeuronNode } && selection.any { it is NeuronNode }
                 EnablingCondition.SOURCE_AND_TARGET_NEURON_GROUPS ->
-                    sourceSelection.any { it is NeuronGroupNode } && selection.any { it is NeuronGroupNode }
+                    sourceSelection.any { it.node is NeuronGroupNode } && selection.any { it.node is NeuronGroupNode }
             }
         }
     }

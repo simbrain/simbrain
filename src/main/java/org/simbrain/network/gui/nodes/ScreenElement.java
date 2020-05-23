@@ -172,13 +172,6 @@ public abstract class ScreenElement extends PPath.Float {
     }
 
     /**
-     * Override if selection events should select something besides the PNode that overrides ScreenElement.
-     */
-    public ScreenElement getSelectionTarget() {
-        return this;
-    }
-
-    /**
      * Returns true if the provided bounds intersect this screen element
      */
     public boolean isIntersecting(PBounds bound) {

@@ -338,8 +338,4 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         return a.getX() == b.getX() && a.getY() == b.getY();
     }
 
-    @Override
-    public ScreenElement getSelectionTarget() {
-        return getInteractionBox();
-    }
 }

@@ -81,14 +81,14 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      * Add a single node to the selection.
      */
     fun add(screenElement: ScreenElement) = modifySelection {
-        add(screenElement.selectionTarget)
+        add(screenElement)
     }
 
     /**
      * Add a collection of nodes to the selection.
      */
     fun add(screenElements: Collection<ScreenElement>) = modifySelection {
-        addAll(screenElements.map { it.selectionTarget })
+        addAll(screenElements)
     }
 
     /**
@@ -110,7 +110,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      */
     fun set(screenElements: Collection<ScreenElement>) = modifySelection {
         clear()
-        addAll(screenElements.map{it.selectionTarget})
+        addAll(screenElements)
     }
 
     /**
@@ -118,7 +118,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      */
     fun set(screenElement: ScreenElement) = modifySelection {
         clear()
-        add(screenElement.selectionTarget)
+        add(screenElement)
     }
 
     /**

@@ -26,8 +26,6 @@ import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.util.StandardDialog
 import javax.swing.AbstractAction
-import javax.swing.JComponent
-import javax.swing.KeyStroke
 
 
 class NetworkActions(val networkPanel: NetworkPanel) {
@@ -80,10 +78,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val zoomToFitPageAction = ZoomToFitPageAction(networkPanel)
 
     val neuronGroupAction = addGroupAction("Add Neuron Group") {
-        NeuronGroupDialog(it).also {
-            networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('g'), this)
-            networkPanel.actionMap.put(this, this)
-        }
+        NeuronGroupDialog(it)
     }
 
     val clipboardActions

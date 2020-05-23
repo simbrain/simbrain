@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
@@ -101,10 +102,11 @@ fun NetworkPanel.createSynapseGroupDialog(synapseGroup: SynapseGroup) =
  *
  * @param network the model network to show
  */
-fun showNetwork(net: Network) {
+fun showNetwork(networkComponent: NetworkComponent) {
     // TODO: Creation outside of desktop lacks menus
     val frame = JFrame()
-    val np = NetworkPanel(null, net)
+    val np = NetworkPanel(networkComponent)
+    // component?.getDesktop()?.addInternalFrame(frame)
     //np.initScreenElements()
     frame.contentPane = np
     frame.preferredSize = Dimension(500, 500)
@@ -121,7 +123,6 @@ fun showNetwork(net: Network) {
 fun NetworkPanel.displayPanel(panel: JPanel?, title: String?): GenericFrame? {
     val frame = GenericJInternalFrame()
     frame.contentPane = panel
-    component?.getDesktop()?.addInternalFrame(frame)
     frame.pack()
     frame.isResizable = true
     frame.isMaximizable = true

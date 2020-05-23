@@ -1,5 +1,7 @@
 package org.simbrain.network.gui
 
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.AttributeContainer
@@ -168,6 +170,11 @@ val NetworkPanel.neuronContextMenu get() = with(networkActions) {
         addSeparator()
         add(testInputAction)
         add(showWeightMatrixAction)
+        if (selectionManager.filterSelectedNodes<NeuronNode>().size == 1) {
+            val node = selectionManager.filterSelectedNodes<NeuronNode>().get(0)
+            addSeparator()
+            add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
+        }
     }
 }
 
@@ -183,8 +190,6 @@ val NetworkPanel.synapseContextMenu get() = with(networkActions) {
     }
 }
 
-fun NetworkPanel.createCouplingMenu(container: AttributeContainer) = component?.workspaceComponent?.let {
-    CouplingMenu(it, container)
-}
+fun NetworkComponent.createCouplingMenu(container: AttributeContainer) = CouplingMenu(this, container)
 
 private fun AbstractAction.toMenuItem() = JCheckBoxMenuItem(this)

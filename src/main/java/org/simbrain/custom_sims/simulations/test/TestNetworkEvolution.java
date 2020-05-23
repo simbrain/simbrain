@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.test;
 
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.geneticalgorithm.Agent;
@@ -68,13 +69,15 @@ public class TestNetworkEvolution  {
             //System.out.println(population.getFittestAgent().getGenome().getIntChromosome());
             if (bestFitness > fitnessThreshold) {
                 Network winner =  population.getFittestAgent().getPhenotype();
-                showNetwork(winner);
+                NetworkComponent nc = new NetworkComponent("Winner", winner);
+                showNetwork(nc);
                 return;
             }
             population.replenish();
         }
         Network winner =  population.getFittestAgent().getPhenotype();
-        showNetwork(winner);
+        NetworkComponent nc = new NetworkComponent("Winner", winner);
+        showNetwork(nc);
 
     }
 

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -69,18 +70,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         this.neuronGroup = group;
         setInteractionBox(new NeuronGroupInteractionBox(networkPanel));
         getInteractionBox().setText(neuronGroup.getLabel());
-    }
-
-    /**
-     * Select the neurons in this group.
-     */
-    public void selectNeurons() {
-        final var nodes = neuronGroup.getNeuronList().stream()
-                .map(getNetworkPanel().getNeuronNodeMapping()::get)
-                .collect(Collectors.toList());
-
-        getNetworkPanel().getSelectionManager().clear();
-        getNetworkPanel().getSelectionManager().set(nodes);
     }
 
     /**
@@ -235,7 +224,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         // Coupling menu
         menu.addSeparator();
-        JMenu couplingMenu = createCouplingMenu(getNetworkPanel(), neuronGroup);
+        JMenu couplingMenu = createCouplingMenu(getNetworkPanel().getNetworkComponent(), neuronGroup);
         if (couplingMenu != null) {
             menu.add(couplingMenu);
         }

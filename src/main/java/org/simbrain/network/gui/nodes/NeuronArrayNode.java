@@ -316,7 +316,7 @@ public class NeuronArrayNode extends ScreenElement {
 
         // Coupling menu
         contextMenu.addSeparator();
-        JMenu couplingMenu = createCouplingMenu(networkPanel, neuronArray);
+        JMenu couplingMenu = createCouplingMenu(networkPanel.getNetworkComponent(), neuronArray);
         if (couplingMenu != null) {
             contextMenu.add(couplingMenu);
         }

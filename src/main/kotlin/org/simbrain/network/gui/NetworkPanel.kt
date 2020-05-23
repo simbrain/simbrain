@@ -6,6 +6,7 @@ import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
 import org.simbrain.network.core.*
@@ -44,14 +45,21 @@ import javax.swing.event.InternalFrameAdapter
 import javax.swing.event.InternalFrameEvent
 
 /**
- * Todo: Should eventually replace NetworkPanel and NetworkPanelDesktop
+ * Main GUI representation of a [Network].
  */
-class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network) : JPanel() {
+class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
-    // TODO: Think about null component
-    // TODO: Change javadocs to single line
-
+    /**
+     * Main Piccolo canvas object.
+     *
+     * @see https://github.com/piccolo2d/piccolo2d.java
+     */
     val canvas = PCanvas()
+
+    /**
+     * Reference to the model network
+     */
+    val network = networkComponent.network
 
     /**
      * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
@@ -59,35 +67,14 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
      * handled by keybindings).
      */
     val selectionManager = NetworkSelectionManager(this).apply {
-        events.apply {
-            onSelection { old, new ->
-                val (removed, added) = old complement new
-                removed.forEach { NodeHandle.removeSelectionHandleFrom(it) }
-                added.forEach {
-                    if (it is InteractionBox) {
-                        NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
-                    } else {
-                        NodeHandle.addSelectionHandleTo(it)
-                    }
-                }
-            }
-            onSourceSelection { old, new ->
-                val (removed, added) = old complement new
-                removed.forEach { NodeHandle.removeSourceHandleFrom(it) }
-                added.forEach {
-                    if (it is InteractionBox) {
-                        NodeHandle.addSourceHandleTo(it, NodeHandle.INTERACTION_BOX_SOURCE_STYLE)
-                    } else {
-                        NodeHandle.addSourceHandleTo(it)
-                    }
-                }
-            }
-        }
+        setUpSelectionEvents()
     }
 
     val networkActions = NetworkActions(this)
 
-    @Deprecated("Consider removing")
+    /**
+     * Associates neurons with neuron nodes for use mainly in creating synapse nodes.
+     */
     val neuronNodeMapping: Map<Neuron, NeuronNode> = HashMap()
 
     val timeLabel = TimeLabel(this).apply { update() }
@@ -100,16 +87,22 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
 
     var showTime = true
 
+    private val toolbars: JPanel = JPanel(BorderLayout())
+
     val mainToolBar = createMainToolBar()
+
     val runToolBar = createRunToolBar()
+
     val editToolBar = createEditToolBar()
 
     var backgroundColor = Color.white!!
 
     val isRunning
-            get()  = network.isRunning
+        get() = network.isRunning
 
-    /** How much to nudge objects per key click. */
+    /**
+     * How much to nudge objects per key click.
+     */
     var nudgeAmount = 2.0
 
     /**
@@ -117,12 +110,10 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
      */
     val textHandle: TextEventHandler = TextEventHandler(this)
 
-    private val toolbars: JPanel = JPanel(BorderLayout())
-
     /**
      * Manages keyboard-based connections.
      */
-     val quickConnector = QuickConnectionManager()
+    val quickConnector = QuickConnectionManager()
 
     /**
      * Manages placement of new nodes, groups, etc.
@@ -378,7 +369,7 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
      * Add representation of specified text to network panel.
      */
     fun add(text: NetworkTextObject) = addScreenElement {
-        TextNode(this, text).apply{
+        TextNode(this, text).apply {
             textHandle.startEditing(null, this.pStyledText);
         }
     }
@@ -676,21 +667,48 @@ class NetworkPanel(val component: NetworkDesktopComponent?, val network: Network
         event.onNeuronCollectionAdded(Consumer { add(it) })
         event.onWeightMatrixRemoved(Consumer { it.delete() })
         event.onUpdateTimeDisplay(Consumer { d: Boolean? -> timeLabel.update() })
-//        event.onUpdateCompleted(Consumer {
-//            updateComplete = it
-//            repaint()
-//        })
+        //        event.onUpdateCompleted(Consumer {
+        //            updateComplete = it
+        //            repaint()
+        //        })
     }
 
     var editMode: EditMode = EditMode.SELECTION
         set(newEditMode) {
-        val oldEditMode = editMode
-        field = newEditMode
-        if (editMode == EditMode.WAND) {
-            editMode.resetWandCursor()
+            val oldEditMode = editMode
+            field = newEditMode
+            if (editMode == EditMode.WAND) {
+                editMode.resetWandCursor()
+            }
+            firePropertyChange("editMode", oldEditMode, editMode)
+            cursor = editMode.cursor
         }
-        firePropertyChange("editMode", oldEditMode, editMode)
-        cursor = editMode.cursor
+
+    private fun NetworkSelectionManager.setUpSelectionEvents() {
+        events.apply {
+            onSelection { old, new ->
+                val (removed, added) = old complement new
+                removed.forEach { NodeHandle.removeSelectionHandleFrom(it) }
+                added.forEach {
+                    if (it is InteractionBox) {
+                        NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
+                    } else {
+                        NodeHandle.addSelectionHandleTo(it)
+                    }
+                }
+            }
+            onSourceSelection { old, new ->
+                val (removed, added) = old complement new
+                removed.forEach { NodeHandle.removeSourceHandleFrom(it) }
+                added.forEach {
+                    if (it is InteractionBox) {
+                        NodeHandle.addSourceHandleTo(it, NodeHandle.INTERACTION_BOX_SOURCE_STYLE)
+                    } else {
+                        NodeHandle.addSourceHandleTo(it)
+                    }
+                }
+            }
+        }
     }
 
 }

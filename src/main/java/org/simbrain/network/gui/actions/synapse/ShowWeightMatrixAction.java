@@ -44,10 +44,7 @@ public final class ShowWeightMatrixAction extends ConditionallyEnabledAction {
         putValue(SHORT_DESCRIPTION, "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)");
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         JPanel panel = WeightMatrixViewer.getWeightMatrixPanel(new WeightMatrixViewer(getNetworkPanel()));
         NetworkDialogsKt.displayPanel(getNetworkPanel(), panel, "Weight matrix viewer");

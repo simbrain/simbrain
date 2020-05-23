@@ -218,7 +218,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         // Coupling menu
         contextMenu.addSeparator();
-        JMenu couplingMenu = createCouplingMenu(networkPanel, weightMatrix);
+        JMenu couplingMenu = createCouplingMenu(networkPanel.getNetworkComponent(), weightMatrix);
         if (couplingMenu != null) {
             contextMenu.add(couplingMenu);
         }

@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.groups.AbstractNeuronCollection;
@@ -67,6 +68,13 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         events.onSelected(s -> {
             getNetworkPanel().getSelectionManager().add(this);
         });
+    }
+
+    /**
+     * Select the neurons in this group.
+     */
+    public void selectNeurons() {
+        getNeuronNodes().stream().map(NeuronNode::getNeuron).forEach(NetworkModel::select);
     }
 
     /**

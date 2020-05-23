@@ -534,9 +534,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         firePropertyChange(-1, "neuron", oldNeuron, neuron);
     }
 
-    /**
-     * @see ScreenElement
-     */
     protected JPopupMenu createContextMenu() {
         return getContextMenu();
     }

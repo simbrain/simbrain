@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
@@ -121,20 +122,13 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         menu.add(selectSynapses);
         Action selectIncomingNodes = new AbstractAction("Select Incoming Neurons") {
             public void actionPerformed(final ActionEvent event) {
-                List<NeuronNode> incomingNodes = synapseGroup.getSourceNeurons().stream()
-                        .map(getNetworkPanel().getNeuronNodeMapping()::get).collect(Collectors.toList());
-                getNetworkPanel().getSelectionManager().clear();
-                getNetworkPanel().getSelectionManager().set(incomingNodes);
+                synapseGroup.getSourceNeurons().forEach(NetworkModel::select);
             }
         };
         menu.add(selectIncomingNodes);
         Action selectOutgoingNodes = new AbstractAction("Select Outgoing Neurons") {
             public void actionPerformed(final ActionEvent event) {
-                List<NeuronNode> outgoingNodes = synapseGroup.getTargetNeurons().stream()
-                        .map(getNetworkPanel().getNeuronNodeMapping()::get).collect(Collectors.toList());
-
-                getNetworkPanel().getSelectionManager().clear();
-                getNetworkPanel().getSelectionManager().set(outgoingNodes);
+                synapseGroup.getTargetNeurons().forEach(NetworkModel::select);
             }
         };
         menu.add(selectOutgoingNodes);
@@ -196,7 +190,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         menu.add(tsvCheckBox);
 
         // Coupling menu
-        JMenu couplingMenu = createCouplingMenu(getNetworkPanel(), synapseGroup);
+        JMenu couplingMenu = createCouplingMenu(getNetworkPanel().getNetworkComponent(), synapseGroup);
         if (couplingMenu != null) {
             menu.addSeparator();
             menu.add(couplingMenu);

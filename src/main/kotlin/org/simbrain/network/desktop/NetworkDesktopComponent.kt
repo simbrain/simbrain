@@ -38,7 +38,7 @@ import javax.swing.JOptionPane
  */
 class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent) : GuiComponent<NetworkComponent?>(frame, component) {
 
-    val networkPanel = NetworkPanel(this, component.network)
+    val networkPanel = NetworkPanel(component)
 
     /**
      * Create and return a new File menu for this Network panel.

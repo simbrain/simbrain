@@ -1,6 +1,7 @@
 package org.simbrain.network.gui;
 
 import org.junit.Test;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -12,7 +13,8 @@ public class NetworkPanelTest {
     @Test
     public void basicTest() {
         Network net = new Network();
-        NetworkPanel np = new NetworkPanel(null, net);
+        NetworkComponent nc = new NetworkComponent("Test", net);
+        NetworkPanel np = new NetworkPanel(nc);
 
         Neuron n1 = new Neuron(net);
         Neuron n2 = new Neuron(net);

@@ -53,10 +53,7 @@ public final class ShowNetworkUpdaterDialog extends AbstractAction {
         this.networkPanel = networkPanel;
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
 
         StandardDialog dialog = new StandardDialog();

@@ -51,14 +51,9 @@ public final class ShowPrioritiesAction extends AbstractAction {
         putValue(SHORT_DESCRIPTION, "Show neuron priorities (for use in priority update)");
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
-
         JCheckBoxMenuItem cb = (JCheckBoxMenuItem) event.getSource();
         networkPanel.setPrioritiesVisible(cb.isSelected());
-
     }
 }

@@ -125,13 +125,15 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
 
 fun NetworkPanel.createViewMenu() = JMenu("View").apply {
     with(networkActions) {
-        add(javax.swing.JMenu("Toolbars").apply {
+        add(JMenu("Toolbars").apply {
             add(showRunToolBarAction.toMenuItem().apply { isSelected = runToolBar.isVisible })
             add(showMainToolBarAction.toMenuItem().apply { isSelected = mainToolBar.isVisible })
             add(showEditToolBarAction.toMenuItem().apply { isSelected = editToolBar.isVisible })
         })
+        addSeparator()
+        add(JCheckBoxMenuItem(showPrioritiesAction).apply { this.state = networkPanel.prioritiesVisible })
+        add(JCheckBoxMenuItem(showWeightsAction).apply { this.state = networkPanel.looseWeightsVisible })
     }
-    addSeparator()
 }
 
 val NetworkPanel.connectionMenu

@@ -51,10 +51,7 @@ public final class ShowWorkspaceUpdaterDialog extends AbstractAction {
         this.desktop = desktop;
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(ActionEvent event) {
         StandardDialog dialog = new StandardDialog(desktop.getFrame(), "Edit Update Sequence");
         WorkspaceUpdateManagerPanel updatePanel = new WorkspaceUpdateManagerPanel(desktop.getWorkspace(), dialog);

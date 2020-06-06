@@ -51,8 +51,8 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
         fileMenu.add(SaveAction(this))
         fileMenu.add(SaveAsAction(this))
         fileMenu.addSeparator()
-        //fileMenu.add(new ShowNetworkUpdaterDialog(networkPanel));
-        //fileMenu.add(new ShowNetworkPreferencesAction(networkPanel));
+        fileMenu.add(networkPanel.networkActions.showNetworkUpdaterDialog);
+        fileMenu.add(networkPanel.networkActions.showNetworkPreferencesAction);
         fileMenu.addSeparator()
         fileMenu.add(CloseAction(workspaceComponent))
         return fileMenu

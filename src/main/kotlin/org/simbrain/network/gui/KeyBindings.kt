@@ -127,7 +127,6 @@ fun NetworkPanel.putInputMap(keyStroke: KeyStroke, mapKey: String) {
 inline fun ActionMap.put(key: String, crossinline action: () -> Unit) {
     put(key, object : AbstractAction() {
         override fun actionPerformed(e: ActionEvent) {
-            println(e)
             action()
         }
     })

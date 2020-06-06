@@ -15,18 +15,20 @@ fun main() {
         val network = network {
             +neuron1
             val neuron2 = +neuron()
-            (neuron1 to neuron2) {
+            (neuron1 connectTo neuron2) {
                 learningRule = HebbianRule()
             }
         }
 
+        // Objects can be treated as built within the sim context
+        // After .run is called they are actually built
         sim {
-            setupNetwork(network) // TODO
+            setupNetwork(network) // TODO. This will be removed.
             network.iterate(10) {
                 println(neuron1.self)
                 neuron1.self.update()
             }
         }
-    }.iterate()
+    }.run()
 
 }

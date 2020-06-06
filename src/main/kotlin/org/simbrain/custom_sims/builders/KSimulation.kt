@@ -65,7 +65,7 @@ open class KSimulation {
 
     }
 
-    fun iterate() {
+    fun run() {
         sims.forEach { it.apply { runtime() } }
     }
 
@@ -117,6 +117,7 @@ class SimContext(val runtime: SimContext.() -> Unit) {
     val NeuronBuilder.activation
         get() = getNeuron(this).activation
 
+    // Provides accesss to Neuron object from NeuronBuilder object
     val NeuronBuilder.self get() = getNeuron(this)
 
     fun getNeuron(neuronBuilder: NeuronBuilder) = neurons.getOrPut(neuronBuilder) {

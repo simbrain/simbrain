@@ -20,17 +20,17 @@ class NetworkBuilder : SimComponentBuilder<Network> {
         this@NetworkBuilder.synapses.add(this)
     }
 
-    infix fun NeuronBuilder.to(other: NeuronBuilder) = SynapseBuilderStub(this, other)
+    infix fun NeuronBuilder.connectTo(other: NeuronBuilder) = SynapseBuilderStub(this, other)
 
-    infix fun Collection<NeuronBuilder>.to(other: NeuronBuilder): List<SynapseBuilderStub> {
+    infix fun Collection<NeuronBuilder>.connectTo(other: NeuronBuilder): List<SynapseBuilderStub> {
         return this.map { source -> SynapseBuilderStub(source, other) }
     }
 
-    infix fun NeuronBuilder.to(other: Collection<NeuronBuilder>): List<SynapseBuilderStub> {
+    infix fun NeuronBuilder.connectTo(other: Collection<NeuronBuilder>): List<SynapseBuilderStub> {
         return other.map { target -> SynapseBuilderStub(this, target) }
     }
 
-    infix fun Collection<NeuronBuilder>.to(other: Collection<NeuronBuilder>): List<SynapseBuilderStub> {
+    infix fun Collection<NeuronBuilder>.connectTo(other: Collection<NeuronBuilder>): List<SynapseBuilderStub> {
         // TODO: use connection strategy
         return (this cartesianProduct other)
                 .map { (source, target) -> SynapseBuilderStub(source, target) }

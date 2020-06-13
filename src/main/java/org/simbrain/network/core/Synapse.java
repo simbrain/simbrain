@@ -71,7 +71,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
             "than upper bound or less than lower bound you must set those first, and close this dialog.",
             probDist = "Normal", probParam1 = .1, probParam2 = .5,
             order = 1)
-    private double strength = 0;
+    private double strength = 1;
 
     @Override
     public String getName() {

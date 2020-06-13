@@ -1,6 +1,5 @@
 package org.simbrain.network.events
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
@@ -21,8 +20,8 @@ import java.util.function.Consumer
  */
 class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 
-    fun onUpdateCompleted(handler: Consumer<Boolean>) = "UpdateCompleted".itemAddedEvent(handler)
-    fun fireUpdateCompleted(completed: Boolean) = "UpdateCompleted"(new = completed)
+    fun onUpdateCompleted(handler:Runnable) = "UpdateCompleted".event(handler)
+    fun fireUpdateCompleted() = "UpdateCompleted"()
 
     fun onUpdateTimeDisplay(handler: Consumer<Boolean>) = "UpdateTimeDisplay".itemAddedEvent(handler)
     fun fireUpdateTimeDisplay(display: Boolean) = "UpdateTimeDisplay"(new = display)

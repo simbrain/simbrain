@@ -208,9 +208,6 @@ public class Network {
      */
     public void update() {
 
-        // TODO: Why no fireupdatecompleted(true) at end?
-        events.fireUpdateCompleted(false);
-
         // Main update
         updateManager.invokeAllUpdates();
 
@@ -219,6 +216,8 @@ public class Network {
         events.fireUpdateTimeDisplay(false);
         iterCount++;
         setUpdateCompleted(true);
+
+        events.fireUpdateCompleted();
 
     }
 

@@ -3,14 +3,12 @@ package org.simbrain.network.gui
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
-import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
 import org.simbrain.network.core.*
-import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.dl4j.ArrayConnectable
 import org.simbrain.network.dl4j.MultiLayerNet
 import org.simbrain.network.dl4j.NeuronArray
@@ -667,10 +665,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         event.onNeuronCollectionAdded(Consumer { add(it) })
         event.onWeightMatrixRemoved(Consumer { it.delete() })
         event.onUpdateTimeDisplay(Consumer { d: Boolean? -> timeLabel.update() })
-        //        event.onUpdateCompleted(Consumer {
-        //            updateComplete = it
-        //            repaint()
-        //        })
+        event.onUpdateCompleted(Runnable{repaint()})
     }
 
     var editMode: EditMode = EditMode.SELECTION

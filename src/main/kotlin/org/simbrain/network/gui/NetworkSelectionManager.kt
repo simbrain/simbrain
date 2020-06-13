@@ -138,6 +138,16 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     fun toggle(screenElements: Collection<ScreenElement>) = screenElements.forEach { toggle(it) }
 
     /**
+     * Unselect provided element
+     */
+    fun unselect(screenElement: ScreenElement) =  modifySelection { remove(screenElement) }
+
+    /**
+     * Unselect provided element
+     */
+    fun unselect(screenElements: Collection<ScreenElement>) = screenElements.forEach { unselect(it) }
+
+    /**
      * Convert all selected nodes to selected source "red" nodes.
      */
     fun convertSelectedNodesToSourceNodes() = modifySourceSelection {
@@ -177,5 +187,6 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
         (selection as CopyOnWriteArraySet).action()
         events.fireSelection(old, selection)
     }
+
 
 }

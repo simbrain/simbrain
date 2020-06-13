@@ -85,6 +85,9 @@ public class Clipboard {
         // Add the copied object
         net.getNetwork().addObjects(copy);
 
+        // Unselect "old" copied objects
+        net.getSelectionManager().clear();
+
         // Select copied objects after pasting them
         copy.forEach(NetworkModel::select);
 

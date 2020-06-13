@@ -294,8 +294,8 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      */
     public void postUnmarshallingInit() {
         events = new NeuronEvents(this);
-        fanOut = new HashMap<Neuron, Synapse>();
-        fanIn = new ArrayList<Synapse>();
+        fanOut = new HashMap<>();
+        fanIn = new ArrayList<>();
         if (polarity == null) {
             polarity = Polarity.BOTH;
         }

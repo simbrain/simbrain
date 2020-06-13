@@ -30,7 +30,6 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
     // fun onAdded(handler: Consumer<NetworkModel>) = "Added".itemAddedEvent(handler)
     // fun fireAdded(model: NetworkModel) = "Added"(new = model)
 
-
     fun onNeuronAdded(handler: Consumer<Neuron>) = "NeuronAdded".itemAddedEvent(handler)
     fun fireNeuronAdded(neuron: Neuron) = "NeuronAdded"(new = neuron)
     fun onNeuronRemoved(handler: Consumer<Neuron>) = "NeuronRemoved".itemRemovedEvent(handler)

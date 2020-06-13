@@ -83,6 +83,17 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             zoomToFitPage()
         }
 
+    var editMode: EditMode = EditMode.SELECTION
+        set(newEditMode) {
+            val oldEditMode = editMode
+            field = newEditMode
+            if (editMode == EditMode.WAND) {
+                editMode.resetWandCursor()
+            }
+            firePropertyChange("editMode", oldEditMode, editMode)
+            cursor = editMode.cursor
+        }
+
     var showTime = true
 
     private val toolbars: JPanel = JPanel(BorderLayout())
@@ -215,7 +226,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             }
         })
 
+        // Add all network elements (important for de-serializing)
+        network.models.forEach{add(it)}
+
     }
+
 
     @Deprecated("Use selectionManager instead.", ReplaceWith("selectionManager.selection"))
     val selectedNodes
@@ -369,6 +384,19 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     fun add(text: NetworkTextObject) = addScreenElement {
         TextNode(this, text).apply {
             textHandle.startEditing(null, this.pStyledText);
+        }
+    }
+
+    private fun add(model: NetworkModel) {
+        when(model) {
+            is Neuron -> add(model)
+            is Synapse -> add(model)
+            is NeuronArray -> add(model)
+            is NeuronCollection -> add(model)
+            is NeuronGroup -> add(model)
+            is SynapseGroup -> add(model)
+            is WeightMatrix -> add(model)
+            is Subnetwork -> add(model)
         }
     }
 
@@ -667,17 +695,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         event.onUpdateTimeDisplay(Consumer { d: Boolean? -> timeLabel.update() })
         event.onUpdateCompleted(Runnable{repaint()})
     }
-
-    var editMode: EditMode = EditMode.SELECTION
-        set(newEditMode) {
-            val oldEditMode = editMode
-            field = newEditMode
-            if (editMode == EditMode.WAND) {
-                editMode.resetWandCursor()
-            }
-            firePropertyChange("editMode", oldEditMode, editMode)
-            cursor = editMode.cursor
-        }
 
     private fun NetworkSelectionManager.setUpSelectionEvents() {
         events.apply {

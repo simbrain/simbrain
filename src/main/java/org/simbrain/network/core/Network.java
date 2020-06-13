@@ -883,35 +883,8 @@ public class Network {
      */
     private Object readResolve() {
 
-        // TODO: Temp code to handle xstream backwards compatibility issues
-        // Remove after converting all old sims
-        if(weightMatrices == null) {
-            weightMatrices = new HashSet<>();
-        }
-        if (neuronCollectionSet == null) {
-            neuronCollectionSet = new HashSet<>();
-        }
-        if (synapseGroups == null) {
-            synapseGroups = new ArrayList<>();
-        }
-        if (neuronGroups == null) {
-            neuronGroups = new ArrayList<>();
-        }
-        if (subnetworks == null) {
-            subnetworks = new ArrayList<>();
-        }
-        if (multiLayerNetworks == null) {
-            multiLayerNetworks = new ArrayList<>();
-        }
-        if (naList == null) {
-            naList = new ArrayList<>();
-        }
-        if (idManager == null) {
-            idManager = new SimpleIdManager();
-            initIdManager();
-        }
-
         events = new NetworkEvents(this);
+        updateCompleted = new AtomicBoolean(false);
 
         // Initialize update manager
         updateManager.postUnmarshallingInit();
@@ -926,7 +899,6 @@ public class Network {
         // Re-populate fan-in / fan-out for loose synapses
         getLooseSynapses().forEach(Synapse::postUnmarshallingInit);
 
-        updateCompleted = new AtomicBoolean(false);
         return this;
     }
 
@@ -1372,6 +1344,19 @@ public class Network {
 
     public SimpleIdManager getIdManager() {
         return idManager;
+    }
+
+    public List<NetworkModel> getModels() {
+        List<NetworkModel> networkModels = new ArrayList<>();
+        networkModels.addAll(looseNeurons);
+        networkModels.addAll(looseSynapses);
+        networkModels.addAll(neuronCollectionSet);
+        networkModels.addAll(neuronGroups);
+        networkModels.addAll(naList);
+        networkModels.addAll(weightMatrices);
+        networkModels.addAll(synapseGroups);
+        networkModels.addAll(subnetworks);
+        return networkModels;
     }
 
 }

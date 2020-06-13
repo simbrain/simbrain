@@ -129,9 +129,13 @@ public class Turning extends Effector {
      *
      * @param amount amount to turn.
      */
-    @Consumable(customDescriptionMethod = "getAttributeDescription")
+    @Consumable(customDescriptionMethod = "getAddAmountDescription")
     public void addAmount(double amount) {
         this.amount += amount;
+    }
+
+    public String getAddAmountDescription() {
+        return getAttributeDescription() + " (Add)";
     }
 
     /**

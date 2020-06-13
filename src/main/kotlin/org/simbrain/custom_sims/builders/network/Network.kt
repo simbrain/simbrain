@@ -8,8 +8,8 @@ class NetworkBuilder : SimComponentBuilder<Network> {
 
     fun buildProduct(context: NetworkBuilder.() -> Network) = context()
 
-    val neurons = HashSet<NeuronBuilder>()
-    val synapses = HashSet<SynapseBuilderStub>()
+    val neurons = ArrayList<NeuronBuilder>()
+    val synapses = ArrayList<SynapseBuilderStub>()
 
     operator fun NeuronBuilder.unaryPlus() = apply {
         network = this@NetworkBuilder

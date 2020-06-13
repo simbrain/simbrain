@@ -10,15 +10,12 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.workspace.CouplingManager
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import kotlin.random.Random
 
 open class KSimulation {
-
-    val workspace = Workspace()
 
     fun neuron(template: Neuron.() -> Unit = { }) = NeuronBuilder { apply(template) }
 
@@ -37,19 +34,13 @@ open class KSimulation {
 
     fun odorWorld(template: OdorWorldBuilder.() -> Unit) = OdorWorldBuilder().apply(template)
 
-    fun sim(init: SimContext.() -> Unit) {
-        SimContext(init).also { sims.add(it) }
-    }
+    fun task(init: Task.() -> Unit) = Task(init).also { tasks.add(it) }
 
     fun coupling(init: CouplingContext.() -> Unit) {
 
     }
 
-    fun couplingManager(init: CouplingManager.() -> Unit) {
-        workspace.couplingManager.apply(init)
-    }
-
-    val sims = ArrayList<SimContext>()
+    val tasks = ArrayList<Task>()
 
     inner class CouplingContext {
 
@@ -66,7 +57,7 @@ open class KSimulation {
     }
 
     fun run() {
-        sims.forEach { it.apply { runtime() } }
+        tasks.forEach { it.apply { runtime() } }
     }
 
     fun afterInitialize(context: (IterationContext) -> Unit) {
@@ -85,6 +76,8 @@ open class KSimulation {
 
 }
 
+fun sim(setup: KSimulation.() -> Unit) = KSimulation().apply(setup)
+
 interface SimComponentBuilder<T> {
 
 }
@@ -99,7 +92,9 @@ interface SimComponentBuilder<T> {
 //}
 
 
-class SimContext(val runtime: SimContext.() -> Unit) {
+class Task(val runtime: Task.() -> Unit) {
+
+    val workspace = Workspace()
 
     val neurons = HashMap<NeuronBuilder, Neuron>()
     val networks = HashMap<NetworkBuilder, NetworkComponent>()
@@ -110,7 +105,7 @@ class SimContext(val runtime: SimContext.() -> Unit) {
     fun NetworkBuilder.iterate(repeat: Int = 1, callback: NetworkComponent.() -> Unit) {
         repeat(repeat) {
             getNetwork(this).callback()
-            getNetwork(this).update()
+            workspace.simpleIterate()
         }
     }
 
@@ -119,6 +114,7 @@ class SimContext(val runtime: SimContext.() -> Unit) {
 
     // Provides accesss to Neuron object from NeuronBuilder object
     val NeuronBuilder.self get() = getNeuron(this)
+    val NetworkBuilder.self get() = getNetwork(this)
 
     fun getNeuron(neuronBuilder: NeuronBuilder) = neurons.getOrPut(neuronBuilder) {
         neuronBuilder.buildProduct { Neuron(getNetwork(it).network) }
@@ -129,13 +125,14 @@ class SimContext(val runtime: SimContext.() -> Unit) {
     }
 
     fun getNetwork(networkBuilder: NetworkBuilder): NetworkComponent = networks.getOrPut(networkBuilder) {
-        NetworkComponent("Network ${Random.nextInt()}", Network())
+        NetworkComponent("Network ${Random.nextInt()}", Network()).also { workspace.addWorkspaceComponent(it) }
     }
 
     fun setupNetwork(networkBuilder: NetworkBuilder) {
         if (networkBuilder !in networkInitialized) {
-            networkBuilder.neurons.forEach { getNeuron(it) }
-            networkBuilder.synapses.forEach { getSynapse(it) }
+            val network = getNetwork(networkBuilder).network
+            networkBuilder.neurons.forEach { network.addLooseNeuron(getNeuron(it)) }
+            networkBuilder.synapses.forEach { network.addLooseSynapse(getSynapse(it)) }
             networkInitialized.add(networkBuilder)
         }
     }

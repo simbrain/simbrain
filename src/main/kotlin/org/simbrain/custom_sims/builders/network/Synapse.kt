@@ -4,10 +4,11 @@ import org.simbrain.network.core.Synapse
 
 class SynapseBuilder(source: NeuronBuilder, target: NeuronBuilder, val template: Synapse.() -> Unit):
         SynapseBuilderStub(source, target) {
-    override fun buildProduct(context: (SynapseBuilder) -> Synapse) = context(this).apply(template)
+    override fun buildProduct(context: (SynapseBuilder) -> Synapse) =
+            context(this).apply { strength = 1.0 }.apply(template)
 }
 
 open class SynapseBuilderStub(val source: NeuronBuilder, val target: NeuronBuilder) {
     operator fun invoke(template: Synapse.() -> Unit) = SynapseBuilder(source, target, template)
-    open fun buildProduct(context: (SynapseBuilder) -> Synapse) = context(invoke {  })
+    open fun buildProduct(context: (SynapseBuilder) -> Synapse) = context(invoke {  }).apply { strength = 1.0 }
 }

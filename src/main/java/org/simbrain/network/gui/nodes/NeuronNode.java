@@ -466,10 +466,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         return true;
     }
 
-    /**
-     * @return able to drag screen element
-     * @see ScreenElement
-     */
+    @Override
     public boolean isDraggable() {
         return true;
     }

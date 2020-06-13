@@ -200,7 +200,7 @@ public class SubnetworkNode extends ScreenElement {
 
     @Override
     public boolean isDraggable() {
-        return false;
+        return true;
     }
 
     /**

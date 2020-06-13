@@ -143,7 +143,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
             } else {
                 act = act + n.getIncrement();
             }
-            n.setActivation(act);
+            n.forceSetActivation(act);
         }
     }
 
@@ -158,7 +158,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
             } else {
                 act = act - n.getIncrement();
             }
-            n.setActivation(act);
+            n.forceSetActivation(act);
         }
     }
 

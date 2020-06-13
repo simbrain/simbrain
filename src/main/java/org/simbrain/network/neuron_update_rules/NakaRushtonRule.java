@@ -193,7 +193,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
             if (act + n.getIncrement()> getUpperBound()) {
                 act = getUpperBound();
             }
-            n.setActivation(act);
+            n.forceSetActivation(act);
         }
     }
 

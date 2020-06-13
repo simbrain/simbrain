@@ -178,7 +178,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
             if (act > getUpperBound()) {
                 act = getUpperBound();
             }
-            n.setActivation(act);
+            n.forceSetActivation(act);
         }
     }
 
@@ -190,7 +190,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
             if (act < getLowerBound()) {
                 act = getLowerBound();
             }
-            n.setActivation(act);
+            n.forceSetActivation(act);
         }
     }
 

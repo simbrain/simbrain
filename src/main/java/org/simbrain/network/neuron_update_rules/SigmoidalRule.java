@@ -85,7 +85,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
             if (act > getUpperBound()) {
                 act = getUpperBound();
             }
-            n.setActivation(act);
+            n.forceSetActivation(act);
         }
     }
 
@@ -97,7 +97,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
             if (act < getLowerBound()) {
                 act = getLowerBound();
             }
-            n.setActivation(act);
+            n.forceSetActivation(act);
         }
     }
 

@@ -142,12 +142,12 @@ public class BinaryRule extends NeuronUpdateRule {
 
     @Override
     public void contextualIncrement(Neuron n) {
-        n.setActivation(ceiling);
+        n.forceSetActivation(ceiling);
     }
 
     @Override
     public void contextualDecrement(Neuron n) {
-        n.setActivation(floor);
+        n.forceSetActivation(floor);
     }
 
     @Override

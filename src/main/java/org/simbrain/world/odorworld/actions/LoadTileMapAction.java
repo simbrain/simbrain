@@ -30,7 +30,7 @@ public class LoadTileMapAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        SFileChooser chooser = new SFileChooser(SimbrainPreferences.getString("mapDirectory"), "Load TMX tilema");
+        SFileChooser chooser = new SFileChooser(SimbrainPreferences.getString("mapDirectory"), "Load TMX tilemap");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
             component.getWorld().setTileMap(TMXUtils.loadTileMap(theFile));

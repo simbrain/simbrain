@@ -19,8 +19,8 @@
 package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingEvents;
+import org.simbrain.workspace.couplings.Coupling;
+import org.simbrain.workspace.couplings.CouplingEvents;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
 
 import javax.swing.*;
@@ -116,12 +116,11 @@ public class CouplingListPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
         couplingFrame.setContentPane(this);
 
+        // Update when couplings are added or removed
         CouplingEvents events = desktop.getWorkspace().getCouplingManager().getEvents();
-
         events.onCouplingAdded(c -> updateCouplingsList());
         events.onCouplingRemoved(c -> updateCouplingsList());
         events.onCouplingsRemoved(cl -> updateCouplingsList());
-
 
     }
 

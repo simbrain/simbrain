@@ -1,5 +1,7 @@
 package org.simbrain.workspace;
 
+import org.simbrain.workspace.couplings.Coupling;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -36,7 +38,7 @@ public class Consumer extends Attribute {
      *
      * @param value the value to set
      */
-    void setValue(Object value) {
+    public void setValue(Object value) {
         try {
             method.invoke(baseObject, value);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {

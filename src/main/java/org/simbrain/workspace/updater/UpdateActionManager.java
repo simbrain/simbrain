@@ -18,8 +18,8 @@
  */
 package org.simbrain.workspace.updater;
 
-import org.simbrain.workspace.Coupling;
-import org.simbrain.workspace.CouplingEvents;
+import org.simbrain.workspace.couplings.Coupling;
+import org.simbrain.workspace.couplings.CouplingEvents;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
 

@@ -1,5 +1,6 @@
-package org.simbrain.workspace
+package org.simbrain.workspace.couplings
 
+import org.simbrain.workspace.*
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 

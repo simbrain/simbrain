@@ -19,6 +19,7 @@
 package org.simbrain.workspace;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.simbrain.workspace.couplings.Coupling;
 
 /**
  * Designates an object as one that contains {@link Consumable}

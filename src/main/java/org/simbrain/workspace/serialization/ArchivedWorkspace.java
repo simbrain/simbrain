@@ -21,7 +21,7 @@ package org.simbrain.workspace.serialization;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.updater.*;

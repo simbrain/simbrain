@@ -1,4 +1,4 @@
-package org.simbrain.util
+package org.simbrain.workspace.couplings
 
 import org.simbrain.workspace.*
 import org.simbrain.world.odorworld.entities.PeripheralAttribute
@@ -24,7 +24,7 @@ class CouplingCache(workspace: Workspace) {
     val consumers = ConsumerCache()
 
     /**
-     * A collection of all couplings grouped by [AttributeContainer]s
+     * A collection of all couplings grouped by [AttributeContainer]s. Neuron1 -> Coupling, Neuron 2->Coupling
      */
     private val couplingsByContainer = HashMap<AttributeContainer, HashSet<Coupling>>()
 
@@ -60,7 +60,11 @@ class CouplingCache(workspace: Workspace) {
                     onAttributeContainerRemoved(JConsumer { ac ->
                         producers.removeContainer(it, ac)
                         consumers.removeContainer(it, ac)
+                        val couplingsCopy = couplingsByContainer[ac]?.toList()
                         couplingsByContainer.remove(ac)
+                        couplingsCopy?.let { it1 ->
+                            workspace.couplingManager.events.fireCouplingsRemoved(it1)
+                        }
                     })
                 }
             })
@@ -149,7 +153,8 @@ sealed class AttributeCache<T : Attribute> {
     private val all = HashSet<T>()
 
     /**
-     * Map from [AttributeContainer]s to attributes.
+     * Map from [AttributeContainer]s to attributes.  E.g. neuron to its produers and connsumers, like
+     * getActivationn, setActivaiton, getInputValue, etc.
      */
     private val byContainer = HashMap<AttributeContainer, HashSet<T>>()
 
@@ -224,7 +229,9 @@ sealed class AttributeCache<T : Attribute> {
      * Remove an attribute container (must pass in workspace component)
      */
     fun removeContainer(component: WorkspaceComponent, attributeContainer: AttributeContainer) {
+        // Get all the attributes(producers and consumers) associated with a conntainer
         val attributes = byContainer[attributeContainer]
+        // Clean up all the maps that reference these attributes
         if (attributes != null) {
             all.removeAll(attributes)
             byType.values.forEach { it.removeAll(attributes) }

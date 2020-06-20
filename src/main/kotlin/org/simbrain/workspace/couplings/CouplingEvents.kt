@@ -1,6 +1,8 @@
-package org.simbrain.workspace
+package org.simbrain.workspace.couplings
 
 import org.simbrain.util.Event
+import org.simbrain.workspace.couplings.Coupling
+import org.simbrain.workspace.couplings.CouplingManager
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 

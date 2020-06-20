@@ -1,5 +1,7 @@
 package org.simbrain.workspace;
 
+import org.simbrain.workspace.couplings.Coupling;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -43,7 +45,7 @@ public class Producer extends Attribute {
      *
      * @return current value
      */
-    Object getValue() {
+    public Object getValue() {
         try {
             return method.invoke(baseObject);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {

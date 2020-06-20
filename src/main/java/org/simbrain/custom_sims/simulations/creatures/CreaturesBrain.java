@@ -9,7 +9,7 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.Producer;
 
 import java.util.ArrayList;

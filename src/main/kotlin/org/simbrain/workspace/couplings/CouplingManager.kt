@@ -1,6 +1,6 @@
-package org.simbrain.workspace
+package org.simbrain.workspace.couplings
 
-import org.simbrain.util.CouplingCache
+import org.simbrain.workspace.*
 import java.lang.reflect.Method
 
 /**

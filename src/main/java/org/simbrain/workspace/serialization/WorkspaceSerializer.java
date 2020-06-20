@@ -23,6 +23,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.*;
+import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;

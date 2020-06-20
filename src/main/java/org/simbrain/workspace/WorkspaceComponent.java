@@ -19,6 +19,7 @@
 package org.simbrain.workspace;
 
 import org.pmw.tinylog.Logger;
+import org.simbrain.workspace.couplings.CouplingManager;
 import org.simbrain.workspace.events.WorkspaceComponentEvents;
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.GuiComponent;

@@ -1,6 +1,7 @@
 package org.simbrain.workspace;
 
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.couplings.Coupling;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

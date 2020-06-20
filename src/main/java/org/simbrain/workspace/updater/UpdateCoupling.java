@@ -18,7 +18,7 @@
  */
 package org.simbrain.workspace.updater;
 
-import org.simbrain.workspace.Coupling;
+import org.simbrain.workspace.couplings.Coupling;
 
 /**
  * Updates a coupling.

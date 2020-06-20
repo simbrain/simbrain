@@ -21,6 +21,8 @@ package org.simbrain.workspace;
 import org.jetbrains.annotations.NotNull;
 import org.pmw.tinylog.Logger;
 import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.workspace.couplings.Coupling;
+import org.simbrain.workspace.couplings.CouplingManager;
 import org.simbrain.workspace.events.WorkspaceEvents;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;

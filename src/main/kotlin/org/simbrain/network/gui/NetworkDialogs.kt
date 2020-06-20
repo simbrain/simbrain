@@ -1,7 +1,6 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.dl4j.NeuronArray
@@ -23,6 +22,7 @@ import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JPanel
 
@@ -143,4 +143,18 @@ fun NetworkPanel.showPiccoloDebugger() {
         setLocationRelativeTo(null)
         isVisible = true
     }
+}
+
+/**
+ * Display the add synapse group dialog. Assumes the enabling condition (at
+ * least one source and target neuron group designated) is in effect.
+ *
+ * @param networkPanel the network panel in which to add the group.
+ */
+fun displaySynapseGroupDialog(networkPanel: NetworkPanel?, src: NeuronGroup?, tar: NeuronGroup?): Boolean {
+    val dialog: JDialog = SynapseGroupDialog.createSynapseGroupDialog(networkPanel, src, tar)
+    dialog.setLocationRelativeTo(null)
+    dialog.pack()
+    dialog.isVisible = true
+    return true
 }

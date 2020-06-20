@@ -18,6 +18,7 @@ import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.actions.edit.ToggleAutoZoom
+import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
@@ -598,20 +599,24 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
      */
     fun connectSelectedModels() {
 
-        // Handle adding synapse groups between neuron groups
-        //if (AddSynapseGroupAction.displaySynapseGroupDialog(this)) {
-        //    // TODO: Document, think about the boolean return on that.
-        //    return
-        //}
 
         with(selectionManager) {
+
+            // Connect first selected neuron groups with a synapse group, if any are selected
+            val src = networkPanel.selectionManager.filterSelectedSourceModels(NeuronGroup::class.java)
+            val tar = networkPanel.selectionManager.filterSelectedModels(NeuronGroup::class.java)
+            if (src.isNotEmpty() && tar.isNotEmpty()) {
+                displaySynapseGroupDialog(this.networkPanel, src.get(0), tar.get(0))
+                return;
+            }
+
+            // Connect loose neurons with loose synapses using quick connector
             val sourceNeurons = filterSelectedSourceModels<Neuron>() +
                     filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedSourceModels<NeuronGroup>().flatMap { it.neuronList }
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-
             quickConnector.applyCurrentConnection(network, sourceNeurons, targetNeurons)
         }
     }

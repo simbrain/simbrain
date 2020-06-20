@@ -55,24 +55,7 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        displaySynapseGroupDialog(networkPanel);
+        networkPanel.connectSelectedModels();
     }
 
-    /**
-     * Display the add synapse group dialog. Assumes the enabling condition (at
-     * least one source and target neuron group designated) is in effect.
-     *
-     * @param networkPanel the network panel in which to add the group.
-     */
-    public static boolean displaySynapseGroupDialog(NetworkPanel networkPanel) {
-
-        // Placed as a separate method since it is reused elsewhere.
-        NeuronGroup src = networkPanel.getSelectionManager().filterSelectedSourceModels(NeuronGroup.class).get(0);
-        NeuronGroup tar = networkPanel.getSelectionManager().filterSelectedModels(NeuronGroup.class).get(0);
-        JDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(networkPanel, src, tar);
-        dialog.setLocationRelativeTo(null);
-        dialog.pack();
-        dialog.setVisible(true);
-        return true;
-    }
 }

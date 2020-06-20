@@ -98,7 +98,7 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
 
         // Handle events
         SynapseGroupEvents events = synapseGroup.getEvents();
-        events.onDelete(s -> removeFromParent());
+        events.onDeleted(s -> removeFromParent());
         events.onLabelChange((o,n) -> updateText());
         events.onVisibilityChange(this::toggleSynapseVisibility);
         events.onSynapseAdded(s -> {

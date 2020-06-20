@@ -148,7 +148,7 @@ public final class SynapseNode extends ScreenElement {
 
         SynapseEvents events = synapse.getEvents();
 
-        events.onDelete(s -> removeFromParent());
+        events.onDeleted(s -> removeFromParent());
         events.onStrengthUpdate(() -> {
             updateColor();
             updateDiameter();

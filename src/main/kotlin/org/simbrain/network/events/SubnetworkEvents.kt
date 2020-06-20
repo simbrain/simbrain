@@ -11,9 +11,6 @@ import java.util.function.Consumer
  */
 class SubnetworkEvents(val subnet: Subnetwork) : NetworkModelEvents(subnet), LocationEvents {
 
-    fun onDelete(handler: Consumer<Subnetwork>) = "Delete".itemRemovedEvent(handler)
-    fun fireDelete() = "Delete"(old = subnet)
-
     override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
     override fun fireLocationChange() = "LocationChange"()
 

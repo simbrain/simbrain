@@ -71,7 +71,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
         NetworkTextEvents events = text.getEvents();
-        events.onDelete(n -> removeFromParent());
+        events.onDeleted(n -> removeFromParent());
         events.onLocationChange(this::pullViewPositionFromModel);
 
         update();

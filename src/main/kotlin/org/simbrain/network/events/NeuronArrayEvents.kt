@@ -11,9 +11,6 @@ import java.util.function.Consumer
  */
 class NeuronArrayEvents(val neuronArray: NeuronArray) : NetworkModelEvents(neuronArray), LocationEvents {
 
-    fun onDelete(handler: Consumer<NeuronArray>) = "Delete".itemRemovedEvent(handler)
-    fun fireDelete() = "Delete"(old = neuronArray)
-
     override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
     override fun fireLocationChange() = "LocationChange"()
 

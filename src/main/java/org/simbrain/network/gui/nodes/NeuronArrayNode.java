@@ -120,7 +120,7 @@ public class NeuronArrayNode extends ScreenElement {
         networkPanel = np;
 
         NeuronArrayEvents events = neuronArray.getEvents();
-        events.onDelete(n -> removeFromParent());
+        events.onDeleted(n -> removeFromParent());
         events.onUpdated(() -> {
             renderArrayToActivationsImage();
             updateInfoText();

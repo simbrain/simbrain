@@ -12,9 +12,6 @@ import java.util.function.Consumer
  */
 class WeightMatrixEvents(val wm: WeightMatrix) : NetworkModelEvents(wm) {
 
-    fun onDelete(handler: Consumer<WeightMatrix>) = "Delete".itemRemovedEvent(handler)
-    fun fireDelete() = "Delete"(old = wm)
-
     fun onLocationChange(handler: BiConsumer<Point2D, Point2D>) = "LocationChange".itemChangedEvent(handler)
     fun fireLocationChange(old: Point2D, new: Point2D) = "LocationChange"(old = old, new = new)
 

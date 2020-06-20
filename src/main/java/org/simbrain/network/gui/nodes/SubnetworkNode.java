@@ -90,7 +90,7 @@ public class SubnetworkNode extends ScreenElement {
         setContextMenu(this.getDefaultContextMenu());
 
         SubnetworkEvents events = subnetwork.getEvents();
-        events.onDelete(n -> removeFromParent());
+        events.onDeleted(n -> removeFromParent());
         events.onLabelChange((o,n) -> updateText());
         events.onLocationChange(this::layoutChildren);
     }
@@ -113,13 +113,13 @@ public class SubnetworkNode extends ScreenElement {
         outlinedObjects.add(node);
         if (node instanceof SynapseGroupNode) {
             node.lowerToBottom();
-            ((SynapseGroupNode) node).getSynapseGroup().getEvents().onDelete(sg -> {
+            ((SynapseGroupNode) node).getSynapseGroup().getEvents().onDeleted(sg -> {
                 outlinedObjects.remove(node);
                 outline.setOutlinedNodes(outlinedObjects);
             });
         } else if (node instanceof NeuronGroupNode) {
             NeuronGroup ng = ((NeuronGroupNode) node).getNeuronGroup();
-            ng.getEvents().onDelete(n -> {
+            ng.getEvents().onDeleted(n -> {
                 outlinedObjects.remove(node);
                 outline.setOutlinedNodes(outlinedObjects);
             });

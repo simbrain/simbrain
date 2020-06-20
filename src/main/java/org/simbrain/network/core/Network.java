@@ -360,13 +360,13 @@ public class Network {
     public void addLooseNeuron(Neuron neuron) {
         looseNeurons.add(neuron);
         updatePriorityList();
-        events.fireNeuronAdded(neuron);
+        events.fireModelAdded(neuron);
     }
 
     public void addLooseNeurons(Collection<Neuron> neurons) {
         looseNeurons.addAll(neurons);
         updatePriorityList();
-        neurons.forEach(events::fireNeuronAdded);
+        neurons.forEach(events::fireModelAdded);
     }
 
     /**
@@ -374,12 +374,12 @@ public class Network {
      */
     public void addNeuronArray(NeuronArray na) {
         naList.add(na);
-        events.fireNeuronArrayAdded(na);
+        events.fireModelAdded(na);
     }
 
     public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
         multiLayerNetworks.add(network);
-        events.fireMultiLayerNetworkAdded(network);
+        events.fireModelAdded(network);
     }
 
     /**
@@ -391,7 +391,7 @@ public class Network {
         synapse.initSpikeResponder();
         looseSynapses.add(synapse);
         synapse.setId(idManager.getId(Synapse.class));
-        events.fireSynapseAdded(synapse);
+        events.fireModelAdded(synapse);
     }
 
     /**
@@ -435,8 +435,8 @@ public class Network {
 
         // Notify listeners that this neuron has been deleted
         if (fireEvent) {
-            events.fireNeuronRemoved(toDelete);
-            toDelete.getEvents().fireDelete();
+            events.fireModelRemoved(toDelete);
+            toDelete.getEvents().fireDeleted();
         }
     }
 
@@ -449,13 +449,13 @@ public class Network {
     public void removeSynapseGroup(SynapseGroup sg) {
         synapseGroups.remove(sg);
         sg.delete();
-        events.fireSynapseGroupRemoved(sg);
+        events.fireModelRemoved(sg);
     }
 
     public void removeSubnetwork(Subnetwork subnet) {
         subnetworks.remove(subnet);
         subnet.delete();
-        events.fireSubnetworkRemoved(subnet);
+        events.fireModelRemoved(subnet);
     }
 
 
@@ -468,7 +468,7 @@ public class Network {
         neuronCollectionSet.remove(nc);
         removeArrayConnectable(nc);
         nc.delete();
-        events.fireNeuronCollectionRemoved(nc);
+        events.fireModelRemoved(nc);
     }
 
     /**
@@ -477,8 +477,8 @@ public class Network {
     public void removeNeuronArray(NeuronArray na) {
         naList.remove(na);
         removeArrayConnectable(na);
-        na.getEvents().fireDelete();
-        events.fireNeuronArrayRemoved(na);
+        na.getEvents().fireDeleted();
+        events.fireModelRemoved(na);
     }
 
     /**
@@ -488,7 +488,7 @@ public class Network {
         multiLayerNetworks.remove(mln);
         removeArrayConnectable(mln);
         //mln.getEvents().fireDelete();
-        events.fireMultiLayerNetworkRemoved(mln);
+        events.fireModelRemoved(mln);
     }
 
     private void removeArrayConnectable(ArrayConnectable ac) {
@@ -505,7 +505,7 @@ public class Network {
             return;
         }
         weightMatrices.remove(wm);
-        events.fireWeightMatrixRemoved(wm);
+        events.fireModelRemoved(wm);
     }
 
 
@@ -539,7 +539,7 @@ public class Network {
             SynapseGroup parentGroup = toDelete.getParentGroup();
             parentGroup.removeSynapse(toDelete);
             if (parentGroup.isDisplaySynapses()) {
-                events.fireSynapseRemoved(toDelete);
+                events.fireModelRemoved(toDelete);
             }
             // TODO
             //if (parentGroup.isEmpty()) {
@@ -548,8 +548,8 @@ public class Network {
         } else {
             looseSynapses.remove(toDelete);
             // Notify listeners that this synapse has been deleted
-            events.fireSynapseRemoved(toDelete);
-            toDelete.getEvents().fireDelete();
+            events.fireModelRemoved(toDelete);
+            toDelete.getEvents().fireDeleted();
         }
     }
 
@@ -596,7 +596,7 @@ public class Network {
             }
         }
         neuronCollectionSet.add(nc);
-        events.fireNeuronCollectionAdded(nc);
+        events.fireModelAdded(nc);
     }
 
     /**
@@ -752,17 +752,17 @@ public class Network {
 
     public void addSynapseGroup(final SynapseGroup sg) {
         synapseGroups.add(sg);
-        events.fireSynapseGroupAdded(sg);
+        events.fireModelAdded(sg);
     }
 
     public void addNeuronGroup(final NeuronGroup ng) {
         neuronGroups.add(ng);
-        events.fireNeuronGroupAdded(ng);
+        events.fireModelAdded(ng);
     }
 
     public void addSubnetwork(Subnetwork net) {
         subnetworks.add(net);
-        events.fireSubnetworkAdded(net);
+        events.fireModelAdded(net);
     }
 
     /**
@@ -1123,7 +1123,7 @@ public class Network {
      */
     public void addText(final NetworkTextObject text) {
         textList.add(text);
-        events.fireTextAdded(text);
+        events.fireModelAdded(text);
     }
 
     /**
@@ -1133,7 +1133,7 @@ public class Network {
      */
     public void deleteText(final NetworkTextObject text) {
         textList.remove(text);
-        events.fireTextRemoved(text);
+        events.fireModelRemoved(text);
     }
 
     /**
@@ -1223,7 +1223,7 @@ public class Network {
         WeightMatrix newMatrix = new WeightMatrix(this, source, target);
         newMatrix.initializeId();
         weightMatrices.add(newMatrix);
-        events.fireWeightMatrixAdded(newMatrix);
+        events.fireModelAdded(newMatrix);
         return newMatrix;
     }
 

@@ -10,9 +10,6 @@ import java.util.function.Consumer
  */
 class NetworkTextEvents(val text: NetworkTextObject) : NetworkModelEvents(text), LocationEvents {
 
-    fun onDelete(handler: Consumer<NetworkTextObject>) = "Delete".itemRemovedEvent(handler)
-    fun fireDelete() = "Delete"(old = text)
-
     override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
     override fun fireLocationChange() = "LocationChange"()
 

@@ -16,4 +16,7 @@ open class NetworkModelEvents(val model: NetworkModel) : Event(PropertyChangeSup
     fun fireSelected() = "Selected"(new = model)
     fun onSelected(handler: Consumer<NetworkModel>) = "Selected".itemAddedEvent(handler)
 
+    fun fireDeleted() = "Deleted"(new = model)
+    fun onDeleted(handler: Consumer<NetworkModel>) = "Deleted".itemAddedEvent(handler)
+
 }

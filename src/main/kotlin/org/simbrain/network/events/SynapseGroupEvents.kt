@@ -13,9 +13,6 @@ import java.util.function.Consumer
  */
 class SynapseGroupEvents(val sg: SynapseGroup) : NetworkModelEvents(sg) {
 
-    fun onDelete(handler: Consumer<SynapseGroup>) = "Delete".itemRemovedEvent(handler)
-    fun fireDelete() = "Delete"(old = sg)
-
     fun onLocationChange(handler: BiConsumer<Point2D, Point2D>) = "LocationChange".itemChangedEvent(handler)
     fun fireLocationChange(old: Point2D, new: Point2D) = "LocationChange"(old = old, new = new)
 

@@ -12,10 +12,6 @@ import java.util.function.Consumer
  */
 class SynapseEvents(val synapse: Synapse) : NetworkModelEvents(synapse) {
 
-    // TODO: Move to NetworkModelEvents
-    fun onDelete(handler: Consumer<Synapse>) = "Delete".itemRemovedEvent(handler)
-    fun fireDelete() = "Delete"(old = synapse)
-
     fun onStrengthUpdate(handler: Runnable) = "StrengthUpdate".event(handler)
     fun fireStrengthUpdate() = "StrengthUpdate"()
 

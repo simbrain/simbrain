@@ -169,7 +169,7 @@ public class NetworkTextObject implements LocatableModel {
      * Notify listeners that this object has been deleted.
      */
     public void fireDeleted() {
-        events.fireDelete();
+        events.fireDeleted();
     }
 
     /**

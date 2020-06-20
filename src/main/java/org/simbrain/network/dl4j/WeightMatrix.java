@@ -215,7 +215,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
                     m.setUseCurve(false);
                     setUseCurve(false);
                 });
-        events.fireDelete();
+        events.fireDeleted();
     }
 
     /**

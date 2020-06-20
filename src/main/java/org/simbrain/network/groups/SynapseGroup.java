@@ -579,7 +579,7 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         clear();
         targetNeuronGroup.removeIncomingSg(this);
         sourceNeuronGroup.removeOutgoingSg(this);
-        events.fireDelete();
+        events.fireDeleted();
     }
 
     @Override

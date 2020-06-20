@@ -12,9 +12,6 @@ import java.util.function.Consumer
  */
 class NeuronEvents(val neuron: Neuron) : NetworkModelEvents(neuron), LocationEvents {
 
-    fun onDelete(handler: Consumer<Neuron>) = "Delete".itemRemovedEvent(handler)
-    fun fireDelete() = "Delete"(old = neuron)
-
     fun onActivationChange(handler: BiConsumer<Double, Double>) = "ActivationChange".itemChangedEvent(handler)
     fun fireActivationChange(old: Double, new: Double) = "ActivationChange"(old = old, new = new)
 

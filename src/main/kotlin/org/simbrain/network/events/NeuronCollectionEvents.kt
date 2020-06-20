@@ -12,9 +12,6 @@ import java.util.function.Consumer
  */
 class NeuronCollectionEvents(val nc: AbstractNeuronCollection) : NetworkModelEvents(nc), LocationEvents {
 
-    fun onDelete(handler: Consumer<AbstractNeuronCollection>) = "Delete".itemRemovedEvent(handler)
-    fun fireDelete() = "Delete"(old = nc)
-
     override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
     override fun fireLocationChange() = "LocationChange"()
 

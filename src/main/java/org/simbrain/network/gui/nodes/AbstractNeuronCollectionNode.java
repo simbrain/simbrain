@@ -52,7 +52,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         addChild(outlinedObjects);
 
         NeuronCollectionEvents events = nc.getEvents();
-        events.onDelete(n ->  {
+        events.onDeleted(n ->  {
             removeFromParent();
         });
         events.onLabelChange((o,n) -> {
@@ -117,7 +117,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             // Listen directly to neuronnodes for property change events
             NeuronEvents events = neuronNode.getNeuron().getEvents();
-            events.onDelete(n -> {
+            events.onDeleted(n -> {
                 this.neuronNodes.remove(neuronNode);
                 outlinedObjects.setOutlinedNodes(this.neuronNodes);
             });

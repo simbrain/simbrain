@@ -193,10 +193,13 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
 
         NetworkEvents event = network.getEvents();
 
-        event.onNeuronAdded(n -> {
+        event.onModelAdded(n -> {
+            if(!(n instanceof Neuron)) {
+                return;
+            }
             pendingOperations.incrementAndGet();
             synchronized (collectionInProgress) {
-                neurons.add(n);
+                neurons.add((Neuron) n);
                 ops++;
                 if (!collectionInProgress.get()) {
                     collectionInProgress.getAndSet(true);
@@ -207,7 +210,10 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
             }
         });
 
-        event.onNeuronRemoved(n -> {
+        event.onModelRemoved(n -> {
+            if(!(n instanceof Neuron)) {
+                return;
+            }
             pendingOperations.incrementAndGet();
             synchronized (collectionInProgress) {
                 neurons.remove(n);

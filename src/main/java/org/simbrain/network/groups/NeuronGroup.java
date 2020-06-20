@@ -152,7 +152,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * Delete this neuron group.
      */
     public void delete() {
-        events.fireDelete();
+        events.fireDeleted();
         for (Neuron neuron : getNeuronList()) {
             neuron.getNetwork().removeNeuron(neuron, true);
         }

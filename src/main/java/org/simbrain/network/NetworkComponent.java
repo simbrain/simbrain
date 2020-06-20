@@ -20,8 +20,10 @@ package org.simbrain.network;
 import com.thoughtworks.xstream.XStream;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.NetworkEvents;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.Utils;
 import org.simbrain.util.nd4j.Nd4jConverter;
+import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -69,63 +71,32 @@ public final class NetworkComponent extends WorkspaceComponent {
 
         NetworkEvents event = network.getEvents();
 
-        event.onNeuronAdded(n -> {
+        event.onModelAdded(m -> {
             setChangedSinceLastSave(true);
-            fireAttributeContainerAdded(n);
+            if (m instanceof AttributeContainer) {
+                fireAttributeContainerAdded((AttributeContainer) m);
+            }
+            if (m instanceof NeuronGroup) {
+                ((NeuronGroup)m).getNeuronList().forEach(this::fireAttributeContainerAdded);
+            }
         });
 
-        event.onNeuronRemoved(n -> {
+        event.onModelRemoved(m -> {
             setChangedSinceLastSave(true);
-            fireAttributeContainerRemoved(n);
+            if (m instanceof AttributeContainer) {
+                fireAttributeContainerRemoved((AttributeContainer) m);
+            }
+            if (m instanceof NeuronGroup) {
+                ((NeuronGroup)m).getNeuronList().forEach(this::fireAttributeContainerRemoved);
+            }
         });
 
 //        event.onNeuronsUpdated(l -> setChangedSinceLastSave(true));
-
-        event.onSynapseAdded(s -> {
-            setChangedSinceLastSave(true);
-            fireAttributeContainerAdded(s);
-        });
-
-        event.onSynapseRemoved(s -> {
-            setChangedSinceLastSave(true);
-            fireAttributeContainerRemoved(s);
-        });
 //
 //        event.onTextAdded(t -> setChangedSinceLastSave(true));
 //
 //        event.onTextRemoved(t -> setChangedSinceLastSave(true));
 
-        event.onNeuronGroupAdded(ng -> {
-            setChangedSinceLastSave(true);
-            fireAttributeContainerAdded(ng);
-            ng.getNeuronList().forEach(this::fireAttributeContainerAdded);
-        });
-
-        event.onNeuronGroupRemoved(ng -> {
-            setChangedSinceLastSave(true);
-            ng.getNeuronList().forEach(this::fireAttributeContainerRemoved);
-            fireAttributeContainerRemoved(ng);
-        });
-
-        event.onNeuronCollectionAdded(nc -> {
-            setChangedSinceLastSave(true);
-            fireAttributeContainerAdded(nc);
-        });
-
-        event.onNeuronCollectionRemoved(nc -> {
-            setChangedSinceLastSave(true);
-            fireAttributeContainerRemoved(nc);
-        });
-
-        event.onNeuronArrayAdded(na -> {
-            setChangedSinceLastSave(true);
-            fireAttributeContainerAdded(na);
-        });
-
-        event.onNeuronArrayRemoved(na -> {
-            setChangedSinceLastSave(true);
-            fireAttributeContainerRemoved(na);
-        });
 
     }
 

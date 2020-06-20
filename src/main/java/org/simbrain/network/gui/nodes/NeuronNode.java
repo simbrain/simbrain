@@ -204,7 +204,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
 
         // Handle events
         NeuronEvents events = neuron.getEvents();
-        events.onDelete(n -> removeFromParent());
+        events.onDeleted(n -> removeFromParent());
         events.onActivationChange((o, n) -> {
             updateColor();
             updateText();

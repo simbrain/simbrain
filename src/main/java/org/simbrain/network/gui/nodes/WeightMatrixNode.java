@@ -82,7 +82,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         setPickable(true);
 
         WeightMatrixEvents events = weightMatrix.getEvents();
-        events.onDelete(w -> removeFromParent());
+        events.onDeleted(w -> removeFromParent());
         events.onUpdated(this::renderMatrixToImage);
         wm.getSource().getEvents().onLocationChange(arrow::invalidateFullBounds);
         wm.getTarget().getEvents().onLocationChange(arrow::invalidateFullBounds);

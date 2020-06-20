@@ -48,11 +48,13 @@ public class NeuronCollection extends AbstractNeuronCollection {
             n.getEvents().onLocationChange(() -> events.fireLocationChange());
         });
 
-        net.getEvents().onNeuronRemoved(n -> {
-            removeNeuron(n);
-            events.fireLocationChange();
-            if (isEmpty()) {
-                delete();
+        net.getEvents().onModelRemoved(n -> {
+            if (n instanceof Neuron) {
+                removeNeuron((Neuron) n);
+                events.fireLocationChange();
+                if (isEmpty()) {
+                    delete();
+                }
             }
         });
     }
@@ -86,7 +88,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
      * Call after deleting neuron collection from parent network.
      */
     public void delete() {
-        events.fireDelete();
+        events.fireDeleted();
     }
 
     /**

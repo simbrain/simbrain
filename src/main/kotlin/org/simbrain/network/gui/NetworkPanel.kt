@@ -681,22 +681,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     private fun addNetworkListeners() {
         val event = network.events
-        event.onNeuronAdded(Consumer { add(it) })
-        event.onSynapseAdded(Consumer { add(it) })
-        event.onTextAdded(Consumer { add(it) })
-        event.onTextRemoved(Consumer { it.fireDeleted() }) // TODO: [event] should not be handled here
-        event.onNeuronGroupAdded(Consumer { add(it) })
-        event.onNeuronGroupRemoved(Consumer { it.events.fireDelete() })
-        event.onSynapseGroupAdded(Consumer { add(it) })
-        //event.onSynapseGroupRemoved(SynapseGroup::fireDeleted); // TODO: [event]
-        event.onSubnetworkAdded(Consumer { add(it) })
-        //event.onSubnetworkRemoved(Subnetwork::fireDeleted); // TODO: [event]
-        event.onNeuronArrayAdded(Consumer { add(it) })
-        event.onWeightMatrixAdded(Consumer { add(it) })
-        // event.onNeuronArrayRemoved(NeuronArray::fireDeleted);
-        event.onMultiLayerNetworkAdded(Consumer { add(it) })
-        event.onNeuronCollectionAdded(Consumer { add(it) })
-        event.onWeightMatrixRemoved(Consumer { it.delete() })
+        event.onModelAdded(Consumer { add(it) })
+        event.onModelRemoved(Consumer { it.events.fireDeleted() })
         event.onUpdateTimeDisplay(Consumer { d: Boolean? -> timeLabel.update() })
         event.onUpdateCompleted(Runnable{repaint()})
     }

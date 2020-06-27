@@ -35,6 +35,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.3.5'
 
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+
     // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
     compile group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
 

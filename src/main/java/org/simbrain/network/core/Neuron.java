@@ -33,8 +33,11 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
+import javax.swing.*;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.simbrain.util.GeomKt.plus;
@@ -1151,8 +1154,24 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public void setLocation(Point2D position, boolean fireEvent) {
         x = position.getX();
         y = position.getY();
+        tempDebugNan(this);
         if (fireEvent) {
             events.fireLocationChange();
+        }
+    }
+
+    // TODO: This is just temporary until the source of the problem is identified
+    public static void tempDebugNan(Neuron test) {
+        if(Double.isNaN(test.x) || Double.isNaN(test.y)) {
+            String message = "x = " + test.x + " and y = " + test.y + ", resetting neuron location to (0,0)";
+            test.x = (0);
+            test.y = (0);
+            System.out.println(message);
+            Toolkit.getDefaultToolkit().beep();
+            JOptionPane optionPane = new JOptionPane(message,JOptionPane.WARNING_MESSAGE);
+            JDialog dialog = optionPane.createDialog("Warning!");
+            dialog.setAlwaysOnTop(true);
+            dialog.setVisible(true);
         }
     }
 

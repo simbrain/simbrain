@@ -323,6 +323,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     }
 
     fun createNode(neuron: Neuron) = addScreenElement {
+        Neuron.tempDebugNan(neuron)
         NeuronNode(this, neuron).also {
             (neuronNodeMapping as HashMap)[neuron] = it
             selectionManager.set(it)

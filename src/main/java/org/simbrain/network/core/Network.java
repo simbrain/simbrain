@@ -475,6 +475,7 @@ public class Network {
     public void delete(NeuronGroup ng) {
         neuronGroups.remove(ng);
         ng.delete();
+        events.fireModelRemoved(ng);
     }
 
     public void delete(SynapseGroup sg) {
@@ -497,7 +498,6 @@ public class Network {
 
     public void delete(MultiLayerNet mln) {
         multiLayerNetworks.remove(mln);
-        //mln.getEvents().fireDelete();
         events.fireModelRemoved(mln);
     }
 

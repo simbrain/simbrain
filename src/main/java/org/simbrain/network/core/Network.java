@@ -354,7 +354,7 @@ public class Network {
     /**
      * Adds a new neuron.
      *
-     * @param neuron Type of neuron to add
+     * @param neuron Template for neuron to add
      */
     public void addLooseNeuron(Neuron neuron) {
         looseNeurons.add(neuron);

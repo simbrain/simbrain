@@ -8,7 +8,10 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkTextObject
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.dl4j.ArrayConnectable
 import org.simbrain.network.dl4j.MultiLayerNet
 import org.simbrain.network.dl4j.NeuronArray
@@ -295,11 +298,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         zoomToFitPage()
     }
 
-    @Deprecated("Consider removing / add from Network instead")
-    fun addNeuron(updateRule: NeuronUpdateRule) {
-        val neuron = Neuron(network, updateRule)
+    /**
+     * Add a neuron and use placement manager to lay it out.
+     */
+    fun placeNeuron(neuron: Neuron) {
         placementManager.addNewModelObject(neuron)
-        neuron.forceSetActivation(0.0)
         network.addLooseNeuron(neuron)
         zoomToFitPage()
     }
@@ -327,9 +330,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
 
         neuronGroup.applyLayout()
-
         val neuronNodes = neuronGroup.neuronList.map { neuron -> add(neuron) }
-
         createNeuronGroupNode().apply { addNeuronNodes(neuronNodes) }
     }
 
@@ -370,7 +371,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         val neuronGroupNodes = subnetwork.neuronGroupList.map { group -> add(group) }
         val synapseGroupNodes = subnetwork.synapseGroupList.map { group -> add(group) }
 
-        //todo
         createSubNetwork().apply {
             neuronGroupNodes.forEach { addNode(it) }
             synapseGroupNodes.forEach { addNode(it) }

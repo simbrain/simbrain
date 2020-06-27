@@ -19,6 +19,7 @@
 package org.simbrain.network.core;
 
 import org.jetbrains.annotations.NotNull;
+import org.piccolo2d.event.PInputEvent;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.events.NetworkTextEvents;
 
@@ -76,6 +77,11 @@ public class NetworkTextObject implements LocatableModel {
      */
     private transient NetworkTextEvents events = new NetworkTextEvents(this);
 
+    // TODO: Temporary so that when added to networkpanel the event is availalble
+    public transient PInputEvent inputEvent;
+
+    // TODO: Too many constructors.
+    
     /**
      * Construct the text object.
      *
@@ -83,10 +89,11 @@ public class NetworkTextObject implements LocatableModel {
      * @param x      x position
      * @param y      y position
      */
-    public NetworkTextObject(Network parent, double x, double y) {
+    public NetworkTextObject(Network parent, double x, double y, PInputEvent event) {
         this.parent = parent;
         this.x = x;
         this.y = y;
+        this.inputEvent = event;
     }
 
     /**
@@ -98,7 +105,9 @@ public class NetworkTextObject implements LocatableModel {
      * @param initialText text for the text object
      */
     public NetworkTextObject(Network parent, double x, double y, String initialText) {
-        this(parent, x, y);
+        this.parent = parent;
+        this.x = x;
+        this.y = y;
         this.setText(initialText);
     }
 

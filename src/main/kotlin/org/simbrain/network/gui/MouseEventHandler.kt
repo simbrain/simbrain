@@ -58,12 +58,28 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
     }
 
+    init {
+        // Only handle events in selection mode
+        eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
+            override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
+                val editMode = networkPanel.editMode
+                return if (editMode.isSelection && super.acceptsEvent(event, type)) {
+                    networkPanel.textHandle.stopEditing()
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
     /**
      * Handles beginnings of drag as well as single-click events.
      */
     override fun startDrag(event: PInputEvent) {
 
         super.startDrag(event)
+
         val pickedNode: PNode? = event.pickedNode
         pickedNode?.firstScreenElement?.let { pickedScreenElement ->
             mode = Mode.DRAG
@@ -155,25 +171,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
     private fun dragItems(event: PInputEvent) {
         val delta = event.position - marqueeEndPosition
-        networkPanel.selectedNodes.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
+        networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
                 .forEach { it?.offset(delta.x, delta.y) }
     }
 
     private val PInputEvent.isPanKeyDown get() = if (SystemUtils.IS_OS_MAC) isMetaDown else isControlDown
-
-    init {
-        eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
-            override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
-                val editMode = networkPanel.editMode
-                return if (editMode.isSelection && super.acceptsEvent(event, type)) {
-                    networkPanel.textHandle.stopEditing()
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-    }
 
     /**
      * A filter that determines whether a given pnode is selectable or not. Bounds are updated as the lasso tool is

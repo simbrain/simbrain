@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
+import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
@@ -307,6 +308,20 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         zoomToFitPage()
     }
 
+    private fun createNode(model: NetworkModel) {
+        when(model) {
+            is Neuron -> createNode(model)
+            is Synapse -> createNode(model)
+            is NeuronArray -> createNode(model)
+            is NeuronCollection -> createNode(model)
+            is NeuronGroup -> createNode(model)
+            is SynapseGroup -> createNode(model)
+            is WeightMatrix -> createNode(model)
+            is Subnetwork -> createNode(model)
+            is NetworkTextObject -> createNode(model)
+        }
+    }
+
     fun createNode(neuron: Neuron) = addScreenElement {
         NeuronNode(this, neuron).also {
             (neuronNodeMapping as HashMap)[neuron] = it
@@ -355,6 +370,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         WeightMatrixNode(this, weightMatrix).also { it.lower() }
     }
 
+    fun createNode(text: NetworkTextObject) = addScreenElement {
+        TextNode(this, text).apply {
+            textHandle.startEditing(text.inputEvent, this.pStyledText);
+        }
+    }
+
     fun createNode(subnetwork: Subnetwork) = addScreenElement {
         fun createSubNetwork() = when (subnetwork) {
             is Hopfield -> HopfieldNode(this, subnetwork)
@@ -376,28 +397,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             synapseGroupNodes.forEach { addNode(it) }
         }
 
-    }
-
-    /**
-     * Add representation of specified text to network panel.
-     */
-    fun createNode(text: NetworkTextObject) = addScreenElement {
-        TextNode(this, text).apply {
-            textHandle.startEditing(null, this.pStyledText);
-        }
-    }
-
-    private fun createNode(model: NetworkModel) {
-        when(model) {
-            is Neuron -> createNode(model)
-            is Synapse -> createNode(model)
-            is NeuronArray -> createNode(model)
-            is NeuronCollection -> createNode(model)
-            is NeuronGroup -> createNode(model)
-            is SynapseGroup -> createNode(model)
-            is WeightMatrix -> createNode(model)
-            is Subnetwork -> createNode(model)
-        }
     }
 
     fun deleteSelectedObjects() {

@@ -67,7 +67,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
         } else if (pickedNode instanceof PCamera) {
              // Make a new text object and then edit it
              NetworkTextObject text = new NetworkTextObject(networkPanel.getNetwork(), inputEvent.getPosition().getX(),
-                     inputEvent.getPosition().getY());
+                     inputEvent.getPosition().getY(), inputEvent);
              networkPanel.getNetwork().addText(text);
         }
     }
@@ -111,12 +111,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
             super(InputEvent.BUTTON1_MASK);
         }
 
-        /**
-         * @param event
-         * @param type
-         * @return
-         * @see PInputEventFilter
-         */
+        @Override
         public boolean acceptsEvent(final PInputEvent event, final int type) {
             EditMode editMode = networkPanel.getEditMode();
             return (editMode.isText() && super.acceptsEvent(event, type));

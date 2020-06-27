@@ -144,9 +144,6 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         }
     }
 
-    /**
-     * @return the textObject
-     */
     public NetworkTextObject getTextObject() {
         return textObject;
     }

@@ -288,7 +288,7 @@ public class SubnetworkNode extends ScreenElement {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            getNetworkPanel().getNetwork().removeSubnetwork(subnetwork);
+            getNetworkPanel().getNetwork().delete(subnetwork);
         }
     };
 

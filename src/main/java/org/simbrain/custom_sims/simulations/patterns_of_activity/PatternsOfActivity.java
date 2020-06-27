@@ -458,7 +458,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
                 System.out.println();
             }
             for (Synapse s : toR) {
-                n.getNetwork().removeSynapse(s);
+                n.getNetwork().delete(s);
             }
             for (int jj = 0; jj < n.getFanIn().size(); ++jj) {
                 Synapse s = n.getFanIn().get(jj);

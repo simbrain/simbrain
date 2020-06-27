@@ -93,6 +93,14 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         source.addOutgoingWeightMatrix(this);
         target.setIncomingWeightMatrix(this);
 
+        // When the parents of the matrix are deleted, delete the matrix
+        source.getEvents().onDeleted(m -> {
+            delete();
+        });
+        target.getEvents().onDeleted(m -> {
+            delete();
+        });
+
         // Default for "adapter" cases is 1-1
         if (source instanceof NeuronCollection || target instanceof NeuronCollection) {
             weightMatrix = Nd4j.create(source.outputSize(), target.inputSize());
@@ -216,6 +224,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
                     setUseCurve(false);
                 });
         events.fireDeleted();
+        parent.delete(this);
     }
 
     /**

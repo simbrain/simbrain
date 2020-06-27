@@ -38,7 +38,6 @@ import java.awt.geom.Point2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.simbrain.network.LocatableModelKt.getTopLeftLocation;
@@ -154,7 +153,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void delete() {
         events.fireDeleted();
         for (Neuron neuron : getNeuronList()) {
-            neuron.getNetwork().removeNeuron(neuron, true);
+            neuron.getNetwork().delete(neuron, true);
         }
         activationRecorder.stopRecording();
         removeAllNeurons();

@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronCollection;
@@ -33,9 +32,6 @@ import org.simbrain.util.math.NumericMatrix;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 
@@ -243,7 +239,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            getNetworkPanel().getNetwork().removeNeuronCollection(neuronCollection);
+            getNetworkPanel().getNetwork().delete(neuronCollection);
         }
     };
 

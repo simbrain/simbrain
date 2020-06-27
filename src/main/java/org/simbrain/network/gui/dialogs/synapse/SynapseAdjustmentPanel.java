@@ -826,7 +826,7 @@ public class SynapseAdjustmentPanel extends JPanel {
                     for (Synapse synapse : synapses) {
                         if (view.synapseIsAdjustable(synapse)) {
                             if (Math.abs(synapse.getStrength()) < threshold) {
-                                networkPanel.getNetwork().removeSynapse(synapse);
+                                networkPanel.getNetwork().delete(synapse);
                             }
                         }
                     }

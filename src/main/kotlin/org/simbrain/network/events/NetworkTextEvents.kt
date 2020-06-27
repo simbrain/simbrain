@@ -8,7 +8,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class NetworkTextEvents(val text: NetworkTextObject) : NetworkModelEvents(text), LocationEvents {
+class NetworkTextEvents(val text: NetworkTextObject) : LocationEvents(text) {
 
     override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
     override fun fireLocationChange() = "LocationChange"()

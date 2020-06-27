@@ -36,7 +36,6 @@ import org.simbrain.util.math.SimbrainMath;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * <b>Network</b> provides core neural network functionality and is the the
@@ -408,123 +407,11 @@ public class Network {
         weightMatrices.forEach(WeightMatrix::update);
     }
 
-    /**
-     * Remove a neuron.
-     *
-     * @param toDelete  the neuron to remove
-     * @param fireEvent whether to fire an event
-     */
-    public void removeNeuron(final Neuron toDelete, boolean fireEvent) {
-
-        // Update priority list
-        updatePriorityList();
-
-        // Remove Connected Synapses
-        toDelete.deleteConnectedSynapses();
-
-        // Remove the neuron itself. Either from a parent group that holds it,
-        // or from the root network.
-        if (toDelete.getParentGroup() != null) {
-            toDelete.getParentGroup().removeNeuron(toDelete);
-            if (toDelete.getParentGroup().isEmpty()) {
-                removeNeuronGroup(toDelete.getParentGroup());
-            }
-        } else {
-            looseNeurons.remove(toDelete);
-        }
-
-        // Notify listeners that this neuron has been deleted
-        if (fireEvent) {
-            events.fireModelRemoved(toDelete);
-            toDelete.getEvents().fireDeleted();
-        }
+    public void delete(final Neuron toDelete) {
+        delete(toDelete, true);
     }
 
-    public void removeNeuronGroup(NeuronGroup ng) {
-        neuronGroups.remove(ng);
-        removeArrayConnectable(ng);
-        ng.delete();
-    }
-
-    public void removeSynapseGroup(SynapseGroup sg) {
-        synapseGroups.remove(sg);
-        sg.delete();
-        events.fireModelRemoved(sg);
-    }
-
-    public void removeSubnetwork(Subnetwork subnet) {
-        subnetworks.remove(subnet);
-        subnet.delete();
-        events.fireModelRemoved(subnet);
-    }
-
-
-    /**
-     * Remove a neuron collection.
-     *
-     * @param nc the collection to remove
-     */
-    public void removeNeuronCollection(NeuronCollection nc) {
-        neuronCollectionSet.remove(nc);
-        removeArrayConnectable(nc);
-        nc.delete();
-        events.fireModelRemoved(nc);
-    }
-
-    /**
-     * Remove a neuron array.
-     */
-    public void removeNeuronArray(NeuronArray na) {
-        naList.remove(na);
-        removeArrayConnectable(na);
-        na.getEvents().fireDeleted();
-        events.fireModelRemoved(na);
-    }
-
-    /**
-     * Remove a multi-layer network
-     */
-    public void removeMultiLayer(MultiLayerNet mln) {
-        multiLayerNetworks.remove(mln);
-        removeArrayConnectable(mln);
-        //mln.getEvents().fireDelete();
-        events.fireModelRemoved(mln);
-    }
-
-    private void removeArrayConnectable(ArrayConnectable ac) {
-        removeWeightMatrix(ac.getIncomingWeightMatrix());
-        List<WeightMatrix> toDelete = new ArrayList<>(ac.getOutgoingWeightMatrices());
-        toDelete.forEach(this::removeWeightMatrix);
-    }
-
-    /**
-     * Remove a weight matrix
-     */
-    public void removeWeightMatrix(WeightMatrix wm) {
-        if (wm == null) {
-            return;
-        }
-        weightMatrices.remove(wm);
-        events.fireModelRemoved(wm);
-    }
-
-
-
-    /**
-     * Deletes a neuron from the network.
-     *
-     * @param toDelete neuron to delete
-     */
-    public void removeNeuron(final Neuron toDelete) {
-        removeNeuron(toDelete, true);
-    }
-
-    /**
-     * Delete a specified weight.
-     *
-     * @param toDelete the weight to delete
-     */
-    public void removeSynapse(final Synapse toDelete) {
+    public void delete(final Synapse toDelete) {
 
         // Remove references to this synapse from parent neurons
         if (toDelete.getSource() != null) {
@@ -552,6 +439,82 @@ public class Network {
             toDelete.getEvents().fireDeleted();
         }
     }
+
+    /**
+     * Delete a neuron.
+     *
+     * @param toDelete  the neuron to remove
+     * @param fireEvent whether to fire an event
+     */
+    public void delete(final Neuron toDelete, boolean fireEvent) {
+
+        // Update priority list
+        updatePriorityList();
+
+        // Remove Connected Synapses
+        toDelete.deleteConnectedSynapses();
+
+        // Remove the neuron itself. Either from a parent group that holds it,
+        // or from the root network.
+        if (toDelete.getParentGroup() != null) {
+            toDelete.getParentGroup().removeNeuron(toDelete);
+            if (toDelete.getParentGroup().isEmpty()) {
+                delete(toDelete.getParentGroup());
+            }
+        } else {
+            looseNeurons.remove(toDelete);
+        }
+
+        // Notify listeners that this neuron has been deleted
+        if (fireEvent) {
+            events.fireModelRemoved(toDelete);
+            toDelete.getEvents().fireDeleted();
+        }
+    }
+
+    public void delete(NeuronGroup ng) {
+        neuronGroups.remove(ng);
+        ng.delete();
+    }
+
+    public void delete(SynapseGroup sg) {
+        synapseGroups.remove(sg);
+        sg.delete();
+        events.fireModelRemoved(sg);
+    }
+
+    public void delete(NeuronCollection nc) {
+        neuronCollectionSet.remove(nc);
+        nc.delete();
+        events.fireModelRemoved(nc);
+    }
+
+    public void delete(NeuronArray na) {
+        naList.remove(na);
+        na.getEvents().fireDeleted();
+        events.fireModelRemoved(na);
+    }
+
+    public void delete(MultiLayerNet mln) {
+        multiLayerNetworks.remove(mln);
+        //mln.getEvents().fireDelete();
+        events.fireModelRemoved(mln);
+    }
+
+    public void delete(Subnetwork subnet) {
+        subnetworks.remove(subnet);
+        subnet.delete();
+        events.fireModelRemoved(subnet);
+    }
+
+    public void delete(WeightMatrix wm) {
+        if (wm == null) {
+            return;
+        }
+        weightMatrices.remove(wm);
+        events.fireModelRemoved(wm);
+    }
+
 
     /**
      * Create a {@link NeuronCollection) from a provided list of neurons
@@ -1217,7 +1180,7 @@ public class Network {
      */
     public WeightMatrix createWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
         if (target.getIncomingWeightMatrix() != null) {
-            removeWeightMatrix(target.getIncomingWeightMatrix());
+            delete(target.getIncomingWeightMatrix());
         }
 
         WeightMatrix newMatrix = new WeightMatrix(this, source, target);

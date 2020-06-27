@@ -495,7 +495,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
             } else { // There is a duplicate connecting src and target
                 // Check that we're not trying to add the exact same synapse...
                 if (!dup.equals(synapse)) {
-                    getNetwork().removeSynapse(fanOut.get(synapse.getTarget()));
+                    getNetwork().delete(fanOut.get(synapse.getTarget()));
                     fanOut.put(synapse.getTarget(), synapse);
                 } // Do nothing if we are.
             }
@@ -868,7 +868,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         List<Synapse> fanOutList = getFanOutList();
         fanOut.clear();
         for (Synapse s : fanOutList) {
-            parent.removeSynapse(s);
+            parent.delete(s);
         }
     }
 
@@ -880,7 +880,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         List<Synapse> fanInList = getFanInList();
         fanIn.clear();
         for (Synapse synapse : fanInList) {
-            parent.removeSynapse(synapse);
+            parent.delete(synapse);
         }
     }
 

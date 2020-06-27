@@ -1,8 +1,11 @@
 package org.simbrain.network.dl4j;
 
+import org.jetbrains.annotations.NotNull;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.NetworkModelEvents;
 
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -74,4 +77,6 @@ public interface ArrayConnectable extends LocatableModel {
 
     Rectangle2D getBound();
 
+    @Override
+    LocationEvents getEvents();
 }

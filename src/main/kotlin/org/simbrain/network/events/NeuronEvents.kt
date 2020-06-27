@@ -10,7 +10,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class NeuronEvents(val neuron: Neuron) : NetworkModelEvents(neuron), LocationEvents {
+class NeuronEvents(val neuron: Neuron) : LocationEvents(neuron) {
 
     fun onActivationChange(handler: BiConsumer<Double, Double>) = "ActivationChange".itemChangedEvent(handler)
     fun fireActivationChange(old: Double, new: Double) = "ActivationChange"(old = old, new = new)

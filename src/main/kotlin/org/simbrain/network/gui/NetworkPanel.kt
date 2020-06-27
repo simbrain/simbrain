@@ -18,7 +18,6 @@ import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.actions.edit.ToggleAutoZoom
-import org.simbrain.network.gui.actions.synapse.AddSynapseGroupAction
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
@@ -401,18 +400,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
     }
 
-    // TODO: refactor network remove model
-    // better to have a series of remove methods, similar to the add methods
     fun deleteSelectedObjects() {
 
         fun deleteGroup(interactionBox: InteractionBox) {
             with(network) {
                 interactionBox.parent.let { groupNode ->
                     when (groupNode) {
-                        is NeuronGroupNode -> removeNeuronGroup(groupNode.neuronGroup)
-                        is NeuronCollectionNode -> removeNeuronCollection(groupNode.neuronCollection)
-                        is SynapseGroupNode -> removeSynapseGroup(groupNode.synapseGroup)
-                        is SubnetworkNode -> removeSubnetwork(groupNode.subnetwork)
+                        is NeuronGroupNode -> delete(groupNode.neuronGroup)
+                        is NeuronCollectionNode -> delete(groupNode.neuronCollection)
+                        is SynapseGroupNode -> delete(groupNode.synapseGroup)
+                        is SubnetworkNode -> delete(groupNode.subnetwork)
                     }
                 }
             }
@@ -421,18 +418,18 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         fun delete(screenElement: ScreenElement) {
             with(network) {
                 when (screenElement) {
-                    is NeuronNode -> removeNeuron(screenElement.neuron, true)
-                    is SynapseNode -> removeSynapse(screenElement.synapse)
-                    is NeuronArrayNode -> removeNeuronArray(screenElement.neuronArray)
-                    is WeightMatrixNode -> removeWeightMatrix(screenElement.model)
-                    is MultiLayerNetworkNode -> removeMultiLayer(screenElement.model)
+                    is NeuronNode -> delete(screenElement.neuron, true)
+                    is SynapseNode -> delete(screenElement.synapse)
+                    is NeuronArrayNode -> delete(screenElement.neuronArray)
+                    is WeightMatrixNode -> delete(screenElement.model)
+                    is MultiLayerNetworkNode -> delete(screenElement.model)
                     is TextNode -> deleteText(screenElement.textObject)
                     is InteractionBox -> deleteGroup(screenElement)
                 }
             }
         }
 
-        selectedNodes.forEach { delete(it) }
+        selectionManager.selection.forEach { delete(it) }
 
         // Zoom events are costly so only zoom after main deletion events
         zoomToFitPage(true)

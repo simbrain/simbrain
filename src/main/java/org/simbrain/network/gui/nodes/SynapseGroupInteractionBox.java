@@ -31,7 +31,6 @@ import org.simbrain.util.StandardDialog;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.simbrain.network.gui.NetworkDialogsKt.createSynapseGroupDialog;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
@@ -260,7 +259,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            getNetworkPanel().getNetwork().removeSynapseGroup(synapseGroup);
+            getNetworkPanel().getNetwork().delete(synapseGroup);
         }
     };
 

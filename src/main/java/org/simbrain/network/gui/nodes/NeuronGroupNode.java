@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -30,7 +29,6 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.simbrain.network.gui.NetworkDialogsKt.createNeuronGroupDialog;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
@@ -283,7 +281,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            getNetworkPanel().getNetwork().removeNeuronGroup(neuronGroup);
+            getNetworkPanel().getNetwork().delete(neuronGroup);
         }
     };
 

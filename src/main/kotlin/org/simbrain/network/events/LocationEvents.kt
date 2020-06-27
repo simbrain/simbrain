@@ -1,18 +1,22 @@
 package org.simbrain.network.events
 
+import org.simbrain.network.NetworkModel
+import org.simbrain.util.Event
+import java.beans.PropertyChangeSupport
+
 /**
- * Handle location events.
+ * @see Event
  */
-interface LocationEvents {
+abstract class LocationEvents(model: NetworkModel) : NetworkModelEvents(model) {
 
     /**
      * Handle location change events
      */
-    fun onLocationChange(handler: Runnable)
+    abstract fun onLocationChange(handler: Runnable)
 
     /**
      * Fire a location change events.
      */
-    fun fireLocationChange()
+    abstract fun fireLocationChange()
 
 }

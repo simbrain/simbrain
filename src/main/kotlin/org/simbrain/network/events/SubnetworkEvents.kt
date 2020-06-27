@@ -9,7 +9,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class SubnetworkEvents(val subnet: Subnetwork) : NetworkModelEvents(subnet), LocationEvents {
+class SubnetworkEvents(val subnet: Subnetwork) : LocationEvents(subnet) {
 
     override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
     override fun fireLocationChange() = "LocationChange"()

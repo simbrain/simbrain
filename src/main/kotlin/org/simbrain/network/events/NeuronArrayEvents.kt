@@ -9,7 +9,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class NeuronArrayEvents(val neuronArray: NeuronArray) : NetworkModelEvents(neuronArray), LocationEvents {
+class NeuronArrayEvents(val neuronArray: NeuronArray) : LocationEvents(neuronArray) {
 
     override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
     override fun fireLocationChange() = "LocationChange"()

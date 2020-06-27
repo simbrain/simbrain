@@ -119,7 +119,6 @@ public class NetworkTextObject implements LocatableModel {
         this.italic = text.isItalic();
     }
 
-
     @Override
     public String toString() {
         return "(" + Math.round(x) + "," + Math.round(y) + "):" + text;

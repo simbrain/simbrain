@@ -515,7 +515,6 @@ public class Network {
         events.fireModelRemoved(wm);
     }
 
-
     /**
      * Create a {@link NeuronCollection) from a provided list of neurons
      *

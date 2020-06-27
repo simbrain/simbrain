@@ -102,11 +102,11 @@ public class SynapseGroupNode extends ScreenElement implements PropertyChangeLis
         events.onLabelChange((o,n) -> updateText());
         events.onVisibilityChange(this::toggleSynapseVisibility);
         events.onSynapseAdded(s -> {
-            SynapseGroupNode.this.getNetworkPanel().add(s);
+            SynapseGroupNode.this.getNetworkPanel().createNode(s);
             refreshVisible();
         });
         events.onSynapseRemoved(s -> {
-            SynapseGroupNode.this.getNetworkPanel().add(s);
+            SynapseGroupNode.this.getNetworkPanel().createNode(s);
             refreshVisible();
         });
 

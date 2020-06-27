@@ -230,7 +230,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         })
 
         // Add all network elements (important for de-serializing)
-        network.models.forEach{add(it)}
+        network.models.forEach{createNode(it)}
 
     }
 
@@ -307,7 +307,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         zoomToFitPage()
     }
 
-    fun add(neuron: Neuron) = addScreenElement {
+    fun createNode(neuron: Neuron) = addScreenElement {
         NeuronNode(this, neuron).also {
             (neuronNodeMapping as HashMap)[neuron] = it
             selectionManager.set(it)
@@ -315,13 +315,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
     }
 
-    fun add(synapse: Synapse) = addScreenElement {
+    fun createNode(synapse: Synapse) = addScreenElement {
         val source = neuronNodeMapping[synapse.source] ?: throw IllegalStateException("Neuron node does not exist")
         val target = neuronNodeMapping[synapse.target] ?: throw IllegalStateException("Neuron node does not exist")
         SynapseNode(this, source, target, synapse)
     }.also { it.lowerToBottom() }
 
-    fun add(neuronGroup: NeuronGroup) = addScreenElement {
+    fun createNode(neuronGroup: NeuronGroup) = addScreenElement {
 
         fun createNeuronGroupNode() = when (neuronGroup) {
             is SOMGroup -> SOMGroupNode(this, neuronGroup)
@@ -330,32 +330,32 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
 
         neuronGroup.applyLayout()
-        val neuronNodes = neuronGroup.neuronList.map { neuron -> add(neuron) }
+        val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron) }
         createNeuronGroupNode().apply { addNeuronNodes(neuronNodes) }
     }
 
-    fun add(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
+    fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
-    fun add(multiLayerNet: MultiLayerNet) = addScreenElement {
+    fun createNode(multiLayerNet: MultiLayerNet) = addScreenElement {
         MultiLayerNetworkNode(this, multiLayerNet)
     }
 
-    fun add(neuronCollection: NeuronCollection) = addScreenElement {
+    fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
         val neuronNodes = neuronCollection.neuronList.map {
             neuronNodeMapping[it] ?: throw IllegalStateException("Neuron node does not exist")
         }
         NeuronCollectionNode(this, neuronCollection).apply { addNeuronNodes(neuronNodes) }
     }
 
-    fun add(synapseGroup: SynapseGroup) = addScreenElement {
+    fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
         SynapseGroupNode(this, synapseGroup)
     }.also { it.lowerToBottom() }
 
-    fun add(weightMatrix: WeightMatrix) = addScreenElement {
+    fun createNode(weightMatrix: WeightMatrix) = addScreenElement {
         WeightMatrixNode(this, weightMatrix).also { it.lower() }
     }
 
-    fun add(subnetwork: Subnetwork) = addScreenElement {
+    fun createNode(subnetwork: Subnetwork) = addScreenElement {
         fun createSubNetwork() = when (subnetwork) {
             is Hopfield -> HopfieldNode(this, subnetwork)
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
@@ -368,8 +368,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        val neuronGroupNodes = subnetwork.neuronGroupList.map { group -> add(group) }
-        val synapseGroupNodes = subnetwork.synapseGroupList.map { group -> add(group) }
+        val neuronGroupNodes = subnetwork.neuronGroupList.map { group -> createNode(group) }
+        val synapseGroupNodes = subnetwork.synapseGroupList.map { group -> createNode(group) }
 
         createSubNetwork().apply {
             neuronGroupNodes.forEach { addNode(it) }
@@ -381,22 +381,22 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     /**
      * Add representation of specified text to network panel.
      */
-    fun add(text: NetworkTextObject) = addScreenElement {
+    fun createNode(text: NetworkTextObject) = addScreenElement {
         TextNode(this, text).apply {
             textHandle.startEditing(null, this.pStyledText);
         }
     }
 
-    private fun add(model: NetworkModel) {
+    private fun createNode(model: NetworkModel) {
         when(model) {
-            is Neuron -> add(model)
-            is Synapse -> add(model)
-            is NeuronArray -> add(model)
-            is NeuronCollection -> add(model)
-            is NeuronGroup -> add(model)
-            is SynapseGroup -> add(model)
-            is WeightMatrix -> add(model)
-            is Subnetwork -> add(model)
+            is Neuron -> createNode(model)
+            is Synapse -> createNode(model)
+            is NeuronArray -> createNode(model)
+            is NeuronCollection -> createNode(model)
+            is NeuronGroup -> createNode(model)
+            is SynapseGroup -> createNode(model)
+            is WeightMatrix -> createNode(model)
+            is Subnetwork -> createNode(model)
         }
     }
 
@@ -678,7 +678,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     private fun addNetworkListeners() {
         val event = network.events
-        event.onModelAdded(Consumer { add(it) })
+        event.onModelAdded(Consumer { createNode(it) })
         event.onModelRemoved(Consumer { it.events.fireDeleted() })
         event.onUpdateTimeDisplay(Consumer { d: Boolean? -> timeLabel.update() })
         event.onUpdateCompleted(Runnable{repaint()})

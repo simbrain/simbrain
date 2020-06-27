@@ -136,7 +136,7 @@ public final class NeuronDialog extends StandardDialog {
             n.getEvents().fireActivationChange(0, n.getActivation());
             n.getEvents().fireLabelChange();
             n.getEvents().fireColorChange();
-            n.getEvents().fireClampedChange(false, n.isClamped() );
+            n.getEvents().fireClampedChange(null, n.isClamped() );
         });
 
     }

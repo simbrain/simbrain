@@ -25,7 +25,7 @@ class NeuronEvents(val neuron: Neuron) : LocationEvents(neuron) {
     fun fireColorChange() = "ColorChange"()
 
     fun onClampedChange(handler: BiConsumer<Boolean, Boolean>) = "ClampedChange".itemChangedEvent(handler)
-    fun fireClampedChange(old: Boolean, new: Boolean) = "ClampedChange"(old = old, new = new)
+    fun fireClampedChange(old: Boolean?, new: Boolean) = "ClampedChange"(old = old, new = new)
 
     fun onUpdateRuleChange(handler: BiConsumer<NeuronUpdateRule, NeuronUpdateRule>) = "UpdateRuleChange".itemChangedEvent(handler)
     fun fireUpdateRuleChange(old: NeuronUpdateRule?, new: NeuronUpdateRule) = "UpdateRuleChange"(old = old, new = new)

@@ -81,7 +81,7 @@ public class NetworkTextObject implements LocatableModel {
     public transient PInputEvent inputEvent;
 
     // TODO: Too many constructors.
-    
+
     /**
      * Construct the text object.
      *

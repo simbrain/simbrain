@@ -18,6 +18,9 @@
  */
 package org.simbrain.network.gui;
 
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+
 import java.util.Stack;
 
 /**
@@ -31,6 +34,7 @@ public class UndoManager {
     // Todo: implement a cap on max-undo.
     // Todo: prevent or constraint very large memory undaoble actions?
 
+
     /**
      * All actions that can be undone are pushed to this stack.
      */
@@ -41,6 +45,12 @@ public class UndoManager {
      * to this stack.
      */
     private final Stack<UndoableAction> redoStack = new Stack<UndoableAction>();
+
+    private final Network network;
+
+    public UndoManager(Network network) {
+        this.network = network;
+    }
 
     /**
      * Add a new undoable action.
@@ -98,6 +108,11 @@ public class UndoManager {
     public interface UndoableAction {
 
         /**
+         * Do the action.
+         */
+        void apply();
+
+        /**
          * Undo this action.
          */
         void undo();
@@ -106,6 +121,47 @@ public class UndoManager {
          * Redo this action.
          */
         void redo();
+
+    }
+
+    // Test main
+    public static void main(String[] args) {
+        Network network = new Network();
+        UndoManager manager = new UndoManager(network);
+        UndoableAction addNeuron = new UndoableAction() {
+
+            Neuron newNeuron = new Neuron(network);
+
+            @Override
+            public void apply() {
+                network.addLooseNeuron(newNeuron);
+            }
+
+            @Override
+            public void undo() {
+                network.delete(newNeuron);
+            }
+
+            @Override
+            public void redo() {
+                network.addLooseNeuron(newNeuron);
+            }
+        };
+
+        manager.addUndoableAction(addNeuron);
+
+        System.out.println("Apply action");
+        addNeuron.apply();
+        System.out.println(network);
+        manager.printUndoRedoStats();
+        System.out.println("Undo action");
+        manager.undo();
+        manager.printUndoRedoStats();
+        System.out.println(network);
+        System.out.println("Redo action");
+        manager.redo();
+        manager.printUndoRedoStats();
+        System.out.println(network);
 
     }
 

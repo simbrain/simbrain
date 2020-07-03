@@ -42,6 +42,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     Neuron errorNeuron;
 
     OdorWorldEntity mouse;
+    SmellSensor smellSensor;
 
     private int netSize = 50;
     private int spacing = 40;
@@ -127,7 +128,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         network.addSynapseGroup(inpSynG);
 
         // Couple from mouse to input nodes
-        sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), inputNetwork);
+        sim.couple(smellSensor, inputNetwork);
 
         // Prediction net
         // predictionRes = net.addNeuronGroup(1,1,  netSize);
@@ -160,7 +161,8 @@ public class KuramotoOscillators extends RegisteredSimulation {
 
         // Mouse
         mouse = world.addEntity(202, 176, EntityType.MOUSE);
-        mouse.addSensor(new SmellSensor(mouse, "Smell-Center", 0, 0));
+        smellSensor = new SmellSensor(mouse, "Smell-Center", 0, 0);
+        mouse.addSensor(smellSensor);
         mouse.setHeading(90);
 
         // Objects

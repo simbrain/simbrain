@@ -58,7 +58,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     /**
      * Current value of the sensor; activationAmount if "active", 0 otherwise.
      */
-    private double[] values;
+    private double[] values = new double[]{};
 
     /**
      * Value to return when the tile sensor is activated.

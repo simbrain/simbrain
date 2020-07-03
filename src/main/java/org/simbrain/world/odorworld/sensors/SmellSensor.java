@@ -128,11 +128,9 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
 
     @Override
     public String getLabel() {
-        if (super.getLabel().isEmpty()) {
-            return getDirectionString() + getSmellSensorDescription();
-        } else {
-            return super.getLabel();
-        }
+        // TODO: Add labbel.ismpety check. Removed it because label is set by AddSensorDialog.
+        //  So for now custom labels not possible on this sensor
+        return getDirectionString() + getSmellSensorDescription();
     }
 
     @Override

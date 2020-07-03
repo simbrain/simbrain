@@ -854,6 +854,7 @@ public class Network {
         getFlatNeuronList().forEach(Neuron::postUnmarshallingInit);
         textList.forEach(NetworkTextObject::postUnmarshallingInit);
         synapseGroups.forEach(SynapseGroup::postUnmarshallingInit);
+        weightMatrices.forEach(WeightMatrix::postUnmarshallingInit);
         neuronGroups.forEach(AbstractNeuronCollection::postUnmarshallingInit);
         neuronCollectionSet.forEach(AbstractNeuronCollection::postUnmarshallingInit);
         subnetworks.forEach(Subnetwork::postUnmarshallingInit);
@@ -1089,6 +1090,14 @@ public class Network {
     }
 
     /**
+     * Add a weight matrix object.
+     */
+    public void addWeightMatrix(final WeightMatrix wm) {
+        weightMatrices.add(wm);
+        events.fireModelAdded(wm);
+    }
+
+    /**
      * Delete a network text object.
      *
      * @param text text object to add
@@ -1141,6 +1150,8 @@ public class Network {
                 addNeuronGroup((NeuronGroup) object);
             } else if (object instanceof NeuronArray) {
                 addNeuronArray((NeuronArray) object);
+            } else if (object instanceof  WeightMatrix) {
+                addWeightMatrix((WeightMatrix) object);
             }
         }
     }
@@ -1183,9 +1194,6 @@ public class Network {
         }
 
         WeightMatrix newMatrix = new WeightMatrix(this, source, target);
-        newMatrix.initializeId();
-        weightMatrices.add(newMatrix);
-        events.fireModelAdded(newMatrix);
         return newMatrix;
     }
 

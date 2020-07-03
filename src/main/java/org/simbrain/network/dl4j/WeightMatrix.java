@@ -93,13 +93,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         source.addOutgoingWeightMatrix(this);
         target.setIncomingWeightMatrix(this);
 
-        // When the parents of the matrix are deleted, delete the matrix
-        source.getEvents().onDeleted(m -> {
-            delete();
-        });
-        target.getEvents().onDeleted(m -> {
-            delete();
-        });
+        initEvents();
 
         // Default for "adapter" cases is 1-1
         if (source instanceof NeuronCollection || target instanceof NeuronCollection) {
@@ -110,6 +104,18 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
             randomize();
         }
 
+        initializeId();
+
+    }
+
+    private void initEvents() {
+        // When the parents of the matrix are deleted, delete the matrix
+        source.getEvents().onDeleted(m -> {
+            delete();
+        });
+        target.getEvents().onDeleted(m -> {
+            delete();
+        });
     }
 
     /**
@@ -273,9 +279,9 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         events.fireUpdated();
     }
 
-    private Object readResolve() {
+    public void postUnmarshallingInit() {
         events = new WeightMatrixEvents(this);
-        return this;
+        initEvents();
     }
 
     //public Layer asLayer() {

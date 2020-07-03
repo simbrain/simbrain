@@ -169,6 +169,10 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         networkPanel.selectionManager.set(finalSelection)
     }
 
+    /**
+     * Search through what's clicked on, upwards through parents, to find the first draggable item, and then
+     * drag that.  See [screenElements].
+     */
     private fun dragItems(event: PInputEvent) {
         val delta = event.position - marqueeEndPosition
         networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }

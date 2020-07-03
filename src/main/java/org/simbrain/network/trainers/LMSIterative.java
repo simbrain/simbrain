@@ -21,7 +21,9 @@ package org.simbrain.network.trainers;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.subnetworks.LMSNetwork;
 
 /**
  * Train using least mean squares.
@@ -41,17 +43,21 @@ public class LMSIterative extends IterableTrainer {
     private double learningRate = .01;
 
     /**
+     * Parent network
+     */
+    final private LMSNetwork network;
+
+    /**
      * Construct a least mean squares iterative panel.
      *
      * @param network
      */
-    public LMSIterative(Trainable network) {
+    public LMSIterative(LMSNetwork network) {
         super(network);
+        this.network = network;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public double getError() {
         return rmsError;
     }
@@ -117,25 +123,18 @@ public class LMSIterative extends IterableTrainer {
      */
     public void randomize() {
         for (Neuron neuron : network.getOutputNeurons()) {
-            neuron.clear(); // Looks nicer in the GUI
-            neuron.randomizeFanIn();
+            neuron.clear(); // Cleared output nodes look nicer in the GUI
             if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
                 ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(Math.random());
             }
         }
-        revalidateSynapseGroups();
+        network.getWeightMatrixList().forEach(WeightMatrix::randomize);
     }
 
-    /**
-     * @return the learningRate
-     */
     public double getLearningRate() {
         return learningRate;
     }
 
-    /**
-     * @param learningRate the learningRate to set
-     */
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
     }

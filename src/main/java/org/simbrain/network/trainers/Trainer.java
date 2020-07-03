@@ -97,6 +97,8 @@ public abstract class Trainer implements EditableObject {
      * Helper function to update synapse groups whose synapses may have changed
      * based on training.
      */
+    // Most trainers should now use dl4j weight matrices
+    @Deprecated()
     public void revalidateSynapseGroups() {
         if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
             for (SynapseGroup sg : ((Subnetwork) getTrainableNetwork().getNetwork()).getSynapseGroupList()) {

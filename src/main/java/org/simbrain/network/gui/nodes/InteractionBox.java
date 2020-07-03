@@ -126,6 +126,7 @@ public abstract class InteractionBox extends ScreenElement {
         return contextMenu;
     }
 
+    // See MouseEventHandler.kt#dragItems
     @Override
     public boolean isDraggable() {
         return false;
@@ -136,16 +137,10 @@ public abstract class InteractionBox extends ScreenElement {
         return true;
     }
 
-    /**
-     * @param contextMenu the contextMenu to set
-     */
     public void setContextMenu(final JPopupMenu contextMenu) {
         this.contextMenu = contextMenu;
     }
 
-    /**
-     * @return the zoomListener
-     */
     public PropertyChangeListener getZoomListener() {
         return zoomListener;
     }

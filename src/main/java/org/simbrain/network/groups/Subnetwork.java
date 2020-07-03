@@ -75,6 +75,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     /**
      * List of synapse groups.
      */
+    @Deprecated
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
 
     /**
@@ -145,6 +146,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      *
      * @param group the synapse group to add
      */
+    @Deprecated
     public void addSynapseGroup(SynapseGroup group) {
         synapseGroupList.add(group);
     }
@@ -493,11 +495,9 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      * override this.
      */
     public void update() {
-
         neuronGroupList.forEach(NeuronGroup::update);
         synapseGroupList.forEach(SynapseGroup::update);
         weightMatrixList.forEach(WeightMatrix::update);
-
     }
 
     /**
@@ -555,6 +555,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         events = new SubnetworkEvents(this);
         neuronGroupList.forEach(AbstractNeuronCollection::postUnmarshallingInit);
         synapseGroupList.forEach(SynapseGroup::postUnmarshallingInit);
+        weightMatrixList.forEach(WeightMatrix::postUnmarshallingInit);
     }
 
     @Override

@@ -391,11 +391,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
 
         val neuronGroupNodes = subnetwork.neuronGroupList.map { group -> createNode(group) }
-        val synapseGroupNodes = subnetwork.synapseGroupList.map { group -> createNode(group) }
+        val weightMatrixNodes = subnetwork.weightMatrixList.map { group -> createNode(group) }
 
         createSubNetwork().apply {
             neuronGroupNodes.forEach { addNode(it) }
-            synapseGroupNodes.forEach { addNode(it) }
+            weightMatrixNodes.forEach { addNode(it) }
         }
 
     }
@@ -628,7 +628,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
             for (source in sources) {
                 for (target in targets) {
-                    network.createWeightMatrix(source, target)
+                    network.addWeightMatrix((network.createWeightMatrix(source, target)));
                 }
             }
         }

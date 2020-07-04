@@ -75,7 +75,6 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     /**
      * List of synapse groups.
      */
-    @Deprecated
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
 
     /**
@@ -146,7 +145,6 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      *
      * @param group the synapse group to add
      */
-    @Deprecated
     public void addSynapseGroup(SynapseGroup group) {
         synapseGroupList.add(group);
     }
@@ -521,20 +519,6 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         }
     }
 
-    //@Override
-    //public void initializeId() {
-    //    // Set id for subnetwork
-    //    super.initializeId();
-    //    // Set ids for neuron groups
-    //    for (Group ng : neuronGroupList) {
-    //        ng.initializeId();
-    //    }
-    //    // Set ids for synapse groups
-    //    for (Group sg : synapseGroupList) {
-    //        sg.initializeId();
-    //    }
-    //}
-
     @Consumable(defaultVisibility = false)
     public void setLabel(String label) {
         String oldLabel = this.label;
@@ -577,7 +561,6 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
 
     @Override
     public void setBufferValues() {
-        // TODO
     }
 
     @Override

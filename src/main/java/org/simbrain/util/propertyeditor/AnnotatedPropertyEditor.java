@@ -340,7 +340,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         if (editedObjects.size() == 1) {
             return "Edit " + firstObject;
         } else {
-            String lastObject = names.get(names.size() - 1);
             return "Edit " + names.size() + " " +
                 editedObjects.get(0).getClass().getSimpleName() + "s";
         }

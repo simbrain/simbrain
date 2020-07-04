@@ -34,17 +34,14 @@ public class BufferedUpdate implements NetworkUpdateAction {
      */
     private Network network;
 
-    /**
-     * @param network
-     */
     public BufferedUpdate(Network network) {
         this.network = network;
     }
 
     @Override
     public void invoke() {
-        network.bufferedUpdateAllNeurons(); // TODO: Rename this
-        //network.clearInputs();
+        network.bufferedUpdateAllNeurons();
+        network.clearInputs();
     }
 
     @Override

@@ -104,20 +104,22 @@ public final class SynapseDialog extends StandardDialog {
      */
     private SynapseDialog(final List<Synapse> synapseList) {
         this.synapseList = synapseList;
-        synapseEditingPanel  = new AnnotatedPropertyEditor(synapseList);
-        initializeLayout();
-        updateHelp();
+        init(synapseList);
     }
 
     /**
      * Private constructor with frame.
-     *
-     * @param synapseList
-     * @param parent
      */
     private SynapseDialog(final List<Synapse> synapseList, final Frame parent) {
         super(parent, "Synapse Dialog");
         this.synapseList = (ArrayList<Synapse>) synapseList;
+        init(synapseList);
+    }
+
+    private void init(List<Synapse> synapseList) {
+        if (synapseList.size() == 0) {
+            return;
+        }
         synapseEditingPanel  = new AnnotatedPropertyEditor(synapseList);
         initializeLayout();
         addListeners();

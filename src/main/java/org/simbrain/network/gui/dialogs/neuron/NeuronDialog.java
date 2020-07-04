@@ -59,13 +59,9 @@ public final class NeuronDialog extends StandardDialog {
 
     /**
      * Construct a dialog for a set of neurons.
-     *
-     * @param neurons
      */
     public NeuronDialog(final List<Neuron> neurons) {
-
         neuronList = neurons;
-
         neuronPropertiesPanel = new AnnotatedPropertyEditor(neuronList);
         setTitle(neuronPropertiesPanel.getTitleString());
 

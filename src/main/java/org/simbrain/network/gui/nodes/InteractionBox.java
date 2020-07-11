@@ -28,7 +28,7 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeListener;
 
 /**
- * Interaction Box: graphical element for interacting with a group.
+ * Interaction Box: graphical element for interacting with a group.  Subclasses support custom menus, dialogs, etc.
  */
 public abstract class InteractionBox extends ScreenElement {
 
@@ -48,11 +48,6 @@ public abstract class InteractionBox extends ScreenElement {
     private PText textLabel;
 
     /**
-     * Context menu.
-     */
-    private JPopupMenu contextMenu;
-
-    /**
      * This is the largest amount an interaction box's scale can be zoomed when the scale gets small. Easiest to
      * understand by changing the value and "zooming  out" of a network containing a neuron group.
      */
@@ -63,12 +58,13 @@ public abstract class InteractionBox extends ScreenElement {
      */
     private final PropertyChangeListener zoomListener;
 
-    Rectangle2D rect = new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    /**
+     * Rectangle that displays the box.
+     */
+    private Rectangle2D rect = new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
     /**
      * Create a new tab node.
-     *
-     * @param net
      */
     public InteractionBox(final NetworkPanel net) {
         super(net);
@@ -121,11 +117,6 @@ public abstract class InteractionBox extends ScreenElement {
         setBounds(textLabel.getBounds());
     }
 
-    @Override
-    public JPopupMenu getContextMenu() {
-        return contextMenu;
-    }
-
     // See MouseEventHandler.kt#dragItems
     @Override
     public boolean isDraggable() {
@@ -135,10 +126,6 @@ public abstract class InteractionBox extends ScreenElement {
     @Override
     public boolean isSelectable() {
         return true;
-    }
-
-    public void setContextMenu(final JPopupMenu contextMenu) {
-        this.contextMenu = contextMenu;
     }
 
     public PropertyChangeListener getZoomListener() {

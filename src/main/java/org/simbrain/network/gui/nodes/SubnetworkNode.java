@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.SubnetworkEvents;
@@ -66,6 +67,11 @@ public class SubnetworkNode extends ScreenElement {
      * The outlined objects (neuron and synapse groups) for this node.
      */
     private final Outline outline = new Outline();
+
+    /**
+     * Custom context menu for subnetwork.
+     */
+    private JPopupMenu contextMenu;
 
     /**
      * The outlined objects
@@ -166,33 +172,6 @@ public class SubnetworkNode extends ScreenElement {
         return outline;
     }
 
-    /**
-     * Basic interaction box for subnetwork nodes. Ensures a property dialog
-     * appears when the box is double-clicked.
-     */
-    public class SubnetworkNodeInteractionBox extends InteractionBox {
-
-        public SubnetworkNodeInteractionBox(NetworkPanel net) {
-            super(net);
-        }
-
-        @Override
-        public JDialog getPropertyDialog() {
-            return SubnetworkNode.this.getPropertyDialog();
-        }
-
-        @Override
-        public SubnetworkNode getNode() {
-            return SubnetworkNode.this;
-        }
-
-        @Override
-        public Subnetwork getModel() {
-            return SubnetworkNode.this.getSubnetwork();
-        }
-
-    }
-
     @Override
     public boolean isSelectable() {
         return true;
@@ -233,7 +212,7 @@ public class SubnetworkNode extends ScreenElement {
      * @param menu the menu to set
      */
     public void setContextMenu(final JPopupMenu menu) {
-        interactionBox.setContextMenu(menu);
+        contextMenu = menu;
     }
 
     /**
@@ -338,5 +317,39 @@ public class SubnetworkNode extends ScreenElement {
         }
         outline.setOutlinedNodes(outlinedObjects);
     }
+
+
+    /**
+     * Basic interaction box for subnetwork nodes. Ensures a property dialog
+     * appears when the box is double-clicked.
+     */
+    public class SubnetworkNodeInteractionBox extends InteractionBox {
+
+        public SubnetworkNodeInteractionBox(NetworkPanel net) {
+            super(net);
+        }
+
+        @Override
+        public JDialog getPropertyDialog() {
+            return SubnetworkNode.this.getPropertyDialog();
+        }
+
+        @Override
+        public JPopupMenu getContextMenu() {
+            return contextMenu;
+        }
+
+        @Override
+        public SubnetworkNode getNode() {
+            return SubnetworkNode.this;
+        }
+
+        @Override
+        public Subnetwork getModel() {
+            return SubnetworkNode.this.getSubnetwork();
+        }
+
+    }
+
 
 }

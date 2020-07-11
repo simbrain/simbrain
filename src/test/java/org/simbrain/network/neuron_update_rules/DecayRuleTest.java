@@ -24,11 +24,11 @@ public class DecayRuleTest {
         // Set to 1 and decay by .2
         n.setActivation(1);
         dr.setDecayAmount(.2);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(.8, n.getActivation(), .01);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(.6, n.getActivation(), .01);
-        IntStream.range(0, 10).forEach(i-> net.bufferedUpdateAllNeurons());
+        IntStream.range(0, 10).forEach(i-> net.bufferedUpdate());
 
         // Should decay to 0 by this point
         assertEquals(0, n.getActivation(), .01);
@@ -48,30 +48,30 @@ public class DecayRuleTest {
         //  1 -> .9 -> .81 -> .729 ->  .6561
         n.setActivation(1);
         dr.setDecayFraction(.1);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(.9,n.getActivation(),.001);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(.81,n.getActivation(),.001);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(.729,n.getActivation(),.001);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(.6561,n.getActivation(),.001);
 
         // Try with larger number
         n.setUpperBound(10);
         n.setActivation(10);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(9,n.getActivation(),.001);
 
         // Try with negative number
         n.setActivation(-1);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(-.9,n.getActivation(),.001);
 
         // Try with different baseline
         n.setActivation(1);
         dr.setBaseLine(.5);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(.95,n.getActivation(),.001);
         
     }

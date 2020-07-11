@@ -57,7 +57,8 @@ public class NetworkUpdateManager {
     }
 
     /**
-     * Invokes the actions in the action list consecutively.
+     * Invokes the actions in the action list consecutively. By default {@link BufferedUpdate} is
+     * all that is called.
      */
     public void invokeAllUpdates() {
         actionList.forEach(NetworkUpdateAction::invoke);

@@ -40,7 +40,7 @@ public class BufferedUpdate implements NetworkUpdateAction {
 
     @Override
     public void invoke() {
-        network.bufferedUpdateAllNeurons();
+        network.bufferedUpdate();
         network.clearInputs();
     }
 

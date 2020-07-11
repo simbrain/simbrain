@@ -24,23 +24,23 @@ public class BinaryRuleTest {
 
         // Below threshold
         n.setInputValue(.4);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(0 ,n.getActivation(),.001);
 
         // Above threshold
         n.setInputValue(.6);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(1 ,n.getActivation(),.001);
 
         // Test new Threshold
         br.setThreshold(.2);
         // Below
         n.setInputValue(.19);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(0 ,n.getActivation(),.001);
         // Above
         n.setInputValue(.3);
-        net.bufferedUpdateAllNeurons();
+        net.bufferedUpdate();
         assertEquals(1 ,n.getActivation(),.001);
 
     }

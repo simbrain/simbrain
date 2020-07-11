@@ -249,12 +249,11 @@ public class Network {
     }
 
     /**
-     * Calls {@link Neuron#update} for each neuron.
+     * Default asycnrhonous update method called by {@link org.simbrain.network.update_actions.BufferedUpdate}.
      */
-    public void bufferedUpdateAllNeurons() {
+    public void bufferedUpdate() {
 
-        // TODO: Rename
-        // TODO: use a getNetworkModels function (then it may be reusable in networkpanel)
+        // TODO: Once update and applybuffervalues are implemented possibly use networkmodels
 
         // First update the activation buffers
         looseNeurons.forEach(NetworkModel::update);
@@ -262,6 +261,7 @@ public class Network {
         weightMatrices.forEach(NetworkModel::update);
         getNeuronArrays().forEach(NetworkModel::update);
         neuronCollectionSet.forEach(NetworkModel::update);
+        subnetworks.forEach(Subnetwork::update);
 
         // Then update the activations themselves
         looseNeurons.forEach(NetworkModel::applyBufferValues);
@@ -269,6 +269,8 @@ public class Network {
         weightMatrices.forEach(NetworkModel::applyBufferValues);
         getNeuronArrays().forEach(NetworkModel::applyBufferValues);
         neuronCollectionSet.forEach(NetworkModel::applyBufferValues);
+        subnetworks.forEach(Subnetwork::applyBufferValues);
+
     }
 
     /**

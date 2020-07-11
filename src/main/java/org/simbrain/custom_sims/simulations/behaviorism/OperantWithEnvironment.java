@@ -213,7 +213,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
             setWinningNode(2);
         }
 
-        network.bufferedUpdateAllNeurons();
+        network.bufferedUpdate();
 
     }
 

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -231,7 +232,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     }
 
     /**
-     * Custom interaction box for Subnetwork node. Ensures a property dialog
+     * Custom interaction box for Neuron Groups node. Ensures a property dialog
      * appears when the box is double-clicked.
      */
     public class NeuronGroupInteractionBox extends InteractionBox {
@@ -253,6 +254,11 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         @Override
         public JPopupMenu getContextMenu() {
             return getDefaultContextMenu();
+        }
+
+        @Override
+        public JDialog getPropertyDialog() {
+            return NeuronGroupNode.this.getPropertyDialog();
         }
 
         @Override

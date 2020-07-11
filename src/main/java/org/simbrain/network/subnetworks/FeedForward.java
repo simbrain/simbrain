@@ -16,6 +16,7 @@ package org.simbrain.network.subnetworks;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.groups.NeuronGroup;
@@ -55,7 +56,8 @@ public class FeedForward extends Subnetwork {
      * @param initialPosition     bottom corner where network will be placed.
      * @param inputNeuronTemplate the type of Neuron to use for the input layer
      */
-    public FeedForward(final Network network, int[] nodesPerLayer, Point2D initialPosition, final Neuron inputNeuronTemplate) {
+    public FeedForward(final Network network, int[] nodesPerLayer, Point2D initialPosition,
+                       final NeuronUpdateRule inputNeuronTemplate) {
         super(network);
         buildNetwork(network, nodesPerLayer, initialPosition, inputNeuronTemplate);
     }
@@ -73,10 +75,8 @@ public class FeedForward extends Subnetwork {
     public FeedForward(final Network network, int[] nodesPerLayer, Point2D initialPosition) {
         super(network);
         LinearRule rule = new LinearRule();
-        Neuron neuron = new Neuron(network, rule);
-        neuron.setIncrement(1); // For easier testing
         rule.setLowerBound(0);
-        buildNetwork(network, nodesPerLayer, initialPosition, neuron);
+        buildNetwork(network, nodesPerLayer, initialPosition, rule);
     }
 
     /**
@@ -89,7 +89,8 @@ public class FeedForward extends Subnetwork {
      * @param initialPosition     bottom corner where network will be placed.
      * @param inputNeuronTemplate the type of Neuron to use for the input layer
      */
-    private void buildNetwork(final Network network, int[] nodesPerLayer, Point2D initialPosition, final Neuron inputNeuronTemplate) {
+    private void buildNetwork(final Network network, int[] nodesPerLayer, Point2D initialPosition,
+                              final NeuronUpdateRule inputNeuronTemplate) {
 
         setLabel("Layered Network");
 

@@ -20,6 +20,7 @@ package org.simbrain.network.gui.actions.synapse
 
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction
 import org.simbrain.network.gui.showSelectedSynapseProperties
 import java.awt.Toolkit
 import java.awt.event.ActionEvent
@@ -32,19 +33,18 @@ import javax.swing.KeyStroke
 /**
  * Set synapse properties.
  */
-class SetSynapsePropertiesAction(val networkPanel: NetworkPanel) : AbstractAction("Synapse Properties...") {
+class SetSynapsePropertiesAction(networkPanel: NetworkPanel) : ConditionallyEnabledAction(networkPanel,
+        "Synapse Properties...", EnablingCondition.SYNAPSES) {
 
     /**
      * Set action text based on number of selected neurons.
      */
     private fun updateAction() {
         val numSynapses = networkPanel.selectionManager.filterSelectedModels<Synapse>().size
-        isEnabled = if (numSynapses > 0) {
+        if (numSynapses > 0) {
             putValue(Action.NAME, "Edit $numSynapses Selected ${if (numSynapses > 1) "Synapses" else "Synapse"}")
-            true
         } else {
             putValue(Action.NAME, "Edit Selected Synapse(s)")
-            false
         }
     }
 

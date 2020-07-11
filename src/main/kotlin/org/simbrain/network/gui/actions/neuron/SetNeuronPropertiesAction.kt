@@ -19,6 +19,8 @@
 package org.simbrain.network.gui.actions.neuron
 
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction
+import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.showSelectedNeuronProperties
 import java.awt.Toolkit
 import java.awt.event.ActionEvent
@@ -31,27 +33,22 @@ import javax.swing.KeyStroke
 /**
  * Set neuron properties.
  */
-class SetNeuronPropertiesAction(private val networkPanel: NetworkPanel) : AbstractAction("Neuron Properties...") {
-
+class SetNeuronPropertiesAction(networkPanel: NetworkPanel) : ConditionallyEnabledAction(networkPanel,
+        "Neuron Properties...", EnablingCondition.NEURONS) {
 
     /**
      * Set action text based on number of selected neurons.
      */
     private fun updateAction() {
-        val numNeurons = networkPanel.selectedNodes.size
-        isEnabled = if (numNeurons > 0) {
+        val numNeurons = networkPanel.selectionManager.filterSelectedNodes<NeuronNode>().size
+        if (numNeurons > 0) {
             putValue(Action.NAME, "Edit $numNeurons Selected ${if (numNeurons > 1) "Neurons" else "Neuron"}")
-            true
         } else {
             putValue(Action.NAME, "Edit Selected Neuron(s)")
-            false
         }
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     override fun actionPerformed(event: ActionEvent) {
         networkPanel.showSelectedNeuronProperties()
     }

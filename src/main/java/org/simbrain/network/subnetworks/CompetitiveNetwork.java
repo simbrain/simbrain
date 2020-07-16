@@ -63,10 +63,10 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
      *
      * @param net                   parent network Set to null when this is used simply as a
      *                              holder for param values.
-     * @param numCompetitiveNeurons number of neurons in the Competitive layer
      * @param numInputNeurons       number of neurons in the input layer
+     * @param numCompetitiveNeurons number of neurons in the Competitive layer
      */
-    public CompetitiveNetwork(Network net, int numCompetitiveNeurons, int numInputNeurons) {
+    public CompetitiveNetwork(Network net, int numInputNeurons, int numCompetitiveNeurons) {
         super(net);
         this.setLabel("Competitive Network");
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
@@ -107,7 +107,6 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
 
     @Override
     public void initNetwork() {
-        // No implementation
     }
 
     /**
@@ -126,7 +125,6 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         return this;
     }
 
-
     /**
      * Helper class for creating new competitive nets using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */
@@ -142,7 +140,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
          * Create the competitive net
          */
         public CompetitiveNetwork create(Network network) {
-            return new CompetitiveNetwork(network, numIn, numComp);
+            return new CompetitiveNetwork(network,  numIn, numComp);
         }
 
     }

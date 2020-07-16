@@ -198,8 +198,8 @@ public class AddNeuronsDialog extends StandardDialog {
                 ng.applyLayout();
                 ng.setLabel(groupPanel.tfGroupName.getText());
             } else {
-                // TODO
-                //networkPanel.addNeuronsToPanel(addedNeurons, layoutObject.getLayout());
+                layoutObject.getLayout().layoutNeurons(addedNeurons);
+                networkPanel.getNetwork().addLooseNeurons(addedNeurons);
             }
         }
     }

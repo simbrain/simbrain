@@ -114,10 +114,9 @@ public final class NetworkComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> retList = new ArrayList<>();
-        //retList.add(network);
         retList.addAll(network.getFlatNeuronList());
         retList.addAll(network.getLooseSynapses());
-        retList.addAll(network.getNeuronGroups());
+        retList.addAll(network.getFlatNeuronGroupList());
         retList.addAll(network.getNeuronCollectionSet());
         retList.addAll(network.getNeuronArrays());
         // TODO: Temp code to handle xstream backwards compatibility issues

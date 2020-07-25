@@ -335,7 +335,7 @@ public class Network {
         ArrayList<NeuronGroup> ret = new ArrayList<>();
         ret.addAll(neuronGroups);
         subnetworks.forEach(net -> ret.addAll(net.getNeuronGroupList()));
-        return neuronGroups;
+        return ret;
     }
 
     /**

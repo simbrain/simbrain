@@ -72,13 +72,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
         events.fireLocationChange();
     }
 
-    public void addNeuron(Neuron neuron, boolean fireEvent) {
-        addNeuron(neuron);
-        if (fireEvent) {
-            events.fireNeuronAdded(neuron);
-        }
-    }
-
     @Override
     public void update() {
         super.update();

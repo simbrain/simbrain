@@ -726,10 +726,6 @@ public class Network {
 
     public void addSubnetwork(Subnetwork net) {
         subnetworks.add(net);
-        net.getNeuronGroupList().forEach(events::fireModelAdded);
-        net.getSynapseGroupList().forEach(events::fireModelAdded);
-        net.getWeightMatrixList().forEach(events::fireModelAdded);
-        // TODO: Loose nodes and synapses? But should be invisible.
         events.fireModelAdded(net);
     }
 

@@ -27,8 +27,4 @@ class NeuronCollectionEvents(val nc: AbstractNeuronCollection) : LocationEvents(
     fun onRecordingStopped(handler: Runnable) = "RecordingStopped".event(handler)
     fun fireRecordingStopped() = "RecordingStopped"()
 
-    fun onNeuronAdded(handler: Consumer<Neuron>) = "NeuronAdded".itemAddedEvent(handler)
-    fun fireNeuronAdded(neuron: Neuron) = "NeuronAdded"(new = neuron)
-
-
 }

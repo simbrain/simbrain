@@ -390,9 +390,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        val neuronGroupNodes = subnetwork.neuronGroupList.map { group -> createNode(group) }
-        val weightMatrixNodes = subnetwork.weightMatrixList.map { group -> createNode(group) }
-        val synapseGroupNodes = subnetwork.synapseGroupList.map { group -> createNode(group) }
+        val neuronGroupNodes = subnetwork.neuronGroupList.map { group ->
+            network.events.fireModelAdded(group)
+            createNode(group)
+        }
+        val weightMatrixNodes = subnetwork.weightMatrixList.map { group ->
+            network.events.fireModelAdded(group)
+            createNode(group) }
+        val synapseGroupNodes = subnetwork.synapseGroupList.map { group ->
+            network.events.fireModelAdded(group)
+            createNode(group) }
 
         createSubNetwork().apply {
             neuronGroupNodes.forEach { addNode(it) }

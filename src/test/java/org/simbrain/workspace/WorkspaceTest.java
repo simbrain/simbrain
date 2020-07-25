@@ -6,6 +6,7 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.plot.projection.ProjectionComponent;
+import org.simbrain.workspace.couplings.CouplingKt;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 

@@ -7,6 +7,10 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.util.complement
+import org.simbrain.workspace.couplings.consumers
+import org.simbrain.workspace.couplings.getConsumer
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.couplings.producers
 
 class CouplingTest {
 

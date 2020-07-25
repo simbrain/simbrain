@@ -52,10 +52,7 @@ public final class ShowRunToolBarAction
 
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
 
         // Perform action

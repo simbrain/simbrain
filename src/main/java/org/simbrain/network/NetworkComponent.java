@@ -186,4 +186,10 @@ public final class NetworkComponent extends WorkspaceComponent {
     public String getXML() {
         return Utils.getSimbrainXStream().toXML(network);
     }
+
+    @Override
+    public void start() {
+        // Stop any local network running that is occurring
+        network.setRunning(false);
+    }
 }

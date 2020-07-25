@@ -555,12 +555,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     }
 
     fun contextualIncrementSelectedObjects() {
+        selectionManager.filterSelectedModels<Synapse>().forEach { it.incrementWeight() }
         selectionManager.filterSelectedModels<Neuron>().forEach { it.updateRule.contextualIncrement(it) }
         selectionManager.filterSelectedModels<NeuronArray>().forEach { it.increment() }
         selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.increment() }
     }
 
     fun contextualDecrementSelectedObjects() {
+        selectionManager.filterSelectedModels<Synapse>().forEach { it.decrementWeight() }
         selectionManager.filterSelectedModels<Neuron>().forEach { it.updateRule.contextualDecrement(it) }
         selectionManager.filterSelectedModels<NeuronArray>().forEach { it.decrement() }
         selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.decrement() }

@@ -104,7 +104,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     val mainToolBar = createMainToolBar()
 
-    val runToolBar = createRunToolBar()
+    val runToolBar = createRunToolBar().apply{isVisible = false}
 
     val editToolBar = createEditToolBar()
 

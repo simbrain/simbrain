@@ -109,6 +109,9 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     }
 
     private void initEvents() {
+        source.postUnmarshallingInit();
+        target.postUnmarshallingInit();
+
         // When the parents of the matrix are deleted, delete the matrix
         source.getEvents().onDeleted(m -> {
             delete();
@@ -280,7 +283,9 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     }
 
     public void postUnmarshallingInit() {
-        events = new WeightMatrixEvents(this);
+        if (events == null) {
+            events = new WeightMatrixEvents(this);
+        }
         initEvents();
     }
 

@@ -1748,7 +1748,9 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
      */
     public void postUnmarshallingInit() {
 
-        events = new SynapseGroupEvents(this);
+        if (events == null) {
+            events = new SynapseGroupEvents(this);
+        }
 
         // Rebuild weight matrix if needed.
         if (this.isUseGroupLevelSettings() && compressedMatrixRep != null) {

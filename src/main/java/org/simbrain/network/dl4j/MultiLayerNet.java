@@ -234,6 +234,10 @@ public class MultiLayerNet implements ArrayConnectable, LocatableModel {
     }
 
     @Override
+    public void postUnmarshallingInit() {
+    }
+
+    @Override
     public String getLabel() {
         return "Todo: labels in multiLayerNet";
     }

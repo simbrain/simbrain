@@ -860,9 +860,9 @@ public class Network {
         getFlatNeuronList().forEach(Neuron::postUnmarshallingInit);
         textList.forEach(NetworkTextObject::postUnmarshallingInit);
         synapseGroups.forEach(SynapseGroup::postUnmarshallingInit);
-        weightMatrices.forEach(WeightMatrix::postUnmarshallingInit);
         neuronGroups.forEach(AbstractNeuronCollection::postUnmarshallingInit);
         neuronCollectionSet.forEach(AbstractNeuronCollection::postUnmarshallingInit);
+        weightMatrices.forEach(WeightMatrix::postUnmarshallingInit);
         subnetworks.forEach(Subnetwork::postUnmarshallingInit);
 
         // Re-populate fan-in / fan-out for loose synapses

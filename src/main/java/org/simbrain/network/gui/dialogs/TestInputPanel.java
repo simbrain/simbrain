@@ -105,11 +105,8 @@ public class TestInputPanel extends DataPanel {
 
         };
         final TestInputPanel panel = new TestInputPanel(networkPanel, inputNeurons, dataHolder);
-        panel.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                panel.commitChanges(); //TODO: More efficient way?
-            }
+        panel.addPropertyChangeListener(evt -> {
+            panel.commitChanges(); //TODO: More efficient way?
         });
         return panel;
     }
@@ -124,11 +121,8 @@ public class TestInputPanel extends DataPanel {
      */
     public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel, List<Neuron> inputNeurons, NumericMatrix dataHolder) {
         final TestInputPanel panel = new TestInputPanel(networkPanel, inputNeurons, dataHolder);
-        panel.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                panel.commitChanges(); //TODO: More efficient way?
-            }
+        panel.addPropertyChangeListener(evt -> {
+            panel.commitChanges(); //TODO: More efficient way?
         });
         return panel;
     }
@@ -259,10 +253,8 @@ public class TestInputPanel extends DataPanel {
         }
         if (network != null) {
             network.update();
-//            network.fireNeuronsUpdated(inputNeurons); // TODO: [event]
         } else {
             inputNeurons.get(0).getNetwork().update();
-//            inputNeurons.get(0).getNetwork().fireNeuronsUpdated(inputNeurons); // TODO: [event]
         }
         if (iterationMode) {
             advanceRow();

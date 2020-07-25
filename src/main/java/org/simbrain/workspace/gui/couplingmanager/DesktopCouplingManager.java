@@ -119,6 +119,7 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         cancelButton.addActionListener(this);
         bottomPanel.add(cancelButton);
 
+        // Center panel with couplings
         JComponent couplingList = new CouplingListPanel(desktop, desktop.getWorkspace().getCouplings());
         couplingList.setBorder(BorderFactory.createTitledBorder("Couplings"));
 

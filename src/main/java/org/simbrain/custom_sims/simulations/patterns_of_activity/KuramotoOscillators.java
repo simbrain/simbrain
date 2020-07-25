@@ -131,24 +131,24 @@ public class KuramotoOscillators extends RegisteredSimulation {
         sim.couple(smellSensor, inputNetwork);
 
         // Prediction net
-        // predictionRes = net.addNeuronGroup(1,1,  netSize);
-        // HexagonalGridLayout.layoutNeurons(predictionRes.getNeuronList(), spacing, spacing);
-        // predictionRes.setLocation(reservoirNet.getMinX()-reservoirNet.getWidth() - 300, reservoirNet.getMinY()-100);
-        // predictionRes.setLabel("Predicted States");
-        // predictionRes.setLowerBound(-10);
-        // predictionRes.setUpperBound(10);
-        // predictionSg = net.addSynapseGroup(reservoirNet, predictionRes);
+        predictionRes = net.addNeuronGroup(1,1,  netSize);
+        HexagonalGridLayout.layoutNeurons(predictionRes.getNeuronList(), spacing, spacing);
+        predictionRes.setLocation(reservoirNet.getMinX()-reservoirNet.getWidth() - 300, reservoirNet.getMinY()-100);
+        predictionRes.setLabel("Predicted States");
+        predictionRes.setLowerBound(-10);
+        predictionRes.setUpperBound(10);
+        predictionSg = net.addSynapseGroup(reservoirNet, predictionRes);
 
         // Train prediction network
-        // network.addUpdateAction((new TrainPredictionNet(this)));
+        network.addUpdateAction((new TrainPredictionNet(this)));
 
         // Error
-        //errorNeuron = net.addLooseNeuron((int) predictionRes.getMinX()-70, (int) predictionRes.getMinY()-45);
-        //errorNeuron.setClamped(true);
-        //errorNeuron.setLabel("Error");
+        errorNeuron = net.addNeuron((int) predictionRes.getMinX()-70, (int) predictionRes.getMinY()-45);
+        errorNeuron.setClamped(true);
+        errorNeuron.setLabel("Error");
 
         // "Halo" based on prediction error
-        //sim.getWorkspace().addUpdateAction((new ColorPlotKuramoto(this)));
+        sim.getWorkspace().addUpdateAction((new ColorPlotKuramoto(this)));
 
     }
 

@@ -79,4 +79,6 @@ public interface ArrayConnectable extends LocatableModel {
 
     @Override
     LocationEvents getEvents();
+
+    void postUnmarshallingInit();
 }

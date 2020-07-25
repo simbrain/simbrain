@@ -390,9 +390,11 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         return events;
     }
 
-    private Object readResolve() {
-        events = new NeuronArrayEvents(this);
-        return this;
+    @Override
+    public void postUnmarshallingInit() {
+        if (events == null) {
+            events = new NeuronArrayEvents(this);
+        }
     }
 
 }

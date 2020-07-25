@@ -176,31 +176,26 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
     public NeuronNode(final NetworkPanel net, final Neuron neuron) {
         super(net);
         this.neuron = neuron;
-        this.centerFullBoundsOnPoint(neuron.getX(), neuron.getY());
 
-        if (neuron.getUpdateRule() instanceof ActivityGenerator) {
-            mainShape = square;
-        } else {
-            mainShape = circle;
-        }
-
-        addChild(mainShape);
-
-        priorityText.setFont(PRIORITY_FONT);
+        // Set up label text
+        //priorityText.setFont(PRIORITY_FONT);
         labelBackground.setPaint(this.getNetworkPanel().getBackground());
         labelBackground.setBounds(labelText.getBounds());
         labelBackground.addChild(labelText);
         addChild(labelBackground);
 
-        resetToDefault();
+        // Set graphics of node based on neuron propertiess
+        updateShape();
+        updateColor();
+        updateText();
+        updateTextLabel();
+        updateClampStatus();
+
+        this.centerFullBoundsOnPoint(neuron.getX(), neuron.getY());
 
         setPickable(true);
 
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
-
-        // The main circle is what users select
-        PBounds bounds = mainShape.getBounds();
-        setBounds(bounds);
 
         // Handle events
         NeuronEvents events = neuron.getEvents();

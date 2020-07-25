@@ -26,6 +26,8 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
+import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -85,7 +87,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      */
     @UserParameter(label = "Activation", description = "Neuron activation. If you want a value greater" +
             " than upper bound or less than lower bound you must set those first, and close this dialog.",
-        increment = .5, probDist = "Normal", order = 1)
+        increment = .5, probDist = "Normal", useSetter = true, order = 1)
     private double activation;
 
     /**
@@ -408,7 +410,11 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         if (isClamped()) {
             return;
         } else {
-            activation = act;
+            if (updateRule instanceof ClippableUpdateRule) {
+                activation = ((ClippableUpdateRule) updateRule).clip(act);
+            } else {
+                activation = act;
+            }
         }
         events.fireActivationChange(lastActivation, act);
     }

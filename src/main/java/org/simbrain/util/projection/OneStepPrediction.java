@@ -3,21 +3,27 @@ package org.simbrain.util.projection;
 import java.util.*;
 
 /**
- * Build a graph model which can be used to predict the next state of an arbitrary system.
+ * Build a model which can be used to predict the next state 
  * <br>
- * The basic data-structure is a hash map which associated data points with sets of target
- * {@link DataPointColored}, which have an activation field that can be used to track probabilities.
+ * The basic data-structure is a hash map which associates data points with sets of target datapoints, which are
+ * {@link DataPointColored}) with have an activation field that can be used to track how many times the point has
+ * been visited.
  * <br>
- * Builds a Markov Model (which assumes the history of the states does not influence the next state, only the current
- * state) with an NxN state transition matrix which needs to be estimated. Then estimate the transition matrix Stores
- * simple dictionaries of state counts rather than the matrix, as in Python {1: {2: 3, 4: 1, 5: 1}, 2: {4: 3}} etc., and
- * “smoothing” can be done by simply adding a small constant to every element in the notional sparse matrix before
- * normalizing it.  (Paraphrased from discussion with Matthew Lloyd)
+ * Essentially builds a Markov model using a dictionary of visitation  counts, e.g. (in Python notation)
+ * {1: {1: 3, 2: 5, 3: 2} , 2: {1: 3}, 3: {1:2, 2:4,3:1}}
+ * So in this example the system went three times from state 1->1, five times from 1 -> 2, etc.
+ * <br>
+ * A next-state probability distribution can then be estimated by normalizing the fan-out from a given source state,
+ * e.g.from state 1 the probabilities of going to the next states are 3/10, 5/10, and 2/10.
+ * <br>
+ * Thanks to Matthew Lloyd on the high level design (implementation errors are my own!)
+ *
+ * @author Jeff Yoshimi
  */
 public class OneStepPrediction {
 
     /**
-     * Associate a source {@link DataPointColored} with a set of DataPointColoreds that store activations, used to
+     * Associates a source point with a set of target points that store activations, used to
      * compute next-step probabilities
      */
     private final HashMap<DataPointColored, HashSet<DataPointColored>>

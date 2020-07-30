@@ -73,6 +73,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
             val theta = targetSide.normalTheta
             rotate(theta)
         }
+        arrowTip.invalidateFullBounds();
 
         // 3. compute the curve
         val curveModel = cubicBezier(

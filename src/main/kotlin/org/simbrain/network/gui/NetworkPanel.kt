@@ -2,7 +2,6 @@ package org.simbrain.network.gui
 
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
-import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
@@ -390,16 +389,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        val neuronGroupNodes = subnetwork.neuronGroupList.map { group ->
-            network.events.fireModelAdded(group)
-            createNode(group)
-        }
-        val weightMatrixNodes = subnetwork.weightMatrixList.map { group ->
-            network.events.fireModelAdded(group)
-            createNode(group) }
-        val synapseGroupNodes = subnetwork.synapseGroupList.map { group ->
-            network.events.fireModelAdded(group)
-            createNode(group) }
+        val neuronGroupNodes = subnetwork.neuronGroupList.map { createNode(it) }
+        val weightMatrixNodes = subnetwork.weightMatrixList.map { createNode(it) }
+        val synapseGroupNodes = subnetwork.synapseGroupList.map { createNode(it) }
 
         createSubNetwork().apply {
             neuronGroupNodes.forEach { addNode(it) }

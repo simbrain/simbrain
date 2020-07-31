@@ -13,18 +13,14 @@
  */
 package org.simbrain.network.subnetworks;
 
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
-import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.util.Direction;
 
 import java.awt.geom.Point2D;
@@ -146,6 +142,7 @@ public class FeedForward extends Subnetwork {
     public void addNeuronGroup(NeuronGroup group) {
         super.addNeuronGroup(group);
         group.setLabel("Layer " + getNeuronGroupCount());
+        getParentNetwork().getEvents().fireModelAdded(group);
     }
 
     public NeuronGroup getInputLayer() {

@@ -327,14 +327,32 @@ public class Network {
     }
 
     /**
-     * Returns a list of all neuron groups.
-     *
-     * @return a neuron group list
+     * Returns a list of all neuron groups including those in subnetworks.
      */
     public List<NeuronGroup> getFlatNeuronGroupList() {
         ArrayList<NeuronGroup> ret = new ArrayList<>();
         ret.addAll(neuronGroups);
         subnetworks.forEach(net -> ret.addAll(net.getNeuronGroupList()));
+        return ret;
+    }
+
+    /**
+     * Returns a list of all synapse groups including those in subnetworks.
+     */
+    public List<SynapseGroup> getFlatSynapseGroupList() {
+        ArrayList<SynapseGroup> ret = new ArrayList<>();
+        ret.addAll(synapseGroups);
+        subnetworks.forEach(net -> ret.addAll(net.getSynapseGroupList()));
+        return ret;
+    }
+
+    /**
+     * Returns a list of all weight matrices including those in subnetworks.
+     */
+    public List<WeightMatrix> getFlatWeightMatrixList() {
+        ArrayList<WeightMatrix> ret = new ArrayList<>();
+        ret.addAll(weightMatrices);
+        subnetworks.forEach(net -> ret.addAll(net.getWeightMatrixList()));
         return ret;
     }
 

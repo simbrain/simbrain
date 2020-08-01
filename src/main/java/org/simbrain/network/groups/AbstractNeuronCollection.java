@@ -825,6 +825,8 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
             events = new NeuronCollectionEvents(this);
         }
 
+        neuronList.forEach(this::addListener);
+
         // TODO: Resave and remove
         if (activationRecorder == null) {
             activationRecorder = new ActivationRecorder(this);

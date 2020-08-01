@@ -3,11 +3,8 @@ package org.simbrain.network.dl4j;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.NDArrayIndex;
-import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.events.NeuronArrayEvents;
 import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.util.UserParameter;
@@ -16,8 +13,6 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 
 /**
@@ -109,8 +104,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     }
 
     private void initEvents() {
-        source.postUnmarshallingInit();
-        target.postUnmarshallingInit();
 
         // When the parents of the matrix are deleted, delete the matrix
         source.getEvents().onDeleted(m -> {

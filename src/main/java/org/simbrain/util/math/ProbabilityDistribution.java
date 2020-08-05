@@ -64,7 +64,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
     public abstract Polarity getPolarity();
 
     @Override
-    public EditableObject copy() {
+    public ProbabilityDistribution copy() {
         return deepCopy();
     }
 

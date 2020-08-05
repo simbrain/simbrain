@@ -470,7 +470,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     @Override
-    public EditableObject copy() {
+    public NeuronGroup copy() {
         return this.deepCopy(this.getParentNetwork());
     }
 

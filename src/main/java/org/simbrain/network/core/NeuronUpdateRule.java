@@ -27,7 +27,6 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -204,7 +203,7 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     }
 
     @Override
-    public EditableObject copy() {
+    public NeuronUpdateRule copy() {
         return deepCopy();
     }
 

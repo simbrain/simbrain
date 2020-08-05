@@ -1,10 +1,6 @@
 package org.simbrain.world.imageworld.filters;
 
-import org.simbrain.util.propertyeditor.EditableObject;
-
 import java.awt.color.ColorSpace;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.ColorConvertOp;
 
 public class GrayOp extends ImageOperation<ColorConvertOp> {
@@ -16,7 +12,7 @@ public class GrayOp extends ImageOperation<ColorConvertOp> {
     }
 
     @Override
-    public EditableObject copy() {
+    public GrayOp copy() {
         return new GrayOp();
     }
 

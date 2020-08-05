@@ -1,15 +1,12 @@
 package org.simbrain.world.imageworld.filters;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.*;
-import java.awt.color.ColorSpace;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.awt.image.ColorConvertOp;
 import java.awt.image.ColorModel;
 
 /**
@@ -112,7 +109,7 @@ public class ThresholdOp extends ImageOperation<ThresholdOp> implements Buffered
     }
 
     @Override
-    public EditableObject copy() {
+    public ThresholdOp copy() {
         return new ThresholdOp(threshold);
     }
 

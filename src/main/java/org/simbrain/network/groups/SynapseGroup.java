@@ -34,13 +34,10 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -1838,8 +1835,9 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
     }
 
     @Override
-    public EditableObject copy() {
-        return this.copy();
+    public SynapseGroup copy() {
+        // return this.copy(); // TODO: this is calling itself
+        return null;
     }
 
     /**

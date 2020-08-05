@@ -20,7 +20,6 @@ package org.simbrain.network.layouts;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -243,7 +242,7 @@ public class GridLayout implements Layout {
     }
 
     @Override
-    public EditableObject copy() {
+    public GridLayout copy() {
         GridLayout layout = new GridLayout(hSpacing, vSpacing, numColumns);
         layout.setAutoColumns(autoColumns);
         return layout;

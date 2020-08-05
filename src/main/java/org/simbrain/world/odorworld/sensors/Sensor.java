@@ -19,7 +19,6 @@
 package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
@@ -33,7 +32,7 @@ import java.util.List;
  * Interface for 2d world sensors.  Sensors have a position given in polar
  * coordinates.
  */
-public abstract class Sensor implements CopyableObject, PeripheralAttribute {
+public abstract class Sensor implements PeripheralAttribute {
 
     public static List<Class> SENSOR_LIST =
             Arrays.asList(

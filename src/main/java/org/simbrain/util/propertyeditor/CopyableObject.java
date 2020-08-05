@@ -15,6 +15,6 @@ public interface CopyableObject extends EditableObject {
      *
      * @return a copy of the object.
      */
-    public EditableObject copy();
+    public CopyableObject copy();
 
 }

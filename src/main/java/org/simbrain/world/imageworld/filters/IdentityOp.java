@@ -1,8 +1,5 @@
 package org.simbrain.world.imageworld.filters;
 
-import org.simbrain.util.propertyeditor.EditableObject;
-
-import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 
@@ -19,7 +16,7 @@ public class IdentityOp extends ImageOperation<AffineTransformOp> {
     }
 
     @Override
-    public EditableObject copy() {
+    public IdentityOp copy() {
         return new IdentityOp();
     }
 

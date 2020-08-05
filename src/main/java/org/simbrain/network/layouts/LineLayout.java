@@ -20,7 +20,6 @@ package org.simbrain.network.layouts;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -187,7 +186,7 @@ public class LineLayout implements Layout {
     }
 
     @Override
-    public EditableObject copy() {
+    public LineLayout copy() {
         return  new LineLayout(spacing, orientation);
     }
 

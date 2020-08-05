@@ -20,7 +20,6 @@ package org.simbrain.network.groups;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.List;
 
@@ -126,7 +125,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
     }
 
     @Override
-    public EditableObject copy() {
+    public NeuronCollection copy() {
         // TODO
         return null;
     }

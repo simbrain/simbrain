@@ -1,7 +1,6 @@
 package org.simbrain.util.math.DecayFunctions;
 
 import org.simbrain.util.math.DecayFunction;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 public class QuadraticDecayFunction extends DecayFunction {
 
@@ -29,7 +28,7 @@ public class QuadraticDecayFunction extends DecayFunction {
     }
 
     @Override
-    public EditableObject copy() {
+    public QuadraticDecayFunction copy() {
         QuadraticDecayFunction ret = new QuadraticDecayFunction();
         ret.setDispersion(this.getDispersion());
         ret.setPeakDistance(this.getPeakDistance());

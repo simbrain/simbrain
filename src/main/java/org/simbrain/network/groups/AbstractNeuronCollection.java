@@ -19,7 +19,6 @@ import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -792,7 +791,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     }
 
     @Override
-    public EditableObject copy() {
+    public AbstractNeuronCollection copy() {
         //TODO
         return null;
     }

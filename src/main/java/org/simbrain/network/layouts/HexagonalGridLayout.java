@@ -20,7 +20,6 @@ package org.simbrain.network.layouts;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -194,7 +193,7 @@ public class HexagonalGridLayout implements Layout {
     }
 
     @Override
-    public EditableObject copy() {
+    public HexagonalGridLayout copy() {
         HexagonalGridLayout layout = new HexagonalGridLayout(hSpacing, vSpacing, numColumns);
         layout.setAutoColumns(this.autoColumns);
         return layout;

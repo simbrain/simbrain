@@ -71,7 +71,7 @@ public class ImageSourceProperties implements EditableObject, CopyableObject {
     }
 
     @Override
-    public EditableObject copy() {
+    public ImageSourceProperties copy() {
         ImageSourceProperties ret = new ImageSourceProperties();
         ret.colorOp = (ImageOperation) colorOp.copy();
         ret.height = height;

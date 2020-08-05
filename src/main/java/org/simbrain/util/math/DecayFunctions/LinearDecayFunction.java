@@ -1,7 +1,6 @@
 package org.simbrain.util.math.DecayFunctions;
 
 import org.simbrain.util.math.DecayFunction;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 public class LinearDecayFunction extends DecayFunction {
 
@@ -35,7 +34,7 @@ public class LinearDecayFunction extends DecayFunction {
     }
 
     @Override
-    public EditableObject copy() {
+    public LinearDecayFunction copy() {
         LinearDecayFunction ret = new LinearDecayFunction();
         ret.setDispersion(this.getDispersion());
         ret.setPeakDistance(this.getPeakDistance());

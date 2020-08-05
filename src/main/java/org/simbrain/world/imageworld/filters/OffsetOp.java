@@ -1,7 +1,6 @@
 package org.simbrain.world.imageworld.filters;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -38,7 +37,7 @@ public class OffsetOp extends ImageOperation<OffsetOp> implements BufferedImageO
     }
 
     @Override
-    public EditableObject copy() {
+    public OffsetOp copy() {
         return new OffsetOp(dx, dy);
     }
 

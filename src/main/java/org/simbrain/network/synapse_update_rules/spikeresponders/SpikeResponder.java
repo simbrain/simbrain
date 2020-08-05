@@ -21,7 +21,6 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,7 +108,7 @@ public abstract class SpikeResponder implements CopyableObject {
     }
 
     @Override
-    public EditableObject copy() {
+    public SpikeResponder copy() {
         return deepCopy();
     }
 

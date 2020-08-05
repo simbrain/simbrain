@@ -22,7 +22,6 @@ import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.Arrays;
 import java.util.List;
@@ -97,7 +96,7 @@ public abstract class SynapseUpdateRule implements CopyableObject {
     }
 
     @Override
-    public EditableObject copy() {
+    public SynapseUpdateRule copy() {
         return deepCopy();
     }
 

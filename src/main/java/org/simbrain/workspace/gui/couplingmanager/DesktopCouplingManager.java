@@ -99,8 +99,43 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         consumerPanel = new AttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Consuming);
         consumerPanel.setBorder(rightBorder);
 
+        // Legend Panel
+        JPanel legend = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final int dimensions = 20;
+        JLabel blue = new JLabel();
+        JPanel blueBox = new JPanel();
+        blueBox.setBackground(Color.BLUE);
+        blueBox.setSize(dimensions, dimensions);
+        blue.setText("Text Value");
+        blue.setForeground(Color.BLUE);
+
+        JPanel greenBox = new JPanel();
+        greenBox.setBackground(new Color(66, 125, 55));
+        greenBox.setSize(dimensions, dimensions);
+        JLabel green = new JLabel();
+        green.setText("Array value");
+        green.setForeground(new Color(66, 125, 55));
+
+        JPanel blackBox = new JPanel();
+        blackBox.setBackground(Color.BLACK);
+        blackBox.setSize(dimensions, dimensions);
+        JLabel black = new JLabel();
+        black.setText("Number Value");
+        black.setForeground(Color.BLACK);
+
+        legend.add(blueBox);
+        legend.add(blue);
+        legend.add(greenBox);
+        legend.add(green);
+        legend.add(blackBox);
+        legend.add(black);
+
         // Bottom Panel
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+
+        bottomPanel.add(legend);
+        bottomPanel.add(Box.createHorizontalGlue());
         bottomPanel.add(new JButton(new ShowHelpAction("Pages/Workspace/Couplings.html")));
         bottomPanel.add(couplingMethodComboBox);
 

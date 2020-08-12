@@ -142,7 +142,6 @@ public class FeedForward extends Subnetwork {
     public void addNeuronGroup(NeuronGroup group) {
         super.addNeuronGroup(group);
         group.setLabel("Layer " + getNeuronGroupCount());
-        getParentNetwork().getEvents().fireModelAdded(group);
     }
 
     public NeuronGroup getInputLayer() {

@@ -6,13 +6,16 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.dl4j.NeuronArray
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.gui.dialogs.TestInputPanel
 import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
+import org.simbrain.network.gui.dialogs.network.LMSEditorDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.TextNode
+import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
@@ -120,20 +123,6 @@ fun showNetwork(networkComponent: NetworkComponent) {
     //System.out.println(np.debugString());
 }
 
-fun NetworkPanel.displayPanel(panel: JPanel?, title: String?): GenericFrame? {
-    val frame = GenericJInternalFrame()
-    frame.contentPane = panel
-    frame.pack()
-    frame.isResizable = true
-    frame.isMaximizable = true
-    frame.isIconifiable = true
-    frame.isClosable = true
-    frame.title = title
-    frame.isVisible = true
-    return frame
-}
-
-
 fun NetworkPanel.showPiccoloDebugger() {
     StandardDialog().apply {
         contentPane = SceneGraphBrowser(canvas.root)
@@ -157,4 +146,31 @@ fun displaySynapseGroupDialog(networkPanel: NetworkPanel?, src: NeuronGroup?, ta
     dialog.pack()
     dialog.isVisible = true
     return true
+}
+
+/**
+ * Shows a dialog that allows the user to send inputs from a [SimbrainDataTable] to the provided neurons.
+ */
+fun NetworkPanel.showInputPanel(neurons : List<Neuron>) {
+    TestInputPanel.createTestInputPanel(this, neurons).apply {
+        val dialog = StandardDialog()
+        dialog.contentPane = this
+        dialog.setLocationRelativeTo(null)
+        dialog.pack()
+        dialog.isVisible = true
+    }
+}
+
+/**
+ * Show weight matrix panel for weights connecting current source (red) and target (green) nodes.
+ */
+fun NetworkPanel.showWeightMatrix() {
+    WeightMatrixViewer.getWeightMatrixPanel(WeightMatrixViewer(this)).apply {
+        val dialog = StandardDialog()
+        dialog.contentPane = this
+        dialog.setLocationRelativeTo(null)
+        dialog.pack()
+        dialog.title = "Weight Matrix Viewer"
+        dialog.isVisible = true
+    }
 }

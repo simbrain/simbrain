@@ -24,6 +24,7 @@ import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.ResourceManager;
 
 import java.awt.event.ActionEvent;
+import  org.simbrain.network.gui.NetworkDialogsKt;
 import java.util.stream.Collectors;
 
 /**
@@ -59,17 +60,9 @@ public class TestInputAction extends ConditionallyEnabledAction {
 
     /**
      * Initialize and display the test input panel.
-     *
-     * @param event
      */
     public void actionPerformed(ActionEvent event) {
-
-        final var neurons = getNetworkPanel().getSelectionManager().getSelectedModels().stream()
-                .filter(Neuron.class::isInstance)
-                .map(Neuron.class::cast)
-                .collect(Collectors.toList());
-
-        TestInputPanel panel = TestInputPanel.createTestInputPanel(networkPanel, neurons);
-        networkPanel.displayPanel(panel, "Test Input Panel");
+        NetworkDialogsKt.showInputPanel(networkPanel,
+                networkPanel.getSelectionManager().filterSelectedModels(Neuron.class));
     }
 }

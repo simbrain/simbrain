@@ -46,7 +46,6 @@ public final class ShowWeightMatrixAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        JPanel panel = WeightMatrixViewer.getWeightMatrixPanel(new WeightMatrixViewer(getNetworkPanel()));
-        NetworkDialogsKt.displayPanel(getNetworkPanel(), panel, "Weight matrix viewer");
+        NetworkDialogsKt.showWeightMatrix(getNetworkPanel());
     }
 }

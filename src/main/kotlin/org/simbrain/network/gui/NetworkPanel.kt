@@ -26,6 +26,9 @@ import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.subnetworks.*
+import org.simbrain.network.trainers.LMSIterative
+import org.simbrain.network.trainers.TrainingSet
+import org.simbrain.network.util.activations
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.widgets.EditablePanel
@@ -712,6 +715,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
                 }
             }
         }
+    }
+
+    fun showLMS() {
+        val sources = selectionManager.filterSelectedSourceModels<Neuron>()
+        val targets = selectionManager.filterSelectedModels<Neuron>()
+        val sourceActivations = arrayOf(sources.activations.toDoubleArray())
+        val targetActivations = arrayOf(targets.activations.toDoubleArray())
+        val ts = TrainingSet(sourceActivations, targetActivations)
+        val lms = LMSIterative(sources, targets, ts)
+        showLMSDialog(lms)
     }
 
 }

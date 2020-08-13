@@ -11,14 +11,14 @@ import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
 import org.simbrain.network.gui.dialogs.network.LMSEditorDialog
+import org.simbrain.network.gui.dialogs.network.LMSEditorDialog2
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.subnetworks.LMSNetwork
+import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import java.awt.Dialog
@@ -27,7 +27,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.JDialog
 import javax.swing.JFrame
-import javax.swing.JPanel
 
 fun NetworkPanel.showTextPropertyDialog(textNodes: List<TextNode>) {
     TextDialog(textNodes).apply {
@@ -172,5 +171,17 @@ fun NetworkPanel.showWeightMatrix() {
         dialog.pack()
         dialog.title = "Weight Matrix Viewer"
         dialog.isVisible = true
+    }
+}
+
+
+/**
+ * Show dialog for LMS training
+ */
+fun NetworkPanel.showLMSDialog(lms: LMSIterative) {
+    LMSEditorDialog2(this, lms).apply {
+        modalityType = Dialog.ModalityType.MODELESS
+        pack()
+        isVisible = true
     }
 }

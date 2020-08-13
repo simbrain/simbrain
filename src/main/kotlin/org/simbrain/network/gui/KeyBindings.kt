@@ -30,6 +30,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Alt + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
+    bind(Shift + 'T') { showLMS() } // TODO: Temp.  Add to regular menu actions when done.
     bindTo("I", networkActions.wandEditModeAction)
     bindTo("G", networkActions.neuronGroupAction)
     bind("Y") { showNeuronArrayCreationDialog() }

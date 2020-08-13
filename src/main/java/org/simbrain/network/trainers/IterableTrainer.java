@@ -63,6 +63,10 @@ public abstract class IterableTrainer extends Trainer {
     @UserParameter(label = "Iterations for Before Stopping", order = 120)
     private int iterationsBeforeStopping = 1000;
 
+    public IterableTrainer() {
+        super();
+    }
+
     /**
      * Stopping condition.
      */
@@ -94,6 +98,7 @@ public abstract class IterableTrainer extends Trainer {
     public IterableTrainer(Trainable network) {
         super(network);
     }
+
 
     /**
      * Get the current MSE error.

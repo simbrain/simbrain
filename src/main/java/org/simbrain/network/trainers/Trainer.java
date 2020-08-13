@@ -45,8 +45,9 @@ public abstract class Trainer implements EditableObject {
 
     /**
      * The trainable object to be trained.
+     * //TODO!
      */
-    protected final Trainable network;
+    protected Trainable network;
 
     /**
      * Handle trainer events.
@@ -60,6 +61,9 @@ public abstract class Trainer implements EditableObject {
      */
     public Trainer(Trainable network) {
         this.network = network;
+    }
+
+    public Trainer() {
     }
 
     /**

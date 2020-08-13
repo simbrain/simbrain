@@ -25,8 +25,14 @@ import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.LMSNetwork;
 
+import java.util.List;
+
 /**
  * Train using least mean squares.
+ * <p>
+ * Clarify it is for loose neurons.  Rename: LMSIterativeLoose
+ * <p>
+ * Pass in input neurons, target neurons, and training dataset.  Weights can be inferred.
  *
  * @author jyoshimi
  */
@@ -37,15 +43,18 @@ public class LMSIterative extends IterableTrainer {
      */
     private double rmsError;
 
+    // TODO: Use annotations around here?
+    public static double DEFAULT_LEARNING_RATE = .01;
+
     /**
      * Learning rate.
      */
-    private double learningRate = .01;
+    private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
      * Parent network
      */
-    final private LMSNetwork network;
+     private LMSNetwork network;
 
     /**
      * Construct a least mean squares iterative panel.
@@ -139,6 +148,66 @@ public class LMSIterative extends IterableTrainer {
         this.learningRate = learningRate;
     }
 
+    public List<Neuron> inputs;
+    public List<Neuron> outputs;
+    public TrainingSet ts;
+
+    public LMSIterative(List<Neuron> inputs, List<Neuron> outputs, TrainingSet ts) {
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.ts = ts;
+    }
+
+    public void train() {
+
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.ts = ts;
+
+        rmsError = 0;
+
+        // Set local variables
+        int numRows = ts.getInputData().length;
+        int numInputs = inputs.size();
+        int numOutputs = outputs.size();
+
+        // Run through training data
+        for (int row = 0; row < numRows; row++) {
+
+            // Set input layer values
+            for (int i = 0; i < numInputs; i++) {
+                inputs.get(i).forceSetActivation(ts.getInputData()[row][i]);
+            }
+
+            // Update output node
+            Network.updateNeurons(outputs);
+
+            // Iterate through weights and biases and update them
+            for (int i = 0; i < numOutputs; i++) {
+
+                // Get target neuron and compute error
+                Neuron outputNeuron = outputs.get(i);
+                double targetValue = ts.getTargetData()[row][i];
+                double error = targetValue - outputNeuron.getActivation();
+                rmsError += (error * error); // TODO: Validate rmse
+
+                // Update weights
+                for (Synapse synapse : outputNeuron.getFanIn()) {
+                    double deltaW = (learningRate * error * synapse.getSource().getActivation());
+                    synapse.setStrength(synapse.getStrength() + deltaW);
+                }
+
+                // Update bias of target neuron
+                BiasedUpdateRule bias = (BiasedUpdateRule) outputNeuron.getUpdateRule();
+                bias.setBias(bias.getBias() + (learningRate * error));
+            }
+            rmsError = rmsError / (numInputs * numOutputs);
+        }
+        getEvents().fireErrorUpdated();
+        incrementIteration();
+    }
+
+    // TODO: Move to test class
     // /**
     // * Test method.
     // *

@@ -19,6 +19,7 @@ import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.trainers.Trainable;
@@ -76,6 +77,11 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
      * List of synapse groups.
      */
     private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
+
+    /**
+     * List of neuron arrays.
+     */
+    private final List<NeuronArray> naList = new CopyOnWriteArrayList<>();
 
     /**
      * List of weight matrices
@@ -387,6 +393,13 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     }
 
     /**
+     * Unomodifiable neuron array list.
+     */
+    public List<NeuronArray> getNAList() {
+        return Collections.unmodifiableList(naList);
+    }
+
+    /**
      * Unomodifiable weight matrix list.
      */
     public List<WeightMatrix> getWeightMatrixList() {
@@ -401,6 +414,18 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         parentNetwork.getEvents().onModelRemoved(w -> {
             if (w instanceof WeightMatrix) {
                 weightMatrixList.remove(w);
+            }
+        });
+    }
+
+    /**
+     * Add a neuron array to the subnet.
+     */
+    public void addNeuronArray(NeuronArray na) {
+        naList.add(na);
+        parentNetwork.getEvents().onModelRemoved(w -> {
+            if (w instanceof NeuronArray) {
+                naList.remove(w);
             }
         });
     }
@@ -459,6 +484,9 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         if(weightMatrixList.size() > 0) {
             weightMatrixList.forEach(sb::append);
         }
+        if(naList.size() > 0) {
+            naList.forEach(sb::append);
+        }
         return sb.toString();
     }
 
@@ -480,6 +508,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         for (SynapseGroup synapseGroup : synapseGroupList) {
             ret += "Synapse Group:   " + synapseGroup.getLabel() + "<br>";
         }
+        // TODO: Add weight matrix and neuron array
         ret += "</html>";
         return ret;
     }
@@ -498,9 +527,11 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     public void update() {
         neuronGroupList.forEach(NeuronGroup::update);
         synapseGroupList.forEach(SynapseGroup::update);
+        naList.forEach(NeuronArray::update);
         weightMatrixList.forEach(WeightMatrix::update);
     }
 
+    // TODO: Rename to clearLooseActivations
     /**
      * Set all activations to 0.
      */
@@ -545,6 +576,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         }
         neuronGroupList.forEach(AbstractNeuronCollection::postUnmarshallingInit);
         synapseGroupList.forEach(SynapseGroup::postUnmarshallingInit);
+        naList.forEach(NeuronArray::postUnmarshallingInit);
         weightMatrixList.forEach(WeightMatrix::postUnmarshallingInit);
     }
 
@@ -552,6 +584,7 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     public void setLocation(@NotNull Point2D location) {
         Point2D delta = minus(location, getLocation());
         neuronGroupList.forEach(ng -> ng.offset(delta.getX(), delta.getY()));
+        // TODO: Needed? Yulin
     }
 
     @NotNull

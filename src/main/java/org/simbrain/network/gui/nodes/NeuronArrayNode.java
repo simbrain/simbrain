@@ -31,6 +31,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.SimbrainMath;
@@ -77,6 +78,11 @@ public class NeuronArrayNode extends ScreenElement {
     private double activationImageHeight = 10;
 
     /**
+     * If true, show the image array as a grid; if false show it as a horizontal line.
+     */
+    private boolean gridMode = false;
+
+    /**
      * Text showing info about the array.
      */
     private PText infoText;
@@ -110,7 +116,7 @@ public class NeuronArrayNode extends ScreenElement {
     /**
      * Create a new neuron array node.
      *
-     * @param np    Reference to NetworkPanel
+     * @param np Reference to NetworkPanel
      * @param na reference to model neuron array
      */
     public NeuronArrayNode(final NetworkPanel np, final NeuronArray na) {
@@ -125,17 +131,15 @@ public class NeuronArrayNode extends ScreenElement {
             renderArrayToActivationsImage();
             updateInfoText();
         });
-        events.onLocationChange(() -> {
-            pullViewPositionFromModel();
-        });
-        events.onLabelChange((o,n) -> {
+        events.onLocationChange(this::pullViewPositionFromModel);
+        events.onLabelChange((o, n) -> {
             //interactionBox.setText((String) evt.getNewValue());
             //interactionBox.updateText();
         });
         events.onSelected(s -> {
             getNetworkPanel().getSelectionManager().add(this);
         });
-        
+
         // Set up main items
         borderBox.setPickable(true);
         addChild(backgroundImage);
@@ -182,51 +186,38 @@ public class NeuronArrayNode extends ScreenElement {
 
     /**
      * Render an image and set it to {@link #activationImage} to show the current activationImage.
-     *
+     * <p>
      * Will not render when {@link NeuronArray#isRenderActivations()} is set to false.
      */
     private void renderArrayToActivationsImage() {
 
-        if (!neuronArray.isRenderActivations()) {
-            // TODO: Remove existing
-            return;
-        }
+        if (neuronArray.isRenderActivations()) {
 
-        ColorModel colorModel = new DirectColorModel(24, 0xff << 16, 0xff << 8, 0xff);
-        SampleModel sampleModel = colorModel.createCompatibleSampleModel(neuronArray.getNumNodes(), 1);
+            if (gridMode) {
+                // "Grid" case
+                float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
+                BufferedImage img = ImageKt.toSimbrainColorImage(
+                        activations,
+                        (int) Math.sqrt(neuronArray.getNumNodes()),
+                        (int) Math.sqrt(neuronArray.getNumNodes()));
+                activationImage.setImage(img);
+                // TODO: Adjust this to look nice. Make itb square.
+                this.activationImage.setBounds(5, .75 * boxHeight - 50 / 2,
+                        boxWidth - 10, 50);
 
-        float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
-
-        int[] raster = new int[neuronArray.getNumNodes()];
-
-        for (int i = 0; i < activations.length; i++) {
-            // Assume activations between -1 and 1.  If larger values are allowed used SimbrainMath.rescale
-            float saturation = activations[i];
-            saturation = SimbrainMath.clip(saturation, -1.0f, 1.0f);
-            if (saturation < 0) {
-                raster[i] = Color.HSBtoRGB(2/3f, -saturation, 1.0f);
+                // TODO PLay with this if you like but this is probably the wrong approach
+                this.setBounds(0, (.75 * boxHeight - 50 / 2) + 5,
+                        boxWidth - 10+5, 55);
             } else {
-                raster[i] = Color.HSBtoRGB(0.0f, saturation, 1.0f);
+                // "Flat" case
+                float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
+                BufferedImage img = ImageKt.toSimbrainColorImage(activations, neuronArray.getNumNodes(), 1);
+                activationImage.setImage(img);
+                this.activationImage.setBounds(5, .75 * boxHeight - activationImageHeight / 2,
+                        boxWidth - 10, activationImageHeight);
             }
         }
 
-        // ref: https://stackoverflow.com/questions/33460365/what-the-fastest-way-to-draw-pixels-buffer-in-java
-        BufferedImage img = new BufferedImage(
-                colorModel,
-                Raster.createWritableRaster(
-                        sampleModel,
-                        new DataBufferInt(raster, raster.length),
-                        null
-                ),
-                false,
-                null
-        );
-
-        SwingUtilities.invokeLater(() -> {
-            this.activationImage.setImage(img);
-            this.activationImage.setBounds(5,.75*boxHeight - activationImageHeight /2,
-                    boxWidth-10, activationImageHeight);
-        });
     }
 
     public NeuronArray getNeuronArray() {
@@ -238,10 +229,10 @@ public class NeuronArrayNode extends ScreenElement {
      */
     private void updateInfoText() {
         infoText.setText(
-                ""+ neuronArray.getLabel() + "    " +
-                "nodes: " + neuronArray.getNeuronArray().length()
-                + "\nmean activation: "
-                + SimbrainMath.roundDouble((java.lang.Double) neuronArray.getNeuronArray().meanNumber(),4));
+                "" + neuronArray.getLabel() + "    " +
+                        "nodes: " + neuronArray.getNeuronArray().length()
+                        + "\nmean activation: "
+                        + SimbrainMath.roundDouble((java.lang.Double) neuronArray.getNeuronArray().meanNumber(), 4));
     }
 
     @Override
@@ -279,9 +270,33 @@ public class NeuronArrayNode extends ScreenElement {
         contextMenu.add(editArray);
         contextMenu.add(new DeleteAction(getNetworkPanel()));
 
+        // TODO: Add a test JRadioButtonMenuItem in its own submenu. Have it print out 1, 2, 3 when you select options
+
+        // TODO: Add a third "LooseNeuron" mode.  It can also be grid or line.  Only allow it for < 1K or some number
+        // Disabled for that number
+
+        contextMenu.addSeparator();
+        Action switchStyle = new AbstractAction("Switch style") {
+            {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/grid.png"));
+                putValue(SHORT_DESCRIPTION, "Change to grid style");
+            }
+
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                // Toggle grid mode
+                if (gridMode == false) {
+                    gridMode = true;
+                } else {
+                    gridMode = false;
+                }
+                renderArrayToActivationsImage();
+            }
+        };
+        contextMenu.add(switchStyle);
+
         contextMenu.addSeparator();
         Action randomizeAction = new AbstractAction("Randomize") {
-
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
                 putValue(SHORT_DESCRIPTION, "Randomize neuro naarray");
@@ -295,7 +310,7 @@ public class NeuronArrayNode extends ScreenElement {
         contextMenu.add(randomizeAction);
 
         contextMenu.addSeparator();
-        Action editComponents= new AbstractAction("Edit Components...") {
+        Action editComponents = new AbstractAction("Edit Components...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 StandardDialog dialog = new StandardDialog();
@@ -309,7 +324,6 @@ public class NeuronArrayNode extends ScreenElement {
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-
             }
         };
         contextMenu.add(editComponents);

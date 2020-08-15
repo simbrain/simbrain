@@ -26,6 +26,8 @@
  */
 package org.simbrain.network.util
 
+import org.simbrain.network.LocatableModel
+import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.util.minus
 import org.simbrain.util.plus
@@ -50,11 +52,24 @@ enum class Direction {
  * @param direction String indication of absolute direction. Must be one of "North", "South", "East", or "West".
  * @param amount    the amount by which to offset the second group
  */
-fun offsetNeuronGroup(group1: NeuronGroup, group2: NeuronGroup, direction: Direction, amount: Double) {
+fun offsetNeuronGroup(group1: AbstractNeuronCollection, group2: AbstractNeuronCollection, direction: Direction, amount: Double) {
     group2.location = when(direction) {
         Direction.NORTH -> group1.location - point(0.0, group1.height / 2 + group2.height / 2 + amount)
         Direction.SOUTH -> group1.location + point(0.0, group1.height / 2 + group2.height / 2 + amount)
         Direction.EAST  -> group1.location + point(group1.width / 2 + group2.width / 2 + amount, 0.0)
         Direction.WEST  -> group1.location - point(group1.width / 2 + group2.width / 2 + amount, 0.0)
+    }
+}
+
+/**
+ * Same as above but specify height and width, which are assumed to be the same for both models.
+ */
+fun offsetNeuronGroup(group1: LocatableModel, group2: LocatableModel, direction: Direction, amount: Double,
+    height: Double, width: Double) {
+    group2.location = when(direction) {
+        Direction.NORTH -> group1.location - point(0.0, height / 2 + height / 2 + amount)
+        Direction.SOUTH -> group1.location + point(0.0, height / 2 + height / 2 + amount)
+        Direction.EAST  -> group1.location + point(width / 2 + width / 2 + amount, 0.0)
+        Direction.WEST  -> group1.location - point(width / 2 + width / 2 + amount, 0.0)
     }
 }

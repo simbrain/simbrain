@@ -16,6 +16,7 @@ package org.simbrain.network.subnetworks;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -38,9 +39,14 @@ import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup
 public class FeedForward extends Subnetwork {
 
     /**
-     * Space to put between layers.
+     * Space to put between layers.  TODO: Redo this for neuron array case.
      */
     private int betweenLayerInterval = 300;
+
+    /**
+     * If true use {@link org.simbrain.network.dl4j.NeuronArray}; if false {@link NeuronGroup}
+     */
+    public boolean useNeuronArrays = true;
 
     /**
      * Construct a feed-forward network.
@@ -89,45 +95,71 @@ public class FeedForward extends Subnetwork {
                               final NeuronUpdateRule inputNeuronTemplate) {
 
         setLabel("Layered Network");
+        
+        // TODO: Merge this and the next case
+        if (useNeuronArrays) {
+            NeuronArray inputLayer = new NeuronArray(network ,nodesPerLayer[0]);
+            addNeuronArray(inputLayer);
 
-        // Set up input layer
-        List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
-        for (int i = 0; i < nodesPerLayer[0]; i++) {
-            inputLayerNeurons.add(new Neuron(network, inputNeuronTemplate));
-        }
-        NeuronGroup inputLayer = new NeuronGroup(network, inputLayerNeurons);
-        inputLayer.setClamped(true); // Clamping makes everything easier in the
-        // GUI. The trainer uses forceset.
-        addNeuronGroup(inputLayer);
-        inputLayer.setLayoutBasedOnSize(initialPosition);
+            // Memory of last layer created
+            NeuronArray lastLayer = inputLayer;
 
-        // Memory of last layer created
-        NeuronGroup lastLayer = inputLayer;
+            // Make hidden layers and output layer
+            for (int i = 1; i < nodesPerLayer.length; i++) {
+                NeuronArray hiddenLayer = new NeuronArray(network, nodesPerLayer[i]);
+                addNeuronArray(hiddenLayer);
+                offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval/2, 100, 200);
 
-        // Make hidden layers and output layer
-        for (int i = 1; i < nodesPerLayer.length; i++) {
-            List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
-            for (int j = 0; j < nodesPerLayer[i]; j++) {
-                SigmoidalRule rule = new SigmoidalRule();
-                Neuron neuron = new Neuron(network, rule);
-                rule.setLowerBound(0);
-                neuron.setUpdatePriority(i);
-                hiddenLayerNeurons.add(neuron);
+                // Add weight matrix
+                WeightMatrix wm = getParentNetwork().createWeightMatrix(lastLayer, hiddenLayer);
+                wm.randomize();
+                addWeightMatrix(wm);
+
+                // Reset last layer
+                lastLayer = hiddenLayer;
             }
 
-            NeuronGroup hiddenLayer = new NeuronGroup(network, hiddenLayerNeurons);
-            hiddenLayer.setLayoutBasedOnSize();
-            addNeuronGroup(hiddenLayer);
-            offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
+        } else {
+            List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
+            for (int i = 0; i < nodesPerLayer[0]; i++) {
+                inputLayerNeurons.add(new Neuron(network, inputNeuronTemplate));
+            }
+            NeuronGroup inputLayer = new NeuronGroup(network, inputLayerNeurons);
+            inputLayer.setClamped(true); // Clamping makes everything easier in the
+            // GUI. The trainer uses forceset.
+            addNeuronGroup(inputLayer);
+            inputLayer.setLayoutBasedOnSize(initialPosition);
 
-            // Add weight matrix
-            WeightMatrix wm = getParentNetwork().createWeightMatrix(lastLayer, hiddenLayer);
-            wm.randomize();
-            addWeightMatrix(wm);
+            // Memory of last layer created
+            NeuronGroup lastLayer = inputLayer;
 
-            // Reset last layer
-            lastLayer = hiddenLayer;
+            // Make hidden layers and output layer
+            for (int i = 1; i < nodesPerLayer.length; i++) {
+                List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
+                for (int j = 0; j < nodesPerLayer[i]; j++) {
+                    SigmoidalRule rule = new SigmoidalRule();
+                    Neuron neuron = new Neuron(network, rule);
+                    rule.setLowerBound(0);
+                    neuron.setUpdatePriority(i);
+                    hiddenLayerNeurons.add(neuron);
+                }
+
+                NeuronGroup hiddenLayer = new NeuronGroup(network, hiddenLayerNeurons);
+                hiddenLayer.setLayoutBasedOnSize();
+                addNeuronGroup(hiddenLayer);
+                offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
+
+                // Add weight matrix
+                WeightMatrix wm = getParentNetwork().createWeightMatrix(lastLayer, hiddenLayer);
+                wm.randomize();
+                addWeightMatrix(wm);
+
+                // Reset last layer
+                lastLayer = hiddenLayer;
+            }
         }
+
+
     }
 
     public int getBetweenLayerInterval() {
@@ -197,6 +229,7 @@ public class FeedForward extends Subnetwork {
 
     @Override
     public void update() {
+        // TODO
         for (int i = 0; i < getNeuronGroupList().size() ; i++) {
             getNeuronGroupList().get(i).update();
             if(getSynapseGroupList().size() > i) {

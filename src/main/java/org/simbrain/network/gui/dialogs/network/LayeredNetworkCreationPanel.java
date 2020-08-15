@@ -189,9 +189,11 @@ public class LayeredNetworkCreationPanel extends JPanel {
 
         // Set neuron types
         i = layerList.size() - 1;
-        for (LayerCreationPanel layer : layerList) {
-            net.getNeuronGroup(i).setNeuronType(layer.getNeuronType());
-            i--;
+        if (!net.useNeuronArrays) {
+            for (LayerCreationPanel layer : layerList) {
+                net.getNeuronGroup(i).setNeuronType(layer.getNeuronType());
+                i--;
+            }
         }
 
         // Add the new network

@@ -393,11 +393,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
 
         val neuronGroupNodes = subnetwork.neuronGroupList.map { createNode(it) }
+        val neuronArrayNodes = subnetwork.naList.map { createNode(it) }
         val weightMatrixNodes = subnetwork.weightMatrixList.map { createNode(it) }
         val synapseGroupNodes = subnetwork.synapseGroupList.map { createNode(it) }
 
         createSubNetwork().apply {
             neuronGroupNodes.forEach { addNode(it) }
+            neuronArrayNodes.forEach { addNode(it) }
             weightMatrixNodes.forEach { addNode(it) }
             synapseGroupNodes.forEach { addNode(it) }
         }

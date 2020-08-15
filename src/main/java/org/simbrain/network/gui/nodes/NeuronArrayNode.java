@@ -63,16 +63,6 @@ public class NeuronArrayNode extends ScreenElement {
     protected NeuronArray neuronArray;
 
     /**
-     * Width in pixels of the main display box for ND4J arrays.
-     */
-    private final float boxWidth = 150;
-
-    /**
-     * Height in pixels of the main display box for ND4J arrays.
-     */
-    private final float boxHeight = 50;
-
-    /**
      * Height in pixels of the pixel display showing the activations.
      */
     private double activationImageHeight = 10;
@@ -90,18 +80,17 @@ public class NeuronArrayNode extends ScreenElement {
     /**
      * Square shape around array node.
      */
-    private PPath borderBox = PPath.createRectangle(0, 0, boxWidth, boxHeight);
+    private PPath borderBox;
+
+    /**
+     * Only update bounds when this is null.
+     */
+    private PBounds boundsCache = null;
 
     /**
      * Image to show activationImage.
      */
     private PImage activationImage = new PImage();
-
-    /**
-     * A backgroundImage to show when no {@link #activationImage} image is present.
-     * (So that the node will not be transparent)
-     */
-    private PPath backgroundImage = PPath.createRectangle(0, 0, boxWidth, boxHeight);
 
     /**
      * Font for info text.
@@ -121,7 +110,6 @@ public class NeuronArrayNode extends ScreenElement {
      */
     public NeuronArrayNode(final NetworkPanel np, final NeuronArray na) {
         super(np);
-        borderBox.setTransparency(0.2f);
         this.neuronArray = na;
         networkPanel = np;
 
@@ -141,14 +129,10 @@ public class NeuronArrayNode extends ScreenElement {
         });
 
         // Set up main items
-        borderBox.setPickable(true);
-        addChild(backgroundImage);
+        setPickable(true);
         addChild(activationImage);
+        borderBox = PPath.createRectangle(0, 0, getWidth(), getHeight());
         addChild(borderBox);
-
-        // Border box determines bounds
-        PBounds bounds = borderBox.getBounds();
-        setBounds(bounds);
 
         // Info text
         infoText = new PText();
@@ -157,15 +141,15 @@ public class NeuronArrayNode extends ScreenElement {
         infoText.offset(8, 8);
         updateInfoText();
 
-        this.centerFullBoundsOnPoint(na.getLocation().getX(), na.getLocation().getY());
+        pullViewPositionFromModel();
 
         // Image array
         renderArrayToActivationsImage();
-        pushViewPositionToModel();
+
     }
 
     public void pullViewPositionFromModel() {
-        Point2D point = minus(neuronArray.getLocation(), new Point2D.Double(boxWidth / 2, boxHeight / 2));
+        Point2D point = minus(neuronArray.getLocation(), new Point2D.Double(getWidth() / 2, getHeight() / 2));
         this.setGlobalTranslation(point);
     }
 
@@ -175,7 +159,7 @@ public class NeuronArrayNode extends ScreenElement {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        neuronArray.setLocation(plus(p, new Point2D.Double(boxWidth / 2, boxHeight / 2)));
+        neuronArray.setLocation(plus(p, new Point2D.Double(getWidth() / 2, getHeight() / 2)));
     }
 
     @Override
@@ -201,21 +185,24 @@ public class NeuronArrayNode extends ScreenElement {
                         (int) Math.sqrt(neuronArray.getNumNodes()),
                         (int) Math.sqrt(neuronArray.getNumNodes()));
                 activationImage.setImage(img);
-                // TODO: Adjust this to look nice. Make itb square.
-                this.activationImage.setBounds(5, .75 * boxHeight - 50 / 2,
-                        boxWidth - 10, 50);
+                // TODO: Adjust this to look nice
+                // TODO: Magic numbers
+                this.activationImage.setBounds(5, infoText.getHeight() + 10, 100, 100);
 
-                // TODO PLay with this if you like but this is probably the wrong approach
-                this.setBounds(0, (.75 * boxHeight - 50 / 2) + 5,
-                        boxWidth - 10+5, 55);
             } else {
                 // "Flat" case
                 float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
                 BufferedImage img = ImageKt.toSimbrainColorImage(activations, neuronArray.getNumNodes(), 1);
                 activationImage.setImage(img);
-                this.activationImage.setBounds(5, .75 * boxHeight - activationImageHeight / 2,
-                        boxWidth - 10, activationImageHeight);
+                this.activationImage.setBounds(5, infoText.getHeight() + 10, 200, 25);
             }
+
+            // Forces the bounds to be updated
+            boundsCache = null;
+
+            // Repaint
+            networkPanel.zoomToFitPage();
+
         }
 
     }
@@ -363,5 +350,28 @@ public class NeuronArrayNode extends ScreenElement {
     protected void paint(PPaintContext paintContext) {
         paintContext.getGraphics().setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         super.paint(paintContext);
+    }
+
+    @Override
+    protected boolean validateFullBounds() {
+        if (boundsCache == null) {
+
+            PBounds bounds = new PBounds();
+            bounds.add(infoText.getFullBoundsReference());
+            bounds.add(activationImage.getFullBoundsReference());
+
+            removeChild(borderBox);
+            borderBox = PPath.createRectangle(bounds.x-3, bounds.y-3, bounds.width+3, bounds.height+3);
+            addChild(borderBox);
+            borderBox.lowerToBottom();
+
+            // Todo: Magic variables
+            var ctr = bounds.getCenter2D();
+            setBounds(0, 0, bounds.width + 7, bounds.height + 30);
+            centerBoundsOnPoint(ctr.getX(), ctr.getY());
+
+            boundsCache = bounds;
+        }
+        return super.validateFullBounds();
     }
 }

@@ -10,7 +10,6 @@ import org.simbrain.network.gui.dialogs.TestInputPanel
 import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
-import org.simbrain.network.gui.dialogs.network.LMSEditorDialog
 import org.simbrain.network.gui.dialogs.network.LMSEditorDialog2
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog

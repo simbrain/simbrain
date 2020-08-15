@@ -52,7 +52,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         public void invoke() {
             try {
                 currentTrainer.apply();
-            } catch (Trainer.DataNotInitializedException ex) {
+            } catch (IterableTrainer.DataNotInitializedException ex) {
                 JOptionPane.showMessageDialog(null, "Unable to apply trainer: data not initialized.");
             }
         }

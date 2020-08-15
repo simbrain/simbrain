@@ -21,7 +21,6 @@ package org.simbrain.network.gui.nodes.subnetworkNodes;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SRNEditorDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 import org.simbrain.network.trainers.SRNTrainer;
@@ -91,10 +90,11 @@ public class SRNNetworkNode extends SubnetworkNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getSubnetwork();
-            IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(getNetworkPanel(), new SRNTrainer(network));
-            JDialog frame = getNetworkPanel().displayPanelInWindow(trainingPanel, "Trainer");
-            trainingPanel.setFrame(frame);
+            // TODO
+            // SimpleRecurrentNetwork network = (SimpleRecurrentNetwork) getSubnetwork();
+            // IterativeTrainingPanel trainingPanel = new IterativeTrainingPanel(getNetworkPanel(), new SRNTrainer(network));
+            // JDialog frame = getNetworkPanel().displayPanelInWindow(trainingPanel, "Trainer");
+            // trainingPanel.setFrame(frame);
         }
     };
 

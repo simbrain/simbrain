@@ -176,12 +176,20 @@ public class BackpropTrainer extends IterableTrainer {
     private double mse;
 
     /**
+     * Construct the backprop trainer.
+     *
+     * @param network the network
+     * @param layers  the layers to train
+     */
+    public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
+    }
+
+    /**
      * Construct the trainer.
      *
      * @param network the network to train
      */
     public BackpropTrainer(BackpropNetwork network) {
-        super(network);
         net = network;
 
         // Synapse group list is ordered from input to output layers
@@ -215,22 +223,11 @@ public class BackpropTrainer extends IterableTrainer {
         setMomentum(DEFAULT_MOMENTUM);
     }
 
-    /**
-     * Construct the backprop trainer.
-     *
-     * @param network the network
-     * @param layers  the layers to train
-     */
-    public BackpropTrainer(Trainable network, List<List<Neuron>> layers) {
-        //TODO: Here to appease SRNTrainer.  Not yet re-implemented.
-        super(network);
-    }
-
     @Override
     public void apply() {
         // Apply one training step according to the currently selected update method
         mse = 0;
-        int numTrainingExamples = getMinimumNumRows(network);
+        int numTrainingExamples = getMinimumNumRows();
         if (updateMethod == UpdateMethod.EPOCH) {
             mse = trainRows(0, numTrainingExamples);
         } else if (updateMethod == UpdateMethod.STOCHASTIC) {
@@ -262,7 +259,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Update weights and biases
         updateParameters();
         // Return the MSE for the row
-        return (double) batchErrors.mul(batchErrors).sumNumber() / network.getOutputNeurons().size();
+        return (double) batchErrors.mul(batchErrors).sumNumber() /net.getOutputNeurons().size();
     }
 
     /**
@@ -291,7 +288,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Update weights and biases
         updateParameters();
         // Return the MSE for the batch
-        return (double) batchErrors.mul(batchErrors).sumNumber() / network.getOutputNeurons().size();
+        return (double) batchErrors.mul(batchErrors).sumNumber() / net.getOutputNeurons().size();
     }
 
     /**
@@ -415,6 +412,12 @@ public class BackpropTrainer extends IterableTrainer {
         }
     }
 
+    // TODO
+    @Override
+    protected TrainingSet getTrainingSet() {
+        return null;
+    }
+
     /**
      * Print debug info.
      */
@@ -466,13 +469,14 @@ public class BackpropTrainer extends IterableTrainer {
      * Initialize input and target datasets ND4J matrices.
      */
     public void initData() {
-        // Store data as columns since that's what everything else deals with so there is no need to transpose later.
-        if (network.getTrainingSet().getInputData() != null) {
-            inputData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getInputData()));
-        }
-        if (network.getTrainingSet().getTargetData() != null) {
-            targetData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getTargetData()));
-        }
+        // TODO
+        // // Store data as columns since that's what everything else deals with so there is no need to transpose later.
+        // if (network.getTrainingSet().getInputData() != null) {
+        //     inputData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getInputData()));
+        // }
+        // if (network.getTrainingSet().getTargetData() != null) {
+        //     targetData = Nd4j.create(Utils.castToFloat(network.getTrainingSet().getTargetData()));
+        // }
     }
 
     public double getLearningRate() {

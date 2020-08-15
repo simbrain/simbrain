@@ -51,19 +51,16 @@ public class LMSIterative extends IterableTrainer {
      */
     private double learningRate = DEFAULT_LEARNING_RATE;
 
-    /**
-     * Parent network
-     */
-     private LMSNetwork network;
 
-    /**
-     * Construct a least mean squares iterative panel.
-     *
-     * @param network
-     */
-    public LMSIterative(LMSNetwork network) {
-        super(network);
-        this.network = network;
+    public List<Neuron> inputs;
+    public List<Neuron> outputs;
+    public TrainingSet ts;
+
+    // TODO
+    public LMSIterative(List<Neuron> inputs, List<Neuron> outputs, TrainingSet ts) {
+        this.inputs = inputs;
+        this.outputs = outputs;
+        this.ts = ts;
     }
 
     @Override
@@ -71,73 +68,24 @@ public class LMSIterative extends IterableTrainer {
         return rmsError;
     }
 
-    @Override
-    public void apply() {
-
-        rmsError = 0;
-
-        // Set local variables
-        int numRows = network.getTrainingSet().getInputData().length;
-        int numInputs = network.getInputNeurons().size();
-        int numOutputs = network.getOutputNeurons().size();
-
-        // Run through training data
-        for (int row = 0; row < numRows; row++) {
-
-            // Set input layer values
-            for (int i = 0; i < numInputs; i++) {
-                network.getInputNeurons().get(i).forceSetActivation(network.getTrainingSet().getInputData()[row][i]);
-            }
-
-            // Update output node
-            Network.updateNeurons(network.getOutputNeurons());
-
-            // Iterate through weights and biases and update them
-            for (int i = 0; i < numOutputs; i++) {
-
-                // Get target neuron and compute error
-                Neuron outputNeuron = network.getOutputNeurons().get(i);
-                double targetValue = network.getTrainingSet().getTargetData()[row][i];
-                double error = targetValue - outputNeuron.getActivation();
-                rmsError += (error * error); // TODO: Validate rmse
-
-                // Update weights
-                for (Synapse synapse : outputNeuron.getFanIn()) {
-                    double deltaW = (learningRate * error * synapse.getSource().getActivation());
-                    // System.out.println(Utils.round(deltaW,2) + "=" + error +
-                    // " * " + synapse.getSource()
-                    // .getActivation());
-                    synapse.setStrength(synapse.getStrength() + deltaW);
-                }
-
-                // System.out.println("Row " + row + "," + outputNeuron.getId()
-                // + ":"
-                // + targetValue + " - " +
-                // Utils.round(outputNeuron.getActivation(),2) + " (" +
-                // Utils.round(error,2) + ")");
-
-                // Update bias of target neuron
-                BiasedUpdateRule bias = (BiasedUpdateRule) outputNeuron.getUpdateRule();
-                bias.setBias(bias.getBias() + (learningRate * error));
-            }
-            rmsError = rmsError / (numInputs * numOutputs);
-        }
-        getEvents().fireErrorUpdated();
-        incrementIteration();
-    }
 
     /**
      * A standard way of randomizing networks to which LMSIterative is applied,
      * by randomizing bias on output nodes and the single layer of weights.
      */
     public void randomize() {
-        for (Neuron neuron : network.getOutputNeurons()) {
+        for (Neuron neuron : outputs) {
             neuron.clear(); // Cleared output nodes look nicer in the GUI
             if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
                 ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(Math.random());
             }
         }
-        network.getWeightMatrixList().forEach(WeightMatrix::randomize);
+        // network.getWeightMatrixList().forEach(WeightMatrix::randomize);
+    }
+
+    @Override
+    protected TrainingSet getTrainingSet() {
+        return ts;
     }
 
     public double getLearningRate() {
@@ -148,21 +96,8 @@ public class LMSIterative extends IterableTrainer {
         this.learningRate = learningRate;
     }
 
-    public List<Neuron> inputs;
-    public List<Neuron> outputs;
-    public TrainingSet ts;
-
-    public LMSIterative(List<Neuron> inputs, List<Neuron> outputs, TrainingSet ts) {
-        this.inputs = inputs;
-        this.outputs = outputs;
-        this.ts = ts;
-    }
-
-    public void train() {
-
-        this.inputs = inputs;
-        this.outputs = outputs;
-        this.ts = ts;
+    @Override
+    public void apply() throws DataNotInitializedException {
 
         rmsError = 0;
 

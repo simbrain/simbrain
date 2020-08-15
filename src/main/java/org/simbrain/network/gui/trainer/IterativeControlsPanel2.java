@@ -178,9 +178,9 @@ public class IterativeControlsPanel2 extends JPanel {
         Executors.newSingleThreadExecutor().submit(() -> {
             try {
                 while (!lms.isUpdateCompleted()) {
-                    lms.iterate();
+                    lms.apply();
                 }
-            } catch (DataNotInitializedException e) {
+            } catch (IterableTrainer.DataNotInitializedException e) {
                 JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
             }
         });
@@ -188,16 +188,16 @@ public class IterativeControlsPanel2 extends JPanel {
 
     private void stopRunning() {
         lms.setUpdateCompleted(true);
-        lms.revalidateSynapseGroups();
+        // lms.revalidateSynapseGroups();
         lms.commitChanges();
     }
 
     private void iterate() {
         initTrainer(false);
         try {
-            lms.iterate();
-            lms.revalidateSynapseGroups();
-        } catch (DataNotInitializedException e) {
+            lms.apply();
+            // lms.revalidateSynapseGroups();
+        } catch (IterableTrainer.DataNotInitializedException e) {
             JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
         }
     }

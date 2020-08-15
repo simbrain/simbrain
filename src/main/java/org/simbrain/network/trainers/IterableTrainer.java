@@ -13,6 +13,7 @@
  */
 package org.simbrain.network.trainers;
 
+import org.simbrain.network.events.TrainerEvents;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -28,7 +29,7 @@ import java.util.List;
  *
  * @author jyoshimi
  */
-public abstract class IterableTrainer extends Trainer {
+public abstract class IterableTrainer implements EditableObject {
 
     //TODO: Fine-tune the useparameter annotations to optimize the editor dialog
 
@@ -41,6 +42,11 @@ public abstract class IterableTrainer extends Trainer {
      * Iteration number. An epoch.
      */
     private int iteration;
+
+    /**
+     * Handle trainer events.
+     */
+    private transient TrainerEvents events = new TrainerEvents(this);
 
     /**
      * Current stopping condition.
@@ -86,19 +92,8 @@ public abstract class IterableTrainer extends Trainer {
         }
     }
 
-
     @UserParameter(label = "Randomizer", isObjectType = true, order = 200)
     private ProbabilityDistribution randomizer = UniformDistribution.create();
-
-    /**
-     * Construct the iterable trainer.
-     *
-     * @param network the trainable network
-     */
-    public IterableTrainer(Trainable network) {
-        super(network);
-    }
-
 
     /**
      * Get the current MSE error.
@@ -122,14 +117,14 @@ public abstract class IterableTrainer extends Trainer {
      */
     public void iterate() throws DataNotInitializedException {
 
-        if (getTrainableNetwork().getTrainingSet().getInputData() == null) {
+        if (getTrainingSet().getInputData() == null) {
             throw new DataNotInitializedException("Input data not initalized");
         }
-        if (getTrainableNetwork().getTrainingSet().getTargetData() == null) {
+        if (getTrainingSet().getTargetData() == null) {
             throw new DataNotInitializedException("Target data not initalized");
         }
 
-        getEvents().fireBeginTraining();
+        events.fireBeginTraining();
         switch (stoppingCondition) {
             case NONE:
                 apply();
@@ -152,9 +147,13 @@ public abstract class IterableTrainer extends Trainer {
             default:
                 break;
         }
-        getEvents().fireEndTraining();
+        events.fireEndTraining();
 
     }
+
+    protected abstract TrainingSet getTrainingSet();
+
+    public abstract void apply() throws DataNotInitializedException;
 
     public boolean isUpdateCompleted() {
         return updateCompleted;
@@ -182,12 +181,12 @@ public abstract class IterableTrainer extends Trainer {
      *
      * @return least number of rows
      */
-    protected int getMinimumNumRows(Trainable network) {
-        if ((network.getTrainingSet().getInputData() == null) || (network.getTrainingSet() == null)) {
+    protected int getMinimumNumRows() {
+        if ((getTrainingSet().getInputData() == null) || (getTrainingSet() == null)) {
             return 0;
         }
-        int inputRows = network.getTrainingSet().getInputData().length;
-        int targetRows = network.getTrainingSet().getTargetData().length;
+        int inputRows = getTrainingSet().getInputData().length;
+        int targetRows = getTrainingSet().getTargetData().length;
         if (inputRows < targetRows) {
             return inputRows;
         } else {
@@ -212,4 +211,19 @@ public abstract class IterableTrainer extends Trainer {
         return randomizer;
     }
 
+    /**
+     * Exception thrown when a training algorithm is applied but no data have
+     * been initialized.
+     */
+    public class DataNotInitializedException extends Exception {
+
+        public DataNotInitializedException(final String message) {
+            super(message);
+        }
+
+    }
+
+    public TrainerEvents getEvents() {
+        return events;
+    }
 }

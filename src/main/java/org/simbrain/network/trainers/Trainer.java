@@ -36,6 +36,7 @@ import java.util.List;
  *
  * @author jeffyoshimi
  */
+@Deprecated
 public abstract class Trainer implements EditableObject {
 
     /**
@@ -52,7 +53,7 @@ public abstract class Trainer implements EditableObject {
     /**
      * Handle trainer events.
      */
-    private transient TrainerEvents events = new TrainerEvents(this);
+    private transient TrainerEvents events = new TrainerEvents(null);
 
     /**
      * Construct the trainer and pass in a reference to the trainable element.

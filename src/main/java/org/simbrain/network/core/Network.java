@@ -876,6 +876,7 @@ public class Network {
         synapseGroups.forEach(SynapseGroup::postUnmarshallingInit);
         neuronGroups.forEach(AbstractNeuronCollection::postUnmarshallingInit);
         neuronCollectionSet.forEach(AbstractNeuronCollection::postUnmarshallingInit);
+        naList.forEach(NeuronArray::postUnmarshallingInit);
         weightMatrices.forEach(WeightMatrix::postUnmarshallingInit);
         subnetworks.forEach(Subnetwork::postUnmarshallingInit);
 

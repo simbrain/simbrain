@@ -6,7 +6,6 @@ import org.simbrain.world.imageworld.ImageAlbumComponent;
 
 public class ImageAlbumDesktopComponent extends GuiComponent<ImageAlbumComponent> {
 
-
     /**
      * Construct a new ImageDesktopComponent GUI.
      *

@@ -13,7 +13,9 @@
  */
 package org.simbrain.network.gui.trainer;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -64,14 +66,67 @@ public class DataPanel extends JPanel {
     /**
      * The neurons that this data will be sent as input to.
      */
-    protected final List<Neuron> inputNeurons;
+    protected List<Neuron> inputNeurons;
 
     /**
      * The toolbar panel.
      */
     protected JPanel toolbars;
 
-    //TODO
+    public DataPanel(final INDArray inputData) {
+        NumericMatrix dataHolder = new NumericMatrix() {
+            @Override
+            public void setData(double[][] data) {
+                inputData.data().setData(Utils.flatten(data));
+            }
+
+            @Override
+            public double[][] getData() {
+                return inputData.toDoubleMatrix();
+            }
+        };
+
+        //TODO: Duplicated code
+
+        // If no data exists, create it!
+        if (dataHolder.getData() == null) {
+            table = SimbrainJTable.createTable(new NumericTable(DEFAULT_NUM_ROWS, inputData.columns()));
+        } else {
+            table = SimbrainJTable.createTable(new NumericTable(dataHolder.getData()));
+        }
+
+        // Set up scrollbar
+        scroller = new SimbrainJTableScrollPanel(table);
+        scroller.setMinimumSize(new Dimension(200, 500));
+        scroller.setMaxVisibleColumns(5);
+
+        setLayout(new BorderLayout());
+        add("Center", scroller);
+
+        // Toolbars
+        toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        // Open / Save Tools
+        JToolBar fileToolBar = new JToolBar();
+        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, dataHolder));
+        fileToolBar.add(TableActionManager.getSaveCSVAction((NumericTable) table.getData()));
+        toolbars.add(fileToolBar);
+
+        // Randomize tools
+        toolbars.add(table.getToolbarRandomize());
+
+        add("North", toolbars);
+
+        table.getData().addTableModelListener(new TableModelListener() {
+            @Override
+            public void tableChanged(TableModelEvent e) {
+                resizePanel();
+            }
+        });
+    }
+
+
+        //TODO
     // This was done quickly and it's not clear it's taking advantage of the dl4j dataset's features
     public DataPanel(final NumericMatrix dataHolder, int numNeurons, final int numVisibleColumns, final String name) {
         this.dataHolder = dataHolder;

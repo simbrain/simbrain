@@ -25,6 +25,8 @@ import javax.swing.*;
  */
 public class LMSCreationDialog extends StandardDialog {
 
+    // TODO: Replace with fields tailored to DL4J
+
     /**
      * Network panel.
      */
@@ -77,12 +79,7 @@ public class LMSCreationDialog extends StandardDialog {
         // Create the layered network
         LMSNetwork lms = new LMSNetwork(networkPanel.getNetwork(), inputLayer.getNumNeurons(),
                 outputLayer.getNumNeurons(), networkPanel.getPlacementManager().getLocationAndIncrement());
-        lms.getInputLayer().setNeuronType(inputLayer.getNeuronType());
-        lms.getOutputLayer().setNeuronType(outputLayer.getNeuronType());
-
         networkPanel.getNetwork().addSubnetwork(lms);
-
-        networkPanel.repaint();
         super.closeDialogOk();
     }
 }

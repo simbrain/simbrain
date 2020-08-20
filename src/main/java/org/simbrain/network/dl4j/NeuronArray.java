@@ -17,6 +17,7 @@ import org.simbrain.workspace.Producible;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -383,7 +384,14 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Override
     public String toString() {
-        return "Array [" + getId() + "] with " + inputSize() + " components\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Array [" + getId() + "] with " + inputSize() + " components\n");
+        // TODO: For larger numbers could present as a matrix
+        int maxToDisplay = 10;
+        if (neuronArray.length() < maxToDisplay) {
+            sb.append(Arrays.toString(neuronArray.toDoubleVector()));
+        }
+        return sb.toString();
     }
 
     public NeuronArrayEvents getEvents() {

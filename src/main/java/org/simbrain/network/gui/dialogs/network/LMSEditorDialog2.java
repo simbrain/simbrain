@@ -170,19 +170,19 @@ public class LMSEditorDialog2  extends StandardDialog {
         setModalityType(ModalityType.MODELESS);
 
         // Input data tab
-        inputPanel = new DataPanel(trainer.inputs, trainer.ts.getInputDataMatrix(), 5,
+        inputPanel = new DataPanel(trainer.getInputs(), trainer.getTrainingSet().getInputDataMatrix(), 5,
                 "Input");
         inputPanel.setFrame(this);
         addTab("Input data", inputPanel);
 
         // Training data tab
-        trainingPanel = new DataPanel(trainer.outputs, trainer.ts.getTargetDataMatrix(), 5, "Targets");
+        trainingPanel = new DataPanel(trainer.getOutputs(), trainer.getTrainingSet().getTargetDataMatrix(), 5, "Targets");
         trainingPanel.setFrame(this);
         addTab("Target data", trainingPanel);
 
         // Testing tab
-        validateInputsPanel = TestInputPanel.createTestInputPanel(networkPanel, trainer.inputs,
-                trainer.ts.getInputDataMatrix());
+        validateInputsPanel = TestInputPanel.createTestInputPanel(networkPanel, trainer.getInputs(),
+                trainer.getTrainingSet().getInputDataMatrix());
         addTab("Validate Input Data", validateInputsPanel);
 
         // Finalize

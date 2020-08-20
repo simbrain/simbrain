@@ -15,6 +15,7 @@ package org.simbrain.network.subnetworks;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -43,8 +44,9 @@ public class LMSNetwork extends FeedForward implements Trainable {
      */
     public LMSNetwork(final Network network, int numInputNeurons, int numOutputNeurons, Point2D initialPosition) {
         super(network, new int[]{numInputNeurons, numOutputNeurons}, initialPosition);
-        getOutputLayer().setNeuronType(new LinearRule());
+        setUseNeuronArrays(true);
         setLabel("LMS Network");
+        //getNAList().forEach(NeuronArray::fireLocationChange);
     }
 
     @Override

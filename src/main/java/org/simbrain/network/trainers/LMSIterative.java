@@ -28,15 +28,26 @@ import org.simbrain.network.subnetworks.LMSNetwork;
 import java.util.List;
 
 /**
- * Train using least mean squares.
- * <p>
- * Clarify it is for loose neurons.  Rename: LMSIterativeLoose
- * <p>
- * Pass in input neurons, target neurons, and training dataset.  Weights can be inferred.
+ * Train loose neurons using least mean squares. Assumes they are connected.
  *
  * @author jyoshimi
  */
 public class LMSIterative extends IterableTrainer {
+
+    /**
+     * Input neurons.
+     */
+    private List<Neuron> inputs;
+
+    /**
+     * Output neurons.
+     */
+    private List<Neuron> outputs;
+
+    /**
+     * Training set with input data and target data with numbers of column to match the size of inputs and outputs.
+     */
+    private TrainingSet ts;
 
     /**
      * Current error.
@@ -51,10 +62,6 @@ public class LMSIterative extends IterableTrainer {
      */
     private double learningRate = DEFAULT_LEARNING_RATE;
 
-
-    public List<Neuron> inputs;
-    public List<Neuron> outputs;
-    public TrainingSet ts;
 
     // TODO
     public LMSIterative(List<Neuron> inputs, List<Neuron> outputs, TrainingSet ts) {
@@ -84,7 +91,7 @@ public class LMSIterative extends IterableTrainer {
     }
 
     @Override
-    protected TrainingSet getTrainingSet() {
+    public TrainingSet getTrainingSet() {
         return ts;
     }
 
@@ -94,6 +101,14 @@ public class LMSIterative extends IterableTrainer {
 
     public void setLearningRate(double learningRate) {
         this.learningRate = learningRate;
+    }
+
+    public List<Neuron> getInputs() {
+        return inputs;
+    }
+
+    public List<Neuron> getOutputs() {
+        return outputs;
     }
 
     @Override
@@ -141,149 +156,5 @@ public class LMSIterative extends IterableTrainer {
         getEvents().fireErrorUpdated();
         incrementIteration();
     }
-
-    // TODO: Move to test class
-    // /**
-    // * Test method.
-    // *
-    // * @param args unused
-    // */
-    // public static void main(String[] args) {
-    // test();
-    // }
-    //
-    // /**
-    // * A test with a 4-2 network and specific start weights to validate
-    // against
-    // * an emergent sim.
-    // */
-    // public static void test2() {
-    //
-    // double inputData[][] = { { .95, 0, 0, 0 }, { 0, .95, 0, 0 },
-    // { 0, 0, .95, 0 }, { 0, 0, 0, .95 } };
-    // double trainingData[][] = { { .95, 0 }, { .95, 0 }, { 0, .95 },
-    // { 0, .95 } };
-    //
-    // // TODO: Long API! Must be shortcuts...
-    //
-    // // Build network
-    // Network network = new Network();
-    //
-    // // Set up input layer
-    // List<Neuron> inputLayer = new ArrayList<Neuron>();
-    // for (int i = 0; i < 4; i++) {
-    // Neuron neuron = new Neuron(network, new LinearRule());
-    // network.addLooseNeuron(neuron);
-    // inputLayer.add(neuron);
-    // // System.out.println("Input " + i + " = " + neuron.getId());
-    // }
-    //
-    // // Set up output layer
-    // List<Neuron> outputLayer = new ArrayList<Neuron>();
-    // for (int i = 0; i < 2; i++) {
-    // LinearRule rule = new LinearRule();
-    // Neuron neuron = new Neuron(network, rule);
-    // ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
-    // rule.setLowerBound(0);
-    // rule.setUpperBound(1);
-    // network.addLooseNeuron(neuron);
-    // // System.out.println("Output " + i + " = " + neuron.getId());
-    // outputLayer.add(neuron);
-    // }
-    //
-    // // Connect input layer to output layer
-    // AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
-    // connection.connectNeurons(true);
-    //
-    // // Set initial weights (from an Emergent sim)
-    // Network.getSynapse(inputLayer.get(0), outputLayer.get(0)).setStrength(
-    // .352391);
-    // Network.getSynapse(inputLayer.get(1), outputLayer.get(0)).setStrength(
-    // .354468);
-    // Network.getSynapse(inputLayer.get(2), outputLayer.get(0)).setStrength(
-    // .338344);
-    // Network.getSynapse(inputLayer.get(3), outputLayer.get(0)).setStrength(
-    // .3593);
-    // Network.getSynapse(inputLayer.get(0), outputLayer.get(1)).setStrength(
-    // .561543);
-    // Network.getSynapse(inputLayer.get(1), outputLayer.get(1)).setStrength(
-    // .584706);
-    // Network.getSynapse(inputLayer.get(2), outputLayer.get(1)).setStrength(
-    // .355258);
-    // Network.getSynapse(inputLayer.get(3), outputLayer.get(1)).setStrength(
-    // .555266);
-    //
-    // // Initialize the trainer
-    // // REDO
-    // // LMSIterative trainer = new LMSIterative(network, inputLayer,
-    // // outputLayer);
-    // // network.setInputData(inputData);
-    // // trainer.setTrainingData(trainingData);
-    // // int epochs = 1000; // Error gets low with 1000 epochs
-    // // for (int i = 0; i < epochs; i++) {
-    // // trainer.apply();
-    // // //System.out.println(network);
-    // // System.out.println("Epoch " + i + ", error = "
-    // // + ((IterableAlgorithm) trainer).getError());
-    // // }
-    // }
-    //
-    // /**
-    // * A simple AND gate.
-    // */
-    // public static void test() {
-    //
-    // double inputData[][] = { { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 } };
-    // double trainingData[][] = { { 1 }, { 0 }, { 0 }, { 0 } };
-    //
-    // // TODO: Long API! Must be shortcuts...
-    //
-    // // Build network
-    // Network network = new Network();
-    //
-    // // Set up input layer
-    // List<Neuron> inputLayer = new ArrayList<Neuron>();
-    // for (int i = 0; i < 2; i++) {
-    // Neuron neuron = new Neuron(network, new LinearRule());
-    // network.addLooseNeuron(neuron);
-    // inputLayer.add(neuron);
-    // // System.out.println("Input " + i + " = " + neuron.getId());
-    // }
-    //
-    // // Set up output layer
-    // List<Neuron> outputLayer = new ArrayList<Neuron>();
-    // for (int i = 0; i < 1; i++) {
-    // LinearRule rule = new LinearRule();
-    // Neuron neuron = new Neuron(network, rule);
-    // ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
-    // rule.setLowerBound(0);
-    // rule.setUpperBound(1);
-    // network.addLooseNeuron(neuron);
-    // // System.out.println("Output " + i + " = " + neuron.getId());
-    // outputLayer.add(neuron);
-    // }
-    //
-    // // Connect input layer to output layer
-    // AllToAll connection = new AllToAll(network, inputLayer, outputLayer);
-    // connection.connectNeurons(true);
-    //
-    // // Set initial weights
-    // network.randomizeWeights();
-    //
-    // // Initialize the trainer
-    // // REDO
-    // // LMSIterative trainer = new LMSIterative(network, inputLayer,
-    // // outputLayer);
-    // // trainer.learningRate = .01;
-    // // trainer.setInputData(inputData);
-    // // trainer.setTrainingData(trainingData);
-    // // int epochs = 1000;
-    // // for (int i = 0; i < epochs; i++) {
-    // // trainer.apply();
-    // // //System.out.println(network);
-    // // System.out.println("Epoch " + i + ", error = "
-    // // + ((IterableAlgorithm) trainer).getError());
-    // // }
-    // }
 
 }

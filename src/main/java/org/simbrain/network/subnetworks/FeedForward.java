@@ -46,7 +46,7 @@ public class FeedForward extends Subnetwork {
     /**
      * If true use {@link org.simbrain.network.dl4j.NeuronArray}; if false {@link NeuronGroup}
      */
-    public boolean useNeuronArrays = true;
+    private boolean useNeuronArrays = true;
 
     /**
      * Construct a feed-forward network.
@@ -229,15 +229,33 @@ public class FeedForward extends Subnetwork {
 
     @Override
     public void update() {
-        // TODO
-        for (int i = 0; i < getNeuronGroupList().size() ; i++) {
-            getNeuronGroupList().get(i).update();
-            if(getSynapseGroupList().size() > i) {
-                getSynapseGroupList().get(i).update();
+
+        if (isUseNeuronArrays()) {
+            for (int i = 0; i < getNAList().size() ; i++) {
+                getNAList().get(i).update();
+                if(getWeightMatrixList().size() > i) {
+                    getWeightMatrixList().get(i).update();
+                }
             }
-            if(getWeightMatrixList().size() > i) {
-                getWeightMatrixList().get(i).update();
+        } else {
+            for (int i = 0; i < getNeuronGroupList().size() ; i++) {
+                getNeuronGroupList().get(i).update();
+                if(getSynapseGroupList().size() > i) {
+                    getSynapseGroupList().get(i).update();
+                }
+                if(getWeightMatrixList().size() > i) {
+                    getWeightMatrixList().get(i).update();
+                }
             }
         }
+
+    }
+
+    public boolean isUseNeuronArrays() {
+        return useNeuronArrays;
+    }
+
+    public void setUseNeuronArrays(boolean useNeuronArrays) {
+        this.useNeuronArrays = useNeuronArrays;
     }
 }

@@ -110,11 +110,11 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         blue.setForeground(Color.BLUE);
 
         JPanel greenBox = new JPanel();
-        greenBox.setBackground(new Color(66, 125, 55));
+        greenBox.setBackground(new Color(36, 152, 38));
         greenBox.setSize(dimensions, dimensions);
         JLabel green = new JLabel();
-        green.setText("Array value");
-        green.setForeground(new Color(66, 125, 55));
+        green.setText("Array Value");
+        green.setForeground(new Color(36, 152, 38));
 
         JPanel blackBox = new JPanel();
         blackBox.setBackground(Color.BLACK);

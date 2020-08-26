@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
@@ -82,14 +82,14 @@ public class SubnetworkNode extends ScreenElement {
      * Create a subnetwork node.
      *
      * @param networkPanel parent panel
-     * @param group        the layered network
+     * @param subnet        the layered network
      */
-    public SubnetworkNode(NetworkPanel networkPanel, Subnetwork group) {
+    public SubnetworkNode(NetworkPanel networkPanel, Subnetwork subnet) {
         super(networkPanel);
         this.networkPanel = networkPanel;
-        this.subnetwork = group;
+        this.subnetwork = subnet;
         interactionBox = new SubnetworkNodeInteractionBox(networkPanel);
-        interactionBox.setText(group.getLabel());
+        interactionBox.setText(subnetwork.getLabel());
         addChild(outline);
         addChild(interactionBox);
 
@@ -99,6 +99,7 @@ public class SubnetworkNode extends ScreenElement {
         events.onDeleted(n -> removeFromParent());
         events.onLabelChange((o,n) -> updateText());
         events.onLocationChange(this::layoutChildren);
+
     }
 
     /**
@@ -106,7 +107,7 @@ public class SubnetworkNode extends ScreenElement {
      */
     @Override
     public void layoutChildren() {
-        outline.setOutlinedNodes(outlinedObjects);
+        outline.resetOutlinedNodes(outlinedObjects);
         interactionBox.setOffset(outline.getFullBounds().getX()
                 + Outline.ARC_SIZE / 2,
                 outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
@@ -117,21 +118,30 @@ public class SubnetworkNode extends ScreenElement {
      */
     public void addNode(ScreenElement node) {
         outlinedObjects.add(node);
+
         if (node instanceof SynapseGroupNode) {
             node.lowerToBottom();
             ((SynapseGroupNode) node).getSynapseGroup().getEvents().onDeleted(sg -> {
                 outlinedObjects.remove(node);
-                outline.setOutlinedNodes(outlinedObjects);
+                outline.resetOutlinedNodes(outlinedObjects);
             });
         } else if (node instanceof NeuronGroupNode) {
             NeuronGroup ng = ((NeuronGroupNode) node).getNeuronGroup();
             ng.getEvents().onDeleted(n -> {
                 outlinedObjects.remove(node);
-                outline.setOutlinedNodes(outlinedObjects);
+                outline.resetOutlinedNodes(outlinedObjects);
             });
-            ng.getEvents().onLocationChange(() -> outline.setOutlinedNodes(outlinedObjects));
+            ng.getEvents().onLocationChange(() -> outline.resetOutlinedNodes(outlinedObjects));
+        } else if (node instanceof NeuronArrayNode) {
+            NeuronArray na = ((NeuronArrayNode) node).getNeuronArray();
+            na.getEvents().fireLocationChange(); // Forces an initial update of connnected weightmatrices
+            na.getEvents().onDeleted(n -> {
+                outlinedObjects.remove(node);
+                outline.resetOutlinedNodes(outlinedObjects);
+            });
+            na.getEvents().onLocationChange(() -> outline.resetOutlinedNodes(outlinedObjects));
         }
-        outline.setOutlinedNodes(outlinedObjects);
+        outline.resetOutlinedNodes(outlinedObjects);
         outline.updateBounds();
     }
 
@@ -315,7 +325,7 @@ public class SubnetworkNode extends ScreenElement {
                 node.offset(dx, dy);
             }
         }
-        outline.setOutlinedNodes(outlinedObjects);
+        outline.resetOutlinedNodes(outlinedObjects);
     }
 
 

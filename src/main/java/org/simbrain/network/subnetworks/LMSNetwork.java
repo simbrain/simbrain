@@ -46,7 +46,6 @@ public class LMSNetwork extends FeedForward implements Trainable {
         super(network, new int[]{numInputNeurons, numOutputNeurons}, initialPosition);
         setUseNeuronArrays(true);
         setLabel("LMS Network");
-        //getNAList().forEach(NeuronArray::fireLocationChange);
     }
 
     @Override

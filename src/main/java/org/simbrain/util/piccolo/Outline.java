@@ -41,10 +41,11 @@ public class Outline extends PNode {
     }
 
     /**
-     * No event is fired when setting outlined nodes. Update only occurs after {@link #updateBounds()} is
-     * called.
+     * Use this method to force the outline to surrounded the provided nodes.  Note that outlinednodes is
+     * set to null at every update. Also note that no event is fired when setting outlined nodes.
+     * Update only occurs after {@link #updateBounds()} is called.
      */
-    public void setOutlinedNodes(Collection<? extends ScreenElement> outlinedNodes) {
+    public void resetOutlinedNodes(Collection<? extends ScreenElement> outlinedNodes) {
         this.outlinedNodes = outlinedNodes;
         invalidateFullBounds();
     }

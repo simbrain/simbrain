@@ -96,7 +96,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.pullViewPositionFromModel();
         }
-        outlinedObjects.setOutlinedNodes(neuronNodes);
+        outlinedObjects.resetOutlinedNodes(neuronNodes);
     }
 
     @Override
@@ -116,15 +116,15 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         this.neuronNodes.addAll(neuronNodes);
         for (NeuronNode neuronNode : neuronNodes) {
             // Listen directly to neuronnodes for property change events
-            NeuronEvents events = neuronNode.getNeuron().getEvents();
-            events.onDeleted(n -> {
+            NeuronEvents neuronEvents = neuronNode.getNeuron().getEvents();
+            neuronEvents.onDeleted(n -> {
                 this.neuronNodes.remove(neuronNode);
-                outlinedObjects.setOutlinedNodes(this.neuronNodes);
+                outlinedObjects.resetOutlinedNodes(this.neuronNodes);
             });
-            events.onLocationChange(() -> outlinedObjects.setOutlinedNodes(this.neuronNodes));
-            events.onLabelChange(() -> outlinedObjects.setOutlinedNodes(this.neuronNodes));
+            neuronEvents.onLocationChange(() -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.onLabelChange(() -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
         }
-        outlinedObjects.setOutlinedNodes(this.neuronNodes);
+        outlinedObjects.resetOutlinedNodes(this.neuronNodes);
         outlinedObjects.updateBounds();
     }
 

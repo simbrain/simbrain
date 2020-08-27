@@ -32,7 +32,9 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer, Ed
     private String name;
 
     /**
-     * An ImageSource from which to extract sensor values.
+     * An ImageSource from which to extract sensor values.  For "image world" this will be a
+     * {@link java.awt.image.FilteredImageSource}, which applies the relevant downscaling, thresholding,
+     * and other operations.
      */
     private ImageSource source;
 

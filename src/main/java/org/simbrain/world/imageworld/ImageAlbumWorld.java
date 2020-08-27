@@ -3,6 +3,7 @@ package org.simbrain.world.imageworld;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.world.imageworld.gui.ImagePanel;
 
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -32,18 +33,21 @@ public class ImageAlbumWorld extends ImageWorld {
         imageSource.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
         initializeDefaultSensorMatrices();
 
+        //clearImage();
+
         // "Paint" pixel
         imagePanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                toggle = toggle == 0xFFFFF ? 0: 0xFFFFF;
-                imageSource.getCurrentImage().setRGB(7,7, toggle);
+                var ratioX = imagePanel.getWidth() / imageSource.getWidth();
+                var ratioY = imagePanel.getHeight() / imageSource.getHeight();
+                var x = evt.getX() / ratioX;
+                var y = evt.getY() / ratioY;
+                imageSource.getCurrentImage().setRGB(x, y, 0xFFFFFF);
                 imageSource.notifyImageUpdate();
             }
         });
     }
-    // Temporary to study drawing to screen in image world
-    int toggle = 0xFFFFF;
 
 
     @Override

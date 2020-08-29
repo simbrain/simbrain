@@ -73,16 +73,19 @@ public class DataPanel extends JPanel {
      */
     protected JPanel toolbars;
 
-    public DataPanel(final INDArray inputData) {
+    // TODO: Document and remove redundancies
+    public DataPanel(final INDArray ndArray) {
+
+        // Wrap the ndarray in a numeric matrix
         NumericMatrix dataHolder = new NumericMatrix() {
             @Override
             public void setData(double[][] data) {
-                inputData.data().setData(Utils.flatten(data));
+                ndArray.data().setData(Utils.flatten(data));
             }
 
             @Override
             public double[][] getData() {
-                return inputData.toDoubleMatrix();
+                return ndArray.toDoubleMatrix();
             }
         };
 
@@ -90,7 +93,7 @@ public class DataPanel extends JPanel {
 
         // If no data exists, create it!
         if (dataHolder.getData() == null) {
-            table = SimbrainJTable.createTable(new NumericTable(DEFAULT_NUM_ROWS, inputData.columns()));
+            table = SimbrainJTable.createTable(new NumericTable(DEFAULT_NUM_ROWS, ndArray.columns()));
         } else {
             table = SimbrainJTable.createTable(new NumericTable(dataHolder.getData()));
         }
@@ -126,7 +129,7 @@ public class DataPanel extends JPanel {
     }
 
 
-        //TODO
+    //TODO
     // This was done quickly and it's not clear it's taking advantage of the dl4j dataset's features
     public DataPanel(final NumericMatrix dataHolder, int numNeurons, final int numVisibleColumns, final String name) {
         this.dataHolder = dataHolder;

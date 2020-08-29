@@ -310,7 +310,8 @@ public class MultiLayerNet implements ArrayConnectable, LocatableModel {
             }
 
             // Set up output layers using output layer creation template
-            lb.layer(oct.create(netTopology.get(netTopology.size() - 1)));
+            lb.layer(oct.
+                    create(netTopology.get(netTopology.size() - 1)));
 
             MultiLayerConfiguration conf = lb.build();
             MultiLayerNet net =
@@ -325,6 +326,7 @@ public class MultiLayerNet implements ArrayConnectable, LocatableModel {
 
     }
 
+    // TODO: Move somewhere else
     public static class LayerCreationTemplate implements EditableObject {
 
         @UserParameter(label = "Activation Function", order = 1)

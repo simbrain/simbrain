@@ -13,9 +13,12 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.nd4j.linalg.dataset.api.DataSet;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.dl4j.NeuronArray;
+import org.simbrain.network.gui.dialogs.network.LMSDialog;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -60,5 +63,15 @@ public class LMSNetwork extends FeedForward implements Trainable {
     @Override
     public NetworkModel getNetwork() {
         return this;
+    }
+
+    public void train(MultiLayerNetwork mln, DataSet data) {
+        for (int i = 0; i < 25; i++) {
+            mln.fit(data);
+            System.out.println("score:" + mln.score());
+        }
+        // TODO: Figure out how to get the weights from the mln object and use them to set the
+        // weights of the lms network
+        // getWeightMatrixList().get(0).setWeights(mln.getLayers()[0].we);
     }
 }

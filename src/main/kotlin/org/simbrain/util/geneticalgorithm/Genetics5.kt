@@ -4,6 +4,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -23,7 +24,7 @@ abstract class Gene5<T> protected constructor(val template: T, protected val mut
 
     abstract override fun copy(): Gene5<T>
 
-    fun onMutation(options: T.() -> Unit) {
+    fun onMutate(options: T.() -> Unit) {
         mutationTasks.add { apply(options) }
     }
 
@@ -92,7 +93,7 @@ fun nodeGene(options: Neuron.() -> Unit = { }): NodeGene5 {
 }
 
 fun connectionGene(source: NodeGene5, target: NodeGene5, options: Synapse.() -> Unit = { }): ConnectionGene5 {
-    return ConnectionGene5(Synapse(null).apply(options), source, target)
+    return ConnectionGene5(Synapse(null, null as Neuron?).apply(options), source, target)
 }
 
 fun smellSensorGene(options: SmellSensor.() -> Unit): PeripheralGene5<SmellSensor> {
@@ -134,24 +135,14 @@ class Memoize<T>(val current: T)
 
 class Agent5(val network: Network, val odorWorldEntity: OdorWorldEntity)
 
-class WorkspaceBuilder {
-
-    val workspace by lazy { Workspace() }
+class SimBuilder {
 
     val genomes = ArrayList<GenomeBuilder>()
 
-    fun network(builder: NetworkAgentBuilder.() -> Unit): NetworkAgentBuilder {
-        return NetworkAgentBuilder().apply(builder)
-    }
+    val builders = LinkedList<WorkspaceBuilder>()
 
-    fun odorworld() {
-
-    }
-
-    operator fun NetworkAgentBuilder.unaryPlus() {
-        workspace.addWorkspaceComponent(NetworkComponent("TempNet", Network().also { network ->
-            tasks.forEach { task -> task(network) }
-        }))
+    fun onBuild(builder: WorkspaceBuilder.() -> Unit) {
+        builders.add(WorkspaceBuilder().apply(builder))
     }
 
     class GenomeBuilder private constructor(refList: MutableList<Memoize<*>>): Memoization(refList) {
@@ -159,10 +150,6 @@ class WorkspaceBuilder {
         constructor(): this(mutableListOf())
 
         val mutationTasks = mutableListOf<() -> Unit>()
-
-        val chromosomes = mutableListOf<Chromosome5<*, *>>()
-
-        val buildTasks = LinkedList<() -> Unit>()
 
         fun copy(): GenomeBuilder {
             return GenomeBuilder(refList)
@@ -188,6 +175,36 @@ class WorkspaceBuilder {
 
     operator fun GenomeBuilder.unaryPlus() {
         genomes.add(this)
+    }
+
+    fun build(): Workspace {
+        val workspace by lazy { Workspace() }
+        builders.forEach { it.builders.forEach { it(workspace) } }
+        return workspace
+    }
+
+}
+
+fun sim(builder: SimBuilder.() -> Unit) = SimBuilder().apply(builder)
+
+class WorkspaceBuilder {
+
+    val builders = ArrayList<(Workspace) -> Unit>()
+
+    fun network(builder: NetworkAgentBuilder.() -> Unit): NetworkAgentBuilder {
+        return NetworkAgentBuilder().apply(builder)
+    }
+
+    fun odorworld() {
+
+    }
+
+    operator fun NetworkAgentBuilder.unaryPlus() {
+        builders.add { workspace: Workspace ->
+            workspace.addWorkspaceComponent(NetworkComponent("TempNet", Network().also { network ->
+                tasks.forEach { task -> task(network) }
+            }))
+        }
     }
 
     class NetworkAgentBuilder {
@@ -227,10 +244,8 @@ class WorkspaceBuilderCoupling {
 
 }
 
-fun buildWorkspace(builder: WorkspaceBuilder.() -> Unit) = WorkspaceBuilder().apply(builder)
-
 fun main() {
-    val thing = buildWorkspace {
+    val thing = sim {
 
         +buildGenome {
 
@@ -262,7 +277,12 @@ fun main() {
                 connections.current.genes.add(connectionGene(source, target))
 
                 val thing = smellSensorGene {  }.also { sensors.current.genes.add(it) }
-                val thing2 = nodeGene().also { inputs.current.genes.add(it) }
+                val thing2 = nodeGene().also {
+                    it.onMutate {
+                        updateRule.let { if (it is BiasedUpdateRule) it.bias + Random().nextDouble() }
+                    }
+                    inputs.current.genes.add(it)
+                }
 
 //                couplingManager.current {
 //                    thing connects thing2
@@ -270,15 +290,29 @@ fun main() {
 
             }
 
-            +network {
-                +inputs
-                +nodes
-                +connections
+            onBuild {
+                +network {
+                    +inputs
+                    +nodes
+                    +connections
+                }
             }
 
         }
 
     }
 
-    println(thing.workspace)
+
+    val a = thing.genomes.forEach { it.mutate() }
+    val b = thing.build()
+    val c = thing.genomes.forEach { it.mutate() }
+    thing.genomes.forEach { it.mutate() }
+    thing.genomes.forEach { it.mutate() }
+    thing.genomes.forEach { it.mutate() }
+    thing.genomes.forEach { it.mutate() }
+
+    val d = thing.build()
+
+    println("end")
+
 }

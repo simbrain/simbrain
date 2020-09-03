@@ -33,26 +33,47 @@ public class ImageAlbumWorld extends ImageWorld {
         imageSource.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
         initializeDefaultSensorMatrices();
 
-        //clearImage();
+        // TODO: Add a button for this and ability to choose size of a blank canvas
+        //  That is, instead of loading an image the user can also just create a drawing canvas of a certain size
+        clearImage();
 
-        // "Paint" pixel
-        imagePanel.addMouseListener(new MouseAdapter() {
+        // Ability to paint pixels black and white
+        MouseAdapter mouseAdapter = new MouseAdapter() {
+
             @Override
-            public void mouseClicked(MouseEvent evt) {
-                var ratioX = imagePanel.getWidth() / imageSource.getWidth();
-                var ratioY = imagePanel.getHeight() / imageSource.getHeight();
-                var x = evt.getX() / ratioX;
-                var y = evt.getY() / ratioY;
-                imageSource.getCurrentImage().setRGB(x, y, 0xFFFFFF);
-                imageSource.notifyImageUpdate();
+            public void mouseDragged(MouseEvent evt) {
+                drawPixel(evt);
             }
-        });
+
+            @Override
+            public void mousePressed(MouseEvent evt) {
+                drawPixel(evt);
+            }
+        };
+        imagePanel.addMouseListener(mouseAdapter);
+        imagePanel.addMouseMotionListener(mouseAdapter);
+
+    }
+
+    private void drawPixel(MouseEvent evt) {
+        var ratioX = 1.0 * imagePanel.getWidth() / imageSource.getWidth();
+        var ratioY = 1.0 * imagePanel.getHeight() / imageSource.getHeight();
+        var x = (int) (evt.getX() / ratioX);
+        var y = (int) (evt.getY() / ratioY);
+
+        int currentColor =  imageSource.getCurrentImage().getRGB(x, y);
+        int drawColor = -1; // White
+        if (currentColor == -1) {
+            drawColor = 0; // If white, toggle to black
+        }
+        imageSource.getCurrentImage().setRGB(x, y, drawColor);
+        imageSource.notifyImageUpdate();
     }
 
 
     @Override
     public void clearImage() {
-        imageSource.setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
+        imageSource.setCurrentImage(new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB));
     }
 
     @Override

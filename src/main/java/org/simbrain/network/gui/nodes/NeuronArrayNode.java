@@ -246,6 +246,10 @@ public class NeuronArrayNode extends ScreenElement {
         contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
+        contextMenu.addSeparator();
+        JMenu switchStyleMenu = new JMenu("Switch Styles");
+        contextMenu.add(switchStyleMenu);
+
         // Edit Submenu
         Action editArray = new AbstractAction("Edit...") {
             @Override
@@ -281,6 +285,35 @@ public class NeuronArrayNode extends ScreenElement {
             }
         };
         contextMenu.add(switchStyle);
+
+        Action radioButton = new AbstractAction("radioButton"){
+            {
+                ButtonGroup styles = new ButtonGroup();
+
+                JRadioButtonMenuItem styleType = new JRadioButtonMenuItem("Style 1", true);
+                styles.add(styleType);
+                switchStyleMenu.add(styleType);
+
+                styleType = new JRadioButtonMenuItem("Style 2");
+                styles.add(styleType);
+                switchStyleMenu.add(styleType);
+
+                styleType = new JRadioButtonMenuItem("Style 3");
+                styles.add(styleType);
+                switchStyleMenu.add(styleType);
+            }
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Toggle grid mode
+                if (gridMode == false) {
+                    gridMode = true;
+                } else {
+                    gridMode = false;
+                }
+                renderArrayToActivationsImage();
+            }
+        };
+        contextMenu.add(radioButton);
 
         contextMenu.addSeparator();
         Action randomizeAction = new AbstractAction("Randomize") {

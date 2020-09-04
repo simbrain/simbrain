@@ -26,11 +26,10 @@ public class PixelDisplayWorld extends ImageWorld {
         initializeDefaultSensorMatrices();
     }
 
-    @Override
-    public void clearImage() {
-        emitterMatrix.clear();
-        emitterMatrix.emitImage();
-    }
+    // public void clearImage() {
+    //     emitterMatrix.clear();
+    //     emitterMatrix.emitImage();
+    // }
 
     @Override
     public boolean getUseColorEmitter() {

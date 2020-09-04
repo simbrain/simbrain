@@ -172,11 +172,6 @@ public abstract class ImageWorld {
         getImageSource().setCurrentImage(image);
     }
 
-    /**
-     * Clear the current image from the composite image source.
-     */
-    public abstract void clearImage();
-
 
     //TODO: Move this and all emitter stuff..
     /**

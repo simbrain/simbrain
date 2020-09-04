@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.world.imageworld.gui.ImagePanel;
 
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -33,10 +32,6 @@ public class ImageAlbumWorld extends ImageWorld {
         imageSource.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
         initializeDefaultSensorMatrices();
 
-        // TODO: Add a button for this and ability to choose size of a blank canvas
-        //  That is, instead of loading an image the user can also just create a drawing canvas of a certain size
-        clearImage();
-
         // Ability to paint pixels black and white
         MouseAdapter mouseAdapter = new MouseAdapter() {
 
@@ -55,6 +50,9 @@ public class ImageAlbumWorld extends ImageWorld {
 
     }
 
+    // int selectedColor = ....
+    // public void setSelectedColor()
+
     private void drawPixel(MouseEvent evt) {
         var ratioX = 1.0 * imagePanel.getWidth() / imageSource.getWidth();
         var ratioY = 1.0 * imagePanel.getHeight() / imageSource.getHeight();
@@ -70,10 +68,9 @@ public class ImageAlbumWorld extends ImageWorld {
         imageSource.notifyImageUpdate();
     }
 
-
-    @Override
-    public void clearImage() {
-        imageSource.setCurrentImage(new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB));
+    // TODO: javadoc
+    public void createBlankCanvas(int width, int height) {
+        imageSource.setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
     }
 
     @Override

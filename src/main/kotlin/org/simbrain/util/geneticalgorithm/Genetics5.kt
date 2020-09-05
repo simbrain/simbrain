@@ -25,7 +25,7 @@ abstract class Gene5<T> protected constructor(val template: T, protected val mut
     abstract override fun copy(): Gene5<T>
 
     fun onMutate(options: T.() -> Unit) {
-        mutationTasks.add { apply(options) }
+        mutationTasks.add(options)
     }
 
 }
@@ -116,7 +116,7 @@ fun <T, G : Gene5<T>> chromosome(genes: () -> MutableList<G>): Chromosome5<T, G>
 
 open class Memoization(protected val refList: MutableList<Memoize<*>>) {
 
-    var isInitial = true
+    var isInitial = refList.isEmpty()
 
     var refIterator = refList.iterator()
 
@@ -135,46 +135,33 @@ class Memoize<T>(val current: T)
 
 class Agent5(val network: Network, val odorWorldEntity: OdorWorldEntity)
 
-class SimBuilder {
+class SimBuilder private constructor(refList: MutableList<Memoize<*>>, private val builder: SimBuilder.() -> Unit):
+        Memoization(refList)  {
 
-    val genomes = ArrayList<GenomeBuilder>()
+    constructor(builder: SimBuilder.() -> Unit): this(mutableListOf(), builder)
+
+    val mutationTasks = mutableListOf<() -> Unit>()
+
+    fun copy(): SimBuilder {
+        return SimBuilder(refList, builder).apply(builder)
+    }
+
+    fun onMutate(task: () -> Unit) {
+        mutationTasks.add(task)
+    }
+
+    fun mutate() {
+        mutationTasks.forEach { it() }
+    }
+
+    infix fun NodeGene5.connects(target: NodeGene5): Chromosome5<Synapse, ConnectionGene5> {
+        TODO("Not yet implemented")
+    }
 
     val builders = LinkedList<WorkspaceBuilder>()
 
     fun onBuild(builder: WorkspaceBuilder.() -> Unit) {
         builders.add(WorkspaceBuilder().apply(builder))
-    }
-
-    class GenomeBuilder private constructor(refList: MutableList<Memoize<*>>): Memoization(refList) {
-
-        constructor(): this(mutableListOf())
-
-        val mutationTasks = mutableListOf<() -> Unit>()
-
-        fun copy(): GenomeBuilder {
-            return GenomeBuilder(refList)
-        }
-
-        fun onMutate(task: () -> Unit) {
-            mutationTasks.add(task)
-        }
-
-        fun mutate() {
-            mutationTasks.forEach { it() }
-        }
-
-        infix fun NodeGene5.connects(target: NodeGene5): Chromosome5<Synapse, ConnectionGene5> {
-            TODO("Not yet implemented")
-        }
-
-    }
-
-    fun buildGenome(builder: GenomeBuilder.() -> Unit): GenomeBuilder {
-        return GenomeBuilder().apply(builder)
-    }
-
-    operator fun GenomeBuilder.unaryPlus() {
-        genomes.add(this)
     }
 
     fun build(): Workspace {
@@ -185,7 +172,7 @@ class SimBuilder {
 
 }
 
-fun sim(builder: SimBuilder.() -> Unit) = SimBuilder().apply(builder)
+fun sim(builder: SimBuilder.() -> Unit) = SimBuilder(builder).apply(builder)
 
 class WorkspaceBuilder {
 
@@ -247,71 +234,68 @@ class WorkspaceBuilderCoupling {
 fun main() {
     val thing = sim {
 
-        +buildGenome {
-
-            val frontSensor by lazy {
-                smellSensorGene {
-                    theta = 0.0
-                    radius = 24.0
-                }
+        val frontSensor by lazy {
+            smellSensorGene {
+                theta = 0.0
+                radius = 24.0
             }
+        }
 
-            val backSensor by lazy {
-                smellSensorGene {
-                    theta = 3.14159
-                    radius = 24.0
-                }
+        val backSensor by lazy {
+            smellSensorGene {
+                theta = 3.14159
+                radius = 24.0
             }
+        }
 
-            val inputs = memoize { chromosome(2) { nodeGene() } }
-            val nodes = memoize { chromosome(2) { nodeGene() } }
-            val connections = memoize { chromosome { ArrayList<ConnectionGene5>() } }
-            val sensors = memoize { chromosome { mutableListOf(frontSensor, backSensor) } }
+        val inputs = memoize { chromosome(2) { nodeGene() } }
+        val nodes = memoize { chromosome(2) { nodeGene().apply {
+            onMutate {
+                updateRule.let { if (it is BiasedUpdateRule) it.bias += Random().nextDouble() }
+            }
+        } } }
+        val connections = memoize { chromosome { ArrayList<ConnectionGene5>() } }
+        val sensors = memoize { chromosome { mutableListOf(frontSensor, backSensor) } }
 //            val couplingManager: Memoize<WorkspaceBuilderCoupling> = memoize { TODO() }
 
-            onMutate {
-                nodes.current.genes.forEach { it.mutate() }
-                connections.current.genes.forEach { it.mutate() }
-                val source = nodes.current.genes.shuffled().first()
-                val target = nodes.current.genes.shuffled().first()
-                connections.current.genes.add(connectionGene(source, target))
+        onMutate {
+            nodes.current.genes.forEach { it.mutate() }
+            connections.current.genes.forEach { it.mutate() }
+            val source = nodes.current.genes.shuffled().first()
+            val target = nodes.current.genes.shuffled().first()
+            connections.current.genes.add(connectionGene(source, target))
 
-                val thing = smellSensorGene {  }.also { sensors.current.genes.add(it) }
-                val thing2 = nodeGene().also {
-                    it.onMutate {
-                        updateRule.let { if (it is BiasedUpdateRule) it.bias + Random().nextDouble() }
-                    }
-                    inputs.current.genes.add(it)
+            val thing = smellSensorGene {  }.also { sensors.current.genes.add(it) }
+            val thing2 = nodeGene().also {
+                it.onMutate {
+                    updateRule.let { if (it is BiasedUpdateRule) it.bias + Random().nextDouble() }
                 }
+                nodes.current.genes.add(it)
+            }
 
 //                couplingManager.current {
 //                    thing connects thing2
 //                }
 
-            }
+        }
 
-            onBuild {
-                +network {
-                    +inputs
-                    +nodes
-                    +connections
-                }
+        onBuild {
+            +network {
+                +inputs
+                +nodes
+                +connections
             }
-
         }
 
     }
 
 
-    val a = thing.genomes.forEach { it.mutate() }
-    val b = thing.build()
-    val c = thing.genomes.forEach { it.mutate() }
-    thing.genomes.forEach { it.mutate() }
-    thing.genomes.forEach { it.mutate() }
-    thing.genomes.forEach { it.mutate() }
-    thing.genomes.forEach { it.mutate() }
-
-    val d = thing.build()
+    val a = thing.copy()
+    a.mutate()
+    val b = a.build()
+    val c = a.copy()
+    c.mutate()
+    val d = c.build()
 
     println("end")
 

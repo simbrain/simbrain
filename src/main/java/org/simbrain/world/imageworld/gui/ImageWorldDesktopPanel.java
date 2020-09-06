@@ -229,11 +229,19 @@ public class ImageWorldDesktopPanel extends JPanel {
         });
         sourceToolbar.add(saveImageButton);
 
-        JButton clearImageButton = new JButton();
-        clearImageButton.setIcon(ResourceManager.getSmallIcon("menu_icons/Eraser.png"));
-        clearImageButton.setToolTipText("Clear Image");
-        clearImageButton.addActionListener(evt -> world.clearImage());
-        // sourceToolbar.add(clearImageButton); // Too destructive.  Don't include on toolbar
+        if (world instanceof ImageAlbumWorld) {
+            JButton createCanvas = new JButton();
+            createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
+            createCanvas.setToolTipText("Create canvas");
+            // JOptionPanel...
+            createCanvas.addActionListener(e -> {
+                ((ImageAlbumWorld)world).createBlankCanvas(50,50);
+            });
+            // TODO: Add more "canvas" optionss for more sizes.
+            //  That is, instead of loading an image the user can also just create a drawing canvas of a certain size
+            sourceToolbar.add(createCanvas); //
+        }
+
 
         sensorToolbar.add(new JLabel("Filters:"));
         sensorToolbar.add(sensorMatrixCombo);

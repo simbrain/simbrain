@@ -13,20 +13,35 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.dataset.api.DataSet;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.learning.config.Sgd;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.dl4j.MultiLayerNet;
 import org.simbrain.network.dl4j.NeuronArray;
 import org.simbrain.network.gui.dialogs.network.LMSDialog;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 
 /**
  * A Least Mean Squares network.
+ *
+ * TODO: Rename. This is not really "LMS" anymore.
+ * This solution involves a parallel dl4j object and simbrian object which get synced during training
+ * Longer term new custom visualization for {@link org.simbrain.network.dl4j.MultiLayerNet} should be used.
  *
  * @author Jeff Yoshimi
  */
@@ -36,6 +51,8 @@ public class LMSNetwork extends FeedForward implements Trainable {
      * Training set.
      */
     private final TrainingSet trainingSet = new TrainingSet();
+
+    //TODO: Put MLNConfig object here
 
     /**
      * Construct a new LMS Network.
@@ -49,6 +66,7 @@ public class LMSNetwork extends FeedForward implements Trainable {
         super(network, new int[]{numInputNeurons, numOutputNeurons}, initialPosition);
         setUseNeuronArrays(true);
         setLabel("LMS Network");
+
     }
 
     @Override
@@ -70,8 +88,12 @@ public class LMSNetwork extends FeedForward implements Trainable {
             mln.fit(data);
             System.out.println("score:" + mln.score());
         }
-        // TODO: Figure out how to get the weights from the mln object and use them to set the
-        // weights of the lms network
-        // getWeightMatrixList().get(0).setWeights(mln.getLayers()[0].we);
+        getWeightMatrixList().get(0)
+                .setWeights(Nd4j.toFlattened(mln.getLayer(0).getParam("W")).toDoubleVector());
+        // TODO: Allow setting of bias in neuron array
+        //getNAList().get(1).setBias(mln.getLayer(0).getParam("b").toDoubleVector());
     }
+
+
+
 }

@@ -45,6 +45,7 @@ import java.util.List;
 
 /**
  * Dialog to edit an {@link LMSNetwork}.
+ * TODO: Rename to traiaing dialog
  */
 public class LMSDialog extends StandardDialog {
 
@@ -100,9 +101,11 @@ public class LMSDialog extends StandardDialog {
     INDArray targets = inputs.dup();
     DataSet dataset = new DataSet(inputs, targets);
 
-    //TODO. Temporary network used in training.  After training, its weights and biases should be
-    // passed on to the LMSNetwork.
-    MultiLayerNetwork net;
+    /**
+     * Underlying DL4J Object.  After training, its weights and biases should be
+     *    passed on to the LMSNetwork.
+     */
+    private MultiLayerNetwork mln;
 
     // {
     //     inputs = inputs.addRowVector(Nd4j.ones(1, 5));
@@ -146,8 +149,9 @@ public class LMSDialog extends StandardDialog {
                             .build())
                     .build();
 
-            net = new MultiLayerNetwork(config);
-            net.init();
+            // TODO: Use config file from LMSNetwork, and draw weights and biases from it as well
+            mln = new MultiLayerNetwork(config);
+            mln.init();
         });
         trainerPanel.add(initButton);
 
@@ -155,7 +159,7 @@ public class LMSDialog extends StandardDialog {
         JButton trainButton = new JButton("Train");
         trainerPanel.add(trainButton);
         trainButton.addActionListener(e -> {
-            lms.train(net, dataset);
+            lms.train(mln, dataset);
         });
         trainerPanel.add(trainButton);
 

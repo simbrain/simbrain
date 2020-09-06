@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.world.imageworld.gui.ImagePanel;
 
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -33,26 +32,45 @@ public class ImageAlbumWorld extends ImageWorld {
         imageSource.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
         initializeDefaultSensorMatrices();
 
-        //clearImage();
+        // Ability to paint pixels black and white
+        MouseAdapter mouseAdapter = new MouseAdapter() {
 
-        // "Paint" pixel
-        imagePanel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent evt) {
-                var ratioX = imagePanel.getWidth() / imageSource.getWidth();
-                var ratioY = imagePanel.getHeight() / imageSource.getHeight();
-                var x = evt.getX() / ratioX;
-                var y = evt.getY() / ratioY;
-                imageSource.getCurrentImage().setRGB(x, y, 0xFFFFFF);
-                imageSource.notifyImageUpdate();
+            public void mouseDragged(MouseEvent evt) {
+                drawPixel(evt);
             }
-        });
+
+            @Override
+            public void mousePressed(MouseEvent evt) {
+                drawPixel(evt);
+            }
+        };
+        imagePanel.addMouseListener(mouseAdapter);
+        imagePanel.addMouseMotionListener(mouseAdapter);
+
     }
 
+    // int selectedColor = ....
+    // public void setSelectedColor()
 
-    @Override
-    public void clearImage() {
-        imageSource.setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
+    private void drawPixel(MouseEvent evt) {
+        var ratioX = 1.0 * imagePanel.getWidth() / imageSource.getWidth();
+        var ratioY = 1.0 * imagePanel.getHeight() / imageSource.getHeight();
+        var x = (int) (evt.getX() / ratioX);
+        var y = (int) (evt.getY() / ratioY);
+
+        int currentColor =  imageSource.getCurrentImage().getRGB(x, y);
+        int drawColor = -1; // White
+        if (currentColor == -1) {
+            drawColor = 0; // If white, toggle to black
+        }
+        imageSource.getCurrentImage().setRGB(x, y, drawColor);
+        imageSource.notifyImageUpdate();
+    }
+
+    // TODO: javadoc
+    public void createBlankCanvas(int width, int height) {
+        imageSource.setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
     }
 
     @Override

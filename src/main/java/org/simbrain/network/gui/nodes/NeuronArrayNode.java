@@ -168,6 +168,10 @@ public class NeuronArrayNode extends ScreenElement {
         super.offset(dx, dy);
     }
 
+    // TODO: Move this to top
+    private final int borderPixels = 10;
+    private final int flatPixelArrayHeight = 10;
+
     /**
      * Render an image and set it to {@link #activationImage} to show the current activationImage.
      * <p>
@@ -194,7 +198,8 @@ public class NeuronArrayNode extends ScreenElement {
                 float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
                 BufferedImage img = ImageKt.toSimbrainColorImage(activations, neuronArray.getNumNodes(), 1);
                 activationImage.setImage(img);
-                this.activationImage.setBounds(5, infoText.getHeight() + 10, 200, 25);
+                this.activationImage.setBounds(borderPixels, infoText.getHeight() + borderPixels,
+                        infoText.getWidth() - borderPixels, flatPixelArrayHeight);
             }
 
             // Forces the bounds to be updated
@@ -241,12 +246,11 @@ public class NeuronArrayNode extends ScreenElement {
     public JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
 
+        // Edit Menu
         contextMenu.add(new CutAction(getNetworkPanel()));
         contextMenu.add(new CopyAction(getNetworkPanel()));
         contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.addSeparator();
-
-        // Edit Submenu
         Action editArray = new AbstractAction("Edit...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
@@ -256,13 +260,11 @@ public class NeuronArrayNode extends ScreenElement {
         };
         contextMenu.add(editArray);
         contextMenu.add(new DeleteAction(getNetworkPanel()));
-
-        // TODO: Add a test JRadioButtonMenuItem in its own submenu. Have it print out 1, 2, 3 when you select options
-
-        // TODO: Add a third "LooseNeuron" mode.  It can also be grid or line.  Only allow it for < 1K or some number
-        // Disabled for that number
-
         contextMenu.addSeparator();
+
+
+        // Layout style
+        // TODO: Add a third "LooseNeuron" mode.  It can also be grid or line.  Only allow it for < 1K or some number
         Action switchStyle = new AbstractAction("Switch style") {
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/grid.png"));
@@ -282,7 +284,27 @@ public class NeuronArrayNode extends ScreenElement {
         };
         contextMenu.add(switchStyle);
 
+        // Example of how to use radio buttons in case we end up with three designs
+        JMenu switchStyleMenu = new JMenu("Switch Styles");
+        ButtonGroup styles = new ButtonGroup();
+        JRadioButtonMenuItem state1 = new JRadioButtonMenuItem("Style 1", true);
+        styles.add(state1);
+        state1.addActionListener(e -> System.out.println("State 1"));
+        switchStyleMenu.add(state1);
+        JRadioButtonMenuItem state2  = new JRadioButtonMenuItem("Style 2");
+        styles.add(state2);
+        state2.addActionListener(e -> System.out.println("State 2"));
+        switchStyleMenu.add(state2);
+        JRadioButtonMenuItem state3  = new JRadioButtonMenuItem("Style 3");
+        state3.addActionListener(e -> System.out.println("State 3"));
+        styles.add(state3);
+        switchStyleMenu.add(state3);
+        contextMenu.add(switchStyleMenu);
         contextMenu.addSeparator();
+
+
+
+        // Randomize Action
         Action randomizeAction = new AbstractAction("Randomize") {
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
@@ -361,7 +383,7 @@ public class NeuronArrayNode extends ScreenElement {
             bounds.add(activationImage.getFullBoundsReference());
 
             removeChild(borderBox);
-            borderBox = PPath.createRectangle(bounds.x-3, bounds.y-3, bounds.width+3, bounds.height+3);
+            borderBox = PPath.createRectangle(bounds.x-3, bounds.y-3, bounds.width+6, bounds.height+6);
             addChild(borderBox);
             borderBox.lowerToBottom();
 

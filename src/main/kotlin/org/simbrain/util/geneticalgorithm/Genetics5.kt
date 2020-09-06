@@ -210,6 +210,7 @@ class WorkspaceBuilder {
                         }
                     } else if (it is ConnectionGene5) {
                         it.build(net, neuronMapping[it.source]!!, neuronMapping[it.target]!!)
+                                .also { synapse -> net.addLooseSynapse(synapse) }
                     }
                 }
             }

@@ -50,7 +50,7 @@ import java.util.List;
 public class LMSDialog extends StandardDialog {
 
     /**
-     * The LMS Network being edited.
+     * The LMS Network being edited.1
      */
     private LMSNetwork lms;
 
@@ -137,8 +137,8 @@ public class LMSDialog extends StandardDialog {
             MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                     // Using stochastic gradient decent
                     .updater(new Sgd(lmsConfig.learningRate)) //TODO
-                    .seed(1) //TODO
-                    .biasInit(0) //TODO
+                    .seed(lmsConfig.seed) //TODO
+                    .biasInit(lmsConfig.initalBias) //TODO
                     .miniBatch(lmsConfig.useMiniBatch)
                     .list()
                     .layer(new OutputLayer.Builder(lmsConfig.lossFunc)
@@ -213,6 +213,14 @@ public class LMSDialog extends StandardDialog {
 
         @UserParameter(label = "Learning Rate", minimumValue = 0, increment = .01, order = 40)
         private double learningRate = .2;
+
+        @UserParameter(label = "Seed", minimumValue = 1, increment = 1, order = 50)
+        private int seed = 1;
+
+        @UserParameter(label = "Initial Bias", minimumValue = 0.0, increment = .1, order = 60)
+        private double initalBias = 0.0;
+
+
 
         // Somehow deal with DL4JInvalidConfigException here
 

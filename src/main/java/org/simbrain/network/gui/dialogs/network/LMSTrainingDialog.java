@@ -32,6 +32,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
+import org.simbrain.network.gui.trainer.ErrorPlotPanel;
 import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.UserParameter;
@@ -45,12 +46,11 @@ import java.util.List;
 
 /**
  * Dialog to edit an {@link LMSNetwork}.
- * TODO: Rename to traiaing dialog
  */
-public class LMSDialog extends StandardDialog {
+public class LMSTrainingDialog extends StandardDialog {
 
     /**
-     * The LMS Network being edited.1
+     * The LMS Network being edited.
      */
     private LMSNetwork lms;
 
@@ -90,27 +90,17 @@ public class LMSDialog extends StandardDialog {
      * @param np  parent panel
      * @param lms edited network
      */
-    public LMSDialog(final NetworkPanel np, final LMSNetwork lms) {
+    public LMSTrainingDialog(final NetworkPanel np, final LMSNetwork lms) {
         this.lms = lms;
         this.networkPanel = np;
         init();
     }
-
-    //TODO: Temp for testing
-    INDArray inputs = Nd4j.eye(5);
-    INDArray targets = inputs.dup();
-    DataSet dataset = new DataSet(inputs, targets);
 
     /**
      * Underlying DL4J Object.  After training, its weights and biases should be
      *    passed on to the LMSNetwork.
      */
     private MultiLayerNetwork mln;
-
-    // {
-    //     inputs = inputs.addRowVector(Nd4j.ones(1, 5));
-    //     targets = inputs.addRowVector(Nd4j.ones(1, 5));
-    // }
 
     /**
      * This method initializes the components on the panel.
@@ -124,21 +114,27 @@ public class LMSDialog extends StandardDialog {
         // Main vertical box
         Box trainerPanel = Box.createVerticalBox();
 
+        // TODO: Move this to a dialog that pops up when initialize networks is pressed
         // Config object that is used when init is pressed
         LMSConfig lmsConfig = new LMSConfig();
         AnnotatedPropertyEditor configPanel = new AnnotatedPropertyEditor(lmsConfig);
         trainerPanel.add(configPanel);
 
+        // Time series for error. TODO.
+        // ErrorPlotPanel graphPanel = new ErrorPlotPanel(trainer);
+        // propsBox.add(graphPanel);
+
         // Initialize the network object
         JButton initButton = new JButton("Initialize network");
         trainerPanel.add(initButton);
         initButton.addActionListener(e -> {
+            // TODO: Ken. Create dialog here. See AnnotatedPropertyEditor#getDialog
             configPanel.commitChanges();
             MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
                     // Using stochastic gradient decent
-                    .updater(new Sgd(lmsConfig.learningRate)) //TODO
-                    .seed(lmsConfig.seed) //TODO
-                    .biasInit(lmsConfig.initalBias) //TODO
+                    .updater(new Sgd(lmsConfig.learningRate))
+                    .seed(lmsConfig.seed)
+                    .biasInit(lmsConfig.initalBias)
                     .miniBatch(lmsConfig.useMiniBatch)
                     .list()
                     .layer(new OutputLayer.Builder(lmsConfig.lossFunc)
@@ -159,7 +155,7 @@ public class LMSDialog extends StandardDialog {
         JButton trainButton = new JButton("Train");
         trainerPanel.add(trainButton);
         trainButton.addActionListener(e -> {
-            lms.train(mln, dataset);
+            lms.train(mln, lms.getDataset());
         });
         trainerPanel.add(trainButton);
 
@@ -167,27 +163,30 @@ public class LMSDialog extends StandardDialog {
         tabbedPane.addTab("Train", trainerPanel);
 
         // Input data tab
-        inputPanel = new DataPanel(inputs);
+        inputPanel = new DataPanel(lms.getInputs());
         inputPanel.setFrame(this);
         tabbedPane.addTab("Input data", inputPanel);
 
         // Training data tab
-        trainingPanel = new DataPanel(targets);
+        trainingPanel = new DataPanel(lms.getTargets());
         trainingPanel.setFrame(this);
         tabbedPane.addTab("Target data", trainingPanel);
 
-        // Testing tab (TODO)
-        // validateInputsPanel = TestInputPanel.createTestInputPanel(networkPanel, lms.sgetInputNeurons(),
-        //         lms.getTrainingSet().getInputDataMatrix());
-        // tabbedPane.addTab("Validate Input Data", validateInputsPanel);
+        // Testing tab
+        validateInputsPanel = new TestInputPanel(networkPanel, lms);
+        tabbedPane.addTab("Validate Input Data", validateInputsPanel);
 
         // Finalize
         setContentPane(tabbedPane);
 
         // See SupervisedTrainingDialog.  Can use this to reset size of tabs.
-        // tabbedPane.addChangeListener(e -> {
-        //     int index =  ((JTabbedPane) e.getSource()).getSelectedIndex();
-        // });
+        tabbedPane.addChangeListener(e -> {
+            int index =  ((JTabbedPane) e.getSource()).getSelectedIndex();
+            if (index == 0) {
+                inputPanel.commitChanges();
+                trainingPanel.commitChanges();
+            }
+        });
 
     }
 
@@ -196,8 +195,6 @@ public class LMSDialog extends StandardDialog {
      */
     protected void closeDialogOk() {
         super.closeDialogOk();
-        // inputPanel.commitChanges();
-        // trainingPanel.commitChanges();
     }
 
     public static class LMSConfig implements EditableObject {
@@ -219,8 +216,6 @@ public class LMSDialog extends StandardDialog {
 
         @UserParameter(label = "Initial Bias", minimumValue = 0.0, increment = .1, order = 60)
         private double initalBias = 0.0;
-
-
 
         // Somehow deal with DL4JInvalidConfigException here
 

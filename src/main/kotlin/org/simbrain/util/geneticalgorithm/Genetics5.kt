@@ -165,8 +165,8 @@ class GeneProductMap(private val map: HashMap<Gene5<*>, Any> = HashMap()) {
 
 class Evaluator(val workspace: Workspace, val mapping: GeneProductMap) {
 
-    val <T, G: Gene5<T>> Chromosome5<T, G>.products: List<T> get() {
-        return genes.map { mapping[it]!! }
+    val <T, G: Gene5<T>, C: Chromosome5<T, G>> Memoize<C>.products: List<T> get() {
+        return current.genes.map { mapping[it]!! }
     }
 
 }
@@ -331,12 +331,12 @@ fun main() = runBlocking {
 
         onEval {
             (0..5).map {
-                inputs.current.products.activations = listOf(Random().nextDouble(), Random().nextDouble())
+                inputs.products.activations = listOf(Random().nextDouble(), Random().nextDouble())
                 repeat(20) {
                     workspace.simpleIterate()
                 }
-                val source = inputs.current.products.activations
-                val target = outputs.current.products.activations
+                val source = inputs.products.activations
+                val target = outputs.products.activations
                 source sse target
             }.sum()
         }

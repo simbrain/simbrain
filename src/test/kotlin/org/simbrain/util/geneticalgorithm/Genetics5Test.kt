@@ -28,7 +28,7 @@ class Genetics5Test {
             }
 
             onEval {
-                inputs.current.products.activations.forEach { assertEquals(0.75, it, 0.01) }
+                inputs.products.activations.forEach { assertEquals(0.75, it, 0.01) }
                 refs.add(inputs.current.genes.toMutableList())
                 0.0
             }

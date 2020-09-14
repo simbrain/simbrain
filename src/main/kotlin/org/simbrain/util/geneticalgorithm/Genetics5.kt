@@ -5,7 +5,9 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
+import org.simbrain.network.util.activations
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.sse
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.entities.PeripheralAttribute
@@ -135,15 +137,43 @@ class Memoize<T>(val current: T)
 
 class Agent5(val network: Network, val odorWorldEntity: OdorWorldEntity)
 
-class SimBuilder private constructor(refList: MutableList<Memoize<*>>, private val builder: SimBuilder.() -> Unit):
+class GeneProductMap(private val map: HashMap<Gene5<*>, Any> = HashMap()) {
+
+    operator fun <T, G: Gene5<T>> get(gene: G) = map[gene] as T?
+
+    operator fun <T, G: Gene5<T>> set(gene: G, product: T) {
+        map[gene] = product as Any
+    }
+
+}
+
+class Evaluator(val workspace: Workspace, val mapping: GeneProductMap) {
+
+    val <T, G: Gene5<T>> Chromosome5<T, G>.products: List<T> get() {
+        return genes.map { mapping[it]!! }
+    }
+
+}
+
+class Environment5(private val evaluator: Evaluator, private val evalFunction: Evaluator.() -> Double) {
+
+    fun eval() = evaluator.evalFunction()
+
+}
+
+class EnvironmentBuilder private constructor(refList: MutableList<Memoize<*>>, private val template: EnvironmentBuilder.() -> Unit):
         Memoization(refList)  {
 
-    constructor(builder: SimBuilder.() -> Unit): this(mutableListOf(), builder)
+    constructor(builder: EnvironmentBuilder.() -> Unit): this(mutableListOf(), builder)
 
     val mutationTasks = mutableListOf<() -> Unit>()
 
-    fun copy(): SimBuilder {
-        return SimBuilder(refList, builder).apply(builder)
+    lateinit var evalFunction: Evaluator.() -> Double
+
+    lateinit var builder: WorkspaceBuilder
+
+    fun copy(): EnvironmentBuilder {
+        return EnvironmentBuilder(refList, template).apply(template)
     }
 
     fun onMutate(task: () -> Unit) {
@@ -158,21 +188,23 @@ class SimBuilder private constructor(refList: MutableList<Memoize<*>>, private v
         TODO("Not yet implemented")
     }
 
-    val builders = LinkedList<WorkspaceBuilder>()
-
-    fun onBuild(builder: WorkspaceBuilder.() -> Unit) {
-        builders.add(WorkspaceBuilder().apply(builder))
+    fun onBuild(template: WorkspaceBuilder.() -> Unit) {
+        builder = WorkspaceBuilder().apply(template)
     }
 
-    fun build(): Workspace {
-        val workspace by lazy { Workspace() }
-        builders.forEach { it.builders.forEach { it(workspace) } }
-        return workspace
+    fun build(): Environment5 {
+        val workspace = Workspace()
+        builder.builders.forEach { it(workspace) }
+        return Environment5(Evaluator(workspace, builder.geneProductMapping), evalFunction)
+    }
+
+    fun onEval(eval: Evaluator.() -> Double) {
+        evalFunction = eval
     }
 
 }
 
-fun sim(builder: SimBuilder.() -> Unit) = SimBuilder(builder).apply(builder)
+fun environmentBuilder(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuilder(builder).apply(builder)
 
 class WorkspaceBuilder {
 
@@ -186,6 +218,18 @@ class WorkspaceBuilder {
 
     }
 
+    val tasks = LinkedList<(Network) -> Unit>()
+
+    val geneProductMapping = GeneProductMap()
+
+    private fun <C: Chromosome5<T, G>, G: Gene5<T>, T> Memoize<C>.addGene(adder: (gene: G, net: Network) -> T) {
+        tasks.add { net ->
+            current.genes.forEach {
+                geneProductMapping[it] = adder(it, net)
+            }
+        }
+    }
+
     operator fun NetworkAgentBuilder.unaryPlus() {
         builders.add { workspace: Workspace ->
             workspace.addWorkspaceComponent(NetworkComponent("TempNet", Network().also { network ->
@@ -194,27 +238,23 @@ class WorkspaceBuilder {
         }
     }
 
-    class NetworkAgentBuilder {
+    inner class NetworkAgentBuilder {
 
-        val tasks = LinkedList<(Network) -> Unit>()
-
-        val neuronMapping = HashMap<NodeGene5, Neuron>()
-
-        operator fun <T: Chromosome5<*, *>> Memoize<T>.unaryPlus(): Memoize<T> {
-            tasks.add { net ->
-                this.current.genes.forEach {
-                    if (it is NodeGene5) {
-                        it.build(net).also { neuron ->
-                            net.addLooseNeuron(neuron)
-                            neuronMapping[it] = neuron
-                        }
-                    } else if (it is ConnectionGene5) {
-                        it.build(net, neuronMapping[it.source]!!, neuronMapping[it.target]!!)
-                                .also { synapse -> net.addLooseSynapse(synapse) }
-                    }
+        @JvmName("unaryPlusNeuron")
+        operator fun <C: Chromosome5<Neuron, NodeGene5>> Memoize<C>.unaryPlus() {
+            addGene { gene, net ->
+                gene.build(net).also { neuron ->
+                    net.addLooseNeuron(neuron)
                 }
             }
-            return this
+        }
+
+        @JvmName("unaryPlusSynapse")
+        operator fun <C: Chromosome5<Synapse, ConnectionGene5>> Memoize<C>.unaryPlus() {
+            addGene { gene, net ->
+                gene.build(net, geneProductMapping[gene.source]!!, geneProductMapping[gene.target]!!)
+                        .also { synapse -> net.addLooseSynapse(synapse) }
+            }
         }
     }
 
@@ -233,7 +273,7 @@ class WorkspaceBuilderCoupling {
 }
 
 fun main() {
-    val thing = sim {
+    val thing = environmentBuilder {
 
         val frontSensor by lazy {
             smellSensorGene {
@@ -280,6 +320,16 @@ fun main() {
 
         }
 
+        onEval {
+            inputs.current.products.activations = listOf(1.0, 0.0)
+            inputs.current.products.forEach { it.isClamped = true }
+            repeat(20) {
+                workspace.simpleIterate()
+            }
+
+            nodes.current.products.activations sse listOf(1.0, 0.0)
+        }
+
         onBuild {
             +network {
                 +inputs
@@ -290,14 +340,14 @@ fun main() {
 
     }
 
-
     val a = thing.copy()
     a.mutate()
     val b = a.build()
+    println(b.eval())
     val c = a.copy()
     c.mutate()
     val d = c.build()
-
+    println(d.eval())
     println("end")
 
 }

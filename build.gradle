@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
     // id 'checkstyle'
 
     // Fixes problem with long filenames
@@ -33,8 +33,8 @@ dependencies {
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.3.5'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.3.9'
 
     // Logger for DL4J
     compile 'ch.qos.logback:logback-classic:1.2.3'

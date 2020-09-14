@@ -1,5 +1,6 @@
 package org.simbrain.util.geneticalgorithm
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -15,6 +16,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.streams.toList
 
 
 abstract class Gene5<T> protected constructor(val template: T, protected val mutationTasks: MutableList<T.() -> Unit>)
@@ -35,10 +37,18 @@ abstract class Gene5<T> protected constructor(val template: T, protected val mut
 class NodeGene5 private constructor(template: Neuron, mutationTasks: MutableList<Neuron.() -> Unit>)
     : Gene5<Neuron>(template, mutationTasks) {
 
+    val onCopy = LinkedList<(NodeGene5) -> Unit>()
+
     constructor(template: Neuron) : this(template, mutableListOf())
 
+    fun conn(task: (NodeGene5) -> Unit) {
+        onCopy.add(task)
+    }
+
     override fun copy(): Gene5<Neuron> {
-        return NodeGene5(template.deepCopy()!!, mutationTasks)
+        val newGene = NodeGene5(template.deepCopy(), mutationTasks)
+        onCopy.forEach { it(newGene) }
+        return newGene
     }
 
     fun build(network: Network): Neuron {
@@ -55,21 +65,25 @@ class ConnectionGene5 private constructor(
 )
     : Gene5<Synapse>(template, mutationTasks) {
 
+    lateinit var sourceCopy: NodeGene5
+    lateinit var targetCopy: NodeGene5
+
+    init {
+        source.conn { sourceCopy = it }
+        target.conn { targetCopy = it }
+    }
+
     constructor(template: Synapse, source: NodeGene5, target: NodeGene5)
             : this(template, source, target, mutableListOf())
 
     override fun copy(): ConnectionGene5 {
-        return ConnectionGene5(template.copy(), source, target, mutationTasks)
+        return ConnectionGene5(Synapse(template), sourceCopy, targetCopy, mutationTasks)
     }
 
     fun build(network: Network, source: Neuron, target: Neuron): Synapse {
         return Synapse(network, source, target, template.learningRule, template)
     }
 
-}
-
-private fun Synapse.copy(): Synapse {
-    return TODO("implement")
 }
 
 class PeripheralGene5<T: PeripheralAttribute> private constructor(
@@ -112,17 +126,17 @@ fun <T, G : Gene5<T>> chromosome(count: Int, genes: () -> G): Chromosome5<T, G> 
     return Chromosome5(List(count) { genes() }.toMutableList())
 }
 
-fun <T, G : Gene5<T>> chromosome(genes: () -> MutableList<G>): Chromosome5<T, G> {
-    return Chromosome5(genes())
+fun <T, G : Gene5<T>> chromosome(vararg genes: G): Chromosome5<T, G> {
+    return Chromosome5(mutableListOf(*genes))
 }
 
-open class Memoization(protected val refList: MutableList<Memoize<*>>) {
+open class Memoization(protected val refList: LinkedList<Memoize<*>>) {
 
     var isInitial = refList.isEmpty()
 
     var refIterator = refList.iterator()
 
-    fun <T> memoize(initializeValue: () -> T): Memoize<T> {
+    fun <T: CopyableObject> memoize(initializeValue: () -> T): Memoize<T> {
         return if (isInitial) {
             Memoize(initializeValue()).also { refList.add(it) }
         } else {
@@ -133,7 +147,9 @@ open class Memoization(protected val refList: MutableList<Memoize<*>>) {
 
 }
 
-class Memoize<T>(val current: T)
+class Memoize<T: CopyableObject>(val current: T) {
+    fun copy() = Memoize(current.copy() as T)
+}
 
 class Agent5(val network: Network, val odorWorldEntity: OdorWorldEntity)
 
@@ -161,10 +177,13 @@ class Environment5(private val evaluator: Evaluator, private val evalFunction: E
 
 }
 
-class EnvironmentBuilder private constructor(refList: MutableList<Memoize<*>>, private val template: EnvironmentBuilder.() -> Unit):
+class EnvironmentBuilder private constructor(
+        refList: LinkedList<Memoize<*>>,
+        private val template: EnvironmentBuilder.() -> Unit
+):
         Memoization(refList)  {
 
-    constructor(builder: EnvironmentBuilder.() -> Unit): this(mutableListOf(), builder)
+    constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
 
     val mutationTasks = mutableListOf<() -> Unit>()
 
@@ -173,7 +192,7 @@ class EnvironmentBuilder private constructor(refList: MutableList<Memoize<*>>, p
     lateinit var builder: WorkspaceBuilder
 
     fun copy(): EnvironmentBuilder {
-        return EnvironmentBuilder(refList, template).apply(template)
+        return EnvironmentBuilder(LinkedList(refList.map { it.copy() }), template).apply(template)
     }
 
     fun onMutate(task: () -> Unit) {
@@ -272,82 +291,82 @@ class WorkspaceBuilderCoupling {
 
 }
 
-fun main() {
-    val thing = environmentBuilder {
+fun main() = runBlocking {
+    val environmentBuilder = environmentBuilder {
 
-        val frontSensor by lazy {
-            smellSensorGene {
-                theta = 0.0
-                radius = 24.0
+        val inputs = memoize {
+            chromosome(2) { nodeGene { isClamped = true } }
+        }
+
+        val nodes = memoize {
+            chromosome(2) {
+                nodeGene().apply {
+                    onMutate {
+                        updateRule.let { if (it is BiasedUpdateRule) it.bias += Random().nextDouble() }
+                    }
+                }
             }
         }
 
-        val backSensor by lazy {
-            smellSensorGene {
-                theta = 3.14159
-                radius = 24.0
-            }
+        val outputs = memoize {
+            chromosome(2) { nodeGene() }
         }
 
-        val inputs = memoize { chromosome(2) { nodeGene() } }
-        val nodes = memoize { chromosome(2) { nodeGene().apply {
-            onMutate {
-                updateRule.let { if (it is BiasedUpdateRule) it.bias += Random().nextDouble() }
-            }
-        } } }
-        val connections = memoize { chromosome { ArrayList<ConnectionGene5>() } }
-        val sensors = memoize { chromosome { mutableListOf(frontSensor, backSensor) } }
-//            val couplingManager: Memoize<WorkspaceBuilderCoupling> = memoize { TODO() }
+        val connections = memoize { chromosome<Synapse, ConnectionGene5>() }
 
         onMutate {
             nodes.current.genes.forEach { it.mutate() }
             connections.current.genes.forEach { it.mutate() }
-            val source = nodes.current.genes.shuffled().first()
-            val target = nodes.current.genes.shuffled().first()
-            connections.current.genes.add(connectionGene(source, target))
-
-            val thing = smellSensorGene {  }.also { sensors.current.genes.add(it) }
-            val thing2 = nodeGene().also {
-                it.onMutate {
-                    updateRule.let { if (it is BiasedUpdateRule) it.bias + Random().nextDouble() }
-                }
-                nodes.current.genes.add(it)
-            }
-
-//                couplingManager.current {
-//                    thing connects thing2
-//                }
-
+            val source = (inputs.current.genes + nodes.current.genes).shuffled().first()
+            val target = (nodes.current.genes + outputs.current.genes).shuffled().first()
+            connections.current.genes.add(
+                    connectionGene(source, target) { strength = Random().nextDouble() }
+                            .apply {
+                                onMutate {
+                                    strength += Random().nextDouble()
+                                }
+                            }
+            )
         }
 
         onEval {
-            inputs.current.products.activations = listOf(1.0, 0.0)
-            inputs.current.products.forEach { it.isClamped = true }
-            repeat(20) {
-                workspace.simpleIterate()
-            }
-
-            nodes.current.products.activations sse listOf(1.0, 0.0)
+            (0..5).map {
+                inputs.current.products.activations = listOf(Random().nextDouble(), Random().nextDouble())
+                repeat(20) {
+                    workspace.simpleIterate()
+                }
+                val source = inputs.current.products.activations
+                val target = outputs.current.products.activations
+                source sse target
+            }.sum()
         }
 
         onBuild {
             +network {
                 +inputs
                 +nodes
+                +outputs
                 +connections
             }
         }
 
     }
 
-    val a = thing.copy()
-    a.mutate()
-    val b = a.build()
-    println(b.eval())
-    val c = a.copy()
-    c.mutate()
-    val d = c.build()
-    println(d.eval())
-    println("end")
+    val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(100).toList()
+
+    sequence {
+        var next = population
+        while (true) {
+            val current = next.parallelStream().map {
+                val build = it.build()
+                val score = build.eval()
+                Pair(it, score)
+            }.toList().sortedBy { it.second }
+            val survivors = current.take(current.size / 2)
+            next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
+            yield(current)
+        }
+    }.onEach { println(it[0].second) }.take(1000).last().let { println(it) }
+
 
 }

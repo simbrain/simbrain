@@ -35,7 +35,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
             launch(Dispatchers.Default) {
                 val generations = evolve { generation, result ->
                     progressWindow.progressBar.value = generation
-                    progressWindow.fitnessScore.text = "Fitness: ${result[0].second.format(2)}"
+                    progressWindow.fitnessScore.text = "Error: ${result[0].second.format(2)}"
                 }
                 val (best, _) = generations.last().first()
 

@@ -27,7 +27,6 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -38,8 +37,8 @@ import org.simbrain.workspace.Producible;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.simbrain.util.GeomKt.plus;
@@ -272,7 +271,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      */
     public Neuron(final Network parent, final Neuron n) {
         this.parent = parent;
-        setId(parent.getIdManager().getId(Neuron.class));
+        if (parent != null) {
+            setId(parent.getIdManager().getId(Neuron.class));
+        }
         setClamped(n.isClamped());
         setUpdateRule(n.getUpdateRule().deepCopy());
         setIncrement(n.getIncrement());

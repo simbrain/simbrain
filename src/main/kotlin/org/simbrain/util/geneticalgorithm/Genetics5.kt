@@ -1,14 +1,10 @@
 package org.simbrain.util.geneticalgorithm
 
-import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
-import org.simbrain.network.util.activations
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.util.sse
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.entities.PeripheralAttribute
@@ -16,7 +12,6 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlin.streams.toList
 
 
 abstract class Gene5<T> protected constructor(val template: T, protected val mutationTasks: MutableList<T.() -> Unit>)
@@ -122,8 +117,8 @@ class Chromosome5<T, G : Gene5<T>>(val genes: MutableList<G>): CopyableObject {
     }
 }
 
-fun <T, G : Gene5<T>> chromosome(count: Int, genes: () -> G): Chromosome5<T, G> {
-    return Chromosome5(List(count) { genes() }.toMutableList())
+fun <T, G : Gene5<T>> chromosome(count: Int, genes: (index: Int) -> G): Chromosome5<T, G> {
+    return Chromosome5(List(count) { genes(it) }.toMutableList())
 }
 
 fun <T, G : Gene5<T>> chromosome(vararg genes: G): Chromosome5<T, G> {
@@ -171,7 +166,7 @@ class Evaluator(val workspace: Workspace, val mapping: GeneProductMap) {
 
 }
 
-class Environment5(private val evaluator: Evaluator, private val evalFunction: Evaluator.() -> Double) {
+class Environment5(val evaluator: Evaluator, private val evalFunction: Evaluator.() -> Double) {
 
     fun eval() = evaluator.evalFunction()
 
@@ -288,85 +283,5 @@ class WorkspaceBuilderCoupling {
     operator fun invoke(block: WorkspaceBuilderCoupling.() -> Unit) {
 
     }
-
-}
-
-fun main() = runBlocking {
-    val environmentBuilder = environmentBuilder {
-
-        val inputs = memoize {
-            chromosome(2) { nodeGene { isClamped = true } }
-        }
-
-        val nodes = memoize {
-            chromosome(2) {
-                nodeGene().apply {
-                    onMutate {
-                        updateRule.let { if (it is BiasedUpdateRule) it.bias += Random().nextDouble() }
-                    }
-                }
-            }
-        }
-
-        val outputs = memoize {
-            chromosome(2) { nodeGene() }
-        }
-
-        val connections = memoize { chromosome<Synapse, ConnectionGene5>() }
-
-        onMutate {
-            nodes.current.genes.forEach { it.mutate() }
-            connections.current.genes.forEach { it.mutate() }
-            val source = (inputs.current.genes + nodes.current.genes).shuffled().first()
-            val target = (nodes.current.genes + outputs.current.genes).shuffled().first()
-            connections.current.genes.add(
-                    connectionGene(source, target) { strength = Random().nextDouble() }
-                            .apply {
-                                onMutate {
-                                    strength += Random().nextDouble()
-                                }
-                            }
-            )
-        }
-
-        onEval {
-            (0..5).map {
-                inputs.products.activations = listOf(Random().nextDouble(), Random().nextDouble())
-                repeat(20) {
-                    workspace.simpleIterate()
-                }
-                val source = inputs.products.activations
-                val target = outputs.products.activations
-                source sse target
-            }.sum()
-        }
-
-        onBuild {
-            +network {
-                +inputs
-                +nodes
-                +outputs
-                +connections
-            }
-        }
-
-    }
-
-    val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(100).toList()
-
-    sequence {
-        var next = population
-        while (true) {
-            val current = next.parallelStream().map {
-                val build = it.build()
-                val score = build.eval()
-                Pair(it, score)
-            }.toList().sortedBy { it.second }
-            val survivors = current.take(current.size / 2)
-            next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
-            yield(current)
-        }
-    }.onEach { println(it[0].second) }.take(1000).last().let { println(it) }
-
 
 }

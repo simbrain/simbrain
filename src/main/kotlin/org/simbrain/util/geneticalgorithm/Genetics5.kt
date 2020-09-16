@@ -14,35 +14,19 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
-abstract class Gene5<T> protected constructor(val template: T, protected val mutationTasks: MutableList<T.() -> Unit>)
-    : CopyableObject {
+abstract class Gene5<T> protected constructor(val template: T) : CopyableObject
 
-    fun mutate() {
-        mutationTasks.forEach { template.it() }
+class NodeGene5 (template: Neuron) : Gene5<Neuron>(template) {
+
+    private val copyListeners = LinkedList<(NodeGene5) -> Unit>()
+
+    fun onCopy(task: (NodeGene5) -> Unit) {
+        copyListeners.add(task)
     }
 
-    abstract override fun copy(): Gene5<T>
-
-    fun onMutate(options: T.() -> Unit) {
-        mutationTasks.add(options)
-    }
-
-}
-
-class NodeGene5 private constructor(template: Neuron, mutationTasks: MutableList<Neuron.() -> Unit>)
-    : Gene5<Neuron>(template, mutationTasks) {
-
-    val onCopy = LinkedList<(NodeGene5) -> Unit>()
-
-    constructor(template: Neuron) : this(template, mutableListOf())
-
-    fun conn(task: (NodeGene5) -> Unit) {
-        onCopy.add(task)
-    }
-
-    override fun copy(): Gene5<Neuron> {
-        val newGene = NodeGene5(template.deepCopy(), mutationTasks)
-        onCopy.forEach { it(newGene) }
+    override fun copy(): NodeGene5 {
+        val newGene = NodeGene5(template.deepCopy())
+        copyListeners.forEach { it(newGene) }
         return newGene
     }
 
@@ -52,27 +36,18 @@ class NodeGene5 private constructor(template: Neuron, mutationTasks: MutableList
 
 }
 
-class ConnectionGene5 private constructor(
-        template: Synapse,
-        val source: NodeGene5,
-        val target: NodeGene5,
-        mutationTasks: MutableList<Synapse.() -> Unit>
-)
-    : Gene5<Synapse>(template, mutationTasks) {
+class ConnectionGene5 (template: Synapse, val source: NodeGene5, val target: NodeGene5) : Gene5<Synapse>(template) {
 
     lateinit var sourceCopy: NodeGene5
     lateinit var targetCopy: NodeGene5
 
     init {
-        source.conn { sourceCopy = it }
-        target.conn { targetCopy = it }
+        source.onCopy { sourceCopy = it }
+        target.onCopy { targetCopy = it }
     }
 
-    constructor(template: Synapse, source: NodeGene5, target: NodeGene5)
-            : this(template, source, target, mutableListOf())
-
     override fun copy(): ConnectionGene5 {
-        return ConnectionGene5(Synapse(template), sourceCopy, targetCopy, mutationTasks)
+        return ConnectionGene5(Synapse(template), sourceCopy, targetCopy)
     }
 
     fun build(network: Network, source: Neuron, target: Neuron): Synapse {
@@ -81,12 +56,7 @@ class ConnectionGene5 private constructor(
 
 }
 
-class PeripheralGene5<T: PeripheralAttribute> private constructor(
-        template: T,
-        mutationTasks: MutableList<T.() -> Unit>
-): Gene5<T>(template, mutationTasks) {
-
-    constructor(template: T) : this(template, mutableListOf())
+class PeripheralGene5<T: PeripheralAttribute> (template: T): Gene5<T>(template) {
 
     override fun copy(): PeripheralGene5<T> {
         val newPeripheralAttribute = template.copy()!! as T
@@ -158,7 +128,7 @@ class GeneProductMap(private val map: HashMap<Gene5<*>, Any> = HashMap()) {
 
 }
 
-class Evaluator(val workspace: Workspace, val mapping: GeneProductMap) {
+class EvaluationContext(val workspace: Workspace, val mapping: GeneProductMap) {
 
     val <T, G: Gene5<T>, C: Chromosome5<T, G>> Memoize<C>.products: List<T> get() {
         return current.genes.map { mapping[it]!! }
@@ -166,40 +136,49 @@ class Evaluator(val workspace: Workspace, val mapping: GeneProductMap) {
 
 }
 
-class Environment5(val evaluator: Evaluator, private val evalFunction: Evaluator.() -> Double) {
+class Environment5(val evaluationContext: EvaluationContext, private val evalFunction: EvaluationContext.() -> Double) {
 
-    fun eval() = evaluator.evalFunction()
+    fun eval() = evaluationContext.evalFunction()
+
+}
+
+class MutationContext {
+
+    inline fun <T, G: Gene5<T>>Chromosome5<T, G>.eachMutate(mutationTask: T.() -> Unit) {
+        genes.forEach { it.template.mutationTask() }
+    }
+
+    inline fun <T> Gene5<T>.mutate(mutationTask: T.() -> Unit) {
+        template.mutationTask()
+    }
 
 }
 
 class EnvironmentBuilder private constructor(
         refList: LinkedList<Memoize<*>>,
         private val template: EnvironmentBuilder.() -> Unit
-):
-        Memoization(refList)  {
+): Memoization(refList) {
 
     constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
 
-    val mutationTasks = mutableListOf<() -> Unit>()
+    val mutationTasks = mutableListOf<MutationContext.() -> Unit>()
+    val mutationContext = MutationContext()
 
-    lateinit var evalFunction: Evaluator.() -> Double
+    lateinit var evalFunction: EvaluationContext.() -> Double
 
     lateinit var builder: WorkspaceBuilder
+
 
     fun copy(): EnvironmentBuilder {
         return EnvironmentBuilder(LinkedList(refList.map { it.copy() }), template).apply(template)
     }
 
-    fun onMutate(task: () -> Unit) {
+    fun onMutate(task: MutationContext.() -> Unit) {
         mutationTasks.add(task)
     }
 
     fun mutate() {
-        mutationTasks.forEach { it() }
-    }
-
-    infix fun NodeGene5.connects(target: NodeGene5): Chromosome5<Synapse, ConnectionGene5> {
-        TODO("Not yet implemented")
+        mutationTasks.forEach { mutationContext.it() }
     }
 
     fun onBuild(template: WorkspaceBuilder.() -> Unit) {
@@ -209,10 +188,10 @@ class EnvironmentBuilder private constructor(
     fun build(): Environment5 {
         val workspace = Workspace()
         builder.builders.forEach { it(workspace) }
-        return Environment5(Evaluator(workspace, builder.geneProductMapping), evalFunction)
+        return Environment5(EvaluationContext(workspace, builder.geneProductMapping), evalFunction)
     }
 
-    fun onEval(eval: Evaluator.() -> Double) {
+    fun onEval(eval: EvaluationContext.() -> Double) {
         evalFunction = eval
     }
 

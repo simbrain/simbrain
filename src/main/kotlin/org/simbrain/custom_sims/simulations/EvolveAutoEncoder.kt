@@ -39,7 +39,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 }
                 val (best, _) = generations.last().first()
 
-                sim.addNetwork(best.build().evaluator.workspace.componentList.first() as NetworkComponent, 0, 200, 200, 0)
+                sim.addNetwork(best.build().evaluationContext.workspace.componentList.first() as NetworkComponent, 0, 200, 200, 0)
 
                 progressWindow.close()
             }
@@ -61,15 +61,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
             }
 
             val nodes = memoize {
-                chromosome(2) {
-                    nodeGene().apply {
-                        onMutate {
-                            updateRule.let {
-                                if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
-                            }
-                        }
-                    }
-                }
+                chromosome(2) { nodeGene() }
             }
 
             val outputs = memoize {
@@ -83,8 +75,14 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
             val connections = memoize { chromosome<Synapse, ConnectionGene5>() }
 
             onMutate {
-                nodes.current.genes.forEach { it.mutate() }
-                connections.current.genes.forEach { it.mutate() }
+                nodes.current.eachMutate {
+                    updateRule.let {
+                        if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
+                    }
+                }
+                connections.current.eachMutate {
+                    strength += (Random().nextDouble() - 0.5 ) * 0.2
+                }
                 val (source, target) = if (Random().nextBoolean()) {
                     val source = (inputs.current.genes + nodes.current.genes).shuffled().first()
                     val target = nodes.current.genes.shuffled().first()
@@ -94,14 +92,9 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                     val target = (outputs.current.genes + nodes.current.genes).shuffled().first()
                     Pair(source, target)
                 }
-                connections.current.genes.add(
-                        connectionGene(source, target) { strength = (Random().nextDouble() - 0.5 ) * 0.2 }
-                                .apply {
-                                    onMutate {
-                                        strength += (Random().nextDouble() - 0.5 ) * 0.2
-                                    }
-                                }
-                )
+                connections.current.genes.add(connectionGene(source, target) {
+                    strength = (Random().nextDouble() - 0.5 ) * 0.2
+                })
             }
 
             onEval {
@@ -145,7 +138,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
                 yield(current)
             }
-        }.onEachIndexed(peek).take(1000).takeWhile { it[0].second > 0.01 }
+        }.onEachIndexed(peek).take(1000).takeWhile { it[0].second > 0.2 }
     }
 
     override fun instantiate(desktop: SimbrainDesktop?): RegisteredSimulation {

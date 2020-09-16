@@ -1340,10 +1340,10 @@ public class Network {
     public List<NetworkModel> getModels() {
         List<NetworkModel> networkModels = new ArrayList<>();
         networkModels.addAll(looseNeurons);
-        networkModels.addAll(looseSynapses);
-        networkModels.addAll(neuronCollectionSet);
         networkModels.addAll(neuronGroups);
+        networkModels.addAll(neuronCollectionSet);
         networkModels.addAll(naList);
+        networkModels.addAll(looseSynapses);
         networkModels.addAll(weightMatrices);
         networkModels.addAll(synapseGroups);
         networkModels.addAll(subnetworks);

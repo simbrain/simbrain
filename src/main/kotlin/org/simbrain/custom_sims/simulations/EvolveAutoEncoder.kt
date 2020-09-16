@@ -11,6 +11,7 @@ import org.simbrain.network.util.activations
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.neat.gui.ProgressWindow
+import org.simbrain.util.point
 import org.simbrain.util.sse
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
@@ -39,7 +40,10 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 }
                 val (best, _) = generations.last().first()
 
-                sim.addNetwork(best.build().evaluationContext.workspace.componentList.first() as NetworkComponent, 0, 200, 200, 0)
+                sim.addNetwork(
+                        best.prettyBuild().evaluationContext.workspace.componentList.first() as NetworkComponent,
+                        0, 200, 200, 0
+                )
 
                 progressWindow.close()
             }
@@ -118,6 +122,24 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                     +inputs
                     +nodes
                     +outputs
+                    +connections
+                }
+            }
+
+            onPrettyBuild {
+                +network {
+                    +inputs.asGroup {
+                        label = "Input"
+                        location = point(0, 100)
+                    }
+                    +nodes {
+                        this[0].location = point(50, 0)
+                        this[1].location = point(100, 0)
+                    }
+                    +outputs.asGroup {
+                        label = "Output"
+                        location = point(0, -100)
+                    }
                     +connections
                 }
             }

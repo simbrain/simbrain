@@ -16,3 +16,11 @@ infix fun Iterable<Double>.sse(other: Iterable<Double>)
 
 infix fun Iterable<Double>.mse(other: Iterable<Double>)
         = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.average()
+
+@JvmName("sseInt")
+infix fun Iterable<Int>.sse(other: Iterable<Int>)
+        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.sum()
+
+@JvmName("mseInt")
+infix fun Iterable<Int>.mse(other: Iterable<Int>)
+        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.average()

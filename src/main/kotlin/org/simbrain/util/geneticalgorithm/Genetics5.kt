@@ -4,6 +4,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -101,7 +102,7 @@ open class Memoization(protected val refList: LinkedList<Memoize<*>>) {
 
     var refIterator = refList.iterator()
 
-    fun <T: CopyableObject> memoize(initializeValue: () -> T): Memoize<T> {
+    fun <T> memoize(initializeValue: () -> T): Memoize<T> {
         return if (isInitial) {
             Memoize(initializeValue()).also { refList.add(it) }
         } else {
@@ -112,8 +113,16 @@ open class Memoization(protected val refList: LinkedList<Memoize<*>>) {
 
 }
 
-class Memoize<T: CopyableObject>(val current: T) {
-    fun copy() = Memoize(current.copy() as T)
+class Memoize<T>(var current: T) {
+    fun copy(): Memoize<T> {
+        return Memoize(current.let {
+            when (it) {
+                is CopyableObject -> it.copy()
+                is MutableList<*> -> mutableListOf(it)
+                else -> it
+            } as T
+        })
+    }
 }
 
 class Agent5(val network: Network, val odorWorldEntity: OdorWorldEntity)
@@ -161,12 +170,14 @@ class EnvironmentBuilder private constructor(
 
     constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
 
-    val mutationTasks = mutableListOf<MutationContext.() -> Unit>()
-    val mutationContext = MutationContext()
+    private val mutationTasks = mutableListOf<MutationContext.() -> Unit>()
+    private val mutationContext = MutationContext()
 
-    lateinit var evalFunction: EvaluationContext.() -> Double
+    private lateinit var evalFunction: EvaluationContext.() -> Double
 
-    lateinit var builder: WorkspaceBuilder
+    private lateinit var builder: WorkspaceBuilder
+
+    private lateinit var prettyBuilder: WorkspaceBuilder
 
 
     fun copy(): EnvironmentBuilder {
@@ -185,11 +196,19 @@ class EnvironmentBuilder private constructor(
         builder = WorkspaceBuilder().apply(template)
     }
 
-    fun build(): Environment5 {
+    fun onPrettyBuild(template: WorkspaceBuilder.() -> Unit) {
+        prettyBuilder = WorkspaceBuilder().apply(template)
+    }
+
+    private fun buildWith(builder: WorkspaceBuilder): Environment5 {
         val workspace = Workspace()
         builder.builders.forEach { it(workspace) }
         return Environment5(EvaluationContext(workspace, builder.geneProductMapping), evalFunction)
     }
+
+    fun build() = buildWith(builder)
+
+    fun prettyBuild() = buildWith(prettyBuilder)
 
     fun onEval(eval: EvaluationContext.() -> Double) {
         evalFunction = eval
@@ -203,6 +222,8 @@ class WorkspaceBuilder {
 
     val builders = ArrayList<(Workspace) -> Unit>()
 
+    val geneProductMapping = GeneProductMap()
+
     fun network(builder: NetworkAgentBuilder.() -> Unit): NetworkAgentBuilder {
         return NetworkAgentBuilder().apply(builder)
     }
@@ -211,27 +232,29 @@ class WorkspaceBuilder {
 
     }
 
-    val tasks = LinkedList<(Network) -> Unit>()
+    inner class NetworkAgentBuilder {
 
-    val geneProductMapping = GeneProductMap()
+        val tasks = LinkedList<(Network) -> Unit>()
 
-    private fun <C: Chromosome5<T, G>, G: Gene5<T>, T> Memoize<C>.addGene(adder: (gene: G, net: Network) -> T) {
-        tasks.add { net ->
-            current.genes.forEach {
-                geneProductMapping[it] = adder(it, net)
+        private fun <C: Chromosome5<T, G>, G: Gene5<T>, T> Memoize<C>.addGene(adder: (gene: G, net: Network) -> T) {
+            tasks.add { net ->
+                current.genes.forEach {
+                    geneProductMapping[it] = adder(it, net)
+                }
             }
         }
-    }
 
-    operator fun NetworkAgentBuilder.unaryPlus() {
-        builders.add { workspace: Workspace ->
-            workspace.addWorkspaceComponent(NetworkComponent("TempNet", Network().also { network ->
-                tasks.forEach { task -> task(network) }
-            }))
+        operator fun unaryPlus() {
+            builders.add { workspace: Workspace ->
+                workspace.addWorkspaceComponent(NetworkComponent("TempNet", Network().also { network ->
+                    tasks.forEach { task -> task(network) }
+                }))
+            }
         }
-    }
 
-    inner class NetworkAgentBuilder {
+        operator fun ((Network) -> Unit).unaryPlus() {
+            tasks.add(this)
+        }
 
         @JvmName("unaryPlusNeuron")
         operator fun <C: Chromosome5<Neuron, NodeGene5>> Memoize<C>.unaryPlus() {
@@ -239,6 +262,34 @@ class WorkspaceBuilder {
                 gene.build(net).also { neuron ->
                     net.addLooseNeuron(neuron)
                 }
+            }
+        }
+
+        private fun <T, G: Gene5<T>, C: Chromosome5<T, G>> Memoize<C>.option(
+                options: List<T>.() -> Unit,
+                adder: (gene: G, net: Network) -> T
+        ): (Network) -> Unit {
+            return { net ->
+                current.genes.map { gene ->
+                    adder(gene, net).also { geneProductMapping[gene] = it }
+                }.options()
+            }
+        }
+
+        operator fun <C: Chromosome5<Neuron, NodeGene5>> Memoize<C>.invoke(options: List<Neuron>.() -> Unit) =
+                option(options) { gene, net ->
+                    gene.build(net).also { neuron ->
+                        net.addLooseNeuron(neuron)
+                    }
+                }
+
+        fun <C: Chromosome5<Neuron, NodeGene5>> Memoize<C>.asGroup(
+                options: NeuronGroup.() -> Unit = {  }
+        ): (Network) -> Unit {
+            return { net ->
+                current.genes.map { gene ->
+                    gene.build(net).also { geneProductMapping[gene] = it }
+                }.let { net.addNeuronGroup(NeuronGroup(net, it).apply(options)) }
             }
         }
 

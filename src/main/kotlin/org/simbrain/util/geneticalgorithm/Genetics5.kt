@@ -27,7 +27,7 @@ class NodeGene5 (template: Neuron) : Gene5<Neuron>(template) {
 
     override fun copy(): NodeGene5 {
         val newGene = NodeGene5(template.deepCopy())
-        copyListeners.forEach { it(newGene) }
+        copyListeners.forEach { it(newGene) } // like firing an event
         return newGene
     }
 
@@ -171,6 +171,7 @@ class EnvironmentBuilder private constructor(
     constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
 
     private val mutationTasks = mutableListOf<MutationContext.() -> Unit>()
+
     private val mutationContext = MutationContext()
 
     private lateinit var evalFunction: EvaluationContext.() -> Double
@@ -224,6 +225,9 @@ class WorkspaceBuilder {
 
     val geneProductMapping = GeneProductMap()
 
+    /**
+     * Returns a NetworkAgentBuilder
+     */
     fun network(builder: NetworkAgentBuilder.() -> Unit): NetworkAgentBuilder {
         return NetworkAgentBuilder().apply(builder)
     }

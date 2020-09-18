@@ -52,7 +52,9 @@ class xor5(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
     }
 
-    fun evolve(peek: (generation: Int, result: List<Pair<EnvironmentBuilder, Double>>) -> Unit): Sequence<List<Pair<EnvironmentBuilder, Double>>> {
+    fun evolve(peek: (generation: Int, result: List<Pair<EnvironmentBuilder, Double>>) -> Unit):
+            Sequence<List<Pair<EnvironmentBuilder, Double>>> {
+
         val environmentBuilder = environmentBuilder {
 
             val inputChromosome = memoize {
@@ -88,6 +90,7 @@ class xor5(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 connectionChromosome.current.eachMutate {
                     strength += (Random().nextDouble() - 0.5 ) * 0.2
                 }
+                // Either connect input to hidden or hidden to output, or hidden to hidden
                 val (source, target) = if (Random().nextBoolean()) {
                     val source = (inputChromosome.current.genes + hiddenNodeChromosome.current.genes).shuffled().first()
                     val target = hiddenNodeChromosome.current.genes.shuffled().first()

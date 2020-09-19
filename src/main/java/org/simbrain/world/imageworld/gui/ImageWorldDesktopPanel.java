@@ -6,6 +6,7 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.table.MutableTable;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -22,8 +23,6 @@ import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -37,7 +36,7 @@ import java.util.List;
  * Contains the toolbars and actions used for the GUI representation
  * of {@link ImageAlbumWorld} and {@link PixelDisplayWorld}.
  */
-public class ImageWorldDesktopPanel extends JPanel implements ChangeListener{
+public class ImageWorldDesktopPanel extends JPanel {
 
     /**
      * Combo box for selecting which sensor matrix to view.
@@ -88,8 +87,6 @@ public class ImageWorldDesktopPanel extends JPanel implements ChangeListener{
      * Button to go to the previous images.
      */
     private JButton previousImagesButton;
-
-    JColorChooser slider;
 
     /**
      * Construct a new ImageDesktopComponent GUI.
@@ -215,7 +212,6 @@ public class ImageWorldDesktopPanel extends JPanel implements ChangeListener{
         contextMenu.show(world.getImagePanel(), evt.getX(), evt.getY());
     }
 
-
     /**
      * Set up toolbars depending on what type of world is being displayed
      */
@@ -239,52 +235,48 @@ public class ImageWorldDesktopPanel extends JPanel implements ChangeListener{
             JButton createCanvas = new JButton();
             createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
             createCanvas.setToolTipText("Create canvas");
-            // JOptionPanel...
+
             createCanvas.addActionListener(e -> {
-                ((ImageAlbumWorld)world).createBlankCanvas(50,50);
+                // StandardDialog dialog = new StandardDialog();
+                // JPanel pane = new JPanel();
+                // JTextField rows = new JTextField();
+                // JTextField columns = new JTextField();
+                // rows.setText("40");
+                // rows.setColumns(3);
+                // columns.setText("10");
+                // columns.setColumns(3);
+                // pane.add(new JLabel("Rows"));
+                // pane.add(rows);
+                // pane.add(new JLabel("Columns"));
+                // pane.add(columns);
+                //
+                // dialog.setContentPane(pane);
+                // dialog.pack();
+                // dialog.setLocationRelativeTo(null);
+                // dialog.setVisible(true);
+                // if (!dialog.hasUserCancelled()) {
+                //     System.out.println("here");
+                //     ((ImageAlbumWorld)world).createBlankCanvas(Integer.parseInt(rows.getText()),Integer.parseInt(columns.getText()));
+                // }
+                ((ImageAlbumWorld)world).createBlankCanvas(10,10);
             });
-            // TODO: Add more "canvas" optionss for more sizes.
-            //  That is, instead of loading an image the user can also just create a drawing canvas of a certain size
-            sourceToolbar.add(createCanvas); //
+            sourceToolbar.add(createCanvas);
         }
 
-        // Painting Color Picker
-        JButton changeColorButton = new JButton();
-        changeColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
-        changeColorButton.setToolTipText("Change Color");
-
-        changeColorButton.addActionListener(e -> {
-            JFrame window = new JFrame("Color Slider");
-            window.setSize(700,300);
-            window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-            JPanel colorChooserPanel = new JPanel();
-            colorChooserPanel.setBounds(150,75, 700,400);
-            window.add(colorChooserPanel);
-
-            slider = new JColorChooser();
-            slider.getSelectionModel().addChangeListener(this);
-
-            int length = 20;
-            UIManager.put("ColorChooser.swatchesRecentSwatchSize", new Dimension(length, length));
-            UIManager.put("ColorChooser.swatchesSwatchSize", new Dimension(length, length));
-
-            colorChooserPanel.add(slider);
-
-            // remove all extra panels and stuff
-            slider.setPreviewPanel(new JPanel());
-            slider.removeChooserPanel(slider.getChooserPanels()[4]); // CYMK
-            slider.removeChooserPanel(slider.getChooserPanels()[3]); // RGB
-//            slider.removeChooserPanel(slider.getChooserPanels()[2]); // HSL
-            slider.removeChooserPanel(slider.getChooserPanels()[1]); // HSV
-//            slider.removeChooserPanel(slider.getChooserPanels()[0]); // Swatches
-
-            window.setVisible(true);
+        // Add Color Picker
+        JButton setColorButton = new JButton();
+        JPanel colorIndicator = new JPanel();
+        colorIndicator.setPreferredSize(new Dimension(20,20));
+        colorIndicator.setBackground(((ImageAlbumWorld)world).getPenColor());
+        setColorButton.add(colorIndicator);
+        setColorButton.setToolTipText("Pen Color");
+        setColorButton.addActionListener(e -> {
+            Color newColor = JColorChooser.showDialog(this, "Choose Color",
+                    ((ImageAlbumWorld)world).getPenColor());
+            ((ImageAlbumWorld)world).setPenColor(newColor);
+            colorIndicator.setBackground(newColor);
         });
-        sourceToolbar.add(changeColorButton);
-
-
-
+        sourceToolbar.add(setColorButton);
 
         sensorToolbar.add(new JLabel("Filters:"));
         sensorToolbar.add(sensorMatrixCombo);
@@ -360,11 +352,6 @@ public class ImageWorldDesktopPanel extends JPanel implements ChangeListener{
 
     }
 
-    // color Picker statechange for change listener
-    public void stateChanged(ChangeEvent e){
-        Color newColor = slider.getColor();
-        System.out.println(newColor.getRGB());
-    }
 
     /**
      * Copy image from current system clipboard.

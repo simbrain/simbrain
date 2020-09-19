@@ -22,6 +22,8 @@ import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -35,7 +37,7 @@ import java.util.List;
  * Contains the toolbars and actions used for the GUI representation
  * of {@link ImageAlbumWorld} and {@link PixelDisplayWorld}.
  */
-public class ImageWorldDesktopPanel extends JPanel {
+public class ImageWorldDesktopPanel extends JPanel implements ChangeListener{
 
     /**
      * Combo box for selecting which sensor matrix to view.
@@ -86,6 +88,8 @@ public class ImageWorldDesktopPanel extends JPanel {
      * Button to go to the previous images.
      */
     private JButton previousImagesButton;
+
+    JColorChooser slider;
 
     /**
      * Construct a new ImageDesktopComponent GUI.
@@ -196,6 +200,8 @@ public class ImageWorldDesktopPanel extends JPanel {
         frame.setJMenuBar(menuBar);
     }
 
+
+
     /**
      * Create and display the context menu.
      */
@@ -241,6 +247,43 @@ public class ImageWorldDesktopPanel extends JPanel {
             //  That is, instead of loading an image the user can also just create a drawing canvas of a certain size
             sourceToolbar.add(createCanvas); //
         }
+
+        // Painting Color Picker
+        JButton changeColorButton = new JButton();
+        changeColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
+        changeColorButton.setToolTipText("Change Color");
+
+        changeColorButton.addActionListener(e -> {
+            JFrame window = new JFrame("Color Slider");
+            window.setSize(700,300);
+            window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            JPanel colorChooserPanel = new JPanel();
+            colorChooserPanel.setBounds(150,75, 700,400);
+            window.add(colorChooserPanel);
+
+            slider = new JColorChooser();
+            slider.getSelectionModel().addChangeListener(this);
+
+            int length = 20;
+            UIManager.put("ColorChooser.swatchesRecentSwatchSize", new Dimension(length, length));
+            UIManager.put("ColorChooser.swatchesSwatchSize", new Dimension(length, length));
+
+            colorChooserPanel.add(slider);
+
+            // remove all extra panels and stuff
+            slider.setPreviewPanel(new JPanel());
+            slider.removeChooserPanel(slider.getChooserPanels()[4]); // CYMK
+            slider.removeChooserPanel(slider.getChooserPanels()[3]); // RGB
+//            slider.removeChooserPanel(slider.getChooserPanels()[2]); // HSL
+            slider.removeChooserPanel(slider.getChooserPanels()[1]); // HSV
+//            slider.removeChooserPanel(slider.getChooserPanels()[0]); // Swatches
+
+            window.setVisible(true);
+        });
+        sourceToolbar.add(changeColorButton);
+
+
 
 
         sensorToolbar.add(new JLabel("Filters:"));
@@ -315,6 +358,12 @@ public class ImageWorldDesktopPanel extends JPanel {
         });
         sensorToolbar.add(editSensorMatrix);
 
+    }
+
+    // color Picker statechange for change listener
+    public void stateChanged(ChangeEvent e){
+        Color newColor = slider.getColor();
+        System.out.println(newColor.getRGB());
     }
 
     /**

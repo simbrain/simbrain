@@ -7,8 +7,10 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.workspace.Workspace
+import org.simbrain.world.odorworld.OdorWorld
+import org.simbrain.world.odorworld.OdorWorldComponent
+import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.entities.PeripheralAttribute
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.util.*
 import kotlin.collections.ArrayList
@@ -57,29 +59,27 @@ class ConnectionGene5 (template: Synapse, val source: NodeGene5, val target: Nod
 
 }
 
-class PeripheralGene5<T: PeripheralAttribute> (template: T): Gene5<T>(template) {
-
-    override fun copy(): PeripheralGene5<T> {
-        val newPeripheralAttribute = template.copy()!! as T
-        return PeripheralGene5(newPeripheralAttribute)
+class SmellSensorGene5(template: SmellSensor): Gene5<SmellSensor>(template) {
+    override fun copy(): SmellSensorGene5 {
+        return SmellSensorGene5(template.copy())
     }
 
-//    fun build(network: Network, odorWorldEntity: OdorWorldEntity): PeripheralGeneType<T> {
-//        return PeripheralGeneType(Neuron(network, neuron), )
-//    }
+    fun build(odorWorldEntity: OdorWorldEntity): SmellSensor {
+        return SmellSensor(template).apply { parent = odorWorldEntity }
+    }
 
 }
 
-fun nodeGene(options: Neuron.() -> Unit = { }): NodeGene5 {
+inline fun nodeGene(options: Neuron.() -> Unit = { }): NodeGene5 {
     return NodeGene5(Neuron(null).apply(options))
 }
 
-fun connectionGene(source: NodeGene5, target: NodeGene5, options: Synapse.() -> Unit = { }): ConnectionGene5 {
+inline fun connectionGene(source: NodeGene5, target: NodeGene5, options: Synapse.() -> Unit = { }): ConnectionGene5 {
     return ConnectionGene5(Synapse(null, null as Neuron?).apply(options), source, target)
 }
 
-fun smellSensorGene(options: SmellSensor.() -> Unit): PeripheralGene5<SmellSensor> {
-    return PeripheralGene5(SmellSensor(OdorWorldEntity(null)))
+inline fun smellSensorGene(options: SmellSensor.() -> Unit = { }): SmellSensorGene5 {
+    return SmellSensorGene5(SmellSensor().apply(options))
 }
 
 class Chromosome5<T, G : Gene5<T>>(val genes: MutableList<G>): CopyableObject {
@@ -94,6 +94,10 @@ fun <T, G : Gene5<T>> chromosome(count: Int, genes: (index: Int) -> G): Chromoso
 
 fun <T, G : Gene5<T>> chromosome(vararg genes: G): Chromosome5<T, G> {
     return Chromosome5(mutableListOf(*genes))
+}
+
+inline fun entity(type: EntityType, crossinline template: OdorWorldEntity.() -> Unit = { }): (OdorWorld) -> OdorWorldEntity {
+    return { world -> OdorWorldEntity(world, type).apply(template) }
 }
 
 open class Memoization(protected val refList: LinkedList<Memoize<*>>) {
@@ -125,7 +129,6 @@ class Memoize<T>(var current: T) {
     }
 }
 
-class Agent5(val network: Network, val odorWorldEntity: OdorWorldEntity)
 
 class GeneProductMap(private val map: HashMap<Gene5<*>, Any> = HashMap()) {
 
@@ -232,13 +235,50 @@ class WorkspaceBuilder {
         return NetworkAgentBuilder().apply(builder)
     }
 
-    fun odorworld() {
+    fun odorworld(builder: OdorWorldAgentBuilder.() -> Unit): OdorWorldAgentBuilder {
+        return OdorWorldAgentBuilder().apply(builder)
+    }
+
+    inner class OdorWorldAgentBuilder {
+
+        private val tasks = LinkedList<(OdorWorld) -> Unit>()
+
+        operator fun unaryPlus() {
+            builders.add { workspace: Workspace ->
+                workspace.addWorkspaceComponent(OdorWorldComponent("TempWorld", OdorWorld().also { world ->
+                    tasks.forEach { task -> task(world) }
+                }))
+            }
+        }
+
+        operator fun Memoize<(OdorWorld) -> OdorWorldEntity>.invoke(
+                template: OdorWorldEntityAgentBuilder.() -> Unit = { }
+        ): OdorWorldEntityAgentBuilder {
+            return OdorWorldEntityAgentBuilder(this.current).apply(template)
+        }
+
+        inner class OdorWorldEntityAgentBuilder(val template: (OdorWorld) -> OdorWorldEntity) {
+            private val tasks2 = LinkedList<(OdorWorldEntity) -> Unit>()
+
+            operator fun unaryPlus() {
+                tasks.add { world ->
+                    template(world).also { entity ->
+                        world.addEntity(entity)
+                        tasks2.forEach { task -> task(entity) }
+                    }
+                }
+            }
+
+            operator fun Memoize<Chromosome5<SmellSensor, SmellSensorGene5>>.unaryPlus() {
+                tasks2.add { entity -> current.genes.forEach { entity.addSensor(it.build(entity)) } }
+            }
+        }
 
     }
 
     inner class NetworkAgentBuilder {
 
-        val tasks = LinkedList<(Network) -> Unit>()
+        private val tasks = LinkedList<(Network) -> Unit>()
 
         private fun <C: Chromosome5<T, G>, G: Gene5<T>, T> Memoize<C>.addGene(adder: (gene: G, net: Network) -> T) {
             tasks.add { net ->
@@ -308,14 +348,37 @@ class WorkspaceBuilder {
 
 }
 
-class WorkspaceBuilderCoupling {
+fun main() {
+    val environmentBuilder = environmentBuilder {
 
-    infix fun PeripheralGene5<*>.connects(other: NodeGene5) {
+        val sensors = memoize {
+            chromosome(3) {
+                smellSensorGene {
+                    theta = it * 2 * Math.PI / 3
+                    radius = 32.0
+                }
+            }
+        }
+
+        val mouse = memoize {
+            entity(EntityType.MOUSE) {
+                setCenterLocation(100.0, 200.0)
+            }
+        }
+
+        onBuild {
+            +odorworld {
+                +mouse {
+                    +sensors
+                }
+            }
+        }
+
+        onEval {
+            0.0
+        }
 
     }
 
-    operator fun invoke(block: WorkspaceBuilderCoupling.() -> Unit) {
-
-    }
-
+    val result = environmentBuilder.build()
 }

@@ -251,10 +251,10 @@ class WorkspaceBuilder {
             }
         }
 
-        operator fun Memoize<(OdorWorld) -> OdorWorldEntity>.invoke(
+        operator fun ((OdorWorld) -> OdorWorldEntity).invoke(
                 template: OdorWorldEntityAgentBuilder.() -> Unit = { }
         ): OdorWorldEntityAgentBuilder {
-            return OdorWorldEntityAgentBuilder(this.current).apply(template)
+            return OdorWorldEntityAgentBuilder(this).apply(template)
         }
 
         inner class OdorWorldEntityAgentBuilder(val template: (OdorWorld) -> OdorWorldEntity) {
@@ -280,7 +280,9 @@ class WorkspaceBuilder {
 
         private val tasks = LinkedList<(Network) -> Unit>()
 
-        private fun <C: Chromosome5<T, G>, G: Gene5<T>, T> Memoize<C>.addGene(adder: (gene: G, net: Network) -> T) {
+        private inline fun <C: Chromosome5<T, G>, G: Gene5<T>, T> Memoize<C>.addGene(
+                crossinline adder: (gene: G, net: Network) -> T
+        ) {
             tasks.add { net ->
                 current.genes.forEach {
                     geneProductMapping[it] = adder(it, net)
@@ -309,9 +311,9 @@ class WorkspaceBuilder {
             }
         }
 
-        private fun <T, G: Gene5<T>, C: Chromosome5<T, G>> Memoize<C>.option(
-                options: List<T>.() -> Unit,
-                adder: (gene: G, net: Network) -> T
+        private inline fun <T, G: Gene5<T>, C: Chromosome5<T, G>> Memoize<C>.option(
+                crossinline options: List<T>.() -> Unit,
+                crossinline adder: (gene: G, net: Network) -> T
         ): (Network) -> Unit {
             return { net ->
                 current.genes.map { gene ->
@@ -360,10 +362,8 @@ fun main() {
             }
         }
 
-        val mouse = memoize {
-            entity(EntityType.MOUSE) {
-                setCenterLocation(100.0, 200.0)
-            }
+        val mouse = entity(EntityType.MOUSE) {
+            setCenterLocation(100.0, 200.0)
         }
 
         onBuild {

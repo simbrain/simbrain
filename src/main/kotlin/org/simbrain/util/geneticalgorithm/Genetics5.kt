@@ -5,16 +5,25 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.couplings.CouplingManager
+import org.simbrain.workspace.couplings.getConsumer
+import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldComponent
+import org.simbrain.world.odorworld.effectors.StraightMovement
+import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.streams.toList
 
 
 abstract class Gene5<T> protected constructor(val template: T) : CopyableObject
@@ -60,12 +69,49 @@ class ConnectionGene5 (template: Synapse, val source: NodeGene5, val target: Nod
 }
 
 class SmellSensorGene5(template: SmellSensor): Gene5<SmellSensor>(template) {
+
     override fun copy(): SmellSensorGene5 {
         return SmellSensorGene5(template.copy())
     }
 
     fun build(odorWorldEntity: OdorWorldEntity): SmellSensor {
         return SmellSensor(template).apply { parent = odorWorldEntity }
+    }
+
+}
+
+class ObjectSensorGene5(template: ObjectSensor): Gene5<ObjectSensor>(template) {
+
+    override fun copy(): ObjectSensorGene5 {
+        return ObjectSensorGene5(template.copy())
+    }
+
+    fun build(odorWorldEntity: OdorWorldEntity): ObjectSensor {
+        return ObjectSensor(template).apply { parent = odorWorldEntity }
+    }
+
+}
+
+class StraightMovementGene5(template: StraightMovement): Gene5<StraightMovement>(template) {
+
+    override fun copy(): StraightMovementGene5 {
+        return StraightMovementGene5(template.copy())
+    }
+
+    fun build(odorWorldEntity: OdorWorldEntity): StraightMovement {
+        return StraightMovement(template).apply { parent = odorWorldEntity }
+    }
+
+}
+
+class TurningGene5(template: Turning): Gene5<Turning>(template) {
+
+    override fun copy(): TurningGene5 {
+        return TurningGene5(template.copy())
+    }
+
+    fun build(odorWorldEntity: OdorWorldEntity): Turning {
+        return Turning(template).apply { parent = odorWorldEntity }
     }
 
 }
@@ -80,6 +126,18 @@ inline fun connectionGene(source: NodeGene5, target: NodeGene5, options: Synapse
 
 inline fun smellSensorGene(options: SmellSensor.() -> Unit = { }): SmellSensorGene5 {
     return SmellSensorGene5(SmellSensor().apply(options))
+}
+
+inline fun objectSensorGene(options: ObjectSensor.() -> Unit = { }): ObjectSensorGene5 {
+    return ObjectSensorGene5(ObjectSensor().apply(options))
+}
+
+inline fun straightMovementGene(options: StraightMovement.() -> Unit = { }): StraightMovementGene5 {
+    return StraightMovementGene5(StraightMovement().apply(options))
+}
+
+inline fun turningGene(options: Turning.() -> Unit = { }): TurningGene5 {
+    return TurningGene5(Turning().apply(options))
 }
 
 class Chromosome5<T, G : Gene5<T>>(val genes: MutableList<G>): CopyableObject {
@@ -130,20 +188,34 @@ class Memoize<T>(var current: T) {
 }
 
 
-class GeneProductMap(private val map: HashMap<Gene5<*>, Any> = HashMap()) {
+class ProductMap(private val map: HashMap<Any, Any> = HashMap()) {
 
     operator fun <T, G: Gene5<T>> get(gene: G) = map[gene] as T?
+
+    operator fun <T, P, B: (P) -> T> get(builder: B) = map[builder] as T?
 
     operator fun <T, G: Gene5<T>> set(gene: G, product: T) {
         map[gene] = product as Any
     }
 
+    operator fun <T, P, B: (P) -> T> set(builder: B, product: T) {
+        map[builder] = product as Any
+    }
+
 }
 
-class EvaluationContext(val workspace: Workspace, val mapping: GeneProductMap) {
+class EvaluationContext(val workspace: Workspace, val mapping: ProductMap) {
 
     val <T, G: Gene5<T>, C: Chromosome5<T, G>> Memoize<C>.products: List<T> get() {
         return current.genes.map { mapping[it]!! }
+    }
+
+    val <T, P> ((P) -> T).products: T get() {
+        return mapping[this]!!
+    }
+
+    fun coupling(couplingManager: CouplingManager.() -> Unit) {
+        workspace.couplingManager.apply(couplingManager)
     }
 
 }
@@ -207,7 +279,7 @@ class EnvironmentBuilder private constructor(
     private fun buildWith(builder: WorkspaceBuilder): Environment5 {
         val workspace = Workspace()
         builder.builders.forEach { it(workspace) }
-        return Environment5(EvaluationContext(workspace, builder.geneProductMapping), evalFunction)
+        return Environment5(EvaluationContext(workspace, builder.productMapping), evalFunction)
     }
 
     fun build() = buildWith(builder)
@@ -226,7 +298,7 @@ class WorkspaceBuilder {
 
     val builders = ArrayList<(Workspace) -> Unit>()
 
-    val geneProductMapping = GeneProductMap()
+    val productMapping = ProductMap()
 
     /**
      * Returns a NetworkAgentBuilder
@@ -257,6 +329,15 @@ class WorkspaceBuilder {
             return OdorWorldEntityAgentBuilder(this).apply(template)
         }
 
+        operator fun ((OdorWorld) -> OdorWorldEntity).unaryPlus() {
+            tasks.add { world ->
+                this(world).also { entity ->
+                    world.addEntity(entity)
+                    productMapping[this] = entity
+                }
+            }
+        }
+
         inner class OdorWorldEntityAgentBuilder(val template: (OdorWorld) -> OdorWorldEntity) {
             private val tasks2 = LinkedList<(OdorWorldEntity) -> Unit>()
 
@@ -265,12 +346,29 @@ class WorkspaceBuilder {
                     template(world).also { entity ->
                         world.addEntity(entity)
                         tasks2.forEach { task -> task(entity) }
+                        productMapping[template] = entity
                     }
                 }
             }
 
+            @JvmName("unaryPlusSmellSensorSmellSensorGene5")
             operator fun Memoize<Chromosome5<SmellSensor, SmellSensorGene5>>.unaryPlus() {
                 tasks2.add { entity -> current.genes.forEach { entity.addSensor(it.build(entity)) } }
+            }
+
+            @JvmName("unaryPlusObjectSensorObjectSensorGene5")
+            operator fun Memoize<Chromosome5<ObjectSensor, ObjectSensorGene5>>.unaryPlus() {
+                tasks2.add { entity -> current.genes.forEach { entity.addSensor(it.build(entity)) } }
+            }
+
+            @JvmName("unaryPlusStraightMovementStraightMovementGene5")
+            operator fun Memoize<Chromosome5<StraightMovement, StraightMovementGene5>>.unaryPlus() {
+                tasks2.add { entity -> current.genes.forEach { entity.addEffector(it.build(entity)) } }
+            }
+
+            @JvmName("unaryPlusTurningTurningGene5")
+            operator fun Memoize<Chromosome5<Turning, TurningGene5>>.unaryPlus() {
+                tasks2.add { entity -> current.genes.forEach { entity.addEffector(it.build(entity)) } }
             }
         }
 
@@ -285,7 +383,7 @@ class WorkspaceBuilder {
         ) {
             tasks.add { net ->
                 current.genes.forEach {
-                    geneProductMapping[it] = adder(it, net)
+                    productMapping[it] = adder(it, net)
                 }
             }
         }
@@ -317,7 +415,7 @@ class WorkspaceBuilder {
         ): (Network) -> Unit {
             return { net ->
                 current.genes.map { gene ->
-                    adder(gene, net).also { geneProductMapping[gene] = it }
+                    adder(gene, net).also { productMapping[gene] = it }
                 }.options()
             }
         }
@@ -334,7 +432,7 @@ class WorkspaceBuilder {
         ): (Network) -> Unit {
             return { net ->
                 current.genes.map { gene ->
-                    gene.build(net).also { geneProductMapping[gene] = it }
+                    gene.build(net).also { productMapping[gene] = it }
                 }.let { net.addNeuronGroup(NeuronGroup(net, it).apply(options)) }
             }
         }
@@ -342,7 +440,7 @@ class WorkspaceBuilder {
         @JvmName("unaryPlusSynapse")
         operator fun <C: Chromosome5<Synapse, ConnectionGene5>> Memoize<C>.unaryPlus() {
             addGene { gene, net ->
-                gene.build(net, geneProductMapping[gene.source]!!, geneProductMapping[gene.target]!!)
+                gene.build(net, productMapping[gene.source]!!, productMapping[gene.target]!!)
                         .also { synapse -> net.addLooseSynapse(synapse) }
             }
         }
@@ -353,32 +451,146 @@ class WorkspaceBuilder {
 fun main() {
     val environmentBuilder = environmentBuilder {
 
+        val inputs = memoize {
+            chromosome(3) {
+                nodeGene()
+            }
+        }
+
+        val hiddens = memoize {
+            chromosome(2) {
+                nodeGene()
+            }
+        }
+
+        val outputs = memoize {
+            chromosome(3) {
+                nodeGene {
+                    updateRule.let {
+                        if (it is LinearRule) {
+                            it.lowerBound = 0.0
+                        }
+                    }
+                }
+            }
+        }
+
+        val connections = memoize {
+            chromosome<Synapse, ConnectionGene5>()
+        }
+
         val sensors = memoize {
             chromosome(3) {
-                smellSensorGene {
+                objectSensorGene {
+                    setObjectType(EntityType.SWISS)
                     theta = it * 2 * Math.PI / 3
                     radius = 32.0
                 }
             }
         }
 
+        val straightMovement = memoize {
+            chromosome(
+                    straightMovementGene()
+            )
+        }
+
+        val turning = memoize {
+            chromosome(
+                    turningGene { direction = -0.1 },
+                    turningGene { direction = 0.1 }
+            )
+        }
+
         val mouse = entity(EntityType.MOUSE) {
             setCenterLocation(100.0, 200.0)
+        }
+
+        val cheese = entity(EntityType.SWISS) {
+            setCenterLocation(150.0, 200.0)
         }
 
         onBuild {
             +odorworld {
                 +mouse {
                     +sensors
+                    +straightMovement
+                    +turning
                 }
+                +cheese
+            }
+            +network {
+                +inputs
+                +hiddens
+                +outputs
             }
         }
 
+        onMutate {
+            hiddens.current.eachMutate {
+                updateRule.let {
+                    if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
+                }
+            }
+            connections.current.eachMutate {
+                strength += (Random().nextDouble() - 0.5 ) * 0.2
+            }
+            val source = (inputs.current.genes + hiddens.current.genes).shuffled().first()
+            val target = (outputs.current.genes + hiddens.current.genes).shuffled().first()
+            connections.current.genes.add(connectionGene(source, target) {
+                strength = (Random().nextDouble() - 0.5 ) * 0.2
+            })
+        }
+
         onEval {
-            0.0
+            var score = 0.0
+            coupling {
+                createOneToOneCouplings(
+                        mouse.products.sensors.map { sensor ->
+                            (sensor as ObjectSensor).getProducer("getCurrentValue")
+                        },
+                        inputs.products.map { neuron ->
+                            neuron.getConsumer("setActivation")
+                        }
+                )
+                createOneToOneCouplings(
+                        inputs.products.map { neuron ->
+                            neuron.getProducer("getActivation")
+                        },
+                        mouse.products.effectors.map { effector ->
+                            effector.getConsumer("setAmount")
+                        }
+                )
+            }
+            cheese.products.onCollide { other ->
+                if (other === mouse.products) {
+                    score += 1
+                }
+                cheese.products.randomizeLocation()
+            }
+            repeat(100) {
+                workspace.simpleIterate()
+            }
+            score + mouse.products.sensors.sumByDouble { (it as ObjectSensor).currentValue }
         }
 
     }
 
-    val result = environmentBuilder.build()
+    val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(100).toList()
+
+    val result = sequence {
+        var next = population
+        while (true) {
+            val current = next.parallelStream().map {
+                val build = it.build()
+                val score = build.eval()
+                Pair(it, score)
+            }.toList().sortedBy { it.second }
+            val survivors = current.take(current.size / 2)
+            next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
+            yield(current)
+        }
+    }.onEach { println(it.first().second) }.take(1000).takeWhile { it[0].second < 2 }
+
+    println(result.last().first())
 }

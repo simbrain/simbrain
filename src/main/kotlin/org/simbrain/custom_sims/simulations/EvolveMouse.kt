@@ -4,19 +4,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
-import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.neat.gui.ProgressWindow
-import org.simbrain.workspace.couplings.getConsumer
-import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.util.point
 import org.simbrain.workspace.gui.SimbrainDesktop
-import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
-import org.simbrain.world.odorworld.sensors.ObjectSensor
+import java.io.File
 import java.util.*
 import kotlin.streams.toList
 
@@ -34,26 +31,22 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             sim.workspace.clearWorkspace()
 
-            val progressWindow = ProgressWindow(100)
+            val progressWindow = ProgressWindow(200)
 
             launch(Dispatchers.Default) {
                 val generations = evolve { generation, result ->
                     progressWindow.progressBar.value = generation
-                    progressWindow.fitnessScore.text = "Error: ${result[0].second.format(2)}"
+                    progressWindow.fitnessScore.text = "Fitness: ${result[0].second.format(2)}"
                 }
                 val (best, _) = generations.last().first()
 
                 println(best)
 
-                val list = best.build().evaluationContext.workspace.componentList
+                val evaluationContext = best.prettyBuild().evaluationContext
 
-                sim.addNetwork(
-                        list.filterIsInstance<NetworkComponent>().first(),
-                        0, 200, 200, 0
-                )
+                evaluationContext.workspace.save(File("winner.zip"))
 
-                sim.addOdorWorld(0, 200, 200, 200, "hi", list.filterIsInstance<OdorWorldComponent>().first().world)
-
+                sim.workspace.openWorkspace(File("winner.zip"))
 
                 progressWindow.close()
             }
@@ -72,7 +65,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             }
 
             val hiddens = memoize {
-                chromosome(2) {
+                chromosome(8) {
                     nodeGene()
                 }
             }
@@ -99,6 +92,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                         setObjectType(EntityType.SWISS)
                         theta = it * 2 * Math.PI / 3
                         radius = 32.0
+                        decayFunction.dispersion = 200.0
                     }
                 }
             }
@@ -111,8 +105,8 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             val turning = memoize {
                 chromosome(
-                        turningGene { direction = -0.1 },
-                        turningGene { direction = 0.1 }
+                        turningGene { direction = -1.0 },
+                        turningGene { direction = 1.0 }
                 )
             }
 
@@ -125,6 +119,10 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             }
 
             onBuild {
+                couplingManager {
+                    couple(sensors, inputs)
+                    couple(outputs.current.genes, straightMovement.current.genes + turning.current.genes)
+                }
                 +odorworld {
                     +mouse {
                         +sensors
@@ -142,6 +140,10 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             }
 
             onPrettyBuild {
+                couplingManager {
+                    couple(sensors, inputs)
+                    couple(outputs.current.genes, straightMovement.current.genes + turning.current.genes)
+                }
                 +odorworld {
                     +mouse {
                         +sensors
@@ -153,9 +155,13 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 +network {
                     +inputs.asGroup {
                         label = "Input"
+                        location = point(0, 100)
                     }
                     +hiddens
-                    +outputs
+                    +outputs.asGroup {
+                        label = "Output"
+                        location = point(0, -100)
+                    }
                     +connections
                 }
             }
@@ -178,34 +184,42 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             onEval {
                 var score = 0.0
-                coupling {
-                    createOneToOneCouplings(
-                            mouse.products.sensors.map { sensor ->
-                                (sensor as ObjectSensor).getProducer("getCurrentValue")
-                            },
-                            inputs.products.map { neuron ->
-                                neuron.getConsumer("setActivation")
-                            }
-                    )
-                    createOneToOneCouplings(
-                            inputs.products.map { neuron ->
-                                neuron.getProducer("getActivation")
-                            },
-                            mouse.products.effectors.map { effector ->
-                                effector.getConsumer("setAmount")
-                            }
-                    )
-                }
+
+                cheese.products.setCenterLocation(
+                        mouse.products.centerX + (Random().nextDouble() * 70 + 30) * (if (Random().nextBoolean()) {
+                            1
+                        } else {
+                            -1
+                        }),
+                        mouse.products.centerY + (Random().nextDouble() * 70 + 30) * (if (Random().nextBoolean()) {
+                            1
+                        } else {
+                            -1
+                        })
+                )
+
                 cheese.products.onCollide { other ->
                     if (other === mouse.products) {
                         score += 1
                     }
-                    cheese.products.randomizeLocation()
+                    cheese.products.setCenterLocation(
+                            mouse.products.centerX + (Random().nextDouble() * 70 + 30) * (if (Random().nextBoolean()) {
+                                1
+                            } else {
+                                -1
+                            }),
+                            mouse.products.centerY + (Random().nextDouble() * 70 + 30) * (if (Random().nextBoolean()) {
+                                1
+                            } else {
+                                -1
+                            })
+                    )
                 }
-                repeat(100) {
+                repeat(1000) {
                     workspace.simpleIterate()
                 }
-                score + mouse.products.sensors.sumByDouble { (it as ObjectSensor).currentValue }
+                val partial = (100 - mouse.products.getRadiusTo(cheese.products)).let { if (it < 0) 0.0 else it } / 100
+                score + partial
             }
 
         }
@@ -219,12 +233,12 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                     val build = it.build()
                     val score = build.eval()
                     Pair(it, score)
-                }.toList().shuffled().sortedBy { it.second }
+                }.toList().shuffled().sortedBy { -it.second }
                 val survivors = current.take(current.size / 2)
                 next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
                 yield(current)
             }
-        }.onEachIndexed(peek).take(1000).takeWhile { it[0].second < 7 }
+        }.onEachIndexed(peek).take(200).takeWhile { it[0].second < 50 }
     }
 
     override fun instantiate(desktop: SimbrainDesktop?): RegisteredSimulation {

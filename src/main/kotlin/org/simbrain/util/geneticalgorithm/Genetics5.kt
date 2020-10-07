@@ -14,6 +14,7 @@ import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldComponent
+import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.entities.EntityType
@@ -279,6 +280,7 @@ class EnvironmentBuilder private constructor(
     private fun buildWith(builder: WorkspaceBuilder): Environment5 {
         val workspace = Workspace()
         builder.builders.forEach { it(workspace) }
+        builder.couplings.forEach { workspace.couplingManager.it(builder.productMapping) }
         return Environment5(EvaluationContext(workspace, builder.productMapping), evalFunction)
     }
 
@@ -298,6 +300,8 @@ class WorkspaceBuilder {
 
     val builders = ArrayList<(Workspace) -> Unit>()
 
+    val couplings = LinkedList<CouplingManager.(ProductMap) -> Unit>()
+
     val productMapping = ProductMap()
 
     /**
@@ -309,6 +313,42 @@ class WorkspaceBuilder {
 
     fun odorworld(builder: OdorWorldAgentBuilder.() -> Unit): OdorWorldAgentBuilder {
         return OdorWorldAgentBuilder().apply(builder)
+    }
+
+    fun couplingManager(template: CouplingManagerContext.() -> Unit) {
+        CouplingManagerContext().template()
+    }
+
+    inner class CouplingManagerContext {
+
+        fun couple(producers: Collection<Gene5<*>>, consumers: Collection<Gene5<*>>) {
+            couplings.add { mapping ->
+                (producers zip consumers).map { (source, target) ->
+                    mapping[source] to mapping[target]
+                }.takeWhile { (source, target) ->
+                    source != null && target != null
+                }.forEach { (source, target) ->
+                    val producer = when (source) {
+                        is Neuron -> source.getProducerByMethodName("getActivation")
+                        is ObjectSensor -> source.getProducerByMethodName("getCurrentValue")
+                        else -> TODO("Not implemented: ${source?.javaClass?.simpleName}")
+                    }
+                    val consumer = when (target) {
+                        is Neuron -> target.getConsumerByMethodName("setInputValue")
+                        is Effector -> target.getConsumerByMethodName("setAmount")
+                        else -> TODO("Not implemented: ${target?.javaClass?.simpleName}")
+                    }
+                    createCoupling(producer, consumer)
+                }
+            }
+        }
+
+        fun <T1, T2, G1 : Gene5<T1>, G2 : Gene5<T2>> couple(
+                producers: Memoize<Chromosome5<T1, G1>>,
+                consumers: Memoize<Chromosome5<T2, G2>>
+        ) {
+            couple(producers.current.genes, consumers.current.genes)
+        }
     }
 
     inner class OdorWorldAgentBuilder {
@@ -353,22 +393,30 @@ class WorkspaceBuilder {
 
             @JvmName("unaryPlusSmellSensorSmellSensorGene5")
             operator fun Memoize<Chromosome5<SmellSensor, SmellSensorGene5>>.unaryPlus() {
-                tasks2.add { entity -> current.genes.forEach { entity.addSensor(it.build(entity)) } }
+                tasks2.add { entity -> current.genes.forEach { gene ->
+                    entity.addSensor(gene.build(entity).also { productMapping[gene] = it })
+                } }
             }
 
             @JvmName("unaryPlusObjectSensorObjectSensorGene5")
             operator fun Memoize<Chromosome5<ObjectSensor, ObjectSensorGene5>>.unaryPlus() {
-                tasks2.add { entity -> current.genes.forEach { entity.addSensor(it.build(entity)) } }
+                tasks2.add { entity -> current.genes.forEach { gene ->
+                    entity.addSensor(gene.build(entity).also { productMapping[gene] = it })
+                } }
             }
 
             @JvmName("unaryPlusStraightMovementStraightMovementGene5")
             operator fun Memoize<Chromosome5<StraightMovement, StraightMovementGene5>>.unaryPlus() {
-                tasks2.add { entity -> current.genes.forEach { entity.addEffector(it.build(entity)) } }
+                tasks2.add { entity -> current.genes.forEach { gene ->
+                    entity.addEffector(gene.build(entity).also { productMapping[gene] = it })
+                } }
             }
 
             @JvmName("unaryPlusTurningTurningGene5")
             operator fun Memoize<Chromosome5<Turning, TurningGene5>>.unaryPlus() {
-                tasks2.add { entity -> current.genes.forEach { entity.addEffector(it.build(entity)) } }
+                tasks2.add { entity -> current.genes.forEach { gene ->
+                    entity.addEffector(gene.build(entity).also { productMapping[gene] = it })
+                } }
             }
         }
 

@@ -137,6 +137,7 @@ inline fun turningGene(options: Turning.() -> Unit = { }): TurningGene5 {
 }
 
 class Chromosome5<T, G : Gene5<T>>(val genes: MutableList<G>): CopyableObject {
+    @Suppress("UNCHECKED_CAST")
     override fun copy(): Chromosome5<T, G> {
         return Chromosome5(genes.map { it.copy() as G }.toMutableList())
     }
@@ -156,6 +157,7 @@ open class Memoization(protected val refList: LinkedList<Memoize<*>>) {
         return if (isInitial) {
             Memoize(initializeValue()).also { refList.add(it) }
         } else {
+            @Suppress("UNCHECKED_CAST")
             refIterator.next() as Memoize<T>
         }
     }
@@ -164,6 +166,7 @@ open class Memoization(protected val refList: LinkedList<Memoize<*>>) {
 }
 
 class Memoize<T>(var current: T) {
+    @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
     fun copy(): Memoize<T> {
         return Memoize(current.let {
             when (it) {
@@ -178,8 +181,10 @@ class Memoize<T>(var current: T) {
 
 class ProductMap(private val map: HashMap<Any, Any> = HashMap()) {
 
+    @Suppress("UNCHECKED_CAST")
     operator fun <T, G: Gene5<T>> get(gene: G) = map[gene] as T?
 
+    @Suppress("UNCHECKED_CAST")
     operator fun <T, P, B: (P) -> T> get(builder: B) = map[builder] as T?
 
     operator fun <T, G: Gene5<T>> set(gene: G, product: T) {

@@ -58,57 +58,43 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
     fun evolve(peek: (generation: Int, result: List<Pair<EnvironmentBuilder, Double>>) -> Unit): Sequence<List<Pair<EnvironmentBuilder, Double>>> {
         val environmentBuilder = environmentBuilder {
 
-            val inputs = memoize {
-                chromosome(3) {
-                    nodeGene()
-                }
+            val inputs = chromosome(3) {
+                nodeGene()
             }
 
-            val hiddens = memoize {
-                chromosome(8) {
-                    nodeGene()
-                }
+            val hiddens = chromosome(8) {
+                nodeGene()
             }
 
-            val outputs = memoize {
-                chromosome(3) {
-                    nodeGene {
-                        updateRule.let {
-                            if (it is LinearRule) {
-                                it.lowerBound = 0.0
-                            }
+            val outputs = chromosome(3) {
+                nodeGene {
+                    updateRule.let {
+                        if (it is LinearRule) {
+                            it.lowerBound = 0.0
                         }
                     }
                 }
             }
 
-            val connections = memoize {
-                chromosome<Synapse, ConnectionGene5>()
-            }
+            val connections = chromosome<Synapse, ConnectionGene5>()
 
-            val sensors = memoize {
-                chromosome(3) {
-                    objectSensorGene {
-                        setObjectType(EntityType.SWISS)
-                        theta = it * 2 * Math.PI / 3
-                        radius = 32.0
-                        decayFunction.dispersion = 200.0
-                    }
+            val sensors = chromosome(3) {
+                objectSensorGene {
+                    setObjectType(EntityType.SWISS)
+                    theta = it * 2 * Math.PI / 3
+                    radius = 32.0
+                    decayFunction.dispersion = 200.0
                 }
             }
 
-            val straightMovement = memoize {
-                chromosome(
-                        straightMovementGene()
-                )
-            }
+            val straightMovement = chromosome(
+                    straightMovementGene()
+            )
 
-            val turning = memoize {
-                chromosome(
-                        turningGene { direction = -1.0 },
-                        turningGene { direction = 1.0 }
-                )
-            }
+            val turning = chromosome(
+                    turningGene { direction = -1.0 },
+                    turningGene { direction = 1.0 }
+            )
 
             val mouse = entity(EntityType.MOUSE) {
                 setCenterLocation(100.0, 200.0)

@@ -12,12 +12,10 @@ class Genetics5Test {
         val refs = mutableListOf(mutableListOf<Any>())
 
         val environment = environmentBuilder {
-            val inputs = memoize {
-                chromosome(2) {
-                    nodeGene {
-                        activation = 0.75
-                        isClamped = true
-                    }
+            val inputs = chromosome(2) {
+                nodeGene {
+                    activation = 0.75
+                    isClamped = true
                 }
             }
 
@@ -43,23 +41,18 @@ class Genetics5Test {
     @Test
     fun `test if connection genes has correct reference to node genes after copy`() {
         val environment = environmentBuilder {
-            val inputs = memoize {
-                chromosome(2) {
-                    nodeGene()
-                }
-            }
-            val outputs = memoize {
-                chromosome(2) {
-                    nodeGene()
-                }
+            val inputs = chromosome(2) {
+                nodeGene()
             }
 
-            val synapses = memoize {
-                chromosome(
-                        connectionGene(inputs.current.genes[0], outputs.current.genes[1]),
-                        connectionGene(inputs.current.genes[1], outputs.current.genes[0]),
-                )
+            val outputs = chromosome(2) {
+                nodeGene()
             }
+
+            val synapses = chromosome(
+                    connectionGene(inputs.current.genes[0], outputs.current.genes[1]),
+                    connectionGene(inputs.current.genes[1], outputs.current.genes[0]),
+            )
 
             onBuild {
                 +network {
@@ -88,23 +81,18 @@ class Genetics5Test {
     @Test
     fun `test if connection genes has correct reference to node genes after mutation`() {
         val environment = environmentBuilder {
-            val inputs = memoize {
-                chromosome(2) {
-                    nodeGene()
-                }
-            }
-            val outputs = memoize {
-                chromosome(2) {
-                    nodeGene()
-                }
+            val inputs = chromosome(2) {
+                nodeGene()
             }
 
-            val synapses = memoize {
-                chromosome(
-                        connectionGene(inputs.current.genes[0], outputs.current.genes[1]),
-                        connectionGene(inputs.current.genes[1], outputs.current.genes[0]),
-                )
+            val outputs = chromosome(2) {
+                nodeGene()
             }
+
+            val synapses = chromosome(
+                    connectionGene(inputs.current.genes[0], outputs.current.genes[1]),
+                    connectionGene(inputs.current.genes[1], outputs.current.genes[0]),
+            )
 
             onBuild {
                 +network {

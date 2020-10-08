@@ -5,13 +5,9 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.neuron_update_rules.LinearRule
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.couplings.CouplingManager
-import org.simbrain.workspace.couplings.getConsumer
-import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.effectors.Effector
@@ -24,7 +20,6 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlin.streams.toList
 
 
 abstract class Gene5<T> protected constructor(val template: T) : CopyableObject
@@ -147,25 +142,17 @@ class Chromosome5<T, G : Gene5<T>>(val genes: MutableList<G>): CopyableObject {
     }
 }
 
-fun <T, G : Gene5<T>> chromosome(count: Int, genes: (index: Int) -> G): Chromosome5<T, G> {
-    return Chromosome5(List(count) { genes(it) }.toMutableList())
-}
-
-fun <T, G : Gene5<T>> chromosome(vararg genes: G): Chromosome5<T, G> {
-    return Chromosome5(mutableListOf(*genes))
-}
-
 inline fun entity(type: EntityType, crossinline template: OdorWorldEntity.() -> Unit = { }): (OdorWorld) -> OdorWorldEntity {
     return { world -> OdorWorldEntity(world, type).apply(template) }
 }
 
 open class Memoization(protected val refList: LinkedList<Memoize<*>>) {
 
-    var isInitial = refList.isEmpty()
+    private var isInitial = refList.isEmpty()
 
-    var refIterator = refList.iterator()
+    private var refIterator = refList.iterator()
 
-    fun <T> memoize(initializeValue: () -> T): Memoize<T> {
+    protected fun <T> memoize(initializeValue: () -> T): Memoize<T> {
         return if (isInitial) {
             Memoize(initializeValue()).also { refList.add(it) }
         } else {
@@ -290,6 +277,14 @@ class EnvironmentBuilder private constructor(
 
     fun onEval(eval: EvaluationContext.() -> Double) {
         evalFunction = eval
+    }
+
+    fun <T, G : Gene5<T>> chromosome(count: Int, genes: (index: Int) -> G): Memoize<Chromosome5<T, G>> {
+        return memoize { Chromosome5(List(count) { genes(it) }.toMutableList()) }
+    }
+
+    fun <T, G : Gene5<T>> chromosome(vararg genes: G): Memoize<Chromosome5<T, G>> {
+        return memoize { Chromosome5(mutableListOf(*genes)) }
     }
 
 }
@@ -494,151 +489,4 @@ class WorkspaceBuilder {
         }
     }
 
-}
-
-fun main() {
-    val environmentBuilder = environmentBuilder {
-
-        val inputs = memoize {
-            chromosome(3) {
-                nodeGene()
-            }
-        }
-
-        val hiddens = memoize {
-            chromosome(2) {
-                nodeGene()
-            }
-        }
-
-        val outputs = memoize {
-            chromosome(3) {
-                nodeGene {
-                    updateRule.let {
-                        if (it is LinearRule) {
-                            it.lowerBound = 0.0
-                        }
-                    }
-                }
-            }
-        }
-
-        val connections = memoize {
-            chromosome<Synapse, ConnectionGene5>()
-        }
-
-        val sensors = memoize {
-            chromosome(3) {
-                objectSensorGene {
-                    setObjectType(EntityType.SWISS)
-                    theta = it * 2 * Math.PI / 3
-                    radius = 32.0
-                }
-            }
-        }
-
-        val straightMovement = memoize {
-            chromosome(
-                    straightMovementGene()
-            )
-        }
-
-        val turning = memoize {
-            chromosome(
-                    turningGene { direction = -0.1 },
-                    turningGene { direction = 0.1 }
-            )
-        }
-
-        val mouse = entity(EntityType.MOUSE) {
-            setCenterLocation(100.0, 200.0)
-        }
-
-        val cheese = entity(EntityType.SWISS) {
-            setCenterLocation(150.0, 200.0)
-        }
-
-        onBuild {
-            +odorworld {
-                +mouse {
-                    +sensors
-                    +straightMovement
-                    +turning
-                }
-                +cheese
-            }
-            +network {
-                +inputs
-                +hiddens
-                +outputs
-            }
-        }
-
-        onMutate {
-            hiddens.current.eachMutate {
-                updateRule.let {
-                    if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
-                }
-            }
-            connections.current.eachMutate {
-                strength += (Random().nextDouble() - 0.5 ) * 0.2
-            }
-            val source = (inputs.current.genes + hiddens.current.genes).shuffled().first()
-            val target = (outputs.current.genes + hiddens.current.genes).shuffled().first()
-            connections.current.genes.add(connectionGene(source, target) {
-                strength = (Random().nextDouble() - 0.5 ) * 0.2
-            })
-        }
-
-        onEval {
-            var score = 0.0
-            coupling {
-                createOneToOneCouplings(
-                        mouse.products.sensors.map { sensor ->
-                            (sensor as ObjectSensor).getProducer("getCurrentValue")
-                        },
-                        inputs.products.map { neuron ->
-                            neuron.getConsumer("setActivation")
-                        }
-                )
-                createOneToOneCouplings(
-                        inputs.products.map { neuron ->
-                            neuron.getProducer("getActivation")
-                        },
-                        mouse.products.effectors.map { effector ->
-                            effector.getConsumer("setAmount")
-                        }
-                )
-            }
-            cheese.products.onCollide { other ->
-                if (other === mouse.products) {
-                    score += 1
-                }
-                cheese.products.randomizeLocation()
-            }
-            repeat(100) {
-                workspace.simpleIterate()
-            }
-            score + mouse.products.sensors.sumByDouble { (it as ObjectSensor).currentValue }
-        }
-
-    }
-
-    val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(100).toList()
-
-    val result = sequence {
-        var next = population
-        while (true) {
-            val current = next.parallelStream().map {
-                val build = it.build()
-                val score = build.eval()
-                Pair(it, score)
-            }.toList().sortedBy { it.second }
-            val survivors = current.take(current.size / 2)
-            next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
-            yield(current)
-        }
-    }.onEach { println(it.first().second) }.take(1000).takeWhile { it[0].second < 2 }
-
-    println(result.last().first())
 }

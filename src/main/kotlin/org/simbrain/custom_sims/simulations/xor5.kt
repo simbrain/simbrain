@@ -57,29 +57,23 @@ class xor5(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
         val environmentBuilder = environmentBuilder {
 
-            val inputChromosome = memoize {
-                chromosome(2) { index ->
-                    nodeGene {
-                        isClamped = true
-                        label = "Input ${index + 1}"
-                        increment = 1.0
-                    }
+            val inputChromosome = chromosome(2) { index ->
+                nodeGene {
+                    isClamped = true
+                    label = "Input ${index + 1}"
+                    increment = 1.0
                 }
             }
 
-            val hiddenNodeChromosome = memoize {
-                chromosome(2) { nodeGene() }
-            }
+            val hiddenNodeChromosome = chromosome(2) { nodeGene() }
 
-            val outputChromosome = memoize {
-                chromosome(1) { index ->
-                    nodeGene {
-                        label = "Output ${index + 1}"
-                    }
+            val outputChromosome = chromosome(1) { index ->
+                nodeGene {
+                    label = "Output ${index + 1}"
                 }
             }
 
-            val connectionChromosome = memoize { chromosome<Synapse, ConnectionGene5>() }
+            val connectionChromosome = chromosome<Synapse, ConnectionGene5>()
 
             onMutate {
                 hiddenNodeChromosome.current.eachMutate {

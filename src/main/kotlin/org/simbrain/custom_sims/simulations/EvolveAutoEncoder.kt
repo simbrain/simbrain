@@ -55,28 +55,22 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
     fun evolve(peek: (generation: Int, result: List<Pair<EnvironmentBuilder, Double>>) -> Unit): Sequence<List<Pair<EnvironmentBuilder, Double>>> {
         val environmentBuilder = environmentBuilder {
 
-            val inputs = memoize {
-                chromosome(8) { index ->
-                    nodeGene {
-                        isClamped = true
-                        label = "Input ${index + 1}"
-                    }
+            val inputs = chromosome(8) { index ->
+                nodeGene {
+                    isClamped = true
+                    label = "Input ${index + 1}"
                 }
             }
 
-            val nodes = memoize {
-                chromosome(2) { nodeGene() }
-            }
+            val nodes = chromosome(2) { nodeGene() }
 
-            val outputs = memoize {
-                chromosome(8) { index ->
-                    nodeGene {
-                        label = "Output ${index + 1}"
-                    }
+            val outputs = chromosome(8) { index ->
+                nodeGene {
+                    label = "Output ${index + 1}"
                 }
             }
 
-            val connections = memoize { chromosome<Synapse, ConnectionGene5>() }
+            val connections = chromosome<Synapse, ConnectionGene5>()
 
             onMutate {
                 nodes.current.eachMutate {

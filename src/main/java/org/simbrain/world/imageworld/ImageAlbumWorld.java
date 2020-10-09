@@ -3,6 +3,7 @@ package org.simbrain.world.imageworld;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.world.imageworld.gui.ImagePanel;
 
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -20,6 +21,11 @@ public class ImageAlbumWorld extends ImageWorld {
      * The object which produces the actual images processed by the "album".
      */
     private ImageAlbumSource imageSource;
+
+    /**
+     * Current pen color when drawing on the current image.
+     */
+    private Color penColor = Color.white;
 
     /**
      * Construct the image world.
@@ -50,25 +56,22 @@ public class ImageAlbumWorld extends ImageWorld {
 
     }
 
-    // int selectedColor = ....
-    // public void setSelectedColor()
-
+    /**
+     * Draw a pixel at the current point in the image panel.
+     */
     private void drawPixel(MouseEvent evt) {
         var ratioX = 1.0 * imagePanel.getWidth() / imageSource.getWidth();
         var ratioY = 1.0 * imagePanel.getHeight() / imageSource.getHeight();
         var x = (int) (evt.getX() / ratioX);
         var y = (int) (evt.getY() / ratioY);
 
-        int currentColor =  imageSource.getCurrentImage().getRGB(x, y);
-        int drawColor = -1; // White
-        if (currentColor == -1) {
-            drawColor = 0; // If white, toggle to black
-        }
-        imageSource.getCurrentImage().setRGB(x, y, drawColor);
+        imageSource.getCurrentImage().setRGB(x, y, penColor.getRGB());
         imageSource.notifyImageUpdate();
     }
 
-    // TODO: javadoc
+    /**
+     * Replace the current image with a blank canvas of the indicated size.
+     */
     public void createBlankCanvas(int width, int height) {
         imageSource.setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
     }
@@ -116,7 +119,13 @@ public class ImageAlbumWorld extends ImageWorld {
 
     @Override
     public void update() {
-
     }
 
+    public Color getPenColor() {
+        return penColor;
+    }
+
+    public void setPenColor(Color penColor) {
+        this.penColor = penColor;
+    }
 }

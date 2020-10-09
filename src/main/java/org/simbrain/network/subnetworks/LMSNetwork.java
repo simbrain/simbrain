@@ -13,26 +13,14 @@
  */
 package org.simbrain.network.subnetworks;
 
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.learning.config.Sgd;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.dl4j.MultiLayerNet;
-import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.gui.dialogs.network.LMSDialog;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 
@@ -54,6 +42,22 @@ public class LMSNetwork extends FeedForward implements Trainable {
 
     //TODO: Put MLNConfig object here
 
+    // TODO: Rename to inputData, targetData
+    /**
+     * Input data.
+     */
+    private INDArray inputs;
+
+    /**
+     * Target data.
+     */
+    private INDArray targets;
+
+    /**
+     * Dataset object used by dl4j.
+     */
+    private DataSet dataset;
+
     /**
      * Construct a new LMS Network.
      *
@@ -66,6 +70,9 @@ public class LMSNetwork extends FeedForward implements Trainable {
         super(network, new int[]{numInputNeurons, numOutputNeurons}, initialPosition);
         setUseNeuronArrays(true);
         setLabel("LMS Network");
+        inputs = Nd4j.zeros(5, numInputNeurons);
+        targets = Nd4j.zeros(5, numOutputNeurons);
+        dataset = new org.nd4j.linalg.dataset.DataSet(inputs, targets);
 
     }
 
@@ -94,6 +101,27 @@ public class LMSNetwork extends FeedForward implements Trainable {
         //getNAList().get(1).setBias(mln.getLayer(0).getParam("b").toDoubleVector());
     }
 
+    public DataSet getDataset() {
+        return dataset;
+    }
+
+    public INDArray getInputs() {
+        return inputs;
+    }
+
+    public void setInputs(INDArray inputs) {
+        this.inputs = inputs;
+        dataset = new org.nd4j.linalg.dataset.DataSet(this.inputs, targets);
+    }
+
+    public INDArray getTargets() {
+        return targets;
+    }
+
+    public void setTargets(INDArray targets) {
+        this.targets = targets;
+        dataset = new org.nd4j.linalg.dataset.DataSet(inputs, this.targets);
+    }
 
 
 }

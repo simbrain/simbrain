@@ -77,7 +77,7 @@ public class DataPanel extends JPanel {
     public DataPanel(final INDArray ndArray) {
 
         // Wrap the ndarray in a numeric matrix
-        NumericMatrix dataHolder = new NumericMatrix() {
+        dataHolder = new NumericMatrix() {
             @Override
             public void setData(double[][] data) {
                 ndArray.data().setData(Utils.flatten(data));
@@ -223,7 +223,7 @@ public class DataPanel extends JPanel {
      * @return
      */
     public boolean commitChanges() {
-        //System.out.println("DataPanel commit changes " + table.hasChanged());
+        // System.out.println("DataPanel commit changes " + table.hasChanged());
         if (table.hasChanged()) {
             dataHolder.setData(((NumericTable) table.getData()).asDoubleArray());
             // Set has changed to false, so that the data only re-committed if
@@ -261,23 +261,14 @@ public class DataPanel extends JPanel {
         this.parentFrame = parentFrame;
     }
 
-    /**
-     * @return the scroller
-     */
     public SimbrainJTableScrollPanel getScroller() {
         return scroller;
     }
 
-    /**
-     * @return the table
-     */
     public SimbrainJTable getTable() {
         return table;
     }
 
-    /**
-     * @param table the table to set
-     */
     public void setTable(SimbrainJTable table) {
         this.table = table;
     }

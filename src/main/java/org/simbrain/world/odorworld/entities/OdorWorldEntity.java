@@ -22,6 +22,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.SimbrainRandomizer;
+import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -47,7 +48,7 @@ import java.util.stream.Collectors;
 /**
  * Parent class for all Odor World objects.
  */
-public class OdorWorldEntity implements EditableObject, AttributeContainer {
+public class OdorWorldEntity implements EditableObject, AttributeContainer, CopyableObject {
 
     @UserParameter(label = "Type", order = 2)
     private EntityType entityType = EntityType.SWISS;

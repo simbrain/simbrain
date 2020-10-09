@@ -4,7 +4,12 @@ import org.simbrain.network.core.Neuron
 
 var List<Neuron?>.activations
     get() = map { it?.activation ?: 0.0 }
-    set(value) = (this zip value).forEach { (neuron, activation) ->
-        if (neuron != null)
-            if (neuron.isClamped) neuron.forceSetActivation(activation) else neuron.activation = activation
+    set(values) = values.forEachIndexed { index, value ->
+        this[index]?.let { neuron ->
+            if (neuron.isClamped) {
+                neuron.forceSetActivation(value)
+            } else {
+                neuron.activation = value
+            }
+        }
     }

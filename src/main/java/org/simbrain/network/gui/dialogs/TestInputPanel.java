@@ -23,6 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
+import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
@@ -66,11 +67,8 @@ public class TestInputPanel extends DataPanel {
     private Network network;
 
     /**
-     * Temporary data for case where input panel does not read stored data but
-     * simply creates temporary data.
+     * Reference to neuron group for cases when that is what's being edited.
      */
-    private double[][] tempDataMatrix = new double[5][inputNeurons.size()];
-
     private NeuronGroup neuronGroup;
 
     public static TestInputPanel createTestInputPanel(NetworkPanel networkPanel, NeuronGroup neuronGroup) {
@@ -141,6 +139,18 @@ public class TestInputPanel extends DataPanel {
             throw new IllegalArgumentException("networkPanel must not be null");
         }
         this.dataHolder = dataHolder;
+        this.networkPanel = networkPanel;
+        initTestInputPanel();
+    }
+
+    // TODO
+    LMSNetwork lms;
+    public TestInputPanel(NetworkPanel networkPanel, LMSNetwork lms) {
+        super(lms.getInputs());
+        this.lms = lms;
+        if (networkPanel == null) {
+            throw new IllegalArgumentException("networkPanel must not be null");
+        }
         this.networkPanel = networkPanel;
         initTestInputPanel();
     }
@@ -248,8 +258,14 @@ public class TestInputPanel extends DataPanel {
             testRow = 0;
         }
         table.updateRowSelection();
-        for (int j = 0; j < inputNeurons.size(); j++) {
-            inputNeurons.get(j).forceSetActivation(((NumericTable) table.getData()).getLogicalValueAt(testRow, j));
+
+        // TODO: Replace with explicit boolean
+        if (inputNeurons == null) {
+            lms.getNAList().get(0).setValues(((NumericTable) table.getData()).getVectorCurrentRow());
+        } else {
+            for (int j = 0; j < inputNeurons.size(); j++) {
+                inputNeurons.get(j).forceSetActivation(((NumericTable) table.getData()).getLogicalValueAt(testRow, j));
+            }
         }
         if (network != null) {
             network.update();
@@ -272,15 +288,12 @@ public class TestInputPanel extends DataPanel {
         }
     }
 
-    /**
-     * @return the table
-     */
     public SimbrainJTable getTable() {
         return table;
     }
 
     /**
-     * Reset the data in this panel.
+     * Resest the data in this panel.
      *
      * @param data the data to set
      */

@@ -20,13 +20,12 @@ package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
 // import org.simbrain.network.gui.dialogs.network.LMSEditorDialog;
-import org.simbrain.network.gui.dialogs.network.LMSDialog;
+import org.simbrain.network.gui.dialogs.network.LMSTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 // import org.simbrain.network.gui.trainer.IterativeTrainingPanel;
 import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.gui.trainer.subnetworkTrainingPanels.LMSOfflineTrainingPanel;
 import org.simbrain.network.subnetworks.LMSNetwork;
-import org.simbrain.network.trainers.LMSIterative;
 import org.simbrain.network.trainers.LMSOffline;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -79,7 +78,7 @@ public class LMSNetworkNode extends SubnetworkNode {
 
     @Override
     public StandardDialog getPropertyDialog() {
-        return new LMSDialog(getNetworkPanel(), lms);
+        return new LMSTrainingDialog(getNetworkPanel(), lms);
     }
 
     /**

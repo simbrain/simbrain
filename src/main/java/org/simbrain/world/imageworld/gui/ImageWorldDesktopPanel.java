@@ -6,6 +6,7 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.table.MutableTable;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -196,6 +197,8 @@ public class ImageWorldDesktopPanel extends JPanel {
         frame.setJMenuBar(menuBar);
     }
 
+
+
     /**
      * Create and display the context menu.
      */
@@ -208,7 +211,6 @@ public class ImageWorldDesktopPanel extends JPanel {
         contextMenu.add(sensorMatrixMenu);
         contextMenu.show(world.getImagePanel(), evt.getX(), evt.getY());
     }
-
 
     /**
      * Set up toolbars depending on what type of world is being displayed
@@ -233,15 +235,48 @@ public class ImageWorldDesktopPanel extends JPanel {
             JButton createCanvas = new JButton();
             createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
             createCanvas.setToolTipText("Create canvas");
-            // JOptionPanel...
+
             createCanvas.addActionListener(e -> {
-                ((ImageAlbumWorld)world).createBlankCanvas(50,50);
+                // StandardDialog dialog = new StandardDialog();
+                // JPanel pane = new JPanel();
+                // JTextField rows = new JTextField();
+                // JTextField columns = new JTextField();
+                // rows.setText("40");
+                // rows.setColumns(3);
+                // columns.setText("10");
+                // columns.setColumns(3);
+                // pane.add(new JLabel("Rows"));
+                // pane.add(rows);
+                // pane.add(new JLabel("Columns"));
+                // pane.add(columns);
+                //
+                // dialog.setContentPane(pane);
+                // dialog.pack();
+                // dialog.setLocationRelativeTo(null);
+                // dialog.setVisible(true);
+                // if (!dialog.hasUserCancelled()) {
+                //     System.out.println("here");
+                //     ((ImageAlbumWorld)world).createBlankCanvas(Integer.parseInt(rows.getText()),Integer.parseInt(columns.getText()));
+                // }
+                ((ImageAlbumWorld)world).createBlankCanvas(10,10);
             });
-            // TODO: Add more "canvas" optionss for more sizes.
-            //  That is, instead of loading an image the user can also just create a drawing canvas of a certain size
-            sourceToolbar.add(createCanvas); //
+            sourceToolbar.add(createCanvas);
         }
 
+        // Add Color Picker
+        JButton setColorButton = new JButton();
+        JPanel colorIndicator = new JPanel();
+        colorIndicator.setPreferredSize(new Dimension(20,20));
+        colorIndicator.setBackground(((ImageAlbumWorld)world).getPenColor());
+        setColorButton.add(colorIndicator);
+        setColorButton.setToolTipText("Pen Color");
+        setColorButton.addActionListener(e -> {
+            Color newColor = JColorChooser.showDialog(this, "Choose Color",
+                    ((ImageAlbumWorld)world).getPenColor());
+            ((ImageAlbumWorld)world).setPenColor(newColor);
+            colorIndicator.setBackground(newColor);
+        });
+        sourceToolbar.add(setColorButton);
 
         sensorToolbar.add(new JLabel("Filters:"));
         sensorToolbar.add(sensorMatrixCombo);
@@ -316,6 +351,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         sensorToolbar.add(editSensorMatrix);
 
     }
+
 
     /**
      * Copy image from current system clipboard.

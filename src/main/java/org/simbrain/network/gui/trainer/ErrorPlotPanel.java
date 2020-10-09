@@ -49,6 +49,9 @@ public class ErrorPlotPanel extends JPanel {
      */
     private JLabel runningLabel = new JLabel();
 
+    // TODO (Ken).  Add a temp test constructor that does not require a trainer.  Use this to mockup how it will look
+    //  in LMSNetwork
+
     /**
      * Construct a trainer panel around a trainer object.
      *

@@ -3,12 +3,79 @@ package org.simbrain.util.geneticalgorithm
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.simbrain.network.core.Network
 import org.simbrain.network.util.activations
 
 class Genetics5Test {
 
     @Test
-    fun `test if copy makes deep copy`() {
+    fun `node gene creates product specified in template`() {
+        val node = nodeGene { activation = 0.7 }
+        val neuron = node.build(Network())
+        assertEquals(0.7, neuron.activation, 0.01)
+    }
+
+    @Test
+    fun `node gene creates specified product after copied`() {
+        val node = nodeGene { activation = 0.7 }
+        val copy = node.copy()
+        val neuron = copy.build(Network())
+        assertEquals(0.7, neuron.activation, 0.01)
+    }
+
+    @Test
+    fun `node chromosome with repeating default genes creates specified neurons`() {
+        val environment = environmentBuilder {
+            val nodes = chromosome(5) {
+                nodeGene { activation = 0.7 }
+            }
+
+            onBuild {
+                +network {
+                    +nodes
+                }
+            }
+
+            onEval {
+                nodes.products.forEach { neuron ->
+                    assertEquals(0.7, neuron.activation, 0.01)
+                }
+                0.0
+            }
+        }
+
+        environment.build().eval()
+    }
+
+    @Test
+    fun `node chromosome with individually specified default genes creates corresponding neurons`() {
+        val defaultActivations = listOf(0.2, 0.7, 0.3, 0.6, 0.5)
+        val environment = environmentBuilder {
+            val nodes = chromosome(
+                    *defaultActivations.map {
+                        nodeGene { activation = it }
+                    }.toTypedArray()
+            )
+
+            onBuild {
+                +network {
+                    +nodes
+                }
+            }
+
+            onEval {
+                (nodes.products.activations zip defaultActivations).forEach { (actual, expected) ->
+                    assertEquals(expected, actual, 0.01)
+                }
+                0.0
+            }
+        }
+
+        environment.build().eval()
+    }
+
+    @Test
+    fun `genes are deeply copied after calling copy on environment`() {
         val refs = mutableListOf(mutableListOf<Any>())
 
         val environment = environmentBuilder {
@@ -39,7 +106,7 @@ class Genetics5Test {
     }
 
     @Test
-    fun `test if connection genes has correct reference to node genes after copy`() {
+    fun `connection genes have correct references to node genes after copy`() {
         val environment = environmentBuilder {
             val inputs = chromosome(2) {
                 nodeGene()
@@ -79,7 +146,7 @@ class Genetics5Test {
     }
 
     @Test
-    fun `test if connection genes has correct reference to node genes after mutation`() {
+    fun `connection genes have correct references to node genes after mutation`() {
         val environment = environmentBuilder {
             val inputs = chromosome(2) {
                 nodeGene()
@@ -126,6 +193,6 @@ class Genetics5Test {
                 yield(newEnv.build().eval())
                 newEnv = newEnv.copy().apply { mutate() }
             }
-        }.onEach { println(it) }.take(100).last()
+        }.onEach { println(it) }.take(5).last()
     }
 }

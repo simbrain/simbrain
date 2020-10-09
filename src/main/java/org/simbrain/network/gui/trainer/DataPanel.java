@@ -103,29 +103,9 @@ public class DataPanel extends JPanel {
         scroller.setMinimumSize(new Dimension(200, 500));
         scroller.setMaxVisibleColumns(5);
 
-        setLayout(new BorderLayout());
-        add("Center", scroller);
+        // Setting up necessary elements.
+        constructorSetUp();
 
-        // Toolbars
-        toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-        // Open / Save Tools
-        JToolBar fileToolBar = new JToolBar();
-        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, dataHolder));
-        fileToolBar.add(TableActionManager.getSaveCSVAction((NumericTable) table.getData()));
-        toolbars.add(fileToolBar);
-
-        // Randomize tools
-        toolbars.add(table.getToolbarRandomize());
-
-        add("North", toolbars);
-
-        table.getData().addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                resizePanel();
-            }
-        });
     }
 
 
@@ -146,29 +126,10 @@ public class DataPanel extends JPanel {
         scroller.setMinimumSize(new Dimension(200, 500));
         scroller.setMaxVisibleColumns(numVisibleColumns);
 
-        setLayout(new BorderLayout());
-        add("Center", scroller);
-
-        // Toolbars
-        toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
         // Open / Save Tools
-        JToolBar fileToolBar = new JToolBar();
-        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, dataHolder));
-        fileToolBar.add(TableActionManager.getSaveCSVAction((NumericTable) table.getData()));
-        toolbars.add(fileToolBar);
+        // Setting up necessary elements.
+        constructorSetUp();
 
-        // Randomize tools
-        toolbars.add(table.getToolbarRandomize());
-
-        add("North", toolbars);
-
-        table.getData().addTableModelListener(new TableModelListener() {
-            @Override
-            public void tableChanged(TableModelEvent e) {
-                resizePanel();
-            }
-        });
 
     }
 
@@ -209,6 +170,24 @@ public class DataPanel extends JPanel {
         scroller.setMinimumSize(new Dimension(200, 500));
         scroller.setMaxVisibleColumns(numVisibleColumns);
 
+        // Set up necessary elements.
+        constructorSetUp();
+
+        // TODO: This is something that the other constructors do not have.
+        // Edit tools
+        JToolBar editToolBar = new JToolBar();
+        editToolBar.add(TableActionManager.getInsertRowAction(table));
+        editToolBar.add(TableActionManager.getDeleteRowAction(table));
+        // toolbars.add(editToolBar);
+
+
+    }
+
+
+    /*
+
+     */
+    private void constructorSetUp() {
         setLayout(new BorderLayout());
         add("Center", scroller);
 
@@ -221,12 +200,6 @@ public class DataPanel extends JPanel {
         fileToolBar.add(TableActionManager.getSaveCSVAction((NumericTable) table.getData()));
         toolbars.add(fileToolBar);
 
-        // Edit tools
-        JToolBar editToolBar = new JToolBar();
-        editToolBar.add(TableActionManager.getInsertRowAction(table));
-        editToolBar.add(TableActionManager.getDeleteRowAction(table));
-        // toolbars.add(editToolBar);
-
         // Randomize tools
         toolbars.add(table.getToolbarRandomize());
 
@@ -238,6 +211,8 @@ public class DataPanel extends JPanel {
                 resizePanel();
             }
         });
+
+        return;
     }
 
     /**

@@ -321,6 +321,10 @@ class WorkspaceBuilder {
 
     inner class CouplingManagerContext {
 
+        operator fun <T1, T2, G1 : Gene5<T1>, G2 : Gene5<T2>> Memoize<Chromosome5<T1, G1>>.plus(
+                other: Memoize<Chromosome5<T2, G2>>
+        ) = listOf(this, other)
+
         fun couple(producers: Collection<Gene5<*>>, consumers: Collection<Gene5<*>>) {
             couplings.add { mapping ->
                 (producers zip consumers).map { (source, target) ->
@@ -341,6 +345,27 @@ class WorkspaceBuilder {
                     createCoupling(producer, consumer)
                 }
             }
+        }
+
+        fun <T, G : Gene5<T>> couple(
+                producers: Memoize<Chromosome5<T, G>>,
+                consumers: List<Memoize<out Chromosome5<out Any?, out Gene5<out Any?>>>>
+        ) {
+            couple(producers.current.genes, consumers.flatMap { it.current.genes })
+        }
+
+        fun <T, G : Gene5<T>> couple(
+                producers: List<Memoize<out Chromosome5<out Any?, out Gene5<out Any?>>>>,
+                consumers: Memoize<Chromosome5<T, G>>
+        ) {
+            couple(producers.flatMap { it.current.genes }, consumers.current.genes)
+        }
+
+        fun couple(
+                producers: List<Memoize<out Chromosome5<out Any?, out Gene5<out Any?>>>>,
+                consumers: List<Memoize<out Chromosome5<out Any?, out Gene5<out Any?>>>>
+        ) {
+            couple(producers.flatMap { it.current.genes }, consumers.flatMap { it.current.genes })
         }
 
         fun <T1, T2, G1 : Gene5<T1>, G2 : Gene5<T2>> couple(

@@ -128,7 +128,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             onPrettyBuild {
                 couplingManager {
                     couple(sensors, inputs)
-                    couple(outputs.current.genes, straightMovement.current.genes + turning.current.genes)
+                    couple(outputs, straightMovement + turning)
                 }
                 +odorworld {
                     +mouse {

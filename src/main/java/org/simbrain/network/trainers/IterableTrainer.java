@@ -109,6 +109,13 @@ public abstract class IterableTrainer implements EditableObject {
      */
     public abstract void randomize();
 
+    //TODO
+    public void iterate2() throws DataNotInitializedException  {
+        apply();
+        incrementIteration();
+        events.fireErrorUpdated();
+    }
+
     /**
      * Iterate the training algorithm and stop iteration based on the selected
      * stopping condition.

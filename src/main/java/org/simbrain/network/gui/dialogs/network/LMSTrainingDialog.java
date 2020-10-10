@@ -34,8 +34,11 @@ import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
 import org.simbrain.network.gui.trainer.ErrorPlotPanel;
 import org.simbrain.network.subnetworks.LMSNetwork;
+import org.simbrain.network.trainers.IterableTrainer;
+import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -80,6 +83,17 @@ public class LMSTrainingDialog extends StandardDialog {
     private List<Component> tabs = new ArrayList<Component>();
 
     /**
+     * LMS Configuration object that is edited using an {@link AnnotatedPropertyEditor}
+     */
+    private LMSConfig lmsConfig = new LMSConfig();
+
+    /**
+     * Underlying DL4J Object.  After training, its weights and biases should be
+     *    passed on to the LMSNetwork.
+     */
+    private MultiLayerNetwork mln;
+
+    /**
      * Network panel.
      */
     protected NetworkPanel networkPanel;
@@ -97,12 +111,6 @@ public class LMSTrainingDialog extends StandardDialog {
     }
 
     /**
-     * Underlying DL4J Object.  After training, its weights and biases should be
-     *    passed on to the LMSNetwork.
-     */
-    private MultiLayerNetwork mln;
-
-    /**
      * This method initializes the components on the panel.
      */
     private void init() {
@@ -114,40 +122,22 @@ public class LMSTrainingDialog extends StandardDialog {
         // Main vertical box
         Box trainerPanel = Box.createVerticalBox();
 
-        // TODO: Move this to a dialog that pops up when initialize networks is pressed
-        // Config object that is used when init is pressed
-        LMSConfig lmsConfig = new LMSConfig();
-        AnnotatedPropertyEditor configPanel = new AnnotatedPropertyEditor(lmsConfig);
-        trainerPanel.add(configPanel);
+        // Time series for error.
+        LMSTrainer trainer = new LMSTrainer();
+        ErrorPlotPanel errorPanel = new ErrorPlotPanel(trainer);
+        trainerPanel.add(errorPanel);
 
-        // Time series for error. TODO.
-        // ErrorPlotPanel graphPanel = new ErrorPlotPanel(trainer);
-        // propsBox.add(graphPanel);
-
-        // Initialize the network object
+        // Button to initialize the network object
         JButton initButton = new JButton("Initialize network");
-        trainerPanel.add(initButton);
         initButton.addActionListener(e -> {
-            // TODO: Ken. Create dialog here. See AnnotatedPropertyEditor#getDialog
-            configPanel.commitChanges();
-            MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
-                    // Using stochastic gradient decent
-                    .updater(new Sgd(lmsConfig.learningRate))
-                    .seed(lmsConfig.seed)
-                    .biasInit(lmsConfig.initalBias)
-                    .miniBatch(lmsConfig.useMiniBatch)
-                    .list()
-                    .layer(new OutputLayer.Builder(lmsConfig.lossFunc)
-                            .nIn(lms.getNAList().get(0).getNumNodes())
-                            .nOut(lms.getNAList().get(1).getNumNodes())
-                            .activation(lmsConfig.actFunc)
-                            .weightInit(new UniformDistribution(0, 1)) //TODO
-                            .build())
-                    .build();
-
-            // TODO: Use config file from LMSNetwork, and draw weights and biases from it as well
-            mln = new MultiLayerNetwork(config);
-            mln.init();
+            AnnotatedPropertyEditor configPanel = new AnnotatedPropertyEditor(lmsConfig);
+            StandardDialog dialog = configPanel.getDialog();
+            dialog.makeVisible();
+            dialog.getOkButton().setText("Init");
+            dialog.addClosingTask(() -> {
+                configPanel.commitChanges();
+                initNetwork();
+            });
         });
         trainerPanel.add(initButton);
 
@@ -155,7 +145,11 @@ public class LMSTrainingDialog extends StandardDialog {
         JButton trainButton = new JButton("Train");
         trainerPanel.add(trainButton);
         trainButton.addActionListener(e -> {
-            lms.train(mln, lms.getDataset());
+            try {
+                trainer.iterate2();
+            } catch (IterableTrainer.DataNotInitializedException dataNotInitializedException) {
+                dataNotInitializedException.printStackTrace();
+            }
         });
         trainerPanel.add(trainButton);
 
@@ -191,13 +185,60 @@ public class LMSTrainingDialog extends StandardDialog {
     }
 
     /**
+     * Initialize the nd4j network using an edited configuration object.
+     */
+    private void initNetwork() {
+        MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
+                // Using stochastic gradient decent
+                .updater(new Sgd(lmsConfig.learningRate))
+                .seed(lmsConfig.seed)
+                .biasInit(lmsConfig.initalBias)
+                .miniBatch(lmsConfig.useMiniBatch)
+                .list()
+                .layer(new OutputLayer.Builder(lmsConfig.lossFunc)
+                        .nIn(lms.getNAList().get(0).getNumNodes())
+                        .nOut(lms.getNAList().get(1).getNumNodes())
+                        .activation(lmsConfig.actFunc)
+                        .weightInit(new UniformDistribution(0, 1)) //TODO
+                        .build())
+                .build();
+
+        // TODO: Use config file from LMSNetwork, and draw weights and biases from it as well
+        mln = new MultiLayerNetwork(config);
+        mln.init();
+    }
+
+    /**
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
         super.closeDialogOk();
     }
 
-    public static class LMSConfig implements EditableObject {
+    private class LMSTrainer extends IterableTrainer {
+
+        @Override
+        public double getError() {
+            return mln.score();
+        }
+
+        @Override
+        public void randomize() {
+            // mln.init();
+        }
+
+        @Override
+        protected TrainingSet getTrainingSet() {
+            // TODO
+            return null;
+        }
+
+        @Override
+        public void apply() throws DataNotInitializedException {
+            lms.train(mln, lms.getDataset());
+        }
+    }
+    private class LMSConfig implements EditableObject {
 
         @UserParameter(label = "Loss Function", order = 10)
         private LossFunctions.LossFunction lossFunc = LossFunctions.LossFunction.MSE;
@@ -217,8 +258,14 @@ public class LMSTrainingDialog extends StandardDialog {
         @UserParameter(label = "Initial Bias", minimumValue = 0.0, increment = .1, order = 60)
         private double initalBias = 0.0;
 
+        @Override
+        public String getName() {
+            return "Optimizer Settings";
+        }
+
         // Somehow deal with DL4JInvalidConfigException here
 
     }
+
 
 }

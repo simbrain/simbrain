@@ -344,4 +344,15 @@ public class StandardDialog extends GenericJDialog {
         okButton.setText("Done");
         cancelButton.setVisible(false);
     }
+
+    /**
+     * Standard operation to make the dialog visible and centered.
+     */
+    public void makeVisible() {
+        pack();
+        setVisible(true);
+        setLocationRelativeTo(null);
+    }
+
+
 }

@@ -20,6 +20,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.random.Random
 
 
 abstract class Gene5<T> protected constructor(val template: T) : CopyableObject
@@ -32,9 +33,13 @@ class NodeGene5 (template: Neuron) : Gene5<Neuron>(template) {
         copyListeners.add(task)
     }
 
+    private fun fireCopied(newGene: NodeGene5) {
+        copyListeners.forEach { it(newGene) }
+    }
+
     override fun copy(): NodeGene5 {
         val newGene = NodeGene5(template.deepCopy())
-        copyListeners.forEach { it(newGene) } // like firing an event
+        fireCopied(newGene)
         return newGene
     }
 
@@ -136,15 +141,15 @@ inline fun turningGene(options: Turning.() -> Unit = { }): TurningGene5 {
     return TurningGene5(Turning().apply(options))
 }
 
+inline fun entity(type: EntityType, crossinline template: OdorWorldEntity.() -> Unit = { }): (OdorWorld) -> OdorWorldEntity {
+    return { world -> OdorWorldEntity(world, type).apply(template) }
+}
+
 class Chromosome5<T, G : Gene5<T>>(val genes: MutableList<G>): CopyableObject {
     @Suppress("UNCHECKED_CAST")
     override fun copy(): Chromosome5<T, G> {
         return Chromosome5(genes.map { it.copy() as G }.toMutableList())
     }
-}
-
-inline fun entity(type: EntityType, crossinline template: OdorWorldEntity.() -> Unit = { }): (OdorWorld) -> OdorWorldEntity {
-    return { world -> OdorWorldEntity(world, type).apply(template) }
 }
 
 open class Memoization(protected val refList: LinkedList<Memoize<*>>) {
@@ -197,13 +202,13 @@ class ProductMap(private val map: HashMap<Any, Any> = HashMap()) {
 
 }
 
-class EvaluationContext(val workspace: Workspace, val mapping: ProductMap) {
+class EvaluationContext(val workspace: Workspace, val mapping: ProductMap, val evalRand: Random) {
 
     val <T, G: Gene5<T>, C: Chromosome5<T, G>> Memoize<C>.products: List<T> get() {
         return current.genes.map { mapping[it]!! }
     }
 
-    val <T, P> ((P) -> T).products: T get() {
+    val <T, P> ((P) -> T).product: T get() {
         return mapping[this]!!
     }
 
@@ -233,10 +238,14 @@ class MutationContext {
 
 class EnvironmentBuilder private constructor(
         refList: LinkedList<Memoize<*>>,
-        private val template: EnvironmentBuilder.() -> Unit
+        private val template: EnvironmentBuilder.() -> Unit,
+        val seed: Int = Random.nextInt(),
+        val random: Random = Random(seed)
 ): Memoization(refList) {
 
     constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
+
+    constructor(seed: Int, builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder, seed)
 
     private val mutationTasks = mutableListOf<MutationContext.() -> Unit>()
 
@@ -250,7 +259,8 @@ class EnvironmentBuilder private constructor(
 
 
     fun copy(): EnvironmentBuilder {
-        return EnvironmentBuilder(LinkedList(refList.map { it.copy() }), template).apply(template)
+        val newSeed = random.nextInt()
+        return EnvironmentBuilder(LinkedList(refList.map { it.copy() }), template, newSeed).apply(template)
     }
 
     fun onMutate(task: MutationContext.() -> Unit) {
@@ -273,7 +283,8 @@ class EnvironmentBuilder private constructor(
         val workspace = Workspace()
         builder.builders.forEach { it(workspace) }
         builder.couplings.forEach { workspace.couplingManager.it(builder.productMapping) }
-        return Environment5(EvaluationContext(workspace, builder.productMapping), evalFunction)
+        val newSeed = random.nextInt()
+        return Environment5(EvaluationContext(workspace, builder.productMapping, Random(newSeed)), evalFunction)
     }
 
     fun build() = buildWith(builder)
@@ -299,6 +310,9 @@ class EnvironmentBuilder private constructor(
 }
 
 fun environmentBuilder(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuilder(builder).apply(builder)
+
+fun environmentBuilder(seed: Int, builder: EnvironmentBuilder.() -> Unit)
+        = EnvironmentBuilder(seed, builder).apply(builder)
 
 class WorkspaceBuilder {
 

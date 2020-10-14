@@ -10,11 +10,11 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.neat.gui.ProgressWindow
+import org.simbrain.util.nextNegate
 import org.simbrain.util.point
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.entities.EntityType
 import java.io.File
-import java.util.*
 import kotlin.streams.toList
 
 class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
@@ -56,7 +56,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
     }
 
     fun evolve(peek: (generation: Int, result: List<Pair<EnvironmentBuilder, Double>>) -> Unit): Sequence<List<Pair<EnvironmentBuilder, Double>>> {
-        val environmentBuilder = environmentBuilder {
+        val environmentBuilder = environmentBuilder(1) {
 
             val inputs = chromosome(3) {
                 nodeGene()
@@ -155,56 +155,46 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             onMutate {
                 hiddens.current.eachMutate {
                     updateRule.let {
-                        if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
+                        if (it is BiasedUpdateRule) it.bias += random.nextDouble(-0.2, 0.2)
                     }
                 }
                 connections.current.eachMutate {
-                    strength += (Random().nextDouble() - 0.5 ) * 0.2
+                    strength += random.nextDouble(-0.2, 0.2)
                 }
-                val source = (inputs.current.genes + hiddens.current.genes).shuffled().first()
-                val target = (outputs.current.genes + hiddens.current.genes).shuffled().first()
+                val source = (inputs.current.genes + hiddens.current.genes).let {
+                    val index = random.nextInt(0, it.size)
+                    it[index]
+                }
+                val target = (outputs.current.genes + hiddens.current.genes).let {
+                    val index = random.nextInt(0, it.size)
+                    it[index]
+                }
                 connections.current.genes.add(connectionGene(source, target) {
-                    strength = (Random().nextDouble() - 0.5 ) * 0.2
+                    strength = random.nextDouble(-0.2, 0.2)
                 })
             }
 
             onEval {
                 var score = 0.0
 
-                cheese.products.setCenterLocation(
-                        mouse.products.centerX + (Random().nextDouble() * 70 + 30) * (if (Random().nextBoolean()) {
-                            1
-                        } else {
-                            -1
-                        }),
-                        mouse.products.centerY + (Random().nextDouble() * 70 + 30) * (if (Random().nextBoolean()) {
-                            1
-                        } else {
-                            -1
-                        })
+                cheese.product.setCenterLocation(
+                        mouse.product.centerX + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate(),
+                        mouse.product.centerY + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate()
                 )
 
-                cheese.products.onCollide { other ->
-                    if (other === mouse.products) {
+                cheese.product.onCollide { other ->
+                    if (other === mouse.product) {
                         score += 1
                     }
-                    cheese.products.setCenterLocation(
-                            mouse.products.centerX + (Random().nextDouble() * 70 + 30) * (if (Random().nextBoolean()) {
-                                1
-                            } else {
-                                -1
-                            }),
-                            mouse.products.centerY + (Random().nextDouble() * 70 + 30) * (if (Random().nextBoolean()) {
-                                1
-                            } else {
-                                -1
-                            })
+                    cheese.product.setCenterLocation(
+                            mouse.product.centerX + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate(),
+                            mouse.product.centerY + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate()
                     )
                 }
                 repeat(1000) {
                     workspace.simpleIterate()
                 }
-                val partial = (100 - mouse.products.getRadiusTo(cheese.products)).let { if (it < 0) 0.0 else it } / 100
+                val partial = (100 - mouse.product.getRadiusTo(cheese.product)).let { if (it < 0) 0.0 else it } / 100
                 score + partial
             }
 
@@ -219,7 +209,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                     val build = it.build()
                     val score = build.eval()
                     Pair(it, score)
-                }.toList().shuffled().sortedBy { -it.second }
+                }.toList().sortedBy { -it.second }
                 val survivors = current.take(current.size / 2)
                 next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
                 yield(current)

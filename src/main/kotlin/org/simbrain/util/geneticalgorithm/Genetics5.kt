@@ -292,6 +292,10 @@ class EnvironmentBuilder private constructor(
         return memoize { Chromosome5(mutableListOf(*genes)) }
     }
 
+    fun <T, G : Gene5<T>> chromosome(genes: Iterable<G>): Memoize<Chromosome5<T, G>> {
+        return memoize { Chromosome5(genes.toMutableList()) }
+    }
+
 }
 
 fun environmentBuilder(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuilder(builder).apply(builder)

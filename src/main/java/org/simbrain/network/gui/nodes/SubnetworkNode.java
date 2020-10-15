@@ -323,6 +323,8 @@ public class SubnetworkNode extends ScreenElement {
         for (PNode node : outlinedObjects) {
             if (node instanceof NeuronGroupNode) {
                 node.offset(dx, dy);
+            } else if (node instanceof NeuronArrayNode) {
+                node.offset(dx, dy);
             }
         }
         outline.resetOutlinedNodes(outlinedObjects);

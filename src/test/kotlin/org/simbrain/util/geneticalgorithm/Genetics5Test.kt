@@ -1,7 +1,6 @@
 package org.simbrain.util.geneticalgorithm
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.util.activations
@@ -94,7 +93,7 @@ class Genetics5Test {
 
             onEval {
                 inputs.products.activations.forEach { assertEquals(0.75, it, 0.01) }
-                refs.add(inputs.current.genes.toMutableList())
+                refs.add(inputs.genes.toMutableList())
                 0.0
             }
         }
@@ -117,8 +116,8 @@ class Genetics5Test {
             }
 
             val synapses = chromosome(
-                    connectionGene(inputs.current.genes[0], outputs.current.genes[1]),
-                    connectionGene(inputs.current.genes[1], outputs.current.genes[0]),
+                    connectionGene(inputs.genes[0], outputs.genes[1]),
+                    connectionGene(inputs.genes[1], outputs.genes[0]),
             )
 
             onBuild {
@@ -130,13 +129,13 @@ class Genetics5Test {
             }
 
             onEval {
-                assertTrue(synapses.current.genes[0].let {
-                    it.source === inputs.current.genes[0]
-                            && it.target === outputs.current.genes[1]
+                assertTrue(synapses.genes[0].let {
+                    it.source === inputs.genes[0]
+                            && it.target === outputs.genes[1]
                 })
-                assertTrue(synapses.current.genes[1].let {
-                    it.source === inputs.current.genes[1]
-                            && it.target === outputs.current.genes[0]
+                assertTrue(synapses.genes[1].let {
+                    it.source === inputs.genes[1]
+                            && it.target === outputs.genes[0]
                 })
                 0.0
             }
@@ -157,8 +156,8 @@ class Genetics5Test {
             }
 
             val synapses = chromosome(
-                    connectionGene(inputs.current.genes[0], outputs.current.genes[1]),
-                    connectionGene(inputs.current.genes[1], outputs.current.genes[0]),
+                    connectionGene(inputs.genes[0], outputs.genes[1]),
+                    connectionGene(inputs.genes[1], outputs.genes[0]),
             )
 
             onBuild {
@@ -172,14 +171,14 @@ class Genetics5Test {
             onMutate {
                 val source = nodeGene()
                 val target = nodeGene()
-                inputs.current.genes.add(source)
-                outputs.current.genes.add(target)
-                synapses.current.genes.add(connectionGene(source, target))
+                inputs.genes.add(source)
+                outputs.genes.add(target)
+                synapses.genes.add(connectionGene(source, target))
             }
 
             onEval {
-                val condition = synapses.current.genes.all {
-                    val result = it.source in inputs.current.genes && it.target in outputs.current.genes
+                val condition = synapses.genes.all {
+                    val result = it.source in inputs.genes && it.target in outputs.genes
                     result
                 }
                 assertTrue(condition)
@@ -194,5 +193,46 @@ class Genetics5Test {
                 newEnv = newEnv.copy().apply { mutate() }
             }
         }.onEach { println(it) }.take(5).last()
+    }
+
+    @Test
+    fun `coupling node chromosome with node chromosome creates correct couplings`() {
+        val environmentBuilder = environmentBuilder {
+            val inputs = chromosome(3) {
+                nodeGene {
+                    isClamped = true
+                }
+            }
+
+            val outputs = chromosome(3) {
+                nodeGene()
+            }
+
+            onBuild {
+                couplingManager {
+                    couple(inputs, outputs)
+                }
+                +network {
+                    +inputs
+                    +outputs
+                }
+            }
+
+            onEval {
+
+                inputs.products.activations = listOf(1.0, 1.0, 1.0)
+
+                workspace.simpleIterate()
+
+                assertArrayEquals(inputs.products.activations.toTypedArray(), outputs.products.activations.toTypedArray())
+
+                0.0
+            }
+
+        }
+
+        val build = environmentBuilder.build()
+
+        build.eval()
     }
 }

@@ -153,23 +153,23 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             }
 
             onMutate {
-                hiddens.current.eachMutate {
+                hiddens.eachMutate {
                     updateRule.let {
                         if (it is BiasedUpdateRule) it.bias += random.nextDouble(-0.2, 0.2)
                     }
                 }
-                connections.current.eachMutate {
+                connections.eachMutate {
                     strength += random.nextDouble(-0.2, 0.2)
                 }
-                val source = (inputs.current.genes + hiddens.current.genes).let {
+                val source = (inputs.genes + hiddens.genes).let {
                     val index = random.nextInt(0, it.size)
                     it[index]
                 }
-                val target = (outputs.current.genes + hiddens.current.genes).let {
+                val target = (outputs.genes + hiddens.genes).let {
                     val index = random.nextInt(0, it.size)
                     it[index]
                 }
-                connections.current.genes.add(connectionGene(source, target) {
+                connections.genes.add(connectionGene(source, target) {
                     strength = random.nextDouble(-0.2, 0.2)
                 })
             }

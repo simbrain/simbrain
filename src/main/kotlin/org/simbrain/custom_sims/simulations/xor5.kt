@@ -76,30 +76,30 @@ class xor5(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             val connectionChromosome = chromosome<Synapse, ConnectionGene5>()
 
             onMutate {
-                hiddenNodeChromosome.current.eachMutate {
+                hiddenNodeChromosome.eachMutate {
                     updateRule.let {
                         if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
                     }
                 }
-                connectionChromosome.current.eachMutate {
+                connectionChromosome.eachMutate {
                     strength += (Random().nextDouble() - 0.5 ) * 0.2
                 }
                 // Either connect input to hidden or hidden to output, or hidden to hidden
                 val (source, target) = if (Random().nextBoolean()) {
-                    val source = (inputChromosome.current.genes + hiddenNodeChromosome.current.genes).shuffled().first()
-                    val target = hiddenNodeChromosome.current.genes.shuffled().first()
+                    val source = (inputChromosome.genes + hiddenNodeChromosome.genes).shuffled().first()
+                    val target = hiddenNodeChromosome.genes.shuffled().first()
                     Pair(source, target)
                 } else {
-                    val source = hiddenNodeChromosome.current.genes.shuffled().first()
-                    val target = (outputChromosome.current.genes + hiddenNodeChromosome.current.genes).shuffled().first()
+                    val source = hiddenNodeChromosome.genes.shuffled().first()
+                    val target = (outputChromosome.genes + hiddenNodeChromosome.genes).shuffled().first()
                     Pair(source, target)
                 }
-                connectionChromosome.current.genes.add(connectionGene(source, target) {
+                connectionChromosome.genes.add(connectionGene(source, target) {
                     strength = (Random().nextDouble() - 0.5 ) * 0.2
                 })
                 when (Random().nextDouble()) {
-                    in 0.9..0.95 ->  hiddenNodeChromosome.current.genes.add(nodeGene())
-                    //in 0.95..1.0 ->  hiddenNodeChromosome.current.genes.removeAt(0)
+                    in 0.9..0.95 ->  hiddenNodeChromosome.genes.add(nodeGene())
+                    //in 0.95..1.0 ->  hiddenNodeChromosome.genes.removeAt(0)
                 }
             }
 

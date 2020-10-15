@@ -73,24 +73,24 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
             val connections = chromosome<Synapse, ConnectionGene5>()
 
             onMutate {
-                nodes.current.eachMutate {
+                nodes.eachMutate {
                     updateRule.let {
                         if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
                     }
                 }
-                connections.current.eachMutate {
+                connections.eachMutate {
                     strength += (Random().nextDouble() - 0.5 ) * 0.2
                 }
                 val (source, target) = if (Random().nextBoolean()) {
-                    val source = (inputs.current.genes + nodes.current.genes).shuffled().first()
-                    val target = nodes.current.genes.shuffled().first()
+                    val source = (inputs.genes + nodes.genes).shuffled().first()
+                    val target = nodes.genes.shuffled().first()
                     Pair(source, target)
                 } else {
-                    val source = nodes.current.genes.shuffled().first()
-                    val target = (outputs.current.genes + nodes.current.genes).shuffled().first()
+                    val source = nodes.genes.shuffled().first()
+                    val target = (outputs.genes + nodes.genes).shuffled().first()
                     Pair(source, target)
                 }
-                connections.current.genes.add(connectionGene(source, target) {
+                connections.genes.add(connectionGene(source, target) {
                     strength = (Random().nextDouble() - 0.5 ) * 0.2
                 })
             }

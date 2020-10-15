@@ -56,7 +56,7 @@ public final class SynapseNode extends ScreenElement {
     private PPath circle;
 
     /**
-     * Line connecting nodes. More of a loop for self cocnections.
+     * Line connecting nodes. More of a loop for self connections.
      */
     private PPath.Float line;
 
@@ -138,6 +138,7 @@ public final class SynapseNode extends ScreenElement {
         this.addChild(line);
         line.setStrokePaint(Color.BLACK);
         line.lowerToBottom();
+        line.setPaint(null);
 
         updateColor();
         updateDiameter();

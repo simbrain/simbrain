@@ -1,7 +1,6 @@
 package org.simbrain.world.imageworld;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -17,27 +16,27 @@ import java.util.List;
  * The interface between image world and the desktop level.
  * Manages couplings and persistence.
  */
-public class ImageAlbumComponent extends WorkspaceComponent {
+public class PixelProducerComponent extends WorkspaceComponent {
 
     /**
      * The image world this component displays.
      */
-    private ImageAlbumWorld world;
+    private PixelProducer world;
 
     /**
      * Default constructor.
      */
-    public ImageAlbumComponent() {
+    public PixelProducerComponent() {
         super("");
-        this.world = new ImageAlbumWorld();
+        this.world = new PixelProducer();
     }
 
     /**
      * Create named component.
      */
-    public ImageAlbumComponent(String name) {
+    public PixelProducerComponent(String name) {
         super(name);
-        this.world = new ImageAlbumWorld();
+        this.world = new PixelProducer();
     }
 
     @Override
@@ -65,9 +64,9 @@ public class ImageAlbumComponent extends WorkspaceComponent {
      * @param format The format of the input stream. Should be xml.
      * @return A deserialized ImageWorldComponent.
      */
-    public static ImageAlbumComponent open(InputStream input, String name, String format) {
-        ImageAlbumWorld world = (ImageAlbumWorld) getXStream().fromXML(input);
-        return new ImageAlbumComponent(name, world);
+    public static PixelProducerComponent open(InputStream input, String name, String format) {
+        PixelProducer world = (PixelProducer) getXStream().fromXML(input);
+        return new PixelProducerComponent(name, world);
     }
 
     @Override
@@ -95,12 +94,12 @@ public class ImageAlbumComponent extends WorkspaceComponent {
      * @param name name of component
      * @param world the deserialized world
      */
-    public ImageAlbumComponent(String name, ImageAlbumWorld world) {
+    public PixelProducerComponent(String name, PixelProducer world) {
         super(name);
         this.world = world;
     }
 
-    public ImageAlbumWorld getWorld() {
+    public PixelProducer getWorld() {
         return world;
     }
 }

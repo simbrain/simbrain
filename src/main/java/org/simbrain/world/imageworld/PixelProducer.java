@@ -15,12 +15,12 @@ import java.io.IOException;
  * matrices and the resulting vectors to be sent to Neural networks and other
  * Simbrain components via couplings.
  */
-public class ImageAlbumWorld extends ImageWorld {
+public class PixelProducer extends ImageWorld {
 
     /**
-     * The object which produces the actual images processed by the "album".
+     * The object which produces the actual pixels produced.
      */
-    private ImageAlbumSource imageSource;
+    private PixelProducerSource imageSource;
 
     /**
      * Current pen color when drawing on the current image.
@@ -30,11 +30,11 @@ public class ImageAlbumWorld extends ImageWorld {
     /**
      * Construct the image world.
      */
-    public ImageAlbumWorld() {
+    public PixelProducer() {
         super();
         showGridLines = false;
         imagePanel = new ImagePanel(showGridLines);
-        imageSource = new ImageAlbumSource();
+        imageSource = new PixelProducerSource();
         imageSource.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
         initializeDefaultSensorMatrices();
 
@@ -92,7 +92,7 @@ public class ImageAlbumWorld extends ImageWorld {
     }
 
     /**
-     * Returns number of frames in album
+     * Returns number of frames in the "album" associated with this component.
      */
     public int getNumImages() {
         return imageSource.getNumFrames();

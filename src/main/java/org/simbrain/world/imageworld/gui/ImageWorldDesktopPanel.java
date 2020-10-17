@@ -6,7 +6,6 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.table.MutableTable;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
@@ -14,9 +13,9 @@ import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.GuiComponent;
-import org.simbrain.world.imageworld.ImageAlbumWorld;
+import org.simbrain.world.imageworld.PixelProducer;
 import org.simbrain.world.imageworld.ImageWorld;
-import org.simbrain.world.imageworld.PixelDisplayWorld;
+import org.simbrain.world.imageworld.PixelConsumer;
 import org.simbrain.world.imageworld.SensorMatrix;
 import org.simbrain.world.imageworld.dialogs.ResizeEmitterMatrixDialog;
 import org.simbrain.world.imageworld.dialogs.SensorMatrixDialog;
@@ -34,7 +33,7 @@ import java.util.List;
 
 /**
  * Contains the toolbars and actions used for the GUI representation
- * of {@link ImageAlbumWorld} and {@link PixelDisplayWorld}.
+ * of {@link PixelProducer} and {@link PixelConsumer}.
  */
 public class ImageWorldDesktopPanel extends JPanel {
 
@@ -69,7 +68,7 @@ public class ImageWorldDesktopPanel extends JPanel {
     private JPopupMenu contextMenu;
 
     /**
-     * Parent world, either an {@link ImageAlbumWorld} or {@link PixelDisplayWorld}.
+     * Parent world, either an {@link PixelProducer} or {@link PixelConsumer}.
      */
     private ImageWorld world;
 
@@ -145,7 +144,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         // }
 
         // Update status of buttons for image album worlds
-        if (world instanceof ImageAlbumWorld) {
+        if (world instanceof PixelProducer) {
             updateButtons();
         }
 
@@ -159,7 +158,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         menuBar.add(fileMenu);
 
         // Add load images menu item if it's an image album world
-        if (world instanceof ImageAlbumWorld) {
+        if (world instanceof PixelProducer) {
             JMenuItem loadImages = new JMenuItem("Load Images...");
             loadImages.addActionListener(e -> {
                 loadImages();
@@ -217,9 +216,9 @@ public class ImageWorldDesktopPanel extends JPanel {
      */
     private void setupToolbars() {
 
-        if (world instanceof ImageAlbumWorld) {
+        if (world instanceof PixelProducer) {
             getImageAlbumButtons().forEach(sourceToolbar::add);
-        } else if (world instanceof PixelDisplayWorld) {
+        } else if (world instanceof PixelConsumer) {
             getPixelDisplayToolbar().forEach(sourceToolbar::add);
         }
 
@@ -231,7 +230,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         });
         sourceToolbar.add(saveImageButton);
 
-        if (world instanceof ImageAlbumWorld) {
+        if (world instanceof PixelProducer) {
             JButton createCanvas = new JButton();
             createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
             createCanvas.setToolTipText("Create canvas");
@@ -258,7 +257,7 @@ public class ImageWorldDesktopPanel extends JPanel {
                 //     System.out.println("here");
                 //     ((ImageAlbumWorld)world).createBlankCanvas(Integer.parseInt(rows.getText()),Integer.parseInt(columns.getText()));
                 // }
-                ((ImageAlbumWorld)world).createBlankCanvas(10,10);
+                ((PixelProducer)world).createBlankCanvas(10,10);
             });
             sourceToolbar.add(createCanvas);
         }
@@ -267,13 +266,13 @@ public class ImageWorldDesktopPanel extends JPanel {
         JButton setColorButton = new JButton();
         JPanel colorIndicator = new JPanel();
         colorIndicator.setPreferredSize(new Dimension(20,20));
-        colorIndicator.setBackground(((ImageAlbumWorld)world).getPenColor());
+        colorIndicator.setBackground(((PixelProducer)world).getPenColor());
         setColorButton.add(colorIndicator);
         setColorButton.setToolTipText("Pen Color");
         setColorButton.addActionListener(e -> {
             Color newColor = JColorChooser.showDialog(this, "Choose Color",
-                    ((ImageAlbumWorld)world).getPenColor());
-            ((ImageAlbumWorld)world).setPenColor(newColor);
+                    ((PixelProducer)world).getPenColor());
+            ((PixelProducer)world).setPenColor(newColor);
             colorIndicator.setBackground(newColor);
         });
         sourceToolbar.add(setColorButton);
@@ -415,7 +414,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         previousImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoPrevious.png"));
         previousImagesButton.setToolTipText("Previous Image");
         previousImagesButton.addActionListener(e -> {
-            ((ImageAlbumWorld)world).previousFrame();
+            ((PixelProducer)world).previousFrame();
         });
         returnList.add(previousImagesButton);
 
@@ -423,7 +422,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         nextImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoNext.png"));
         nextImagesButton.setToolTipText("Next Image");
         nextImagesButton.addActionListener(e -> {
-            ((ImageAlbumWorld)world).nextFrame();
+            ((PixelProducer)world).nextFrame();
         });
         returnList.add(nextImagesButton);
 
@@ -449,7 +448,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         editEmitterButton.setIcon(ResourceManager.getSmallIcon("menu_icons/resize.png"));
         editEmitterButton.setToolTipText("Edit Emitter Matrix");
         editEmitterButton.addActionListener(evt -> {
-            ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog((PixelDisplayWorld) world);
+            ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog((PixelConsumer) world);
             dialog.setVisible(true);
         });
         returnList.add(editEmitterButton);
@@ -466,7 +465,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         if (files != null) {
 
             // Load the images
-            ((ImageAlbumWorld) world).loadImages(files);
+            ((PixelProducer) world).loadImages(files);
 
             // Update status of buttons
             updateButtons();
@@ -482,7 +481,7 @@ public class ImageWorldDesktopPanel extends JPanel {
      */
     public void updateButtons() {
         // Disable next / previous buttons when there is less than two images
-        if (((ImageAlbumWorld) world).getNumImages() < 2) {
+        if (((PixelProducer) world).getNumImages() < 2) {
             nextImagesButton.setEnabled(false);
             previousImagesButton.setEnabled(false);
         } else {

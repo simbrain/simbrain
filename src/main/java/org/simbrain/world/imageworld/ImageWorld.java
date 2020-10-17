@@ -23,11 +23,8 @@ import java.util.List;
  * The world contains a single {@link ImagePanel} which all {@link ImageSource}'s
  * draw to.
  * <br>
- * Currently there are two subclasses corresponding to the "Image World" ({@link
- * ImageAlbumWorld}) and "Pixel Display" ({@link PixelDisplayWorld}) in the
- * GUI.  Broadly speaking ImageAlbumWorld produces pixels to be consumed by
- * other components and PixelDisplayWorld consumes pixels produced by other
- * components.
+ * Currently there are two subclasses corresponding which either produce or consume pixels.
+ * See {@link PixelProducer}) and {@link PixelConsumer} in the GUI.
  *
  * @author Tim Shea
  * @author Jeff Yoshimi
@@ -62,7 +59,7 @@ public abstract class ImageWorld {
     /**
      * If true show grid lines.
      */
-     // TODO: Expose this in a preferences dialog
+    // TODO: Expose this in a preferences dialog
     protected boolean showGridLines;
 
     /**
@@ -83,42 +80,42 @@ public abstract class ImageWorld {
 
         // Load default sensor matrices
         SensorMatrix unfiltered = new SensorMatrix(
-            "Unfiltered",
-            getImageSource()
+                "Unfiltered",
+                getImageSource()
         );
         getSensorMatrices().add(unfiltered);
 
         SensorMatrix gray100x100 = new SensorMatrix(
-            "Gray 150x150",
-            ImageFilterFactory.createGrayFilter(getImageSource(), 150, 150)
+                "Gray 150x150",
+                ImageFilterFactory.createGrayFilter(getImageSource(), 150, 150)
         );
         getSensorMatrices().add(gray100x100);
 
         SensorMatrix color100x100 = new SensorMatrix(
-            "Color 100x100",
-            ImageFilterFactory.createColorFilter(getImageSource(), 100, 100)
+                "Color 100x100",
+                ImageFilterFactory.createColorFilter(getImageSource(), 100, 100)
         );
         getSensorMatrices().add(color100x100);
 
         SensorMatrix threshold10x10 = new SensorMatrix(
-            "Threshold 10x10",
-            ThresholdFilterFactory.createThresholdFilter(
-                getImageSource(),
-                0.5f,
-                10,
-                10
-            )
+                "Threshold 10x10",
+                ThresholdFilterFactory.createThresholdFilter(
+                        getImageSource(),
+                        0.5f,
+                        10,
+                        10
+                )
         );
         getSensorMatrices().add(threshold10x10);
 
         SensorMatrix threshold250x250 = new SensorMatrix(
-            "Threshold 250x250",
-            ThresholdFilterFactory.createThresholdFilter(
-                getImageSource(),
-                0.5f,
-                250,
-                250
-            )
+                "Threshold 250x250",
+                ThresholdFilterFactory.createThresholdFilter(
+                        getImageSource(),
+                        0.5f,
+                        250,
+                        250
+                )
         );
 
         getSensorMatrices().add(threshold250x250);
@@ -161,7 +158,7 @@ public abstract class ImageWorld {
             //imagePanel.setToolTipText(compositeSource.getImageSource().getWidth() + " by " +  compositeSource.getImageSource().getHeight());
         } else {
             imagePanel.setToolTipText(currentSensorMatrix.getWidth() +
-                " by " + currentSensorMatrix.getHeight());
+                    " by " + currentSensorMatrix.getHeight());
         }
     }
 
@@ -174,6 +171,7 @@ public abstract class ImageWorld {
 
 
     //TODO: Move this and all emitter stuff..
+
     /**
      * Get whether the emitter matrix is using color.
      */
@@ -228,7 +226,7 @@ public abstract class ImageWorld {
     public ImageClipboard getClipboard() {
         return clipboard;
     }
-    
+
     public SensorMatrix getCurrentSensorMatrix() {
         return currentSensorMatrix;
     }

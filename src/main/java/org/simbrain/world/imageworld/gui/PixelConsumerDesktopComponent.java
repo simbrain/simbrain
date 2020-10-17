@@ -2,9 +2,9 @@ package org.simbrain.world.imageworld.gui;
 
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.GuiComponent;
-import org.simbrain.world.imageworld.PixelDisplayComponent;
+import org.simbrain.world.imageworld.PixelConsumerComponent;
 
-public class PixelDisplayDesktopComponent extends GuiComponent<PixelDisplayComponent> {
+public class PixelConsumerDesktopComponent extends GuiComponent<PixelConsumerComponent> {
 
     /**
      * Construct a new PixelDisplayDesktopComponent GUI.
@@ -12,7 +12,7 @@ public class PixelDisplayDesktopComponent extends GuiComponent<PixelDisplayCompo
      * @param frame     The frame in which to place GUI elements.
      * @param component The PixelDisplayComponent to interact with.
      */
-    public PixelDisplayDesktopComponent(GenericFrame frame, PixelDisplayComponent component) {
+    public PixelConsumerDesktopComponent(GenericFrame frame, PixelConsumerComponent component) {
         super(frame, component);
         add(new ImageWorldDesktopPanel(this.getParentFrame(), this, getWorkspaceComponent().getWorld()));
     }

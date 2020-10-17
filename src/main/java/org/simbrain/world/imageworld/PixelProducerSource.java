@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ImageAlbum allows static images (JPG, BMP, PNG) to be loaded and
+ * Pixle producer allows static images (JPG, BMP, PNG) to be loaded and
  * filtered using the ImageSource interface. Can also be used to display
  * individual images.
  *
  * @author Tim Shea
  */
-public class ImageAlbumSource extends ImageSourceAdapter {
+public class PixelProducerSource extends ImageSourceAdapter {
 
     /**
      * A list of buffered images that can be stepped through.
@@ -36,11 +36,11 @@ public class ImageAlbumSource extends ImageSourceAdapter {
     /**
      * Construct a new StaticImageSource.
      */
-    public ImageAlbumSource() {
+    public PixelProducerSource() {
         super();
     }
 
-    public ImageAlbumSource(String filename, BufferedImage currentImage) {
+    public PixelProducerSource(String filename, BufferedImage currentImage) {
         super(currentImage);
     }
 

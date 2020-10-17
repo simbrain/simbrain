@@ -16,20 +16,20 @@ import java.util.List;
  * The interface between pixel display world and the desktop level.
  * Manages couplings and persistence.
  */
-public class PixelDisplayComponent extends WorkspaceComponent {
+public class PixelConsumerComponent extends WorkspaceComponent {
 
     /**
      * The image world this component displays.
      */
-    private PixelDisplayWorld world;
+    private PixelConsumer world;
 
     /**
      * Create an Image World Component from a Image World.
      *
      */
-    public PixelDisplayComponent() {
+    public PixelConsumerComponent() {
         super("");
-        this.world = new PixelDisplayWorld();
+        this.world = new PixelConsumer();
     }
 
     /**
@@ -38,7 +38,7 @@ public class PixelDisplayComponent extends WorkspaceComponent {
      * @param name name of component
      * @param world the deserialized world
      */
-    public PixelDisplayComponent(String name, PixelDisplayWorld world) {
+    public PixelConsumerComponent(String name, PixelConsumer world) {
         super(name);
         this.world = world;
     }
@@ -51,12 +51,12 @@ public class PixelDisplayComponent extends WorkspaceComponent {
      * @param format The format of the input stream. Should be xml.
      * @return A deserialized ImageWorldComponent.
      */
-    public static PixelDisplayComponent open(InputStream input, String name, String format) {
-        PixelDisplayWorld world = (PixelDisplayWorld) getXStream().fromXML(input);
-        return new PixelDisplayComponent(name, world);
+    public static PixelConsumerComponent open(InputStream input, String name, String format) {
+        PixelConsumer world = (PixelConsumer) getXStream().fromXML(input);
+        return new PixelConsumerComponent(name, world);
     }
 
-    public PixelDisplayWorld getWorld() {
+    public PixelConsumer getWorld() {
         return world;
     }
 

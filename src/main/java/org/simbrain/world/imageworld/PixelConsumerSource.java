@@ -20,7 +20,7 @@ import java.util.Arrays;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class PixelDisplaySource extends ImageSourceAdapter {
+public class PixelConsumerSource extends ImageSourceAdapter {
 
     @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
     private boolean usingRGBColor = false;
@@ -42,7 +42,7 @@ public class PixelDisplaySource extends ImageSourceAdapter {
     /**
      * Construct an empty emitter matrix.
      */
-    public PixelDisplaySource() {
+    public PixelConsumerSource() {
         super();
         channels = new double[3][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];
@@ -53,7 +53,7 @@ public class PixelDisplaySource extends ImageSourceAdapter {
      *
      * @param currentImage
      */
-    public PixelDisplaySource(BufferedImage currentImage) {
+    public PixelConsumerSource(BufferedImage currentImage) {
         super(currentImage);
         channels = new double[3][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];

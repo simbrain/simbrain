@@ -31,8 +31,6 @@ import org.simbrain.util.table.SimbrainJTable;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 
 /**
@@ -146,7 +144,7 @@ public class TestInputPanel extends DataPanel {
     // TODO
     LMSNetwork lms;
     public TestInputPanel(NetworkPanel networkPanel, LMSNetwork lms) {
-        super(lms.getInputs());
+        super(lms.getInputData());
         this.lms = lms;
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

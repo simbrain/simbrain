@@ -18,17 +18,6 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.nd4j.linalg.activations.Activation;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dataset.DataSet;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.learning.config.Sgd;
-import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
@@ -37,10 +26,7 @@ import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,17 +69,6 @@ public class LMSTrainingDialog extends StandardDialog {
     private List<Component> tabs = new ArrayList<Component>();
 
     /**
-     * LMS Configuration object that is edited using an {@link AnnotatedPropertyEditor}
-     */
-    private LMSConfig lmsConfig = new LMSConfig();
-
-    /**
-     * Underlying DL4J Object.  After training, its weights and biases should be
-     *    passed on to the LMSNetwork.
-     */
-    private MultiLayerNetwork mln;
-
-    /**
      * Network panel.
      */
     protected NetworkPanel networkPanel;
@@ -128,18 +103,17 @@ public class LMSTrainingDialog extends StandardDialog {
         trainerPanel.add(errorPanel);
 
         // Button to initialize the network object
-        JButton initButton = new JButton("Initialize network");
-        initButton.addActionListener(e -> {
-            AnnotatedPropertyEditor configPanel = new AnnotatedPropertyEditor(lmsConfig);
+        JButton prefsButton = new JButton("Network Prefs");
+        prefsButton.addActionListener(e -> {
+            AnnotatedPropertyEditor configPanel = new AnnotatedPropertyEditor(lms.getConfig());
             StandardDialog dialog = configPanel.getDialog();
             dialog.makeVisible();
-            dialog.getOkButton().setText("Init");
             dialog.addClosingTask(() -> {
                 configPanel.commitChanges();
-                initNetwork();
+                lms.initNetwork();
             });
         });
-        trainerPanel.add(initButton);
+        trainerPanel.add(prefsButton);
 
         // Train the network
         JButton trainButton = new JButton("Train");
@@ -157,12 +131,12 @@ public class LMSTrainingDialog extends StandardDialog {
         tabbedPane.addTab("Train", trainerPanel);
 
         // Input data tab
-        inputPanel = new DataPanel(lms.getInputs());
+        inputPanel = new DataPanel(lms.getInputData());
         inputPanel.setFrame(this);
         tabbedPane.addTab("Input data", inputPanel);
 
         // Training data tab
-        trainingPanel = new DataPanel(lms.getTargets());
+        trainingPanel = new DataPanel(lms.getTargetData());
         trainingPanel.setFrame(this);
         tabbedPane.addTab("Target data", trainingPanel);
 
@@ -177,35 +151,13 @@ public class LMSTrainingDialog extends StandardDialog {
         tabbedPane.addChangeListener(e -> {
             int index =  ((JTabbedPane) e.getSource()).getSelectedIndex();
             if (index == 0) {
+                // TODO: Only update data when _leaving_ relevant panel,
+                // maybe with a focus listener
                 inputPanel.commitChanges();
                 trainingPanel.commitChanges();
             }
         });
 
-    }
-
-    /**
-     * Initialize the nd4j network using an edited configuration object.
-     */
-    private void initNetwork() {
-        MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
-                // Using stochastic gradient decent
-                .updater(new Sgd(lmsConfig.learningRate))
-                .seed(lmsConfig.seed)
-                .biasInit(lmsConfig.initalBias)
-                .miniBatch(lmsConfig.useMiniBatch)
-                .list()
-                .layer(new OutputLayer.Builder(lmsConfig.lossFunc)
-                        .nIn(lms.getNAList().get(0).getNumNodes())
-                        .nOut(lms.getNAList().get(1).getNumNodes())
-                        .activation(lmsConfig.actFunc)
-                        .weightInit(new UniformDistribution(0, 1)) //TODO
-                        .build())
-                .build();
-
-        // TODO: Use config file from LMSNetwork, and draw weights and biases from it as well
-        mln = new MultiLayerNetwork(config);
-        mln.init();
     }
 
     /**
@@ -219,7 +171,7 @@ public class LMSTrainingDialog extends StandardDialog {
 
         @Override
         public double getError() {
-            return mln.score();
+            return lms.getError();
         }
 
         @Override
@@ -235,37 +187,8 @@ public class LMSTrainingDialog extends StandardDialog {
 
         @Override
         public void apply() throws DataNotInitializedException {
-            lms.train(mln, lms.getDataset());
+            lms.train();
         }
     }
-    private class LMSConfig implements EditableObject {
-
-        @UserParameter(label = "Loss Function", order = 10)
-        private LossFunctions.LossFunction lossFunc = LossFunctions.LossFunction.MSE;
-
-        @UserParameter(label = "Activation Function", order = 20)
-        private Activation actFunc = Activation.SIGMOID;
-
-        @UserParameter(label = "Minibatch", order = 30)
-        private boolean useMiniBatch = true;
-
-        @UserParameter(label = "Learning Rate", minimumValue = 0, increment = .01, order = 40)
-        private double learningRate = .2;
-
-        @UserParameter(label = "Seed", minimumValue = 1, increment = 1, order = 50)
-        private int seed = 1;
-
-        @UserParameter(label = "Initial Bias", minimumValue = 0.0, increment = .1, order = 60)
-        private double initalBias = 0.0;
-
-        @Override
-        public String getName() {
-            return "Optimizer Settings";
-        }
-
-        // Somehow deal with DL4JInvalidConfigException here
-
-    }
-
 
 }

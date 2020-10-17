@@ -13,14 +13,24 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
+import org.deeplearning4j.nn.conf.distribution.UniformDistribution;
+import org.deeplearning4j.nn.conf.layers.OutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
+import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.DataSet;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.learning.config.Sgd;
+import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 
@@ -28,7 +38,8 @@ import java.awt.geom.Point2D;
  * A Least Mean Squares network.
  *
  * TODO: Rename. This is not really "LMS" anymore.
- * This solution involves a parallel dl4j object and simbrian object which get synced during training
+ *
+ * This solution involves a parallel dl4j object and Simbrain object which get synced during training
  * Longer term new custom visualization for {@link org.simbrain.network.dl4j.MultiLayerNet} should be used.
  *
  * @author Jeff Yoshimi
@@ -40,23 +51,30 @@ public class LMSNetwork extends FeedForward implements Trainable {
      */
     private final TrainingSet trainingSet = new TrainingSet();
 
-    //TODO: Put MLNConfig object here
+    /**
+     * LMS Configuration object that is edited using an {@link AnnotatedPropertyEditor}
+     */
+    private LMSConfig lmsConfig = new LMSConfig();
 
-    // TODO: Rename to inputData, targetData
     /**
      * Input data.
      */
-    private INDArray inputs;
+    private INDArray inputData;
 
     /**
      * Target data.
      */
-    private INDArray targets;
+    private INDArray targetData;
 
     /**
      * Dataset object used by dl4j.
      */
     private DataSet dataset;
+
+    /**
+     * DL4J  Multi-layer network.
+     */
+    private transient MultiLayerNetwork mln;
 
     /**
      * Construct a new LMS Network.
@@ -70,57 +88,116 @@ public class LMSNetwork extends FeedForward implements Trainable {
         super(network, new int[]{numInputNeurons, numOutputNeurons}, initialPosition);
         setUseNeuronArrays(true);
         setLabel("LMS Network");
-        inputs = Nd4j.zeros(5, numInputNeurons);
-        targets = Nd4j.zeros(5, numOutputNeurons);
-        dataset = new org.nd4j.linalg.dataset.DataSet(inputs, targets);
-
-    }
-
-    @Override
-    public TrainingSet getTrainingSet() {
-        return trainingSet;
+        inputData = Nd4j.zeros(5, numInputNeurons);
+        targetData = Nd4j.zeros(5, numOutputNeurons);
+        dataset = new org.nd4j.linalg.dataset.DataSet(inputData, targetData);
+        initNetwork();
     }
 
     @Override
     public void initNetwork() {
-    }
+
+        MultiLayerConfiguration config = new NeuralNetConfiguration.Builder()
+                // Using stochastic gradient decent
+                .updater(new Sgd(lmsConfig.learningRate))
+                .seed(lmsConfig.seed)
+                .biasInit(lmsConfig.initalBias)
+                .miniBatch(lmsConfig.useMiniBatch)
+                .list()
+                .layer(new OutputLayer.Builder(lmsConfig.lossFunc)
+                        .nIn(getNAList().get(0).getNumNodes())
+                        .nOut(getNAList().get(1).getNumNodes())
+                        .activation(lmsConfig.actFunc)
+                        .weightInit(new UniformDistribution(0, 1)) //TODO
+                        .build())
+                .build();
+
+        // TODO: Use config file from LMSNetwork, and draw weights and biases from it as well
+        mln = new MultiLayerNetwork(config);
+        mln.init();    }
 
     @Override
     public NetworkModel getNetwork() {
         return this;
     }
 
-    public void train(MultiLayerNetwork mln, DataSet data) {
+
+    @Override
+    public TrainingSet getTrainingSet() {
+        return trainingSet;
+    }
+
+    public double getError() {
+        return mln.score();
+    }
+
+    /**
+     * Train the network
+     */
+    public void train() {
         for (int i = 0; i < 25; i++) {
-            mln.fit(data);
+            mln.fit(dataset);
             System.out.println("score:" + mln.score());
         }
+
+        // Use DL4J net to set weights
         getWeightMatrixList().get(0)
                 .setWeights(Nd4j.toFlattened(mln.getLayer(0).getParam("W")).toDoubleVector());
         // TODO: Allow setting of bias in neuron array
         //getNAList().get(1).setBias(mln.getLayer(0).getParam("b").toDoubleVector());
     }
 
-    public DataSet getDataset() {
-        return dataset;
+    public INDArray getInputData() {
+        return inputData;
     }
 
-    public INDArray getInputs() {
-        return inputs;
+    public LMSConfig getConfig() {
+        return lmsConfig;
     }
 
-    public void setInputs(INDArray inputs) {
-        this.inputs = inputs;
-        dataset = new org.nd4j.linalg.dataset.DataSet(this.inputs, targets);
+    public void setInputData(INDArray inputData) {
+        this.inputData = inputData;
+        dataset = new org.nd4j.linalg.dataset.DataSet(this.inputData, targetData);
     }
 
-    public INDArray getTargets() {
-        return targets;
+    public INDArray getTargetData() {
+        return targetData;
     }
 
-    public void setTargets(INDArray targets) {
-        this.targets = targets;
-        dataset = new org.nd4j.linalg.dataset.DataSet(inputs, this.targets);
+    public void setTargetData(INDArray targetData) {
+        this.targetData = targetData;
+        dataset = new org.nd4j.linalg.dataset.DataSet(inputData, this.targetData);
+    }
+
+    /**
+     * Configuration object.
+     */
+    private class LMSConfig implements EditableObject {
+
+        @UserParameter(label = "Loss Function", order = 10)
+        private LossFunctions.LossFunction lossFunc = LossFunctions.LossFunction.MSE;
+
+        @UserParameter(label = "Activation Function", order = 20)
+        private Activation actFunc = Activation.SIGMOID;
+
+        @UserParameter(label = "Minibatch", order = 30)
+        private boolean useMiniBatch = true;
+
+        @UserParameter(label = "Learning Rate", minimumValue = 0, increment = .01, order = 40)
+        private double learningRate = .2;
+
+        @UserParameter(label = "Seed", minimumValue = 1, increment = 1, order = 50)
+        private int seed = 1;
+
+        @UserParameter(label = "Initial Bias", minimumValue = 0.0, increment = .1, order = 60)
+        private double initalBias = 0.0;
+
+        @Override
+        public String getName() {
+            return "Optimizer Settings";
+        }
+
+        // Somehow deal with DL4JInvalidConfigException here
     }
 
 

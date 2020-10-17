@@ -200,8 +200,8 @@ public class WorkspaceActionManager {
                 createComponentFactoryAction(workspace, "Data Table", "menu_icons/Table.png"),
                 createComponentFactoryAction(workspace, "Odor World", "menu_icons/SwissIcon.png"),
                 createComponentFactoryAction(workspace, "3D World", "menu_icons/World.png"),
-                createComponentFactoryAction(workspace, "Pixel Display", "menu_icons/PaintView.png"),
-                createComponentFactoryAction(workspace, "Image World", "menu_icons/photo.png"),
+                createComponentFactoryAction(workspace, "Pixel Producer", "menu_icons/photo.png"),
+                createComponentFactoryAction(workspace, "Pixel Consumer", "menu_icons/PaintView.png"),
                 createComponentFactoryAction(workspace, "Text Display", "menu_icons/Text.png"),
                 createComponentFactoryAction(workspace, "Text Reader", "menu_icons/Text.png"));
                 //createComponentFactoryAction(workspace, "Device Interaction", "Text.png"));

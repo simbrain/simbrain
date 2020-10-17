@@ -266,7 +266,10 @@ public class ImageWorldDesktopPanel extends JPanel {
         JButton setColorButton = new JButton();
         JPanel colorIndicator = new JPanel();
         colorIndicator.setPreferredSize(new Dimension(20,20));
-        colorIndicator.setBackground(((PixelProducer)world).getPenColor());
+
+        if (world instanceof PixelProducer) {
+            colorIndicator.setBackground(((PixelProducer)world).getPenColor());
+        }
         setColorButton.add(colorIndicator);
         setColorButton.setToolTipText("Pen Color");
         setColorButton.addActionListener(e -> {

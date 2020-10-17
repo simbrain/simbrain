@@ -77,10 +77,10 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Text Reader", () -> new ReaderComponent(""));
         putGuiComponentFactory(ReaderComponent.class, ReaderComponentDesktopGui::new);
 
-        putWorkspaceComponentFactory("Image World", PixelProducerComponent::new);
+        putWorkspaceComponentFactory("Pixel Producer", PixelProducerComponent::new);
         putGuiComponentFactory(PixelProducerComponent.class, PixelProducerDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Pixel Display", PixelConsumerComponent::new);
+        putWorkspaceComponentFactory("Pixel Consumer", PixelConsumerComponent::new);
         putGuiComponentFactory(PixelConsumerComponent.class, PixelConsumerDesktopComponent::new);
 
         putWorkspaceComponentFactory("Device Interaction", () -> new DeviceInteractionComponent(""));

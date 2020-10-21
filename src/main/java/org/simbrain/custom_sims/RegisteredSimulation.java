@@ -41,7 +41,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActiv
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.custom_sims.simulations.sorn.SORN;
 import org.simbrain.custom_sims.simulations.test.*;
-import org.simbrain.custom_sims.simulations.xor5;
+import org.simbrain.custom_sims.simulations.xor;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -106,7 +106,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new EvolvePursuer());
         REGISTERED_SIMS.add(new SORN());
         REGISTERED_SIMS.add(new EvolveAutoEncoder(null));
-        REGISTERED_SIMS.add(new xor5(null));
+        REGISTERED_SIMS.add(new xor(null));
         REGISTERED_SIMS.add(new EvolveMouse(null));
         // REsGISTERED_SIMS.add(new MpfsSOM());
 

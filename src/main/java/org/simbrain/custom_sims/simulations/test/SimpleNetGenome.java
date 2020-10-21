@@ -4,11 +4,11 @@ import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.util.geneticalgorithm.Genome;
-import org.simbrain.util.geneticalgorithm.numerical.DoubleChromosome;
-import org.simbrain.util.geneticalgorithm.numerical.DoubleGene;
-import org.simbrain.util.geneticalgorithm.numerical.IntegerChromosome;
-import org.simbrain.util.geneticalgorithm.numerical.IntegerGene;
+import org.simbrain.util.geneticalgorithms.Genome;
+import org.simbrain.util.geneticalgorithms.numerical.DoubleChromosome;
+import org.simbrain.util.geneticalgorithms.numerical.DoubleGene;
+import org.simbrain.util.geneticalgorithms.numerical.IntegerChromosome;
+import org.simbrain.util.geneticalgorithms.numerical.IntegerGene;
 
 /**
  * Represent a network using integers to determine number and type

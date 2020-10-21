@@ -1,7 +1,7 @@
 package org.simbrain.util.neat;
 
 import org.simbrain.network.core.Synapse;
-import org.simbrain.util.geneticalgorithm.Chromosome;
+import org.simbrain.util.geneticalgorithms.Chromosome;
 import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.*;

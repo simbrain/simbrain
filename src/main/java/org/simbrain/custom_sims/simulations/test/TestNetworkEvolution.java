@@ -2,9 +2,8 @@ package org.simbrain.custom_sims.simulations.test;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.geneticalgorithm.Agent;
-import org.simbrain.util.geneticalgorithm.Population;
+import org.simbrain.util.geneticalgorithms.Agent;
+import org.simbrain.util.geneticalgorithms.Population;
 
 import static org.simbrain.network.gui.NetworkDialogsKt.showNetwork;
 

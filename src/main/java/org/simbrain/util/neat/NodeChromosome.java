@@ -1,8 +1,7 @@
 package org.simbrain.util.neat;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.geneticalgorithm.Chromosome;
-import org.simbrain.util.math.SimbrainRandomizer;
+import org.simbrain.util.geneticalgorithms.Chromosome;
 
 import java.util.*;
 import java.util.function.Function;

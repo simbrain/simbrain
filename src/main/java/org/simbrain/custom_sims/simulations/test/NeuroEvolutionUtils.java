@@ -1,9 +1,8 @@
 package org.simbrain.custom_sims.simulations.test;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.geneticalgorithm.numerical.DoubleChromosome;
-import org.simbrain.util.geneticalgorithm.numerical.IntegerChromosome;
+import org.simbrain.util.geneticalgorithms.numerical.DoubleChromosome;
+import org.simbrain.util.geneticalgorithms.numerical.IntegerChromosome;
 
 /**
  * Planning to develop utilities here for getting a neuron

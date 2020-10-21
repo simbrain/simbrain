@@ -3,8 +3,8 @@ package org.simbrain.util.neat.testsims;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.util.geneticalgorithm.Agent;
-import org.simbrain.util.geneticalgorithm.Population;
+import org.simbrain.util.geneticalgorithms.Agent;
+import org.simbrain.util.geneticalgorithms.Population;
 import org.simbrain.util.neat.NetworkGenome;
 
 /**

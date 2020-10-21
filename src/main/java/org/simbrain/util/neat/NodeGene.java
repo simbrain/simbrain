@@ -3,8 +3,7 @@ package org.simbrain.util.neat;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.util.geneticalgorithm.Gene;
+import org.simbrain.util.geneticalgorithms.Gene;
 import org.simbrain.util.math.SimbrainRandomizer;
 
 /**

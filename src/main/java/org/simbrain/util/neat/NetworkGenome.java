@@ -5,7 +5,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.util.geneticalgorithm.Genome;
+import org.simbrain.util.geneticalgorithms.Genome;
 import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.*;

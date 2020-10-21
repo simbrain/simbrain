@@ -8,9 +8,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.neuron_update_rules.*;
-import org.simbrain.util.geneticalgorithm.Agent;
-import org.simbrain.util.geneticalgorithm.Population;
-import org.simbrain.util.math.SimbrainRandomizer;
+import org.simbrain.util.geneticalgorithms.Agent;
+import org.simbrain.util.geneticalgorithms.Population;
 import org.simbrain.util.neat.NetworkGenome;
 import org.simbrain.util.neat.gui.ProgressWindow;
 import org.simbrain.workspace.Workspace;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class EvolvePursuer extends RegisteredSimulation {
 

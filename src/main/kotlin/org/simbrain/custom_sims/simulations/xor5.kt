@@ -73,7 +73,7 @@ class xor5(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
             }
 
-            val connectionChromosome = chromosome<Synapse, ConnectionGene5>()
+            val connectionChromosome = chromosome<Synapse, ConnectionGene>()
 
             onMutate {
                 hiddenNodeChromosome.eachMutate {

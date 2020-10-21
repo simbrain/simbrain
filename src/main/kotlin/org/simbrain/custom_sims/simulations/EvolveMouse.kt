@@ -76,7 +76,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
             }
 
-            val connections = chromosome<Synapse, ConnectionGene5>()
+            val connections = chromosome<Synapse, ConnectionGene>()
 
             val sensors = chromosome(3) {
                 objectSensorGene {

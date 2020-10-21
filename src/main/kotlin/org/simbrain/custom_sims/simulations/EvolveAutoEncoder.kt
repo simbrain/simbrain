@@ -70,7 +70,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 }
             }
 
-            val connections = chromosome<Synapse, ConnectionGene5>()
+            val connections = chromosome<Synapse, ConnectionGene>()
 
             onMutate {
                 nodes.eachMutate {

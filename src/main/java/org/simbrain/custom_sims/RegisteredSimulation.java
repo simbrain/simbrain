@@ -101,9 +101,6 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new RandomizedPursuer());
         REGISTERED_SIMS.add(new PatternsOfActivity());
         REGISTERED_SIMS.add(new KuramotoOscillators());
-        REGISTERED_SIMS.add(new EvolveOdorWorldAgent());
-        REGISTERED_SIMS.add(new TestEvolution());
-        REGISTERED_SIMS.add(new EvolvePursuer());
         REGISTERED_SIMS.add(new SORN());
         REGISTERED_SIMS.add(new EvolveAutoEncoder(null));
         REGISTERED_SIMS.add(new xor(null));

@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.simbrain.util.neat.NeatUtils.assertBound;
-
 /**
  * Extends java randomizer with convenience functions to, e.g. get numbers in a range.
  * If called using the static instance, threadsafe random numbers are returned. If created
@@ -100,5 +98,17 @@ public class SimbrainRandomizer extends Random {
         int index = nextInt(list.size());
         return list.get(index);
     }
+
+    /**
+     * Check that the specified pair of value is a valid bound.
+     * @param floor Lower bound
+     * @param ceiling Upper bound
+     */
+    private void assertBound(double floor, double ceiling) {
+        if (floor > ceiling) {
+            throw new IllegalArgumentException("Floor cannot be greater than ceiling.");
+        }
+    }
+
 
 }

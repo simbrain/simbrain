@@ -10,9 +10,9 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
-import org.simbrain.util.neat.gui.ProgressWindow
 import org.simbrain.util.point
 import org.simbrain.util.sse
+import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
 import kotlin.streams.toList

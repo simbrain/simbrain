@@ -9,9 +9,9 @@ import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
-import org.simbrain.util.neat.gui.ProgressWindow
 import org.simbrain.util.nextNegate
 import org.simbrain.util.point
+import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.entities.EntityType
 import java.io.File

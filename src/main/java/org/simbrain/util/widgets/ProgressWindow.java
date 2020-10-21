@@ -1,4 +1,4 @@
-package org.simbrain.util.neat.gui;
+package org.simbrain.util.widgets;
 
 import javax.swing.*;
 import java.awt.*;

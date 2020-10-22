@@ -21,9 +21,23 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.random.Random
 
-
+/**
+ * Something with a template that can be used to produce multiple copies of itself. The smallest "atom" of a
+ * evolutionary simulation.  Describes how to make a product, or "express a phenotype". Evolutionary simulations
+ * should extend this class.
+ *
+ * Support for mutation is not provided. Genes are mutated by directly changing the template in an
+ * [EnvironmentBuilder.onMutate] function.
+ *
+ * By convention most Genes should provide a build function that returns a product.
+ */
 abstract class Gene<T> protected constructor(val template: T) : CopyableObject
 
+/**
+ * A list of genes. They are meant to be used inside of builders. Note that most of the machinery associated with
+ * chromosomes is context specific and in extension functions.  For exmaple, some extensions to this function ensure
+ * that copies of chromosomes are not changed between generations.
+ */
 class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
     @Suppress("UNCHECKED_CAST")
     override fun copy(): Chromosome<T, G> {
@@ -31,6 +45,10 @@ class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
     }
 }
 
+/**
+ * Maps genes to products or builder functions to products.  E.g. [NodeGene] to [Neuron] or supplier<OdorWorldEntity>
+ * to [OdorWorldEntity].  Think of "gene products", not the gene itself but the thing it expresses.
+ */
 class ProductMap(private val map: HashMap<Any, Any> = HashMap()) {
 
     @Suppress("UNCHECKED_CAST")
@@ -49,6 +67,9 @@ class ProductMap(private val map: HashMap<Any, Any> = HashMap()) {
 
 }
 
+/**
+ * Provides a context for [EnvironmentBuilder.onEval].  "This" in onEval will refer to an instance of this class.
+ */
 class EvaluationContext(val workspace: Workspace, val mapping: ProductMap, val evalRand: Random) {
 
     val <T, G: Gene<T>, C: Chromosome<T, G>> C.products: List<T> get() {
@@ -65,6 +86,9 @@ class EvaluationContext(val workspace: Workspace, val mapping: ProductMap, val e
 
 }
 
+/**
+ * Provides a context for [EnvironmentBuilder.onMutate].  "This" in onMutate will refer to this object.
+ */
 object MutationContext {
 
     inline fun <T, G: Gene<T>> Chromosome<T, G>.eachMutate(mutationTask: T.() -> Unit) {
@@ -77,12 +101,18 @@ object MutationContext {
 
 }
 
+/**
+ * The environment produced by [EnvironmentBuilder.build].  All it does is provide for evaluation of a fitness function.
+ */
 class Environment(val evaluationContext: EvaluationContext, private val evalFunction: EvaluationContext.() -> Double) {
 
     fun eval() = evaluationContext.evalFunction()
 
 }
 
+/**
+ * The main provider for the genetic algorithm DSL.
+ */
 class EnvironmentBuilder private constructor(
         private val chromosomeList: LinkedList<Chromosome<*, *>>,
         private val template: EnvironmentBuilder.() -> Unit,
@@ -176,6 +206,7 @@ fun environmentBuilder(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuil
 fun environmentBuilder(seed: Int, builder: EnvironmentBuilder.() -> Unit)
         = EnvironmentBuilder(seed, builder).apply(builder)
 
+// TODO: Decouple from here down and move to a separate file
 class WorkspaceBuilder {
 
     val builders = ArrayList<(Workspace) -> Unit>()

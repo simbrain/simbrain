@@ -17,7 +17,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
 import kotlin.streams.toList
 
-class xor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
+class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
     private val mainScope = MainScope()
 
@@ -159,7 +159,7 @@ class xor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
     }
 
     override fun instantiate(desktop: SimbrainDesktop?): RegisteredSimulation {
-        return xor(desktop)
+        return EvolveXor(desktop)
     }
 
 }

@@ -2,7 +2,11 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.builders.sim
 import org.simbrain.network.neuron_update_rules.DecayRule
+import org.simbrain.custom_sims.helper_classes.Simulation
 
+/**
+ * Initial work towards a Kotlin version of [Simulation].
+ */
 fun main() {
 
     val sample = sim {

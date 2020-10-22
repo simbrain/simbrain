@@ -5,7 +5,7 @@ import org.junit.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.util.activations
 
-class Genetics5Test {
+class GeneticsTest {
 
     @Test
     fun `node gene creates product specified in template`() {

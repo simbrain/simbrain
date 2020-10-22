@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.builders.network.SynapseBuilderStub
 import org.simbrain.custom_sims.builders.odorworld.ObjectSensorBuilder
 import org.simbrain.custom_sims.builders.odorworld.OdorWorldBuilder
 import org.simbrain.custom_sims.builders.odorworld.OdorWorldEntityBuilder
+import org.simbrain.custom_sims.helper_classes.Simulation
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -15,6 +16,9 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import kotlin.random.Random
 
+/**
+ * Initial work towards a Kotlin version of [Simulation].
+ */
 open class KSimulation {
 
     fun neuron(template: Neuron.() -> Unit = { }) = NeuronBuilder { apply(template) }

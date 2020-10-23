@@ -96,6 +96,7 @@ public class LMSTrainingDialog extends StandardDialog {
 
         // Main vertical box
         Box trainerPanel = Box.createVerticalBox();
+        Box buttonPanel = Box.createHorizontalBox();
 
         // Time series for error.
         LMSTrainer trainer = new LMSTrainer();
@@ -113,7 +114,7 @@ public class LMSTrainingDialog extends StandardDialog {
                 lms.initNetwork();
             });
         });
-        trainerPanel.add(prefsButton);
+        buttonPanel.add(prefsButton);
 
         // Train the network
         JButton trainButton = new JButton("Train");
@@ -125,7 +126,8 @@ public class LMSTrainingDialog extends StandardDialog {
                 dataNotInitializedException.printStackTrace();
             }
         });
-        trainerPanel.add(trainButton);
+        buttonPanel.add(trainButton);
+        trainerPanel.add(buttonPanel);
 
         // Add to tabbed pane
         tabbedPane.addTab("Train", trainerPanel);

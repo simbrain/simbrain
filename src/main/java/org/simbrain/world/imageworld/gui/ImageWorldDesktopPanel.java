@@ -150,7 +150,6 @@ public class ImageWorldDesktopPanel extends JPanel {
 
     }
 
-
     private void setupMenuBar(GenericFrame frame) {
 
         JMenuBar menuBar = new JMenuBar();
@@ -264,19 +263,12 @@ public class ImageWorldDesktopPanel extends JPanel {
 
         // Add Color Picker
         JButton setColorButton = new JButton();
-        JPanel colorIndicator = new JPanel();
-        colorIndicator.setPreferredSize(new Dimension(20,20));
-
-        if (world instanceof PixelProducer) {
-            colorIndicator.setBackground(((PixelProducer)world).getPenColor());
-        }
-        setColorButton.add(colorIndicator);
+        setColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
         setColorButton.setToolTipText("Pen Color");
         setColorButton.addActionListener(e -> {
             Color newColor = JColorChooser.showDialog(this, "Choose Color",
                     ((PixelProducer)world).getPenColor());
             ((PixelProducer)world).setPenColor(newColor);
-            colorIndicator.setBackground(newColor);
         });
         sourceToolbar.add(setColorButton);
 

@@ -20,6 +20,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.random.Random
+import kotlin.streams.toList
 
 /**
  * Something with a template that can be used to produce multiple copies of itself. The smallest "atom" of a
@@ -200,6 +201,8 @@ class EnvironmentBuilder private constructor(
     }
 
 }
+
+data class BuilderFitnessPair(val environmentBuilder: EnvironmentBuilder, val fitness: Double)
 
 fun environmentBuilder(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuilder(builder).apply(builder)
 
@@ -430,4 +433,67 @@ class WorkspaceBuilder {
         }
     }
 
+}
+
+class Evaluator(environmentBuilder: EnvironmentBuilder) {
+
+    var populationSize: Int = 100
+    var eliminationRatio: Double = 0.5
+    var optimize: Optimize = Optimize.MAXIMIZE_FITNESS
+
+    private val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(populationSize).toList()
+
+    lateinit var stoppingCondition: RunUntilContext.() -> Boolean
+
+    fun runUntil(stoppingCondition: RunUntilContext.() -> Boolean) {
+        this.stoppingCondition = stoppingCondition
+    }
+
+    class RunUntilContext(val generation: Int, val fitness: Double)
+
+    enum class Optimize {
+        MAXIMIZE_FITNESS,
+        MINIMIZE_FITNESS
+    }
+
+    fun start(): Sequence<List<BuilderFitnessPair>> {
+        return sequence {
+            var generation = 0
+            var next = population
+            do {
+                val current = next.parallelStream().map {
+                    val build = it.build()
+                    val score = build.eval()
+                    BuilderFitnessPair(it, score)
+                }.toList().sortedBy { if (optimize == Optimize.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
+
+                val currentFitness = if (optimize == Optimize.MAXIMIZE_FITNESS) {
+                    current.maxOf { it.fitness }
+                } else {
+                    current.minOf { it.fitness }
+                }
+
+                val survivors = current.take((eliminationRatio * current.size).toInt())
+
+                yield(current)
+
+                next = survivors.map { it.environmentBuilder } + survivors.uniformSample()
+                        .take(populationSize - survivors.size)
+                        .map { it.environmentBuilder.copy().apply { mutate() } }
+                        .toList()
+
+                generation++
+            } while (!stoppingCondition(RunUntilContext(generation, currentFitness)))
+        }
+    }
+}
+
+fun evaluator(environmentBuilder: EnvironmentBuilder, template: Evaluator.() -> Unit) =
+        Evaluator(environmentBuilder).apply(template)
+
+fun List<BuilderFitnessPair>.uniformSample() = sequence {
+    while(true) {
+        val index = (Math.random() * size).toInt()
+        yield(this@uniformSample[index])
+    }
 }

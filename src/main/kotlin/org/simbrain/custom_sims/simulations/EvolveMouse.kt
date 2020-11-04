@@ -15,7 +15,6 @@ import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.entities.EntityType
 import java.io.File
-import kotlin.streams.toList
 
 class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
@@ -34,9 +33,9 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             val progressWindow = ProgressWindow(200)
 
             launch(Dispatchers.Default) {
-                val generations = evolve { generation, result ->
+                val generations = evolution.start().onEachIndexed { generation, result ->
                     progressWindow.progressBar.value = generation
-                    progressWindow.fitnessScore.text = "Fitness: ${result[0].second.format(2)}"
+                    progressWindow.fitnessScore.text = "Fitness: ${result[0].fitness.format(2)}"
                 }
                 val (best, _) = generations.last().first()
 
@@ -55,7 +54,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
     }
 
-    fun evolve(peek: (generation: Int, result: List<Pair<EnvironmentBuilder, Double>>) -> Unit): Sequence<List<Pair<EnvironmentBuilder, Double>>> {
+    val evolution: Evaluator get() {
         val environmentBuilder = environmentBuilder(1) {
 
             val inputs = chromosome(3) {
@@ -200,21 +199,11 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
         }
 
-        val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(100).toList()
-
-        return sequence {
-            var next = population
-            while (true) {
-                val current = next.parallelStream().map {
-                    val build = it.build()
-                    val score = build.eval()
-                    Pair(it, score)
-                }.toList().sortedBy { -it.second }
-                val survivors = current.take(current.size / 2)
-                next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
-                yield(current)
-            }
-        }.onEachIndexed(peek).take(200).takeWhile { it[0].second < 50 }
+        return evaluator(environmentBuilder) {
+            populationSize = 100
+            eliminationRatio = 0.5
+            runUntil { generation == 200 || fitness > 50 }
+        }
     }
 
     override fun instantiate(desktop: SimbrainDesktop?): RegisteredSimulation {

@@ -34,9 +34,10 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
             val progressWindow = ProgressWindow(1000)
 
             launch(Dispatchers.Default) {
-                val generations = evolve { generation, result ->
+
+                val generations = evolution.start().onEachIndexed { generation, result ->
                     progressWindow.progressBar.value = generation
-                    progressWindow.fitnessScore.text = "Error: ${result[0].second.format(2)}"
+                    progressWindow.fitnessScore.text = "Error: ${result[0].fitness.format(2)}"
                 }
                 val (best, _) = generations.last().first()
 
@@ -52,7 +53,8 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
 
     }
 
-    fun evolve(peek: (generation: Int, result: List<Pair<EnvironmentBuilder, Double>>) -> Unit): Sequence<List<Pair<EnvironmentBuilder, Double>>> {
+    val evolution: Evaluator get() {
+
         val environmentBuilder = environmentBuilder {
 
             val inputs = chromosome(8) { index ->
@@ -79,7 +81,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                     }
                 }
                 connections.eachMutate {
-                    strength += (Random().nextDouble() - 0.5 ) * 0.2
+                    strength += (Random().nextDouble() - 0.5) * 0.2
                 }
                 val (source, target) = if (Random().nextBoolean()) {
                     val source = (inputs.genes + nodes.genes).shuffled().first()
@@ -91,7 +93,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                     Pair(source, target)
                 }
                 connections.genes.add(connectionGene(source, target) {
-                    strength = (Random().nextDouble() - 0.5 ) * 0.2
+                    strength = (Random().nextDouble() - 0.5) * 0.2
                 })
             }
 
@@ -140,21 +142,13 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
 
         }
 
-        val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(100).toList()
+        return evaluator(environmentBuilder) {
+            populationSize = 100
+            eliminationRatio = 0.5
+            optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
+            runUntil { generation == 500 || fitness < .2 }
+        }
 
-        return sequence {
-            var next = population
-            while (true) {
-                val current = next.parallelStream().map {
-                    val build = it.build()
-                    val score = build.eval()
-                    Pair(it, score)
-                }.toList().sortedBy { it.second }
-                val survivors = current.take(current.size / 2)
-                next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
-                yield(current)
-            }
-        }.onEachIndexed(peek).take(1000).takeWhile { it[0].second > 0.2 }
     }
 
     override fun instantiate(desktop: SimbrainDesktop?): RegisteredSimulation {

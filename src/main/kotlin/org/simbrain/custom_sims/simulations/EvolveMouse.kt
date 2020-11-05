@@ -33,6 +33,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             val progressWindow = ProgressWindow(200)
 
             launch(Dispatchers.Default) {
+
                 val generations = evolution.start().onEachIndexed { generation, result ->
                     progressWindow.progressBar.value = generation
                     progressWindow.fitnessScore.text = "Fitness: ${result[0].fitness.format(2)}"

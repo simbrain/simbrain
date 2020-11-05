@@ -34,9 +34,10 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             val progressWindow = ProgressWindow(1000)
 
             launch(Dispatchers.Default) {
-                val generations = evolve { generation, result ->
+
+                val generations = evolution.start().onEachIndexed { generation, result ->
                     progressWindow.progressBar.value = generation
-                    progressWindow.fitnessScore.text = "Error: ${result[0].second.format(10)}"
+                    progressWindow.fitnessScore.text = "Error: ${result[0].fitness.format(10)}"
                 }
                 val (best, _) = generations.last().first()
 
@@ -52,8 +53,7 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
     }
 
-    fun evolve(peek: (generation: Int, result: List<Pair<EnvironmentBuilder, Double>>) -> Unit):
-            Sequence<List<Pair<EnvironmentBuilder, Double>>> {
+    val evolution: Evaluator get() {
 
         val environmentBuilder = environmentBuilder {
 
@@ -141,21 +141,13 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
         }
 
-        // TODO: Move to genetics
-        val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(100).toList()
-        return sequence {
-            var next = population
-            while (true) {
-                val current = next.parallelStream().map {
-                    val build = it.build()
-                    val score = build.eval()
-                    Pair(it, score)
-                }.toList().sortedBy { it.second }
-                val survivors = current.take(current.size / 2)
-                next = survivors.map { it.first } + survivors.parallelStream().map { it.first.copy().apply { mutate() } }.toList()
-                yield(current)
-            }
-        }.onEachIndexed(peek).take(1000).takeWhile { it[0].second > 0.01 }
+        return evaluator(environmentBuilder) {
+            populationSize = 100
+            eliminationRatio = 0.5
+            optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
+            runUntil { generation == 200 || fitness < .1 }
+        }
+
     }
 
     override fun instantiate(desktop: SimbrainDesktop?): RegisteredSimulation {

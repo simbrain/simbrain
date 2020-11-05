@@ -24,7 +24,7 @@ import kotlin.streams.toList
 
 /**
  * Something with a template that can be used to produce multiple copies of itself. The smallest "atom" of a
- * evolutionary simulation.  Describes how to make a product, or "express a phenotype". Evolutionary simulations
+ * evolutionary simulation. Describes how to make a product, or "express a phenotype". Evolutionary simulations
  * should extend this class.
  *
  * Support for mutation is not provided. Genes are mutated by directly changing the template in an
@@ -103,7 +103,7 @@ object MutationContext {
 }
 
 /**
- * The environment produced by [EnvironmentBuilder.build].  All it does is provide for evaluation of a fitness function.
+ * The environment produced by [EnvironmentBuilder.build]. All it does is provide for evaluation of a fitness function.
  */
 class Environment(val evaluationContext: EvaluationContext, private val evalFunction: EvaluationContext.() -> Double) {
 
@@ -435,27 +435,62 @@ class WorkspaceBuilder {
 
 }
 
+/**
+ * Runs the evolutionary algorithm.
+ */
 class Evaluator(environmentBuilder: EnvironmentBuilder) {
 
+    /**
+     * Number of agents in a population. An agent exists in an environment, and so the objects created for each agent
+     * will often be environments.
+     */
     var populationSize: Int = 100
+
+    /**
+     * How many agents to eliminate each generation.
+     */
     var eliminationRatio: Double = 0.5
-    var optimize: Optimize = Optimize.MAXIMIZE_FITNESS
 
-    private val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(populationSize).toList()
+    /**
+     * What optimization method the evolutionary algorithm uses. Usuaally maximize fitness but
+     * sometimes minimize errors.
+     */
+    var optimizationMethod: OptimizationMethod = OptimizationMethod.MAXIMIZE_FITNESS
 
-    lateinit var stoppingCondition: RunUntilContext.() -> Boolean
-
-    fun runUntil(stoppingCondition: RunUntilContext.() -> Boolean) {
-        this.stoppingCondition = stoppingCondition
-    }
-
-    class RunUntilContext(val generation: Int, val fitness: Double)
-
-    enum class Optimize {
+    enum class OptimizationMethod {
         MAXIMIZE_FITNESS,
         MINIMIZE_FITNESS
     }
 
+    /**
+     * A lazy list of agents, or more specifically environments containing agents.
+     */
+    private val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(populationSize).toList()
+
+    /**
+     * Condition in which to stop the evolution.
+     */
+    private lateinit var stoppingCondition: RunUntilContext.() -> Boolean
+
+    /**
+     * Set the stopping condition
+     */
+    fun runUntil(stoppingCondition: RunUntilContext.() -> Boolean) {
+        this.stoppingCondition = stoppingCondition
+    }
+
+    /**
+     * Allows you to set stopping condition in a convenient way.
+     * Allows you to use a curly braced argument with several components.
+     * E.g. runUntil { generation == 200 || fitness > 50 }
+     */
+    class RunUntilContext(val generation: Int, val fitness: Double)
+
+    /**
+     * "Runs" the evolutionary algorithm.  Sequence is a lazy list. When you call .last
+     * the whole sequence is created, by sequentially creating successive generations, so that at any time only the
+     * last generation and the current one need to be in memory.
+     */
     fun start(): Sequence<List<BuilderFitnessPair>> {
         return sequence {
             var generation = 0
@@ -465,9 +500,9 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
                     val build = it.build()
                     val score = build.eval()
                     BuilderFitnessPair(it, score)
-                }.toList().sortedBy { if (optimize == Optimize.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
+                }.toList().sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
 
-                val currentFitness = if (optimize == Optimize.MAXIMIZE_FITNESS) {
+                val currentFitness = if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) {
                     current.maxOf { it.fitness }
                 } else {
                     current.minOf { it.fitness }
@@ -488,9 +523,16 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
     }
 }
 
+/**
+ * Create the evaluator.
+ */
 fun evaluator(environmentBuilder: EnvironmentBuilder, template: Evaluator.() -> Unit) =
         Evaluator(environmentBuilder).apply(template)
 
+/**
+ * Helper function to uniformly sample builder fitness papers.  Used to choose survivors
+ * for replenishing a population.
+ */
 fun List<BuilderFitnessPair>.uniformSample() = sequence {
     while(true) {
         val index = (Math.random() * size).toInt()

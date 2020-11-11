@@ -39,7 +39,9 @@ fun main() {
 
         onBuild {
             intChromosome.genes.forEach{
-                it.build()
+                it.build().also { product ->
+                    productMapping[it] = product
+                }
             }
         }
 

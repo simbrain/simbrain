@@ -1,14 +1,13 @@
-SIMBRAIN 3.04
+SIMBRAIN 3.05
 
 RUNNING SIMBRAIN
 
-To run double click Simbrain.jar.   
+Install and run as with any modern application.
 
-(Linux users: This does not work on all distributions of linux.  An alternative is to open a terminal, navigate to where Simbrain.jar is located, and then enter the command "java -jar Simbrain.jar").
+Requires java 1.8 or later.
 
 For more info see http://www.simbrain.net
 
-You will need to have java 1.8 or later installed: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 GETTING STARTED
 

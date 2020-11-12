@@ -37,34 +37,24 @@ import java.util.prefs.Preferences;
  * This is 0 for numbers and an empty string for string.
  *
  * @author Jeff Yoshimi
- *
  */
 public class SimbrainPreferences {
 
-    /** The main preference object. */
+    /**
+     * The main preference object.
+     */
     private static final Preferences SIMBRAIN_PREFERENCES = Preferences
             .userRoot().node("/org/simbrain");
 
-    /** Mapping from property names to default values. */
+    /**
+     * Mapping from property names to default values.
+     */
     private static final HashMap<String, Object> DEFAULT_MAP = new HashMap<String, Object>();
 
-    /** System specific file separator. */
-    private static final String FS = System.getProperty("file.separator");
-
-    /** Initialize default map */
+    /*
+       Initialize default map.
+     */
     static {
-        DEFAULT_MAP.put("workspaceBaseDirectory", "." + FS
-                + "simulations");
-        DEFAULT_MAP.put("workspaceSimulationDirectory", "." + FS
-                + "simulations" + FS + "workspaces");
-        DEFAULT_MAP.put("workspaceNetworkDirectory", "." + FS + "simulations"
-                + FS + "networks");
-        DEFAULT_MAP.put("workspaceOdorWorldDirectory", "." + FS + "simulations"
-                + FS + "worlds");
-        DEFAULT_MAP.put("workspaceTableDirectory", "." + FS + "simulations"
-                + FS + "tables");
-        DEFAULT_MAP.put("workspaceScriptDirectory", "." + FS + "scripts"
-                + FS + "scriptMenu");
         DEFAULT_MAP.put("networkBackgroundColor", Color.WHITE.getRGB());
         DEFAULT_MAP.put("networkLineColor", Color.BLACK.getRGB());
         DEFAULT_MAP.put("networkHotNodeColor",
@@ -80,8 +70,6 @@ public class SimbrainPreferences {
         DEFAULT_MAP.put("networkNudgeAmount", 2d);
         DEFAULT_MAP.put("networkSynapseVisibilityThreshold", 200);
         DEFAULT_MAP.put("networkWandRadius", 40);
-        DEFAULT_MAP.put("networkTableDirectory", "." + FS + "simulations" + FS
-                + "tables");
         DEFAULT_MAP.put("projectorTolerance", .1);
         DEFAULT_MAP.put("projectorSammonPerturbationAmount", .1);
         DEFAULT_MAP.put("projectorSammonEpsilon", .5);
@@ -117,7 +105,7 @@ public class SimbrainPreferences {
      * Set a property whose value is a String.
      *
      * @param property the property name
-     * @param val the string value
+     * @param val      the string value
      */
     public static void putString(String property, String val) {
         SIMBRAIN_PREFERENCES.put(property, val);
@@ -129,7 +117,7 @@ public class SimbrainPreferences {
      * @param property the property name
      * @return the retrieved value
      * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     *                                   not found
      */
     public static String getString(String property)
             throws PropertyNotFoundException {
@@ -150,7 +138,7 @@ public class SimbrainPreferences {
      * Set a property whose value is a double.
      *
      * @param property the property name
-     * @param val the double value
+     * @param val      the double value
      */
     public static void putDouble(String property, double val) {
         SIMBRAIN_PREFERENCES.putDouble(property, val);
@@ -162,7 +150,7 @@ public class SimbrainPreferences {
      * @param property the property name
      * @return the retrieved value
      * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     *                                   not found
      */
     public static double getDouble(String property)
             throws PropertyNotFoundException {
@@ -178,17 +166,17 @@ public class SimbrainPreferences {
             return value;
         }
     }
-    
+
     /**
      * Set a property whose value is a boolean.
      *
      * @param property the property name
-     * @param val the boolean value
+     * @param val      the boolean value
      */
     public static void putBoolean(String property, boolean val) {
         SIMBRAIN_PREFERENCES.putBoolean(property, val);
     }
-    
+
 
     /**
      * Retrieve a property whose value is a boolean.
@@ -196,7 +184,7 @@ public class SimbrainPreferences {
      * @param property the property name
      * @return the retrieved value
      * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     *                                   not found
      */
     public static boolean getBoolean(String property)
             throws PropertyNotFoundException {
@@ -217,7 +205,7 @@ public class SimbrainPreferences {
      * Set a property whose value is a integer.
      *
      * @param property the property name
-     * @param val the int value
+     * @param val      the int value
      */
     public static void putInt(String property, int val) {
         SIMBRAIN_PREFERENCES.putInt(property, val);
@@ -229,7 +217,7 @@ public class SimbrainPreferences {
      * @param property the property name
      * @return the retrieved value
      * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     *                                   not found
      */
     public static int getInt(String property) throws PropertyNotFoundException {
         Integer defVal = (Integer) DEFAULT_MAP.get(property);
@@ -249,7 +237,7 @@ public class SimbrainPreferences {
      * Set a property whose value is a float.
      *
      * @param property the property name
-     * @param val the float value
+     * @param val      the float value
      */
     public static void putFloat(String property, float val) {
         SIMBRAIN_PREFERENCES.putFloat(property, val);
@@ -261,7 +249,7 @@ public class SimbrainPreferences {
      * @param property the property name
      * @return the retrieved value
      * @throws PropertyNotFoundException exception thrown when the property is
-     *             not found
+     *                                   not found
      */
     public static float getFloat(String property)
             throws PropertyNotFoundException {

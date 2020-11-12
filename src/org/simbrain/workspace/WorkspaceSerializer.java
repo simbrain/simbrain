@@ -36,6 +36,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.gui.GuiComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
@@ -219,10 +220,10 @@ public class WorkspaceSerializer {
                 // This will cause a desktop component (GuiComponent) to be
                 // created
                 workspace.addWorkspaceComponent(wc);
+                XStream xstream = Utils.getSimbrainXStream();
 
                 if (archivedComponent.getDesktopComponent() != null) {
-                    Rectangle bounds = (Rectangle) new XStream(new DomDriver())
-                            .fromXML(new ByteArrayInputStream(entries
+                    Rectangle bounds = (Rectangle) xstream.fromXML(new ByteArrayInputStream(entries
                                     .get(archivedComponent
                                             .getDesktopComponent().getUri())));
                     GuiComponent<?> desktopComponent = desktop

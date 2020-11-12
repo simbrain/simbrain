@@ -63,15 +63,6 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
     /** Whether to initially display the update rule panel. */
     private static boolean DEFAULT_DISPLAY_UPDATE_RULE_PANEL = true;
 
-    /** Static initializer */
-    static {
-        Properties properties = Utils.getSimbrainProperties();
-        if (properties.containsKey("useNativeFileChooser")) {
-            DEFAULT_DISPLAY_UPDATE_RULE_PANEL = Boolean.parseBoolean(properties
-                .getProperty("initializeNeuronDialogToExpandedState"));
-        }
-    }
-
     /**
      * Creates a neuron property panel with a default display state.
      *
@@ -110,9 +101,6 @@ public class NeuronPropertiesPanel extends JPanel implements EditablePanel {
         return cnip;
     }
 
-    /**
-     * {@link #createNeuronPropertiesPanel(List, Window, boolean, boolean)}
-     */
     private NeuronPropertiesPanel(final List<Neuron> neuronList,
         final Window parent, final boolean displayUpdateRuleProperties,
         final boolean displayID) {

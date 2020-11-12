@@ -1,6 +1,6 @@
 SIMULATIONS DIRECTORY README
 
-This directory contains simulation files of various kinds.   (If you are downloading from svn then some of these folders will be incomplete).
+This directory contains simulation files of various kinds.
 
 - The workspaces directory contains full workspaces as .zip files.
 

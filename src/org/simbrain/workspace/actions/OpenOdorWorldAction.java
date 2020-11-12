@@ -31,6 +31,9 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceSerializer;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
+import static org.simbrain.util.Utils.FS;
+import static org.simbrain.util.Utils.USER_DIR;
+
 /**
  * Open an odor world in current workspace. //TODO: Use generic!
  */
@@ -51,13 +54,7 @@ public final class OpenOdorWorldAction extends WorkspaceAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        String defaultDirectory = ".";
-        try {
-            defaultDirectory = SimbrainPreferences
-            .getString("workspaceOdorWorldDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
+        String defaultDirectory = USER_DIR + FS + "simulations" + FS + "worlds";
         SFileChooser chooser = new SFileChooser(defaultDirectory,
                 "xml file", "xml");
         File theFile = chooser.showOpenDialog();

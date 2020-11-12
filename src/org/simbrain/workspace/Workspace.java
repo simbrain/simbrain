@@ -21,6 +21,8 @@ package org.simbrain.workspace;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,9 +37,13 @@ import java.util.concurrent.CountDownLatch;
 import org.apache.log4j.Logger;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.updater.TaskSynchronizationManager;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.WorkspaceUpdater;
+
+import static org.simbrain.util.Utils.FS;
+import static org.simbrain.util.Utils.USER_DIR;
 
 /**
  * A collection of components which interact via couplings. Neural networks,
@@ -426,21 +432,7 @@ public class Workspace {
      * @return the currentDirectory
      */
     public String getCurrentDirectory() {
-        try {
-            return SimbrainPreferences
-                    .getString("workspaceSimulationDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-            return ".";
-        }
-    }
-
-    /**
-     * @param currentDirectory the currentDirectory to set
-     */
-    public void setCurrentDirectory(final String currentDirectory) {
-        SimbrainPreferences.putString("workspaceSimulationDirectory",
-                currentDirectory);
+        return USER_DIR + FS + "simulations" + FS + "workspaces";
     }
 
     /**

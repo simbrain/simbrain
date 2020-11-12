@@ -46,6 +46,9 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+import static org.simbrain.util.Utils.FS;
+import static org.simbrain.util.Utils.USER_DIR;
+
 /**
  * A gui view on a {@link org.simbrain.workspace.WorkspaceComponent}.
  *
@@ -53,28 +56,40 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel {
 
-    /** serial version UID. */
+    /**
+     * serial version UID.
+     */
     private static final long serialVersionUID = 1L;
 
-    /** Reference to workspace component. */
+    /**
+     * Reference to workspace component.
+     */
     private E workspaceComponent;
 
-    /** File Chooser. */
+    /**
+     * File Chooser.
+     */
     private final SFileChooser chooser;
 
-    /** Reference to parent frame. */
+    /**
+     * Reference to parent frame.
+     */
     private GenericFrame parentFrame;
 
-    /** Log4j logger. */
+    /**
+     * Log4j logger.
+     */
     private Logger logger = Logger.getLogger(GuiComponent.class);
 
-    /** Reference to parent desktop. */
+    /**
+     * Reference to parent desktop.
+     */
     private SimbrainDesktop desktop;
 
     /**
      * Construct a workspace component.
      *
-     * @param frame the parent frame.
+     * @param frame              the parent frame.
      * @param workspaceComponent the component to wrap.
      */
     public GuiComponent(final GenericFrame frame, final E workspaceComponent) {
@@ -123,7 +138,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
 
         logger.trace(this.getClass().getCanonicalName() + " created");
     }
-    
+
 
     /**
      * If any initialization is needed after adding this component to workspace.
@@ -144,11 +159,11 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         }
         closing();
         workspaceComponent.close();
-        getDesktop().unregisterComponent(this);        
+        getDesktop().unregisterComponent(this);
     }
 
     /**
-     * Perform cleanup after closing. 
+     * Perform cleanup after closing.
      * TODO: Rename to guiClosing since workspace has its own
      */
     protected abstract void closing();
@@ -160,8 +175,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * in the workspace component.
      */
     protected void update() {
-        repaint(); // TODO: Is this repaint needed here? Should only be in
-                   // subclasses.
+        repaint(); // TODO: Is this repaint needed here? Should only be in subclasses.
     }
 
     /**
@@ -191,8 +205,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                                 SFileChooser.getExtension(theFile));
                 workspace.addWorkspaceComponent(workspaceComponent);
                 workspaceComponent.setCurrentFile(theFile);
-                setDefaultDirectory(workspaceComponent
-                        .getClass(), theFile.getParentFile().getAbsolutePath());
                 SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
                 GuiComponent desktopComponent = desktop
                         .getDesktopComponent(workspaceComponent);
@@ -232,10 +244,6 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
                 throw new RuntimeException(e);
             }
 
-            // workspaceComponent.setCurrentDirectory(theFile.getParentFile()
-            // .getAbsolutePath());
-            setDefaultDirectory(workspaceComponent
-                    .getClass(), theFile.getParentFile().getAbsolutePath());
             workspaceComponent.setName(theFile.getName());
             getParentFrame().setTitle(workspaceComponent.getName());
         }
@@ -275,12 +283,12 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * Creates a new desktop component from the provided stream.
      *
      * @param component the component to create the desktop component for.
-     * @param istream the inputstream containing the serialized data.
-     * @param name the name of the desktop component.
+     * @param istream   the inputstream containing the serialized data.
+     * @param name      the name of the desktop component.
      * @return a new component.
      */
     public static GuiComponent<?> open(final WorkspaceComponent component,
-            final InputStream istream, final String name) {
+                                       final InputStream istream, final String name) {
 
         // SimbrainDesktop desktop =
         // SimbrainDesktop.getDesktop(component.getWorkspace());
@@ -301,7 +309,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @return true if user cancels
      */
     public boolean showHasChangedDialog() {
-        Object[] options = { "Save", "Don't Save", "Cancel" };
+        Object[] options = {"Save", "Don't Save", "Cancel"};
         int s = JOptionPane.showInternalOptionDialog(this,
                 "This component has changed since last save,\n"
                         + "Would you like to save these changes?",
@@ -404,44 +412,17 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      */
     private String getDefaultDirectory(
             Class<? extends WorkspaceComponent> componentType) {
-        String defaultDirectory = ".";
-        try {
-            if (componentType == OdorWorldComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceOdorWorldDirectory");
-            } else if (componentType == DataWorldComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceTableDirectory");
-            } else if (componentType == NetworkComponent.class) {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceNetworkDirectory");
-            } else {
-                defaultDirectory = SimbrainPreferences
-                        .getString("workspaceBaseDirectory");
-            }
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
+        String defaultDirectory;
+        if (componentType == OdorWorldComponent.class) {
+            defaultDirectory = USER_DIR + FS + "simulations" + FS + "worlds";
+        } else if (componentType == DataWorldComponent.class) {
+            defaultDirectory = USER_DIR + FS + "simulations" + FS + "tables";
+        } else if (componentType == NetworkComponent.class) {
+            defaultDirectory = USER_DIR + FS + "simulations" + FS + "networks";
+        } else {
+            defaultDirectory = USER_DIR + FS + "simulations";
         }
         return defaultDirectory;
-    }
-
-    /**
-     * Set the default directory for specific component types.
-     *
-     * @param componentType the component type
-     * @param dir the directory to set
-     */
-    private void setDefaultDirectory(
-            Class<? extends WorkspaceComponent> componentType, String dir) {
-        if (componentType == OdorWorldComponent.class) {
-            SimbrainPreferences.putString("workspaceOdorWorldDirectory", dir);
-        } else if (componentType == DataWorldComponent.class) {
-            SimbrainPreferences.putString("workspaceTableDirectory", dir);
-        } else if (componentType == NetworkComponent.class) {
-            SimbrainPreferences.putString("workspaceNetworkDirectory", dir);
-        } else {
-            SimbrainPreferences.putString("workspaceBaseDirectory", dir);
-        }
     }
 
 }

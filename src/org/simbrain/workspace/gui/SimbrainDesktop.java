@@ -37,13 +37,7 @@ import java.awt.event.WindowListener;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -177,7 +171,7 @@ public class SimbrainDesktop {
     private JToolBar wsToolBar = new JToolBar();
 
     /** Whether the bottom dock is visible. */
-    private boolean dockVisible = true;
+    private boolean dockVisible = false;
 
     /** the frame that will hold the workspace. */
     private JFrame frame;
@@ -331,13 +325,6 @@ public class SimbrainDesktop {
         workspaceBounds = new Rectangle(WORKSPACE_INSET, WORKSPACE_INSET,
                 screenSize.width - (WORKSPACE_INSET * 2),
                 screenSize.height - (WORKSPACE_INSET * 2));
-
-        // Set the bottom dock to visible or not based on the properties file.
-        Properties properties = Utils.getSimbrainProperties();
-        if (properties.containsKey("showBottomDock")) {
-            dockVisible = Boolean
-                    .parseBoolean(properties.getProperty("showBottomDock"));
-        }
 
         // Set up Desktop
         desktop = new JDesktopPane();
@@ -1059,8 +1046,6 @@ public class SimbrainDesktop {
         File simFile = simulationChooser.showOpenDialog();
         if (simFile != null) {
             workspace.openWorkspace(simFile);
-            workspace.setCurrentDirectory(
-                    simulationChooser.getCurrentLocation());
             workspace.setCurrentFile(simFile);
         }
     }
@@ -1104,7 +1089,6 @@ public class SimbrainDesktop {
         // Save the file by setting the current file
         if (theFile != null) {
             workspace.setCurrentFile(theFile);
-            workspace.setCurrentDirectory(chooser.getCurrentLocation());
             save(theFile);
         }
     }

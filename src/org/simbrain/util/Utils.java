@@ -18,7 +18,7 @@
  */
 package org.simbrain.util;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,11 +52,15 @@ import com.Ostermiller.util.CSVPrinter;
  * <b>Utils</b>. Utility class for simbrain package.
  */
 public class Utils {
+
     /** Logger. */
     private static Logger logger = Logger.getLogger(Utils.class);
 
     /** File system separator. */
-    private static final String FS = System.getProperty("file.separator");
+    public static final String FS = System.getProperty("file.separator");
+
+    /** User directory where java is launched from. */
+    public static final String USER_DIR = System.getProperty("user.dir");
 
     /**
      * Helper method that returns the date and time in a format that can be used
@@ -679,28 +683,6 @@ public class Utils {
     }
 
     /**
-     * Return the Simbrain properties file, or null if it is not found.
-     *
-     * @return the Simbrain properties file
-     */
-    public static Properties getSimbrainProperties() {
-        try {
-            Properties properties = new Properties();
-            File file = new File("." + FS + "etc" + FS + "config.properties");
-            if (file.exists()) {
-                properties.load(new FileInputStream(file));
-            } else {
-                logger.info("Could not find properties file at "
-                        + file.getAbsolutePath());
-            }
-            return properties;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
      * Returns the contents of a file as a String.
      *
      * @param file the file to read
@@ -774,9 +756,8 @@ public class Utils {
     public static XStream getSimbrainXStream() {
         XStream xstream = new XStream(new DomDriver("UTF-8"));
         xstream.ignoreUnknownElements();
-        // Trying to suppress xstream warnings. Not working yet...
         xstream.allowTypesByWildcard(new String[] {
-            "org.simbrain.**",
+            "org.simbrain.**", "java.awt.**"
         });
         return xstream;
     }

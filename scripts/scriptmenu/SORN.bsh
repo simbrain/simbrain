@@ -70,7 +70,8 @@ import org.simbrain.workspace.*;
 
     // Add custom classes to classpath
     String FS = System.getProperty("file.separator");
-    addClassPath("scripts" + FS + "scriptmenu" + FS + "SORN" );
+    String USER_DIR = System.getProperty("user.dir");
+    addClassPath(USER_DIR + FS + "scripts" + FS + "scriptmenu" + FS + "SORN" );
 
     // Build Network
     NetworkComponent networkComponent = new NetworkComponent("Network");

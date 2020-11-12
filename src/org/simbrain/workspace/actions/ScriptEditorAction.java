@@ -31,6 +31,9 @@ import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.SimbrainScriptEditor;
 
+import static org.simbrain.util.Utils.FS;
+import static org.simbrain.util.Utils.USER_DIR;
+
 /**
  * Open a script editor.
  */
@@ -54,20 +57,11 @@ public final class ScriptEditorAction extends AbstractAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        String scriptDirectory = ".";
-        try {
-            scriptDirectory = SimbrainPreferences
-                    .getString("workspaceScriptDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
-
+        String scriptDirectory = USER_DIR + FS + "scripts";
         SFileChooser fileChooser = new SFileChooser(scriptDirectory,
                 "Run Script", "bsh");
         File scriptFile = fileChooser.showOpenDialog();
         if (scriptFile != null) {
-            SimbrainPreferences.putString("workspaceScriptDirectory",
-                    fileChooser.getCurrentLocation());
             GenericJInternalFrame frame = SimbrainScriptEditor.getInternalFrame(
                     desktop, scriptFile);
             desktop.addInternalFrame(frame);

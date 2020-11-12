@@ -38,6 +38,9 @@ import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.TableDataException;
 
+import static org.simbrain.util.Utils.FS;
+import static org.simbrain.util.Utils.USER_DIR;
+
 /**
  * Contains actions for use in Trainer GUI.
  *
@@ -119,28 +122,12 @@ public class TrainerGuiActions {
     }
 
     /**
-     * Sets the current data directory in user preferences (memory for file
-     * chooser).
-     *
-     * @param dir directory to set
-     */
-    public static void setDataDirectory(final String dir) {
-        SimbrainPreferences.putString("networkTableDirectory", dir);
-    }
-
-    /**
      * Return the current data directory.
      *
      * @return return the data directory
      */
     public static String getDataDirectory() {
-        try {
-            return SimbrainPreferences
-                .getString("networkTableDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return USER_DIR + FS + "simulations" + FS + "tables";
     }
 
     /**
@@ -186,7 +173,6 @@ public class TrainerGuiActions {
                             JOptionPane.WARNING_MESSAGE, null, null, null);
                     }
                 }
-                setDataDirectory(chooser.getCurrentLocation());
             }
 
         };

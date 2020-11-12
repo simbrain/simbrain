@@ -55,8 +55,13 @@ public class NetworkScriptMenu {
         JMenu scriptMenu = new JMenu("Scripts");
         scriptMenu.add(new RunScriptAction(panel));
         scriptMenu.addSeparator();
-        for (Action action : getScriptActions(panel)) {
-            scriptMenu.add(action);
+        List<Action> actions = getScriptActions(panel);
+        if (actions != null) {
+            for (Action action : actions) {
+                scriptMenu.add(action);
+            }
+        } else {
+            // TODO: Throw exception
         }
         return scriptMenu;
     }

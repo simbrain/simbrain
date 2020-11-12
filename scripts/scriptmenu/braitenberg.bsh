@@ -27,7 +27,8 @@ import java.util.*;
 
     // Open workspace
 	String FS = System.getProperty("file.separator");
-    workspace.openWorkspace(new File("scripts" + FS + "scriptmenu" + FS  + "braitenberg.zip"));
+    String USER_DIR = System.getProperty("user.dir");
+    workspace.openWorkspace(new File(USER_DIR + FS + "scripts" + FS + "scriptmenu" + FS  + "braitenberg.zip"));
 	Network vehicle1 = ((NetworkComponent) workspace.getComponent("vehicle1.xml")).getNetwork();
 	
 	Network vehicle2 = ((NetworkComponent) workspace.getComponent("vehicle2.xml")).getNetwork();

@@ -31,6 +31,9 @@ import org.simbrain.util.SimbrainPreferences.PropertyNotFoundException;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceSerializer;
 
+import static org.simbrain.util.Utils.FS;
+import static org.simbrain.util.Utils.USER_DIR;
+
 /**
  * Open a network within current workspace.
  */
@@ -52,13 +55,7 @@ public final class OpenNetworkAction extends WorkspaceAction {
      * @param event
      */
     public void actionPerformed(final ActionEvent event) {
-        String defaultDirectory = ".";
-        try {
-            defaultDirectory = SimbrainPreferences
-            .getString("workspaceNetworkDirectory");
-        } catch (PropertyNotFoundException e) {
-            e.printStackTrace();
-        }
+        String defaultDirectory = USER_DIR + FS + "simulations" + FS + "networks";
         SFileChooser chooser = new SFileChooser(defaultDirectory,
                 "xml file", "xml");
         File theFile = chooser.showOpenDialog();

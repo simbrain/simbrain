@@ -40,6 +40,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
+import static org.simbrain.util.Utils.FS;
+import static org.simbrain.util.Utils.USER_DIR;
+
 /**
  * Workspace action manager.
  *
@@ -365,7 +368,7 @@ public class WorkspaceActionManager {
      */
     public List<ScriptAction> getScriptActions(final SimbrainDesktop desktop) {
         ArrayList<ScriptAction> list = new ArrayList();
-        File dir = new File(SCRIPT_MENU_DIRECTORY);
+        File dir = new File(USER_DIR + FS + "scripts" + FS + "scriptmenu");
         if (!dir.isDirectory()) {
             return null; // Throw exception instead?
         }

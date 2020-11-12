@@ -18,9 +18,6 @@
  */
 package org.simbrain.workspace.gui;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.simbrain.resource.ResourceManager;
 
 /*
@@ -41,18 +38,8 @@ public class Splasher {
     /**
      * Shows the splash screen, launches the application and then disposes the
      * splash screen.
-     *
-     * @param args
-     *            the command line arguments
      */
     public static void main(final String[] args) {
-
-        // try {
-        // UIManager.setLookAndFeel(new NimbusLookAndFeel());
-        // } catch (Exception e) {
-        // // If Nimbus is not available, you can set the GUI to another look
-        // // and feel.
-        // }
 
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
         SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop",

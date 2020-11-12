@@ -34,6 +34,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import static org.simbrain.util.Utils.FS;
+
 /**
  * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic
  * adding of file extensions, memory of file-locations, and checks to prevent
@@ -68,19 +70,6 @@ public class SFileChooser {
 
     /** Use the image viewer to preview image files. */
     private boolean useViewer = false;
-
-    /** File separator. */
-    private static final String FS = System.getProperty("file.separator");
-
-    /** Static initializer */
-    static {
-        Properties properties = Utils.getSimbrainProperties();
-        if (properties.containsKey("useNativeFileChooser")) {
-            useNativeFileChooser = Boolean.parseBoolean(properties
-                    .getProperty("useNativeFileChooser"));
-        }
-
-    }
 
     /**
      * Creates file chooser dialog.
@@ -514,7 +503,6 @@ public class SFileChooser {
      * Check to see if the file has the extension, and if not, add it.
      *
      * @param theFile File to add extension to
-     * @param extension Extension to add to file
      * @return The file name with the correct extension
      */
     private File addExtension(final File theFile, final FileFilter filter) {

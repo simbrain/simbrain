@@ -48,8 +48,9 @@ double lambda = 1; // Maximum value the associative strength can take
 void main() {
 	workspace.clearWorkspace();
 	String FS = System.getProperty("file.separator");
+    String USER_DIR = System.getProperty("user.dir");
 	// This script is based on a saved workspace file
-	workspace.openWorkspace(new File("scripts" + FS + "scriptmenu" + FS  + "rescorla_wagner.zip"));
+	workspace.openWorkspace(new File(USER_DIR + FS + "scripts" + FS + "scriptmenu" + FS  + "rescorla_wagner.zip"));
     buildButtonPanel();
 }
 

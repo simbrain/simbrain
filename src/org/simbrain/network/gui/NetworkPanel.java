@@ -187,9 +187,6 @@ public class NetworkPanel extends JPanel {
     /** The model neural-Network object. */
     private Network network;
 
-    /** The Network hierarchy panel. */
-    private NetworkHierarchyPanel networkHierarchyPanel;
-
     /** Main splitter pane: network in middle, hierarchy on left. */
     private JSplitPane splitPane;
 
@@ -318,9 +315,6 @@ public class NetworkPanel extends JPanel {
     /** Whether to display update priorities. */
     private boolean prioritiesVisible = false;
 
-    /** Whether to display the network hierarchy panel. */
-    private boolean showNetworkHierarchyPanel;
-
     /** Text object event handler. */
     private TextEventHandler textHandle;
 
@@ -405,21 +399,9 @@ public class NetworkPanel extends JPanel {
         super.setLayout(new BorderLayout());
         this.add("North", toolbars);
 
-        // Set up network hierarchy panel
-        Properties properties = Utils.getSimbrainProperties();
-        if (properties.containsKey("showNetworkHierarchyPanel")) {
-            showNetworkHierarchyPanel = Boolean.parseBoolean(
-                    properties.getProperty("showNetworkHierarchyPanel"));
-        }
-        // networkHierarchyPanel = new NetworkHierarchyPanel(this);
-        // splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        // splitPane.setDividerLocation(.2);
-        // splitPane.setLeftComponent(networkHierarchyPanel);
-        // splitPane.setRightComponent(canvas);
         this.add("Center", canvas);
 
         setPrioritiesVisible(prioritiesVisible);
-        // setHierarchyPanelVisible(showNetworkHierarchyPanel);
 
         // Event listeners
         removeDefaultEventListeners();
@@ -782,8 +764,6 @@ public class NetworkPanel extends JPanel {
 
     /**
      * Update visible state of group nodes.
-     *
-     * @param group the group to update
      */
     private void updateGroupNodes(Collection<Group> groups) {
         // System.out.println("In update group node. Updating group " + group);
@@ -2792,25 +2772,6 @@ public class NetworkPanel extends JPanel {
             NeuronNode node = neuronNodes.next();
             node.setPriorityView(prioritiesVisible);
         }
-    }
-
-    /**
-     * Set the visibility of the hiearchy panel.
-     *
-     * @param showIt whether it should be visible or not
-     */
-    public void setHierarchyPanelVisible(boolean showIt) {
-        this.showNetworkHierarchyPanel = showIt;
-        actionManager.getShowNetworkHierarchyPanel()
-                .setState(showNetworkHierarchyPanel);
-        if (!showNetworkHierarchyPanel) {
-            splitPane.setLeftComponent(null);
-            splitPane.setDividerSize(0);
-        } else {
-            splitPane.setLeftComponent(networkHierarchyPanel);
-            splitPane.setDividerSize(4);
-        }
-        networkHierarchyPanel.setVisible(showNetworkHierarchyPanel);
     }
 
     /**

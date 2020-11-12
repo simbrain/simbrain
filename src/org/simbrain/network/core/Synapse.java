@@ -49,10 +49,10 @@ public class Synapse {
     private static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new JumpAndDecay();
 
     /** Default upper bound. */
-    private static double DEFAULT_UPPER_BOUND = 100;
+    private static final double DEFAULT_UPPER_BOUND = 10;
 
     /** Default lower bound. */
-    private static double DEFAULT_LOWER_BOUND = -100;
+    private static final double DEFAULT_LOWER_BOUND = -10;
 
     /**
      * Parent network. Can't just use getSouce().getParent() because synapses
@@ -136,22 +136,6 @@ public class Synapse {
      * target neuron before allowing certain changes.
      */
     private final boolean isTemplate;
-
-    /** Initialize properties */
-    static {
-        Properties properties = Utils.getSimbrainProperties();
-        if (properties.containsKey("weightUpperBound")) {
-            DEFAULT_UPPER_BOUND = Double
-                    .parseDouble(properties.getProperty("weightUpperBound"));
-
-        }
-        if (properties.containsKey("weightLowerBound")) {
-            DEFAULT_LOWER_BOUND = Double
-                    .parseDouble(properties.getProperty("weightLowerBound"));
-
-        }
-
-    }
 
     /**
      * Construct a synapse using a source and target neuron, defaulting to

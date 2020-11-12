@@ -1,12 +1,21 @@
 package org.simbrain.util.geneticalgorithms
 
+import org.simbrain.util.propertyeditor.CopyableObject
 import kotlin.random.Random
 
 
 // Yulin will make work and make corresponding API changes
 // Also cohere with IntEvolution and IntEvolutionDSL.
 
-class IntWrapper (var value: Int = 0)
+class IntWrapper (var value: Int = 0) : CopyableObject {
+    override fun toString(): String {
+        return "" + value
+    }
+
+    override fun copy(): IntWrapper {
+        return IntWrapper(value)
+    }
+}
 
 inline fun intGene(initVal : IntWrapper.() -> Unit = { }): IntGene {
     return IntGene(IntWrapper().apply(initVal))
@@ -15,11 +24,11 @@ inline fun intGene(initVal : IntWrapper.() -> Unit = { }): IntGene {
 class IntGene (template: IntWrapper) : Gene<IntWrapper>(template) {
 
     override fun copy(): IntGene {
-        return IntGene(template);
+        return IntGene(template.copy());
     }
 
     fun build() : IntWrapper {
-        return template;
+        return template.copy();
     }
 }
 
@@ -28,7 +37,7 @@ fun main() {
     val environmentBuilder = environmentBuilder {
 
         val intChromosome = chromosome(100) {
-            intGene{value = 5}
+            intGene{}
         }
 
         onMutate {
@@ -47,6 +56,7 @@ fun main() {
 
         onEval {
             val total = intChromosome.products.sumByDouble {it.value.toDouble() }
+            println(intChromosome.products)
             Math.abs(total - 10)
         }
 
@@ -56,11 +66,11 @@ fun main() {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 500 || fitness < .2 }
+        runUntil { generation == 100 || fitness < .2 }
     }
 
-    val best = evolution.start().last().first()
-    print(best)
+    val lastGen = evolution.start().last()
+    print(lastGen.map { it.fitness })
 
 }
 

@@ -69,7 +69,7 @@ class ProductMap(private val map: HashMap<Any, Any> = HashMap()) {
 }
 
 /**
- * Provides a context for [EnvironmentBuilder.onEval].  "This" in onEval will refer to an instance of this class.
+ * Provides a context for [EnvironmentBuilder.onEval]. "This" in onEval will refer to an instance of this class.
  */
 class EvaluationContext(val workspace: Workspace, val mapping: ProductMap, val evalRand: Random) {
 
@@ -88,7 +88,7 @@ class EvaluationContext(val workspace: Workspace, val mapping: ProductMap, val e
 }
 
 /**
- * Provides a context for [EnvironmentBuilder.onMutate].  "This" in onMutate will refer to this object.
+ * Provides a context for [EnvironmentBuilder.onMutate]. "This" in onMutate will refer to this object.
  */
 object MutationContext {
 
@@ -112,7 +112,11 @@ class Environment(val evaluationContext: EvaluationContext, private val evalFunc
 }
 
 /**
- * The main provider for the genetic algorithm DSL.
+ * The main provider for the genetic algorithm DSL. An environment is basically the thing that we are evolving, which
+ * will often be an agent in a virtual enviroment.  A single agent or entity with everything it needs to be evaluated.
+ *
+ * @param chromosomeList set of genes describing an agent, e.g. input, hidden, and output node genes
+ * @param template allow for the DSL to open a configuration block, as in " = environmentBuilder {..}
  */
 class EnvironmentBuilder private constructor(
         private val chromosomeList: LinkedList<Chromosome<*, *>>,
@@ -121,44 +125,83 @@ class EnvironmentBuilder private constructor(
         val random: Random = Random(seed)
 ) {
 
+    /**
+     * Main public constructor.
+     */
     constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
 
+    /**
+     * Construct with a seed.
+     */
     constructor(seed: Int, builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder, seed)
 
+    /**
+     * List of mutation tasks executed at each generation.
+     */
     private val mutationTasks = mutableListOf<MutationContext.() -> Unit>()
 
+    /**
+     * A fitness function.
+     */
     private lateinit var evalFunction: EvaluationContext.() -> Double
 
+    // TODO: Replace this with something more generic
+    /**
+     * Builders which build the products ("agents") associated with the chromosomes
+     */
     private lateinit var builder: WorkspaceBuilder
 
+    /**
+     * A separate builder that allows you to build "nicer" products.  Whatever is done here is not needed to evaluate
+     * an agent, but can be done for nice layout on the final product that is viewed.
+     */
     private lateinit var prettyBuilder: WorkspaceBuilder
 
+    /**
+     * Indicates we are on the first generation of the evolutionary algorithm.  Important to distinguish
+     * this case so that future generations are "memoized".
+     */
     private val isInitial = chromosomeList.isEmpty()
 
     private val chromosomeIterator = chromosomeList.iterator()
-
 
     fun copy(): EnvironmentBuilder {
         val newSeed = random.nextInt()
         return EnvironmentBuilder(LinkedList(chromosomeList.map { it.copy() }), template, newSeed).apply(template)
     }
 
+    /**
+     * Use this to describe what happens with each mutation. Can be called multiple times to add more mutation tasks.
+     */
     fun onMutate(task: MutationContext.() -> Unit) {
         mutationTasks.add(task)
     }
 
+    /**
+     * Execute all the mutation tasks
+     */
     fun mutate() {
         mutationTasks.forEach { MutationContext.it() }
     }
 
+    /**
+     * Use this to describe what happens when the builder builds products.  Can only be called once.
+     */
     fun onBuild(template: WorkspaceBuilder.() -> Unit) {
         builder = WorkspaceBuilder().apply(template)
     }
 
+    /**
+     * Use this to describe what happens o "pretty build". Usually called for the "best" evolved agent, which can
+     * then be displayed.
+     */
     fun onPrettyBuild(template: WorkspaceBuilder.() -> Unit) {
         prettyBuilder = WorkspaceBuilder().apply(template)
     }
 
+    /**
+     * Builds the products.
+     */
     private fun buildWith(builder: WorkspaceBuilder): Environment {
         val workspace = Workspace()
         builder.builders.forEach { it(workspace) }
@@ -171,6 +214,9 @@ class EnvironmentBuilder private constructor(
 
     fun prettyBuild() = buildWith(prettyBuilder)
 
+    /**
+     * Use this to define your evaluation / fitness function.
+     */
     fun onEval(eval: EvaluationContext.() -> Double) {
         evalFunction = eval
     }
@@ -184,28 +230,49 @@ class EnvironmentBuilder private constructor(
         }
     }
 
+    /**
+     * Use this to create a chromosome with a set number of genes.
+     */
     fun <T, G : Gene<T>> chromosome(count: Int, genes: (index: Int) -> G): Chromosome<T, G> {
         return createChromosome { Chromosome(List(count) { genes(it) }.toMutableList()) }
     }
 
+    /**
+     * Use this to create a chromosome from existing genes
+     */
     fun <T, G : Gene<T>> chromosome(vararg genes: G): Chromosome<T, G> {
         return createChromosome { Chromosome(mutableListOf(*genes)) }
     }
 
+    /**
+     * Use this to create a chromosome from a collection of genes
+     */
     fun <T, G : Gene<T>> chromosome(genes: Iterable<G>): Chromosome<T, G> {
         return createChromosome { Chromosome(genes.toMutableList()) }
     }
 
+    /**
+     * Use this when more complex logic is needed...
+     */
     fun <T, G : Gene<T>> chromosome(listBuilder: MutableList<G>.() -> Unit): Chromosome<T, G> {
         return createChromosome { Chromosome(mutableListOf<G>().apply(listBuilder)) }
     }
 
 }
 
+/**
+ * Holds an environment builder and fitness value. Used to hold results at each generation.
+ */
 data class BuilderFitnessPair(val environmentBuilder: EnvironmentBuilder, val fitness: Double)
 
+/**
+ * Use this to create an environment builder.
+ */
 fun environmentBuilder(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuilder(builder).apply(builder)
 
+/**
+ * Use tihs to create an environment builder with an initial seed.
+ */
 fun environmentBuilder(seed: Int, builder: EnvironmentBuilder.() -> Unit)
         = EnvironmentBuilder(seed, builder).apply(builder)
 
@@ -483,6 +550,8 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
      * Allows you to set stopping condition in a convenient way.
      * Allows you to use a curly braced argument with several components.
      * E.g. runUntil { generation == 200 || fitness > 50 }
+     * Note the instance is an implicit `this`, so you don't need to write
+     * { data -> data.generation == 500 || data.fitness < 0.2 }
      */
     class RunUntilContext(val generation: Int, val fitness: Double)
 

@@ -375,7 +375,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun createNode(text: NetworkTextObject) = addScreenElement {
         TextNode(this, text).apply {
-            textHandle.startEditing(text.inputEvent, this.pStyledText);
+            // TODO: Temp / check with Yulin
+            if(text.inputEvent != null) {
+                textHandle.startEditing(text.inputEvent, this.pStyledText);
+            }
         }
     }
 

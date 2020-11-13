@@ -31,6 +31,7 @@ import java.awt.Color;
     desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 337);
     Network network = networkComponent.getNetwork();
     NeuronGroup ng = new NeuronGroup(network, numNeurons);
+    ng.setLabel("Recurrent network");
     ng.setNeuronType("DecayRule");
     ng.setUpperBound(10);
     network.addNeuronGroup(ng);
@@ -55,8 +56,9 @@ import java.awt.Color;
     desktop.getDesktopComponent(barChart).getParentFrame().setBounds(500,20,537,345);
 
     // COUPLING NETWORK TO BARCHART
-    Producer neuronProducer = workspace.getCouplingManager().getProducer(ng, "getActivations");
-    Consumer barChartConsumer =  workspace.getCouplingManager().getConsumer(barChart.getModel(), "setBarValues");
+    Producer neuronProducer = workspace.getCouplingManager().getProducerByMethodName(ng, "getActivations");
+    Consumer barChartConsumer =  workspace.getCouplingManager().getConsumerByMethodName(barChart.getModel(),
+    "setBarValues");
     workspace.getCouplingManager().createCoupling(neuronProducer, barChartConsumer);
 
     workspace.iterate();

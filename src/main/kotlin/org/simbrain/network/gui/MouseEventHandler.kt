@@ -88,14 +88,14 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 networkPanel.selectionManager.toggle(pickedScreenElement)
             }
             // Required so that clicking to drag does not de-select all other nodes
-            if (pickedScreenElement !in networkPanel.selectedNodes) {
+            if (pickedScreenElement !in networkPanel.selectionManager.selection) {
                 if(!event.isShiftDown) {
                     networkPanel.selectionManager.set(pickedScreenElement)
                 }
             }
         }
 
-        priorSelection = networkPanel.selectedNodes.toMutableSet()
+        priorSelection = networkPanel.selectionManager.selection.toMutableSet()
         marqueeStartPosition = event.position
         marqueeEndPosition = event.position
         selectionMarquee.reset()

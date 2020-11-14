@@ -25,7 +25,7 @@ fun IntArray.toRGBImage(width: Int, height: Int): BufferedImage {
 }
 
 fun FloatArray.toGrayScaleImage(width: Int, height: Int) = this
-        .map { (it.clip(0.0f, 1.0f) * 255).toByte() }
+        .map { (it.clip(0.0f, 1.0f) * 255).toInt().toByte() }
         .toByteArray()
         .let {
             val colorModel = DirectColorModel(8, 0xff, 0xff, 0xff)

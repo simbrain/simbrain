@@ -30,7 +30,7 @@ interface LocatableModel : NetworkModel {
  * Return top left location in a list of [LocatableModel] objects.
  */
 val List<LocatableModel>.topLeftLocation
-    get() = Point2D.Double(map { it.location.x }.min() ?: 0.0, map { it.location.y }.min() ?: 0.0)
+    get() = Point2D.Double(map { it.location.x }.minOrNull() ?: 0.0, map { it.location.y }.minOrNull() ?: 0.0)
 
 /**
  * Return the center location in a list of [LocatableModel] objects.
@@ -38,10 +38,10 @@ val List<LocatableModel>.topLeftLocation
 val List<LocatableModel>.centerLocation
     get() = Point2D.Double(bound.x + bound.width / 2, bound.y + bound.height / 2)
 
-val List<LocatableModel>.minX get() = map { it.location.x }.min() ?: 0.0
-val List<LocatableModel>.minY get() = map { it.location.y }.min() ?: 0.0
-val List<LocatableModel>.maxX get() = map { it.location.x }.max() ?: 0.0
-val List<LocatableModel>.maxY get() = map { it.location.y }.max() ?: 0.0
+val List<LocatableModel>.minX get() = map { it.location.x }.minOrNull() ?: 0.0
+val List<LocatableModel>.minY get() = map { it.location.y }.minOrNull() ?: 0.0
+val List<LocatableModel>.maxX get() = map { it.location.x }.maxOrNull() ?: 0.0
+val List<LocatableModel>.maxY get() = map { it.location.y }.maxOrNull() ?: 0.0
 
 /**
  * Top-left and bottom-right locations padded with a small delta to make sure the bound has some size

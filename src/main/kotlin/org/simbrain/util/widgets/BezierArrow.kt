@@ -61,9 +61,9 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
                 }
                 .let {
                     if (bidirectional) {
-                        it.maxBy { (line, source, _) -> line dot source.normal }
+                        it.maxByOrNull { (line, source, _) -> line dot source.normal }
                     } else {
-                        it.minBy { (_, source, target) -> source.midPoint distanceSqTo target.midPoint }
+                        it.minByOrNull { (_, source, target) -> source.midPoint distanceSqTo target.midPoint }
                     }
                 }.also { if (it == null) updateEvent(null) } ?: return
 

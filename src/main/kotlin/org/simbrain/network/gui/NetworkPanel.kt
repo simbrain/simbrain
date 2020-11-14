@@ -375,7 +375,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun createNode(text: NetworkTextObject) = addScreenElement {
         TextNode(this, text).apply {
-            // TODO: Temp / check with Yulin
             if(text.inputEvent != null) {
                 textHandle.startEditing(text.inputEvent, this.pStyledText);
             }
@@ -478,14 +477,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun alignHorizontal() {
         val neurons = selectionManager.filterSelectedModels<Neuron>()
-        val minY = neurons.map { it.y }.min() ?: Double.MAX_VALUE
+        val minY = neurons.map { it.y }.minOrNull() ?: Double.MAX_VALUE
         neurons.forEach { it.y = minY }
         repaint()
     }
 
     fun alignVertical() {
         val neurons = selectionManager.filterSelectedModels<Neuron>()
-        val minX = neurons.map { it.x }.min() ?: Double.MAX_VALUE
+        val minX = neurons.map { it.x }.minOrNull() ?: Double.MAX_VALUE
         neurons.forEach { it.x = minX }
         repaint()
     }
@@ -688,10 +687,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     private fun addNetworkListeners() {
         val event = network.events
-        event.onModelAdded(Consumer { createNode(it) })
-        event.onModelRemoved(Consumer { it.events.fireDeleted() })
-        event.onUpdateTimeDisplay(Consumer { d: Boolean? -> timeLabel.update() })
-        event.onUpdateCompleted(Runnable{repaint()})
+        event.onModelAdded { createNode(it) }
+        event.onModelRemoved { it.events.fireDeleted() }
+        event.onUpdateTimeDisplay { timeLabel.update() }
+        event.onUpdateCompleted { repaint() }
     }
 
     private fun NetworkSelectionManager.setUpSelectionEvents() {

@@ -11,6 +11,7 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;
@@ -130,9 +131,8 @@ public class Simulation {
      */
     public DocViewerComponent addDocViewer(int x, int y, int width, int height, String title, String fileName) {
         DocViewerComponent docViewer = new DocViewerComponent(title);
-        String html = Utils.readFileContents(
-                new File(ClassLoader.getSystemClassLoader().getResource("custom_sims"
-                + Utils.FS + fileName).getPath()));
+        String html = ResourceManager.getString("custom_sims"
+                + Utils.FS + fileName);
         docViewer.setText(html);
         workspace.addWorkspaceComponent(docViewer);
         desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height);

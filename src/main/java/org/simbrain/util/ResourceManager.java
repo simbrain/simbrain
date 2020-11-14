@@ -20,10 +20,12 @@ package org.simbrain.util;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.net.URL;
 
 /**
- * <b>ResourceManager</b> provides convenient access to resource files.
+ * <b>ResourceManager</b> provides convenient access to resource files. Pass in paths relative to the resource
+ * directory as root.
  */
 public class ResourceManager {
 
@@ -32,22 +34,22 @@ public class ResourceManager {
     /**
      * Retrieve an ImageIcon based on its file name.
      *
-     * @param name name of the image file to retrieve
+     * @param path name of the image file to retrieve
      * @return the ImageIcon which can be used with Swing components, etc
      */
-    public static ImageIcon getImageIcon(final String name) {
-        URL url = ClassLoader.getSystemClassLoader().getResource(name);
+    public static ImageIcon getImageIcon(final String path) {
+        URL url = ClassLoader.getSystemClassLoader().getResource(path);
         return new ImageIcon(url);
     }
 
     /**
      * Retrieve an Image based on its file name.
      *
-     * @param name name of the image file to retrieve
+     * @param path name of the image file to retrieve
      * @return the Image which can be used with Swing components, etc
      */
-    public static Image getImage(final String name) {
-        URL url = ClassLoader.getSystemClassLoader().getResource(name);
+    public static Image getImage(final String path) {
+        URL url = ClassLoader.getSystemClassLoader().getResource(path);
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
         return toolKit.getImage(url);
     }
@@ -55,16 +57,22 @@ public class ResourceManager {
     /**
      * Load an ImageIcon from the resources directory and scale it if necessary.
      *
-     * @param name The name of the icon to load within the resources directory.
+     * @param path The path of the icon to load within the resources directory.
      * @return Returns a scaled ImageIcon.
      */
-    public static ImageIcon getSmallIcon(final String name) {
-        URL url = ClassLoader.getSystemClassLoader().getResource( name);
+    public static ImageIcon getSmallIcon(final String path) {
+        URL url = ClassLoader.getSystemClassLoader().getResource(path);
         ImageIcon imageIcon = new ImageIcon(url);
         Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
         imageIcon.setImage(image);
         return imageIcon;
     }
 
+    /**
+     * Returns a string (e.g. an html string) from a specified path.
+     */
+    public static String getString(String name) {
+        return Utils.readFileContents(new File(ClassLoader.getSystemClassLoader().getResource(name).getPath()));
+    }
 
 }

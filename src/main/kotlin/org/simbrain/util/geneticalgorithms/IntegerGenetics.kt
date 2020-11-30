@@ -21,13 +21,13 @@ inline fun intGene(initVal : IntWrapper.() -> Unit = { }): IntGene {
     return IntGene(IntWrapper().apply(initVal))
 }
 
-class IntGene (template: IntWrapper) : Gene<IntWrapper>(template) {
+class IntGene(template: IntWrapper) : TopLevelGene<IntWrapper>(template) {
 
     override fun copy(): IntGene {
         return IntGene(template.copy());
     }
 
-    fun build() : IntWrapper {
+    override fun TopLevelBuilderContext.build() : IntWrapper {
         return template.copy();
     }
 }
@@ -37,7 +37,7 @@ fun main() {
     val environmentBuilder = environmentBuilder {
 
         val intChromosome = chromosome(100) {
-            intGene{}
+            intGene()
         }
 
         onMutate {
@@ -47,11 +47,7 @@ fun main() {
         }
 
         onBuild {
-            intChromosome.genes.forEach{
-                it.build().also { product ->
-                    productMapping[it] = product
-                }
-            }
+            +intChromosome
         }
 
         onEval {

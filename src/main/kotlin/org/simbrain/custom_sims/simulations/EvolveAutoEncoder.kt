@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
-import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
@@ -15,7 +14,6 @@ import org.simbrain.util.sse
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
-import kotlin.streams.toList
 
 class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
@@ -41,10 +39,10 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 }
                 val (best, _) = generations.last().first()
 
-                sim.addNetwork(
-                        best.prettyBuild().evaluationContext.workspace.componentList.first() as NetworkComponent,
-                        0, 200, 200, 0
-                )
+//                sim.addNetwork(
+//                        best.prettyBuild().evaluationContext.workspace.componentList.first() as NetworkComponent,
+//                        0, 200, 200, 0
+//                )
 
                 progressWindow.close()
             }
@@ -56,6 +54,9 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
     val evolution: Evaluator get() {
 
         val environmentBuilder = environmentBuilder {
+
+            val workspace = useWorkspace()
+            val network = useNetwork()
 
             val inputs = chromosome(8) { index ->
                 nodeGene {
@@ -104,39 +105,51 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                     inputs.products.activations = inputs.products.mapIndexed { index, _ ->
                         if (index % 2 == 0) even else odd
                     }
+                    workspace.product.apply { repeat(2) { simpleIterate() } }
+
                     repeat(2) {
-                        workspace.simpleIterate()
+                        workspace.product.simpleIterate()
                     }
+
+                    val thing by workspace
+
+                    thing.simpleIterate()
+
+                    workspace {
+                        repeat(2) {
+                            simpleIterate()
+                        }
+                    }
+
                     val source = inputs.products.activations
                     val target = outputs.products.activations
                     source sse target
                 }.sum()
             }
 
-            onBuild {
-                +network {
-                    +inputs
-                    +nodes
-                    +outputs
-                    +connections
-                }
-            }
-
-            onPrettyBuild {
-                +network {
-                    +inputs.asGroup {
-                        label = "Input"
-                        location = point(0, 100)
+            onBuild { pretty ->
+                workspace {
+                    network {
+                        if (pretty) {
+                            +inputs.asGroup {
+                                label = "Input"
+                                location = point(0, 100)
+                            }
+                            +nodes {
+                                this[0].location = point(50, 0)
+                                this[1].location = point(100, 0)
+                            }
+                            +outputs.asGroup {
+                                label = "Output"
+                                location = point(0, -100)
+                            }
+                        } else {
+                            +inputs
+                            +nodes
+                            +outputs
+                        }
+                        +connections
                     }
-                    +nodes {
-                        this[0].location = point(50, 0)
-                        this[1].location = point(100, 0)
-                    }
-                    +outputs.asGroup {
-                        label = "Output"
-                        location = point(0, -100)
-                    }
-                    +connections
                 }
             }
 

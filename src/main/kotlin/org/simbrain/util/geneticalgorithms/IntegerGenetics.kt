@@ -21,7 +21,7 @@ inline fun intGene(initVal : IntWrapper.() -> Unit = { }): IntGene {
     return IntGene(IntWrapper().apply(initVal))
 }
 
-class IntGene(template: IntWrapper) : TopLevelGene<IntWrapper>(template) {
+class IntGene(template: IntWrapper) : Gene<IntWrapper>(template), TopLevelGene<IntWrapper> {
 
     override fun copy(): IntGene {
         return IntGene(template.copy());

@@ -5,6 +5,11 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.workspace.Consumer
+import org.simbrain.workspace.Producer
+import org.simbrain.workspace.couplings.CouplingManager
+import org.simbrain.workspace.couplings.getConsumer
+import org.simbrain.workspace.couplings.getProducer
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -18,7 +23,7 @@ inline fun connectionGene(source: NodeGene, target: NodeGene, options: Synapse.(
 
 sealed class NetworkGene<T>(template: T): Gene<T>(template)
 
-class NodeGene(template: Neuron) : NetworkGene<Neuron>(template) {
+class NodeGene(template: Neuron) : NetworkGene<Neuron>(template), ProducerGene<Neuron>, ConsumerGene<Neuron> {
 
     private val copyListeners = LinkedList<(NodeGene) -> Unit>()
 
@@ -34,6 +39,14 @@ class NodeGene(template: Neuron) : NetworkGene<Neuron>(template) {
         val newGene = NodeGene(template.deepCopy())
         fireCopied(newGene)
         return newGene
+    }
+
+    override fun CouplingManager.defaultProducer(container: Neuron): Producer? {
+        return container.getProducer("getActivation")
+    }
+
+    override fun CouplingManager.defaultConsumer(container: Neuron): Consumer? {
+        return container.getConsumer("setInputValue")
     }
 
     fun build(network: Network): Neuron {
@@ -63,26 +76,32 @@ class ConnectionGene(template: Synapse, val source: NodeGene, val target: NodeGe
 }
 
 class NetworkBuilderProvider: BuilderProvider<Network, NetworkGeneticBuilder, NetworkBuilderContext>,
-        WorkspaceBuilderContextInvokable, TopLevelBuilderContextInvokable {
+        WorkspaceBuilderContextInvokable<NetworkBuilderContext, Network>,
+        TopLevelBuilderContextInvokable<NetworkBuilderContext, Network> {
 
     private lateinit var product: Network
 
     override fun createWorkspaceComponent(name: String) = NetworkComponent(name, product)
 
-    override fun createBuilder(productMap: ProductMap): NetworkGeneticBuilder {
+    fun createBuilder(productMap: ProductMap): NetworkGeneticBuilder {
         return NetworkGeneticBuilder(productMap)
     }
 
-    override fun createContext(builder: NetworkGeneticBuilder): NetworkBuilderContext {
+    fun createContext(builder: NetworkGeneticBuilder): NetworkBuilderContext {
         return NetworkBuilderContext(builder)
     }
+
+    override fun createProduct(productMap: ProductMap, template: NetworkBuilderContext.() -> Unit): Network {
+        return createBuilder(productMap).also { createContext(it).apply(template) }.build().also { product = it }
+    }
+
 }
 
 class NetworkGeneticBuilder(override val productMap: ProductMap) : GeneticBuilder<Network> {
 
     val tasks = ArrayList<(Network) -> Unit>()
 
-    override fun build(): Network {
+    fun build(): Network {
         return Network().also { net -> tasks.forEach { it(net) } }
     }
 

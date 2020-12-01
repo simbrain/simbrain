@@ -1,7 +1,6 @@
 package org.simbrain.util.geneticalgorithms
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.util.activations
@@ -210,44 +209,52 @@ class GeneticsTest {
         }.onEach { println(it) }.take(5).last()
     }
 
-//    @Test
-//    fun `coupling node chromosome with node chromosome creates correct couplings`() {
-//        val environmentBuilder = environmentBuilder {
-//            val inputs = chromosome(3) {
-//                nodeGene {
-//                    isClamped = true
-//                }
-//            }
-//
-//            val outputs = chromosome(3) {
-//                nodeGene()
-//            }
-//
-//            onBuild {
-//                couplingManager {
-//                    couple(inputs, outputs)
-//                }
-//                +network {
-//                    +inputs
-//                    +outputs
-//                }
-//            }
-//
-//            onEval {
-//
-//                inputs.products.activations = listOf(1.0, 1.0, 1.0)
-//
-//                workspace.simpleIterate()
-//
-//                assertArrayEquals(inputs.products.activations.toTypedArray(), outputs.products.activations.toTypedArray())
-//
-//                0.0
-//            }
-//
-//        }
-//
-//        val build = environmentBuilder.build()
-//
-//        build.eval()
-//    }
+    @Test
+    fun `coupling node chromosome with node chromosome creates correct couplings`() {
+        val environmentBuilder = environmentBuilder {
+
+            val workspace = useWorkspace()
+            val network = useNetwork()
+
+            val inputs = chromosome(3) {
+                nodeGene {
+                    isClamped = true
+                }
+            }
+
+            val outputs = chromosome(3) {
+                nodeGene()
+            }
+
+            onBuild {
+                workspace {
+                    couplingManager {
+                        couple(inputs, outputs)
+                    }
+                    network {
+                        +inputs
+                        +outputs
+                    }
+                }
+            }
+
+            onEval {
+
+                inputs.products.activations = listOf(1.0, 1.0, 1.0)
+
+                workspace {
+                    simpleIterate()
+                }
+
+                assertArrayEquals(inputs.products.activations.toTypedArray(), outputs.products.activations.toTypedArray())
+
+                0.0
+            }
+
+        }
+
+        val build = environmentBuilder.build()
+
+        build.eval()
+    }
 }

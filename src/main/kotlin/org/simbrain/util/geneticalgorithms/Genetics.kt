@@ -20,9 +20,9 @@ import kotlin.streams.toList
  */
 abstract class Gene<T> protected constructor(val template: T) : CopyableObject
 
-abstract class TopLevelGene<T> protected constructor(template: T): Gene<T>(template) {
+interface TopLevelGene<T> {
 
-    abstract fun TopLevelBuilderContext.build(): T
+    fun TopLevelBuilderContext.build(): T
 
 }
 
@@ -36,6 +36,8 @@ class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
     override fun copy(): Chromosome<T, G> {
         return Chromosome(genes.map { it.copy() as G }.toMutableList())
     }
+
+    operator fun get(index: Int) = genes[index]
 }
 
 /**
@@ -45,10 +47,10 @@ class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
 class ProductMap(private val map: HashMap<Any, Any> = HashMap()) {
 
     @Suppress("UNCHECKED_CAST")
-    operator fun <T, G: Gene<T>> get(gene: G) = map[gene] as T?
+    operator fun <T, G: Gene<T>> get(gene: G) = map[gene]!! as T
 
     @Suppress("UNCHECKED_CAST")
-    operator fun <T, P, B: (P) -> T> get(builder: B) = map[builder] as T?
+    operator fun <T, P, B: (P) -> T> get(builder: B) = map[builder]!! as T
 
     @Suppress("UNCHECKED_CAST")
     operator fun <T, P: BuilderProvider<T, *, *>> get(provider: P) = map[provider]!! as T
@@ -122,7 +124,9 @@ class Environment(val evaluationContext: EvaluationContext, private val evalFunc
 
 }
 
-interface TopLevelBuilderContextInvokable
+interface TopLevelBuilderContextInvokable<C: BuilderContext, T> {
+    fun createProduct(productMap: ProductMap, template: C.() -> Unit): T
+}
 
 class TopLevelBuilderContext {
 
@@ -133,11 +137,15 @@ class TopLevelBuilderContext {
             C : BuilderContext,
             B : GeneticBuilder<T>,
             P : BuilderProvider<T, B, C>,
-            P: TopLevelBuilderContextInvokable {
+            P: TopLevelBuilderContextInvokable<C, T> {
         productMap[this] = this.createProduct(productMap, template) // result is T
     }
 
-    operator fun <T, G: TopLevelGene<T>, C: Chromosome<T, G>> C.unaryPlus() {
+    operator fun <T, G, C> C.unaryPlus()
+            where
+            G: Gene<T>,
+            G: TopLevelGene<T>,
+            C: Chromosome<T, G> {
         genes.forEach {
             with(it) {
                 build().also { product -> productMap[it] = product }
@@ -398,21 +406,10 @@ fun List<BuilderFitnessPair>.uniformSample() = sequence {
     }
 }
 
-interface BuilderProvider<T, B: GeneticBuilder<T>, C: BuilderContext> {
-
-    fun createBuilder(productMap: ProductMap): B
-    fun createContext(builder: B): C
-
-    fun createProduct(productMap: ProductMap, template: C.() -> Unit): T {
-        return createBuilder(productMap).also { createContext(it).apply(template) }.build()
-    }
-
-}
+interface BuilderProvider<T, B: GeneticBuilder<T>, C: BuilderContext>
 
 interface GeneticBuilder<T> {
     val productMap: ProductMap
-
-    fun build(): T
 }
 
 interface BuilderContext

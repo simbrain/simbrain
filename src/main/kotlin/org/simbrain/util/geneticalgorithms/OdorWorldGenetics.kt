@@ -1,5 +1,8 @@
 package org.simbrain.util.geneticalgorithms
 
+import org.simbrain.workspace.Consumer
+import org.simbrain.workspace.Producer
+import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.effectors.Effector
@@ -36,7 +39,10 @@ interface OdorWorldEntityBuildable<T> {
     fun build(odorWorldEntity: OdorWorldEntity): T
 }
 
-class SmellSensorGene(template: SmellSensor): Gene<SmellSensor>(template), OdorWorldEntityBuildable<SmellSensor> {
+class SmellSensorGene(template: SmellSensor):
+        Gene<SmellSensor>(template),
+        OdorWorldEntityBuildable<SmellSensor>,
+        ProducerGene<SmellSensor> {
 
     override fun copy(): SmellSensorGene {
         return SmellSensorGene(template.copy())
@@ -46,9 +52,16 @@ class SmellSensorGene(template: SmellSensor): Gene<SmellSensor>(template), OdorW
         return SmellSensor(template).apply { parent = odorWorldEntity }
     }
 
+    override fun CouplingManager.defaultProducer(container: SmellSensor): Producer? {
+        TODO("Not yet implemented")
+    }
+
 }
 
-class ObjectSensorGene(template: ObjectSensor): Gene<ObjectSensor>(template), OdorWorldEntityBuildable<ObjectSensor> {
+class ObjectSensorGene(template: ObjectSensor):
+        Gene<ObjectSensor>(template),
+        OdorWorldEntityBuildable<ObjectSensor>,
+        ProducerGene<ObjectSensor> {
 
     override fun copy(): ObjectSensorGene {
         return ObjectSensorGene(template.copy())
@@ -58,9 +71,16 @@ class ObjectSensorGene(template: ObjectSensor): Gene<ObjectSensor>(template), Od
         return ObjectSensor(template).apply { parent = odorWorldEntity }
     }
 
+    override fun CouplingManager.defaultProducer(container: ObjectSensor): Producer? {
+        return container.getProducerByMethodName("getCurrentValue")
+    }
+
 }
 
-class StraightMovementGene(template: StraightMovement): Gene<StraightMovement>(template), OdorWorldEntityBuildable<StraightMovement> {
+class StraightMovementGene(template: StraightMovement):
+        Gene<StraightMovement>(template),
+        OdorWorldEntityBuildable<StraightMovement>,
+        ConsumerGene<StraightMovement> {
 
     override fun copy(): StraightMovementGene {
         return StraightMovementGene(template.copy())
@@ -70,9 +90,16 @@ class StraightMovementGene(template: StraightMovement): Gene<StraightMovement>(t
         return StraightMovement(template).apply { parent = odorWorldEntity }
     }
 
+    override fun CouplingManager.defaultConsumer(container: StraightMovement): Consumer? {
+        return container.getConsumerByMethodName("setAmount")
+    }
+
 }
 
-class TurningGene(template: Turning): Gene<Turning>(template), OdorWorldEntityBuildable<Turning> {
+class TurningGene(template: Turning):
+        Gene<Turning>(template),
+        OdorWorldEntityBuildable<Turning>,
+        ConsumerGene<Turning> {
 
     override fun copy(): TurningGene {
         return TurningGene(template.copy())
@@ -82,22 +109,30 @@ class TurningGene(template: Turning): Gene<Turning>(template), OdorWorldEntityBu
         return Turning(template).apply { parent = odorWorldEntity }
     }
 
+    override fun CouplingManager.defaultConsumer(container: Turning): Consumer? {
+        return container.getConsumerByMethodName("setAmount")
+    }
+
 }
 
 class OdorWorldBuilderProvider :
         BuilderProvider<OdorWorld, OdorWorldGeneticBuilder, OdorWorldBuilderContext>,
-        WorkspaceBuilderContextInvokable {
+        WorkspaceBuilderContextInvokable<OdorWorldBuilderContext, OdorWorld> {
 
     lateinit var product: OdorWorld
 
     override fun createWorkspaceComponent(name: String) = OdorWorldComponent(name, product)
 
-    override fun createBuilder(productMap: ProductMap): OdorWorldGeneticBuilder {
+    fun createBuilder(productMap: ProductMap): OdorWorldGeneticBuilder {
         return OdorWorldGeneticBuilder(productMap)
     }
 
-    override fun createContext(builder: OdorWorldGeneticBuilder): OdorWorldBuilderContext {
+    fun createContext(builder: OdorWorldGeneticBuilder): OdorWorldBuilderContext {
         return OdorWorldBuilderContext(builder)
+    }
+
+    override fun createProduct(productMap: ProductMap, template: OdorWorldBuilderContext.() -> Unit): OdorWorld {
+        return createBuilder(productMap).also { createContext(it).apply(template) }.build().also { product = it }
     }
 
 }
@@ -111,7 +146,7 @@ class OdorWorldGeneticBuilder(override val productMap: ProductMap) : GeneticBuil
         tasks.add(task)
     }
 
-    override fun build() = OdorWorld().also { world -> tasks.forEach { it(world) } }
+    fun build() = OdorWorld().also { world -> tasks.forEach { it(world) } }
 
 }
 
@@ -120,7 +155,9 @@ class OdorWorldBuilderContext(val builder: OdorWorldGeneticBuilder): BuilderCont
     operator fun OdorWorldEntityBuilderProvider.invoke(template: OdorWorldEntityBuilderContext.() -> Unit) {
         with(builder) {
             addTask { world ->
-                world.addEntity(createProduct(productMap, template).apply(entityTemplate))
+                world.addEntity(createProduct(world, productMap, template).apply(entityTemplate).also {
+                    builder.productMap[this@invoke] = it
+                })
             }
         }
     }
@@ -136,12 +173,17 @@ fun useOdorWorld() = OdorWorldBuilderProvider()
 class OdorWorldEntityBuilderProvider(val type: EntityType, val entityTemplate: OdorWorldEntity.() -> Unit)
     : BuilderProvider<OdorWorldEntity, OdorWorldEntityGeneticBuilder, OdorWorldEntityBuilderContext> {
 
-    override fun createBuilder(productMap: ProductMap): OdorWorldEntityGeneticBuilder {
+    fun createBuilder(productMap: ProductMap): OdorWorldEntityGeneticBuilder {
         return OdorWorldEntityGeneticBuilder(productMap, type)
     }
 
-    override fun createContext(builder: OdorWorldEntityGeneticBuilder): OdorWorldEntityBuilderContext {
+    fun createContext(builder: OdorWorldEntityGeneticBuilder): OdorWorldEntityBuilderContext {
         return OdorWorldEntityBuilderContext(builder)
+    }
+
+    fun createProduct(world: OdorWorld, productMap: ProductMap, template: OdorWorldEntityBuilderContext.() -> Unit):
+            OdorWorldEntity {
+        return createBuilder(productMap).also { createContext(it).apply(template) }.build(world)
     }
 
 }
@@ -155,8 +197,8 @@ class OdorWorldEntityGeneticBuilder(override val productMap: ProductMap, val typ
         tasks.add(task)
     }
 
-    override fun build(): OdorWorldEntity {
-        return OdorWorldEntity(type).also { tasks.forEach { task -> task(it) } }
+    fun build(world: OdorWorld): OdorWorldEntity {
+        return OdorWorldEntity(world, type).also { tasks.forEach { task -> task(it) } }
     }
 
 }

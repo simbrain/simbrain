@@ -138,13 +138,12 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                         +cheese
                     }
                     couplingManager {
-
+                        couple(sensors, inputs)
+                        couple(outputs[0], straightMovement[0])
+                        couple(outputs[1], turning[0])
+                        couple(outputs[2], turning[1])
                     }
                 }
-//                couplingManager {
-//                    couple(sensors, inputs)
-//                    couple(outputs, straightMovement + turning)
-//                }
             }
 
             onMutate {
@@ -197,7 +196,6 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
                 val partial = (100 - mouse.product.getRadiusTo(cheese.product)).let { if (it < 0) 0.0 else it } / 100
                 score + partial
-                1.0
             }
 
         }

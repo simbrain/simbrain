@@ -255,18 +255,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
         effectorsEnabled = type.isUseEffectors();
     }
 
-
-    /**
-     * Construct a basic entity with a single image location.
-     *
-     * @param type  image location
-     */
-    public OdorWorldEntity(final EntityType type) {
-        setEntityType(type);
-        sensorsEnabled = type.isUseSensors();
-        effectorsEnabled = type.isUseEffectors();
-    }
-
     /**
      * Updates this OdorWorldEntity's Animation and its position based on the
      * velocity.

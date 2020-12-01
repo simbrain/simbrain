@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
+import org.simbrain.custom_sims.helper_classes.Simulation
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
@@ -14,6 +15,7 @@ import org.simbrain.util.point
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.entities.EntityType
+import java.io.File
 
 class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
@@ -33,7 +35,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             launch(Dispatchers.Default) {
 
-                val generations = evolution.start().onEachIndexed { generation, result ->
+                val generations = createEvolution(sim, progressWindow).start().onEachIndexed { generation, result ->
                     progressWindow.progressBar.value = generation
                     progressWindow.fitnessScore.text = "Fitness: ${result[0].fitness.format(2)}"
                 }
@@ -41,20 +43,14 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
                 println(best)
 
-                val evaluationContext = best.prettyBuild().evaluationContext
-//
-//                evaluationContext.workspace.save(File("winner.zip"))
-//
-//                sim.workspace.openWorkspace(File("winner.zip"))
-
-                progressWindow.close()
+                best.prettyBuild().peek()
             }
 
         }
 
     }
 
-    val evolution: Evaluator get() {
+    private fun createEvolution(sim: Simulation, progressWindow: ProgressWindow): Evaluator {
         val environmentBuilder = environmentBuilder(1) {
 
             val inputs = chromosome(3) {
@@ -196,6 +192,12 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
                 val partial = (100 - mouse.product.getRadiusTo(cheese.product)).let { if (it < 0) 0.0 else it } / 100
                 score + partial
+            }
+
+            onPeek {
+                workspace { save(File("winner.zip")) }
+                sim.workspace.openWorkspace(File("winner.zip"))
+                progressWindow.close()
             }
 
         }

@@ -163,7 +163,7 @@ class NetworkBuilderContext(val builder: NetworkGeneticBuilder): BuilderContext 
     @JvmName("unaryPlusSynapse")
     operator fun <C: Chromosome<Synapse, ConnectionGene>> C.unaryPlus() {
         addGene { gene, net ->
-            gene.build(net, builder.productMap[gene.source]!!, builder.productMap[gene.target]!!)
+            gene.build(net, builder.productMap[gene.source], builder.productMap[gene.target])
                     .also { synapse -> net.addLooseSynapse(synapse) }
         }
     }

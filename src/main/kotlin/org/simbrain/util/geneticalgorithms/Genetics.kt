@@ -118,9 +118,15 @@ object MutationContext {
 /**
  * The environment produced by [EnvironmentBuilder.build]. All it does is provide for evaluation of a fitness function.
  */
-class Environment(val evaluationContext: EvaluationContext, private val evalFunction: EvaluationContext.() -> Double) {
+class Environment(
+        val evaluationContext: EvaluationContext,
+        private val evalFunction: EvaluationContext.() -> Double,
+        private val peekFunction: EvaluationContext.() -> Unit
+) {
 
     fun eval() = evaluationContext.evalFunction()
+
+    fun peek() = evaluationContext.peekFunction()
 
 }
 
@@ -189,6 +195,8 @@ class EnvironmentBuilder private constructor(
      */
     private lateinit var evalFunction: EvaluationContext.() -> Double
 
+    private lateinit var peekFunction: EvaluationContext.() -> Unit
+
     private lateinit var builderTemplate: TopLevelBuilderContext.(pretty: Boolean) -> Unit
 
     /**
@@ -230,7 +238,7 @@ class EnvironmentBuilder private constructor(
      */
     private fun buildWith(builder: TopLevelBuilderContext): Environment {
         val newSeed = random.nextInt()
-        return Environment(EvaluationContext(builder.productMap, Random(newSeed)), evalFunction)
+        return Environment(EvaluationContext(builder.productMap, Random(newSeed)), evalFunction, peekFunction)
     }
 
     fun build() = buildWith(TopLevelBuilderContext().apply { builderTemplate(false) })
@@ -242,6 +250,10 @@ class EnvironmentBuilder private constructor(
      */
     fun onEval(eval: EvaluationContext.() -> Double) {
         evalFunction = eval
+    }
+
+    fun onPeek(peek: EvaluationContext.() -> Unit) {
+        peekFunction = peek
     }
 
     private inline fun <T, G: Gene<T>> createChromosome(initializeValue: () -> Chromosome<T, G>): Chromosome<T, G> {

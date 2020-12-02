@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
@@ -39,10 +40,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 }
                 val (best, _) = generations.last().first()
 
-//                sim.addNetwork(
-//                        best.prettyBuild().evaluationContext.workspace.componentList.first() as NetworkComponent,
-//                        0, 200, 200, 0
-//                )
+                best.prettyBuild().peek()
 
                 progressWindow.close()
             }
@@ -55,7 +53,6 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
 
         val environmentBuilder = environmentBuilder {
 
-            val workspace = useWorkspace()
             val network = useNetwork()
 
             val inputs = chromosome(8) { index ->
@@ -105,20 +102,9 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                     inputs.products.activations = inputs.products.mapIndexed { index, _ ->
                         if (index % 2 == 0) even else odd
                     }
-                    workspace.product.apply { repeat(2) { simpleIterate() } }
 
-                    repeat(2) {
-                        workspace.product.simpleIterate()
-                    }
-
-                    val thing by workspace
-
-                    thing.simpleIterate()
-
-                    workspace {
-                        repeat(2) {
-                            simpleIterate()
-                        }
+                    network {
+                        repeat(2) { bufferedUpdate() }
                     }
 
                     val source = inputs.products.activations
@@ -127,29 +113,34 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 }.sum()
             }
 
+            onPeek {
+                sim.addNetwork(
+                        network { NetworkComponent("Network", this) },
+                        0, 200, 200, 0
+                )
+            }
+
             onBuild { pretty ->
-                workspace {
-                    network {
-                        if (pretty) {
-                            +inputs.asGroup {
-                                label = "Input"
-                                location = point(0, 100)
-                            }
-                            +nodes {
-                                this[0].location = point(50, 0)
-                                this[1].location = point(100, 0)
-                            }
-                            +outputs.asGroup {
-                                label = "Output"
-                                location = point(0, -100)
-                            }
-                        } else {
-                            +inputs
-                            +nodes
-                            +outputs
+                network {
+                    if (pretty) {
+                        +inputs.asGroup {
+                            label = "Input"
+                            location = point(0, 100)
                         }
-                        +connections
+                        +nodes {
+                            this[0].location = point(50, 0)
+                            this[1].location = point(100, 0)
+                        }
+                        +outputs.asGroup {
+                            label = "Output"
+                            location = point(0, -100)
+                        }
+                    } else {
+                        +inputs
+                        +nodes
+                        +outputs
                     }
+                    +connections
                 }
             }
 

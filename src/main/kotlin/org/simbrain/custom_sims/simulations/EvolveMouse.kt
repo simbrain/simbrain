@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
-import org.simbrain.custom_sims.helper_classes.Simulation
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
@@ -35,7 +34,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             launch(Dispatchers.Default) {
 
-                val generations = createEvolution(sim, progressWindow).start().onEachIndexed { generation, result ->
+                val generations = createEvolution().start().onEachIndexed { generation, result ->
                     progressWindow.progressBar.value = generation
                     progressWindow.fitnessScore.text = "Fitness: ${result[0].fitness.format(2)}"
                 }
@@ -44,13 +43,15 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 println(best)
 
                 best.prettyBuild().peek()
+
+                progressWindow.close()
             }
 
         }
 
     }
 
-    private fun createEvolution(sim: Simulation, progressWindow: ProgressWindow): Evaluator {
+    private fun createEvolution(): Evaluator {
         val environmentBuilder = environmentBuilder(1) {
 
             val inputs = chromosome(3) {
@@ -197,7 +198,6 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             onPeek {
                 workspace { save(File("winner.zip")) }
                 sim.workspace.openWorkspace(File("winner.zip"))
-                progressWindow.close()
             }
 
         }

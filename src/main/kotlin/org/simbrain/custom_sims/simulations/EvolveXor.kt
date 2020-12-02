@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
@@ -39,10 +40,7 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
                 val (best, _) = generations.last().first()
 
-//                sim.addNetwork(
-//                        best.prettyBuild().evaluationContext.workspace.componentList.first() as NetworkComponent,
-//                        0, 200, 200, 0
-//                )
+                best.prettyBuild().peek()
 
                 progressWindow.close()
             }
@@ -113,6 +111,10 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                     }
                     t sse outputChromosome.products.activations
                 }.sum()
+            }
+
+            onPeek {
+                sim.addNetwork(network { NetworkComponent("Network", this) }, 0, 200, 200, 0)
             }
 
             onBuild { pretty ->

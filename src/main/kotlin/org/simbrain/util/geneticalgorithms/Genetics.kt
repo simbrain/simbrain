@@ -94,10 +94,6 @@ class EvaluationContext(val mapping: ProductMap, val evalRand: Random) {
         return mapping[this].run(template)
     }
 
-    operator fun <P: BuilderProvider<T, *, *>, T> P.getValue(thisRef: Any?, property: Any): T {
-        return mapping[this]
-    }
-
 }
 
 /**

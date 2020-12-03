@@ -17,6 +17,7 @@ package org.simbrain.network.dl4j.DL4JSandbox;
  * SPDX-License-Identifier: Apache-2.0
  ******************************************************************************/
 
+import org.deeplearning4j.common.resources.DL4JResources;
 import org.deeplearning4j.datasets.iterator.impl.MnistDataSetIterator;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -56,6 +57,9 @@ public class MNISTSingleLayer {
     private static Logger log = LoggerFactory.getLogger(MNISTSingleLayer.class);
 
     public static void main(String[] args) throws Exception {
+
+        DL4JResources.setBaseDownloadURL("https://dl4jdata.blob.core.windows.net/");
+
         //number of rows and columns in the input pictures
         final int numRows = 28;
         final int numColumns = 28;

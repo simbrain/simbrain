@@ -28,6 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,16 +42,19 @@ public class ImageWorldDesktopPanel extends JPanel {
      * Combo box for selecting which sensor matrix to view.
      */
     private JComboBox<SensorMatrix> sensorMatrixCombo = new JComboBox<SensorMatrix>();
+    private JComboBox<Color> colorPicker = new JComboBox<Color>();
 
     /**
      * Toolbars.
      */
     private JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    private JPanel bottom_toolbars = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
     /**
      * Main toolbar with buttons to advance images, etc.
      */
     private JToolBar sourceToolbar = new JToolBar();
+    private JToolBar imageAlbumToolbar = new JToolBar();
 
     /**
      * Toolbar for setting the sensor matrix.
@@ -109,6 +113,8 @@ public class ImageWorldDesktopPanel extends JPanel {
         toolbars.add(sensorToolbar);
         add(world.getImagePanel(), BorderLayout.CENTER);
         world.getImagePanel().setPreferredSize(new Dimension(640, 480));
+        add(bottom_toolbars, BorderLayout.SOUTH);
+        bottom_toolbars.add(imageAlbumToolbar);
 
         world.addListener(new ImageWorld.Listener() {
 
@@ -195,8 +201,6 @@ public class ImageWorldDesktopPanel extends JPanel {
         frame.setJMenuBar(menuBar);
     }
 
-
-
     /**
      * Create and display the context menu.
      */
@@ -216,9 +220,9 @@ public class ImageWorldDesktopPanel extends JPanel {
     private void setupToolbars() {
 
         if (world instanceof PixelProducer) {
-            getImageAlbumButtons().forEach(sourceToolbar::add);
+            getImageAlbumButtons().forEach(imageAlbumToolbar::add);
         } else if (world instanceof PixelConsumer) {
-            getPixelDisplayToolbar().forEach(sourceToolbar::add);
+            getPixelDisplayToolbar().forEach(imageAlbumToolbar::add);
         }
 
         JButton saveImageButton = new JButton();
@@ -235,27 +239,6 @@ public class ImageWorldDesktopPanel extends JPanel {
             createCanvas.setToolTipText("Create canvas");
 
             createCanvas.addActionListener(e -> {
-                // StandardDialog dialog = new StandardDialog();
-                // JPanel pane = new JPanel();
-                // JTextField rows = new JTextField();
-                // JTextField columns = new JTextField();
-                // rows.setText("40");
-                // rows.setColumns(3);
-                // columns.setText("10");
-                // columns.setColumns(3);
-                // pane.add(new JLabel("Rows"));
-                // pane.add(rows);
-                // pane.add(new JLabel("Columns"));
-                // pane.add(columns);
-                //
-                // dialog.setContentPane(pane);
-                // dialog.pack();
-                // dialog.setLocationRelativeTo(null);
-                // dialog.setVisible(true);
-                // if (!dialog.hasUserCancelled()) {
-                //     System.out.println("here");
-                //     ((ImageAlbumWorld)world).createBlankCanvas(Integer.parseInt(rows.getText()),Integer.parseInt(columns.getText()));
-                // }
                 ((PixelProducer)world).createBlankCanvas(10,10);
             });
             sourceToolbar.add(createCanvas);
@@ -295,15 +278,6 @@ public class ImageWorldDesktopPanel extends JPanel {
         });
         sensorToolbar.add(addSensorMatrix);
 
-        // Delete sensor matrix
-        JButton deleteSensorMatrix = new JButton(ResourceManager.getImageIcon("menu_icons/minus.png"));
-        deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");
-        deleteSensorMatrix.addActionListener(evt -> {
-            SensorMatrix selectedSensorMatrix = (SensorMatrix) sensorMatrixCombo.getSelectedItem();
-            world.removeSensorMatrix(selectedSensorMatrix);
-        });
-        sensorToolbar.add(deleteSensorMatrix);
-
         // Editor Sensor Matrix
         JButton editSensorMatrix = new JButton(ResourceManager.getImageIcon("menu_icons/Prefs.png"));
         editSensorMatrix.setToolTipText("Edit Sensor Matrix");
@@ -319,9 +293,7 @@ public class ImageWorldDesktopPanel extends JPanel {
             SensorMatrix sensorMatrix = world.getCurrentSensorMatrix();
             AnnotatedPropertyEditor sensorEditor = new AnnotatedPropertyEditor(sensorMatrix);
             dialogPanel.add(sensorEditor);
-            filterEditorDialog.addClosingTask(() -> {
-                sensorEditor.commitChanges();
-            });
+            filterEditorDialog.addClosingTask(sensorEditor::commitChanges);
 
             // If the sensor matrix has a filtered image source, edit it too
             if (sensorMatrix.getSource() instanceof FilteredImageSource) {
@@ -337,6 +309,15 @@ public class ImageWorldDesktopPanel extends JPanel {
                 });
             }
 
+            // Delete sensor matrix
+            JButton deleteSensorMatrix = new JButton("Delete Filter");
+            deleteSensorMatrix.setToolTipText("Delete Sensor Matrix");
+            deleteSensorMatrix.addActionListener(e -> {
+                world.removeSensorMatrix(sensorMatrix);
+                filterEditorDialog.setVisible(false);
+            });
+            dialogPanel.add(deleteSensorMatrix);
+
             filterEditorDialog.pack();
             filterEditorDialog.setLocationRelativeTo(this);
             filterEditorDialog.setVisible(true);
@@ -345,7 +326,6 @@ public class ImageWorldDesktopPanel extends JPanel {
         sensorToolbar.add(editSensorMatrix);
 
     }
-
 
     /**
      * Copy image from current system clipboard.
@@ -405,6 +385,14 @@ public class ImageWorldDesktopPanel extends JPanel {
     public List<JButton> getImageAlbumButtons() {
         List<JButton> returnList = new LinkedList<>();
 
+        JButton loadImagesButton = new JButton();
+        loadImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/photo.png"));
+        loadImagesButton.setToolTipText("Load Images");
+        loadImagesButton.addActionListener(e -> {
+            loadImages();
+        });
+        returnList.add(loadImagesButton);
+
         previousImagesButton = new JButton();
         previousImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoPrevious.png"));
         previousImagesButton.setToolTipText("Previous Image");
@@ -420,14 +408,6 @@ public class ImageWorldDesktopPanel extends JPanel {
             ((PixelProducer)world).nextFrame();
         });
         returnList.add(nextImagesButton);
-
-        JButton loadImagesButton = new JButton();
-        loadImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/photo.png"));
-        loadImagesButton.setToolTipText("Load Images");
-        loadImagesButton.addActionListener(e -> {
-            loadImages();
-        });
-        returnList.add(loadImagesButton);
 
         return returnList;
     }
@@ -482,10 +462,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         } else {
             nextImagesButton.setEnabled(true);
             previousImagesButton.setEnabled(true);
-
         }
 
     }
-
-
 }

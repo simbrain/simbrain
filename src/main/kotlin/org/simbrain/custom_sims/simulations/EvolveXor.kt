@@ -15,7 +15,6 @@ import org.simbrain.util.sse
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
-import kotlin.streams.toList
 
 class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
@@ -41,10 +40,7 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
                 val (best, _) = generations.last().first()
 
-                sim.addNetwork(
-                        best.prettyBuild().evaluationContext.workspace.componentList.first() as NetworkComponent,
-                        0, 200, 200, 0
-                )
+                best.prettyBuild().peek()
 
                 progressWindow.close()
             }
@@ -56,6 +52,8 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
     val evolution: Evaluator get() {
 
         val environmentBuilder = environmentBuilder {
+
+            val network = useNetwork()
 
             val inputChromosome = chromosome(2) { index ->
                 nodeGene {
@@ -108,32 +106,33 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 val tarData = listOf(listOf(0.0), listOf(1.0), listOf(1.0), listOf(0.0))
                 inputData.zip(tarData).map {(i, t) ->
                     inputChromosome.products.activations = i
-                    repeat(20) {
-                        workspace.simpleIterate()
+                    network {
+                        repeat(20) { bufferedUpdate() }
                     }
                     t sse outputChromosome.products.activations
                 }.sum()
             }
 
-            onBuild {
-                +network {
-                    +inputChromosome
-                    +hiddenNodeChromosome
-                    +outputChromosome
-                    +connectionChromosome
-                }
+            onPeek {
+                sim.addNetwork(network { NetworkComponent("Network", this) }, 0, 200, 200, 0)
             }
 
-            onPrettyBuild {
-                +network {
-                    +inputChromosome.asGroup {
-                        label = "Input"
-                        location = point(0, 100)
-                    }
-                    +hiddenNodeChromosome
-                    +outputChromosome.asGroup {
-                        label = "Output"
-                        location = point(0, -100)
+            onBuild { pretty ->
+                network {
+                    if (pretty) {
+                        +inputChromosome.asGroup {
+                            label = "Input"
+                            location = point(0, 100)
+                        }
+                        +hiddenNodeChromosome
+                        +outputChromosome.asGroup {
+                            label = "Output"
+                            location = point(0, -100)
+                        }
+                    } else {
+                        +inputChromosome
+                        +hiddenNodeChromosome
+                        +outputChromosome
                     }
                     +connectionChromosome
                 }

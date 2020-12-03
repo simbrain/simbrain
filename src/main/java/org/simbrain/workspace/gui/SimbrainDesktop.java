@@ -914,6 +914,7 @@ public class SimbrainDesktop {
         desktop.add(componentFrame);
         guiComponent.postAddInit();
         lastFocusedStack.push(guiComponent);
+        guiComponent.getParentFrame().pack();
         // System.out.println(lastOpened.getName());
 
         // Forces last component of the desktop to the front

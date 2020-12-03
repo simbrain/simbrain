@@ -25,12 +25,15 @@ class GeneticsTest {
     @Test
     fun `node chromosome with repeating default genes creates specified neurons`() {
         val environment = environmentBuilder {
+
+            val network = useNetwork()
+
             val nodes = chromosome(5) {
                 nodeGene { activation = 0.7 }
             }
 
             onBuild {
-                +network {
+                network {
                     +nodes
                 }
             }
@@ -50,6 +53,9 @@ class GeneticsTest {
     fun `node chromosome with individually specified default genes creates corresponding neurons`() {
         val defaultActivations = listOf(0.2, 0.7, 0.3, 0.6, 0.5)
         val environment = environmentBuilder {
+
+            val network = useNetwork()
+
             val nodes = chromosome(
                     *defaultActivations.map {
                         nodeGene { activation = it }
@@ -57,7 +63,7 @@ class GeneticsTest {
             )
 
             onBuild {
-                +network {
+                network {
                     +nodes
                 }
             }
@@ -77,6 +83,8 @@ class GeneticsTest {
     fun `genes are deeply copied after calling copy on environment`() {
         val refs = mutableListOf(mutableListOf<Any>())
 
+        val network = useNetwork()
+
         val environment = environmentBuilder {
             val inputs = chromosome(2) {
                 nodeGene {
@@ -86,7 +94,7 @@ class GeneticsTest {
             }
 
             onBuild {
-                +network {
+                network {
                     +inputs
                 }
             }
@@ -107,6 +115,9 @@ class GeneticsTest {
     @Test
     fun `connection genes have correct references to node genes after copy`() {
         val environment = environmentBuilder {
+
+            val network = useNetwork()
+
             val inputs = chromosome(2) {
                 nodeGene()
             }
@@ -121,7 +132,7 @@ class GeneticsTest {
             )
 
             onBuild {
-                +network {
+                network {
                     +inputs
                     +outputs
                     +synapses
@@ -147,6 +158,9 @@ class GeneticsTest {
     @Test
     fun `connection genes have correct references to node genes after mutation`() {
         val environment = environmentBuilder {
+
+            val network = useNetwork()
+
             val inputs = chromosome(2) {
                 nodeGene()
             }
@@ -161,7 +175,7 @@ class GeneticsTest {
             )
 
             onBuild {
-                +network {
+                network {
                     +inputs
                     +outputs
                     +synapses
@@ -198,6 +212,10 @@ class GeneticsTest {
     @Test
     fun `coupling node chromosome with node chromosome creates correct couplings`() {
         val environmentBuilder = environmentBuilder {
+
+            val workspace = useWorkspace()
+            val network = useNetwork()
+
             val inputs = chromosome(3) {
                 nodeGene {
                     isClamped = true
@@ -209,12 +227,14 @@ class GeneticsTest {
             }
 
             onBuild {
-                couplingManager {
-                    couple(inputs, outputs)
-                }
-                +network {
-                    +inputs
-                    +outputs
+                workspace {
+                    couplingManager {
+                        couple(inputs, outputs)
+                    }
+                    network {
+                        +inputs
+                        +outputs
+                    }
                 }
             }
 
@@ -222,7 +242,9 @@ class GeneticsTest {
 
                 inputs.products.activations = listOf(1.0, 1.0, 1.0)
 
-                workspace.simpleIterate()
+                workspace {
+                    simpleIterate()
+                }
 
                 assertArrayEquals(inputs.products.activations.toTypedArray(), outputs.products.activations.toTypedArray())
 

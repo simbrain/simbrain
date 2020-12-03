@@ -34,7 +34,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             launch(Dispatchers.Default) {
 
-                val generations = evolution.start().onEachIndexed { generation, result ->
+                val generations = createEvolution().start().onEachIndexed { generation, result ->
                     progressWindow.progressBar.value = generation
                     progressWindow.fitnessScore.text = "Fitness: ${result[0].fitness.format(2)}"
                 }
@@ -42,11 +42,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
                 println(best)
 
-                val evaluationContext = best.prettyBuild().evaluationContext
-
-                evaluationContext.workspace.save(File("winner.zip"))
-
-                sim.workspace.openWorkspace(File("winner.zip"))
+                best.prettyBuild().peek()
 
                 progressWindow.close()
             }
@@ -55,7 +51,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
     }
 
-    val evolution: Evaluator get() {
+    private fun createEvolution(): Evaluator {
         val environmentBuilder = environmentBuilder(1) {
 
             val inputs = chromosome(3) {
@@ -78,6 +74,12 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             val connections = chromosome<Synapse, ConnectionGene>()
 
+            val workspace = useWorkspace()
+
+            val network = useNetwork()
+
+            val odorworld = useOdorWorld()
+
             val sensors = chromosome(3) {
                 objectSensorGene {
                     setObjectType(EntityType.SWISS)
@@ -96,59 +98,48 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                     turningGene { direction = 1.0 }
             )
 
-            val mouse = entity(EntityType.MOUSE) {
+            val mouse = useEntity(EntityType.MOUSE) {
                 setCenterLocation(100.0, 200.0)
             }
 
-            val cheese = entity(EntityType.SWISS) {
+            val cheese = useEntity(EntityType.SWISS) {
                 setCenterLocation(150.0, 200.0)
             }
 
-            onBuild {
-                couplingManager {
-                    couple(sensors, inputs)
-                    couple(outputs, straightMovement + turning)
-                }
-                +odorworld {
-                    +mouse {
-                        +sensors
-                        +straightMovement
-                        +turning
+            onBuild { pretty ->
+                workspace {
+                    network {
+                        if (pretty) {
+                            +inputs.asGroup {
+                                label = "Input"
+                                location = point(0, 100)
+                            }
+                            +hiddens
+                            +outputs.asGroup {
+                                label = "Output"
+                                location = point(0, -100)
+                            }
+                        } else {
+                            +inputs
+                            +hiddens
+                            +outputs
+                        }
+                        +connections
                     }
-                    +cheese
-                }
-                +network {
-                    +inputs
-                    +hiddens
-                    +outputs
-                    +connections
-                }
-            }
-
-            onPrettyBuild {
-                couplingManager {
-                    couple(sensors, inputs)
-                    couple(outputs, straightMovement + turning)
-                }
-                +odorworld {
-                    +mouse {
-                        +sensors
-                        +straightMovement
-                        +turning
+                    odorworld {
+                        mouse {
+                            +sensors
+                            +straightMovement
+                            +turning
+                        }
+                        +cheese
                     }
-                    +cheese
-                }
-                +network {
-                    +inputs.asGroup {
-                        label = "Input"
-                        location = point(0, 100)
+                    couplingManager {
+                        couple(sensors, inputs)
+                        couple(outputs[0], straightMovement[0])
+                        couple(outputs[1], turning[0])
+                        couple(outputs[2], turning[1])
                     }
-                    +hiddens
-                    +outputs.asGroup {
-                        label = "Output"
-                        location = point(0, -100)
-                    }
-                    +connections
                 }
             }
 
@@ -177,6 +168,12 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             onEval {
                 var score = 0.0
 
+                cheese {
+                    val x = mouse { centerX } + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate()
+                    val y = mouse { centerY } + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate()
+                    setCenterLocation(x, y)
+                }
+
                 cheese.product.setCenterLocation(
                         mouse.product.centerX + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate(),
                         mouse.product.centerY + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate()
@@ -191,11 +188,16 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                             mouse.product.centerY + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate()
                     )
                 }
-                repeat(1000) {
-                    workspace.simpleIterate()
+                workspace {
+                    repeat(1000) { simpleIterate() }
                 }
                 val partial = (100 - mouse.product.getRadiusTo(cheese.product)).let { if (it < 0) 0.0 else it } / 100
                 score + partial
+            }
+
+            onPeek {
+                workspace { save(File("winner.zip")) }
+                sim.workspace.openWorkspace(File("winner.zip"))
             }
 
         }

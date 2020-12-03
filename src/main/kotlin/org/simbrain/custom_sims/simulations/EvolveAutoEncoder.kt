@@ -15,7 +15,6 @@ import org.simbrain.util.sse
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
-import kotlin.streams.toList
 
 class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
@@ -41,10 +40,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 }
                 val (best, _) = generations.last().first()
 
-                sim.addNetwork(
-                        best.prettyBuild().evaluationContext.workspace.componentList.first() as NetworkComponent,
-                        0, 200, 200, 0
-                )
+                best.prettyBuild().peek()
 
                 progressWindow.close()
             }
@@ -56,6 +52,8 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
     val evolution: Evaluator get() {
 
         val environmentBuilder = environmentBuilder {
+
+            val network = useNetwork()
 
             val inputs = chromosome(8) { index ->
                 nodeGene {
@@ -104,37 +102,43 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                     inputs.products.activations = inputs.products.mapIndexed { index, _ ->
                         if (index % 2 == 0) even else odd
                     }
-                    repeat(2) {
-                        workspace.simpleIterate()
+
+                    network {
+                        repeat(2) { bufferedUpdate() }
                     }
+
                     val source = inputs.products.activations
                     val target = outputs.products.activations
                     source sse target
                 }.sum()
             }
 
-            onBuild {
-                +network {
-                    +inputs
-                    +nodes
-                    +outputs
-                    +connections
-                }
+            onPeek {
+                sim.addNetwork(
+                        network { NetworkComponent("Network", this) },
+                        0, 200, 200, 0
+                )
             }
 
-            onPrettyBuild {
-                +network {
-                    +inputs.asGroup {
-                        label = "Input"
-                        location = point(0, 100)
-                    }
-                    +nodes {
-                        this[0].location = point(50, 0)
-                        this[1].location = point(100, 0)
-                    }
-                    +outputs.asGroup {
-                        label = "Output"
-                        location = point(0, -100)
+            onBuild { pretty ->
+                network {
+                    if (pretty) {
+                        +inputs.asGroup {
+                            label = "Input"
+                            location = point(0, 100)
+                        }
+                        +nodes {
+                            this[0].location = point(50, 0)
+                            this[1].location = point(100, 0)
+                        }
+                        +outputs.asGroup {
+                            label = "Output"
+                            location = point(0, -100)
+                        }
+                    } else {
+                        +inputs
+                        +nodes
+                        +outputs
                     }
                     +connections
                 }

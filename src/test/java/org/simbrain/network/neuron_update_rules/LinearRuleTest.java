@@ -1,8 +1,11 @@
 package org.simbrain.network.neuron_update_rules;
 
 import org.junit.Test;
+import org.opencv.dnn.Net;
+import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 
 import static org.junit.Assert.*;
 
@@ -11,13 +14,31 @@ public class LinearRuleTest {
     @Test
     public void testUpdate() {
 
-        LinearRule lr = new LinearRule();
-        Neuron n = new Neuron(new Network(), lr);
-        n.setInputValue(10);
-        lr.update(n);
-        assertEquals(1, n.getBuffer(), 0);
-        // TODO: Finish testing the update method
+        // Default update rule is linear
+        Network net = new Network();
+        Neuron output = new Neuron(net);
+        output.setUpperBound(10);
+        net.addLooseNeuron(output);
 
+        Neuron input1 = new Neuron(net);
+        input1.setClamped(true);
+        input1.setActivation(1);
+        net.addLooseNeuron(input1);
+        Neuron input2 = new Neuron(net);
+        input2.setClamped(true);
+        input2.setActivation(-1);
+        net.addLooseNeuron(input2);
+
+        Synapse w13 = new Synapse(input1, output);
+        w13.setStrength(.5);
+        net.addLooseSynapse(w13);
+        Synapse w23 = new Synapse(input2, output);
+        w23.setStrength(-1);
+        net.addLooseSynapse(w23);
+
+        // 1*.5 + -1*-1 = .5 + 1 = 1.5
+        net.update();
+        assertEquals(1.5, output.getActivation(), 0);
     }
 
     @Test

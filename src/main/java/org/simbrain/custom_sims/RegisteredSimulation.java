@@ -103,6 +103,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new KuramotoOscillators());
         REGISTERED_SIMS.add(new SORN());
         REGISTERED_SIMS.add(new TestSim());
+        REGISTERED_SIMS.add(new lstmBlock());
         REGISTERED_SIMS.add(new EvolveAutoEncoder(null));
         REGISTERED_SIMS.add(new EvolveXor(null));
         REGISTERED_SIMS.add(new EvolveMouse(null));

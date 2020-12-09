@@ -7,10 +7,6 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.util.complement
-import org.simbrain.workspace.couplings.consumers
-import org.simbrain.workspace.couplings.getConsumer
-import org.simbrain.workspace.couplings.getProducer
-import org.simbrain.workspace.couplings.producers
 
 class CouplingTest {
 
@@ -29,7 +25,7 @@ class CouplingTest {
         val neuron = Neuron(network)
         network.addLooseNeuron(neuron)
         val expected = setOf("getLabel", "getActivation")
-        val actual = neuron.producers.map { it.method.name }.toSet()
+        val actual = with(couplingManager) { neuron.producers.map { it.method.name }.toSet() }
         val diff = expected complement actual // For error message if test fails
         assertTrue("$diff", diff.isIdentical())
     }
@@ -39,7 +35,7 @@ class CouplingTest {
         val neuron = Neuron(network)
         network.addLooseNeuron(neuron)
         val expected = setOf("setActivation", "forceSetActivation", "setInputValue", "addInputValue", "setLabel")
-        val actual = neuron.consumers.map { it.method.name }.toSet()
+        val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
         val diff = expected complement actual
         assertTrue("$diff", diff.isIdentical())
     }
@@ -53,7 +49,7 @@ class CouplingTest {
             addLooseNeuron(neuron2)
         }
         with(couplingManager) {
-            neuron1.producerByName("getActivation") couple neuron2.consumerByName("forceSetActivation")
+            neuron1.getProducerByMethodName("getActivation") couple neuron2.getConsumerByMethodName("forceSetActivation")
         }
         neuron1.activation = 1.0
         neuron2.isClamped = true
@@ -77,10 +73,16 @@ class CouplingTest {
         network2.addLooseNeuron(neuron3)
 
         // Now couple them
-        couplingManager.createCoupling(neuron1.getProducer("getActivation"),
-                neuron3.getConsumer("addInputValue"));
-        couplingManager.createCoupling(neuron2.getProducer("getActivation"),
-                neuron3.getConsumer("addInputValue"));
+        with(couplingManager) {
+            createCoupling(
+                    neuron1.getProducerByMethodName("getActivation"),
+                    neuron3.getConsumerByMethodName("addInputValue")
+            )
+            createCoupling(
+                    neuron2.getProducerByMethodName("getActivation"),
+                    neuron3.getConsumerByMethodName("addInputValue")
+            )
+        }
 
         // We expect neuron 3 to have  value of 1 after update
         workspace.simpleIterate()
@@ -102,10 +104,16 @@ class CouplingTest {
         network2.addLooseNeuron(neuron3)
 
         // Now couple them
-        couplingManager.createCoupling(neuron1.getProducer("getActivation"),
-                neuron2.getConsumer("setInputValue"));
-        couplingManager.createCoupling(neuron1.getProducer("getActivation"),
-                neuron3.getConsumer("setInputValue"));
+        with(couplingManager) {
+            couplingManager.createCoupling(
+                    neuron1.getProducerByMethodName("getActivation"),
+                    neuron2.getConsumerByMethodName("setInputValue")
+            )
+            couplingManager.createCoupling(
+                    neuron1.getProducerByMethodName("getActivation"),
+                    neuron3.getConsumerByMethodName("setInputValue")
+            )
+        }
 
         // We expect neurons 2 and 3 to have  value of .5 after update
         workspace.simpleIterate()

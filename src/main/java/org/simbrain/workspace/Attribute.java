@@ -205,6 +205,24 @@ public abstract class Attribute {
         visibility = visible;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Attribute attribute = (Attribute) o;
+
+        if (!getBaseObject().equals(attribute.getBaseObject())) return false;
+        return getMethod().equals(attribute.getMethod());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getBaseObject().hashCode();
+        result = 31 * result + getMethod().hashCode();
+        return result;
+    }
+
     /**
      * Base builder for {@link Consumer} and {@link Producer} instances.
      * Create custom instances of the specific implementation of {@link Attribute} by using

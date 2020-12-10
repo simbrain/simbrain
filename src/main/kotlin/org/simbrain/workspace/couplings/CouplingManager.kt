@@ -23,15 +23,16 @@ class CouplingManager(val workspace: Workspace) {
 
     private val newCouplingCache = NewCouplingCache(this)
 
-    private val _couplings = LinkedHashMap<Pair<Producer, Consumer>, Coupling>()
+    private val _couplings = LinkedHashSet<Coupling>()
+
+    private val attributeContainerCouplings = HashMap<AttributeContainer, LinkedHashSet<Coupling>>()
 
     val methodVisibilities = HashMap<Method, Boolean>()
 
     /**
      * Returns all couplings
      */
-    val couplings
-        get() = _couplings.values
+    val couplings: Set<Coupling> = _couplings
 
     /**
      * List of listeners to fire updates when couplings are changed.
@@ -158,7 +159,9 @@ class CouplingManager(val workspace: Workspace) {
      * @return the newly creating coupling
      */
     fun createCoupling(producer: Producer?, consumer: Consumer?) = Coupling.create(producer, consumer).also {
-        _couplings[it.producer to it.consumer] = it
+        _couplings.add(it)
+        attributeContainerCouplings.getOrPut(it.producer.baseObject) { LinkedHashSet() }.add(it)
+        attributeContainerCouplings.getOrPut(it.consumer.baseObject) { LinkedHashSet() }.add(it)
         events.fireCouplingAdded(it)
     }
 
@@ -246,8 +249,25 @@ class CouplingManager(val workspace: Workspace) {
      * @param coupling the coupling to remove
      */
     fun removeCoupling(coupling: Coupling) {
-        _couplings.remove(coupling.producer to coupling.consumer)
+        _couplings.remove(coupling)
+        attributeContainerCouplings[coupling.producer.baseObject]?.remove(coupling)
+        attributeContainerCouplings[coupling.consumer.baseObject]?.remove(coupling)
         events.fireCouplingRemoved(coupling)
+    }
+
+    fun removeAttributeContainer(attributeContainer: AttributeContainer) {
+        attributeContainerCouplings[attributeContainer]?.let {
+            it.forEach { coupling ->
+                _couplings.remove(coupling)
+                val other = if (attributeContainer === coupling.consumer) {
+                    coupling.producer
+                } else {
+                    coupling.consumer
+                }
+                attributeContainerCouplings[other.baseObject]?.remove(coupling)
+            }
+            events.fireCouplingsRemoved(it.toList())
+        }
     }
 
 }

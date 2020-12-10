@@ -21,18 +21,24 @@ import java.lang.reflect.Method
  */
 class CouplingManager(val workspace: Workspace) {
 
-    private val newCouplingCache = NewCouplingCache(this)
+    private val couplingCache = CouplingCache(this)
 
+    /**
+     * Backing field for [couplings].
+     */
     private val _couplings = LinkedHashSet<Coupling>()
-
-    private val attributeContainerCouplings = HashMap<AttributeContainer, LinkedHashSet<Coupling>>()
-
-    val methodVisibilities = HashMap<Method, Boolean>()
 
     /**
      * Returns all couplings
      */
     val couplings: Set<Coupling> = _couplings
+
+    /**
+     * Couplings associated with an [AttributeContainer]. For faster lookup.
+     */
+    private val attributeContainerCouplings = HashMap<AttributeContainer, LinkedHashSet<Coupling>>()
+
+    val methodVisibilities = HashMap<Method, Boolean>()
 
     /**
      * List of listeners to fire updates when couplings are changed.
@@ -46,8 +52,8 @@ class CouplingManager(val workspace: Workspace) {
         get() = sequence {
             workspace.componentList.forEach { component ->
                 component.attributeContainers.forEach { container ->
-                    newCouplingCache.getMethods(container)
-                            .filter { newCouplingCache.getVisibility(it) }
+                    couplingCache.getMethods(container)
+                            .filter { couplingCache.getVisibility(it) }
                             .forEach { yield(it) }
                 }
             }
@@ -59,7 +65,7 @@ class CouplingManager(val workspace: Workspace) {
     val WorkspaceComponent.producerMethods: Set<Method>
         get() = sequence {
             attributeContainers.forEach { container ->
-                newCouplingCache.getMethods(container)
+                couplingCache.getMethods(container)
                         .filter { it.isProducible() }
                         .forEach { yield(it) }
             }
@@ -71,7 +77,7 @@ class CouplingManager(val workspace: Workspace) {
     val WorkspaceComponent.consumerMethods: Set<Method>
         get() = sequence {
             attributeContainers.forEach { container ->
-                newCouplingCache.getMethods(container)
+                couplingCache.getMethods(container)
                         .filter { it.isConsumable() }
                         .forEach { yield(it) }
             }
@@ -81,61 +87,61 @@ class CouplingManager(val workspace: Workspace) {
      * A collection of all visible [Producer]s in a given [WorkspaceComponent]
      */
     val WorkspaceComponent.producers: Sequence<Producer>
-        get() = newCouplingCache.getProducers(this)
+        get() = couplingCache.getProducers(this)
 
     /**
      * A collection of all visible [Consumer]s in a given [WorkspaceComponent]
      */
     val WorkspaceComponent.consumers: Sequence<Consumer>
-        get() = newCouplingCache.getConsumers(this)
+        get() = couplingCache.getConsumers(this)
 
     /**
      * A collection of all visible [Producer]s in a given [AttributeContainer]
      */
     val AttributeContainer.producers: Sequence<Producer>
-        get() = newCouplingCache.getProducers(this)
+        get() = couplingCache.getProducers(this)
 
     /**
      * A collection of all visible [Consumer]s in a given [AttributeContainer]
      */
     val AttributeContainer.consumers: Sequence<Consumer>
-        get() = newCouplingCache.getConsumers(this)
+        get() = couplingCache.getConsumers(this)
 
     /**
      * A collection of all visible [Producer]s in a given [WorkspaceComponent]
      */
     val WorkspaceComponent.visibleProducers: Sequence<Producer>
-        get() = newCouplingCache.getVisibleProducers(this)
+        get() = couplingCache.getVisibleProducers(this)
 
     /**
      * A collection of all visible [Consumer]s in a given [WorkspaceComponent]
      */
     val WorkspaceComponent.visibleConsumers: Sequence<Consumer>
-        get() = newCouplingCache.getVisibleConsumers(this)
+        get() = couplingCache.getVisibleConsumers(this)
 
     /**
      * A collection of all visible [Producer]s in a given [AttributeContainer]
      */
     val AttributeContainer.visibleProducers: Sequence<Producer>
-        get() = newCouplingCache.getVisibleProducers(this)
+        get() = couplingCache.getVisibleProducers(this)
 
     /**
      * A collection of all visible [Consumer]s in a given [AttributeContainer]
      */
     val AttributeContainer.visibleConsumers: Sequence<Consumer>
-        get() = newCouplingCache.getVisibleConsumers(this)
+        get() = couplingCache.getVisibleConsumers(this)
 
     /**
      * Find the first [Consumer] in an [AttributeContainer] which has the given method name
      */
-    fun AttributeContainer.getConsumerByMethodName(methodName: String): Consumer = with(newCouplingCache) {
+    fun AttributeContainer.getConsumerByMethodName(methodName: String): Consumer = with(couplingCache) {
         getConsumer(methodName)
     }
 
     /**
      * Find the first [Producer] in an [AttributeContainer] which has the given method name
      */
-    fun AttributeContainer.getProducerByMethodName(methodName: String) = with(newCouplingCache) {
+    fun AttributeContainer.getProducerByMethodName(methodName: String) = with(couplingCache) {
         getProducer(methodName)
     }
 
@@ -143,13 +149,13 @@ class CouplingManager(val workspace: Workspace) {
      * A collection of all [compatibleProducers] in a given [WorkspaceComponent]
      */
     fun Consumer.compatiblesOfComponent(component: WorkspaceComponent)
-            = newCouplingCache.getCompatibleVisibleProducers(this, component)
+            = couplingCache.getCompatibleVisibleProducers(this, component)
 
     /**
      * A collection of all [compatibleConsumers] in a given [WorkspaceComponent]
      */
     fun Producer.compatiblesOfComponent(component: WorkspaceComponent)
-            = newCouplingCache.getCompatibleVisibleConsumers(this, component)
+            = couplingCache.getCompatibleVisibleConsumers(this, component)
 
     /**
      * Create a coupling from a producer and consumer of the same type.

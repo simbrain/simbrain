@@ -3,14 +3,35 @@ package org.simbrain.workspace.couplings
 import org.simbrain.workspace.*
 import java.lang.reflect.Method
 
-class NewCouplingCache(val couplingManager: CouplingManager) {
+/**
+ * Cache method objects for each [AttributeContainer]. Reflection is still used to create Method objects but they are
+ * cached here for quick access.
+ *
+ * A utility class for [CouplingManager]. Provides optimized ways to access specific sets of producers and consumers.
+ * These methods should not be called directly and this class should not be instantiated outside of CouplingManager.
+ *
+ * @author Yulin Li
+ */
+class CouplingCache(val couplingManager: CouplingManager) {
 
+    /**
+     * The main cache for [Method] objects.
+     */
     private val attributeMethods = HashMap<Class<AttributeContainer>, List<Method>>()
 
+    /**
+     * Cache properties of [Producible] methods like annotations and custom descriptions.
+     */
     private val producerBuilders = HashMap<Method, (AttributeContainer) -> Producer>()
 
+    /**
+     * Cache properties of [Consumable] methods like annotations and custom descriptions.
+     */
     private val consumerBuilders = HashMap<Method, (AttributeContainer) -> Consumer>()
 
+    /**
+     * Get all the [Producible] or [Consumable] methods from an [AttributeContainer] and put them in the main cache.
+     */
     fun getMethods(container: AttributeContainer): List<Method> {
         return attributeMethods.getOrPut(container.javaClass) {
             container.javaClass.methods
@@ -52,11 +73,13 @@ class NewCouplingCache(val couplingManager: CouplingManager) {
         return javaClass.findMethod(methodName)?.let { method ->
             getProducer(method)
         } ?: throw NoSuchMethodException(
-                "No producible method with name $methodName was found in class ${this@NewCouplingCache.javaClass.simpleName}."
+                "No producible method with name $methodName was found in class ${this@CouplingCache.javaClass.simpleName}."
         )
     }
 
     fun AttributeContainer.getProducer(method: Method): Producer = producerBuilders.getOrPut(method) {
+
+        // The objects below are what are cached by the builder
         val annotation = method.getAnnotation(Producible::class.java)
                 ?: throw IllegalArgumentException("Method ${method.name} is not producible.")
 
@@ -75,11 +98,13 @@ class NewCouplingCache(val couplingManager: CouplingManager) {
         return javaClass.findMethod(methodName)?.let { method ->
             this.getConsumer(method)
         } ?: throw NoSuchMethodException(
-                "No consumable method with name $methodName was found in class ${this@NewCouplingCache.javaClass.simpleName}."
+                "No consumable method with name $methodName was found in class ${this@CouplingCache.javaClass.simpleName}."
         )
     }
 
     fun AttributeContainer.getConsumer(method: Method): Consumer = consumerBuilders.getOrPut(method) {
+
+        // The objects below are what are cached by the builder
         val annotation = method.getAnnotation(Consumable::class.java)
                 ?: throw IllegalArgumentException("Method ${method.name} is not consumable.")
 

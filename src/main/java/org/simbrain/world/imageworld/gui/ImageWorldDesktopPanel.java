@@ -41,8 +41,7 @@ public class ImageWorldDesktopPanel extends JPanel {
     /**
      * Combo box for selecting which sensor matrix to view.
      */
-    private JComboBox<SensorMatrix> sensorMatrixCombo = new JComboBox<SensorMatrix>();
-    private JComboBox<Color> colorPicker = new JComboBox<Color>();
+    private JComboBox<SensorMatrix> sensorMatrixCombo = new JComboBox<>();
 
     /**
      * Toolbars.

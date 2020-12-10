@@ -42,7 +42,7 @@ public abstract class Attribute {
     protected Method customDescriptionMethod;
 
     /**
-     * Whether the attribute shows up in the GUI.  Invisible attribute can still
+     * Whether the attribute shows up in the GUI. Invisible attribute can still
      * be part of couplings (if created in a script).
      */
     protected boolean visibility = true;

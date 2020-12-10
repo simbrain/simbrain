@@ -259,15 +259,18 @@ class CouplingManager(val workspace: Workspace) {
         attributeContainerCouplings[attributeContainer]?.let {
             it.forEach { coupling ->
                 _couplings.remove(coupling)
-                val other = if (attributeContainer === coupling.consumer) {
-                    coupling.producer
-                } else {
-                    coupling.consumer
+                if (coupling.producer.baseObject !== coupling.consumer.baseObject) {
+                    val other = if (attributeContainer === coupling.consumer) {
+                        coupling.producer
+                    } else {
+                        coupling.consumer
+                    }
+                    attributeContainerCouplings[other.baseObject]?.remove(coupling)
                 }
-                attributeContainerCouplings[other.baseObject]?.remove(coupling)
             }
             events.fireCouplingsRemoved(it.toList())
         }
+        attributeContainerCouplings.remove(attributeContainer)
     }
 
 }

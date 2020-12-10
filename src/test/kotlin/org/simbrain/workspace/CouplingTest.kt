@@ -49,7 +49,7 @@ class CouplingTest {
             addLooseNeuron(neuron2)
         }
         with(couplingManager) {
-            neuron1.getProducerByMethodName("getActivation") couple neuron2.getConsumerByMethodName("forceSetActivation")
+            neuron1.getProducer("getActivation") couple neuron2.getConsumer("forceSetActivation")
         }
         neuron1.activation = 1.0
         neuron2.isClamped = true
@@ -75,12 +75,12 @@ class CouplingTest {
         // Now couple them
         with(couplingManager) {
             createCoupling(
-                    neuron1.getProducerByMethodName("getActivation"),
-                    neuron3.getConsumerByMethodName("addInputValue")
+                    neuron1.getProducer("getActivation"),
+                    neuron3.getConsumer("addInputValue")
             )
             createCoupling(
-                    neuron2.getProducerByMethodName("getActivation"),
-                    neuron3.getConsumerByMethodName("addInputValue")
+                    neuron2.getProducer("getActivation"),
+                    neuron3.getConsumer("addInputValue")
             )
         }
 
@@ -106,12 +106,12 @@ class CouplingTest {
         // Now couple them
         with(couplingManager) {
             couplingManager.createCoupling(
-                    neuron1.getProducerByMethodName("getActivation"),
-                    neuron2.getConsumerByMethodName("setInputValue")
+                    neuron1.getProducer("getActivation"),
+                    neuron2.getConsumer("setInputValue")
             )
             couplingManager.createCoupling(
-                    neuron1.getProducerByMethodName("getActivation"),
-                    neuron3.getConsumerByMethodName("setInputValue")
+                    neuron1.getProducer("getActivation"),
+                    neuron3.getConsumer("setInputValue")
             )
         }
 

@@ -40,11 +40,11 @@ class NodeGene(template: Neuron) : NetworkGene<Neuron>(template), ProducerGene<N
     }
 
     override fun CouplingManager.defaultProducer(container: Neuron): Producer {
-        return container.getProducerByMethodName("getActivation")
+        return container.getProducer("getActivation")
     }
 
     override fun CouplingManager.defaultConsumer(container: Neuron): Consumer {
-        return container.getConsumerByMethodName("setInputValue")
+        return container.getConsumer("setInputValue")
     }
 
     fun build(network: Network): Neuron {

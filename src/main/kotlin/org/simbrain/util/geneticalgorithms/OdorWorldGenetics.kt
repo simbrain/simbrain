@@ -72,7 +72,7 @@ class ObjectSensorGene(template: ObjectSensor):
     }
 
     override fun CouplingManager.defaultProducer(container: ObjectSensor): Producer? {
-        return container.getProducerByMethodName("getCurrentValue")
+        return container.getProducer("getCurrentValue")
     }
 
 }
@@ -91,7 +91,7 @@ class StraightMovementGene(template: StraightMovement):
     }
 
     override fun CouplingManager.defaultConsumer(container: StraightMovement): Consumer? {
-        return container.getConsumerByMethodName("setAmount")
+        return container.getConsumer("setAmount")
     }
 
 }
@@ -110,7 +110,7 @@ class TurningGene(template: Turning):
     }
 
     override fun CouplingManager.defaultConsumer(container: Turning): Consumer? {
-        return container.getConsumerByMethodName("setAmount")
+        return container.getConsumer("setAmount")
     }
 
 }

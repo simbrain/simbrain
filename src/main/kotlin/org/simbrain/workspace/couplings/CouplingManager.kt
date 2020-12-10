@@ -134,14 +134,14 @@ class CouplingManager(val workspace: Workspace) {
     /**
      * Find the first [Consumer] in an [AttributeContainer] which has the given method name
      */
-    fun AttributeContainer.getConsumerByMethodName(methodName: String): Consumer = with(couplingCache) {
+    fun AttributeContainer.getConsumer(methodName: String): Consumer = with(couplingCache) {
         getConsumer(methodName)
     }
 
     /**
      * Find the first [Producer] in an [AttributeContainer] which has the given method name
      */
-    fun AttributeContainer.getProducerByMethodName(methodName: String) = with(couplingCache) {
+    fun AttributeContainer.getProducer(methodName: String) = with(couplingCache) {
         getProducer(methodName)
     }
 

@@ -1,34 +1,24 @@
 package org.simbrain.custom_sims.simulations.test;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.neuron_update_rules.TimedAccumulatorRule;
 import org.simbrain.plot.barchart.BarChartComponent;
-import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Playground for testing new features. A lot of stuff is commented out but
- * should work.
+ * Playground for testing new features.
  *
  * To add a sim, copy paste this, put in whatever menu you want it to be in, at {@link #getSubmenuName()}, and be
  * sure to register it at {@link RegisteredSimulation}.
@@ -94,8 +84,8 @@ public class TestSim extends RegisteredSimulation {
         sim.getDesktop().getDesktopComponent(barChart).getParentFrame().setBounds(500,20,537,345);
 
         // COUPLING NETWORK TO BARCHART
-        Producer neuronProducer = workspace.getCouplingManager().getProducerByMethodName(ng, "getActivations");
-        Consumer barChartConsumer =  workspace.getCouplingManager().getConsumerByMethodName(barChart.getModel(),
+        Producer neuronProducer = workspace.getCouplingManager().getProducer(ng, "getActivations");
+        Consumer barChartConsumer =  workspace.getCouplingManager().getConsumer(barChart.getModel(),
                 "setBarValues");
         workspace.getCouplingManager().createCoupling(neuronProducer, barChartConsumer);
 

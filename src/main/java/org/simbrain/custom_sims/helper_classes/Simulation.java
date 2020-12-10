@@ -261,14 +261,14 @@ public class Simulation {
      * Helper for obtaining producers.
      */
     public Producer getProducer(AttributeContainer container, String methodName) {
-        return workspace.getCouplingManager().getProducerByMethodName(container, methodName);
+        return workspace.getCouplingManager().getProducer(container, methodName);
     }
 
     /**
      * Helper for obtaining consumers.
      */
     public Consumer getConsumer(AttributeContainer container, String methodName) {
-        return workspace.getCouplingManager().getConsumerByMethodName(container, methodName);
+        return workspace.getCouplingManager().getConsumer(container, methodName);
     }
 
     /**
@@ -324,7 +324,7 @@ public class Simulation {
      * @param forceSet if true, assume the neuron is clamped and use forceSet
      */
     public void couple(ObjectSensor sensor, Neuron neuron, boolean forceSet) {
-        Producer sensoryProducer = workspace.getCouplingManager().getProducerByMethodName(sensor, "getCurrentValue");
+        Producer sensoryProducer = workspace.getCouplingManager().getProducer(sensor, "getCurrentValue");
         Consumer sensoryConsumer;
         if(forceSet) {
             sensoryConsumer = getConsumer(neuron, "forceSetActivation");

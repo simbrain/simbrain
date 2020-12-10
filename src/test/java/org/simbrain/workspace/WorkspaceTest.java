@@ -43,8 +43,8 @@ public class WorkspaceTest {
 
         // Couple them
         workspace.getCouplingManager().createCoupling(
-                workspace.getCouplingManager().getProducerByMethodName(n1, "getActivation"),
-                workspace.getCouplingManager().getConsumerByMethodName(n2, "setInputValue"));
+                workspace.getCouplingManager().getProducer(n1, "getActivation"),
+                workspace.getCouplingManager().getConsumer(n2, "setInputValue"));
 
     }
 

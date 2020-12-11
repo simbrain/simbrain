@@ -215,10 +215,9 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     fun removeCouplings(couplings: List<Coupling>) {
-        couplings.forEach {
-            _couplings.remove(it.producer to it.consumer)
+        couplings.forEach { coupling ->
+            removeCouplingWithoutFiringEvent(coupling)
         }
-        // What to do here?
         events.fireCouplingsRemoved(couplings)
     }
 
@@ -255,10 +254,24 @@ class CouplingManager(val workspace: Workspace) {
      * @param coupling the coupling to remove
      */
     fun removeCoupling(coupling: Coupling) {
-        _couplings.remove(coupling)
-        attributeContainerCouplings[coupling.producer.baseObject]?.remove(coupling)
-        attributeContainerCouplings[coupling.consumer.baseObject]?.remove(coupling)
+        removeCouplingWithoutFiringEvent(coupling)
         events.fireCouplingRemoved(coupling)
+    }
+
+    private fun removeCouplingWithoutFiringEvent(coupling: Coupling) {
+        _couplings.remove(coupling)
+        attributeContainerCouplings[coupling.producer.baseObject]?.let {
+            it.remove(coupling)
+            if (it.isEmpty()) {
+                attributeContainerCouplings.remove(coupling.producer.baseObject)
+            }
+        }
+        attributeContainerCouplings[coupling.consumer.baseObject]?.let {
+            it.remove(coupling)
+            if (it.isEmpty()) {
+                attributeContainerCouplings.remove(coupling.consumer.baseObject)
+            }
+        }
     }
 
     fun removeAttributeContainer(attributeContainer: AttributeContainer) {

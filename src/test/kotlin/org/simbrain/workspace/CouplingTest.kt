@@ -7,6 +7,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.util.complement
+import org.simbrain.workspace.couplings.Coupling
 
 class CouplingTest {
 
@@ -19,6 +20,125 @@ class CouplingTest {
      * Create a network and "also" add it to the workspace.
      */
     private val network = Network().also { workspace.addWorkspaceComponent(NetworkComponent("net1", it)) }
+
+    @Test
+    fun `ensure producers from multiple identical gets are equal`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val get1 = neuron.getProducer("getActivation")
+            val get2 = neuron.getProducer("getActivation")
+            assert(get1 == get2)
+            assertEquals(1, setOf(get1, get2).size)
+        }
+    }
+
+    @Test
+    fun `ensure consumers from multiple identical gets are equal`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val get1 = neuron.getConsumer("forceSetActivation")
+            val get2 = neuron.getConsumer("forceSetActivation")
+            assert(get1 == get2)
+            assertEquals(1, setOf(get1, get2).size)
+        }
+    }
+
+    @Test
+    fun `ensure couplings from multiple identical createCoupling calls are equal`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val producer = neuron.getProducer("getActivation")
+            val consumer = neuron.getConsumer("setInputValue")
+            val coupling1 = createCoupling(producer, consumer)
+            val coupling2 = createCoupling(producer, consumer)
+            assert(coupling1 == coupling2)
+        }
+    }
+
+    @Test
+    fun `check if createCoupling successfully creates coupling`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val producer = neuron.getProducer("getActivation")
+            val consumer = neuron.getConsumer("setInputValue")
+            createCoupling(producer, consumer)
+            assert(couplings.isNotEmpty())
+        }
+    }
+
+    @Test
+    fun `ensure createCoupling does not create duplicate coupling`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val producer = neuron.getProducer("getActivation")
+            val consumer = neuron.getConsumer("setInputValue")
+            createCoupling(producer, consumer)
+            createCoupling(producer, consumer)
+            assertEquals(1, couplings.size)
+        }
+    }
+
+    @Test
+    fun `check if removeCoupling successfully removes coupling`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val producer = neuron.getProducer("getActivation")
+            val consumer = neuron.getConsumer("setInputValue")
+            val coupling = createCoupling(producer, consumer)
+            removeCoupling(coupling)
+            assert(couplings.isEmpty())
+        }
+    }
+
+    @Test
+    fun `check if removeCouplings successfully removes couplings`() {
+        val neuron1 = Neuron(network)
+        val neuron2 = Neuron(network)
+        val neuron3 = Neuron(network)
+        with(couplingManager) {
+            fun neuronCoupling(source: Neuron, target: Neuron): Coupling {
+                val producer = source.getProducer("getActivation")
+                val consumer = target.getConsumer("setInputValue")
+                return createCoupling(producer, consumer)
+            }
+
+            val coupling1 = neuronCoupling(neuron1, neuron2)
+            val coupling2 = neuronCoupling(neuron2, neuron3)
+            val coupling3 = neuronCoupling(neuron3, neuron1)
+
+            removeCouplings(listOf(coupling1, coupling2))
+
+            val expected = setOf(coupling3)
+            val diff = expected complement couplings
+
+            assert(diff.isIdentical()) { "Diff: $diff" }
+        }
+    }
+
+    @Test
+    fun `check if removeAttributeContainer successfully removes corresponding couplings`() {
+        val neuron1 = Neuron(network)
+        val neuron2 = Neuron(network)
+        val neuron3 = Neuron(network)
+        with(couplingManager) {
+            fun neuronCoupling(source: Neuron, target: Neuron): Coupling {
+                val producer = source.getProducer("getActivation")
+                val consumer = target.getConsumer("setInputValue")
+                return createCoupling(producer, consumer)
+            }
+
+            val coupling1 = neuronCoupling(neuron1, neuron2)
+            val coupling2 = neuronCoupling(neuron2, neuron3)
+            val coupling3 = neuronCoupling(neuron3, neuron1)
+
+            removeAttributeContainer(neuron1)
+
+            val expected = setOf(coupling2)
+            val diff = expected complement couplings
+
+            assert(diff.isIdentical()) { "Diff: $diff" }
+        }
+    }
 
     @Test
     fun `check if all producers are created on a neuron`() {

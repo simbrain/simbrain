@@ -132,7 +132,9 @@ class OdorWorldBuilderProvider :
     }
 
     override fun createProduct(productMap: ProductMap, template: OdorWorldBuilderContext.() -> Unit): OdorWorld {
-        return createBuilder(productMap).also { createContext(it).apply(template) }.build().also { product = it }
+        return createBuilder(productMap).also { createContext(it).apply(template) }.build().also {
+            product = it.apply {isObjectsBlockMovement = false}
+           }
     }
 
 }

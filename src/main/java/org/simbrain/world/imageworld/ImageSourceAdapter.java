@@ -1,5 +1,8 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.world.imageworld.events.ImageSourceEvents;
+import org.simbrain.world.imageworld.events.ImageWorldEvents;
+
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,15 +27,17 @@ public abstract class ImageSourceAdapter implements ImageSource {
      * Default buffered image to work with.
      */
     private BufferedImage currentImage;
-    
-    private transient List<ImageSourceListener> listeners;
+
+    /**
+     * Handle Image source Events.
+     */
+    private transient ImageSourceEvents events = new ImageSourceEvents(this);
 
     /**
      * Construct a new ImageSourceAdapter and initialize the current image.
      */
     public ImageSourceAdapter() {
         currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
-        listeners = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -42,14 +47,13 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     public ImageSourceAdapter(BufferedImage currentImage) {
         this.currentImage = currentImage;
-        listeners = new CopyOnWriteArrayList<>();
     }
 
     /**
      * Return a deserialized ImageSourceAdapter.
      */
     public Object readResolve() {
-        listeners = new CopyOnWriteArrayList<>();
+        events = new ImageSourceEvents(this);
         return this;
     }
 
@@ -68,9 +72,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     public void notifyImageUpdate() {
         if (isEnabled()) {
-            for (ImageSourceListener listener : listeners) {
-                listener.onImageUpdate(this);
-            }
+            events.fireImageUpdate(this);
         }
     }
 
@@ -92,18 +94,6 @@ public abstract class ImageSourceAdapter implements ImageSource {
     }
 
     @Override
-    public void addListener(ImageSourceListener listener) {
-        listeners.add(listener);
-        listener.onResize(this);
-        listener.onImageUpdate(this);
-    }
-
-    @Override
-    public void removeListener(ImageSourceListener listener) {
-        listeners.remove(listener);
-    }
-
-    @Override
     public int getWidth() {
         return currentImage.getWidth();
     }
@@ -118,9 +108,11 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     public void notifyResize() {
         if (isEnabled()) {
-            for (ImageSourceListener listener : listeners) {
-                listener.onResize(this);
-            }
+            events.fireImageResize(this);
         }
+    }
+
+    public ImageSourceEvents getEvents() {
+        return events;
     }
 }

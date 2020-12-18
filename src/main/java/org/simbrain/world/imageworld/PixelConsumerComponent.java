@@ -29,6 +29,8 @@ public class PixelConsumerComponent extends WorkspaceComponent {
     public PixelConsumerComponent() {
         super("");
         this.world = new PixelConsumer();
+        world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
+        world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
     }
 
     /**

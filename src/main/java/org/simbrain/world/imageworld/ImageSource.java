@@ -2,6 +2,7 @@ package org.simbrain.world.imageworld;
 
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.world.imageworld.events.ImageSourceEvents;
 
 import java.awt.image.BufferedImage;
 
@@ -10,7 +11,7 @@ import java.awt.image.BufferedImage;
  * produces BufferedImages periodically and notifies listeners of new
  * images or changes to the image size.
  * <br>
- * Image sources can be enabled or disabled.  E.g. if a webcam is available it can
+ * Image sources can be enabled or disabled. E.g. if a webcam is available it can
  * enable its image source, and then when it is turned off the image source can be
  * disabled (however this is not currently used and has not been tested).
  *
@@ -25,7 +26,7 @@ public interface ImageSource extends AttributeContainer, EditableObject {
     boolean isEnabled();
 
     /**
-     * @param value Assign whether the source should update the image.
+     * @param value whether the source should update the image.
      */
     void setEnabled(boolean value);
 
@@ -33,20 +34,6 @@ public interface ImageSource extends AttributeContainer, EditableObject {
      * @return Returns the current image.
      */
     BufferedImage getCurrentImage();
-
-    /**
-     * Add a listener to be notified of new images and resizes.
-     *
-     * @param listener The listener to add.
-     */
-    void addListener(ImageSourceListener listener);
-
-    /**
-     * Remove a listener to stop being notified.
-     *
-     * @param listener The listener to remove.
-     */
-    void removeListener(ImageSourceListener listener);
 
     /**
      * @return Returns the width of the images produced by the source.
@@ -57,4 +44,9 @@ public interface ImageSource extends AttributeContainer, EditableObject {
      * @return Returns the height of the images produced by the source.
      */
     int getHeight();
+
+    /**
+     * @return Returns event handler
+     */
+    ImageSourceEvents getEvents();
 }

@@ -1,7 +1,6 @@
 package org.simbrain.world.imageworld.gui;
 
 import org.simbrain.world.imageworld.ImageSource;
-import org.simbrain.world.imageworld.ImageSourceListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +12,7 @@ import java.awt.image.BufferedImage;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class ImagePanel extends JPanel implements ImageSourceListener {
+public class ImagePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
@@ -22,6 +21,11 @@ public class ImagePanel extends JPanel implements ImageSourceListener {
      */
     private boolean showGridLines;
 
+    /**
+     * Construct the world.
+     *
+     * @param showGridLines
+     */
     public ImagePanel(boolean showGridLines) {
         this.showGridLines = showGridLines;
     }
@@ -63,13 +67,11 @@ public class ImagePanel extends JPanel implements ImageSourceListener {
         }
     }
 
-    @Override
     public void onImageUpdate(ImageSource source) {
         currentImage = source.getCurrentImage();
         repaint();
     }
 
-    @Override
     public void onResize(ImageSource source) {
         repaint();
     }

@@ -29,6 +29,8 @@ public class PixelProducerComponent extends WorkspaceComponent {
     public PixelProducerComponent() {
         super("");
         this.world = new PixelProducer();
+        world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
+        world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
     }
 
     /**

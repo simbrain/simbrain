@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.world.imageworld.events.ImageWorldEvents;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 import org.simbrain.world.imageworld.gui.ImagePanel;
@@ -52,9 +53,9 @@ public abstract class ImageWorld {
     private transient ImageClipboard clipboard;
 
     /**
-     * List of world listeners.
+     * Handle ImageWorld Events.
      */
-    private transient List<Listener> listeners;
+    private transient ImageWorldEvents events = new ImageWorldEvents(this);
 
     /**
      * If true show grid lines.
@@ -67,8 +68,7 @@ public abstract class ImageWorld {
      */
     public ImageWorld() {
         clipboard = new ImageClipboard(this);
-        sensorMatrices = new ArrayList<SensorMatrix>();
-        listeners = new ArrayList<Listener>();
+        sensorMatrices = new ArrayList<>();
     }
 
     /**
@@ -123,13 +123,18 @@ public abstract class ImageWorld {
         setCurrentSensorMatrix(getSensorMatrices().get(0));
     }
 
+    public ImageWorldEvents getEvents() {
+        return events;
+    }
+
     /**
      * Returns a deserialized ImageWorld.
      */
     public Object readResolve() {
+        events = new ImageWorldEvents(this);
         imagePanel = new ImagePanel(showGridLines);
-        listeners = new ArrayList<Listener>();
-        currentSensorMatrix.getSource().addListener(imagePanel);
+        currentSensorMatrix.getSource().getEvents().onImageResize(imagePanel::onResize);
+        currentSensorMatrix.getSource().getEvents().onImageUpdate(imagePanel::onImageUpdate);
         clipboard = new ImageClipboard(this);
         getImageSource().notifyResize();
         getImageSource().notifyImageUpdate();
@@ -185,7 +190,7 @@ public abstract class ImageWorld {
     public void addSensorMatrix(SensorMatrix matrix) {
         sensorMatrices.add(matrix);
         setCurrentSensorMatrix(matrix);
-        fireSensorMatrixAdded(matrix);
+        events.fireSensorMatrixAdded(matrix);
     }
 
     /**
@@ -208,8 +213,7 @@ public abstract class ImageWorld {
             // if (source instanceof FilteredImageSource) {
             //     compositeSource.removeListener((FilteredImageSource) source);
             // }
-            sensorMatrix.getSource().removeListener(sensorMatrix);
-            fireSensorMatrixRemoved(sensorMatrix);
+            events.fireSensorMatrixRemoved(sensorMatrix);
         }
     }
 
@@ -235,32 +239,14 @@ public abstract class ImageWorld {
         if (sensorMatrix == currentSensorMatrix) {
             return;
         }
-        if (currentSensorMatrix != null) {
-            currentSensorMatrix.getSource().removeListener(imagePanel);
-        }
-        sensorMatrix.getSource().addListener(imagePanel);
+        sensorMatrix.getSource().getEvents().onImageResize(imagePanel::onResize);
+        sensorMatrix.getSource().getEvents().onImageUpdate(imagePanel::onImageUpdate);
         currentSensorMatrix = sensorMatrix;
         updateToolTipText();
     }
 
     public List<SensorMatrix> getSensorMatrices() {
         return sensorMatrices;
-    }
-
-    /**
-     * Listener receives notifications when the image world is changed.
-     */
-    public interface Listener {
-
-        /**
-         * Called whenever a sensor matrix is added.
-         */
-        void sensorMatrixAdded(SensorMatrix addedMatrix);
-
-        /**
-         * Called whenever a sensor matrix is removed.
-         */
-        void sensorMatrixRemoved(SensorMatrix removedMatrix);
     }
 
     /**
@@ -273,28 +259,4 @@ public abstract class ImageWorld {
      */
     public abstract void update();
 
-    /**
-     * @param listener the listener to add.
-     */
-    public void addListener(Listener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Notify listeners that a sensor matrix was added to the image world.
-     */
-    protected void fireSensorMatrixAdded(SensorMatrix matrix) {
-        for (Listener listener : listeners) {
-            listener.sensorMatrixAdded(matrix);
-        }
-    }
-
-    /**
-     * Notify listeners that a sensor matrix was removed from the image world.
-     */
-    protected void fireSensorMatrixRemoved(SensorMatrix matrix) {
-        for (Listener listener : listeners) {
-            listener.sensorMatrixRemoved(matrix);
-        }
-    }
 }

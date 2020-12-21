@@ -45,7 +45,7 @@ public abstract class ImageWorld {
     /**
      * Current image and sensor matrices draw to this JPanel.
      */
-    protected transient ImagePanel imagePanel;
+    private transient ImagePanel imagePanel;
 
     /**
      * Clipboard for the image world.
@@ -61,12 +61,13 @@ public abstract class ImageWorld {
      * If true show grid lines.
      */
     // TODO: Expose this in a preferences dialog
-    protected boolean showGridLines;
+    private boolean showGridLines;
 
     /**
      * Construct the image world.
      */
     public ImageWorld() {
+        imagePanel = new ImagePanel(true);
         clipboard = new ImageClipboard(this);
         sensorMatrices = new ArrayList<>();
     }
@@ -243,6 +244,7 @@ public abstract class ImageWorld {
         sensorMatrix.getSource().getEvents().onImageUpdate(imagePanel::onImageUpdate);
         currentSensorMatrix = sensorMatrix;
         updateToolTipText();
+        sensorMatrix.getSource().getEvents().fireImageUpdate(sensorMatrix.getSource());
     }
 
     public List<SensorMatrix> getSensorMatrices() {

@@ -1,11 +1,8 @@
 package org.simbrain.world.imageworld;
 
 import org.simbrain.world.imageworld.events.ImageSourceEvents;
-import org.simbrain.world.imageworld.events.ImageWorldEvents;
 
 import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Abstract helper class which provides basic listener and image management for
@@ -38,6 +35,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     public ImageSourceAdapter() {
         currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        getEvents().fireImageUpdate(this);
     }
 
     /**

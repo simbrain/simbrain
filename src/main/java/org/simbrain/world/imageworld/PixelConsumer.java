@@ -1,7 +1,5 @@
 package org.simbrain.world.imageworld;
 
-import org.simbrain.world.imageworld.gui.ImagePanel;
-
 /**
  * The "Pixel display" component which allows data to be received from Neural networks
  * and other Simbrain components via couplings and rendered in a Buffered "pixel" image.
@@ -20,8 +18,7 @@ public class PixelConsumer extends ImageWorld {
      */
     public PixelConsumer() {
         super();
-        showGridLines = true;
-        imagePanel = new ImagePanel(showGridLines);
+        getImagePanel().setShowGridLines(true);
         emitterMatrix = new PixelConsumerSource();
         initializeDefaultSensorMatrices();
     }

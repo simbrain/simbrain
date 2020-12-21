@@ -39,6 +39,7 @@ public class ImagePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
+        if (currentImage == null) return;
         graphics.drawImage(currentImage, 0, 0, getWidth(), getHeight(), this);
 
         // Draw grid lines
@@ -65,6 +66,11 @@ public class ImagePanel extends JPanel {
                 }
             }
         }
+    }
+
+    public void setShowGridLines(boolean showGridLines) {
+        this.showGridLines = showGridLines;
+        repaint();
     }
 
     public void onImageUpdate(ImageSource source) {

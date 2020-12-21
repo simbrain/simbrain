@@ -1,7 +1,6 @@
 package org.simbrain.world.imageworld;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.world.imageworld.gui.ImagePanel;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -32,8 +31,7 @@ public class PixelProducer extends ImageWorld {
      */
     public PixelProducer() {
         super();
-        showGridLines = false;
-        imagePanel = new ImagePanel(showGridLines);
+        getImagePanel().setShowGridLines(false);
         imageSource = new PixelProducerSource();
         imageSource.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
         initializeDefaultSensorMatrices();
@@ -51,8 +49,8 @@ public class PixelProducer extends ImageWorld {
                 drawPixel(evt);
             }
         };
-        imagePanel.addMouseListener(mouseAdapter);
-        imagePanel.addMouseMotionListener(mouseAdapter);
+        getImagePanel().addMouseListener(mouseAdapter);
+        getImagePanel().addMouseMotionListener(mouseAdapter);
 
     }
 
@@ -60,8 +58,8 @@ public class PixelProducer extends ImageWorld {
      * Draw a pixel at the current point in the image panel.
      */
     private void drawPixel(MouseEvent evt) {
-        var ratioX = 1.0 * imagePanel.getWidth() / imageSource.getWidth();
-        var ratioY = 1.0 * imagePanel.getHeight() / imageSource.getHeight();
+        var ratioX = 1.0 * getImagePanel().getWidth() / imageSource.getWidth();
+        var ratioY = 1.0 * getImagePanel().getHeight() / imageSource.getHeight();
         var x = (int) (evt.getX() / ratioX);
         var y = (int) (evt.getY() / ratioY);
 

@@ -42,7 +42,7 @@ public abstract class Attribute {
     protected Method customDescriptionMethod;
 
     /**
-     * Whether the attribute shows up in the GUI.  Invisible attribute can still
+     * Whether the attribute shows up in the GUI. Invisible attribute can still
      * be part of couplings (if created in a script).
      */
     protected boolean visibility = true;
@@ -203,6 +203,24 @@ public abstract class Attribute {
 
     public void setVisible(boolean visible) {
         visibility = visible;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Attribute attribute = (Attribute) o;
+
+        if (!getBaseObject().equals(attribute.getBaseObject())) return false;
+        return getMethod().equals(attribute.getMethod());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getBaseObject().hashCode();
+        result = 31 * result + getMethod().hashCode();
+        return result;
     }
 
     /**

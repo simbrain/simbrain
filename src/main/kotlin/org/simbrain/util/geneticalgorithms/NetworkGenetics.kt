@@ -8,8 +8,6 @@ import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.couplings.CouplingManager
-import org.simbrain.workspace.couplings.getConsumer
-import org.simbrain.workspace.couplings.getProducer
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -41,11 +39,11 @@ class NodeGene(template: Neuron) : NetworkGene<Neuron>(template), ProducerGene<N
         return newGene
     }
 
-    override fun CouplingManager.defaultProducer(container: Neuron): Producer? {
+    override fun CouplingManager.defaultProducer(container: Neuron): Producer {
         return container.getProducer("getActivation")
     }
 
-    override fun CouplingManager.defaultConsumer(container: Neuron): Consumer? {
+    override fun CouplingManager.defaultConsumer(container: Neuron): Consumer {
         return container.getConsumer("setInputValue")
     }
 

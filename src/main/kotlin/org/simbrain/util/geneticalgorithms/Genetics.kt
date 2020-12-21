@@ -223,7 +223,12 @@ class EnvironmentBuilder private constructor(
     }
 
     /**
-     * Use this to describe what happens when the builder builds products.  Can only be called once.
+     * Use this to describe what happens when the builder builds products.
+     *
+     * Only use once in a script.
+     *
+     * The build operation is called once for each genome at each generation, via
+     * [build]
      */
     fun onBuild(template: TopLevelBuilderContext.(pretty: Boolean) -> Unit) {
         builderTemplate = template

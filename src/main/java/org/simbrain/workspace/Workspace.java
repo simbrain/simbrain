@@ -166,6 +166,8 @@ public class Workspace {
 
         events.fireComponentAdded(component);
 
+        component.getEvents().onAttributeContainerRemoved(couplingManager::removeAttributeContainer);
+
 
     }
 

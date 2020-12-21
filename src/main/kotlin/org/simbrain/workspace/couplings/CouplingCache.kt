@@ -1,269 +1,216 @@
 package org.simbrain.workspace.couplings
 
 import org.simbrain.workspace.*
-import org.simbrain.world.odorworld.entities.PeripheralAttribute
 import java.lang.reflect.Method
-import java.lang.reflect.Type
-
-typealias JConsumer<T> = java.util.function.Consumer<T>
 
 /**
- * A cache of all [Attribute] and [Coupling] objects in the [Workspace]. Used to provide
- * fast indexed access to producers, consumers, couplings, etc., and to filter these quickly.
+ * Cache method objects for each [AttributeContainer]. Reflection is still used to create Method objects but they are
+ * cached here for quick access.
+ *
+ * A utility class for [CouplingManager]. Provides optimized ways to access specific sets of producers and consumers.
+ * These methods should not be called directly and this class should not be instantiated outside of CouplingManager.
+ *
+ * @author Yulin Li
  */
-class CouplingCache(workspace: Workspace) {
+class CouplingCache(val couplingManager: CouplingManager) {
 
     /**
-     * A cache of all producers in the current workspace
+     * The main cache for [Method] objects.
      */
-    val producers = ProducerCache()
+    private val attributeMethods = HashMap<Class<AttributeContainer>, List<Method>>()
 
     /**
-     * A cache of all consumers in the current workspace
+     * Cache properties of [Producible] methods like annotations and custom descriptions.
      */
-    val consumers = ConsumerCache()
+    private val producerBuilders = HashMap<Method, (AttributeContainer) -> Producer>()
 
     /**
-     * A collection of all couplings grouped by [AttributeContainer]s. Neuron1 -> Coupling, Neuron 2->Coupling
+     * Cache properties of [Consumable] methods like annotations and custom descriptions.
      */
-    private val couplingsByContainer = HashMap<AttributeContainer, HashSet<Coupling>>()
+    private val consumerBuilders = HashMap<Method, (AttributeContainer) -> Consumer>()
 
     /**
-     * A collection of all producible and consumable methods that are visible
+     * Get all the [Producible] or [Consumable] methods from an [AttributeContainer] and put them in the main cache.
      */
-    val visibleMethods
-        get() = producers.visibleMethods + consumers.visibleMethods
-
-    /**
-     * A collection of all couplings. This is mainly for serialization.
-     */
-    val couplings
-        get() = couplingsByContainer.values.flatten().toSet().sortedBy { it.id }
-
-    init {
-        workspace.events.apply {
-
-            onComponentAdded(JConsumer {
-
-                it.attributeContainers.forEach{ ac ->
-                    producers.addContainer(it, ac)
-                    consumers.addContainer(it, ac)
-                }
-
-                it.events.apply {
-
-                    onAttributeContainerAdded(JConsumer { ac ->
-                        producers.addContainer(it, ac)
-                        consumers.addContainer(it, ac)
-                    })
-
-                    onAttributeContainerRemoved(JConsumer { ac ->
-                        producers.removeContainer(it, ac)
-                        consumers.removeContainer(it, ac)
-                        val couplingsCopy = couplingsByContainer[ac]?.toList()
-                        couplingsByContainer.remove(ac)
-                        couplingsCopy?.let { it1 ->
-                            workspace.couplingManager.events.fireCouplingsRemoved(it1)
-                        }
-                    })
-                }
-            })
-
-            onComponentRemoved(JConsumer {
-                it.attributeContainers.forEach { ac ->
-                    producers.removeContainer(it, ac)
-                    consumers.removeContainer(it, ac)
-                    couplingsByContainer.remove(ac)
-                }
-            })
-
-        }
-
-    }
-
-    /**
-     * Adds a coupling to the cache.
-     */
-    fun add(coupling: Coupling) {
-        val producerContainer = coupling.producer.baseObject.run {
-            if (this is PeripheralAttribute) this.parent else this
-        }
-        val consumerContainer = coupling.consumer.baseObject.run {
-            if (this is PeripheralAttribute) this.parent else this
-        }
-
-        if (producerContainer in couplingsByContainer) {
-            couplingsByContainer[producerContainer]!!.add(coupling)
-        } else {
-            couplingsByContainer[producerContainer] = hashSetOf(coupling)
-        }
-
-        if (consumerContainer in couplingsByContainer) {
-            couplingsByContainer[consumerContainer]!!.add(coupling)
-        } else {
-            couplingsByContainer[consumerContainer] = hashSetOf(coupling)
+    fun getMethods(container: AttributeContainer): List<Method> {
+        return attributeMethods.getOrPut(container.javaClass) {
+            container.javaClass.methods
+                    .filter { it.annotations.any { annotation -> annotation is Producible || annotation is Consumable } }
+                    .sortedBy { it.name }
         }
     }
 
-    /**
-     * Removes a coupling from the cache
-     */
-    fun remove(coupling: Coupling) {
-        val producerContainer = coupling.producer.baseObject.run {
-            if (this is PeripheralAttribute) this.parent else this
-        }
-        val consumerContainer = coupling.consumer.baseObject.run {
-            if (this is PeripheralAttribute) this.parent else this
-        }
-
-        couplingsByContainer[producerContainer]?.remove(coupling)
-        couplingsByContainer[consumerContainer]?.remove(coupling)
-    }
-
-    /**
-     * Sets an [Attribute.method] to being visible, i.e. visible in the GUI.
-     */
-    fun setVisible(method: Method, visible: Boolean) {
-        val cache = when {
-            method.isProducible() -> producers
-            method.isConsumable() -> consumers
-            else -> return
-        }
-
-        if (visible) {
-            cache.visibleMethods.add(method)
-        } else {
-            cache.visibleMethods.remove(method)
+    fun getMethods(containerClass: Class<AttributeContainer>): List<Method> {
+        return attributeMethods.getOrPut(containerClass) {
+            containerClass.methods
+                    .filter { it.annotations.any { annotation -> annotation is Producible || annotation is Consumable } }
+                    .sortedBy { it.name }
         }
     }
-}
 
-/**
- * Cache of [Attribute]s.  Basically a [Consumer] cache or a [Producer] cache.  This supports 4 access patterns:
- * - by [AttributeContainer]
- * - by [WorkspaceComponent]
- * - by the [Type] which an attribute produces or consumes
- * - by [Attribute.visibility]
- */
-sealed class AttributeCache<T : Attribute> {
+    fun getProducibleMethods(container: AttributeContainer): List<Method> {
+        return getMethods(container).filter { it.annotations.any { annotation -> annotation is Producible } }
+    }
 
-    /**
-     * All attributes.
-     */
-    private val all = HashSet<T>()
+    fun getProducibleMethods(containerClass: Class<AttributeContainer>): List<Method> {
+        return getMethods(containerClass).filter { it.annotations.any { annotation -> annotation is Producible } }
+    }
 
-    /**
-     * Map from [AttributeContainer]s to attributes.  E.g. neuron to its produers and connsumers, like
-     * getActivationn, setActivaiton, getInputValue, etc.
-     */
-    private val byContainer = HashMap<AttributeContainer, HashSet<T>>()
+    fun getConsumableMethods(container: AttributeContainer): List<Method> {
+        return getMethods(container).filter { it.annotations.any { annotation -> annotation is Consumable } }
+    }
 
-    /**
-     * Map from [WorkspaceComponent]s to attributes.
-     */
-    private val byComponent = HashMap<WorkspaceComponent, HashSet<T>>()
+    fun getConsumableMethods(containerClass: Class<AttributeContainer>): List<Method> {
+        return getMethods(containerClass).filter { it.annotations.any { annotation -> annotation is Consumable } }
+    }
 
-    /**
-     * Map from [Type]s to attributes.
-     */
-    private val byType = HashMap<Type, HashSet<T>>()
+    fun getVisibility(method: Method) = couplingManager.methodVisibilities.getOrElse(method) {
+        method.getAnnotation(Producible::class.java)?.defaultVisibility
+                ?: method.getAnnotation(Consumable::class.java).defaultVisibility
+    }
 
-    /**
-     * Which attributes are visible
-     */
-    val visibleMethods = HashSet<Method>()
+    fun AttributeContainer.getProducer(methodName: String): Producer {
+        return javaClass.findMethod(methodName)?.let { method ->
+            getProducer(method)
+        } ?: throw NoSuchMethodException(
+                "No producible method with name $methodName was found in class ${this@CouplingCache.javaClass.simpleName}."
+        )
+    }
 
-    /**
-     * Get by type.
-     */
-    operator fun get(type: Type) = byType[type] ?: hashSetOf()
+    fun AttributeContainer.getProducer(method: Method): Producer = producerBuilders.getOrPut(method) {
 
-    /**
-     * Get by attributecontainer
-     */
-    operator fun get(container: AttributeContainer) = byContainer[container] ?: hashSetOf()
+        // The objects below are what are cached by the builder
+        val annotation = method.getAnnotation(Producible::class.java)
+                ?: throw IllegalArgumentException("Method ${method.name} is not producible.")
 
-    /**
-     * Get by WorkspaceComponent
-     */
-    operator fun get(component: WorkspaceComponent) = byComponent[component] ?: hashSetOf()
+        val customDescription = javaClass.findMethod(annotation.customDescriptionMethod)
+        val arrayDescriptionMethod = javaClass.findMethod(annotation.arrayDescriptionMethod)
 
-    /**
-     * Add a [AttributeContainer] to the cache.
-     */
-    abstract fun addContainer(component: WorkspaceComponent, container: AttributeContainer)
+        fun (attributeContainer: AttributeContainer) = Producer.builder(attributeContainer, method)
+                .description(annotation.description)
+                .customDescription(customDescription)
+                .arrayDescriptionMethod(arrayDescriptionMethod)
+                .visibility(annotation.defaultVisibility)
+                .build()
+    }(this)
 
-    /**
-     * Add a [Consumer] or [Producer] to the cache.
-     */
-    protected fun addAttributes(component: WorkspaceComponent, attributes: Collection<T>) {
+    fun AttributeContainer.getConsumer(methodName: String): Consumer {
+        return javaClass.findMethod(methodName)?.let { method ->
+            this.getConsumer(method)
+        } ?: throw NoSuchMethodException(
+                "No consumable method with name $methodName was found in class ${this@CouplingCache.javaClass.simpleName}."
+        )
+    }
 
-        all.addAll(attributes)
+    fun AttributeContainer.getConsumer(method: Method): Consumer = consumerBuilders.getOrPut(method) {
 
-        attributes.groupBy { it.type }.forEach {
+        // The objects below are what are cached by the builder
+        val annotation = method.getAnnotation(Consumable::class.java)
+                ?: throw IllegalArgumentException("Method ${method.name} is not consumable.")
 
-            if (it.key !in byType) {
-                byType[it.key] = it.value.toHashSet()
-            } else {
-                byType[it.key]!!.addAll(it.value)
+        val customDescription = javaClass.findMethod(annotation.customDescriptionMethod)
+
+        fun (attributeContainer: AttributeContainer) = Consumer.builder(attributeContainer, method)
+                .description(annotation.description)
+                .customDescription(customDescription)
+                .visibility(annotation.defaultVisibility)
+                .build()
+    }(this)
+
+    fun getProducers(attributeContainer: AttributeContainer): Sequence<Producer> = sequence {
+        getProducibleMethods(attributeContainer).forEach {
+            yield(attributeContainer.getProducer(it))
+        }
+    }
+
+    fun getConsumers(attributeContainer: AttributeContainer): Sequence<Consumer> = sequence {
+        getConsumableMethods(attributeContainer).forEach {
+            yield(attributeContainer.getConsumer(it))
+        }
+    }
+
+    fun getProducers(workspaceComponent: WorkspaceComponent): Sequence<Producer> = sequence {
+        workspaceComponent.attributeContainers.forEach { container ->
+            getProducers(container).forEach {
+                yield(it)
             }
         }
+    }
 
-        attributes.groupBy { it.baseObject as AttributeContainer }.forEach {
-            if (it.key !in byContainer) {
-                byContainer[it.key] = it.value.toHashSet()
-            } else {
-                byContainer[it.key]!!.addAll(it.value)
+    fun getConsumers(workspaceComponent: WorkspaceComponent): Sequence<Consumer> = sequence {
+        workspaceComponent.attributeContainers.forEach { container ->
+            getConsumers(container).forEach {
+                yield(it)
             }
         }
+    }
 
+    fun getVisibleProducers(attributeContainer: AttributeContainer): Sequence<Producer> = sequence {
+        getProducibleMethods(attributeContainer)
+                .filter { getVisibility(it) }
+                .forEach { yield(attributeContainer.getProducer(it)) }
+    }
 
-        if (component in byComponent) {
-            byComponent[component]!!.addAll(attributes)
-        } else {
-            byComponent[component] = attributes.toHashSet()
+    fun getVisibleConsumers(attributeContainer: AttributeContainer): Sequence<Consumer> = sequence {
+        getConsumableMethods(attributeContainer)
+                .filter { getVisibility(it) }
+                .forEach { yield(attributeContainer.getConsumer(it)) }
+    }
+
+    fun getVisibleProducers(workspaceComponent: WorkspaceComponent): Sequence<Producer> = sequence {
+        workspaceComponent.attributeContainers.groupBy { it.javaClass }.entries.forEach { (clazz, containers) ->
+            val methods = getProducibleMethods(clazz).filter { getVisibility(it) }
+            containers.forEach { container ->
+                methods.forEach { method ->
+                    yield(container.getProducer(method))
+                }
+            }
         }
     }
 
-    /**
-     * Remove an attribute container (must pass in workspace component)
-     */
-    fun removeContainer(component: WorkspaceComponent, attributeContainer: AttributeContainer) {
-        // Get all the attributes(producers and consumers) associated with a conntainer
-        val attributes = byContainer[attributeContainer]
-        // Clean up all the maps that reference these attributes
-        if (attributes != null) {
-            all.removeAll(attributes)
-            byType.values.forEach { it.removeAll(attributes) }
-            byComponent[component]?.removeAll(attributes)
-            byContainer.remove(attributeContainer)
+    fun getVisibleConsumers(workspaceComponent: WorkspaceComponent): Sequence<Consumer> = sequence {
+        workspaceComponent.attributeContainers.groupBy { it.javaClass }.entries.forEach { (clazz, containers) ->
+            val methods = getConsumableMethods(clazz).filter { getVisibility(it) }
+            containers.forEach { container ->
+                methods.forEach { method ->
+                    yield(container.getConsumer(method))
+                }
+            }
         }
     }
 
-}
-
-/**
- * Producer cache.
- */
-class ProducerCache : AttributeCache<Producer>() {
-    override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
-        addAttributes(component, container.producers)
-        container.producibles
-                .filter { it !in visibleMethods }
-                .filter { it.getAnnotation(Producible::class.java).defaultVisibility }
-                .let { visibleMethods.addAll(it) }
+    fun getCompatibleVisibleProducers(
+            consumer: Consumer,
+            workspaceComponent: WorkspaceComponent
+    ): Sequence<Producer> = sequence {
+        workspaceComponent.attributeContainers.groupBy { it.javaClass }.entries.forEach { (clazz, containers) ->
+            val methods = getProducibleMethods(clazz)
+                    .filter { getVisibility(it) }
+                    .filter { it.returnType == consumer.type }
+            containers.forEach { container ->
+                methods.forEach { method ->
+                    yield(container.getProducer(method))
+                }
+            }
+        }
     }
-}
 
-/**
- * Consumer cache.
- */
-class ConsumerCache : AttributeCache<Consumer>() {
-    override fun addContainer(component: WorkspaceComponent, container: AttributeContainer) {
-        addAttributes(component, container.consumers)
-        container.consumables
-                .filter { it !in visibleMethods }
-                .filter { it.getAnnotation(Consumable::class.java).defaultVisibility }
-                .let { visibleMethods.addAll(it) }
+    fun getCompatibleVisibleConsumers(
+            producer: Producer,
+            workspaceComponent: WorkspaceComponent
+    ): Sequence<Consumer> = sequence {
+        workspaceComponent.attributeContainers.groupBy { it.javaClass }.entries.forEach { (clazz, containers) ->
+            val methods = getConsumableMethods(clazz)
+                    .filter { getVisibility(it) }
+                    .filter { it.parameterTypes[0] == producer.type }
+            containers.forEach { container ->
+                methods.forEach { method ->
+                    yield(container.getConsumer(method))
+                }
+            }
+        }
     }
+
+    private fun Class<AttributeContainer>.findMethod(name: String): Method? = methods.find { it.name == name }
+
 }

@@ -17,7 +17,7 @@ plugins {
 compileJava.options.encoding = 'UTF-8'
 
 def versionName = "Simbrain4Beta"
-def jmonkeyengine_version = '3.2.2-stable'
+def jmonkeyengine_version = '3.3.2-stable'
 def dl4j_version = "1.0.0-beta4" // beta5 not working on mac
 
 mainClassName = 'org.simbrain.workspace.gui.Splasher'

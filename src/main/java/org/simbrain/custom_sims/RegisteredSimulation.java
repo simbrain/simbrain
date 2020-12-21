@@ -21,6 +21,7 @@ package org.simbrain.custom_sims;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.EvolveAutoEncoder;
 import org.simbrain.custom_sims.simulations.EvolveMouse;
+import org.simbrain.custom_sims.simulations.EvolveAvoider;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
 import org.simbrain.custom_sims.simulations.agent_trails.RandomizedPursuer;
@@ -108,6 +109,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new EvolveAutoEncoder(null));
         REGISTERED_SIMS.add(new EvolveXor(null));
         REGISTERED_SIMS.add(new EvolveMouse(null));
+        REGISTERED_SIMS.add(new EvolveAvoider(null));
         // REsGISTERED_SIMS.add(new MpfsSOM());
 
         // Alphabetize

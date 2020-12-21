@@ -21,7 +21,7 @@ import java.awt.image.BufferedImage;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class SensorMatrix implements ImageSourceListener, AttributeContainer, EditableObject {
+public class SensorMatrix implements AttributeContainer, EditableObject {
 
     /**
      * Name of this matrix.
@@ -71,12 +71,15 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer, Ed
     public SensorMatrix(String name, ImageSource source) {
         this.name = name;
         this.source = source;
-        source.addListener(this);
+        initChannels(source);
+        source.getEvents().onImageResize(this::initChannels);
+        source.getEvents().onImageUpdate(this::onImageUpdate);
     }
 
     public Object readResolve() {
-        source.addListener(this);
-        onResize(source);
+        source.getEvents().onImageResize(this::initChannels);
+        source.getEvents().onImageUpdate(this::onImageUpdate);
+        initChannels(source);
         return this;
     }
 
@@ -96,11 +99,7 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer, Ed
         if (this.source == source) {
             return;
         }
-        if (this.source != null) {
-            this.source.removeListener(this);
-        }
         this.source = source;
-        this.source.addListener(this);
     }
 
     public int getWidth() {
@@ -141,13 +140,11 @@ public class SensorMatrix implements ImageSourceListener, AttributeContainer, Ed
         return this.name;
     }
 
-    @Override
     public void onImageUpdate(ImageSource source) {
         updateSensorValues(source.getCurrentImage());
     }
 
-    @Override
-    public void onResize(ImageSource source) {
+    private void initChannels(ImageSource source) {
         channels = new double[4][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];
     }

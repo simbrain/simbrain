@@ -25,11 +25,12 @@ public class PixelConsumerComponent extends WorkspaceComponent {
 
     /**
      * Create an Image World Component from a Image World.
-     *
      */
     public PixelConsumerComponent() {
         super("");
         this.world = new PixelConsumer();
+        world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
+        world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
     }
 
     /**

@@ -84,11 +84,13 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
     /**
      * X Velocity. Used internally for {@link #simpleMotion()}.
      */
+    @UserParameter(label = "Velocity X", description = "X Velocity", useSetter = true, order = 10)
     protected double dx;
 
     /**
      * Y Velocity. Used internally for {@link #simpleMotion()}.
      */
+    @UserParameter(label = "Velocity Y", description = "Y Velocity", useSetter = true, order = 11)
     protected double dy;
 
     /**

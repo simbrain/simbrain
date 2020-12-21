@@ -6,13 +6,14 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.plot.projection.ProjectionComponent;
-import org.simbrain.workspace.couplings.CouplingKt;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class WorkspaceTest {
 
@@ -42,8 +43,8 @@ public class WorkspaceTest {
 
         // Couple them
         workspace.getCouplingManager().createCoupling(
-                CouplingKt.getProducer(n1, "getActivation"),
-                CouplingKt.getConsumer(n2, "setInputValue"));
+                workspace.getCouplingManager().getProducer(n1, "getActivation"),
+                workspace.getCouplingManager().getConsumer(n2, "setInputValue"));
 
     }
 

@@ -1,7 +1,6 @@
 package org.simbrain.world.imageworld;
 
 import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -96,6 +95,7 @@ public class PixelProducerSource extends ImageSourceAdapter {
         graphics.drawImage(imageIcon.getImage(), 0, 0, null);
         graphics.dispose();
         setCurrentImage(image);
+        getEvents().fireImageUpdate(this);
     }
 
     /**

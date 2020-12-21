@@ -7,10 +7,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.util.complement
-import org.simbrain.workspace.couplings.consumers
-import org.simbrain.workspace.couplings.getConsumer
-import org.simbrain.workspace.couplings.getProducer
-import org.simbrain.workspace.couplings.producers
+import org.simbrain.workspace.couplings.Coupling
 
 class CouplingTest {
 
@@ -25,11 +22,130 @@ class CouplingTest {
     private val network = Network().also { workspace.addWorkspaceComponent(NetworkComponent("net1", it)) }
 
     @Test
+    fun `ensure producers from multiple identical gets are equal`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val get1 = neuron.getProducer("getActivation")
+            val get2 = neuron.getProducer("getActivation")
+            assert(get1 == get2)
+            assertEquals(1, setOf(get1, get2).size)
+        }
+    }
+
+    @Test
+    fun `ensure consumers from multiple identical gets are equal`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val get1 = neuron.getConsumer("forceSetActivation")
+            val get2 = neuron.getConsumer("forceSetActivation")
+            assert(get1 == get2)
+            assertEquals(1, setOf(get1, get2).size)
+        }
+    }
+
+    @Test
+    fun `ensure couplings from multiple identical createCoupling calls are equal`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val producer = neuron.getProducer("getActivation")
+            val consumer = neuron.getConsumer("setInputValue")
+            val coupling1 = createCoupling(producer, consumer)
+            val coupling2 = createCoupling(producer, consumer)
+            assert(coupling1 == coupling2)
+        }
+    }
+
+    @Test
+    fun `check if createCoupling successfully creates coupling`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val producer = neuron.getProducer("getActivation")
+            val consumer = neuron.getConsumer("setInputValue")
+            createCoupling(producer, consumer)
+            assert(couplings.isNotEmpty())
+        }
+    }
+
+    @Test
+    fun `ensure createCoupling does not create duplicate coupling`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val producer = neuron.getProducer("getActivation")
+            val consumer = neuron.getConsumer("setInputValue")
+            createCoupling(producer, consumer)
+            createCoupling(producer, consumer)
+            assertEquals(1, couplings.size)
+        }
+    }
+
+    @Test
+    fun `check if removeCoupling successfully removes coupling`() {
+        val neuron = Neuron(network)
+        with(couplingManager) {
+            val producer = neuron.getProducer("getActivation")
+            val consumer = neuron.getConsumer("setInputValue")
+            val coupling = createCoupling(producer, consumer)
+            removeCoupling(coupling)
+            assert(couplings.isEmpty())
+        }
+    }
+
+    @Test
+    fun `check if removeCouplings successfully removes couplings`() {
+        val neuron1 = Neuron(network)
+        val neuron2 = Neuron(network)
+        val neuron3 = Neuron(network)
+        with(couplingManager) {
+            fun neuronCoupling(source: Neuron, target: Neuron): Coupling {
+                val producer = source.getProducer("getActivation")
+                val consumer = target.getConsumer("setInputValue")
+                return createCoupling(producer, consumer)
+            }
+
+            val coupling1 = neuronCoupling(neuron1, neuron2)
+            val coupling2 = neuronCoupling(neuron2, neuron3)
+            val coupling3 = neuronCoupling(neuron3, neuron1)
+
+            removeCouplings(listOf(coupling1, coupling2))
+
+            val expected = setOf(coupling3)
+            val diff = expected complement couplings
+
+            assert(diff.isIdentical()) { "Diff: $diff" }
+        }
+    }
+
+    @Test
+    fun `check if removeAttributeContainer successfully removes corresponding couplings`() {
+        val neuron1 = Neuron(network)
+        val neuron2 = Neuron(network)
+        val neuron3 = Neuron(network)
+        with(couplingManager) {
+            fun neuronCoupling(source: Neuron, target: Neuron): Coupling {
+                val producer = source.getProducer("getActivation")
+                val consumer = target.getConsumer("setInputValue")
+                return createCoupling(producer, consumer)
+            }
+
+            val coupling1 = neuronCoupling(neuron1, neuron2)
+            val coupling2 = neuronCoupling(neuron2, neuron3)
+            val coupling3 = neuronCoupling(neuron3, neuron1)
+
+            removeAttributeContainer(neuron1)
+
+            val expected = setOf(coupling2)
+            val diff = expected complement couplings
+
+            assert(diff.isIdentical()) { "Diff: $diff" }
+        }
+    }
+
+    @Test
     fun `check if all producers are created on a neuron`() {
         val neuron = Neuron(network)
         network.addLooseNeuron(neuron)
         val expected = setOf("getLabel", "getActivation")
-        val actual = neuron.producers.map { it.method.name }.toSet()
+        val actual = with(couplingManager) { neuron.producers.map { it.method.name }.toSet() }
         val diff = expected complement actual // For error message if test fails
         assertTrue("$diff", diff.isIdentical())
     }
@@ -39,7 +155,7 @@ class CouplingTest {
         val neuron = Neuron(network)
         network.addLooseNeuron(neuron)
         val expected = setOf("setActivation", "forceSetActivation", "setInputValue", "addInputValue", "setLabel")
-        val actual = neuron.consumers.map { it.method.name }.toSet()
+        val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
         val diff = expected complement actual
         assertTrue("$diff", diff.isIdentical())
     }
@@ -53,7 +169,7 @@ class CouplingTest {
             addLooseNeuron(neuron2)
         }
         with(couplingManager) {
-            neuron1.producerByName("getActivation") couple neuron2.consumerByName("forceSetActivation")
+            neuron1.getProducer("getActivation") couple neuron2.getConsumer("forceSetActivation")
         }
         neuron1.activation = 1.0
         neuron2.isClamped = true
@@ -77,10 +193,16 @@ class CouplingTest {
         network2.addLooseNeuron(neuron3)
 
         // Now couple them
-        couplingManager.createCoupling(neuron1.getProducer("getActivation"),
-                neuron3.getConsumer("addInputValue"));
-        couplingManager.createCoupling(neuron2.getProducer("getActivation"),
-                neuron3.getConsumer("addInputValue"));
+        with(couplingManager) {
+            createCoupling(
+                    neuron1.getProducer("getActivation"),
+                    neuron3.getConsumer("addInputValue")
+            )
+            createCoupling(
+                    neuron2.getProducer("getActivation"),
+                    neuron3.getConsumer("addInputValue")
+            )
+        }
 
         // We expect neuron 3 to have  value of 1 after update
         workspace.simpleIterate()
@@ -102,10 +224,16 @@ class CouplingTest {
         network2.addLooseNeuron(neuron3)
 
         // Now couple them
-        couplingManager.createCoupling(neuron1.getProducer("getActivation"),
-                neuron2.getConsumer("setInputValue"));
-        couplingManager.createCoupling(neuron1.getProducer("getActivation"),
-                neuron3.getConsumer("setInputValue"));
+        with(couplingManager) {
+            couplingManager.createCoupling(
+                    neuron1.getProducer("getActivation"),
+                    neuron2.getConsumer("setInputValue")
+            )
+            couplingManager.createCoupling(
+                    neuron1.getProducer("getActivation"),
+                    neuron3.getConsumer("setInputValue")
+            )
+        }
 
         // We expect neurons 2 and 3 to have  value of .5 after update
         workspace.simpleIterate()

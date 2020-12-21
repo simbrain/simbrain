@@ -4,7 +4,6 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.ImageSourceAdapter;
-import org.simbrain.world.imageworld.ImageSourceListener;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
@@ -17,7 +16,7 @@ import java.awt.image.BufferedImageOp;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class FilteredImageSource extends ImageSourceAdapter implements ImageSourceListener, EditableObject {
+public class FilteredImageSource extends ImageSourceAdapter implements EditableObject {
 
     /**
      * The parent image source being filtered.
@@ -58,13 +57,18 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
         this.imageOp = colorOp;
         this.width = width;
         this.height = height;
-        wrappedSource.addListener(this);
+        onResize(wrappedSource);
+        scaleToFit(wrappedSource);
+        wrappedSource.getEvents().onImageResize(this::onResize);
+        wrappedSource.getEvents().onImageUpdate(this::onImageUpdate);
     }
 
     public Object readResolve() {
         super.readResolve();
+        onResize(wrappedSource);
         scaleToFit(wrappedSource);
-        wrappedSource.addListener(this);
+        wrappedSource.getEvents().onImageResize(this::onResize);
+        wrappedSource.getEvents().onImageUpdate(this::onImageUpdate);
         return this;
     }
 
@@ -104,7 +108,6 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
         return height;
     }
 
-    @Override
     public void onImageUpdate(ImageSource source) {
         BufferedImage image = source.getCurrentImage();
         image = scaleOp.filter(image, null);
@@ -112,9 +115,7 @@ public class FilteredImageSource extends ImageSourceAdapter implements ImageSour
         setCurrentImage(image);
     }
 
-    @Override
     public void onResize(ImageSource source) {
-        scaleToFit(source);
         notifyResize();
     }
 

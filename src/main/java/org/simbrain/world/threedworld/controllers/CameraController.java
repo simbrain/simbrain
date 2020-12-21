@@ -216,7 +216,7 @@ public class CameraController implements AnalogListener, ActionListener, Editabl
      */
     public void registerInput() {
         InputManager input = world.getEngine().getInputManager();
-        input.addMapping(MouseLook.toString(), new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        input.addMapping(MouseLook.toString(), new KeyTrigger(KeyInput.KEY_C));
         input.addMapping(YawLeft.toString(), new MouseAxisTrigger(MouseInput.AXIS_X, true));
         input.addMapping(YawRight.toString(), new MouseAxisTrigger(MouseInput.AXIS_X, false));
         input.addMapping(PitchUp.toString(), new MouseAxisTrigger(MouseInput.AXIS_Y, false));
@@ -227,8 +227,8 @@ public class CameraController implements AnalogListener, ActionListener, Editabl
         input.addMapping(MoveRight.toString(), new KeyTrigger(KeyInput.KEY_D));
         input.addMapping(MoveForward.toString(), new KeyTrigger(KeyInput.KEY_W));
         input.addMapping(MoveBackward.toString(), new KeyTrigger(KeyInput.KEY_S));
-        input.addMapping(MoveUp.toString(), new KeyTrigger(KeyInput.KEY_E));
-        input.addMapping(MoveDown.toString(), new KeyTrigger(KeyInput.KEY_Q));
+        input.addMapping(MoveUp.toString(), new KeyTrigger(KeyInput.KEY_R));
+        input.addMapping(MoveDown.toString(), new KeyTrigger(KeyInput.KEY_F));
         for (Mapping mapping : Mapping.values()) {
             input.addListener(this, mapping.toString());
         }

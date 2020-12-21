@@ -51,40 +51,52 @@ class CouplingMenu(
      * @param producer the producer to make a menu for
      */
     private fun createProducerSubmenu(producer: Producer) {
-        sourceComponent.workspace.componentList.map { wc ->
-            sourceComponent.couplingManager.run {
-                producer.compatiblesOfComponent(wc)
-            }.map { c ->
-                CouplingMenuItem(sourceComponent.workspace, "${wc.name} / ${c.simpleDescription}", producer, c)
+        val workspace = sourceComponent.workspace
+        sequence {
+            workspace.componentList.forEach { wc ->
+                with(sourceComponent.couplingManager) {
+                    producer.compatiblesOfComponent(wc).forEach { consumer ->
+                        CouplingMenuItem(workspace,
+                                "${wc.name} / ${consumer.simpleDescription}",
+                                producer,
+                                consumer
+                        ).let { yield(it) }
+                    }
+                }
             }
-        }.flatten().createSubmenu("${producer.simpleDescription} send to")
+        }.createSubmenu("${producer.simpleDescription} send to")
     }
 
     private fun createConsumerSubmenu(consumer: org.simbrain.workspace.Consumer) {
-        sourceComponent.workspace.componentList.map { wc ->
-            wc.couplingManager.run {
-                consumer.compatiblesOfComponent(wc)
-            }.map { p ->
-                CouplingMenuItem(sourceComponent.workspace, "${wc.name}/${p.simpleDescription}", p, consumer)
+        val workspace = sourceComponent.workspace
+        sequence {
+            workspace.componentList.forEach { wc ->
+                with(workspace.couplingManager) {
+                    consumer.compatiblesOfComponent(wc)
+                }.forEach { product ->
+                    CouplingMenuItem(workspace, "${wc.name}/${product.simpleDescription}", product, consumer)
+                            .let { yield(it) }
+                }
             }
-        }.flatten().createSubmenu("${consumer.simpleDescription} receive ${consumer.typeName} from")
+        }.createSubmenu("${consumer.simpleDescription} receive ${consumer.typeName} from")
     }
 
-    private fun List<CouplingMenuItem>.createSubmenu(description: String) {
+    private fun Sequence<CouplingMenuItem>.createSubmenu(description: String) {
 
         val submenu = JMenu(description)
 
         // TODO: magic number
         // TODO: "..." menu has no action
-        if (isNotEmpty()) {
-            if (count() > 40) {
-                this.take(35).map { it.create() }.forEach { submenu.add(it) }
-                submenu.add(JSeparator())
-                submenu.add(JMenuItem("... and ${count() - 35} more items"))
-            } else {
-                this.map { it.create() }.forEach { submenu.add(it) }
+        if (firstOrNull() != null) {
+            take(36).let { items ->
+                items.map { it.create() }.forEach { submenu.add(it) }
+                if (items.count() > 35) {
+                    submenu.add(JSeparator())
+                    submenu.add(JMenuItem("... and more items"))
+                }
             }
-            add(submenu)
         }
+
+        add(submenu)
     }
 }

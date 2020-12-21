@@ -1,7 +1,6 @@
 package org.simbrain.world.threedworld;
 
 import org.simbrain.world.imageworld.ImageSource;
-import org.simbrain.world.imageworld.ImageSourceListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +10,7 @@ import java.awt.*;
  *
  * @author Tim Shea
  */
-public class ThreeDImagePanel extends JPanel implements ImageSourceListener {
+public class ThreeDImagePanel extends JPanel {
     private static final long serialVersionUID = 2582113543119990412L;
 
     private ImageSource nextSource;
@@ -43,7 +42,8 @@ public class ThreeDImagePanel extends JPanel implements ImageSourceListener {
         if (currentSource == null) {
             currentSource = value;
             nextSource = value;
-            currentSource.addListener(this);
+            currentSource.getEvents().onImageResize(this::onResize);
+            currentSource.getEvents().onImageUpdate(this::onImageUpdate);
         } else {
             nextSource = value;
         }
@@ -76,24 +76,23 @@ public class ThreeDImagePanel extends JPanel implements ImageSourceListener {
         }
     }
 
-    @Override
     public void onImageUpdate(ImageSource source) {
         if (destroyNeeded) {
-            currentSource.removeListener(this);
+            // currentSource.removeListener(this);
             currentSource = null;
             return;
         }
         if (nextSource != currentSource) {
-            currentSource.removeListener(this);
+            // currentSource.removeListener(this);
             currentSource = nextSource;
-            currentSource.addListener(this);
+            currentSource.getEvents().onImageResize(this::onResize);
+            currentSource.getEvents().onImageUpdate(this::onImageUpdate);
         }
         if (currentSource.isEnabled()) {
             repaint();
         }
     }
 
-    @Override
     public void onResize(ImageSource source) {
         onImageUpdate(source);
     }

@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld;
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
@@ -110,6 +109,7 @@ public class PixelConsumerSource extends ImageSourceAdapter {
         setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
         channels = new double[3][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];
+        getEvents().fireImageResize(this);
     }
 
     /**

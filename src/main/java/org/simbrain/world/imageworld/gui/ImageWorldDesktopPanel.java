@@ -41,8 +41,7 @@ public class ImageWorldDesktopPanel extends JPanel {
     /**
      * Combo box for selecting which sensor matrix to view.
      */
-    private JComboBox<SensorMatrix> sensorMatrixCombo = new JComboBox<SensorMatrix>();
-    private JComboBox<Color> colorPicker = new JComboBox<Color>();
+    private JComboBox<SensorMatrix> sensorMatrixCombo = new JComboBox<>();
 
     /**
      * Toolbars.
@@ -116,18 +115,8 @@ public class ImageWorldDesktopPanel extends JPanel {
         add(bottom_toolbars, BorderLayout.SOUTH);
         bottom_toolbars.add(imageAlbumToolbar);
 
-        world.addListener(new ImageWorld.Listener() {
-
-            @Override
-            public void sensorMatrixAdded(SensorMatrix addedMatrix) {
-                updateComboBox();
-            }
-
-            @Override
-            public void sensorMatrixRemoved(SensorMatrix removedMatrix) {
-                updateComboBox();
-            }
-        });
+        world.getEvents().onSensorMatrixAdded(s-> updateComboBox());
+        world.getEvents().onSensorMatrixRemoved(s-> updateComboBox());
 
         // Set up context menu
         world.getImagePanel().addMouseListener(new MouseAdapter() {

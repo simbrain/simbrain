@@ -183,7 +183,7 @@ public class Braitenberg extends RegisteredSimulation {
 
     @Override
     public String getSubmenuName() {
-        return "Behaviorism";
+        return "Braitenberg";
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment;
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant;
+import org.simbrain.custom_sims.simulations.braitenberg.Braitenberg;
 import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum;
 import org.simbrain.custom_sims.simulations.cortex.CortexSimple;
 import org.simbrain.custom_sims.simulations.cortex.CorticalBranching;

@@ -269,8 +269,8 @@ class EnvironmentBuilder private constructor(
     /**
      * Use this to create a chromosome with a set number of genes.
      */
-    fun <T, G : Gene<T>> chromosome(count: Int, genes: (index: Int) -> G): Chromosome<T, G> {
-        return createChromosome { Chromosome(List(count) { genes(it) }.toMutableList()) }
+    fun <T, G : Gene<T>> chromosome(initialCount: Int, genes: (index: Int) -> G): Chromosome<T, G> {
+        return createChromosome { Chromosome(List(initialCount) { genes(it) }.toMutableList()) }
     }
 
     /**

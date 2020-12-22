@@ -173,7 +173,7 @@ val NetworkPanel.neuronContextMenu get() = with(networkActions) {
         add(testInputAction)
         add(showWeightMatrixAction)
         if (selectionManager.filterSelectedNodes<NeuronNode>().size == 1) {
-            val node = selectionManager.filterSelectedNodes<NeuronNode>().get(0)
+            val node = selectionManager.filterSelectedNodes<NeuronNode>()[0]
             addSeparator()
             add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
         }

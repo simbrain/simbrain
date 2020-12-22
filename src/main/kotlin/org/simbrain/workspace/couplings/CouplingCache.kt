@@ -90,7 +90,6 @@ class CouplingCache(val couplingManager: CouplingManager) {
                 .description(annotation.description)
                 .customDescription(customDescription)
                 .arrayDescriptionMethod(arrayDescriptionMethod)
-                .visibility(annotation.defaultVisibility)
                 .build()
     }(this)
 
@@ -113,7 +112,6 @@ class CouplingCache(val couplingManager: CouplingManager) {
         fun (attributeContainer: AttributeContainer) = Consumer.builder(attributeContainer, method)
                 .description(annotation.description)
                 .customDescription(customDescription)
-                .visibility(annotation.defaultVisibility)
                 .build()
     }(this)
 

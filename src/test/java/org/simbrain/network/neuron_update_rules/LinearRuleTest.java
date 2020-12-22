@@ -21,12 +21,12 @@ public class LinearRuleTest {
         net.addLooseNeuron(output);
 
         Neuron input1 = new Neuron(net);
-        input1.setClamped(true);
         input1.setActivation(1);
+        input1.setClamped(true);
         net.addLooseNeuron(input1);
         Neuron input2 = new Neuron(net);
-        input2.setClamped(true);
         input2.setActivation(-1);
+        input2.setClamped(true);
         net.addLooseNeuron(input2);
 
         Synapse w13 = new Synapse(input1, output);
@@ -39,6 +39,28 @@ public class LinearRuleTest {
         // 1*.5 + -1*-1 = .5 + 1 = 1.5
         net.update();
         assertEquals(1.5, output.getActivation(), 0);
+
+        // Testing two negative slopes.
+        input1 = new Neuron(net);
+        input1.setActivation(1);
+        input1.setClamped(true);
+        net.addLooseNeuron(input1);
+        input2 = new Neuron(net);
+        input2.setActivation(-1);
+        input2.setClamped(true);
+        net.addLooseNeuron(input2);
+
+        w13 = new Synapse(input1, output);
+        w13.setStrength(-0.8);
+        net.addLooseSynapse(w13);
+        w23 = new Synapse(input2, output);
+        w23.setStrength(-0.2);
+        net.addLooseSynapse(w23);
+
+        net.update();
+        // 0.6 with the epsilon(threshold) 0.0001
+        assertEquals(-0.6, output.getActivation(), 0.0001);
+
     }
 
     @Test

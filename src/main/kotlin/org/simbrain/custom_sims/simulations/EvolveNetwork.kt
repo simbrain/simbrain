@@ -17,8 +17,9 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
 import kotlin.math.abs
 
-// TODO: Do this with layouts and connection managers
-// TODO: Allow mutation of neuron type
+/**
+ * Evolve a network whose average activation is a specified value.
+ */
 class EvolveNetwork(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
     private val mainScope = MainScope()
@@ -58,7 +59,7 @@ class EvolveNetwork(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             val network = useNetwork()
 
-            val nodeChromosome = chromosome(2) {
+            val nodeChromosome = chromosome(20) {
                 nodeGene() {
                     location = point(Math.random()*100, Math.random()*100)
                 }
@@ -94,6 +95,7 @@ class EvolveNetwork(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             }
 
             onEval {
+                repeat(10) { network.product.bufferedUpdate() }
                 abs(nodeChromosome.products.activations.average() - .5)
             }
 

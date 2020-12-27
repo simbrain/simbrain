@@ -16,6 +16,13 @@ public class OdorWorldEntityTest {
     }
 
     @Test
+    public void entityCreationWorks() {
+        OdorWorldEntity entity = new OdorWorldEntity(world);
+        world.addEntity(entity);
+        assertNotNull(world.getEntity(entity.getId()));
+    }
+
+    @Test
     public void testWorldBounds() {
         world.setWrapAround(false);
         OdorWorldEntity entity = new OdorWorldEntity(world);

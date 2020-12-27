@@ -1,30 +1,12 @@
-package org.simbrain.custom_sims.simulations.test;
+package org.simbrain.custom_sims.simulations.braitenberg;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.ConnectionUtilities;
-import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.ProductRule;
-import org.simbrain.network.neuron_update_rules.TimedAccumulatorRule;
-import org.simbrain.plot.barchart.BarChartComponent;
 import org.simbrain.util.LabelledItemPanel;
-import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -32,31 +14,10 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
 
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-import org.simbrain.custom_sims.helper_classes.*;
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.core.*;
-import org.simbrain.network.groups.*;
-import org.simbrain.network.connections.*;
-import org.simbrain.network.desktop.*;
-import org.simbrain.network.layouts.*;
-import org.simbrain.network.neuron_update_rules.*;
-import org.simbrain.network.synapse_update_rules.*;
-import org.simbrain.workspace.*;
-import org.simbrain.util.*;
 import javax.swing.JInternalFrame;
-import java.util.*;
-import org.simbrain.world.odorworld.entities.*;
 
 /**
  * Playground for testing new features. A lot of stuff is commented out but
@@ -72,19 +33,17 @@ public class Braitenberg extends RegisteredSimulation {
         super();
     }
 
-    /**
-     * @param desktop
-     */
     public Braitenberg(SimbrainDesktop desktop) {
         super(desktop);
     }
 
     /**
-     * Run the simulation!
+     * Run the simulation.
      */
     public void run() {
 
         Workspace workspace = sim.getWorkspace();
+
         // Clear workspace
         workspace.clearWorkspace();
         SimbrainDesktop desktop = sim.getDesktop();
@@ -106,7 +65,6 @@ public class Braitenberg extends RegisteredSimulation {
         Vehicle vb2 = new Vehicle(sim, vehicle2, world);
         NeuronGroup ng2 = vb2.addPursuer(1, 1, agent2, EntityType.CIRCLE,
                 (ObjectSensor)agent1.getSensors().get(0), (ObjectSensor)agent1.getSensors().get(1));
-
 
         // Make buttons
         JInternalFrame internalFrame = new JInternalFrame("Set weights", true, true);

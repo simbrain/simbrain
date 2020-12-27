@@ -42,12 +42,6 @@ public abstract class Attribute {
     protected Method customDescriptionMethod;
 
     /**
-     * Whether the attribute shows up in the GUI. Invisible attribute can still
-     * be part of couplings (if created in a script).
-     */
-    protected boolean visibility = true;
-
-    /**
      * The String description of the attribute. By default has this form:
      * ID:methodName(Type).  E.g. Neuron1:getActivation(Double).
      * <p>
@@ -197,14 +191,6 @@ public abstract class Attribute {
         return method;
     }
 
-    public boolean isVisible() {
-        return visibility;
-    }
-
-    public void setVisible(boolean visible) {
-        visibility = visible;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -231,8 +217,6 @@ public abstract class Attribute {
      * If no special set-up is needed, just use, for example, in the case of Consumer,
      * {@code Consumer.builder(container, method).build()} or the short-cut equivalent
      * {@code Consumer.create(container, method)}.
-     *
-     * See {@link CouplingUtils#getProducer} for an example.
      *
      * @param <B> The type of the builder to return when building
      * @param <T> The type of the final product to return when finish building.
@@ -280,17 +264,6 @@ public abstract class Attribute {
          */
         public B customDescription(Method customDescription) {
             product().customDescriptionMethod = customDescription;
-            return (B) this;
-        }
-
-        /**
-         * Set whether the attribute shows up in the GUI.
-         *
-         * @param visibility true if the attribute should show up in the GUI
-         * @return the Builder instance (for use in chained initialization)
-         */
-        public B visibility(boolean visibility) {
-            product().visibility = visibility;
             return (B) this;
         }
 

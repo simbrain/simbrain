@@ -11,7 +11,10 @@ import org.simbrain.util.component1
 import org.simbrain.util.component2
 import java.awt.geom.Point2D
 
-var List<Neuron?>.activations
+/**
+ * Easily get or set activations for a list of neurons.
+ */
+var List<Neuron?>.activations : List<Double>
     get() = map { it?.activation ?: 0.0 }
     set(values) = values.forEachIndexed { index, value ->
         this[index]?.let { neuron ->
@@ -23,13 +26,19 @@ var List<Neuron?>.activations
         }
     }
 
-var List<Neuron?>.labels
+/**
+ * Easily get or set labels for a list of neurons.
+ */
+var List<Neuron?>.labels : List<String>
     get() = map { it?.label ?: "" }
     set(values) = values.forEachIndexed { index, label ->
         this[index]?.let { it.label = label }
     }
 
-var List<Neuron>.auxValues
+/**
+ * Easily get or set auxiliary values for a list of neurons
+ */
+var List<Neuron>.auxValues : List<Double>
     get() = map { it.auxValue }
     set(values) = values.forEachIndexed { index, value ->
         this[index].auxValue = value

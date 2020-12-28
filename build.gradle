@@ -101,16 +101,9 @@ dependencies {
 
 }
 
-// Sample call: gradle runSim -PsimName='Evolve Mouse Pursuer'
+// Sample invocation:
+//   gradle runSim -PsimName="Test Sim"
 task runSim(type: JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
-    main = "org.simbrain.custom_sims.RegisteredSimulation"
-    if(project.hasProperty('simName')){
-        args simName
-    }
-}
-
-task runNewSim(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "org.simbrain.custom_sims.simulations.RegisteredSimulationsKt"
     if(project.hasProperty('simName')){

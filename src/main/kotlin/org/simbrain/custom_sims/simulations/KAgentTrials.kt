@@ -70,8 +70,6 @@ val kAgentTrials = newSim {
         lastPredicted = sensoryNet.neuronList.activations
     })
 
-
-
     val odorWorldComponent = addOdorWorldComponent()
 
     withGui {
@@ -112,6 +110,22 @@ val kAgentTrials = newSim {
     }
 
     odorWorld.update()
+
+    withGui {
+        val plot = addProjectionPlot("Sensory States + Predictions").apply {
+            projector.tolerance = .001
+        }
+        place(plot) {
+            location = point(194,312)
+            size = point(441, 308)
+        }
+
+      // sim.couple(sensoryNet, plot);
+
+        // // Uncomment for prediction halo
+        // plot.getProjectionModel().getProjector().setUseColorManager(false);
+        // sim.getWorkspace().addUpdateAction(new ColorPlot(this));
+    }
 
 
 }

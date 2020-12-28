@@ -2,7 +2,17 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.util.dir
 
+/**
+ * Use this DSL to create the structure of the simulation menu in the Simbrain Desktop.
+ * - dir is a JMenu
+ * - item is a JMenuItem. The label given is used both as the Menu Item name, and in the command line as the name to
+ * use to call them using "run sim" (see build.gradle#runSim). If duplicate labels are used the first one encountered
+ * will be run from the command line.
+ */
 val simulations = dir<NewSimulation>("Simulations") {
+
+    // This supersedes RegisteredSimulation.java. Will have to move that stuff here.
+
     dir("Demo") {
         item("Test Sim") { testSim }
         item("Agent Trials") { kAgentTrials }
@@ -15,6 +25,9 @@ val simulations = dir<NewSimulation>("Simulations") {
     }
 }
 
+/**
+ * Called by build.gradle#runSim when invoking a headless simulation from the command line.
+ */
 fun main(args: Array<String>) {
 
     if (args.isEmpty()) throw IllegalArgumentException("""

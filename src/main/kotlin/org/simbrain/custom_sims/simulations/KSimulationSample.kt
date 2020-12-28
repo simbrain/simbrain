@@ -29,12 +29,10 @@ val testSim = newSim {
 
     println("Total Number of neurons: ${network.looseNeurons.size}")
 
-
     withGui {
         place(networkComponent) {
             location = point(250, 0)
         }
     }
-
 
 }

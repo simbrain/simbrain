@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations
+package org.simbrain.custom_sims
 
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
@@ -9,6 +9,8 @@ import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.OdorWorldComponent
+
+// TODO: Rename to Simulation
 
 class SimulationScope(val desktop: SimbrainDesktop? = null) {
 

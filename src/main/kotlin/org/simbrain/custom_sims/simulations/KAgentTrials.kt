@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import org.simbrain.custom_sims.*
 import org.simbrain.network.util.*
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place

@@ -24,7 +24,7 @@ import kotlin.Unit;
 import org.pmw.tinylog.Logger;
 import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.simulations.RegisteredSimulationsKt;
+import org.simbrain.custom_sims.RegisteredSimulationsKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;

@@ -1,5 +1,7 @@
-package org.simbrain.custom_sims.simulations
+package org.simbrain.custom_sims
 
+import org.simbrain.custom_sims.simulations.kAgentTrials
+import org.simbrain.custom_sims.simulations.testSim
 import org.simbrain.util.dir
 
 /**
@@ -22,6 +24,9 @@ val simulations = dir<NewSimulation>("Simulations") {
             item("Test Sim2") { testSim }
             item("Test Sim3") { testSim }
         }
+    }
+    dir("Evolution") {
+
     }
 }
 

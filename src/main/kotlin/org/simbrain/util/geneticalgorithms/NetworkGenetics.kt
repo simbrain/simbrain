@@ -1,10 +1,13 @@
 package org.simbrain.util.geneticalgorithms
 
+import com.jme3.scene.debug.Grid
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.layouts.Layout
 import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.couplings.CouplingManager
@@ -18,6 +21,11 @@ inline fun nodeGene(options: Neuron.() -> Unit = { }): NodeGene {
 inline fun connectionGene(source: NodeGene, target: NodeGene, options: Synapse.() -> Unit = { }): ConnectionGene {
     return ConnectionGene(Synapse(null, null as Neuron?).apply(options), source, target)
 }
+
+inline fun layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
+    return LayoutGene(GridLayout().apply(options))
+}
+
 
 sealed class NetworkGene<T>(template: T): Gene<T>(template)
 
@@ -69,6 +77,20 @@ class ConnectionGene(template: Synapse, val source: NodeGene, val target: NodeGe
 
     fun build(network: Network, source: Neuron, target: Neuron): Synapse {
         return Synapse(network, source, target, template.learningRule, template)
+    }
+
+}
+
+class LayoutGene(template: GridLayout) : NetworkGene<GridLayout>(template) {
+
+    // Todo: handle types of layout
+
+    override fun copy(): LayoutGene {
+        return LayoutGene(template)
+    }
+
+    fun build(): GridLayout {
+        return GridLayout()
     }
 
 }

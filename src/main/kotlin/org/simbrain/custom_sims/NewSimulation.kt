@@ -2,6 +2,7 @@ package org.simbrain.custom_sims
 
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.Utils
@@ -36,6 +37,11 @@ fun newSim(block: SimulationScope.() -> Unit) = NewSimulation(block)
 fun SimulationScope.addNetworkComponent(name: String, config: NetworkComponent.() -> Unit = { }): NetworkComponent {
     return NetworkComponent(name)
         .apply(config)
+        .also(workspace::addWorkspaceComponent)
+}
+
+fun SimulationScope.addNetworkComponent(name: String, network : Network): NetworkComponent {
+    return NetworkComponent(name, network)
         .also(workspace::addWorkspaceComponent)
 }
 

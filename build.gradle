@@ -105,7 +105,7 @@ dependencies {
 //   gradle runSim -PsimName="Test Sim"
 task runSim(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = "org.simbrain.custom_sims.simulations.RegisteredSimulationsKt"
+    main = "org.simbrain.custom_sims.RegisteredSimulationsKt"
     if(project.hasProperty('simName')){
         args simName
     }

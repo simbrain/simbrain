@@ -66,6 +66,8 @@ public class Braitenberg extends RegisteredSimulation {
         NeuronGroup ng2 = vb2.addPursuer(1, 1, agent2, EntityType.CIRCLE,
                 (ObjectSensor)agent1.getSensors().get(0), (ObjectSensor)agent1.getSensors().get(1));
 
+        sim.addDocViewer(0, 0, 253, 313, "Information",
+                "Braitenberg.html");
         // Make buttons
         JInternalFrame internalFrame = new JInternalFrame("Set weights", true, true);
         LabelledItemPanel panel = new LabelledItemPanel();

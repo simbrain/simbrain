@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.20'
     // id 'checkstyle'
 
     // Fixes problem with long filenames
@@ -31,10 +31,17 @@ repositories {
 
 dependencies {
 
-    // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.3.9'
+//    // Kotlin
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.20"
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-jvm-host:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-jsr223:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-compiler-embeddable:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-script-util:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.4.20'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.2'
 
     // Logger for DL4J
     compile 'ch.qos.logback:logback-classic:1.2.3'
@@ -98,6 +105,14 @@ dependencies {
 task runSim(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "org.simbrain.custom_sims.RegisteredSimulation"
+    if(project.hasProperty('simName')){
+        args simName
+    }
+}
+
+task runNewSim(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = "org.simbrain.custom_sims.simulations.RegisteredSimulationsKt"
     if(project.hasProperty('simName')){
         args simName
     }

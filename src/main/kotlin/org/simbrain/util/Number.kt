@@ -11,16 +11,23 @@ fun <T : Comparable<T>> T.clip(range: ClosedRange<T>) =
  */
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
+infix fun Iterable<Double>.squaredError(other: Iterable<Double>)
+        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }
+
 infix fun Iterable<Double>.sse(other: Iterable<Double>)
-        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.sum()
+        = (this squaredError other).sum()
 
 infix fun Iterable<Double>.mse(other: Iterable<Double>)
-        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.average()
+        = (this squaredError other).average()
+
+@JvmName("squaredErrorInt")
+infix fun Iterable<Int>.squaredError(other: Iterable<Int>)
+        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }
 
 @JvmName("sseInt")
 infix fun Iterable<Int>.sse(other: Iterable<Int>)
-        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.sum()
+        = (this squaredError other).sum()
 
 @JvmName("mseInt")
 infix fun Iterable<Int>.mse(other: Iterable<Int>)
-        = this.zip(other).map { (a, b) -> (a - b).let { it * it } }.average()
+        = (this squaredError other).average()

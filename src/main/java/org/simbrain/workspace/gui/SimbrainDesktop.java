@@ -20,9 +20,11 @@ package org.simbrain.workspace.gui;
 
 import bsh.Interpreter;
 import bsh.util.JConsole;
+import kotlin.Unit;
 import org.pmw.tinylog.Logger;
 import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.simulations.RegisteredSimulationsKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
@@ -35,7 +37,6 @@ import org.simbrain.util.widgets.ToggleButton;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
-import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.InterceptingEventQueue;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
@@ -569,6 +570,11 @@ public class SimbrainDesktop {
                 }
             }
         }
+        scriptMenu.addSeparator();
+        RegisteredSimulationsKt.getSimulations().addToMenu(scriptMenu, newSimulation -> {
+            newSimulation.run(this);
+            return Unit.INSTANCE;
+        });
         if (actionManager.getScriptActions(this) == null) {
             JOptionPane.showOptionDialog(null, "To use scripts place Simbrain.jar in the same directory as the scripts directory and restart.", "Warning", JOptionPane.DEFAULT_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, null, null);

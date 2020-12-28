@@ -172,7 +172,7 @@ class OdorWorldBuilderContext(val builder: OdorWorldGeneticBuilder): BuilderCont
 
 fun useOdorWorld() = OdorWorldBuilderProvider()
 
-class OdorWorldEntityBuilderProvider(val type: EntityType, val entityTemplate: OdorWorldEntity.() -> Unit)
+class OdorWorldEntityBuilderProvider(private val type: EntityType, val entityTemplate: OdorWorldEntity.() -> Unit)
     : BuilderProvider<OdorWorldEntity, OdorWorldEntityGeneticBuilder, OdorWorldEntityBuilderContext> {
 
     fun createBuilder(productMap: ProductMap): OdorWorldEntityGeneticBuilder {

@@ -167,6 +167,12 @@ public class OdorWorld implements EditableObject {
         return entity;
     }
 
+    public OdorWorldEntity addEntity(EntityType type) {
+        final var entity = new OdorWorldEntity(this, type);
+        addEntity(entity);
+        return entity;
+    }
+
     /**
      * Add new "agent" (rotating with some default) sensors and effectors at last clicked position.
      */

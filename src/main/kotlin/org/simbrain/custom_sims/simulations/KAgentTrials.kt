@@ -28,7 +28,8 @@ val kAgentTrials = newSim {
     withGui {
         place(networkComponent) {
             location = point(195, 9)
-            size = point(447, 296)
+            width = 447
+            height = 296
         }
     }
 
@@ -141,7 +142,8 @@ val kAgentTrials = newSim {
         }
         place(plot) {
             location = point(194,312)
-            size = point(441, 308)
+            width = 441
+            height = 308
         }
 
         couplingManager.createCoupling(sensoryNet, plot)

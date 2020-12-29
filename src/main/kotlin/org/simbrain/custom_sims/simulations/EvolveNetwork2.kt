@@ -75,7 +75,8 @@ val evolveNetwork2 = newSim {
             val nc = addNetworkComponent("Network", network.product)
             withGui {
                 place(nc) {
-                    size = point(200, 200)
+                    width = 200
+                    height = 200
                 }
             }
             // When run headless

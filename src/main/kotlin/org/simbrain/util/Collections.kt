@@ -13,9 +13,14 @@ data class SetDifference<T>(val leftComp: Set<T>, val rightComp: Set<T>) {
 infix fun <T> Set<T>.complement(other: Set<T>) = SetDifference(this - other, other - this)
 
 /**
- * A.k.a list of all to all pairs.
+ * Map a pair of lists to a list of pairs.
+ *
+ * Ex: (1,2) cartesianProduct (3,4) -> ((1,3),(1,4),(2,3), (2,4))
  */
-infix fun <T> Iterable<T>.cartesianProduct(other: Iterable<T>) = this.flatMap { a -> other.map { b -> a to b }}
+infix fun <T,U> Iterable<T>.cartesianProduct(other: Iterable<U>) = this.flatMap { a -> other.map { b -> a to b }}
 
+/**
+ * [cartesianProduct] for a pair of sequences.
+ */
 infix fun <T, U> Sequence<T>.cartesianProduct(other: Sequence<U>)
     = this.flatMap { a -> other.map { b -> a to b }}

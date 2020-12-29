@@ -13,7 +13,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.world.odorworld.OdorWorldComponent
 
-// TODO: Rename to Simulation
+// TODO: Rename to Simulation after Simulatoin.java is removed
 
 class SimulationScope(val desktop: SimbrainDesktop? = null) {
 

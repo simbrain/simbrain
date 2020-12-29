@@ -25,18 +25,6 @@ import java.lang.reflect.Method
  */
 class CouplingManager(val workspace: Workspace) {
 
-    val Producer.preference: Int get() = when {
-        else -> 0
-    }
-
-    val Consumer.preference: Int get() = when {
-        baseObject is StraightMovement && method.name == "setAmount" -> 10
-        baseObject is Turning && method.name == "setAmount" -> 10
-        with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
-        with(baseObject) { this is Neuron && !isClamped && method.name == "setActivation" } -> 10
-        else -> 0
-    }
-
     private val couplingCache = CouplingCache(this)
 
     /**
@@ -146,6 +134,30 @@ class CouplingManager(val workspace: Workspace) {
      */
     val AttributeContainer.visibleConsumers: Sequence<Consumer>
         get() = couplingCache.getVisibleConsumers(this)
+
+    /**
+     * Induces a priority on consumers which allows for auto-coupling, i.e. making couplings between
+     * [AttributeContainer]s without specifying specific consumers or producers.
+     */
+    val Consumer.preference: Int get() = when {
+
+        // TODO: Possibly find a way to move this to [AttributeContainers], e.g. adding a getAttributeOrdering method
+        //  to AttributeContainer
+
+        baseObject is StraightMovement && method.name == "setAmount" -> 10
+        baseObject is Turning && method.name == "setAmount" -> 10
+        with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
+        with(baseObject) { this is Neuron && !isClamped && method.name == "setActivation" } -> 10
+        else -> 0
+    }
+
+    /**
+     * See [Consumer.preference]
+     */
+    val Producer.preference: Int get() = when {
+        else -> 0
+    }
+
 
     /**
      * Find the first [Consumer] in an [AttributeContainer] which has the given method name

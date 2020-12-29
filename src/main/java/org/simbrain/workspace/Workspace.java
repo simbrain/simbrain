@@ -240,6 +240,9 @@ public class Workspace {
      * scripts when making a series of events occur, e.g. set some neurons, run
      * for 50 iterations, set some other neurons, run 20 iterations, etc.
      *
+     * Forces desktop to render between iterations. For headless simulations suggest
+     * using {@link #simpleIterate()}.
+     *
      * @param numIterations the number of iteration to run while waiting on the
      *                      latch.
      */

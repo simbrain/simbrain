@@ -38,7 +38,6 @@ val kAgentTrials = newSim {
         label = "Sensory"
         neuronList.labels = listOf("Cheese", "Flower", "Fish")
     }
-    val (cheeseNeuron, flowerNeuron, fishNeuron) = sensoryNet.neuronList
 
     val actionNet = network.addNeuronGroup(3, point(0.0, -0.79)).apply {
         label = "Actions"
@@ -99,6 +98,7 @@ val kAgentTrials = newSim {
         manualStraightMovementIncrement = 2.0
         manualMotionTurnIncrement = 2.0
     }
+
     val (straightMovement, turnLeft, turnRight) = mouse.effectors
     val (smellSensors) = mouse.sensors
 
@@ -144,30 +144,29 @@ val kAgentTrials = newSim {
             size = point(441, 308)
         }
 
-        with(couplingManager) {
-            createCoupling(sensoryNet, plot)
-        }
+        couplingManager.createCoupling(sensoryNet, plot)
 
         createControlPanel("Control Panel", 5, 10) {
 
-            fun simple(location: Point2D) {
+            fun positionMouse(location: Point2D) {
                 network.clearActivations()
                 val (x, y) = location
                 mouse.setLocation(x, y + dispersion)
                 mouse.heading = 90.0
                 straightNeuron.forceSetActivation(1.0)
-                workspace.iterate((2 * dispersion).toInt())
+                // TODO: move to a location by iterating while not at location
+                workspace.iterate((4 * dispersion).toInt())
                 straightNeuron.forceSetActivation(0.0)
             }
 
             addButton("Cheese") {
-                simple(cheeseLocation)
+                positionMouse(cheeseLocation)
             }
             addButton("Fish") {
-                simple(fishLocation)
+                positionMouse(fishLocation)
             }
             addButton("Flower") {
-                simple(flowerLocation)
+                positionMouse(flowerLocation)
             }
             addButton("Cheese > Flower") {
                 network.clearActivations()
@@ -216,7 +215,6 @@ val kAgentTrials = newSim {
                 fish.velocityY = 0.0
             }
         }
-        // Uncomment for prediction halo
 
         // Uncomment for prediction halo
         plot.projectionModel.projector.isUseColorManager = false

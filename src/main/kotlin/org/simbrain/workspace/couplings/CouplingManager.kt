@@ -1,6 +1,10 @@
 package org.simbrain.workspace.couplings
 
+import org.simbrain.network.core.Neuron
+import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
+import org.simbrain.world.odorworld.effectors.StraightMovement
+import org.simbrain.world.odorworld.effectors.Turning
 import java.lang.reflect.Method
 
 /**
@@ -20,6 +24,18 @@ import java.lang.reflect.Method
  * be properly managed and serialized.
  */
 class CouplingManager(val workspace: Workspace) {
+
+    val Producer.preference: Int get() = when {
+        else -> 0
+    }
+
+    val Consumer.preference: Int get() = when {
+        baseObject is StraightMovement && method.name == "setAmount" -> 10
+        baseObject is Turning && method.name == "setAmount" -> 10
+        with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
+        with(baseObject) { this is Neuron && !isClamped && method.name == "setActivation" } -> 10
+        else -> 0
+    }
 
     private val couplingCache = CouplingCache(this)
 
@@ -175,6 +191,19 @@ class CouplingManager(val workspace: Workspace) {
      * Convenience operator for creating couplings.
      */
     infix fun Producer?.couple(consumer: Consumer?) = createCoupling(this, consumer)
+
+    fun createCoupling(producingContainer: AttributeContainer, consumingContainer: AttributeContainer): Coupling {
+        val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers)
+            .filter { (a, b) -> a.type == b.type }
+            .sortedByDescending { (a, b) -> a.preference + b.preference }
+            .firstOrNull() ?: throw RuntimeException(
+                    "No compatible attributes found between $producingContainer and $consumingContainer"
+            )
+        return producer couple consumer
+    }
+
+    infix fun AttributeContainer.couple(consumingContainer: AttributeContainer)
+        = createCoupling(this, consumingContainer)
 
     /**
      * Create a coupling from each producer to every consumer of the same type.

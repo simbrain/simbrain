@@ -16,3 +16,6 @@ infix fun <T> Set<T>.complement(other: Set<T>) = SetDifference(this - other, oth
  * A.k.a list of all to all pairs.
  */
 infix fun <T> Iterable<T>.cartesianProduct(other: Iterable<T>) = this.flatMap { a -> other.map { b -> a to b }}
+
+infix fun <T, U> Sequence<T>.cartesianProduct(other: Sequence<U>)
+    = this.flatMap { a -> other.map { b -> a to b }}

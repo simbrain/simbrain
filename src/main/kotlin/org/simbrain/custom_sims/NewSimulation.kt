@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims
 
+import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -9,6 +10,7 @@ import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
+import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.world.odorworld.OdorWorldComponent
 
 // TODO: Rename to Simulation
@@ -87,4 +89,15 @@ fun SimulationScope.addDocViewer(title: String?, fileName: String): DocViewerCom
 }
 
 val SimulationScope.couplingManager get() = workspace.couplingManager
+
+fun SimbrainDesktop.createControlPanel(name: String, x: Int, y: Int, config: ControlPanel.() -> Unit): ControlPanel {
+    return ControlPanel.makePanel(this, name, x, y).apply(config)
+}
+
+fun updateAction(description: String, longDescription: String = description, action: () -> Unit)
+        = object : UpdateAction {
+    override fun invoke() = action()
+    override fun getDescription(): String = description
+    override fun getLongDescription(): String = longDescription
+}
 

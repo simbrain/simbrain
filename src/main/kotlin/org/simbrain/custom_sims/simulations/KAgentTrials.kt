@@ -2,16 +2,24 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.util.*
+import org.simbrain.util.component1
+import org.simbrain.util.component2
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.squaredError
+import org.simbrain.util.projection.Halo
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
+import java.awt.geom.Point2D
+import kotlin.math.sqrt
 
 val kAgentTrials = newSim {
 
     val dispersion = 100.0
+
+    val cheeseLocation = point(200.0, 250.0)
+    val flowerLocation = point(330.0, 100.0)
+    val fishLocation = point(50.0, 100.0)
 
     workspace.clearWorkspace()
 
@@ -58,17 +66,17 @@ val kAgentTrials = newSim {
     network.addUpdateAction(networkUpdateAction("K Custom Learning Rule") {
         val learningRate = 0.1
 
-        val squareError = sensoryNet.neuronList.activations squaredError lastPredicted
-        predictionNet.neuronList.auxValues = squareError
+        val errors = (sensoryNet.neuronList.activations zip lastPredicted).map { (a, b) -> a - b }
+        predictionNet.neuronList.auxValues = errors
 
-        val sumError = squareError.sum()
-        errorNeuron.activation = sumError
+        val sse = errors.map { it * it }.sum()
+        errorNeuron.activation = sqrt(sse)
 
         network.flatSynapseList.forEach {
             it.strength = it.strength + learningRate * it.source.activation * it.target.auxValue
         }
 
-        lastPredicted = sensoryNet.neuronList.activations
+        lastPredicted = predictionNet.neuronList.activations
     })
 
     val odorWorldComponent = addOdorWorldComponent()
@@ -86,31 +94,46 @@ val kAgentTrials = newSim {
     val mouse = odorWorld.addEntity(EntityType.MOUSE).apply {
         setLocation(204.0, 343.0)
         heading = 90.0
-        addDefaultSensorsEffectors()
+        addDefaultEffectors()
         addSensor(SmellSensor(this))
         manualStraightMovementIncrement = 2.0
         manualMotionTurnIncrement = 2.0
     }
+    val (straightMovement, turnLeft, turnRight) = mouse.effectors
+    val (smellSensors) = mouse.sensors
 
     val cheese = odorWorld.addEntity(EntityType.SWISS).apply {
+        val (x, y) = cheeseLocation
+        setLocation(x, y)
         smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0)).apply {
             this.dispersion = dispersion
         }
     }
 
-    val flower = odorWorld.addEntity(EntityType.SWISS).apply {
+    val flower = odorWorld.addEntity(EntityType.FLOWER).apply {
+        val (x, y) = flowerLocation
+        setLocation(x, y)
         smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0)).apply {
             this.dispersion = dispersion
         }
     }
 
-    val fish = odorWorld.addEntity(EntityType.SWISS).apply {
+    val fish = odorWorld.addEntity(EntityType.FISH).apply {
+        val (x, y) = fishLocation
+        setLocation(x, y)
         smellSource = SmellSource(doubleArrayOf(0.0, 0.0, 1.0)).apply {
             this.dispersion = dispersion
         }
     }
 
     odorWorld.update()
+
+    with(couplingManager) {
+        straightNeuron couple straightMovement
+        leftNeuron couple turnLeft
+        rightNeuron couple turnRight
+        smellSensors couple sensoryNet
+    }
 
     withGui {
         val plot = addProjectionPlot("Sensory States + Predictions").apply {
@@ -121,11 +144,86 @@ val kAgentTrials = newSim {
             size = point(441, 308)
         }
 
-      // sim.couple(sensoryNet, plot);
+        with(couplingManager) {
+            createCoupling(sensoryNet, plot)
+        }
 
-        // // Uncomment for prediction halo
-        // plot.getProjectionModel().getProjector().setUseColorManager(false);
-        // sim.getWorkspace().addUpdateAction(new ColorPlot(this));
+        createControlPanel("Control Panel", 5, 10) {
+
+            fun simple(location: Point2D) {
+                network.clearActivations()
+                val (x, y) = location
+                mouse.setLocation(x, y + dispersion)
+                mouse.heading = 90.0
+                straightNeuron.forceSetActivation(1.0)
+                workspace.iterate((2 * dispersion).toInt())
+                straightNeuron.forceSetActivation(0.0)
+            }
+
+            addButton("Cheese") {
+                simple(cheeseLocation)
+            }
+            addButton("Fish") {
+                simple(fishLocation)
+            }
+            addButton("Flower") {
+                simple(flowerLocation)
+            }
+            addButton("Cheese > Flower") {
+                network.clearActivations()
+                val (x, y) = cheeseLocation
+                mouse.setLocation(x, y + dispersion)
+                mouse.heading = 90.0
+                straightNeuron.forceSetActivation(1.0)
+                workspace.iterate(50)
+                rightNeuron.forceSetActivation(1.5)
+                workspace.iterate(25)
+                rightNeuron.forceSetActivation(0.0)
+                workspace.iterate(220)
+                straightNeuron.forceSetActivation(0.0)
+            }
+            addButton("Cheese > Fish") {
+                network.clearActivations()
+                val (x, y) = cheeseLocation
+                mouse.setLocation(x, y + dispersion)
+                mouse.heading = 90.0
+                straightNeuron.forceSetActivation(1.0)
+                workspace.iterate(50)
+                leftNeuron.forceSetActivation(1.5)
+                workspace.iterate(25)
+                leftNeuron.forceSetActivation(0.0)
+                workspace.iterate(220)
+                straightNeuron.forceSetActivation(0.0)
+            }
+            addButton("Solar System") {
+                network.clearActivations()
+                cheese.velocityX = 2.05
+                cheese.velocityY = 2.05
+                flower.velocityX = 2.5
+                flower.velocityY = 2.1
+                fish.velocityX = -2.5
+                fish.velocityY = 1.05
+                val (x, y) = cheeseLocation
+                mouse.setLocation(x, y + dispersion)
+                mouse.heading = 90.0
+                straightNeuron.forceSetActivation(0.0)
+                workspace.iterate(200)
+                cheese.velocityX = 0.0
+                cheese.velocityY = 0.0
+                flower.velocityX = 0.0
+                flower.velocityY = 0.0
+                fish.velocityX = 0.0
+                fish.velocityY = 0.0
+            }
+        }
+        // Uncomment for prediction halo
+
+        // Uncomment for prediction halo
+        plot.projectionModel.projector.isUseColorManager = false
+        workspace.addUpdateAction(updateAction("Color projection points") {
+            val predictedState: DoubleArray = predictionNet.activations
+            Halo.makeHalo(plot.projectionModel.projector, predictedState, errorNeuron.activation.toFloat())
+        })
     }
 
 

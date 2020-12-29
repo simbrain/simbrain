@@ -14,7 +14,6 @@ import org.simbrain.util.point
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.entities.EntityType
-import java.io.File
 
 class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
@@ -196,8 +195,7 @@ class EvolveMouse(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             }
 
             onPeek {
-                workspace { save(File("winner.zip")) }
-                sim.workspace.openWorkspace(File("winner.zip"))
+                sim.workspace.openFromZipData(workspace.product.zipData)
             }
 
         }

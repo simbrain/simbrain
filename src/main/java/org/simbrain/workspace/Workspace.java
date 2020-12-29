@@ -535,6 +535,37 @@ public class Workspace {
     }
 
     /**
+     * Returns a "flat" representation of the workspace as a byte array from the zipped representation
+     * {@link WorkspaceSerializer } produces.
+     */
+    public byte[] getZipData() {
+        try {
+            WorkspaceSerializer serializer =  new WorkspaceSerializer(this);
+            ByteArrayOutputStream bas = new ByteArrayOutputStream();
+            serializer.serialize(bas);
+            bas.close();
+            return bas.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Open a workspace from the flat representation provided by {@link #getZipData()} }.
+     */
+    public void openFromZipData(byte[] zipData) {
+        try {
+            WorkspaceSerializer serializer =  new WorkspaceSerializer(this);
+            ByteArrayInputStream bis = new ByteArrayInputStream(zipData);
+            serializer.deserialize(bis);
+            bis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Convenience method for adding an update action to the workspace's action
      * list (the sequence of actions invoked on each iteration of the
      * workspace).

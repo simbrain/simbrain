@@ -112,7 +112,11 @@ object MutationContext {
 }
 
 /**
- * The environment produced by [EnvironmentBuilder.build]. All it does is provide for evaluation of a fitness function.
+ * The environment produced by [EnvironmentBuilder.build]. Provides a context for interacting with an evolutionary
+ * simulation after an environment has been built, so that products are availalble.
+ *
+ * @param evalFunction A function that returns a double indicating fitness. Used by the [Evaluator] during evolution.
+ * @param peekFunction A function that can be called after an environment has been built.
  */
 class Environment(
         val evaluationContext: EvaluationContext,

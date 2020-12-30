@@ -86,7 +86,7 @@ public class WorkspaceTest {
         assertEquals(4, workspace.getComponentList().size());
         assertEquals(1, workspace.getCouplingManager().getCouplings().size());
 
-        // Cant reuse n1 and n2 because it's been deserialized
+        // Can't reuse n1 and n2 because it's been deserialized
         Neuron newN1 = ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getLooseNeuron(0);
         Neuron newN2 = ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getLooseNeuron(0);
         newN1.forceSetActivation(.8);
@@ -95,7 +95,24 @@ public class WorkspaceTest {
 
     }
 
+    @Test
+    public void testZipMethods() throws IOException {
 
+        byte[] byteArray = workspace.getZipData();
+        workspace.openFromZipData(byteArray);
+
+        // Check everything is as expected in the deserialized net
+        assertEquals(4, workspace.getComponentList().size());
+        assertEquals(1, workspace.getCouplingManager().getCouplings().size());
+
+        // Can't reuse n1 and n2 because it's been deserialized
+        Neuron newN1 = ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getLooseNeuron(0);
+        Neuron newN2 = ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getLooseNeuron(0);
+        newN1.forceSetActivation(.8);
+        workspace.simpleIterate();
+        assertEquals(.8, newN2.getActivation(), .0001);
+
+    }
 
 
 }

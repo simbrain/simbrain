@@ -41,7 +41,7 @@ import java.io.*;
  *
  * @param <E> the type of the workspace component.
  */
-public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel {
+public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPanel {
 
     /**
      * serial version UID.
@@ -74,7 +74,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @param frame              the parent frame.
      * @param workspaceComponent the component to wrap.
      */
-    public GuiComponent(final GenericFrame frame, final E workspaceComponent) {
+    public DesktopComponent(final GenericFrame frame, final E workspaceComponent) {
         super();
         this.parentFrame = frame;
         this.workspaceComponent = workspaceComponent;
@@ -88,8 +88,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         // Add a default update listener
         WorkspaceComponentEvents events = workspaceComponent.getEvents();
 
-        events.onComponentUpdated(GuiComponent.this::update);
-        events.onGUIToggled(() -> GuiComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn()));
+        events.onComponentUpdated(DesktopComponent.this::update);
+        events.onGUIToggled(() -> DesktopComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn()));
         events.onComponentClosing(this::close);
 
         Logger.trace(this.getClass().getCanonicalName() + " created");
@@ -177,7 +177,7 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
         workspaceComponent.setCurrentFile(file);
         setDefaultDirectory(workspaceComponent.getClass(), dir);
         SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
-        GuiComponent desktopComponent = desktop.getDesktopComponent(workspaceComponent);
+        DesktopComponent desktopComponent = desktop.getDesktopComponent(workspaceComponent);
         desktop.registerComponentInstance(workspaceComponent, desktopComponent);
         desktopComponent.getParentFrame().setBounds(bounds);
         workspaceComponent.setName(name);
@@ -252,10 +252,10 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      * @param name      the name of the desktop component.
      * @return a new component.
      */
-    public static GuiComponent<?> open(final WorkspaceComponent component, final InputStream istream, final String name) {
+    public static DesktopComponent<?> open(final WorkspaceComponent component, final InputStream istream, final String name) {
         // SimbrainDesktop desktop =
         // SimbrainDesktop.getDesktop(component.getWorkspace());
-        GuiComponent<?> dc = SimbrainDesktop.createDesktopComponent(null, component);
+        DesktopComponent<?> dc = SimbrainDesktop.createDesktopComponent(null, component);
         Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
 
         dc.setTitle(name);

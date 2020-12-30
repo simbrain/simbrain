@@ -12,7 +12,7 @@ import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.CouplingMenu;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.imageworld.PixelProducer;
 import org.simbrain.world.imageworld.ImageWorld;
 import org.simbrain.world.imageworld.PixelConsumer;
@@ -28,7 +28,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -78,7 +77,7 @@ public class ImageWorldDesktopPanel extends JPanel {
     /**
      * Parent GUI Component
      */
-    private GuiComponent guiComponent;
+    private DesktopComponent desktopComponent;
 
     /**
      * Button to advance to the next images.
@@ -94,13 +93,13 @@ public class ImageWorldDesktopPanel extends JPanel {
      * Construct a new ImageDesktopComponent GUI.
      *
      * @param frame     The frame in which to place GUI elements.
-     * @param guiComponent The parent GUI Component
+     * @param desktopComponent The parent GUI Component
      * @param world     The underlying ImageWorld
      */
-    public ImageWorldDesktopPanel(GenericFrame frame, GuiComponent guiComponent, ImageWorld world) {
+    public ImageWorldDesktopPanel(GenericFrame frame, DesktopComponent desktopComponent, ImageWorld world) {
 
         this.world = world;
-        this.guiComponent = guiComponent;
+        this.desktopComponent = desktopComponent;
 
         setupMenuBar(frame);
         setupToolbars();
@@ -172,11 +171,11 @@ public class ImageWorldDesktopPanel extends JPanel {
         fileMenu.add(pasteAction);
 
         fileMenu.addSeparator();
-        fileMenu.add(new OpenAction(guiComponent));
-        fileMenu.add(new SaveAction(guiComponent));
-        fileMenu.add(new SaveAsAction(guiComponent));
+        fileMenu.add(new OpenAction(desktopComponent));
+        fileMenu.add(new SaveAction(desktopComponent));
+        fileMenu.add(new SaveAsAction(desktopComponent));
         fileMenu.addSeparator();
-        fileMenu.add(new CloseAction(guiComponent.getWorkspaceComponent()));
+        fileMenu.add(new CloseAction(desktopComponent.getWorkspaceComponent()));
 
         // Help Menu
         JMenu helpMenu = new JMenu("Help");
@@ -198,7 +197,7 @@ public class ImageWorldDesktopPanel extends JPanel {
         contextMenu.add(copyAction);
         contextMenu.add(pasteAction);
         contextMenu.addSeparator();
-        CouplingMenu sensorMatrixMenu = new CouplingMenu(guiComponent.getWorkspaceComponent(), world.getCurrentSensorMatrix());
+        CouplingMenu sensorMatrixMenu = new CouplingMenu(desktopComponent.getWorkspaceComponent(), world.getCurrentSensorMatrix());
         contextMenu.add(sensorMatrixMenu);
         contextMenu.show(world.getImagePanel(), evt.getX(), evt.getY());
     }
@@ -342,7 +341,7 @@ public class ImageWorldDesktopPanel extends JPanel {
     private void saveImage() {
         fileChooser.setDescription("Save image");
         fileChooser.setUseImagePreview(true);
-        File file = fileChooser.showSaveDialog(guiComponent.getWorkspaceComponent().getName() + ".png");
+        File file = fileChooser.showSaveDialog(desktopComponent.getWorkspaceComponent().getName() + ".png");
         if (file != null) {
             try {
                 world.saveImage(file.toString());

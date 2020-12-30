@@ -27,7 +27,7 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -40,7 +40,7 @@ import java.awt.event.ActionListener;
  * <b>DataWorldComponent</b> is a "spreadsheet world" used to send rows of raw
  * data to input nodes.
  */
-public class DataWorldDesktopComponent extends GuiComponent<DataWorldComponent> {
+public class DataWorldDesktopComponent extends DesktopComponent<DataWorldComponent> {
 
     private static final long serialVersionUID = 1L;
 

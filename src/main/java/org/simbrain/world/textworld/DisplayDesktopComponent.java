@@ -24,7 +24,7 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +34,7 @@ import java.awt.event.ComponentEvent;
 /**
  * <b>DisplayComponentDesktopGui</b> is the container for the display component.
  */
-public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
+public class DisplayDesktopComponent extends DesktopComponent<DisplayComponent> {
 
     /**
      * Default height.
@@ -102,7 +102,7 @@ public class DisplayComponentDesktopGui extends GuiComponent<DisplayComponent> {
      * @param frame
      * @param component
      */
-    public DisplayComponentDesktopGui(GenericFrame frame, DisplayComponent component) {
+    public DisplayDesktopComponent(GenericFrame frame, DisplayComponent component) {
         super(frame, component);
 
         world = component.getWorld();

@@ -25,7 +25,7 @@ import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,7 @@ import java.awt.event.ActionListener;
 /**
  * Display a PieChart.
  */
-public class PieChartGui extends GuiComponent<PieChartComponent> implements ActionListener {
+public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent> implements ActionListener {
 
     /**
      * Plot action manager.
@@ -63,7 +63,7 @@ public class PieChartGui extends GuiComponent<PieChartComponent> implements Acti
      * @param frame     Generic Frame
      * @param component Pie chart component
      */
-    public PieChartGui(final GenericFrame frame, final PieChartComponent component) {
+    public PieChartDesktopComponent(final GenericFrame frame, final PieChartComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);

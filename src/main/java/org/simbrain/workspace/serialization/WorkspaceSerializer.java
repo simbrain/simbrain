@@ -24,7 +24,7 @@ import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.couplings.Coupling;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionManager;
@@ -164,7 +164,7 @@ public class WorkspaceSerializer {
             zipStream.putNextEntry(entry);
             serializer.serializeComponent(component, zipStream);
             if (SimbrainDesktop.getDesktop(workspace) != null) {
-                GuiComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace).getDesktopComponent(component);
+                DesktopComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace).getDesktopComponent(component);
                 // Makes it possible to save a non-GUI simulation
                 if (desktopComponent != null) {
                     ArchivedWorkspaceComponent.ArchivedDesktopComponent dc = archiveComp.addDesktopComponent(desktopComponent);
@@ -303,7 +303,7 @@ public class WorkspaceSerializer {
                     workspace.addWorkspaceComponent(wc);
                     if (archivedComponent.getDesktopComponent() != null) {
                         Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
-                        GuiComponent<?> desktopComponent = desktop.getDesktopComponent(wc);
+                        DesktopComponent<?> desktopComponent = desktop.getDesktopComponent(wc);
                         desktopComponent.getParentFrame().setBounds(bounds);
                     }
                 } catch (Exception ex) {

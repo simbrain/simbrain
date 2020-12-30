@@ -1,7 +1,7 @@
 package org.simbrain.world.game;
 
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.game.tictactoe.TicTacToeGui;
 import org.simbrain.world.game.tictactoe.TicTacToeGui.Listener;
 import org.simbrain.world.game.tictactoe.TicTacToeModel;
@@ -15,7 +15,7 @@ import java.awt.*;
  *
  * @author Matt Watson
  */
-public class GameDesktopComponent extends GuiComponent<GameComponent> {
+public class GameDesktopComponent extends DesktopComponent<GameComponent> {
     /**
      * The game gui.
      */

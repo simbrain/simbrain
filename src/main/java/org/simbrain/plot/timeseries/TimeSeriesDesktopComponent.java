@@ -16,21 +16,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.rasterchart;
+package org.simbrain.plot.timeseries;
 
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
 
 /**
- * Display a raster plot.
+ * Display a TimeSeriesPlot.
  */
-public class RasterPlotGui extends GuiComponent<RasterPlotComponent> {
+public class TimeSeriesDesktopComponent extends DesktopComponent<TimeSeriesPlotComponent> {
 
     /**
      * Plot action manager.
@@ -40,23 +40,21 @@ public class RasterPlotGui extends GuiComponent<RasterPlotComponent> {
     /**
      * Panel for chart.
      */
-    private RasterPlotPanel rasterPanel;
+    private TimeSeriesPlotPanel timeSeriesPanel;
 
     /**
-     * Construct a raster plot gui.
+     * Construct a time series plot gui.
      *
      * @param frame     parent frame
      * @param component the underlying component
      */
-    public RasterPlotGui(final GenericFrame frame, final RasterPlotComponent component) {
+    public TimeSeriesDesktopComponent(GenericFrame frame, TimeSeriesPlotComponent component) {
         super(frame, component);
-
         actionManager = new PlotActionManager(this);
-        rasterPanel = new RasterPlotPanel(component.getModel());
+        timeSeriesPanel = new TimeSeriesPlotPanel(component.getModel());
         createAttachMenuBar();
         this.setLayout(new BorderLayout());
-        add("Center", rasterPanel);
-
+        add("Center", timeSeriesPanel);
     }
 
     /**
@@ -64,7 +62,7 @@ public class RasterPlotGui extends GuiComponent<RasterPlotComponent> {
      */
     @Override
     public void postAddInit() {
-        rasterPanel.init();
+        timeSeriesPanel.init();
     }
 
     /**
@@ -81,10 +79,10 @@ public class RasterPlotGui extends GuiComponent<RasterPlotComponent> {
         fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
 
         JMenu editMenu = new JMenu("Edit");
-        editMenu.add(new JMenuItem(RasterPlotActions.getPropertiesDialogAction(rasterPanel)));
+        editMenu.add(new JMenuItem(TimeSeriesPlotActions.getPropertiesDialogAction(timeSeriesPanel)));
 
         JMenu helpMenu = new JMenu("Help");
-        ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/raster.html");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/time_series.html");
         JMenuItem helpItem = new JMenuItem(helpAction);
         helpMenu.add(helpItem);
 

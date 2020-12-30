@@ -25,7 +25,7 @@ import org.simbrain.workspace.component_actions.CloseAction
 import org.simbrain.workspace.component_actions.OpenAction
 import org.simbrain.workspace.component_actions.SaveAction
 import org.simbrain.workspace.component_actions.SaveAsAction
-import org.simbrain.workspace.gui.GuiComponent
+import org.simbrain.workspace.gui.DesktopComponent
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JMenu
@@ -36,7 +36,7 @@ import javax.swing.JOptionPane
  * Network desktop component. An extension of the Gui component for this class
  * which is used in the Simbrain desktop.
  */
-class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent) : GuiComponent<NetworkComponent?>(frame, component) {
+class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent) : DesktopComponent<NetworkComponent?>(frame, component) {
 
     val networkPanel = NetworkPanel(component)
 

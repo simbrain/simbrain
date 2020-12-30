@@ -19,7 +19,7 @@
 package org.simbrain.world.odorworld;
 
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import java.awt.*;
 
@@ -28,7 +28,7 @@ import java.awt.*;
  * buttons, and serializing of world data. The main environment codes is in
  * {@link OdorWorldPanel}.
  */
-public class OdorWorldDesktopComponent extends GuiComponent<OdorWorldComponent> {
+public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldComponent> {
 
     private static final long serialVersionUID = 1L;
 

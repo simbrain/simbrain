@@ -28,7 +28,7 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +38,7 @@ import java.awt.event.ActionListener;
 /**
  * GUI for a bar chart.
  */
-public class BarChartGui extends GuiComponent<BarChartComponent> implements ActionListener {
+public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent> implements ActionListener {
 
     /**
      * Main JFreeChart object.
@@ -66,7 +66,7 @@ public class BarChartGui extends GuiComponent<BarChartComponent> implements Acti
      * @param frame     Generic frame
      * @param component Bar chart component
      */
-    public BarChartGui(GenericFrame frame, BarChartComponent component) {
+    public BarChartDesktopComponent(GenericFrame frame, BarChartComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);

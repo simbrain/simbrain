@@ -24,7 +24,7 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +34,7 @@ import java.awt.event.ComponentEvent;
 /**
  * <b>ReaderComponentDesktopGui</b> is the gui view for the reader world.
  */
-public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
+public class ReaderDesktopComponent extends DesktopComponent<ReaderComponent> {
 
     /**
      * Default height.
@@ -97,7 +97,7 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
      * @param frame
      * @param component
      */
-    public ReaderComponentDesktopGui(GenericFrame frame, ReaderComponent component) {
+    public ReaderDesktopComponent(GenericFrame frame, ReaderComponent component) {
         super(frame, component);
 
         world = component.getWorld();

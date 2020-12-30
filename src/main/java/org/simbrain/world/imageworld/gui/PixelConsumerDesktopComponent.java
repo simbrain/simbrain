@@ -1,10 +1,10 @@
 package org.simbrain.world.imageworld.gui;
 
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.imageworld.PixelConsumerComponent;
 
-public class PixelConsumerDesktopComponent extends GuiComponent<PixelConsumerComponent> {
+public class PixelConsumerDesktopComponent extends DesktopComponent<PixelConsumerComponent> {
 
     /**
      * Construct a new PixelDisplayDesktopComponent GUI.

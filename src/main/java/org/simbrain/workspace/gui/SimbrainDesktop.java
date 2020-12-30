@@ -87,7 +87,7 @@ public class SimbrainDesktop {
      * Reference to the last internal frames that were focused, so that they can get the focus when the next one is
      * closed.
      */
-    private static final Stack<GuiComponent<?>> lastFocusedStack = new Stack<GuiComponent<?>>();
+    private static final Stack<DesktopComponent<?>> lastFocusedStack = new Stack<DesktopComponent<?>>();
 
     /**
      * TODO: Create Javadoc comment.
@@ -188,7 +188,7 @@ public class SimbrainDesktop {
     /**
      * Associates workspace components with their corresponding gui components.
      */
-    private static Map<WorkspaceComponent, GuiComponent<?>> guiComponents = new LinkedHashMap<WorkspaceComponent, GuiComponent<?>>();
+    private static Map<WorkspaceComponent, DesktopComponent<?>> guiComponents = new LinkedHashMap<WorkspaceComponent, DesktopComponent<?>>();
 
     /**
      * Associates script submenunames ({@link RegisteredSimulation#getSubmenuName()})
@@ -269,7 +269,7 @@ public class SimbrainDesktop {
         events.onComponentAdded(this::addDesktopComponent);
 
         events.onComponentRemoved(wc -> {
-            GuiComponent<?> component = guiComponents.get(wc);
+            DesktopComponent<?> component = guiComponents.get(wc);
             if (component == null) {
                 return;
             }
@@ -389,7 +389,7 @@ public class SimbrainDesktop {
      */
     private void moveLastFocusedComponentToFront() {
         if (!lastFocusedStack.isEmpty()) {
-            GuiComponent<?> lastFocused = lastFocusedStack.peek();
+            DesktopComponent<?> lastFocused = lastFocusedStack.peek();
             if (lastFocused != null) {
                 try {
                     ((JInternalFrame) lastFocused.getParentFrame()).setSelected(true);
@@ -709,7 +709,7 @@ public class SimbrainDesktop {
      *
      * @return the list of components
      */
-    public Collection<GuiComponent<?>> getDesktopComponents() {
+    public Collection<DesktopComponent<?>> getDesktopComponents() {
         return guiComponents.values();
     }
 
@@ -719,7 +719,7 @@ public class SimbrainDesktop {
      * @param component component to check with
      * @return component guicomponent
      */
-    public GuiComponent<?> getDesktopComponent(final WorkspaceComponent component) {
+    public DesktopComponent<?> getDesktopComponent(final WorkspaceComponent component) {
         return guiComponents.get(component);
     }
 
@@ -729,7 +729,7 @@ public class SimbrainDesktop {
      * @param componentName name of desktop component to return
      * @return component desktop component, or null if none found
      */
-    public GuiComponent<?> getDesktopComponent(final String componentName) {
+    public DesktopComponent<?> getDesktopComponent(final String componentName) {
         WorkspaceComponent wc = workspace.getComponent(componentName);
         if (wc != null) {
             return guiComponents.get(wc);
@@ -752,7 +752,7 @@ public class SimbrainDesktop {
         /**
          * Gui Component.
          */
-        private GuiComponent guiComponent;
+        private DesktopComponent desktopComponent;
 
         /**
          * Construct an internal frame.
@@ -779,10 +779,10 @@ public class SimbrainDesktop {
         /**
          * Set the Gui Component.
          *
-         * @param guiComponent the component to set.
+         * @param desktopComponent the component to set.
          */
-        public void setGuiComponent(final GuiComponent guiComponent) {
-            this.guiComponent = guiComponent;
+        public void setGuiComponent(final DesktopComponent desktopComponent) {
+            this.desktopComponent = desktopComponent;
         }
 
         /**
@@ -805,7 +805,7 @@ public class SimbrainDesktop {
 
             @Override
             public void internalFrameClosing(final InternalFrameEvent e) {
-                guiComponent.close();
+                desktopComponent.close();
                 guiComponents.remove(workspaceComponent);
             }
 
@@ -868,12 +868,12 @@ public class SimbrainDesktop {
      * Registers instance of guiComponents.
      *
      * @param workspaceComponent Workspace component
-     * @param guiComponent       GUI component
+     * @param desktopComponent       GUI component
      */
     public void registerComponentInstance(final WorkspaceComponent workspaceComponent,
-                                          final GuiComponent guiComponent) {
-        guiComponent.setDesktop(this);
-        guiComponents.put(workspaceComponent, guiComponent);
+                                          final DesktopComponent desktopComponent) {
+        desktopComponent.setDesktop(this);
+        guiComponents.put(workspaceComponent, desktopComponent);
     }
 
     /**
@@ -888,39 +888,39 @@ public class SimbrainDesktop {
         final DesktopInternalFrame componentFrame = new DesktopInternalFrame(workspaceComponent);
         // componentFrame.setFrameIcon(new ImageIcon(ResourceManager.getImage("icons/20.png")));
 
-        GuiComponent<?> guiComponent = createDesktopComponent(componentFrame, workspaceComponent);
-        componentFrame.setGuiComponent(guiComponent);
+        DesktopComponent<?> desktopComponent = createDesktopComponent(componentFrame, workspaceComponent);
+        componentFrame.setGuiComponent(desktopComponent);
 
         // Either add the window at a default location, or relative to the last
         // added window. Note that this is overridden when individual
         // components are opened
         if (guiComponents.size() == 0) {
             componentFrame.setBounds(DEFAULT_WINDOW_OFFSET, DEFAULT_WINDOW_OFFSET,
-                    (int) guiComponent.getPreferredSize().getWidth(),
-                    (int) guiComponent.getPreferredSize().getHeight());
+                    (int) desktopComponent.getPreferredSize().getWidth(),
+                    (int) desktopComponent.getPreferredSize().getHeight());
         } else {
             // This should be coordinated with the logic in
             // RepositionAllWindowsSction
             int highestComponentNumber = guiComponents.size() + 1;
-            double xMax = desktop.getWidth() - guiComponent.getPreferredSize().getWidth();
-            double yMax = desktop.getHeight() - guiComponent.getPreferredSize().getHeight();
+            double xMax = desktop.getWidth() - desktopComponent.getPreferredSize().getWidth();
+            double yMax = desktop.getHeight() - desktopComponent.getPreferredSize().getHeight();
             componentFrame.setBounds(
                     (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET) % xMax),
                     (int) ((highestComponentNumber * DEFAULT_WINDOW_OFFSET) % yMax),
-                    (int) guiComponent.getPreferredSize().getWidth(),
-                    (int) guiComponent.getPreferredSize().getHeight());
+                    (int) desktopComponent.getPreferredSize().getWidth(),
+                    (int) desktopComponent.getPreferredSize().getHeight());
         }
 
         // Other initialization
         componentFrame.addComponentListener(componentListener);
-        componentFrame.setContentPane(guiComponent);
-        registerComponentInstance(workspaceComponent, guiComponent);
+        componentFrame.setContentPane(desktopComponent);
+        registerComponentInstance(workspaceComponent, desktopComponent);
         componentFrame.setVisible(true);
         componentFrame.setTitle(workspaceComponent.getName());
         desktop.add(componentFrame);
-        guiComponent.postAddInit();
-        lastFocusedStack.push(guiComponent);
-        guiComponent.getParentFrame().pack();
+        desktopComponent.postAddInit();
+        lastFocusedStack.push(desktopComponent);
+        desktopComponent.getParentFrame().pack();
         // System.out.println(lastOpened.getName());
 
         // Forces last component of the desktop to the front
@@ -939,7 +939,7 @@ public class SimbrainDesktop {
      * @param parentFrame The frame of this component
      * @return A new desktop component wrapping the provided component.
      */
-    static GuiComponent<?> createDesktopComponent(GenericFrame parentFrame, WorkspaceComponent component) {
+    static DesktopComponent<?> createDesktopComponent(GenericFrame parentFrame, WorkspaceComponent component) {
         GenericFrame genericFrame = parentFrame != null ? parentFrame : new DesktopInternalFrame(component);
         return component.getWorkspace().getComponentFactory().createGuiComponent(genericFrame, component);
     }
@@ -964,7 +964,7 @@ public class SimbrainDesktop {
      */
     public static void showJFrame(final WorkspaceComponent component) {
         GenericJFrame theFrame = new GenericJFrame();
-        GuiComponent<?> desktopComponent = createDesktopComponent(theFrame, component);
+        DesktopComponent<?> desktopComponent = createDesktopComponent(theFrame, component);
         theFrame.setResizable(true);
         theFrame.setVisible(true);
         theFrame.setBounds(100, 100, 200, 200);
@@ -1294,34 +1294,34 @@ public class SimbrainDesktop {
      * Note that this is overridden when individual components are opened.
      *
      * @param positionIndex
-     * @param guiComponent
+     * @param desktopComponent
      */
     public void positionComponent(int positionIndex,
-                                  GuiComponent<?> guiComponent) {
+                                  DesktopComponent<?> desktopComponent) {
 
         // TODO: Some better logic that detects whether some existing slot is
         // open would be nice, but this does well enough for now...
 
         if (positionIndex == 0) {
             // If this is the first window at it at a default position
-            guiComponent.getParentFrame().setBounds(DEFAULT_WINDOW_OFFSET,
+            desktopComponent.getParentFrame().setBounds(DEFAULT_WINDOW_OFFSET,
                     DEFAULT_WINDOW_OFFSET,
-                    (int) guiComponent.getPreferredSize().getWidth(),
-                    (int) guiComponent.getPreferredSize().getHeight());
+                    (int) desktopComponent.getPreferredSize().getWidth(),
+                    (int) desktopComponent.getPreferredSize().getHeight());
         } else {
             // Add window below the current window at a slight offent
-            guiComponent.getParentFrame().setBounds(
+            desktopComponent.getParentFrame().setBounds(
                     (int) (((positionIndex + 1) * DEFAULT_WINDOW_OFFSET)
-                            % (desktop.getWidth() - guiComponent
+                            % (desktop.getWidth() - desktopComponent
                             .getPreferredSize().getWidth())),
                     (int) (((positionIndex + 1) * DEFAULT_WINDOW_OFFSET)
-                            % (desktop.getHeight() - guiComponent
+                            % (desktop.getHeight() - desktopComponent
                             .getPreferredSize().getHeight())),
-                    (int) guiComponent.getPreferredSize().getWidth(),
-                    (int) guiComponent.getPreferredSize().getHeight());
+                    (int) desktopComponent.getPreferredSize().getWidth(),
+                    (int) desktopComponent.getPreferredSize().getHeight());
             // Focus the last positioned frame to have the focus
             try {
-                ((JInternalFrame) guiComponent.getParentFrame())
+                ((JInternalFrame) desktopComponent.getParentFrame())
                         .setSelected(true);
             } catch (PropertyVetoException e) {
                 e.printStackTrace();
@@ -1336,7 +1336,7 @@ public class SimbrainDesktop {
     public void repositionAllWindows() {
         // TODO: Do this for non-component internal frames as well?
         int i = 0;
-        for (GuiComponent<?> component : getDesktopComponents()) {
+        for (DesktopComponent<?> component : getDesktopComponents()) {
             positionComponent(i++, component);
         }
     }

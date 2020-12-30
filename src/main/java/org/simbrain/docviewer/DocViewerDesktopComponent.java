@@ -27,7 +27,7 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -52,7 +52,7 @@ import java.nio.charset.Charset;
  * <img src = "file:docs/Images/World.gif" alt="world">
  * <a href = "file:docs/SimbrainDocs.html">Local link</a>.
  */
-public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> {
+public class DocViewerDesktopComponent extends DesktopComponent<DocViewerComponent> {
 
     /**
      * Main text area.

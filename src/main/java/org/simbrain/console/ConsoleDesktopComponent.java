@@ -22,7 +22,7 @@ import bsh.Interpreter;
 import bsh.util.JConsole;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import java.awt.*;
 import java.util.concurrent.Executors;
@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 /**
  * Desktop graphical component displaying a beanshell interpreter.
  */
-public class ConsoleDesktopComponent extends GuiComponent<ConsoleComponent> {
+public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> {
 
     /**
      * Constructor.

@@ -33,7 +33,7 @@ import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.*;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,8 +48,7 @@ import java.util.concurrent.Executors;
 /**
  * Gui Component to display a high dimensional projection object.
  */
-public class
-ProjectionGui extends GuiComponent<ProjectionComponent> {
+public class ProjectionDesktopComponent extends DesktopComponent<ProjectionComponent> {
 
     /**
      * Open button.
@@ -244,7 +243,7 @@ ProjectionGui extends GuiComponent<ProjectionComponent> {
      * @param frame
      * @param component
      */
-    public ProjectionGui(final GenericFrame frame, final ProjectionComponent component) {
+    public ProjectionDesktopComponent(final GenericFrame frame, final ProjectionComponent component) {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
         actionManager = new PlotActionManager(this);

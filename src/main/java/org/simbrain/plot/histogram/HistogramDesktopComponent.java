@@ -22,7 +22,7 @@ import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +30,7 @@ import java.awt.*;
 /**
  * Display a Histogram in the Simbrain Desktop.
  */
-public class HistogramGui extends GuiComponent<HistogramComponent> {
+public class HistogramDesktopComponent extends DesktopComponent<HistogramComponent> {
 
     /**
      * Plot action manager.
@@ -53,7 +53,7 @@ public class HistogramGui extends GuiComponent<HistogramComponent> {
      * @param frame     Generic Frame
      * @param component Histogram component
      */
-    public HistogramGui(final GenericFrame frame, final HistogramComponent component) {
+    public HistogramDesktopComponent(final GenericFrame frame, final HistogramComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
         actionManager = new PlotActionManager(this);

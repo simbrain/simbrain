@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
  *
  * @author Jeff Yoshimi
  */
-public class SquashingFunctionsTest {
+public class SigmoidFunctionTests {
 
     @Test
     public void testSigmoids() {

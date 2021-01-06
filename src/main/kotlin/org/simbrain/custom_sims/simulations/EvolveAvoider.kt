@@ -3,7 +3,10 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.simbrain.custom_sims.RegisteredSimulation
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addOdorWorldComponent
+import org.simbrain.custom_sims.couplingManager
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.neuron_update_rules.LinearRule
@@ -13,7 +16,6 @@ import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
 import org.simbrain.util.widgets.ProgressWindow
-import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import java.io.File
@@ -21,46 +23,12 @@ import java.io.File
 // Not working...
 
 // Rename to Avoider
-class EvolveAvoider(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
-    private val mainScope = MainScope()
+val evolveAvoider = newSim {
 
-    override fun getName() = "Evolve Avoider"
+    val scope = MainScope()
 
-    override fun getSubmenuName() = "Evolution"
-
-    override fun run() {
-
-        mainScope.launch {
-
-            sim.workspace.clearWorkspace()
-
-            val progressWindow = ProgressWindow(200)
-
-            launch(Dispatchers.Default) {
-
-                val generations = createEvolution().start().onEachIndexed { generation, result ->
-                    progressWindow.progressBar.value = generation
-                    progressWindow.fitnessScore.text = "Fitness: ${result[0].fitness.format(2)}"
-                }
-                val (best, _) = generations.last().first()
-
-                println(best)
-
-                best.prettyBuild().peek()
-
-                progressWindow.close()
-            }
-
-        }
-
-    }
-
-    // Questions:
-    // How to lay out hidden units in a nicer way
-
-
-    private fun createEvolution(): Evaluator {
+    fun createEvolution(): Evaluator {
         val environmentBuilder = environmentBuilder(1) {
 
             // Set up the chromosomes.
@@ -89,11 +57,13 @@ class EvolveAvoider(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             val connections = chromosome<Synapse, ConnectionGene>()
 
-            val workspace = useWorkspace()
+            val networkComponent = addNetworkComponent("Avoider")
 
-            val network = useNetwork()
+            val network = networkComponent.network
 
-            val odorworld = useOdorWorld()
+            val odorworldComponent = addOdorWorldComponent("World")
+
+            val odorworld = odorworldComponent.world
 
             val sensors = chromosome(3) {
                 objectSensorGene {
@@ -113,7 +83,7 @@ class EvolveAvoider(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 turningGene { direction = 1.0 }
             )
 
-            val mouse = useEntity(EntityType.MOUSE) {
+            val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
                 setCenterLocation(100.0, 200.0)
             }
 
@@ -122,8 +92,9 @@ class EvolveAvoider(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 velocityX = random.nextDouble(-1.0,1.0)
                 velocityY = random.nextDouble(-1.0,1.0)
             }
-            fun addPoison() = useEntity(EntityType.POISON) {
-                reset()
+
+            fun addPoison() = odorworld.addEntity(EntityType.POISON).apply {
+                setCenterLocation(100.0, 200.0)
             }
 
             val poison1 = addPoison();
@@ -135,70 +106,71 @@ class EvolveAvoider(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             // Everything needed to build one generation
             // Called once for each genome at each generation
             onBuild { pretty ->
-                    workspace {
-                        network {
-                            if (pretty) {
-                                +inputs.asGroup {
-                                    label = "Input"
-                                    location = point(0, 200)
-                                }
-                                +hiddens.asGroup {
-                                    label = "Hidden"
-                                    location = point(0, 100)
-                                }
-                                +outputs.asGroup {
-                                    label = "Output"
-                                    location = point(0, 0)
-                                }
-                            } else {
-                                // This is update when graphics are off
-                                +inputs
-                                +hiddens
-                                +outputs
-                            }
-                            +connections
-                            // Not possible to connect nodes here, because the product does not exist yet
-                            // A neat framework could address this (but is it worth it?)
+                network {
+                    if (pretty) {
+                        +inputs.asGroup {
+                            label = "Input"
+                            location = point(0, 200)
                         }
-                        odorworld {
-                            mouse {
-                                +sensors
-                                +straightMovement
-                                +turning
-                            }
-                            +poison1
-                            +poison2
-                            +poison3
+                        +hiddens.asGroup {
+                            label = "Hidden"
+                            location = point(0, 100)
                         }
-                        couplingManager {
-                            couple(sensors, inputs)
-                            couple(outputs[0], straightMovement[0])
-                            couple(outputs[1], turning[0])
-                            couple(outputs[2], turning[1])
+                        +outputs.asGroup {
+                            label = "Output"
+                            location = point(0, 0)
                         }
+                    } else {
+                        // This is update when graphics are off
+                        +inputs
+                        +hiddens
+                        +outputs
                     }
                 }
+                mouse {
+                    +sensors
+                    +straightMovement
+                    +turning
+                }
+
+                couplingManager.apply {
+                    val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
+                    val (straightConsumer) = straightMovement.products
+                    val (left, right) = turning.products
+
+                    sensors.products couple inputs.products
+                    straightNeuron couple straightConsumer
+                    leftNeuron couple left
+                    rightNeuron couple right
+                }
+            }
 
 
             //
             // Mutate the chromosomes. Specify what things are mutated at each generation.
             //
             onMutate {
-                hiddens.eachMutate {
-                    updateRule.let {
-                        if (it is BiasedUpdateRule) it.bias += random.nextDouble(-0.2, 0.2)
+                hiddens.genes.forEach {
+                    it.mutate {
+                        updateRule.let {
+                            if (it is BiasedUpdateRule) it.bias += random.nextDouble(-0.2, 0.2)
+                        }
                     }
                 }
-                outputs.eachMutate {
-                    when (random.nextInt(3)) {
-                        0 -> updateRule = SigmoidalRule()
-                        1 -> updateRule = DecayRule()
-                        2 -> {
-                        } // Leave the same
+                outputs.genes.forEach {
+                    it.mutate {
+                        when (random.nextInt(3)) {
+                            0 -> updateRule = SigmoidalRule()
+                            1 -> updateRule = DecayRule()
+                            2 -> {
+                            } // Leave the same
+                        }
                     }
                 }
-                connections.eachMutate {
-                    strength += random.nextDouble(-0.5, 0.5)
+                connections.genes.forEach {
+                    it.mutate {
+                        strength += random.nextDouble(-0.5, 0.5)
+                    }
                 }
 
                 // Random source neuron
@@ -223,21 +195,21 @@ class EvolveAvoider(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             onEval {
                 var score = 0.0
 
-                mouse.product.setCenterLocation(Math.random()*300, Math.random()*300)
+                mouse.setCenterLocation(Math.random()*300, Math.random()*300)
 
                 fun OdorWorldEntity.handleCollision() {
                     onCollide { other ->
-                        if (other === mouse.product) {
+                        if (other === mouse) {
                             score -= 1
                         }
                         reset()
                     }
                 }
-                poison1.product.handleCollision();
-                poison2.product.handleCollision();
-                poison3.product.handleCollision();
+                poison1.handleCollision();
+                poison2.handleCollision();
+                poison3.handleCollision();
 
-                workspace {
+                workspace.apply {
                     repeat(1000) { simpleIterate() }
                 }
 
@@ -250,8 +222,8 @@ class EvolveAvoider(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
             // Todo: work on getting rid of winner.zip
             onPeek {
-                workspace { save(File("winner.zip")) }
-                sim.workspace.openWorkspace(File("winner.zip"))
+                workspace.apply { save(File("winner.zip")) }
+                workspace.openWorkspace(File("winner.zip"))
             }
         }
 
@@ -262,8 +234,27 @@ class EvolveAvoider(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
         }
     }
 
-    override fun instantiate(desktop: SimbrainDesktop?): RegisteredSimulation {
-        return EvolveAvoider(desktop)
+    scope.launch {
+        workspace.clearWorkspace()
+
+        val progressWindow = ProgressWindow(200)
+
+        launch(Dispatchers.Default) {
+
+            val generations = createEvolution().start().onEachIndexed { generation, result ->
+                progressWindow.progressBar.value = generation
+                progressWindow.fitnessScore.text = "Fitness: ${result[0].fitness.format(2)}"
+            }
+            val (best, _) = generations.last().first()
+
+            println(best)
+
+            best.prettyBuild().peek()
+
+            progressWindow.close()
+        }
     }
+
+
 
 }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
@@ -53,7 +54,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
 
         val environmentBuilder = environmentBuilder {
 
-            val network = useNetwork()
+            val network = Network()
 
             val inputs = chromosome(8) { index ->
                 nodeGene {
@@ -73,14 +74,21 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
             val connections = chromosome<Synapse, ConnectionGene>()
 
             onMutate {
-                nodes.eachMutate {
+
+                fun NodeGene.mutateBias() = mutate {
                     updateRule.let {
                         if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
                     }
                 }
-                connections.eachMutate {
+
+                fun ConnectionGene.mutateWeight() = mutate {
                     strength += (Random().nextDouble() - 0.5) * 0.2
                 }
+
+                nodes.forEach { it.mutateBias() }
+
+                connections.forEach { it.mutateWeight() }
+
                 val (source, target) = if (Random().nextBoolean()) {
                     val source = (inputs.genes + nodes.genes).shuffled().first()
                     val target = nodes.genes.shuffled().first()
@@ -90,6 +98,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                     val target = (outputs.genes + nodes.genes).shuffled().first()
                     Pair(source, target)
                 }
+
                 connections.genes.add(connectionGene(source, target) {
                     strength = (Random().nextDouble() - 0.5) * 0.2
                 })
@@ -103,7 +112,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                         if (index % 2 == 0) even else odd
                     }
 
-                    network {
+                    network.apply {
                         repeat(2) { bufferedUpdate() }
                     }
 
@@ -115,7 +124,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
 
             onPeek {
                 sim.addNetwork(
-                        network { NetworkComponent("Network", this) },
+                        NetworkComponent("Network", network),
                         0, 200, 200, 0
                 )
             }
@@ -127,10 +136,11 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                             label = "Input"
                             location = point(0, 100)
                         }
-                        +nodes {
-                            this[0].location = point(50, 0)
-                            this[1].location = point(100, 0)
-                        }
+
+                        val (n1, n2) = +nodes
+                        n1.location = point(50, 0)
+                        n2.location = point(100, 0)
+
                         +outputs.asGroup {
                             label = "Output"
                             location = point(0, -100)

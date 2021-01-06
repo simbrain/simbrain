@@ -255,6 +255,14 @@ class CouplingManager(val workspace: Workspace) {
         }
     }
 
+    fun createOneToOneCouplings(
+        producers: Collection<AttributeContainer>,
+        consumers: Collection<AttributeContainer>
+    ): List<Coupling> = (producers zip consumers).map { (producer, consumer) -> producer couple consumer }
+
+    infix fun Collection<AttributeContainer>.couple(consumers: Collection<AttributeContainer>): List<Coupling>
+        = createOneToOneCouplings(this, consumers)
+
     fun removeCouplings(couplings: List<Coupling>) {
         couplings.forEach { coupling ->
             removeCouplingWithoutFiringEvent(coupling)

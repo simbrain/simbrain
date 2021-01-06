@@ -17,7 +17,7 @@ import org.simbrain.world.odorworld.OdorWorldComponent
 
 class SimulationScope(val desktop: SimbrainDesktop? = null) {
 
-    val workspace = desktop?.workspace ?: Workspace()
+    var workspace = desktop?.workspace ?: Workspace()
 
     /**
      * If Desktop exists, provide a context for convenient access.

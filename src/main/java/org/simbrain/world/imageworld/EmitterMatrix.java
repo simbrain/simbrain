@@ -2,6 +2,7 @@ package org.simbrain.world.imageworld;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
+import org.simbrain.world.imageworld.filters.Filter;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -12,14 +13,14 @@ import java.util.Arrays;
  * values are stored in two arrays, one for rgb colors and
  * another with separate channels for brightness, red, green, and blue.
  * <br>
- * An emitter matrix is a kind of countepart to a {@link SensorMatrix}. Rather
+ * An emitter matrix is a kind of countepart to a {@link Filter}. Rather
  * than sensing visual locations emitters are like pixels that an "organism" can emit
  * cf. a squid's iridiphores.
  *
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class PixelConsumerSource extends ImageSourceAdapter {
+public class EmitterMatrix extends ImageSourceAdapter {
 
     @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
     private boolean usingRGBColor = false;
@@ -41,7 +42,7 @@ public class PixelConsumerSource extends ImageSourceAdapter {
     /**
      * Construct an empty emitter matrix.
      */
-    public PixelConsumerSource() {
+    public EmitterMatrix() {
         super();
         channels = new double[3][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];
@@ -52,7 +53,7 @@ public class PixelConsumerSource extends ImageSourceAdapter {
      *
      * @param currentImage
      */
-    public PixelConsumerSource(BufferedImage currentImage) {
+    public EmitterMatrix(BufferedImage currentImage) {
         super(currentImage);
         channels = new double[3][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];
@@ -109,7 +110,7 @@ public class PixelConsumerSource extends ImageSourceAdapter {
         setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
         channels = new double[3][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];
-        getEvents().fireImageResize(this);
+        getEvents().fireResize();
     }
 
     /**

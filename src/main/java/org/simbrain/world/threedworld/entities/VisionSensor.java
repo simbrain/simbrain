@@ -5,7 +5,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import org.simbrain.util.UserParameter;
-import org.simbrain.world.imageworld.SensorMatrix;
+import org.simbrain.world.imageworld.filters.Filter;
 import org.simbrain.world.imageworld.filters.ImageFilterFactory;
 import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 import org.simbrain.world.threedworld.engine.ThreeDRenderSource;
@@ -18,7 +18,7 @@ import java.awt.image.ImageFilter;
  *
  * @author Tim Shea
  */
-public class VisionSensor extends SensorMatrix implements Sensor {
+public class VisionSensor extends Filter implements Sensor {
 
     /**
      * Color filter type for the sensor.

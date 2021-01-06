@@ -398,4 +398,9 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
         }
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        // TODO. Magics
+        return new Dimension(500,500);
+    }
 }

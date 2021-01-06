@@ -28,7 +28,7 @@ interface TopLevelGene<T> {
 
 /**
  * A list of genes. They are meant to be used inside of builders. Note that most of the machinery associated with
- * chromosomes is context specific and in extension functions.  For exmaple, some extensions to this function ensure
+ * chromosomes is context specific and in extension functions. For example, some extensions to this function ensure
  * that copies of chromosomes are not changed between generations.
  */
 class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
@@ -95,6 +95,9 @@ class EvaluationContext(val mapping: ProductMap, val evalRand: Random) {
     }
 
 }
+
+// operator fun test.invoke { print("hi") }
+
 
 /**
  * Provides a context for [EnvironmentBuilder.onMutate]. "This" in onMutate will refer to this object.

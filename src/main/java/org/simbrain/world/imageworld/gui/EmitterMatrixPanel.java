@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class ImagePanel extends JPanel {
+public class EmitterMatrixPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,7 +26,7 @@ public class ImagePanel extends JPanel {
      *
      * @param showGridLines
      */
-    public ImagePanel(boolean showGridLines) {
+    public EmitterMatrixPanel(boolean showGridLines) {
         this.showGridLines = showGridLines;
     }
 

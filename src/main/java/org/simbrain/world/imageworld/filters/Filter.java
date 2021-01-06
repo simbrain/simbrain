@@ -1,30 +1,32 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.world.imageworld.filters;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
+import org.simbrain.world.imageworld.ImageSource;
 
 import java.awt.image.BufferedImage;
 
 /**
- * A rectangular matrix of filtered sensors on an {@link ImageSource} which
- * can be coupled to.  Arrays tracking int rgb colors and doubles for
+ * Wraps an {@link ImageOperation} in a structure that allows for coupling, event handling etc.
+ *
+ * Arrays tracking int rgb colors and doubles for
  * brightness, red, green, and blue separately are maintained and can serve
  * as producers for couplings.
  * <br>
  * The actual filtering happens in the {@link org.simbrain.world.imageworld.filters}
- * package. Sensor matrices do the work of allowing the filtered images to
- * couple to something else.  This makes sense biologically: retinal patterns
+ * package. Filters do the work of allowing the filtered images to
+ * couple to something else. This makes sense biologically: retinal patterns
  * are what neurons "sense".
  *
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class SensorMatrix implements AttributeContainer, EditableObject {
+public class Filter implements AttributeContainer, EditableObject {
 
     /**
-     * Name of this matrix.
+     * Name of the filter.
      */
     @UserParameter(
             label = "Name"
@@ -32,7 +34,7 @@ public class SensorMatrix implements AttributeContainer, EditableObject {
     private String name;
 
     /**
-     * An ImageSource from which to extract sensor values.  For "image world" this will be a
+     * An ImageSource from which to extract filter values.  For "image world" this will be a
      * {@link java.awt.image.FilteredImageSource}, which applies the relevant downscaling, thresholding,
      * and other operations.
      */
@@ -42,7 +44,6 @@ public class SensorMatrix implements AttributeContainer, EditableObject {
      * The values this matrix produces for floating point channel couplings.
      * Four copies of the (flattened) matrix are stored for brightness (0),
      * red (1), green (2), and blue (3).
-     * See {@link #updateSensorValues(BufferedImage)}.
      */
     private transient double[][] channels;
 
@@ -53,33 +54,33 @@ public class SensorMatrix implements AttributeContainer, EditableObject {
     private transient int[] rgbColors;
 
     /**
-     * Construct a sensor matrix without attaching it to a source.
+     * Construct a filter without attaching it to a source.
      * Currently used by 3d component.
      *
-     * @param name The name of the sensor matrix.
+     * @param name The name of the filter
      */
-    protected SensorMatrix(String name) {
+    protected Filter(String name) {
         this.name = name;
     }
 
     /**
-     * Construct a sensor matrix attached to an ImageSource.
+     * Construct a filter attached to an ImageSource.
      *
-     * @param name   The name of the sensor matrix.
+     * @param name   The name of the filter
      * @param source The source to attach.
      */
-    public SensorMatrix(String name, ImageSource source) {
+    public Filter(String name, ImageSource source) {
         this.name = name;
         this.source = source;
-        initChannels(source);
-        source.getEvents().onImageResize(this::initChannels);
-        source.getEvents().onImageUpdate(this::onImageUpdate);
+        initChannels();
+        source.getEvents().onResize(this::initChannels);
+        source.getEvents().onImageUpdate(this::updateFilter);
     }
 
     public Object readResolve() {
-        source.getEvents().onImageResize(this::initChannels);
-        source.getEvents().onImageUpdate(this::onImageUpdate);
-        initChannels(source);
+        source.getEvents().onResize(this::initChannels);
+        source.getEvents().onImageUpdate(this::updateFilter);
+        initChannels();
         return this;
     }
 
@@ -140,28 +141,24 @@ public class SensorMatrix implements AttributeContainer, EditableObject {
         return this.name;
     }
 
-    public void onImageUpdate(ImageSource source) {
-        updateSensorValues(source.getCurrentImage());
-    }
 
-    private void initChannels(ImageSource source) {
+    private void initChannels() {
         channels = new double[4][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];
     }
 
     /**
-     * Update the sensor matrix values.
-     *
-     * @param image the image to copy to the sensor values
+     * Update the filter.
      */
-    private void updateSensorValues(BufferedImage image) {
-        if (image.getHeight() != getHeight() || image.getWidth() != getWidth()) {
+    private void updateFilter() {
+
+        if (source.getHeight() != getHeight() || source.getWidth() != getWidth()) {
             throw new AssertionError();
         }
 
-        for (int y = 0; y < image.getHeight(); ++y) {
-            for (int x = 0; x < image.getWidth(); ++x) {
-                int color = image.getRGB(x, y);
+        for (int y = 0; y < source.getHeight(); ++y) {
+            for (int x = 0; x < source.getWidth(); ++x) {
+                int color = source.getCurrentImage().getRGB(x, y);
 
                 // Update rgb colors
                 rgbColors[y * getWidth() + x] = color;

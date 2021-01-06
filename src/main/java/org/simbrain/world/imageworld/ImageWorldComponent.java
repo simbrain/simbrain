@@ -16,45 +16,48 @@ import java.util.List;
  * The interface between image world and the desktop level.
  * Manages couplings and persistence.
  */
-public class PixelProducerComponent extends WorkspaceComponent {
+public class ImageWorldComponent extends WorkspaceComponent {
 
     /**
      * The image world this component displays.
      */
-    private PixelProducer world;
+    private ImageWorld world;
 
     /**
      * Default constructor.
      */
-    public PixelProducerComponent() {
+    public ImageWorldComponent() {
         super("");
-        this.world = new PixelProducer();
-        world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
-        world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
+        this.world = new ImageWorld();
+        // TODO: Get filter selector and its events
+        // world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
+        // world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
     }
 
     /**
      * Create named component.
      */
-    public PixelProducerComponent(String name) {
+    public ImageWorldComponent(String name) {
         super(name);
-        this.world = new PixelProducer();
+        this.world = new ImageWorld();
     }
 
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        containers.addAll(world.getSensorMatrices());
+        // TODO
+        // containers.addAll(world.getSensorMatrices());
         return containers;
     }
 
     @Override
     public AttributeContainer getAttributeContainer(String objectKey) {
-        for (SensorMatrix sensor : world.getSensorMatrices()) {
-            if (objectKey.equals(sensor.getName())) {
-                return sensor;
-            }
-        }
+        // TODO
+        // for (FilterContainer sensor : world.getSensorMatrices()) {
+        //     if (objectKey.equals(sensor.getName())) {
+        //         return sensor;
+        //     }
+        // }
         return null;
     }
 
@@ -66,9 +69,9 @@ public class PixelProducerComponent extends WorkspaceComponent {
      * @param format The format of the input stream. Should be xml.
      * @return A deserialized ImageWorldComponent.
      */
-    public static PixelProducerComponent open(InputStream input, String name, String format) {
-        PixelProducer world = (PixelProducer) getXStream().fromXML(input);
-        return new PixelProducerComponent(name, world);
+    public static ImageWorldComponent open(InputStream input, String name, String format) {
+        ImageWorld world = (ImageWorld) getXStream().fromXML(input);
+        return new ImageWorldComponent(name, world);
     }
 
     @Override
@@ -96,12 +99,12 @@ public class PixelProducerComponent extends WorkspaceComponent {
      * @param name name of component
      * @param world the deserialized world
      */
-    public PixelProducerComponent(String name, PixelProducer world) {
+    public ImageWorldComponent(String name, ImageWorld world) {
         super(name);
         this.world = world;
     }
 
-    public PixelProducer getWorld() {
+    public ImageWorld getWorld() {
         return world;
     }
 }

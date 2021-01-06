@@ -21,8 +21,9 @@ public abstract class ImageSourceAdapter implements ImageSource {
     private boolean enabled = true;
 
     /**
-     * Default buffered image to work with.
+     * TODO: Get rid of me
      */
+    @Deprecated
     private BufferedImage currentImage;
 
     /**
@@ -35,7 +36,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     public ImageSourceAdapter() {
         currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
-        getEvents().fireImageUpdate(this);
+        getEvents().fireImageUpdate();
     }
 
     /**
@@ -70,7 +71,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     public void notifyImageUpdate() {
         if (isEnabled()) {
-            events.fireImageUpdate(this);
+            events.fireImageUpdate();
         }
     }
 
@@ -106,7 +107,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     public void notifyResize() {
         if (isEnabled()) {
-            events.fireImageResize(this);
+            events.fireResize();
         }
     }
 

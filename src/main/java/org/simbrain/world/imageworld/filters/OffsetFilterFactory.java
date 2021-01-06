@@ -49,7 +49,7 @@ public class OffsetFilterFactory extends ImageFilterFactory {
             super(source, ImageFilterFactory.createIdentityOp(), width, height);
             this.xOffset = xOffset;
             this.yOffset = yOffset;
-            onImageUpdate(source);
+            onImageUpdate();
         }
 
         @Override

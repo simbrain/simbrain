@@ -4,34 +4,29 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.imageworld.ImageSourceProperties;
-import org.simbrain.world.imageworld.ImageWorld;
-import org.simbrain.world.imageworld.SensorMatrix;
+import org.simbrain.world.imageworld.filters.Filter;
+import org.simbrain.world.imageworld.filters.FilterSelector;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 
 import javax.swing.*;
 
 /**
- * A dialog to create a new SensorMatrix.
+ * A dialog to create a new Filter.
  */
-public class SensorMatrixDialog extends StandardDialog {
+public class FilterDialog extends StandardDialog {
 
-    private ImageWorld world;
+    private FilterSelector filterSelector;
     private AnnotatedPropertyEditor editorPanel;
     private ImageSourceProperties imageSourceMeta = new ImageSourceProperties();
 
-    /**
-     * Construct a new SensorMatrixDialog for selecting parameters of a new
-     * SensorMatrix.
-     *
-     * @param world The ImageWorld which will hold the new SensorMatrix.
-     */
-    public SensorMatrixDialog(ImageWorld world) {
-        this.world = world;
-        setTitle("Create Sensor Matrix");
+    public FilterDialog(FilterSelector filterSelector) {
+        setTitle("Create Filter");
+        this.filterSelector = filterSelector;
+        // TODO: rename help
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/sensorMatrix.html");
         addButton(new JButton(helpAction));
 
-        imageSourceMeta.setName("Filter " + (world.getSensorMatrices().size() + 1));
+        imageSourceMeta.setName("Filter " + (filterSelector.getFilters().size() + 1));
 
         editorPanel = new AnnotatedPropertyEditor(imageSourceMeta);
         Box mainPanel = Box.createVerticalBox();
@@ -56,12 +51,12 @@ public class SensorMatrixDialog extends StandardDialog {
         String name = imageSourceMeta.getName();
         // FilteredImageSource filter = filterFactory.create(world.getCompositeImageSource());
         FilteredImageSource filter = new FilteredImageSource(
-                world.getImageSource(),
+                filterSelector.getImageSource(),
                 imageSourceMeta.getColorOp(),
                 imageSourceMeta.getWidth(),
                 imageSourceMeta.getHeight()
         );
-        SensorMatrix matrix = new SensorMatrix(name, filter);
-        world.addSensorMatrix(matrix);
+        Filter newFilter = new Filter(name, filter);
+        filterSelector.addFilterContainer(newFilter);
     }
 }

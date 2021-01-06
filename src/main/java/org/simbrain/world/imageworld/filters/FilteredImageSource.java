@@ -57,17 +57,17 @@ public class FilteredImageSource extends ImageSourceAdapter implements EditableO
         this.imageOp = colorOp;
         this.width = width;
         this.height = height;
-        onResize(wrappedSource);
+        notifyResize();
         scaleToFit(wrappedSource);
-        wrappedSource.getEvents().onImageResize(this::onResize);
+        wrappedSource.getEvents().onResize(this::notifyResize);
         wrappedSource.getEvents().onImageUpdate(this::onImageUpdate);
     }
 
     public Object readResolve() {
         super.readResolve();
-        onResize(wrappedSource);
+        notifyResize();
         scaleToFit(wrappedSource);
-        wrappedSource.getEvents().onImageResize(this::onResize);
+        wrappedSource.getEvents().onResize(this::notifyResize);
         wrappedSource.getEvents().onImageUpdate(this::onImageUpdate);
         return this;
     }
@@ -108,15 +108,11 @@ public class FilteredImageSource extends ImageSourceAdapter implements EditableO
         return height;
     }
 
-    public void onImageUpdate(ImageSource source) {
-        BufferedImage image = source.getCurrentImage();
+    public void onImageUpdate() {
+        BufferedImage image = getCurrentImage();
         image = scaleOp.filter(image, null);
         image = imageOp.getOp().filter(image, null);
         setCurrentImage(image);
-    }
-
-    public void onResize(ImageSource source) {
-        notifyResize();
     }
 
     protected void scaleToFit(ImageSource source) {

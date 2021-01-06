@@ -16,21 +16,22 @@ import java.util.List;
  * The interface between pixel display world and the desktop level.
  * Manages couplings and persistence.
  */
-public class PixelConsumerComponent extends WorkspaceComponent {
+public class PixelPlotComponent extends WorkspaceComponent {
 
     /**
      * The image world this component displays.
      */
-    private PixelConsumer world;
+    private PixelPlot world;
 
     /**
      * Create an Image World Component from a Image World.
      */
-    public PixelConsumerComponent() {
+    public PixelPlotComponent() {
         super("");
-        this.world = new PixelConsumer();
-        world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
-        world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
+        this.world = new PixelPlot();
+        // TODO
+        // world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
+        // world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
     }
 
     /**
@@ -39,7 +40,7 @@ public class PixelConsumerComponent extends WorkspaceComponent {
      * @param name name of component
      * @param world the deserialized world
      */
-    public PixelConsumerComponent(String name, PixelConsumer world) {
+    public PixelPlotComponent(String name, PixelPlot world) {
         super(name);
         this.world = world;
     }
@@ -52,35 +53,37 @@ public class PixelConsumerComponent extends WorkspaceComponent {
      * @param format The format of the input stream. Should be xml.
      * @return A deserialized ImageWorldComponent.
      */
-    public static PixelConsumerComponent open(InputStream input, String name, String format) {
-        PixelConsumer world = (PixelConsumer) getXStream().fromXML(input);
-        return new PixelConsumerComponent(name, world);
+    public static PixelPlotComponent open(InputStream input, String name, String format) {
+        PixelPlot world = (PixelPlot) getXStream().fromXML(input);
+        return new PixelPlotComponent(name, world);
     }
 
-    public PixelConsumer getWorld() {
+    public PixelPlot getWorld() {
         return world;
     }
 
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        // Main Consumer to display pixels
-        containers.add(world.getImageSource());
-        // Producers to read out transformed pixels
-        containers.addAll(world.getSensorMatrices());
+        //TODO
+        // // Main Consumer to display pixels
+        // containers.add(world.getImageAlbum());
+        // // Producers to read out transformed pixels
+        // containers.addAll(world.getSensorMatrices());
         return containers;
     }
 
     @Override
     public AttributeContainer getAttributeContainer(String objectKey) {
-        if (objectKey.equalsIgnoreCase("EmitterMatrix")) {
-            return world.getImageSource();
-        }
-        for (SensorMatrix sensor : world.getSensorMatrices()) {
-            if (objectKey.equals(sensor.getName())) {
-                return sensor;
-            }
-        }
+        // TODO
+        // if (objectKey.equalsIgnoreCase("EmitterMatrix")) {
+        //     return world.getImageAlbum();
+        // }
+        // for (FilterContainer sensor : world.getSensorMatrices()) {
+        //     if (objectKey.equals(sensor.getName())) {
+        //         return sensor;
+        //     }
+        // }
         return null;
     }
 

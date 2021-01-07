@@ -5,7 +5,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.imageworld.ImageSourceProperties;
 import org.simbrain.world.imageworld.filters.Filter;
-import org.simbrain.world.imageworld.filters.FilterSelector;
+import org.simbrain.world.imageworld.filters.FilterCollection;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 
 import javax.swing.*;
@@ -15,18 +15,18 @@ import javax.swing.*;
  */
 public class FilterDialog extends StandardDialog {
 
-    private FilterSelector filterSelector;
+    private FilterCollection filterCollection;
     private AnnotatedPropertyEditor editorPanel;
     private ImageSourceProperties imageSourceMeta = new ImageSourceProperties();
 
-    public FilterDialog(FilterSelector filterSelector) {
+    public FilterDialog(FilterCollection filterCollection) {
         setTitle("Create Filter");
-        this.filterSelector = filterSelector;
+        this.filterCollection = filterCollection;
         // TODO: rename help
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/sensorMatrix.html");
         addButton(new JButton(helpAction));
 
-        imageSourceMeta.setName("Filter " + (filterSelector.getFilters().size() + 1));
+        imageSourceMeta.setName("Filter " + (filterCollection.getFilters().size() + 1));
 
         editorPanel = new AnnotatedPropertyEditor(imageSourceMeta);
         Box mainPanel = Box.createVerticalBox();
@@ -51,12 +51,12 @@ public class FilterDialog extends StandardDialog {
         String name = imageSourceMeta.getName();
         // FilteredImageSource filter = filterFactory.create(world.getCompositeImageSource());
         FilteredImageSource filter = new FilteredImageSource(
-                filterSelector.getImageSource(),
+                filterCollection.getImageSource(),
                 imageSourceMeta.getColorOp(),
                 imageSourceMeta.getWidth(),
                 imageSourceMeta.getHeight()
         );
         Filter newFilter = new Filter(name, filter);
-        filterSelector.addFilterContainer(newFilter);
+        filterCollection.addFilterContainer(newFilter);
     }
 }

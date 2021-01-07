@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld.filters;
 
 import org.simbrain.world.imageworld.ImageSource;
-import org.simbrain.world.imageworld.events.FilterSelectorEvents;
+import org.simbrain.world.imageworld.events.FilterCollectionEvents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Maintains a list of {@link Filter}s that can be applied to an {@link ImageSource}.
  */
-public class FilterSelector {
+public class FilterCollection {
 
     /**
      * List of filters that can be applied to an image.
@@ -29,9 +29,9 @@ public class FilterSelector {
     /**
      * Handle FilterSelector Events.
      */
-    private transient FilterSelectorEvents events = new FilterSelectorEvents(this);
+    private transient FilterCollectionEvents events = new FilterCollectionEvents(this);
 
-    public FilterSelector(ImageSource imageSource) {
+    public FilterCollection(ImageSource imageSource) {
         this.imageSource = imageSource;
         initializeDefaultFilters();
     }
@@ -131,7 +131,7 @@ public class FilterSelector {
         currentFilter.getSource().getEvents().fireImageUpdate();
     }
 
-    public FilterSelectorEvents getEvents() {
+    public FilterCollectionEvents getEvents() {
         return events;
     }
 

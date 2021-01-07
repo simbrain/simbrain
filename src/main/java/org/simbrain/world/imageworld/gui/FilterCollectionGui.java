@@ -5,7 +5,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.imageworld.dialogs.FilterDialog;
 import org.simbrain.world.imageworld.filters.Filter;
-import org.simbrain.world.imageworld.filters.FilterSelector;
+import org.simbrain.world.imageworld.filters.FilterCollection;
 import org.simbrain.world.imageworld.filters.FilteredImageSource;
 
 import javax.swing.*;
@@ -13,18 +13,18 @@ import java.awt.*;
 
 /**
  * Provides a toolbar for adding, deleting, and setting a current {@link Filter}
- * in a {@link FilterSelector}.
+ * in a {@link FilterCollection}.
  */
-public class FilterSelectorGui {
+public class FilterCollectionGui {
 
-    private final FilterSelector filterSelector;
+    private final FilterCollection filterCollection;
 
-    private JComboBox<Filter> filterComboBox = new JComboBox<>();
+    private final JComboBox<Filter> filterComboBox = new JComboBox<>();
 
-    public FilterSelectorGui(FilterSelector filterSelector) {
-        this.filterSelector = filterSelector;
-        filterSelector.getEvents().onFilterAdded(s-> updateComboBox());
-        filterSelector.getEvents().onFilterRemoved(s-> updateComboBox());
+    public FilterCollectionGui(FilterCollection filterCollection) {
+        this.filterCollection = filterCollection;
+        filterCollection.getEvents().onFilterAdded(s-> updateComboBox());
+        filterCollection.getEvents().onFilterRemoved(s-> updateComboBox());
     }
 
     public JToolBar getToolBar() {
@@ -34,12 +34,12 @@ public class FilterSelectorGui {
         filterToolbar.add(filterComboBox);
         filterComboBox.setToolTipText("Which filter to view");
         updateComboBox();
-        filterComboBox.setSelectedItem(filterSelector.getCurrentFilter());
+        filterComboBox.setSelectedItem(filterCollection.getCurrentFilter());
         filterComboBox.setMaximumSize(new Dimension(200, 100));
         filterComboBox.addActionListener(evt -> {
             Filter selectedFilter = (Filter) filterComboBox.getSelectedItem();
             if (selectedFilter != null) {
-                filterSelector.setCurrentFilter(selectedFilter);
+                filterCollection.setCurrentFilter(selectedFilter);
             }
         });
 
@@ -47,7 +47,7 @@ public class FilterSelectorGui {
         JButton addFilter = new JButton(ResourceManager.getImageIcon("menu_icons/plus.png"));
         addFilter.setToolTipText("Add Filter");
         addFilter.addActionListener(evt -> {
-            FilterDialog dialog = new FilterDialog(filterSelector);
+            FilterDialog dialog = new FilterDialog(filterCollection);
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         });
@@ -65,7 +65,7 @@ public class FilterSelectorGui {
             filterEditorDialog.setContentPane(dialogPanel);
 
             // Edit the top level filter, basically just a name
-            Filter filter = filterSelector.getCurrentFilter();
+            Filter filter = filterCollection.getCurrentFilter();
             AnnotatedPropertyEditor topLevelFilterEditor = new AnnotatedPropertyEditor(filter);
             dialogPanel.add(topLevelFilterEditor);
             filterEditorDialog.addClosingTask(topLevelFilterEditor::commitChanges);
@@ -97,7 +97,7 @@ public class FilterSelectorGui {
                 int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete sensor panel \"" + filter.getName() + "\" ?", "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     int index = filterComboBox.getSelectedIndex();
-                    filterSelector.setCurrentFilter(filterComboBox.getItemAt(index - 1));
+                    filterCollection.setCurrentFilter(filterComboBox.getItemAt(index - 1));
                     filterComboBox.remove(index);
                     // TODO: Remove listener?
                     // ImageSource source = sensorMatrix.getSource();
@@ -125,12 +125,16 @@ public class FilterSelectorGui {
      */
     private void updateComboBox() {
         filterComboBox.removeAllItems();
-        Filter selectedFilter = filterSelector.getCurrentFilter();
-        for (Filter filter : filterSelector.getFilters()) {
+        Filter selectedFilter = filterCollection.getCurrentFilter();
+        for (Filter filter : filterCollection.getFilters()) {
             filterComboBox.addItem(filter);
             if (filter.equals(selectedFilter)) {
                 filterComboBox.setSelectedItem(filter);
             }
         }
+    }
+
+    public JComboBox<Filter> getFilterComboBox() {
+        return filterComboBox;
     }
 }

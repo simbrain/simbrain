@@ -7,13 +7,11 @@ import org.simbrain.world.imageworld.events.ImageSourceEvents;
 import java.awt.image.BufferedImage;
 
 /**
- * ImageSource is basically any visible image in an ImageWorld.
- * produces BufferedImages periodically and notifies listeners of new
- * images or changes to the image size.
+ * ImageSource is basically any visible image in an ImageWorld. Produces BufferedImages periodically and notifies
+ * listeners when the image changes or is resized.
  * <br>
- * Image sources can be enabled or disabled. E.g. if a webcam is available it can
- * enable its image source, and then when it is turned off the image source can be
- * disabled (however this is not currently used and has not been tested).
+ * Image sources can be enabled or disabled. E.g. if a webcam is available it can enable its image source, and then
+ * when it is turned off the image source can be disabled (however this is not currently used and has not been tested).
  *
  * @author Tim Shea
  */

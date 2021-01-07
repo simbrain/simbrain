@@ -141,7 +141,6 @@ public class Filter implements AttributeContainer, EditableObject {
         return this.name;
     }
 
-
     private void initChannels() {
         channels = new double[4][getWidth() * getHeight()];
         rgbColors = new int[getWidth() * getHeight()];
@@ -158,7 +157,7 @@ public class Filter implements AttributeContainer, EditableObject {
 
         for (int y = 0; y < source.getHeight(); ++y) {
             for (int x = 0; x < source.getWidth(); ++x) {
-                int color = source.getCurrentImage().getRGB(x, y);
+                    int color = source.getCurrentImage().getRGB(x, y);
 
                 // Update rgb colors
                 rgbColors[y * getWidth() + x] = color;

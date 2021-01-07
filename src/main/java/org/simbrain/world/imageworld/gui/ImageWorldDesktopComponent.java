@@ -14,7 +14,6 @@ import org.simbrain.world.imageworld.ImageClipboard;
 import org.simbrain.world.imageworld.ImageWorld;
 import org.simbrain.world.imageworld.ImageWorldComponent;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -22,7 +21,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.LinkedList;
-import java.util.List;
 
 public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldComponent> {
 
@@ -90,7 +88,12 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         add(toolbars, BorderLayout.NORTH);
         toolbars.add(sourceToolbar);
         toolbars.add(sensorToolbar);
-        toolbars.add(new FilterSelectorGui(imageWorld.getFilterSelector()).getToolBar());
+        var filterGui = new FilterCollectionGui(imageWorld.getFilterCollection());
+        toolbars.add(filterGui.getToolBar());
+        filterGui.getFilterComboBox().addActionListener(e -> {
+            repaint();
+        });
+
         setupToolbars();
 
         add(imageAlbumToolbar, BorderLayout.SOUTH);
@@ -154,7 +157,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            g.drawImage(imageWorld.getFilterSelector().getCurrentFilter().getSource().getCurrentImage(),
+            g.drawImage(imageWorld.getFilterCollection().getCurrentFilter().getSource().getCurrentImage(),
                     0, 0, getWidth(), getHeight(), this);
         }
 

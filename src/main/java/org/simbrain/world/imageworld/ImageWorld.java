@@ -1,16 +1,17 @@
 package org.simbrain.world.imageworld;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.world.imageworld.filters.FilterSelector;
+import org.simbrain.world.imageworld.filters.FilterCollection;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 /**
- * The default "Image World" which allows images to be filtered by sensor
- * matrices and the resulting vectors to be sent to Neural networks and other
- * Simbrain components via couplings.
+ *
+ * At each update, apply all the filters in a {@link FilterCollection} to the current image in an {@link ImageAlbum}
+ *
+ * Display the result of the current filter applied to the current image  to the screen.
  */
 public class ImageWorld {
 
@@ -22,7 +23,7 @@ public class ImageWorld {
     /**
      * List of filters.
      */
-    private FilterSelector filterSelector;
+    private FilterCollection filterCollection;
 
     /**
      * Construct the image world.
@@ -35,7 +36,7 @@ public class ImageWorld {
         imageAlbum.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
 
         // Filter Selector
-        filterSelector = new FilterSelector(imageAlbum);
+        filterCollection = new FilterCollection(imageAlbum);
 
     }
 
@@ -81,7 +82,7 @@ public class ImageWorld {
         return imageAlbum;
     }
 
-    public FilterSelector getFilterSelector() {
-        return filterSelector;
+    public FilterCollection getFilterCollection() {
+        return filterCollection;
     }
 }

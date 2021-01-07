@@ -5,7 +5,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
 import org.simbrain.util.format
@@ -40,7 +42,7 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
                 val (best, _) = generations.last().first()
 
-                best.prettyBuild().peek()
+                best.copy().prettyBuild().peek()
 
                 progressWindow.close()
             }
@@ -53,7 +55,7 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
         val environmentBuilder = environmentBuilder {
 
-            val network = useNetwork()
+            val network = Network()
 
             val inputChromosome = chromosome(2) { index ->
                 nodeGene {
@@ -74,13 +76,17 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             val connectionChromosome = chromosome<Synapse, ConnectionGene>()
 
             onMutate {
-                hiddenNodeChromosome.eachMutate {
-                    updateRule.let {
-                        if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
+                hiddenNodeChromosome.forEach {
+                    it.mutate {
+                        updateRule.let {
+                            if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
+                        }
                     }
                 }
-                connectionChromosome.eachMutate {
-                    strength += (Random().nextDouble() - 0.5 ) * 0.2
+                connectionChromosome.forEach {
+                    it.mutate {
+                        strength += (Random().nextDouble() - 0.5 ) * 0.2
+                    }
                 }
                 // Either connect input to hidden or hidden to output, or hidden to hidden
                 val (source, target) = if (Random().nextBoolean()) {
@@ -106,7 +112,7 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 val tarData = listOf(listOf(0.0), listOf(1.0), listOf(1.0), listOf(0.0))
                 inputData.zip(tarData).map {(i, t) ->
                     inputChromosome.products.activations = i
-                    network {
+                    network.apply {
                         repeat(20) { bufferedUpdate() }
                     }
                     t sse outputChromosome.products.activations
@@ -114,7 +120,7 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
             }
 
             onPeek {
-                sim.addNetwork(network { NetworkComponent("Network", this) }, 0, 200, 200, 0)
+                sim.addNetwork(NetworkComponent("Network", network), 0, 200, 200, 0)
             }
 
             onBuild { pretty ->
@@ -124,7 +130,9 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                             label = "Input"
                             location = point(0, 100)
                         }
-                        +hiddenNodeChromosome
+                        (+hiddenNodeChromosome).also {
+                            LineLayout().layoutNeurons(it)
+                        }
                         +outputChromosome.asGroup {
                             label = "Output"
                             location = point(0, -100)

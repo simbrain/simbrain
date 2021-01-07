@@ -5,13 +5,13 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.RegisteredSimulation
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
-import org.simbrain.util.sse
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
@@ -57,7 +57,7 @@ class EvolveNetwork(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
 
         val environmentBuilder = environmentBuilder {
 
-            val network = useNetwork()
+            val network = Network()
 
             val nodeChromosome = chromosome(20) {
                 nodeGene() {
@@ -75,9 +75,11 @@ class EvolveNetwork(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
 
                 // Change bias of nodes
-                nodeChromosome.eachMutate {
-                    updateRule.let {
-                        if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
+                nodeChromosome.forEach {
+                    it.mutate {
+                        updateRule.let {
+                            if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
+                        }
                     }
                 }
 
@@ -89,18 +91,20 @@ class EvolveNetwork(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 })
 
                 // Weight mutations
-                connectionChromosome.eachMutate {
-                    strength += (Random().nextDouble() - 0.5 ) * 0.2
+                connectionChromosome.forEach {
+                    it.mutate {
+                        strength += (Random().nextDouble() - 0.5 ) * 0.2
+                    }
                 }
             }
 
             onEval {
-                repeat(10) { network.product.bufferedUpdate() }
+                repeat(10) { network.bufferedUpdate() }
                 abs(nodeChromosome.products.activations.average() - .5)
             }
 
             onPeek {
-                sim.addNetwork(network { NetworkComponent("Network", this) }, 0, 200, 200, 0)
+                sim.addNetwork(NetworkComponent("Network", network), 0, 200, 200, 0)
             }
 
             onBuild { pretty ->

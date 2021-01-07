@@ -1,10 +1,8 @@
 package org.simbrain.util.geneticalgorithms
 
-import org.simbrain.network.core.Neuron
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import java.util.*
-import kotlin.collections.HashMap
+import java.util.concurrent.CompletableFuture
 import kotlin.random.Random
 import kotlin.streams.toList
 
@@ -17,8 +15,18 @@ import kotlin.streams.toList
  * [EnvironmentBuilder.onMutate] function.
  *
  * By convention most Genes should provide a build function that returns a product.
+ *
+ * @param template A skeleton object holding the param of this gene. While we use builder patterns, we still need
  */
-abstract class Gene<T> protected constructor(val template: T) : CopyableObject
+abstract class Gene<P> : CopyableObject {
+
+    abstract val promise: CompletableFuture<P>
+
+    protected inline fun completeWith(block: () -> P): P {
+        return block().also { promise.complete(it) }
+    }
+
+}
 
 interface TopLevelGene<T> {
 
@@ -37,64 +45,17 @@ class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
         return Chromosome(genes.map { it.copy() as G }.toMutableList())
     }
 
+    inline fun forEach(block: (G) -> Unit) = genes.forEach(block)
+
     operator fun get(index: Int) = genes[index]
-}
 
-/**
- * Maps genes to products or builder functions to products.  E.g. [NodeGene] to [Neuron] or supplier<OdorWorldEntity>
- * to [OdorWorldEntity].  Think of "gene products", not the gene itself but the thing it expresses.
- */
-class ProductMap(private val map: HashMap<Any, Any> = HashMap()) {
-
-    @Suppress("UNCHECKED_CAST")
-    operator fun <T, G: Gene<T>> get(gene: G) = map[gene]!! as T
-
-    @Suppress("UNCHECKED_CAST")
-    operator fun <T, P, B: (P) -> T> get(builder: B) = map[builder]!! as T
-
-    @Suppress("UNCHECKED_CAST")
-    operator fun <T, P: BuilderProvider<T, *, *>> get(provider: P) = map[provider]!! as T
-
-    operator fun <T, G: Gene<T>> set(gene: G, product: T) {
-        map[gene] = product as Any
-    }
-
-    operator fun <T, P, B: (P) -> T> set(builder: B, product: T) {
-        map[builder] = product as Any
-    }
-
-    operator fun <P: BuilderProvider<T, *, *>, T> set(provider: P, product: T) {
-        map[provider] = product as Any
-    }
-
+    val products get() = genes.map { it.promise.get() }
 }
 
 /**
  * Provides a context for [EnvironmentBuilder.onEval]. "This" in onEval will refer to an instance of this class.
  */
-class EvaluationContext(val mapping: ProductMap, val evalRand: Random) {
-
-    val <T, G: Gene<T>, C: Chromosome<T, G>> C.products: List<T> get() {
-        return genes.map { mapping[it]!! }
-    }
-
-    operator fun <T, G: Gene<T>, C: Chromosome<T, G>, R> C.invoke(template: List<T>.() -> R): R {
-        return genes.map { mapping[it]!! }.run(template)
-    }
-
-    val <T, P> ((P) -> T).product: T get() {
-        return mapping[this]!!
-    }
-
-    val <P: BuilderProvider<T, *, *>, T> P.product: T get() {
-        return mapping[this]
-    }
-
-    operator fun <P: BuilderProvider<T, *, *>, T, R> P.invoke(template: T.() -> R): R {
-        return mapping[this].run(template)
-    }
-
-}
+class EvaluationContext(val evalRand: Random)
 
 // operator fun test.invoke { print("hi") }
 
@@ -103,14 +64,6 @@ class EvaluationContext(val mapping: ProductMap, val evalRand: Random) {
  * Provides a context for [EnvironmentBuilder.onMutate]. "This" in onMutate will refer to this object.
  */
 object MutationContext {
-
-    inline fun <T, G: Gene<T>> Chromosome<T, G>.eachMutate(mutationTask: T.() -> Unit) {
-        genes.forEach { it.template.mutationTask() }
-    }
-
-    inline fun <T> Gene<T>.mutate(mutationTask: T.() -> Unit) {
-        template.mutationTask()
-    }
 
 }
 
@@ -133,34 +86,14 @@ class Environment(
 
 }
 
-interface TopLevelBuilderContextInvokable<C: BuilderContext, T> {
-    fun createProduct(productMap: ProductMap, template: C.() -> Unit): T
-}
-
 class TopLevelBuilderContext {
 
-    val productMap = ProductMap()
-
-    operator fun <P, B, C, T> P.invoke(template: C.() -> Unit)
-            where
-            C : BuilderContext,
-            B : GeneticBuilder<T>,
-            P : BuilderProvider<T, B, C>,
-            P: TopLevelBuilderContextInvokable<C, T> {
-        productMap[this] = this.createProduct(productMap, template) // result is T
-    }
-
-    operator fun <T, G, C> C.unaryPlus()
+    operator fun <T, G, C> C.unaryPlus() : List<T>
             where
             G: Gene<T>,
             G: TopLevelGene<T>,
-            C: Chromosome<T, G> {
-        genes.forEach {
-            with(it) {
-                build().also { product -> productMap[it] = product }
-            }
-        }
-    }
+            C: Chromosome<T, G>
+    = genes.map { with(it) { build() } }
 
 }
 
@@ -246,7 +179,7 @@ class EnvironmentBuilder private constructor(
      */
     private fun buildWith(builder: TopLevelBuilderContext): Environment {
         val newSeed = random.nextInt()
-        return Environment(EvaluationContext(builder.productMap, Random(newSeed)), evalFunction, peekFunction)
+        return Environment(EvaluationContext(Random(newSeed)), evalFunction, peekFunction)
     }
 
     fun build() = buildWith(TopLevelBuilderContext().apply { builderTemplate(false) })
@@ -425,11 +358,3 @@ fun List<BuilderFitnessPair>.uniformSample() = sequence {
         yield(this@uniformSample[index])
     }
 }
-
-interface BuilderProvider<T, B: GeneticBuilder<T>, C: BuilderContext>
-
-interface GeneticBuilder<T> {
-    val productMap: ProductMap
-}
-
-interface BuilderContext

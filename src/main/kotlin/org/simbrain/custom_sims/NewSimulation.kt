@@ -13,11 +13,18 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.world.odorworld.OdorWorldComponent
 
-// TODO: Rename to Simulation after Simulatoin.java is removed
+class SimulationScope private constructor(
+    val desktop: SimbrainDesktop?,
+    val workspace: Workspace
+) {
 
-class SimulationScope(val desktop: SimbrainDesktop? = null) {
+    constructor(desktop: SimbrainDesktop? = null): this(desktop, desktop?.workspace ?: Workspace())
 
-    val workspace = desktop?.workspace ?: Workspace()
+    private constructor(workspace: Workspace): this(null, workspace)
+
+    operator fun <T> Workspace.invoke(block: SimulationScope.() -> T): T {
+        return SimulationScope(this).block()
+    }
 
     /**
      * If Desktop exists, provide a context for convenient access.
@@ -28,6 +35,7 @@ class SimulationScope(val desktop: SimbrainDesktop? = null) {
 
 }
 
+// TODO: Rename to Simulation after Simulation.java is removed
 class NewSimulation(val task: SimulationScope.() -> Unit) {
     fun run(desktop: SimbrainDesktop? = null) {
         SimulationScope(desktop).apply(task)

@@ -147,7 +147,7 @@ class CouplingManager(val workspace: Workspace) {
         baseObject is StraightMovement && method.name == "setAmount" -> 10
         baseObject is Turning && method.name == "setAmount" -> 10
         with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
-        with(baseObject) { this is Neuron && !isClamped && method.name == "setActivation" } -> 10
+        with(baseObject) { this is Neuron && !isClamped && method.name == "setInputValue" } -> 10
         else -> 0
     }
 
@@ -254,6 +254,14 @@ class CouplingManager(val workspace: Workspace) {
             }
         }
     }
+
+    fun createOneToOneCouplings(
+        producers: Collection<AttributeContainer>,
+        consumers: Collection<AttributeContainer>
+    ): List<Coupling> = (producers zip consumers).map { (producer, consumer) -> producer couple consumer }
+
+    infix fun Collection<AttributeContainer>.couple(consumers: Collection<AttributeContainer>): List<Coupling>
+        = createOneToOneCouplings(this, consumers)
 
     fun removeCouplings(couplings: List<Coupling>) {
         couplings.forEach { coupling ->

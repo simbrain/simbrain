@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.layouts;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
 
@@ -154,6 +155,7 @@ public class LineLayout implements Layout {
     /**
      * @return the orientation
      */
+    @NotNull
     public LineOrientation getOrientation() {
         return orientation;
     }
@@ -161,7 +163,7 @@ public class LineLayout implements Layout {
     /**
      * @param orientation the orientation to set
      */
-    public void setOrientation(final LineOrientation orientation) {
+    public void setOrientation(@NotNull final LineOrientation orientation) {
         this.orientation = orientation;
         // System.out.println("LineLayout orientation: " + this.orientation);
     }

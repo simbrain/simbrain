@@ -85,13 +85,13 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
      * X Velocity. Used internally for {@link #simpleMotion()}.
      */
     @UserParameter(label = "Velocity X", description = "X Velocity", useSetter = true, order = 10)
-    protected double dx;
+    protected double velocityX;
 
     /**
      * Y Velocity. Used internally for {@link #simpleMotion()}.
      */
     @UserParameter(label = "Velocity Y", description = "Y Velocity", useSetter = true, order = 11)
-    protected double dy;
+    protected double velocityY;
 
     /**
      * Amount to manually move forward or in cardinal directions.
@@ -302,8 +302,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
             dx = manualMovementVelocity.getX();
             dy = manualMovementVelocity.getY();
         } else {
-            dx = this.dx;
-            dy = this.dy;
+            dx = this.velocityX;
+            dy = this.velocityY;
         }
         if (dx != 0) {
             if (!collideOn("x")) {
@@ -335,8 +335,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
             if (manualMode) {
                 manualMovementVelocity.setLocation(dx2, dy2);
             } else {
-                this.dx = dx2;
-                this.dy = dy2;
+                this.velocityX = dx2;
+                this.velocityY = dy2;
             }
         }
         motionEventListeners.forEach(f -> f.apply(dx, dy, dtheta));
@@ -405,7 +405,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
      */
     @Producible()
     public double getVelocityX() {
-        return dx;
+        return velocityX;
     }
 
     /**
@@ -414,7 +414,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
      */
     @Producible()
     public double getVelocityY() {
-        return dy;
+        return velocityY;
     }
 
     /**
@@ -423,7 +423,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
      */
     @Consumable(defaultVisibility = false)
     public void setVelocityX(final double dx) {
-        this.dx = dx;
+        this.velocityX = dx;
         updateCollisionBound();
     }
 
@@ -433,7 +433,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
      */
     @Consumable(defaultVisibility = false)
     public void setVelocityY(final double dy) {
-        this.dy = dy;
+        this.velocityY = dy;
         updateCollisionBound();
     }
 
@@ -597,7 +597,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
         if (manualMode) {
             collisionBound.setVelocity(manualMovementVelocity.getX(), manualMovementVelocity.getY());
         } else {
-            collisionBound.setVelocity(dx, dy);
+            collisionBound.setVelocity(velocityX, velocityY);
         }
         collisionBound.setLocation(x, y);
         collisionBound.setSize(entityType.getImageWidth(), entityType.getImageHeight()); // TODO: optimize
@@ -988,8 +988,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
     //@Consumible(customDescriptionMethod="getId")
     public void goStraight(double amount) {
         double radians = getHeadingRadians();
-        dx = amount * Math.cos(radians);
-        dy = -amount * Math.sin(radians);
+        velocityX = amount * Math.cos(radians);
+        velocityY = -amount * Math.sin(radians);
         events.fireMoved();
     }
 
@@ -1000,8 +1000,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
         if (manualMode) {
             manualMovementVelocity.setLocation(dx, dy);
         } else {
-            this.dx = dx;
-            this.dy = dy;
+            this.velocityX = dx;
+            this.velocityY = dy;
         }
     }
 
@@ -1012,8 +1012,8 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
         if (manualMode) {
             manualMovementVelocity.setLocation(dx, dy);
         } else {
-            this.dx = dx;
-            this.dy = dy;
+            this.velocityX = dx;
+            this.velocityY = dy;
         }
     }
 
@@ -1037,7 +1037,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
      * Set the heading to be in the direction of current velocity.
      */
     public void updateHeadingBasedOnVelocity() {
-        boolean velocityIsNonZero = !((dx == 0) && (dy == 0));
+        boolean velocityIsNonZero = !((velocityX == 0) && (velocityY == 0));
         if (velocityIsNonZero) {
             setHeading(Math.toDegrees(Math.atan2(getVelocityX(), getVelocityY())) - 90);
         }

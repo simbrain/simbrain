@@ -41,6 +41,10 @@ class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<IntW
     override fun TopLevelBuilderContext.build(): IntWrapper {
         return template.copy().also { promise.complete(it.value) }
     }
+
+    fun mutate(block: IntWrapper.() -> Unit) {
+        template.apply(block)
+    }
 }
 
 /**
@@ -59,11 +63,13 @@ fun main() {
         }
 
         onMutate {
-            intChromosome.forEach {  }
+            intChromosome.forEach { it.mutate {
+                value += random.nextInt(-5,5)
+            }}
         }
 
         onBuild {
-            intChromosome
+            intChromosome.forEach { with(it) {build()} }
         }
 
         onEval {
@@ -88,8 +94,8 @@ fun main() {
 
     val time = measureTimeMillis {
         val (builder, fitness) = evolution.start().last().first()
-        builder.build().peek()
-        println("Fitness: $fitness $")
+        builder.copy().build().peek()
+        println("Fitness: $fitness")
     }
 
     println("Finished in ${time / 1000.0}s")

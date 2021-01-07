@@ -12,6 +12,7 @@ import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.SigmoidalRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
+import org.simbrain.network.util.labels
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
@@ -19,10 +20,6 @@ import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-
-// Not working...
-
-// Rename to Avoider
 
 val evolveAvoider = newSim {
 
@@ -112,18 +109,21 @@ val evolveAvoider = newSim {
             onBuild { pretty ->
                 network {
                     if (pretty) {
-                        +inputs.asGroup {
+                        val inputGroup = +inputs.asGroup {
                             label = "Input"
                             location = point(0, 200)
                         }
+                        inputGroup.neuronList.labels = listOf("center", "left", "right")
                         +hiddens.asGroup {
                             label = "Hidden"
                             location = point(0, 100)
                         }
-                        +outputs.asGroup {
+                        val outputGroup = +outputs.asGroup {
                             label = "Output"
                             location = point(0, 0)
                         }
+                        outputGroup.neuronList.labels = listOf("right", "left", "right")
+
                     } else {
                         // This is update when graphics are off
                         +inputs
@@ -151,7 +151,6 @@ val evolveAvoider = newSim {
                     }
                 }
             }
-
 
             //
             // Mutate the chromosomes. Specify what things are mutated at each generation.
@@ -228,6 +227,7 @@ val evolveAvoider = newSim {
                 score
             }
 
+            // Called when evolution finishes. evolutionWorkspace is the "winning" sim.
             onPeek {
                 workspace.openFromZipData(evolutionWorkspace.zipData)
             }

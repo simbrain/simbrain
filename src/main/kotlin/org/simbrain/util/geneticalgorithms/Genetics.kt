@@ -355,5 +355,3 @@ fun List<BuilderFitnessPair>.uniformSample() = sequence {
         yield(this@uniformSample[index])
     }
 }
-
-interface BuilderContext

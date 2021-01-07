@@ -26,7 +26,6 @@ inline fun layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
     return LayoutGene(LayoutWrapper(layout, layout.hSpacing, layout.vSpacing))
 }
 
-
 sealed class NetworkGene<P: NetworkModel>: Gene<P>() {
 
     abstract fun NetworkGeneticsContext.build(): P
@@ -97,6 +96,9 @@ class ConnectionGene(private val template: Synapse, val source: NodeGene, val ta
 
 }
 
+/**
+ * Needed so we can evolve different types of layout.
+ */
 class LayoutWrapper(var layout: Layout, var hSpacing: Double, var vSpacing: Double): CopyableObject {
 
     override fun copy() = LayoutWrapper(layout.copy(), hSpacing, vSpacing)

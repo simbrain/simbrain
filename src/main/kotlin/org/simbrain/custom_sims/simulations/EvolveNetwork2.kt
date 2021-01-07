@@ -2,6 +2,8 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
@@ -22,9 +24,7 @@ val evolveNetwork2 = newSim {
 
     val environmentBuilder = environmentBuilder {
 
-        val networkComponent = addNetworkComponent("Main Network")
-
-        val network = networkComponent.network
+        val network = Network()
 
         val nodeChromosome = chromosome(20) {
             nodeGene() {
@@ -40,6 +40,7 @@ val evolveNetwork2 = newSim {
 
         onMutate {
 
+            // Local functions that define how to mutate genes
             fun LayoutGene.mutateParam() = mutate {
                 hSpacing += random.nextDouble(-1.0, 1.0)
                 vSpacing += random.nextDouble(-1.0, 1.0)
@@ -62,6 +63,8 @@ val evolveNetwork2 = newSim {
             fun ConnectionGene.mutateWeight() = mutate {
                 strength += (Random().nextDouble() - 0.5) * 0.2
             }
+
+            // Apply mutations across chromosomes
 
             // New nodes
             if (Random().nextDouble() > .95) {
@@ -90,19 +93,17 @@ val evolveNetwork2 = newSim {
         }
 
         onEval {
-            repeat(10) { workspace.simpleIterate() }
+            repeat(10) { network.bufferedUpdate() }
             abs(nodeChromosome.products.activations.average() - .5)
         }
 
         onPeek {
-//                val source = nodeChromosome.genes.shuffled().first()
-//                val target = nodeChromosome.genes.shuffled().first()
-//                val synapse = connectionGene(source, target).tester(network)
 
+            val networkComponent = addNetworkComponent("50 Percent Active", network)
             withGui {
                 place(networkComponent) {
-                    width = 200
-                    height = 200
+                    width = 400
+                    height = 400
                 }
             }
             // When run headless

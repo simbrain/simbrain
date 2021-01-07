@@ -13,8 +13,6 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.world.odorworld.OdorWorldComponent
 
-// TODO: Rename to Simulation after Simulatoin.java is removed
-
 class SimulationScope private constructor(
     val desktop: SimbrainDesktop?,
     val workspace: Workspace
@@ -37,6 +35,7 @@ class SimulationScope private constructor(
 
 }
 
+// TODO: Rename to Simulation after Simulation.java is removed
 class NewSimulation(val task: SimulationScope.() -> Unit) {
     fun run(desktop: SimbrainDesktop? = null) {
         SimulationScope(desktop).apply(task)

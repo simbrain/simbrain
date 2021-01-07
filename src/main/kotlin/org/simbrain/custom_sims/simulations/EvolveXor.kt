@@ -7,6 +7,7 @@ import org.simbrain.custom_sims.RegisteredSimulation
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
 import org.simbrain.util.format
@@ -41,7 +42,7 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                 }
                 val (best, _) = generations.last().first()
 
-                best.prettyBuild().peek()
+                best.copy().prettyBuild().peek()
 
                 progressWindow.close()
             }
@@ -129,7 +130,9 @@ class EvolveXor(desktop: SimbrainDesktop?) : RegisteredSimulation(desktop) {
                             label = "Input"
                             location = point(0, 100)
                         }
-                        +hiddenNodeChromosome
+                        (+hiddenNodeChromosome).also {
+                            LineLayout().layoutNeurons(it)
+                        }
                         +outputChromosome.asGroup {
                             label = "Output"
                             location = point(0, -100)

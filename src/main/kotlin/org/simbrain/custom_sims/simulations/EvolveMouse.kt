@@ -5,17 +5,19 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addOdorWorldComponent
+import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
+import org.simbrain.network.util.activations
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
-import org.simbrain.util.nextNegate
 import org.simbrain.util.point
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.EntityType
+import kotlin.math.abs
 
 val evolveMouse = newSim {
 
@@ -23,8 +25,6 @@ val evolveMouse = newSim {
 
     fun createEvolution(): Evaluator {
         val environmentBuilder = environmentBuilder(1) {
-
-            workspace = Workspace()
 
             val inputs = chromosome(3) {
                 nodeGene()
@@ -46,10 +46,12 @@ val evolveMouse = newSim {
 
             val connections = chromosome<Synapse, ConnectionGene>()
 
-            val networkComponent = addNetworkComponent("Network")
+            val evolutionWorkspace = Workspace()
+
+            val networkComponent = evolutionWorkspace { addNetworkComponent("Network") }
             val network = networkComponent.network
 
-            val odorworldComponent = addOdorWorldComponent("Odor World")
+            val odorworldComponent = evolutionWorkspace { addOdorWorldComponent("Odor World") }
             val odorworld = odorworldComponent.world
 
             val sensors = chromosome(3) {
@@ -71,12 +73,17 @@ val evolveMouse = newSim {
             )
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
-                setCenterLocation(100.0, 200.0)
+                setCenterLocation(50.0, 200.0)
             }
 
-            val cheese = odorworld.addEntity(EntityType.SWISS).apply {
-                setCenterLocation(150.0, 200.0)
+            fun createCheese() = odorworld.addEntity(EntityType.SWISS).apply {
+                setCenterLocation(
+                    random.nextDouble(100.0, 300.0),
+                    random.nextDouble(0.0, 300.0)
+                )
             }
+
+            val cheeses = List(3) { createCheese() }
 
             onBuild { pretty ->
                 network {
@@ -102,15 +109,26 @@ val evolveMouse = newSim {
                     +straightMovement
                     +turning
                 }
-                workspace.couplingManager.apply {
-                    val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
-                    val (straightConsumer) = straightMovement.products
-                    val (left, right) = turning.products
+                evolutionWorkspace {
+                    couplingManager.apply {
+                        val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
+                        val (straightConsumer) = straightMovement.products
+                        val (left, right) = turning.products
 
-                    sensors.products couple inputs.products
-                    straightNeuron couple straightConsumer
-                    leftNeuron couple left
-                    rightNeuron couple right
+                        sensors.products couple inputs.products
+                        straightNeuron couple straightConsumer
+                        leftNeuron couple left
+                        rightNeuron couple right
+                    }
+                }
+
+                cheeses.forEach { cheese ->
+                    cheese.onCollide {
+                        cheese.setCenterLocation(
+                            random.nextDouble(100.0, 300.0),
+                            random.nextDouble(0.0, 300.0)
+                        )
+                    }
                 }
             }
 
@@ -143,29 +161,32 @@ val evolveMouse = newSim {
             onEval {
                 var score = 0.0
 
-                cheese.setCenterLocation(
-                    mouse.centerX + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate(),
-                    mouse.centerY + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate()
-                )
-
-                cheese.onCollide { other ->
-                    if (other === mouse) {
-                        score += 1
+                cheeses.forEach {
+                    it.onCollide { other ->
+                        if (other === mouse) {
+                            score += 1
+                        }
                     }
-                    cheese.setCenterLocation(
-                        mouse.centerX + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate(),
-                        mouse.centerY + evalRand.nextDouble(30.0, 70.0) * evalRand.nextNegate()
-                    )
                 }
-                workspace.apply {
-                    repeat(1000) { simpleIterate() }
+                evolutionWorkspace.apply {
+                    repeat(1000) {
+                        simpleIterate()
+                        val energy = abs(outputs.products.activations.sum()) + 5
+                        score -= energy / 1000
+                    }
                 }
-                val partial = (100 - mouse.getRadiusTo(cheese)).let { if (it < 0) 0.0 else it } / 100
+
+
+
+                val partial = cheeses.map { cheese -> 100 - mouse.getRadiusTo(cheese) }
+                    .maxOf { it }
+                    .let { if (it < 0) 0.0 else it } / 100
+
                 score + partial
             }
 
             onPeek {
-                workspace.openFromZipData(workspace.zipData)
+                workspace.openFromZipData(evolutionWorkspace.zipData)
             }
 
         }
@@ -193,7 +214,7 @@ val evolveMouse = newSim {
 
             println(best)
 
-            best.prettyBuild().peek()
+            best.copy().prettyBuild().peek()
 
             progressWindow.close()
         }

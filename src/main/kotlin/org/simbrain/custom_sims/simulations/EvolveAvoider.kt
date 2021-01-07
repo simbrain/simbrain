@@ -16,9 +16,9 @@ import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
 import org.simbrain.util.widgets.ProgressWindow
+import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import java.io.File
 
 // Not working...
 
@@ -55,15 +55,19 @@ val evolveAvoider = newSim {
                 }
             }
 
+            val evolutionWorkspace = Workspace()
+
             val connections = chromosome<Synapse, ConnectionGene>()
 
-            val networkComponent = addNetworkComponent("Avoider")
+            val networkComponent = evolutionWorkspace { addNetworkComponent("Avoider") }
 
             val network = networkComponent.network
 
-            val odorworldComponent = addOdorWorldComponent("World")
+            val odorworldComponent = evolutionWorkspace { addOdorWorldComponent("World") }
 
-            val odorworld = odorworldComponent.world
+            val odorworld = odorworldComponent.world.apply {
+                isObjectsBlockMovement = false
+            }
 
             val sensors = chromosome(3) {
                 objectSensorGene {
@@ -84,23 +88,23 @@ val evolveAvoider = newSim {
             )
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
-                setCenterLocation(100.0, 200.0)
+                setCenterLocation(200.0, 200.0)
             }
 
             fun OdorWorldEntity.reset() {
                 setCenterLocation(random.nextDouble()*300,random.nextDouble()*300)
-                velocityX = random.nextDouble(-1.0,1.0)
-                velocityY = random.nextDouble(-1.0,1.0)
             }
 
             fun addPoison() = odorworld.addEntity(EntityType.POISON).apply {
-                setCenterLocation(100.0, 200.0)
+                setCenterLocation(random.nextDouble()*300,random.nextDouble()*300)
+                velocityX = random.nextDouble(-5.0,5.0)
+                velocityY = random.nextDouble(-5.0,5.0)
+                onCollide {
+                    if (it === mouse) reset()
+                }
             }
 
-            val poison1 = addPoison();
-            val poison2 = addPoison();
-            val poison3 = addPoison();
-            // TODO: What to do for many...
+            val (poison1, poison2, poison3) = List(3) { addPoison() }
 
             // Take the current chromosomes,and express them via an agent in a world.
             // Everything needed to build one generation
@@ -126,6 +130,7 @@ val evolveAvoider = newSim {
                         +hiddens
                         +outputs
                     }
+                    +connections
                 }
                 mouse {
                     +sensors
@@ -133,15 +138,17 @@ val evolveAvoider = newSim {
                     +turning
                 }
 
-                couplingManager.apply {
-                    val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
-                    val (straightConsumer) = straightMovement.products
-                    val (left, right) = turning.products
+                evolutionWorkspace {
+                    couplingManager.apply {
+                        val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
+                        val (straightConsumer) = straightMovement.products
+                        val (left, right) = turning.products
 
-                    sensors.products couple inputs.products
-                    straightNeuron couple straightConsumer
-                    leftNeuron couple left
-                    rightNeuron couple right
+                        sensors.products couple inputs.products
+                        straightNeuron couple straightConsumer
+                        leftNeuron couple left
+                        rightNeuron couple right
+                    }
                 }
             }
 
@@ -195,41 +202,41 @@ val evolveAvoider = newSim {
             onEval {
                 var score = 0.0
 
-                mouse.setCenterLocation(Math.random()*300, Math.random()*300)
-
                 fun OdorWorldEntity.handleCollision() {
                     onCollide { other ->
                         if (other === mouse) {
                             score -= 1
                         }
-                        reset()
                     }
                 }
+
                 poison1.handleCollision();
                 poison2.handleCollision();
                 poison3.handleCollision();
 
-                workspace.apply {
-                    repeat(1000) { simpleIterate() }
+                evolutionWorkspace.apply {
+                    score += (0..5000).map {
+                        simpleIterate()
+                        minOf(
+                            poison1.getRadiusTo(mouse),
+                            poison2.getRadiusTo(mouse),
+                            poison3.getRadiusTo(mouse)
+                        ) / 100
+                    }.minOf { it }
                 }
 
-                // val distFromPoison = SimbrainMath.clip(
-                //     mouse.product.getRadiusTo(poison.product) / 100,
-                //     0.0, 1.0
-                // )
                 score
             }
 
-            // Todo: work on getting rid of winner.zip
             onPeek {
-                workspace.apply { save(File("winner.zip")) }
-                workspace.openWorkspace(File("winner.zip"))
+                workspace.openFromZipData(evolutionWorkspace.zipData)
             }
         }
 
         return evaluator(environmentBuilder) {
             populationSize = 100
             eliminationRatio = 0.5
+            optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
             runUntil { generation == 50 || fitness > 50 }
         }
     }
@@ -249,9 +256,12 @@ val evolveAvoider = newSim {
 
             println(best)
 
-            best.prettyBuild().peek()
+            val build = best.copy().prettyBuild()
+
+            build.peek()
 
             progressWindow.close()
+
         }
     }
 

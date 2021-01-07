@@ -312,7 +312,7 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
             var generation = 0
             var next = population
             do {
-                val current = next.stream().map {
+                val current = next.parallelStream().map {
                     val build = it.build()
                     val score = build.eval()
                     BuilderFitnessPair(it, score)

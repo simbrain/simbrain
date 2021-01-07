@@ -15,9 +15,18 @@ import org.simbrain.world.odorworld.OdorWorldComponent
 
 // TODO: Rename to Simulation after Simulatoin.java is removed
 
-class SimulationScope(val desktop: SimbrainDesktop? = null) {
+class SimulationScope private constructor(
+    val desktop: SimbrainDesktop?,
+    val workspace: Workspace
+) {
 
-    var workspace = desktop?.workspace ?: Workspace()
+    constructor(desktop: SimbrainDesktop? = null): this(desktop, desktop?.workspace ?: Workspace())
+
+    private constructor(workspace: Workspace): this(null, workspace)
+
+    operator fun <T> Workspace.invoke(block: SimulationScope.() -> T): T {
+        return SimulationScope(this).block()
+    }
 
     /**
      * If Desktop exists, provide a context for convenient access.

@@ -1,11 +1,13 @@
 package org.simbrain.util.geneticalgorithms
 
 import org.simbrain.world.odorworld.OdorWorld
+import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
+import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.util.concurrent.CompletableFuture
 
@@ -100,7 +102,14 @@ class TurningGene(private val template: Turning):
 class OdorWorldEntityGeneticsContext(val entity: OdorWorldEntity) {
 
     fun <T, G> express(chromosome: Chromosome<T, G>): List<T> where G: OdorWorldEntityGene<T>, G: Gene<T> =
-        chromosome.genes.map { it.build(entity) }
+        chromosome.genes.map {
+            it.build(entity).also { peripheralAttribute ->
+                when (peripheralAttribute) {
+                    is Sensor -> entity.addSensor(peripheralAttribute)
+                    is Effector -> entity.addEffector(peripheralAttribute)
+                }
+            } 
+        }
 
     operator fun <T, G> Chromosome<T, G>.unaryPlus(): List<T> where G: OdorWorldEntityGene<T>, G: Gene<T> =
         express(this)

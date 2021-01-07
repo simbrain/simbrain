@@ -41,7 +41,7 @@ class EvolveAutoEncoder(desktop: SimbrainDesktop?) : RegisteredSimulation(deskto
                 }
                 val (best, _) = generations.last().first()
 
-                best.prettyBuild().peek()
+                best.copy().prettyBuild().peek()
 
                 progressWindow.close()
             }

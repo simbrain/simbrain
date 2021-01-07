@@ -147,7 +147,7 @@ class CouplingManager(val workspace: Workspace) {
         baseObject is StraightMovement && method.name == "setAmount" -> 10
         baseObject is Turning && method.name == "setAmount" -> 10
         with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
-        with(baseObject) { this is Neuron && !isClamped && method.name == "setActivation" } -> 10
+        with(baseObject) { this is Neuron && !isClamped && method.name == "setInputValue" } -> 10
         else -> 0
     }
 

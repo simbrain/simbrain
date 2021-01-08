@@ -3,10 +3,10 @@ package org.simbrain.world.imageworld.gui;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.dialogs.FilterDialog;
 import org.simbrain.world.imageworld.filters.Filter;
 import org.simbrain.world.imageworld.filters.FilterCollection;
-import org.simbrain.world.imageworld.filters.FilteredImageSource;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,10 +21,13 @@ public class FilterCollectionGui {
 
     private final JComboBox<Filter> filterComboBox = new JComboBox<>();
 
-    public FilterCollectionGui(FilterCollection filterCollection) {
+    private final ImageWorldDesktopComponent parent;
+
+    public FilterCollectionGui(ImageWorldDesktopComponent parent, FilterCollection filterCollection) {
+        this.parent = parent;
         this.filterCollection = filterCollection;
-        filterCollection.getEvents().onFilterAdded(s-> updateComboBox());
-        filterCollection.getEvents().onFilterRemoved(s-> updateComboBox());
+        filterCollection.getEvents().onFilterAdded(s -> updateComboBox());
+        filterCollection.getEvents().onFilterRemoved(s -> updateComboBox());
     }
 
     public JToolBar getToolBar() {
@@ -70,20 +73,16 @@ public class FilterCollectionGui {
             dialogPanel.add(topLevelFilterEditor);
             filterEditorDialog.addClosingTask(topLevelFilterEditor::commitChanges);
 
-            // If the filter is  a filtered image source, edit it too
-            if (filter.getSource() instanceof FilteredImageSource) {
-                FilteredImageSource imageSource = (FilteredImageSource) filter.getSource();
-                AnnotatedPropertyEditor filterEditor = new AnnotatedPropertyEditor(imageSource);
-                dialogPanel.add(filterEditor);
-                filterEditorDialog.addClosingTask(() -> {
-                    filterEditor.commitChanges();
-                    // TODO
-                    // Update the image based on the image source
-                    // world.getImageAlbum().notifyResize();
-                    // world.getImageAlbum().notifyImageUpdate();
-                    filterComboBox.updateUI();
-                });
-            }
+            // If the filter is a filtered image source, edit it too
+            ImageSource imageSource = filter.getSource();
+            AnnotatedPropertyEditor filterEditor = new AnnotatedPropertyEditor(imageSource);
+            dialogPanel.add(filterEditor);
+            filterEditorDialog.addClosingTask(() -> {
+                filterEditor.commitChanges();
+                filter.refresh();
+                filterComboBox.updateUI();
+                parent.repaint();
+            });
 
             // Delete filter
             JButton deleteFilter = new JButton("Delete Filter");

@@ -6,8 +6,6 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import org.simbrain.util.UserParameter;
 import org.simbrain.world.imageworld.filters.Filter;
-import org.simbrain.world.imageworld.filters.ImageFilterFactory;
-import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
 import org.simbrain.world.threedworld.engine.ThreeDRenderSource;
 
 import java.awt.image.ImageFilter;
@@ -68,7 +66,8 @@ public class VisionSensor extends Filter implements Sensor {
      * @param agent The agent to attach the sensor to.
      */
     public VisionSensor(Agent agent) {
-        super(agent.getName() + ":VisionSensor");
+        // TODO: Just adding nulls to remove compile errors. When we get to this it will have to be refactored.
+        super(agent.getName() + ":VisionSensor", null, null, 100,100);
         this.agent = agent;
         agent.addSensor(this);
         initializeView();
@@ -159,17 +158,18 @@ public class VisionSensor extends Filter implements Sensor {
      */
     private void applyFilter() {
         ImageFilter filter;
-        switch (filterType) {
-            case COLOR:
-                setSource(ImageFilterFactory.createColorFilter(renderSource, width, height));
-                break;
-            case GRAY:
-                setSource(ImageFilterFactory.createGrayFilter(renderSource, width, height));
-                break;
-            case THRESHOLD:
-                setSource(ThresholdFilterFactory.createThresholdFilter(renderSource, threshold, width, height));
-                break;
-        }
+        // TODO
+        // switch (filterType) {
+        //     case COLOR:
+        //         setSource(ImageFilterFactory.createColorFilter(renderSource, width, height));
+        //         break;
+        //     case GRAY:
+        //         setSource(ImageFilterFactory.createGrayFilter(renderSource, width, height));
+        //         break;
+        //     case THRESHOLD:
+        //         setSource(ThresholdFilterFactory.createThresholdFilter(renderSource, threshold, width, height));
+        //         break;
+        // }
     }
 
     /**

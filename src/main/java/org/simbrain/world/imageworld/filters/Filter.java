@@ -4,9 +4,12 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
+import org.simbrain.world.imageworld.ImageAlbum;
 import org.simbrain.world.imageworld.ImageSource;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 
 /**
  * Wraps an {@link ImageOperation} in a structure that allows for coupling, event handling etc.
@@ -33,12 +36,41 @@ public class Filter implements AttributeContainer, EditableObject {
     )
     private String name;
 
+    @UserParameter(
+            label = "Width",
+            order = 1
+    )
+    private int width;
+
+    @UserParameter(
+            label = "Height",
+            order = 2
+    )
+    private int height;
+
+    @UserParameter(
+            label = "Filter",
+            order = 3,
+            isObjectType = true
+    )
+    private ImageOperation imageOp;
+
+    /**
+     * Use for rescaling.
+     */
+    private transient BufferedImageOp scaleOp;
+
     /**
      * An ImageSource from which to extract filter values.  For "image world" this will be a
      * {@link java.awt.image.FilteredImageSource}, which applies the relevant downscaling, thresholding,
      * and other operations.
      */
     private ImageSource source;
+
+    /**
+     * The filtered image that can be displayed in the desktop.
+     */
+    private BufferedImage filteredImage;
 
     /**
      * The values this matrix produces for floating point channel couplings.
@@ -54,33 +86,23 @@ public class Filter implements AttributeContainer, EditableObject {
     private transient int[] rgbColors;
 
     /**
-     * Construct a filter without attaching it to a source.
-     * Currently used by 3d component.
-     *
-     * @param name The name of the filter
-     */
-    protected Filter(String name) {
-        this.name = name;
-    }
-
-    /**
      * Construct a filter attached to an ImageSource.
      *
      * @param name   The name of the filter
      * @param source The source to attach.
      */
-    public Filter(String name, ImageSource source) {
+    public Filter(String name, ImageSource source, ImageOperation imageOp, int width, int height) {
         this.name = name;
         this.source = source;
+        this.imageOp = imageOp;
+        this.width = width;
+        this.height = height;
+        initScaleOp();
         initChannels();
-        source.getEvents().onResize(this::initChannels);
-        source.getEvents().onImageUpdate(this::updateFilter);
+        updateFilter();
     }
 
     public Object readResolve() {
-        source.getEvents().onResize(this::initChannels);
-        source.getEvents().onImageUpdate(this::updateFilter);
-        initChannels();
         return this;
     }
 
@@ -101,14 +123,6 @@ public class Filter implements AttributeContainer, EditableObject {
             return;
         }
         this.source = source;
-    }
-
-    public int getWidth() {
-        return source.getWidth();
-    }
-
-    public int getHeight() {
-        return source.getHeight();
     }
 
     @Producible()
@@ -141,26 +155,43 @@ public class Filter implements AttributeContainer, EditableObject {
         return this.name;
     }
 
-    private void initChannels() {
-        channels = new double[4][getWidth() * getHeight()];
-        rgbColors = new int[getWidth() * getHeight()];
+    void initChannels() {
+        channels = new double[4][width * height];
+        rgbColors = new int[width * height];
+    }
+
+    BufferedImage applyFilter() {
+        BufferedImage image = source.getCurrentImage();
+        image = scaleOp.filter(image, null);
+        image = imageOp.getOp().filter(image, null);
+        return image;
+    }
+
+    void initScaleOp() {
+        // Subtract 0.1 from width and height to avoid exceeding the specified dimension due to floating point error.
+        float scaleX = (width - 0.1f) / source.getWidth();
+        float scaleY = (height - 0.1f) / source.getHeight();
+        scaleOp = FilterUtils.createScaleOp(scaleX, scaleY, true);
     }
 
     /**
      * Update the filter.
      */
-    private void updateFilter() {
+    public void updateFilter() {
 
-        if (source.getHeight() != getHeight() || source.getWidth() != getWidth()) {
-            throw new AssertionError();
+        filteredImage = applyFilter();
+
+        if (filteredImage.getHeight() != height || filteredImage.getWidth() != width) {
+            throw new AssertionError("Filtered image size not equal to filter size");
         }
 
-        for (int y = 0; y < source.getHeight(); ++y) {
-            for (int x = 0; x < source.getWidth(); ++x) {
-                    int color = source.getCurrentImage().getRGB(x, y);
+        // Set values of channels
+        for (int y = 0; y < filteredImage.getHeight(); ++y) {
+            for (int x = 0; x < filteredImage.getWidth(); ++x) {
 
                 // Update rgb colors
-                rgbColors[y * getWidth() + x] = color;
+                int color = filteredImage.getRGB(x, y);
+                rgbColors[y * width + x] = color;
 
                 // Update other color channels
                 // Cf https://stackoverflow.com/questions/2534116/how-to-convert-get-rgbx-y-integer-pixel-to-colorr-g-b-a-in-java
@@ -168,10 +199,10 @@ public class Filter implements AttributeContainer, EditableObject {
                 double green = ((color >>> 8) & 0xFF) / 255.0;
                 double blue = (color & 0xFF) / 255.0;
                 // Cf. https://en.wikipedia.org/wiki/Luma_(video)
-                channels[0][y * getWidth() + x] = (red * 0.2126 + green * 0.7152 + blue * 0.0722);
-                channels[1][y * getWidth() + x] = red;
-                channels[2][y * getWidth() + x] = green;
-                channels[3][y * getWidth() + x] = blue;
+                channels[0][y * width + x] = (red * 0.2126 + green * 0.7152 + blue * 0.0722);
+                channels[1][y * width + x] = red;
+                channels[2][y * width + x] = green;
+                channels[3][y * width + x] = blue;
             }
         }
     }
@@ -179,5 +210,23 @@ public class Filter implements AttributeContainer, EditableObject {
     @Override
     public String getId() {
         return getName();
+    }
+
+    public Image getFilteredImage() {
+        return filteredImage;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void refresh() {
+        initChannels();
+        initScaleOp();
+        updateFilter();
     }
 }

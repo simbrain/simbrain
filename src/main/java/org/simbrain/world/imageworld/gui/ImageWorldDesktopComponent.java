@@ -78,9 +78,8 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         setLayout(new BorderLayout());
 
         // Main image
-        add(new ImageHolder(), BorderLayout.CENTER);
+        add(new ImagePanel(), BorderLayout.CENTER);
         imageWorld.getImageAlbum().getEvents().onImageUpdate(() -> {
-            System.out.println("here");
             repaint();
         });
 
@@ -88,7 +87,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         add(toolbars, BorderLayout.NORTH);
         toolbars.add(sourceToolbar);
         toolbars.add(sensorToolbar);
-        var filterGui = new FilterCollectionGui(imageWorld.getFilterCollection());
+        var filterGui = new FilterCollectionGui(this, imageWorld.getFilterCollection());
         toolbars.add(filterGui.getToolBar());
         filterGui.getFilterComboBox().addActionListener(e -> {
             repaint();
@@ -121,21 +120,21 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         });
 
         // TODO. Only paint in paint "mode"
-        // // Ability to paint pixels black and white
-        // MouseAdapter mouseAdapter = new MouseAdapter() {
-        //
-        //     @Override
-        //     public void mouseDragged(MouseEvent evt) {
-        //         drawPixel(evt);
-        //     }
-        //
-        //     @Override
-        //     public void mousePressed(MouseEvent evt) {
-        //         drawPixel(evt);
-        //     }
-        // };
-        // addMouseListener(mouseAdapter);
-        // addMouseMotionListener(mouseAdapter);
+        // Ability to paint pixels black and white
+        MouseAdapter mouseAdapter = new MouseAdapter() {
+
+            @Override
+            public void mouseDragged(MouseEvent evt) {
+                drawPixel(evt);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent evt) {
+                drawPixel(evt);
+            }
+        };
+        addMouseListener(mouseAdapter);
+        addMouseMotionListener(mouseAdapter);
     }
 
     /**
@@ -152,15 +151,13 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         imageWorld.getImageAlbum().notifyImageUpdate();
     }
 
-    // TODO
-    private class ImageHolder extends JPanel {
+    private class ImagePanel extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            g.drawImage(imageWorld.getFilterCollection().getCurrentFilter().getSource().getCurrentImage(),
+            g.drawImage(imageWorld.getFilterCollection().getCurrentFilter().getFilteredImage(),
                     0, 0, getWidth(), getHeight(), this);
         }
-
     }
 
     private void setupMenuBar(GenericFrame frame) {

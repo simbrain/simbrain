@@ -3,6 +3,7 @@ package org.simbrain.world.imageworld.filters;
 import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.events.FilterCollectionEvents;
 
+import java.awt.image.ColorConvertOp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,12 @@ public class FilterCollection {
     public FilterCollection(ImageSource imageSource) {
         this.imageSource = imageSource;
         initializeDefaultFilters();
+        imageSource.getEvents().onResize(() -> {
+            filters.forEach(Filter::initScaleOp);
+        });
+        imageSource.getEvents().onImageUpdate(() -> {
+            filters.forEach(Filter::updateFilter);
+        });
     }
 
     /**
@@ -46,55 +53,42 @@ public class FilterCollection {
         // Load default sensor matrices
         Filter unfiltered = new Filter(
                 "Unfiltered",
-                imageSource
+                imageSource, new IdentityOp(), imageSource.getWidth(), imageSource.getHeight()
         );
+        imageSource.getEvents().onResize(() -> {
+            unfiltered.setHeight(imageSource.getCurrentImage().getHeight());
+            unfiltered.setWidth(imageSource.getCurrentImage().getWidth());
+            unfiltered.initChannels();
+        });
         filters.add(unfiltered);
 
         Filter gray100x100 = new Filter(
                 "Gray 150x150",
-                ImageFilterFactory.createGrayFilter(imageSource, 150, 150)
-        );
+                imageSource, new GrayOp(), 150, 150);
         filters.add(gray100x100);
 
         Filter color100x100 = new Filter(
-                "Color 100x100",
-                ImageFilterFactory.createColorFilter(imageSource, 100, 100)
-        );
+                "Color 100x100", imageSource, new IdentityOp(), 100, 100);
         filters.add(color100x100);
 
         Filter threshold10x10 = new Filter(
-                "Threshold 10x10",
-                ThresholdFilterFactory.createThresholdFilter(
-                        imageSource,
-                        0.5f,
-                        10,
-                        10
-                )
-        );
+                "Threshold 10x10", imageSource, new ThresholdOp(.5f), 10, 10);
         filters.add(threshold10x10);
 
         Filter threshold250x250 = new Filter(
                 "Threshold 250x250",
-                ThresholdFilterFactory.createThresholdFilter(
-                        imageSource,
-                        0.5f,
-                        250,
-                        250
-                )
-        );
-
+                imageSource, new ThresholdOp(.5f), 250, 250);
         filters.add(threshold250x250);
 
         currentFilter = filters.get(0);
     }
-
 
     /**
      * Add a new filterContainer to the list.
      *
      * @param filter the filterContainer to add
      */
-    public void addFilterContainer(Filter filter) {
+    public void addFilter(Filter filter) {
         filters.add(filter);
         currentFilter = filter;
         events.fireFilterAdded(filter);
@@ -105,7 +99,7 @@ public class FilterCollection {
      *
      * @param filter the sensor matrix to remove
      */
-    public void removeFilterContainer(Filter filter) {
+    public void removeFilter(Filter filter) {
         // Can't remove the "Unfiltered" option
         if (filter.getName().equalsIgnoreCase("Unfiltered")) {
             return;
@@ -128,7 +122,6 @@ public class FilterCollection {
 
     public void setCurrentFilter(Filter currentFilter) {
         this.currentFilter = currentFilter;
-        currentFilter.getSource().getEvents().fireImageUpdate();
     }
 
     public FilterCollectionEvents getEvents() {

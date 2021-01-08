@@ -20,10 +20,6 @@ public abstract class ImageSourceAdapter implements ImageSource {
      */
     private boolean enabled = true;
 
-    /**
-     * TODO: Get rid of me
-     */
-    @Deprecated
     private BufferedImage currentImage;
 
     /**
@@ -80,16 +76,22 @@ public abstract class ImageSourceAdapter implements ImageSource {
         return currentImage;
     }
 
+    protected void setCurrentImage(BufferedImage image, boolean fireEvents) {
+        boolean resized = image.getWidth() != currentImage.getWidth() || image.getHeight() != currentImage.getHeight();
+        currentImage = image;
+        if (fireEvents) {
+            if (resized && isEnabled()) {
+                events.fireResize();
+            }
+            notifyImageUpdate();
+        }
+    }
+
     /**
      * @param image The image to assign to the current image.
      */
     protected void setCurrentImage(BufferedImage image) {
-        boolean resized = image.getWidth() != currentImage.getWidth() || image.getHeight() != currentImage.getHeight();
-        currentImage = image;
-        if (resized) {
-            notifyResize();
-        }
-        notifyImageUpdate();
+        setCurrentImage(image, true);
     }
 
     @Override
@@ -100,15 +102,6 @@ public abstract class ImageSourceAdapter implements ImageSource {
     @Override
     public int getHeight() {
         return currentImage.getHeight();
-    }
-
-    /**
-     * Notify ImageSourceListeners that a resize has occurred.
-     */
-    public void notifyResize() {
-        if (isEnabled()) {
-            events.fireResize();
-        }
     }
 
     public ImageSourceEvents getEvents() {

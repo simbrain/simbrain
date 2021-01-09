@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Tim Shea
  */
-public class ImageAlbum extends ImageSourceAdapter {
+public class ImageAlbum extends ImageSource {
 
     /**
      * A list of buffered images that can be stepped through.

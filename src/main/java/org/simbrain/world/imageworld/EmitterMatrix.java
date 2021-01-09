@@ -20,7 +20,7 @@ import java.util.Arrays;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class EmitterMatrix extends ImageSourceAdapter {
+public class EmitterMatrix extends ImageSource {
 
     @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
     private boolean usingRGBColor = false;

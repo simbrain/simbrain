@@ -9,7 +9,7 @@ import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image.Format;
 import com.jme3.util.BufferUtils;
 import com.jme3.util.Screenshots;
-import org.simbrain.world.imageworld.ImageSourceAdapter;
+import org.simbrain.world.imageworld.ImageSource;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -24,7 +24,7 @@ import java.nio.IntBuffer;
  *
  * @author Tim Shea
  */
-public class ThreeDRenderSource extends ImageSourceAdapter implements SceneProcessor {
+public class ThreeDRenderSource extends ImageSource implements SceneProcessor {
     private boolean attachAsMain = false;
     private FrameBuffer frameBuffer;
     private ByteBuffer byteBuffer;

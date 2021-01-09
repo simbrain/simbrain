@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld.events
 import org.simbrain.util.Event
 import org.simbrain.world.imageworld.ImageSource
 import java.beans.PropertyChangeSupport
-import java.util.function.Consumer
 
 /**
  * See [Event].

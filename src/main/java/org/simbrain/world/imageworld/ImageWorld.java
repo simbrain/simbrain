@@ -1,6 +1,7 @@
 package org.simbrain.world.imageworld;
 
 import org.simbrain.util.ResourceManager;
+import org.simbrain.world.imageworld.filters.Filter;
 import org.simbrain.world.imageworld.filters.FilterCollection;
 
 import java.awt.image.BufferedImage;
@@ -85,4 +86,28 @@ public class ImageWorld {
     public FilterCollection getFilterCollection() {
         return filterCollection;
     }
+
+    /**
+     * Convenience method to get current filter.
+     */
+    public Filter getCurrentFilter() {
+        return filterCollection.getCurrentFilter();
+    }
+
+    /**
+     * Convenience method to set current filter on collection.
+     */
+    public void setCurrentFilter(String name) {
+        filterCollection.getFilters().stream()
+                .filter(f -> f.getName().equals(name)).findAny()
+                .ifPresent(f -> filterCollection.setCurrentFilter(f));
+    }
+
+    /**
+     * Convenience method to get current image.
+     */
+    public BufferedImage getCurrentImage() {
+        return imageAlbum.getCurrentImage();
+    }
+
 }

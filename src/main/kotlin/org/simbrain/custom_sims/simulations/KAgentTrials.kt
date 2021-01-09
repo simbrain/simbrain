@@ -13,7 +13,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.awt.geom.Point2D
 import kotlin.math.sqrt
 
-val kAgentTrials = newSim {
+val kAgentTrails = newSim {
 
     val dispersion = 100.0
 

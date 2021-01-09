@@ -83,6 +83,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         // Main image
         add(new ImagePanel(), BorderLayout.CENTER);
         imageWorld.getImageAlbum().getEvents().onImageUpdate(() -> {
+            updateButtons();
             repaint();
         });
 

@@ -21,7 +21,7 @@ public class ImageAlbum extends ImageSource {
     /**
      * A list of buffered images that can be stepped through.
      */
-    private List<BufferedImage> frames;
+    private List<BufferedImage> frames = new ArrayList<>();
 
     /**
      * Current frame being shown.
@@ -130,6 +130,15 @@ public class ImageAlbum extends ImageSource {
             return 0;
         }
         return frames.size();
+    }
+
+    /**
+     * Set album to frame aat provided index.
+     */
+    public void setFrame(int frameIndex) {
+        if (frameIndex >= 0 && frameIndex < frames.size()) {
+            setCurrentImage(frames.get(frameIndex));
+        }
     }
 
 }

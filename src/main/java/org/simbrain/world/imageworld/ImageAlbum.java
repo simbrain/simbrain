@@ -81,6 +81,14 @@ public class ImageAlbum extends ImageSourceAdapter {
     }
 
     /**
+     * Add a new image to the album and set the current frame to it.
+     */
+    public void addImage(BufferedImage image) {
+        frames.add(image);
+        setCurrentImage(image);
+    }
+
+    /**
      * Create image from a provided image icon.
      *
      * @param imageIcon the image icon

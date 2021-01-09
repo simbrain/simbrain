@@ -65,7 +65,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
     /**
      * Notify ImageSourceListeners that a new image is available.
      */
-    public void notifyImageUpdate() {
+    public void fireImageUpdate() {
         if (isEnabled()) {
             events.fireImageUpdate();
         }
@@ -76,6 +76,9 @@ public abstract class ImageSourceAdapter implements ImageSource {
         return currentImage;
     }
 
+    /**
+     * Set the current image on the source, and optionally fire an updaet event.
+     */
     protected void setCurrentImage(BufferedImage image, boolean fireEvents) {
         boolean resized = image.getWidth() != currentImage.getWidth() || image.getHeight() != currentImage.getHeight();
         currentImage = image;
@@ -83,7 +86,7 @@ public abstract class ImageSourceAdapter implements ImageSource {
             if (resized && isEnabled()) {
                 events.fireResize();
             }
-            notifyImageUpdate();
+            fireImageUpdate();
         }
     }
 

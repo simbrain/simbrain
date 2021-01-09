@@ -16,6 +16,6 @@ class FilterCollectionEvents(val source : FilterCollection) : Event(PropertyChan
 
     fun onFilterRemoved(handler: Consumer<Filter>) =
         "FilterRemoved".itemRemovedEvent(handler)
-    fun onFilterAdded(filter: Filter) = "FilterRemoved"(old = filter)
+    fun fireFilterRemoved(filter: Filter) = "FilterRemoved"(old = filter)
 
 }

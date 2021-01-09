@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld.filters;
 import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.events.FilterCollectionEvents;
 
-import java.awt.image.ColorConvertOp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +40,17 @@ public class FilterCollection {
         imageSource.getEvents().onImageUpdate(() -> {
             filters.forEach(Filter::updateFilter);
         });
+    }
+
+    public Object readResolve() {
+        events = new FilterCollectionEvents(this);
+        imageSource.getEvents().onResize(() -> {
+            filters.forEach(Filter::initScaleOp);
+        });
+        imageSource.getEvents().onImageUpdate(() -> {
+            filters.forEach(Filter::updateFilter);
+        });
+        return this;
     }
 
     /**
@@ -105,7 +115,7 @@ public class FilterCollection {
             return;
         }
         filters.remove(filter);
-        events.onFilterAdded(filter);
+        getEvents().fireFilterRemoved(filter);
     }
 
     public ImageSource getImageSource() {

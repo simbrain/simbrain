@@ -11,6 +11,7 @@ import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAction
+import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
 
 class SimulationScope private constructor(
@@ -76,6 +77,12 @@ fun SimulationScope.addProjectionPlot(name: String?): ProjectionComponent {
     val projectionComponent = ProjectionComponent(name)
     workspace.addWorkspaceComponent(projectionComponent)
     return projectionComponent
+}
+
+fun SimulationScope.addImageWorld(name: String?): ImageWorldComponent {
+    val imageWorldComponent = ImageWorldComponent(name)
+    workspace.addWorkspaceComponent(imageWorldComponent)
+    return imageWorldComponent
 }
 
 /**

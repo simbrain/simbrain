@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.world.imageworld.filters.Filter;
 import org.simbrain.world.imageworld.serialization.BufferedImageConverter;
 import org.simbrain.world.imageworld.serialization.CouplingArrayConverter;
 
@@ -29,9 +30,6 @@ public class ImageWorldComponent extends WorkspaceComponent {
     public ImageWorldComponent() {
         super("");
         this.world = new ImageWorld();
-        // TODO: Get filter selector and its events
-        // world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
-        // world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
     }
 
     /**
@@ -45,19 +43,17 @@ public class ImageWorldComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        // TODO
-        // containers.addAll(world.getSensorMatrices());
+        containers.addAll(world.getFilterCollection().getFilters());
         return containers;
     }
 
     @Override
     public AttributeContainer getAttributeContainer(String objectKey) {
-        // TODO
-        // for (FilterContainer sensor : world.getSensorMatrices()) {
-        //     if (objectKey.equals(sensor.getName())) {
-        //         return sensor;
-        //     }
-        // }
+        for (Filter filter : world.getFilterCollection().getFilters()) {
+            if (objectKey.equals(filter.getName())) {
+                return filter;
+            }
+        }
         return null;
     }
 

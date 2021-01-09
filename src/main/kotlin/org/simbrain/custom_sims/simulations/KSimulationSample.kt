@@ -32,7 +32,18 @@ val testSim = newSim {
 
     withGui {
         place(networkComponent) {
-            location = point(250, 0)
+            location = point(0, 0)
+            width = 400
+            height = 400
+        }
+    }
+
+    val imageWorldComponent = addImageWorld("Image World")
+    withGui {
+        place(imageWorldComponent) {
+            location = point(410,0)
+            width = 400
+            height = 400
         }
     }
 

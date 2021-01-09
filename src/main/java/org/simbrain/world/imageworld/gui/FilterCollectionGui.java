@@ -79,7 +79,7 @@ public class FilterCollectionGui {
             dialogPanel.add(filterEditor);
             filterEditorDialog.addClosingTask(() -> {
                 filterEditor.commitChanges();
-                filter.refresh();
+                filter.refreshFilter();
                 filterComboBox.updateUI();
                 parent.repaint();
             });
@@ -88,23 +88,14 @@ public class FilterCollectionGui {
             JButton deleteFilter = new JButton("Delete Filter");
             deleteFilter.setToolTipText("Delete Filter");
             deleteFilter.addActionListener(e -> {
-                // TODO: How to deal with this?
-                // Can't remove the "Unfiltered" option
                 if (filter.getName().equalsIgnoreCase("Unfiltered")) {
+                    JOptionPane.showMessageDialog(null, "Can't remove unfiltered option");
                     return;
                 }
                 int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete sensor panel \"" + filter.getName() + "\" ?", "Warning", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
-                    int index = filterComboBox.getSelectedIndex();
-                    filterCollection.setCurrentFilter(filterComboBox.getItemAt(index - 1));
-                    filterComboBox.remove(index);
-                    // TODO: Remove listener?
-                    // ImageSource source = sensorMatrix.getSource();
-                    // if (source instanceof FilteredImageSource) {
-                    //     compositeSource.removeListener((FilteredImageSource) source);
-                    // }
-                    // TODO
-                    // events.fireSensorMatrixRemoved(filterContainer);
+                    filterCollection.removeFilter(filter);
+                    updateComboBox();
                 }
                 filterEditorDialog.setVisible(false);
             });

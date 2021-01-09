@@ -9,6 +9,7 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
+import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.imageworld.ImageClipboard;
 import org.simbrain.world.imageworld.ImageWorld;
@@ -74,6 +75,8 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
 
         super(frame, component);
         imageWorld = component.getWorld();
+        clipboard = new ImageClipboard(imageWorld);
+
         setupMenuBar(frame);
         setLayout(new BorderLayout());
 
@@ -141,16 +144,17 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
      * Draw a pixel at the current point in the image panel.
      */
     private void drawPixel(MouseEvent evt) {
-        // TODO: Evaluate
         var ratioX = 1.0 * getWidth() / imageWorld.getImageAlbum().getWidth();
         var ratioY = 1.0 * getHeight() / imageWorld.getImageAlbum().getHeight();
         var x = (int) (evt.getX() / ratioX);
         var y = (int) (evt.getY() / ratioY);
-
         imageWorld.getImageAlbum().getCurrentImage().setRGB(x, y, penColor.getRGB());
-        imageWorld.getImageAlbum().notifyImageUpdate();
+        imageWorld.getImageAlbum().fireImageUpdate();
     }
 
+    /**
+     * Central panel to render the image.
+     */
     private class ImagePanel extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
@@ -210,9 +214,9 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         contextMenu.add(copyAction);
         contextMenu.add(pasteAction);
         contextMenu.addSeparator();
-        // TODO
-        // CouplingMenu sensorMatrixMenu = new CouplingMenu(desktopComponent.getWorkspaceComponent(), pixelProducer.getCurrentSensorMatrix());
-        // contextMenu.add(sensorMatrixMenu);
+        CouplingMenu filterMenu = new CouplingMenu(getWorkspaceComponent(),
+                imageWorld.getFilterCollection().getCurrentFilter());
+        contextMenu.add(filterMenu);
         contextMenu.show(this, evt.getX(), evt.getY());
     }
 
@@ -246,7 +250,9 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         setColorButton.setToolTipText("Pen Color");
         setColorButton.addActionListener(e -> {
             Color newColor = JColorChooser.showDialog(this, "Choose Color", penColor);
-            this.penColor = newColor;
+            if (newColor != null) {
+                this.penColor = newColor;
+            }
         });
         sourceToolbar.add(setColorButton);
 

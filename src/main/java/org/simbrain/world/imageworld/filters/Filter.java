@@ -4,7 +4,6 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
-import org.simbrain.world.imageworld.ImageAlbum;
 import org.simbrain.world.imageworld.ImageSource;
 
 import java.awt.*;
@@ -23,6 +22,7 @@ import java.awt.image.BufferedImageOp;
  * couple to something else. This makes sense biologically: retinal patterns
  * are what neurons "sense".
  *
+ * @author Yulin Li
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
@@ -97,12 +97,11 @@ public class Filter implements AttributeContainer, EditableObject {
         this.imageOp = imageOp;
         this.width = width;
         this.height = height;
-        initScaleOp();
-        initChannels();
-        updateFilter();
+        refreshFilter();
     }
 
     public Object readResolve() {
+        refreshFilter();
         return this;
     }
 
@@ -224,7 +223,7 @@ public class Filter implements AttributeContainer, EditableObject {
         this.height = height;
     }
 
-    public void refresh() {
+    public void refreshFilter() {
         initChannels();
         initScaleOp();
         updateFilter();

@@ -157,7 +157,7 @@ public class EmitterMatrix extends ImageSourceAdapter {
             }
         }
 
-        notifyImageUpdate();
+        fireImageUpdate();
     }
 
     @Override

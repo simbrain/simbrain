@@ -8,6 +8,8 @@ import java.io.IOException;
 
 public class ImageClipboard implements ClipboardOwner {
 
+    private ImageWorld world;
+
     private class TransferableImage implements Transferable {
 
         private Image image;
@@ -35,9 +37,6 @@ public class ImageClipboard implements ClipboardOwner {
 
     private static boolean hasContents = false;
 
-    // TODO: Discuss
-    private ImageWorld world;
-
     public ImageClipboard(ImageWorld world) {
         this.world = world;
     }
@@ -47,10 +46,9 @@ public class ImageClipboard implements ClipboardOwner {
     }
 
     public void copyImage() {
-        // TODO
-        // BufferedImage image = world.getCurrentSensorMatrix().getSource().getCurrentImage();
-        // Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        // clipboard.setContents(new TransferableImage(image), this);
+        BufferedImage image = world.getImageAlbum().getCurrentImage();
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(new TransferableImage(image), this);
     }
 
     public void pasteImage() {
@@ -63,8 +61,7 @@ public class ImageClipboard implements ClipboardOwner {
                 Graphics graphics = bufferedImage.getGraphics();
                 graphics.drawImage(image, 0, 0, null);
                 graphics.dispose();
-                // TODO
-                // world.setImage(bufferedImage);
+                world.getImageAlbum().addImage(bufferedImage);
             } catch (UnsupportedFlavorException | IOException ex) {
                 JOptionPane.showMessageDialog(null, "Unable to read image from clipboard.");
             }

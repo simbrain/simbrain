@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld.filters;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 
-
 /**
  * Basically the color operation.
  */

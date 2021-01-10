@@ -13,7 +13,6 @@ plugins {
 
 }
 
-
 compileJava.options.encoding = 'UTF-8'
 
 def versionName = "Simbrain4Beta"
@@ -27,6 +26,9 @@ sourceCompatibility = 1.10
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url  "https://kotlin.bintray.com/kotlin-datascience"
+    }
 }
 
 dependencies {
@@ -42,6 +44,8 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.4.20'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.2'
+
+    implementation 'org.jetbrains.kotlin-deeplearning:api:0.1.0'
 
     // Logger for DL4J
     compile 'ch.qos.logback:logback-classic:1.2.3'

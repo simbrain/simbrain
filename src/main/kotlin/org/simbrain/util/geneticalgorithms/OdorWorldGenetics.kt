@@ -39,14 +39,14 @@ class SmellSensorGene(private val template: SmellSensor):
         Gene<SmellSensor>(),
         OdorWorldEntityGene<SmellSensor> {
 
-    override val promise = CompletableFuture<SmellSensor>()
+    override val product = CompletableFuture<SmellSensor>()
 
     override fun copy(): SmellSensorGene {
         return SmellSensorGene(template.copy())
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): SmellSensor {
-        return SmellSensor(template).apply { parent = odorWorldEntity }.also { promise.complete(it) }
+        return SmellSensor(template).apply { parent = odorWorldEntity }.also { product.complete(it) }
     }
 
 }
@@ -55,14 +55,14 @@ class ObjectSensorGene(private val template: ObjectSensor):
         Gene<ObjectSensor>(),
         OdorWorldEntityGene<ObjectSensor> {
 
-    override val promise = CompletableFuture<ObjectSensor>()
+    override val product = CompletableFuture<ObjectSensor>()
 
     override fun copy(): ObjectSensorGene {
         return ObjectSensorGene(template.copy())
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): ObjectSensor {
-        return ObjectSensor(template).apply { parent = odorWorldEntity }.also { promise.complete(it) }
+        return ObjectSensor(template).apply { parent = odorWorldEntity }.also { product.complete(it) }
     }
 
 }
@@ -71,14 +71,14 @@ class StraightMovementGene(private val template: StraightMovement):
         Gene<StraightMovement>(),
         OdorWorldEntityGene<StraightMovement> {
 
-    override val promise = CompletableFuture<StraightMovement>()
+    override val product = CompletableFuture<StraightMovement>()
 
     override fun copy(): StraightMovementGene {
         return StraightMovementGene(template.copy())
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): StraightMovement {
-        return StraightMovement(template).apply { parent = odorWorldEntity }.also { promise.complete(it) }
+        return StraightMovement(template).apply { parent = odorWorldEntity }.also { product.complete(it) }
     }
 
 }
@@ -87,14 +87,14 @@ class TurningGene(private val template: Turning):
         Gene<Turning>(),
         OdorWorldEntityGene<Turning>{
 
-    override val promise = CompletableFuture<Turning>()
+    override val product = CompletableFuture<Turning>()
 
     override fun copy(): TurningGene {
         return TurningGene(template.copy())
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): Turning {
-        return Turning(template).apply { parent = odorWorldEntity }.also { promise.complete(it) }
+        return Turning(template).apply { parent = odorWorldEntity }.also { product.complete(it) }
     }
 
 }

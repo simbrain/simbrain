@@ -2,6 +2,7 @@ package org.simbrain.util.geneticalgorithms
 
 import org.simbrain.util.propertyeditor.CopyableObject
 import java.util.concurrent.CompletableFuture
+import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 
 /**
@@ -30,16 +31,17 @@ inline fun intGene(initVal: IntWrapper.() -> Unit = { }): IntGene {
  * [Gene] and implements [TopLevelGene], which allows you to add this gene directly into an onBuild context.
  * function.
  */
-class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<IntWrapper> {
+class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<Int> {
 
-    override val promise = CompletableFuture<Int>()
+    override val product = CompletableFuture<Int>()
 
     override fun copy(): IntGene {
         return IntGene(template.copy());
     }
 
-    override fun TopLevelBuilderContext.build(): IntWrapper {
-        return template.copy().also { promise.complete(it.value) }
+    override fun TopLevelBuilderContext.build(): Int {
+        template.copy().also { product.complete(it.value) }
+        return product.get()
     }
 
     fun mutate(block: IntWrapper.() -> Unit) {
@@ -63,24 +65,26 @@ fun main() {
         }
 
         onMutate {
-            intChromosome.forEach { it.mutate {
-                value += random.nextInt(-5,5)
-            }}
+            intChromosome.forEach {
+                it.mutate {
+                    value += random.nextInt(-5,5)
+                }
+            }
         }
 
         onBuild {
-            intChromosome.forEach { with(it) {build()} }
+            +intChromosome
         }
 
         onEval {
-            val total = intChromosome.genes.map { it.promise.get() }.sumByDouble { it.toDouble() }
+            val total = intChromosome.genes.map { it.product.get() }.sumByDouble { it.toDouble() }
             val targetSum = 10
-            Math.abs(total - targetSum)
+            abs(total - targetSum)
         }
 
         onPeek {
             print("Integer genes:")
-            println(intChromosome.genes.map { it.promise.get() }.joinToString(", "))
+            println(intChromosome.genes.map { it.product.get() }.joinToString(", "))
         }
 
     }

@@ -38,7 +38,7 @@ class NodeGene private constructor(private val template: Neuron = Neuron(null)):
         template.apply(config)
     }
 
-    override val promise = CompletableFuture<Neuron>()
+    override val product = CompletableFuture<Neuron>()
 
     private val copyListeners = LinkedList<(NodeGene) -> Unit>()
 
@@ -61,14 +61,14 @@ class NodeGene private constructor(private val template: Neuron = Neuron(null)):
     }
 
     override fun NetworkGeneticsContext.build(): Neuron {
-        return Neuron(network, template).also { promise.complete(it) }
+        return Neuron(network, template).also { product.complete(it) }
     }
 
 }
 
 class ConnectionGene(private val template: Synapse, val source: NodeGene, val target: NodeGene) : NetworkGene<Synapse>() {
 
-    override val promise = CompletableFuture<Synapse>()
+    override val product = CompletableFuture<Synapse>()
 
     private lateinit var sourceCopy: NodeGene
     private lateinit var targetCopy: NodeGene
@@ -88,9 +88,9 @@ class ConnectionGene(private val template: Synapse, val source: NodeGene, val ta
     }
 
     override fun NetworkGeneticsContext.build(): Synapse {
-        return Synapse(network, source.promise.get(), target.promise.get(), template.learningRule, template).also {
+        return Synapse(network, source.product.get(), target.product.get(), template.learningRule, template).also {
             network.addLooseSynapse(it)
-            promise.complete(it)
+            product.complete(it)
         }
     }
 
@@ -107,7 +107,7 @@ class LayoutWrapper(var layout: Layout, var hSpacing: Double, var vSpacing: Doub
 
 class LayoutGene(private val template: LayoutWrapper) : Gene<Layout>(), TopLevelGene<Layout> {
 
-    override val promise = CompletableFuture<Layout>()
+    override val product = CompletableFuture<Layout>()
 
     // Todo: handle types of layout
 

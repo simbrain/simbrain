@@ -20,10 +20,10 @@ import kotlin.streams.toList
  */
 abstract class Gene<P> : CopyableObject {
 
-    abstract val promise: CompletableFuture<P>
+    abstract val product: CompletableFuture<P>
 
     protected inline fun completeWith(block: () -> P): P {
-        return block().also { promise.complete(it) }
+        return block().also { product.complete(it) }
     }
 
 }
@@ -49,15 +49,13 @@ class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
 
     operator fun get(index: Int) = genes[index]
 
-    val products get() = genes.map { it.promise.get() }
+    val products get() = genes.map { it.product.get() }
 }
 
 /**
  * Provides a context for [EnvironmentBuilder.onEval]. "This" in onEval will refer to an instance of this class.
  */
 class EvaluationContext(val evalRand: Random)
-
-// operator fun test.invoke { print("hi") }
 
 
 /**
@@ -75,9 +73,9 @@ object MutationContext {
  * @param peekFunction A function that can be called after an environment has been built.
  */
 class Environment(
-        val evaluationContext: EvaluationContext,
-        private val evalFunction: EvaluationContext.() -> Double,
-        private val peekFunction: EvaluationContext.() -> Unit
+    private val evaluationContext: EvaluationContext,
+    private val evalFunction: EvaluationContext.() -> Double,
+    private val peekFunction: EvaluationContext.() -> Unit
 ) {
 
     fun eval() = evaluationContext.evalFunction()
@@ -321,11 +319,7 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
                     BuilderFitnessPair(it, score)
                 }.toList().sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
 
-                val currentFitness = if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) {
-                    current.maxOf { it.fitness }
-                } else {
-                    current.minOf { it.fitness }
-                }
+                val currentFitness = current[0].fitness
 
                 val survivors = current.take((eliminationRatio * current.size).toInt())
 
@@ -354,6 +348,7 @@ fun evaluator(environmentBuilder: EnvironmentBuilder, template: Evaluator.() -> 
  */
 fun List<BuilderFitnessPair>.uniformSample() = sequence {
     while(true) {
+        // TODO: use evaluator random
         val index = (Math.random() * size).toInt()
         yield(this@uniformSample[index])
     }

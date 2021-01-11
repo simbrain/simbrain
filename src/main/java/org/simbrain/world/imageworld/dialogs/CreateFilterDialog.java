@@ -3,33 +3,37 @@ package org.simbrain.world.imageworld.dialogs;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.world.imageworld.ImageSourceProperties;
 import org.simbrain.world.imageworld.filters.Filter;
 import org.simbrain.world.imageworld.filters.FilterCollection;
+import org.simbrain.world.imageworld.filters.IdentityOp;
 
 import javax.swing.*;
 
 /**
  * A dialog to create a new Filter.
  */
-public class FilterDialog extends StandardDialog {
+public class CreateFilterDialog extends StandardDialog {
 
     private final FilterCollection filterCollection;
 
     private final AnnotatedPropertyEditor editorPanel;
 
-    private final ImageSourceProperties imageSourceProperties = new ImageSourceProperties();
+    private Filter templateFilter;
 
-    public FilterDialog(FilterCollection filterCollection) {
+    public CreateFilterDialog(FilterCollection filterCollection) {
         setTitle("Create Filter");
         this.filterCollection = filterCollection;
+
         // TODO: rename help
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/sensorMatrix.html");
         addButton(new JButton(helpAction));
 
-        imageSourceProperties.setName("Filter " + (filterCollection.getFilters().size() + 1));
+        templateFilter =
+                new Filter("Filter " + (filterCollection.getFilters().size() + 1),
+                        filterCollection.getImageSource(),
+                        new IdentityOp(), 100, 100);
 
-        editorPanel = new AnnotatedPropertyEditor(imageSourceProperties);
+        editorPanel = new AnnotatedPropertyEditor(templateFilter);
         Box mainPanel = Box.createVerticalBox();
         mainPanel.add(editorPanel);
 
@@ -49,14 +53,6 @@ public class FilterDialog extends StandardDialog {
      */
     public void commitChanges() {
         editorPanel.commitChanges();
-        String name = imageSourceProperties.getName();
-        Filter newFilter = new Filter(
-                name,
-                filterCollection.getImageSource(),
-                imageSourceProperties.getColorOp(),
-                imageSourceProperties.getWidth(),
-                imageSourceProperties.getHeight()
-        );
-        filterCollection.addFilter(newFilter);
+        filterCollection.addFilter(templateFilter);
     }
 }

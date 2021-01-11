@@ -86,6 +86,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             updateButtons();
             repaint();
         });
+        imageWorld.getFilterCollection().getEvents().onFilterChanged(this::repaint);
 
         // Toolbars
         add(toolbars, BorderLayout.NORTH);
@@ -93,9 +94,6 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         toolbars.add(sensorToolbar);
         var filterGui = new FilterCollectionGui(this, imageWorld.getFilterCollection());
         toolbars.add(filterGui.getToolBar());
-        filterGui.getFilterComboBox().addActionListener(e -> {
-            repaint();
-        });
 
         setupToolbars();
 

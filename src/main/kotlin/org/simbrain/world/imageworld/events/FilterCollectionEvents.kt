@@ -18,4 +18,10 @@ class FilterCollectionEvents(val source : FilterCollection) : Event(PropertyChan
         "FilterRemoved".itemRemovedEvent(handler)
     fun fireFilterRemoved(filter: Filter) = "FilterRemoved"(old = filter)
 
+    /**
+     * The current filter has changed.
+     */
+    fun onFilterChanged(handler: Runnable) = "FilterChanged".event(handler)
+    fun fireFilterChanged() = "FilterChanged"()
+
 }

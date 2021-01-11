@@ -4,7 +4,7 @@ import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.imageworld.ImageSource;
-import org.simbrain.world.imageworld.dialogs.FilterDialog;
+import org.simbrain.world.imageworld.dialogs.CreateFilterDialog;
 import org.simbrain.world.imageworld.filters.Filter;
 import org.simbrain.world.imageworld.filters.FilterCollection;
 
@@ -50,7 +50,7 @@ public class FilterCollectionGui {
         JButton addFilter = new JButton(ResourceManager.getImageIcon("menu_icons/plus.png"));
         addFilter.setToolTipText("Add Filter");
         addFilter.addActionListener(evt -> {
-            FilterDialog dialog = new FilterDialog(filterCollection);
+            CreateFilterDialog dialog = new CreateFilterDialog(filterCollection);
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         });

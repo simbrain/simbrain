@@ -121,45 +121,56 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             }
         });
 
-        // TODO. Only paint in paint "mode"
-        // Ability to paint pixels black and white
-        MouseAdapter mouseAdapter = new MouseAdapter() {
 
-            @Override
-            public void mouseDragged(MouseEvent evt) {
-                drawPixel(evt);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent evt) {
-                drawPixel(evt);
-            }
-        };
-        addMouseListener(mouseAdapter);
-        addMouseMotionListener(mouseAdapter);
     }
 
-    /**
-     * Draw a pixel at the current point in the image panel.
-     */
-    private void drawPixel(MouseEvent evt) {
-        var ratioX = 1.0 * getWidth() / imageWorld.getImageAlbum().getWidth();
-        var ratioY = 1.0 * getHeight() / imageWorld.getImageAlbum().getHeight();
-        var x = (int) (evt.getX() / ratioX);
-        var y = (int) (evt.getY() / ratioY);
-        imageWorld.getImageAlbum().getCurrentImage().setRGB(x, y, penColor.getRGB());
-        imageWorld.getImageAlbum().fireImageUpdate();
-    }
 
     /**
      * Central panel to render the image.
      */
     private class ImagePanel extends JPanel {
+
+        public ImagePanel() {
+            super();
+            // TODO. Only paint in paint "mode"
+            // Ability to paint pixels black and white
+            MouseAdapter mouseAdapter = new MouseAdapter() {
+
+                @Override
+                public void mouseDragged(MouseEvent evt) {
+                    drawPixel(evt);
+                }
+
+                @Override
+                public void mousePressed(MouseEvent evt) {
+                    drawPixel(evt);
+                }
+            };
+            addMouseListener(mouseAdapter);
+            addMouseMotionListener(mouseAdapter);
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             g.drawImage(imageWorld.getFilterCollection().getCurrentFilter().getFilteredImage(),
                     0, 0, getWidth(), getHeight(), this);
+        }
+
+        /**
+         * Draw a pixel at the current point in the image panel.
+         */
+        private void drawPixel(MouseEvent evt) {
+            var image = imageWorld.getImageAlbum().getCurrentImage();
+            var ratioX = 1.0 * getWidth() / image.getWidth();
+            var ratioY = 1.0 * getHeight() / image.getHeight();
+            var x = (int) (evt.getX() / ratioX);
+            var y = (int) (evt.getY() / ratioY);
+            if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight() ) {
+                return;
+            }
+            image.setRGB(x, y, penColor.getRGB());
+            imageWorld.getImageAlbum().fireImageUpdate();
         }
     }
 

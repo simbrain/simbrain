@@ -3,6 +3,14 @@ package org.simbrain.util
 import javax.swing.JMenu
 import javax.swing.JMenuItem
 
+/**
+ * A DSL to support creating a structured list of menus in a Swing application. Each menu item is associated with a
+ * task.
+ *
+ * By default, menus are alphabetically sorted, and items within them are alphabetically sorted.
+ *
+ * @param R the return value (if needed) for the task associated with the menu item.
+ */
 class StructureDir<R>(val name: String, private val alphabetical: Boolean, private val divAtTop: Boolean) {
 
     private val list = ArrayList<Pair<String, Any>>()

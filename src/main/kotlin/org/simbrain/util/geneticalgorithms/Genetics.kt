@@ -7,27 +7,41 @@ import kotlin.random.Random
 import kotlin.streams.toList
 
 /**
- * Something with a template that can be used to produce multiple copies of itself. The smallest "atom" of a
- * evolutionary simulation. Describes how to make a product, or "express a phenotype". Evolutionary simulations
- * should extend this class.
+ * Describes how to make a gene product, or "express a phenotype". Extend this class with your own gene type, and
+ * provide the subclass with
+ *  - A template object that can be used for copying and mutating the gene
+ *  - A mutate function
+ *  - A build function for expressing the gene. This will either be a [TopLevelBuilderContext] or a custom context
+ *  that provides model objects used in expressing the gene.
  *
- * Support for mutation is not provided. Genes are mutated by directly changing the template in an
- * [EnvironmentBuilder.onMutate] function.
+ *  For usage examples see [IntGene] and [NodeGene].
  *
- * By convention most Genes should provide a build function that returns a product.
- *
- * @param template A skeleton object holding the param of this gene. While we use builder patterns, we still need
+ * @param P the phenotype of the gene product. For example, the phenotype of [NodeGene] is [Neuron]
  */
 abstract class Gene<P> : CopyableObject {
 
+    /**
+     * The phenotype expressed by the gene. Not expressed until onBuild is called.
+     */
     abstract val product: CompletableFuture<P>
 
+    /**
+     * Helper to make it easy to complete the build.
+     */
     protected inline fun completeWith(block: () -> P): P {
         return block().also { product.complete(it) }
     }
 
 }
 
+/**
+ * Use this to designate that a [Gene] can be directly added in an onBuild function. If a gene must be added within
+ * some other context, it is not top-level.
+ *
+ * Examples: [LayoutGene] (top level) vs [NodeGene] (not top-level).
+ *
+ * @param T the type of the phenotype expressed by the gene.
+ */
 interface TopLevelGene<T> {
 
     fun TopLevelBuilderContext.build(): T
@@ -35,9 +49,7 @@ interface TopLevelGene<T> {
 }
 
 /**
- * A list of genes. They are meant to be used inside of builders. Note that most of the machinery associated with
- * chromosomes is context specific and in extension functions. For example, some extensions to this function ensure
- * that copies of chromosomes are not changed between generations.
+ * A list of genes that is memoized during evolution.
  */
 class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
     @Suppress("UNCHECKED_CAST")
@@ -57,35 +69,44 @@ class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
  */
 class EvaluationContext(val evalRand: Random)
 
-
 /**
  * Provides a context for [EnvironmentBuilder.onMutate]. "This" in onMutate will refer to this object.
  */
-object MutationContext {
-
-}
+object MutationContext
 
 /**
  * The environment produced by [EnvironmentBuilder.build]. Provides a context for interacting with an evolutionary
- * simulation after an environment has been built, so that products are availalble.
+ * simulation after an environment has been built, so that products are available.
  *
- * @param evalFunction A function that returns a double indicating fitness. Used by the [Evaluator] during evolution.
- * @param peekFunction A function that can be called after an environment has been built.
  */
 class Environment(
     private val evaluationContext: EvaluationContext,
     private val evalFunction: EvaluationContext.() -> Double,
-    private val peekFunction: EvaluationContext.() -> Unit
+    private val peekFunction: (EvaluationContext.() -> Unit)?
 ) {
 
+    /**
+     * A function that returns a double indicating fitness. Used by the [Evaluator] during evolution.
+     */
     fun eval() = evaluationContext.evalFunction()
 
-    fun peek() = evaluationContext.peekFunction()
+    /**
+     * A function that can be called after an environment has been built. Useful for getting the "winning" genotype.
+     */
+    fun peek() = peekFunction?.let { evaluationContext.it() }
 
 }
 
+/**
+ * Default context provided by the onBuild block for [TopLevelGene]s.
+ */
 class TopLevelBuilderContext {
 
+    /**
+     * @param T the phenotype expressed, e.g. [Layout]
+     * @param G the gene type, e.g. [LayoutGene]
+     * @param C the inferred chromosome type, e.g. <Layout, LayoutGene>
+     */
     operator fun <T, G, C> C.unaryPlus() : List<T>
             where
             G: Gene<T>,
@@ -97,10 +118,12 @@ class TopLevelBuilderContext {
 
 /**
  * The main provider for the genetic algorithm DSL. An environment is basically the thing that we are evolving, which
- * will often be an agent in a virtual enviroment.  A single agent or entity with everything it needs to be evaluated.
+ * will often be an agent in a virtual environment. A single agent or entity with everything it needs to be evaluated.
  *
  * @param chromosomeList set of genes describing an agent, e.g. input, hidden, and output node genes
- * @param template allow for the DSL to open a configuration block, as in " = environmentBuilder {..}
+ * @param template the block opened up in the DSL
+ * @param seed optional random seed
+ * @param random private field used by copy function
  */
 class EnvironmentBuilder private constructor(
         private val chromosomeList: LinkedList<Chromosome<*, *>>,
@@ -115,7 +138,7 @@ class EnvironmentBuilder private constructor(
     constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
 
     /**
-     * Construct with a seed.
+     * Public onstructor with a seed.
      */
     constructor(seed: Int, builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder, seed)
 
@@ -129,7 +152,7 @@ class EnvironmentBuilder private constructor(
      */
     private lateinit var evalFunction: EvaluationContext.() -> Double
 
-    private lateinit var peekFunction: EvaluationContext.() -> Unit
+    private var peekFunction: (EvaluationContext.() -> Unit)? = null
 
     private lateinit var builderTemplate: TopLevelBuilderContext.(pretty: Boolean) -> Unit
 
@@ -161,9 +184,9 @@ class EnvironmentBuilder private constructor(
     }
 
     /**
-     * Use this to describe what happens when the builder builds products.
+     * Use this to describe what happens when the builder expresses its products.
      *
-     * Only use once in a script.
+     * You should only use once in a script. If a multiople onBuild blocks, only the last one will be called.
      *
      * The build operation is called once for each genome at each generation, via
      * [build]
@@ -172,16 +195,19 @@ class EnvironmentBuilder private constructor(
         builderTemplate = template
     }
 
-    /**
-     * Builds the products.
-     */
     private fun buildWith(builder: TopLevelBuilderContext): Environment {
         val newSeed = random.nextInt()
         return Environment(EvaluationContext(Random(newSeed)), evalFunction, peekFunction)
     }
 
+    /**
+     * Called when building without graphics.
+     */
     fun build() = buildWith(TopLevelBuilderContext().apply { builderTemplate(false) })
 
+    /**
+     * Called when building with graphics
+     */
     fun prettyBuild() = buildWith(TopLevelBuilderContext().apply { builderTemplate(true) })
 
     /**

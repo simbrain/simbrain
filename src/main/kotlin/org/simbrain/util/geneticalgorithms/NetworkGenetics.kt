@@ -26,6 +26,9 @@ inline fun layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
     return LayoutGene(LayoutWrapper(layout, layout.hSpacing, layout.vSpacing))
 }
 
+/**
+ * Subclasses are genes that express products that can be added to a [Network].
+ */
 sealed class NetworkGene<P: NetworkModel>: Gene<P>() {
 
     abstract fun NetworkGeneticsContext.build(): P
@@ -60,9 +63,10 @@ class NodeGene private constructor(private val template: Neuron = Neuron(null)):
         return newGene
     }
 
-    override fun NetworkGeneticsContext.build(): Neuron {
-        return Neuron(network, template).also { product.complete(it) }
+    override fun NetworkGeneticsContext.build(): Neuron = completeWith {
+      Neuron(network, template)
     }
+
 
 }
 

@@ -8,6 +8,8 @@ import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.loadTileMap
+import org.simbrain.util.place
+import org.simbrain.util.point
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAction
@@ -82,6 +84,21 @@ fun SimulationScope.addProjectionPlot(name: String?): ProjectionComponent {
 fun SimulationScope.addImageWorld(name: String?): ImageWorldComponent {
     val imageWorldComponent = ImageWorldComponent(name)
     workspace.addWorkspaceComponent(imageWorldComponent)
+    return imageWorldComponent
+}
+
+/**
+ * Convenience to add add an image world at a location
+ */
+fun SimulationScope.addImageWorld(name: String?, x: Int, y: Int, width: Int, height: Int): ImageWorldComponent {
+    val imageWorldComponent = addImageWorld(name)
+    withGui {
+        place(imageWorldComponent) {
+            location = point(x,y)
+            this.width = width
+            this.height = height
+        }
+    }
     return imageWorldComponent
 }
 

@@ -36,7 +36,7 @@ val imageSim = newSim {
         }
     }
 
-    val iwc = addImageWorld("Image World")
+    val iwc = addImageWorld("Image World", 166, 9, 500,500)
     val world = iwc.world
     // world.setCurrentFilter("Threshold 10x10")
     val threshold400 = Filter("Threshold 20x20", world.imageAlbum, ThresholdOp(), 20, 20)
@@ -45,14 +45,6 @@ val imageSim = newSim {
     world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Swiss.gif"))
     world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Poison.gif"))
     world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Fish.gif"))
-
-    withGui {
-        place(iwc) {
-            location = point(166,0)
-            width = 500
-            height = 500
-        }
-    }
 
     with(couplingManager) {
         iwc.world.filterCollection.currentFilter couple pixelNet

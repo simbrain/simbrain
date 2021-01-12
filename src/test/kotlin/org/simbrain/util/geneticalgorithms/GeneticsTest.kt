@@ -12,11 +12,9 @@ class GeneticsTest {
      @Test
      fun `node gene creates product specified in template`() {
          val node = nodeGene { activation = 0.7 }
-         val neuron = with(NetworkGeneticsContext(Network())) {
-             with(node) {
-                 build()
-             }
-         }
+
+         val neuron = node.buildWithContext(NetworkGeneticsContext(Network()))
+
          assertEquals(0.7, neuron.activation, 0.01)
      }
 
@@ -24,11 +22,7 @@ class GeneticsTest {
      fun `node gene creates specified product after copied`() {
          val node = nodeGene { activation = 0.7 }
          val copy = node.copy()
-         val neuron = with(NetworkGeneticsContext(Network())) {
-             with(copy) {
-                 build()
-             }
-         }
+         val neuron = copy.buildWithContext(NetworkGeneticsContext(Network()))
          assertEquals(0.7, neuron.activation, 0.01)
      }
 

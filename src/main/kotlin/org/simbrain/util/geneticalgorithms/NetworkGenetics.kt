@@ -31,7 +31,7 @@ inline fun layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
  */
 sealed class NetworkGene<P: NetworkModel>: Gene<P>() {
 
-    abstract fun NetworkGeneticsContext.build(): P
+    abstract fun buildWithContext(context: NetworkGeneticsContext): P
 
 }
 
@@ -63,10 +63,9 @@ class NodeGene private constructor(private val template: Neuron = Neuron(null)):
         return newGene
     }
 
-    override fun NetworkGeneticsContext.build(): Neuron = completeWith {
-      Neuron(network, template)
+    override fun buildWithContext(context: NetworkGeneticsContext): Neuron = completeWith {
+      Neuron(context.network, template)
     }
-
 
 }
 
@@ -91,9 +90,10 @@ class ConnectionGene(private val template: Synapse, val source: NodeGene, val ta
         return ConnectionGene(Synapse(template), sourceCopy, targetCopy)
     }
 
-    override fun NetworkGeneticsContext.build(): Synapse {
-        return Synapse(network, source.product.get(), target.product.get(), template.learningRule, template).also {
-            network.addLooseSynapse(it)
+    override fun buildWithContext(context : NetworkGeneticsContext): Synapse {
+        return Synapse(context.network, source.product.get(), target.product.get(), template.learningRule, template)
+            .also {
+            context.network.addLooseSynapse(it)
             product.complete(it)
         }
     }
@@ -153,17 +153,15 @@ operator fun Network.invoke(block: NetworkGeneticsContext.() -> Unit) {
 class NetworkGeneticsContext(val network: Network) {
 
     fun <T, G: NetworkGene<T>> express(chromosome: Chromosome<T, G>): List<T> = chromosome.genes.map {
-        with(it) {
-            build().also { product ->
-                if (product is Neuron) network.addLooseNeuron(product)
-            }
+        it.buildWithContext(this).also { product ->
+            if (product is Neuron) network.addLooseNeuron(product)
         }
     }
 
     operator fun <T, G: NetworkGene<T>> Chromosome<T, G>.unaryPlus(): List<T> = express(this)
 
     fun Chromosome<Neuron, NodeGene>.asGroup(block: NeuronGroup.() -> Unit = { }) = fun(network: Network): NeuronGroup {
-        return genes.map { with(it) { build() } }
+        return genes.map { it.buildWithContext(this@NetworkGeneticsContext) }
             .let { NeuronGroup(network, it).apply(block) }
             .also { network.addNeuronGroup(it) }
     }

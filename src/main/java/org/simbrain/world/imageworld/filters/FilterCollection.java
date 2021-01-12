@@ -100,7 +100,6 @@ public class FilterCollection {
      */
     public void addFilter(Filter filter) {
         filters.add(filter);
-        setCurrentFilter(filter);
         events.fireFilterAdded(filter);
     }
 

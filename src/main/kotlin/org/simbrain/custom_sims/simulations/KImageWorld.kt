@@ -36,11 +36,14 @@ val imageSim = newSim {
         }
     }
 
-    val iwc = addImageWorld("Image World", 166, 9, 500,500)
+    val iwc = addImageWorld("Image World")
+    placeComponent(iwc,166, 9, 500,500)
     val world = iwc.world
     // world.setCurrentFilter("Threshold 10x10")
+
     val threshold400 = Filter("Threshold 20x20", world.imageAlbum, ThresholdOp(), 20, 20)
     world.filterCollection.addFilter(threshold400)
+    world.filterCollection.currentFilter = threshold400
 
     world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Swiss.gif"))
     world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Poison.gif"))

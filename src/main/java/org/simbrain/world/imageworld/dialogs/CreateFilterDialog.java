@@ -55,5 +55,6 @@ public class CreateFilterDialog extends StandardDialog {
         editorPanel.commitChanges();
         templateFilter.refreshFilter();
         filterCollection.addFilter(templateFilter);
+        filterCollection.setCurrentFilter(templateFilter);
     }
 }

@@ -11,6 +11,7 @@ import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.world.imageworld.ImageWorldComponent
@@ -87,19 +88,14 @@ fun SimulationScope.addImageWorld(name: String?): ImageWorldComponent {
     return imageWorldComponent
 }
 
-/**
- * Convenience to add add an image world at a location
- */
-fun SimulationScope.addImageWorld(name: String?, x: Int, y: Int, width: Int, height: Int): ImageWorldComponent {
-    val imageWorldComponent = addImageWorld(name)
+fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
     withGui {
-        place(imageWorldComponent) {
+        place(component) {
             location = point(x,y)
             this.width = width
             this.height = height
         }
     }
-    return imageWorldComponent
 }
 
 /**

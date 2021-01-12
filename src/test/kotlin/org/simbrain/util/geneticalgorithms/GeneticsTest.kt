@@ -9,20 +9,28 @@ import org.simbrain.workspace.Workspace
 
 class GeneticsTest {
 
-    // @Test
-    // fun `node gene creates product specified in template`() {
-    //     val node = nodeGene { activation = 0.7 }
-    //     val neuron = node.build(Network())
-    //     assertEquals(0.7, neuron.activation, 0.01)
-    // }
+     @Test
+     fun `node gene creates product specified in template`() {
+         val node = nodeGene { activation = 0.7 }
+         val neuron = with(NetworkGeneticsContext(Network())) {
+             with(node) {
+                 build()
+             }
+         }
+         assertEquals(0.7, neuron.activation, 0.01)
+     }
 
-    // @Test
-    // fun `node gene creates specified product after copied`() {
-    //     val node = nodeGene { activation = 0.7 }
-    //     val copy = node.copy()
-    //     val neuron = copy.build(Network())
-    //     assertEquals(0.7, neuron.activation, 0.01)
-    // }
+     @Test
+     fun `node gene creates specified product after copied`() {
+         val node = nodeGene { activation = 0.7 }
+         val copy = node.copy()
+         val neuron = with(NetworkGeneticsContext(Network())) {
+             with(copy) {
+                 build()
+             }
+         }
+         assertEquals(0.7, neuron.activation, 0.01)
+     }
 
     @Test
     fun `node chromosome with repeating default genes creates specified neurons`() {

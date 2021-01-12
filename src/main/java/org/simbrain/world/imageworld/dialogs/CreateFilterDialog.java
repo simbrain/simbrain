@@ -53,6 +53,7 @@ public class CreateFilterDialog extends StandardDialog {
      */
     public void commitChanges() {
         editorPanel.commitChanges();
+        templateFilter.refreshFilter();
         filterCollection.addFilter(templateFilter);
     }
 }

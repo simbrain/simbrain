@@ -15,8 +15,8 @@ val simulations = dir<NewSimulation>("Simulations") {
     // This supersedes RegisteredSimulation.java. Will have to move that stuff here.
 
     dir("Demos") {
-        item("Simple network") { testSim }
-        item("Image world") { imageSim }
+        item("Simple Network") { testSim }
+        item("Mnist Images") { imageSim }
         item("Agent Trails") { kAgentTrails }
     }
     // dir("TestDiv2") {

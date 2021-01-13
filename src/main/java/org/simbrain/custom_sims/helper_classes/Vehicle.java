@@ -1,10 +1,14 @@
 package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A custom class that makes it easy to add Braitenberg vehicles to a
@@ -75,34 +79,45 @@ public class Vehicle {
      * @param objectType  what kind of object this vehicles pursues or avoids
      * @return a reference to the resulting neuron group
      */
-    public NeuronGroup addVehicle(int x, int y, OdorWorldEntity agent, VehicleType vehicleType, EntityType objectType,
+    public NeuronCollection addVehicle(int x, int y, OdorWorldEntity agent, VehicleType vehicleType, EntityType objectType,
                                   ObjectSensor leftSensor, ObjectSensor rightSensor) {
 
-        // Create the network
-        NeuronGroup vehicle = new NeuronGroup(net.getNetwork()); //TODO Change to NeuronCollection
+
+        List<Neuron> neurons = new ArrayList<>();
+
         // These have to be updated first to update properly
         // unless priority is used
         Neuron leftInput = net.addNeuron(x, y + 100);
         leftInput.setLabel(objectType + " (L)");
         leftInput.setClamped(true);
-        setNodeDefaults(leftInput, vehicle);
+        neurons.add(leftInput);
+
         Neuron rightInput = net.addNeuron(x + 100, y + 100);
         rightInput.setLabel(objectType + " (R)");
         rightInput.setClamped(true);
-        setNodeDefaults(rightInput, vehicle);
+        neurons.add(leftInput);
+
         Neuron leftTurn = net.addNeuron(x, y);
         leftTurn.setLabel("Left");
-        setNodeDefaults(leftTurn, vehicle);
+        neurons.add(leftTurn);
+
         Neuron straight = net.addNeuron(x + 50, y);
         straight.setLabel("Speed");
         straight.setActivation(3);
-        setNodeDefaults(straight, vehicle);
         straight.setClamped(true);
+        neurons.add(straight);
+
         Neuron rightTurn = net.addNeuron(x + 100, y);
         rightTurn.setLabel("Right");
-        setNodeDefaults(rightTurn, vehicle);
+        neurons.add(rightTurn);
 
-        net.getNetwork().addNeuronGroup(vehicle);
+        NeuronCollection vehicle = new NeuronCollection(net.getNetwork(), neurons);
+        setNodeDefaults(leftInput, vehicle);
+        setNodeDefaults(rightInput, vehicle);
+        setNodeDefaults(straight, vehicle);
+        setNodeDefaults(rightTurn, vehicle);
+        setNodeDefaults(leftTurn, vehicle);
+        net.getNetwork().addNeuronCollection(vehicle);
 
         // Set weights here
         if (vehicleType == VehicleType.PURSUER) {
@@ -132,14 +147,14 @@ public class Vehicle {
     /**
      * Add a pursuer.
      */
-    public NeuronGroup addPursuer(int x, int y, OdorWorldEntity agent, EntityType objectType, ObjectSensor left, ObjectSensor right) {
+    public NeuronCollection addPursuer(int x, int y, OdorWorldEntity agent, EntityType objectType, ObjectSensor left, ObjectSensor right) {
         return addVehicle(x, y, agent, VehicleType.PURSUER, objectType, left, right);
     }
 
     /**
      * Add an avoider.
      */
-    public NeuronGroup addAvoider(int x, int y, OdorWorldEntity agent, EntityType objectType, ObjectSensor left, ObjectSensor right) {
+    public NeuronCollection addAvoider(int x, int y, OdorWorldEntity agent, EntityType objectType, ObjectSensor left, ObjectSensor right) {
         return addVehicle(x, y, agent, VehicleType.AVOIDER, objectType, left, right);
     }
 
@@ -147,12 +162,12 @@ public class Vehicle {
      * Helper method to set default value for vehicle nodes.
      *
      * @param neuron the neuron to update.
-     * @param ng     the neuron group the node is in.
+     * @param nc     the neuron group the node is in.
      */
-    private void setNodeDefaults(Neuron neuron, NeuronGroup ng) {
+    private void setNodeDefaults(Neuron neuron, NeuronCollection nc) {
         neuron.setLowerBound(-100);
         neuron.setUpperBound(200);
-        ng.addNeuron(neuron);
+        nc.addNeuron(neuron);
     }
 
 }

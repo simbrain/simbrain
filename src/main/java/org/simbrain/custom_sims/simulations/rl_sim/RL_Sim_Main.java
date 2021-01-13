@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.helper_classes.*;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.LineLayout;
@@ -54,7 +55,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
     /**
      * List of vehicles.
      */
-    List<NeuronGroup> vehicles = new ArrayList<>();
+    List<NeuronCollection> vehicles = new ArrayList<>();
 
     /**
      * Number of trials per run.
@@ -352,11 +353,14 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         // Positions determined by laying by hand and in console running
         // print(getNetwork("Neural Network"));
         Vehicle vehicleBuilder = new Vehicle(sim, net, world);
-        NeuronGroup pursueCheese = vehicleBuilder.addPursuer(-509, -460, mouse, EntityType.SWISS, cheeseLeft, cheeseRight);
+        NeuronCollection pursueCheese = vehicleBuilder.addPursuer(-509, -460, mouse, EntityType.SWISS, cheeseLeft,
+                cheeseRight);
         pursueCheese.setLabel(strPursueCheese);
-        NeuronGroup pursueFlower = vehicleBuilder.addPursuer(-171, -469, mouse, EntityType.FLOWER, flowerLeft, flowerRight);
+        NeuronCollection pursueFlower = vehicleBuilder.addPursuer(-171, -469, mouse, EntityType.FLOWER, flowerLeft,
+                flowerRight);
         pursueFlower.setLabel(strPursueFlower);
-        NeuronGroup pursueCandle = vehicleBuilder.addPursuer(163, -475, mouse, EntityType.CANDLE, candleLeft, candleRight);
+        NeuronCollection pursueCandle = vehicleBuilder.addPursuer(163, -475, mouse, EntityType.CANDLE, candleLeft,
+                candleRight);
         pursueCandle.setLabel(strPursueCandle);
 
         // NeuronGroup avoidCheese = vehicleBuilder.addAvoider(-340, -247, mouse, EntityType.SWISS, cheeseLeft ,cheeseRight);
@@ -396,7 +400,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
      *
      * @param vehicle vehicle to modify
      */
-    private void setUpVehicle(NeuronGroup vehicle) {
+    private void setUpVehicle(NeuronCollection vehicle) {
         Neuron speedNeuron = vehicle.getNeuronByLabel("Speed");
         speedNeuron.setUpdateRule("LinearRule");
         // ((LinearRule)speedNeuron.getUpdateRule()).setBias(1); // Just so things move a bit

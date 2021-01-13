@@ -4,6 +4,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 
@@ -217,7 +218,7 @@ public class RL_Update implements NetworkUpdateAction {
      * @param winner
      */
     void updateVehicleNet(Neuron winner) {
-        for (NeuronGroup vehicle : sim.vehicles) {
+        for (NeuronCollection vehicle : sim.vehicles) {
             if (vehicle.getLabel().equalsIgnoreCase(winner.getLabel())) {
                 vehicle.update();
             } else {

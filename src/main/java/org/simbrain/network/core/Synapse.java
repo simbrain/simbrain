@@ -27,6 +27,7 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -1067,6 +1068,13 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
     public String getLabel() {
         // Label not used for synapse currently
         return "";
+    }
+
+    /**
+     * Returns the length in pixels of the "axon" this synapse is at the end of.
+     */
+    public Double getLength() {
+        return SimbrainMath.distance(source.getLocation(), target.getLocation());
     }
 
 }

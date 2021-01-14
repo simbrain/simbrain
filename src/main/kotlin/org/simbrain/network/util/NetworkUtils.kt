@@ -12,8 +12,9 @@ import org.simbrain.util.component2
 import java.awt.geom.Point2D
 
 /**
- * Easily get or set activations for a list of neurons.
+ * Conveninece methods to get or set values for lists of network objects
  */
+
 var List<Neuron?>.activations : List<Double>
     get() = map { it?.activation ?: 0.0 }
     set(values) = values.forEachIndexed { index, value ->
@@ -26,23 +27,22 @@ var List<Neuron?>.activations : List<Double>
         }
     }
 
-/**
- * Easily get or set labels for a list of neurons.
- */
 var List<Neuron?>.labels : List<String>
     get() = map { it?.label ?: "" }
     set(values) = values.forEachIndexed { index, label ->
         this[index]?.let { it.label = label }
     }
 
-/**
- * Easily get or set auxiliary values for a list of neurons
- */
 var List<Neuron>.auxValues : List<Double>
     get() = map { it.auxValue }
     set(values) = values.forEachIndexed { index, value ->
         this[index].auxValue = value
     }
+
+
+val List<Synapse>.lengths : List<Double>
+    get() = map { it.length }
+
 
 fun Network.addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
     .apply(block)
@@ -51,6 +51,10 @@ fun Network.addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
 fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
     .apply(block)
     .also(this::addLooseSynapse)
+
+/**
+ * Other helper methods for networks.
+ */
 
 fun Network.addNeuronGroup(count: Int, template: Neuron.() -> Unit = { }) = NeuronGroup(this, List(count) {
     Neuron(this).apply(template)

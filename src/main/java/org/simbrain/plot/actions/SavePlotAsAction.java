@@ -18,7 +18,7 @@
  */
 package org.simbrain.plot.actions;
 
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -31,14 +31,14 @@ public final class SavePlotAsAction extends AbstractAction {
     /**
      * Plot GUI component.
      */
-    private final GuiComponent component;
+    private final DesktopComponent component;
 
     /**
      * Create a new save plot as action.
      *
      * @param component GUI Component, must not be null.
      */
-    public SavePlotAsAction(final GuiComponent component) {
+    public SavePlotAsAction(final DesktopComponent component) {
         super("Save As...");
         if (component == null) {
             throw new IllegalArgumentException("Desktop component must not be null");

@@ -24,7 +24,7 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingManager;
 import org.simbrain.workspace.events.WorkspaceEvents;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;
 import org.simbrain.workspace.updater.TaskSynchronizationManager;
 import org.simbrain.workspace.updater.UpdateAction;
@@ -42,7 +42,7 @@ import java.util.*;
  * org.simbrain.workspace.gui.SimbrainDesktop}.
  * <p>
  * To create a new type of workspace component, extend {@link
- * WorkspaceComponent}, and {@link org.simbrain.workspace.gui.GuiComponent}. The
+ * WorkspaceComponent}, and {@link DesktopComponent}. The
  * latter is a gui representation of the former. Follow the pattern in {@link
  * AbstractComponentFactory} to register this mapping.  The workspace component
  * holds all the model objects, and manages couplings. Usually there is some
@@ -54,7 +54,7 @@ import java.util.*;
  * of are to handle custom model deserializing in a readresolve method in the
  * main model object (e.g. Network or OdorWorld) and that if any special
  * graphical syncing is needed that it can be done the guicomponent constructor
- * by overriding {@link GuiComponent#postAddInit()}. Other init can happen in
+ * by overriding {@link DesktopComponent#postAddInit()}. Other init can happen in
  * overrides of {@link WorkspaceComponent#save(OutputStream, String)} and in a
  * static open method that must also be created. An example is {@link
  * org.simbrain.world.odorworld.OdorWorldComponent#open(InputStream, String,
@@ -239,6 +239,9 @@ public class Workspace {
      * Iterated for a specified number of iterations using a latch. Used in
      * scripts when making a series of events occur, e.g. set some neurons, run
      * for 50 iterations, set some other neurons, run 20 iterations, etc.
+     *
+     * Forces desktop to render between iterations. For headless simulations suggest
+     * using {@link #simpleIterate()}.
      *
      * @param numIterations the number of iteration to run while waiting on the
      *                      latch.
@@ -528,6 +531,38 @@ public class Workspace {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Returns a "flat" representation of the workspace as a byte array from the zipped representation
+     * {@link WorkspaceSerializer } produces.
+     */
+    public byte[] getZipData() {
+        try {
+            WorkspaceSerializer serializer =  new WorkspaceSerializer(this);
+            ByteArrayOutputStream bas = new ByteArrayOutputStream();
+            serializer.serialize(bas);
+            bas.close();
+            return bas.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Open a workspace from the flat representation provided by {@link #getZipData()} }.
+     */
+    public void openFromZipData(byte[] zipData) {
+        try {
+            clearWorkspace();
+            WorkspaceSerializer serializer =  new WorkspaceSerializer(this);
+            ByteArrayInputStream bis = new ByteArrayInputStream(zipData);
+            serializer.deserialize(bis);
+            bis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

@@ -35,7 +35,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
     OdorWorldEntity mouse;
     OdorWorldEntity cheese, flower, fish;
     ControlPanel panel;
-    NeuronGroup vehicleNetwork;
+    NeuronCollection vehicleNetwork;
     NeuronCollection sensorNodes, motorNodes;
 
     OdorWorldWrapper worldBuilder;

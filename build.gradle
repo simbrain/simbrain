@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.4.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.20'
     // id 'checkstyle'
 
     // Fixes problem with long filenames
@@ -12,7 +12,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.2.0'
 
 }
-
 
 compileJava.options.encoding = 'UTF-8'
 
@@ -27,14 +26,26 @@ sourceCompatibility = 1.10
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        url  "https://kotlin.bintray.com/kotlin-datascience"
+    }
 }
 
 dependencies {
 
-    // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.3.9'
+//    // Kotlin
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.20"
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-jvm-host:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-jsr223:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-compiler-embeddable:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-script-util:1.4.20'
+    implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.4.20'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.2'
+
+    implementation 'org.jetbrains.kotlin-deeplearning:api:0.1.0'
 
     // Logger for DL4J
     compile 'ch.qos.logback:logback-classic:1.2.3'
@@ -94,10 +105,11 @@ dependencies {
 
 }
 
-// Sample call: gradle runSim -PsimName='Evolve Mouse Pursuer'
+// Sample invocation:
+//   gradle runSim -PsimName="Test Sim"
 task runSim(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    main = "org.simbrain.custom_sims.RegisteredSimulation"
+    main = "org.simbrain.custom_sims.RegisteredSimulationsKt"
     if(project.hasProperty('simName')){
         args simName
     }

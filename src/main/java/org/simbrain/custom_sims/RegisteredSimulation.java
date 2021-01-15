@@ -19,7 +19,8 @@
 package org.simbrain.custom_sims;
 
 import org.simbrain.custom_sims.helper_classes.Simulation;
-import org.simbrain.custom_sims.simulations.*;
+import org.simbrain.custom_sims.simulations.EvolveAutoEncoder;
+import org.simbrain.custom_sims.simulations.EvolveXor;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
 import org.simbrain.custom_sims.simulations.agent_trails.RandomizedPursuer;
@@ -40,7 +41,10 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillat
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
 import org.simbrain.custom_sims.simulations.sorn.SORN;
-import org.simbrain.custom_sims.simulations.test.*;
+import org.simbrain.custom_sims.simulations.test.ConvertSim;
+import org.simbrain.custom_sims.simulations.test.ReadSim;
+import org.simbrain.custom_sims.simulations.test.TestSim;
+import org.simbrain.custom_sims.simulations.test.lstmBlock;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -106,9 +110,6 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new Braitenberg());
         REGISTERED_SIMS.add(new EvolveAutoEncoder(null));
         REGISTERED_SIMS.add(new EvolveXor(null));
-        REGISTERED_SIMS.add(new EvolveMouse(null));
-        REGISTERED_SIMS.add(new EvolveAvoider(null));
-        REGISTERED_SIMS.add(new EvolveNetwork(null));
 
         // Alphabetize
         // TODO: Find a way to sort by submenu name as well.

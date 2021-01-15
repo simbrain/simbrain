@@ -28,7 +28,7 @@ public class ThresholdOp extends ImageOperation<ThresholdOp> implements Buffered
             maximumValue = 1,
             increment = 0.1
     )
-    private double threshold;
+    private double threshold = .5f;
 
     /**
      * Construct a new ThresholdOp which maps the luminance of each pixel onto

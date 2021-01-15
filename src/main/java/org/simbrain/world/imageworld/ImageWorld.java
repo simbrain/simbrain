@@ -1,264 +1,113 @@
 package org.simbrain.world.imageworld;
 
-import org.simbrain.world.imageworld.events.ImageWorldEvents;
-import org.simbrain.world.imageworld.filters.ImageFilterFactory;
-import org.simbrain.world.imageworld.filters.ThresholdFilterFactory;
-import org.simbrain.world.imageworld.gui.ImagePanel;
+import org.simbrain.util.ResourceManager;
+import org.simbrain.world.imageworld.filters.Filter;
+import org.simbrain.world.imageworld.filters.FilterCollection;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Sublcasses of ImageWorld contain an {@link ImageSource} and a series of
- * {@link SensorMatrix} objects. The image source is what outputs an image of
- * some kind, either a static image, or a video or a pixel display.  The sensor
- * matrices convert the image into numbers and allow the current image in an
- * image source to be in couplings and thereby communicate with other workspace
- * components.
- * <br>
- * The world contains a single {@link ImagePanel} which all {@link ImageSource}'s
- * draw to.
- * <br>
- * Currently there are two subclasses corresponding which either produce or consume pixels.
- * See {@link PixelProducer}) and {@link PixelConsumer} in the GUI.
  *
- * @author Tim Shea
- * @author Jeff Yoshimi
+ * At each update, apply all the filters in a {@link FilterCollection} to the current image in an {@link ImageAlbum}
+ *
+ * Display the result of the current filter applied to the current image  to the screen.
  */
-public abstract class ImageWorld {
+public class ImageWorld {
 
     /**
-     * List of sensor matrices associated with this world.
+     * Contains the current image rendered here.
      */
-    private List<SensorMatrix> sensorMatrices;
+    private ImageAlbum imageAlbum;
 
     /**
-     * Currently selected sensor matrix.
+     * List of filters.
      */
-    private SensorMatrix currentSensorMatrix;
-
-    /**
-     * Current image and sensor matrices draw to this JPanel.
-     */
-    private transient ImagePanel imagePanel;
-
-    /**
-     * Clipboard for the image world.
-     */
-    private transient ImageClipboard clipboard;
-
-    /**
-     * Handle ImageWorld Events.
-     */
-    private transient ImageWorldEvents events = new ImageWorldEvents(this);
-
-    /**
-     * If true show grid lines.
-     */
-    // TODO: Expose this in a preferences dialog
-    private boolean showGridLines;
+    private FilterCollection filterCollection;
 
     /**
      * Construct the image world.
      */
     public ImageWorld() {
-        imagePanel = new ImagePanel(true);
-        clipboard = new ImageClipboard(this);
-        sensorMatrices = new ArrayList<>();
+        super();
+
+        // Image Album
+        imageAlbum = new ImageAlbum();
+        imageAlbum.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
+
+        // Filter Selector
+        filterCollection = new FilterCollection(imageAlbum);
+
     }
 
     /**
-     * Initialize some default filters on world creation. This should be called
-     * on the instantiation of a child of this class after the image source is
-     * created.
+     * Replace the current image with a blank canvas of the indicated size.
      */
-    void initializeDefaultSensorMatrices() {
-
-        // Load default sensor matrices
-        SensorMatrix unfiltered = new SensorMatrix(
-                "Unfiltered",
-                getImageSource()
-        );
-        getSensorMatrices().add(unfiltered);
-
-        SensorMatrix gray100x100 = new SensorMatrix(
-                "Gray 150x150",
-                ImageFilterFactory.createGrayFilter(getImageSource(), 150, 150)
-        );
-        getSensorMatrices().add(gray100x100);
-
-        SensorMatrix color100x100 = new SensorMatrix(
-                "Color 100x100",
-                ImageFilterFactory.createColorFilter(getImageSource(), 100, 100)
-        );
-        getSensorMatrices().add(color100x100);
-
-        SensorMatrix threshold10x10 = new SensorMatrix(
-                "Threshold 10x10",
-                ThresholdFilterFactory.createThresholdFilter(
-                        getImageSource(),
-                        0.5f,
-                        10,
-                        10
-                )
-        );
-        getSensorMatrices().add(threshold10x10);
-
-        SensorMatrix threshold250x250 = new SensorMatrix(
-                "Threshold 250x250",
-                ThresholdFilterFactory.createThresholdFilter(
-                        getImageSource(),
-                        0.5f,
-                        250,
-                        250
-                )
-        );
-
-        getSensorMatrices().add(threshold250x250);
-
-        setCurrentSensorMatrix(getSensorMatrices().get(0));
-    }
-
-    public ImageWorldEvents getEvents() {
-        return events;
+    public void createBlankCanvas(int width, int height) {
+        imageAlbum.setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
     }
 
     /**
-     * Returns a deserialized ImageWorld.
-     */
-    public Object readResolve() {
-        events = new ImageWorldEvents(this);
-        imagePanel = new ImagePanel(showGridLines);
-        currentSensorMatrix.getSource().getEvents().onImageResize(imagePanel::onResize);
-        currentSensorMatrix.getSource().getEvents().onImageUpdate(imagePanel::onImageUpdate);
-        clipboard = new ImageClipboard(this);
-        getImageSource().notifyResize();
-        getImageSource().notifyImageUpdate();
-        return this;
-    }
-
-    /**
-     * Save the current image as the specified filename.
+     * Load images from an array.
      *
-     * @param filename The filename to save to.
+     * @param files array of images to load
+     * @throws IOException thrown if the requested file is not available
      */
-    public void saveImage(String filename) throws IOException {
-        BufferedImage image = currentSensorMatrix.getSource().getCurrentImage();
-        File file = new File(filename);
-        String[] split = filename.split("\\.");
-        String ext = split[split.length - 1];
-        ImageIO.write(image, ext, file);
+    public void loadImages(File[] files) {
+        imageAlbum.loadImages(files);
     }
 
     /**
-     * Update the current tooltip on the jpanel.
+     * Returns number of frames in the "album" associated with this component.
      */
-    private void updateToolTipText() {
-        if (currentSensorMatrix == null) {
-            //TODO
-            //imagePanel.setToolTipText(compositeSource.getImageSource().getWidth() + " by " +  compositeSource.getImageSource().getHeight());
-        } else {
-            imagePanel.setToolTipText(currentSensorMatrix.getWidth() +
-                    " by " + currentSensorMatrix.getHeight());
-        }
+    public int getNumImages() {
+        return imageAlbum.getNumFrames();
     }
 
     /**
-     * Set an existing buffered image as the current image.
+     * Update the image source to the next image.
      */
-    public void setImage(BufferedImage image) {
-        getImageSource().setCurrentImage(image);
-    }
-
-
-    //TODO: Move this and all emitter stuff..
-
-    /**
-     * Get whether the emitter matrix is using color.
-     */
-    public abstract boolean getUseColorEmitter();
-
-    /**
-     * Add a new matrix to the list.
-     *
-     * @param matrix the matrix to add
-     */
-    public void addSensorMatrix(SensorMatrix matrix) {
-        sensorMatrices.add(matrix);
-        setCurrentSensorMatrix(matrix);
-        events.fireSensorMatrixAdded(matrix);
+    public void nextFrame() {
+        imageAlbum.nextFrame();
     }
 
     /**
-     * Remove the indicated sensor matrix.
-     *
-     * @param sensorMatrix the sensor matrix to remove
+     * Update the image source to the previous image.
      */
-    public void removeSensorMatrix(SensorMatrix sensorMatrix) {
-        // Can't remove the "Unfiltered" option
-        if (sensorMatrix.getName().equalsIgnoreCase("Unfiltered")) {
-            return;
-        }
-        int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete sensor panel \"" + sensorMatrix.getName() + "\" ?", "Warning", JOptionPane.YES_NO_OPTION);
-        if (dialogResult == JOptionPane.YES_OPTION) {
-            int index = sensorMatrices.indexOf(sensorMatrix);
-            setCurrentSensorMatrix(sensorMatrices.get(index - 1));
-            sensorMatrices.remove(sensorMatrix);
-            // TODO: This is bad and should be handled in SensorMatrix
-            // ImageSource source = sensorMatrix.getSource();
-            // if (source instanceof FilteredImageSource) {
-            //     compositeSource.removeListener((FilteredImageSource) source);
-            // }
-            events.fireSensorMatrixRemoved(sensorMatrix);
-        }
+    public void previousFrame() {
+        imageAlbum.previousFrame();
+    }
+
+    public ImageAlbum getImageAlbum() {
+        return imageAlbum;
+    }
+
+    public FilterCollection getFilterCollection() {
+        return filterCollection;
     }
 
     /**
-     * Return the image panel.
+     * Convenience method to get current filter.
      */
-    public ImagePanel getImagePanel() {
-        return imagePanel;
+    public Filter getCurrentFilter() {
+        return filterCollection.getCurrentFilter();
     }
 
     /**
-     * Return the clipboard.
+     * Convenience method to set current filter on collection.
      */
-    public ImageClipboard getClipboard() {
-        return clipboard;
-    }
-
-    public SensorMatrix getCurrentSensorMatrix() {
-        return currentSensorMatrix;
-    }
-
-    public void setCurrentSensorMatrix(SensorMatrix sensorMatrix) {
-        if (sensorMatrix == currentSensorMatrix) {
-            return;
-        }
-        sensorMatrix.getSource().getEvents().onImageResize(imagePanel::onResize);
-        sensorMatrix.getSource().getEvents().onImageUpdate(imagePanel::onImageUpdate);
-        currentSensorMatrix = sensorMatrix;
-        updateToolTipText();
-        sensorMatrix.getSource().getEvents().fireImageUpdate(sensorMatrix.getSource());
-    }
-
-    public List<SensorMatrix> getSensorMatrices() {
-        return sensorMatrices;
+    public void setCurrentFilter(String name) {
+        filterCollection.getFilters().stream()
+                .filter(f -> f.getName().equals(name)).findAny()
+                .ifPresent(f -> filterCollection.setCurrentFilter(f));
     }
 
     /**
-     * Return the main {@link ImageSource} associated with this component.
+     * Convenience method to get current image.
      */
-    public abstract ImageSourceAdapter getImageSource();
-
-    /**
-     * Update the image source.
-     */
-    public abstract void update();
+    public BufferedImage getCurrentImage() {
+        return imageAlbum.getCurrentImage();
+    }
 
 }

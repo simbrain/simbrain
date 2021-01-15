@@ -6,7 +6,7 @@ import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +17,7 @@ import java.awt.event.ComponentEvent;
 /**
  * @author Amanda Pandey <amanda.pandey@gmail.com>
  */
-public class DeviceInteractionDesktopComponent extends GuiComponent<DeviceInteractionComponent> {
+public class DeviceInteractionDesktopComponent extends DesktopComponent<DeviceInteractionComponent> {
 
     /**
      * Default height.

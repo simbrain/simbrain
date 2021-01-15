@@ -7,9 +7,8 @@ import org.simbrain.world.imageworld.filters.IdentityOp;
 import org.simbrain.world.imageworld.filters.ImageOperation;
 
 /**
- * Properties used by a {@link org.simbrain.world.imageworld.filters.FilteredImageSource}
- * to facilitate use of {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
- * to edit filter objects.
+ * Facilitate use of {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
+ * to edit filters.
  */
 public class ImageSourceProperties implements EditableObject, CopyableObject {
 

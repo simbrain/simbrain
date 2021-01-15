@@ -19,7 +19,7 @@
 package org.simbrain.workspace.component_actions;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -32,25 +32,25 @@ public final class SaveAsAction extends AbstractAction {
     /**
      * Network panel.
      */
-    private final GuiComponent guiComponent;
+    private final DesktopComponent desktopComponent;
 
     /**
      * Create a new save component action with the specified.
      *
-     * @param guiComponent networkPanel, must not be null
+     * @param desktopComponent networkPanel, must not be null
      */
-    public SaveAsAction(final GuiComponent guiComponent) {
+    public SaveAsAction(final DesktopComponent desktopComponent) {
 
         super("Save As...");
 
-        if (guiComponent == null) {
+        if (desktopComponent == null) {
             throw new IllegalArgumentException("component must not be null");
         }
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/SaveAs.png"));
         putValue(SHORT_DESCRIPTION, "Save this component with a new name");
 
-        this.guiComponent = guiComponent;
+        this.desktopComponent = desktopComponent;
     }
 
     /**
@@ -58,6 +58,6 @@ public final class SaveAsAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        guiComponent.showSaveFileDialog();
+        desktopComponent.showSaveFileDialog();
     }
 }

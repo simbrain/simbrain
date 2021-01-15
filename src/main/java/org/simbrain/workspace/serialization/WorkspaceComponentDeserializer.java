@@ -19,7 +19,7 @@
 package org.simbrain.workspace.serialization;
 
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -94,9 +94,9 @@ public class WorkspaceComponentDeserializer {
      * @param name      The name of the desktop component.
      * @return The deserialized desktop component.
      */
-    GuiComponent<?> deserializeDesktopComponent(String className, WorkspaceComponent component, InputStream input, String name) throws ReflectiveOperationException {
+    DesktopComponent<?> deserializeDesktopComponent(String className, WorkspaceComponent component, InputStream input, String name) throws ReflectiveOperationException {
         Class<?> clazz = Class.forName(className);
         Method method = clazz.getMethod("open", WorkspaceComponent.class, InputStream.class, String.class);
-        return (GuiComponent<?>) method.invoke(null, component, input, name);
+        return (DesktopComponent<?>) method.invoke(null, component, input, name);
     }
 }

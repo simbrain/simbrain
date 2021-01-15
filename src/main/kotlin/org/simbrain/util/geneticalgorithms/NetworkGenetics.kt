@@ -1,32 +1,56 @@
 package org.simbrain.util.geneticalgorithms
 
-import org.simbrain.network.NetworkComponent
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.workspace.Consumer
-import org.simbrain.workspace.Producer
-import org.simbrain.workspace.couplings.CouplingManager
+import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.layouts.HexagonalGridLayout
+import org.simbrain.network.layouts.Layout
+import org.simbrain.network.layouts.LineLayout
+import org.simbrain.util.propertyeditor.CopyableObject
 import java.util.*
-import kotlin.collections.ArrayList
+import java.util.concurrent.CompletableFuture
 
-inline fun nodeGene(options: Neuron.() -> Unit = { }): NodeGene {
-    return NodeGene(Neuron(null).apply(options))
+fun nodeGene(options: Neuron.() -> Unit = { }): NodeGene {
+    return NodeGene(options)
 }
 
 inline fun connectionGene(source: NodeGene, target: NodeGene, options: Synapse.() -> Unit = { }): ConnectionGene {
     return ConnectionGene(Synapse(null, null as Neuron?).apply(options), source, target)
 }
 
-sealed class NetworkGene<T>(template: T): Gene<T>(template)
+inline fun layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
+    val layout = GridLayout().apply(options)
+    return LayoutGene(LayoutWrapper(layout, layout.hSpacing, layout.vSpacing))
+}
 
-class NodeGene(template: Neuron) : NetworkGene<Neuron>(template), ProducerGene<Neuron>, ConsumerGene<Neuron> {
+/**
+ * Subclasses are genes that express products that can be added to a [Network].
+ */
+sealed class NetworkGene<P: NetworkModel>: Gene<P>() {
+
+    abstract fun buildWithContext(context: NetworkGeneticsContext): P
+
+}
+
+class NodeGene private constructor(private val template: Neuron = Neuron(null)): NetworkGene<Neuron>() {
+
+    constructor(config: Neuron.() -> Unit): this(Neuron(null)) {
+        template.apply(config)
+    }
+
+    override val product = CompletableFuture<Neuron>()
 
     private val copyListeners = LinkedList<(NodeGene) -> Unit>()
 
     fun onCopy(task: (NodeGene) -> Unit) {
         copyListeners.add(task)
+    }
+
+    fun mutate(config: Neuron.() -> Unit) {
+        template.apply(config)
     }
 
     private fun fireCopied(newGene: NodeGene) {
@@ -39,134 +63,109 @@ class NodeGene(template: Neuron) : NetworkGene<Neuron>(template), ProducerGene<N
         return newGene
     }
 
-    override fun CouplingManager.defaultProducer(container: Neuron): Producer {
-        return container.getProducer("getActivation")
-    }
-
-    override fun CouplingManager.defaultConsumer(container: Neuron): Consumer {
-        return container.getConsumer("setInputValue")
-    }
-
-    fun build(network: Network): Neuron {
-        return Neuron(network, template)
+    override fun buildWithContext(context: NetworkGeneticsContext): Neuron = completeWith {
+      Neuron(context.network, template)
     }
 
 }
 
-class ConnectionGene(template: Synapse, val source: NodeGene, val target: NodeGene) : NetworkGene<Synapse>(template) {
+class ConnectionGene(private val template: Synapse, val source: NodeGene, val target: NodeGene) : NetworkGene<Synapse>() {
 
-    lateinit var sourceCopy: NodeGene
-    lateinit var targetCopy: NodeGene
+    override val product = CompletableFuture<Synapse>()
+
+    private lateinit var sourceCopy: NodeGene
+    private lateinit var targetCopy: NodeGene
 
     init {
         source.onCopy { sourceCopy = it }
         target.onCopy { targetCopy = it }
     }
 
+    fun mutate(block: Synapse.() -> Unit) {
+        template.apply(block)
+    }
+
+
     override fun copy(): ConnectionGene {
         return ConnectionGene(Synapse(template), sourceCopy, targetCopy)
     }
 
-    fun build(network: Network, source: Neuron, target: Neuron): Synapse {
-        return Synapse(network, source, target, template.learningRule, template)
+    override fun buildWithContext(context : NetworkGeneticsContext): Synapse {
+        return Synapse(context.network, source.product.get(), target.product.get(), template.learningRule, template)
+            .also {
+            context.network.addLooseSynapse(it)
+            product.complete(it)
+        }
     }
 
 }
 
-class NetworkBuilderProvider: BuilderProvider<Network, NetworkGeneticBuilder, NetworkBuilderContext>,
-        WorkspaceBuilderContextInvokable<NetworkBuilderContext, Network>,
-        TopLevelBuilderContextInvokable<NetworkBuilderContext, Network> {
+/**
+ * Needed so we can evolve different types of layout.
+ */
+class LayoutWrapper(var layout: Layout, var hSpacing: Double, var vSpacing: Double): CopyableObject {
 
-    private lateinit var product: Network
-
-    override fun createWorkspaceComponent(name: String) = NetworkComponent(name, product)
-
-    fun createBuilder(productMap: ProductMap): NetworkGeneticBuilder {
-        return NetworkGeneticBuilder(productMap)
-    }
-
-    fun createContext(builder: NetworkGeneticBuilder): NetworkBuilderContext {
-        return NetworkBuilderContext(builder)
-    }
-
-    override fun createProduct(productMap: ProductMap, template: NetworkBuilderContext.() -> Unit): Network {
-        return createBuilder(productMap).also { createContext(it).apply(template) }.build().also { product = it }
-    }
+    override fun copy() = LayoutWrapper(layout.copy(), hSpacing, vSpacing)
 
 }
 
-class NetworkGeneticBuilder(override val productMap: ProductMap) : GeneticBuilder<Network> {
+class LayoutGene(private val template: LayoutWrapper) : Gene<Layout>(), TopLevelGene<Layout> {
 
-    val tasks = ArrayList<(Network) -> Unit>()
+    override val product = CompletableFuture<Layout>()
 
-    fun build(): Network {
-        return Network().also { net -> tasks.forEach { it(net) } }
+    // Todo: handle types of layout
+
+    override fun copy(): LayoutGene {
+        return LayoutGene(template.copy())
     }
 
-}
-
-class NetworkBuilderContext(val builder: NetworkGeneticBuilder): BuilderContext {
-
-    private inline fun <C: Chromosome<T, G>, G: NetworkGene<T>, T> C.addGene(
-            crossinline adder: (gene: G, net: Network) -> T
-    ) {
-        builder.tasks.add { net ->
-            genes.forEach {
-                builder.productMap[it] = adder(it, net)
-            }
-        }
+    fun mutate(config: LayoutWrapper.() -> Unit) {
+        template.apply(config)
     }
 
-    operator fun ((Network) -> Unit).unaryPlus() {
-        builder.tasks.add(this)
-    }
-
-    @JvmName("unaryPlusNeuron")
-    operator fun <C: Chromosome<Neuron, NodeGene>> C.unaryPlus() {
-        addGene { gene, net ->
-            gene.build(net).also { neuron ->
-                net.addLooseNeuron(neuron)
-            }
-        }
-    }
-
-    private inline fun <T, G: Gene<T>, C: Chromosome<T, G>> C.option(
-            crossinline options: List<T>.() -> Unit,
-            crossinline adder: (gene: G, net: Network) -> T
-    ): (Network) -> Unit {
-        return { net ->
-            genes.map { gene ->
-                adder(gene, net).also { builder.productMap[gene] = it }
-            }.options()
-        }
-    }
-
-    operator fun <C: Chromosome<Neuron, NodeGene>> C.invoke(options: List<Neuron>.() -> Unit) =
-            option(options) { gene, net ->
-                gene.build(net).also { neuron ->
-                    net.addLooseNeuron(neuron)
+    override fun TopLevelBuilderContext.build(): Layout = completeWith {
+        template.layout.apply {
+            when(this) {
+                is GridLayout -> {
+                    hSpacing = template.hSpacing
+                    vSpacing = template.vSpacing
+                }
+                is HexagonalGridLayout -> {
+                    hSpacing = template.hSpacing
+                    vSpacing = template.vSpacing
+                }
+                is LineLayout -> {
+                    spacing = when (orientation) {
+                        LineLayout.LineOrientation.VERTICAL -> template.vSpacing
+                        LineLayout.LineOrientation.HORIZONTAL -> template.hSpacing
+                    }
                 }
             }
-
-    fun <C: Chromosome<Neuron, NodeGene>> C.asGroup(
-            options: NeuronGroup.() -> Unit = {  }
-    ): (Network) -> Unit {
-        return { net ->
-            genes.map { gene ->
-                gene.build(net).also { builder.productMap[gene] = it }
-            }.let { net.addNeuronGroup(NeuronGroup(net, it).apply(options)) }
         }
     }
-
-    @JvmName("unaryPlusSynapse")
-    operator fun <C: Chromosome<Synapse, ConnectionGene>> C.unaryPlus() {
-        addGene { gene, net ->
-            gene.build(net, builder.productMap[gene.source], builder.productMap[gene.target])
-                    .also { synapse -> net.addLooseSynapse(synapse) }
-        }
-    }
-
 
 }
 
-fun useNetwork() = NetworkBuilderProvider()
+operator fun Network.invoke(block: NetworkGeneticsContext.() -> Unit) {
+    NetworkGeneticsContext(this).apply(block)
+}
+
+class NetworkGeneticsContext(val network: Network) {
+
+    fun <T, G: NetworkGene<T>> express(chromosome: Chromosome<T, G>): List<T> = chromosome.genes.map {
+        it.buildWithContext(this).also { product ->
+            if (product is Neuron) network.addLooseNeuron(product)
+        }
+    }
+
+    operator fun <T, G: NetworkGene<T>> Chromosome<T, G>.unaryPlus(): List<T> = express(this)
+
+    fun Chromosome<Neuron, NodeGene>.asGroup(block: NeuronGroup.() -> Unit = { }) = fun(network: Network): NeuronGroup {
+        return genes.map { it.buildWithContext(this@NetworkGeneticsContext) }
+            .let { NeuronGroup(network, it).apply(block) }
+            .also { network.addNeuronGroup(it) }
+    }
+
+    operator fun <T> ((Network) -> T).unaryPlus(): T = this(network)
+
+}

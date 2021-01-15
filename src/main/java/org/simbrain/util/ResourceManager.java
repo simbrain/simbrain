@@ -18,9 +18,12 @@
  */
 package org.simbrain.util;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 /**
@@ -73,6 +76,22 @@ public class ResourceManager {
      */
     public static String getString(String name) {
         return Utils.readFileContents(new File(ClassLoader.getSystemClassLoader().getResource(name).getPath()));
+    }
+
+    /**
+     * See {@link org.simbrain.world.odorworld.OdorWorldResourceManager#getBufferedImage(String)}
+     */
+    public static BufferedImage getBufferedImage(final String name) {
+        URL url = ClassLoader.getSystemClassLoader().getResource(name);
+        BufferedImage image = null;
+        try {
+            // source: https://stackoverflow.com/a/44170254
+            ImageIO.setUseCache(false);
+            image = ImageIO.read(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
     }
 
 }

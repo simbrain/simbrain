@@ -2,31 +2,35 @@ package org.simbrain.util.geneticalgorithms
 
 import org.junit.Assert.*
 import org.junit.Test
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.util.activations
+import org.simbrain.workspace.Workspace
 
 class GeneticsTest {
 
-    @Test
-    fun `node gene creates product specified in template`() {
-        val node = nodeGene { activation = 0.7 }
-        val neuron = node.build(Network())
-        assertEquals(0.7, neuron.activation, 0.01)
-    }
+     @Test
+     fun `node gene creates product specified in template`() {
+         val node = nodeGene { activation = 0.7 }
 
-    @Test
-    fun `node gene creates specified product after copied`() {
-        val node = nodeGene { activation = 0.7 }
-        val copy = node.copy()
-        val neuron = copy.build(Network())
-        assertEquals(0.7, neuron.activation, 0.01)
-    }
+         val neuron = node.buildWithContext(NetworkGeneticsContext(Network()))
+
+         assertEquals(0.7, neuron.activation, 0.01)
+     }
+
+     @Test
+     fun `node gene creates specified product after copied`() {
+         val node = nodeGene { activation = 0.7 }
+         val copy = node.copy()
+         val neuron = copy.buildWithContext(NetworkGeneticsContext(Network()))
+         assertEquals(0.7, neuron.activation, 0.01)
+     }
 
     @Test
     fun `node chromosome with repeating default genes creates specified neurons`() {
         val environment = environmentBuilder {
 
-            val network = useNetwork()
+            val network = Network()
 
             val nodes = chromosome(5) {
                 nodeGene { activation = 0.7 }
@@ -54,7 +58,7 @@ class GeneticsTest {
         val defaultActivations = listOf(0.2, 0.7, 0.3, 0.6, 0.5)
         val environment = environmentBuilder {
 
-            val network = useNetwork()
+            val network = Network()
 
             val nodes = chromosome(
                     *defaultActivations.map {
@@ -83,7 +87,7 @@ class GeneticsTest {
     fun `genes are deeply copied after calling copy on environment`() {
         val refs = mutableListOf(mutableListOf<Any>())
 
-        val network = useNetwork()
+        val network = Network()
 
         val environment = environmentBuilder {
             val inputs = chromosome(2) {
@@ -116,7 +120,7 @@ class GeneticsTest {
     fun `connection genes have correct references to node genes after copy`() {
         val environment = environmentBuilder {
 
-            val network = useNetwork()
+            val network = Network()
 
             val inputs = chromosome(2) {
                 nodeGene()
@@ -159,7 +163,7 @@ class GeneticsTest {
     fun `connection genes have correct references to node genes after mutation`() {
         val environment = environmentBuilder {
 
-            val network = useNetwork()
+            val network = Network()
 
             val inputs = chromosome(2) {
                 nodeGene()
@@ -213,8 +217,11 @@ class GeneticsTest {
     fun `coupling node chromosome with node chromosome creates correct couplings`() {
         val environmentBuilder = environmentBuilder {
 
-            val workspace = useWorkspace()
-            val network = useNetwork()
+            val workspace = Workspace()
+
+            val nc = NetworkComponent("network")
+            val network = nc.network
+            workspace.addWorkspaceComponent(nc)
 
             val inputs = chromosome(3) {
                 nodeGene {
@@ -227,24 +234,22 @@ class GeneticsTest {
             }
 
             onBuild {
-                workspace {
-                    couplingManager {
-                        couple(inputs, outputs)
-                    }
                     network {
                         +inputs
                         +outputs
                     }
+
+                    with(workspace.couplingManager) {
+                        inputs.products couple outputs.products
+                    }
                 }
-            }
+
 
             onEval {
 
                 inputs.products.activations = listOf(1.0, 1.0, 1.0)
 
-                workspace {
-                    simpleIterate()
-                }
+                workspace.simpleIterate()
 
                 assertArrayEquals(inputs.products.activations.toTypedArray(), outputs.products.activations.toTypedArray())
 

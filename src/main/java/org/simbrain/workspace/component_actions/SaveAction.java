@@ -19,7 +19,7 @@
 package org.simbrain.workspace.component_actions;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,18 +34,18 @@ public final class SaveAction extends AbstractAction {
     /**
      * Network panel.
      */
-    private final GuiComponent guiComponent;
+    private final DesktopComponent desktopComponent;
 
     /**
      * Create a new save component action with the specified.
      *
-     * @param guiComponent networkPanel, must not be null
+     * @param desktopComponent networkPanel, must not be null
      */
-    public SaveAction(final GuiComponent guiComponent) {
+    public SaveAction(final DesktopComponent desktopComponent) {
 
         super("Save...");
 
-        if (guiComponent == null) {
+        if (desktopComponent == null) {
             throw new IllegalArgumentException("component must not be null");
         }
 
@@ -54,7 +54,7 @@ public final class SaveAction extends AbstractAction {
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SHORT_DESCRIPTION, "Save this component");
 
-        this.guiComponent = guiComponent;
+        this.desktopComponent = desktopComponent;
     }
 
     /**
@@ -62,6 +62,6 @@ public final class SaveAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        guiComponent.save();
+        desktopComponent.save();
     }
 }

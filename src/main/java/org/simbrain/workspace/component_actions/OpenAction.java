@@ -19,7 +19,7 @@
 package org.simbrain.workspace.component_actions;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,18 +34,18 @@ public final class OpenAction extends AbstractAction {
     /**
      * Network panel.
      */
-    private final GuiComponent guiComponent;
+    private final DesktopComponent desktopComponent;
 
     /**
      * Create a new open component action with the specified.
      *
-     * @param guiComponent networkPanel, must not be null
+     * @param desktopComponent networkPanel, must not be null
      */
-    public OpenAction(final GuiComponent guiComponent) {
+    public OpenAction(final DesktopComponent desktopComponent) {
 
         super("Open...");
 
-        if (guiComponent == null) {
+        if (desktopComponent == null) {
             throw new IllegalArgumentException("component must not be null");
         }
 
@@ -54,7 +54,7 @@ public final class OpenAction extends AbstractAction {
         this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         putValue(SHORT_DESCRIPTION, "Open a new component");
 
-        this.guiComponent = guiComponent;
+        this.desktopComponent = desktopComponent;
     }
 
     /**
@@ -62,6 +62,6 @@ public final class OpenAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        guiComponent.showOpenFileDialog();
+        desktopComponent.showOpenFileDialog();
     }
 }

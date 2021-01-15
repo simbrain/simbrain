@@ -7,46 +7,110 @@ import org.simbrain.world.imageworld.events.ImageSourceEvents;
 import java.awt.image.BufferedImage;
 
 /**
- * ImageSource is basically any visible image in an ImageWorld.
- * produces BufferedImages periodically and notifies listeners of new
- * images or changes to the image size.
+ * Produces BufferedImages periodically and notifies listeners when the image changes or is resized.
  * <br>
- * Image sources can be enabled or disabled. E.g. if a webcam is available it can
- * enable its image source, and then when it is turned off the image source can be
- * disabled (however this is not currently used and has not been tested).
+ * Image sources can be enabled or disabled. E.g. if a webcam is available it can enable its image source, and then
+ * when it is turned off the image source can be disabled (however this is not currently used and has not been tested).
+ *
+ * Whenever the current image is updated, the adapter compares it to previous image and decides which events need to
+ * be called.
  *
  * @author Tim Shea
  */
-public interface ImageSource extends AttributeContainer, EditableObject {
+public abstract class ImageSource implements AttributeContainer, EditableObject {
 
     /**
-     * @return Returns whether the source will update the image when updateImage
+     * Whether the source will update the image when updateImage
      * is invoked.
      */
-    boolean isEnabled();
+    private boolean enabled = true;
 
     /**
-     * @param value whether the source should update the image.
+     * Image backing the source.
      */
-    void setEnabled(boolean value);
+    private BufferedImage currentImage;
 
     /**
-     * @return Returns the current image.
+     * Handle Image source Events.
      */
-    BufferedImage getCurrentImage();
+    private transient ImageSourceEvents events = new ImageSourceEvents(this);
 
     /**
-     * @return Returns the width of the images produced by the source.
+     * Construct a new ImageSourceAdapter and initialize the current image.
      */
-    int getWidth();
+    public ImageSource() {
+        currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
+        getEvents().fireImageUpdate();
+    }
 
     /**
-     * @return Returns the height of the images produced by the source.
+     * Construct a new ImageSourceAdapter with the specified currentImage.
+     *
+     * @param currentImage the image to provide from the source
      */
-    int getHeight();
+    public ImageSource(BufferedImage currentImage) {
+        this.currentImage = currentImage;
+    }
 
     /**
-     * @return Returns event handler
+     * Return a deserialized ImageSourceAdapter.
      */
-    ImageSourceEvents getEvents();
+    public Object readResolve() {
+        events = new ImageSourceEvents(this);
+        return this;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean value) {
+        enabled = value;
+    }
+
+    /**
+     * Notify ImageSourceListeners that a new image is available.
+     */
+    public void fireImageUpdate() {
+        if (isEnabled()) {
+            events.fireImageUpdate();
+        }
+    }
+
+    public BufferedImage getCurrentImage() {
+        return currentImage;
+    }
+
+    /**
+     * Set the current image on the source, and optionally fire an updaet event.
+     */
+    protected void setCurrentImage(BufferedImage image, boolean fireEvents) {
+        boolean resized = image.getWidth() != currentImage.getWidth() || image.getHeight() != currentImage.getHeight();
+        currentImage = image;
+        if (fireEvents) {
+            if (resized && isEnabled()) {
+                events.fireResize();
+            }
+            fireImageUpdate();
+        }
+    }
+
+    /**
+     * @param image The image to assign to the current image.
+     */
+    protected void setCurrentImage(BufferedImage image) {
+        setCurrentImage(image, true);
+    }
+
+    public int getWidth() {
+        return currentImage.getWidth();
+    }
+
+    public int getHeight() {
+        return currentImage.getHeight();
+    }
+
+    public ImageSourceEvents getEvents() {
+        return events;
+    }
 }

@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
@@ -183,13 +184,17 @@ public class ControlPanel extends JPanel {
      * @return the internal frame
      */
     public static ControlPanel makePanel(Simulation sim, String name, int x, int y) {
+        return makePanel(sim.getDesktop(), name, x, y);
+    }
+
+    public static ControlPanel makePanel(SimbrainDesktop desktop, String name, int x, int y) {
         ControlPanel panel = new ControlPanel();
         panel.internalFrame = new JInternalFrame(name, true, true);
         panel.internalFrame.setLocation(x, y);
         panel.internalFrame.getContentPane().add(panel);
         panel.internalFrame.setVisible(true);
         panel.internalFrame.pack();
-        sim.getDesktop().addInternalFrame(panel.internalFrame);
+        desktop.addInternalFrame(panel.internalFrame);
         return panel;
     }
 

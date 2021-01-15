@@ -1,7 +1,8 @@
 package org.simbrain.util.geneticalgorithms
 
 import org.simbrain.util.propertyeditor.CopyableObject
-import kotlin.random.Random
+import java.util.concurrent.CompletableFuture
+import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 
 /**
@@ -30,14 +31,21 @@ inline fun intGene(initVal: IntWrapper.() -> Unit = { }): IntGene {
  * [Gene] and implements [TopLevelGene], which allows you to add this gene directly into an onBuild context.
  * function.
  */
-class IntGene(template: IntWrapper) : Gene<IntWrapper>(template), TopLevelGene<IntWrapper> {
+class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<Int> {
+
+    override val product = CompletableFuture<Int>()
 
     override fun copy(): IntGene {
         return IntGene(template.copy());
     }
 
-    override fun TopLevelBuilderContext.build(): IntWrapper {
-        return template.copy();
+    override fun TopLevelBuilderContext.build(): Int {
+        template.copy().also { product.complete(it.value) }
+        return product.get()
+    }
+
+    fun mutate(block: IntWrapper.() -> Unit) {
+        template.apply(block)
     }
 }
 
@@ -57,8 +65,10 @@ fun main() {
         }
 
         onMutate {
-            intChromosome.eachMutate {
-                value += Random.nextInt(-2, 2)
+            intChromosome.forEach {
+                it.mutate {
+                    value += random.nextInt(-5,5)
+                }
             }
         }
 
@@ -67,14 +77,14 @@ fun main() {
         }
 
         onEval {
-            val total = intChromosome.products.sumByDouble { it.value.toDouble() }
+            val total = intChromosome.genes.map { it.product.get() }.sumByDouble { it.toDouble() }
             val targetSum = 10
-            Math.abs(total - targetSum)
+            abs(total - targetSum)
         }
 
         onPeek {
             print("Integer genes:")
-            println(intChromosome.products.map { it.value }.joinToString(", "))
+            println(intChromosome.genes.map { it.product.get() }.joinToString(", "))
         }
 
     }
@@ -88,8 +98,8 @@ fun main() {
 
     val time = measureTimeMillis {
         val (builder, fitness) = evolution.start().last().first()
-        builder.build().peek()
-        println("Fitness: $fitness $")
+        builder.copy().build().peek()
+        println("Fitness: $fitness")
     }
 
     println("Finished in ${time / 1000.0}s")

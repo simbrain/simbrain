@@ -18,7 +18,7 @@
  */
 package org.simbrain.plot.actions;
 
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -31,14 +31,14 @@ public final class OpenPlotAction extends AbstractAction {
     /**
      * Plot GUI component.
      */
-    private final GuiComponent component;
+    private final DesktopComponent component;
 
     /**
      * Create a new open plot action.
      *
      * @param component GUI component, must not be null.
      */
-    public OpenPlotAction(final GuiComponent component) {
+    public OpenPlotAction(final DesktopComponent component) {
         super("Open...");
         if (component == null) {
             throw new IllegalArgumentException("Desktop component must not be null");

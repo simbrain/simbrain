@@ -55,6 +55,9 @@ public interface Layout extends CopyableObject {
      */
     void setInitialLocation(final Point2D initialPoint);
 
+    @Override
+    Layout copy();
+
     /**
      * Called via reflection using {@link UserParameter#typeListMethod()}.
      */

@@ -24,7 +24,7 @@ import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.actions.*;
 import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.imageworld.PixelProducerComponent;
+import org.simbrain.world.imageworld.ImageWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 
 import javax.swing.*;
@@ -178,7 +178,7 @@ public class WorkspaceActionManager {
         openWorldActions = Arrays.asList(
                 new OpenComponentAction<>(DataWorldComponent.class, "Data Table", "menu_icons/Table.png", workspace),
                 new OpenComponentAction<>(OdorWorldComponent.class, "Odor World", "menu_icons/SwissIcon.png", workspace),
-                new OpenComponentAction<>(PixelProducerComponent.class, "Image Display", "menu_icons/camera.png", workspace));
+                new OpenComponentAction<>(ImageWorldComponent.class, "Image Display", "menu_icons/camera.png", workspace));
 
         openWorkspaceAction = new OpenWorkspaceAction(desktop);
         saveWorkspaceAction = new SaveWorkspaceAction(desktop);
@@ -200,8 +200,8 @@ public class WorkspaceActionManager {
                 createComponentFactoryAction(workspace, "Data Table", "menu_icons/Table.png"),
                 createComponentFactoryAction(workspace, "Odor World", "menu_icons/SwissIcon.png"),
                 createComponentFactoryAction(workspace, "3D World", "menu_icons/World.png"),
-                createComponentFactoryAction(workspace, "Pixel Producer", "menu_icons/photo.png"),
-                createComponentFactoryAction(workspace, "Pixel Consumer", "menu_icons/PaintView.png"),
+                createComponentFactoryAction(workspace, "Image World", "menu_icons/photo.png"),
+                // createComponentFactoryAction(workspace, "Pixel Consumer", "menu_icons/PaintView.png"),
                 createComponentFactoryAction(workspace, "Text Display", "menu_icons/Text.png"),
                 createComponentFactoryAction(workspace, "Text Reader", "menu_icons/Text.png"));
                 //createComponentFactoryAction(workspace, "Device Interaction", "Text.png"));

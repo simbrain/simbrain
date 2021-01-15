@@ -7,6 +7,9 @@ import org.simbrain.network.core.Synapse;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests for the underlying sigmoid math see {@link org.simbrain.util.math.SigmoidFunctionTests}
+ */
 public class SigmoidalDiscreteRuleTest {
 
     @Test

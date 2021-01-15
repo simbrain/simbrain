@@ -7,20 +7,20 @@ import org.simbrain.docviewer.DocViewerDesktopComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.plot.barchart.BarChartComponent;
-import org.simbrain.plot.barchart.BarChartGui;
+import org.simbrain.plot.barchart.BarChartDesktopComponent;
 import org.simbrain.plot.histogram.HistogramComponent;
-import org.simbrain.plot.histogram.HistogramGui;
+import org.simbrain.plot.histogram.HistogramDesktopComponent;
 import org.simbrain.plot.piechart.PieChartComponent;
-import org.simbrain.plot.piechart.PieChartGui;
+import org.simbrain.plot.piechart.PieChartDesktopComponent;
 import org.simbrain.plot.projection.ProjectionComponent;
-import org.simbrain.plot.projection.ProjectionGui;
+import org.simbrain.plot.projection.ProjectionDesktopComponent;
 import org.simbrain.plot.rasterchart.RasterPlotComponent;
-import org.simbrain.plot.rasterchart.RasterPlotGui;
+import org.simbrain.plot.rasterchart.RasterPlotDesktopComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
-import org.simbrain.plot.timeseries.TimeSeriesPlotGui;
+import org.simbrain.plot.timeseries.TimeSeriesDesktopComponent;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.table.NumericTable;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
 import org.simbrain.world.deviceinteraction.DeviceInteractionComponent;
@@ -28,14 +28,14 @@ import org.simbrain.world.deviceinteraction.DeviceInteractionDesktopComponent;
 import org.simbrain.world.game.GameComponent;
 import org.simbrain.world.game.GameDesktopComponent;
 import org.simbrain.world.imageworld.*;
-import org.simbrain.world.imageworld.gui.PixelProducerDesktopComponent;
-import org.simbrain.world.imageworld.gui.PixelConsumerDesktopComponent;
+import org.simbrain.world.imageworld.gui.ImageWorldDesktopComponent;
+import org.simbrain.world.imageworld.gui.PixelPlotDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.textworld.DisplayComponent;
-import org.simbrain.world.textworld.DisplayComponentDesktopGui;
+import org.simbrain.world.textworld.DisplayDesktopComponent;
 import org.simbrain.world.textworld.ReaderComponent;
-import org.simbrain.world.textworld.ReaderComponentDesktopGui;
+import org.simbrain.world.textworld.ReaderDesktopComponent;
 import org.simbrain.world.threedworld.ThreeDDesktopComponent;
 import org.simbrain.world.threedworld.ThreeDWorldComponent;
 
@@ -51,7 +51,7 @@ public class AbstractComponentFactory {
     }
 
     /** Type alias for gui component factory methods. */
-    private interface GuiComponentFactory extends BiFunction<GenericFrame, WorkspaceComponent, GuiComponent> {
+    private interface GuiComponentFactory extends BiFunction<GenericFrame, WorkspaceComponent, DesktopComponent> {
     }
 
     private Map<String, Supplier<WorkspaceComponent>> workspaceComponentFactories = new HashMap<>();
@@ -72,38 +72,38 @@ public class AbstractComponentFactory {
         putGuiComponentFactory(DataWorldComponent.class, DataWorldDesktopComponent::new);
 
         putWorkspaceComponentFactory("Text Display", () -> new DisplayComponent(""));
-        putGuiComponentFactory(DisplayComponent.class, DisplayComponentDesktopGui::new);
+        putGuiComponentFactory(DisplayComponent.class, DisplayDesktopComponent::new);
 
         putWorkspaceComponentFactory("Text Reader", () -> new ReaderComponent(""));
-        putGuiComponentFactory(ReaderComponent.class, ReaderComponentDesktopGui::new);
+        putGuiComponentFactory(ReaderComponent.class, ReaderDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Pixel Producer", PixelProducerComponent::new);
-        putGuiComponentFactory(PixelProducerComponent.class, PixelProducerDesktopComponent::new);
+        putWorkspaceComponentFactory("Image World", ImageWorldComponent::new);
+        putGuiComponentFactory(ImageWorldComponent.class, ImageWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Pixel Consumer", PixelConsumerComponent::new);
-        putGuiComponentFactory(PixelConsumerComponent.class, PixelConsumerDesktopComponent::new);
+        // putWorkspaceComponentFactory("Pixel Plot", PixelPlotComponent::new);
+        // putGuiComponentFactory(PixelPlotComponent.class, PixelPlotDesktopComponent::new);
 
         putWorkspaceComponentFactory("Device Interaction", () -> new DeviceInteractionComponent(""));
         putGuiComponentFactory(DeviceInteractionComponent.class, DeviceInteractionDesktopComponent::new);
 
         // Plot components
         putWorkspaceComponentFactory("Bar Chart", () -> new BarChartComponent(""));
-        putGuiComponentFactory(BarChartComponent.class, BarChartGui::new);
+        putGuiComponentFactory(BarChartComponent.class, BarChartDesktopComponent::new);
 
         putWorkspaceComponentFactory("Histogram", () -> new HistogramComponent(""));
-        putGuiComponentFactory(HistogramComponent.class, HistogramGui::new);
+        putGuiComponentFactory(HistogramComponent.class, HistogramDesktopComponent::new);
 
         putWorkspaceComponentFactory("Pie Chart", () -> new PieChartComponent(""));
-        putGuiComponentFactory(PieChartComponent.class, PieChartGui::new);
+        putGuiComponentFactory(PieChartComponent.class, PieChartDesktopComponent::new);
 
         putWorkspaceComponentFactory("Projection Plot", () -> new ProjectionComponent(""));
-        putGuiComponentFactory(ProjectionComponent.class, ProjectionGui::new);
+        putGuiComponentFactory(ProjectionComponent.class, ProjectionDesktopComponent::new);
 
         putWorkspaceComponentFactory("Time Series", () -> new TimeSeriesPlotComponent(""));
-        putGuiComponentFactory(TimeSeriesPlotComponent.class, TimeSeriesPlotGui::new);
+        putGuiComponentFactory(TimeSeriesPlotComponent.class, TimeSeriesDesktopComponent::new);
 
         putWorkspaceComponentFactory("Raster Plot", () -> new RasterPlotComponent(""));
-        putGuiComponentFactory(RasterPlotComponent.class, RasterPlotGui::new);
+        putGuiComponentFactory(RasterPlotComponent.class, RasterPlotDesktopComponent::new);
 
         // Other
         putGuiComponentFactory(DocViewerComponent.class, DocViewerDesktopComponent::new);
@@ -116,7 +116,7 @@ public class AbstractComponentFactory {
         workspaceComponentFactories.put(name, factory);
     }
 
-    public <S extends WorkspaceComponent> void putGuiComponentFactory(Class<S> type, BiFunction<GenericFrame, S, GuiComponent<S>> factory) {
+    public <S extends WorkspaceComponent> void putGuiComponentFactory(Class<S> type, BiFunction<GenericFrame, S, DesktopComponent<S>> factory) {
         guiComponentFactories.put(type, (frame, component) -> factory.apply(frame, (S) component));
     }
 
@@ -128,7 +128,7 @@ public class AbstractComponentFactory {
         }
     }
 
-    public GuiComponent createGuiComponent(GenericFrame frame, WorkspaceComponent workspaceComponent) {
+    public DesktopComponent createGuiComponent(GenericFrame frame, WorkspaceComponent workspaceComponent) {
         if (guiComponentFactories.containsKey(workspaceComponent.getClass())) {
             GuiComponentFactory factory = guiComponentFactories.get(workspaceComponent.getClass());
             return factory.apply(frame, workspaceComponent);

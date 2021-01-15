@@ -20,7 +20,7 @@ package org.simbrain.world.oscworld;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.gui.GuiComponent;
+import org.simbrain.workspace.gui.DesktopComponent;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -33,7 +33,7 @@ import java.awt.event.MouseEvent;
 /**
  * OSC world desktop component.
  */
-public final class OscWorldDesktopComponent extends GuiComponent<OscWorldComponent> {
+public final class OscWorldDesktopComponent extends DesktopComponent<OscWorldComponent> {
 
     /**
      * List of OSC out message consumers.

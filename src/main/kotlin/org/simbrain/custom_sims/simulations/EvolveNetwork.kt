@@ -106,7 +106,6 @@ val evolveNetwork = newSim {
                 return abs(nodeChromosome.products.activations.sum() - 20)
             }
             val result = fitness()
-            println("Fitness: ${result.format(3)}")
             result
         }
 
@@ -141,15 +140,13 @@ val evolveNetwork = newSim {
 
     workspace.clearWorkspace()
 
-    val generations = evolution.start()
+    val generations = evolution.start().onEachIndexed { gen, result ->
+        println("Generation ${gen}, Fitness ${result[0].fitness}")
+    }
+
     val (winner, fitness) = generations.last().first()
     println("Winning fitness $fitness")
     winner.copy().prettyBuild().peek()
-
-    // TODO: Not sure why below won't work
-    // val generations = evolution.start().forEachIndexed{gen, result ->
-    //     print("Generation ${gen}, Fitness ${result[0].fitness}")
-    // }
 
 }
 

@@ -138,7 +138,7 @@ class EnvironmentBuilder private constructor(
     constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
 
     /**
-     * Public onstructor with a seed.
+     * Public constructor with a seed.
      */
     constructor(seed: Int, builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder, seed)
 
@@ -369,7 +369,7 @@ fun evaluator(environmentBuilder: EnvironmentBuilder, template: Evaluator.() -> 
         Evaluator(environmentBuilder).apply(template)
 
 /**
- * Helper function to uniformly sample builder fitness papers.  Used to choose survivors
+ * Helper function to uniformly sample builder fitness papers. Used to choose survivors
  * for replenishing a population.
  */
 fun List<BuilderFitnessPair>.uniformSample() = sequence {

@@ -16,7 +16,7 @@ val simulations = dir<NewSimulation>("Simulations") {
 
     dir("Demos") {
         item("Simple Network") { testSim }
-        item("Mnist Images") { imageSim }
+        item("Mnist Images") { mnistSim }
         item("Agent Trails") { kAgentTrails }
     }
     // dir("TestDiv2") {
@@ -26,9 +26,11 @@ val simulations = dir<NewSimulation>("Simulations") {
     //     }
     // }
     dir("Evolution") {
-        item("Evolve Network") { evolveNetwork }
         item("Evolve Avoider") { evolveAvoider }
+        item("Evolve AutoEncoder") { evolveAutoAssociator }
+        item("Evolve Network") { evolveNetwork }
         item("Evolve Mouse") { evolveMouse }
+        item("Evolve XOR") { evolveXor }
     }
 }
 

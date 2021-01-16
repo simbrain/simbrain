@@ -35,12 +35,13 @@ public class IAC_Test {
         Synapse w12 = new Synapse(input1, output, 1);
         net.addLooseSynapse(w12);
 
-        // Upper Bound (u) = 1, lower bound (l) = -1, decay rate(λ) = 0.05, resting value (b) = 0.01,
+        // Upper Bound (u) = 1, lower bound (l) = -1, decay rate(λ) = 0.05, resting value (b) = 0.1,
         // weighted input (W) = 0.5 * 1, where w > 0
         // The interactive activation and competition networks
         net.update();
-        // a = 0.5 + ((1 - 0.5)(0.5) - 0.05 (0.5 - 0.1)) = 0.73, where w > 0
-        assertEquals(0.73, output.getActivation(), 0.00001);
+        // a = 0 + ((1 - 0)(0.5) - 0.05 (0 - 0.1)) = 0.505, where w > 0
+        // Timestampd is 0.1, so it's 0.0505 instead of 0.505
+        assertEquals(0.505, output.getActivation(), 0.00001);
 
     }
 

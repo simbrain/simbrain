@@ -20,8 +20,6 @@ import java.util.*
 
 val evolveXor = newSim {
 
-    val mainScope = MainScope()
-
     val environmentBuilder = environmentBuilder {
 
         val network = Network()
@@ -89,8 +87,7 @@ val evolveXor = newSim {
         }
 
         onPeek {
-            val nc = addNetworkComponent("Network", network)
-            placeComponent(nc, 0, 0, 200, 200)
+            addNetworkComponent("Network", network)
         }
 
         onBuild { pretty ->
@@ -122,10 +119,10 @@ val evolveXor = newSim {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 200 || fitness < .1 }
+        runUntil { generation == 1000 || fitness < .001 }
     }
 
-    mainScope.launch {
+    MainScope().launch {
 
         workspace.clearWorkspace()
 

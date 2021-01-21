@@ -110,7 +110,7 @@ val evolveNetwork = newSim {
         }
 
         onPeek {
-            val nc = addNetworkComponent("50 Percent Active", network)
+            val nc = addNetworkComponent("Network", network)
             placeComponent(nc, 0,0,400,400)
 
             // When run headless store the winning network

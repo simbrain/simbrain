@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.placeComponent
-import org.simbrain.network.NetworkComponent
+import org.simbrain.network.bound
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.layouts.GridLayout
@@ -11,10 +11,8 @@ import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
-import org.simbrain.util.format
+import org.simbrain.network.util.lengths
 import org.simbrain.util.geneticalgorithms.*
-import org.simbrain.util.place
-import org.simbrain.util.point
 import java.io.File
 import java.util.*
 import kotlin.math.abs
@@ -28,7 +26,7 @@ val evolveNetwork = newSim {
 
         val network = Network()
 
-        val nodeChromosome = chromosome(5) {
+        val nodeChromosome = chromosome(25) {
             nodeGene() {
                 lowerBound = -10.0
                 upperBound = 10.0
@@ -102,8 +100,27 @@ val evolveNetwork = newSim {
 
             // Comment / Uncomment different choices of fitness function here
             fun fitness() : Double {
-                // return abs(nodeChromosome.products.activations.average() - 5)
-                return abs(nodeChromosome.products.activations.sum() - 20)
+
+                val bounds  = network.looseNeurons.bound
+
+                var avgLength = connectionChromosome.products.lengths.average()
+                if (avgLength.isNaN()) avgLength = 0.0
+
+                val numWeights = connectionChromosome.products.size
+
+
+                val avgActivation = nodeChromosome.products.activations.average()
+                val totalActivation = nodeChromosome.products.activations.sum()
+
+                // val avgActivationError = abs(avgActivation - 5)
+                val totalActivationError = abs(totalActivation - 10)
+                val lengthError = abs(avgLength - 50)
+                val numWeightsError = abs(numWeights - 100)
+                val networkSizeError = abs(bounds.height - 400)
+
+                return lengthError + numWeightsError +
+                        totalActivationError + networkSizeError
+
             }
             val result = fitness()
             result
@@ -135,7 +152,7 @@ val evolveNetwork = newSim {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 1000 || fitness < .01 }
+        runUntil { generation == 250 || fitness < .01 }
     }
 
     workspace.clearWorkspace()

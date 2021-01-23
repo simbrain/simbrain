@@ -3,8 +3,8 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.simbrain.custom_sims.*
-import org.simbrain.network.NetworkComponent
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.layouts.LineLayout
@@ -15,7 +15,6 @@ import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
 import org.simbrain.util.sse
 import org.simbrain.util.widgets.ProgressWindow
-import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.*
 
 val evolveXor = newSim {
@@ -130,13 +129,13 @@ val evolveXor = newSim {
 
         launch(Dispatchers.Default) {
 
-            val generations = evolution.start().onEachIndexed { generation, result ->
+            val generations = evolution.start().onEachGenerationBest { generation ->
                 progressWindow.progressBar.value = generation
-                progressWindow.fitnessScore.text = "Error: ${result[0].fitness.format(10)}"
+                progressWindow.fitnessScore.text = "Error: ${fitness.format(10)}"
             }
-            val (best, _) = generations.last().first()
+            val (best, _) = generations.best
 
-            best.copy().prettyBuild().peek()
+            best.prettyBuild().peek()
 
             progressWindow.close()
         }

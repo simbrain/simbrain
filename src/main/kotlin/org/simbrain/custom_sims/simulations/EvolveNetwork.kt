@@ -157,13 +157,13 @@ val evolveNetwork = newSim {
 
     workspace.clearWorkspace()
 
-    val generations = evolution.start().onEachIndexed { gen, result ->
-        println("Generation ${gen}, Fitness ${result[0].fitness}")
+    val generations = evolution.start().onEachGenerationBest { gen ->
+        println("Generation ${gen}, Fitness ${fitness}")
     }
 
-    val (winner, fitness) = generations.last().first()
+    val (winner, fitness) = generations.best
     println("Winning fitness $fitness")
-    winner.copy().prettyBuild().peek()
+    winner.prettyBuild().peek()
 
 }
 

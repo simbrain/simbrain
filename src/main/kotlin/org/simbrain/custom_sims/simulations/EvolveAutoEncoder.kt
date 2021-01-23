@@ -139,13 +139,13 @@ val evolveAutoAssociator = newSim {
 
         launch(Dispatchers.Default) {
 
-            val generations = evolution.start().onEachIndexed { generation, result ->
+            val generations = evolution.start().onEachGenerationBest { generation ->
                 progressWindow.progressBar.value = generation
-                progressWindow.fitnessScore.text = "Error: ${result[0].fitness.format(2)}"
+                progressWindow.fitnessScore.text = "Error: ${fitness.format(2)}"
             }
-            val (best, _) = generations.last().first()
+            val (best, _) = generations.best
 
-            best.copy().prettyBuild().peek()
+            best.prettyBuild().peek()
 
             progressWindow.close()
         }

@@ -97,8 +97,8 @@ fun main() {
     }
 
     val time = measureTimeMillis {
-        val (builder, fitness) = evolution.start().last().first()
-        builder.copy().build().peek()
+        val (builder, fitness) = evolution.start().best
+        builder.build().peek()
         println("Fitness: $fitness")
     }
 

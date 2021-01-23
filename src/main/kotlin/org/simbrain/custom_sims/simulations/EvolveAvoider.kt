@@ -248,15 +248,15 @@ val evolveAvoider = newSim {
 
         launch(Dispatchers.Default) {
 
-            val generations = createEvolution().start().onEachIndexed { generation, result ->
+            val generations = createEvolution().start().onEachGenerationBest { generation ->
                 progressWindow.progressBar.value = generation
-                progressWindow.fitnessScore.text = "Fitness: ${result[0].fitness.format(2)}"
+                progressWindow.fitnessScore.text = "Fitness: ${fitness.format(2)}"
             }
-            val (best, _) = generations.last().first()
+            val (best, _) = generations.best
 
             println(best)
 
-            val build = best.copy().prettyBuild()
+            val build = best.prettyBuild()
 
             build.peek()
 

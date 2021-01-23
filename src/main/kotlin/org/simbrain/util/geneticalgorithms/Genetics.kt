@@ -329,13 +329,8 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
      */
     class RunUntilContext(val generation: Int, val fitness: Double)
 
-    /**
-     * "Runs" the evolutionary algorithm.  Sequence is a lazy list. When you call .last
-     * the whole sequence is created, by sequentially creating successive generations, so that at any time only the
-     * last generation and the current one need to be in memory.
-     */
-    fun start(): Sequence<List<BuilderFitnessPair>> {
-        return sequence {
+    inner class Result {
+        private val generations = sequence {
             var generation = 0
             var next = population
             do {
@@ -352,14 +347,34 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
                 yield(current)
 
                 next = survivors.map { it.environmentBuilder } + survivors.uniformSample()
-                        .take(populationSize - survivors.size)
-                        .map { it.environmentBuilder.copy().apply { mutate() } }
-                        .toList()
+                    .take(populationSize - survivors.size)
+                    .map { it.environmentBuilder.copy().apply { mutate() } }
+                    .toList()
 
                 generation++
             } while (!stoppingCondition(RunUntilContext(generation, currentFitness)))
         }
+
+        val best: BuilderFitnessPair get() = generations.last().first().let { (builder, fitness) ->
+            BuilderFitnessPair(builder.copy(), fitness)
+        }
+
+        fun onEachGeneration(block: List<BuilderFitnessPair>.(generationNumber: Int) -> Unit): Result = this.apply {
+            generations.onEachIndexed { index, list -> list.block(index) }
+        }
+
+        fun onEachGenerationBest(block: BuilderFitnessPair.(generationNumber: Int) -> Unit): Result = this.apply {
+            generations.map { it.first() }.onEachIndexed { index, pair -> pair.block(index) }
+        }
+
     }
+
+    /**
+     * "Runs" the evolutionary algorithm.  Sequence is a lazy list. When you call .last
+     * the whole sequence is created, by sequentially creating successive generations, so that at any time only the
+     * last generation and the current one need to be in memory.
+     */
+    fun start() = Result()
 }
 
 /**

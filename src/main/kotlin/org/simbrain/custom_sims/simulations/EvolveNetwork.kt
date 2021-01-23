@@ -13,6 +13,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
 import org.simbrain.network.util.lengths
 import org.simbrain.util.geneticalgorithms.*
+import org.simbrain.util.point
 import java.io.File
 import java.util.*
 import kotlin.math.abs
@@ -25,6 +26,18 @@ val evolveNetwork = newSim {
     val environmentBuilder = environmentBuilder {
 
         val network = Network()
+
+        /**
+         * Testing evolution of nodes with fixed characteristics
+         */
+        val motivations = chromosome(2) {
+            nodeGene() {
+                label = "Fixed node ${it+1}"
+                location = point(it*100,-50)
+                lowerBound = -10.0
+                upperBound = 10.0
+            }
+        }
 
         val nodeChromosome = chromosome(25) {
             nodeGene() {
@@ -72,6 +85,10 @@ val evolveNetwork = newSim {
                 nodeChromosome.genes.add(nodeGene())
             }
 
+            motivations.genes.forEach {
+                it.mutateBias()
+            }
+
             nodeChromosome.genes.forEach {
                 it.mutateBias()
             }
@@ -104,22 +121,26 @@ val evolveNetwork = newSim {
                 val bounds  = network.looseNeurons.bound
 
                 var avgLength = connectionChromosome.products.lengths.average()
-                if (avgLength.isNaN()) avgLength = 0.0
 
                 val numWeights = connectionChromosome.products.size
 
-
                 val avgActivation = nodeChromosome.products.activations.average()
                 val totalActivation = nodeChromosome.products.activations.sum()
+
+                // Evolve fixed nodes to have specific activations 2.5 and -3
+                val (m1, m2) =  motivations.products
+                val m1error = abs(m1.activation - 2.5)
+                val m2error = abs(m2.activation + 3)
 
                 // val avgActivationError = abs(avgActivation - 5)
                 val totalActivationError = abs(totalActivation - 10)
                 val lengthError = abs(avgLength - 50)
                 val numWeightsError = abs(numWeights - 100)
-                val networkSizeError = abs(bounds.height - 400)
+                val networkSize = bounds.height * bounds.width / 10_000
 
-                return lengthError + numWeightsError +
-                        totalActivationError + networkSizeError
+                // TODO: Normalize errors
+                return networkSize - (lengthError + numWeightsError +
+                        totalActivationError + m1error + m2error)
 
             }
             val result = fitness()
@@ -139,6 +160,8 @@ val evolveNetwork = newSim {
         onBuild { pretty ->
             val (layout) = +layoutChromosome
             network {
+                +motivations
+
                 (+nodeChromosome).apply {
                     layout.layoutNeurons(this)
                 }
@@ -151,8 +174,8 @@ val evolveNetwork = newSim {
     val evolution = evaluator(environmentBuilder) {
         populationSize = 100
         eliminationRatio = 0.5
-        optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 250 || fitness < .01 }
+        optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
+        runUntil { generation == 250 || fitness > 200 }
     }
 
     workspace.clearWorkspace()
@@ -162,7 +185,7 @@ val evolveNetwork = newSim {
     }
 
     val (winner, fitness) = generations.best
-    println("Winning fitness $fitness")
+    println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
     winner.prettyBuild().peek()
 
 }

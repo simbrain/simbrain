@@ -329,6 +329,9 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
      */
     class RunUntilContext(val generation: Int, val fitness: Double)
 
+    /**
+     * Packages the result of a run of [Evaluator].
+     */
     inner class Result {
         private val generations = sequence {
             var generation = 0
@@ -355,22 +358,38 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
             } while (!stoppingCondition(RunUntilContext(generation, currentFitness)))
         }
 
+        /**
+         * Returns the wining agent builder and its fitness.
+         */
         val best: BuilderFitnessPair get() = generations.last().first().let { (builder, fitness) ->
             BuilderFitnessPair(builder.copy(), fitness)
         }
 
+        /**
+         * Returns the generation number.
+         */
+        val finalGenerationNumber: Int get() = generations.count()
+
+        /**
+         * Run the provided block at each generation. Context provides the whole population of builders.
+         */
         fun onEachGeneration(block: List<BuilderFitnessPair>.(generationNumber: Int) -> Unit): Result = this.apply {
             generations.onEachIndexed { index, list -> list.block(index) }
         }
 
+
+        /**
+         * Like  [onEachGeneration] but context only provides the (builder for) the fittest agent at each generation.
+         */
         fun onEachGenerationBest(block: BuilderFitnessPair.(generationNumber: Int) -> Unit): Result = this.apply {
             generations.map { it.first() }.onEachIndexed { index, pair -> pair.block(index) }
         }
 
+
     }
 
     /**
-     * "Runs" the evolutionary algorithm.  Sequence is a lazy list. When you call .last
+     * "Runs" the evolutionary algorithm.  Sequence is a lazy list. When you call .last()
      * the whole sequence is created, by sequentially creating successive generations, so that at any time only the
      * last generation and the current one need to be in memory.
      */

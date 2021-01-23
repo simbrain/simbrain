@@ -19,7 +19,10 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.EntityType
 import kotlin.math.abs
 
-val evolveMouse = newSim {
+/**
+ * Evolve agent to be a Braitenberg vehicle that pursues cheese
+ */
+val evolvePursuer = newSim {
 
     val mainScope = MainScope()
 
@@ -161,27 +164,28 @@ val evolveMouse = newSim {
             onEval {
                 var score = 0.0
 
-                // cheeses.forEach {
-                //     it.onCollide { other ->
-                //         if (other === mouse) {
-                //             score += 1
-                //         }
-                //     }
-                // }
-
+                cheeses.forEach {
+                    it.onCollide { other ->
+                        if (other === mouse) {
+                            score += 1
+                        }
+                    }
+                }
                 evolutionWorkspace.apply {
-                    repeat(100) {
+                    repeat(1000) {
                         simpleIterate()
                         val energy = abs(outputs.products.activations.sum()) + 5
-                        score += energy / 1000
+                        score -= energy / 1000
                     }
                 }
 
-                // val partial = cheeses.map { cheese -> 100 - mouse.getRadiusTo(cheese) }
-                //     .maxOf { it }
-                //     .let { if (it < 0) 0.0 else it } / 100
 
-                score
+
+                val partial = cheeses.map { cheese -> 100 - mouse.getRadiusTo(cheese) }
+                    .maxOf { it }
+                    .let { if (it < 0) 0.0 else it } / 100
+
+                score + partial
             }
 
             onPeek {
@@ -193,7 +197,7 @@ val evolveMouse = newSim {
         return evaluator(environmentBuilder) {
             populationSize = 100
             eliminationRatio = 0.5
-            runUntil { generation == 50 || fitness > 250 }
+            runUntil { generation == 200 || fitness > 50 }
         }
     }
 
@@ -209,9 +213,9 @@ val evolveMouse = newSim {
                 progressWindow.progressBar.value = generation
                 progressWindow.fitnessScore.text = "Fitness: ${fitness.format(2)}"
             }
-            val (best, fitness) = generations.best
+            val (best, _) = generations.best
 
-            println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
+            println(best)
 
             best.prettyBuild().peek()
 

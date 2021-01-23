@@ -28,8 +28,9 @@ val simulations = dir<NewSimulation>("Simulations") {
     dir("Evolution") {
         item("Evolve Avoider") { evolveAvoider }
         item("Evolve AutoEncoder") { evolveAutoAssociator }
-        item("Evolve Network") { evolveNetwork }
-        item("Evolve Mouse") { evolveMouse }
+        item("Evolve Network (Sandbox)") { evolveNetwork }
+        item("Evolve Pursuer") { evolvePursuer }
+        item("Evolve Mouse (Sandbox)") { evolveMouse }
         item("Evolve XOR") { evolveXor }
     }
 }

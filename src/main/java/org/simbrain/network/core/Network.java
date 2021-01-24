@@ -85,12 +85,12 @@ public class Network {
     /**
      * List of "loose neurons" (as opposed to neurons in neuron groups)
      */
-    private final List<Neuron> looseNeurons = new ArrayList<Neuron>();
+    private final List<Neuron> looseNeurons = new ArrayList<>();
 
     /**
      * Array list of "loose synapses" (as opposed to synapses in synapse groups)
      */
-    private final Set<Synapse> looseSynapses = new LinkedHashSet<Synapse>();
+    private final Set<Synapse> looseSynapses = new LinkedHashSet<>();
 
     //TODO: Set all below back to final when backwards compatibility issue fixed
     /**
@@ -408,9 +408,14 @@ public class Network {
      */
     public void addLooseSynapse(Synapse synapse) {
         synapse.initSpikeResponder();
-        looseSynapses.add(synapse);
-        synapse.setId(idManager.getId(Synapse.class));
-        events.fireModelAdded(synapse);
+        var wasAdded = looseSynapses.add(synapse);
+        // Fails if a synapse with same source and target already exists.
+        if(wasAdded) {
+            synapse.setId(idManager.getId(Synapse.class));
+            events.fireModelAdded(synapse);
+        } else {
+            System.out.println("An attempt was made to add a duplicate synapse");
+        }
     }
 
     /**

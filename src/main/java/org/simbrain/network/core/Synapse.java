@@ -209,7 +209,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         }
         if (properties.containsKey("weightLowerBound")) {
             DEFAULT_LOWER_BOUND = Double.parseDouble(properties.getProperty("weightLowerBound"));
-
         }
 
     }

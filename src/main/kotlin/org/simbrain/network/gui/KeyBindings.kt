@@ -34,6 +34,8 @@ fun NetworkPanel.addKeyBindings() {
     bindTo("I", networkActions.wandEditModeAction)
     bindTo("G", networkActions.neuronGroupAction)
     bind("Y") { showNeuronArrayCreationDialog() }
+    bind(CmdOrCtrl + 'Z') { undo() }
+    bind(CmdOrCtrl + 'Y') { redo() }
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModels() }
     bindTo("3", networkActions.selectIncomingWeightsAction)

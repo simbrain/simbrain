@@ -20,6 +20,7 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.actions.edit.ToggleAutoZoom
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
@@ -134,6 +135,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
      * Manages placement of new nodes, groups, etc.
      */
     val placementManager = PlacementManager()
+
+    /**
+     * Undo Manager
+     */
+    val undoManager = UndoManager()
 
     /**
      * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update is complete.
@@ -306,6 +312,20 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
      */
     fun placeNeuron(neuron: Neuron) {
         placementManager.addNewModelObject(neuron)
+
+        // TODO: Smelly
+        undoManager.addUndoableAction(object : UndoableAction {
+            override fun apply() {
+                network.addLooseNeuron(neuron)
+            }
+            override fun undo() {
+                network.delete(neuron)
+                zoomToFitPage() // TODO: Why?
+            }
+            override fun redo() {
+                network.addLooseNeuron(neuron)
+            }
+        })
         network.addLooseNeuron(neuron)
         zoomToFitPage()
     }
@@ -728,6 +748,22 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         val ts = TrainingSet(sourceActivations, targetActivations)
         val lms = LMSIterative(sources, targets, ts)
         showLMSDialog(lms)
+    }
+
+    /**
+     * TODO: Work in progress.
+     */
+    fun undo() {
+        println("Initial testing on undo...")
+        undoManager.undo()
+    }
+
+    /**
+     * TODO: Work in progress.
+     */
+    fun redo() {
+        println("Initial testing on redo...")
+        undoManager.redo()
     }
 
 }

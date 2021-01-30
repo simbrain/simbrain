@@ -45,7 +45,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.2'
 
-    implementation 'org.jetbrains.kotlin-deeplearning:api:0.1.0'
+    implementation 'org.jetbrains.kotlin-deeplearning:api:0.1.1'
 
     // Logger for DL4J
     compile 'ch.qos.logback:logback-classic:1.2.3'

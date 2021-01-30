@@ -39,7 +39,7 @@ public class SynapseTest {
     }
 
     @Test
-    public void testSetUp() {
+    public void testAddSynapses() {
 
         Network net = new Network();
 
@@ -60,11 +60,9 @@ public class SynapseTest {
         assertEquals(n2, s1.getTarget());
 
         // A second synapse with the same source and target should not be added
-        Synapse s2_redundant = new Synapse(n1, n2); // TODO: network.looseSynapses becomes empty at this point.
+        Synapse s2_redundant = new Synapse(n1, n2);
         net.addLooseSynapse(s2_redundant);
-        System.out.println(net.getFlatSynapseList().get(0));
         assertEquals(1, net.getSynapseCount(), 0.0);
-        // assertEquals("Synapse_1", net.getFlatSynapseList().get(0).getId());
 
     }
 

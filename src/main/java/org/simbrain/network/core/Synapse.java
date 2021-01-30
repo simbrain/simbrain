@@ -452,6 +452,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
      * @param newTarget the target neuron to the synapse
      */
     private void setSourceAndTarget(final Neuron newSource, final Neuron newTarget) {
+
         if (this.source != null) {
             this.source.removeEfferent(this);
         }

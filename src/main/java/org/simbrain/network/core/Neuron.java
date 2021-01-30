@@ -500,9 +500,11 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public void addEfferent(final Synapse synapse) {
         if (fanOut != null) {
             Synapse dup = fanOut.get(synapse.getTarget());
-            if (dup == null) { // There is no duplicate
+            if (dup == null) {
+                // There is no duplicate
                 fanOut.put(synapse.getTarget(), synapse);
-            } else { // There is a duplicate connecting src and target
+            } else {
+                // There is a duplicate connecting src and target
                 // Check that we're not trying to add the exact same synapse...
                 if (!dup.equals(synapse)) {
                     getNetwork().delete(fanOut.get(synapse.getTarget()));

@@ -3,7 +3,6 @@ package org.simbrain.util.geneticalgorithms
 import org.simbrain.util.propertyeditor.CopyableObject
 import java.util.*
 import java.util.concurrent.CompletableFuture
-import kotlin.collections.ArrayList
 import kotlin.random.Random
 import kotlin.streams.toList
 
@@ -335,33 +334,29 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
      */
     inner class Result {
 
-        private val peekFunctions = ArrayList<List<BuilderFitnessPair>.(generationNumber: Int) -> Unit>()
+        private var generations = sequence {
+            var generation = 0
+            var next = population
+            do {
+                val current = next.parallelStream().map {
+                    val build = it.build()
+                    val score = build.eval()
+                    BuilderFitnessPair(it, score)
+                }.toList().sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
 
-        private val generations by lazy {
-            sequence {
-                var generation = 0
-                var next = population
-                do {
-                    val current = next.parallelStream().map {
-                        val build = it.build()
-                        val score = build.eval()
-                        BuilderFitnessPair(it, score)
-                    }.toList().sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
+                val currentFitness = current[0].fitness
 
-                    val currentFitness = current[0].fitness
+                val survivors = current.take((eliminationRatio * current.size).toInt())
 
-                    val survivors = current.take((eliminationRatio * current.size).toInt())
+                yield(current)
 
-                    yield(current)
+                next = survivors.map { it.environmentBuilder } + survivors.uniformSample()
+                    .take(populationSize - survivors.size)
+                    .map { it.environmentBuilder.copy().apply { mutate() } }
+                    .toList()
 
-                    next = survivors.map { it.environmentBuilder } + survivors.uniformSample()
-                        .take(populationSize - survivors.size)
-                        .map { it.environmentBuilder.copy().apply { mutate() } }
-                        .toList()
-
-                    generation++
-                } while (!stoppingCondition(RunUntilContext(generation, currentFitness)))
-            }.onEachIndexed { index, list -> peekFunctions.forEach { list.it(index) } }.toList()
+                generation++
+            } while (!stoppingCondition(RunUntilContext(generation, currentFitness)))
         }
 
         /**
@@ -380,7 +375,7 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
          * Run the provided block at each generation. Context provides the whole population of builders.
          */
         fun onEachGeneration(block: List<BuilderFitnessPair>.(generationNumber: Int) -> Unit): Result = this.apply {
-            peekFunctions.add(block)
+            generations = generations.onEachIndexed { index, list -> list.block(index) }
         }
 
 
@@ -388,9 +383,7 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
          * Like  [onEachGeneration] but context only provides the (builder for) the fittest agent at each generation.
          */
         fun onEachGenerationBest(block: BuilderFitnessPair.(generationNumber: Int) -> Unit): Result = this.apply {
-            peekFunctions.add {
-                first().apply { block(it) }
-            }
+            generations = generations.onEachIndexed { index, list -> list.first().block(index) }
         }
 
 

@@ -180,8 +180,8 @@ val evolveNetwork = newSim {
 
     workspace.clearWorkspace()
 
-    val generations = evolution.start().onEachGenerationBest { gen ->
-        println("Generation ${gen}, Fitness ${fitness}")
+    val generations = evolution.start().onEachGenerationBest { agent, gen ->
+        println("Generation ${gen}, Fitness ${agent.fitness}")
     }
 
     val (winner, fitness) = generations.best

@@ -209,9 +209,9 @@ val evolvePursuer = newSim {
 
         launch(Dispatchers.Default) {
 
-            val generations = createEvolution().start().onEachGenerationBest { generation ->
-                progressWindow.progressBar.value = generation
-                progressWindow.fitnessScore.text = "Fitness: ${fitness.format(2)}"
+            val generations = createEvolution().start().onEachGenerationBest { agent, gen ->
+                progressWindow.progressBar.value = gen
+                progressWindow.fitnessScore.text = "Error: ${agent.fitness.format(2)}"
             }
             val (best, _) = generations.best
 

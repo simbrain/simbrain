@@ -39,7 +39,7 @@ val evolveNetwork = newSim {
             }
         }
 
-        val nodeChromosome = chromosome(25) {
+        val nodeChromosome = chromosome(2) {
             nodeGene() {
                 lowerBound = -10.0
                 upperBound = 10.0
@@ -62,9 +62,9 @@ val evolveNetwork = newSim {
 
             fun LayoutGene.mutateType() = mutate {
                 when (random.nextDouble()) {
-                    in 0.0..0.05 -> layout = GridLayout()
-                    in 0.05..0.1 -> layout = HexagonalGridLayout()
-                    in 0.1..0.15 -> layout = LineLayout()
+                    in 0.0..0.5 -> layout = GridLayout()
+                    in 0.5..1.0 -> layout = HexagonalGridLayout()
+                    // in 0.1..0.15 -> layout = LineLayout()
                 }
             }
 
@@ -118,8 +118,6 @@ val evolveNetwork = newSim {
             // Comment / Uncomment different choices of fitness function here
             fun fitness() : Double {
 
-                val bounds  = network.looseNeurons.bound
-
                 var avgLength = connectionChromosome.products.lengths.average()
 
                 val numWeights = connectionChromosome.products.size
@@ -132,15 +130,19 @@ val evolveNetwork = newSim {
                 val m1error = abs(m1.activation - 2.5)
                 val m2error = abs(m2.activation + 3)
 
-                // val avgActivationError = abs(avgActivation - 5)
-                val totalActivationError = abs(totalActivation - 10)
-                val lengthError = abs(avgLength - 50)
-                val numWeightsError = abs(numWeights - 100)
-                val networkSize = bounds.height * bounds.width / 10_000
-
                 // TODO: Normalize errors
-                return networkSize - (lengthError + numWeightsError +
-                        totalActivationError + m1error + m2error)
+                val numNodesError = abs(network.looseNeurons.size - 20).toDouble()
+                val numWeightsError = abs(numWeights - 40)
+                val axonLengthError = abs(avgLength - 50)
+                val avgActivationError = abs(avgActivation - 5)
+                val totalActivationError = abs(totalActivation - 10)
+
+                val bounds  = network.looseNeurons.bound
+                val size = bounds.height * bounds.width / 10_000
+                val sizeError = abs(size - 10)
+
+                return m1error + m2error + numNodesError + numWeightsError + axonLengthError +
+                        totalActivationError + sizeError
 
             }
             val result = fitness()
@@ -174,8 +176,8 @@ val evolveNetwork = newSim {
     val evolution = evaluator(environmentBuilder) {
         populationSize = 100
         eliminationRatio = 0.5
-        optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-        runUntil { generation == 250 || fitness > 200 }
+        optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
+        runUntil { generation == 250 || fitness < .01 }
     }
 
     workspace.clearWorkspace()
@@ -185,7 +187,7 @@ val evolveNetwork = newSim {
     }
 
     val (winner, fitness) = generations.best
-    println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
+    // println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
     winner.prettyBuild().peek()
 
 }

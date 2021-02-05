@@ -28,6 +28,7 @@ public class FilterCollectionGui {
         this.filterCollection = filterCollection;
         filterCollection.getEvents().onFilterAdded(s -> updateComboBox());
         filterCollection.getEvents().onFilterRemoved(s -> updateComboBox());
+        filterCollection.getEvents().onFilterChanged(this::updateComboBox);
     }
 
     public JToolBar getToolBar() {
@@ -92,7 +93,9 @@ public class FilterCollectionGui {
                     JOptionPane.showMessageDialog(null, "Can't remove unfiltered option");
                     return;
                 }
-                int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete sensor panel \"" + filter.getName() + "\" ?", "Warning", JOptionPane.YES_NO_OPTION);
+                int dialogResult = JOptionPane.showConfirmDialog(filterEditorDialog,
+                        "Are you sure you want to delete filter panel \"" + filter.getName() + "\" ?", "Warning",
+                        JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     filterCollection.removeFilter(filter);
                     updateComboBox();

@@ -40,18 +40,26 @@ val simulations = dir<NewSimulation>("Simulations") {
  */
 fun main(args: Array<String>) {
 
-    if (args.isEmpty()) throw IllegalArgumentException("""
-        Please supply a simulation name. A list of possible values are:
-        ${simulations.items.map { (name, _) -> name }.joinToString(", ")}
-    """.trimIndent())
+    if (args.isEmpty()) throw IllegalArgumentException(
+        "Please supply a simulation name or an index. A list of possible values are:\n" +
+        simulations.items.mapIndexed { index, (name, _) ->
+        "\t$index. $name"
+        }.joinToString("\n")
+    )
 
-    val name = args[0]
-    val (_, sim) = simulations.items
-        .firstOrNull { (key, _) -> key == name } ?:
-            throw IllegalArgumentException("""
-                Simulation $name not found. A list of possible values are:
-                ${simulations.items.map { (name, _) -> name }.joinToString(", ")}
-            """.trimIndent())
-
+    val (_, sim) = try {
+        val index = args[0].toInt()
+        simulations.items.drop(index).first()
+    } catch (e: NumberFormatException) {
+        val name = args[0]
+        simulations.items
+            .firstOrNull { (key, _) -> key == name } ?:
+        throw IllegalArgumentException(
+                "Simulation $name not found. A list of possible values are:\n" +
+                simulations.items.mapIndexed { index, (name, _) -> "\t$index. $name" }.joinToString("\n")
+            )
+    } catch (e: NoSuchElementException) {
+        throw IllegalArgumentException("Index is out of bound")
+    }
     sim.run()
 }

@@ -111,7 +111,8 @@ public final class SynapseNode extends ScreenElement {
     private static int minDiameter = 7;
 
     /**
-     * Color of lines in synapse representation.
+     * Color of lines in synapse representation. Also used for node representation.
+     * TODO: Move it somewhere more sensible.
      */
     private static Color lineColor = Color.black;
 
@@ -157,6 +158,9 @@ public final class SynapseNode extends ScreenElement {
         events.onSelected(s -> {
             getNetworkPanel().getSelectionManager().add(this);
         });
+
+        // Respond to spiking events
+        source.neuron.getEvents().onSpiked((o, n) -> updateSpikeColor());
 
     }
 
@@ -255,6 +259,13 @@ public final class SynapseNode extends ScreenElement {
         } else {
             circle.setPaint(excitatoryColor);
         }
+    }
+
+    /**
+     * When spiking change the color of the line.
+     */
+    private void updateSpikeColor() {
+        System.out.println("SynapseNode.updateSpikeColor");
         if (source.getNeuron().isSpike()) {
             line.setStrokePaint(NeuronNode.getSpikingColor());
         } else {

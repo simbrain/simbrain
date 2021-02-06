@@ -204,6 +204,9 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             updateColor();
             updateText();
         });
+        events.onSpiked((o, n) -> {
+            updateSpikeColor();
+        });
         events.onColorChange(this::updateColor);
         events.onLabelChange(this::updateTextLabel);
         events.onClampedChange((o, n) -> updateClampStatus());
@@ -371,12 +374,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         }
 
         if (!customStrokeColor) {
-            if (neuron.isSpike()) {
-                mainShape.setStrokePaint(spikingColor);
-                mainShape.setPaint(spikingColor);
-            } else {
-                mainShape.setStrokePaint(SynapseNode.getLineColor());
-            }
 
             // Color stroke paint based on Polarity
             if(neuron.getPolarity() == SimbrainConstants.Polarity.EXCITATORY) {
@@ -388,6 +385,22 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             }
         }
 
+    }
+
+    /**
+     * When spiking change the color of the line around the node.
+     */
+    private void updateSpikeColor() {
+        if (!customStrokeColor) {
+            if (neuron.isSpike()) {
+                mainShape.setStrokePaint(spikingColor);
+                mainShape.setPaint(spikingColor);
+            } else {
+                // "Erase" the spike color
+                // TODO: Interaction with polarity based coloring not tested.
+                mainShape.setStrokePaint(SynapseNode.getLineColor());
+            }
+        }
     }
 
     /**

@@ -1134,7 +1134,9 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     }
 
     public void setSpike(boolean spike) {
+        var oldSpike = this.spike;
         this.spike = spike;
+        events.fireSpiked(oldSpike, spike);
     }
 
     public boolean getSpkBuffer() {

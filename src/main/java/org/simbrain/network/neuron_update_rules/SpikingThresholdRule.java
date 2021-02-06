@@ -75,9 +75,6 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public double getRandomValue() {
         Random rand = new Random();

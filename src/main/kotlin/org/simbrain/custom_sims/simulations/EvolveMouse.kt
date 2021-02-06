@@ -201,13 +201,21 @@ val evolveMouse = newSim {
 
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(200)
+        val generations = createEvolution().start()
 
         launch(Dispatchers.Default) {
 
-            val generations = createEvolution().start().onEachGenerationBest { agent, gen ->
-                progressWindow.progressBar.value = gen
-                progressWindow.fitnessScore.text = "Error: ${agent.fitness.format(2)}"
+            withGui {
+                val progressWindow = ProgressWindow(200)
+                generations.onEachGenerationBest { agent, gen ->
+                    progressWindow.progressBar.value = gen
+                    progressWindow.fitnessScore.text = "Error: ${agent.fitness.format(2)}"
+                }
+                progressWindow.close()
+            }
+
+            generations.onEachGenerationBest { agent, gen ->
+                println("[$gen] Error: ${agent.fitness.format(6)}")
             }
 
             val (best, fitness) = generations.best
@@ -215,8 +223,6 @@ val evolveMouse = newSim {
             println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
 
             best.prettyBuild().peek()
-
-            progressWindow.close()
         }
 
     }

@@ -333,8 +333,9 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
      */
     inner class Result {
 
+        private var generation = 0
+
         private var generations = sequence {
-            var generation = 0
             var next = population
             do {
                 val current = next.parallelStream().map {
@@ -362,15 +363,14 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
         /**
          * Returns the wining agent builder and its fitness.
          */
-        val best: BuilderFitnessPair
-            get() = generations.last().first().let { (builder, fitness) ->
+        val best: BuilderFitnessPair get() = generations.last().first().let { (builder, fitness) ->
                 BuilderFitnessPair(builder.copy(), fitness)
             }
 
         /**
          * Returns the generation number.
          */
-        val finalGenerationNumber: Int get() = generations.count()
+        val finalGenerationNumber: Int get() = generation
 
         /**
          * Run the provided block at each generation. Context provides the whole population of builders.

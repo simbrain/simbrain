@@ -401,6 +401,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 mainShape.setStrokePaint(SynapseNode.getLineColor());
             }
         }
+
+
     }
 
     /**

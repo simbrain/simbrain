@@ -21,12 +21,14 @@ public class SmileTest {
 
         //Todo: Just put this through the paces.
         //  Try as much matrix stuff possible
-
+        long start_time;
+        long stop_time;
+        long difference;
         // Initial code to create a 2d matrix of floats
 
 
         // Create a 2x3 zero matrix
-
+        start_time = System.nanoTime();
         var matrix_a = Matrix.eye(2,3);
 
         // Get its shape
@@ -36,7 +38,9 @@ public class SmileTest {
         var result = "Shape: "+rows+" x "+cols;
         System.out.println("Shape: "+rows+" x "+cols);
         assertEquals("Shape: 2 x 3", result);
-
+        stop_time = System.nanoTime();
+        difference = stop_time - start_time;
+        System.out.println("Compute Time: "+difference);
         // Create a 2x3 matrix of ones
 
         double[][] ones = {{1.0,1.0,1.0},{1.0,1.0,1.0}};
@@ -46,9 +50,14 @@ public class SmileTest {
 
         // Confirm sum of entries is 6
 
+        start_time = System.nanoTime();
         var sums = matrix_ones.sum();
         System.out.println("Sums: "+sums);
         assertEquals(6.0, sums,0.0);
+        stop_time = System.nanoTime();
+        difference = stop_time - start_time;
+        System.out.println("Compute Time: "+difference);
+
         // Set the value of entry 1,3 to 3
 
         matrix_ones.set(0,2,3);
@@ -60,12 +69,16 @@ public class SmileTest {
 
         // Perform a matrix multiplication using simple values and confirm correct outputs
 
+        start_time = System.nanoTime();
         double[][] twos = {{2.0,2.0,2.0},{2.0,2.0,2.0}};
         var matrix_twos = new Matrix(2,3,twos);
         double[][] threes = {{3.0,3.0},{3.0,3.0},{3.0,3.0}};
         var matrix_threes = new Matrix(3,2,threes);
         var result_matrix = matrix_twos.mm(matrix_threes);
+        stop_time = System.nanoTime();
         System.out.println(result_matrix);
+        difference = stop_time - start_time;
+        System.out.println("Compute Time: "+difference);
 
         //TODO: Perform a dot product and confirm correct outputs
 

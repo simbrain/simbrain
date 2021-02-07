@@ -34,19 +34,16 @@ public class UndoManager {
     // Todo: implement a cap on max-undo.
     // Todo: prevent or constraint very large memory undaoble actions?
 
-
     /**
      * All actions that can be undone are pushed to this stack.
      */
-    private final Stack<UndoableAction> undoStack = new Stack<UndoableAction>();
+    private final Stack<UndoableAction> undoStack = new Stack<>();
 
     /**
      * When an action is undone, it is popped off the undo stack and pushed on
      * to this stack.
      */
-    private final Stack<UndoableAction> redoStack = new Stack<UndoableAction>();
-
-    // private final Network network;
+    private final Stack<UndoableAction> redoStack = new Stack<>();
 
     /**
      * Add a new undoable action.
@@ -104,11 +101,6 @@ public class UndoManager {
     public interface UndoableAction {
 
         /**
-         * Do the action.
-         */
-        void apply();
-
-        /**
          * Undo this action.
          */
         void undo();
@@ -129,11 +121,6 @@ public class UndoManager {
             Neuron newNeuron = new Neuron(network);
 
             @Override
-            public void apply() {
-                network.addLooseNeuron(newNeuron);
-            }
-
-            @Override
             public void undo() {
                 network.delete(newNeuron);
             }
@@ -146,8 +133,6 @@ public class UndoManager {
 
         manager.addUndoableAction(addNeuron);
 
-        System.out.println("Apply action");
-        addNeuron.apply();
         System.out.println(network);
         manager.printUndoRedoStats();
         System.out.println("Undo action");

@@ -313,14 +313,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     fun placeNeuron(neuron: Neuron) {
         placementManager.addNewModelObject(neuron)
 
-        // TODO: Smelly
         undoManager.addUndoableAction(object : UndoableAction {
-            override fun apply() {
-                network.addLooseNeuron(neuron)
-            }
             override fun undo() {
                 network.delete(neuron)
-                zoomToFitPage() // TODO: Why?
             }
             override fun redo() {
                 network.addLooseNeuron(neuron)
@@ -445,7 +440,18 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         fun delete(screenElement: ScreenElement) {
             with(network) {
                 when (screenElement) {
-                    is NeuronNode -> delete(screenElement.neuron, true)
+                    is NeuronNode -> {
+                        delete(screenElement.neuron, true)
+
+                        undoManager.addUndoableAction(object : UndoableAction {
+                            override fun undo() {
+                                network.addLooseNeuron(screenElement.neuron)
+                            }
+                            override fun redo() {
+                                network.delete(screenElement.neuron, true)
+                            }
+                        })
+                    }
                     is SynapseNode -> delete(screenElement.synapse)
                     is NeuronArrayNode -> delete(screenElement.neuronArray)
                     is WeightMatrixNode -> delete(screenElement.model)
@@ -708,9 +714,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     private fun addNetworkListeners() {
         val event = network.events
         event.onModelAdded { createNode(it) }
-        event.onModelRemoved { it.events.fireDeleted() }
+        event.onModelRemoved {
+            it.events.fireDeleted()
+            // TODO: For batch delete ideally this would only be called once
+            zoomToFitPage()
+        }
         event.onUpdateTimeDisplay { timeLabel.update() }
         event.onUpdateCompleted { repaint() }
+
     }
 
     private fun NetworkSelectionManager.setUpSelectionEvents() {

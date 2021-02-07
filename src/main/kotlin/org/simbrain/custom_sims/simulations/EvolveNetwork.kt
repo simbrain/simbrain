@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.placeComponent
-import org.simbrain.network.NetworkComponent
+import org.simbrain.network.bound
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.layouts.GridLayout
@@ -11,9 +11,8 @@ import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
-import org.simbrain.util.format
+import org.simbrain.network.util.lengths
 import org.simbrain.util.geneticalgorithms.*
-import org.simbrain.util.place
 import org.simbrain.util.point
 import java.io.File
 import java.util.*
@@ -28,7 +27,19 @@ val evolveNetwork = newSim {
 
         val network = Network()
 
-        val nodeChromosome = chromosome(5) {
+        /**
+         * Testing evolution of nodes with fixed characteristics
+         */
+        val motivations = chromosome(2) {
+            nodeGene() {
+                label = "Fixed node ${it+1}"
+                location = point(it*100,-50)
+                lowerBound = -10.0
+                upperBound = 10.0
+            }
+        }
+
+        val nodeChromosome = chromosome(2) {
             nodeGene() {
                 lowerBound = -10.0
                 upperBound = 10.0
@@ -51,9 +62,9 @@ val evolveNetwork = newSim {
 
             fun LayoutGene.mutateType() = mutate {
                 when (random.nextDouble()) {
-                    in 0.0..0.05 -> layout = GridLayout()
-                    in 0.05..0.1 -> layout = HexagonalGridLayout()
-                    in 0.1..0.15 -> layout = LineLayout()
+                    in 0.0..0.5 -> layout = GridLayout()
+                    in 0.5..1.0 -> layout = HexagonalGridLayout()
+                    // in 0.1..0.15 -> layout = LineLayout()
                 }
             }
 
@@ -72,6 +83,10 @@ val evolveNetwork = newSim {
             // New nodes
             if (Random().nextDouble() > .95) {
                 nodeChromosome.genes.add(nodeGene())
+            }
+
+            motivations.genes.forEach {
+                it.mutateBias()
             }
 
             nodeChromosome.genes.forEach {
@@ -102,16 +117,40 @@ val evolveNetwork = newSim {
 
             // Comment / Uncomment different choices of fitness function here
             fun fitness() : Double {
-                // return abs(nodeChromosome.products.activations.average() - 5)
-                return abs(nodeChromosome.products.activations.sum() - 20)
+
+                var avgLength = connectionChromosome.products.lengths.average()
+
+                val numWeights = connectionChromosome.products.size
+
+                val avgActivation = nodeChromosome.products.activations.average()
+                val totalActivation = nodeChromosome.products.activations.sum()
+
+                // Evolve fixed nodes to have specific activations 2.5 and -3
+                val (m1, m2) =  motivations.products
+                val m1error = abs(m1.activation - 2.5)
+                val m2error = abs(m2.activation + 3)
+
+                // TODO: Normalize errors
+                val numNodesError = abs(network.looseNeurons.size - 20).toDouble()
+                val numWeightsError = abs(numWeights - 40)
+                val axonLengthError = abs(avgLength - 50)
+                val avgActivationError = abs(avgActivation - 5)
+                val totalActivationError = abs(totalActivation - 10)
+
+                val bounds  = network.looseNeurons.bound
+                val size = bounds.height * bounds.width / 10_000
+                val sizeError = abs(size - 10)
+
+                return m1error + m2error + numNodesError + numWeightsError + axonLengthError +
+                        totalActivationError + sizeError
+
             }
             val result = fitness()
-            println("Fitness: ${result.format(3)}")
             result
         }
 
         onPeek {
-            val nc = addNetworkComponent("50 Percent Active", network)
+            val nc = addNetworkComponent("Network", network)
             placeComponent(nc, 0,0,400,400)
 
             // When run headless store the winning network
@@ -123,6 +162,8 @@ val evolveNetwork = newSim {
         onBuild { pretty ->
             val (layout) = +layoutChromosome
             network {
+                +motivations
+
                 (+nodeChromosome).apply {
                     layout.layoutNeurons(this)
                 }
@@ -136,20 +177,18 @@ val evolveNetwork = newSim {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 1000 || fitness < .01 }
+        runUntil { generation == 250 || fitness < .01 }
     }
 
     workspace.clearWorkspace()
 
-    val generations = evolution.start()
-    val (winner, fitness) = generations.last().first()
-    println("Winning fitness $fitness")
-    winner.copy().prettyBuild().peek()
+    val generations = evolution.start().onEachGenerationBest { agent, gen ->
+        println("Generation ${gen}, Fitness ${agent.fitness}")
+    }
 
-    // TODO: Not sure why below won't work
-    // val generations = evolution.start().forEachIndexed{gen, result ->
-    //     print("Generation ${gen}, Fitness ${result[0].fitness}")
-    // }
+    val (winner, fitness) = generations.best
+    // println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
+    winner.prettyBuild().peek()
 
 }
 

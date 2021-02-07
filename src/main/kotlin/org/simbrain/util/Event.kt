@@ -16,6 +16,8 @@ import java.util.function.Consumer
  * to handle them.  They are placed next to each other in subclasses so it is easy to track how event broadcasting
  * and event.
  *
+ * Note that change events using "old" and "new" will only fire if old is different from new.
+ *
  * Advantages of this design are: externally no need for strings, so all references can be autocompleted in the IDE.
  * Also, since the fireX and onX methods are (by convention) next to each other, it's easy
  * to get from the code where an event is fired in the code to where it is handled, and conversely.
@@ -27,7 +29,7 @@ import java.util.function.Consumer
  *  - `sevt0` (event with no argument),
  *  - `sevtn` (event to create something)
  *  - `sevto` (event to remove something)
- *  - `sevtc` (event to change something)
+ *  - `sevtc` (event to change something). Events are only fired when old and new are different.
  *  - `sevtar` (create both add & remove events).
  *
  *  They can be used just like other intellij built-in shortcuts, e.g `sout`.

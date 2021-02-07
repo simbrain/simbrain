@@ -46,11 +46,7 @@ public class UndoManager {
      */
     private final Stack<UndoableAction> redoStack = new Stack<UndoableAction>();
 
-    private final Network network;
-
-    public UndoManager(Network network) {
-        this.network = network;
-    }
+    // private final Network network;
 
     /**
      * Add a new undoable action.
@@ -127,7 +123,7 @@ public class UndoManager {
     // Test main
     public static void main(String[] args) {
         Network network = new Network();
-        UndoManager manager = new UndoManager(network);
+        UndoManager manager = new UndoManager();
         UndoableAction addNeuron = new UndoableAction() {
 
             Neuron newNeuron = new Neuron(network);

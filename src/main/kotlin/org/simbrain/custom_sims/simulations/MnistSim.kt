@@ -1,5 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.jetbrains.kotlinx.dl.datasets.handlers.TEST_IMAGES_ARCHIVE
 import org.jetbrains.kotlinx.dl.datasets.handlers.extractImages
 import org.simbrain.custom_sims.*
@@ -17,9 +20,11 @@ import javax.swing.JProgressBar
 /**
  * Image world coupled to a neural network.
  */
-val imageSim = newSim {
+val mnistSim = newSim {
 
     workspace.clearWorkspace()
+
+    val mainScope = MainScope()
 
     val networkComponent = addNetworkComponent("Neural Network")
 
@@ -51,14 +56,19 @@ val imageSim = newSim {
     world.filterCollection.currentFilter = threshold400
 
     // TODO: Performance issues..
-    // TODO: Progress bar (see shelved changes)
-    extractImages(TEST_IMAGES_ARCHIVE)
-        .take(100)
-        .map {it.toGrayScaleImage(28,28)}
-        .forEachIndexed { i, it ->
-            world.imageAlbum.addImage(it)
-            println("Loading $i")
+    mainScope.launch {
+        val progressWindow = ProgressWindow(1000)
+        launch(Dispatchers.Default) {
+            extractImages(TEST_IMAGES_ARCHIVE)
+                .take(1000)
+                .map {it.toGrayScaleImage(28,28)}
+                .forEachIndexed { i, it ->
+                    world.imageAlbum.addImage(it)
+                    progressWindow.progressBar.value = i
+                }
+            progressWindow.close()
         }
+    }
 
     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Swiss.gif"))
     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Poison.gif"))

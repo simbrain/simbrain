@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.math.SquashingFunctionEnum;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,10 +14,11 @@ import static org.junit.Assert.assertEquals;
 public class SigmoidalDiscreteRuleTest {
 
     @Test
-    public void testUpdate1Input1Output() {
+    public void testUpdate1InputToOutput() {
         Network net = new Network();
         SigmoidalRule sig = new SigmoidalRule();
 
+        // Testing Arctan ================================================
         // Setup the input neuron
         Neuron input1 =  new Neuron(net);
         input1.setActivation(0.5);
@@ -40,16 +42,34 @@ public class SigmoidalDiscreteRuleTest {
         net.addLooseSynapse(w12);
 
         // Upper Bound (u) = 2, lower bound (l) = -1, slope (m) = 1.7, bias (b) = 0.42, weighted input (W) = 0.5 * 1.5
-        // Discrete sigmoidal arctan
+        // Discrete sigmoidal Arctan
         net.update();
         assertEquals(1.57256, output.getActivation(), 0.00001);
+
+
+        // Testing hyperbolic tangent (Tanh) ================================================
+        // set the sig function to tanh
+        SquashingFunctionEnum sigFunc = SquashingFunctionEnum.TANH;
+        sig.setSquashFunctionType(sigFunc);
+//      the upper bound and lower bound have been reset from the line above.
+        sig.setUpperBound(2);
+        sig.setLowerBound(-1);
+
+        output.setUpdateRule(sig);
+
+        // Upper Bound (u) = 2, lower bound (l) = -1, slope (m) = 1.7, bias (b) = 0.42, weighted input (W) = 0.5 * 1.5
+        // Discrete sigmoidal Tanh
+        net.update();
+        assertEquals(1.80240, output.getActivation(), 0.00001);
+
     }
 
     @Test
-    public void testUpdate1Input2Outputs() {
+    public void testUpdate2InputsToOutput() {
         Network net = new Network();
         SigmoidalRule sig = new SigmoidalRule();
 
+        // Testing Arctan ================================================
         // Setup the input neuron
         Neuron input1 =  new Neuron(net);
         input1.setActivation(0.5);
@@ -87,14 +107,30 @@ public class SigmoidalDiscreteRuleTest {
         // Discrete sigmoidal arctan
         net.update();
         assertEquals(1.67571, output.getActivation(), 0.00001);
+
+        // Testing hyperbolic tangent (Tanh) ================================================
+        SquashingFunctionEnum sigFunc = SquashingFunctionEnum.TANH;
+        sig.setSquashFunctionType(sigFunc);
+        //  the upper bound and lower bound have been reset from the liine above.
+        sig.setUpperBound(2);
+        sig.setLowerBound(-1);
+
+        output.setUpdateRule(sig);
+
+        // Upper Bound (u) = 2, lower bound (l) = -1, slope (m) = 1.7, bias (b) = 0.42, weighted input (W) = 0.5 * 1.5
+        // + 0.3 * 1.4 = 1.17
+        // Discrete sigmoidal tanh
+        net.update();
+        assertEquals(1.92052, output.getActivation(), 0.00001);
     }
 
 
     @Test
-    public void testUpdate1Input3Outputs() {
+    public void testUpdate3InputToOutput() {
         Network net = new Network();
         SigmoidalRule sig = new SigmoidalRule();
 
+        // Testing Arctan ================================================
         // Setup the input neuron
         Neuron input1 =  new Neuron(net);
         input1.setActivation(0.5);
@@ -141,6 +177,21 @@ public class SigmoidalDiscreteRuleTest {
         // Discrete sigmoidal arctan
         net.update();
         assertEquals(0.13727, output.getActivation(), 0.00001);
+
+        // Testing hyperbolic tangent (Tanh) ================================================
+        SquashingFunctionEnum sigFunc = SquashingFunctionEnum.TANH;
+        sig.setSquashFunctionType(sigFunc);
+        //  the upper bound and lower bound have been reset from the line above.
+        sig.setUpperBound(1);
+        sig.setLowerBound(0);
+
+        output.setUpdateRule(sig);
+
+        // Upper Bound (u) = 1, lower bound (l) = 0, slope (m) = 1.89, bias (b) = -.45, weighted input (W) = 0.5 * 1.5
+        // + 0.3 * -1.4 + -0.2 * 1.23  = 0.084
+        // Discrete sigmoidal tanh
+        net.update();
+        assertEquals(0.059136, output.getActivation(), 0.00001);
     }
 
 }

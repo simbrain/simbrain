@@ -237,19 +237,12 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
 
         getImageAlbumButtons().forEach(imageAlbumToolbar::add);
 
-        JButton saveImageButton = new JButton();
-        saveImageButton.setIcon(ResourceManager.getSmallIcon("menu_icons/Save.png"));
-        saveImageButton.setToolTipText("Save Image");
-        saveImageButton.addActionListener(e -> {
-            saveImage();
-        });
-        sourceToolbar.add(saveImageButton);
-
         JButton createCanvas = new JButton();
         createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
-        createCanvas.setToolTipText("Create canvas");
-
+        createCanvas.setToolTipText("New canvas...");
         createCanvas.addActionListener(e -> {
+            // TODO: Create and show a dialog here.
+            //  First pass just use JOptionPane
             imageWorld.createBlankCanvas(10, 10);
         });
         sourceToolbar.add(createCanvas);

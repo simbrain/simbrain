@@ -34,6 +34,9 @@ fun NetworkPanel.addKeyBindings() {
     bindTo("I", networkActions.wandEditModeAction)
     bindTo("G", networkActions.neuronGroupAction)
     bind("Y") { showNeuronArrayCreationDialog() }
+    bind(CmdOrCtrl + 'Z') { undo() }
+    bind(CmdOrCtrl + Shift + 'Z') { redo() }
+    bind(CmdOrCtrl + 'Y') { redo() }
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModels() }
     bindTo("3", networkActions.selectIncomingWeightsAction)
@@ -52,7 +55,7 @@ sealed class KeyMask {
     operator fun plus(@MagicConstant(valuesFromClass = KeyStroke::class) key: Int) =
             KeyCombination(key, keyCode)
 
-    operator fun plus(keyMask: KeyMask) = KeyCombination(modifiers = keyMask.keyCode)
+    operator fun plus(keyMask: KeyMask) = KeyCombination(modifiers = this.keyCode or keyMask.keyCode)
 
     abstract val keyCode: Int
 }
@@ -81,7 +84,7 @@ class KeyCombination(
     constructor(char: Char, modifiers: Int = 0) : this(char.toInt(), modifiers)
 
     operator fun plus(keyMask: KeyMask) = KeyCombination(key, modifiers or keyMask.keyCode)
-    operator fun plus(key: Char) = KeyCombination(key)
+    operator fun plus(key: Char) = KeyCombination(key, modifiers)
     fun withKeyStroke(block: (KeyStroke) -> Unit) = key?.let { block(KeyStroke.getKeyStroke(it, modifiers)) }
     override fun toString() = "$modifiers + $key"
 }

@@ -51,7 +51,7 @@ interface TopLevelGene<T> {
 /**
  * A list of genes that is memoized during evolution.
  */
-class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>): CopyableObject {
+class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>) : CopyableObject {
     @Suppress("UNCHECKED_CAST")
     override fun copy(): Chromosome<T, G> {
         return Chromosome(genes.map { it.copy() as G }.toMutableList())
@@ -107,12 +107,11 @@ class TopLevelBuilderContext {
      * @param G the gene type, e.g. [LayoutGene]
      * @param C the inferred chromosome type, e.g. <Layout, LayoutGene>
      */
-    operator fun <T, G, C> C.unaryPlus() : List<T>
+    operator fun <T, G, C> C.unaryPlus(): List<T>
             where
-            G: Gene<T>,
-            G: TopLevelGene<T>,
-            C: Chromosome<T, G>
-    = genes.map { with(it) { build() } }
+            G : Gene<T>,
+            G : TopLevelGene<T>,
+            C : Chromosome<T, G> = genes.map { with(it) { build() } }
 
 }
 
@@ -126,21 +125,21 @@ class TopLevelBuilderContext {
  * @param random private field used by copy function
  */
 class EnvironmentBuilder private constructor(
-        private val chromosomeList: LinkedList<Chromosome<*, *>>,
-        private val template: EnvironmentBuilder.() -> Unit,
-        val seed: Int = Random.nextInt(),
-        val random: Random = Random(seed)
+    private val chromosomeList: LinkedList<Chromosome<*, *>>,
+    private val template: EnvironmentBuilder.() -> Unit,
+    val seed: Int = Random.nextInt(),
+    val random: Random = Random(seed)
 ) {
 
     /**
      * Main public constructor.
      */
-    constructor(builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder)
+    constructor(builder: EnvironmentBuilder.() -> Unit) : this(LinkedList(), builder)
 
     /**
-     * Public onstructor with a seed.
+     * Public constructor with a seed.
      */
-    constructor(seed: Int, builder: EnvironmentBuilder.() -> Unit): this(LinkedList(), builder, seed)
+    constructor(seed: Int, builder: EnvironmentBuilder.() -> Unit) : this(LinkedList(), builder, seed)
 
     /**
      * List of mutation tasks executed at each generation.
@@ -221,7 +220,7 @@ class EnvironmentBuilder private constructor(
         peekFunction = peek
     }
 
-    private inline fun <T, G: Gene<T>> createChromosome(initializeValue: () -> Chromosome<T, G>): Chromosome<T, G> {
+    private inline fun <T, G : Gene<T>> createChromosome(initializeValue: () -> Chromosome<T, G>): Chromosome<T, G> {
         return if (isInitial) {
             initializeValue().also { chromosomeList.add(it) }
         } else {
@@ -273,8 +272,8 @@ fun environmentBuilder(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuil
 /**
  * Use tihs to create an environment builder with an initial seed.
  */
-fun environmentBuilder(seed: Int, builder: EnvironmentBuilder.() -> Unit)
-        = EnvironmentBuilder(seed, builder).apply(builder)
+fun environmentBuilder(seed: Int, builder: EnvironmentBuilder.() -> Unit) =
+    EnvironmentBuilder(seed, builder).apply(builder)
 
 /**
  * Runs the evolutionary algorithm.
@@ -330,20 +329,21 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
     class RunUntilContext(val generation: Int, val fitness: Double)
 
     /**
-     * "Runs" the evolutionary algorithm.  Sequence is a lazy list. When you call .last
-     * the whole sequence is created, by sequentially creating successive generations, so that at any time only the
-     * last generation and the current one need to be in memory.
+     * Packages the result of a run of [Evaluator].
      */
-    fun start(): Sequence<List<BuilderFitnessPair>> {
-        return sequence {
-            var generation = 0
+    inner class Result {
+
+        private var generation = 0
+
+        private var generations = sequence {
             var next = population
             do {
                 val current = next.parallelStream().map {
                     val build = it.build()
                     val score = build.eval()
                     BuilderFitnessPair(it, score)
-                }.toList().sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
+                }.toList()
+                    .sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
 
                 val currentFitness = current[0].fitness
 
@@ -352,28 +352,64 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
                 yield(current)
 
                 next = survivors.map { it.environmentBuilder } + survivors.uniformSample()
-                        .take(populationSize - survivors.size)
-                        .map { it.environmentBuilder.copy().apply { mutate() } }
-                        .toList()
+                    .take(populationSize - survivors.size)
+                    .map { it.environmentBuilder.copy().apply { mutate() } }
+                    .toList()
 
                 generation++
             } while (!stoppingCondition(RunUntilContext(generation, currentFitness)))
         }
+
+        /**
+         * Returns the wining agent builder and its fitness.
+         */
+        val best: BuilderFitnessPair get() = generations.last().first().let { (builder, fitness) ->
+                BuilderFitnessPair(builder.copy(), fitness)
+            }
+
+        /**
+         * Returns the generation number.
+         */
+        val finalGenerationNumber: Int get() = generation
+
+        /**
+         * Run the provided block at each generation. Context provides the whole population of builders.
+         */
+        fun onEachGeneration(block: (agents: List<BuilderFitnessPair>, generationNumber: Int) -> Unit): Result = this
+            .apply {
+                generations = generations.onEachIndexed { index, list -> block(list, index) }
+            }
+
+        /**
+         * Like [onEachGeneration] but context only provides the (builder for) the fittest agent at each generation.
+         */
+        fun onEachGenerationBest(block: (agent: BuilderFitnessPair, generationNumber: Int) -> Unit): Result = this
+            .apply {
+                generations = generations.onEachIndexed { index, list -> block(list.first(), index) }
+            }
+
     }
+
+    /**
+     * "Runs" the evolutionary algorithm.  Sequence is a lazy list. When you call .last()
+     * the whole sequence is created, by sequentially creating successive generations, so that at any time only the
+     * last generation and the current one need to be in memory.
+     */
+    fun start() = Result()
 }
 
 /**
  * Create the evaluator.
  */
 fun evaluator(environmentBuilder: EnvironmentBuilder, template: Evaluator.() -> Unit) =
-        Evaluator(environmentBuilder).apply(template)
+    Evaluator(environmentBuilder).apply(template)
 
 /**
- * Helper function to uniformly sample builder fitness papers.  Used to choose survivors
+ * Helper function to uniformly sample builder fitness papers. Used to choose survivors
  * for replenishing a population.
  */
 fun List<BuilderFitnessPair>.uniformSample() = sequence {
-    while(true) {
+    while (true) {
         // TODO: use evaluator random
         val index = (Math.random() * size).toInt()
         yield(this@uniformSample[index])

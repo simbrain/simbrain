@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.opencv.core.Mat;
 import smile.math.matrix.Matrix;
 import static org.junit.Assert.assertEquals;
+import smile.math.matrix.Matrix.EVD;
 
 /**
  * @return
@@ -107,5 +108,18 @@ public class SmileTest {
         System.out.println(result_matrix);
         assertEquals(8.0, result_matrix.sum(),0.0);
 
+        // Testing for eigenvalue
+        var eigenvalue = result_matrix.eigen();
+        var eigen_matrix = new Matrix.EVD(eigenvalue.wr, eigenvalue.wi, eigenvalue.Vl, eigenvalue.Vr);
+        double[] res = eigen_matrix.wr;
+        for(double x:res){
+            if(x < 1e-10){
+                System.out.println(0.0);
+            }
+            else {
+                System.out.println(x);
+            }
+        }
+        System.out.println(eigen_matrix.diag());
     }
 }

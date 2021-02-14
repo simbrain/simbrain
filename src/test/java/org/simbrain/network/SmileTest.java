@@ -40,7 +40,7 @@ public class SmileTest {
         assertEquals("Shape: 2 x 3", result);
         stop_time = System.nanoTime();
         difference = stop_time - start_time;
-        System.out.println("Compute Time: "+difference);
+        System.out.println("Compute Time: "+difference/1e6+" ms");
         // Create a 2x3 matrix of ones
 
         double[][] ones = {{1.0,1.0,1.0},{1.0,1.0,1.0}};
@@ -56,7 +56,7 @@ public class SmileTest {
         assertEquals(6.0, sums,0.0);
         stop_time = System.nanoTime();
         difference = stop_time - start_time;
-        System.out.println("Compute Time: "+difference);
+        System.out.println("Compute Time: "+difference/1e6+" ms");
 
         // Set the value of entry 1,3 to 3
 
@@ -78,9 +78,34 @@ public class SmileTest {
         stop_time = System.nanoTime();
         System.out.println(result_matrix);
         difference = stop_time - start_time;
-        System.out.println("Compute Time: "+difference);
+        System.out.println("Compute Time: "+difference/1e6+" ms");
 
         //TODO: Perform a dot product and confirm correct outputs
+
+        //--------------WeightMatrixTest implementation----
+
+        // Set first entry to 4
+
+        var weightMatrix = new Matrix(2,2);
+        weightMatrix.set(0,0,4.0);
+        assertEquals(4.0, weightMatrix.get(0,0),0.0);
+
+        // Set to ((0,0);(0,0))
+        weightMatrix.set(0,0,0.0);
+        assertEquals(0.0,weightMatrix.sum(),0.0);
+
+
+        // Add 1 to each entry. Should get ((1,1);(1,1))
+
+        weightMatrix.add(1.0);
+        assertEquals(4.0, weightMatrix.sum(),0.0);
+
+
+        // Multiply by itself.  Should get ((2,2);(2,2))
+
+        result_matrix = weightMatrix.mm(weightMatrix);
+        System.out.println(result_matrix);
+        assertEquals(8.0, result_matrix.sum(),0.0);
 
     }
 }

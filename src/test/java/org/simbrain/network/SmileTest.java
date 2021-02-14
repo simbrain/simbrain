@@ -27,7 +27,7 @@ public class SmileTest {
         long difference;
         // Initial code to create a 2d matrix of floats
 
-
+        System.out.println("Basic tests:");
         // Create a 2x3 zero matrix
         start_time = System.nanoTime();
         var matrix_a = Matrix.eye(2,3);
@@ -84,7 +84,7 @@ public class SmileTest {
         //TODO: Perform a dot product and confirm correct outputs
 
         //--------------WeightMatrixTest implementation----
-
+        System.out.println("WeightMatrix tests:");
         // Set first entry to 4
 
         var weightMatrix = new Matrix(2,2);
@@ -103,23 +103,47 @@ public class SmileTest {
 
 
         // Multiply by itself.  Should get ((2,2);(2,2))
-
+        start_time = System.nanoTime();
         result_matrix = weightMatrix.mm(weightMatrix);
+        stop_time = System.nanoTime();
         System.out.println(result_matrix);
+        difference = stop_time - start_time;
+        System.out.println("MATRIX MULTIPLICATION:");
+        System.out.println("Compute Time: "+difference/1e6+" ms");
         assertEquals(8.0, result_matrix.sum(),0.0);
 
+        //Matrix instantiation for large computations; Creating a 50x50 matrix of 5's
+
+        var large_matrix = new Matrix(50,50);
+        large_matrix.add(5.0);
+
         // Testing for eigenvalue
-        var eigenvalue = result_matrix.eigen();
+
+        start_time = System.nanoTime();
+        var eigenvalue = large_matrix.eigen();
+        stop_time = System.nanoTime();
+        difference = stop_time - start_time;
         var eigen_matrix = new Matrix.EVD(eigenvalue.wr, eigenvalue.wi, eigenvalue.Vl, eigenvalue.Vr);
-        double[] res = eigen_matrix.wr;
-        for(double x:res){
+        //double[] res = eigen_matrix.wr;
+        /*for(double x:res){
             if(x < 1e-10){
                 System.out.println(0.0);
             }
             else {
                 System.out.println(x);
             }
-        }
+        }*/
+        System.out.println("MATRIX EIGENVALUES:");
+        System.out.println("Compute Time: "+difference/1e6+" ms");
         System.out.println(eigen_matrix.diag());
+
+        //Matrix Decomposition
+        start_time = System.nanoTime();
+        var decompose = large_matrix.lu();
+        stop_time = System.nanoTime();
+        difference = stop_time - start_time;
+        System.out.println("MATRIX LU DECOMPOSITION:");
+        System.out.println("Compute Time: "+difference/1e6+" ms");
+        System.out.println(decompose.lu);
     }
 }

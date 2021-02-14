@@ -5,6 +5,7 @@ import org.opencv.core.Mat;
 import smile.math.matrix.Matrix;
 import static org.junit.Assert.assertEquals;
 import smile.math.matrix.Matrix.EVD;
+import smile.stat.distribution.GaussianDistribution;
 
 /**
  * @return
@@ -114,8 +115,8 @@ public class SmileTest {
 
         //Matrix instantiation for large computations; Creating a 50x50 matrix of 5's
 
-        var large_matrix = new Matrix(50,50);
-        large_matrix.add(5.0);
+        var large_matrix =  Matrix.rand(50,50, new GaussianDistribution(0,1));
+        //large_matrix.add(5.0);
 
         // Testing for eigenvalue
 

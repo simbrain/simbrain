@@ -88,9 +88,10 @@ public class FilterCollectionGui {
             // Delete filter
             JButton deleteFilter = new JButton("Delete Filter");
             deleteFilter.setToolTipText("Delete Filter");
+            deleteFilter.setAlignmentX(Component.CENTER_ALIGNMENT);
             deleteFilter.addActionListener(e -> {
                 if (filter.getName().equalsIgnoreCase("Unfiltered")) {
-                    JOptionPane.showMessageDialog(null, "Can't remove unfiltered option");
+                    JOptionPane.showMessageDialog(filterEditorDialog, "Can't remove unfiltered option");
                     return;
                 }
                 int dialogResult = JOptionPane.showConfirmDialog(filterEditorDialog,

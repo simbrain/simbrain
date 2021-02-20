@@ -155,9 +155,6 @@ public final class SynapseNode extends ScreenElement {
             updateColor();
             updateDiameter();
         });
-        events.onSelected(s -> {
-            getNetworkPanel().getSelectionManager().add(this);
-        });
 
         // Respond to spiking events
         source.neuron.getEvents().onSpiked((o, n) -> updateSpikeColor());

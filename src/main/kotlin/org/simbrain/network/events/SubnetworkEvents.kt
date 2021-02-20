@@ -11,9 +11,6 @@ import java.util.function.Consumer
  */
 class SubnetworkEvents(val subnet: Subnetwork) : LocationEvents(subnet) {
 
-    override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
-    override fun fireLocationChange() = "LocationChange"()
-
     fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
     fun fireLabelChange(old: String, new: String) = "LabelChange"(old = old, new = new)
 

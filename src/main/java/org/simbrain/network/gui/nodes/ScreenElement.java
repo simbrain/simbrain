@@ -119,9 +119,11 @@ public abstract class ScreenElement extends PPath.Float {
         private void showContextMenu(final PInputEvent event) {
             event.setHandled(true);
             JPopupMenu contextMenu = getContextMenu();
-            Point2D canvasPosition = event.getCanvasPosition();
-            //networkPanel.getPlacementManager().setLastClickedPosition(canvasPosition);
-            contextMenu.show(networkPanel.getCanvas(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
+            if (contextMenu != null) {
+                Point2D canvasPosition = event.getCanvasPosition();
+                //networkPanel.getPlacementManager().setLastClickedPosition(canvasPosition);
+                contextMenu.show(networkPanel.getCanvas(), (int) canvasPosition.getX(), (int) canvasPosition.getY());
+            }
         }
 
         @Override
@@ -155,9 +157,11 @@ public abstract class ScreenElement extends PPath.Float {
                 event.setHandled(true);
                 SwingUtilities.invokeLater(() -> {
                     JDialog propertyDialog = getPropertyDialog();
-                    propertyDialog.pack();
-                    propertyDialog.setLocationRelativeTo(null);
-                    propertyDialog.setVisible(true);
+                    if (propertyDialog != null) {
+                        propertyDialog.pack();
+                        propertyDialog.setLocationRelativeTo(null);
+                        propertyDialog.setVisible(true);
+                    }
                 });
             }
         }

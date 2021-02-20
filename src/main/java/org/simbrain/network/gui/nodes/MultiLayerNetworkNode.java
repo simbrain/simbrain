@@ -62,7 +62,6 @@ public class MultiLayerNetworkNode extends ScreenElement {
         super(networkPanel);
         this.net = dl4jNet;
 
-
         box.setPickable(true);
         addChild(box);
 

@@ -65,9 +65,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
         events.onRecordingStarted(this::updateText);
         events.onRecordingStopped(this::updateText);
-        events.onSelected(s -> {
-            getNetworkPanel().getSelectionManager().add(this);
-        });
+
     }
 
     /**

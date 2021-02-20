@@ -26,6 +26,7 @@ import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
+import org.simbrain.network.smile.SmileSVM
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.network.trainers.TrainingSet
@@ -336,6 +337,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is WeightMatrix -> createNode(model)
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
+            is SmileSVM -> createNode(model)
         }
     }
 
@@ -371,6 +373,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun createNode(multiLayerNet: MultiLayerNet) = addScreenElement {
         MultiLayerNetworkNode(this, multiLayerNet)
+    }
+
+    fun createNode(svm : SmileSVM) = addScreenElement {
+        SmileSVMNode(this, svm)
     }
 
     fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
@@ -458,6 +464,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
                     is MultiLayerNetworkNode -> delete(screenElement.model)
                     is TextNode -> deleteText(screenElement.textObject)
                     is InteractionBox -> deleteGroup(screenElement)
+                    is SmileSVMNode -> delete(screenElement.model)
                 }
             }
         }

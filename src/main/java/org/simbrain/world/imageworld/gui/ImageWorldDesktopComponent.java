@@ -17,9 +17,7 @@ import org.simbrain.world.imageworld.ImageWorldComponent;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.util.LinkedList;
 
@@ -64,6 +62,8 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
      * Button to go to the previous images.
      */
     private JButton previousImagesButton;
+
+//    public boolean paintMode = false;
 
     /**
      * Construct a new ImageDesktopComponent GUI.
@@ -241,23 +241,65 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
         createCanvas.setToolTipText("New canvas...");
         createCanvas.addActionListener(e -> {
+
             // TODO: Create and show a dialog here.
             //  First pass just use JOptionPane
-            imageWorld.createBlankCanvas(10, 10);
+
+            JTextField wInp = new JTextField(5);
+            JTextField hInp = new JTextField(5);
+
+            JPanel myPanel = new JPanel();
+            myPanel.add(new JLabel("Width:"));
+            myPanel.add(wInp);
+            myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+            myPanel.add(new JLabel("Height:"));
+            myPanel.add(hInp);
+
+            int result = JOptionPane.showConfirmDialog(null, myPanel, "Create new canvas, enter dimensions.", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                imageWorld.createBlankCanvas(Integer.parseInt(wInp.getText()), Integer.parseInt(hInp.getText()));
+            }
         });
         sourceToolbar.add(createCanvas);
 
-        // Add Color Picker
-        JButton setColorButton = new JButton();
-        setColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
-        setColorButton.setToolTipText("Pen Color");
-        setColorButton.addActionListener(e -> {
-            Color newColor = JColorChooser.showDialog(this, "Choose Color", penColor);
-            if (newColor != null) {
-                this.penColor = newColor;
+//        // Add Color Picker
+//        JButton setColorButton = new JButton();
+//        setColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
+//        setColorButton.setToolTipText("Pen Color");
+//        setColorButton.addActionListener(e -> {
+//            Color newColor = JColorChooser.showDialog(this, "Choose Color", penColor);
+//            if (newColor != null) {
+//                this.penColor = newColor;
+//            }
+//        });
+//        sourceToolbar.add(setColorButton);
+
+        Color colorList [] = {Color.white, Color.black, Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta};
+        String colorNames [] = {"White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta"};
+
+        JComboBox colorChoice = new JComboBox(colorNames);
+
+        JCheckBox draw = new JCheckBox("Draw");
+        draw.setSelected(false);
+        colorChoice.setEnabled(false);
+
+        draw.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if(e.getStateChange()==ItemEvent.SELECTED){
+                    colorChoice.setEnabled(true);
+                }else if(e.getStateChange()==ItemEvent.DESELECTED){
+                    colorChoice.setEnabled(false);
+                }
             }
         });
-        sourceToolbar.add(setColorButton);
+
+        colorChoice.addActionListener(e -> {
+            int index = colorChoice.getSelectedIndex();
+            this.penColor = colorList[index];
+
+        });
+        sourceToolbar.add(draw);
+        sourceToolbar.add(colorChoice);
 
     }
 

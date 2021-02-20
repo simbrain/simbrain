@@ -242,12 +242,10 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         createCanvas.setToolTipText("New canvas...");
         createCanvas.addActionListener(e -> {
 
-            // TODO: Create and show a dialog here.
-            //  First pass just use JOptionPane
-
             JTextField wInp = new JTextField(5);
             JTextField hInp = new JTextField(5);
-
+            wInp.setText("20");
+            hInp.setText("20");
             JPanel myPanel = new JPanel();
             myPanel.add(new JLabel("Width:"));
             myPanel.add(wInp);

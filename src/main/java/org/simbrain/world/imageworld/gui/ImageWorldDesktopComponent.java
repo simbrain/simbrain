@@ -242,12 +242,10 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         createCanvas.setToolTipText("New canvas...");
         createCanvas.addActionListener(e -> {
 
-            // TODO: Create and show a dialog here.
-            //  First pass just use JOptionPane
-
             JTextField wInp = new JTextField(5);
             JTextField hInp = new JTextField(5);
-
+            wInp.setText("20");
+            hInp.setText("20");
             JPanel myPanel = new JPanel();
             myPanel.add(new JLabel("Width:"));
             myPanel.add(wInp);
@@ -283,13 +281,11 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         draw.setSelected(false);
         colorChoice.setEnabled(false);
 
-        draw.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                if(e.getStateChange()==ItemEvent.SELECTED){
-                    colorChoice.setEnabled(true);
-                }else if(e.getStateChange()==ItemEvent.DESELECTED){
-                    colorChoice.setEnabled(false);
-                }
+        draw.addItemListener(e -> {
+            if(e.getStateChange()==ItemEvent.SELECTED){
+                colorChoice.setEnabled(true);
+            }else if(e.getStateChange()==ItemEvent.DESELECTED){
+                colorChoice.setEnabled(false);
             }
         });
 
@@ -414,4 +410,8 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
     protected void closing() {
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(650,500);
+    }
 }

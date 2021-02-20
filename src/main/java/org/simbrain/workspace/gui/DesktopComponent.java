@@ -39,6 +39,8 @@ import java.io.*;
 /**
  * A gui view on a {@link org.simbrain.workspace.WorkspaceComponent}.
  *
+ * For a custom size override {@link #getPreferredSize()}
+ *
  * @param <E> the type of the workspace component.
  */
 public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPanel {
@@ -46,7 +48,12 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
     /**
      * serial version UID.
      */
-    private static final long serialVersionUID = 1L;
+    private final long serialVersionUID = 1L;
+
+    /**
+     * Default size for new components;
+     */
+    private final Dimension DEFAULT_SIZE = new Dimension(500,500);
 
     /**
      * Reference to workspace component.
@@ -400,7 +407,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
 
     @Override
     public Dimension getPreferredSize() {
-        // TODO. Magics
-        return new Dimension(500,500);
+        return DEFAULT_SIZE;
     }
 }

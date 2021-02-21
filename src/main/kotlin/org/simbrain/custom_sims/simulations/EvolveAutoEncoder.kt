@@ -21,7 +21,7 @@ val evolveAutoAssociator = newSim {
 
     val mainScope = MainScope()
 
-    val environmentBuilder = environmentBuilder {
+    val environmentBuilder = evolutionarySimulation {
 
         val network = Network()
 

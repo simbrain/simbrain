@@ -28,7 +28,7 @@ class GeneticsTest {
 
     @Test
     fun `node chromosome with repeating default genes creates specified neurons`() {
-        val environment = environmentBuilder {
+        val environment = evolutionarySimulation {
 
             val network = Network()
 
@@ -56,7 +56,7 @@ class GeneticsTest {
     @Test
     fun `node chromosome with individually specified default genes creates corresponding neurons`() {
         val defaultActivations = listOf(0.2, 0.7, 0.3, 0.6, 0.5)
-        val environment = environmentBuilder {
+        val environment = evolutionarySimulation {
 
             val network = Network()
 
@@ -89,7 +89,7 @@ class GeneticsTest {
 
         val network = Network()
 
-        val environment = environmentBuilder {
+        val environment = evolutionarySimulation {
             val inputs = chromosome(2) {
                 nodeGene {
                     activation = 0.75
@@ -118,7 +118,7 @@ class GeneticsTest {
 
     @Test
     fun `connection genes have correct references to node genes after copy`() {
-        val environment = environmentBuilder {
+        val environment = evolutionarySimulation {
 
             val network = Network()
 
@@ -161,7 +161,7 @@ class GeneticsTest {
 
     @Test
     fun `connection genes have correct references to node genes after mutation`() {
-        val environment = environmentBuilder {
+        val environment = evolutionarySimulation {
 
             val network = Network()
 
@@ -215,7 +215,7 @@ class GeneticsTest {
 
     @Test
     fun `coupling node chromosome with node chromosome creates correct couplings`() {
-        val environmentBuilder = environmentBuilder {
+        val environmentBuilder = evolutionarySimulation {
 
             val workspace = Workspace()
 

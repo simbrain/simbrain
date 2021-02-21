@@ -8,7 +8,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
-import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.util.activations
 import org.simbrain.network.util.lengths
@@ -23,7 +22,7 @@ import kotlin.math.abs
  */
 val evolveNetwork = newSim {
 
-    val environmentBuilder = environmentBuilder {
+    val environmentBuilder = evolutionarySimulation {
 
         val network = Network()
 
@@ -110,6 +109,18 @@ val evolveNetwork = newSim {
             connectionChromosome.forEach { it.mutateWeight() }
         }
 
+        onBuild { pretty ->
+            val (layout) = +layoutChromosome
+            network {
+                +motivations
+
+                (+nodeChromosome).apply {
+                    layout.layoutNeurons(this)
+                }
+                +connectionChromosome
+            }
+        }
+
         onEval {
 
             // Iterate to stabilize network but sometimes fails for small numbers.
@@ -145,8 +156,8 @@ val evolveNetwork = newSim {
                         totalActivationError + sizeError
 
             }
-            val result = fitness()
-            result
+
+            fitness()
         }
 
         onPeek {
@@ -156,18 +167,6 @@ val evolveNetwork = newSim {
             // When run headless store the winning network
             if (desktop == null) {
                 workspace.save(File("evolved.zip"))
-            }
-        }
-
-        onBuild { pretty ->
-            val (layout) = +layoutChromosome
-            network {
-                +motivations
-
-                (+nodeChromosome).apply {
-                    layout.layoutNeurons(this)
-                }
-                +connectionChromosome
             }
         }
 

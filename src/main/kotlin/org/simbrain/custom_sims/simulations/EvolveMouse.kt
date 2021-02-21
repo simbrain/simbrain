@@ -24,7 +24,7 @@ val evolveMouse = newSim {
     val mainScope = MainScope()
 
     fun createEvolution(): Evaluator {
-        val environmentBuilder = environmentBuilder(1) {
+        val environmentBuilder = evolutionarySimulation(1) {
 
             val inputs = chromosome(3) {
                 nodeGene()
@@ -159,7 +159,7 @@ val evolveMouse = newSim {
             }
 
             onEval {
-                var score = 0.0
+                var fitness = 0.0
 
                 // cheeses.forEach {
                 //     it.onCollide { other ->
@@ -173,7 +173,7 @@ val evolveMouse = newSim {
                     repeat(100) {
                         simpleIterate()
                         val energy = abs(outputs.products.activations.sum()) + 5
-                        score += energy / 1000
+                        fitness += energy / 1000
                     }
                 }
 
@@ -181,7 +181,7 @@ val evolveMouse = newSim {
                 //     .maxOf { it }
                 //     .let { if (it < 0) 0.0 else it } / 100
 
-                score
+                fitness
             }
 
             onPeek {

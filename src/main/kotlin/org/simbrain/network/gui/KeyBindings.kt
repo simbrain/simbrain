@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.intellij.lang.annotations.MagicConstant
 import org.simbrain.network.LocatableModel
+import org.simbrain.network.smile.SmileSVM
 import org.simbrain.util.Utils
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent.*
@@ -26,11 +27,11 @@ fun NetworkPanel.addKeyBindings() {
     bind(CmdOrCtrl + 'D') { duplicate() }
     bind(VK_ESCAPE) { selectionManager.clear(); selectionManager.clearAllSource() }
     bind("C") { clearSelectedObjects() }
-    bind(Alt + 'D') { println(network) }
+    bind(Alt + 'D') { println(network) } // Print debug information
     bind(Alt + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
-    bind(Shift + 'T') { showLMS() } // TODO: Temp.  Add to regular menu actions when done.
+    bind(Shift + 'T') { network.addSVM(SmileSVM()) } // TODO: Temp testing key command
     bindTo("I", networkActions.wandEditModeAction)
     bindTo("G", networkActions.neuronGroupAction)
     bind("Y") { showNeuronArrayCreationDialog() }

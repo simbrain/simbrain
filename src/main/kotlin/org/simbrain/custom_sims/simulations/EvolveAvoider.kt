@@ -26,7 +26,7 @@ val evolveAvoider = newSim {
     val scope = MainScope()
 
     fun createEvolution(): Evaluator {
-        val environmentBuilder = environmentBuilder(1) {
+        val environmentBuilder = evolutionarySimulation(1) {
 
             // Set up the chromosomes.
 

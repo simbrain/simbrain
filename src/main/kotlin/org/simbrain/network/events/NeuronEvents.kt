@@ -18,9 +18,6 @@ class NeuronEvents(val neuron: Neuron) : LocationEvents(neuron) {
     fun onSpiked(handler: BiConsumer<Boolean, Boolean>) = "Spiked".itemChangedEvent(handler)
     fun fireSpiked(old: Boolean, new: Boolean) = "Spiked"(old = old, new = new)
 
-    override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
-    override fun fireLocationChange() = "LocationChange"()
-
     fun onLabelChange(handler: Runnable) = "LabelChange".event(handler)
     fun fireLabelChange() = "LabelChange"()
 

@@ -17,9 +17,7 @@ import org.simbrain.world.imageworld.ImageWorldComponent;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.util.LinkedList;
 
@@ -47,6 +45,11 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
      * Main model object.
      */
     private ImageWorld imageWorld;
+
+    /**
+     * If true, allow painting
+     */
+    public boolean paintMode = false;
 
     private transient ImageClipboard clipboard;
 
@@ -110,20 +113,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         //    fileChooser.addExtension(descriptions[i], "." + exts[i]);
         // }
 
-        // Set up context menu
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                super.mouseClicked(evt);
-                if (evt.isControlDown() || (evt.getButton() == MouseEvent.BUTTON3)) {
-                    showContextMenu(evt);
-                }
-            }
-        });
-
-
     }
-
 
     /**
      * Central panel to render the image.
@@ -132,7 +122,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
 
         public ImagePanel() {
             super();
-            // TODO. Only paint in paint "mode"
+
             // Ability to paint pixels black and white
             MouseAdapter mouseAdapter = new MouseAdapter() {
 
@@ -144,6 +134,14 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
                 @Override
                 public void mousePressed(MouseEvent evt) {
                     drawPixel(evt);
+                }
+
+                @Override
+                public void mouseClicked(MouseEvent evt) {
+                    super.mouseClicked(evt);
+                    if (evt.isControlDown() || (evt.getButton() == MouseEvent.BUTTON3)) {
+                        showContextMenu(evt);
+                    }
                 }
             };
             addMouseListener(mouseAdapter);
@@ -161,12 +159,15 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
          * Draw a pixel at the current point in the image panel.
          */
         private void drawPixel(MouseEvent evt) {
+            if(!paintMode || evt.isControlDown() || (evt.getButton() == MouseEvent.BUTTON3) ) {
+                return;
+            }
             var image = imageWorld.getImageAlbum().getCurrentImage();
             var ratioX = 1.0 * getWidth() / image.getWidth();
             var ratioY = 1.0 * getHeight() / image.getHeight();
             var x = (int) (evt.getX() / ratioX);
             var y = (int) (evt.getY() / ratioY);
-            if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight() ) {
+            if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) {
                 return;
             }
             image.setRGB(x, y, penColor.getRGB());
@@ -241,23 +242,58 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
         createCanvas.setToolTipText("New canvas...");
         createCanvas.addActionListener(e -> {
-            // TODO: Create and show a dialog here.
-            //  First pass just use JOptionPane
-            imageWorld.createBlankCanvas(10, 10);
+            JTextField wInp = new JTextField(5);
+            JTextField hInp = new JTextField(5);
+            wInp.setText("20");
+            hInp.setText("20");
+            JPanel myPanel = new JPanel();
+            myPanel.add(new JLabel("Width:"));
+            myPanel.add(wInp);
+            myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+            myPanel.add(new JLabel("Height:"));
+            myPanel.add(hInp);
+            int result = JOptionPane.showConfirmDialog(null, myPanel, "Create new canvas, enter dimensions.", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                imageWorld.createBlankCanvas(Integer.parseInt(wInp.getText()), Integer.parseInt(hInp.getText()));
+            }
         });
         sourceToolbar.add(createCanvas);
 
-        // Add Color Picker
-        JButton setColorButton = new JButton();
-        setColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
-        setColorButton.setToolTipText("Pen Color");
-        setColorButton.addActionListener(e -> {
-            Color newColor = JColorChooser.showDialog(this, "Choose Color", penColor);
-            if (newColor != null) {
-                this.penColor = newColor;
-            }
+        //        // Add Color Picker
+        //        JButton setColorButton = new JButton();
+        //        setColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
+        //        setColorButton.setToolTipText("Pen Color");
+        //        setColorButton.addActionListener(e -> {
+        //            Color newColor = JColorChooser.showDialog(this, "Choose Color", penColor);
+        //            if (newColor != null) {
+        //                this.penColor = newColor;
+        //            }
+        //        });
+        //        sourceToolbar.add(setColorButton);
+
+        Color colorList[] = {Color.white, Color.black, Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta};
+        String colorNames[] = {"White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta"};
+        JComboBox colorChoice = new JComboBox(colorNames);
+        JCheckBox cbDrawMode = new JCheckBox("Draw");
+
+        paintMode = cbDrawMode.isSelected();
+        colorChoice.setEnabled(cbDrawMode.isSelected());
+        cbDrawMode.addItemListener(e -> {
+            paintMode = cbDrawMode.isSelected();
+            colorChoice.setEnabled(cbDrawMode.isSelected());
         });
-        sourceToolbar.add(setColorButton);
+
+        colorChoice.addActionListener(e -> {
+            int index = colorChoice.getSelectedIndex();
+            this.penColor = colorList[index];
+        });
+
+        sourceToolbar.add(cbDrawMode);
+        sourceToolbar.add(colorChoice);
+
+    }
+
+    private void syncDrawMode() {
 
     }
 
@@ -372,4 +408,8 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
     protected void closing() {
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(650, 500);
+    }
 }

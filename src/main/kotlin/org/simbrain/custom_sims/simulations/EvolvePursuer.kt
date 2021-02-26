@@ -27,7 +27,7 @@ val evolvePursuer = newSim {
     val mainScope = MainScope()
 
     fun createEvolution(): Evaluator {
-        val environmentBuilder = environmentBuilder(1) {
+        val environmentBuilder = evolutionarySimulation(1) {
 
             val inputs = chromosome(3) {
                 nodeGene()

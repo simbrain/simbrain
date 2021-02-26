@@ -27,6 +27,7 @@ import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.smile.SmileSVM;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimpleIdManager;
@@ -109,6 +110,7 @@ public class Network {
     private List<NeuronGroup> neuronGroups  = new ArrayList<>();
     private List<SynapseGroup> synapseGroups  = new ArrayList<>();
     private List<Subnetwork> subnetworks  = new ArrayList<>();
+    private List<SmileSVM> svmList  = new ArrayList<>();
 
     /**
      * Text objects.
@@ -396,6 +398,11 @@ public class Network {
         events.fireModelAdded(na);
     }
 
+    public void addSVM(SmileSVM svm) {
+        svmList.add(svm);
+        events.fireModelAdded(svm);
+    }
+
     public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
         multiLayerNetworks.add(network);
         events.fireModelAdded(network);
@@ -501,6 +508,11 @@ public class Network {
         neuronGroups.remove(ng);
         ng.delete();
         events.fireModelRemoved(ng);
+    }
+
+    public void delete(final SmileSVM svm) {
+        svmList.remove(svm);
+        events.fireModelRemoved(svm);
     }
 
     public void delete(SynapseGroup sg) {
@@ -1074,6 +1086,7 @@ public class Network {
         naList.forEach(ret::append);
         weightMatrices.forEach(ret::append);
         textList.forEach(ret::append);
+        svmList.forEach(ret::append);
         return ret.toString();
     }
 
@@ -1178,6 +1191,8 @@ public class Network {
                 addNeuronArray((NeuronArray) object);
             } else if (object instanceof  WeightMatrix) {
                 addWeightMatrix((WeightMatrix) object);
+            } else if (object instanceof SmileSVM) {
+                addSVM((SmileSVM) object);
             }
         }
     }

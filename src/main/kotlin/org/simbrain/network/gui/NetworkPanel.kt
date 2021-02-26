@@ -26,6 +26,7 @@ import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
+import org.simbrain.network.smile.SmileSVM
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.network.trainers.TrainingSet
@@ -313,14 +314,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     fun placeNeuron(neuron: Neuron) {
         placementManager.addNewModelObject(neuron)
 
-        // TODO: Smelly
         undoManager.addUndoableAction(object : UndoableAction {
-            override fun apply() {
-                network.addLooseNeuron(neuron)
-            }
             override fun undo() {
                 network.delete(neuron)
-                zoomToFitPage() // TODO: Why?
             }
             override fun redo() {
                 network.addLooseNeuron(neuron)
@@ -341,6 +337,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is WeightMatrix -> createNode(model)
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
+            is SmileSVM -> createNode(model)
         }
     }
 
@@ -376,6 +373,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun createNode(multiLayerNet: MultiLayerNet) = addScreenElement {
         MultiLayerNetworkNode(this, multiLayerNet)
+    }
+
+    fun createNode(svm : SmileSVM) = addScreenElement {
+        SmileSVMNode(this, svm)
     }
 
     fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
@@ -445,13 +446,25 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         fun delete(screenElement: ScreenElement) {
             with(network) {
                 when (screenElement) {
-                    is NeuronNode -> delete(screenElement.neuron, true)
+                    is NeuronNode -> {
+                        delete(screenElement.neuron, true)
+
+                        undoManager.addUndoableAction(object : UndoableAction {
+                            override fun undo() {
+                                network.addLooseNeuron(screenElement.neuron)
+                            }
+                            override fun redo() {
+                                network.delete(screenElement.neuron, true)
+                            }
+                        })
+                    }
                     is SynapseNode -> delete(screenElement.synapse)
                     is NeuronArrayNode -> delete(screenElement.neuronArray)
                     is WeightMatrixNode -> delete(screenElement.model)
                     is MultiLayerNetworkNode -> delete(screenElement.model)
                     is TextNode -> deleteText(screenElement.textObject)
                     is InteractionBox -> deleteGroup(screenElement)
+                    is SmileSVMNode -> delete(screenElement.model)
                 }
             }
         }
@@ -708,9 +721,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     private fun addNetworkListeners() {
         val event = network.events
         event.onModelAdded { createNode(it) }
-        event.onModelRemoved { it.events.fireDeleted() }
+        event.onModelRemoved {
+            it.events.fireDeleted()
+            // TODO: For batch delete ideally this would only be called once
+            zoomToFitPage()
+        }
         event.onUpdateTimeDisplay { timeLabel.update() }
         event.onUpdateCompleted { repaint() }
+
     }
 
     private fun NetworkSelectionManager.setUpSelectionEvents() {

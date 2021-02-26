@@ -54,7 +54,7 @@ class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<Int>
  */
 fun main() {
 
-    val environmentBuilder = environmentBuilder {
+    val environmentBuilder = evolutionarySimulation {
 
         /**
          * Set number of integers per chromosome here

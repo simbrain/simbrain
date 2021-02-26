@@ -19,7 +19,7 @@ import java.util.*
 
 val evolveXor = newSim {
 
-    val environmentBuilder = environmentBuilder {
+    val environmentBuilder = evolutionarySimulation {
 
         val network = Network()
 

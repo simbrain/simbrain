@@ -265,14 +265,14 @@ class EnvironmentBuilder private constructor(
 data class BuilderFitnessPair(val environmentBuilder: EnvironmentBuilder, val fitness: Double)
 
 /**
- * Use this to create an environment builder.
+ * Entry point for building an evolutionary simulation
  */
-fun environmentBuilder(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuilder(builder).apply(builder)
+fun evolutionarySimulation(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuilder(builder).apply(builder)
 
 /**
- * Use tihs to create an environment builder with an initial seed.
+ * Use this to create an environment builder with an initial seed.
  */
-fun environmentBuilder(seed: Int, builder: EnvironmentBuilder.() -> Unit) =
+fun evolutionarySimulation(seed: Int, builder: EnvironmentBuilder.() -> Unit) =
     EnvironmentBuilder(seed, builder).apply(builder)
 
 /**

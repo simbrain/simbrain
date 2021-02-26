@@ -7,16 +7,16 @@ import java.beans.PropertyChangeSupport
 /**
  * @see Event
  */
-abstract class LocationEvents(model: NetworkModel) : NetworkModelEvents(model) {
+open class LocationEvents(model: NetworkModel) : NetworkModelEvents(model) {
 
     /**
      * Handle location change events
      */
-    abstract fun onLocationChange(handler: Runnable)
+    open fun onLocationChange(handler: Runnable)  = "LocationChange".event(handler)
 
     /**
      * Fire a location change events.
      */
-    abstract fun fireLocationChange()
+    open fun fireLocationChange() = "LocationChange"()
 
 }

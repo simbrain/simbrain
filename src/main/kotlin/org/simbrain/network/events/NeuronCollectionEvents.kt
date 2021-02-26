@@ -12,9 +12,6 @@ import java.util.function.Consumer
  */
 class NeuronCollectionEvents(val nc: AbstractNeuronCollection) : LocationEvents(nc) {
 
-    override fun onLocationChange(handler: Runnable) = "LocationChange".event(handler)
-    override fun fireLocationChange() = "LocationChange"()
-
     fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
     fun fireLabelChange(old: String?, new: String) = "LabelChange"(old = old, new = new)
 

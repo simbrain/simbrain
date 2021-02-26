@@ -34,7 +34,7 @@ public class ImageWorld {
 
         // Image Album
         imageAlbum = new ImageAlbum();
-        imageAlbum.loadImage(ResourceManager.getImageIcon("imageworld/bobcat.jpg"));
+        imageAlbum.addImage(ResourceManager.getBufferedImage("imageworld/bobcat.jpg"));
 
         // Filter Selector
         filterCollection = new FilterCollection(imageAlbum);

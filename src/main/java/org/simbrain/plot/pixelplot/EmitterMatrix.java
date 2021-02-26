@@ -1,7 +1,9 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.plot.pixelplot;
 
 import org.simbrain.util.UserParameter;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
+import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.filters.Filter;
 
 import java.awt.image.BufferedImage;
@@ -20,7 +22,7 @@ import java.util.Arrays;
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class EmitterMatrix extends ImageSource {
+public class EmitterMatrix extends ImageSource implements AttributeContainer {
 
     @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
     private boolean usingRGBColor = false;

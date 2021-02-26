@@ -1,4 +1,4 @@
-package org.simbrain.world.imageworld.gui;
+package org.simbrain.plot.pixelplot;
 
 import org.simbrain.world.imageworld.ImageSource;
 
@@ -34,12 +34,16 @@ public class EmitterMatrixPanel extends JPanel {
      * Reference to last image provided, so we don't to have reload the image
      * every time we redraw the panel.
      */
-    private BufferedImage currentImage;
+    private BufferedImage currentImage = new BufferedImage(20, 20, BufferedImage.TYPE_INT_RGB);
+    // TODO. Currently hand set for testing.
 
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
-        if (currentImage == null) return;
+        if (currentImage == null) {
+            return;
+        }
+
         graphics.drawImage(currentImage, 0, 0, getWidth(), getHeight(), this);
 
         // Draw grid lines

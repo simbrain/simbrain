@@ -1,9 +1,9 @@
-package org.simbrain.world.imageworld.dialogs;
+package org.simbrain.plot.pixelplot;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.world.imageworld.PixelPlot;
+import org.simbrain.plot.pixelplot.PixelPlot;
 
 import javax.swing.*;
 import java.text.NumberFormat;

@@ -1,4 +1,4 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.plot.pixelplot;
 
 /**
  * The "Pixel display" component which allows data to be received from Neural networks
@@ -10,7 +10,7 @@ public class PixelPlot {
      * The BufferedImage that displays whatever pixel pattern is currently being
      * received from other Simbrain components via couplings.
      */
-    private EmitterMatrix emitterMatrix;
+    public EmitterMatrix emitterMatrix; // TODO: Public
 
     /**
      * Construct the image world.

@@ -1,4 +1,4 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.plot.pixelplot;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -26,8 +26,8 @@ public class PixelPlotComponent extends WorkspaceComponent {
     /**
      * Create an Image World Component from a Image World.
      */
-    public PixelPlotComponent() {
-        super("");
+    public PixelPlotComponent(String title) {
+        super(title);
         this.world = new PixelPlot();
         // TODO
         // world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
@@ -65,6 +65,7 @@ public class PixelPlotComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
+        containers.add(world.emitterMatrix);
         //TODO
         // // Main Consumer to display pixels
         // containers.add(world.getImageAlbum());

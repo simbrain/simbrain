@@ -192,6 +192,7 @@ public class WorkspaceActionManager {
                 createComponentFactoryAction(workspace, "Bar Chart", "menu_icons/BarChart.png"),
                 createComponentFactoryAction(workspace, "Histogram", "menu_icons/BarChart.png"),
                 createComponentFactoryAction(workspace, "Pie Chart", "menu_icons/PieChart.png"),
+                createComponentFactoryAction(workspace, "Pixel Plot", "menu_icons/grid.png"),
                 createComponentFactoryAction(workspace, "Projection Plot", "menu_icons/ProjectionIcon.png"),
                 createComponentFactoryAction(workspace, "Raster Plot", "menu_icons/ScatterIcon.png"),
                 createComponentFactoryAction(workspace, "Time Series", "menu_icons/CurveChart.png"));

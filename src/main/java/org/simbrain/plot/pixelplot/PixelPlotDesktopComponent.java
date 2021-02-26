@@ -1,11 +1,12 @@
-package org.simbrain.world.imageworld.gui;
+package org.simbrain.plot.pixelplot;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.DesktopComponent;
-import org.simbrain.world.imageworld.PixelPlotComponent;
+import org.simbrain.plot.pixelplot.PixelPlotComponent;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,8 +20,9 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
      */
     public PixelPlotDesktopComponent(GenericFrame frame, PixelPlotComponent component) {
         super(frame, component);
-        //TODO
-        // add(new ImageWorldDesktopPanel(this.getParentFrame(), this, getWorkspaceComponent().getWorld()));
+        setLayout(new BorderLayout());
+        // add(BorderLayout.NORTH,getPixelDisplayToolbar());
+        add(BorderLayout.CENTER, new EmitterMatrixPanel(true));
     }
 
 
@@ -34,7 +36,6 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         JButton editEmitterButton = new JButton();
         editEmitterButton.setIcon(ResourceManager.getSmallIcon("menu_icons/resize.png"));
         editEmitterButton.setToolTipText("Edit Emitter Matrix");
-        //TODO
         // editEmitterButton.addActionListener(evt -> {
         //     ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog((PixelConsumer) world);
         //     dialog.setVisible(true);

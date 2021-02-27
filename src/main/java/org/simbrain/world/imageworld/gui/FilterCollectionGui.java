@@ -3,6 +3,7 @@ package org.simbrain.world.imageworld.gui;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.dialogs.CreateFilterDialog;
 import org.simbrain.world.imageworld.filters.Filter;
@@ -76,7 +77,7 @@ public class FilterCollectionGui {
 
             // If the filter is a filtered image source, edit it too
             ImageSource imageSource = filter.getSource();
-            AnnotatedPropertyEditor filterEditor = new AnnotatedPropertyEditor(imageSource);
+            AnnotatedPropertyEditor filterEditor = new AnnotatedPropertyEditor((EditableObject) imageSource);
             dialogPanel.add(filterEditor);
             filterEditorDialog.addClosingTask(() -> {
                 filterEditor.commitChanges();

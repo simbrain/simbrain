@@ -7,10 +7,21 @@ import org.simbrain.plot.pixelplot.PixelPlotComponent;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
 
 public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotComponent> {
+
+    /**
+     * If true show grid lines.
+     */
+    private boolean showGridLines = true;
+
+    /**
+     * Displays the {@link EmitterMatrix}
+     */
+    private EmitterPanel emitterPanel = new EmitterPanel();
 
     /**
      * Construct a new PixelDisplayDesktopComponent GUI.
@@ -22,9 +33,49 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         super(frame, component);
         setLayout(new BorderLayout());
         // add(BorderLayout.NORTH,getPixelDisplayToolbar());
-        add(BorderLayout.CENTER, new EmitterMatrixPanel(true));
+        add(BorderLayout.CENTER, emitterPanel);
+        getWorkspaceComponent().getEvents().onComponentUpdated(() -> {
+            System.out.println("PixelPlotDesktopComponent.PixelPlotDesktopComponent");
+            repaint();
+        });
     }
 
+    private class EmitterPanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics graphics) {
+            super.paintComponent(graphics);
+            BufferedImage currentImage = getWorkspaceComponent().getEmitter().getImage();
+            if (currentImage == null) {
+                return;
+            }
+            graphics.drawImage(currentImage, 0, 0, getWidth(), getHeight(), this);
+
+            // Draw grid lines
+            if (showGridLines) {
+                // Don't draw gridlines in cases where they would obscure the image itself
+                // That is, only draw if image is zoomed in more than 10 times
+                if (getWidth() > currentImage.getWidth() * 10 && getHeight() > currentImage.getHeight() * 10) {
+                    graphics.setColor(Color.GRAY);
+                    for (int i = 0; i < currentImage.getWidth(); i++) {
+                        graphics.drawLine(
+                                (int) ((double) i / currentImage.getWidth() * getWidth()),
+                                0,
+                                (int) ((double) i / currentImage.getWidth() * getWidth()),
+                                getHeight()
+                        );
+                    }
+                    for (int i = 0; i < currentImage.getHeight(); i++) {
+                        graphics.drawLine(
+                                0,
+                                (int) ((double) i / currentImage.getHeight() * getHeight()),
+                                getWidth(),
+                                (int) ((double) i / currentImage.getHeight() * getHeight())
+                        );
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Toolbar buttons for pixel display world.
@@ -48,6 +99,5 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
     protected void closing() {
 
     }
-
 
 }

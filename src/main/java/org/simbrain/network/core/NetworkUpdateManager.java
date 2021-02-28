@@ -107,8 +107,7 @@ public class NetworkUpdateManager {
                             network.getSubnetworks(),
                             network.getSynapseGroups(),
                             network.getNeuronArrays(),
-                            network.getWeightMatrices(),
-                            network.getMultiLayerNetworks())
+                            network.getWeightMatrices())
                         .flatMap(Collection::stream).collect(Collectors.toList());
 
         for (NetworkModel nm : actionableModels) {

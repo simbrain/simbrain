@@ -3,9 +3,8 @@ package org.simbrain.network
 import junit.framework.Assert.assertEquals
 import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.junit.Test
-import org.simbrain.network.dl4j.WeightMatrixTest
+import org.simbrain.network.matrix.WeightMatrixTest
 import org.tensorflow.Tensor
-import org.tensorflow.op.core.MatrixDiagV2
 import java.nio.FloatBuffer
 
 /**

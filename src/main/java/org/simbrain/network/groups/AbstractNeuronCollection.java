@@ -1,16 +1,14 @@
 package org.simbrain.network.groups;
 
 import org.jetbrains.annotations.NotNull;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.dl4j.ArrayConnectable;
-import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.NeuronCollectionEvents;
+import org.simbrain.network.matrix.ArrayConnectable;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
@@ -25,10 +23,7 @@ import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.simbrain.network.LocatableModelKt.getCenterLocation;
@@ -84,7 +79,7 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     /**
      * For buffered update relative to weight matrices.
      */
-    private INDArray arrayBuffer;
+    private double[] arrayBuffer;
 
     /**
      * A single outgoing weight matrix is possible, to a neuron collection, group, or array.
@@ -419,28 +414,23 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     }
 
     @Override
-    public INDArray getOutputArray() {
-        float[] floatActivation = new float[getActivations().length];
-        // Potential performance cost, but no clear way around this
-        for (int i = 0; i < getActivations().length; i++) {
-            floatActivation[i] = (float) getActivations()[i];
-        }
-        return Nd4j.create(new int[]{floatActivation.length}, floatActivation);
+    public double[] getOutputArray() {
+        return getActivations();
     }
 
     @Override
-    public long inputSize() {
+    public int inputSize() {
         return neuronList.size();
     }
 
     @Override
-    public long outputSize() {
+    public int outputSize() {
         return neuronList.size();
     }
 
     @Override
-    public void setInputArray(INDArray activations) {
-        setInputValues(activations.toDoubleVector());
+    public void setInputArray(double[] activations) {
+        setInputValues(activations);
     }
 
     @Override
@@ -844,12 +834,12 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     @Override
     public void applyBufferValues() {
         if (arrayBuffer != null) {
-            setInputArray(arrayBuffer.dup());
+            setInputArray(Arrays.stream(arrayBuffer).toArray());
         }
     }
 
     @Override
-    public void setInputBuffer(INDArray activations) {
+    public void setInputBuffer(double[] activations) {
         arrayBuffer = activations;
     }
 }

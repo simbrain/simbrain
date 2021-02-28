@@ -18,10 +18,8 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.math.SquashingFunctionEnum;
 
 /**
  * <b>SigmoidalRule</b> provides various implementations of a standard sigmoidal
@@ -31,7 +29,7 @@ import org.simbrain.util.math.SquashingFunctionEnum;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunction {
+public class SigmoidalRule extends AbstractSigmoidalRule {
 
     // TODO: Possibly rename to "DiscreteSigmoidalRule"
 
@@ -45,11 +43,10 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
     /**
      * Construct a sigmoid update with a specified implementation.
      *
-     * @param sFunction the squashing function implementation to use.
      */
-    public SigmoidalRule(SquashingFunctionEnum sFunction) {
-        super(sFunction);
-    }
+    // public SigmoidalRule(SquashingFunctionEnum sFunction) {
+    //     super(sFunction);
+    // }
 
     @Override
     public final TimeType getTimeType() {
@@ -65,7 +62,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
             val += noiseGenerator.getRandom();
         }
 
-        val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());
+        // val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());
 
         neuron.setBuffer(val);
     }
@@ -106,7 +103,8 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
         double up = getUpperBound();
         double lw = getLowerBound();
         double diff = up - lw;
-        return sFunction.derivVal(val, up, lw, diff);
+        return 0;
+        // return sFunction.derivVal(val, up, lw, diff);
     }
 
     @Override
@@ -114,24 +112,24 @@ public class SigmoidalRule extends AbstractSigmoidalRule implements TransferFunc
         return "Sigmoidal (Discrete)";
     }
 
-    @Override
-    public void applyFunctionInPlace(INDArray input) {
-        applyFunction(input, input);
-    }
-
-    @Override
-    public void applyFunction(INDArray input, INDArray output) {
-        sFunction.valueOf(input, output, getUpperBound(), getLowerBound(), slope);
-    }
-
-    @Override
-    public void getDerivative(INDArray input, INDArray output) {
-        sFunction.derivVal(input, output, getUpperBound(), getLowerBound(), slope);
-    }
-
-    @Override
-    public void applyFunctionAndDerivative(INDArray input, INDArray output, INDArray derivative) {
-        sFunction.valueAndDeriv(input, output, derivative, getUpperBound(), getLowerBound(), slope);
-    }
+    // @Override
+    // public void applyFunctionInPlace(INDArray input) {
+    //     applyFunction(input, input);
+    // }
+    //
+    // @Override
+    // public void applyFunction(INDArray input, INDArray output) {
+    //     sFunction.valueOf(input, output, getUpperBound(), getLowerBound(), slope);
+    // }
+    //
+    // @Override
+    // public void getDerivative(INDArray input, INDArray output) {
+    //     sFunction.derivVal(input, output, getUpperBound(), getLowerBound(), slope);
+    // }
+    //
+    // @Override
+    // public void applyFunctionAndDerivative(INDArray input, INDArray output, INDArray derivative) {
+    //     sFunction.valueAndDeriv(input, output, derivative, getUpperBound(), getLowerBound(), slope);
+    // }
 
 }

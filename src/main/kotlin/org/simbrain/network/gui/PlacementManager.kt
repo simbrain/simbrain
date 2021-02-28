@@ -2,7 +2,7 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.dl4j.NeuronArray
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.gui.PlacementManager.DefaultOffsets
 import org.simbrain.network.topLeftLocation

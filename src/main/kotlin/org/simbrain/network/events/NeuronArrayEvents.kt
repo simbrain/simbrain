@@ -1,10 +1,8 @@
 package org.simbrain.network.events
 
-import org.simbrain.network.dl4j.NeuronArray
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.Event
-import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
-import java.util.function.Consumer
 
 /**
  * @see Event

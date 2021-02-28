@@ -1,10 +1,7 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.dl4j.NeuronArray
 import org.simbrain.network.events.NetworkSelectionEvent
-import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.nodes.*
 import java.util.concurrent.CopyOnWriteArraySet
 

@@ -20,7 +20,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.dl4j.NeuronArray;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;

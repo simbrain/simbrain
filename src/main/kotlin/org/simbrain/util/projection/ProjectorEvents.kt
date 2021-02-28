@@ -1,6 +1,5 @@
 package org.simbrain.util.projection
 
-import org.simbrain.network.dl4j.MultiLayerNet
 import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 

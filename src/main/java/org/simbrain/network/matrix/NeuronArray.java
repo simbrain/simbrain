@@ -1,14 +1,12 @@
-package org.simbrain.network.dl4j;
+package org.simbrain.network.matrix;
 
 
 import org.jetbrains.annotations.NotNull;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.NeuronArrayEvents;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -57,12 +55,12 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     /**
      * ND4J Array backing this object
      */
-    private INDArray neuronArray;
+    private double[] neuronArray;
 
     /**
      * For buffered update.
      */
-    private INDArray arrayBuffer;
+    private double[] arrayBuffer;
 
     /**
      * Center of the neuron array.
@@ -105,6 +103,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     public NeuronArray(Network net, int numNodes) {
         parent = net;
         this.id = net.getIdManager().getId(NeuronArray.class);
+        neuronArray = new double[numNodes];
         this.numNodes = numNodes;
         randomize();
     }
@@ -127,16 +126,12 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
 
     @Consumable()
     public void setValues(double[] values) {
-        float[] floatValues = Utils.castToFloat(values);
-        // TODO: Deal with the float issue, and make this set values in place of a float array, rather than
-        //  re-creating it every time! However there may be an nd4j optimization such that under the hood
-        //  not much object creation is happening
-        neuronArray = Nd4j.create(floatValues).reshape(neuronArray.rows(), neuronArray.columns());
+        neuronArray = values;
     }
 
     @Producible()
     public double[] getValues() {
-        return Nd4j.toFlattened(neuronArray).toDoubleVector();
+        return neuronArray;
     }
 
     /**
@@ -154,7 +149,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Simple randomization for now.
      */
     public void randomize() {
-        neuronArray = Nd4j.rand(1, numNodes).subi(0.5).mul(2); // row vector
+        neuronArray = SimbrainMath.randomVector(neuronArray.length, -1, 1);
         events.fireUpdated();
     }
 
@@ -167,11 +162,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     public int getNumNodes() {
-        return (int) neuronArray.length();
-    }
-
-    public INDArray getNeuronArray() {
-        return neuronArray;
+        return neuronArray.length;
     }
 
     @NotNull
@@ -254,7 +245,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Add increment to every entry in weight matrix
      */
     public void increment() {
-        neuronArray.addi(increment);
+        for (int i = 0; i < neuronArray.length; i++) {
+            neuronArray[i] += increment;
+        }
         events.fireUpdated();
     }
 
@@ -262,7 +255,9 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Subtract increment from every entry in weight matrix
      */
     public void decrement() {
-        neuronArray.subi(increment);
+        for (int i = 0; i < neuronArray.length; i++) {
+            neuronArray[i] -= increment;
+        }
         events.fireUpdated();
     }
 
@@ -270,7 +265,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
      * Clear activations;
      */
     public void clear() {
-        neuronArray.assign(0);
+        neuronArray = new double[neuronArray.length];
         events.fireUpdated();
     }
 
@@ -325,28 +320,28 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     @Override
-    public INDArray getOutputArray() {
+    public double[] getOutputArray() {
         return neuronArray;
     }
 
     @Override
-    public long inputSize() {
-        return neuronArray.length();
+    public int inputSize() {
+        return neuronArray.length;
     }
 
     @Override
-    public long outputSize() {
-        return neuronArray.length();
+    public int outputSize() {
+        return neuronArray.length;
     }
 
     @Override
-    public void setInputArray(INDArray activations) {
+    public void setInputArray(double[] activations) {
         neuronArray = activations;
-        numNodes = activations.columns();
+        numNodes = activations.length;
     }
 
     @Override
-    public void setInputBuffer(INDArray activations) {
+    public void setInputBuffer(double[] activations) {
         arrayBuffer = activations;
     }
 
@@ -358,7 +353,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     @Override
     public void applyBufferValues() {
         if (arrayBuffer != null) {
-            setInputArray(arrayBuffer.dup());
+            setInputArray(Arrays.stream(arrayBuffer).toArray());
         }
     }
 
@@ -388,8 +383,8 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         sb.append("Array [" + getId() + "] with " + inputSize() + " components\n");
         // TODO: For larger numbers could present as a matrix
         int maxToDisplay = 10;
-        if (neuronArray.length() < maxToDisplay) {
-            sb.append(Arrays.toString(neuronArray.toDoubleVector()));
+        if (neuronArray.length < maxToDisplay) {
+            sb.append(Arrays.toString(neuronArray));
         }
         return sb.toString();
     }

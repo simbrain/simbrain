@@ -20,10 +20,10 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.dl4j.ArrayConnectable;
-import org.simbrain.network.dl4j.MultiLayerNet;
-import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.matrix.ArrayConnectable;
+// import org.simbrain.network.dl4j.MultiLayerNet;
+import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
@@ -106,7 +106,7 @@ public class Network {
     private HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
 
     //TODO
-    private List<MultiLayerNet> multiLayerNetworks = new ArrayList<>();
+    // private List<MultiLayerNet> multiLayerNetworks = new ArrayList<>();
     private List<NeuronGroup> neuronGroups  = new ArrayList<>();
     private List<SynapseGroup> synapseGroups  = new ArrayList<>();
     private List<Subnetwork> subnetworks  = new ArrayList<>();
@@ -403,10 +403,10 @@ public class Network {
         events.fireModelAdded(svm);
     }
 
-    public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
-        multiLayerNetworks.add(network);
-        events.fireModelAdded(network);
-    }
+    // public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
+    //     multiLayerNetworks.add(network);
+    //     events.fireModelAdded(network);
+    // }
 
     /**
      * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
@@ -533,10 +533,10 @@ public class Network {
         events.fireModelRemoved(na);
     }
 
-    public void delete(MultiLayerNet mln) {
-        multiLayerNetworks.remove(mln);
-        events.fireModelRemoved(mln);
-    }
+    // public void delete(MultiLayerNet mln) {
+    //     multiLayerNetworks.remove(mln);
+    //     events.fireModelRemoved(mln);
+    // }
 
     public void delete(Subnetwork subnet) {
         subnetworks.remove(subnet);
@@ -915,8 +915,8 @@ public class Network {
         idManager.initId(Subnetwork.class, subnetworks.size() + 1);
         idManager.initId(NeuronArray.class, naList.size() + 1);
         idManager.initId(WeightMatrix.class, weightMatrices.size() + 1);
-        idManager.initId(MultiLayerNet.class, multiLayerNetworks.size() + 1);
-    }
+        // idManager.initId(MultiLayerNet.class, multiLayerNetworks.size() + 1);
+    }   
 
     /**
      * Perform operations required before saving a network. Post-opening operations occur in {@link #readResolve()}.
@@ -1309,9 +1309,9 @@ public class Network {
         return events;
     }
 
-    public List<MultiLayerNet> getMultiLayerNetworks() {
-        return  Collections.unmodifiableList(multiLayerNetworks);
-    }
+    // public List<MultiLayerNet> getMultiLayerNetworks() {
+    //     return  Collections.unmodifiableList(multiLayerNetworks);
+    // }
 
     public List<Subnetwork> getSubnetworks() {
         return Collections.unmodifiableList(subnetworks);

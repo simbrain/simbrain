@@ -1,8 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
-import org.nd4j.linalg.factory.Nd4j;
 import org.piccolo2d.util.PPaintContext;
-import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.gui.ImageBox;
 import org.simbrain.network.gui.NetworkPanel;
@@ -11,6 +9,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -101,9 +100,9 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         BufferedImage img = null;
 
         if (weightMatrix.isEnableRendering()) {
-            float[] activations = Nd4j.toFlattened(weightMatrix.getWeightMatrix()).toFloatVector();
-            img = ImageKt.toSimbrainColorImage(activations, weightMatrix.getWeightMatrix().columns(),
-                    weightMatrix.getWeightMatrix().rows());
+            double[] pixelArray = weightMatrix.getWeights();
+            img = ImageKt.toSimbrainColorImage(pixelArray, weightMatrix.getWeightMatrix().ncols(),
+                    weightMatrix.getWeightMatrix().nrows());
         }
 
         imageBox.setImage(img);
@@ -198,7 +197,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
             @Override
             public void actionPerformed(final ActionEvent event) {
                 StandardDialog dialog = new StandardDialog();
-                NumericTable table = new NumericTable(weightMatrix.getWeightMatrix().toDoubleMatrix());
+                NumericTable table = new NumericTable(weightMatrix.getWeightMatrix().toArray());
                 SimbrainJTable st = SimbrainJTable.createTable(table);
                 dialog.setContentPane(new SimbrainJTableScrollPanel(st));
 

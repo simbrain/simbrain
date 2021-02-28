@@ -3,19 +3,17 @@ package org.simbrain.network.gui
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.dl4j.NeuronArray
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.dialogs.TestInputPanel
-import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
+//import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
-import org.simbrain.network.gui.dialogs.network.LMSEditorDialog2
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.TextNode
-import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
@@ -68,11 +66,11 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
 }
 
 fun NetworkPanel.showMultiLayerNetworkCreationDialog() {
-    MultiLayerNetCreationDialog(this).apply {
-        pack()
-        setLocationRelativeTo(this)
-        isVisible = true
-    }
+//    MultiLayerNetCreationDialog(this).apply {
+//        pack()
+//        setLocationRelativeTo(this)
+//        isVisible = true
+//    }
 }
 
 val NetworkPanel.neuronDialog get() = selectionManager.filterSelectedModels<Neuron>().let { neurons ->
@@ -178,9 +176,9 @@ fun NetworkPanel.showWeightMatrix() {
  * Show dialog for LMS training
  */
 fun NetworkPanel.showLMSDialog(lms: LMSIterative) {
-    LMSEditorDialog2(this, lms).apply {
-        modalityType = Dialog.ModalityType.MODELESS
-        pack()
-        isVisible = true
-    }
+//    LMSEditorDialog2(this, lms).apply {
+//        modalityType = Dialog.ModalityType.MODELESS
+//        pack()
+//        isVisible = true
+//    }
 }

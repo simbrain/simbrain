@@ -52,7 +52,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
      * Current implementation.
      */
     @UserParameter(label = "Implementation", order = -10)
-    protected SquashingFunctionEnum sFunction;
+    protected SquashingFunctionEnum sFunction    ;
 
     /**
      * See {@link BiasedUpdateRule}. In a sigmoidal node, shifts the inflection point to the left or right of the origin.
@@ -95,18 +95,17 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
 
     public AbstractSigmoidalRule() {
         super();
-        sFunction = DEFAULT_SQUASHING_FUNCTION;
+        // sFunction = DEFAULT_SQUASHING_FUNCTION;
     }
 
     /**
-     * @param sFunction
      */
-    public AbstractSigmoidalRule(SquashingFunctionEnum sFunction) {
-        super();
-        this.sFunction = sFunction;
-        setUpperBound(sFunction.getDefaultUpperBound());
-        setLowerBound(sFunction.getDefaultLowerBound());
-    }
+    // public AbstractSigmoidalRule(SquashingFunctionEnum sFunction) {
+    //     super();
+    //     this.sFunction = sFunction;
+    //     setUpperBound(sFunction.getDefaultUpperBound());
+    //     setLowerBound(sFunction.getDefaultLowerBound());
+    // }
 
     public SquashingFunctionEnum getSquashFunctionType() {
         if (sFunction == null) {
@@ -197,7 +196,8 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         double up = getUpperBound();
         double lw = getLowerBound();
         double diff = up - lw;
-        return sFunction.inverseVal(val, up, lw, diff);
+        return 0;
+        // return sFunction.inverseVal(val, up, lw, diff);
     }
 
     @Override

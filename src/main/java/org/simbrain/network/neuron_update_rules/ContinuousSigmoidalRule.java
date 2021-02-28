@@ -23,7 +23,6 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.math.SquashingFunctionEnum;
 
 /**
  * <b>Continuous Sigmoidal Rule</b> provides various squashing function
@@ -89,12 +88,11 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     /**
      * Construct a sigmoid update with a specified implementation.
      *
-     * @param sFunction the implementation to use.
      */
-    public ContinuousSigmoidalRule(final SquashingFunctionEnum sFunction) {
-        super();
-        this.sFunction = sFunction;
-    }
+    // public ContinuousSigmoidalRule(final SquashingFunctionEnum sFunction) {
+    //     super();
+    //     this.sFunction = sFunction;
+    // }
 
     @Override
     public final ContinuousSigmoidalRule deepCopy() {
@@ -132,9 +130,11 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
         netActivation = netActivation * (1 - (leak * dt / tau)) + inputTerm;
 
-        double output = sFunction.valueOf(netActivation, getUpperBound(), getLowerBound(), getSlope());
+        // TODO
 
-        neuron.setBuffer(output);
+        // double output = sFunction.valueOf(netActivation, getUpperBound(), getLowerBound(), getSlope());
+
+        // neuron.setBuffer(output);
 
     }
 
@@ -147,7 +147,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
 
     public void update(int offset, final double[] arr) {
         arr[offset] = arr[offset + 2] * (1 - arr[offset + 3] * arr[offset + 4]) + arr[offset + 4] * arr[offset + 1];
-        arr[offset] = sFunction.valueOf(arr[offset], arr[offset + 5], arr[offset + 6], arr[offset + 7]);
+        // arr[offset] = sFunction.valueOf(arr[offset], arr[offset + 5], arr[offset + 6], arr[offset + 7]);
     }
 
     public int writeToArr(Network net, final double[] arr, int _offset) {
@@ -205,7 +205,8 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         double up = getUpperBound();
         double lw = getLowerBound();
         double diff = up - lw;
-        return sFunction.derivVal(val, up, lw, diff);
+        return 0;
+        // return sFunction.derivVal(val, up, lw, diff);
     }
 
     public double getSlope() {

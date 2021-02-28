@@ -1,8 +1,5 @@
-package org.simbrain.network.dl4j;
+package org.simbrain.network.matrix;
 
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.WeightMatrixEvents;
@@ -12,11 +9,13 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
+import smile.math.matrix.Matrix;
+import smile.stat.distribution.GaussianDistribution;
 
 import java.util.Arrays;
 
 /**
- * An ND4J weight matrix that connects a source and target {@link ArrayConnectable}
+ * An weight matrix that connects a source and target {@link ArrayConnectable}
  * object.
  */
 public class WeightMatrix implements EditableObject, AttributeContainer, NetworkModel {
@@ -61,7 +60,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     /**
      * The weight matrix object.
      */
-    private INDArray weightMatrix;
+    private Matrix weightMatrix;
 
     /**
      * WeightMatrixNode will render an image of this matrix if set to true
@@ -92,7 +91,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
 
         // Default for "adapter" cases is 1-1
         if (source instanceof NeuronCollection || target instanceof NeuronCollection) {
-            weightMatrix = Nd4j.create(source.outputSize(), target.inputSize());
+            weightMatrix = new Matrix(source.outputSize(), target.inputSize());
             diagonalize();
         } else {
             // For now randomize new matrices between arrays
@@ -134,7 +133,13 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      * result to target.
      */
     public void update() {
-        target.setInputArray(source.getOutputArray().mmul(weightMatrix));
+        // TODO: Check
+        double[][] outputArray = new double[][]{source.getOutputArray()};
+        target.setInputArray(Arrays.stream(new Matrix(1, source.inputSize(), outputArray)
+                .mm(weightMatrix)
+                .toArray())
+                .flatMapToDouble(Arrays::stream)
+                .toArray());
     }
 
     @Override
@@ -162,9 +167,9 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     @Override
     public String toString() {
         String ret = new String();
-        ret += weightMatrix.rows() + "x" + weightMatrix.columns() + " matrix [" + getId() + "] ";
+        ret += weightMatrix.nrows() + "x" + weightMatrix.ncols() + " matrix [" + getId() + "] ";
         ret += "  Connects " + source.getId() + " to " + target.getId() + "\n";
-        ret += "\t\t" + Arrays.deepToString(weightMatrix.toDoubleMatrix()) + "\n";
+        ret += "\t\t" + Arrays.deepToString(weightMatrix.toArray()) + "\n";
         return ret;
     }
 
@@ -176,13 +181,15 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         return target;
     }
 
-    public INDArray getWeightMatrix() {
+    public Matrix getWeightMatrix() {
         return weightMatrix;
     }
 
     @Producible
     public double[] getWeights() {
-        return Nd4j.toFlattened(weightMatrix).toDoubleVector();
+        return Arrays.stream(weightMatrix.toArray())
+                .flatMapToDouble(Arrays::stream)
+                .toArray();
     }
 
     public boolean isUseCurve() {
@@ -196,7 +203,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
 
     @Consumable
     public void setWeights(double[] newWeights) {
-        weightMatrix.data().setData(newWeights);
+        weightMatrix = new Matrix(newWeights); // TODO: Is this ok?
         events.fireUpdated();
     }
 
@@ -233,7 +240,8 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      * Randomize weights in this matrix
      */
     public void randomize() {
-        weightMatrix = Nd4j.rand((int) source.outputSize(), (int) target.inputSize()).subi(0.5).mul(2);
+        weightMatrix = Matrix.rand(source.outputSize(), (int) target.inputSize(),
+                new GaussianDistribution(0, 1));
         events.fireUpdated();
     }
 
@@ -245,7 +253,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      * Add increment to every entry in weight matrix
      */
     public void increment() {
-        weightMatrix.addi(increment);
+        weightMatrix.add(increment);
         events.fireUpdated();
     }
 
@@ -253,7 +261,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      * Subtract increment from every entry in weight matrix
      */
     public void decrement() {
-        weightMatrix.subi(increment);
+        weightMatrix.sub(increment);
         events.fireUpdated();
     }
 
@@ -261,7 +269,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      * Set all entries to 0.
      */
     public void clear() {
-        weightMatrix.assign(0);
+        weightMatrix = new Matrix(weightMatrix.nrows(), weightMatrix.ncols());
         events.fireUpdated();
     }
 
@@ -270,8 +278,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      */
     public void diagonalize() {
         clear();
-        INDArray id = Nd4j.eye(Math.min(source.outputSize(), target.inputSize()));
-        weightMatrix.get(NDArrayIndex.createCoveringShape(id.shape())).assign(id);
+        weightMatrix = Matrix.eye(Math.min(source.outputSize(), target.inputSize()));
         events.fireUpdated();
     }
 

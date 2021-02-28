@@ -20,11 +20,6 @@ package org.simbrain.util.projection;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dimensionalityreduction.PCA;
-import org.nd4j.linalg.indexing.NDArrayIndex;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.Arrays;
 
@@ -120,33 +115,6 @@ public class ProjectPCA extends ProjectionMethod {
         }
     }
 
-    /**
-     * Project using nd4j.  Still experimental.
-     */
-    private void projectND4J() {
-        if (projector.getUpstairs() == null) {
-            return;
-        }
-        if (projector.getUpstairs().getNumPoints() <= 2) {
-            return;
-        }
-        // TODO: case of 1 or 2 rows
-
-        INDArray upstairs = projector.getUpstairs().getArray();
-        //System.out.println(upstairs);
-        INDArray cov = PCA.covarianceMatrix(upstairs)[0];
-        INDArray results =  PCA.principalComponents(cov)[0];
-        //System.out.println(results);
-
-        int len = results.columns();
-        double[][] downstairs = projector
-                .getUpstairs()
-                .getArray()
-                .mmul(results.get(NDArrayIndex.all(),
-                        NDArrayIndex.interval(len-2,len))).toDoubleMatrix();
-
-        projector.getDownstairs().setData(downstairs);
-    }
 
     @Override
     public void init() {

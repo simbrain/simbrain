@@ -17,7 +17,6 @@ compileJava.options.encoding = 'UTF-8'
 
 def versionName = "Simbrain4Beta"
 def jmonkeyengine_version = '3.3.2-stable'
-def dl4j_version = "1.0.0-beta4" // beta5 not working on mac
 
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
@@ -50,9 +49,6 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.haifengl/smile-core
     compile group: 'com.github.haifengl', name: 'smile-core', version: '2.6.0'
 
-    // Logger for DL4J
-    compile 'ch.qos.logback:logback-classic:1.2.3'
-
     // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
     compile group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
 
@@ -80,10 +76,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/gov.nist.math/jama
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
-
-    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
-    compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
-    compile "org.nd4j:nd4j-native-platform:${dl4j_version}"
 
     // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
     compile group: 'org.swinglabs', name: 'swingx-core', version: '1.6.2-2'

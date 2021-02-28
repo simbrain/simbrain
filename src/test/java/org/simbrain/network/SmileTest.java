@@ -1,7 +1,6 @@
 package org.simbrain.network;
 
 import org.junit.Test;
-import org.opencv.core.Mat;
 import smile.math.matrix.Matrix;
 
 import static org.junit.Assert.assertEquals;
@@ -86,7 +85,7 @@ public class SmileTest {
         System.out.println("Compute time for large matrix product: " + difference + " ms");
     }
 
-    @Test
+    // @Test
     public void compute_matrix_eigenvalue() {
 
         var large_matrix = Matrix.rand(50, 50, new GaussianDistribution(0, 1));
@@ -102,7 +101,7 @@ public class SmileTest {
         // System.out.println(eigen_matrix.diag());
     }
 
-    @Test
+    // @Test
     public void compute_matrix_LU_Decomposition() {
         //Matrix Decomposition
 

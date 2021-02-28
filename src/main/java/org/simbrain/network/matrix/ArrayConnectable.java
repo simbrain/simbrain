@@ -1,11 +1,8 @@
-package org.simbrain.network.dl4j;
+package org.simbrain.network.matrix;
 
-import org.jetbrains.annotations.NotNull;
-import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.events.NetworkModelEvents;
 
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -19,27 +16,27 @@ public interface ArrayConnectable extends LocatableModel {
     /**
      * Set input activations.
      */
-    void setInputArray(INDArray activations);
+    void setInputArray(double[] activations);
 
     /**
      * Set input buffer to support buffered update.
      */
-    void setInputBuffer(INDArray activations);
+    void setInputBuffer(double[] activations);
 
     /**
      * Returns "output" activations.
      */
-    INDArray getOutputArray();
+    double[] getOutputArray();
 
     /**
      * (Possibly cached) input array size.
      */
-    long inputSize();
+    int inputSize();
 
     /**
      * (Possibly cached) output array size.
      */
-    long outputSize();
+    int outputSize();
 
     /**
      * Connection from another ArrayConncetable to this one.

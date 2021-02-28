@@ -3,10 +3,13 @@ package org.simbrain.network;
 import org.junit.Test;
 import smile.math.matrix.Matrix;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import smile.math.matrix.Matrix.EVD;
 import smile.stat.distribution.GaussianDistribution;
+
+import java.util.Arrays;
 
 /**
  * Testing the Smile package. https://haifengl.github.io/
@@ -112,6 +115,17 @@ public class SmileTest {
         difference = stop_time - start_time;
         System.out.println("Compute time for LU Decomposition: " + difference + " ms");
         // System.out.println(decompose.lu);
+    }
+
+    @Test
+    public void matrixVector() {
+        double[] vec = {1.0, 2.0};
+        Matrix mat = new Matrix(new double[][]{
+                {1,-1},{0,2}
+        });
+        double[] result = mat.mv(vec);
+        double[] expected = {-1,4};
+        assertArrayEquals(expected, result, 0.0);
     }
 
 }

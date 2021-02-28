@@ -133,13 +133,9 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
      * result to target.
      */
     public void update() {
-        // TODO: Check
-        double[][] outputArray = new double[][]{source.getOutputArray()};
-        target.setInputArray(Arrays.stream(new Matrix(1, source.inputSize(), outputArray)
-                .mm(weightMatrix)
-                .toArray())
-                .flatMapToDouble(Arrays::stream)
-                .toArray());
+
+        target.setInputArray(weightMatrix.mv(source.getOutputArray()));
+
     }
 
     @Override

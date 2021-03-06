@@ -8,9 +8,6 @@ plugins {
     // Fixes problem with long filenames
     id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
 
-    // Build executable jar using <code>gradle shadowJar</code>. The result is placed in be in build/libs
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
-
 }
 
 compileJava.options.encoding = 'UTF-8'
@@ -100,25 +97,12 @@ dependencies {
 }
 
 // Sample invocation:
-//   gradle runSim -PsimName="Test Sim"
+// gradle runSim -PsimName="Test Sim"
 task runSim(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "org.simbrain.custom_sims.RegisteredSimulationsKt"
     if(project.hasProperty('simName')){
         args simName
-    }
-}
-
-task printStuff {
-    group 'Misc'
-    description 'For printing variable bindings / learning gradle'
-    doLast {
-        println gradle.gradleHomeDir
-        println mainClassName
-        println project.buildDir
-        println "" + project.buildDir + "/" + project.executableDir
-        println rootProject
-        println projectDir
     }
 }
 
@@ -131,7 +115,3 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-// Uncomment to minimize the JAR.  Currently only reduces < 10%, and the jar does not execute.
-//shadowJar {
-//    minimize()
-//}

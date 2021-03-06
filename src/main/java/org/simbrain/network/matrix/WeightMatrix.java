@@ -199,7 +199,17 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
 
     @Consumable
     public void setWeights(double[] newWeights) {
-        weightMatrix = new Matrix(newWeights); // TODO: Is this ok?
+        // TODO: No library for this? Unit test needed.
+        int k = 0;
+        for (int i = 0; i < weightMatrix.nrows(); i++) {
+            for (int j = 0; j < weightMatrix.ncols(); j++) {
+                if (++k < newWeights.length) {
+                    weightMatrix.set(i,j,newWeights[k]);
+                } else {
+                    break;
+                }
+            }
+        }
         events.fireUpdated();
     }
 

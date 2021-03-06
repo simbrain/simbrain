@@ -252,7 +252,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     /**
-     * Subtract increment from every entry in weight matrix
+     * Subtract increment from every entry in the array
      */
     public void decrement() {
         for (int i = 0; i < neuronArray.length; i++) {

@@ -24,7 +24,7 @@ val evolveMouse = newSim {
     val mainScope = MainScope()
 
     fun createEvolution(): Evaluator {
-        val environmentBuilder = evolutionarySimulation(1) {
+        val evolutionarySimulation = evolutionarySimulation(1) {
 
             val inputs = chromosome(3) {
                 nodeGene()
@@ -190,7 +190,7 @@ val evolveMouse = newSim {
 
         }
 
-        return evaluator(environmentBuilder) {
+        return evaluator(evolutionarySimulation) {
             populationSize = 100
             eliminationRatio = 0.5
             runUntil { generation == 50 || fitness > 250 }

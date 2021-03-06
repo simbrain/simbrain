@@ -19,7 +19,7 @@ import java.util.*
 
 val evolveXor = newSim {
 
-    val environmentBuilder = evolutionarySimulation {
+    val evolutionarySimulation = evolutionarySimulation {
 
         val network = Network()
 
@@ -114,7 +114,7 @@ val evolveXor = newSim {
 
     }
 
-    val evolution = evaluator(environmentBuilder) {
+    val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS

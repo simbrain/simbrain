@@ -27,7 +27,7 @@ val evolvePursuer = newSim {
     val mainScope = MainScope()
 
     fun createEvolution(): Evaluator {
-        val environmentBuilder = evolutionarySimulation(1) {
+        val evolutionarySimulation = evolutionarySimulation(1) {
 
             val inputs = chromosome(3) {
                 nodeGene()
@@ -194,7 +194,7 @@ val evolvePursuer = newSim {
 
         }
 
-        return evaluator(environmentBuilder) {
+        return evaluator(evolutionarySimulation) {
             populationSize = 100
             eliminationRatio = 0.5
             runUntil { generation == 200 || fitness > 50 }

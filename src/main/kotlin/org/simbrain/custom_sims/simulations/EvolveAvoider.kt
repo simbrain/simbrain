@@ -26,7 +26,7 @@ val evolveAvoider = newSim {
     val scope = MainScope()
 
     fun createEvolution(): Evaluator {
-        val environmentBuilder = evolutionarySimulation(1) {
+        val evolutionarySimulation = evolutionarySimulation(1) {
 
             // Set up the chromosomes.
 
@@ -233,7 +233,7 @@ val evolveAvoider = newSim {
             }
         }
 
-        return evaluator(environmentBuilder) {
+        return evaluator(evolutionarySimulation) {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS

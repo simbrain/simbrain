@@ -65,17 +65,17 @@ class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>) : CopyableObject {
 }
 
 /**
- * Provides a context for [EnvironmentBuilder.onEval]. "This" in onEval will refer to an instance of this class.
+ * Provides a context for [AgentBuilder.onEval]. "This" in onEval will refer to an instance of this class.
  */
 class EvaluationContext(val evalRand: Random)
 
 /**
- * Provides a context for [EnvironmentBuilder.onMutate]. "This" in onMutate will refer to this object.
+ * Provides a context for [AgentBuilder.onMutate]. "This" in onMutate will refer to this object.
  */
 object MutationContext
 
 /**
- * The environment produced by [EnvironmentBuilder.build]. Provides a context for interacting with an evolutionary
+ * The environment produced by [AgentBuilder.build]. Provides a context for interacting with an evolutionary
  * simulation after an environment has been built, so that products are available.
  *
  */
@@ -116,17 +116,18 @@ class TopLevelBuilderContext {
 }
 
 /**
- * The main provider for the genetic algorithm DSL. An environment is basically the thing that we are evolving, which
- * will often be an agent in a virtual environment. A single agent or entity with everything it needs to be evaluated.
+ * The main provider for the genetic algorithm DSL. The agent we are evolving, which will often be an agent in a
+ * virtual environment.
  *
  * @param chromosomeList set of genes describing an agent, e.g. input, hidden, and output node genes
- * @param template the block opened up in the DSL
+ * @param template the block opened up in the DSL, where you build the agent, by creating chromosomes and setting
+ *                  up DSL functions like onMutate.
  * @param seed optional random seed
  * @param random private field used by copy function
  */
-class EnvironmentBuilder private constructor(
+class AgentBuilder private constructor(
     private val chromosomeList: LinkedList<Chromosome<*, *>>,
-    private val template: EnvironmentBuilder.() -> Unit,
+    private val template: AgentBuilder.() -> Unit,
     val seed: Int = Random.nextInt(),
     val random: Random = Random(seed)
 ) {
@@ -134,12 +135,12 @@ class EnvironmentBuilder private constructor(
     /**
      * Main public constructor.
      */
-    constructor(builder: EnvironmentBuilder.() -> Unit) : this(LinkedList(), builder)
+    constructor(builder: AgentBuilder.() -> Unit) : this(LinkedList(), builder)
 
     /**
      * Public constructor with a seed.
      */
-    constructor(seed: Int, builder: EnvironmentBuilder.() -> Unit) : this(LinkedList(), builder, seed)
+    constructor(seed: Int, builder: AgentBuilder.() -> Unit) : this(LinkedList(), builder, seed)
 
     /**
      * List of mutation tasks executed at each generation.
@@ -163,9 +164,9 @@ class EnvironmentBuilder private constructor(
 
     private val chromosomeIterator = chromosomeList.iterator()
 
-    fun copy(): EnvironmentBuilder {
+    fun copy(): AgentBuilder {
         val newSeed = random.nextInt()
-        return EnvironmentBuilder(LinkedList(chromosomeList.map { it.copy() }), template, newSeed).apply(template)
+        return AgentBuilder(LinkedList(chromosomeList.map { it.copy() }), template, newSeed).apply(template)
     }
 
     /**
@@ -262,23 +263,23 @@ class EnvironmentBuilder private constructor(
 /**
  * Holds an environment builder and fitness value. Used to hold results at each generation.
  */
-data class BuilderFitnessPair(val environmentBuilder: EnvironmentBuilder, val fitness: Double)
+data class BuilderFitnessPair(val agentBuilder: AgentBuilder, val fitness: Double)
 
 /**
  * Entry point for building an evolutionary simulation
  */
-fun evolutionarySimulation(builder: EnvironmentBuilder.() -> Unit) = EnvironmentBuilder(builder).apply(builder)
+fun evolutionarySimulation(builder: AgentBuilder.() -> Unit) = AgentBuilder(builder).apply(builder)
 
 /**
  * Use this to create an environment builder with an initial seed.
  */
-fun evolutionarySimulation(seed: Int, builder: EnvironmentBuilder.() -> Unit) =
-    EnvironmentBuilder(seed, builder).apply(builder)
+fun evolutionarySimulation(seed: Int, builder: AgentBuilder.() -> Unit) =
+    AgentBuilder(seed, builder).apply(builder)
 
 /**
  * Runs the evolutionary algorithm.
  */
-class Evaluator(environmentBuilder: EnvironmentBuilder) {
+class Evaluator(agentBuilder: AgentBuilder) {
 
     /**
      * Number of agents in a population. An agent exists in an environment, and so the objects created for each agent
@@ -305,7 +306,7 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
     /**
      * A lazy list of agents, or more specifically environments containing agents.
      */
-    private val population = generateSequence(environmentBuilder.copy()) { it.copy() }.take(populationSize).toList()
+    private val population = generateSequence(agentBuilder.copy()) { it.copy() }.take(populationSize).toList()
 
     /**
      * Condition in which to stop the evolution.
@@ -351,9 +352,9 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
 
                 yield(current)
 
-                next = survivors.map { it.environmentBuilder } + survivors.uniformSample()
+                next = survivors.map { it.agentBuilder } + survivors.uniformSample()
                     .take(populationSize - survivors.size)
-                    .map { it.environmentBuilder.copy().apply { mutate() } }
+                    .map { it.agentBuilder.copy().apply { mutate() } }
                     .toList()
 
                 generation++
@@ -363,7 +364,8 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
         /**
          * Returns the wining agent builder and its fitness.
          */
-        val best: BuilderFitnessPair get() = generations.last().first().let { (builder, fitness) ->
+        val best: BuilderFitnessPair
+            get() = generations.last().first().let { (builder, fitness) ->
                 BuilderFitnessPair(builder.copy(), fitness)
             }
 
@@ -401,8 +403,8 @@ class Evaluator(environmentBuilder: EnvironmentBuilder) {
 /**
  * Create the evaluator.
  */
-fun evaluator(environmentBuilder: EnvironmentBuilder, template: Evaluator.() -> Unit) =
-    Evaluator(environmentBuilder).apply(template)
+fun evaluator(agentBuilder: AgentBuilder, template: Evaluator.() -> Unit) =
+    Evaluator(agentBuilder).apply(template)
 
 /**
  * Helper function to uniformly sample builder fitness papers. Used to choose survivors

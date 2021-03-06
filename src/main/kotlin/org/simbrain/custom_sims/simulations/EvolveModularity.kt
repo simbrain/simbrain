@@ -20,7 +20,7 @@ import java.util.*
  */
 val evolveModularity = newSim {
 
-    val environmentBuilder = evolutionarySimulation {
+    val evolutionarySim = evolutionarySimulation {
 
         val network = Network()
 
@@ -149,7 +149,7 @@ val evolveModularity = newSim {
 
     }
 
-    val evolution = evaluator(environmentBuilder) {
+    val evolution = evaluator(evolutionarySim) {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS

@@ -21,7 +21,7 @@ val evolveAutoAssociator = newSim {
 
     val mainScope = MainScope()
 
-    val environmentBuilder = evolutionarySimulation {
+    val evolutionarySimulation = evolutionarySimulation {
 
         val network = Network()
 
@@ -124,7 +124,7 @@ val evolveAutoAssociator = newSim {
 
     }
 
-    val evolution = evaluator(environmentBuilder) {
+    val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS

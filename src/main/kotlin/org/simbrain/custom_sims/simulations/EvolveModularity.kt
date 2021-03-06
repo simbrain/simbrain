@@ -109,7 +109,7 @@ val evolveModularity = newSim {
         }
 
 
-        onBuild { pretty ->
+        onBuild { visible ->
             val (layout) = +layoutChromosome
             network {
                 +retina
@@ -164,7 +164,7 @@ val evolveModularity = newSim {
 
     val (winner, fitness) = generations.best
     // println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
-    winner.prettyBuild().peek()
+    winner.visibleBuild().peek()
 
 }
 

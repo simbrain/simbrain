@@ -185,12 +185,12 @@ class EnvironmentBuilder private constructor(
     /**
      * Use this to describe what happens when the builder expresses its products.
      *
-     * You should only use once in a script. If a multiople onBuild blocks, only the last one will be called.
+     * You should only use once in a script. If a multiple onBuild blocks, only the last one will be called.
      *
      * The build operation is called once for each genome at each generation, via
      * [build]
      */
-    fun onBuild(template: TopLevelBuilderContext.(pretty: Boolean) -> Unit) {
+    fun onBuild(template: TopLevelBuilderContext.(visible: Boolean) -> Unit) {
         builderTemplate = template
     }
 
@@ -207,7 +207,7 @@ class EnvironmentBuilder private constructor(
     /**
      * Called when building with graphics
      */
-    fun prettyBuild() = buildWith(TopLevelBuilderContext().apply { builderTemplate(true) })
+    fun visibleBuild() = buildWith(TopLevelBuilderContext().apply { builderTemplate(true) })
 
     /**
      * Use this to define your evaluation / fitness function.

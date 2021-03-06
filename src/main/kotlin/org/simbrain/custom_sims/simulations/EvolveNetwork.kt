@@ -109,7 +109,7 @@ val evolveNetwork = newSim {
             connectionChromosome.forEach { it.mutateWeight() }
         }
 
-        onBuild { pretty ->
+        onBuild { visible ->
             val (layout) = +layoutChromosome
             network {
                 +motivations
@@ -187,7 +187,7 @@ val evolveNetwork = newSim {
 
     val (winner, fitness) = generations.best
     // println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
-    winner.prettyBuild().peek()
+    winner.visibleBuild().peek()
 
 }
 

@@ -97,9 +97,9 @@ val evolveAutoAssociator = newSim {
 
         }
 
-        onBuild { pretty ->
+        onBuild { visible ->
             network {
-                if (pretty) {
+                if (visible) {
                     +inputs.asGroup {
                         label = "Input"
                         location = point(0, 100)
@@ -146,7 +146,7 @@ val evolveAutoAssociator = newSim {
 
             val (best, _) = generations.best
 
-            best.prettyBuild().peek()
+            best.visibleBuild().peek()
 
             progressWindow.close()
         }

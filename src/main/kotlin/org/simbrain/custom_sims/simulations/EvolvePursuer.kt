@@ -88,9 +88,9 @@ val evolvePursuer = newSim {
 
             val cheeses = List(3) { createCheese() }
 
-            onBuild { pretty ->
+            onBuild { visible ->
                 network {
-                    if (pretty) {
+                    if (visible) {
                         +inputs.asGroup {
                             label = "Input"
                             location = point(0, 100)
@@ -217,7 +217,7 @@ val evolvePursuer = newSim {
 
             println(best)
 
-            best.prettyBuild().peek()
+            best.visibleBuild().peek()
 
             progressWindow.close()
         }

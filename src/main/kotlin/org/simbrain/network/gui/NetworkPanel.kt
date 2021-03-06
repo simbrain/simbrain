@@ -406,7 +406,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is Hopfield -> HopfieldNode(this, subnetwork)
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
             is SOMNetwork -> SOMNetworkNode(this, subnetwork)
-            is EchoStateNetwork -> ESNNetworkNode(this, subnetwork)
+            // is EchoStateNetwork -> ESNNetworkNode(this, subnetwork)
             //is SimpleRecurrentNetwork -> SRNNetworkNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
             // is LMSNetwork -> LMSNetworkNode(this, subnetwork)

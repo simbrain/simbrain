@@ -93,7 +93,7 @@ class ConnectionGene(private val template: Synapse, val source: NodeGene, val ta
     override fun buildWithContext(context : NetworkGeneticsContext): Synapse {
         return Synapse(context.network, source.product.get(), target.product.get(), template.learningRule, template)
             .also {
-            context.network.addLooseSynapse(it)
+            context.network.addNetworkModel(it)
             product.complete(it)
         }
     }
@@ -154,7 +154,7 @@ class NetworkGeneticsContext(val network: Network) {
 
     fun <T, G: NetworkGene<T>> express(chromosome: Chromosome<T, G>): List<T> = chromosome.genes.map {
         it.buildWithContext(this).also { product ->
-            if (product is Neuron) network.addLooseNeuron(product)
+            if (product is Neuron) network.addNetworkModel(product)
         }
     }
 
@@ -163,7 +163,7 @@ class NetworkGeneticsContext(val network: Network) {
     fun Chromosome<Neuron, NodeGene>.asGroup(block: NeuronGroup.() -> Unit = { }) = fun(network: Network): NeuronGroup {
         return genes.map { it.buildWithContext(this@NetworkGeneticsContext) }
             .let { NeuronGroup(network, it).apply(block) }
-            .also { network.addNeuronGroup(it) }
+            .also { network.addNetworkModel(it) }
     }
 
     operator fun <T> ((Network) -> T).unaryPlus(): T = this(network)

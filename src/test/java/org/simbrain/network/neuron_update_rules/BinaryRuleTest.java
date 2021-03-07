@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class BinaryRuleTest {
 
@@ -14,7 +14,7 @@ public class BinaryRuleTest {
 
         Network net = new Network();
         Neuron n = new Neuron(net,  new BinaryRule());
-        net.addLooseNeuron(n);
+        net.addNetworkModel(n);
         BinaryRule br = (BinaryRule) n.getUpdateRule();
 
         // Set up rule

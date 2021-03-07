@@ -19,8 +19,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.util.math.SimbrainMath;
 
 import java.util.*;
@@ -79,7 +79,7 @@ public class SimnetUtils {
                 } else {
                     Synapse newSynapse = new Synapse(src.get(i), tar.get(j));
                     newSynapse.forceSetStrength(w[i][j]);
-                    newSynapse.getParentNetwork().addLooseSynapse(newSynapse);
+                    newSynapse.getParentNetwork().addNetworkModel(newSynapse);
                 }
             }
         }

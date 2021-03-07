@@ -1077,4 +1077,34 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         return SimbrainMath.distance(source.getLocation(), target.getLocation());
     }
 
+    @Override
+    public void delete() {
+        // Remove references to this synapse from parent neurons
+        if (getSource() != null) {
+            getSource().removeEfferent(this);
+        }
+        if (getTarget() != null) {
+            getTarget().removeAfferent(this);
+        }
+
+        // If this synapse has a parent group, delete that group
+        if (getParentGroup() != null) {
+            SynapseGroup parentGroup = getParentGroup();
+            parentGroup.removeSynapse(this);
+            // TODO
+            // if (parentGroup.isDisplaySynapses()) {
+            //     events.fireModelRemoved(toDelete);
+            // }
+            if (parentGroup.isEmpty()) {
+               parentNetwork.delete(getParentGroup());
+            }
+        } else {
+            getEvents().fireDeleted();
+        }
+    }
+
+    @Override
+    public void afterAddedToNetwork() {
+        initSpikeResponder();
+    }
 }

@@ -16,23 +16,23 @@
 //         Network net = new Network();
 //         Neuron output = new Neuron(net);
 //         output.setUpperBound(10);
-//         net.addLooseNeuron(output);
+//         net.addNetworkModel(output);
 //
 //         Neuron input1 = new Neuron(net);
 //         input1.setActivation(1);
 //         input1.setClamped(true);
-//         net.addLooseNeuron(input1);
+//         net.addNetworkModel(input1);
 //         Neuron input2 = new Neuron(net);
 //         input2.setActivation(-1);
 //         input2.setClamped(true);
-//         net.addLooseNeuron(input2);
+//         net.addNetworkModel(input2);
 //
 //         Synapse w13 = new Synapse(input1, output);
 //         w13.setStrength(.5);
-//         net.addLooseSynapse(w13);
+//         net.addNetworkModel(w13);
 //         Synapse w23 = new Synapse(input2, output);
 //         w23.setStrength(-1);
-//         net.addLooseSynapse(w23);
+//         net.addNetworkModel(w23);
 //
 //         // 1*.5 + -1*-1 = .5 + 1 = 1.5
 //         net.update();
@@ -42,18 +42,18 @@
 //         input1 = new Neuron(net);
 //         input1.setActivation(1);
 //         input1.setClamped(true);
-//         net.addLooseNeuron(input1);
+//         net.addNetworkModel(input1);
 //         input2 = new Neuron(net);
 //         input2.setActivation(-1);
 //         input2.setClamped(true);
-//         net.addLooseNeuron(input2);
+//         net.addNetworkModel(input2);
 //
 //         w13 = new Synapse(input1, output);
 //         w13.setStrength(-0.8);
-//         net.addLooseSynapse(w13);
+//         net.addNetworkModel(w13);
 //         w23 = new Synapse(input2, output);
 //         w23.setStrength(-0.2);
-//         net.addLooseSynapse(w23);
+//         net.addNetworkModel(w23);
 //
 //         net.update();
 //         // 0.6 with the epsilon(threshold) 0.0001

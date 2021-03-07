@@ -26,7 +26,10 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.propertyeditor.EditableObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -187,7 +190,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
                     }
                     synapses.add(s);
                     if (loose) {
-                        src.getNetwork().addLooseSynapse(s);
+                        src.getNetwork().addNetworkModel(s);
                     }
                 }
             }
@@ -217,7 +220,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
                     Synapse s = new Synapse(src, tar);
                     synapses.add(s);
                     if (loose) {
-                        src.getNetwork().addLooseSynapse(s);
+                        src.getNetwork().addNetworkModel(s);
                     }
                 }
             }
@@ -275,7 +278,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
         List<Synapse> syns = connectRadialPolarized(source, target, eeDistConst,
                 eiDistConst, ieDistConst, iiDistConst, distConst, lambda, true);
         for(Synapse s : syns) {
-            network.addLooseSynapse(s);
+            network.addNetworkModel(s);
         }
         return syns;
     }
@@ -508,7 +511,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
                         Synapse s = new Synapse(src, tar);
                         synapses.add(s);
                         if (loose) {
-                            src.getNetwork().addLooseSynapse(s);
+                            src.getNetwork().addNetworkModel(s);
                         }
                     }
                 }

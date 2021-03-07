@@ -360,7 +360,7 @@ public final class SynapseGroupDialog extends StandardDialog {
             connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
             //sumPanel.commitChanges();
             editSynapsesPanel.commitChanges();
-            networkPanel.getNetwork().addSynapseGroup(synapseGroup);
+            networkPanel.getNetwork().addNetworkModel(synapseGroup);
             networkPanel.repaint();
         } else {
             // Must be set ONLY after dialog is closed otherwise changes won't

@@ -62,13 +62,13 @@ public class ClassicalConditioning extends RegisteredSimulation {
         bellDetectorNeuron.setLocation(295, 194);
         bellDetectorNeuron.setLabel("Bell Detector");
         bellDetectorNeuron.setClamped(true);
-        network.addLooseNeuron(bellDetectorNeuron);
+        network.addNetworkModel(bellDetectorNeuron);
 
         Neuron cheeseDetectorNeuron = new Neuron(network);
         cheeseDetectorNeuron.setLocation(160, 194);
         cheeseDetectorNeuron.setLabel("Cheese Detector");
         cheeseDetectorNeuron.setClamped(false);
-        network.addLooseNeuron(cheeseDetectorNeuron);
+        network.addNetworkModel(cheeseDetectorNeuron);
 
         BinaryRule responseRule = new BinaryRule();
         responseRule.setThreshold(.5);
@@ -76,18 +76,18 @@ public class ClassicalConditioning extends RegisteredSimulation {
         Neuron salivationResponse = new Neuron(network, responseRule);
         salivationResponse.setLocation(160, 60);
         salivationResponse.setLabel("Salivation");
-        network.addLooseNeuron(salivationResponse);
+        network.addNetworkModel(salivationResponse);
 
         Synapse cheeseToSalivation = new Synapse(cheeseDetectorNeuron, salivationResponse,1);
         cheeseToSalivation.setUpperBound(1);
-        network.addLooseSynapse(cheeseToSalivation);
+        network.addNetworkModel(cheeseToSalivation);
 
         Synapse association = new Synapse(bellDetectorNeuron, cheeseDetectorNeuron);
         association.setStrength(0);
         association.setLowerBound(0);
         association.setUpperBound(1);
 
-        network.addLooseSynapse(association);
+        network.addNetworkModel(association);
         // TODO
         networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
 

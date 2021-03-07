@@ -6,7 +6,7 @@ import org.simbrain.network.core.Neuron;
 
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class DecayRuleTest {
 
@@ -15,7 +15,7 @@ public class DecayRuleTest {
 
         Network net = new Network();
         Neuron n = new Neuron(net,  new DecayRule());
-        net.addLooseNeuron(n);
+        net.addNetworkModel(n);
 
         // Set decay method to absolute
         DecayRule dr = (DecayRule) n.getUpdateRule();
@@ -41,7 +41,7 @@ public class DecayRuleTest {
     public void testRelativeDecay() {
         Network net = new Network();
         Neuron n = new Neuron(net,  new DecayRule());
-        net.addLooseNeuron(n);
+        net.addNetworkModel(n);
         DecayRule dr = (DecayRule) n.getUpdateRule();
 
         // Set to 1 and decay, with fraction of .1.  We are expecting

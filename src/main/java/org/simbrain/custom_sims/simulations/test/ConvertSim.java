@@ -39,14 +39,14 @@ public class ConvertSim extends RegisteredSimulation {
                     System.out.println(neuronName + ".setX(" + neuron.getX() + ");");
                     System.out.println(neuronName + ".setY(" + neuron.getY() + ");");
                     System.out.println(neuronName + ".setLabel(\"" + neuron.getLabel() + "\");");
-                    System.out.println(netName + ".addLooseNeuron(" + neuronName + ");");
+                    System.out.println(netName + ".addNetworkModel(" + neuronName + ");");
                 }
                 for(Synapse synapse : network.getFlatSynapseList()) {
                     String synapseName = new String("syn_" + synapse.getId());
                     String sourceRef = new String(netName + ".getLooseNeuron(\"" + synapse.getSource().getId() +"\")");
                     String targetRef = new String(netName + ".getLooseNeuron(\"" + synapse.getTarget().getId() +"\")");
                     System.out.println("Synapse " + synapseName + " = new Synapse(" + sourceRef + "," + targetRef + "," + synapse.getStrength() + ");");
-                    System.out.println(netName + ".addLooseSynapse(" + synapseName + ");");
+                    System.out.println(netName + ".addNetworkModel(" + synapseName + ");");
                 }
             }
         }

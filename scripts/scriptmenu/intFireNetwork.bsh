@@ -34,7 +34,7 @@ import org.simbrain.util.math.ProbDistributions.*;
 	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setTimeConstant(5);
 	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setResetPotential(2);
 	    ((IntegrateAndFireRule)neuron.getUpdateRule()).setThreshold(11);
-	    network.addLooseNeuron(neuron);
+	    network.addNetworkModel(neuron);
 	}
 	layout.layoutNeurons(network.getNeuronList());
     Sparse.connectSparse(network.getFlatNeuronList(),

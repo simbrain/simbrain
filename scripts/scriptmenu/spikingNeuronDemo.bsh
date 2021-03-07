@@ -29,7 +29,7 @@ import org.simbrain.plot.timeseries.*;
     inputNeuron.setIncrement(1);
     inputNeuron.setLabel("Input");
     inputNeuron.setClamped(true);
-    network.addLooseNeuron(inputNeuron);
+    network.addNetworkModel(inputNeuron);
 
     // Spiking neuron
     Neuron spiker = new Neuron(network, new IzhikevichRule());
@@ -41,10 +41,10 @@ import org.simbrain.plot.timeseries.*;
     ((IzhikevichRule)spiker.getUpdateRule()).setD(2);
     ((IzhikevichRule)spiker.getUpdateRule()).setiBg(2); // So spiking does not  happen without input
 
-    network.addLooseNeuron(spiker);
+    network.addNetworkModel(spiker);
 
     // Connect neurons
-    network.addLooseSynapse(new Synapse(inputNeuron, spiker, 1));
+    network.addNetworkModel(new Synapse(inputNeuron, spiker, 1));
 
     // Initialize network
     desktop.getDesktopComponent(networkComponent).getParentFrame().setBounds(10,20,458,347);

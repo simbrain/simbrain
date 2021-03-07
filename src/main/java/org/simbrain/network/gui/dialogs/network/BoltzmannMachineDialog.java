@@ -102,7 +102,7 @@ public class BoltzmannMachineDialog extends StandardDialog {
                 visibleNeurons, hiddenNeurons, networkPanel.getPlacementManager().getLocationAndIncrement());
         layoutPanel.commitChanges();
 
-        networkPanel.getNetwork().addSubnetwork(boltzmannMachine);
+        networkPanel.getNetwork().addNetworkModel(boltzmannMachine);
         super.closeDialogOk();
     }
 

@@ -68,7 +68,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
              // Make a new text object and then edit it
              NetworkTextObject text = new NetworkTextObject(networkPanel.getNetwork(), inputEvent.getPosition().getX(),
                      inputEvent.getPosition().getY(), inputEvent);
-             networkPanel.getNetwork().addText(text);
+             networkPanel.getNetwork().addNetworkModel(text);
         }
     }
 
@@ -81,7 +81,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
             editedText.getDocument().removeDocumentListener(docListener);
             editedText.setEditing(false);
             if (editedText.getDocument().getLength() == 0) {
-                networkPanel.getNetwork().deleteText(node.getTextObject());
+                networkPanel.getNetwork().delete(node.getTextObject());
                 editedText.removeFromParent();
             } else {
                 try {

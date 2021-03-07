@@ -1,19 +1,19 @@
 package org.simbrain.network.gui
 
+//import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.dialogs.TestInputPanel
-//import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.TextNode
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
@@ -57,7 +57,7 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
         addClosingTask {
             val neuronArray = template.create(network)
             placementManager.addNewModelObject(neuronArray)
-            network.addNeuronArray(neuronArray)
+            network.addNetworkModel(neuronArray)
         }
         pack()
         setLocationRelativeTo(this@showNeuronArrayCreationDialog)

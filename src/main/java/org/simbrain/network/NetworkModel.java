@@ -42,4 +42,20 @@ public interface NetworkModel {
     default void select() {
         getEvents().fireSelected();
     }
+
+    default void delete() {
+
+    }
+
+    default void afterAddedToNetwork() {
+
+    }
+
+    default void afterBatchAddedToNetwork() {
+        afterAddedToNetwork();
+    }
+
+    default boolean shouldAdd() {
+        return true;
+    }
 }

@@ -3,16 +3,16 @@ package org.simbrain.custom_sims.simulations.cortex;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.connections.RadialSimple;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
-import org.simbrain.util.SimbrainConstants.*;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.TimedAccumulatorRule;
+import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -68,7 +68,7 @@ public class CorticalBranching extends RegisteredSimulation {
         }
         NeuronGroup ng1 = new NeuronGroup(network, neurons);
         ng1.setLabel("CorticalBranching");
-        network.addNeuronGroup(ng1);
+        network.addNetworkModel(ng1);
         ng1.setLayout(layout);
         ng1.applyLayout(new Point2D.Double(0.0 ,0.0));
 
@@ -100,7 +100,7 @@ public class CorticalBranching extends RegisteredSimulation {
         }
 
         sg.setLabel("Recurrent Synapses");
-        network.addSynapseGroup(sg);
+        network.addNetworkModel(sg);
 
     }
 

@@ -29,30 +29,30 @@ interface LocatableModel : NetworkModel {
 /**
  * Return top left location in a list of [LocatableModel] objects.
  */
-val List<LocatableModel>.topLeftLocation
+val Collection<LocatableModel>.topLeftLocation
     get() = Point2D.Double(map { it.location.x }.minOrNull() ?: 0.0, map { it.location.y }.minOrNull() ?: 0.0)
 
 /**
  * Return the center location in a list of [LocatableModel] objects.
  */
-val List<LocatableModel>.centerLocation
+val Collection<LocatableModel>.centerLocation
     get() = Point2D.Double(bound.x + bound.width / 2, bound.y + bound.height / 2)
 
-val List<LocatableModel>.minX get() = map { it.location.x }.minOrNull() ?: 0.0
-val List<LocatableModel>.minY get() = map { it.location.y }.minOrNull() ?: 0.0
-val List<LocatableModel>.maxX get() = map { it.location.x }.maxOrNull() ?: 0.0
-val List<LocatableModel>.maxY get() = map { it.location.y }.maxOrNull() ?: 0.0
+val Collection<LocatableModel>.minX get() = map { it.location.x }.minOrNull() ?: 0.0
+val Collection<LocatableModel>.minY get() = map { it.location.y }.minOrNull() ?: 0.0
+val Collection<LocatableModel>.maxX get() = map { it.location.x }.maxOrNull() ?: 0.0
+val Collection<LocatableModel>.maxY get() = map { it.location.y }.maxOrNull() ?: 0.0
 
 /**
  * Top-left and bottom-right locations padded with a small delta to make sure the bound has some size
  */
-val List<LocatableModel>.minMax
+val Collection<LocatableModel>.minMax
     get() = point(minX, minY) - point(0.001, 0.001) to point(maxX, maxY) + point(0.001, 0.001)
 
 /**
  * The four vertices of the bound in the order of topLeft, topRight, bottomLeft, bottomRight
  */
-val List<LocatableModel>.vertices: RectangleVertices
+val Collection<LocatableModel>.vertices: RectangleVertices
     get() {
         val (min, max) = minMax
         return RectangleVertices(
@@ -66,17 +66,17 @@ val List<LocatableModel>.vertices: RectangleVertices
 /**
  * The four sides of the bound.
  */
-val List<LocatableModel>.outlines get() = vertices.outlines
+val Collection<LocatableModel>.outlines get() = vertices.outlines
 
 /**
  * Return bounding box for a list of [LocatableModel] objects.
  */
-val List<LocatableModel>.bound: Rectangle2D
+val Collection<LocatableModel>.bound: Rectangle2D
     get() {
         val (min, max) = minMax
         return rectangle(min, max)
     }
 
-fun List<LocatableModel>.translate(vector: Point2D) = forEach { it.location = it.location + vector }
-fun List<LocatableModel>.translate(dx: Double, dy: Double) = translate(point(dx, dy))
+fun Collection<LocatableModel>.translate(vector: Point2D) = forEach { it.location = it.location + vector }
+fun Collection<LocatableModel>.translate(dx: Double, dy: Double) = translate(point(dx, dy))
 

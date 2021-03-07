@@ -1281,4 +1281,23 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public NeuronEvents getEvents() {
         return events;
     }
+
+    @Override
+    public void delete() {
+        getNetwork().updatePriorityList();
+        deleteConnectedSynapses();
+
+        if (getParentGroup() != null) {
+            getParentGroup().removeNeuron(this);
+            if (getParentGroup().isEmpty()) {
+                getNetwork().delete(getParentGroup());
+            }
+        }
+        events.fireDeleted();
+    }
+
+    @Override
+    public void afterAddedToNetwork() {
+        getNetwork().updatePriorityList();
+    }
 }

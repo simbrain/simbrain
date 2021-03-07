@@ -21,8 +21,8 @@ public class SpikeResponderTest {
         lr.setClipped(false);
         Neuron output = new Neuron(net, lr );
         Synapse s = new Synapse(spiking, output);
-        net.addLooseNeuron(spiking);
-        net.addLooseNeuron(output);
+        net.addNetworkModel(spiking);
+        net.addNetworkModel(output);
 
         for (int i = 0; i < 100 ; i++) {
             net.update();

@@ -130,4 +130,14 @@ public class NeuronCollection extends AbstractNeuronCollection {
         return null;
     }
 
+    @Override
+    public boolean shouldAdd() {
+        int hashCode = getSummedNeuronHash();
+        for (NeuronCollection other : getNetwork().getNeuronCollectionSet()) {
+            if (hashCode == other.getSummedNeuronHash()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

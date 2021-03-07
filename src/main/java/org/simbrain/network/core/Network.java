@@ -20,14 +20,12 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.matrix.ArrayConnectable;
-// import org.simbrain.network.dl4j.MultiLayerNet;
-import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.*;
+import org.simbrain.network.matrix.ArrayConnectable;
+import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.smile.SmileSVM;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimpleIdManager;
@@ -83,44 +81,7 @@ public class Network {
      */
     private transient NetworkEvents events = new NetworkEvents(this);
 
-    /**
-     * List of "loose neurons" (as opposed to neurons in neuron groups)
-     */
-    private final List<Neuron> looseNeurons = new ArrayList<>();
-
-    /**
-     * Array list of "loose synapses" (as opposed to synapses in synapse groups)
-     */
-    private final Set<Synapse> looseSynapses = new LinkedHashSet<>();
-
-    //TODO: Set all below back to final when backwards compatibility issue fixed
-    /**
-     * Set of weight matrices.
-     */
-    private Set<WeightMatrix> weightMatrices = new HashSet<>();
-
-    /**
-     * Neuron Collections. Can contain overlapping neurons. A set is used
-     * to prevent identical sets from being created.
-     */
-    private HashSet<NeuronCollection> neuronCollectionSet = new HashSet();
-
-    //TODO
-    // private List<MultiLayerNet> multiLayerNetworks = new ArrayList<>();
-    private List<NeuronGroup> neuronGroups  = new ArrayList<>();
-    private List<SynapseGroup> synapseGroups  = new ArrayList<>();
-    private List<Subnetwork> subnetworks  = new ArrayList<>();
-    private List<SmileSVM> svmList  = new ArrayList<>();
-
-    /**
-     * Text objects.
-     */
-    private List<NetworkTextObject> textList = new ArrayList<NetworkTextObject>();
-
-    /**
-     * Neuron Array objects (nd4j). Not yet implemented.
-     */
-    private List<NeuronArray> naList = new ArrayList();
+    private NetworkModelList networkModels = new NetworkModelList();
 
     /**
      * The update manager for this network.
@@ -257,21 +218,20 @@ public class Network {
 
         // TODO: Once update and applybuffervalues are implemented possibly use networkmodels
 
+        final var classes = List.of(
+                Neuron.class,
+                NeuronGroup.class,
+                WeightMatrix.class,
+                NeuronArray.class,
+                NeuronCollection.class,
+                Subnetwork.class
+        );
+
         // First update the activation buffers
-        looseNeurons.forEach(NetworkModel::update);
-        neuronGroups.forEach(NetworkModel::update);
-        weightMatrices.forEach(NetworkModel::update);
-        getNeuronArrays().forEach(NetworkModel::update);
-        neuronCollectionSet.forEach(NetworkModel::update);
-        subnetworks.forEach(Subnetwork::update);
+        classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::update));
 
         // Then update the activations themselves
-        looseNeurons.forEach(NetworkModel::applyBufferValues);
-        neuronGroups.forEach(NetworkModel::applyBufferValues);
-        weightMatrices.forEach(NetworkModel::applyBufferValues);
-        getNeuronArrays().forEach(NetworkModel::applyBufferValues);
-        neuronCollectionSet.forEach(NetworkModel::applyBufferValues);
-        subnetworks.forEach(Subnetwork::applyBufferValues);
+        classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::applyBufferValues));
 
     }
 
@@ -293,14 +253,14 @@ public class Network {
      * @return Number of neurons in network.
      */
     public int getNeuronCount() {
-        return looseNeurons.size();
+        return getLooseNeurons().size();
     }
 
     /**
      * @return Number of weights in network
      */
     public int getSynapseCount() {
-        return looseSynapses.size();
+        return getLooseSynapses().size();
     }
 
     /**
@@ -309,8 +269,13 @@ public class Network {
      * @param neuronIndex index of the neuron
      * @return the neuron at that index
      */
+    @Deprecated
     public Neuron getLooseNeuron(int neuronIndex) {
-        return looseNeurons.get(neuronIndex);
+        final var iterator = getLooseNeurons().iterator();
+        for (int i = 0; i < neuronIndex; i++) {
+            iterator.next();
+        }
+        return iterator.next();
     }
 
     /**
@@ -333,8 +298,8 @@ public class Network {
      */
     public List<NeuronGroup> getFlatNeuronGroupList() {
         ArrayList<NeuronGroup> ret = new ArrayList<>();
-        ret.addAll(neuronGroups);
-        subnetworks.forEach(net -> ret.addAll(net.getNeuronGroupList()));
+        ret.addAll(getNeuronGroups());
+        getSubnetworks().forEach(net -> ret.addAll(net.getNeuronGroupList()));
         return ret;
     }
 
@@ -343,8 +308,8 @@ public class Network {
      */
     public List<SynapseGroup> getFlatSynapseGroupList() {
         ArrayList<SynapseGroup> ret = new ArrayList<>();
-        ret.addAll(synapseGroups);
-        subnetworks.forEach(net -> ret.addAll(net.getSynapseGroupList()));
+        ret.addAll(getSynapseGroups());
+        getSubnetworks().forEach(net -> ret.addAll(net.getSynapseGroupList()));
         return ret;
     }
 
@@ -353,8 +318,8 @@ public class Network {
      */
     public List<WeightMatrix> getFlatWeightMatrixList() {
         ArrayList<WeightMatrix> ret = new ArrayList<>();
-        ret.addAll(weightMatrices);
-        subnetworks.forEach(net -> ret.addAll(net.getWeightMatrixList()));
+        ret.addAll(getWeightMatrices());
+        getSubnetworks().forEach(net -> ret.addAll(net.getWeightMatrixList()));
         return ret;
     }
 
@@ -373,56 +338,21 @@ public class Network {
         return null;
     }
 
-    /**
-     * Adds a new neuron.
-     *
-     * @param neuron Template for neuron to add
-     */
-    public void addLooseNeuron(Neuron neuron) {
-        looseNeurons.add(neuron);
-        updatePriorityList();
-        events.fireModelAdded(neuron);
-    }
-
-    public void addLooseNeurons(Collection<Neuron> neurons) {
-        looseNeurons.addAll(neurons);
-        updatePriorityList();
-        neurons.forEach(events::fireModelAdded);
-    }
-
-    /**
-     * Add an ND4J array object.
-     */
-    public void addNeuronArray(NeuronArray na) {
-        naList.add(na);
-        events.fireModelAdded(na);
-    }
-
-    public void addSVM(SmileSVM svm) {
-        svmList.add(svm);
-        events.fireModelAdded(svm);
-    }
-
-    // public void addDL4JMultiLayerNetwork(MultiLayerNet network) {
-    //     multiLayerNetworks.add(network);
-    //     events.fireModelAdded(network);
-    // }
-
-    /**
-     * Adds a weight to the neuron network, where that weight already has designated source and target neurons.
-     *
-     * @param synapse the weight object to add
-     */
-    public void addLooseSynapse(Synapse synapse) {
-        synapse.initSpikeResponder();
-        var wasAdded = looseSynapses.add(synapse);
-        // Fails if a synapse with same source and target already exists.
-        if(wasAdded) {
-            synapse.setId(idManager.getId(Synapse.class));
-            events.fireModelAdded(synapse);
-        } else {
-            System.out.println("An attempt was made to add a duplicate synapse");
+    public void addNetworkModel(NetworkModel networkModel) {
+        if (networkModel.shouldAdd()) {
+            networkModels.add(networkModel);
+            events.fireModelAdded(networkModel);
         }
+    }
+
+    // TODO: check should add
+    public <T extends NetworkModel> void batchAddNetworkModels(List<T> networkModels) {
+        final var sample = networkModels.stream().findFirst();
+        sample.ifPresent(model -> {
+            this.networkModels.putAllUnchecked(model.getClass(), networkModels);
+            model.afterBatchAddedToNetwork();
+        });
+        networkModels.forEach(events::fireModelAdded);
     }
 
     /**
@@ -430,126 +360,20 @@ public class Network {
      */
     public void updateLooseSynapses() {
         // No Buffering necessary because the values of weights don't depend on one another
-        for (Synapse s : looseSynapses) {
+        for (Synapse s : networkModels.get(Synapse.class)) {
             s.update();
         }
     }
 
     public void updateNeuronArrayConnections() {
-        weightMatrices.forEach(WeightMatrix::update);
+        networkModels.get(WeightMatrix.class).forEach(WeightMatrix::update);
     }
 
-    public void delete(final Neuron toDelete) {
-        delete(toDelete, true);
-    }
+    public void delete(final NetworkModel toDelete) {
+        networkModels.remove(toDelete);
+        toDelete.delete();
+        events.fireModelRemoved(toDelete);
 
-    public void delete(final Synapse toDelete) {
-
-        // Remove references to this synapse from parent neurons
-        if (toDelete.getSource() != null) {
-            toDelete.getSource().removeEfferent(toDelete);
-        }
-        if (toDelete.getTarget() != null) {
-            toDelete.getTarget().removeAfferent(toDelete);
-        }
-
-        // If this synapse has a parent group, delete that group
-        if (toDelete.getParentGroup() != null) {
-            SynapseGroup parentGroup = toDelete.getParentGroup();
-            parentGroup.removeSynapse(toDelete);
-            if (parentGroup.isDisplaySynapses()) {
-                events.fireModelRemoved(toDelete);
-            }
-            // TODO
-            //if (parentGroup.isEmpty()) {
-            //    removeGroup(toDelete.getParentGroup());
-            //}
-        } else {
-            looseSynapses.remove(toDelete);
-            // Notify listeners that this synapse has been deleted
-            events.fireModelRemoved(toDelete);
-            toDelete.getEvents().fireDeleted();
-        }
-    }
-
-    /**
-     * Delete a neuron.
-     *
-     * @param toDelete  the neuron to remove
-     * @param fireEvent whether to fire an event
-     */
-    public void delete(final Neuron toDelete, boolean fireEvent) {
-
-        // Update priority list
-        updatePriorityList();
-
-        // Remove Connected Synapses
-        toDelete.deleteConnectedSynapses();
-
-        // Remove the neuron itself. Either from a parent group that holds it,
-        // or from the root network.
-        if (toDelete.getParentGroup() != null) {
-            toDelete.getParentGroup().removeNeuron(toDelete);
-            if (toDelete.getParentGroup().isEmpty()) {
-                delete(toDelete.getParentGroup());
-            }
-        } else {
-            looseNeurons.remove(toDelete);
-        }
-
-        // Notify listeners that this neuron has been deleted
-        if (fireEvent) {
-            events.fireModelRemoved(toDelete);
-            toDelete.getEvents().fireDeleted();
-        }
-    }
-
-    public void delete(NeuronGroup ng) {
-        neuronGroups.remove(ng);
-        ng.delete();
-        events.fireModelRemoved(ng);
-    }
-
-    public void delete(final SmileSVM svm) {
-        svmList.remove(svm);
-        events.fireModelRemoved(svm);
-    }
-
-    public void delete(SynapseGroup sg) {
-        synapseGroups.remove(sg);
-        sg.delete();
-        events.fireModelRemoved(sg);
-    }
-
-    public void delete(NeuronCollection nc) {
-        neuronCollectionSet.remove(nc);
-        nc.delete();
-        events.fireModelRemoved(nc);
-    }
-
-    public void delete(NeuronArray na) {
-        naList.remove(na);
-        na.getEvents().fireDeleted();
-        events.fireModelRemoved(na);
-    }
-
-    // public void delete(MultiLayerNet mln) {
-    //     multiLayerNetworks.remove(mln);
-    //     events.fireModelRemoved(mln);
-    // }
-
-    public void delete(Subnetwork subnet) {
-        subnetworks.remove(subnet);
-        subnet.delete();
-        events.fireModelRemoved(subnet);
-    }
-
-    public void delete(WeightMatrix wm) {
-        if (wm == null) {
-            return;
-        }
-        weightMatrices.remove(wm);
-        events.fireModelRemoved(wm);
     }
 
     /**
@@ -570,7 +394,7 @@ public class Network {
             // Creating a neuron collection increments the id counter so don't
             // even create it if it's a duplicate
             int hashCode = loose.stream().mapToInt(n -> n.hashCode()).sum();
-            for (NeuronCollection nc : neuronCollectionSet) {
+            for (NeuronCollection nc : getNeuronCollectionSet()) {
                 if (hashCode == nc.getSummedNeuronHash()) {
                     return;
                 }
@@ -578,24 +402,8 @@ public class Network {
 
             // Make the collection
             NeuronCollection nc = new NeuronCollection(this, loose);
-            addNeuronCollection(nc);
+            addNetworkModel(nc);
         }
-    }
-
-    /**
-     * Add a neuron collection to the network
-     * @param nc the neuron collection to add
-     */
-    public void addNeuronCollection(NeuronCollection nc) {
-        // Don't add duplicates
-        int hashCode = nc.getSummedNeuronHash();
-        for (NeuronCollection other : neuronCollectionSet) {
-            if (hashCode == other.getSummedNeuronHash()) {
-                return;
-            }
-        }
-        neuronCollectionSet.add(nc);
-        events.fireModelAdded(nc);
     }
 
     /**
@@ -677,7 +485,7 @@ public class Network {
      * Sets all weight values to zero, effectively eliminating them.
      */
     public void setWeightsToZero() {
-        for (Synapse s : looseSynapses) {
+        for (Synapse s : getLooseSynapses()) {
             s.setStrength(0);
         }
     }
@@ -686,7 +494,7 @@ public class Network {
      * Randomizes all loose neurons.
      */
     public void randomizeLooseNeurons() {
-        for (Neuron n : looseNeurons) {
+        for (Neuron n : getLooseNeurons()) {
             n.randomize();
         }
     }
@@ -702,7 +510,7 @@ public class Network {
      * Randomizes all loose weights.
      */
     public void randomizeLooseWeights() {
-        for (Synapse s : looseSynapses) {
+        for (Synapse s : getLooseSynapses()) {
             s.randomize();
         }
     }
@@ -721,7 +529,7 @@ public class Network {
      * @param upper upper bound for randomization.
      */
     public void randomizeBiasesLooseNeurons(double lower, double upper) {
-        for (Neuron neuron : looseNeurons) {
+        for (Neuron neuron : getLooseNeurons()) {
             neuron.randomizeBias(lower, upper);
         }
     }
@@ -749,21 +557,6 @@ public class Network {
         return getLooseNeuron(i).getFanOut().get(getLooseNeuron(j));
     }
 
-    public void addSynapseGroup(final SynapseGroup sg) {
-        synapseGroups.add(sg);
-        events.fireModelAdded(sg);
-    }
-
-    public void addNeuronGroup(final NeuronGroup ng) {
-        neuronGroups.add(ng);
-        events.fireModelAdded(ng);
-    }
-
-    public void addSubnetwork(Subnetwork net) {
-        subnetworks.add(net);
-        events.fireModelAdded(net);
-    }
-
     /**
      * Returns true if all objects are gone from this network.
      *
@@ -784,11 +577,11 @@ public class Network {
      * @return the flat list
      */
     public List<Neuron> getFlatNeuronList() {
-        List<Neuron> ret = new ArrayList<Neuron>();
-        ret.addAll(looseNeurons);
-        neuronGroups.forEach(ng -> ret.addAll(ng.getNeuronList()));
-        neuronCollectionSet.forEach(nc -> ret.addAll(nc.getNeuronList()));
-        subnetworks.forEach(s -> s.getNeuronGroupList().forEach(
+        List<Neuron> ret = new ArrayList<>();
+        ret.addAll(getLooseNeurons());
+        getNeuronGroups().forEach(ng -> ret.addAll(ng.getNeuronList()));
+        getNeuronCollectionSet().forEach(nc -> ret.addAll(nc.getNeuronList()));
+        getSubnetworks().forEach(s -> s.getNeuronGroupList().forEach(
                         ng -> ret.addAll(ng.getNeuronList())));
         return ret;
     }
@@ -799,10 +592,10 @@ public class Network {
      * @return the flat list
      */
     public List<Synapse> getFlatSynapseList() {
-        List<Synapse> ret = new ArrayList<Synapse>(10000);
-        ret.addAll(looseSynapses);
-        synapseGroups.forEach(sg -> ret.addAll(sg.getAllSynapses()));
-        subnetworks.forEach(s -> s.getSynapseGroupList().forEach(
+        List<Synapse> ret = new ArrayList<>(10000);
+        ret.addAll(getLooseSynapses());
+        getSynapseGroups().forEach(sg -> ret.addAll(sg.getAllSynapses()));
+        getSubnetworks().forEach(s -> s.getSynapseGroupList().forEach(
                 sg -> ret.addAll(sg.getAllSynapses())));
         return ret;
     }
@@ -889,13 +682,13 @@ public class Network {
         updateManager.postUnmarshallingInit();
 
         getFlatNeuronList().forEach(Neuron::postUnmarshallingInit);
-        textList.forEach(NetworkTextObject::postUnmarshallingInit);
-        synapseGroups.forEach(SynapseGroup::postUnmarshallingInit);
-        neuronGroups.forEach(AbstractNeuronCollection::postUnmarshallingInit);
-        neuronCollectionSet.forEach(AbstractNeuronCollection::postUnmarshallingInit);
-        naList.forEach(NeuronArray::postUnmarshallingInit);
-        weightMatrices.forEach(WeightMatrix::postUnmarshallingInit);
-        subnetworks.forEach(Subnetwork::postUnmarshallingInit);
+        getTextList().forEach(NetworkTextObject::postUnmarshallingInit);
+        getSynapseGroups().forEach(SynapseGroup::postUnmarshallingInit);
+        getNeuronGroups().forEach(AbstractNeuronCollection::postUnmarshallingInit);
+        getNeuronCollectionSet().forEach(AbstractNeuronCollection::postUnmarshallingInit);
+        getNeuronArrays().forEach(NeuronArray::postUnmarshallingInit);
+        getWeightMatrices().forEach(WeightMatrix::postUnmarshallingInit);
+        getSubnetworks().forEach(Subnetwork::postUnmarshallingInit);
 
         // Re-populate fan-in / fan-out for loose synapses
         getLooseSynapses().forEach(Synapse::postUnmarshallingInit);
@@ -907,16 +700,10 @@ public class Network {
      * Initialize all ids in the {@link SimpleIdManager}.
      */
     private void initIdManager() {
-        idManager.initId(Neuron.class, looseNeurons.size() + 1);
-        idManager.initId(Synapse.class, looseSynapses.size() + 1);
-        idManager.initId(NeuronGroup.class, neuronGroups.size() + 1);
-        idManager.initId(NeuronCollection.class, neuronCollectionSet.size() + 1);
-        idManager.initId(SynapseGroup.class, synapseGroups.size() + 1);
-        idManager.initId(Subnetwork.class, subnetworks.size() + 1);
-        idManager.initId(NeuronArray.class, naList.size() + 1);
-        idManager.initId(WeightMatrix.class, weightMatrices.size() + 1);
-        // idManager.initId(MultiLayerNet.class, multiLayerNetworks.size() + 1);
-    }   
+        List.of(Neuron.class, Synapse.class, NeuronGroup.class, NeuronCollection.class, SynapseGroup.class,
+                Subnetwork.class, NeuronArray.class, WeightMatrix.class)
+                .forEach(cls -> idManager.initId(cls, networkModels.get(cls).size() + 1));
+    }
 
     /**
      * Perform operations required before saving a network. Post-opening operations occur in {@link #readResolve()}.
@@ -1076,17 +863,8 @@ public class Network {
 
     @Override
     public String toString() {
-
         final StringBuilder ret = new StringBuilder("Root Network \n================= \n");
-        looseNeurons.forEach(ret::append);
-        looseSynapses.forEach(ret::append);
-        neuronGroups.forEach(ret::append);
-        synapseGroups.forEach(ret::append);
-        subnetworks.forEach(ret::append);
-        naList.forEach(ret::append);
-        weightMatrices.forEach(ret::append);
-        textList.forEach(ret::append);
-        svmList.forEach(ret::append);
+        ret.append(networkModels.getAll().stream().map(NetworkModel::toString).collect(Collectors.joining()));
         return ret.toString();
     }
 
@@ -1113,47 +891,16 @@ public class Network {
      * @return matched NeuronGroup, if any
      */
     public NeuronGroup getNeuronGroupByLabel(String label) {
-        return neuronGroups.stream()
+        return getNeuronGroups().stream()
                 .filter(n -> n.getLabel().equalsIgnoreCase(label))
                 .findFirst().get();
     }
 
     /**
-     * Add a network text object.
-     *
-     * @param text text object to add.
-     */
-    public void addText(final NetworkTextObject text) {
-        textList.add(text);
-        events.fireModelAdded(text);
-    }
-
-    /**
-     * Add a weight matrix object.
-     */
-    public void addWeightMatrix(final WeightMatrix wm) {
-        weightMatrices.add(wm);
-        events.fireModelAdded(wm);
-    }
-
-    /**
-     * Delete a network text object.
-     *
-     * @param text text object to add
-     */
-    public void deleteText(final NetworkTextObject text) {
-        textList.remove(text);
-        events.fireModelRemoved(text);
-    }
-
-    /**
      * Returns the list of text objects
      */
-    public List<NetworkTextObject> getTextList() {
-        if (textList == null) {
-            textList = new ArrayList<NetworkTextObject>();
-        }
-        return textList;
+    public LinkedHashSet<NetworkTextObject> getTextList() {
+        return networkModels.get(NetworkTextObject.class);
     }
 
     /**
@@ -1175,26 +922,8 @@ public class Network {
      *
      * @param toAdd list of objects to add.
      */
-    public void addObjects(final List<?> toAdd) {
-        for (Object object : toAdd) {
-            if (object instanceof Neuron) {
-                Neuron neuron = (Neuron) object;
-                addLooseNeuron(neuron);
-            } else if (object instanceof Synapse) {
-                Synapse synapse = (Synapse) object;
-                addLooseSynapse(synapse);
-            } else if (object instanceof NetworkTextObject) {
-                addText((NetworkTextObject) object);
-            } else if (object instanceof NeuronGroup) {
-                addNeuronGroup((NeuronGroup) object);
-            } else if (object instanceof NeuronArray) {
-                addNeuronArray((NeuronArray) object);
-            } else if (object instanceof  WeightMatrix) {
-                addWeightMatrix((WeightMatrix) object);
-            } else if (object instanceof SmileSVM) {
-                addSVM((SmileSVM) object);
-            }
-        }
+    public void addObjects(final List<NetworkModel> toAdd) {
+        toAdd.forEach(this::addNetworkModel);
     }
 
     /**
@@ -1218,7 +947,7 @@ public class Network {
      */
     public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng, final ConnectionStrategy connection) {
         final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng, connection);
-        addSynapseGroup(group);
+        addNetworkModel(group);
     }
 
     /**
@@ -1313,32 +1042,32 @@ public class Network {
     //     return  Collections.unmodifiableList(multiLayerNetworks);
     // }
 
-    public List<Subnetwork> getSubnetworks() {
-        return Collections.unmodifiableList(subnetworks);
+    public LinkedHashSet<Subnetwork> getSubnetworks() {
+        return networkModels.get(Subnetwork.class);
     }
 
-    public List<SynapseGroup> getSynapseGroups() {
-        return Collections.unmodifiableList(synapseGroups);
+    public LinkedHashSet<SynapseGroup> getSynapseGroups() {
+        return networkModels.get(SynapseGroup.class);
     }
 
-    public List<NeuronGroup> getNeuronGroups() {
-        return Collections.unmodifiableList(neuronGroups);
+    public LinkedHashSet<NeuronGroup> getNeuronGroups() {
+        return networkModels.get(NeuronGroup.class);
     }
 
-    public List<NeuronArray> getNeuronArrays() {
-        return Collections.unmodifiableList(naList);
+    public LinkedHashSet<NeuronArray> getNeuronArrays() {
+        return networkModels.get(NeuronArray.class);
     }
 
     public Set<WeightMatrix> getWeightMatrices() {
-        return Collections.unmodifiableSet(weightMatrices);
+        return networkModels.get(WeightMatrix.class);
     }
 
     /**
      * Return the list of synapses. These are "loose" neurons. For the full set of neurons, including neurons inside of
      * subnetworks and groups, use {@link #getFlatNeuronList()}.
      */
-    public List<? extends Neuron> getLooseNeurons() {
-        return Collections.unmodifiableList(looseNeurons);
+    public LinkedHashSet<? extends Neuron> getLooseNeurons() {
+        return networkModels.get(Neuron.class);
     }
 
     /**
@@ -1346,11 +1075,11 @@ public class Network {
      * of subnetworks and groups, use {@link #getFlatSynapseList()}.
      */
     public Collection<Synapse> getLooseSynapses() {
-        return Collections.unmodifiableCollection(looseSynapses);
+        return Collections.unmodifiableCollection(networkModels.get(Synapse.class));
     }
 
     public HashSet<NeuronCollection> getNeuronCollectionSet() {
-        return neuronCollectionSet;
+        return networkModels.get(NeuronCollection.class);
     }
 
     public SimpleIdManager getIdManager() {
@@ -1358,16 +1087,86 @@ public class Network {
     }
 
     public List<NetworkModel> getModels() {
-        List<NetworkModel> networkModels = new ArrayList<>();
-        networkModels.addAll(looseNeurons);
-        networkModels.addAll(neuronGroups);
-        networkModels.addAll(neuronCollectionSet);
-        networkModels.addAll(naList);
-        networkModels.addAll(looseSynapses);
-        networkModels.addAll(weightMatrices);
-        networkModels.addAll(synapseGroups);
-        networkModels.addAll(subnetworks);
-        return networkModels;
+        return networkModels.getAll();
+    }
+
+    public List<NetworkModel> getModelsInDeserializationOrder() {
+        return networkModels.getAllInDeserializationOrder();
+    }
+
+    private static class NetworkModelList {
+
+        private final static transient List<Class<? extends NetworkModel>> order = List.of(
+                Neuron.class,
+                NeuronGroup.class,
+                NeuronCollection.class,
+                NeuronArray.class,
+                Synapse.class,
+                WeightMatrix.class,
+                SynapseGroup.class,
+                Subnetwork.class
+        );
+
+        private final Map<Class<? extends NetworkModel>, LinkedHashSet<NetworkModel>> networkModels = new HashMap<>();
+
+        public <T extends NetworkModel> void put(Class<T> modelClass, T model) {
+            networkModels.putIfAbsent(modelClass, new LinkedHashSet<>());
+            networkModels.get(modelClass).add(model);
+        }
+
+        public <T extends NetworkModel> void putAll(Class<T> modelClass, List<T> model) {
+            networkModels.putIfAbsent(modelClass, new LinkedHashSet<>());
+            networkModels.get(modelClass).addAll(model);
+        }
+
+        private void putAllUnchecked(Class<? extends NetworkModel> modelClass, List<? extends NetworkModel> model) {
+            networkModels.putIfAbsent(modelClass, new LinkedHashSet<>());
+            networkModels.get(modelClass).addAll(model);
+        }
+
+        public void addAll(Collection<? extends NetworkModel> models) {
+            models.forEach(this::add);
+        }
+
+        public void add(NetworkModel model) {
+            if (model instanceof Subnetwork) {
+                put(Subnetwork.class, (Subnetwork) model);
+            } else {
+                networkModels.putIfAbsent(model.getClass(), new LinkedHashSet<>());
+                networkModels.get(model.getClass()).add(model);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T extends NetworkModel> LinkedHashSet<T> get(Class<T> modelClass) {
+            if (networkModels.containsKey(modelClass)) {
+                return (LinkedHashSet<T>) networkModels.get(modelClass);
+            } else {
+                return new LinkedHashSet<>();
+            }
+        }
+
+        public List<NetworkModel> getAll() {
+            return networkModels.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        }
+
+        public List<NetworkModel> getAllInDeserializationOrder() {
+            return order.stream()
+                    .filter(networkModels::containsKey)
+                    .flatMap(cls -> networkModels.get(cls).stream()).collect(Collectors.toList());
+        }
+
+        public void remove(NetworkModel model) {
+            if (model instanceof Subnetwork) {
+                if (networkModels.containsKey(Subnetwork.class)) {
+                    networkModels.get(Subnetwork.class).remove(model);
+                }
+            } else {
+                if (networkModels.containsKey(model.getClass())) {
+                    networkModels.get(model.getClass()).remove(model);
+                }
+            }
+        }
     }
 
 }

@@ -52,7 +52,7 @@ public class NetworkWrapper {
     public Neuron addNeuron(int x, int y) {
         Neuron neuron = new Neuron(network, "LinearRule");
         neuron.setLocation(x, y);
-        network.addLooseNeuron(neuron);
+        network.addNetworkModel(neuron);
         return neuron;
     }
 
@@ -64,7 +64,7 @@ public class NetworkWrapper {
         List<Neuron> newNeurons = new ArrayList();
         for (int i = 0; i < numNeurons; i++) {
             Neuron neuron = new Neuron(network, type);
-            network.addLooseNeuron(neuron);
+            network.addNetworkModel(neuron);
             newNeurons.add(neuron);
         }
 
@@ -96,7 +96,7 @@ public class NetworkWrapper {
         synapse.forceSetStrength(value);
         synapse.setLowerBound(lowerBound);
         synapse.setUpperBound(upperBound);
-        source.getNetwork().addLooseSynapse(synapse);
+        source.getNetwork().addNetworkModel(synapse);
     }
 
     /**
@@ -108,7 +108,7 @@ public class NetworkWrapper {
     public Synapse connect(Neuron source, Neuron target, double value) {
         Synapse synapse = new Synapse(source, target);
         synapse.forceSetStrength(value);
-        source.getNetwork().addLooseSynapse(synapse);
+        source.getNetwork().addNetworkModel(synapse);
         return synapse;
     }
 
@@ -120,7 +120,7 @@ public class NetworkWrapper {
     public Synapse connect(Neuron source, Neuron target, SynapseUpdateRule rule, double value) {
         Synapse synapse = new Synapse(source, target, rule);
         synapse.forceSetStrength(value);
-        source.getNetwork().addLooseSynapse(synapse);
+        source.getNetwork().addNetworkModel(synapse);
         return synapse;
     }
 
@@ -176,7 +176,7 @@ public class NetworkWrapper {
      */
     public SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target) {
         SynapseGroup sg = SynapseGroup.createSynapseGroup(source, target);
-        network.addSynapseGroup(sg);
+        network.addNetworkModel(sg);
         return sg;
     }
 
@@ -193,7 +193,7 @@ public class NetworkWrapper {
         ng.setLocation(x,y);
         ng.setNeuronType(rule);
 
-        network.addNeuronGroup(ng);
+        network.addNetworkModel(ng);
         layoutNeuronGroup(ng, x, y, layoutName);
         return ng;
 
@@ -254,7 +254,7 @@ public class NetworkWrapper {
         WinnerTakeAll wta = new WinnerTakeAll(network, numNeurons);
         wta.setLocation(x, y);
         layoutNeuronGroup(wta, x, y, "line");
-        network.addNeuronGroup(wta);
+        network.addNetworkModel(wta);
         return wta;
     }
 

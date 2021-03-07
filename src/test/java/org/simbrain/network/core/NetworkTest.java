@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.WorkspaceComponent;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class NetworkTest {
 
@@ -21,10 +21,10 @@ public class NetworkTest {
 
         n1 = new Neuron(net);
         n1.setLabel("neuron1");
-        net.addLooseNeuron(n1);
+        net.addNetworkModel(n1);
         n2 = new Neuron(net);
         n2.setLabel("neuron2");
-        net.addLooseNeuron(n2);
+        net.addNetworkModel(n2);
 
         ng1 = new NeuronGroup(net);
         ng1.setLabel("neuron_group_1");

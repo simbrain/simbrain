@@ -55,6 +55,6 @@
 //
 //     @Override
 //     public void actionPerformed(final ActionEvent event) {
-//         networkPanel.getNetwork().addLooseNeuron(new StochasticRule());
+//         networkPanel.getNetwork().addNetworkModel(new StochasticRule());
 //     }
 // }

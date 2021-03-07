@@ -18,8 +18,8 @@ public class NetworkPanelTest {
 
         Neuron n1 = new Neuron(net);
         Neuron n2 = new Neuron(net);
-        net.addLooseNeuron(n1);
-        net.addLooseNeuron(n2);
+        net.addNetworkModel(n1);
+        net.addNetworkModel(n2);
 
         List<NeuronNode> nodes =  np.filterScreenElements(NeuronNode.class);
 

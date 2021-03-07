@@ -105,7 +105,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         sgRes2.copySynapses(sgRes1);
         sgRes2.setLabel("Recurrent Synapses");
 
-        network.addSynapseGroup(sgRes2);
+        network.addNetworkModel(sgRes2);
 
         // Set up "bit-stream" inputs
         bitStream1 = buildBitStream(res1);
@@ -132,7 +132,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         bitStreamInputs.setClamped(true);
         bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
         bitStreamInputs.setInputMode(true);
-        network.addNeuronGroup(bitStreamInputs);
+        network.addNetworkModel(bitStreamInputs);
         return bitStreamInputs;
     }
 

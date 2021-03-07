@@ -304,9 +304,9 @@ class Evaluator(agentBuilder: AgentBuilder) {
     }
 
     /**
-     * A lazy list of agents, or more specifically environments containing agents.
+     * The initial, immutable list of agents.
      */
-    private val population = generateSequence(agentBuilder.copy()) { it.copy() }.take(populationSize).toList()
+    private val initialPopulation = generateSequence(agentBuilder.copy()) { it.copy() }.take(populationSize).toList()
 
     /**
      * Condition in which to stop the evolution.
@@ -336,26 +336,31 @@ class Evaluator(agentBuilder: AgentBuilder) {
 
         private var generation = 0
 
+        /**
+         * Begins yielding values when evolution.start() is called.
+         */
         private var generations = sequence {
-            var next = population
+            var population = initialPopulation
             do {
-                val current = next.parallelStream().map {
+                val builderFitnessPairs = population.parallelStream().map {
                     val build = it.build()
                     val score = build.eval()
                     BuilderFitnessPair(it, score)
                 }.toList()
                     .sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
 
-                val currentFitness = current[0].fitness
+                val currentFitness = builderFitnessPairs[0].fitness
 
-                val survivors = current.take((eliminationRatio * current.size).toInt())
+                val survivors = builderFitnessPairs.take((eliminationRatio * builderFitnessPairs.size).toInt())
 
-                yield(current)
+                yield(builderFitnessPairs)
 
-                next = survivors.map { it.agentBuilder } + survivors.uniformSample()
+                // Concatenate (1) the most-fit survivors and (2) a random sample of mutated offspring of
+                // those survivors to replenish the population
+                population = survivors.map { it.agentBuilder } + (survivors.uniformSample()
                     .take(populationSize - survivors.size)
                     .map { it.agentBuilder.copy().apply { mutate() } }
-                    .toList()
+                    .toList())
 
                 generation++
             } while (!stoppingCondition(RunUntilContext(generation, currentFitness)))

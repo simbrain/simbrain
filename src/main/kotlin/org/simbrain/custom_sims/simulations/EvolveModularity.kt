@@ -24,10 +24,12 @@ val evolveModularity = newSim {
 
         val network = Network()
 
+        // TODO: How to share information between these chromosomes
+
         /**
          * Retina
          */
-        val retinaChromosome = chromosome(8) {
+        val leftRetina = chromosome(4) {
             nodeGene() {
                 updateRule = BinaryRule()
                 location = point(it*30,-50) // TODO: Make a grid
@@ -37,11 +39,45 @@ val evolveModularity = newSim {
             }
         }
 
-        // TODO: Make this correspond to the layered architecture in Clune
-        val nodeChromosome = chromosome(1) {
+        val rightRetina = chromosome(4) {
+            nodeGene() {
+                updateRule = BinaryRule()
+                location = point(150 + (it * 30),-50) // TODO: Make a grid
+                lowerBound = 0.0
+                upperBound = 1.0
+                isClamped = true
+            }
+        }
+
+        val layer1Chromosome = chromosome(8) {
             nodeGene() {
                 lowerBound = -10.0
                 upperBound = 10.0
+                location = point(it * 30,0)
+            }
+        }
+
+        val layer2Chromosome = chromosome(4) {
+            nodeGene() {
+                lowerBound = -10.0
+                upperBound = 10.0
+                location = point(50 + (it * 30),50)
+            }
+        }
+
+        val layer3Chromosome = chromosome(2) {
+            nodeGene() {
+                lowerBound = -10.0
+                upperBound = 10.0
+                location = point(70 + (it * 30),100)
+            }
+        }
+
+        val outputChromosome = chromosome(1) {
+            nodeGene() {
+                lowerBound = -10.0
+                upperBound = 10.0
+                location = point(90,150)
             }
         }
 
@@ -66,13 +102,37 @@ val evolveModularity = newSim {
             //     nodeChromosome.genes.add(nodeGene())
             // }
 
-            nodeChromosome.genes.forEach {
+            layer1Chromosome.genes.forEach {
                 it.mutateBias()
             }
 
-            // New connections
-            val source = retinaChromosome.genes.shuffled().first()
-            val target = nodeChromosome.genes.shuffled().first()
+            // Left to layer 1
+            var source = leftRetina.genes.shuffled().first()
+            var target = layer1Chromosome.genes.shuffled().first()
+            connectionChromosome.genes.add(connectionGene(source, target) {
+                strength = (Random().nextDouble() - 0.5) * 0.2
+            })
+            // Right to layer 1
+            source = rightRetina.genes.shuffled().first()
+            target = layer1Chromosome.genes.shuffled().first()
+            connectionChromosome.genes.add(connectionGene(source, target) {
+                strength = (Random().nextDouble() - 0.5) * 0.2
+            })
+            // Layer 1 to Layer 2
+            source = layer1Chromosome.genes.shuffled().first()
+            target = layer2Chromosome.genes.shuffled().first()
+            connectionChromosome.genes.add(connectionGene(source, target) {
+                strength = (Random().nextDouble() - 0.5) * 0.2
+            })
+            // Layer 2 to Layer 3
+            source = layer2Chromosome.genes.shuffled().first()
+            target = layer3Chromosome.genes.shuffled().first()
+            connectionChromosome.genes.add(connectionGene(source, target) {
+                strength = (Random().nextDouble() - 0.5) * 0.2
+            })
+            // Layer 3 to Layer output
+            source = layer3Chromosome.genes.shuffled().first()
+            target = outputChromosome.genes.shuffled().first()
             connectionChromosome.genes.add(connectionGene(source, target) {
                 strength = (Random().nextDouble() - 0.5) * 0.2
             })
@@ -83,8 +143,12 @@ val evolveModularity = newSim {
 
         onBuild { visible ->
             network {
-                +retinaChromosome
-                +nodeChromosome
+                +leftRetina
+                +rightRetina
+                +layer1Chromosome
+                +layer2Chromosome
+                +layer3Chromosome
+                +outputChromosome
                 +connectionChromosome
             }
         }
@@ -93,15 +157,15 @@ val evolveModularity = newSim {
 
             // TODO: Separate left and right
             val inputData = listOf(
-                listOf(1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0),
-                listOf(1.0,1.0,1.0,0.0,1.0,1.0,1.0,0.0))
+                listOf(1.0,1.0,1.0,1.0),
+                listOf(1.0,1.0,1.0,0.0))
             val tarData = listOf(listOf(0.0), listOf(1.0))
             inputData.zip(tarData).map { (i, t) ->
-                retinaChromosome.products.activations = i
+                leftRetina.products.activations = i
                 network.apply {
                     repeat(3) { bufferedUpdate() }
                 }
-                t sse nodeChromosome.products.activations
+                t sse layer1Chromosome.products.activations
             }.sum()
         }
 
@@ -111,11 +175,13 @@ val evolveModularity = newSim {
             withGui {
                 createControlPanel("Control Panel", 5, 10) {
                     addButton("Pattern 1") {
-                        retinaChromosome.products.activations = listOf(1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0)
+                        leftRetina.products.activations = listOf(1.0,1.0,1.0,1.0)
+                        rightRetina.products.activations = listOf(1.0,0.0,1.0,1.0)
                         workspace.iterate()
                     }
                     addButton("Pattern 2") {
-                        retinaChromosome.products.activations = listOf(1.0,1.0,1.0,0.0,1.0,1.0,1.0,0.0)
+                        leftRetina.products.activations = listOf(1.0,1.0,1.0,0.0)
+                        rightRetina.products.activations = listOf(0.0,1.0,1.0,1.0)
                         workspace.iterate()
                     }
                 }

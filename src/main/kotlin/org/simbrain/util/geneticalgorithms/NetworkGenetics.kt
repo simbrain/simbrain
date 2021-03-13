@@ -13,14 +13,15 @@ import org.simbrain.util.propertyeditor.CopyableObject
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
+/**
+ * Helper functions to create genes
+ */
 fun nodeGene(options: Neuron.() -> Unit = { }): NodeGene {
     return NodeGene(options)
 }
-
 inline fun connectionGene(source: NodeGene, target: NodeGene, options: Synapse.() -> Unit = { }): ConnectionGene {
     return ConnectionGene(Synapse(null, null as Neuron?).apply(options), source, target)
 }
-
 inline fun layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
     val layout = GridLayout().apply(options)
     return LayoutGene(LayoutWrapper(layout, layout.hSpacing, layout.vSpacing))
@@ -84,7 +85,6 @@ class ConnectionGene(private val template: Synapse, val source: NodeGene, val ta
     fun mutate(block: Synapse.() -> Unit) {
         template.apply(block)
     }
-
 
     override fun copy(): ConnectionGene {
         return ConnectionGene(Synapse(template), sourceCopy, targetCopy)

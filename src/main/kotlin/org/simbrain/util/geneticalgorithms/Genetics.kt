@@ -75,11 +75,11 @@ class EvaluationContext(val evalRand: Random)
 object MutationContext
 
 /**
- * The environment produced by [AgentBuilder.build]. Provides a context for interacting with an evolutionary
- * simulation after an environment has been built, so that products are available.
+ * The agent produced by [AgentBuilder.build]. Provides a context for interacting with an evolutionary
+ * simulation after an agent has been built, so its products are available.
  *
  */
-class Environment(
+class Agent(
     private val evaluationContext: EvaluationContext,
     private val evalFunction: EvaluationContext.() -> Double,
     private val peekFunction: (EvaluationContext.() -> Unit)?
@@ -98,7 +98,8 @@ class Environment(
 }
 
 /**
- * Default context provided by the onBuild block for [TopLevelGene]s.
+ * Default context provided by the onBuild block for [TopLevelGene]s.  Allows code like
+ * `+intChromosome`
  */
 class TopLevelBuilderContext {
 
@@ -120,14 +121,14 @@ class TopLevelBuilderContext {
  * virtual environment.
  *
  * @param chromosomeList set of genes describing an agent, e.g. input, hidden, and output node genes
- * @param template the block opened up in the DSL, where you build the agent, by creating chromosomes and setting
+ * @param block the block opened up in the DSL, where you build the agent, by creating chromosomes and setting
  *                  up DSL functions like onMutate.
  * @param seed optional random seed
  * @param random private field used by copy function
  */
 class AgentBuilder private constructor(
     private val chromosomeList: LinkedList<Chromosome<*, *>>,
-    private val template: AgentBuilder.() -> Unit,
+    private val block: AgentBuilder.() -> Unit,
     val seed: Int = Random.nextInt(),
     val random: Random = Random(seed)
 ) {
@@ -154,7 +155,7 @@ class AgentBuilder private constructor(
 
     private var peekFunction: (EvaluationContext.() -> Unit)? = null
 
-    private lateinit var builderTemplate: TopLevelBuilderContext.(pretty: Boolean) -> Unit
+    private lateinit var builderBlock: TopLevelBuilderContext.(pretty: Boolean) -> Unit
 
     /**
      * Indicates we are on the first generation of the evolutionary algorithm.  Important to distinguish
@@ -166,7 +167,7 @@ class AgentBuilder private constructor(
 
     fun copy(): AgentBuilder {
         val newSeed = random.nextInt()
-        return AgentBuilder(LinkedList(chromosomeList.map { it.copy() }), template, newSeed).apply(template)
+        return AgentBuilder(LinkedList(chromosomeList.map { it.copy() }), block, newSeed).apply(block)
     }
 
     /**
@@ -191,24 +192,30 @@ class AgentBuilder private constructor(
      * The build operation is called once for each genome at each generation, via
      * [build]
      */
-    fun onBuild(template: TopLevelBuilderContext.(visible: Boolean) -> Unit) {
-        builderTemplate = template
+    fun onBuild(block: TopLevelBuilderContext.(visible: Boolean) -> Unit) {
+        builderBlock = block
     }
 
-    private fun buildWith(builder: TopLevelBuilderContext): Environment {
+    private fun createAgent(): Agent {
         val newSeed = random.nextInt()
-        return Environment(EvaluationContext(Random(newSeed)), evalFunction, peekFunction)
+        return Agent(EvaluationContext(Random(newSeed)), evalFunction, peekFunction)
     }
 
     /**
-     * Called when building without graphics.
+     * Build an agent by running the builderBlock defined in [onBuild].
      */
-    fun build() = buildWith(TopLevelBuilderContext().apply { builderTemplate(false) })
+    fun build(): Agent {
+        TopLevelBuilderContext().builderBlock(false)
+        return createAgent()
+    }
 
     /**
-     * Called when building with graphics
+     * [build] for the case where the agent should be visible in the desktop/
      */
-    fun visibleBuild() = buildWith(TopLevelBuilderContext().apply { builderTemplate(true) })
+    fun visibleBuild(): Agent {
+        TopLevelBuilderContext().builderBlock(true)
+        return createAgent()
+    }
 
     /**
      * Use this to define your evaluation / fitness function.
@@ -353,8 +360,6 @@ class Evaluator(agentBuilder: AgentBuilder) {
 
                 val survivors = builderFitnessPairs.take((eliminationRatio * builderFitnessPairs.size).toInt())
 
-                yield(builderFitnessPairs)
-
                 // Concatenate (1) the most-fit survivors and (2) a random sample of mutated offspring of
                 // those survivors to replenish the population
                 population = survivors.map { it.agentBuilder } + (survivors.uniformSample()
@@ -362,7 +367,10 @@ class Evaluator(agentBuilder: AgentBuilder) {
                     .map { it.agentBuilder.copy().apply { mutate() } }
                     .toList())
 
+                yield(builderFitnessPairs)
+
                 generation++
+
             } while (!stoppingCondition(RunUntilContext(generation, currentFitness)))
         }
 
@@ -408,8 +416,8 @@ class Evaluator(agentBuilder: AgentBuilder) {
 /**
  * Create the evaluator.
  */
-fun evaluator(agentBuilder: AgentBuilder, template: Evaluator.() -> Unit) =
-    Evaluator(agentBuilder).apply(template)
+fun evaluator(agentBuilder: AgentBuilder, block: Evaluator.() -> Unit) =
+    Evaluator(agentBuilder).apply(block)
 
 /**
  * Helper function to uniformly sample builder fitness papers. Used to choose survivors

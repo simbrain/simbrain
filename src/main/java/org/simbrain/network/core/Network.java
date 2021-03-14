@@ -217,9 +217,7 @@ public class Network {
      */
     public void bufferedUpdate() {
 
-        /**
-         * Only update things in this list, and in this order.
-         */
+        // Only update things in this list, and in this order.
         final var classes = List.of(
                 Neuron.class,
                 NeuronGroup.class,
@@ -252,17 +250,12 @@ public class Network {
     }
 
     /**
-     * @return Number of neurons in network.
+     * Set the activation level of all neurons to zero.
      */
-    public int getNeuronCount() {
-        return getLooseNeurons().size();
-    }
-
-    /**
-     * @return Number of weights in network
-     */
-    public int getSynapseCount() {
-        return getLooseSynapses().size();
+    public void clearActivations() {
+        for (Neuron neuron : this.getFlatNeuronList()) {
+            neuron.clear();
+        }
     }
 
     /**
@@ -296,36 +289,6 @@ public class Network {
     }
 
     /**
-     * Returns a list of all neuron groups including those in subnetworks.
-     */
-    public List<NeuronGroup> getFlatNeuronGroupList() {
-        ArrayList<NeuronGroup> ret = new ArrayList<>();
-        ret.addAll(getNeuronGroups());
-        getSubnetworks().forEach(net -> ret.addAll(net.getNeuronGroupList()));
-        return ret;
-    }
-
-    /**
-     * Returns a list of all synapse groups including those in subnetworks.
-     */
-    public List<SynapseGroup> getFlatSynapseGroupList() {
-        ArrayList<SynapseGroup> ret = new ArrayList<>();
-        ret.addAll(getSynapseGroups());
-        getSubnetworks().forEach(net -> ret.addAll(net.getSynapseGroupList()));
-        return ret;
-    }
-
-    /**
-     * Returns a list of all weight matrices including those in subnetworks.
-     */
-    public List<WeightMatrix> getFlatWeightMatrixList() {
-        ArrayList<WeightMatrix> ret = new ArrayList<>();
-        ret.addAll(getWeightMatrices());
-        getSubnetworks().forEach(net -> ret.addAll(net.getWeightMatrixList()));
-        return ret;
-    }
-
-    /**
      * Find a synapse with a given string id.
      *
      * @param id id to search for.
@@ -340,6 +303,78 @@ public class Network {
         return null;
     }
 
+    /**
+     * Returns a reference to the synapse connecting two neurons, or null if there is none.
+     *
+     * @param src source neuron
+     * @param tar target neuron
+     * @return synapse from source to target
+     */
+    public static Synapse getLooseSynapse(final Neuron src, final Neuron tar) {
+        return src.getFanOut().get(tar);
+    }
+
+
+    /**
+     * Create "flat" list of neurons, which includes the top-level neurons plus all group neurons.
+     *
+     * @return the flat list
+     */
+    public List<Neuron> getFlatNeuronList() {
+        List<Neuron> ret = new ArrayList<>();
+        ret.addAll(getLooseNeurons());
+        getNeuronGroups().forEach(ng -> ret.addAll(ng.getNeuronList()));
+        // TODO: Does this double-count?
+        getNeuronCollectionSet().forEach(nc -> ret.addAll(nc.getNeuronList()));
+        getSubnetworks().forEach(s -> s.getNeuronGroupList().forEach(
+                ng -> ret.addAll(ng.getNeuronList())));
+        return ret;
+    }
+
+    /**
+     * Create "flat" list of synapses, which includes the top-level synapses plus all subnet synapses.
+     *
+     * @return the flat list
+     */
+    public List<Synapse> getFlatSynapseList() {
+        List<Synapse> ret = new ArrayList<>(10000);
+        ret.addAll(getLooseSynapses());
+        getSynapseGroups().forEach(sg -> ret.addAll(sg.getAllSynapses()));
+        getSubnetworks().forEach(s -> s.getSynapseGroupList().forEach(
+                sg -> ret.addAll(sg.getAllSynapses())));
+        return ret;
+    }
+
+    /**
+     * Returns a list of all neuron groups including those in subnetworks.
+     */
+    public List<NeuronGroup> getFlatNeuronGroupList() {
+        ArrayList<NeuronGroup> ret = new ArrayList<>(getNeuronGroups());
+        getSubnetworks().forEach(net -> ret.addAll(net.getNeuronGroupList()));
+        return ret;
+    }
+
+    /**
+     * Returns a list of all synapse groups including those in subnetworks.
+     */
+    public List<SynapseGroup> getFlatSynapseGroupList() {
+        ArrayList<SynapseGroup> ret = new ArrayList<>(getSynapseGroups());
+        getSubnetworks().forEach(net -> ret.addAll(net.getSynapseGroupList()));
+        return ret;
+    }
+
+    /**
+     * Returns a list of all weight matrices including those in subnetworks.
+     */
+    public List<WeightMatrix> getFlatWeightMatrixList() {
+        ArrayList<WeightMatrix> ret = new ArrayList<>(getWeightMatrices());
+        getSubnetworks().forEach(net -> ret.addAll(net.getWeightMatrixList()));
+        return ret;
+    }
+
+    /**
+     * Add a new {@link NetworkModel}
+     */
     public void addNetworkModel(NetworkModel networkModel) {
         if (networkModel.shouldAdd()) {
             networkModels.add(networkModel);
@@ -358,19 +393,8 @@ public class Network {
     }
 
     /**
-     * Calls {@link Synapse#update} for each weight.
+     * Delete a {@link NetworkModel}
      */
-    public void updateLooseSynapses() {
-        // No Buffering necessary because the values of weights don't depend on one another
-        for (Synapse s : networkModels.get(Synapse.class)) {
-            s.update();
-        }
-    }
-
-    public void updateNeuronArrayConnections() {
-        networkModels.get(WeightMatrix.class).forEach(WeightMatrix::update);
-    }
-
     public void delete(final NetworkModel toDelete) {
         networkModels.remove(toDelete);
         toDelete.delete();
@@ -408,200 +432,6 @@ public class Network {
     }
 
     /**
-     * Set the activation level of all neurons to zero.
-     */
-    public void clearActivations() {
-        for (Neuron neuron : this.getFlatNeuronList()) {
-            neuron.clear();
-        }
-    }
-
-    /**
-     * Set biases on all neurons with a bias to 0.
-     */
-    public void clearBiases() {
-        for (Neuron neuron : this.getFlatNeuronList()) {
-            if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
-                ((BiasedUpdateRule) neuron.getUpdateRule()).setBias(0);
-            }
-        }
-    }
-
-    /**
-     * Sets all neurons to a specified value.
-     *
-     * @param value value to set
-     */
-    public void setActivations(final double value) {
-        for (Neuron neuron : this.getFlatNeuronList()) {
-            neuron.setActivation(value);
-        }
-    }
-
-    /**
-     * Sets neuron activations using values in an array of doubles. Currently these activations are applied to the
-     * network in whatever order the neurons were added.
-     *
-     * @param activationArray array of values to apply to network
-     */
-    public void setActivations(final double[] activationArray) {
-        // TODO: Sort by id
-        int i = 0;
-        for (Neuron neuron : this.getFlatNeuronList()) {
-            if (activationArray.length == i) {
-                return;
-            }
-            neuron.setActivation(activationArray[i++]);
-        }
-    }
-
-    /**
-     * Sets all weights to a specified value.
-     *
-     * @param value value to set
-     */
-    public void setWeights(final double value) {
-        for (Synapse synapse : this.getFlatSynapseList()) {
-            synapse.setStrength(value);
-        }
-    }
-
-    /**
-     * Returns the "state" of the network: the activation level of its neurons. An activation vector.
-     *
-     * @return an array representing the activation levels of all the neurons in this network
-     */
-    public double[] getState() {
-        double[] ret = new double[this.getNeuronCount()];
-
-        for (int i = 0; i < this.getNeuronCount(); i++) {
-            Neuron n = getLooseNeuron(i);
-            ret[i] = (int) n.getActivation();
-        }
-
-        return ret;
-    }
-
-    /**
-     * Sets all weight values to zero, effectively eliminating them.
-     */
-    public void setWeightsToZero() {
-        for (Synapse s : getLooseSynapses()) {
-            s.setStrength(0);
-        }
-    }
-
-    /**
-     * Randomizes all loose neurons.
-     */
-    public void randomizeLooseNeurons() {
-        for (Neuron n : getLooseNeurons()) {
-            n.randomize();
-        }
-    }
-
-    /**
-     * Randomize loose neurons. Keeping this for legacy code.
-     */
-    public void randomizeNeurons() {
-        randomizeLooseNeurons();
-    }
-
-    /**
-     * Randomizes all loose weights.
-     */
-    public void randomizeLooseWeights() {
-        for (Synapse s : getLooseSynapses()) {
-            s.randomize();
-        }
-    }
-
-    /**
-     * Randomize loose weights. Keeping this for legacy code.
-     */
-    public void randomizeWeights() {
-        randomizeLooseWeights();
-    }
-
-    /**
-     * Randomize all biased loose neurons.
-     *
-     * @param lower lower bound for randomization.
-     * @param upper upper bound for randomization.
-     */
-    public void randomizeBiasesLooseNeurons(double lower, double upper) {
-        for (Neuron neuron : getLooseNeurons()) {
-            neuron.randomizeBias(lower, upper);
-        }
-    }
-
-    /**
-     * Returns a reference to the synapse connecting two neurons, or null if there is none.
-     *
-     * @param src source neuron
-     * @param tar target neuron
-     * @return synapse from source to target
-     */
-    public static Synapse getLooseSynapse(final Neuron src, final Neuron tar) {
-        return src.getFanOut().get(tar);
-    }
-
-    /**
-     * Gets the synapse at particular point.
-     *
-     * @param i Neuron number
-     * @param j Weight to get
-     * @return Weight at the points defined
-     */
-    // TODO: Either fix this or make its assumptions explicit
-    public Synapse getLooseWeight(final int i, final int j) {
-        return getLooseNeuron(i).getFanOut().get(getLooseNeuron(j));
-    }
-
-    /**
-     * Returns true if all objects are gone from this network.
-     *
-     * @return true if everything's gone.
-     */
-    public boolean isEmpty() {
-        boolean neuronsGone = false;
-        boolean networksGone = false;
-        if (this.getNeuronCount() == 0) {
-            neuronsGone = true;
-        }
-        return (neuronsGone && networksGone);
-    }
-
-    /**
-     * Create "flat" list of neurons, which includes the top-level neurons plus all group neurons.
-     *
-     * @return the flat list
-     */
-    public List<Neuron> getFlatNeuronList() {
-        List<Neuron> ret = new ArrayList<>();
-        ret.addAll(getLooseNeurons());
-        getNeuronGroups().forEach(ng -> ret.addAll(ng.getNeuronList()));
-        getNeuronCollectionSet().forEach(nc -> ret.addAll(nc.getNeuronList()));
-        getSubnetworks().forEach(s -> s.getNeuronGroupList().forEach(
-                ng -> ret.addAll(ng.getNeuronList())));
-        return ret;
-    }
-
-    /**
-     * Create "flat" list of synapses, which includes the top-level synapses plus all subnet synapses.
-     *
-     * @return the flat list
-     */
-    public List<Synapse> getFlatSynapseList() {
-        List<Synapse> ret = new ArrayList<>(10000);
-        ret.addAll(getLooseSynapses());
-        getSynapseGroups().forEach(sg -> ret.addAll(sg.getAllSynapses()));
-        getSubnetworks().forEach(s -> s.getSynapseGroupList().forEach(
-                sg -> ret.addAll(sg.getAllSynapses())));
-        return ret;
-    }
-
-    /**
      * Returns the precision of the current time step.
      *
      * @return the precision of the current time step.
@@ -636,24 +466,6 @@ public class Network {
         for (Neuron neuron : neuronList) {
             neuron.setToBufferVals();
         }
-
-    }
-
-    /**
-     * Get the activations associated with a list of neurons.
-     *
-     * @param neuronList the neurons whose activations to get.
-     * @return vector of activations
-     */
-    public static double[] getActivationVector(List<Neuron> neuronList) {
-        double[] ret = new double[neuronList.size()];
-
-        for (int i = 0; i < neuronList.size(); i++) {
-            Neuron n = neuronList.get(i);
-            ret[i] = n.getActivation();
-        }
-
-        return ret;
     }
 
     /**
@@ -931,18 +743,6 @@ public class Network {
     }
 
     /**
-     * Connect a source neuron group to a target neuron group using a connection object.
-     *
-     * @param sng        source neuron group
-     * @param tng        target neuron group
-     * @param connection connection object
-     */
-    public void connectNeuronGroups(final NeuronGroup sng, final NeuronGroup tng, final ConnectionStrategy connection) {
-        final SynapseGroup group = SynapseGroup.createSynapseGroup(sng, tng, connection);
-        addNetworkModel(group);
-    }
-
-    /**
      * Add a weight matrix between two {@link ArrayConnectable}'s.
      * Can "adapt" a neuron collection to an ND4J array, or be a weight
      * matrix between those arrays.
@@ -1029,10 +829,6 @@ public class Network {
     public NetworkEvents getEvents() {
         return events;
     }
-
-    // public List<MultiLayerNet> getMultiLayerNetworks() {
-    //     return  Collections.unmodifiableList(multiLayerNetworks);
-    // }
 
     public LinkedHashSet<Subnetwork> getSubnetworks() {
         return networkModels.get(Subnetwork.class);

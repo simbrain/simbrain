@@ -73,7 +73,6 @@ public class TestSim extends RegisteredSimulation {
         Sparse.connectSparse(network.getFlatNeuronList(),
                 network.getFlatNeuronList(), sparsity, false, false, true);
         ConnectionUtilities.randomizeAndPolarizeSynapses(network.getLooseSynapses(), excitatoryRatio);
-        network.randomizeNeurons();
 
         //MAKE BARCHART
         BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network");

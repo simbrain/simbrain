@@ -18,7 +18,7 @@ public class ConcurrentBufferedUpdateTest
         Network net = new Network();
         net.setTimeStep(0.1);
         NeuronGroup ng = new NeuronGroup(net, 40_000);
-        net.addNeuronGroup(ng);
+        net.addNetworkModel(ng);
         net.getUpdateManager().clear();
         ConcurrentBufferedUpdate cbu = ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net);
         net.getUpdateManager().addAction(cbu);

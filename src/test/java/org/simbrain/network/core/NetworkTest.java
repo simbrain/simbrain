@@ -28,10 +28,10 @@ public class NetworkTest {
 
         ng1 = new NeuronGroup(net);
         ng1.setLabel("neuron_group_1");
-        net.addNeuronGroup(ng1);
+        net.addNetworkModel(ng1);
         ng2 = new NeuronGroup(net);
         ng2.setLabel("ng2");
-        net.addNeuronGroup(ng2);
+        net.addNetworkModel(ng2);
     }
 
     @Test

@@ -329,13 +329,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     }
 
     /**
-     * Print activations as a vector.
-     */
-    public void printActivations() {
-        System.out.println(Utils.doubleArrayToString(Network.getActivationVector(neuronList)));
-    }
-
-    /**
      * Randomize all neurons in group.
      */
     public void randomize() {

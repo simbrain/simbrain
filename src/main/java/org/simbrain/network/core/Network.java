@@ -26,6 +26,7 @@ import org.simbrain.network.matrix.ArrayConnectable;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.smile.SmileSVM;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.SimpleIdManager;
@@ -37,11 +38,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
- * <b>Network</b> provides core neural network functionality and is the the
- * main
- * <p>
- * API for external calls. Network objects are sets of neurons and weights connecting them. Most update and learning
- * logic occurs in the neurons and weights themselves, as well as in special groups.
+ * <b>Network</b> provides core neural network functionality and is the main API for external calls. Network objects
+ * are sets of neurons and weights connecting them. Most update and learning logic occurs in the neurons and weights
+ * themselves, as well as in special groups.
  */
 public class Network {
 
@@ -81,12 +80,15 @@ public class Network {
      */
     private transient NetworkEvents events = new NetworkEvents(this);
 
-    private NetworkModelList networkModels = new NetworkModelList();
+    /**
+     * Main data structure containing all {@link NetworkModel}s: neurons, synapses, etc.
+     */
+    private final NetworkModelList networkModels = new NetworkModelList();
 
     /**
      * The update manager for this network.
      */
-    private NetworkUpdateManager updateManager;
+    private final NetworkUpdateManager updateManager;
 
     /**
      * In iterations or msec.
@@ -121,12 +123,12 @@ public class Network {
     /**
      * Comparator used for sorting the priority sorted neuron list.
      */
-    private PriorityComparator priorityComparator = new PriorityComparator();
+    private final PriorityComparator priorityComparator = new PriorityComparator();
 
     /**
      * Manage ids for all network elements.
      */
-    private SimpleIdManager idManager = new SimpleIdManager();
+    private final SimpleIdManager idManager = new SimpleIdManager((clazz) -> networkModels.unsafeGet(clazz).size() + 1);
 
     /**
      * An internal id giving networks unique numbers within the same simbrain session.
@@ -161,7 +163,6 @@ public class Network {
         current_id++;
         updateManager = new NetworkUpdateManager(this);
         prioritySortedNeuronList = new ArrayList<>();
-        initIdManager();
     }
 
     /**
@@ -212,19 +213,21 @@ public class Network {
     }
 
     /**
-     * Default asycnrhonous update method called by {@link org.simbrain.network.update_actions.BufferedUpdate}.
+     * Default asynchronous update method called by {@link org.simbrain.network.update_actions.BufferedUpdate}.
      */
     public void bufferedUpdate() {
 
-        // TODO: Once update and applybuffervalues are implemented possibly use networkmodels
-
+        /**
+         * Only update things in this list, and in this order.
+         */
         final var classes = List.of(
                 Neuron.class,
                 NeuronGroup.class,
                 WeightMatrix.class,
                 NeuronArray.class,
                 NeuronCollection.class,
-                Subnetwork.class
+                Subnetwork.class,
+                SmileSVM.class
         );
 
         // First update the activation buffers
@@ -247,7 +250,6 @@ public class Network {
             neuron.setInputValue(0);
         }
     }
-
 
     /**
      * @return Number of neurons in network.
@@ -373,7 +375,6 @@ public class Network {
         networkModels.remove(toDelete);
         toDelete.delete();
         events.fireModelRemoved(toDelete);
-
     }
 
     /**
@@ -582,7 +583,7 @@ public class Network {
         getNeuronGroups().forEach(ng -> ret.addAll(ng.getNeuronList()));
         getNeuronCollectionSet().forEach(nc -> ret.addAll(nc.getNeuronList()));
         getSubnetworks().forEach(s -> s.getNeuronGroupList().forEach(
-                        ng -> ret.addAll(ng.getNeuronList())));
+                ng -> ret.addAll(ng.getNeuronList())));
         return ret;
     }
 
@@ -694,15 +695,6 @@ public class Network {
         getLooseSynapses().forEach(Synapse::postUnmarshallingInit);
 
         return this;
-    }
-
-    /**
-     * Initialize all ids in the {@link SimpleIdManager}.
-     */
-    private void initIdManager() {
-        List.of(Neuron.class, Synapse.class, NeuronGroup.class, NeuronCollection.class, SynapseGroup.class,
-                Subnetwork.class, NeuronArray.class, WeightMatrix.class)
-                .forEach(cls -> idManager.initId(cls, networkModels.get(cls).size() + 1));
     }
 
     /**
@@ -1094,8 +1086,14 @@ public class Network {
         return networkModels.getAllInDeserializationOrder();
     }
 
+    /**
+     * The main data structure for {@link NetworkModel}s. Wraps a map from classes to ordered sets of those objects.
+     */
     private static class NetworkModelList {
 
+        /**
+         * Items must be ordered for deserializing. For example neurons but serialized before synapses.
+         */
         private final static transient List<Class<? extends NetworkModel>> order = List.of(
                 Neuron.class,
                 NeuronGroup.class,
@@ -1107,6 +1105,9 @@ public class Network {
                 Subnetwork.class
         );
 
+        /**
+         * Backing for the collection: a map from model types to linked hash sets.
+         */
         private final Map<Class<? extends NetworkModel>, LinkedHashSet<NetworkModel>> networkModels = new HashMap<>();
 
         public <T extends NetworkModel> void put(Class<T> modelClass, T model) {
@@ -1137,6 +1138,9 @@ public class Network {
             }
         }
 
+        /**
+         * Returns an ordered set of network models of a specific type.
+         */
         @SuppressWarnings("unchecked")
         public <T extends NetworkModel> LinkedHashSet<T> get(Class<T> modelClass) {
             if (networkModels.containsKey(modelClass)) {
@@ -1146,10 +1150,24 @@ public class Network {
             }
         }
 
+        //TODO
+        public LinkedHashSet<?> unsafeGet(Class<?> modelClass) {
+            if (networkModels.containsKey(modelClass)) {
+                return (LinkedHashSet<?>) networkModels.get(modelClass);
+            } else {
+                return new LinkedHashSet<>();
+            }
+        }
+
+
+
         public List<NetworkModel> getAll() {
             return networkModels.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
         }
 
+        /**
+         * Returns a list of network models in the order required for proper deserilization.
+         */
         public List<NetworkModel> getAllInDeserializationOrder() {
             return order.stream()
                     .filter(networkModels::containsKey)

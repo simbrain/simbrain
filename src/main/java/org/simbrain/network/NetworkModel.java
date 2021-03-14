@@ -43,13 +43,14 @@ public interface NetworkModel {
         getEvents().fireSelected();
     }
 
-    default void delete() {
+    /**
+     * Override if cleanup is needed when deleting.
+     */
+    default void delete() {};
 
-    }
+    // TODO: Discuss the methods below
 
-    default void afterAddedToNetwork() {
-
-    }
+    default void afterAddedToNetwork() {}
 
     default void afterBatchAddedToNetwork() {
         afterAddedToNetwork();

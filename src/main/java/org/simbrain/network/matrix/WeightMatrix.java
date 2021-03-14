@@ -226,9 +226,7 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         return id;
     }
 
-    /**
-     * Notify listeners that this object has been deleted.
-     */
+    @Override
     public void delete() {
         source.removeOutgoingWeightMatrix(this);
         target.setIncomingWeightMatrix(null);
@@ -239,7 +237,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
                     setUseCurve(false);
                 });
         events.fireDeleted();
-        parent.delete(this);
     }
 
     /**

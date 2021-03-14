@@ -3,8 +3,6 @@ package org.simbrain.network.smile;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.events.NetworkModelEvents;
-import org.simbrain.network.events.NeuronArrayEvents;
 
 import java.awt.geom.Point2D;
 
@@ -22,6 +20,7 @@ public class SmileSVM implements  LocatableModel {
 
     @Override
     public void update() {
+        System.out.println("test");
     }
 
     @Override
@@ -42,7 +41,6 @@ public class SmileSVM implements  LocatableModel {
 
     @Override
     public void setLocation(@NotNull Point2D location) {
-
     }
 
     @NotNull
@@ -51,5 +49,8 @@ public class SmileSVM implements  LocatableModel {
         return events;
     }
 
-
+    @Override
+    public String toString() {
+        return "SVM Smile object " + getLabel();
+    }
 }

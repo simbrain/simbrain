@@ -25,8 +25,8 @@ import java.util.List;
 
 /**
  * A collection of loose neurons (neurons in a {@link NeuronGroup} can be added to a collection). Allows them to be
- * labelled, moved around as a unit, coupled to, etc.   However no special processing occurs in neuron collections. They
- * are a convenience.  NeuronCollections can overlap each other.
+ * labelled, moved around as a unit, coupled to, etc. However no special processing occurs in neuron collections. They
+ * are a convenience. NeuronCollections can overlap each other.
  */
 public class NeuronCollection extends AbstractNeuronCollection {
 
@@ -115,8 +115,8 @@ public class NeuronCollection extends AbstractNeuronCollection {
     }
 
     /**
-     * Returns the summed hash codes of contained neurons.  Used to prevent creating neuron collections from identical
-     * neurons.
+     * Returns the summed hash codes of contained neurons.  Used to prevent creation of neuron collections from
+     * identical sets of neurons.
      *
      * @return summed hash
      */

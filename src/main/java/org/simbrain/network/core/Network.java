@@ -228,11 +228,11 @@ public class Network {
                 SmileSVM.class
         );
 
-        // First update the activation buffers
-        classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::update));
+        // First update the buffers using the models internal update logic
+        classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::setBufferValues));
 
-        // Then update the activations themselves
-        classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::applyBufferValues));
+        // Then update the states themselves
+        classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::update));
 
     }
 
@@ -383,16 +383,6 @@ public class Network {
         }
     }
 
-    // TODO: check should add
-    public <T extends NetworkModel> void batchAddNetworkModels(List<T> networkModels) {
-        final var sample = networkModels.stream().findFirst();
-        sample.ifPresent(model -> {
-            this.networkModels.putAllUnchecked(model.getClass(), networkModels);
-            model.afterBatchAddedToNetwork();
-        });
-        networkModels.forEach(events::fireModelAdded);
-    }
-
     /**
      * Delete a {@link NetworkModel}
      */
@@ -427,7 +417,9 @@ public class Network {
             }
 
             // Make the collection
-            return new NeuronCollection(this, loose);
+            NeuronCollection nc =new NeuronCollection(this, loose);
+            nc.setLabel(getIdManager().getProposedId(nc.getClass()));
+            return nc;
         }
         return null;
     }

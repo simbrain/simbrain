@@ -22,30 +22,22 @@ public abstract class NetworkModel {
     private String id;
 
     /**
-     * Optional string description of neuron.
+     * Optional string description of model object.
      */
     @UserParameter(label = "Label", description = "Optional string description",  useSetter = true, order = 2)
     private String label = "";
 
     /**
-     * Update buffers
+     * Set buffer values as part of async updating.
+     * See {@link org.simbrain.network.update_actions.BufferedUpdate}
+     */
+    public void setBufferValues() {}
+
+    /**
+     * Apply buffers to current state
      */
     public void update() {
     }
-
-    // TODO: Is this is correct most general method?
-    //  No argument because for loose neurons it's not needed. But array conectables use setInputBuffer; a confusing
-    // overlap of terminology
-
-    /**
-     * Set buffer values as part of async updating.  See {@link org.simbrain.network.update_actions.BufferedUpdate}
-     */
-    void setBufferValues() {}
-
-    /**
-     * Apply buffer values to actual values of models, to support async updating.
-     */
-    public void applyBufferValues() {}
 
     /**
      * Return a reference to that model type's instance of [NetworkModelEvent]
@@ -65,17 +57,10 @@ public abstract class NetworkModel {
     public void delete() {
     }
 
-    ;
-
-    // TODO: Discuss the methods below
-
-    void afterAddedToNetwork() {
-    }
-
-    public void afterBatchAddedToNetwork() {
-        afterAddedToNetwork();
-    }
-
+    /**
+     * Override if there are cases where a created model should not be added, e.g. if it is a
+     * duplicate of an existing model. Currently only used by {@link org.simbrain.network.groups.NeuronCollection}
+     */
     public boolean shouldAdd() {
         return true;
     }

@@ -698,6 +698,13 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         return LocatableModelKt.getMaxY(neuronList);
     }
 
+    @Override
+    public void setBufferValues() {
+        if (arrayBuffer != null) {
+            setInputArray(Arrays.stream(arrayBuffer).toArray());
+        }
+    }
+
     /**
      * Generic update operations that can be "doubled" if a neuron is part of multiple collections.
      */
@@ -750,7 +757,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
 
     @Override
     public AbstractNeuronCollection copy() {
-        //TODO
         return null;
     }
 
@@ -787,17 +793,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
 
     public NeuronCollectionEvents getEvents() {
         return events;
-    }
-
-    public void setBufferValues() {
-        update(); // For loose neurons. Weight matrix buffered update handled by weight matrix
-    }
-
-    @Override
-    public void applyBufferValues() {
-        if (arrayBuffer != null) {
-            setInputArray(Arrays.stream(arrayBuffer).toArray());
-        }
     }
 
     @Override

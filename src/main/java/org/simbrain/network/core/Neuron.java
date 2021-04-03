@@ -872,7 +872,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public String toString() {
-        return "Neuron [" + getId() + "] " + getType() + "  Activation = " + this.getActivation() + "  Location = (" + x + "," + y + ")\n";
+        return getType() + " Activation = " + this.getActivation() + " Location = (" + x + "," + y + ")\n";
     }
 
     /**

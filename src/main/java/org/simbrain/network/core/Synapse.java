@@ -613,7 +613,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      * @return tool tip text
      */
     public String getToolTipText() {
-        return "(" + getId() + ") Strength: " + Utils.round(this.getStrength(), MAX_DIGITS);
+        return "Strength: " + Utils.round(this.getStrength(), MAX_DIGITS);
     }
 
     /**

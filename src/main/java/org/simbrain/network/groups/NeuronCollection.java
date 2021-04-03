@@ -39,7 +39,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
     public NeuronCollection(final Network net, final List<Neuron> neurons) {
         super(net);
         addNeurons(neurons);
-        setLabel(getId());
         subsamplingManager.resetIndices();
 
         neurons.forEach(n -> {
@@ -109,8 +108,8 @@ public class NeuronCollection extends AbstractNeuronCollection {
 
     @Override
     public String toString() {
-        return String.format("Neuron Collection [%s]. Neuron group with %d neuron(s). Located at (%2.2f, %2.2f).\n",
-                getLabel(), this.getNeuronList().size(), getLocation().getX(), getLocation().getY());
+        return String.format("Neuron collection with %d neuron(s). Located at (%2.2f, %2.2f).\n",
+                this.getNeuronList().size(), getLocation().getX(), getLocation().getY());
     }
 
     /**
@@ -124,12 +123,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
     }
 
     @Override
-    public NeuronCollection copy() {
-        // TODO
-        return null;
-    }
-
-    @Override
     public boolean shouldAdd() {
         int hashCode = getSummedNeuronHash();
         for (NeuronCollection other : getNetwork().getNeuronCollectionSet()) {
@@ -139,4 +132,5 @@ public class NeuronCollection extends AbstractNeuronCollection {
         }
         return true;
     }
+
 }

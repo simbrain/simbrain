@@ -369,14 +369,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         }
     }
 
-    public void setBufferValues() {
-        update();
-    }
-
-    public void applyBufferValues() {
-        // Not needed?
-    }
-
     /**
      * For spiking source neurons, returns the spike-responder's value times the synapse strength. For non-spiking
      * neurons, returns the pre-synaptic activation times the synapse strength.

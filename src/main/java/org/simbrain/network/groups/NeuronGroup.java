@@ -164,7 +164,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Override
     public void update() {
-        super.update();
         if (!inputMode) {
             Network.updateNeurons(getNeuronList());
         }

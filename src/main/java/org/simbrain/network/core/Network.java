@@ -19,13 +19,11 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.*;
 import org.simbrain.network.matrix.ArrayConnectable;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.smile.SmileSVM;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SimbrainPreferences;
@@ -208,7 +206,7 @@ public class Network {
     public void updateNeuronsByPriority() {
         for (Neuron neuron : prioritySortedNeuronList) {
             neuron.update();
-            neuron.setToBufferVals();
+            neuron.updateStateFromBuffer();
         }
     }
 
@@ -229,7 +227,7 @@ public class Network {
         );
 
         // First update the buffers using the models internal update logic
-        classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::setBufferValues));
+        classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::updateBuffer));
 
         // Then update the states themselves
         classes.forEach(cls -> networkModels.get(cls).forEach(NetworkModel::update));
@@ -472,10 +470,10 @@ public class Network {
     public static void updateNeurons(List<Neuron> neuronList) {
         // TODO: Update by priority if priority based update?
         for (Neuron neuron : neuronList) {
-            neuron.update();
+            neuron.updateBuffer();
         }
         for (Neuron neuron : neuronList) {
-            neuron.setToBufferVals();
+            neuron.updateStateFromBuffer();
         }
     }
 

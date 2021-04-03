@@ -1,7 +1,6 @@
 package org.simbrain.network;
 
 
-import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.events.NetworkModelEvents;
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
@@ -28,15 +27,23 @@ public abstract class NetworkModel {
     private String label = "";
 
     /**
-     * Set buffer values as part of async updating.
-     * See {@link org.simbrain.network.update_actions.BufferedUpdate}
+     * Set buffer values as first part of async updating. The only things that need to be
+     * buffered are values that communicate with the rest of the network.
      */
-    public void setBufferValues() {}
+    public void updateBuffer() {}
 
     /**
-     * Apply buffers to current state
+     * Apply buffers to current state a second part of async updating.
+     */
+    public void updateStateFromBuffer() {}
+
+    /**
+     * Immediately update the model.
      */
     public void update() {
+        updateBuffer();
+        updateStateFromBuffer();
+        getEvents().fireUpdated();
     }
 
     /**

@@ -42,18 +42,6 @@ public class WeightMatrix extends NetworkModel implements EditableObject,Attribu
      */
     private boolean useCurve = false;
 
-    /**
-     * A label for this Neuron Array for display purpose.
-     */
-    @UserParameter(label = "Label", order = 10)
-    private String label = "";
-
-    /**
-     * Id of this array.
-     */
-    @UserParameter(label = "ID", description = "Id of this weight matrix", order = -1, editable = false)
-    private String id;
-
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
     private double increment = .1;
 
@@ -122,16 +110,6 @@ public class WeightMatrix extends NetworkModel implements EditableObject,Attribu
 
     }
 
-    public void setBufferValues() {
-        // TODO
-        update();
-    }
-
-    @Override
-    public void applyBufferValues() {
-        // No implementation?
-    }
-
     @Override
     public String toString() {
         String ret = new String();
@@ -191,11 +169,6 @@ public class WeightMatrix extends NetworkModel implements EditableObject,Attribu
 
     public void setEnableRendering(boolean enableRendering) {
         this.enableRendering = enableRendering;
-    }
-
-    @Override
-    public String getId() {
-        return id;
     }
 
     @Override

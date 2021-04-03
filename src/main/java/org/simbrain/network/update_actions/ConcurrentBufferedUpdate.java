@@ -308,7 +308,7 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
                 for (int i = 0; i < results.size(); i++) {
                     for (int j = 0; j < ((BufferedUpdateTask) results.get(i).get()).getHosts().length; j++)
                     {
-                        ((BufferedUpdateTask) results.get(i).get()).getHosts()[j].setToBufferVals();
+                        ((BufferedUpdateTask) results.get(i).get()).getHosts()[j].updateStateFromBuffer();
                     }
                 }
             }

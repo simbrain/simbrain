@@ -699,7 +699,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     }
 
     @Override
-    public void setBufferValues() {
+    public void updateBuffer() {
         if (arrayBuffer != null) {
             setInputArray(Arrays.stream(arrayBuffer).toArray());
         }
@@ -708,6 +708,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     /**
      * Generic update operations that can be "doubled" if a neuron is part of multiple collections.
      */
+    @Override
     public void update() {
         if (inputMode) {
             updateInputs();
@@ -795,8 +796,4 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         return events;
     }
 
-    @Override
-    public void setInputBuffer(double[] activations) {
-        arrayBuffer = activations;
-    }
 }

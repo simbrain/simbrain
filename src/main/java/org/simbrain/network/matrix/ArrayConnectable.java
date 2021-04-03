@@ -19,11 +19,6 @@ public abstract class ArrayConnectable extends LocatableModel {
     public abstract void setInputArray(double[] activations);
 
     /**
-     * Set input buffer to support buffered update.
-     */
-    public abstract void setInputBuffer(double[] activations);
-
-    /**
      * Returns "output" activations.
      */
     public abstract double[] getOutputArray();

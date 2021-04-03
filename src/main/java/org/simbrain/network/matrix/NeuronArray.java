@@ -33,18 +33,6 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     private final Network parent;
 
     /**
-     * A label for this Neuron Array for display purpose.
-     */
-    @UserParameter(label = "Label")
-    private String label = "";
-
-    /**
-     * Id of this array.
-     */
-    @UserParameter(label = "ID", description = "Id of this array", order = -1, editable = false)
-    private final String id;
-
-    /**
      * Number of columns in the under laying ND4J Array.
      */
     @UserParameter(label = "Nodes", description = "Number of nodes", editable = false, order = 1)
@@ -103,7 +91,6 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
      */
     public NeuronArray(Network net, int numNodes) {
         parent = net;
-        this.id = net.getIdManager().getId(NeuronArray.class);
         neuronArray = new double[numNodes];
         this.numNodes = numNodes;
         randomize();
@@ -136,29 +123,10 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     }
 
     /**
-     * Set the label. This prevents the group id being used as the label for new groups.  If null or empty labels are
-     * sent in then the group label is used.
-     */
-    @Consumable(defaultVisibility = false)
-    public void setLabel(String label) {
-        String oldLabel = this.label;
-        this.label = label;
-        events.fireLabelChange(oldLabel, label);
-    }
-
-    /**
      * Simple randomization for now.
      */
     public void randomize() {
         neuronArray = SimbrainMath.randomVector(neuronArray.length, -1, 1);
-        events.fireUpdated();
-    }
-
-    public void update() {
-
-        // TODO: This is just a place holder. Do something useful.
-        // neuronArray = Nd4j.rand(10,10).subi(0.5).mul(2);
-
         events.fireUpdated();
     }
 
@@ -218,11 +186,7 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
 
     @Override
     public void onCommit() {
-        events.fireLabelChange("", label);
-    }
-
-    public String getLabel() {
-        return label;
+        events.fireLabelChange("", getLabel());
     }
 
     @Override
@@ -303,7 +267,7 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
          */
         public NeuronArray create(Network network) {
             NeuronArray na = new NeuronArray(network, numNodes);
-            na.label = label;
+            na.setLabel(label);
             return na;
         }
 
@@ -342,23 +306,17 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     }
 
     @Override
-    public void setInputBuffer(double[] activations) {
-        arrayBuffer = activations;
+    public void updateBuffer() {
+        arrayBuffer = Arrays.stream(neuronArray).toArray();
     }
 
     @Override
-    public void applyBufferValues() {
+    public void updateStateFromBuffer() {
         if (arrayBuffer != null) {
             setInputArray(Arrays.stream(arrayBuffer).toArray());
         }
     }
-
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
+    
     public void fireLocationChange() {
         events.fireLocationChange();
     }
@@ -376,7 +334,7 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Array [" + getId() + "] with " + inputSize() + " components\n");
+        sb.append(" with " + inputSize() + " components\n");
         // TODO: For larger numbers could present as a matrix
         int maxToDisplay = 10;
         if (neuronArray.length < maxToDisplay) {

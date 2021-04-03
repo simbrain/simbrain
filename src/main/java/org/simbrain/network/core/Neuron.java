@@ -362,21 +362,11 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Updates neuron buffers.
      */
-    public void update() {
+    public void updateBuffer() {
         if (isClamped()) {
             return;
         }
         updateRule.update(this);
-    }
-
-    public void setBufferValues() {
-        // TODO: renames around here might be needed.
-        update();
-    }
-
-    public void applyBufferValues() {
-        // TODO: More renames at some point
-        setToBufferVals();
     }
 
     /**
@@ -408,7 +398,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * update synchronously in the same way activations do for buffered
      * updates.
      */
-    public void setToBufferVals() {
+    @Override
+    public void updateStateFromBuffer() {
         setActivation(getBuffer());
         setSpike(getSpkBuffer());
     }

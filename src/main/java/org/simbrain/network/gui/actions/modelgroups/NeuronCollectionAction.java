@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.actions.modelgroups;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 
@@ -47,14 +48,14 @@ public final class NeuronCollectionAction extends ConditionallyEnabledAction {
 
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         List<Neuron> neuronList = getNetworkPanel().getSelectedModels(Neuron.class);
         if (neuronList.size() > 0) {
-            getNetworkPanel().getNetwork().createNeuronCollection(neuronList);
+            NeuronCollection nc = getNetworkPanel().getNetwork().createNeuronCollection(neuronList);
+            if (nc != null) {
+                getNetworkPanel().getNetwork().addNetworkModel(nc);
+            }
         }
     }
 

@@ -406,7 +406,7 @@ public class Network {
      *
      * @param neuronList list of neurons to add to a neuron collection.
      */
-    public void createNeuronCollection(List<Neuron> neuronList) {
+    public NeuronCollection createNeuronCollection(List<Neuron> neuronList) {
 
         // Filter out loose neurons (a neuron is loose if its parent group is null)
         List<Neuron> loose = neuronList.stream()
@@ -421,14 +421,32 @@ public class Network {
             int hashCode = loose.stream().mapToInt(n -> n.hashCode()).sum();
             for (NeuronCollection nc : getNeuronCollectionSet()) {
                 if (hashCode == nc.getSummedNeuronHash()) {
-                    return;
+                    return null;
                 }
             }
 
             // Make the collection
-            NeuronCollection nc = new NeuronCollection(this, loose);
-            addNetworkModel(nc);
+            return new NeuronCollection(this, loose);
         }
+        return null;
+    }
+
+
+    /**
+     * Add a weight matrix between two {@link ArrayConnectable}'s.
+     * Can "adapt" a neuron collection to an ND4J array, or be a weight
+     * matrix between those arrays.
+     *
+     * @param source source neuron collection or nd4j array
+     * @param target target neuron collection or nd4j array
+     */
+    public WeightMatrix createWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
+        if (target.getIncomingWeightMatrix() != null) {
+            delete(target.getIncomingWeightMatrix());
+        }
+
+        WeightMatrix newMatrix = new WeightMatrix(this, source, target);
+        return newMatrix;
     }
 
     /**
@@ -668,7 +686,10 @@ public class Network {
     @Override
     public String toString() {
         final StringBuilder ret = new StringBuilder("Root Network \n================= \n");
-        ret.append(networkModels.getAll().stream().map(NetworkModel::toString).collect(Collectors.joining()));
+        ret.append(networkModels.getAll().stream()
+                .map(NetworkModel::getDescription)
+                .collect(Collectors.joining("\n")));
+
         return ret.toString();
     }
 
@@ -740,23 +761,6 @@ public class Network {
         for (Neuron neuron : this.getFlatNeuronList()) {
             neuron.offset(offsetX, offsetY);
         }
-    }
-
-    /**
-     * Add a weight matrix between two {@link ArrayConnectable}'s.
-     * Can "adapt" a neuron collection to an ND4J array, or be a weight
-     * matrix between those arrays.
-     *
-     * @param source source neuron collection or nd4j array
-     * @param target target neuron collection or nd4j array
-     */
-    public WeightMatrix createWeightMatrix(ArrayConnectable source, ArrayConnectable target) {
-        if (target.getIncomingWeightMatrix() != null) {
-            delete(target.getIncomingWeightMatrix());
-        }
-
-        WeightMatrix newMatrix = new WeightMatrix(this, source, target);
-        return newMatrix;
     }
 
     /**

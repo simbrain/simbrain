@@ -39,8 +39,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
     public NeuronCollection(final Network net, final List<Neuron> neurons) {
         super(net);
         addNeurons(neurons);
-        id = net.getIdManager().getId(NeuronCollection.class);
-        setLabel(id);
+        setLabel(getId());
         subsamplingManager.resetIndices();
 
         neurons.forEach(n -> {

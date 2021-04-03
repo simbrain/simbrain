@@ -51,7 +51,7 @@ import java.util.function.Function;
  *
  * @author Zoë Tosi
  */
-public class SynapseGroup implements NetworkModel, CopyableObject, AttributeContainer {
+public class SynapseGroup extends NetworkModel implements CopyableObject, AttributeContainer {
 
     /**
      * Reference to the network this group is a part of.
@@ -542,7 +542,6 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
         }
     }
 
-    @Override
     public void setBufferValues() {
         update();
     }
@@ -1856,18 +1855,6 @@ public class SynapseGroup implements NetworkModel, CopyableObject, AttributeCont
      */
     private void fireSynapseRemoved(Synapse synapse) {
         events.fireSynapseRemoved(synapse);
-    }
-
-    @Consumable(defaultVisibility = false)
-    public void setLabel(String label) {
-        String oldLabel = this.label;
-        this.label = label;
-        events.fireLabelChange(oldLabel , label);
-    }
-
-    @Producible(defaultVisibility = false)
-    public String getLabel() {
-        return label;
     }
 
     public Network getParentNetwork() {

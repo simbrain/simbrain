@@ -373,12 +373,13 @@ public class Network {
     }
 
     /**
-     * Add a new {@link NetworkModel}
+     * Add a new {@link NetworkModel}. All network models MUST be added using this method.
      */
     public void addNetworkModel(NetworkModel networkModel) {
         if (networkModel.shouldAdd()) {
             networkModels.add(networkModel);
             events.fireModelAdded(networkModel);
+            networkModel.setId(idManager.getId(networkModel.getClass()));
         }
     }
 
@@ -686,10 +687,9 @@ public class Network {
     @Override
     public String toString() {
         final StringBuilder ret = new StringBuilder("Root Network \n================= \n");
-        ret.append(networkModels.getAll().stream()
-                .map(NetworkModel::getDescription)
-                .collect(Collectors.joining("\n")));
-
+        ret.append(networkModels.getAll()
+                .stream().map((m)-> "[" + m.getId() + "] " + m.toString())
+                .collect(Collectors.joining()));
         return ret.toString();
     }
 

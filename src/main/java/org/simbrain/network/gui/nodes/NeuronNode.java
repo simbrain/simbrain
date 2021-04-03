@@ -208,7 +208,7 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             updateSpikeColor();
         });
         events.onColorChange(this::updateColor);
-        events.onLabelChange(this::updateTextLabel);
+        events.onLabelChange((o,n) -> updateTextLabel());
         events.onClampedChange((o, n) -> updateClampStatus());
         events.onLocationChange(this::pullViewPositionFromModel);
         events.onUpdateRuleChange((o, n) -> updateShape());

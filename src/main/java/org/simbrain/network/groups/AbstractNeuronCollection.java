@@ -33,25 +33,12 @@ import static org.simbrain.util.GeomKt.minus;
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
  * neuron update rules and track synapse polarity).
  */
-public abstract class AbstractNeuronCollection implements CopyableObject, AttributeContainer, ArrayConnectable, LocatableModel {
+public abstract class AbstractNeuronCollection extends ArrayConnectable implements CopyableObject, AttributeContainer {
 
     /**
      * Reference to the network this group is a part of.
      */
     private final Network parentNetwork;
-
-    /**
-     * Id of this group.
-     */
-    @UserParameter(label = "ID", description = "Id of this neuron collection", order = -1, editable = false)
-    protected String id;
-
-    /**
-     * Name of this group. Null strings lead to default labeling conventions.
-     */
-    @UserParameter(label = "Label", description = "Neuron collection label", useSetter = true,
-            order = 10)
-    private String label;
 
     /**
      * Optional information about the current state of the group. For display in
@@ -757,18 +744,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         return subsamplingManager.getActivations();
     }
 
-    @Consumable(defaultVisibility = false)
-    public void setLabel(String label) {
-        String oldLabel = this.label;
-        this.label = label;
-        events.fireLabelChange(oldLabel, label);
-    }
-
-    @Producible(defaultVisibility = false)
-    public String getLabel() {
-        return label;
-    }
-
     public Network getParentNetwork() {
         return parentNetwork;
     }
@@ -787,11 +762,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
     @Override
     public void onCommit() {
         //todo
-    }
-
-    @Override
-    public String getId() {
-        return id;
     }
 
     public String getStateInfo() {
@@ -819,7 +789,6 @@ public abstract class AbstractNeuronCollection implements CopyableObject, Attrib
         return events;
     }
 
-    @Override
     public void setBufferValues() {
         update(); // For loose neurons. Weight matrix buffered update handled by weight matrix
     }

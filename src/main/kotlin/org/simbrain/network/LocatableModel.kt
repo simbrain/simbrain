@@ -12,18 +12,17 @@ import java.awt.geom.Rectangle2D
  *
  * Kotlin note: java implementing classes must provide getters and setters for vars and getters for vals.
  */
-interface LocatableModel : NetworkModel {
+abstract class LocatableModel() : NetworkModel() {
 
     /**
      * Center location of the [NetworkModel].
      */
-    var location: Point2D
+    abstract var location: Point2D
 
     /**
      * Implementing classes must fire and handle location events.
      */
-    val events: LocationEvents
-
+    abstract val events: LocationEvents
 }
 
 /**

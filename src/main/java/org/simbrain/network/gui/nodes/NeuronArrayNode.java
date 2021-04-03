@@ -23,7 +23,7 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
-import org.simbrain.network.events.NeuronArrayEvents;
+import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
@@ -113,7 +113,7 @@ public class NeuronArrayNode extends ScreenElement {
         this.neuronArray = na;
         networkPanel = np;
 
-        NeuronArrayEvents events = neuronArray.getEvents();
+        LocationEvents events = neuronArray.getEvents();
         events.onDeleted(n -> removeFromParent());
         events.onUpdated(() -> {
             renderArrayToActivationsImage();

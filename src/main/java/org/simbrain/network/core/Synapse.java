@@ -43,7 +43,7 @@ import java.util.*;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Synapse implements EditableObject, AttributeContainer, NetworkModel {
+public class Synapse extends NetworkModel implements EditableObject, AttributeContainer {
 
     /**
      * A default update rule for the synapse.
@@ -109,11 +109,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
     @UserParameter(label = "Spike Responder", isObjectType = true,
             showDetails = false, order = 200)
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
-
-    /**
-     * Synapse id.
-     */
-    private String id = "";
 
     /**
      * The maximum number of digits to display in the tool tip.
@@ -374,12 +369,10 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         }
     }
 
-    @Override
     public void setBufferValues() {
         update();
     }
 
-    @Override
     public void applyBufferValues() {
         // Not needed?
     }
@@ -620,7 +613,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
      * @return tool tip text
      */
     public String getToolTipText() {
-        return "(" + id + ") Strength: " + Utils.round(this.getStrength(), MAX_DIGITS);
+        return "(" + getId() + ") Strength: " + Utils.round(this.getStrength(), MAX_DIGITS);
     }
 
     /**
@@ -670,18 +663,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
             }
         }
         return val;
-    }
-
-    public String getId() {
-        if (id != null) {
-            return id;
-        } else {
-            return "";
-        }
-    }
-
-    public void setId(final String id) {
-        this.id = id;
     }
 
     public SpikeResponder getSpikeResponder() {
@@ -1103,7 +1084,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         }
     }
 
-    @Override
     public void afterAddedToNetwork() {
         initSpikeResponder();
     }

@@ -18,7 +18,7 @@ import java.util.Arrays;
  * An weight matrix that connects a source and target {@link ArrayConnectable}
  * object.
  */
-public class WeightMatrix implements EditableObject, AttributeContainer, NetworkModel {
+public class WeightMatrix extends NetworkModel implements EditableObject,AttributeContainer  {
 
     /**
      * The source "layer" / activation vector for this weight matrix.
@@ -98,8 +98,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
             randomize();
         }
 
-        initializeId();
-
     }
 
     private void initEvents() {
@@ -113,20 +111,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
         });
     }
 
-    /**
-     * Initialize the id for this array. A default label based
-     * on the id is also set.
-     */
-    public void initializeId() {
-        id = parent.getIdManager().getId(WeightMatrix.class);
-        label = id.replaceAll("_", " ");
-    }
-
-    @Override
-    public String getLabel() {
-        // Label not used for weight matrix currently
-        return id;
-    }
 
     /**
      * Default update simply matrix multiplies source times matrix and sets
@@ -138,7 +122,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
 
     }
 
-    @Override
     public void setBufferValues() {
         // TODO
         update();
@@ -147,17 +130,6 @@ public class WeightMatrix implements EditableObject, AttributeContainer, Network
     @Override
     public void applyBufferValues() {
         // No implementation?
-    }
-
-    /**
-     * Set the label. This prevents the group id being used as the label for
-     * new groups.  If null or empty labels are sent in then the group label is used.
-     */
-    @Consumable(defaultVisibility = false)
-    public void setLabel(String label) {
-        String oldLabel = this.label;
-        this.label = label;
-        events.fireLabelChange(oldLabel , label);
     }
 
     @Override

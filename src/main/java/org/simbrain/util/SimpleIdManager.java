@@ -76,6 +76,9 @@ public class SimpleIdManager {
      * Get the {@link SimpleId#getProposedId()} associated with a class.
      */
     public String getProposedId(Class<?> clazz) {
+        if (!idMap.containsKey(clazz)) {
+            initId(clazz, initIdFunction.apply(clazz));
+        }
         return idMap.get(clazz).getProposedId();
     }
 }

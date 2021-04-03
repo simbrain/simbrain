@@ -39,7 +39,7 @@ public class SimpleId {
      * Construct simpleId.
      *
      * @param rootName root name.
-     * @param initialIndex    beginning index.
+     * @param initialIndex beginning index.
      */
     public SimpleId(final String rootName, final int initialIndex) {
         this.rootName = rootName;

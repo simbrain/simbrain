@@ -18,10 +18,12 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import com.sun.jdi.event.LocatableEvent;
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.NetworkModelEvents;
 import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
@@ -95,11 +97,10 @@ public class SubnetworkNode extends ScreenElement {
 
         setContextMenu(this.getDefaultContextMenu());
 
-        SubnetworkEvents events = subnetwork.getEvents();
+        LocationEvents events = subnetwork.getEvents();
         events.onDeleted(n -> removeFromParent());
         events.onLabelChange((o,n) -> updateText());
         events.onLocationChange(this::layoutChildren);
-
     }
 
     /**

@@ -16,9 +16,6 @@ class SynapseGroupEvents(val sg: SynapseGroup) : NetworkModelEvents(sg) {
     fun onLocationChange(handler: BiConsumer<Point2D, Point2D>) = "LocationChange".itemChangedEvent(handler)
     fun fireLocationChange(old: Point2D, new: Point2D) = "LocationChange"(old = old, new = new)
 
-    fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
-    fun fireLabelChange(old: String?, new: String) = "LabelChange"(old = old, new = new)
-
     fun onSynapseAdded(handler: Consumer<Synapse>) = "SynapseAdded".itemAddedEvent(handler)
     fun fireSynapseAdded(syn: Synapse) = "SynapseAdded"(new = syn)
 
@@ -27,6 +24,5 @@ class SynapseGroupEvents(val sg: SynapseGroup) : NetworkModelEvents(sg) {
 
     fun onVisibilityChange(handler: Runnable) = "VisibilityChange".event(handler)
     fun fireVisibilityChange() = "VisibilityChange"()
-
 
 }

@@ -4,7 +4,8 @@ package org.simbrain.network.matrix;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.events.NeuronArrayEvents;
+import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.NetworkModelEvents;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -21,7 +22,7 @@ import java.util.List;
 /**
  * High performance immutable array backed by ND4J Array.
  */
-public class NeuronArray implements EditableObject, AttributeContainer, ArrayConnectable, LocatableModel {
+public class NeuronArray extends ArrayConnectable implements EditableObject, AttributeContainer {
 
     //TODO: Rename ideas: Array, Layer, ND4J Array, Double Array
     //TODO: See if data can be stored as an array. If not maybe used column instead of row.
@@ -92,7 +93,7 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     /**
      * Event support.
      */
-    private transient NeuronArrayEvents events = new NeuronArrayEvents(this);
+    private transient LocationEvents events = new LocationEvents(this);
 
     /**
      * Construct a neuron array.
@@ -346,11 +347,6 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
     }
 
     @Override
-    public void setBufferValues() {
-        // Not needed; Weight matrix does this.
-    }
-
-    @Override
     public void applyBufferValues() {
         if (arrayBuffer != null) {
             setInputArray(Arrays.stream(arrayBuffer).toArray());
@@ -389,14 +385,14 @@ public class NeuronArray implements EditableObject, AttributeContainer, ArrayCon
         return sb.toString();
     }
 
-    public NeuronArrayEvents getEvents() {
+    public LocationEvents getEvents() {
         return events;
     }
 
     @Override
     public void postUnmarshallingInit() {
         if (events == null) {
-            events = new NeuronArrayEvents(this);
+            events = new LocationEvents(this);
         }
     }
 

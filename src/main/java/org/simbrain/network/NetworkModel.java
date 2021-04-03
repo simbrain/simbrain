@@ -1,7 +1,11 @@
 package org.simbrain.network;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.events.NetworkModelEvents;
+import org.simbrain.util.UserParameter;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 /**
  * "Model" objects placed in a {@link org.simbrain.network.core.Network} should implement this interface.  E.g. neurons, synapses, neuron groups, etc.
@@ -9,54 +13,94 @@ import org.simbrain.network.events.NetworkModelEvents;
  * <p>
  * Primarily meant as a marker interface.
  */
-public interface NetworkModel {
+public abstract class NetworkModel {
 
-    String getLabel();
+    /**
+     * A unique id for this model.
+     */
+    // TODO: Would be nice if this were final
+    private String id;
+
+    /**
+     * Optional string description of neuron.
+     */
+    @UserParameter(label = "Label", description = "Optional string description",  useSetter = true, order = 2)
+    private String label = "";
 
     /**
      * Update buffers
      */
-    void update();
+    public void update() {
+    }
 
     // TODO: Is this is correct most general method?
     //  No argument because for loose neurons it's not needed. But array conectables use setInputBuffer; a confusing
     // overlap of terminology
+
     /**
      * Set buffer values as part of async updating.  See {@link org.simbrain.network.update_actions.BufferedUpdate}
      */
-    void setBufferValues();
+    void setBufferValues() {}
 
     /**
      * Apply buffer values to actual values of models, to support async updating.
      */
-    void applyBufferValues();
+    public void applyBufferValues() {}
 
     /**
      * Return a reference to that model type's instance of [NetworkModelEvent]
      */
-    NetworkModelEvents getEvents();
+    public abstract NetworkModelEvents getEvents();
 
     /**
      * Select this network model.
      */
-    default void select() {
+    public void select() {
         getEvents().fireSelected();
     }
 
     /**
      * Override if cleanup is needed when deleting.
      */
-    default void delete() {};
+    public void delete() {
+    }
+
+    ;
 
     // TODO: Discuss the methods below
 
-    default void afterAddedToNetwork() {}
+    void afterAddedToNetwork() {
+    }
 
-    default void afterBatchAddedToNetwork() {
+    public void afterBatchAddedToNetwork() {
         afterAddedToNetwork();
     }
 
-    default boolean shouldAdd() {
+    public boolean shouldAdd() {
         return true;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String theName) {
+        id = theName;
+    }
+
+    @Producible(defaultVisibility = false)
+    public String getLabel() {
+        return label;
+    }
+
+    @Consumable(defaultVisibility = false)
+    public void setLabel(String label) {
+        String oldLabel = this.label;
+        this.label = label;
+        if (this.label == null) {
+            this.label = "";
+        }
+        getEvents().fireLabelChange(oldLabel, this.label);
+    }
+
 }

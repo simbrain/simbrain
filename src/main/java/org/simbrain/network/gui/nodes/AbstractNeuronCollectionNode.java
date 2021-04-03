@@ -120,7 +120,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
                 outlinedObjects.resetOutlinedNodes(this.neuronNodes);
             });
             neuronEvents.onLocationChange(() -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
-            neuronEvents.onLabelChange(() -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.onLabelChange((o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
         }
         outlinedObjects.resetOutlinedNodes(this.neuronNodes);
         outlinedObjects.updateBounds();

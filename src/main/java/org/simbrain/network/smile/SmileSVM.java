@@ -6,7 +6,7 @@ import org.simbrain.network.events.LocationEvents;
 
 import java.awt.geom.Point2D;
 
-public class SmileSVM implements  LocatableModel {
+public class SmileSVM extends LocatableModel {
 
     /**
      * Event support.
@@ -21,16 +21,6 @@ public class SmileSVM implements  LocatableModel {
     @Override
     public void update() {
         System.out.println("test");
-    }
-
-    @Override
-    public void setBufferValues() {
-
-    }
-
-    @Override
-    public void applyBufferValues() {
-
     }
 
     @NotNull

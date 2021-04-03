@@ -19,9 +19,10 @@ import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.NetworkModelEvents;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
-import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -43,7 +44,7 @@ import static org.simbrain.util.GeomKt.minus;
  * its own update rules. Note that no neurons or synapses or other objects are contained in a subnet (as of now), it
  * only contains neuron and synapse groups.
  */
-public abstract class Subnetwork implements EditableObject, LocatableModel, AttributeContainer {
+public abstract class Subnetwork extends LocatableModel implements EditableObject, AttributeContainer {
 
     /**
      * Reference to the network this group is a part of.
@@ -51,32 +52,19 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
     private final Network parentNetwork;
 
     /**
-     * Id of this group.
-     */
-    @UserParameter(label = "ID", description = "Id of this subnetwork", order = -1, editable = false)
-    protected String id;
-
-    /**
-     * Name of this group. Null strings lead to default labeling conventions.
-     */
-    @UserParameter(label = "Label", description = "Subnetwork label", useSetter = true,
-            order = 10)
-    private String label = "";
-
-    /**
      * Event support.
      */
-    protected transient SubnetworkEvents events = new SubnetworkEvents(this);
+    protected transient LocationEvents events = new LocationEvents(this);
 
     /**
      * List of neuron groups.
      */
-    private final List<NeuronGroup> neuronGroupList = new CopyOnWriteArrayList<NeuronGroup>();
+    private final List<NeuronGroup> neuronGroupList = new CopyOnWriteArrayList<>();
 
     /**
      * List of synapse groups.
      */
-    private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<SynapseGroup>();
+    private final List<SynapseGroup> synapseGroupList = new CopyOnWriteArrayList<>();
 
     /**
      * List of neuron arrays.
@@ -553,25 +541,13 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         }
     }
 
-    @Consumable(defaultVisibility = false)
-    public void setLabel(String label) {
-        String oldLabel = this.label;
-        this.label = label;
-        events.fireLabelChange(oldLabel , label);
-    }
-
-    @Producible(defaultVisibility = false)
-    public String getLabel() {
-        return label;
-    }
-
     public Network getParentNetwork() {
         return parentNetwork;
     }
     
     public void postUnmarshallingInit() {
         if (events == null) {
-            events = new SubnetworkEvents(this);
+            events = new LocationEvents(this);
             initEvents();
         }
         neuronGroupList.forEach(AbstractNeuronCollection::postUnmarshallingInit);
@@ -593,18 +569,9 @@ public abstract class Subnetwork implements EditableObject, LocatableModel, Attr
         return getCenterLocation(neuronGroupList);
     }
 
-    public SubnetworkEvents
-    getEvents() {
+    @NotNull
+    @Override
+    public LocationEvents getEvents() {
         return events;
     }
-
-    @Override
-    public void setBufferValues() {
-    }
-
-    @Override
-    public void applyBufferValues() {
-        // TODO
-    }
-
 }

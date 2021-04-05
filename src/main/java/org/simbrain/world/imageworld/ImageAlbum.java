@@ -1,5 +1,7 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
 import javax.imageio.ImageIO;
@@ -16,7 +18,7 @@ import java.util.List;
  *
  * @author Tim Shea
  */
-public class ImageAlbum extends ImageSource {
+public class ImageAlbum extends ImageSource implements AttributeContainer, EditableObject {
 
     /**
      * A list of buffered images that can be stepped through.

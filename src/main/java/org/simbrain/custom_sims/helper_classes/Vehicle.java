@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
@@ -117,7 +116,7 @@ public class Vehicle {
         setNodeDefaults(straight, vehicle);
         setNodeDefaults(rightTurn, vehicle);
         setNodeDefaults(leftTurn, vehicle);
-        net.getNetwork().addNeuronCollection(vehicle);
+        net.getNetwork().addNetworkModel(vehicle);
 
         // Set weights here
         if (vehicleType == VehicleType.PURSUER) {

@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;

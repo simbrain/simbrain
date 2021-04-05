@@ -2,16 +2,6 @@ package org.simbrain.network.events
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.dl4j.MultiLayerNet
-import org.simbrain.network.dl4j.NeuronArray
-import org.simbrain.network.dl4j.WeightMatrix
-import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.groups.Subnetwork
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer

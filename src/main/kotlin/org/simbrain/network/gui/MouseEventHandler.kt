@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui
 
-import org.apache.commons.lang3.SystemUtils
 import org.piccolo2d.PCamera
 import org.piccolo2d.PLayer
 import org.piccolo2d.PNode
@@ -29,6 +28,7 @@ import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.gui.nodes.ScreenElement
+import org.simbrain.util.Utils
 import org.simbrain.util.minus
 import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
@@ -179,7 +179,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 .forEach { it?.offset(delta.x, delta.y) }
     }
 
-    private val PInputEvent.isPanKeyDown get() = if (SystemUtils.IS_OS_MAC) isMetaDown else isControlDown
+    private val PInputEvent.isPanKeyDown get() = if (Utils.isMacOSX()) isMetaDown else isControlDown
 
     /**
      * A filter that determines whether a given pnode is selectable or not. Bounds are updated as the lasso tool is

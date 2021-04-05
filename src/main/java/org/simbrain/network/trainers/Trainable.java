@@ -15,7 +15,6 @@ package org.simbrain.network.trainers;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.dl4j.WeightMatrix;
 
 import java.util.List;
 

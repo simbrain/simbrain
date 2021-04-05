@@ -16,8 +16,8 @@ package org.simbrain.network.subnetworks;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.dl4j.WeightMatrix;
+import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -44,7 +44,7 @@ public class FeedForward extends Subnetwork {
     private int betweenLayerInterval = 300;
 
     /**
-     * If true use {@link org.simbrain.network.dl4j.NeuronArray}; if false {@link NeuronGroup}
+     * If true use {@link org.simbrain.network.matrix.NeuronArray}; if false {@link NeuronGroup}
      */
     private boolean useNeuronArrays = true;
 

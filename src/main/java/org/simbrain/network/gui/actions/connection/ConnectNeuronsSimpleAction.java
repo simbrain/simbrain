@@ -85,7 +85,8 @@ public class ConnectNeuronsSimpleAction extends AbstractAction {
         }
 
         for (NeuronNode source : sourceNeurons) {
-            networkPanel.getNetwork().addLooseSynapse(new Synapse(networkPanel.getNetwork(), source.getNeuron(), targetNeuron.getNeuron(), new StaticSynapseRule()));
+            networkPanel.getNetwork().addNetworkModel(new Synapse(networkPanel.getNetwork(), source.getNeuron(),
+                    targetNeuron.getNeuron(), new StaticSynapseRule()));
         }
 
     }

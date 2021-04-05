@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations.mpfs_som;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -16,7 +15,6 @@ import org.simbrain.util.Utils;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +56,7 @@ public class MpfsSOM extends RegisteredSimulation {
         som = new SOMNetwork(network, numSOMNodes, 29);
         som.getSom().setLayout(new HexagonalGridLayout(40, 40, 5));
         som.getSom().applyLayout();
-        network.addSubnetwork(som);
+        network.addNetworkModel(som);
         som.getInputLayer().setLayout(new GridLayout(70, 60, 5));
         som.getInputLayer().applyLayout();
 

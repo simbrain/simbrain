@@ -22,7 +22,7 @@ import kotlin.math.abs
  */
 val evolveNetwork = newSim {
 
-    val environmentBuilder = evolutionarySimulation {
+    val evolutionarySimulation = evolutionarySimulation {
 
         val network = Network()
 
@@ -109,7 +109,7 @@ val evolveNetwork = newSim {
             connectionChromosome.forEach { it.mutateWeight() }
         }
 
-        onBuild { pretty ->
+        onBuild { visible ->
             val (layout) = +layoutChromosome
             network {
                 +motivations
@@ -172,7 +172,7 @@ val evolveNetwork = newSim {
 
     }
 
-    val evolution = evaluator(environmentBuilder) {
+    val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
@@ -187,7 +187,7 @@ val evolveNetwork = newSim {
 
     val (winner, fitness) = generations.best
     // println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
-    winner.prettyBuild().peek()
+    winner.visibleBuild().peek()
 
 }
 

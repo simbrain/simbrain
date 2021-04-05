@@ -24,7 +24,7 @@ val evolveMouse = newSim {
     val mainScope = MainScope()
 
     fun createEvolution(): Evaluator {
-        val environmentBuilder = evolutionarySimulation(1) {
+        val evolutionarySimulation = evolutionarySimulation(1) {
 
             val inputs = chromosome(3) {
                 nodeGene()
@@ -85,9 +85,9 @@ val evolveMouse = newSim {
 
             val cheeses = List(3) { createCheese() }
 
-            onBuild { pretty ->
+            onBuild { visible ->
                 network {
-                    if (pretty) {
+                    if (visible) {
                         +inputs.asGroup {
                             label = "Input"
                             location = point(0, 100)
@@ -190,7 +190,7 @@ val evolveMouse = newSim {
 
         }
 
-        return evaluator(environmentBuilder) {
+        return evaluator(evolutionarySimulation) {
             populationSize = 100
             eliminationRatio = 0.5
             runUntil { generation == 50 || fitness > 250 }
@@ -222,7 +222,7 @@ val evolveMouse = newSim {
 
             println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
 
-            best.prettyBuild().peek()
+            best.visibleBuild().peek()
         }
 
     }

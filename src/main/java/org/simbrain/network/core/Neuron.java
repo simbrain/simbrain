@@ -52,7 +52,7 @@ import static org.simbrain.util.GeomKt.point;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Neuron implements EditableObject, AttributeContainer, LocatableModel {
+public class Neuron extends LocatableModel implements EditableObject, AttributeContainer {
 
     /**
      * The default neuron update rule. Neurons which are constructed without a
@@ -68,18 +68,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     @UserParameter(label = "Update Rule", isObjectType = true, useSetter = true,
         conditionalEnablingMethod = "notInNeuronGroup", order = 100)
     private NeuronUpdateRule updateRule;
-
-    /**
-     * A unique id for this neuron.
-     */
-    private String id;
-
-    /**
-     * Optional string description of neuron.
-     */
-    @UserParameter(label = "Label", description = "Optional string description associated with this neuron",
-        useSetter = true, order = 2)
-    private String label = "";
 
     /**
      * Activation value of the neuron. The main state variable.
@@ -232,9 +220,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
         this.parent = parent;
         setUpdateRule(updateRule);
-        if (parent != null) {
-            id = parent.getIdManager().getId(Neuron.class);
-        }
     }
 
     /**
@@ -258,7 +243,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     public Neuron(final Network parent, final String updateRule) {
         this.parent = parent;
         setUpdateRule(updateRule);
-        id = parent.getIdManager().getId(Neuron.class);
     }
 
 
@@ -378,23 +362,11 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
     /**
      * Updates neuron buffers.
      */
-    public void update() {
+    public void updateBuffer() {
         if (isClamped()) {
             return;
         }
         updateRule.update(this);
-    }
-
-    @Override
-    public void setBufferValues() {
-        // TODO: renames around here might be needed.
-        update();
-    }
-
-    @Override
-    public void applyBufferValues() {
-        // TODO: More renames at some point
-        setToBufferVals();
     }
 
     /**
@@ -426,7 +398,8 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * update synchronously in the same way activations do for buffered
      * updates.
      */
-    public void setToBufferVals() {
+    @Override
+    public void updateStateFromBuffer() {
         setActivation(getBuffer());
         setSpike(getSpkBuffer());
     }
@@ -451,14 +424,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         return activation;
     }
 
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    public void setId(final String theName) {
-        id = theName;
-    }
 
     /**
      * @return an unmodifiable version of the fanIn list.
@@ -682,7 +647,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
      * Sends relevant information about the network to standard output.
      */
     public void debug() {
-        System.out.println("neuron " + id);
+        System.out.println("neuron " + getId());
         System.out.println("fan in");
 
         for (int i = 0; i < fanIn.size(); i++) {
@@ -898,7 +863,7 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     @Override
     public String toString() {
-        return "Neuron [" + getId() + "] " + getType() + "  Activation = " + this.getActivation() + "  Location = (" + x + "," + y + ")\n";
+        return getType() + " Activation = " + this.getActivation() + " Location = (" + x + "," + y + ")\n";
     }
 
     /**
@@ -958,18 +923,6 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
         boolean old = this.clamped;
         this.clamped = clamped;
         events.fireClampedChange(old, clamped);
-    }
-
-    @NotNull
-    @Producible(defaultVisibility = false)
-    public String getLabel() {
-        return label;
-    }
-
-    @Consumable(defaultVisibility = false)
-    public void setLabel(final String label) {
-        this.label = label;
-        events.fireLabelChange();
     }
 
     /**
@@ -1280,5 +1233,23 @@ public class Neuron implements EditableObject, AttributeContainer, LocatableMode
 
     public NeuronEvents getEvents() {
         return events;
+    }
+
+    @Override
+    public void delete() {
+        getNetwork().updatePriorityList();
+        deleteConnectedSynapses();
+
+        if (getParentGroup() != null) {
+            getParentGroup().removeNeuron(this);
+            if (getParentGroup().isEmpty()) {
+                getNetwork().delete(getParentGroup());
+            }
+        }
+        events.fireDeleted();
+    }
+
+    public void afterAddedToNetwork() {
+        getNetwork().updatePriorityList();
     }
 }

@@ -45,15 +45,15 @@ public class SynapseTest {
 
         Neuron n1 = new Neuron(net);
         Neuron n2 = new Neuron(net);
-        net.addLooseNeuron(n1);
-        net.addLooseNeuron(n2);
+        net.addNetworkModel(n1);
+        net.addNetworkModel(n2);
 
         // Adding one synapse to a network
         Synapse s1 = new Synapse(n1,n2);
-        net.addLooseSynapse(s1);
+        net.addNetworkModel(s1);
 
         // There should now be one synapse
-        assertEquals(1, net.getSynapseCount(), 0.0);
+        assertEquals(1, net.getLooseSynapses().size(), 0.0);
 
         // Test source and target
         assertEquals(n1, s1.getSource());
@@ -61,8 +61,8 @@ public class SynapseTest {
 
         // A second synapse with the same source and target should not be added
         Synapse s2_redundant = new Synapse(n1, n2);
-        net.addLooseSynapse(s2_redundant);
-        assertEquals(1, net.getSynapseCount(), 0.0);
+        net.addNetworkModel(s2_redundant);
+        assertEquals(1, net.getLooseSynapses().size(), 0.0);
 
     }
 

@@ -107,7 +107,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
         layoutPanel.commitChanges();
         cn.getCompetitive().setLayout(layoutObject.getLayout());
         cn.getCompetitive().applyLayout();
-        networkPanel.getNetwork().addSubnetwork(cn);
+        networkPanel.getNetwork().addNetworkModel(cn);
         networkPanel.getPlacementManager().addNewModelObject(cn);
         super.closeDialogOk();
 

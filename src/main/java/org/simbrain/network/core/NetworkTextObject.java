@@ -30,7 +30,7 @@ import java.awt.geom.Point2D;
  * used to label elements of a neural network simulation. Contains basic text
  * properties as well.
  */
-public class NetworkTextObject implements LocatableModel {
+public class NetworkTextObject extends LocatableModel {
 
     /**
      * Reference to parent root network of this text object.
@@ -205,23 +205,4 @@ public class NetworkTextObject implements LocatableModel {
         return events;
     }
 
-    @Override
-    public String getLabel() {
-        return text;
-    }
-
-    @Override
-    public void update() {
-        // No implementation
-    }
-
-    @Override
-    public void setBufferValues() {
-        // No implementaiton
-    }
-
-    @Override
-    public void applyBufferValues() {
-        // No implementaiton
-    }
 }

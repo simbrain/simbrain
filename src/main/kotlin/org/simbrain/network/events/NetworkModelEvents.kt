@@ -19,4 +19,10 @@ open class NetworkModelEvents(val model: NetworkModel) : Event(PropertyChangeSup
     fun fireDeleted() = "Deleted"(new = model)
     fun onDeleted(handler: Consumer<NetworkModel>) = "Deleted".itemAddedEvent(handler)
 
+    fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
+    fun fireLabelChange(old: String, new: String) = "LabelChange"(old = old, new = new)
+
+    fun onUpdated(handler: Runnable) = "Updated".event(handler)
+    fun fireUpdated() = "Updated"()
+
 }

@@ -19,6 +19,7 @@
 package org.simbrain.util;
 
 import java.util.HashMap;
+import java.util.function.Function;
 
 /**
  * Maintains a map from Classes to {@link SimpleId}'s, to easily
@@ -29,7 +30,19 @@ public class SimpleIdManager {
     /**
      * The map backing this class.
      */
-    private HashMap<Class, SimpleId> idMap = new HashMap<>();
+    private final HashMap<Class<?>, SimpleId> idMap = new HashMap<>();
+
+    /**
+     * Function to initialize id count.
+     */
+    private final Function<Class<?>, Integer> initIdFunction;
+
+    /**
+     * Initialize with a initialization function
+     */
+    public SimpleIdManager(Function<Class<?>, Integer> initIdFunction) {
+        this.initIdFunction = initIdFunction;
+    }
 
     /**
      * Initialize a class > id mapping.
@@ -45,21 +58,27 @@ public class SimpleIdManager {
     /**
      * @see #initId(Class, int)
      */
-    public void initId(Class clazz, int initId) {
+    public void initId(Class<?> clazz, int initId) {
         initId(clazz, clazz.getSimpleName(), initId);
     }
 
     /**
      * Get the id associated with a class. Increments the id number.
      */
-    public String getId(Class clazz) {
+    public String getId(Class<?> clazz) {
+        if (!idMap.containsKey(clazz)) {
+            initId(clazz, initIdFunction.apply(clazz));
+        }
         return idMap.get(clazz).getId();
     }
 
     /**
      * Get the {@link SimpleId#getProposedId()} associated with a class.
      */
-    public String getProposedId(Class clazz) {
+    public String getProposedId(Class<?> clazz) {
+        if (!idMap.containsKey(clazz)) {
+            initId(clazz, initIdFunction.apply(clazz));
+        }
         return idMap.get(clazz).getProposedId();
     }
 }

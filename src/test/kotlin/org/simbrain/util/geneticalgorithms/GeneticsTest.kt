@@ -215,7 +215,7 @@ class GeneticsTest {
 
     @Test
     fun `coupling node chromosome with node chromosome creates correct couplings`() {
-        val environmentBuilder = evolutionarySimulation {
+        val evolutionarySimulation = evolutionarySimulation {
 
             val workspace = Workspace()
 
@@ -258,7 +258,7 @@ class GeneticsTest {
 
         }
 
-        val build = environmentBuilder.build()
+        val build = evolutionarySimulation.build()
 
         build.eval()
     }

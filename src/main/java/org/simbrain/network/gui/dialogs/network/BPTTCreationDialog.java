@@ -82,7 +82,7 @@ public class BPTTCreationDialog extends StandardDialog {
             BPTTNetwork bptt = new BPTTNetwork(panel.getNetwork(), Integer.parseInt(tfNumInputsOutputs.getText()), Integer.parseInt(tfNumHidden.getText()),
                     Integer.parseInt(tfNumInputsOutputs.getText()), panel.getPlacementManager().getLocationAndIncrement());
 
-            bptt.getParentNetwork().addSubnetwork(bptt);
+            bptt.getParentNetwork().addNetworkModel(bptt);
             dispose();
 
         } catch (NumberFormatException nfe) {

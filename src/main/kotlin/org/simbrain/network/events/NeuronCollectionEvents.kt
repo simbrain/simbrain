@@ -12,12 +12,6 @@ import java.util.function.Consumer
  */
 class NeuronCollectionEvents(val nc: AbstractNeuronCollection) : LocationEvents(nc) {
 
-    fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
-    fun fireLabelChange(old: String?, new: String) = "LabelChange"(old = old, new = new)
-
-    fun onUpdated(handler: Runnable) = "Updated".event(handler)
-    fun fireUpdated() = "Updated"()
-
     fun onRecordingStarted(handler: Runnable) = "RecordingStarted".event(handler)
     fun fireRecordingStarted() = "RecordingStarted"()
 

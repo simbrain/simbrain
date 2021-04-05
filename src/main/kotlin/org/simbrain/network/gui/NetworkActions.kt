@@ -101,9 +101,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addGroupAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addGroupAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addGroupAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
-            addGroupAction("LMS (Least Mean Squares)") { LMSCreationDialog(networkPanel) },
+//            addGroupAction("LMS (Least Mean Squares)") { LMSCreationDialog(networkPanel) },
             addGroupAction("SOM Network") { SOMCreationDialog(networkPanel) },
-            addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
+//            addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
     )
 
     val connectionActions get() = listOf(

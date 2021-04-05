@@ -31,7 +31,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Alt + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
-    bind(Shift + 'T') { network.addSVM(SmileSVM()) } // TODO: Temp testing key command
+    bind(Shift + 'T') { network.addNetworkModel(SmileSVM()) } // TODO: Temp testing key command
     bindTo("I", networkActions.wandEditModeAction)
     bindTo("G", networkActions.neuronGroupAction)
     bind("Y") { showNeuronArrayCreationDialog() }

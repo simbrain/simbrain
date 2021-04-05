@@ -17,7 +17,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Tim Shea
  */
-public abstract class ImageSource implements AttributeContainer, EditableObject {
+public abstract class ImageSource  {
 
     /**
      * Whether the source will update the image when updateImage

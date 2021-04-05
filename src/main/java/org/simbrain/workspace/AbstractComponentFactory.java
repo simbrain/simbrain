@@ -12,6 +12,8 @@ import org.simbrain.plot.histogram.HistogramComponent;
 import org.simbrain.plot.histogram.HistogramDesktopComponent;
 import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.plot.piechart.PieChartDesktopComponent;
+import org.simbrain.plot.pixelplot.PixelPlotComponent;
+import org.simbrain.plot.pixelplot.PixelPlotDesktopComponent;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.projection.ProjectionDesktopComponent;
 import org.simbrain.plot.rasterchart.RasterPlotComponent;
@@ -29,7 +31,6 @@ import org.simbrain.world.game.GameComponent;
 import org.simbrain.world.game.GameDesktopComponent;
 import org.simbrain.world.imageworld.*;
 import org.simbrain.world.imageworld.gui.ImageWorldDesktopComponent;
-import org.simbrain.world.imageworld.gui.PixelPlotDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.textworld.DisplayComponent;
@@ -95,6 +96,9 @@ public class AbstractComponentFactory {
 
         putWorkspaceComponentFactory("Pie Chart", () -> new PieChartComponent(""));
         putGuiComponentFactory(PieChartComponent.class, PieChartDesktopComponent::new);
+
+        putWorkspaceComponentFactory("Pixel Plot", () -> new PixelPlotComponent(""));
+        putGuiComponentFactory(PixelPlotComponent.class, PixelPlotDesktopComponent::new);
 
         putWorkspaceComponentFactory("Projection Plot", () -> new ProjectionComponent(""));
         putGuiComponentFactory(ProjectionComponent.class, ProjectionDesktopComponent::new);

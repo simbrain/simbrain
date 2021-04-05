@@ -43,7 +43,7 @@ import java.util.*;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Synapse implements EditableObject, AttributeContainer, NetworkModel {
+public class Synapse extends NetworkModel implements EditableObject, AttributeContainer {
 
     /**
      * A default update rule for the synapse.
@@ -109,11 +109,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
     @UserParameter(label = "Spike Responder", isObjectType = true,
             showDetails = false, order = 200)
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
-
-    /**
-     * Synapse id.
-     */
-    private String id = "";
 
     /**
      * The maximum number of digits to display in the tool tip.
@@ -374,16 +369,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         }
     }
 
-    @Override
-    public void setBufferValues() {
-        update();
-    }
-
-    @Override
-    public void applyBufferValues() {
-        // Not needed?
-    }
-
     /**
      * For spiking source neurons, returns the spike-responder's value times the synapse strength. For non-spiking
      * neurons, returns the pre-synaptic activation times the synapse strength.
@@ -620,7 +605,7 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
      * @return tool tip text
      */
     public String getToolTipText() {
-        return "(" + id + ") Strength: " + Utils.round(this.getStrength(), MAX_DIGITS);
+        return "Strength: " + Utils.round(this.getStrength(), MAX_DIGITS);
     }
 
     /**
@@ -670,18 +655,6 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
             }
         }
         return val;
-    }
-
-    public String getId() {
-        if (id != null) {
-            return id;
-        } else {
-            return "";
-        }
-    }
-
-    public void setId(final String id) {
-        this.id = id;
     }
 
     public SpikeResponder getSpikeResponder() {
@@ -1077,4 +1050,33 @@ public class Synapse implements EditableObject, AttributeContainer, NetworkModel
         return SimbrainMath.distance(source.getLocation(), target.getLocation());
     }
 
+    @Override
+    public void delete() {
+        // Remove references to this synapse from parent neurons
+        if (getSource() != null) {
+            getSource().removeEfferent(this);
+        }
+        if (getTarget() != null) {
+            getTarget().removeAfferent(this);
+        }
+
+        // If this synapse has a parent group, delete that group
+        if (getParentGroup() != null) {
+            SynapseGroup parentGroup = getParentGroup();
+            parentGroup.removeSynapse(this);
+            // TODO
+            // if (parentGroup.isDisplaySynapses()) {
+            //     events.fireModelRemoved(toDelete);
+            // }
+            if (parentGroup.isEmpty()) {
+               parentNetwork.delete(getParentGroup());
+            }
+        } else {
+            getEvents().fireDeleted();
+        }
+    }
+
+    public void afterAddedToNetwork() {
+        initSpikeResponder();
+    }
 }

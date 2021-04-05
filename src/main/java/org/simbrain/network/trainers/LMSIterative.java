@@ -21,9 +21,7 @@ package org.simbrain.network.trainers;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.dl4j.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.subnetworks.LMSNetwork;
 
 import java.util.List;
 

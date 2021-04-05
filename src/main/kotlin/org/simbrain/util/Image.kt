@@ -10,6 +10,19 @@ fun FloatArray.toSimbrainColor() = map { value ->
     }
 }.toIntArray()
 
+fun DoubleArray.toSimbrainColor() = map { value ->
+    value.clip(-1.0..1.0).let {
+        if (it < 0) Color.HSBtoRGB(2/3f, (-it).toFloat(), 1.0F) else Color.HSBtoRGB(0.0f, it.toFloat(), 1.0f)
+    }
+}.toIntArray()
+
+fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor().let {
+    val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
+    val sampleModel = colorModel.createCompatibleSampleModel(width, height)
+    val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, it.size), null)
+    BufferedImage(colorModel, raster, false, null)
+}
+
 fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor().let {
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)

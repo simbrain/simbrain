@@ -1,9 +1,8 @@
-package org.simbrain.world.imageworld.dialogs;
+package org.simbrain.plot.pixelplot;
 
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.world.imageworld.PixelPlot;
 
 import javax.swing.*;
 import java.text.NumberFormat;
@@ -11,7 +10,7 @@ import java.text.NumberFormat;
 public class ResizeEmitterMatrixDialog extends StandardDialog {
     private static final long serialVersionUID = 1L;
 
-    private PixelPlot world;
+    private EmitterMatrix world;
     private Box mainPanel = Box.createVerticalBox();
     private LabelledItemPanel emitterMatrixPanel = new LabelledItemPanel();
     private JCheckBox useColorCheckBox = new JCheckBox();
@@ -23,7 +22,7 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
      *
      * @param world The ImageWorld which holds the EmitterMatrix.
      */
-    public ResizeEmitterMatrixDialog(PixelPlot world) {
+    public ResizeEmitterMatrixDialog(EmitterMatrix world) {
         this.world = world;
         setTitle("Emitter Matrix Settings");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/emitterMatrix.html");
@@ -47,8 +46,8 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
     public void readValues() {
         // TODO
         // useColorCheckBox.setSelected(world.getUseColorEmitter());
-        widthField.setValue(world.getEmitterWidth());
-        heightField.setValue(world.getEmitterHeight());
+        // widthField.setValue(world.getEmitterWidth());
+        // heightField.setValue(world.getEmitterHeight());
     }
 
     /**
@@ -58,7 +57,7 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
         boolean useColor = useColorCheckBox.isSelected();
         int width = Integer.parseInt(widthField.getText());
         int height = Integer.parseInt(heightField.getText());
-        world.setUseColorEmitter(useColor);
-        world.resizeEmitterMatrix(width, height);
+        // world.setUseColorEmitter(useColor);
+        // world.resizeEmitterMatrix(width, height);
     }
 }

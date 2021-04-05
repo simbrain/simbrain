@@ -24,7 +24,6 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -194,12 +193,12 @@ public class AddNeuronsDialog extends StandardDialog {
             if (inGroup) {
                 NeuronGroup ng = new NeuronGroup(networkPanel.getNetwork(), addedNeurons);
                 ng.setLayout(layoutObject.getLayout());
-                networkPanel.getNetwork().addNeuronGroup(ng);
+                networkPanel.getNetwork().addNetworkModel(ng);
                 ng.applyLayout();
                 ng.setLabel(groupPanel.tfGroupName.getText());
             } else {
                 layoutObject.getLayout().layoutNeurons(addedNeurons);
-                networkPanel.getNetwork().addLooseNeurons(addedNeurons);
+                addedNeurons.forEach(networkPanel.getNetwork()::addNetworkModel);
             }
         }
     }

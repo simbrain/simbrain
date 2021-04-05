@@ -14,13 +14,10 @@ public class FeedForwardTest {
     public void testUpdate() {
         Network net = new Network();
         FeedForward ff = new FeedForward(net, new int[]{2,2,2}, new Point2D.Double(0,0));
-        ff.getNeuronGroupList().get(0).forceSetActivations(new double[]{1,-1});
-        ff.getNeuronGroupList().get(1).setGroupUpdateRule(UpdateRuleEnum.LINEAR);
-        ff.getNeuronGroupList().get(2).setGroupUpdateRule(UpdateRuleEnum.LINEAR);
+        ff.getNAList().get(0).setValues(new double[]{1,-1});
         ff.getWeightMatrixList().get(0).diagonalize();
         ff.getWeightMatrixList().get(1).diagonalize();
         ff.update();
-        assertArrayEquals(new double[]{1,-1}, ff.getOutputLayer().getActivations(), .01);
-        //System.out.println(ff);
+        assertArrayEquals(new double[]{1,-1}, ff.getNAList().get(2).getValues(), .01);
     }
 }

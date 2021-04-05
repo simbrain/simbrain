@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+//import org.simbrain.network.dl4j.MultiLayerNet
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
@@ -12,10 +13,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.dl4j.ArrayConnectable
-import org.simbrain.network.dl4j.MultiLayerNet
-import org.simbrain.network.dl4j.NeuronArray
-import org.simbrain.network.dl4j.WeightMatrix
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
@@ -26,6 +23,9 @@ import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
+import org.simbrain.network.matrix.ArrayConnectable
+import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.SmileSVM
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.LMSIterative
@@ -42,7 +42,6 @@ import java.awt.FlowLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.function.Consumer
 import javax.swing.JInternalFrame
 import javax.swing.JPanel
 import javax.swing.JToolBar
@@ -240,7 +239,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         })
 
         // Add all network elements (important for de-serializing)
-        network.models.forEach{createNode(it)}
+        network.modelsInDeserializationOrder.forEach{ createNode(it) }
 
     }
 
@@ -319,10 +318,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
                 network.delete(neuron)
             }
             override fun redo() {
-                network.addLooseNeuron(neuron)
+                network.addNetworkModel(neuron)
             }
         })
-        network.addLooseNeuron(neuron)
+        network.addNetworkModel(neuron)
         zoomToFitPage()
     }
 
@@ -371,9 +370,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
-    fun createNode(multiLayerNet: MultiLayerNet) = addScreenElement {
-        MultiLayerNetworkNode(this, multiLayerNet)
-    }
+//    fun createNode(multiLayerNet: MultiLayerNet) = addScreenElement {
+//        MultiLayerNetworkNode(this, multiLayerNet)
+//    }
 
     fun createNode(svm : SmileSVM) = addScreenElement {
         SmileSVMNode(this, svm)
@@ -407,10 +406,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is Hopfield -> HopfieldNode(this, subnetwork)
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
             is SOMNetwork -> SOMNetworkNode(this, subnetwork)
-            is EchoStateNetwork -> ESNNetworkNode(this, subnetwork)
-            is SimpleRecurrentNetwork -> SRNNetworkNode(this, subnetwork)
+            // is EchoStateNetwork -> ESNNetworkNode(this, subnetwork)
+            //is SimpleRecurrentNetwork -> SRNNetworkNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
-            is LMSNetwork -> LMSNetworkNode(this, subnetwork)
+            // is LMSNetwork -> LMSNetworkNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)
         }
 
@@ -431,14 +430,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     fun deleteSelectedObjects() {
 
         fun deleteGroup(interactionBox: InteractionBox) {
-            with(network) {
-                interactionBox.parent.let { groupNode ->
-                    when (groupNode) {
-                        is NeuronGroupNode -> delete(groupNode.neuronGroup)
-                        is NeuronCollectionNode -> delete(groupNode.neuronCollection)
-                        is SynapseGroupNode -> delete(groupNode.synapseGroup)
-                        is SubnetworkNode -> delete(groupNode.subnetwork)
-                    }
+            interactionBox.parent.let { groupNode ->
+                if (groupNode is ScreenElement) {
+                    network.delete(groupNode.model)
                 }
             }
         }
@@ -447,24 +441,19 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             with(network) {
                 when (screenElement) {
                     is NeuronNode -> {
-                        delete(screenElement.neuron, true)
+                        network.delete(screenElement.model)
 
                         undoManager.addUndoableAction(object : UndoableAction {
                             override fun undo() {
-                                network.addLooseNeuron(screenElement.neuron)
+                                network.addNetworkModel(screenElement.model)
                             }
                             override fun redo() {
-                                network.delete(screenElement.neuron, true)
+                                network.delete(screenElement.model)
                             }
                         })
                     }
-                    is SynapseNode -> delete(screenElement.synapse)
-                    is NeuronArrayNode -> delete(screenElement.neuronArray)
-                    is WeightMatrixNode -> delete(screenElement.model)
-                    is MultiLayerNetworkNode -> delete(screenElement.model)
-                    is TextNode -> deleteText(screenElement.textObject)
                     is InteractionBox -> deleteGroup(screenElement)
-                    is SmileSVMNode -> delete(screenElement.model)
+                    else -> delete(screenElement.model)
                 }
             }
         }
@@ -670,7 +659,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
             for (source in sources) {
                 for (target in targets) {
-                    network.addWeightMatrix((network.createWeightMatrix(source, target)));
+                    network.addNetworkModel((network.createWeightMatrix(source, target)));
                 }
             }
         }

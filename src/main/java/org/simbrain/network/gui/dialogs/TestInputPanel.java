@@ -23,7 +23,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
-import org.simbrain.network.subnetworks.LMSNetwork;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
@@ -142,16 +141,16 @@ public class TestInputPanel extends DataPanel {
     }
 
     // TODO
-    LMSNetwork lms;
-    public TestInputPanel(NetworkPanel networkPanel, LMSNetwork lms) {
-        super(lms.getInputData());
-        this.lms = lms;
-        if (networkPanel == null) {
-            throw new IllegalArgumentException("networkPanel must not be null");
-        }
-        this.networkPanel = networkPanel;
-        initTestInputPanel();
-    }
+    // LMSNetwork lms;
+    // public TestInputPanel(NetworkPanel networkPanel, LMSNetwork lms) {
+    //     super(lms.getInputData());
+    //     this.lms = lms;
+    //     if (networkPanel == null) {
+    //         throw new IllegalArgumentException("networkPanel must not be null");
+    //     }
+    //     this.networkPanel = networkPanel;
+    //     initTestInputPanel();
+    // }
 
     /**
      * Initiate the test network panel using the network panel.
@@ -259,7 +258,7 @@ public class TestInputPanel extends DataPanel {
 
         // TODO: Replace with explicit boolean
         if (inputNeurons == null) {
-            lms.getNAList().get(0).setValues(((NumericTable) table.getData()).getVectorCurrentRow());
+            // lms.getNAList().get(0).setValues(((NumericTable) table.getData()).getVectorCurrentRow());
         } else {
             for (int j = 0; j < inputNeurons.size(); j++) {
                 inputNeurons.get(j).forceSetActivation(((NumericTable) table.getData()).getLogicalValueAt(testRow, j));

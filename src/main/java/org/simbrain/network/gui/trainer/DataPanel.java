@@ -13,7 +13,6 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import org.nd4j.linalg.api.ndarray.INDArray;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
@@ -115,39 +114,6 @@ public class DataPanel extends JPanel {
 
     }
 
-    /**
-     * Create a data panel to display an {@link INDArray}.
-     */
-    public DataPanel(final INDArray ndArray) {
-
-        // Wrap the ndarray in a numeric matrix
-        dataHolder = new NumericMatrix() {
-            @Override
-            public void setData(double[][] data) {
-                ndArray.data().setData(Utils.flatten(data));
-            }
-
-            @Override
-            public double[][] getData() {
-                return ndArray.toDoubleMatrix();
-            }
-        };
-
-        // If no data exists, create it
-        if (dataHolder.getData() == null) {
-            table = SimbrainJTable.createTable(new NumericTable(DEFAULT_NUM_ROWS, ndArray.columns()));
-        } else {
-            table = SimbrainJTable.createTable(new NumericTable(dataHolder.getData()));
-        }
-
-        // Set up scrollbar
-        scroller = new SimbrainJTableScrollPanel(table);
-        scroller.setMinimumSize(new Dimension(200, 500));
-        scroller.setMaxVisibleColumns(5);
-
-        initPanel();
-
-    }
 
 
     //TODO

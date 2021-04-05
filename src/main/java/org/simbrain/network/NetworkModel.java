@@ -2,6 +2,9 @@ package org.simbrain.network;
 
 
 import org.simbrain.network.events.NetworkModelEvents;
+import org.simbrain.util.UserParameter;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 /**
  * "Model" objects placed in a {@link org.simbrain.network.core.Network} should implement this interface.  E.g. neurons, synapses, neuron groups, etc.
@@ -9,37 +12,87 @@ import org.simbrain.network.events.NetworkModelEvents;
  * <p>
  * Primarily meant as a marker interface.
  */
-public interface NetworkModel {
-
-    String getLabel();
+public abstract class NetworkModel {
 
     /**
-     * Update buffers
+     * A unique id for this model.
      */
-    void update();
-
-    // TODO: Is this is correct most general method?
-    //  No argument because for loose neurons it's not needed. But array conectables use setInputBuffer; a confusing
-    // overlap of terminology
-    /**
-     * Set buffer values as part of async updating.  See {@link org.simbrain.network.update_actions.BufferedUpdate}
-     */
-    void setBufferValues();
+    // TODO: Would be nice if this were final
+    private String id;
 
     /**
-     * Apply buffer values to actual values of models, to support async updating.
+     * Optional string description of model object.
      */
-    void applyBufferValues();
+    @UserParameter(label = "Label", description = "Optional string description",  useSetter = true, order = 2)
+    private String label = "";
+
+    /**
+     * Set buffer values as first part of async updating. The only things that need to be
+     * buffered are values that communicate with the rest of the network.
+     */
+    public void updateBuffer() {}
+
+    /**
+     * Apply buffers to current state a second part of async updating.
+     */
+    public void updateStateFromBuffer() {}
+
+    /**
+     * Immediately update the model.
+     */
+    public void update() {
+        updateBuffer();
+        updateStateFromBuffer();
+        getEvents().fireUpdated();
+    }
 
     /**
      * Return a reference to that model type's instance of [NetworkModelEvent]
      */
-    NetworkModelEvents getEvents();
+    public abstract NetworkModelEvents getEvents();
 
     /**
      * Select this network model.
      */
-    default void select() {
+    public void select() {
         getEvents().fireSelected();
     }
+
+    /**
+     * Override if cleanup is needed when deleting.
+     */
+    public void delete() {
+    }
+
+    /**
+     * Override if there are cases where a created model should not be added, e.g. if it is a
+     * duplicate of an existing model. Currently only used by {@link org.simbrain.network.groups.NeuronCollection}
+     */
+    public boolean shouldAdd() {
+        return true;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String theName) {
+        id = theName;
+    }
+
+    @Producible(defaultVisibility = false)
+    public String getLabel() {
+        return label;
+    }
+
+    @Consumable(defaultVisibility = false)
+    public void setLabel(String label) {
+        String oldLabel = this.label;
+        this.label = label;
+        if (this.label == null) {
+            this.label = "";
+        }
+        getEvents().fireLabelChange(oldLabel, this.label);
+    }
+
 }

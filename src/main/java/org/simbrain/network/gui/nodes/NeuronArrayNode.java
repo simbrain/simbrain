@@ -18,19 +18,18 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.nd4j.linalg.factory.Nd4j;
 import org.piccolo2d.nodes.PImage;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
-import org.simbrain.network.dl4j.NeuronArray;
-import org.simbrain.network.events.NeuronArrayEvents;
+import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -44,7 +43,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 import static org.simbrain.util.GeomKt.minus;
@@ -113,7 +113,7 @@ public class NeuronArrayNode extends ScreenElement {
         this.neuronArray = na;
         networkPanel = np;
 
-        NeuronArrayEvents events = neuronArray.getEvents();
+        LocationEvents events = neuronArray.getEvents();
         events.onDeleted(n -> removeFromParent());
         events.onUpdated(() -> {
             renderArrayToActivationsImage();
@@ -180,7 +180,7 @@ public class NeuronArrayNode extends ScreenElement {
 
             if (gridMode) {
                 // "Grid" case
-                float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
+                double[] activations = neuronArray.getValues();
                 BufferedImage img = ImageKt.toSimbrainColorImage(
                         activations,
                         (int) Math.sqrt(neuronArray.getNumNodes()),
@@ -192,7 +192,7 @@ public class NeuronArrayNode extends ScreenElement {
 
             } else {
                 // "Flat" case
-                float[] activations = Nd4j.toFlattened(neuronArray.getNeuronArray()).toFloatVector();
+                double[] activations = neuronArray.getValues();
                 BufferedImage img = ImageKt.toSimbrainColorImage(activations, neuronArray.getNumNodes(), 1);
                 activationImage.setImage(img);
                 this.activationImage.setBounds(borderPixels, infoText.getHeight() + borderPixels,
@@ -219,9 +219,9 @@ public class NeuronArrayNode extends ScreenElement {
     private void updateInfoText() {
         infoText.setText(
                 "" + neuronArray.getLabel() + "    " +
-                        "nodes: " + neuronArray.getNeuronArray().length()
+                        "nodes: " + neuronArray.getValues().length
                         + "\nmean activation: "
-                        + SimbrainMath.roundDouble((java.lang.Double) neuronArray.getNeuronArray().meanNumber(), 4));
+                        + SimbrainMath.roundDouble(Arrays.stream(neuronArray.getValues()).average().orElse(0), 4));
     }
 
     @Override
@@ -320,11 +320,11 @@ public class NeuronArrayNode extends ScreenElement {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 StandardDialog dialog = new StandardDialog();
-                NumericTable arrayData = new NumericTable(neuronArray.getNeuronArray().toDoubleVector());
+                NumericTable arrayData = new NumericTable(neuronArray.getValues());
                 dialog.setContentPane(new SimbrainJTableScrollPanel(
                         SimbrainJTable.createTable(arrayData)));
                 dialog.addClosingTask(() -> {
-                    neuronArray.getNeuronArray().data().setData(arrayData.getVectorCurrentRow());
+                    neuronArray.setInputArray(arrayData.getVectorCurrentRow());
                     neuronArray.update();
                 });
                 dialog.pack();

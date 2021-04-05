@@ -1,16 +1,11 @@
 package org.simbrain.util.projection;
 
 import org.junit.Test;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.dimensionalityreduction.PCA;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.math.SimbrainRandomizer;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ProjectPCATest {
 

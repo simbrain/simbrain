@@ -1,4 +1,4 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.plot.pixelplot;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -21,28 +21,20 @@ public class PixelPlotComponent extends WorkspaceComponent {
     /**
      * The image world this component displays.
      */
-    private PixelPlot world;
+    private EmitterMatrix emitter = new EmitterMatrix();
 
     /**
      * Create an Image World Component from a Image World.
      */
-    public PixelPlotComponent() {
-        super("");
-        this.world = new PixelPlot();
-        // TODO
-        // world.getEvents().onSensorMatrixAdded(this::fireAttributeContainerAdded);
-        // world.getEvents().onSensorMatrixRemoved(this::fireAttributeContainerRemoved);
+    public PixelPlotComponent(String title) {
+        super(title);
     }
 
     /**
      * Deserialize an ImageAlbumComponent.
-     *
-     * @param name name of component
-     * @param world the deserialized world
      */
-    public PixelPlotComponent(String name, PixelPlot world) {
+    public PixelPlotComponent(String name, EmitterMatrix matrix) {
         super(name);
-        this.world = world;
     }
 
     /**
@@ -54,36 +46,20 @@ public class PixelPlotComponent extends WorkspaceComponent {
      * @return A deserialized ImageWorldComponent.
      */
     public static PixelPlotComponent open(InputStream input, String name, String format) {
-        PixelPlot world = (PixelPlot) getXStream().fromXML(input);
-        return new PixelPlotComponent(name, world);
-    }
-
-    public PixelPlot getWorld() {
-        return world;
+        EmitterMatrix matrix = (EmitterMatrix) getXStream().fromXML(input);
+        return new PixelPlotComponent(name, matrix);
     }
 
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        //TODO
-        // // Main Consumer to display pixels
-        // containers.add(world.getImageAlbum());
-        // // Producers to read out transformed pixels
-        // containers.addAll(world.getSensorMatrices());
+        containers.add(emitter);
         return containers;
     }
 
     @Override
     public AttributeContainer getAttributeContainer(String objectKey) {
         // TODO
-        // if (objectKey.equalsIgnoreCase("EmitterMatrix")) {
-        //     return world.getImageAlbum();
-        // }
-        // for (FilterContainer sensor : world.getSensorMatrices()) {
-        //     if (objectKey.equals(sensor.getName())) {
-        //         return sensor;
-        //     }
-        // }
         return null;
     }
 
@@ -99,15 +75,20 @@ public class PixelPlotComponent extends WorkspaceComponent {
 
     @Override
     public void save(OutputStream output, String format) {
-        getXStream().toXML(getWorld(), output);
+        getXStream().toXML(emitter, output);
     }
 
     @Override
     protected void closing() {
     }
 
+    public EmitterMatrix getEmitter() {
+        return emitter;
+    }
+
     @Override
     public void update() {
-        getWorld().update();
+        // TODO: Very smelly
+        getEvents().fireComponentUpdated();
     }
 }

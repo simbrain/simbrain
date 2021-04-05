@@ -94,7 +94,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         reservoirNet = new NeuronGroup(network, neuronList);
         reservoirNet.setLocation(150,-242);
         reservoirNet.setLayout(new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(neuronList.size())));
-        network.addNeuronGroup(reservoirNet);
+        network.addNetworkModel(reservoirNet);
         reservoirNet.applyLayout();
         reservoirNet.setLabel("Recurrent Layer");
 
@@ -106,7 +106,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
             RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
             50);
         recConnection.connectNeurons(recSyns);
-        network.addSynapseGroup(recSyns);
+        network.addNetworkModel(recSyns);
         recSyns.setLabel("Recurrent");
 
         // Inputs
@@ -114,7 +114,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         inputNetwork.setLocation(reservoirNet.getCenterX() - inputNetwork.getWidth()/2, reservoirNet.getMaxY()+150);
         inputNetwork.setLowerBound(-100);
         inputNetwork.setUpperBound(100);
-        network.addNeuronGroup(inputNetwork);
+        network.addNetworkModel(inputNetwork);
         inputNetwork.setLabel("Sensory Neurons");
 
         // Inputs to reservoir
@@ -125,7 +125,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
             NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         inpSynG.randomizeConnectionWeights();
         inpSynG.setDisplaySynapses(false);
-        network.addSynapseGroup(inpSynG);
+        network.addNetworkModel(inpSynG);
 
         // Couple from mouse to input nodes
         sim.couple(smellSensor, inputNetwork);

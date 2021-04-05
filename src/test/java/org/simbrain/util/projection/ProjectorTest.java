@@ -1,11 +1,8 @@
 package org.simbrain.util.projection;
 
 import org.junit.Test;
-import org.nd4j.linalg.dataset.DataSet;
 
-import java.util.Arrays;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class ProjectorTest {
 

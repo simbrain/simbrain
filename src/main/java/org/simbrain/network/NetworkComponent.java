@@ -22,8 +22,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.Utils;
-import org.simbrain.util.nd4j.Nd4jConverter;
-import org.simbrain.workspace.Attribute;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -142,7 +140,6 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private static XStream getNetworkXStream() {
         XStream xstream = Utils.getSimbrainXStream();
-        xstream.registerConverter(new Nd4jConverter());
         return xstream;
     }
 

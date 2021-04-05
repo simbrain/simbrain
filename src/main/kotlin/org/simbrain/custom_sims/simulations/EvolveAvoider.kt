@@ -26,7 +26,7 @@ val evolveAvoider = newSim {
     val scope = MainScope()
 
     fun createEvolution(): Evaluator {
-        val environmentBuilder = evolutionarySimulation(1) {
+        val evolutionarySimulation = evolutionarySimulation(1) {
 
             // Set up the chromosomes.
 
@@ -106,9 +106,9 @@ val evolveAvoider = newSim {
             // Take the current chromosomes,and express them via an agent in a world.
             // Everything needed to build one generation
             // Called once for each genome at each generation
-            onBuild { pretty ->
+            onBuild { visible ->
                 network {
-                    if (pretty) {
+                    if (visible) {
                         val inputGroup = +inputs.asGroup {
                             label = "Input"
                             location = point(0, 200)
@@ -233,7 +233,7 @@ val evolveAvoider = newSim {
             }
         }
 
-        return evaluator(environmentBuilder) {
+        return evaluator(evolutionarySimulation) {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
@@ -257,7 +257,7 @@ val evolveAvoider = newSim {
 
             println(best)
 
-            val build = best.prettyBuild()
+            val build = best.visibleBuild()
 
             build.peek()
 

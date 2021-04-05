@@ -99,7 +99,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net) {
         super(net);
-        id = net.getIdManager().getId(NeuronGroup.class);
     }
 
     /**
@@ -132,7 +131,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, final NeuronGroup toCopy) {
         this(net, toCopy.getNeuronList().stream().map(Neuron::deepCopy).collect(Collectors.toList()));
-        setLabel(id); // Don't copy existing labels but reset them to id. Avoids many headaches.
+        setLabel(getId()); // Don't copy existing labels but reset them to id. Avoids many headaches.
         this.setLayout(toCopy.getLayout());
         this.setGroupUpdateRule(toCopy.groupUpdateRule);
     }
@@ -153,7 +152,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void delete() {
         events.fireDeleted();
         for (Neuron neuron : getNeuronList()) {
-            neuron.getNetwork().delete(neuron, true);
+            neuron.getNetwork().delete(neuron);
         }
         activationRecorder.stopRecording();
         removeAllNeurons();
@@ -165,7 +164,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Override
     public void update() {
-        super.update();
         if (!inputMode) {
             Network.updateNeurons(getNeuronList());
         }

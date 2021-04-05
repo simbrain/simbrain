@@ -49,7 +49,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
     /**
      * If true, allow painting
      */
-    public boolean paintMode = false;
+    public boolean paintMode = true;
 
     private transient ImageClipboard clipboard;
 
@@ -272,28 +272,29 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         //        sourceToolbar.add(setColorButton);
 
         Color colorList[] = {Color.white, Color.black, Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta};
-        String colorNames[] = {"White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta"};
-        JComboBox colorChoice = new JComboBox(colorNames);
-        JCheckBox cbDrawMode = new JCheckBox("Draw");
+        String colorNames[] = {"White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta", "Custom"};
+        JComboBox cbColorChoice = new JComboBox(colorNames);
 
-        paintMode = cbDrawMode.isSelected();
-        colorChoice.setEnabled(cbDrawMode.isSelected());
-        cbDrawMode.addItemListener(e -> {
-            paintMode = cbDrawMode.isSelected();
-            colorChoice.setEnabled(cbDrawMode.isSelected());
+        // Check box handling
+        JCheckBox checkBoxDrawMode = new JCheckBox("Draw");
+        checkBoxDrawMode.setSelected(paintMode);
+        cbColorChoice.setEnabled(checkBoxDrawMode.isSelected());
+        checkBoxDrawMode.addItemListener(e -> {
+            paintMode = checkBoxDrawMode.isSelected();
+            cbColorChoice.setEnabled(checkBoxDrawMode.isSelected());
         });
 
-        colorChoice.addActionListener(e -> {
-            int index = colorChoice.getSelectedIndex();
-            this.penColor = colorList[index];
+        cbColorChoice.addActionListener(e -> {
+            int len = cbColorChoice.getItemCount();
+            if(((JComboBox)e.getSource()).getSelectedIndex() == len -1) {
+                System.out.println("Custom...");
+            } else {
+                this.penColor = colorList[cbColorChoice.getSelectedIndex()];
+            }
         });
 
-        sourceToolbar.add(cbDrawMode);
-        sourceToolbar.add(colorChoice);
-
-    }
-
-    private void syncDrawMode() {
+        sourceToolbar.add(checkBoxDrawMode);
+        sourceToolbar.add(cbColorChoice);
 
     }
 

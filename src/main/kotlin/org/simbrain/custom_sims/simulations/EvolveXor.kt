@@ -19,7 +19,7 @@ import java.util.*
 
 val evolveXor = newSim {
 
-    val environmentBuilder = evolutionarySimulation {
+    val evolutionarySimulation = evolutionarySimulation {
 
         val network = Network()
 
@@ -89,9 +89,9 @@ val evolveXor = newSim {
             addNetworkComponent("Network", network)
         }
 
-        onBuild { pretty ->
+        onBuild { visible ->
             network {
-                if (pretty) {
+                if (visible) {
                     +inputChromosome.asGroup {
                         label = "Input"
                         location = point(0, 100)
@@ -114,7 +114,7 @@ val evolveXor = newSim {
 
     }
 
-    val evolution = evaluator(environmentBuilder) {
+    val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
@@ -136,7 +136,7 @@ val evolveXor = newSim {
 
             val (best, _) = generations.best
 
-            best.prettyBuild().peek()
+            best.visibleBuild().peek()
 
             progressWindow.close()
         }

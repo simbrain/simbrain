@@ -8,7 +8,6 @@ import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
@@ -106,7 +105,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
         Neuron sensor2 = net.getNeuronByLabel("Swiss (R)");
         sensorNodes = new NeuronCollection(net, Arrays.asList(sensor1, sensor2));
         sensorNodes.setLabel("Sensor Nodes");
-        net.addNeuronCollection(sensorNodes);
+        net.addNetworkModel(sensorNodes);
     }
 
     private void setUpPlots() {

@@ -46,11 +46,11 @@ val List<Synapse>.lengths : List<Double>
 
 fun Network.addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
     .apply(block)
-    .also(this::addLooseNeuron)
+    .also(this::addNetworkModel)
 
 fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
     .apply(block)
-    .also(this::addLooseSynapse)
+    .also(this::addNetworkModel)
 
 /**
  * Other helper methods for networks.
@@ -58,13 +58,13 @@ fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit
 
 fun Network.addNeuronGroup(count: Int, template: Neuron.() -> Unit = { }) = NeuronGroup(this, List(count) {
     Neuron(this).apply(template)
-}).also { addNeuronGroup(it) }
+}).also { addNetworkModel(it) }
 
 fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
     return NeuronGroup(this, List(count) {
         Neuron(this).apply(template)
     }).also {
-        addNeuronGroup(it)
+        addNetworkModel(it)
         if (location != null) {
             val (x, y) = location
             it.setLocation(x, y)
@@ -88,7 +88,7 @@ fun createNeuronGroupTemplate(template: NeuronGroup.() -> Unit) = fun Network.(
     template: Neuron.() -> Unit
 ) = NeuronGroup(this, List(count) {
     Neuron(this).apply(template)
-}).also { addNeuronGroup(it) }
+}).also { addNetworkModel(it) }
 
 
 fun <R> Network.withConnectionStrategy(

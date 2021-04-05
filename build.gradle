@@ -8,16 +8,12 @@ plugins {
     // Fixes problem with long filenames
     id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
 
-    // Build executable jar using <code>gradle shadowJar</code>. The result is placed in be in build/libs
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
-
 }
 
 compileJava.options.encoding = 'UTF-8'
 
 def versionName = "Simbrain4Beta"
 def jmonkeyengine_version = '3.3.2-stable'
-def dl4j_version = "1.0.0-beta4" // beta5 not working on mac
 
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
@@ -33,8 +29,7 @@ repositories {
 
 dependencies {
 
-//    // Kotlin
-//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.20"
     implementation 'org.jetbrains.kotlin:kotlin-scripting-jvm-host:1.4.20'
     implementation 'org.jetbrains.kotlin:kotlin-scripting-jsr223:1.4.20'
@@ -44,23 +39,20 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.4.20'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.2'
+
     implementation 'org.jetbrains.kotlin-deeplearning:api:0.1.1'
+
     implementation 'com.github.haifengl:smile-kotlin:2.6.0'
+    implementation 'com.github.haifengl:smile-mkl:2.6.0'
 
     // https://mvnrepository.com/artifact/com.github.haifengl/smile-core
     compile group: 'com.github.haifengl', name: 'smile-core', version: '2.6.0'
-
-    // Logger for DL4J
-    compile 'ch.qos.logback:logback-classic:1.2.3'
 
     // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
     compile group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
 
     //https://mvnrepository.com/artifact/org.ostermiller/utils
     compile group: 'org.ostermiller', name: 'utils', version: '1.07.00'
-
-    // https://mvnrepository.com/artifact/org.ojalgo/ojalgo
-    compile group: 'org.ojalgo', name: 'ojalgo', version: '37.1.1'
 
     // https://mvnrepository.com/artifact/org.tinylog/tinylog/1.3.6
     compile group: 'org.tinylog', name: 'tinylog', version: '1.3.6'
@@ -80,10 +72,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/gov.nist.math/jama
     compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
-
-    // https://mvnrepository.com/artifact/org.deeplearning4j/deeplearning4j-core
-    compile "org.deeplearning4j:deeplearning4j-core:${dl4j_version}"
-    compile "org.nd4j:nd4j-native-platform:${dl4j_version}"
 
     // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
     compile group: 'org.swinglabs', name: 'swingx-core', version: '1.6.2-2'
@@ -109,25 +97,12 @@ dependencies {
 }
 
 // Sample invocation:
-//   gradle runSim -PsimName="Test Sim"
+// gradle runSim -PsimName="Test Sim"
 task runSim(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = "org.simbrain.custom_sims.RegisteredSimulationsKt"
     if(project.hasProperty('simName')){
         args simName
-    }
-}
-
-task printStuff {
-    group 'Misc'
-    description 'For printing variable bindings / learning gradle'
-    doLast {
-        println gradle.gradleHomeDir
-        println mainClassName
-        println project.buildDir
-        println "" + project.buildDir + "/" + project.executableDir
-        println rootProject
-        println projectDir
     }
 }
 
@@ -140,7 +115,3 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-// Uncomment to minimize the JAR.  Currently only reduces < 10%, and the jar does not execute.
-//shadowJar {
-//    minimize()
-//}

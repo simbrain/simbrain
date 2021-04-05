@@ -54,7 +54,7 @@ class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<Int>
  */
 fun main() {
 
-    val environmentBuilder = evolutionarySimulation {
+    val evolutionarySimulation = evolutionarySimulation {
 
         /**
          * Set number of integers per chromosome here
@@ -89,7 +89,7 @@ fun main() {
 
     }
 
-    val evolution = evaluator(environmentBuilder) {
+    val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS

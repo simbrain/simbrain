@@ -51,7 +51,7 @@ public class ActivationInputManager {
         if (inputSpikes) {
             pc.setInputValues(data[inputIndex]);
             for (int i = 0; i < pc.getNeuronList().size(); i++) {
-                pc.getNeuron(i).setToBufferVals();
+                pc.getNeuron(i).updateStateFromBuffer();
             }
         } else {
             pc.forceSetActivations(data[inputIndex]);

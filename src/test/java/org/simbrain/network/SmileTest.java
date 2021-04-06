@@ -1,6 +1,10 @@
 package org.simbrain.network;
 
+import org.apache.commons.csv.CSVFormat;
 import org.junit.Test;
+import smile.classification.KNN;
+import smile.classification.SVM;
+import smile.io.Read;
 import smile.math.matrix.Matrix;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -8,7 +12,14 @@ import static org.junit.Assert.assertEquals;
 
 import smile.math.matrix.Matrix.EVD;
 import smile.stat.distribution.GaussianDistribution;
+import smile.classification.KNN.*;
+import smile.validation.metric.Accuracy;
+import smile.validation.metric.ConfusionMatrix;
+import smile.validation.metric.Recall;
+import smile.validation.metric.Sensitivity;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 /**
@@ -88,7 +99,7 @@ public class SmileTest {
         System.out.println("Compute time for large matrix product: " + difference + " ms");
     }
 
-    // @Test
+    @Test
     public void compute_matrix_eigenvalue() {
 
         var large_matrix = Matrix.rand(50, 50, new GaussianDistribution(0, 1));
@@ -104,7 +115,7 @@ public class SmileTest {
         // System.out.println(eigen_matrix.diag());
     }
 
-    // @Test
+    @Test
     public void compute_matrix_LU_Decomposition() {
         //Matrix Decomposition
 
@@ -126,6 +137,25 @@ public class SmileTest {
         double[] result = mat.mv(vec);
         double[] expected = {-1,4};
         assertArrayEquals(expected, result, 0.0);
+    }
+
+    @Test
+    public void modelIris() throws IOException, URISyntaxException {
+        var train_data = Read.csv("./src/test/java/org/simbrain/network/train.csv", CSVFormat.DEFAULT.withDelimiter(','));
+        var test_data = Read.csv("./src/test/java/org/simbrain/network/test.csv", CSVFormat.DEFAULT.withDelimiter(','));
+        var x = train_data.select(1,2,3,4).toArray();
+        var y = train_data.column(5).toIntArray();
+
+        var test_x = test_data.select(1,2,3,4).toArray();
+        var test_y = test_data.column(5).toIntArray();
+
+        var model = KNN.fit(x,y,3);
+
+        var pred = Arrays.stream(test_x).mapToInt(xi -> model.predict(xi)).toArray();
+
+        System.out.println(Accuracy.of(test_y, pred));
+        System.out.println(ConfusionMatrix.of(test_y,pred));
+
     }
 
 }

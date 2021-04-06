@@ -248,10 +248,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
         super.addNeuron(neuron);
         neuron.setParentGroup(this);
         if (getParentNetwork() != null) {
-            neuron.setId(getParentNetwork().getIdManager().getId(Neuron.class));
-            if (fireEvent) {
-                //                getParentNetwork().fireNeuronAdded(neuron); // TODO: [event] let synapse handle this
-            }
+            // If parent is a group, these neurons will need ids since they are not directly added to the network
+            neuron.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
         }
         if (fireEvent) {
             subsamplingManager.resetIndices();

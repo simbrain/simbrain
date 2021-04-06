@@ -262,7 +262,7 @@ public class AddNeuronsDialog extends StandardDialog {
             groupPanel.add(tfNameLabel);
             tfGroupName.setEnabled(addToGroup.isSelected());
             String dName = networkPanel.getNetwork()
-                    .getIdManager().getId(NeuronGroup.class);
+                    .getIdManager().getProposedId(NeuronGroup.class);
             tfGroupName.setText(dName);
             groupPanel.add(tfGroupName);
             groupPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -278,7 +278,7 @@ public class AddNeuronsDialog extends StandardDialog {
             addToGroup.addActionListener(evt -> {
                 tfGroupName.setEnabled(addToGroup.isSelected());
                 String dName = networkPanel.getNetwork()
-                        .getIdManager().getId(NeuronGroup.class);
+                        .getIdManager().getProposedId(NeuronGroup.class);
                 tfGroupName.setText(dName);
             });
         }

@@ -255,9 +255,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public Neuron(final Network parent, final Neuron n) {
         this.parent = parent;
-        if (parent != null) {
-            setId(parent.getIdManager().getId(Neuron.class));
-        }
         setClamped(n.isClamped());
         setUpdateRule(n.getUpdateRule().deepCopy());
         setIncrement(n.getIncrement());

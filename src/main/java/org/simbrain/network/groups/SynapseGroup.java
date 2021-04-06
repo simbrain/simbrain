@@ -35,7 +35,6 @@ import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.io.FileWriter;
@@ -383,8 +382,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
         recurrent = testRecurrent();
-        id = parentNetwork.getIdManager().getId(SynapseGroup.class);
-        setLabel(id);
         initializeSynapseVisibility();
         initSpikeResponders();
         source.addOutgoingSg(this);
@@ -407,8 +404,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         this.targetNeuronGroup = target;
         this.connectionManager = connectionManager;
         recurrent = testRecurrent();
-        id = parentNetwork.getIdManager().getId(SynapseGroup.class);
-        setLabel(id);
         initializeSynapseVisibility();
         initSpikeResponders();
     }
@@ -696,7 +691,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      *                of this group.
      */
     public void addNewExcitatorySynapse(final Synapse synapse)  {
-        synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
         synapse.setParentGroup(this);
         if (exciteRand != null) {
             synapse.setStrength(exciteRand.getRandom());
@@ -721,7 +715,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      *                of this group.
      */
     public void addNewInhibitorySynapse(final Synapse synapse) {
-        synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
         synapse.setParentGroup(this);
         if (inhibRand != null) {
             synapse.setStrength(inhibRand.getRandom());
@@ -777,7 +770,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         exSynapseSet.add(synapse);
         excitatoryRatio = exSynapseSet.size() / (double) size();
         if (getParentNetwork() != null) {
-            synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
             synapse.setParentGroup(this);
         }
         fireSynapseAdded(synapse);
@@ -794,7 +786,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         inSynapseSet.add(synapse);
         excitatoryRatio = exSynapseSet.size() / (double) size();
         if (getParentNetwork() != null) {
-            synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
             synapse.setParentGroup(this);
         }
         fireSynapseAdded(synapse);

@@ -126,7 +126,7 @@ public class Network {
     /**
      * Manage ids for all network elements.
      */
-    private final SimpleIdManager idManager = new SimpleIdManager((clazz) -> networkModels.unsafeGet(clazz).size() + 1);
+    private final SimpleIdManager idManager = new SimpleIdManager((clazz) -> networkModels.unsafeGet(clazz).size());
 
     /**
      * An internal id giving networks unique numbers within the same simbrain session.
@@ -377,7 +377,7 @@ public class Network {
         if (networkModel.shouldAdd()) {
             networkModels.add(networkModel);
             events.fireModelAdded(networkModel);
-            networkModel.setId(idManager.getId(networkModel.getClass()));
+            networkModel.setId(idManager.getAndIncrementId(networkModel.getClass()));
         }
     }
 

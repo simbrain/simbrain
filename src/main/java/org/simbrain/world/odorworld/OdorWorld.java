@@ -143,7 +143,7 @@ public class OdorWorld implements EditableObject {
         }
 
         // Set the entity's id
-        entity.setId(entityIDGenerator.getId());
+        entity.setId(entityIDGenerator.getAndIncrement());
         entity.setName(entity.getId());
 
         // Add entity to the map

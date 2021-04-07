@@ -126,7 +126,7 @@ public class Network {
     /**
      * Manage ids for all network elements.
      */
-    private final SimpleIdManager idManager = new SimpleIdManager((clazz) -> networkModels.unsafeGet(clazz).size());
+    private final SimpleIdManager idManager = new SimpleIdManager((clazz) -> networkModels.unsafeGet(clazz).size()+1);
 
     /**
      * An internal id giving networks unique numbers within the same simbrain session.
@@ -312,7 +312,6 @@ public class Network {
         return src.getFanOut().get(tar);
     }
 
-
     /**
      * Create "flat" list of neurons, which includes the top-level neurons plus all group neurons.
      *
@@ -375,9 +374,9 @@ public class Network {
      */
     public void addNetworkModel(NetworkModel networkModel) {
         if (networkModel.shouldAdd()) {
+            networkModel.setId(idManager.getAndIncrementId(networkModel.getClass()));
             networkModels.add(networkModel);
             events.fireModelAdded(networkModel);
-            networkModel.setId(idManager.getAndIncrementId(networkModel.getClass()));
         }
     }
 

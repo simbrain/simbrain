@@ -386,6 +386,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         initSpikeResponders();
         source.addOutgoingSg(this);
         target.addIncomingSg(this);
+        setLabel(parentNetwork.getIdManager().getProposedId(this.getClass()));
     }
 
     /**
@@ -406,6 +407,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         recurrent = testRecurrent();
         initializeSynapseVisibility();
         initSpikeResponders();
+        setLabel(parentNetwork.getIdManager().getProposedId(this.getClass()));
     }
 
     /**

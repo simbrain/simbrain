@@ -131,7 +131,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, final NeuronGroup toCopy) {
         this(net, toCopy.getNeuronList().stream().map(Neuron::deepCopy).collect(Collectors.toList()));
-        setLabel(getId()); // Don't copy existing labels but reset them to id. Avoids many headaches.
+        // Copying "custom" labels creates too many problems...
+        setLabel(net.getIdManager().getProposedId(this.getClass()));
         this.setLayout(toCopy.getLayout());
         this.setGroupUpdateRule(toCopy.groupUpdateRule);
     }
@@ -247,10 +248,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void addNeuron(Neuron neuron, boolean fireEvent) {
         super.addNeuron(neuron);
         neuron.setParentGroup(this);
-        if (getParentNetwork() != null) {
-            // If parent is a group, these neurons will need ids since they are not directly added to the network
-            neuron.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
-        }
+        neuron.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
         if (fireEvent) {
             subsamplingManager.resetIndices();
         }
@@ -261,6 +259,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         groupUpdateRule = UpdateRuleEnum.get(neurons.iterator().next().getUpdateRule());
         // TODO: Throw exception if not same type
         super.addNeurons(neurons);
+        neurons.forEach(n -> n.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class)));
         neurons.forEach(n -> n.setParentGroup(this));
     }
 

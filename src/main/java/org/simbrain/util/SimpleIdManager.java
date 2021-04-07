@@ -70,7 +70,7 @@ public class SimpleIdManager {
         if (!idMap.containsKey(clazz)) {
             initId(clazz, initIdFunction.apply(clazz));
         }
-        return idMap.get(clazz).getId();
+        return idMap.get(clazz).getAndIncrement();
     }
 
     /**
@@ -114,13 +114,13 @@ public class SimpleIdManager {
          *
          * @return a unique identification
          */
-        public String getId() {
+        public String getAndIncrement() {
             String id = rootName + "_" + index.getAndIncrement();
             return id;
         }
 
         /**
-         * "Peek" ahead the next id that will be made if {@link #getId()} is called.
+         * "Peek" ahead the next id that will be made if {@link #getAndIncrement()} is called.
          */
         public String getProposedId() {
             return rootName + "_" + index;

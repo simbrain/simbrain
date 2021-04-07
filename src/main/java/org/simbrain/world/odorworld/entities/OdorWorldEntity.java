@@ -496,7 +496,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
     public void addEffector(final Effector effector) {
         // if (effector.getApplicableTypes().contains(this.getClass()))...
         effectors.add(effector);
-        effector.setId(parentWorld.getEffectorIDGenerator().getId());
+        effector.setId(parentWorld.getEffectorIDGenerator().getAndIncrement());
         events.fireEffectorAdded(effector);
     }
 
@@ -523,7 +523,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
 
         // Assign an id unless it already has one
         if (sensor.getId() == null) {
-            sensor.setId(parentWorld.getSensorIDGenerator().getId());
+            sensor.setId(parentWorld.getSensorIDGenerator().getAndIncrement());
         }
 
         events.fireSensorAdded(sensor);

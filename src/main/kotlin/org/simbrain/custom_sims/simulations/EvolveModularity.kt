@@ -17,7 +17,7 @@ import java.io.File
 import java.util.*
 
 /**
- * TODO
+ * A partial replication of Clune, Mouret and Lipson 2018, "The evolutionary origins of modularity"
  */
 val evolveModularity = newSim {
 
@@ -36,7 +36,7 @@ val evolveModularity = newSim {
         val leftRetina = chromosome(4) {
             nodeGene() {
                 updateRule = BinaryRule()
-                location = point(it * 30, -50) // TODO: Make a grid
+                location = point(it * 30, -50)
                 isClamped = true
                 applyDefaultParams()
             }
@@ -45,7 +45,7 @@ val evolveModularity = newSim {
         val rightRetina = chromosome(4) {
             nodeGene() {
                 updateRule = BinaryRule()
-                location = point(150 + (it * 30), -50) // TODO: Make a grid
+                location = point(150 + (it * 30), -50)
                 isClamped = true
                 applyDefaultParams()
             }
@@ -53,7 +53,7 @@ val evolveModularity = newSim {
 
         val layer1Chromosome = chromosome(8) {
             nodeGene() {
-                location = point(it * 30, 0)
+                location = point(20 + (it * 30), 0)
                 applyDefaultParams()
             }
         }
@@ -79,7 +79,6 @@ val evolveModularity = newSim {
             }
         }
 
-
         // Utility to create connections
         fun createInitialConnection(
             sourceLayer: Chromosome<Neuron, NodeGene>,
@@ -100,51 +99,56 @@ val evolveModularity = newSim {
             repeat(2) { add(createInitialConnection(layer3Chromosome, outputChromosome)) }
         }
 
+        val thresholds = listOf(-2.0,-1.0,0.0,1.0,2.0)
+        val weightStrengths = listOf(-2.0,-1.0,1.0,2.0)
+
+        // See https://docs.google.com/document/d/1MnMAvfI49NKmDyIITVJBxckvXHSDR-kPY1p7vE2hwTk/edit
         onMutate {
 
+            // TODO: Clipping
+
+            // TODO
             // Local extension function for mutating biases
-            fun NodeGene.mutateBias() = mutate {
-                updateRule.let {
-                    if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
-                }
-            }
+            // fun NodeGene.mutateThreshold() = mutate {
+            //     updateRule.let {
+            //         if (it is BinaryRule) it.threshold = thresholds.shuffled().first()
+            //     }
+            // }
 
             // Local extension for mutating connection
             fun ConnectionGene.mutateWeight() = mutate {
                 strength += (Random().nextDouble() - 0.5) * 0.2
+                // strength += weightStrengths.shuffled().first()
             }
 
-            // Add new nodes
-            // if (Random().nextDouble() > .95) {
-            //     nodeChromosome.genes.add(nodeGene())
+            // TODO: do it for all nodes
+            // layer1Chromosome.genes.forEach {
+            //    if Random.nextDouble() > 1/24 {
+            //     it.mutateThreshold()
+            //     }
             // }
-
-            layer1Chromosome.genes.forEach {
-                it.mutateBias()
-            }
 
             // Utility to mutate connections
             fun Chromosome<Synapse, ConnectionGene>.mutateConnections(
                 sourceLayer: Chromosome<Neuron, NodeGene>,
-                targetLayer: Chromosome<Neuron, NodeGene>,
-                creationProbability: Double = .5
+                targetLayer: Chromosome<Neuron, NodeGene>
             ) {
                 val source = sourceLayer.genes.shuffled().first()
                 val target = targetLayer.genes.shuffled().first()
-                if (Random().nextDouble() <= creationProbability) {
-                    genes.add(connectionGene(source, target) {
-                        strength = (Random().nextDouble() - 0.5) * 0.2
-                    })
-                }
+                genes.add(connectionGene(source, target) {
+                    strength = (Random().nextDouble() - 0.5) * 0.2
+                })
             }
 
-            // Create connection geness
-            with(connectionChromosome) {
-                mutateConnections(leftRetina, layer1Chromosome)
-                mutateConnections(rightRetina, layer1Chromosome)
-                mutateConnections(layer1Chromosome, layer2Chromosome)
-                mutateConnections(layer2Chromosome, layer3Chromosome)
-                mutateConnections(layer3Chromosome, outputChromosome)
+            // Create connection genes
+            if (Random().nextDouble() > .8) {
+                when (Random().nextInt(5)) {
+                    0 -> connectionChromosome.mutateConnections(leftRetina, layer1Chromosome)
+                    1 -> connectionChromosome.mutateConnections(rightRetina, layer1Chromosome)
+                    2 -> connectionChromosome.mutateConnections(layer1Chromosome, layer2Chromosome)
+                    3 -> connectionChromosome.mutateConnections(layer2Chromosome, layer3Chromosome)
+                    4 -> connectionChromosome.mutateConnections(layer3Chromosome, outputChromosome)
+                }
             }
 
             // Weight mutations
@@ -163,35 +167,70 @@ val evolveModularity = newSim {
             }
         }
 
+        // See Clune et. al. Fig2a
+        val leftInputs = listOf(
+            listOf(1.0, 1.0, 1.0, 1.0),
+            listOf(1.0, 1.0, 1.0, 0.0),
+            listOf(1.0, 0.0, 1.0, 0.0),
+            listOf(1.0, 0.0, 1.0, 1.0),
+            listOf(1.0, 0.0, 0.0, 0.0),
+            listOf(1.0, 1.0, 0.0, 1.0),
+            listOf(0.0, 0.0, 1.0, 0.0),
+            listOf(0.0, 1.0, 1.0, 1.0)
+        )
+
+        val rightInputs = listOf(
+            listOf(1.0, 1.0, 1.0, 1.0),
+            listOf(1.0, 1.0, 1.0, 0.0),
+            listOf(0.0, 1.0, 0.0, 1.0),
+            listOf(0.0, 0.0, 0.0, 1.0),
+            listOf(1.0, 0.0, 0.0, 0.0),
+            listOf(1.0, 1.0, 0.0, 1.0),
+            listOf(0.0, 1.0, 0.0, 0.0),
+            listOf(0.0, 1.0, 1.0, 1.0)
+        )
+
         onEval {
 
-            val inputData = listOf(
-                listOf(1.0, 1.0, 1.0, 1.0),
-                listOf(1.0, 1.0, 1.0, 0.0)
-            )
             val tarData = listOf(listOf(0.0), listOf(1.0))
-            inputData.zip(tarData).map { (i, t) ->
-                leftRetina.products.activations = i
-                network.apply {
-                    repeat(4) { bufferedUpdate() }
-                }
-                t sse outputChromosome.products.activations
-            }.sum()
+
+            // TODO: See https://linear.app/simbrain/issue/SIM-35/implement-clune-paper
+
+            // TODO: Need functions
+            //  - Checks whether left is in leftinputs
+            //  - Checks whether right is in rightinputs
+            //  - Computes the target on that basis
+
+
+            // leftInputs.zip(tarData).map { (i, t) ->
+            //     leftRetina.products.activations = i
+            //     network.apply {
+            //         repeat(4) { bufferedUpdate() }
+            //     }
+            //     t sse outputChromosome.products.activations
+            // }.sum()
+
+            0.0 // so compiler will be quiet
         }
+
 
         onPeek {
             val nc = addNetworkComponent("Network", network)
-            placeComponent(nc, 142, 0, 400, 400)
+            placeComponent(nc, 170, 0, 400, 400)
             withGui {
+                // TODO: Generalize this with a loop
                 createControlPanel("Control Panel", 5, 10) {
-                    addButton("Pattern 1") {
-                        leftRetina.products.activations = listOf(1.0, 1.0, 1.0, 1.0)
-                        rightRetina.products.activations = listOf(1.0, 0.0, 1.0, 1.0)
+                    addButton("Random pattern") {
+                        rightRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
+                        leftRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                         workspace.iterate()
                     }
-                    addButton("Pattern 2") {
-                        leftRetina.products.activations = listOf(1.0, 1.0, 1.0, 0.0)
-                        rightRetina.products.activations = listOf(0.0, 1.0, 1.0, 1.0)
+                    addButton("Left Pattern 1") {
+                        leftRetina.products.activations = leftInputs[0]
+                        workspace.iterate()
+                    }
+                    addButton("Right Pattern 2") {
+                        rightRetina.products.activations = rightInputs[1]
                         workspace.iterate()
                     }
                 }

@@ -162,9 +162,9 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Override
     public void update() {
-        if (!inputMode) {
+        // if (!inputMode) {
             NetworkKt.updateNeurons(getNeuronList());
-        }
+        // }
     }
 
     /**
@@ -280,15 +280,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
                 reaper.remove();
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Neuron Group [%s]. Neuron group with %d neuron(s). Located at (%2.2f, %2.2f).\n",
-                getLabel(), this.getNeuronList().size(), getLocation().getX(), getLocation().getY()));
-        sb.append("\tActivations:").append(getOutputArray()).append("\n");
-        return sb.toString();
     }
 
     /**
@@ -450,10 +441,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
 
     public void setGridThreshold(int gridThreshold) {
         this.gridThreshold = gridThreshold;
-    }
-
-    public boolean isInputMode() {
-        return inputMode;
     }
 
     // TODO

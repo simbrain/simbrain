@@ -7,13 +7,11 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.matrix.ArrayConnectable;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.RectangleOutlines;
 import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -56,37 +54,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     private List<Neuron> neuronList = new CopyOnWriteArrayList<>();
 
     /**
-     * Array to hold activation values for any caller that needs the activation values for this group in array form.
-     * Lazy... activations are only written (and this array is only initialized) when {@link #getActivations()} is
-     * called.
-     */
-    private double[] activations;
-
-    /**
-     * For buffered update relative to weight matrices.
-     */
-    private double[] arrayBuffer;
-
-    /**
-     * A single outgoing weight matrix is possible, to a neuron collection, group, or array.
-     */
-    private WeightMatrix incomingWeightMatrix;
-
-    /**
-     * A neuron collection or group may connect to multiple neuron arrays via weight matrices.
-     */
-    private List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
-
-    /**
-     * Whether or not this neuron group is in input mode. If the group is in
-     * input mode then its update involves either injecting activation or
-     * directly setting the activation of the neurons in the group based on
-     * the values in test data, ignoring all other inputs.
-     */
-    @UserParameter(label = "Input mode", order = 40)
-    protected boolean inputMode = false;
-
-    /**
      * Maintains a matrix of data that can be used to send inputs to this neuron collection.
      */
     protected ActivationInputManager inputManager;
@@ -105,6 +72,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
      * Default constructor.
      */
     public AbstractNeuronCollection(Network net) {
+        super(100); // TODO
         parentNetwork = net;
         inputManager = new ActivationInputManager(this);
         subsamplingManager = new SubsamplingManager(this);
@@ -129,6 +97,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         return getCenterLocation(neuronList).y;
     }
 
+    @NotNull
     @Override
     public Point2D getLocation() {
         return getCenterLocation(neuronList);
@@ -330,7 +299,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
             if (i < neuronList.size()) {
                 neuronList.get(i).setActivation(neuron.getInputValue() + neuron.getActivation());
                 neuronList.get(i++).setSpike(neuron.isSpike());
-
             }
         }
     }
@@ -413,48 +381,28 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         }
     }
 
+
     @Override
-    public double[] getOutputArray() {
-        return getActivations();
+    public void updateInputs() {
+        // if (inputManager.getData() == null) {
+        //     throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
+        // }
+        // inputManager.applyCurrentRow(); // TODO
+        setInputs(getWeightedInputs());
     }
 
     @Override
-    public int inputSize() {
-        return neuronList.size();
+    public void updateBuffer() {
+        // TODO
+        copyToBuffer(getInputs());
+        if (activationRecorder.isRecording()) {
+            activationRecorder.writeActsToFile();
+        }
     }
 
     @Override
-    public int outputSize() {
-        return neuronList.size();
-    }
-
-    @Override
-    public void setInputArray(double[] activations) {
-        setInputValues(activations);
-    }
-
-    @Override
-    public WeightMatrix getIncomingWeightMatrix() {
-        return incomingWeightMatrix;
-    }
-
-    public void setIncomingWeightMatrix(WeightMatrix incomingWeightMatrix) {
-        this.incomingWeightMatrix = incomingWeightMatrix;
-    }
-
-    @Override
-    public List<WeightMatrix> getOutgoingWeightMatrices() {
-        return outgoingWeightMatrices;
-    }
-
-    @Override
-    public void addOutgoingWeightMatrix(WeightMatrix outgoingWeightMatrix) {
-        this.outgoingWeightMatrices.add(outgoingWeightMatrix);
-    }
-
-    @Override
-    public void removeOutgoingWeightMatrix(WeightMatrix weightMatrix) {
-        this.outgoingWeightMatrices.remove(weightMatrix);
+    public void updateStateFromBuffer() {
+        copyBufferToActivation();
     }
 
     @Override
@@ -634,14 +582,12 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     }
 
     @Producible(arrayDescriptionMethod = "getLabelArray")
+    @Override
     public double[] getActivations() {
-        if (activations == null) {
-            activations = new double[size()];
-        }
         for (int ii=0; ii<size(); ++ii) {
-            activations[ii] = neuronList.get(ii).getActivation();
+            super.getActivations()[ii] = neuronList.get(ii).getActivation();
         }
-        return activations;
+        return super.getActivations();
     }
 
     /**
@@ -699,7 +645,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         if (inputManager.getData() == null && inputMode) {
             throw new IllegalArgumentException("Cannot set input mode to true" + " if there is no input data stored in NeuronGroup field:" + " testData");
         }
-        this.inputMode = inputMode;
+        // this.inputMode = inputMode;
         //fireLabelUpdated();
     }
     public double getMinX() {
@@ -717,36 +663,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     public double getMaxY() {
         return LocatableModelKt.getMaxY(neuronList);
     }
-
-    @Override
-    public void updateBuffer() {
-        if (arrayBuffer != null) {
-            setInputArray(Arrays.stream(arrayBuffer).toArray());
-        }
-    }
-
-    /**
-     * Generic update operations that can be "doubled" if a neuron is part of multiple collections.
-     */
-    @Override
-    public void update() {
-        if (inputMode) {
-            updateInputs();
-        }
-        if (activationRecorder.isRecording()) {
-            activationRecorder.writeActsToFile();
-        }
-    }
-
-    /**
-     * Applies input data in {@link ActivationInputManager} to neurons in this group or collection.
-     */
-    public void updateInputs() {
-        if (inputManager.getData() == null) {
-            throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
-        }
-        inputManager.applyCurrentRow();
-    };
 
     public ActivationInputManager getInputManager() {
         return inputManager;

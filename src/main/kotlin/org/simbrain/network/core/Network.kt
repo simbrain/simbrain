@@ -9,16 +9,12 @@ import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.matrix.ArrayConnectable
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.smile.SmileSVM
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.SimbrainPreferences
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashSet
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.ln
@@ -218,20 +214,9 @@ class Network {
      * Default asynchronous update method called by [org.simbrain.network.update_actions.BufferedUpdate].
      */
     fun bufferedUpdate() {
-
-        // Only update things in this list, and in this order.
-        val classes = listOf(
-            Neuron::class.java,
-            NeuronGroup::class.java,
-            WeightMatrix::class.java,
-            NeuronArray::class.java,
-            NeuronCollection::class.java,
-            Subnetwork::class.java,
-            SmileSVM::class.java
-        )
-
-        classes.forEach { cls -> networkModels[cls].forEach { it.updateBuffer() } }
-        classes.forEach { cls -> networkModels[cls].forEach { it.update() } }
+        networkModels.all.forEach { it.updateInputs() }
+        networkModels.all.forEach { it.updateBuffer() }
+        networkModels.all.forEach { it.updateStateFromBuffer() }
     }
 
     /**
@@ -408,12 +393,8 @@ class Network {
      * @param target target neuron collection or nd4j array
      */
     fun createWeightMatrix(source: ArrayConnectable, target: ArrayConnectable): WeightMatrix {
-        if (target.incomingWeightMatrix != null) {
-            delete(target.incomingWeightMatrix)
-        }
         return WeightMatrix(this, source, target)
     }
-
 
     /**
      * Returns the precision of the current time step.
@@ -423,7 +404,6 @@ class Network {
     private fun getTimeStepPrecision(): Int = ceil(ln(timeStep) / LOG_10).toInt().let {
         if (it < 0) { abs(it) + 1 } else { 0 }
     }
-
 
     /**
      * Returns a copy of this network based on its xml rep.

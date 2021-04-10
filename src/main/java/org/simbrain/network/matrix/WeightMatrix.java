@@ -18,7 +18,7 @@ import java.util.Arrays;
  * An weight matrix that connects a source and target {@link ArrayConnectable}
  * object.
  */
-public class WeightMatrix extends NetworkModel implements EditableObject,AttributeContainer  {
+public class WeightMatrix extends NetworkModel implements EditableObject, AttributeContainer  {
 
     /**
      * The source "layer" / activation vector for this weight matrix.
@@ -73,13 +73,15 @@ public class WeightMatrix extends NetworkModel implements EditableObject,Attribu
         this.target = target;
 
         source.addOutgoingWeightMatrix(this);
-        target.setIncomingWeightMatrix(this);
+        target.addIncomingWeightMatrix(this);
 
         initEvents();
 
+        weightMatrix = new Matrix(source.getActivations().length,
+                target.getActivations().length);
+
         // Default for "adapter" cases is 1-1
         if (source instanceof NeuronCollection || target instanceof NeuronCollection) {
-            weightMatrix = new Matrix(source.outputSize(), target.inputSize());
             diagonalize();
         } else {
             // For now randomize new matrices between arrays
@@ -99,16 +101,6 @@ public class WeightMatrix extends NetworkModel implements EditableObject,Attribu
         });
     }
 
-
-    /**
-     * Default update simply matrix multiplies source times matrix and sets
-     * result to target.
-     */
-    public void update() {
-
-        target.setInputArray(weightMatrix.mv(source.getOutputArray()));
-
-    }
 
     @Override
     public String toString() {
@@ -174,13 +166,13 @@ public class WeightMatrix extends NetworkModel implements EditableObject,Attribu
     @Override
     public void delete() {
         source.removeOutgoingWeightMatrix(this);
-        target.setIncomingWeightMatrix(null);
-        target.getOutgoingWeightMatrices().stream()
-                .filter(m -> m.getTarget() == source)
-                .forEach(m -> { // Even though this is for each but should happen only once.
-                    m.setUseCurve(false);
-                    setUseCurve(false);
-                });
+        target.removeIncomingWeightMatrix(null);
+        // target.getOutgoingWeightMatrices().stream()
+        //         .filter(m -> m.getTarget() == source)
+        //         .forEach(m -> { // Even though this is for each but should happen only once.
+        //             m.setUseCurve(false);
+        //             setUseCurve(false);
+        //         });
         events.fireDeleted();
     }
 
@@ -188,7 +180,7 @@ public class WeightMatrix extends NetworkModel implements EditableObject,Attribu
      * Randomize weights in this matrix
      */
     public void randomize() {
-        weightMatrix = Matrix.rand(source.outputSize(), (int) target.inputSize(),
+        weightMatrix = Matrix.rand(source.getActivations().length,  target.getActivations().length,
                 new GaussianDistribution(0, 1));
         events.fireUpdated();
     }
@@ -226,7 +218,7 @@ public class WeightMatrix extends NetworkModel implements EditableObject,Attribu
      */
     public void diagonalize() {
         clear();
-        weightMatrix = Matrix.eye(Math.min(source.outputSize(), target.inputSize()));
+        weightMatrix = Matrix.eye(Math.min(source.getActivations().length, target.getActivations().length));
         events.fireUpdated();
     }
 

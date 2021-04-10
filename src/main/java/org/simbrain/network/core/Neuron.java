@@ -522,8 +522,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public double getWeightedInputs() {
         double wtdSum = inputValue;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            wtdSum += fanIn.get(i).calcWeightedSum();
+        for (Synapse synapse : fanIn) {
+            wtdSum += synapse.calcWeightedSum();
         }
         return wtdSum;
     }

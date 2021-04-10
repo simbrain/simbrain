@@ -292,10 +292,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 //    }
 
     val zoomToFitPage = fun (): (Boolean) -> Unit {
-        // TODO: Add a check to see if network is running
         var timer: Timer? = null
         return fun (forceZoom: Boolean) {
+
+            // Implements debounce. If many requests are made they will all be cancelled, until the last one.
             timer?.cancel()
+
             timer = Timer().apply {
                 schedule(timerTask {
                     if (autoZoom && editMode.isSelection || forceZoom) {

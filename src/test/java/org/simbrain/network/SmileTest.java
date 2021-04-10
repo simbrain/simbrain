@@ -141,8 +141,9 @@ public class SmileTest {
 
     @Test
     public void modelIris() throws IOException, URISyntaxException {
-        var train_data = Read.csv("./src/test/java/org/simbrain/network/train.csv", CSVFormat.DEFAULT.withDelimiter(','));
-        var test_data = Read.csv("./src/test/java/org/simbrain/network/test.csv", CSVFormat.DEFAULT.withDelimiter(','));
+        var train_data = Read.csv(this.getClass().getClassLoader().getResource("iris_train.csv").getPath());
+        var test_data = Read.csv(this.getClass().getClassLoader().getResource("iris_test.csv").getPath());
+
         var x = train_data.select(1,2,3,4).toArray();
         var y = train_data.column(5).toIntArray();
 

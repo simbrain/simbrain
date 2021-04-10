@@ -125,7 +125,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
     @Override
     public boolean shouldAdd() {
         int hashCode = getSummedNeuronHash();
-        for (NeuronCollection other : getNetwork().getNeuronCollectionSet()) {
+        for (NeuronCollection other : getNetwork().getModels(NeuronCollection.class)) {
             if (hashCode == other.getSummedNeuronHash()) {
                 return false;
             }

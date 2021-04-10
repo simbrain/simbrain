@@ -16,10 +16,7 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.core.*;
 import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
@@ -582,7 +579,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * displayed.
      */
     public void initializeSynapseVisibility() {
-        int threshold = Network.getSynapseVisibilityThreshold();
+        int threshold = NetworkKt.getSynapseVisibilityThreshold();
         if (sourceNeuronGroup.size() * targetNeuronGroup.size() > threshold) {
             displaySynapses = false;
         } else {

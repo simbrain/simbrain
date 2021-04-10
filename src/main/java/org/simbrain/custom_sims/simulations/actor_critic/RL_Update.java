@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.actor_critic;
 
-import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkKt;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -57,8 +57,8 @@ public class RL_Update implements NetworkUpdateAction {
 
         // Update neurons and networks
         sim.sensorNeurons.update();
-        Network.updateNeurons(Collections.singletonList(sim.value));
-        Network.updateNeurons(Collections.singletonList(sim.reward));
+        NetworkKt.updateNeurons(Collections.singletonList(sim.value));
+        NetworkKt.updateNeurons(Collections.singletonList(sim.reward));
         sim.outputs.update();
 
         // System.out.println("td error:" + value.getActivation() + " + " +

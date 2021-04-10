@@ -1,7 +1,6 @@
 package org.simbrain.network.groups;
 
 import org.jetbrains.annotations.NotNull;
-import org.simbrain.network.LocatableModel;
 import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -15,7 +14,6 @@ import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.RectangleOutlines;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -25,6 +23,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.simbrain.network.LocatableModelKt.getCenterLocation;
 import static org.simbrain.util.GeomKt.minus;
@@ -219,8 +218,29 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
      * Add listener to indicated neuron.
      */
     private void addListener(Neuron n) {
-        n.getEvents().onLocationChange(() -> events.fireLocationChange());
+        n.getEvents().onLocationChange(fireLocationChange);
     }
+
+    private Runnable createFireLocationChange() {
+        AtomicReference<Timer> timer = new AtomicReference<>();
+        timer.set(null);
+        return () -> {
+            var thisTimer = timer.get();
+            if (thisTimer != null) {
+                thisTimer.cancel();
+            }
+            thisTimer = new Timer();
+            thisTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    events.fireLocationChange();
+                }
+            }, 5);
+            timer.set(thisTimer);
+        };
+    }
+
+    private final Runnable fireLocationChange = createFireLocationChange();
 
     /**
      * Remove a neuron

@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.trainers;
 
-import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkKt;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
@@ -128,7 +128,7 @@ public class LMSIterative extends IterableTrainer {
             }
 
             // Update output node
-            Network.updateNeurons(outputs);
+            NetworkKt.updateNeurons(outputs);
 
             // Iterate through weights and biases and update them
             for (int i = 0; i < numOutputs; i++) {

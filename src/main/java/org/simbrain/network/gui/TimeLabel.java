@@ -27,7 +27,7 @@ public class TimeLabel extends JLabel {
         this.addMouseListener(new MouseAdapter() {
             public void mousePressed(final MouseEvent event) {
                 if (event.getClickCount() == 2) {
-                    networkPanel.getNetwork().setTime(0);
+                    networkPanel.getNetwork().resetTime();
                     update();
                 }
             }

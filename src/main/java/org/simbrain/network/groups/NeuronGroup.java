@@ -17,10 +17,7 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.*;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
@@ -166,7 +163,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     @Override
     public void update() {
         if (!inputMode) {
-            Network.updateNeurons(getNeuronList());
+            NetworkKt.updateNeurons(getNeuronList());
         }
     }
 

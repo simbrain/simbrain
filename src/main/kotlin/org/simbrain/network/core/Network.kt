@@ -6,7 +6,6 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
-import org.simbrain.network.matrix.ArrayConnectable
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.SimbrainConstants.Polarity
@@ -381,19 +380,6 @@ class Network {
             }
         }
         return null
-    }
-
-
-    /**
-     * Add a weight matrix between two [ArrayConnectable]'s.
-     * Can "adapt" a neuron collection to an ND4J array, or be a weight
-     * matrix between those arrays.
-     *
-     * @param source source neuron collection or nd4j array
-     * @param target target neuron collection or nd4j array
-     */
-    fun createWeightMatrix(source: ArrayConnectable, target: ArrayConnectable): WeightMatrix {
-        return WeightMatrix(this, source, target)
     }
 
     /**

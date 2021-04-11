@@ -16,10 +16,10 @@ package org.simbrain.network.subnetworks;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.util.Direction;
@@ -111,7 +111,7 @@ public class FeedForward extends Subnetwork {
                 offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval/2, 100, 200);
 
                 // Add weight matrix
-                WeightMatrix wm = getParentNetwork().createWeightMatrix(lastLayer, hiddenLayer);
+                WeightMatrix wm = new WeightMatrix(getParentNetwork(), lastLayer, hiddenLayer);
                 wm.randomize();
                 addWeightMatrix(wm);
 
@@ -150,7 +150,7 @@ public class FeedForward extends Subnetwork {
                 offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
 
                 // Add weight matrix
-                WeightMatrix wm = getParentNetwork().createWeightMatrix(lastLayer, hiddenLayer);
+                WeightMatrix wm = new WeightMatrix(getParentNetwork(), lastLayer, hiddenLayer);
                 wm.randomize();
                 addWeightMatrix(wm);
 

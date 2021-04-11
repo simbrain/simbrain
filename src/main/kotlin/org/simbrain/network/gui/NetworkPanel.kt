@@ -682,7 +682,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
             for (source in sources) {
                 for (target in targets) {
-                    network.addNetworkModel((network.createWeightMatrix(source, target)));
+                    network.addNetworkModel(WeightMatrix(network, source, target));
                 }
             }
         }

@@ -516,7 +516,7 @@ class Network {
     override fun toString(): String = """
         Root Network
         =================
-        ${networkModels.all.joinToString { "[${it.id}] $it" }}
+        ${networkModels.all.joinToString(separator = "") { "[${it.id}] $it" }}
     """.trimIndent()
 
 

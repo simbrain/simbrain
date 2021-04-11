@@ -216,8 +216,7 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(" with " + getActivations().length + " components\n");
-        // TODO: For larger numbers could present as a matrix
+        sb.append("NeuronArray with " + getActivations().length + " activations\n");
         int maxToDisplay = 10;
         if (getActivations().length < maxToDisplay) {
             sb.append(Arrays.toString(getActivations()));

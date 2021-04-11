@@ -10,7 +10,6 @@ import org.simbrain.workspace.AttributeContainer;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
 
 /**
  * High performance immutable array backed by ND4J Array.
@@ -18,7 +17,6 @@ import java.util.Arrays;
 public class NeuronArray extends ArrayConnectable implements EditableObject, AttributeContainer {
 
     //TODO: Rename ideas: Array, Layer,Double Array
-    //TODO: See if data can be stored as an array. If not maybe used column instead of row.
 
     /**
      * Reference to network this array is part of.
@@ -212,19 +210,5 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     public Network getNetwork() {
         return parent;
     }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("NeuronArray with " + getActivations().length + " activations\n");
-        int maxToDisplay = 10;
-        if (getActivations().length < maxToDisplay) {
-            sb.append(Arrays.toString(getActivations()));
-        }
-        return sb.toString();
-    }
-
-
-
 
 }

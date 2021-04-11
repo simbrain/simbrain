@@ -29,6 +29,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -860,7 +861,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public String toString() {
-        return getType() + " Activation = " + this.getActivation() + " Location = (" + x + "," + y + ")";
+        return getType() + " Activation = " + SimbrainMath.roundDouble(this.getActivation(), 3);
     }
 
     /**

@@ -750,8 +750,8 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Synapse [" + getId() + "]: " + getStrength());
-        ret += ("  Connects neuron " + (getSource() == null ? "[null]" : getSource().getId()) + " to neuron " + (getTarget() == null ? "[null]" : getTarget().getId()) + "\n");
+        ret += ("Strength = " + SimbrainMath.roundDouble(getStrength(), 3));
+        ret += (" Connects " + (getSource() == null ? "[null]" : getSource().getId()) + " to " + (getTarget() == null ? "[null]" : getTarget().getId()));
         return ret;
     }
 

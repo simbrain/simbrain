@@ -566,8 +566,8 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Synapse Group [" + getLabel() + "]. Contains " + this.size() + " synapse(s)." + " Connects " + getSourceNeuronGroup().getId() + " [" + getSourceNeuronGroup().getLabel() + "]" + " to " + getTargetNeuronGroup().getId() + " [" + getTargetNeuronGroup().getLabel() + "]\n");
-
+        ret += "with " + this.size() + " synapse(s)" + " from " + getSourceNeuronGroup().getId()
+            + " to " + getTargetNeuronGroup().getId();
         return ret;
     }
 

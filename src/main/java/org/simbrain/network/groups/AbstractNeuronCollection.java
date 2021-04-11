@@ -732,4 +732,15 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         return events;
     }
 
+    // TODO: Specify to subclasses
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("with " + getActivations().length + " activations");
+        int maxToDisplay = 10;
+        if (getActivations().length < maxToDisplay) {
+            sb.append(Arrays.toString(getActivations()));
+        }
+        return sb.toString();
+    }
 }

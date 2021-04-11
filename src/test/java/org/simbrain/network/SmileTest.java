@@ -1,26 +1,19 @@
 package org.simbrain.network;
 
-import org.apache.commons.csv.CSVFormat;
 import org.junit.Test;
 import smile.classification.KNN;
-import smile.classification.SVM;
 import smile.io.Read;
 import smile.math.matrix.Matrix;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
-import smile.math.matrix.Matrix.EVD;
 import smile.stat.distribution.GaussianDistribution;
-import smile.classification.KNN.*;
 import smile.validation.metric.Accuracy;
 import smile.validation.metric.ConfusionMatrix;
-import smile.validation.metric.Recall;
-import smile.validation.metric.Sensitivity;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Testing the Smile package. https://haifengl.github.io/
@@ -141,18 +134,19 @@ public class SmileTest {
 
     @Test
     public void modelIris() throws IOException, URISyntaxException {
-        var train_data = Read.csv(this.getClass().getClassLoader().getResource("iris_train.csv").getPath());
-        var test_data = Read.csv(this.getClass().getClassLoader().getResource("iris_test.csv").getPath());
 
-        var x = train_data.select(1,2,3,4).toArray();
-        var y = train_data.column(5).toIntArray();
+        var train_data = Read.csv(getClass().getClassLoader().getResource("iris_train.csv").getPath());
+        var test_data = Read.csv(getClass().getClassLoader().getResource("iris_test.csv").getPath());
 
-        var test_x = test_data.select(1,2,3,4).toArray();
-        var test_y = test_data.column(5).toIntArray();
+        var x = train_data.select(0,1,2,3).toArray();
+        var y = train_data.column(4).toIntArray();
+
+        var test_x = test_data.select(0,1,2,3).toArray();
+        var test_y = test_data.column(4).toIntArray();
 
         var model = KNN.fit(x,y,3);
 
-        var pred = Arrays.stream(test_x).mapToInt(xi -> model.predict(xi)).toArray();
+        var pred = Arrays.stream(test_x).mapToInt(model::predict).toArray();
 
         System.out.println(Accuracy.of(test_y, pred));
         System.out.println(ConfusionMatrix.of(test_y,pred));

@@ -3,7 +3,7 @@ package org.simbrain.network.matrix;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.WeightMatrixEvents;
-import org.simbrain.network.groups.NeuronCollection;
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -81,13 +81,12 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
                 target.getActivations().length);
 
         // Default for "adapter" cases is 1-1
-        if (source instanceof NeuronCollection || target instanceof NeuronCollection) {
+        if (source instanceof AbstractNeuronCollection) {
             diagonalize();
         } else {
             // For now randomize new matrices between arrays
             randomize();
         }
-
     }
 
     private void initEvents() {

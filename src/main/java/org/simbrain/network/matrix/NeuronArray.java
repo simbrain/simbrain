@@ -48,7 +48,7 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     /**
      * Construct a neuron array.
      *
-     * @param net      parent net
+     * @param net  parent net
      * @param numNodes number of nodes
      */
     public NeuronArray(Network net, int numNodes) {
@@ -56,6 +56,7 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
         parent = net;
         this.numNodes = numNodes;
         randomize();
+        setLabel(net.getIdManager().getProposedId(this.getClass()));
     }
 
     /**
@@ -67,7 +68,6 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
      */
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
         NeuronArray copy = new NeuronArray(newParent, orig.getActivations().length);
-        copy.setLabel(copy.getId());
         copy.x = orig.x;
         copy.y = orig.y;
         copy.copyToActivations(orig.getActivations());

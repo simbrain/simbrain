@@ -388,7 +388,13 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         //     throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
         // }
         // inputManager.applyCurrentRow(); // TODO
-        setInputs(getWeightedInputs());
+
+        // Set inputs to current activations
+        for (int i=0; i<size(); ++i) {
+            super.getInputs()[i] = neuronList.get(i).getActivation();
+        }
+        // Add weighted inputs
+        addInputs(getWeightedInputs());
     }
 
     @Override
@@ -403,6 +409,10 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     @Override
     public void updateStateFromBuffer() {
         copyBufferToActivation();
+        for (int i=0; i<size(); ++i) {
+            // TODO: should be setInputs
+            neuronList.get(i).forceSetActivation(super.getActivations()[i]);
+        }
     }
 
     @Override
@@ -528,7 +538,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
                 .findFirst()
                 .orElse(null);
     }
-
 
     /**
      * Set input values of neurons using an array of doubles. Assumes the order

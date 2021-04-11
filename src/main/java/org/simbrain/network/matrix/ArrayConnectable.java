@@ -128,6 +128,11 @@ public abstract class ArrayConnectable extends LocatableModel {
         this.inputs = inputs;
     }
 
+    @Consumable()
+    public void addInputs(double[] newInputs) {
+        this.inputs = SimbrainMath.addVector(inputs, newInputs);
+    }
+
     /**
      * Register a callback function to run when the location of this object is updated.
      */

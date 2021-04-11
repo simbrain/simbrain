@@ -516,7 +516,7 @@ class Network {
     override fun toString(): String = """
         Root Network
         =================
-        ${networkModels.all.joinToString(separator = "") { "[${it.id}] $it" }}
+        ${networkModels.all.joinToString("\n        ") { "[${it.id}] $it" }}
     """.trimIndent()
 
 
@@ -615,8 +615,15 @@ class Network {
          */
         private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = HashMap()
 
+        @Suppress("UNCHECKED_CAST")
         fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
-            networkModels.putIfAbsent(modelClass, LinkedHashSet())?.add(model)
+            if (modelClass in networkModels) {
+                networkModels[modelClass]!!.add(model)
+            } else {
+                val newSet = LinkedHashSet<T>()
+                newSet.add(model)
+                networkModels[modelClass] = newSet as LinkedHashSet<NetworkModel>
+            }
         }
 
         fun <T : NetworkModel> putAll(modelClass: Class<T>, model: List<T>) {

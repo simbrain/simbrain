@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkKt;
 import org.simbrain.network.gui.EditMode;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -320,7 +320,7 @@ public class NetworkPropertiesPanel extends JPanel {
         timeStepField.setText(Double.toString(networkPanel.getNetwork().getTimeStep()));
         iterUpdateField.setText(Integer.toString(networkPanel.getNetwork().getUpdateFreq()));
         nudgeAmountField.setText(Double.toString(networkPanel.getNudgeAmount()));
-        tfSynapseVisibilityThreshold.setText(Integer.toString(Network.getSynapseVisibilityThreshold()));
+        tfSynapseVisibilityThreshold.setText(Integer.toString(NetworkKt.getSynapseVisibilityThreshold()));
     }
 
     /**
@@ -333,7 +333,7 @@ public class NetworkPropertiesPanel extends JPanel {
         upF = upF < 1 ? 1 : upF;
         networkPanel.getNetwork().setUpdateFreq(upF);
         networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
-        Network.setSynapseVisibilityThreshold(Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
+        NetworkKt.setSynapseVisibilityThreshold(Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
         EditMode.setWandRadius(Integer.parseInt(wandRadiusField.getText()));
         if (networkPanel.getEditMode().isWand()) {
             networkPanel.getEditMode().resetWandCursor();

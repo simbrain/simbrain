@@ -2,11 +2,10 @@ package org.simbrain.network.subnetworks;
 
 import org.junit.Test;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 
 import java.awt.geom.Point2D;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 
 public class FeedForwardTest {
 
@@ -14,10 +13,10 @@ public class FeedForwardTest {
     public void testUpdate() {
         Network net = new Network();
         FeedForward ff = new FeedForward(net, new int[]{2,2,2}, new Point2D.Double(0,0));
-        ff.getNAList().get(0).setValues(new double[]{1,-1});
+        ff.getNAList().get(0).setActivations(new double[]{1,-1});
         ff.getWeightMatrixList().get(0).diagonalize();
         ff.getWeightMatrixList().get(1).diagonalize();
         ff.update();
-        assertArrayEquals(new double[]{1,-1}, ff.getNAList().get(2).getValues(), .01);
+        assertArrayEquals(new double[]{1,-1}, ff.getNAList().get(2).getActivations(), .01);
     }
 }

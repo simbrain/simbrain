@@ -4,10 +4,7 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
 import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
@@ -273,7 +270,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         // If there are inputs, update weights
         if(totalActivation > .1) {
             Neuron src = WinnerTakeAll.getWinner(stimulusNet.getNeuronList(), true);
-            Synapse s_r = Network.getLooseSynapse(src,winner);
+            Synapse s_r = NetworkKt.getLooseSynapse(src,winner);
             // Strengthen or weaken active S-R Pair
             s_r.setStrength(s_r.getStrength() + valence);
 

@@ -1,6 +1,9 @@
 package org.simbrain.network.gui
 
 //import org.simbrain.network.dl4j.MultiLayerNet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
@@ -41,13 +44,12 @@ import java.awt.Cursor
 import java.awt.FlowLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.util.Timer
 import java.util.concurrent.atomic.AtomicInteger
-import javax.swing.JInternalFrame
-import javax.swing.JPanel
-import javax.swing.JToolBar
-import javax.swing.ToolTipManager
+import javax.swing.*
 import javax.swing.event.InternalFrameAdapter
 import javax.swing.event.InternalFrameEvent
+import kotlin.concurrent.timerTask
 
 /**
  * Main GUI representation of a [Network].
@@ -239,7 +241,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         })
 
         // Add all network elements (important for de-serializing)
-        network.modelsInDeserializationOrder.forEach{ createNode(it) }
+        network.allModelsInDeserializationOrder.forEach{ createNode(it) }
 
     }
 
@@ -269,7 +271,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     }
 
     fun zoomToFitPage() {
-        zoomToFitPage(false)
+        GlobalScope.launch(Dispatchers.Main) {
+            zoomToFitPage(false)
+        }
     }
 
     /**
@@ -277,15 +281,35 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
      *
      * @param forceZoom if true force the zoom to happen
      */
-    fun zoomToFitPage(forceZoom: Boolean) {
-        // TODO: Add a check to see if network is running
-        if (autoZoom && editMode.isSelection || forceZoom) {
-            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
-            val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
-                    filtered.getWidth() + 20, filtered.getHeight() + 20)
-            canvas.camera.setViewBounds(adjustedFiltered)
+//    fun zoomToFitPage(forceZoom: Boolean) {
+//        // TODO: Add a check to see if network is running
+//        if (autoZoom && editMode.isSelection || forceZoom) {
+//            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
+//            val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
+//                    filtered.getWidth() + 20, filtered.getHeight() + 20)
+//            canvas.camera.setViewBounds(adjustedFiltered)
+//        }
+//    }
+
+    val zoomToFitPage = fun (): (Boolean) -> Unit {
+        var timer: Timer? = null
+        return fun (forceZoom: Boolean) {
+
+            // Implements debounce. If many requests are made they will all be cancelled, until the last one.
+            timer?.cancel()
+
+            timer = Timer().apply {
+                schedule(timerTask {
+                    if (autoZoom && editMode.isSelection || forceZoom) {
+                        val filtered = canvas.layer.getUnionOfChildrenBounds(null)
+                        val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
+                            filtered.getWidth() + 20, filtered.getHeight() + 20)
+                        canvas.camera.setViewBounds(adjustedFiltered)
+                    }
+                }, 5)
+            }
         }
-    }
+    }()
 
     /**
      * Returns all nodes in the canvas.
@@ -345,7 +369,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         NeuronNode(this, neuron).also {
             (neuronNodeMapping as HashMap)[neuron] = it
             selectionManager.set(it)
-            zoomToFitPage()
         }
     }
 
@@ -659,7 +682,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
             for (source in sources) {
                 for (target in targets) {
-                    network.addNetworkModel((network.createWeightMatrix(source, target)));
+                    network.addNetworkModel(WeightMatrix(network, source, target));
                 }
             }
         }

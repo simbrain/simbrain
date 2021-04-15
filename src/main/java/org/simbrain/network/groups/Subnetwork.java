@@ -20,15 +20,11 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.events.NetworkModelEvents;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.trainers.Trainable;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -461,20 +457,12 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Subnetwork Group [" + getLabel() + "] Subnetwork with " + neuronGroupList.size() + " neuron " +
-                "group(s) and ");
-        sb.append(synapseGroupList.size()).append(" synapse group(s) and ")
-                .append(weightMatrixList.size()).append(" weight matrices\n");
-        neuronGroupList.forEach(sb::append);
-        if(synapseGroupList.size() > 0) {
-            synapseGroupList.forEach(sb::append);
-        }
-        if(weightMatrixList.size() > 0) {
-            weightMatrixList.forEach(sb::append);
-        }
-        if(naList.size() > 0) {
-            naList.forEach(sb::append);
-        }
+        sb.append(" with ")
+                .append(neuronGroupList.size()).append(" neuron group(s) and ")
+                .append(synapseGroupList.size()).append(" synapse group(s) and ")
+                .append(naList.size()).append(" neuron array(s) and ")
+                .append(weightMatrixList.size()).append(" weight matrix");
+
         return sb.toString();
     }
 

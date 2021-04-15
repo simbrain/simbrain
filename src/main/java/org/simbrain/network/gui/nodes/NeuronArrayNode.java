@@ -180,11 +180,10 @@ public class NeuronArrayNode extends ScreenElement {
 
             if (gridMode) {
                 // "Grid" case
-                double[] activations = neuronArray.getValues();
+                double[] activations = neuronArray.getActivations();
+                int len = (int) Math.sqrt(activations.length);
                 BufferedImage img = ImageKt.toSimbrainColorImage(
-                        activations,
-                        (int) Math.sqrt(neuronArray.getNumNodes()),
-                        (int) Math.sqrt(neuronArray.getNumNodes()));
+                        activations,len,len);
                 activationImage.setImage(img);
                 // TODO: Adjust this to look nice
                 // TODO: Magic numbers
@@ -192,8 +191,8 @@ public class NeuronArrayNode extends ScreenElement {
 
             } else {
                 // "Flat" case
-                double[] activations = neuronArray.getValues();
-                BufferedImage img = ImageKt.toSimbrainColorImage(activations, neuronArray.getNumNodes(), 1);
+                double[] activations = neuronArray.getActivations();
+                BufferedImage img = ImageKt.toSimbrainColorImage(activations,activations.length, 1);
                 activationImage.setImage(img);
                 this.activationImage.setBounds(borderPixels, infoText.getHeight() + borderPixels,
                         infoText.getWidth() - borderPixels, flatPixelArrayHeight);
@@ -219,9 +218,9 @@ public class NeuronArrayNode extends ScreenElement {
     private void updateInfoText() {
         infoText.setText(
                 "" + neuronArray.getLabel() + "    " +
-                        "nodes: " + neuronArray.getValues().length
+                        "nodes: " + neuronArray.getActivations().length
                         + "\nmean activation: "
-                        + SimbrainMath.roundDouble(Arrays.stream(neuronArray.getValues()).average().orElse(0), 4));
+                        + SimbrainMath.roundDouble(Arrays.stream(neuronArray.getActivations()).average().orElse(0), 4));
     }
 
     @Override
@@ -320,11 +319,11 @@ public class NeuronArrayNode extends ScreenElement {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 StandardDialog dialog = new StandardDialog();
-                NumericTable arrayData = new NumericTable(neuronArray.getValues());
+                NumericTable arrayData = new NumericTable(neuronArray.getActivations());
                 dialog.setContentPane(new SimbrainJTableScrollPanel(
                         SimbrainJTable.createTable(arrayData)));
                 dialog.addClosingTask(() -> {
-                    neuronArray.setInputArray(arrayData.getVectorCurrentRow());
+                    neuronArray.setInputs(arrayData.getVectorCurrentRow());
                     neuronArray.update();
                 });
                 dialog.pack();

@@ -17,10 +17,7 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.*;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
@@ -131,7 +128,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, final NeuronGroup toCopy) {
         this(net, toCopy.getNeuronList().stream().map(Neuron::deepCopy).collect(Collectors.toList()));
-        setLabel(getId()); // Don't copy existing labels but reset them to id. Avoids many headaches.
+        // Copying "custom" labels creates too many problems...
+        setLabel(net.getIdManager().getProposedId(this.getClass()));
         this.setLayout(toCopy.getLayout());
         this.setGroupUpdateRule(toCopy.groupUpdateRule);
     }
@@ -164,9 +162,9 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Override
     public void update() {
-        if (!inputMode) {
-            Network.updateNeurons(getNeuronList());
-        }
+        // if (!inputMode) {
+            NetworkKt.updateNeurons(getNeuronList());
+        // }
     }
 
     /**
@@ -247,12 +245,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void addNeuron(Neuron neuron, boolean fireEvent) {
         super.addNeuron(neuron);
         neuron.setParentGroup(this);
-        if (getParentNetwork() != null) {
-            neuron.setId(getParentNetwork().getIdManager().getId(Neuron.class));
-            if (fireEvent) {
-                //                getParentNetwork().fireNeuronAdded(neuron); // TODO: [event] let synapse handle this
-            }
-        }
+        neuron.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
         if (fireEvent) {
             subsamplingManager.resetIndices();
         }
@@ -263,6 +256,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         groupUpdateRule = UpdateRuleEnum.get(neurons.iterator().next().getUpdateRule());
         // TODO: Throw exception if not same type
         super.addNeurons(neurons);
+        neurons.forEach(n -> n.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class)));
         neurons.forEach(n -> n.setParentGroup(this));
     }
 
@@ -286,15 +280,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
                 reaper.remove();
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Neuron Group [%s]. Neuron group with %d neuron(s). Located at (%2.2f, %2.2f).\n",
-                getLabel(), this.getNeuronList().size(), getLocation().getX(), getLocation().getY()));
-        sb.append("\tActivations:").append(getOutputArray()).append("\n");
-        return sb.toString();
     }
 
     /**
@@ -456,10 +441,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
 
     public void setGridThreshold(int gridThreshold) {
         this.gridThreshold = gridThreshold;
-    }
-
-    public boolean isInputMode() {
-        return inputMode;
     }
 
     // TODO

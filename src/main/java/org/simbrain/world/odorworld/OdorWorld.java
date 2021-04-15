@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.odorworld;
 
-import org.simbrain.util.SimpleId;
+import org.simbrain.util.SimpleIdManager;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TMXUtils;
@@ -71,25 +71,26 @@ public class OdorWorld implements EditableObject {
     @UserParameter(label = "Objects block movement", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
     private boolean objectsBlockMovement = true;
 
+    // TODO: Use the id manager
     /**
      * Entity Id generator.
      */
-    private SimpleId entityIDGenerator = new SimpleId("Entity", 1);
+    private SimpleIdManager.SimpleId entityIDGenerator = new SimpleIdManager.SimpleId("Entity", 1);
 
     /**
      * Sensor Id generator.
      */
-    private SimpleId sensorIDGenerator = new SimpleId("Sensor", 1);
+    private SimpleIdManager.SimpleId sensorIDGenerator = new SimpleIdManager.SimpleId("Sensor", 1);
 
     /**
      * Effector Id generator.
      */
-    private SimpleId effectorIDGenerator = new SimpleId("Effector", 1);
+    private SimpleIdManager.SimpleId effectorIDGenerator = new SimpleIdManager.SimpleId("Effector", 1);
 
     /**
      * Agent Name generator.
      */
-    private SimpleId agentIdGenerator = new SimpleId("Agent", 1);
+    private SimpleIdManager.SimpleId agentIdGenerator = new SimpleIdManager.SimpleId("Agent", 1);
 
     /**
      * Event support
@@ -142,7 +143,7 @@ public class OdorWorld implements EditableObject {
         }
 
         // Set the entity's id
-        entity.setId(entityIDGenerator.getId());
+        entity.setId(entityIDGenerator.getAndIncrement());
         entity.setName(entity.getId());
 
         // Add entity to the map
@@ -358,7 +359,7 @@ public class OdorWorld implements EditableObject {
      */
     private Object readResolve() {
         if (agentIdGenerator == null) {
-            agentIdGenerator = new SimpleId("Agent", 1);
+            agentIdGenerator = new SimpleIdManager.SimpleId("Agent", 1);
         }
 
         events = new OdorWorldEvents(this);
@@ -493,11 +494,11 @@ public class OdorWorld implements EditableObject {
         }
     }
 
-    public SimpleId getSensorIDGenerator() {
+    public SimpleIdManager.SimpleId getSensorIDGenerator() {
         return sensorIDGenerator;
     }
 
-    public SimpleId getEffectorIDGenerator() {
+    public SimpleIdManager.SimpleId getEffectorIDGenerator() {
         return effectorIDGenerator;
     }
 

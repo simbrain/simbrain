@@ -29,6 +29,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -255,9 +256,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public Neuron(final Network parent, final Neuron n) {
         this.parent = parent;
-        if (parent != null) {
-            setId(parent.getIdManager().getId(Neuron.class));
-        }
         setClamped(n.isClamped());
         setUpdateRule(n.getUpdateRule().deepCopy());
         setIncrement(n.getIncrement());
@@ -525,8 +523,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public double getWeightedInputs() {
         double wtdSum = inputValue;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            wtdSum += fanIn.get(i).calcWeightedSum();
+        for (Synapse synapse : fanIn) {
+            wtdSum += synapse.calcWeightedSum();
         }
         return wtdSum;
     }
@@ -863,7 +861,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public String toString() {
-        return getType() + " Activation = " + this.getActivation() + " Location = (" + x + "," + y + ")\n";
+        return getType() + " Activation = " + SimbrainMath.roundDouble(this.getActivation(), 3);
     }
 
     /**

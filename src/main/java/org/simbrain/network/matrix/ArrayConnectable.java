@@ -1,59 +1,137 @@
 package org.simbrain.network.matrix;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.LocationEvents;
+import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Classes that implement this interface can be the source or target of an
- * ND4J weight matrix (or other layer-to-layer connector, if we add them).
+ * Classes that implement this interface can be the source or target of a
+ * weight matrix (or other layer-to-layer connector, if we add them). Encompasses
+ * both {@link NeuronArray} and {@link org.simbrain.network.groups.AbstractNeuronCollection}.
  */
 public abstract class ArrayConnectable extends LocatableModel {
 
     /**
-     * Set input activations.
+     * Array to hold activation values.
      */
-    public abstract void setInputArray(double[] activations);
+    private double[] activations;
 
     /**
-     * Returns "output" activations.
+     * For buffered update.
      */
-    public abstract double[] getOutputArray();
+    private double[] buffer;
 
     /**
-     * (Possibly cached) input array size.
+     * Collects inputs from other network models using arrays.
      */
-    public abstract int inputSize();
+    private double[] inputs;
 
     /**
-     * (Possibly cached) output array size.
+     * "Fan-in" of incoming weight matrices.
      */
-    public abstract int outputSize();
+    private final List<WeightMatrix> incomingWeightMatrices = new ArrayList<>();;
 
     /**
-     * Connection from another ArrayConncetable to this one.
+     * "Fan-out" of outgoing weight matrices.
      */
-    public abstract WeightMatrix getIncomingWeightMatrix();
+    private final List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
+
+    @UserParameter(label = "Increment amount", increment = .1, order = 20)
+    private double increment = .1;
 
     /**
-     * Connection from another ArrayConncetable to this one.
+     * Event support.
      */
-    public abstract void setIncomingWeightMatrix(WeightMatrix weightMatrix);
+    private transient LocationEvents events = new LocationEvents(this);
 
-    /**
-     * Connection from this ArrayConncetable to another one
-     */
-    public abstract List<WeightMatrix> getOutgoingWeightMatrices();
+    public ArrayConnectable(int size) {
+        activations = new double[size];
+        buffer = new double[size];
+        inputs = new double[size];
+    }
 
-    /**
-     * Connection from this ArrayConncetable to another one
-     */
-    public abstract void addOutgoingWeightMatrix(WeightMatrix weightMatrix);
+    public void addIncomingWeightMatrix(WeightMatrix weightMatrix) {
+        incomingWeightMatrices.add(weightMatrix);
+    }
 
-    public abstract void removeOutgoingWeightMatrix(WeightMatrix weightMatrix);
+    public void removeIncomingWeightMatrix(WeightMatrix weightMatrix) {
+        incomingWeightMatrices.remove(weightMatrix);
+    }
+
+    public void addOutgoingWeightMatrix(WeightMatrix weightMatrix) {
+        outgoingWeightMatrices.add(weightMatrix);
+    }
+
+    public void removeOutgoingWeightMatrix(WeightMatrix weightMatrix) {
+        outgoingWeightMatrices.remove(weightMatrix);
+    }
+
+    public List<WeightMatrix> getIncomingWeightMatrices() {
+        return incomingWeightMatrices;
+    }
+
+    public List<WeightMatrix> getOutgoingWeightMatrices() {
+        return outgoingWeightMatrices;
+    }
+
+    @Producible()
+    public double[] getActivations() {
+        return activations;
+    }
+
+    @Consumable()
+    public void setActivations(double[] activations) {
+        this.activations = activations;
+    }
+
+    public double[] getWeightedInputs() {
+        double[] result = new double[inputs.length];
+        for (WeightMatrix wm : incomingWeightMatrices) {
+            result = SimbrainMath.addVector(result, wm.getWeightMatrix().mv(wm.getSource().getActivations()));
+        }
+        return result;
+    }
+
+    public void copyBufferToActivation() {
+        copyToActivations(buffer);
+    }
+
+    public void copyToActivations(double [] newActivations) {
+        // TODO: Is this the most performant way to copy an array?
+        activations = Arrays.stream(newActivations).toArray();
+    }
+
+    public double[] getInputs() {
+        return inputs;
+    }
+
+    public void copyToInputs(double [] newInputs) {
+        inputs = Arrays.stream(newInputs).toArray();
+    }
+
+    public void copyToBuffer(double [] newBuffer) {
+        buffer = Arrays.stream(newBuffer).toArray();
+    }
+
+    @Consumable()
+    public void setInputs(double[] inputs) {
+        this.inputs = inputs;
+    }
+
+    @Consumable()
+    public void addInputs(double[] newInputs) {
+        this.inputs = SimbrainMath.addVector(inputs, newInputs);
+    }
 
     /**
      * Register a callback function to run when the location of this object is updated.
@@ -64,5 +142,44 @@ public abstract class ArrayConnectable extends LocatableModel {
 
     public abstract Rectangle2D getBound();
 
-    public abstract void postUnmarshallingInit();
+    public void postUnmarshallingInit() {
+        if (events == null) {
+            events = new LocationEvents(this);
+        }
+    }
+
+    @NotNull
+    @Override
+    public LocationEvents getEvents() {
+        return events;
+    }
+
+    /**
+     * Add increment to every entry in weight matrix
+     */
+    public void increment() {
+        for (int i = 0; i < activations.length; i++) {
+            activations[i] += increment;
+        }
+        events.fireUpdated();
+    }
+
+    /**
+     * Subtract increment from every entry in the array
+     */
+    public void decrement() {
+        for (int i = 0; i < activations.length; i++) {
+            activations[i] -= increment;
+        }
+        events.fireUpdated();
+    }
+
+    /**
+     * Clear activations;
+     */
+    public void clear() {
+        activations = new double[activations.length];
+        events.fireUpdated();
+    }
+
 }

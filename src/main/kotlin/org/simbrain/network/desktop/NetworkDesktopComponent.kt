@@ -19,6 +19,7 @@
 package org.simbrain.network.desktop
 
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.component_actions.CloseAction
@@ -99,7 +100,7 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
      * operation should be cancelled.
      */
     private fun showUncompressedSynapseGroupWarning(): Boolean {
-        val showPanel = networkPanel.network.synapseGroups.any {
+        val showPanel = networkPanel.network.getModels<SynapseGroup>().any {
             it.allSynapses.size > saveWarningThreshold && !it.isUseFullRepOnSave
         }
         if (showPanel) {

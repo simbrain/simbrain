@@ -8,9 +8,7 @@ import org.simbrain.workspace.Producible;
 
 /**
  * "Model" objects placed in a {@link org.simbrain.network.core.Network} should implement this interface.  E.g. neurons, synapses, neuron groups, etc.
- * Contrasted with "nodes" in the GUI which represent these objects.
- * <p>
- * Primarily meant as a marker interface.
+ * Contrasted with GUI "nodes" which graphically represent these objects.
  */
 public abstract class NetworkModel {
 
@@ -27,13 +25,19 @@ public abstract class NetworkModel {
     private String label = "";
 
     /**
-     * Set buffer values as first part of async updating. The only things that need to be
+     * First part of async updating. For each component, update the input using by summing over states of other
+     * components, weighted by any components in between.
+     */
+    public void updateInputs() {}
+
+    /**
+     * Set buffer values as second part of async updating. The only things that need to be
      * buffered are values that communicate with the rest of the network.
      */
     public void updateBuffer() {}
 
     /**
-     * Apply buffers to current state a second part of async updating.
+     * Apply buffers to current state as third part of async updating.
      */
     public void updateStateFromBuffer() {}
 
@@ -65,7 +69,7 @@ public abstract class NetworkModel {
     }
 
     /**
-     * Override if there are cases where a created model should not be added, e.g. if it is a
+     * Override if there are cases where a model should not be added after creation, e.g. if it is a
      * duplicate of an existing model. Currently only used by {@link org.simbrain.network.groups.NeuronCollection}
      */
     public boolean shouldAdd() {

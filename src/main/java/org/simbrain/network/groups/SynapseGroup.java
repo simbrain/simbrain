@@ -16,10 +16,7 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.core.*;
 import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
@@ -35,7 +32,6 @@ import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import java.io.FileWriter;
@@ -383,12 +379,11 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         this.sourceNeuronGroup = source;
         this.targetNeuronGroup = target;
         recurrent = testRecurrent();
-        id = parentNetwork.getIdManager().getId(SynapseGroup.class);
-        setLabel(id);
         initializeSynapseVisibility();
         initSpikeResponders();
         source.addOutgoingSg(this);
         target.addIncomingSg(this);
+        setLabel(parentNetwork.getIdManager().getProposedId(this.getClass()));
     }
 
     /**
@@ -407,10 +402,9 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         this.targetNeuronGroup = target;
         this.connectionManager = connectionManager;
         recurrent = testRecurrent();
-        id = parentNetwork.getIdManager().getId(SynapseGroup.class);
-        setLabel(id);
         initializeSynapseVisibility();
         initSpikeResponders();
+        setLabel(parentNetwork.getIdManager().getProposedId(this.getClass()));
     }
 
     /**
@@ -572,8 +566,8 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     @Override
     public String toString() {
         String ret = new String();
-        ret += ("Synapse Group [" + getLabel() + "]. Contains " + this.size() + " synapse(s)." + " Connects " + getSourceNeuronGroup().getId() + " [" + getSourceNeuronGroup().getLabel() + "]" + " to " + getTargetNeuronGroup().getId() + " [" + getTargetNeuronGroup().getLabel() + "]\n");
-
+        ret += "with " + this.size() + " synapse(s)" + " from " + getSourceNeuronGroup().getId()
+            + " to " + getTargetNeuronGroup().getId();
         return ret;
     }
 
@@ -585,7 +579,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * displayed.
      */
     public void initializeSynapseVisibility() {
-        int threshold = Network.getSynapseVisibilityThreshold();
+        int threshold = NetworkKt.getSynapseVisibilityThreshold();
         if (sourceNeuronGroup.size() * targetNeuronGroup.size() > threshold) {
             displaySynapses = false;
         } else {
@@ -696,7 +690,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      *                of this group.
      */
     public void addNewExcitatorySynapse(final Synapse synapse)  {
-        synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
         synapse.setParentGroup(this);
         if (exciteRand != null) {
             synapse.setStrength(exciteRand.getRandom());
@@ -721,7 +714,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      *                of this group.
      */
     public void addNewInhibitorySynapse(final Synapse synapse) {
-        synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
         synapse.setParentGroup(this);
         if (inhibRand != null) {
             synapse.setStrength(inhibRand.getRandom());
@@ -777,7 +769,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         exSynapseSet.add(synapse);
         excitatoryRatio = exSynapseSet.size() / (double) size();
         if (getParentNetwork() != null) {
-            synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
             synapse.setParentGroup(this);
         }
         fireSynapseAdded(synapse);
@@ -794,7 +785,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         inSynapseSet.add(synapse);
         excitatoryRatio = exSynapseSet.size() / (double) size();
         if (getParentNetwork() != null) {
-            synapse.setId(getParentNetwork().getIdManager().getId(Synapse.class));
             synapse.setParentGroup(this);
         }
         fireSynapseAdded(synapse);

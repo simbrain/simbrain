@@ -19,8 +19,11 @@ package org.simbrain.network;
 
 import com.thoughtworks.xstream.XStream;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.NetworkEvents;
+import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -113,12 +116,12 @@ public final class NetworkComponent extends WorkspaceComponent {
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> retList = new ArrayList<>();
         retList.addAll(network.getFlatNeuronList());
-        retList.addAll(network.getLooseSynapses());
+        retList.addAll(network.getModels(Synapse.class));
         retList.addAll(network.getFlatNeuronGroupList());
         retList.addAll(network.getFlatSynapseGroupList());
         retList.addAll(network.getFlatWeightMatrixList());
-        retList.addAll(network.getNeuronCollectionSet());
-        retList.addAll(network.getNeuronArrays());
+        retList.addAll(network.getModels(NeuronCollection.class));
+        retList.addAll(network.getModels(NeuronArray.class));
 
         return retList;
     }

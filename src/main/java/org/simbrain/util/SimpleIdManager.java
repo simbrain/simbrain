@@ -19,6 +19,7 @@
 package org.simbrain.util;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -33,7 +34,7 @@ public class SimpleIdManager {
     private final HashMap<Class<?>, SimpleId> idMap = new HashMap<>();
 
     /**
-     * Function to initialize id count.
+     * Function to initialize id count assocaitd with a class.
      */
     private final Function<Class<?>, Integer> initIdFunction;
 
@@ -51,25 +52,25 @@ public class SimpleIdManager {
      * @param rootName the root name for the id, e.g. Neuron
      * @param initId the initial id number, e.g. 2 to start at Neuron_2
      */
-    public void initId(Class clazz, String rootName, int initId) {
+    private void initId(Class clazz, String rootName, int initId) {
         idMap.put(clazz, new SimpleId(rootName, initId));
     }
 
     /**
      * @see #initId(Class, int)
      */
-    public void initId(Class<?> clazz, int initId) {
+    private void initId(Class<?> clazz, int initId) {
         initId(clazz, clazz.getSimpleName(), initId);
     }
 
     /**
      * Get the id associated with a class. Increments the id number.
      */
-    public String getId(Class<?> clazz) {
+    public String getAndIncrementId(Class<?> clazz) {
         if (!idMap.containsKey(clazz)) {
             initId(clazz, initIdFunction.apply(clazz));
         }
-        return idMap.get(clazz).getId();
+        return idMap.get(clazz).getAndIncrement();
     }
 
     /**
@@ -80,5 +81,54 @@ public class SimpleIdManager {
             initId(clazz, initIdFunction.apply(clazz));
         }
         return idMap.get(clazz).getProposedId();
+    }
+
+    /**
+     * <b>SimpleId</b> provides an id based on a base name and an integer index.
+     */
+    public static class SimpleId {
+
+        /**
+         * The base name of the id.
+         */
+        private String rootName;
+
+        /**
+         * The starting index.
+         */
+        private AtomicInteger index;
+
+        /**
+         * Construct simpleId.
+         *
+         * @param rootName root name.
+         * @param initialIndex beginning index.
+         */
+        public SimpleId(final String rootName, final int initialIndex) {
+            this.rootName = rootName;
+            this.index = new AtomicInteger(initialIndex);
+        }
+
+        /**
+         * Returns a simple identifier and increments id index.
+         *
+         * @return a unique identification
+         */
+        public String getAndIncrement() {
+            String id = rootName + "_" + index.getAndIncrement();
+            return id;
+        }
+
+        /**
+         * "Peek" ahead the next id that will be made if {@link #getAndIncrement()} is called.
+         */
+        public String getProposedId() {
+            return rootName + "_" + index;
+        }
+
+        public int getCurrentIndex() {
+            return index.get();
+        }
+
     }
 }

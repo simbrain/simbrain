@@ -19,6 +19,7 @@ package org.simbrain.network.connections;
 
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkKt;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
@@ -250,7 +251,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
         }
         for (Neuron otherNeu : neusInRadius) {
             // Don't add a connection if there is already one present
-            if (Network.getLooseSynapse(neuron, otherNeu) != null) {
+            if (NetworkKt.getLooseSynapse(neuron, otherNeu) != null) {
                 continue;
             }
             if (!allowSelfConnections) {
@@ -316,7 +317,7 @@ public class RadialSimple extends ConnectionStrategy implements EditableObject {
         }
         for (Neuron otherNeu : neusInRadius) {
             // Don't add a connection if there is already one present
-            if (Network.getLooseSynapse(neuron, otherNeu) != null) {
+            if (NetworkKt.getLooseSynapse(neuron, otherNeu) != null) {
                 continue;
             }
             if (!allowSelfConnections) {

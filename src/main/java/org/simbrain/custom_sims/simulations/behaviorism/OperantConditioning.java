@@ -3,10 +3,7 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.math.SimbrainMath;
@@ -213,7 +210,7 @@ public class OperantConditioning extends RegisteredSimulation {
                 // Update weight on active node
                 for(Neuron src : stimulusNet.getNeuronList()) {
                     if (src.getActivation() > 0) {
-                        Synapse s = Network.getLooseSynapse(src,tar);
+                        Synapse s = NetworkKt.getLooseSynapse(src,tar);
                         s.setStrength(Math.max(s.getStrength() + valence, 0));
                     }
                 }

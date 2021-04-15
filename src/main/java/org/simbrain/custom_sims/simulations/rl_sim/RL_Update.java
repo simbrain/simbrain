@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.rl_sim;
 
-import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkKt;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -109,13 +109,13 @@ public class RL_Update implements NetworkUpdateAction {
         sim.predictionRight.update();
 
         // Reward node
-        Network.updateNeurons(Collections.singletonList(sim.reward));
+        NetworkKt.updateNeurons(Collections.singletonList(sim.reward));
 
         // Train prediction nodes
         trainPredictionNodes();
 
         // Value node
-        Network.updateNeurons(Collections.singletonList(sim.value));
+        NetworkKt.updateNeurons(Collections.singletonList(sim.value));
 
 
         // Outputs and vehicles
@@ -133,7 +133,7 @@ public class RL_Update implements NetworkUpdateAction {
             winner = sim.wtaNet.getWinner();
 
             // Update the reward neuron and the change in reward
-            Network.updateNeurons(Collections.singletonList(sim.reward));
+            NetworkKt.updateNeurons(Collections.singletonList(sim.reward));
             updateDeltaReward();
 
             updateTDError();

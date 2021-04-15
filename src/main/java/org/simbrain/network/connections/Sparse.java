@@ -18,6 +18,7 @@
 package org.simbrain.network.connections;
 
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkKt;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
@@ -409,7 +410,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
             int finalNumConPerSource = curNumConPerSource - removePerSource;
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 for (int j = curNumConPerSource - 1; j >= finalNumConPerSource; j--) {
-                    Synapse toRemove = Network.getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]);
+                    Synapse toRemove = NetworkKt.getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]);
                     net.delete(toRemove);
                 }
                 currentOrderingIndices[i] = finalNumConPerSource;
@@ -504,7 +505,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
     private List<Synapse> decreaseDensity(int i, int finalNumConnections) {
         List<Synapse> removed = new ArrayList<Synapse>(currentOrderingIndices[i] - finalNumConnections);
         for (int j = currentOrderingIndices[i] - 1; j >= finalNumConnections; j--) {
-            Synapse toRemove = Network.getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]);
+            Synapse toRemove = NetworkKt.getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]);
             removed.add(toRemove);
         }
         return removed;

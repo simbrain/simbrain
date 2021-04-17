@@ -61,7 +61,7 @@ dependencies {
     compile "junit:junit:4.12"
 
     // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.12'
+    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.14'
 
     // https://mvnrepository.com/artifact/org.piccolo2d/piccolo2d-extras
     compile group: 'org.piccolo2d', name: 'piccolo2d-extras', version: '3.0.1'

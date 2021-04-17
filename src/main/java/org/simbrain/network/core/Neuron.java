@@ -104,6 +104,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Temporary activation value for synchronous updating.
      */
+    @Deprecated
     private double buffer;
 
     /**
@@ -357,10 +358,13 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         }
     }
 
-    /**
-     * Updates neuron buffers.
-     */
-    public void updateBuffer() {
+    @Override
+    public void updateInputs() {
+        addInputValue(getWeightedInputs());
+    }
+
+    @Override
+    public void update() {
         if (isClamped()) {
             return;
         }
@@ -391,18 +395,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * A general purpose method that moves all relevant values from this
-     * neuron's buffer to its main values. Must be used to ensure that spikes
-     * update synchronously in the same way activations do for buffered
-     * updates.
-     */
-    @Override
-    public void updateStateFromBuffer() {
-        setActivation(getBuffer());
-        setSpike(getSpkBuffer());
-    }
-
-    /**
      * Sets the activation of the neuron regardless of the state of the neuron.
      * Overrides clamping and any intrinsic dynamics of the neuron, and forces
      * the neuron's activation to take a specific value. Used primarily by the
@@ -421,7 +413,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public double getActivation() {
         return activation;
     }
-
 
     /**
      * @return an unmodifiable version of the fanIn list.
@@ -540,11 +531,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @return total input to this neuron from other neurons
      */
     public double getInput() {
-        double wtdSum = inputValue;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            wtdSum += fanIn.get(i).calcPSR();
-        }
-        return wtdSum;
+        return inputValue;
     }
 
     /**
@@ -701,9 +688,12 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * external components (like input tables) send activation to the network
      * they should use this.
      *
+     * SHOULD NOT ALLOW THIS, ONLY add input values.
+     *
      * @param inputValue The inputValue to set.
      */
     @Consumable()
+    @Deprecated
     public void setInputValue(final double inputValue) {
         this.inputValue = inputValue;
     }

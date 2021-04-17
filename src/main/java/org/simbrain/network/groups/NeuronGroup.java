@@ -164,6 +164,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void update() {
         // if (!inputMode) {
             NetworkKt.updateNeurons(getNeuronList());
+            invalidateCachedActivations();
         // }
     }
 
@@ -322,22 +323,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return retArray;
     }
 
-
     /**
      * @param x x coordinate for neuron group
      * @param y y coordinate for neuron group
      */
     public void setLocation(final double x, final double y) {
         super.setLocation(new Point2D.Double(x, y));
-    }
-
-    /**
-     * Apply any input values to the activations of the neurons in this group.
-     */
-    public void applyInputs() {
-        for (Neuron neuron : getNeuronList()) {
-            neuron.setActivation(neuron.getActivation() + neuron.getInputValue());
-        }
     }
 
     public Layout getLayout() {

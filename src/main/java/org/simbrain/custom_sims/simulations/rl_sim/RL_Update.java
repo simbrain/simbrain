@@ -222,7 +222,7 @@ public class RL_Update implements NetworkUpdateAction {
             if (vehicle.getLabel().equalsIgnoreCase(winner.getLabel())) {
                 vehicle.update();
             } else {
-                vehicle.clearActivations();
+                vehicle.clear();
             }
         }
     }

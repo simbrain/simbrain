@@ -49,9 +49,19 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     protected transient NeuronCollectionEvents events = new NeuronCollectionEvents(this);
 
     /**
+     * Cache of neuron activation values.
+     */
+    private double[] activations;
+
+    /**
+     * Flag to mark whether {@link #activations} is "dirty", that is outdated and in need of updating.
+     */
+    private boolean cachedActivationsDirty = true;
+
+    /**
      * References to neurons in this collection
      */
-    private List<Neuron> neuronList = new CopyOnWriteArrayList<>();
+    private final List<Neuron> neuronList = new CopyOnWriteArrayList<>();
 
     /**
      * Maintains a matrix of data that can be used to send inputs to this neuron collection.
@@ -72,7 +82,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
      * Default constructor.
      */
     public AbstractNeuronCollection(Network net) {
-        super(100); // TODO
         parentNetwork = net;
         inputManager = new ActivationInputManager(this);
         subsamplingManager = new SubsamplingManager(this);
@@ -192,7 +201,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
 
     private Runnable createFireLocationChange() {
         AtomicReference<Timer> timer = new AtomicReference<>();
-        timer.set(null);
+        timer.set(null); // debouncing
         return () -> {
             var thisTimer = timer.get();
             if (thisTimer != null) {
@@ -228,24 +237,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     }
 
     /**
-     * Force set activations of neurons using an array of doubles. Assumes the order of the items in the array should
-     * match the order of items in the neuronlist.
-     * <p>
-     * Does not throw an exception if the provided input array and neuron list do not match in size.
-     *
-     * @param inputs the input vector as a double array.
-     */
-    @Consumable()
-    public void forceSetActivations(double[] inputs) {
-        for (int i = 0, n = size(); i < n; i++) {
-            if (i >= inputs.length) {
-                break;
-            }
-            neuronList.get(i).forceSetActivation(inputs[i]);
-        }
-    }
-
-    /**
      * True if the group contains the specified neuron.
      *
      * @param n neuron to check for.
@@ -267,17 +258,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     }
 
     /**
-     * Set all activations to a specified value.
-     *
-     * @param value the value to set the neurons to
-     */
-    public void setActivationLevels(final double value) {
-        for (Neuron n : getNeuronList()) {
-            n.setActivation(value);
-        }
-    }
-
-    /**
      * Force set all activations to a specified value.
      *
      * @param value the value to set the neurons to
@@ -286,21 +266,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         for (Neuron n : getNeuronList()) {
             n.forceSetActivation(value);
         }
-    }
-
-    /**
-     * Copy activations from one neuron group to this one.
-     *
-     * @param toCopy the group to copy activations from.
-     */
-    public void copyActivations(AbstractNeuronCollection toCopy) {
-        int i = 0;
-        for (Neuron neuron : toCopy.getNeuronList()) {
-            if (i < neuronList.size()) {
-                neuronList.get(i).setActivation(neuron.getInputValue() + neuron.getActivation());
-                neuronList.get(i++).setSpike(neuron.isSpike());
-            }
-        }
+        cachedActivationsDirty = true;
     }
 
     /**
@@ -310,6 +276,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomize();
         }
+        invalidateCachedActivations();
     }
 
     /**
@@ -322,6 +289,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomizeBias(lower, upper);
         }
+        invalidateCachedActivations();
     }
 
     /**
@@ -372,16 +340,6 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
 
     public abstract void setNeuronType(String rule);
 
-    /**
-     * Set all activations to 0.
-     */
-    public void clearActivations() {
-        for (Neuron n : this.getNeuronList()) {
-            n.clear();
-        }
-    }
-
-
     @Override
     public void updateInputs() {
         // if (inputManager.getData() == null) {
@@ -389,30 +347,47 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         // }
         // inputManager.applyCurrentRow(); // TODO
 
-        // Set inputs to current activations
-        for (int i=0; i<size(); ++i) {
-            super.getInputs()[i] = neuronList.get(i).getActivation();
-        }
-        // Add weighted inputs
+        // Add weighted inputs to inputs
         addInputs(getWeightedInputs());
     }
 
     @Override
-    public void updateBuffer() {
-        // TODO
-        copyToBuffer(getInputs());
+    public void update() {
+        setActivations(getInputs());
         if (activationRecorder.isRecording()) {
             activationRecorder.writeActsToFile();
         }
     }
 
+    @Producible(arrayDescriptionMethod = "getLabelArray")
     @Override
-    public void updateStateFromBuffer() {
-        copyBufferToActivation();
-        for (int i=0; i<size(); ++i) {
-            // TODO: should be setInputs
-            neuronList.get(i).forceSetActivation(super.getActivations()[i]);
+    public double[] getActivations() {
+        if (cachedActivationsDirty) {
+            activations = neuronList.stream()
+                    .map(Neuron::getActivation)
+                    .mapToDouble(Double::doubleValue)
+                    .toArray();
+            cachedActivationsDirty = false;
+            return activations;
+        } else {
+            return activations;
         }
+    }
+
+    @Override
+    public void addInputs(double[] inputs) {
+        int size = Math.min(inputs.length, neuronList.size());
+        for (int i = 0; i < size; i++) {
+            neuronList.get(i).addInputValue(inputs[i]);
+        }
+    }
+
+    @Override
+    protected double[] getInputs() {
+        return neuronList.stream()
+                .map(Neuron::getInput)
+                .mapToDouble(Double::doubleValue)
+                .toArray();
     }
 
     @Override
@@ -559,45 +534,37 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     }
 
     /**
-     * Adds input values.  Useful when doing a many to one coupling.
-     */
-    @Consumable()
-    public void addInputValues(double[] inputs) {
-        for (int i = 0, n = size(); i < n; i++) {
-            if (i >= inputs.length) {
-                break;
-            }
-            neuronList.get(i).addInputValue(inputs[i]);
-        }
-    }
-
-    /**
      * Set activations of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
      * <p>
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
      *
-     * @param inputs the input vector as a double array.
+     * @param activations the input vector as a double array.
      */
     @Consumable()
-    public void setActivations(double[] inputs) {
-        for (int i = 0, n = size(); i < n; i++) {
-            if (i >= inputs.length) {
-                break;
-            }
-            neuronList.get(i).setActivation(inputs[i]);
+    public void setActivations(double[] activations) {
+        int size = Math.min(activations.length, neuronList.size());
+        for (int i = 0; i < size; i++) {
+            neuronList.get(i).setActivation(activations[i]);
         }
+        cachedActivationsDirty = true;
     }
 
-    @Producible(arrayDescriptionMethod = "getLabelArray")
-    @Override
-    public double[] getActivations() {
-        for (int ii=0; ii<size(); ++ii) {
-            super.getActivations()[ii] = neuronList.get(ii).getActivation();
-        }
-        return super.getActivations();
+    protected void invalidateCachedActivations() {
+        cachedActivationsDirty = true;
     }
+
+    //TODO
+    @Consumable()
+    public void forceSetActivations(double[] activations) {
+        int size = Math.min(activations.length, neuronList.size());
+        for (int i = 0; i < size; i++) {
+            neuronList.get(i).forceSetActivation(activations[i]);
+        }
+        cachedActivationsDirty = true;
+    }
+
 
     /**
      * Returns an array of labels, one for each neuron this group.

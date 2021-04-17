@@ -623,7 +623,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             filterSelectedModels<Neuron>().forEach { it.clear() }
             filterSelectedModels<Synapse>().forEach { it.forceSetStrength(0.0) }
             filterSelectedModels<NeuronArray>().forEach { it.clear() }
-            filterSelectedModels<NeuronGroup>().forEach { it.clearActivations() }
+            filterSelectedModels<NeuronGroup>().forEach { it.clear() }
             filterSelectedModels<WeightMatrix>().forEach { it.clear() }
         }
     }
@@ -631,7 +631,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     fun selectNeuronsInNeuronGroups() {
         selectionManager.filterSelectedNodes<NeuronGroupNode>().forEach { it.selectNeurons() }
     }
-
 
     fun clearNeurons() {
         filterScreenElements<NeuronNode>().forEach { it.neuron.clear() }

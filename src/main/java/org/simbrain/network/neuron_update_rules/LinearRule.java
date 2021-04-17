@@ -99,7 +99,7 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
             val = clip(val);
         }
 
-        neuron.setBuffer(val);
+        neuron.setActivation(val);
     }
 
     @Override

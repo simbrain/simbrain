@@ -69,11 +69,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
         events.fireLocationChange();
     }
 
-    @Override
-    public void update() {
-        super.update();
-    }
-
     /**
      * Call after deleting neuron collection from parent network.
      */
@@ -104,7 +99,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public String toString() {

@@ -205,7 +205,6 @@ class Network {
     fun updateNeuronsByPriority() {
         for (neuron in prioritySortedNeuronList) {
             neuron.update()
-            neuron.updateStateFromBuffer()
         }
     }
 
@@ -214,8 +213,7 @@ class Network {
      */
     fun bufferedUpdate() {
         networkModels.all.forEach { it.updateInputs() }
-        networkModels.all.forEach { it.updateBuffer() }
-        networkModels.all.forEach { it.updateStateFromBuffer() }
+        networkModels.all.forEach { it.update() }
     }
 
     /**
@@ -724,10 +722,10 @@ private val deserializationOrder: List<Class<out NetworkModel>> = listOf(
 fun updateNeurons(neuronList: List<Neuron>) {
     // TODO: Update by priority if priority based update?
     for (neuron in neuronList) {
-        neuron.updateBuffer()
+        neuron.updateInputs()
     }
     for (neuron in neuronList) {
-        neuron.updateStateFromBuffer()
+        neuron.update()
     }
 }
 

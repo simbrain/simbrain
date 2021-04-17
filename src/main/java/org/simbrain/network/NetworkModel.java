@@ -25,30 +25,14 @@ public abstract class NetworkModel {
     private String label = "";
 
     /**
-     * First part of async updating. For each component, update the input using by summing over states of other
-     * components, weighted by any components in between.
+     * First pass of updating. Generally a "weighted input".
      */
     public void updateInputs() {}
 
     /**
-     * Set buffer values as second part of async updating. The only things that need to be
-     * buffered are values that communicate with the rest of the network.
+     * Update the state of the model, based in part on weighted inputs set in {@link #updateInputs()}
      */
-    public void updateBuffer() {}
-
-    /**
-     * Apply buffers to current state as third part of async updating.
-     */
-    public void updateStateFromBuffer() {}
-
-    /**
-     * Immediately update the model.
-     */
-    public void update() {
-        updateBuffer();
-        updateStateFromBuffer();
-        getEvents().fireUpdated();
-    }
+    public void update() {}
 
     /**
      * Return a reference to that model type's instance of [NetworkModelEvent]

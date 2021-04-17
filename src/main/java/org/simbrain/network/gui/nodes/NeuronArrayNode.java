@@ -298,8 +298,6 @@ public class NeuronArrayNode extends ScreenElement {
         contextMenu.add(switchStyleMenu);
         contextMenu.addSeparator();
 
-
-
         // Randomize Action
         Action randomizeAction = new AbstractAction("Randomize") {
             {
@@ -323,7 +321,7 @@ public class NeuronArrayNode extends ScreenElement {
                 dialog.setContentPane(new SimbrainJTableScrollPanel(
                         SimbrainJTable.createTable(arrayData)));
                 dialog.addClosingTask(() -> {
-                    neuronArray.setInputs(arrayData.getVectorCurrentRow());
+                    neuronArray.addInputs(arrayData.getVectorCurrentRow());
                     neuronArray.update();
                 });
                 dialog.pack();

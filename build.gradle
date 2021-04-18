@@ -107,11 +107,12 @@ task runSim(type: JavaExec) {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "10"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.experimental.ExperimentalTypeInference"
+    kotlinOptions.useIR = true
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "10"
 }
 

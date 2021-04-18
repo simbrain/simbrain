@@ -1,9 +1,6 @@
 package org.simbrain.network.gui
 
 //import org.simbrain.network.dl4j.MultiLayerNet
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
@@ -179,72 +176,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             field = guiOn
         }
 
-    /**
-     * Main initialization of the network panel.
-     */
-    init {
-        super.setLayout(BorderLayout())
-
-        canvas.apply {
-            // Always render in high quality
-            setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)
-            animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
-            interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
-
-            // Remove default event listeners
-            removeInputEventListener(panEventHandler)
-            removeInputEventListener(zoomEventHandler)
-
-            // Event listeners
-            addInputEventListener(MouseEventHandler(this@NetworkPanel))
-            addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
-            addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
-            addInputEventListener(textHandle)
-            addInputEventListener(WandEventHandler(this@NetworkPanel));
-
-            // Don't show text when the canvas is sufficiently zoomed in
-            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                filterScreenElements<NeuronNode>().forEach { it.updateTextVisibility() }
-            }
-        }
-
-        // Init network change listeners
-        addNetworkListeners()
-
-        toolbars.apply {
-
-            cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
-            val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
-            add("Center", JPanel(flowLayout).apply {
-                add(mainToolBar)
-                add(runToolBar)
-                add(editToolBar)
-            })
-        }
-
-        add("North", toolbars)
-        add("Center", canvas)
-        add("South", JToolBar().apply { add(timeLabel) })
-
-        // Register support for tool tips
-        // TODO: might be a memory leak, if not unregistered when the parent frame is removed
-        // TODO: copy from old code. Re-verify.
-        ToolTipManager.sharedInstance().registerComponent(this)
-
-        addKeyBindings()
-
-        // Repaint whenever window is opened or changed.
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(arg0: ComponentEvent) {
-                zoomToFitPage()
-            }
-        })
-
-        // Add all network elements (important for de-serializing)
-        network.allModelsInDeserializationOrder.forEach{ createNode(it) }
-
-    }
-
 
     @Deprecated("Use selectionManager instead.", ReplaceWith("selectionManager.selection"))
     val selectedNodes
@@ -270,27 +201,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         this.updateComplete.set(if (updateComplete) 0 else 3)
     }
 
-    fun zoomToFitPage() {
-        GlobalScope.launch(Dispatchers.Main) {
-            zoomToFitPage(false)
-        }
-    }
-
-    /**
-     * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
-     *
-     * @param forceZoom if true force the zoom to happen
-     */
-//    fun zoomToFitPage(forceZoom: Boolean) {
-//        // TODO: Add a check to see if network is running
-//        if (autoZoom && editMode.isSelection || forceZoom) {
-//            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
-//            val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
-//                    filtered.getWidth() + 20, filtered.getHeight() + 20)
-//            canvas.camera.setViewBounds(adjustedFiltered)
-//        }
-//    }
-
     val zoomToFitPage = fun (): (Boolean) -> Unit {
         var timer: Timer? = null
         return fun (forceZoom: Boolean) {
@@ -310,6 +220,25 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             }
         }
     }()
+
+    fun zoomToFitPage() {
+        zoomToFitPage(false)
+    }
+
+    /**
+     * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
+     *
+     * @param forceZoom if true force the zoom to happen
+     */
+//    fun zoomToFitPage(forceZoom: Boolean) {
+//        // TODO: Add a check to see if network is running
+//        if (autoZoom && editMode.isSelection || forceZoom) {
+//            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
+//            val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
+//                    filtered.getWidth() + 20, filtered.getHeight() + 20)
+//            canvas.camera.setViewBounds(adjustedFiltered)
+//        }
+//    }
 
     /**
      * Returns all nodes in the canvas.
@@ -793,6 +722,72 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     fun redo() {
         println("Initial testing on redo...")
         undoManager.redo()
+    }
+
+    /**
+     * Main initialization of the network panel.
+     */
+    init {
+        super.setLayout(BorderLayout())
+
+        canvas.apply {
+            // Always render in high quality
+            setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)
+            animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
+            interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
+
+            // Remove default event listeners
+            removeInputEventListener(panEventHandler)
+            removeInputEventListener(zoomEventHandler)
+
+            // Event listeners
+            addInputEventListener(MouseEventHandler(this@NetworkPanel))
+            addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
+            addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
+            addInputEventListener(textHandle)
+            addInputEventListener(WandEventHandler(this@NetworkPanel));
+
+            // Don't show text when the canvas is sufficiently zoomed in
+            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
+                filterScreenElements<NeuronNode>().forEach { it.updateTextVisibility() }
+            }
+        }
+
+        // Init network change listeners
+        addNetworkListeners()
+
+        toolbars.apply {
+
+            cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+            val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
+            add("Center", JPanel(flowLayout).apply {
+                add(mainToolBar)
+                add(runToolBar)
+                add(editToolBar)
+            })
+        }
+
+        add("North", toolbars)
+        add("Center", canvas)
+        add("South", JToolBar().apply { add(timeLabel) })
+
+        // Register support for tool tips
+        // TODO: might be a memory leak, if not unregistered when the parent frame is removed
+        // TODO: copy from old code. Re-verify.
+        ToolTipManager.sharedInstance().registerComponent(this)
+
+        addKeyBindings()
+
+        // Repaint whenever window is opened or changed.
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(arg0: ComponentEvent) {
+                zoomToFitPage()
+            }
+        })
+
+        // Add all network elements (important for de-serializing)
+        network.allModelsInDeserializationOrder.forEach{ createNode(it) }
+
     }
 
 }

@@ -1,7 +1,10 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
-import org.simbrain.network.util.*
+import org.simbrain.network.core.activations
+import org.simbrain.network.core.auxValues
+import org.simbrain.network.core.labels
+import org.simbrain.network.core.networkUpdateAction
 import org.simbrain.util.component1
 import org.simbrain.util.component2
 import org.simbrain.util.environment.SmellSource

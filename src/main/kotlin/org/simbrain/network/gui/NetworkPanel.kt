@@ -9,10 +9,7 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
@@ -30,7 +27,6 @@ import org.simbrain.network.smile.SmileSVM
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.network.trainers.TrainingSet
-import org.simbrain.network.util.activations
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.widgets.EditablePanel
@@ -221,24 +217,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
     }()
 
-    fun zoomToFitPage() {
-        zoomToFitPage(false)
-    }
-
     /**
      * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
      *
      * @param forceZoom if true force the zoom to happen
      */
-//    fun zoomToFitPage(forceZoom: Boolean) {
-//        // TODO: Add a check to see if network is running
-//        if (autoZoom && editMode.isSelection || forceZoom) {
-//            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
-//            val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
-//                    filtered.getWidth() + 20, filtered.getHeight() + 20)
-//            canvas.camera.setViewBounds(adjustedFiltered)
-//        }
-//    }
+    fun zoomToFitPage() {
+        zoomToFitPage(false)
+    }
 
     /**
      * Returns all nodes in the canvas.

@@ -1,6 +1,8 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -8,11 +10,10 @@ import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.Polarity
-import org.simbrain.util.SimbrainPreferences
-import org.simbrain.util.SimpleIdManager
-import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
+import java.awt.geom.Point2D
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -64,7 +65,7 @@ class Network {
      */
     @Transient
     var events = NetworkEvents(this)
-    private set
+        private set
 
     /**
      * Main data structure containing all [NetworkModel]s: neurons, synapses, etc.
@@ -122,7 +123,7 @@ class Network {
      * priorities WITHIN the group... To be resolved.
      */
     var prioritySortedNeuronList: ArrayList<Neuron> = ArrayList()
-    private set
+        private set
 
     /**
      * Manage ids for all network elements.
@@ -153,8 +154,8 @@ class Network {
         current_id++
     }
 
-    fun <T: NetworkModel> getModels(cls: Class<T>) = networkModels[cls]
-    inline fun <reified T: NetworkModel> getModels() = getModels(T::class.java)
+    fun <T : NetworkModel> getModels(cls: Class<T>) = networkModels[cls]
+    inline fun <reified T : NetworkModel> getModels() = getModels(T::class.java)
 
     val allModels get() = networkModels.all
     val allModelsInDeserializationOrder get() = networkModels.allInDeserializationOrder
@@ -386,7 +387,11 @@ class Network {
      * @return the precision of the current time step.
      */
     private fun getTimeStepPrecision(): Int = ceil(ln(timeStep) / LOG_10).toInt().let {
-        if (it < 0) { abs(it) + 1 } else { 0 }
+        if (it < 0) {
+            abs(it) + 1
+        } else {
+            0
+        }
     }
 
     /**
@@ -552,7 +557,6 @@ class Network {
         updateManager.addAction(action)
     }
 
-
     /**
      * Adds a list of network elements to this network. Used in copy / paste.
      *
@@ -575,7 +579,6 @@ class Network {
         }
     }
 
-
     /**
      * Freeze or unfreeze all synapses in the network.
      *
@@ -592,16 +595,66 @@ class Network {
         }
     }
 
-
     var isRunning: Boolean
         get() = _isRunning.get()
-        set(value) { _isRunning.set(value) }
+        set(value) {
+            _isRunning.set(value)
+        }
 
     val isRedrawTime: Boolean = oneOffRun || (iterCount % updateFreq == 0)
 
     val looseNeurons get() = networkModels.get<Neuron>()
 
+    fun addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
+        .apply(block)
+        .also(this::addNetworkModel)
 
+    fun addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
+        .apply(block)
+        .also(this::addNetworkModel)
+
+    fun addNeuronGroup(count: Int, template: Neuron.() -> Unit = { }) = NeuronGroup(this, List(count) {
+        Neuron(this).apply(template)
+    }).also { addNetworkModel(it) }
+
+    fun addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
+        return NeuronGroup(this, List(count) {
+            Neuron(this).apply(template)
+        }).also {
+            addNetworkModel(it)
+            if (location != null) {
+                val (x, y) = location
+                it.setLocation(x, y)
+            }
+        }
+    }
+
+    fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
+        return AllToAll().connectAllToAll(source.neuronList, target.neuronList)
+    }
+
+    fun createNeuronGroupTemplate(template: NeuronGroup.() -> Unit) = fun Network.(
+        count: Int,
+        template: Neuron.() -> Unit
+    ) = NeuronGroup(this, List(count) {
+        Neuron(this).apply(template)
+    }).also { addNetworkModel(it) }
+
+    fun <R> Network.withConnectionStrategy(
+        connectionStrategy: ConnectionStrategy,
+        block: NetworkWithConnectionStrategy.() -> R
+    ): R {
+        return NetworkWithConnectionStrategy(this, connectionStrategy).run(block)
+    }
+
+    data class NetworkWithConnectionStrategy(
+        private val network: Network,
+        private val connectionStrategy: ConnectionStrategy
+    ) {
+        fun connect(source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+            return connectionStrategy.connectNeurons(network, source, target)
+        }
+    }
 
 
     /**
@@ -657,7 +710,7 @@ class Network {
         }
 
         @Suppress("UNCHECKED_CAST")
-        inline fun <reified T: NetworkModel> get() = get(T::class.java)
+        inline fun <reified T : NetworkModel> get() = get(T::class.java)
 
         //TODO
         fun unsafeGet(modelClass: Class<*>?): LinkedHashSet<*> {
@@ -737,3 +790,40 @@ fun updateNeurons(neuronList: List<Neuron>) {
  * @return synapse from source to target
  */
 fun getLooseSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
+
+/**
+ * Convenient access to a list of activations
+ */
+var List<Neuron?>.activations: List<Double>
+    get() = map { it?.activation ?: 0.0 }
+    set(values) = values.forEachIndexed { index, value ->
+        this[index]?.let { neuron ->
+            if (neuron.isClamped) {
+                neuron.forceSetActivation(value)
+            } else {
+                neuron.activation = value
+            }
+        }
+    }
+
+var List<Neuron?>.labels: List<String>
+    get() = map { it?.label ?: "" }
+    set(values) = values.forEachIndexed { index, label ->
+        this[index]?.let { it.label = label }
+    }
+
+var List<Neuron>.auxValues: List<Double>
+    get() = map { it.auxValue }
+    set(values) = values.forEachIndexed { index, value ->
+        this[index].auxValue = value
+    }
+
+val List<Synapse>.lengths: List<Double>
+    get() = map { it.length }
+
+fun networkUpdateAction(description: String, longDescription: String = description, action: () -> Unit) =
+    object : NetworkUpdateAction {
+        override fun invoke() = action()
+        override fun getDescription(): String = description
+        override fun getLongDescription(): String = longDescription
+    }

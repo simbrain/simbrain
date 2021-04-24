@@ -7,12 +7,10 @@ import org.simbrain.custom_sims.placeComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.activations
 import org.simbrain.network.neuron_update_rules.BinaryRule
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
-import org.simbrain.network.util.activations
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
-import org.simbrain.util.sse
 import java.io.File
 import java.util.*
 

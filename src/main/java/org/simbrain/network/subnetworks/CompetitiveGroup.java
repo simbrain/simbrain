@@ -195,7 +195,7 @@ public class CompetitiveGroup extends NeuronGroup {
             Neuron neuron = getNeuronList().get(i);
             if (i == winner) {
                 neuron.setActivation(winValue);
-                neuron.setSpkBuffer(neuron.isSpike());
+                neuron.setSpike(neuron.isSpike());
                 if (updateMethod == UpdateMethod.RUMM_ZIPSER) {
                     rummelhartZipser(neuron);
                 } else if (updateMethod == UpdateMethod.ALVAREZ_SQUIRE) {
@@ -204,7 +204,7 @@ public class CompetitiveGroup extends NeuronGroup {
                 }
             } else {
                 neuron.setActivation(loseValue);
-                neuron.setSpkBuffer(neuron.isSpike());
+                neuron.setSpike(neuron.isSpike());
                 if (useLeakyLearning) {
                     leakyLearning(neuron);
                 }

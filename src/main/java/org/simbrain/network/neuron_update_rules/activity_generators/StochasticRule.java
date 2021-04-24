@@ -64,13 +64,13 @@ public class StochasticRule extends SpikingNeuronUpdateRule implements ActivityG
     public void update(Neuron neuron) {
         double rand = Math.random();
         if (rand > 1 - firingProbability) {
-            neuron.setSpkBuffer(true);
+            neuron.setSpike(true);
             setHasSpiked(true, neuron);
-            neuron.setBuffer(1);
+            neuron.setActivation(1);
         } else {
-            neuron.setSpkBuffer(false);
+            neuron.setSpike(false);
             setHasSpiked(false, neuron);
-            neuron.setBuffer(0); // Make this a separate variable?
+            neuron.setActivation(0); // Make this a separate variable?
         }
     }
 

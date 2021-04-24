@@ -167,7 +167,7 @@ public class OperantConditioning extends RegisteredSimulation {
 
         panel.addButton("Reward", () -> {
             learn(1);
-            rewardNeuron.setInputValue(1);
+            rewardNeuron.addInputValue(1);
             punishNeuron.forceSetActivation(0);
             sim.iterate();
        });
@@ -175,13 +175,13 @@ public class OperantConditioning extends RegisteredSimulation {
         panel.addButton("Punish", () -> {
             learn(-1);
             rewardNeuron.forceSetActivation(0);
-            punishNeuron.setInputValue(1);
+            punishNeuron.addInputValue(1);
             sim.iterate();
         });
 
         panel.addButton("Do nothing", () -> {
             rewardNeuron.forceSetActivation(0);
-            punishNeuron.setInputValue(0);
+            punishNeuron.addInputValue(0);
             sim.iterate();
         });
 

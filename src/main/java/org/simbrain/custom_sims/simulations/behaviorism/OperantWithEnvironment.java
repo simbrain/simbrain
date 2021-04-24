@@ -218,10 +218,10 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         winningNode = nodeIndex;
         for (int i = 0; i < behaviorNet.size(); i++) {
             if (i == nodeIndex) {
-                behaviorNet.getNeuron(i).setInputValue(1);
+                behaviorNet.getNeuron(i).addInputValue(1);
                 behaviorNet.getNeuron(i).setActivation(1);
             } else {
-                behaviorNet.getNeuron(i).setInputValue(0);
+                behaviorNet.getNeuron(i).addInputValue(0);
                 behaviorNet.getNeuron(i).setActivation(0);
             }
         }

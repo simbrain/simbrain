@@ -22,11 +22,11 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -242,7 +242,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                 for (int i = 0, n = neurons.size(); i < n; i++) {
                     neuron = neurons.get(i);
                     neuron.update();
-                    neuron.setActivation(neuron.getBuffer());
+                    neuron.setActivation(neuron.getActivation());
                 }
             }
 
@@ -268,14 +268,14 @@ public class Hopfield extends Subnetwork implements Trainable {
                         // the list every iteration.
                         if (hop.getNeuronSet().contains(n)) {
                             n.update();
-                            n.setActivation(n.getBuffer());
+                            n.setActivation(n.getActivation());
                         }
                     }
                 } else {
                     neurons = hop.getFlatNeuronList();
                     for (Neuron n : neurons) {
                         n.update();
-                        n.setActivation(n.getBuffer());
+                        n.setActivation(n.getActivation());
                     }
                 }
 
@@ -299,7 +299,7 @@ public class Hopfield extends Subnetwork implements Trainable {
                     n.update();
                 }
                 for (Neuron n : neurons) {
-                    n.setActivation(n.getBuffer());
+                    n.setActivation(n.getActivation());
                 }
             }
 

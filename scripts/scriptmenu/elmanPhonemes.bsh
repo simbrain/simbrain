@@ -169,7 +169,7 @@ void buildReaderWorld() {
 
     // Couple reader world to network
     PotentialProducer readerWorldProducer = readerWorldComponent.getPotentialProducers().get(0); // Assumes vector thing is first
-    PotentialConsumer inputLayerConsumer = networkComponent.getAttributeManager().createPotentialConsumer(srn.getInputLayer(),"setInputValues", double[].class);
+    PotentialConsumer inputLayerConsumer = networkComponent.getAttributeManager().createPotentialConsumer(srn.getInputLayer(),"addInputValues", double[].class);
     workspace.getCouplingManager().addCoupling(new Coupling(readerWorldProducer, inputLayerConsumer));
 }
 

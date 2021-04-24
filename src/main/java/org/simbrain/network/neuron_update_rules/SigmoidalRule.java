@@ -64,7 +64,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
 
         // val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());
 
-        neuron.setBuffer(val);
+        neuron.setActivation(val);
     }
 
     @Override

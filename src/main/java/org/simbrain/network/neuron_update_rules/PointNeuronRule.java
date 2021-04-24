@@ -22,7 +22,6 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -287,7 +286,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
     public void clear(final Neuron neuron) {
         membranePotential = DEFAULT_MEMBRANE_POTENTIAL;
         neuron.setActivation(0);
-        neuron.setBuffer(0);
+        neuron.setActivation(0);
         excitatoryConductance = 0;
         inhibitoryConductance = 0;
         leakConductance = 0;
@@ -326,23 +325,23 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
         // Apply output function. (p. 45-48)
         if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
             if (membranePotential > thresholdPotential) {
-                neuron.setBuffer(1);
+                neuron.setActivation(1);
                 membranePotential = refractoryPotential;
             } else {
-                neuron.setBuffer(0);
+                neuron.setActivation(0);
             }
         } else if (outputFunction == OutputFunction.RATE_CODE) {
             double val = (gain * getPositiveComponent(membranePotential - thresholdPotential)) / (gain * getPositiveComponent(membranePotential - thresholdPotential) + 1);
             // TODO: Correct way to bias for this rule?
-            neuron.setBuffer(val + bias);
+            neuron.setActivation(val + bias);
         } else if (outputFunction == OutputFunction.LINEAR) {
             double val = gain * getPositiveComponent(membranePotential - thresholdPotential);
             // TODO: Correct way to bias for this rule?
-            neuron.setBuffer(val + bias);
+            neuron.setActivation(val + bias);
         } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
-            neuron.setBuffer(1); // TODO: Complete this implementation
+            neuron.setActivation(1); // TODO: Complete this implementation
         } else if (outputFunction == OutputFunction.NONE) {
-            neuron.setBuffer(membranePotential);
+            neuron.setActivation(membranePotential);
         }
 
         // Display current values of variables for diagnostics.

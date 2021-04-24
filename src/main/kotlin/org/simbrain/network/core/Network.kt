@@ -169,7 +169,6 @@ class Network {
         // Main update
         updateManager.invokeAllUpdates()
 
-        //clearInputs();
         updateTime()
         events.fireUpdateTimeDisplay(false)
         iterCount++
@@ -215,19 +214,6 @@ class Network {
     fun bufferedUpdate() {
         networkModels.all.forEach { it.updateInputs() }
         networkModels.all.forEach { it.update() }
-    }
-
-    /**
-     * Clears out input values of network nodes, which otherwise linger and cause problems.
-     */
-    fun clearInputs() {
-
-        // TODO: Is there a more efficient way to handle this?
-        // i.e. a way to get a list of neurons that (1) are coupled or better,
-        // (2) have input values which consume.
-        for (neuron in flatNeuronList) {
-            neuron.inputValue = 0.0
-        }
     }
 
     /**

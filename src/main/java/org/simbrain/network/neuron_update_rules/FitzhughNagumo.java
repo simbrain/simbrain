@@ -132,14 +132,14 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
         // v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs) );
         // You want this
         if (v >= threshold) {
-            neuron.setSpkBuffer(true);
+            neuron.setSpike(true);
             setHasSpiked(true, neuron);
         } else {
-            neuron.setSpkBuffer(false);
+            neuron.setSpike(false);
             setHasSpiked(false, neuron);
         }
         //till here
-        neuron.setBuffer(v);
+        neuron.setActivation(v);
     }
 
     @Override

@@ -17,8 +17,8 @@ import org.simbrain.util.math.DecayFunction;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.world.odorworld.OdorWorld;
@@ -277,7 +277,7 @@ public class ActorCritic extends RegisteredSimulation {
         // Set up couplings
         Producer gridProducer = sim.getProducer(sensor, "getValues");
         gridProducer.setDescription(sensor.getLabel());
-        Consumer ngConsumer = sim.getConsumer(sensorNeurons, "setInputValues");
+        Consumer ngConsumer = sim.getConsumer(sensorNeurons, "addInputValues");
         Coupling gridCoupling = sim.createCoupling(gridProducer, ngConsumer);
         sensorCouplings.add(gridCoupling);
         setCouplings(oc, nc);

@@ -183,7 +183,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
             val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
         }
 
-        neuron.setBuffer(val);
+        neuron.setActivation(val);
     }
 
     @Override

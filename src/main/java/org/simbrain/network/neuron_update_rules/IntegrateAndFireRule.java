@@ -194,15 +194,15 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         }
 
         if ((memPotential >= threshold) && (neuron.getNetwork().getTime() > (getLastSpikeTime() + refractoryPeriod))) {
-            neuron.setSpkBuffer(true);
+            neuron.setSpike(true);
             setHasSpiked(true, neuron);
             memPotential = resetPotential;
         } else {
-            neuron.setSpkBuffer(false);
+            neuron.setSpike(false);
             setHasSpiked(false, neuron);
         }
 
-        neuron.setBuffer(memPotential);
+        neuron.setActivation(memPotential);
     }
 
     @Override

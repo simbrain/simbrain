@@ -315,9 +315,9 @@ public class Cerebellum extends RegisteredSimulation {
                     // dampedTarget = target.getActivation();
                     // double dopDelt = gamma * (dampedTarget -
                     // output.getActivation());
-                    // dopamine.setInputValue(dopamine.getActivation() +
+                    // dopamine.addInputValue(dopamine.getActivation() +
                     // dopDelt);
-                    dopamine.setInputValue(
+                    dopamine.addInputValue(
                         target.getActivation() - output.getActivation());
 
                     // Update parallel fiber weights

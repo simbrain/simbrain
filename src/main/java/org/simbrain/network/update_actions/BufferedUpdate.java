@@ -41,7 +41,6 @@ public class BufferedUpdate implements NetworkUpdateAction {
     @Override
     public void invoke() {
         network.bufferedUpdate();
-        network.clearInputs();
     }
 
     @Override

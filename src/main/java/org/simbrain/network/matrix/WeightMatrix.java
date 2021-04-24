@@ -140,16 +140,9 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
 
     @Consumable
     public void setWeights(double[] newWeights) {
-        // TODO: No library for this? Unit test needed.
-        int k = 0;
-        for (int i = 0; i < weightMatrix.nrows(); i++) {
-            for (int j = 0; j < weightMatrix.ncols(); j++) {
-                if (++k < newWeights.length) {
-                    weightMatrix.set(i,j,newWeights[k]);
-                } else {
-                    break;
-                }
-            }
+        int len = Math.min((int) weightMatrix.size(), newWeights.length);
+        for (int i = 0; i < len; i++) {
+            weightMatrix.set(i / weightMatrix.ncols(), i % weightMatrix.ncols(), newWeights[i]);
         }
         events.fireUpdated();
     }

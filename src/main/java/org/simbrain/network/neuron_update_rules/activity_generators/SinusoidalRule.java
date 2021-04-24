@@ -98,7 +98,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerato
             val += noiseGenerator.getRandom();
         }
 
-        neuron.setBuffer(val);
+        neuron.setActivation(val);
     }
 
     @Override

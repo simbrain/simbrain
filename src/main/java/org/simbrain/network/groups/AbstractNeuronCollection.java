@@ -524,12 +524,12 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
      * @param inputs the input vector as a double array.
      */
     @Consumable()
-    public void setInputValues(double[] inputs) {
+    public void addInputValues(double[] inputs) {
         for (int i = 0, n = size(); i < n; i++) {
             if (i >= inputs.length) {
                 break;
             }
-            neuronList.get(i).setInputValue(inputs[i]);
+            neuronList.get(i).addInputValue(inputs[i]);
         }
     }
 

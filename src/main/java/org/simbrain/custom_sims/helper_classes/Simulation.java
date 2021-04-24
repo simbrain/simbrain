@@ -15,7 +15,10 @@ import org.simbrain.util.ResourceManager;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumer;
+import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingManager;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -329,7 +332,7 @@ public class Simulation {
         if(forceSet) {
             sensoryConsumer = getConsumer(neuron, "forceSetActivation");
         } else {
-            sensoryConsumer = getConsumer(neuron, "setInputValue");
+            sensoryConsumer = getConsumer(neuron, "addInputValue");
         }
         createCoupling(sensoryProducer, sensoryConsumer);
     }
@@ -349,10 +352,10 @@ public class Simulation {
         Consumer sensoryConsumer;
         // TODO: Rules for this not clear? add a parameter for forced or not
         if (ng.isSpikingNeuronGroup()) {
-            sensoryConsumer = getConsumer(ng, "setInputValues");
+            sensoryConsumer = getConsumer(ng, "addInputValues");
 
         } else {
-            sensoryConsumer = getConsumer(ng, "setInputValues");
+            sensoryConsumer = getConsumer(ng, "addInputValues");
         }
         createCoupling(sensoryProducer, sensoryConsumer);
     }

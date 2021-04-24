@@ -163,7 +163,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     }
 
     public void writeFromArr(Neuron neu, final double[] arr) {
-        neu.setBuffer(arr[offset]);
+        neu.setActivation(arr[offset]);
         netActivation = arr[offset + 2];
         leak = arr[offset + 3];
         tau = 1 / arr[offset + 4] * neu.getNetwork().getTimeStep();

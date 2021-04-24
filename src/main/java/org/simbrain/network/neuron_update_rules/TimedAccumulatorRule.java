@@ -2,7 +2,6 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.util.UserParameter;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -105,15 +104,15 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
             if (currentState > maxState) {
                 currentState = 0;
             }
-            neuron.setBuffer(currentState);
-            neuron.setSpkBuffer(false);
+            neuron.setActivation(currentState);
+            neuron.setSpike(false);
             setHasSpiked(false, neuron);
             return;
         }
         if (ThreadLocalRandom.current().nextDouble() < baseProb) {
             currentState++;
-            neuron.setBuffer(1);
-            neuron.setSpkBuffer(true);
+            neuron.setActivation(1);
+            neuron.setSpike(true);
             setHasSpiked(true, neuron);
             return;
         }
@@ -130,15 +129,15 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
                 // then set this to a 1 state from a 0 with that probability.
                 if (ThreadLocalRandom.current().nextDouble() < kappa * neuron.getFanInUnsafe().get(ii).getPsr() / expSum) {
                     currentState++;
-                    neuron.setBuffer(1);
-                    neuron.setSpkBuffer(true);
+                    neuron.setActivation(1);
+                    neuron.setSpike(true);
                     setHasSpiked(true, neuron);
                     return;
                 }
             }
         }
-        neuron.setBuffer(0);
-        neuron.setSpkBuffer(false);
+        neuron.setActivation(0);
+        neuron.setSpike(false);
         setHasSpiked(false, neuron);
     }
 

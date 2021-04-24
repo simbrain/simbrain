@@ -1,10 +1,10 @@
 package org.simbrain.custom_sims.simulations.sorn;
 
-import org.simbrain.network.core.*;
-import org.simbrain.network.neuron_update_rules.interfaces.*;
-import org.simbrain.network.neuron_update_rules.*;
-import org.simbrain.util.math.*;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * An implementation of the specific type of threshold neuron used in Lazar,
@@ -67,8 +67,8 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         // not in the refractory period
         boolean spk = outOfRef && (input >= getThreshold());
         setHasSpiked(spk, neuron);
-        neuron.setSpkBuffer(spk);
-        neuron.setBuffer(2*(input-getThreshold()));
+        neuron.setSpike(spk);
+        neuron.setActivation(2*(input-getThreshold()));
         plasticUpdate(neuron);
     }
 

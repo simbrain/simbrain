@@ -8,13 +8,13 @@ import static org.junit.Assert.assertEquals;
 
 public class WeightMatrixTest {
 
+    Network net = new Network();
+    NeuronGroup ng1 = new NeuronGroup(net, 2);
+    NeuronGroup ng2 = new NeuronGroup(net, 2);
+    WeightMatrix wm = new WeightMatrix(net, ng1, ng2);
+
     @Test
     public void testMatrixOperations() {
-
-        Network net = new Network();
-        NeuronGroup ng1 = new NeuronGroup(net, 2);
-        NeuronGroup ng2 = new NeuronGroup(net, 2);
-        WeightMatrix wm = new WeightMatrix(net, ng1, ng2);
 
         // Set first entry to 4
         long start_time = System.currentTimeMillis();
@@ -24,7 +24,7 @@ public class WeightMatrixTest {
         // Set to ((0,0);(0,0)) and check sum
         start_time = System.currentTimeMillis();
         wm.setWeights(new double[]{0, 0, 0, 0});
-        // System.out.println(wm);
+        System.out.println(wm.getWeightMatrix());
         assertEquals(0.0, wm.getWeightMatrix().sum(), 0.0);
 
         // Add 1 to each entry. Should get ((1,1);(1,1))
@@ -38,6 +38,15 @@ public class WeightMatrixTest {
         // wm.getWeightMatrix().mm(wm.getWeightMatrix());
         // System.out.println(wm);
         // assertEquals(8.0, wm.getWeightMatrix().sum(), 0.0);
+    }
+
+    @Test
+    public void testSetWeights() {
+        wm.setWeights(new double[]{1, 2, 3, 4});
+        assertEquals(1.0, wm.getWeightMatrix().get(0,0), 0.0);
+        assertEquals(2.0, wm.getWeightMatrix().get(0,1), 0.0);
+        assertEquals(3.0, wm.getWeightMatrix().get(1,0), 0.0);
+        assertEquals(4.0, wm.getWeightMatrix().get(1,1), 0.0);
     }
 
     // @Test

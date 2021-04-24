@@ -4,7 +4,7 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
-import org.simbrain.network.util.activations
+import org.simbrain.network.core.activations
 import org.simbrain.workspace.Workspace
 
 class GeneticsTest {

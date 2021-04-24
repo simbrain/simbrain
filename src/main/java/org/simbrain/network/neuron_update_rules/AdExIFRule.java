@@ -291,19 +291,19 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             v_mem = v_Peak;
             w = w + (b * CURRENT_CONVERTER);
             if (!refractory) {
-                neuron.setSpkBuffer(true);
+                neuron.setSpike(true);
                 setHasSpiked(true, neuron);
             } else {
-                neuron.setSpkBuffer(false);
+                neuron.setSpike(false);
                 setHasSpiked(false, neuron);
             }
         } else {
-            neuron.setSpkBuffer(false);
+            neuron.setSpike(false);
             setHasSpiked(false, neuron);
         }
 
         // Set the buffer to the membrane potential
-        neuron.setBuffer(v_mem);
+        neuron.setActivation(v_mem);
 
     }
 

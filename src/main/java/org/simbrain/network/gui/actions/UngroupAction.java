@@ -76,7 +76,7 @@ public final class UngroupAction extends AbstractAction {
      * Set action text based on number of selected neurons.
      */
     private void updateAction() {
-        int numSelected = networkPanel.getSelectedModels().size();
+        int numSelected = networkPanel.getSelectionManager().getSelectedModels().size();
         if (numSelected > 0) {
             setEnabled(true);
         } else {

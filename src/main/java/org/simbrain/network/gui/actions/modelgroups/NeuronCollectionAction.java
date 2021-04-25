@@ -50,7 +50,7 @@ public final class NeuronCollectionAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        List<Neuron> neuronList = getNetworkPanel().getSelectedModels(Neuron.class);
+        List<Neuron> neuronList = getNetworkPanel().getSelectionManager().filterSelectedModels(Neuron.class);
         if (neuronList.size() > 0) {
             NeuronCollection nc = getNetworkPanel().getNetwork().createNeuronCollection(neuronList);
             if (nc != null) {

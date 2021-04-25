@@ -1,6 +1,5 @@
 package org.simbrain.network.gui
 
-//import org.simbrain.network.dl4j.MultiLayerNet
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
@@ -171,23 +170,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             }
             field = guiOn
         }
-
-
-    @Deprecated("Use selectionManager instead.", ReplaceWith("selectionManager.selection"))
-    val selectedNodes
-        get() = selectionManager.selection
-
-    @Deprecated("User selectionManager instead", ReplaceWith("selectionManager.selectionOf(clazz)"))
-    fun <T : ScreenElement> getSelectedNodes(clazz: Class<T>) =
-            selectionManager.filterSelectedNodes(clazz)
-
-    @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModels"))
-    val selectedModels
-        get() = selectionManager.selection.map { it.model!! }
-
-    @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModelsOf(clazz)"))
-    fun <T : NetworkModel> getSelectedModels(clazz: Class<T>) =
-            selectionManager.selectedModels.filterIsInstance(clazz)
 
     /** TODO: Javadoc. */
     fun setUpdateComplete(updateComplete: Boolean) {

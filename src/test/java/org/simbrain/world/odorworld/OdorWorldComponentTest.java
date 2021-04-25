@@ -1,6 +1,6 @@
 package org.simbrain.world.odorworld;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
@@ -8,7 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OdorWorldComponentTest {
 

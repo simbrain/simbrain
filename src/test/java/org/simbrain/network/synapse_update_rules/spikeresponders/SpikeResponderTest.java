@@ -1,6 +1,6 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;

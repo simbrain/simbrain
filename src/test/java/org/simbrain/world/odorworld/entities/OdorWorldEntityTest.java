@@ -1,16 +1,17 @@
 package org.simbrain.world.odorworld.entities;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.simbrain.world.odorworld.OdorWorld;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class OdorWorldEntityTest {
 
     OdorWorld world;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         world = new OdorWorld();
     }

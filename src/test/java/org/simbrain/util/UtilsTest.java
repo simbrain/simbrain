@@ -1,11 +1,12 @@
 package org.simbrain.util;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-public class UtilsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class UtilsTest {
 
     @Test
     public void testGetDoubleMatrix() {

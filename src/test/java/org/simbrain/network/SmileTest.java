@@ -1,6 +1,6 @@
 package org.simbrain.network;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import smile.classification.KNN;
 import smile.classification.SVM;
 import smile.io.Read;
@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Testing the Smile package. https://haifengl.github.io/

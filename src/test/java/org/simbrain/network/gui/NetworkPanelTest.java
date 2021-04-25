@@ -1,11 +1,11 @@
 package org.simbrain.network.gui;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NetworkPanelTest {
 

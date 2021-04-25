@@ -1,12 +1,11 @@
 package org.simbrain.network.groups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
-import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NeuronGroupTest {
 

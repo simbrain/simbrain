@@ -1,7 +1,7 @@
 package org.simbrain.network.matrix
 
-import org.junit.Assert.assertArrayEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 
 class ArrayConnectableTest {

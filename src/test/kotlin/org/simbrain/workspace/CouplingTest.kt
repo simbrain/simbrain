@@ -1,8 +1,9 @@
 package org.simbrain.workspace
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
+
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -147,7 +148,7 @@ class CouplingTest {
         val expected = setOf("getLabel", "getActivation")
         val actual = with(couplingManager) { neuron.producers.map { it.method.name }.toSet() }
         val diff = expected complement actual // For error message if test fails
-        assertTrue("$diff", diff.isIdentical())
+        assertTrue(diff.isIdentical(),"$diff")
     }
 
     @Test
@@ -157,7 +158,7 @@ class CouplingTest {
         val expected = setOf("setActivation", "forceSetActivation", "addInputValue", "addInputValue", "setLabel")
         val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
         val diff = expected complement actual
-        assertTrue("$diff", diff.isIdentical())
+        assertTrue(diff.isIdentical(),"$diff")
     }
 
     @Test

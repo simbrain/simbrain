@@ -1,6 +1,6 @@
 // package org.simbrain.network.trainers;
 //
-// import org.junit.Test;
+// import org.junit.jupiter.api.Test;
 // import org.nd4j.linalg.api.ndarray.INDArray;
 // import org.nd4j.linalg.factory.Nd4j;
 // import org.simbrain.network.core.Network;

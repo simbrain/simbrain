@@ -1,12 +1,11 @@
 package org.simbrain.network.subnetworks;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 
 import java.awt.geom.Point2D;
 
-import static org.junit.Assert.assertArrayEquals;
-
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 public class FeedForwardTest {
 
     @Test

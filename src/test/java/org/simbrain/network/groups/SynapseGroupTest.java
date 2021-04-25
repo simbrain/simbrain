@@ -1,13 +1,13 @@
 package org.simbrain.network.groups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SynapseGroupTest {
 

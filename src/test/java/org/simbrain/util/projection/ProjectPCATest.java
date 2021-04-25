@@ -1,11 +1,11 @@
 package org.simbrain.util.projection;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.util.math.SimbrainMath;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProjectPCATest {
 

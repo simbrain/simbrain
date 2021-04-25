@@ -1,12 +1,12 @@
 package org.simbrain.network.core;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.Utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class NetworkTest {
 
@@ -15,7 +15,7 @@ public class NetworkTest {
     NeuronGroup ng1, ng2;
     // TODO: Collections, neuronarrays, synapsegroups, update, copy/paste
 
-    @Before
+    @BeforeEach
     public void setUpNetwork() {
         net = new Network();
 

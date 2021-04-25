@@ -1,11 +1,11 @@
 package org.simbrain.network.neuron_update_rules;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ThreeValueRuleTest {
     @Test

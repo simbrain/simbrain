@@ -392,7 +392,6 @@ class Network {
         return Utils.getSimbrainXStream().fromXML(xmlRepresentation) as Network
     }
 
-
     /**
      * Standard method call made to objects after they are deserialized. See: http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
@@ -418,7 +417,6 @@ class Network {
         networkModels.get<Synapse>().forEach { it.postUnmarshallingInit() }
         return this
     }
-
 
     /**
      * Perform operations required before saving a network. Post-opening operations occur in [.readResolve].
@@ -446,7 +444,6 @@ class Network {
      */
     val iterations: Long get() = (time / timeStep).toLong()
 
-
     /**
      * string version of time, with units.
      */
@@ -456,7 +453,6 @@ class Network {
         } else {
             "${SimbrainMath.roundDouble(time, getTimeStepPrecision() + 1)} msec"
         }
-
 
     /**
      * If there is a single continuous neuron in the network, consider this a continuous network.
@@ -482,7 +478,6 @@ class Network {
     fun resetTime() {
         time = 0.0
     }
-
 
     /**
      * Used by Network thread to ensure that an update cycle is complete before updating again.
@@ -532,7 +527,6 @@ class Network {
         it.label.equals(label, ignoreCase = true)
     }
 
-
     /**
      * Add an update action to the network' action list (the sequence of actions invoked on each iteration of the
      * network).
@@ -551,7 +545,6 @@ class Network {
     fun addObjects(toAdd: List<NetworkModel>) {
         toAdd.forEach { addNetworkModel(it) }
     }
-
 
     /**
      * Translate all neurons (the only objects with position information).

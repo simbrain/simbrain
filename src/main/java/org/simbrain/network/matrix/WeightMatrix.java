@@ -103,10 +103,12 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
 
     @Override
     public String toString() {
-        String ret = new String();
+        String ret = "";
         ret += weightMatrix.nrows() + "x" + weightMatrix.ncols();
         ret += "  Connects " + source.getId() + " to " + target.getId();
-        // ret += "\t\t" + Arrays.deepToString(weightMatrix.toArray()) + "\n";
+        if (weightMatrix.size() < 1000) {
+            ret += "\t\t" + Arrays.deepToString(weightMatrix.toArray()) + "\n";
+        }
         return ret;
     }
 
@@ -219,6 +221,13 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
             events = new WeightMatrixEvents(this);
         }
         initEvents();
+    }
+
+    /**
+     * Returns the product of the this matrix its source activations
+     */
+    public double[] weightsTimesSource() {
+        return weightMatrix.mv(source.getActivations());
     }
 
     //public Layer asLayer() {

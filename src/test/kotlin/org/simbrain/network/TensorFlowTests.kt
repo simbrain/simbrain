@@ -1,7 +1,6 @@
 package org.simbrain.network
 
 import junit.framework.Assert.assertEquals
-import org.jetbrains.kotlinx.dl.api.extension.convertTensorToMultiDimArray
 import org.junit.Test
 import org.simbrain.network.matrix.WeightMatrixTest
 import org.tensorflow.Tensor
@@ -43,13 +42,12 @@ class TensorFlowTests {
         val shape = longArrayOf(2,3)
         val sampData: FloatBuffer = FloatBuffer.allocate(6)
         val matrix_of_zeros = Tensor.create(shape,sampData);
-        println(matrix_of_zeros.convertTensorToMultiDimArray().contentDeepToString());
+        // println(matrix_of_zeros.convertTensorToMultiDimArray().contentDeepToString());
         var tensor_to_matrix =  Array(2){FloatArray(3) {0.0f}}
         matrix_of_zeros.copyTo(tensor_to_matrix);
 
         // Get its shape
-        println(matrix_of_zeros)
-
+        // println(matrix_of_zeros)
 
         // Create a 2x3 matrix of ones
         val sampData1: FloatBuffer = FloatBuffer.allocate(6)
@@ -60,8 +58,7 @@ class TensorFlowTests {
         sampData1.put(4,1.0f)
         sampData1.put(5, 1.0f)
         val matrix_of_ones = Tensor.create(shape,sampData1)
-        println(matrix_of_ones.convertTensorToMultiDimArray().contentDeepToString())
-
+        // println(matrix_of_ones.convertTensorToMultiDimArray().contentDeepToString())
 
         // Confirm sum of entries is 6
         matrix_of_ones.copyTo(tensor_to_matrix)
@@ -73,19 +70,15 @@ class TensorFlowTests {
         }
         assertEquals(6.0f, sum)
 
-
         // Set the value of entry 1,3 to 3
         tensor_to_matrix[0][2] = 3.0f;
 
-
         // Retrieve the value of that entry and confirm it is 3
-        println(tensor_to_matrix[0][2])
-
+        // println(tensor_to_matrix[0][2])
 
         // Perform a matrix multiplication using simple values and confirm correct outputs
         //val temp = MatrixDiagV2.create()
         // Perform a dot product and confirm correct outputs
-
 
     }
 

@@ -86,7 +86,7 @@ public abstract class ArrayConnectable extends LocatableModel {
     public double[] getWeightedInputs() {
         double[] result = new double[getInputs().length];
         for (WeightMatrix wm : incomingWeightMatrices) {
-            result = SimbrainMath.addVector(result, wm.getWeightMatrix().mv(wm.getSource().getActivations()));
+            result = SimbrainMath.addVector(result, wm.weightsTimesSource());
         }
         return result;
     }

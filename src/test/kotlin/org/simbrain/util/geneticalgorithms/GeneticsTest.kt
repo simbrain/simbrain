@@ -210,7 +210,7 @@ class GeneticsTest {
                 yield(newEnv.build().eval())
                 newEnv = newEnv.copy().apply { mutate() }
             }
-        }.onEach { println(it) }.take(5).last()
+        }.take(5).last()
     }
 
     @Test

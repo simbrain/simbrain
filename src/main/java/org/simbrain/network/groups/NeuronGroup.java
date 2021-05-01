@@ -162,6 +162,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Override
     public void update() {
+        super.update();
         // if (!inputMode) {
             NetworkKt.updateNeurons(getNeuronList());
             invalidateCachedActivations();

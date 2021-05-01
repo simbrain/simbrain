@@ -353,10 +353,10 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
 
     @Override
     public void update() {
-        setActivations(getInputs());
         if (activationRecorder.isRecording()) {
             activationRecorder.writeActsToFile();
         }
+        invalidateCachedActivations();
     }
 
     @Producible(arrayDescriptionMethod = "getLabelArray")

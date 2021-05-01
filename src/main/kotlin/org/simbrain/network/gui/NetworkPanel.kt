@@ -22,7 +22,7 @@ import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.matrix.ArrayConnectable
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.smile.SmileSVM
+import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.network.trainers.TrainingSet
@@ -257,7 +257,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is WeightMatrix -> createNode(model)
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
-            is SmileSVM -> createNode(model)
+            is SmileClassifier -> createNode(model)
         }
     }
 
@@ -294,8 +294,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 //        MultiLayerNetworkNode(this, multiLayerNet)
 //    }
 
-    fun createNode(svm : SmileSVM) = addScreenElement {
-        SmileSVMNode(this, svm)
+    fun createNode(classifier : SmileClassifier) = addScreenElement {
+        SmileClassifierNode(this, classifier)
     }
 
     fun createNode(neuronCollection: NeuronCollection) = addScreenElement {

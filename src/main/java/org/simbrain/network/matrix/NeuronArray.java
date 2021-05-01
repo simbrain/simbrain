@@ -35,7 +35,8 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     private double y;
 
     /**
-     * Array to hold activation values.
+     * Array to hold activation values. These are also the outputs that are consumed by
+     * other network components via {@link ArrayConnectable}.
      */
     private double[] activations;
 
@@ -210,6 +211,16 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     @Override
     public double[] getActivations() {
         return activations;
+    }
+
+    /**
+     * Set the activations to a one-hot encoding (all 0s and one 1) at provided index.
+     * @see {<a href="https://en.wikipedia.org/wiki/One-hot"></a>}.
+     */
+    public void setOneHot(int index) {
+        clear();
+        activations[index] = 1.0;
+        getEvents().fireUpdated();
     }
 
     @Override

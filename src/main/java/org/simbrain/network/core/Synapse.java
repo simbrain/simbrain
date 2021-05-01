@@ -994,9 +994,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         setFrozen(enFr == 1 || enFr == 3);
     }
 
-    /**
-     * Called after a synapse is de-serialized, to repopulate fan-in and fan-out lists.
-     */
+    @Override
     public void postUnmarshallingInit() {
         events = new SynapseEvents(this);
         if (getTarget() != null) {

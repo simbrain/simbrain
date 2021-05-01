@@ -216,6 +216,7 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         events.fireUpdated();
     }
 
+    @Override
     public void postUnmarshallingInit() {
         if (events == null) {
             events = new WeightMatrixEvents(this);

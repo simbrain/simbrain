@@ -1720,9 +1720,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         }
     }
 
-    /**
-     * Perform operations required after opening a synapse group.
-     */
+    @Override
     public void postUnmarshallingInit() {
 
         if (events == null) {

@@ -18,10 +18,8 @@
  */
 package org.simbrain.network.gui;
 
-import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.gui.nodes.ScreenElement;
 import org.simbrain.network.util.SimnetUtils;
 
 import java.util.ArrayList;
@@ -83,7 +81,7 @@ public class Clipboard {
         List<NetworkModel> copy = SimnetUtils.getCopy(net.getNetwork(), copiedObjects);
 
         // Add the copied object
-        net.getNetwork().addObjects(copy);
+        net.getNetwork().addNetworkModels(copy);
 
         // Unselect "old" copied objects
         net.getSelectionManager().clear();

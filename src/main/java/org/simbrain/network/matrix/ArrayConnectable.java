@@ -100,6 +100,7 @@ public abstract class ArrayConnectable extends LocatableModel {
 
     public abstract Rectangle2D getBound();
 
+    @Override
     public void postUnmarshallingInit() {
         if (events == null) {
             events = new LocationEvents(this);

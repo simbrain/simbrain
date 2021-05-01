@@ -532,7 +532,8 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     public Network getParentNetwork() {
         return parentNetwork;
     }
-    
+
+    @Override
     public void postUnmarshallingInit() {
         if (events == null) {
             events = new LocationEvents(this);

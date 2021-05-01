@@ -264,10 +264,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         return new Neuron(parent, this);
     }
 
-    /**
-     * Perform any initialization required when creating a neuron, but after the
-     * parent network has been added.
-     */
+    @Override
     public void postUnmarshallingInit() {
         events = new NeuronEvents(this);
         fanOut = new HashMap<>();

@@ -12,7 +12,7 @@ class NeuronTest {
         val n1 = Neuron(net, "LinearRule")
         val n2 = Neuron(net, "LinearRule")
         val n3 = Neuron(net, "LinearRule")
-        net.addObjects(listOf(n1,n2,n3))
+        net.addNetworkModels(listOf(n1,n2,n3))
         net.addSynapse(n1, n3)
         net.addSynapse(n2, n3)
         n1.addInputValue(.1)

@@ -691,6 +691,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         this.stateInfo = stateInfo;
     }
 
+    @Override
     public void postUnmarshallingInit() {
         if (events == null) {
             events = new NeuronCollectionEvents(this);

@@ -341,7 +341,7 @@ class Network {
 
 
     /**
-     * Delete a [NetworkModel]
+     * Delete a [NetworkModel].
      */
     fun delete(toDelete: NetworkModel) {
         networkModels.remove(toDelete)
@@ -538,7 +538,7 @@ class Network {
      *
      * @param toAdd list of objects to add.
      */
-    fun addObjects(toAdd: List<NetworkModel>) {
+    fun addNetworkModels(toAdd: List<NetworkModel>) {
         toAdd.forEach { addNetworkModel(it) }
     }
 
@@ -631,11 +631,11 @@ class Network {
         }
     }
 
-
     /**
      * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
      */
     private class NetworkModelList {
+
         /**
          * Backing for the collection: a map from model types to linked hash sets.
          */
@@ -653,6 +653,10 @@ class Network {
             }
         }
 
+        /**
+         * Put in the list without checking type. Needed for de-serialization. Avoid, and if used
+         * use with caution.
+         */
         fun putUnsafe(modelClass: Class<out NetworkModel>, model: NetworkModel) {
             if (modelClass in networkModels) {
                 networkModels[modelClass]!!.add(model)
@@ -663,18 +667,16 @@ class Network {
             }
         }
 
-        fun <T : NetworkModel> putAll(modelClass: Class<T>, model: List<T>) {
-            networkModels.putIfAbsent(modelClass, LinkedHashSet())?.addAll(model)
-        }
-
-        fun putAllUnchecked(modelClass: Class<out NetworkModel>, model: List<NetworkModel>) {
-            networkModels.putIfAbsent(modelClass, LinkedHashSet())?.addAll(model)
-        }
-
+        /**
+         * Add a collection of network models to the map.
+         */
         fun addAll(models: Collection<NetworkModel>) {
             models.forEach { add(it) }
         }
 
+        /**
+         * Add a network model to the map.
+         */
         fun add(model: NetworkModel) {
             if (model is Subnetwork) {
                 put(Subnetwork::class.java, model)
@@ -736,7 +738,11 @@ class Network {
         }
     }
 
+    /**
+     * Custom serializer that stores [Network.networkModels], which is a map, as a flat list of [NetworkModel]s.
+     */
     class NetworkModelListConverter : Converter {
+
         override fun canConvert(type: Class<*>?) = NetworkModelList::class.java == type
 
         override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {

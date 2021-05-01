@@ -51,7 +51,6 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-
         getNetworkPanel().getSelectionManager().filterSelectedModels(Neuron.class).forEach(Neuron::randomize);
         getNetworkPanel().getSelectionManager().filterSelectedModels(Synapse.class).forEach(Synapse::randomize);
         getNetworkPanel().getSelectionManager().filterSelectedModels(NeuronGroup.class).forEach(NeuronGroup::randomize);

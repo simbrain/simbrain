@@ -1,5 +1,11 @@
 package org.simbrain.network.core
 
+import com.thoughtworks.xstream.annotations.XStreamImplicit
+import com.thoughtworks.xstream.converters.Converter
+import com.thoughtworks.xstream.converters.MarshallingContext
+import com.thoughtworks.xstream.converters.UnmarshallingContext
+import com.thoughtworks.xstream.io.HierarchicalStreamReader
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
@@ -404,17 +410,7 @@ class Network {
 
         // Initialize update manager
         updateManager.postUnmarshallingInit()
-        flatNeuronList.forEach { it.postUnmarshallingInit() }
-        networkModels.get<NetworkTextObject>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<SynapseGroup>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<NeuronGroup>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<NeuronCollection>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<NeuronArray>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<WeightMatrix>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<Subnetwork>().forEach { it.postUnmarshallingInit() }
-
-        // Re-populate fan-in / fan-out for loose synapses
-        networkModels.get<Synapse>().forEach { it.postUnmarshallingInit() }
+        networkModels.allInDeserializationOrder.forEach { it.postUnmarshallingInit() }
         return this
     }
 
@@ -643,6 +639,7 @@ class Network {
         /**
          * Backing for the collection: a map from model types to linked hash sets.
          */
+        @XStreamImplicit
         private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = HashMap()
 
         @Suppress("UNCHECKED_CAST")
@@ -653,6 +650,16 @@ class Network {
                 val newSet = LinkedHashSet<T>()
                 newSet.add(model)
                 networkModels[modelClass] = newSet as LinkedHashSet<NetworkModel>
+            }
+        }
+
+        fun putUnsafe(modelClass: Class<out NetworkModel>, model: NetworkModel) {
+            if (modelClass in networkModels) {
+                networkModels[modelClass]!!.add(model)
+            } else {
+                val newSet = LinkedHashSet<NetworkModel>()
+                newSet.add(model)
+                networkModels[modelClass] = newSet
             }
         }
 
@@ -729,6 +736,32 @@ class Network {
         }
     }
 
+    class NetworkModelListConverter : Converter {
+        override fun canConvert(type: Class<*>?) = NetworkModelList::class.java == type
+
+        override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+            val modelList = source as NetworkModelList
+            modelList.allInDeserializationOrder.forEach { model ->
+                writer.startNode(model::class.java.name)
+                context.convertAnother(model)
+                writer.endNode()
+            }
+        }
+
+        override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
+            val modelList = NetworkModelList()
+            while (reader.hasMoreChildren()) {
+                reader.moveDown()
+                val cls = Class.forName(reader.nodeName)
+                val model = context.convertAnother(reader.value, cls) as NetworkModel
+                modelList.putUnsafe(cls as Class<out NetworkModel>, model)
+                reader.moveUp()
+            }
+            return modelList
+        }
+
+    }
+
 }
 
 /**
@@ -739,10 +772,10 @@ private val deserializationOrder: List<Class<out NetworkModel>> = listOf(
     NeuronGroup::class.java,
     NeuronCollection::class.java,
     NeuronArray::class.java,
-    Synapse::class.java,
     WeightMatrix::class.java,
     SynapseGroup::class.java,
-    Subnetwork::class.java
+    Subnetwork::class.java,
+    Synapse::class.java
 )
 
 /**

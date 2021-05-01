@@ -83,4 +83,8 @@ public abstract class NetworkModel {
         getEvents().fireLabelChange(oldLabel, this.label);
     }
 
+    public void postUnmarshallingInit() {
+
+    }
+
 }

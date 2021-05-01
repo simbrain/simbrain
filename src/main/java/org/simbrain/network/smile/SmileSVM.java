@@ -33,6 +33,11 @@ public class SmileSVM extends LocatableModel {
     public void setLocation(@NotNull Point2D location) {
     }
 
+    @Override
+    public void postUnmarshallingInit() {
+        events = new LocationEvents(this);
+    }
+
     @NotNull
     @Override
     public LocationEvents getEvents() {

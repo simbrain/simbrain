@@ -218,7 +218,7 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
         };
     }
 
-    private final Runnable fireLocationChange = createFireLocationChange();
+    private Runnable fireLocationChange = createFireLocationChange();
 
     /**
      * Remove a neuron
@@ -694,6 +694,10 @@ public abstract class AbstractNeuronCollection extends ArrayConnectable implemen
     public void postUnmarshallingInit() {
         if (events == null) {
             events = new NeuronCollectionEvents(this);
+        }
+
+        if (fireLocationChange == null) {
+            fireLocationChange = createFireLocationChange();
         }
 
         neuronList.forEach(this::addListener);

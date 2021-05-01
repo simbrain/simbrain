@@ -15,7 +15,7 @@ import java.util.Arrays;
 /**
  * A "neuron array" backed by a double array.
  */
-public class NeuronArray extends ArrayConnectable implements EditableObject, AttributeContainer {
+public class NeuronArray extends WeightMatrixConnectable implements EditableObject, AttributeContainer {
 
     //TODO: Rename ideas: Array, Layer,Double Array
 
@@ -36,7 +36,7 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
 
     /**
      * Array to hold activation values. These are also the outputs that are consumed by
-     * other network components via {@link ArrayConnectable}.
+     * other network components via {@link WeightMatrixConnectable}.
      */
     private double[] activations;
 

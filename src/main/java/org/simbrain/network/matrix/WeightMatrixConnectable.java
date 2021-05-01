@@ -19,7 +19,7 @@ import java.util.List;
  * weight matrix (or other layer-to-layer connector, if we add them). Encompasses
  * both {@link NeuronArray} and {@link org.simbrain.network.groups.AbstractNeuronCollection}.
  */
-public abstract class ArrayConnectable extends LocatableModel {
+public abstract class WeightMatrixConnectable extends LocatableModel {
 
     /**
      * "Fan-in" of incoming weight matrices.

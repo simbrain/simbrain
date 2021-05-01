@@ -19,9 +19,9 @@ import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
-import org.simbrain.network.matrix.ArrayConnectable
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.matrix.WeightMatrixConnectable
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.LMSIterative
@@ -569,12 +569,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     }
 
     /**
-     * Connect all selected [ArrayConnectable]s with [WeightMatrix] objects.
+     * Connect all selected [WeightMatrixConnectable]s with [WeightMatrix] objects.
      */
     fun connectWithWeightMatrix() {
         with(selectionManager) {
-            val sources = filterSelectedSourceModels<ArrayConnectable>()
-            val targets = filterSelectedModels<ArrayConnectable>()
+            val sources = filterSelectedSourceModels<WeightMatrixConnectable>()
+            val targets = filterSelectedModels<WeightMatrixConnectable>()
 
             for (source in sources) {
                 for (target in targets) {

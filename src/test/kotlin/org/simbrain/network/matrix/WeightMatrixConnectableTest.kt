@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 
-class ArrayConnectableTest {
+class WeightMatrixConnectableTest {
 
     var net = Network()
     var na1 = NeuronArray(net, 2)

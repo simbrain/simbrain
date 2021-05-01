@@ -15,7 +15,7 @@ import smile.stat.distribution.GaussianDistribution;
 import java.util.Arrays;
 
 /**
- * An weight matrix that connects a source and target {@link ArrayConnectable}
+ * An weight matrix that connects a source and target {@link WeightMatrixConnectable}
  * object.
  */
 public class WeightMatrix extends NetworkModel implements EditableObject, AttributeContainer  {
@@ -23,12 +23,12 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
     /**
      * The source "layer" / activation vector for this weight matrix.
      */
-    private ArrayConnectable source;
+    private WeightMatrixConnectable source;
 
     /**
      * The target "layer" for this weight matrix.
      */
-    private ArrayConnectable target;
+    private WeightMatrixConnectable target;
 
     /**
      * Reference to network this neuron is part of.
@@ -67,7 +67,7 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
      * @param source source layer
      * @param target target layer
      */
-    public WeightMatrix(Network net, ArrayConnectable source, ArrayConnectable target) {
+    public WeightMatrix(Network net, WeightMatrixConnectable source, WeightMatrixConnectable target) {
         this.parent = net;
         this.source = source;
         this.target = target;
@@ -112,11 +112,11 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         return ret;
     }
 
-    public ArrayConnectable getSource() {
+    public WeightMatrixConnectable getSource() {
         return source;
     }
 
-    public ArrayConnectable getTarget() {
+    public WeightMatrixConnectable getTarget() {
         return target;
     }
 

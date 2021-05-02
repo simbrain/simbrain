@@ -226,9 +226,7 @@ class Network {
      * Set the activation level of all neurons to zero.
      */
     fun clearActivations() {
-        for (neuron in flatNeuronList) {
-            neuron.clear()
-        }
+        flatNeuronList.forEach(Neuron::clear)
     }
 
 

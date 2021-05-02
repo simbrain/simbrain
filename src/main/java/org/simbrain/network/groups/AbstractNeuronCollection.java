@@ -374,7 +374,15 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
         }
     }
 
+    /**
+     * Set input values of neurons using an array of doubles. Assumes the order
+     * of the items in the array matches the order of items in the neuronlist.
+     * <p>
+     * Does not throw an exception if the provided input array and neuron list
+     * do not match in size.
+     */
     @Override
+    @Consumable
     public void addInputs(double[] inputs) {
         int size = Math.min(inputs.length, neuronList.size());
         for (int i = 0; i < size; i++) {
@@ -512,25 +520,6 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
                 .filter(n -> n.getLabel().equalsIgnoreCase(label))
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * Set input values of neurons using an array of doubles. Assumes the order
-     * of the items in the array matches the order of items in the neuronlist.
-     * <p>
-     * Does not throw an exception if the provided input array and neuron list
-     * do not match in size.
-     *
-     * @param inputs the input vector as a double array.
-     */
-    @Consumable()
-    public void addInputValues(double[] inputs) {
-        for (int i = 0, n = size(); i < n; i++) {
-            if (i >= inputs.length) {
-                break;
-            }
-            neuronList.get(i).addInputValue(inputs[i]);
-        }
     }
 
     /**

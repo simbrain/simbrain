@@ -1,7 +1,6 @@
 package org.simbrain.world.odorworld.entities;
 
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.world.odorworld.events.AttributeEvents;
 
@@ -12,7 +11,7 @@ import org.simbrain.world.odorworld.events.AttributeEvents;
  *
  * @author Jeff Yoshimi
  */
-public interface PeripheralAttribute extends AttributeContainer, EditableObject, CopyableObject {
+public interface PeripheralAttribute extends AttributeContainer, CopyableObject {
 
     String getLabel();
 

@@ -20,6 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.util.math.SquashingFunctionEnum;
 
 /**
  * <b>SigmoidalRule</b> provides various implementations of a standard sigmoidal
@@ -44,9 +45,9 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
      * Construct a sigmoid update with a specified implementation.
      *
      */
-    // public SigmoidalRule(SquashingFunctionEnum sFunction) {
-    //     super(sFunction);
-    // }
+    public SigmoidalRule(SquashingFunctionEnum sFunction) {
+        super(sFunction);
+    }
 
     @Override
     public final TimeType getTimeType() {
@@ -62,7 +63,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
             val += noiseGenerator.getRandom();
         }
 
-        // val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());
+        val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());
 
         neuron.setActivation(val);
     }
@@ -103,8 +104,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
         double up = getUpperBound();
         double lw = getLowerBound();
         double diff = up - lw;
-        return 0;
-        // return sFunction.derivVal(val, up, lw, diff);
+        return sFunction.derivVal(val, up, lw, diff);
     }
 
     @Override

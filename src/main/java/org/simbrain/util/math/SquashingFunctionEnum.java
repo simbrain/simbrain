@@ -47,20 +47,17 @@ public enum SquashingFunctionEnum {
 
         @Override
         public double valueOf(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.atan(val, ceil, floor, slope);
+            return SquashingFunctions.atan(val, ceil, floor, slope);
         }
 
         @Override
         public double inverseVal(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.invAtan(val, ceil, floor, slope);
+            return SquashingFunctions.invAtan(val, ceil, floor, slope);
         }
 
         @Override
         public double derivVal(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.derivAtan(val, ceil, floor, slope);
+           return SquashingFunctions.derivAtan(val, ceil, floor, slope);
         }
 
         @Override
@@ -114,20 +111,17 @@ public enum SquashingFunctionEnum {
 
         @Override
         public double valueOf(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.logistic(val, ceil, floor, slope);
+            return SquashingFunctions.logistic(val, ceil, floor, slope);
         }
 
         @Override
         public double inverseVal(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.invLogistic(val, ceil, floor, slope);
+            return SquashingFunctions.invLogistic(val, ceil, floor, slope);
         }
 
         @Override
         public double derivVal(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.derivLogistic(val, ceil, floor, slope);
+            return SquashingFunctions.derivLogistic(val, ceil, floor, slope);
         }
 
         @Override
@@ -180,20 +174,17 @@ public enum SquashingFunctionEnum {
 
         @Override
         public double valueOf(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.tanh(val, ceil, floor, slope);
+            return SquashingFunctions.tanh(val, ceil, floor, slope);
         }
 
         @Override
         public double inverseVal(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.invTanh(val, ceil, floor, slope);
+            return SquashingFunctions.invTanh(val, ceil, floor, slope);
         }
 
         @Override
         public double derivVal(double val, double ceil, double floor, double slope) {
-            return 0;
-            // return SquashingFunctions.derivTanh(val, ceil, floor, slope);
+            return SquashingFunctions.derivTanh(val, ceil, floor, slope);
         }
 
         @Override

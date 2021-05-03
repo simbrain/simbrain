@@ -491,12 +491,8 @@ class Network {
         updateCompleted.set(b)
     }
 
-    override fun toString(): String = """
-        Root Network
-        =================
-        ${networkModels.all.joinToString("\n        ") { "[${it.id}] $it" }}
-    """.trimIndent()
-
+    override fun toString(): String =
+        " ---Network--- \n" + networkModels.all.joinToString("\n") { "$it" }
 
     /**
      * Returns a neuron with a matching label.  If more than one

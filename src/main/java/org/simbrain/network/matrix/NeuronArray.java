@@ -4,6 +4,7 @@ package org.simbrain.network.matrix;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -243,4 +244,9 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
         return parent;
     }
 
+    @Override
+    public String toString() {
+        return getId() + " with " + getActivations().length + " activations: " +
+                Utils.getTruncatedArrayString(getActivations(), 10);
+    }
 }

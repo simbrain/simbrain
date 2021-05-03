@@ -24,6 +24,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.pmw.tinylog.Logger;
+import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
 import java.awt.*;
@@ -820,6 +821,22 @@ public class Utils {
         return newArray;
     }
 
-
+    /**
+     * Returns a string representation of an array. If length > "maxToDisplay" display with "..." at end.
+     */
+    public static String getTruncatedArrayString(double[] array, int maxToDisplay) {
+        StringBuilder sb = new StringBuilder();
+        if (array.length < maxToDisplay) {
+            sb.append(Arrays.toString(SimbrainMath.roundVec(array, 3)));
+        } else {
+            sb.append("[");
+            for (int i = 0; i < maxToDisplay; i++) {
+                sb.append(SimbrainMath.roundDouble(array[i],3));
+                sb.append(",");
+            }
+            sb.append("...]");
+        }
+        return sb.toString();
+    }
 
 }

@@ -100,16 +100,11 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         });
     }
 
-
     @Override
     public String toString() {
-        String ret = "";
-        ret += weightMatrix.nrows() + "x" + weightMatrix.ncols();
-        ret += "  Connects " + source.getId() + " to " + target.getId();
-        if (weightMatrix.size() < 1000) {
-            ret += "\t\t" + Arrays.deepToString(weightMatrix.toArray());
-        }
-        return ret;
+        return getId()
+                + " (" + weightMatrix.nrows() + "x" + weightMatrix.ncols() + ") "
+                + "connecting " + source.getId() + " to " + target.getId();
     }
 
     public WeightMatrixConnectable getSource() {

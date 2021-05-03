@@ -12,6 +12,7 @@ import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.RectangleOutlines;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -702,15 +703,9 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
         return events;
     }
 
-    // TODO: Specify to subclasses
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("with " + getActivations().length + " activations");
-        int maxToDisplay = 10;
-        if (getActivations().length < maxToDisplay) {
-            sb.append(Arrays.toString(getActivations()));
-        }
-        return sb.toString();
+        return getId() + " with " + getActivations().length + " activations: " +
+                Utils.getTruncatedArrayString(getActivations(), 10);
     }
 }

@@ -789,7 +789,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public String toString() {
-        return getId() + " " + getType() + " Activation = " + SimbrainMath.roundDouble(this.getActivation(), 3);
+        return getId() + ": " + getType() + " Activation = " + SimbrainMath.roundDouble(this.getActivation(), 3);
     }
 
     /**

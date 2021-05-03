@@ -100,11 +100,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
         }
     }
 
-    @Override
-    public String toString() {
-        return String.format("with %d neuron(s).", this.getNeuronList().size());
-    }
-
     /**
      * Returns the summed hash codes of contained neurons.  Used to prevent creation of neuron collections from
      * identical sets of neurons.

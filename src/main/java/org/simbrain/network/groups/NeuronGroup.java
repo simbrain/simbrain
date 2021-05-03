@@ -340,6 +340,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
         this.layout.setLayout(layout);
     }
 
+    public Layout.LayoutObject getLayoutObject() {
+        return layout;
+    }
+
     /**
      * Apply this group's layout to its neurons.
      */

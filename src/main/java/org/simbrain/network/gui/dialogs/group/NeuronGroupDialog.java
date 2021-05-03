@@ -172,7 +172,7 @@ public final class NeuronGroupDialog extends StandardDialog {
         if(isCreationDialog) {
             layoutObject = new Layout.LayoutObject(NeuronGroup.DEFAULT_LAYOUT);
         } else {
-            layoutObject = new Layout.LayoutObject(neuronGroup.getLayout());
+            layoutObject = neuronGroup.getLayoutObject();
         }
         layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         tabbedPane.addTab("Layout", layoutPanel);
@@ -276,8 +276,8 @@ public final class NeuronGroupDialog extends StandardDialog {
         if (isCreationDialog) {
             neuronGroupCreationEditor.commitChanges();
             neuronGroup = ngCreator.create(networkPanel.getNetwork());
-            neuronGroup.setLayout(layoutObject.getLayout());
             layoutPanel.commitChanges();
+            neuronGroup.setLayout(layoutObject.getLayout());
             neuronGroup.applyLayout();
             networkPanel.getNetwork().addNetworkModel(neuronGroup);
             networkPanel.getPlacementManager().addNewModelObject(neuronGroup);

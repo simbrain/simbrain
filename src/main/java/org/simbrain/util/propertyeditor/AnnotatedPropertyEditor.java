@@ -310,7 +310,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 continue;
             }
 
-
             // If the widget is in "..." mode don't do anything with it
             if (!pw.isInconsistent()) {
                 for (Object o : objectsToEdit) {

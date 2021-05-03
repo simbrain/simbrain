@@ -86,9 +86,13 @@ public class NumericWidget extends JPanel {
                             parameter.setFieldValue(o, pd.nextRand());
                         }
                     });
-                    // Provides some indication that fields have been mutated
-                    if (setNull != null) {
-                        setNull.run();
+                    if(editableObjects.size() == 1) {
+                        setValue(parameter.getFieldValue(editableObjects.get(0)));
+                    } else {
+                        // Provides some indication that fields have been mutated
+                        if (setNull != null) {
+                            setNull.run();
+                        }
                     }
                 });
 

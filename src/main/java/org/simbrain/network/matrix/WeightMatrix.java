@@ -80,6 +80,9 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         weightMatrix = new Matrix(source.getActivations().length,
                 target.getActivations().length);
 
+        // Hack to initialize backend array so there are no delays later at first computation
+        weightMatrix.aat();
+
         // Default for "adapter" cases is 1-1
         if (source instanceof AbstractNeuronCollection) {
             diagonalize();

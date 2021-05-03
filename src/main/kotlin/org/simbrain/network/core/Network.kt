@@ -106,7 +106,6 @@ class Network {
      */
     var timeStep = DEFAULT_TIME_STEP
 
-
     /**
      * Local thread flag for starting and stopping the network
      */
@@ -182,7 +181,6 @@ class Network {
         events.fireUpdateCompleted()
     }
 
-
     /**
      * Update the priority list used for priority based update.
      */
@@ -227,22 +225,6 @@ class Network {
      */
     fun clearActivations() {
         flatNeuronList.forEach(Neuron::clear)
-    }
-
-
-    /**
-     * Return the neuron at the specified index of the internal list storing neurons.
-     *
-     * @param neuronIndex index of the neuron
-     * @return the neuron at that index
-     */
-    @Deprecated("This is linear search")
-    fun getLooseNeuron(neuronIndex: Int): Neuron {
-        val iterator: Iterator<Neuron> = networkModels.get<Neuron>().iterator()
-        for (i in 0 until neuronIndex) {
-            iterator.next()
-        }
-        return iterator.next()
     }
 
     /**
@@ -337,7 +319,6 @@ class Network {
         }
     }
 
-
     /**
      * Delete a [NetworkModel].
      */
@@ -346,7 +327,6 @@ class Network {
         toDelete.delete()
         events.fireModelRemoved(toDelete)
     }
-
 
     /**
      * Create a [NeuronCollection] from a provided list of neurons
@@ -430,7 +410,6 @@ class Network {
         }
     }
 
-
     /**
      * Returns the current number of iterations.
      *
@@ -459,7 +438,6 @@ class Network {
             }
         }
     }
-
 
     /**
      * Increment the time counter, using a different method depending on whether this is a continuous or discrete.
@@ -504,7 +482,6 @@ class Network {
     fun getNeuronByLabel(label: String): Neuron? = flatNeuronList.firstOrNull {
         it.label.equals(label, ignoreCase = true)
     }
-
 
     /**
      * Returns a neurongroup with a matching label.  If more than one

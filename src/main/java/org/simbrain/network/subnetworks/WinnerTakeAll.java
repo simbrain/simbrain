@@ -37,39 +37,28 @@ import java.util.Random;
 public class WinnerTakeAll extends NeuronGroup {
 
     /**
-     * Default initial number of units.
-     */
-    private static final int DEFAULT_NUM_UNITS = 5;
-
-    /**
-     * Number of neurons.
-     */
-    private int numUnits = DEFAULT_NUM_UNITS;
-
-    /**
      * Winning value.
      */
-    @UserParameter(label = "Win value")
+    @UserParameter(label = "Win value", order = 50)
     private double winValue = 1;
 
     /**
      * Losing value.
      */
-    @UserParameter(label = "Lose value")
+    @UserParameter(label = "Lose value", order = 60)
     private double loseValue = 0;
 
     /**
      * If true, sometimes set the winner randomly.
      */
-    @UserParameter(label = "Random winner")
+    @UserParameter(label = "Random winner", order = 70)
     private boolean useRandom;
 
     /**
      * Probability of setting the winner randomly, when useRandom is true.
      */
-    @UserParameter(label = "Random prob")
+    @UserParameter(label = "Random prob", conditionalEnablingMethod = "isUseRandom", order = 80)
     private double randomProb = .1;
-    // todo; conditonal on userandom
 
     /**
      * Random number generator.
@@ -190,65 +179,34 @@ public class WinnerTakeAll extends NeuronGroup {
 
     }
 
-    /**
-     * @return Returns the loseValue.
-     */
     public double getLoseValue() {
         return loseValue;
     }
 
-    /**
-     * @param loseValue The loseValue to set.
-     */
     public void setLoseValue(final double loseValue) {
         this.loseValue = loseValue;
     }
 
-    /**
-     * @return Returns the winValue.
-     */
     public double getWinValue() {
         return winValue;
     }
 
-    /**
-     * @param winValue The winValue to set.
-     */
     public void setWinValue(final double winValue) {
         this.winValue = winValue;
     }
 
-    /**
-     * @return Number of neurons.
-     */
-    public int getNumUnits() {
-        return numUnits;
-    }
-
-    /**
-     * @return the useRandom
-     */
     public boolean isUseRandom() {
         return useRandom;
     }
 
-    /**
-     * @param useRandom the useRandom to set
-     */
     public void setUseRandom(boolean useRandom) {
         this.useRandom = useRandom;
     }
 
-    /**
-     * @return the randomProb
-     */
     public double getRandomProb() {
         return randomProb;
     }
 
-    /**
-     * @param randomProb the randomProb to set
-     */
     public void setRandomProb(double randomProb) {
         this.randomProb = randomProb;
     }

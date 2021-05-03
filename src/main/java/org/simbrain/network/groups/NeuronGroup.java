@@ -518,9 +518,34 @@ public class NeuronGroup extends AbstractNeuronCollection {
         }
     }
 
-    // TODO
+    /**
+     * Enum for creation dialog.
+     */
     public enum GroupEnum {
-        DEFAULT, WTA, COMPETITIVE, SOM;
+        DEFAULT  {
+            @Override
+            public String toString() {
+                return "Default";
+            }
+        },
+        WTA {
+            @Override
+            public String toString() {
+                return "Winner take all";
+            }
+        },
+        COMPETITIVE {
+            @Override
+            public String toString() {
+                return "Competitive";
+            }
+        },
+        SOM {
+            @Override
+            public String toString() {
+                return "Self organizing map";
+            }
+        };
     }
 
 }

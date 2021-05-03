@@ -23,6 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.UserParameter;
 
 import java.util.Iterator;
 
@@ -48,39 +49,52 @@ public class CompetitiveGroup extends NeuronGroup {
     public static final UpdateMethod DEFAULT_UPDATE_METHOD = UpdateMethod.RUMM_ZIPSER;
 
     /**
+     * Current update method.
+     */
+    @UserParameter(label = "Update method", order = 30)
+    private UpdateMethod updateMethod = DEFAULT_UPDATE_METHOD;
+
+    /**
      * Learning rate.
      */
+    @UserParameter(label = "Learning rate", order = 40)
     private double learningRate = DEFAULT_LEARNING_RATE;
 
     /**
      * Winner value.
      */
+    @UserParameter(label = "Winner Value", order = 50)
     private double winValue = DEFAULT_WIN_VALUE;
 
     /**
-     * loser value.
+     * Loser value.
      */
+    @UserParameter(label = "Lose Value", order = 60)
     private double loseValue = DEFAULT_LOSE_VALUE;
 
     /**
      * Normalize inputs boolean.
      */
+    @UserParameter(label = "Normalize inputs", order = 70)
     private boolean normalizeInputs = DEFAULT_NORM_INPUTS;
 
     /**
      * Use leaky learning boolean.
      */
+    @UserParameter(label = "Use Leaky learning", order = 80)
     private boolean useLeakyLearning = DEFAULT_USE_LEAKY;
 
     /**
      * Leaky learning rate .
      */
+    @UserParameter(label = "Leaky learning rate", conditionalEnablingMethod = "getUseLeakyLearning", order = 90)
     private double leakyLearningRate = DEFAULT_LEAKY_RATE;
 
     /**
      * Percentage by which to decay synapses on each update for for
      * Alvarez-Squire update.
      */
+    @UserParameter(label = "Decay percent", order = 100)
     private double synpaseDecayPercent = DEFAULT_DECAY_PERCENT;
 
     /**
@@ -92,11 +106,6 @@ public class CompetitiveGroup extends NeuronGroup {
      * Winner value.
      */
     private int winner;
-
-    /**
-     * Current update method.
-     */
-    private UpdateMethod updateMethod = DEFAULT_UPDATE_METHOD;
 
     /**
      * Specific implementation of competitive learning.

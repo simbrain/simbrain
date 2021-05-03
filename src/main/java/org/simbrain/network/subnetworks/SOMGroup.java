@@ -68,27 +68,27 @@ public class SOMGroup extends NeuronGroup {
     /**
      * Initial Learning Rate.
      */
-    @UserParameter(label = "Initial alpha")
+    @UserParameter(label = "Initial alpha", order = 50)
     private double initAlpha = DEFAULT_ALPHA;
 
     /**
      * Learning rate.
      */
-    @UserParameter(label = "alpha")
+    @UserParameter(label = "alpha", order = 60)
     private double alpha = DEFAULT_ALPHA;
 
     /**
      * Current Neighborhood Size. With a circular neighborhood, neighborhoodSize
      * connotes radius.
      */
-    @UserParameter(label = "Neighborhood size")
+    @UserParameter(label = "Neighborhood size", order = 70)
     private double neighborhoodSize = DEFAULT_INIT_NSIZE;
 
     /**
      * The initial neighborhoodSize. neighborhoodSize is set back to this
      * whenever network is reset.
      */
-    @UserParameter(label = "Initial neighborhood size")
+    @UserParameter(label = "Initial neighborhood size", order = 80)
     private double initNeighborhoodSize = DEFAULT_INIT_NSIZE;
 
     /**
@@ -110,13 +110,13 @@ public class SOMGroup extends NeuronGroup {
     /**
      * The rate at which the learning rate decays.
      */
-    @UserParameter(label = "Alpha decay rate")
+    @UserParameter(label = "Alpha decay rate", order = 90)
     private double alphaDecayRate = DEFAULT_DECAY_RATE;
 
     /**
      * The amount that the neighborhood decrements.
      */
-    @UserParameter(label = "Neighborhood decay rate")
+    @UserParameter(label = "Neighborhood decay rate", order = 100)
     private double neighborhoodDecayAmount = DEFAULT_NEIGHBORHOOD_DECAY_AMOUNT;
 
     /**

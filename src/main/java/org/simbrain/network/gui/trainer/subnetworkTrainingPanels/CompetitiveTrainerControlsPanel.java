@@ -22,8 +22,8 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.network.trainers.CompetitiveTrainer;
 import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
-import org.simbrain.util.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -131,9 +131,7 @@ public class CompetitiveTrainerControlsPanel extends JPanel {
             putValue(SHORT_DESCRIPTION, "Iterate training until stopping condition met");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             if (trainer == null) {
                 return;

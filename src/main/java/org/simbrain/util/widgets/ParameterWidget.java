@@ -18,7 +18,10 @@
  */
 package org.simbrain.util.widgets;
 
-import org.simbrain.util.*;
+import org.simbrain.util.BiMap;
+import org.simbrain.util.Parameter;
+import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.util.propertyeditor.NumericWidget;
@@ -69,7 +72,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     /**
      * Construct a parameter widget from a parameter, which in turn represents a
      * field.
-     * @param parameter the parameter object
+     *
+     * @param parameter       the parameter object
      * @param editableObjects objects to edit
      */
     public ParameterWidget(Parameter parameter, List<? extends EditableObject> editableObjects) {
@@ -100,12 +104,13 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             try {
                 Method method = editableObjects.get(0).getClass().
                         getDeclaredMethod(conditionalEnableMethod);
-                Boolean enabled  = (Boolean) method.invoke(editableObjects.get(0));
+                Boolean enabled = (Boolean) method.invoke(editableObjects.get(0));
                 component.setEnabled(enabled);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-        }    }
+        }
+    }
 
     /**
      * Set the initial value of this widget if the {@link UserParameter#initialValueMethod()}
@@ -139,7 +144,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             String methodName = parameter.getAnnotation().typeListMethod();
             BiMap<String, Class> typeMap = getTypeMap(parameter.getType(), methodName);
             return ObjectTypeEditor.createEditor(objectTypeList, typeMap,
-                parameter.getAnnotation().label(), parameter.getAnnotation().showDetails());
+                    parameter.getAnnotation().label(), parameter.getAnnotation().showDetails());
         }
 
         if (!parameter.isEditable()) {
@@ -290,7 +295,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             } else {
                 ((ChoicesWithNull) component).setSelectedItem(value);
             }
-        } else if (parameter.isString()){
+        } else if (parameter.isString()) {
             if (value == null) {
                 ((TextWithNull) component).setNull();
             } else {

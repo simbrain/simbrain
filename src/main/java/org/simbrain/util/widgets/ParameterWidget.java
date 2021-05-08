@@ -95,10 +95,14 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     }
 
     /**
-     * If this component should be disabled (based on the {@link UserParameter#conditionalEnablingMethod()}
-     * annotation, disable it.
+     * If this component should be disabled (based on the {@link UserParameter#
+     * conditionalEnablingMethod()} annotation, disable it.
      */
     private void checkConditionalEnabling() {
+
+        // Note that parameter widgets defined in makeWidget must override setEnabled in some meaningful way for this
+        // to work
+
         String conditionalEnableMethod = parameter.getAnnotation().conditionalEnablingMethod();
         if (!conditionalEnableMethod.isEmpty()) {
             try {

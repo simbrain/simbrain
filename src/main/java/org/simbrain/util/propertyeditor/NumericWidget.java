@@ -115,5 +115,8 @@ public class NumericWidget extends JPanel {
         spinner.setValue(value);
     }
 
-
+    @Override
+    public void setEnabled(boolean enabled) {
+        spinner.setEnabled(enabled);
+    }
 }

@@ -306,7 +306,6 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
         return value;
     }
 
-
     /**
      * Sets the current value for this sequence.
      * <p>

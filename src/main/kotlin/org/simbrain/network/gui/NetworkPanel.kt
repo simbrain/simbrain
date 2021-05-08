@@ -1,5 +1,8 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
@@ -205,7 +208,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
      * @param forceZoom if true force the zoom to happen
      */
     fun zoomToFitPage() {
-        zoomToFitPage(false)
+        GlobalScope.launch(Dispatchers.Main) {
+            zoomToFitPage(false)
+        }
     }
 
     /**

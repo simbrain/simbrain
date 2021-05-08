@@ -59,7 +59,6 @@ public class JNumberSpinnerWithNull extends JSpinner {
             this(spinner, new DecimalFormat(decimalFormatPattern));
         }
 
-
         public NumberEditorWithNull(JSpinner spinner, DecimalFormat format) {
             super(spinner);
             if (!(spinner.getModel() instanceof SpinnerNumberModel)) {
@@ -140,5 +139,12 @@ public class JNumberSpinnerWithNull extends JSpinner {
             }
             return super.valueToString(value);
         }
+    }
+
+    /**
+     * Forward to the text field.
+     */
+    public void setEnabled(boolean enabled) {
+        ((NumberEditorWithNull) getEditor()).getTextField().setEnabled(enabled);
     }
 }

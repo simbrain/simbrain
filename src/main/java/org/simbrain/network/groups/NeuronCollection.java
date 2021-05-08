@@ -43,6 +43,9 @@ public class NeuronCollection extends AbstractNeuronCollection {
 
         neurons.forEach(n -> {
             n.getEvents().onLocationChange(() -> events.fireLocationChange());
+            n.getEvents().onActivationChange((aold, anew) -> {
+                invalidateCachedActivations();
+            });
         });
 
         net.getEvents().onModelRemoved(n -> {

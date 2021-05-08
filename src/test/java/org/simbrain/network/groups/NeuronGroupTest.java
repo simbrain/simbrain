@@ -52,8 +52,8 @@ public class NeuronGroupTest {
 
     @Test
     void propagateLooseActivations() {
-        ng.getNeuron(0).addInputValue(1.0);
-        ng.getNeuron(1).addInputValue(-1.0);
+        ng.getNeuron(0).setActivation(1.0);
+        ng.getNeuron(1).setActivation(-1.0);
         NeuronGroup ng2 = new NeuronGroup(net, 2);
         WeightMatrix wm = new WeightMatrix(net, ng, ng2);
         net.addNetworkModels(List.of(ng2, wm));

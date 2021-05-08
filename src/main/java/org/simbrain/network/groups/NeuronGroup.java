@@ -242,33 +242,18 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * Add a neuron to group.
      *
      * @param neuron    neuron to add
-     * @param fireEvent whether to fire a neuron added event
      */
-    public void addNeuron(Neuron neuron, boolean fireEvent) {
+    public void addNeuron(Neuron neuron) {
         super.addNeuron(neuron);
         neuron.setParentGroup(this);
         neuron.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
-        if (fireEvent) {
-            subsamplingManager.resetIndices();
-        }
+        subsamplingManager.resetIndices();
     }
 
     @Override
     public void addNeurons(Collection<Neuron> neurons) {
         groupUpdateRule = UpdateRuleEnum.get(neurons.iterator().next().getUpdateRule());
-        // TODO: Throw exception if not same type
         super.addNeurons(neurons);
-        neurons.forEach(n -> n.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class)));
-        neurons.forEach(n -> n.setParentGroup(this));
-    }
-
-    /**
-     * Add neuron to group.
-     *
-     * @param neuron neuron to add
-     */
-    public void addNeuron(Neuron neuron) {
-        addNeuron(neuron, true);
     }
 
     /**

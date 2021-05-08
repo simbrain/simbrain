@@ -70,4 +70,16 @@ public class NeuronGroupTest {
         net.update();
         assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
     }
+
+    @Test
+    void getThenSetActivations() {
+        ng.getActivations(); // validates the cache. be sure propagation still works
+        ng.getNeuron(0).setActivation(1.0);
+        ng.getNeuron(1).setActivation(-1.0);
+        NeuronGroup ng2 = new NeuronGroup(net, 2);
+        WeightMatrix wm = new WeightMatrix(net, ng, ng2);
+        net.addNetworkModels(List.of(ng2, wm));
+        net.update();
+        assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
+    }
 }

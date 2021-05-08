@@ -189,8 +189,7 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
      * Add a collection of neurons.
      */
     public void addNeurons(Collection<Neuron> neurons) {
-        neuronList.addAll(neurons);
-        neurons.forEach(this::addListener);
+        neurons.forEach(this::addNeuron);
     }
 
     /**
@@ -198,6 +197,9 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
      */
     private void addListener(Neuron n) {
         n.getEvents().onLocationChange(fireLocationChange);
+        n.getEvents().onActivationChange((aold,anew) -> {
+            invalidateCachedActivations();
+        });
     }
 
     private Runnable createFireLocationChange() {

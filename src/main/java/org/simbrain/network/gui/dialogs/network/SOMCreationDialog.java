@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
@@ -61,7 +62,7 @@ public class SOMCreationDialog extends StandardDialog {
     /**
      * Layout object.
      */
-    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+    private Layout layout = new HexagonalGridLayout();
 
     /**
      * Layout panel.
@@ -83,8 +84,8 @@ public class SOMCreationDialog extends StandardDialog {
         setTitle("New SOM Network");
         somPanel = new AnnotatedPropertyEditor(sc);
         tabLogic.add(somPanel);
-        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
-        layoutObject.setLayout(SOMGroup.DEFAULT_LAYOUT);
+        layoutPanel = new AnnotatedPropertyEditor(layout);
+        layout = SOMGroup.DEFAULT_LAYOUT;
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
@@ -102,7 +103,7 @@ public class SOMCreationDialog extends StandardDialog {
         somPanel.commitChanges();
         SOMNetwork som = sc.create(networkPanel.getNetwork());
         layoutPanel.commitChanges();
-        som.getSom().setLayout(layoutObject.getLayout());
+        som.getSom().setLayout(layout);
         som.getSom().applyLayout();
         networkPanel.getNetwork().addNetworkModel(som);
         networkPanel.getPlacementManager().addNewModelObject(som);

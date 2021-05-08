@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author wstclair
  */
-public class HexagonalGridLayout implements Layout {
+public class HexagonalGridLayout extends Layout {
 
     //TODO: Extend GridLayout?
 

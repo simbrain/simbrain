@@ -20,9 +20,7 @@ package org.simbrain.network.layouts;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;
@@ -34,29 +32,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public interface Layout extends CopyableObject {
-
-    /**
-     * Layout a list of neurons.
-     *
-     * @param neurons the list of neurons
-     */
-    void layoutNeurons(List<Neuron> neurons);
-
-    /**
-     * @return the name of this layout type
-     */
-    String getDescription();
-
-    /**
-     * Set the initial position.
-     *
-     * @param initialPoint initial position
-     */
-    void setInitialLocation(final Point2D initialPoint);
-
-    @Override
-    Layout copy();
+public abstract class Layout implements CopyableObject {
 
     /**
      * Called via reflection using {@link UserParameter#typeListMethod()}.
@@ -65,45 +41,31 @@ public interface Layout extends CopyableObject {
         return Arrays.asList(LineLayout.class, GridLayout.class, HexagonalGridLayout.class);
     }
 
+    /**
+     * Layout a list of neurons.
+     *
+     * @param neurons the list of neurons
+     */
+    public abstract void layoutNeurons(List<Neuron> neurons);
+
+    /**
+     * @return the name of this layout type
+     */
+    public abstract String getDescription();
+
+    /**
+     * Set the initial position.
+     *
+     * @param initialPoint initial position
+     */
+    public abstract void setInitialLocation(final Point2D initialPoint);
+
     @Override
-    default String getName() {
+    public abstract Layout copy();
+
+    @Override
+    public String getName() {
         return getDescription();
     }
 
-    //TODO: A better name would be nice but we can't come up with one...
-    /**
-     * Layout wrapped for {@link AnnotatedPropertyEditor} to edit.
-     */
-    class LayoutObject implements EditableObject {
-
-        /**
-         * The layout to edit. Default to {@link LineLayout}.
-         */
-        @UserParameter(label = "Layout", isObjectType = true)
-        private Layout layout = new LineLayout();
-
-        /**
-         * Construct with default line layout.
-         */
-        public LayoutObject() {
-        }
-
-        /**
-         * Construct with a specified layout.
-         *
-         * @param layout layout to use
-         */
-        public LayoutObject(Layout layout) {
-            this.layout = layout;
-        }
-
-        public Layout getLayout() {
-            return layout;
-        }
-
-        public void setLayout(Layout layout) {
-            this.layout = layout;
-        }
-
-    }
 }

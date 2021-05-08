@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.BoltzmannMachine;
 import org.simbrain.util.LabelledItemPanel;
@@ -35,7 +36,7 @@ import java.text.NumberFormat;
 public class BoltzmannMachineDialog extends StandardDialog {
 
     
-    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+    private Layout layoutObject = new GridLayout();
 
     /**
      * Layout panel.

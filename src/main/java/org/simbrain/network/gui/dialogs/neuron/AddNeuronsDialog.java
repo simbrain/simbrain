@@ -90,7 +90,7 @@ public class AddNeuronsDialog extends StandardDialog {
     /**
      * Layout object.
      */
-    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+    private Layout layoutObject = new GridLayout();
 
     /**
      * A panel where layout settings can be edited.
@@ -164,7 +164,7 @@ public class AddNeuronsDialog extends StandardDialog {
         combinedNeuronInfoPanel.setDetailTrianglesOpen(false);
 
         // Layout Panel
-        layoutObject.setLayout(DEFAULT_LAYOUT);
+        layoutObject = DEFAULT_LAYOUT;
         selectLayout = new AnnotatedPropertyEditor(layoutObject);
         selectLayout.setDetailTrianglesOpen(false);
         addNeuronsPanel.add(selectLayout);
@@ -192,12 +192,12 @@ public class AddNeuronsDialog extends StandardDialog {
             }
             if (inGroup) {
                 NeuronGroup ng = new NeuronGroup(networkPanel.getNetwork(), addedNeurons);
-                ng.setLayout(layoutObject.getLayout());
+                ng.setLayout(layoutObject);
                 networkPanel.getNetwork().addNetworkModel(ng);
                 ng.applyLayout();
                 ng.setLabel(groupPanel.tfGroupName.getText());
             } else {
-                layoutObject.getLayout().layoutNeurons(addedNeurons);
+                layoutObject.layoutNeurons(addedNeurons);
                 addedNeurons.forEach(networkPanel.getNetwork()::addNetworkModel);
             }
         }

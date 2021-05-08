@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author jyoshimi
  */
-public class LineLayout implements Layout {
+public class LineLayout extends Layout {
 
     /**
      * Orientation of the line.

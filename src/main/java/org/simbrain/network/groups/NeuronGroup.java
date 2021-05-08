@@ -68,7 +68,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     /**
      * The layout for the neurons in this group.
      */
-    private Layout.LayoutObject layout = new Layout.LayoutObject();
+    private Layout layout = DEFAULT_LAYOUT;
 
     /**
      * Set of incoming synapse groups.
@@ -333,23 +333,20 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     public Layout getLayout() {
-        return layout.getLayout();
+        return layout;
     }
 
     public void setLayout(Layout layout) {
-        this.layout.setLayout(layout);
+        this.layout = layout;
     }
 
-    public Layout.LayoutObject getLayoutObject() {
-        return layout;
-    }
 
     /**
      * Apply this group's layout to its neurons.
      */
     public void applyLayout() {
-        layout.getLayout().setInitialLocation(getTopLeftLocation(getNeuronList()));
-        layout.getLayout().layoutNeurons(getNeuronList());
+        layout.setInitialLocation(getTopLeftLocation(getNeuronList()));
+        layout.layoutNeurons(getNeuronList());
     }
 
     /**
@@ -358,8 +355,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * @param initialPosition the position from which to begin the layout.
      */
     public void applyLayout(Point2D initialPosition) {
-        layout.getLayout().setInitialLocation(initialPosition);
-        layout.getLayout().layoutNeurons(getNeuronList());
+        layout.setInitialLocation(initialPosition);
+        layout.layoutNeurons(getNeuronList());
     }
 
     public HashSet<SynapseGroup> getIncomingSgs() {

@@ -101,7 +101,7 @@ public final class NeuronGroupDialog extends StandardDialog {
     /**
      * Layout object for new or existing neuron groups.
      */
-    private Layout.LayoutObject layoutObject;
+    private Layout layout;
 
     /**
      * For creating a new neuron group.
@@ -163,11 +163,11 @@ public final class NeuronGroupDialog extends StandardDialog {
 
         // Layout panel
         if(isCreationDialog) {
-            layoutObject = new Layout.LayoutObject(NeuronGroup.DEFAULT_LAYOUT);
+            layout = NeuronGroup.DEFAULT_LAYOUT;
         } else {
-            layoutObject = neuronGroup.getLayoutObject();
+            layout = neuronGroup.getLayout();
         }
-        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
+        layoutPanel = new AnnotatedPropertyEditor(layout);
         tabbedPane.addTab("Layout", layoutPanel);
         JScrollPane layoutWrapper = new JScrollPane(layoutPanel);
         layoutWrapper.setBorder(null);
@@ -270,7 +270,7 @@ public final class NeuronGroupDialog extends StandardDialog {
             neuronGroupCreationEditor.commitChanges();
             neuronGroup = ngCreator.create(networkPanel.getNetwork());
             layoutPanel.commitChanges();
-            neuronGroup.setLayout(layoutObject.getLayout());
+            neuronGroup.setLayout(layout);
             neuronGroup.applyLayout();
             networkPanel.getNetwork().addNetworkModel(neuronGroup);
             networkPanel.getPlacementManager().addNewModelObject(neuronGroup);

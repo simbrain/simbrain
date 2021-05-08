@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
@@ -59,10 +60,11 @@ public class CompetitiveCreationDialog extends StandardDialog {
      */
     private CompetitiveNetwork.CompetitiveCreator
             cc = new  CompetitiveNetwork.CompetitiveCreator();
+
     /**
      * Layout object.
      */
-    private Layout.LayoutObject layoutObject = new Layout.LayoutObject();
+    private Layout layout = new GridLayout();
 
     /**
      * Layout panel.
@@ -85,8 +87,8 @@ public class CompetitiveCreationDialog extends StandardDialog {
         setTitle("New Competitive Network");
         competitivePanel = new AnnotatedPropertyEditor(cc);
         tabLogic.add(competitivePanel);
-        layoutPanel = new AnnotatedPropertyEditor(layoutObject);
-        layoutObject.setLayout(CompetitiveGroup.DEFAULT_LAYOUT);
+        layoutPanel = new AnnotatedPropertyEditor(layout);
+        layout  = CompetitiveGroup.DEFAULT_LAYOUT;
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);
@@ -105,7 +107,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
         competitivePanel.commitChanges();
         CompetitiveNetwork cn = cc.create(networkPanel.getNetwork());
         layoutPanel.commitChanges();
-        cn.getCompetitive().setLayout(layoutObject.getLayout());
+        cn.getCompetitive().setLayout(layout);
         cn.getCompetitive().applyLayout();
         networkPanel.getNetwork().addNetworkModel(cn);
         networkPanel.getPlacementManager().addNewModelObject(cn);

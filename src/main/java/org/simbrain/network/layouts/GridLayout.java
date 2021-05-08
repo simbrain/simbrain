@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public class GridLayout implements Layout {
+public class GridLayout extends Layout {
 
     /**
      * The default number of columns if manual columns are allowed.

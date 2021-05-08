@@ -2,12 +2,11 @@ package org.simbrain.network;
 
 import org.junit.jupiter.api.Test;
 import smile.classification.KNN;
-import smile.data.formula.Formula;
-import smile.classification.SVM
+import smile.classification.SVM;
 import smile.io.Read;
+import smile.math.kernel.GaussianKernel;
 import smile.math.kernel.PolynomialKernel;
 import smile.math.matrix.Matrix;
-import smile.regression.OLS;
 import smile.regression.SVR;
 import smile.stat.distribution.GaussianDistribution;
 import smile.validation.CrossValidation;
@@ -177,7 +176,7 @@ public class SmileTest {
         System.out.println("Accuracy: "+Accuracy.instance.score(test_y, pred));
     }
 
-    @Test
+    // @Test
     public void modelAH() throws IOException, URISyntaxException {
         var train_data = Read.csv(getClass().getClassLoader().getResource("TrainSAT_GPA.csv").getPath());
         var test_data = Read.csv(getClass().getClassLoader().getResource("testSAT_GPA.csv").getPath());
@@ -188,7 +187,13 @@ public class SmileTest {
         var test_x = test_data.select(0,1,2,3).toArray();
         var test_y = test_data.column(4).toDoubleArray();
 
-        var model = CrossValidation.regression(5, test_x,test_y,(a,b) -> SVR.fit(x, y, new GaussianKernel(0.6), 20, 10, 1E-3));
+        var model =
+                CrossValidation.regression(
+                        5,
+                        test_x,
+                        test_y,
+                        (a,b) -> SVR.fit(x, y, new GaussianKernel(0.6), 20, 10, 1E-3)
+                );
 
         //var model = SVR.fit(x,y,0.01, 1000,1E-3);
         System.out.println(model);

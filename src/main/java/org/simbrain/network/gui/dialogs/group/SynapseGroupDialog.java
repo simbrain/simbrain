@@ -26,6 +26,7 @@ import org.simbrain.network.gui.dialogs.connect.ConnectionSelectorPanel;
 import org.simbrain.network.gui.dialogs.connect.SynapsePropertiesPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ApplyPanel;
 import org.simbrain.util.widgets.ShowHelpAction;
 
@@ -49,7 +50,7 @@ public final class SynapseGroupDialog extends StandardDialog {
     /**
      * Parent network panel.
      */
-    private NetworkPanel networkPanel;
+    private final NetworkPanel networkPanel;
 
     /**
      * Synapse Group.
@@ -82,6 +83,10 @@ public final class SynapseGroupDialog extends StandardDialog {
     private SynapseGroupAdjustmentPanel adjustmentPanel;
 
     /**
+     * Summary info about synapse group.
+     */
+    private AnnotatedPropertyEditor sgProperties;
+    /**
      * If true this is a creation dialog. Otherwise it is an edit dialog.
      */
     private boolean isCreationDialog = false;
@@ -100,19 +105,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      * The list of components which are stored here so their tabs can be blanked
      * out. This is what allows the panel to resize when tabs are changed.
      */
-    private ArrayList<Component> storedComponents = new ArrayList<Component>();
-
-    ///**
-    // * See {@link SynapseGroup#useGroupLevelSettings}.
-    // */
-    //private boolean setUseGroupLevelSettings;
-
-    /**
-     * Summary information panel
-     */
-
-    // TODO
-    //private SummaryPanel sumPanel;
+    private final ArrayList<Component> storedComponents = new ArrayList<>();
 
     /**
      * When editing the connection strategy must be explicitly applied with a button press.
@@ -195,28 +188,19 @@ public final class SynapseGroupDialog extends StandardDialog {
         fillFieldValues();
         setContentPane(tabbedPane);
 
-        // Summary Info
-        JPanel tabSummaryInfo = new JPanel();
+        // Make the synapse group
         if (isCreationDialog) {
             synapseGroup = new SynapseGroup(sourceNeuronGroup, targetNeuronGroup);
-            //sumPanel = new SummaryPanel(synapseGroup);
-            JPanel container = new JPanel();
-            //container.add(sumPanel);
-            tabSummaryInfo = container;
-        } else {
-            //sumPanel = new SummaryPanel(synapseGroup);
-            //tabSummaryInfo = ApplyPanel.createApplyPanel(sumPanel);
-            //((ApplyPanel) tabSummaryInfo).addActionListener(new ActionListener() {
-            //    @Override
-            //    public void actionPerformed(ActionEvent e) {
-            //        //setUseGroupLevelSettings = sumPanel.getUseGlobalSettingsChkBx().isSelected();
-            //    }
-            //});
         }
-        JScrollPane summaryScrollWrapper = new JScrollPane(tabSummaryInfo);
-        summaryScrollWrapper.setBorder(null);
-        storedComponents.add(summaryScrollWrapper);
-        tabbedPane.addTab("Properties", summaryScrollWrapper);
+
+        // Summary Info
+        if (!isCreationDialog) {
+            sgProperties = new AnnotatedPropertyEditor(synapseGroup);
+            JScrollPane summaryScrollWrapper = new JScrollPane(sgProperties);
+            summaryScrollWrapper.setBorder(null);
+            storedComponents.add(summaryScrollWrapper);
+            tabbedPane.addTab("Properties", summaryScrollWrapper);
+        }
 
         // Connectivity panel
         if (isCreationDialog) {
@@ -352,30 +336,17 @@ public final class SynapseGroupDialog extends StandardDialog {
         }
     }
 
-    /**
-     * Commit changes.
-     */
-    public void commitChanges() {
-        if (isCreationDialog) {
-            connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
-            //sumPanel.commitChanges();
-            editSynapsesPanel.commitChanges();
-            networkPanel.getNetwork().addNetworkModel(synapseGroup);
-            networkPanel.repaint();
-        } else {
-            // Must be set ONLY after dialog is closed otherwise changes won't
-            // take effect
-            // TODO
-            //synapseGroup.setUseGroupLevelSettings(setUseGroupLevelSettings);
-            // When editing a synpase group most edits are handled by apply buttons
-        }
-    }
-
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         if (isCreationDialog) {
-            commitChanges();
+            connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
+            editSynapsesPanel.commitChanges();
+            networkPanel.getNetwork().addNetworkModel(synapseGroup);
+            networkPanel.repaint();
+        } else {
+            // When editing a synpase group most edits are handled by apply buttons
+            sgProperties.commitChanges();
         }
     }
 

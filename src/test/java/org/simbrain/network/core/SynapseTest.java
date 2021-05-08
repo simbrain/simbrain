@@ -1,12 +1,13 @@
 package org.simbrain.network.core;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 
 public class SynapseTest {
 

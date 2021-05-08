@@ -151,14 +151,14 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
         if (val >= threshold) {
             val = c;
             recovery += d;
-            neuron.setSpkBuffer(true);
+            neuron.setSpike(true);
             setHasSpiked(true, neuron);
         } else {
-            neuron.setSpkBuffer(false);
+            neuron.setSpike(false);
             setHasSpiked(false, neuron);
         }
 
-        neuron.setBuffer(val);
+        neuron.setActivation(val);
     }
 
     @Override

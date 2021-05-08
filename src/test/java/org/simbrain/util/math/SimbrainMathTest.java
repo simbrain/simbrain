@@ -1,11 +1,12 @@
 package org.simbrain.util.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class SimbrainMathTest {
 

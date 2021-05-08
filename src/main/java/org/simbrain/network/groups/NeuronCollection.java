@@ -69,11 +69,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
         events.fireLocationChange();
     }
 
-    @Override
-    public void update() {
-        super.update();
-    }
-
     /**
      * Call after deleting neuron collection from parent network.
      */
@@ -103,12 +98,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-
-    @Override
-    public String toString() {
-        return String.format("with %d neuron(s).", this.getNeuronList().size());
     }
 
     /**

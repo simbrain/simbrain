@@ -1,6 +1,14 @@
 package org.simbrain.network.core
 
+import com.thoughtworks.xstream.annotations.XStreamImplicit
+import com.thoughtworks.xstream.converters.Converter
+import com.thoughtworks.xstream.converters.MarshallingContext
+import com.thoughtworks.xstream.converters.UnmarshallingContext
+import com.thoughtworks.xstream.io.HierarchicalStreamReader
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -8,11 +16,10 @@ import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.Polarity
-import org.simbrain.util.SimbrainPreferences
-import org.simbrain.util.SimpleIdManager
-import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
+import java.awt.geom.Point2D
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -64,7 +71,7 @@ class Network {
      */
     @Transient
     var events = NetworkEvents(this)
-    private set
+        private set
 
     /**
      * Main data structure containing all [NetworkModel]s: neurons, synapses, etc.
@@ -99,7 +106,6 @@ class Network {
      */
     var timeStep = DEFAULT_TIME_STEP
 
-
     /**
      * Local thread flag for starting and stopping the network
      */
@@ -122,7 +128,7 @@ class Network {
      * priorities WITHIN the group... To be resolved.
      */
     var prioritySortedNeuronList: ArrayList<Neuron> = ArrayList()
-    private set
+        private set
 
     /**
      * Manage ids for all network elements.
@@ -153,8 +159,8 @@ class Network {
         current_id++
     }
 
-    fun <T: NetworkModel> getModels(cls: Class<T>) = networkModels[cls]
-    inline fun <reified T: NetworkModel> getModels() = getModels(T::class.java)
+    fun <T : NetworkModel> getModels(cls: Class<T>) = networkModels[cls]
+    inline fun <reified T : NetworkModel> getModels() = getModels(T::class.java)
 
     val allModels get() = networkModels.all
     val allModelsInDeserializationOrder get() = networkModels.allInDeserializationOrder
@@ -168,14 +174,12 @@ class Network {
         // Main update
         updateManager.invokeAllUpdates()
 
-        //clearInputs();
         updateTime()
         events.fireUpdateTimeDisplay(false)
         iterCount++
         setUpdateCompleted(true)
         events.fireUpdateCompleted()
     }
-
 
     /**
      * Update the priority list used for priority based update.
@@ -205,7 +209,6 @@ class Network {
     fun updateNeuronsByPriority() {
         for (neuron in prioritySortedNeuronList) {
             neuron.update()
-            neuron.updateStateFromBuffer()
         }
     }
 
@@ -214,46 +217,14 @@ class Network {
      */
     fun bufferedUpdate() {
         networkModels.all.forEach { it.updateInputs() }
-        networkModels.all.forEach { it.updateBuffer() }
-        networkModels.all.forEach { it.updateStateFromBuffer() }
-    }
-
-    /**
-     * Clears out input values of network nodes, which otherwise linger and cause problems.
-     */
-    fun clearInputs() {
-
-        // TODO: Is there a more efficient way to handle this?
-        // i.e. a way to get a list of neurons that (1) are coupled or better,
-        // (2) have input values which consume.
-        for (neuron in flatNeuronList) {
-            neuron.inputValue = 0.0
-        }
+        networkModels.all.forEach { it.update() }
     }
 
     /**
      * Set the activation level of all neurons to zero.
      */
     fun clearActivations() {
-        for (neuron in flatNeuronList) {
-            neuron.clear()
-        }
-    }
-
-
-    /**
-     * Return the neuron at the specified index of the internal list storing neurons.
-     *
-     * @param neuronIndex index of the neuron
-     * @return the neuron at that index
-     */
-    @Deprecated("This is linear search")
-    fun getLooseNeuron(neuronIndex: Int): Neuron {
-        val iterator: Iterator<Neuron> = networkModels.get<Neuron>().iterator()
-        for (i in 0 until neuronIndex) {
-            iterator.next()
-        }
-        return iterator.next()
+        flatNeuronList.forEach(Neuron::clear)
     }
 
     /**
@@ -348,16 +319,14 @@ class Network {
         }
     }
 
-
     /**
-     * Delete a [NetworkModel]
+     * Delete a [NetworkModel].
      */
     fun delete(toDelete: NetworkModel) {
         networkModels.remove(toDelete)
         toDelete.delete()
         events.fireModelRemoved(toDelete)
     }
-
 
     /**
      * Create a [NeuronCollection] from a provided list of neurons
@@ -388,7 +357,11 @@ class Network {
      * @return the precision of the current time step.
      */
     private fun getTimeStepPrecision(): Int = ceil(ln(timeStep) / LOG_10).toInt().let {
-        if (it < 0) { abs(it) + 1 } else { 0 }
+        if (it < 0) {
+            abs(it) + 1
+        } else {
+            0
+        }
     }
 
     /**
@@ -403,7 +376,6 @@ class Network {
         return Utils.getSimbrainXStream().fromXML(xmlRepresentation) as Network
     }
 
-
     /**
      * Standard method call made to objects after they are deserialized. See: http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
      * http://xstream.codehaus.org/faq.html
@@ -416,20 +388,9 @@ class Network {
 
         // Initialize update manager
         updateManager.postUnmarshallingInit()
-        flatNeuronList.forEach { it.postUnmarshallingInit() }
-        networkModels.get<NetworkTextObject>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<SynapseGroup>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<NeuronGroup>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<NeuronCollection>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<NeuronArray>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<WeightMatrix>().forEach { it.postUnmarshallingInit() }
-        networkModels.get<Subnetwork>().forEach { it.postUnmarshallingInit() }
-
-        // Re-populate fan-in / fan-out for loose synapses
-        networkModels.get<Synapse>().forEach { it.postUnmarshallingInit() }
+        networkModels.allInDeserializationOrder.forEach { it.postUnmarshallingInit() }
         return this
     }
-
 
     /**
      * Perform operations required before saving a network. Post-opening operations occur in [.readResolve].
@@ -449,14 +410,12 @@ class Network {
         }
     }
 
-
     /**
      * Returns the current number of iterations.
      *
      * @return the number of update iterations which have been run since the network was created.
      */
     val iterations: Long get() = (time / timeStep).toLong()
-
 
     /**
      * string version of time, with units.
@@ -467,7 +426,6 @@ class Network {
         } else {
             "${SimbrainMath.roundDouble(time, getTimeStepPrecision() + 1)} msec"
         }
-
 
     /**
      * If there is a single continuous neuron in the network, consider this a continuous network.
@@ -481,7 +439,6 @@ class Network {
         }
     }
 
-
     /**
      * Increment the time counter, using a different method depending on whether this is a continuous or discrete.
      * network.
@@ -493,7 +450,6 @@ class Network {
     fun resetTime() {
         time = 0.0
     }
-
 
     /**
      * Used by Network thread to ensure that an update cycle is complete before updating again.
@@ -513,12 +469,8 @@ class Network {
         updateCompleted.set(b)
     }
 
-    override fun toString(): String = """
-        Root Network
-        =================
-        ${networkModels.all.joinToString("\n        ") { "[${it.id}] $it" }}
-    """.trimIndent()
-
+    override fun toString(): String =
+        " ---Network--- \n" + networkModels.all.joinToString("\n") { "$it" }
 
     /**
      * Returns a neuron with a matching label.  If more than one
@@ -531,7 +483,6 @@ class Network {
         it.label.equals(label, ignoreCase = true)
     }
 
-
     /**
      * Returns a neurongroup with a matching label.  If more than one
      * group has a matching label, the first one found is returned.
@@ -543,7 +494,6 @@ class Network {
         it.label.equals(label, ignoreCase = true)
     }
 
-
     /**
      * Add an update action to the network' action list (the sequence of actions invoked on each iteration of the
      * network).
@@ -554,16 +504,14 @@ class Network {
         updateManager.addAction(action)
     }
 
-
     /**
      * Adds a list of network elements to this network. Used in copy / paste.
      *
      * @param toAdd list of objects to add.
      */
-    fun addObjects(toAdd: List<NetworkModel>) {
+    fun addNetworkModels(toAdd: List<NetworkModel>) {
         toAdd.forEach { addNetworkModel(it) }
     }
-
 
     /**
      * Translate all neurons (the only objects with position information).
@@ -576,7 +524,6 @@ class Network {
             neuron.offset(offsetX, offsetY)
         }
     }
-
 
     /**
      * Freeze or unfreeze all synapses in the network.
@@ -594,25 +541,76 @@ class Network {
         }
     }
 
-
     var isRunning: Boolean
         get() = _isRunning.get()
-        set(value) { _isRunning.set(value) }
+        set(value) {
+            _isRunning.set(value)
+        }
 
     val isRedrawTime: Boolean = oneOffRun || (iterCount % updateFreq == 0)
 
     val looseNeurons get() = networkModels.get<Neuron>()
 
+    fun addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
+        .apply(block)
+        .also(this::addNetworkModel)
 
+    fun addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
+        .apply(block)
+        .also(this::addNetworkModel)
 
+    fun addNeuronGroup(count: Int, template: Neuron.() -> Unit = { }) = NeuronGroup(this, List(count) {
+        Neuron(this).apply(template)
+    }).also { addNetworkModel(it) }
+
+    fun addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
+        return NeuronGroup(this, List(count) {
+            Neuron(this).apply(template)
+        }).also {
+            addNetworkModel(it)
+            if (location != null) {
+                val (x, y) = location
+                it.setLocation(x, y)
+            }
+        }
+    }
+
+    fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
+        return AllToAll().connectAllToAll(source.neuronList, target.neuronList)
+    }
+
+    fun createNeuronGroupTemplate(template: NeuronGroup.() -> Unit) = fun Network.(
+        count: Int,
+        template: Neuron.() -> Unit
+    ) = NeuronGroup(this, List(count) {
+        Neuron(this).apply(template)
+    }).also { addNetworkModel(it) }
+
+    fun <R> Network.withConnectionStrategy(
+        connectionStrategy: ConnectionStrategy,
+        block: NetworkWithConnectionStrategy.() -> R
+    ): R {
+        return NetworkWithConnectionStrategy(this, connectionStrategy).run(block)
+    }
+
+    data class NetworkWithConnectionStrategy(
+        private val network: Network,
+        private val connectionStrategy: ConnectionStrategy
+    ) {
+        fun connect(source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+            return connectionStrategy.connectNeurons(network, source, target)
+        }
+    }
 
     /**
      * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
      */
     private class NetworkModelList {
+
         /**
          * Backing for the collection: a map from model types to linked hash sets.
          */
+        @XStreamImplicit
         private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = HashMap()
 
         @Suppress("UNCHECKED_CAST")
@@ -626,18 +624,30 @@ class Network {
             }
         }
 
-        fun <T : NetworkModel> putAll(modelClass: Class<T>, model: List<T>) {
-            networkModels.putIfAbsent(modelClass, LinkedHashSet())?.addAll(model)
+        /**
+         * Put in the list without checking type. Needed for de-serialization. Avoid, and if used
+         * use with caution.
+         */
+        fun putUnsafe(modelClass: Class<out NetworkModel>, model: NetworkModel) {
+            if (modelClass in networkModels) {
+                networkModels[modelClass]!!.add(model)
+            } else {
+                val newSet = LinkedHashSet<NetworkModel>()
+                newSet.add(model)
+                networkModels[modelClass] = newSet
+            }
         }
 
-        fun putAllUnchecked(modelClass: Class<out NetworkModel>, model: List<NetworkModel>) {
-            networkModels.putIfAbsent(modelClass, LinkedHashSet())?.addAll(model)
-        }
-
+        /**
+         * Add a collection of network models to the map.
+         */
         fun addAll(models: Collection<NetworkModel>) {
             models.forEach { add(it) }
         }
 
+        /**
+         * Add a network model to the map.
+         */
         fun add(model: NetworkModel) {
             if (model is Subnetwork) {
                 put(Subnetwork::class.java, model)
@@ -659,7 +669,7 @@ class Network {
         }
 
         @Suppress("UNCHECKED_CAST")
-        inline fun <reified T: NetworkModel> get() = get(T::class.java)
+        inline fun <reified T : NetworkModel> get() = get(T::class.java)
 
         //TODO
         fun unsafeGet(modelClass: Class<*>?): LinkedHashSet<*> {
@@ -699,6 +709,36 @@ class Network {
         }
     }
 
+    /**
+     * Custom serializer that stores [Network.networkModels], which is a map, as a flat list of [NetworkModel]s.
+     */
+    class NetworkModelListConverter : Converter {
+
+        override fun canConvert(type: Class<*>?) = NetworkModelList::class.java == type
+
+        override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+            val modelList = source as NetworkModelList
+            modelList.allInDeserializationOrder.forEach { model ->
+                writer.startNode(model::class.java.name)
+                context.convertAnother(model)
+                writer.endNode()
+            }
+        }
+
+        override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
+            val modelList = NetworkModelList()
+            while (reader.hasMoreChildren()) {
+                reader.moveDown()
+                val cls = Class.forName(reader.nodeName)
+                val model = context.convertAnother(reader.value, cls) as NetworkModel
+                modelList.putUnsafe(cls as Class<out NetworkModel>, model)
+                reader.moveUp()
+            }
+            return modelList
+        }
+
+    }
+
 }
 
 /**
@@ -709,10 +749,10 @@ private val deserializationOrder: List<Class<out NetworkModel>> = listOf(
     NeuronGroup::class.java,
     NeuronCollection::class.java,
     NeuronArray::class.java,
-    Synapse::class.java,
     WeightMatrix::class.java,
     SynapseGroup::class.java,
-    Subnetwork::class.java
+    Subnetwork::class.java,
+    Synapse::class.java
 )
 
 /**
@@ -724,10 +764,10 @@ private val deserializationOrder: List<Class<out NetworkModel>> = listOf(
 fun updateNeurons(neuronList: List<Neuron>) {
     // TODO: Update by priority if priority based update?
     for (neuron in neuronList) {
-        neuron.updateBuffer()
+        neuron.updateInputs()
     }
     for (neuron in neuronList) {
-        neuron.updateStateFromBuffer()
+        neuron.update()
     }
 }
 
@@ -739,3 +779,40 @@ fun updateNeurons(neuronList: List<Neuron>) {
  * @return synapse from source to target
  */
 fun getLooseSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
+
+/**
+ * Convenient access to a list of activations
+ */
+var List<Neuron?>.activations: List<Double>
+    get() = map { it?.activation ?: 0.0 }
+    set(values) = values.forEachIndexed { index, value ->
+        this[index]?.let { neuron ->
+            if (neuron.isClamped) {
+                neuron.forceSetActivation(value)
+            } else {
+                neuron.activation = value
+            }
+        }
+    }
+
+var List<Neuron?>.labels: List<String>
+    get() = map { it?.label ?: "" }
+    set(values) = values.forEachIndexed { index, label ->
+        this[index]?.let { it.label = label }
+    }
+
+var List<Neuron>.auxValues: List<Double>
+    get() = map { it.auxValue }
+    set(values) = values.forEachIndexed { index, value ->
+        this[index].auxValue = value
+    }
+
+val List<Synapse>.lengths: List<Double>
+    get() = map { it.length }
+
+fun networkUpdateAction(description: String, longDescription: String = description, action: () -> Unit) =
+    object : NetworkUpdateAction {
+        override fun invoke() = action()
+        override fun getDescription(): String = description
+        override fun getLongDescription(): String = longDescription
+    }

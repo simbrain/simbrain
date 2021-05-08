@@ -102,7 +102,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
 
         contextMenu.add(new DeleteAction(getNetworkPanel()));
 
-        final var textNodes = getNetworkPanel().getSelectedNodes().stream()
+        final var textNodes = getNetworkPanel().getSelectionManager().getSelection().stream()
                 .filter(TextNode.class::isInstance)
                 .map(TextNode.class::cast)
                 .collect(Collectors.toList());

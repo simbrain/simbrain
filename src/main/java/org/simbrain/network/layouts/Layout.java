@@ -89,7 +89,7 @@ public interface Layout extends CopyableObject {
         }
 
         /**
-         * Contstruct with a specified layout.
+         * Construct with a specified layout.
          *
          * @param layout layout to use
          */

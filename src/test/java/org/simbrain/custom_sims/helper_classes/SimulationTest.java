@@ -1,10 +1,9 @@
 package org.simbrain.custom_sims.helper_classes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.gui.SimbrainDesktop;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SimulationTest {
 
@@ -15,7 +14,6 @@ public class SimulationTest {
         sim.addOdorWorld(0,0,100,100, "Test");
 
         assertTrue(sim.getWorkspace().getComponentList().size() == 1);
-
 
     }
 }

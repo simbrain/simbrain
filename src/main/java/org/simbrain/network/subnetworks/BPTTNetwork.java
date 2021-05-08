@@ -70,8 +70,8 @@ public final class BPTTNetwork extends FeedForward implements Trainable {
     public void update() {
         getHiddenLayer().update();
         getOutputLayer().update();
-        getInputLayer().copyActivations(getOutputLayer());
-        getInputLayer().applyInputs();
+        // getInputLayer().copyActivations(getOutputLayer());
+        // getInputLayer().applyInputs();
     }
 
     /**

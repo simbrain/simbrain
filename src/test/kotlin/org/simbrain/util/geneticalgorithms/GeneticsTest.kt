@@ -1,10 +1,10 @@
 package org.simbrain.util.geneticalgorithms
 
-import org.junit.Assert.*
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
-import org.simbrain.network.util.activations
+import org.simbrain.network.core.activations
 import org.simbrain.workspace.Workspace
 
 class GeneticsTest {
@@ -210,7 +210,7 @@ class GeneticsTest {
                 yield(newEnv.build().eval())
                 newEnv = newEnv.copy().apply { mutate() }
             }
-        }.onEach { println(it) }.take(5).last()
+        }.take(5).last()
     }
 
     @Test

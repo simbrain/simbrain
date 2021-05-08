@@ -2,7 +2,7 @@ package org.simbrain.network.gui
 
 import org.intellij.lang.annotations.MagicConstant
 import org.simbrain.network.LocatableModel
-import org.simbrain.network.smile.SmileSVM
+import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.Utils
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent.*
@@ -31,7 +31,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Alt + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
-    bind(Shift + 'T') { network.addNetworkModel(SmileSVM()) } // TODO: Temp testing key command
+    bind(Shift + 'T') { network.addNetworkModel(SmileClassifier(network,2)) } // TODO: Temp testing key command
     bindTo("I", networkActions.wandEditModeAction)
     bindTo("G", networkActions.neuronGroupAction)
     bind("Y") { showNeuronArrayCreationDialog() }

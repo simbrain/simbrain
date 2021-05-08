@@ -1,12 +1,12 @@
 // package org.simbrain.network.neuron_update_rules;
 //
-// import org.junit.Test;
+// import org.junit.jupiter.api.Test;
 // import org.simbrain.network.core.Network;
 // import org.simbrain.network.core.Neuron;
 // import org.simbrain.network.core.Synapse;
 // import org.simbrain.util.math.SquashingFunctionEnum;
 //
-// import static org.junit.Assert.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
 //
 // /**
 //  * Tests for the underlying sigmoid math see {@link org.simbrain.util.math.SigmoidFunctionTests}

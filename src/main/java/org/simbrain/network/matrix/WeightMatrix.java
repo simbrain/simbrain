@@ -15,7 +15,7 @@ import smile.stat.distribution.GaussianDistribution;
 import java.util.Arrays;
 
 /**
- * An weight matrix that connects a source and target {@link ArrayConnectable}
+ * An weight matrix that connects a source and target {@link WeightMatrixConnectable}
  * object.
  */
 public class WeightMatrix extends NetworkModel implements EditableObject, AttributeContainer  {
@@ -23,12 +23,12 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
     /**
      * The source "layer" / activation vector for this weight matrix.
      */
-    private ArrayConnectable source;
+    private WeightMatrixConnectable source;
 
     /**
      * The target "layer" for this weight matrix.
      */
-    private ArrayConnectable target;
+    private WeightMatrixConnectable target;
 
     /**
      * Reference to network this neuron is part of.
@@ -67,7 +67,7 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
      * @param source source layer
      * @param target target layer
      */
-    public WeightMatrix(Network net, ArrayConnectable source, ArrayConnectable target) {
+    public WeightMatrix(Network net, WeightMatrixConnectable source, WeightMatrixConnectable target) {
         this.parent = net;
         this.source = source;
         this.target = target;
@@ -79,6 +79,9 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
 
         weightMatrix = new Matrix(source.getActivations().length,
                 target.getActivations().length);
+
+        // Hack to initialize backend array so there are no delays later at first computation
+        weightMatrix.aat();
 
         // Default for "adapter" cases is 1-1
         if (source instanceof AbstractNeuronCollection) {
@@ -100,21 +103,18 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         });
     }
 
-
     @Override
     public String toString() {
-        String ret = new String();
-        ret += weightMatrix.nrows() + "x" + weightMatrix.ncols();
-        ret += "  Connects " + source.getId() + " to " + target.getId();
-        // ret += "\t\t" + Arrays.deepToString(weightMatrix.toArray()) + "\n";
-        return ret;
+        return getId()
+                + " (" + weightMatrix.nrows() + "x" + weightMatrix.ncols() + ") "
+                + "connecting " + source.getId() + " to " + target.getId();
     }
 
-    public ArrayConnectable getSource() {
+    public WeightMatrixConnectable getSource() {
         return source;
     }
 
-    public ArrayConnectable getTarget() {
+    public WeightMatrixConnectable getTarget() {
         return target;
     }
 
@@ -140,16 +140,9 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
 
     @Consumable
     public void setWeights(double[] newWeights) {
-        // TODO: No library for this? Unit test needed.
-        int k = 0;
-        for (int i = 0; i < weightMatrix.nrows(); i++) {
-            for (int j = 0; j < weightMatrix.ncols(); j++) {
-                if (++k < newWeights.length) {
-                    weightMatrix.set(i,j,newWeights[k]);
-                } else {
-                    break;
-                }
-            }
+        int len = Math.min((int) weightMatrix.size(), newWeights.length);
+        for (int i = 0; i < len; i++) {
+            weightMatrix.set(i / weightMatrix.ncols(), i % weightMatrix.ncols(), newWeights[i]);
         }
         events.fireUpdated();
     }
@@ -221,11 +214,19 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         events.fireUpdated();
     }
 
+    @Override
     public void postUnmarshallingInit() {
         if (events == null) {
             events = new WeightMatrixEvents(this);
         }
         initEvents();
+    }
+
+    /**
+     * Returns the product of the this matrix its source activations
+     */
+    public double[] weightsTimesSource() {
+        return weightMatrix.mv(source.getActivations());
     }
 
     //public Layer asLayer() {

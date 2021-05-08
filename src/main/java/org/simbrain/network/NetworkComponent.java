@@ -143,6 +143,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private static XStream getNetworkXStream() {
         XStream xstream = Utils.getSimbrainXStream();
+        xstream.registerConverter(new Network.NetworkModelListConverter());
         return xstream;
     }
 

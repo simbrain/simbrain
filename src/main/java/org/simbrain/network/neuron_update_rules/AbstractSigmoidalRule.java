@@ -95,17 +95,16 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
 
     public AbstractSigmoidalRule() {
         super();
-        // sFunction = DEFAULT_SQUASHING_FUNCTION;
+        sFunction = DEFAULT_SQUASHING_FUNCTION;
     }
 
-    /**
-     */
-    // public AbstractSigmoidalRule(SquashingFunctionEnum sFunction) {
-    //     super();
-    //     this.sFunction = sFunction;
-    //     setUpperBound(sFunction.getDefaultUpperBound());
-    //     setLowerBound(sFunction.getDefaultLowerBound());
-    // }
+
+    public AbstractSigmoidalRule(SquashingFunctionEnum sFunction) {
+        super();
+        this.sFunction = sFunction;
+        setUpperBound(sFunction.getDefaultUpperBound());
+        setLowerBound(sFunction.getDefaultLowerBound());
+    }
 
     public SquashingFunctionEnum getSquashFunctionType() {
         if (sFunction == null) {
@@ -196,8 +195,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         double up = getUpperBound();
         double lw = getLowerBound();
         double diff = up - lw;
-        return 0;
-        // return sFunction.inverseVal(val, up, lw, diff);
+        return sFunction.inverseVal(val, up, lw, diff);
     }
 
     @Override

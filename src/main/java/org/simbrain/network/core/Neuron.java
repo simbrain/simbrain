@@ -102,19 +102,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     private boolean spike;
 
     /**
-     * Temporary activation value for synchronous updating.
-     */
-    private double buffer;
-
-    /**
-     * A temporary spike value, set so that neuron's spiking behavior can be
-     * synchronously updated.
-     */
-    private boolean spkBuffer;
-
-    /**
      * Value of any external inputs to neuron. See description at
-     * {@link #setInputValue(double)}
+     * {@link #addInputValue(double)}
      */
     private double inputValue;
 
@@ -132,12 +121,12 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * List of synapses this neuron attaches to.
      */
-    private transient Map<Neuron, Synapse> fanOut = new HashMap<Neuron, Synapse>(PRE_ALLOCATED_NUM_SYNAPSES);
+    private transient Map<Neuron, Synapse> fanOut = new HashMap<>(PRE_ALLOCATED_NUM_SYNAPSES);
 
     /**
      * List of synapses attaching to this neuron.
      */
-    private transient ArrayList<Synapse> fanIn = new ArrayList<Synapse>(PRE_ALLOCATED_NUM_SYNAPSES);
+    private transient ArrayList<Synapse> fanIn = new ArrayList<>(PRE_ALLOCATED_NUM_SYNAPSES);
 
     /**
      * x-coordinate of this neuron in 2-space.
@@ -260,7 +249,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         setUpdateRule(n.getUpdateRule().deepCopy());
         setIncrement(n.getIncrement());
         forceSetActivation(n.getActivation());
-        setInputValue(n.getInputValue());
         x = n.x;
         y = n.y;
         setUpdatePriority(n.getUpdatePriority());
@@ -276,10 +264,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         return new Neuron(parent, this);
     }
 
-    /**
-     * Perform any initialization required when creating a neuron, but after the
-     * parent network has been added.
-     */
+    @Override
     public void postUnmarshallingInit() {
         events = new NeuronEvents(this);
         fanOut = new HashMap<>();
@@ -357,14 +342,18 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         }
     }
 
-    /**
-     * Updates neuron buffers.
-     */
-    public void updateBuffer() {
+    @Override
+    public void updateInputs() {
+        addInputValue(getWeightedInputs());
+    }
+
+    @Override
+    public void update() {
         if (isClamped()) {
             return;
         }
         updateRule.update(this);
+        inputValue = 0.0;
     }
 
     /**
@@ -391,18 +380,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * A general purpose method that moves all relevant values from this
-     * neuron's buffer to its main values. Must be used to ensure that spikes
-     * update synchronously in the same way activations do for buffered
-     * updates.
-     */
-    @Override
-    public void updateStateFromBuffer() {
-        setActivation(getBuffer());
-        setSpike(getSpkBuffer());
-    }
-
-    /**
      * Sets the activation of the neuron regardless of the state of the neuron.
      * Overrides clamping and any intrinsic dynamics of the neuron, and forces
      * the neuron's activation to take a specific value. Used primarily by the
@@ -421,7 +398,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public double getActivation() {
         return activation;
     }
-
 
     /**
      * @return an unmodifiable version of the fanIn list.
@@ -522,7 +498,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @return weighted input to this node
      */
     public double getWeightedInputs() {
-        double wtdSum = inputValue;
+        double wtdSum = 0;
         for (Synapse synapse : fanIn) {
             wtdSum += synapse.calcWeightedSum();
         }
@@ -540,11 +516,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @return total input to this neuron from other neurons
      */
     public double getInput() {
-        double wtdSum = inputValue;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            wtdSum += fanIn.get(i).calcPSR();
-        }
-        return wtdSum;
+        return inputValue;
     }
 
     /**
@@ -635,13 +607,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Randomize this neuron to a value between upperBound and lowerBound.
-     */
-    public void randomizeBuffer() {
-        setBuffer(getUpdateRule().getRandomValue());
-    }
-
-    /**
      * Sends relevant information about the network to standard output.
      */
     public void debug() {
@@ -671,46 +636,9 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Temporary buffer which can be used for algorithms which should not depend
-     * on the order in which neurons are updated.
-     *
-     * @param d temporary value
-     */
-    public void setBuffer(final double d) {
-        lastActivation = getActivation();
-        buffer = d;
-    }
-
-    /**
-     * @return Returns the current value in the buffer.
-     */
-    public double getBuffer() {
-        return buffer;
-    }
-
-    /**
-     * @return Returns the inputValue.
-     */
-    public double getInputValue() {
-        return inputValue;
-    }
-
-    /**
-     * Set the input value of the neuron. This is used in
-     * {@link #getWeightedInputs()} as an "external input" to the neuron. When
-     * external components (like input tables) send activation to the network
-     * they should use this.
-     *
-     * @param inputValue The inputValue to set.
-     */
-    @Consumable()
-    public void setInputValue(final double inputValue) {
-        this.inputValue = inputValue;
-    }
-
-    /**
-     * Called in couplings (by reflection) to allow multiple values to be added each time step to a neuron.
-     * Inputs are cleared each time step.
+     * Add to the input value of the neuron. When external components (like input tables) send activation to the
+     * network they should use this. Called in couplings (by reflection) to allow multiple values to be added each
+     * time step to a neuron. Inputs are cleared each time step.
      */
     @Consumable
     public void addInputValue(double toAdd) {
@@ -861,13 +789,15 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public String toString() {
-        return getType() + " Activation = " + SimbrainMath.roundDouble(this.getActivation(), 3);
+        return getId() + ": " + getType() + " Activation = " + SimbrainMath.roundDouble(this.getActivation(), 3);
     }
 
     /**
      * Forward to updaterule's clearing method. By default set activation to 0.
      */
     public void clear() {
+        inputValue = 0.0;
+        setActivation(0.0);
         updateRule.clear(this);
     }
 
@@ -1088,14 +1018,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         var oldSpike = this.spike;
         this.spike = spike;
         events.fireSpiked(oldSpike, spike);
-    }
-
-    public boolean getSpkBuffer() {
-        return spkBuffer;
-    }
-
-    public void setSpkBuffer(boolean spkBuffer) {
-        this.spkBuffer = spkBuffer;
     }
 
     public double getLastActivation() {

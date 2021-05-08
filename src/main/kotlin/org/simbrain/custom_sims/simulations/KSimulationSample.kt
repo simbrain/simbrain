@@ -1,10 +1,10 @@
 package org.simbrain.custom_sims.simulations
 
+import org.simbrain.custom_sims.addImageWorld
+import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.helper_classes.Simulation
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.util.addNeuron
-import org.simbrain.network.util.addSynapse
 import org.simbrain.util.place
 import org.simbrain.util.point
 

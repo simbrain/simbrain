@@ -70,7 +70,7 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         // not in the refractory period
         boolean spk = outOfRef && (input >= getThreshold());
         setHasSpiked(spk, neuron);
-        neuron.setSpkBuffer(spk);
+        neuron.setSpike(spk);
         neuron.setBuffer(2*(input-getThreshold()));
         plasticUpdate(neuron);
     }

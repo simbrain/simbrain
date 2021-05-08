@@ -88,8 +88,8 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
             val += noiseGenerator.getRandom();
         }
 
-        neuron.setBuffer(val);
-        neuron.setInputValue(0);
+        neuron.setActivation(val);
+        neuron.addInputValue(0);
     }
 
     /**

@@ -119,7 +119,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         // annual cog-sci meeting
 
         // Sum of the "active excitors" and "active inhibitors"
-        netInput = neuron.getInputValue();
+        netInput = neuron.getInput();
         for (Synapse w : neuron.getFanIn()) {
             if (w.getSource().getActivation() > 0) {
                 netInput += (w.getStrength() * w.getSource().getActivation());
@@ -145,7 +145,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
             act = clip(act);
         }
 
-        neuron.setBuffer(act);
+        neuron.setActivation(act);
     }
 
     @Override

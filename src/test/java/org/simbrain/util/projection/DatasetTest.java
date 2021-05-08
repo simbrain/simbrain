@@ -1,15 +1,15 @@
 package org.simbrain.util.projection;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DatasetTest {
 
     Dataset data;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         data = new Dataset(2);
         data.addPoint(new DataPoint(new double[]{1,0}));

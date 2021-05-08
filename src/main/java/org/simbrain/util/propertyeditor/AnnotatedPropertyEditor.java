@@ -39,13 +39,11 @@ import java.util.stream.Collectors;
  * is shown.  Null values are ignored when the panel is closed, and any values
  * in the panel are written to it.
  * <p>
- * To use simply initialize with a single object or list of objects to edit,
- * which contain the {@link UserParameter} annotation. When ready to write the
- * values of the panel to the underlying objects call commitChanges.
- * <p>
- * The class can also be used in "apply" mode: the editor values can be used to
- * set the values of a set of compatible objects using fillFieldValues(List<EditableObject>)
- * and commitChanges(List<EditableObject>)
+ * To use simply initialize with a single object or list of objects to edit. These
+ * objects must instantiate {@link EditableObject}. The fields that should be editable
+ * are annotated with the {@link UserParameter} annotation.  Object types must instantiate
+ * {@link CopyableObject}, because the way it works is that (e.g.) when changing the update
+ * rule of a neuron, a copy of a prototype rule is made of the relevant type.
  * <p>
  * You can also use the editor to build a more customized panel but using the
  * property editor as a holder that can then return JComponents for specific
@@ -311,7 +309,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 }
                 continue;
             }
-
 
             // If the widget is in "..." mode don't do anything with it
             if (!pw.isInconsistent()) {

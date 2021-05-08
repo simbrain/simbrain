@@ -150,7 +150,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
 
         dv = -1 * neuron.getNetwork().getTimeStep() * (k_current + na_current + gl * (v - vl)) / cm;
 
-        neuron.setBuffer(-1 * (v + dv + resting_v));
+        neuron.setActivation(-1 * (v + dv + resting_v));
         h += dh;
         m += dm;
         n += dn;

@@ -1,8 +1,9 @@
 package org.simbrain.workspace
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Test
+
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -48,7 +49,7 @@ class CouplingTest {
         val neuron = Neuron(network)
         with(couplingManager) {
             val producer = neuron.getProducer("getActivation")
-            val consumer = neuron.getConsumer("setInputValue")
+            val consumer = neuron.getConsumer("addInputValue")
             val coupling1 = createCoupling(producer, consumer)
             val coupling2 = createCoupling(producer, consumer)
             assert(coupling1 == coupling2)
@@ -60,7 +61,7 @@ class CouplingTest {
         val neuron = Neuron(network)
         with(couplingManager) {
             val producer = neuron.getProducer("getActivation")
-            val consumer = neuron.getConsumer("setInputValue")
+            val consumer = neuron.getConsumer("addInputValue")
             createCoupling(producer, consumer)
             assert(couplings.isNotEmpty())
         }
@@ -71,7 +72,7 @@ class CouplingTest {
         val neuron = Neuron(network)
         with(couplingManager) {
             val producer = neuron.getProducer("getActivation")
-            val consumer = neuron.getConsumer("setInputValue")
+            val consumer = neuron.getConsumer("addInputValue")
             createCoupling(producer, consumer)
             createCoupling(producer, consumer)
             assertEquals(1, couplings.size)
@@ -83,7 +84,7 @@ class CouplingTest {
         val neuron = Neuron(network)
         with(couplingManager) {
             val producer = neuron.getProducer("getActivation")
-            val consumer = neuron.getConsumer("setInputValue")
+            val consumer = neuron.getConsumer("addInputValue")
             val coupling = createCoupling(producer, consumer)
             removeCoupling(coupling)
             assert(couplings.isEmpty())
@@ -98,7 +99,7 @@ class CouplingTest {
         with(couplingManager) {
             fun neuronCoupling(source: Neuron, target: Neuron): Coupling {
                 val producer = source.getProducer("getActivation")
-                val consumer = target.getConsumer("setInputValue")
+                val consumer = target.getConsumer("addInputValue")
                 return createCoupling(producer, consumer)
             }
 
@@ -123,7 +124,7 @@ class CouplingTest {
         with(couplingManager) {
             fun neuronCoupling(source: Neuron, target: Neuron): Coupling {
                 val producer = source.getProducer("getActivation")
-                val consumer = target.getConsumer("setInputValue")
+                val consumer = target.getConsumer("addInputValue")
                 return createCoupling(producer, consumer)
             }
 
@@ -147,17 +148,17 @@ class CouplingTest {
         val expected = setOf("getLabel", "getActivation")
         val actual = with(couplingManager) { neuron.producers.map { it.method.name }.toSet() }
         val diff = expected complement actual // For error message if test fails
-        assertTrue("$diff", diff.isIdentical())
+        assertTrue(diff.isIdentical(),"$diff")
     }
 
     @Test
     fun `check if all consumers are created on a neuron`() {
         val neuron = Neuron(network)
         network.addNetworkModel(neuron)
-        val expected = setOf("setActivation", "forceSetActivation", "setInputValue", "addInputValue", "setLabel")
+        val expected = setOf("setActivation", "forceSetActivation", "addInputValue", "addInputValue", "setLabel")
         val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
         val diff = expected complement actual
-        assertTrue("$diff", diff.isIdentical())
+        assertTrue(diff.isIdentical(),"$diff")
     }
 
     @Test
@@ -227,11 +228,11 @@ class CouplingTest {
         with(couplingManager) {
             couplingManager.createCoupling(
                     neuron1.getProducer("getActivation"),
-                    neuron2.getConsumer("setInputValue")
+                    neuron2.getConsumer("addInputValue")
             )
             couplingManager.createCoupling(
                     neuron1.getProducer("getActivation"),
-                    neuron3.getConsumer("setInputValue")
+                    neuron3.getConsumer("addInputValue")
             )
         }
 

@@ -1,9 +1,5 @@
 package org.simbrain.network.gui
 
-//import org.simbrain.network.dl4j.MultiLayerNet
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
@@ -12,10 +8,7 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
@@ -26,14 +19,13 @@ import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
-import org.simbrain.network.matrix.ArrayConnectable
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.smile.SmileSVM
+import org.simbrain.network.matrix.WeightMatrixConnectable
+import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.network.trainers.TrainingSet
-import org.simbrain.network.util.activations
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.widgets.EditablePanel
@@ -179,89 +171,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             field = guiOn
         }
 
-    /**
-     * Main initialization of the network panel.
-     */
-    init {
-        super.setLayout(BorderLayout())
-
-        canvas.apply {
-            // Always render in high quality
-            setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)
-            animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
-            interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
-
-            // Remove default event listeners
-            removeInputEventListener(panEventHandler)
-            removeInputEventListener(zoomEventHandler)
-
-            // Event listeners
-            addInputEventListener(MouseEventHandler(this@NetworkPanel))
-            addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
-            addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
-            addInputEventListener(textHandle)
-            addInputEventListener(WandEventHandler(this@NetworkPanel));
-
-            // Don't show text when the canvas is sufficiently zoomed in
-            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                filterScreenElements<NeuronNode>().forEach { it.updateTextVisibility() }
-            }
-        }
-
-        // Init network change listeners
-        addNetworkListeners()
-
-        toolbars.apply {
-
-            cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
-            val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
-            add("Center", JPanel(flowLayout).apply {
-                add(mainToolBar)
-                add(runToolBar)
-                add(editToolBar)
-            })
-        }
-
-        add("North", toolbars)
-        add("Center", canvas)
-        add("South", JToolBar().apply { add(timeLabel) })
-
-        // Register support for tool tips
-        // TODO: might be a memory leak, if not unregistered when the parent frame is removed
-        // TODO: copy from old code. Re-verify.
-        ToolTipManager.sharedInstance().registerComponent(this)
-
-        addKeyBindings()
-
-        // Repaint whenever window is opened or changed.
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(arg0: ComponentEvent) {
-                zoomToFitPage()
-            }
-        })
-
-        // Add all network elements (important for de-serializing)
-        network.allModelsInDeserializationOrder.forEach{ createNode(it) }
-
-    }
-
-
-    @Deprecated("Use selectionManager instead.", ReplaceWith("selectionManager.selection"))
-    val selectedNodes
-        get() = selectionManager.selection
-
-    @Deprecated("User selectionManager instead", ReplaceWith("selectionManager.selectionOf(clazz)"))
-    fun <T : ScreenElement> getSelectedNodes(clazz: Class<T>) =
-            selectionManager.filterSelectedNodes(clazz)
-
-    @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModels"))
-    val selectedModels
-        get() = selectionManager.selection.map { it.model!! }
-
-    @Deprecated("Use selectionManager instead", ReplaceWith("selectionManager.selectedModelsOf(clazz)"))
-    fun <T : NetworkModel> getSelectedModels(clazz: Class<T>) =
-            selectionManager.selectedModels.filterIsInstance(clazz)
-
     /** TODO: Javadoc. */
     fun setUpdateComplete(updateComplete: Boolean) {
         if (!updateComplete && this.updateComplete.get() != 0) {
@@ -269,27 +178,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
         this.updateComplete.set(if (updateComplete) 0 else 3)
     }
-
-    fun zoomToFitPage() {
-        GlobalScope.launch(Dispatchers.Main) {
-            zoomToFitPage(false)
-        }
-    }
-
-    /**
-     * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
-     *
-     * @param forceZoom if true force the zoom to happen
-     */
-//    fun zoomToFitPage(forceZoom: Boolean) {
-//        // TODO: Add a check to see if network is running
-//        if (autoZoom && editMode.isSelection || forceZoom) {
-//            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
-//            val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
-//                    filtered.getWidth() + 20, filtered.getHeight() + 20)
-//            canvas.camera.setViewBounds(adjustedFiltered)
-//        }
-//    }
 
     val zoomToFitPage = fun (): (Boolean) -> Unit {
         var timer: Timer? = null
@@ -310,6 +198,15 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             }
         }
     }()
+
+    /**
+     * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
+     *
+     * @param forceZoom if true force the zoom to happen
+     */
+    fun zoomToFitPage() {
+        zoomToFitPage(false)
+    }
 
     /**
      * Returns all nodes in the canvas.
@@ -360,7 +257,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is WeightMatrix -> createNode(model)
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
-            is SmileSVM -> createNode(model)
+            is SmileClassifier -> createNode(model)
         }
     }
 
@@ -397,8 +294,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 //        MultiLayerNetworkNode(this, multiLayerNet)
 //    }
 
-    fun createNode(svm : SmileSVM) = addScreenElement {
-        SmileSVMNode(this, svm)
+    fun createNode(classifier : SmileClassifier) = addScreenElement {
+        SmileClassifierNode(this, classifier)
     }
 
     fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
@@ -623,7 +520,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             filterSelectedModels<Neuron>().forEach { it.clear() }
             filterSelectedModels<Synapse>().forEach { it.forceSetStrength(0.0) }
             filterSelectedModels<NeuronArray>().forEach { it.clear() }
-            filterSelectedModels<NeuronGroup>().forEach { it.clearActivations() }
+            filterSelectedModels<NeuronGroup>().forEach { it.clear() }
             filterSelectedModels<WeightMatrix>().forEach { it.clear() }
         }
     }
@@ -631,7 +528,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     fun selectNeuronsInNeuronGroups() {
         selectionManager.filterSelectedNodes<NeuronGroupNode>().forEach { it.selectNeurons() }
     }
-
 
     fun clearNeurons() {
         filterScreenElements<NeuronNode>().forEach { it.neuron.clear() }
@@ -673,12 +569,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     }
 
     /**
-     * Connect all selected [ArrayConnectable]s with [WeightMatrix] objects.
+     * Connect all selected [WeightMatrixConnectable]s with [WeightMatrix] objects.
      */
     fun connectWithWeightMatrix() {
         with(selectionManager) {
-            val sources = filterSelectedSourceModels<ArrayConnectable>()
-            val targets = filterSelectedModels<ArrayConnectable>()
+            val sources = filterSelectedSourceModels<WeightMatrixConnectable>()
+            val targets = filterSelectedModels<WeightMatrixConnectable>()
 
             for (source in sources) {
                 for (target in targets) {
@@ -794,6 +690,72 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     fun redo() {
         println("Initial testing on redo...")
         undoManager.redo()
+    }
+
+    /**
+     * Main initialization of the network panel.
+     */
+    init {
+        super.setLayout(BorderLayout())
+
+        canvas.apply {
+            // Always render in high quality
+            setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)
+            animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
+            interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
+
+            // Remove default event listeners
+            removeInputEventListener(panEventHandler)
+            removeInputEventListener(zoomEventHandler)
+
+            // Event listeners
+            addInputEventListener(MouseEventHandler(this@NetworkPanel))
+            addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
+            addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
+            addInputEventListener(textHandle)
+            addInputEventListener(WandEventHandler(this@NetworkPanel));
+
+            // Don't show text when the canvas is sufficiently zoomed in
+            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
+                filterScreenElements<NeuronNode>().forEach { it.updateTextVisibility() }
+            }
+        }
+
+        // Init network change listeners
+        addNetworkListeners()
+
+        toolbars.apply {
+
+            cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+            val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
+            add("Center", JPanel(flowLayout).apply {
+                add(mainToolBar)
+                add(runToolBar)
+                add(editToolBar)
+            })
+        }
+
+        add("North", toolbars)
+        add("Center", canvas)
+        add("South", JToolBar().apply { add(timeLabel) })
+
+        // Register support for tool tips
+        // TODO: might be a memory leak, if not unregistered when the parent frame is removed
+        // TODO: copy from old code. Re-verify.
+        ToolTipManager.sharedInstance().registerComponent(this)
+
+        addKeyBindings()
+
+        // Repaint whenever window is opened or changed.
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(arg0: ComponentEvent) {
+                zoomToFitPage()
+            }
+        })
+
+        // Add all network elements (important for de-serializing)
+        network.allModelsInDeserializationOrder.forEach{ createNode(it) }
+
     }
 
 }

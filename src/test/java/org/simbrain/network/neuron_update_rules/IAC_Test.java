@@ -1,12 +1,12 @@
 package org.simbrain.network.neuron_update_rules;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class IAC_Test {
     @Test

@@ -19,10 +19,8 @@
 package org.simbrain.util.propertyeditor;
 
 /**
- * Serves as a marker interface for objects that can be edited in an
- * {@link AnnotatedPropertyEditor}.  Also provides a getName function
- * that retursn a name used in combo boxes (for objects edited by
- * an  {@link ObjectTypeEditor}) and dialog box titles.
+ * Indicates that objects that can be edited in an {@link AnnotatedPropertyEditor}. Returns a name that is used in the
+ * GUI and has a commit method that can be overridden if special actions are needed when committing.
  *
  * @author Jeff Yoshimi
  */

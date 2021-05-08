@@ -103,7 +103,7 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
         // val = clip(val);
         // }
 
-        neuron.setBuffer(theta);
+        neuron.setActivation(theta);
     }
 
     @Override

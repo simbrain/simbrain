@@ -18,13 +18,13 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.nodes.NeuronGroupNode;
-import org.simbrain.network.gui.nodes.NeuronNode;
-import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
@@ -51,20 +51,10 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        for (NeuronNode node : getNetworkPanel().getSelectedNodes(NeuronNode.class)) {
-            node.getNeuron().randomize();
-        }
-        for (SynapseNode node : getNetworkPanel().getSelectedNodes(SynapseNode.class)) {
-            node.getSynapse().randomize();
-        }
-        for (NeuronGroupNode node : getNetworkPanel().getSelectedNodes(NeuronGroupNode.class)) {
-            node.getNeuronGroup().randomize();
-        }
-        for (NeuronArray na: getNetworkPanel().getSelectedModels(NeuronArray.class)) {
-            na.randomize();
-        }
-        for (WeightMatrix wm: getNetworkPanel().getSelectedModels(WeightMatrix.class)) {
-            wm.randomize();
-        }
+        getNetworkPanel().getSelectionManager().filterSelectedModels(Neuron.class).forEach(Neuron::randomize);
+        getNetworkPanel().getSelectionManager().filterSelectedModels(Synapse.class).forEach(Synapse::randomize);
+        getNetworkPanel().getSelectionManager().filterSelectedModels(NeuronGroup.class).forEach(NeuronGroup::randomize);
+        getNetworkPanel().getSelectionManager().filterSelectedModels(NeuronArray.class).forEach(NeuronArray::randomize);
+        getNetworkPanel().getSelectionManager().filterSelectedModels(WeightMatrix.class).forEach(WeightMatrix::randomize);
     }
 }

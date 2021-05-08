@@ -83,7 +83,7 @@ public class ProductRule extends LinearRule {
             val = clip(val);
         }
 
-        neuron.setBuffer(val);
+        neuron.setActivation(val);
     }
 
     public boolean getUseWeights() {

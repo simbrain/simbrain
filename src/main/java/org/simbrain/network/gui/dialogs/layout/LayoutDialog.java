@@ -61,8 +61,10 @@ public class LayoutDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
-        layoutObject.getLayout().setInitialLocation(getCenterLocation(networkPanel.getSelectedModels(Neuron.class)));
-        layoutObject.getLayout().layoutNeurons(networkPanel.getSelectedModels(Neuron.class));
+        layoutObject.getLayout()
+                .setInitialLocation(getCenterLocation(networkPanel.getSelectionManager().filterSelectedModels(Neuron.class)));
+        layoutObject.getLayout()
+                .layoutNeurons(networkPanel.getSelectionManager().filterSelectedModels(Neuron.class));
         networkPanel.repaint();
     }
 

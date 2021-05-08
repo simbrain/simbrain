@@ -1,16 +1,13 @@
 package org.simbrain.network.update_actions;
 
-import org.junit.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
-
-import static org.junit.Assert.*;
 
 public class ConcurrentBufferedUpdateTest
 
 {
 
-    @Test
+    // @Test
     public void simpleTest() {
 
         // Not an actual test yet...
@@ -24,7 +21,7 @@ public class ConcurrentBufferedUpdateTest
         net.getUpdateManager().addAction(cbu);
         net.update();
 
-        System.out.println(cbu);
+        // System.out.println(cbu);
 
 
         // TODO: Try with normal run to see if same results

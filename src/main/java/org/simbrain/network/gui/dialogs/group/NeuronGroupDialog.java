@@ -161,18 +161,11 @@ public final class NeuronGroupDialog extends StandardDialog {
         storedComponents.add(summaryScrollWrapper);
         tabbedPane.addTab("Summary", summaryScrollWrapper);
 
-        specificNeuronGroupPanel = getSpecificGroupPanel();
-        if (specificNeuronGroupPanel != null) {
-            String type = neuronGroup.getTypeDescription();
-            storedComponents.add(specificNeuronGroupPanel);
-            tabbedPane.addTab(type + " Properties", (JPanel) specificNeuronGroupPanel);
-        }
-
         // Layout panel
         if(isCreationDialog) {
             layoutObject = new Layout.LayoutObject(NeuronGroup.DEFAULT_LAYOUT);
         } else {
-            layoutObject = new Layout.LayoutObject(neuronGroup.getLayout());
+            layoutObject = neuronGroup.getLayoutObject();
         }
         layoutPanel = new AnnotatedPropertyEditor(layoutObject);
         tabbedPane.addTab("Layout", layoutPanel);
@@ -276,8 +269,8 @@ public final class NeuronGroupDialog extends StandardDialog {
         if (isCreationDialog) {
             neuronGroupCreationEditor.commitChanges();
             neuronGroup = ngCreator.create(networkPanel.getNetwork());
-            neuronGroup.setLayout(layoutObject.getLayout());
             layoutPanel.commitChanges();
+            neuronGroup.setLayout(layoutObject.getLayout());
             neuronGroup.applyLayout();
             networkPanel.getNetwork().addNetworkModel(neuronGroup);
             networkPanel.getPlacementManager().addNewModelObject(neuronGroup);
@@ -310,24 +303,5 @@ public final class NeuronGroupDialog extends StandardDialog {
         }
     }
 
-    /**
-     * Gets the specificNeuronGroupPanel based on the underlying group.
-     *
-     * @return the committable neuron group panel corresponding to the specific
-     * type of the neuron group being edited if it has one.
-     */
-    private EditablePanel getSpecificGroupPanel() {
-        return null;
-        // TODO
-        //if (neuronGroup instanceof CompetitiveGroup) {
-        //    return CompetitivePropertiesPanel.createCompetitivePropertiesPanel(networkPanel, (CompetitiveGroup) neuronGroup);
-        //} else if (neuronGroup instanceof WinnerTakeAll) {
-        //    return new WTAPropertiesPanel(networkPanel, (WinnerTakeAll) neuronGroup);
-        //} else if (neuronGroup instanceof SOMGroup) {
-        //    return new SOMPropertiesPanel(networkPanel, (SOMGroup) neuronGroup);
-        //} else {
-        //    return null;
-        //}
-    }
 
 }

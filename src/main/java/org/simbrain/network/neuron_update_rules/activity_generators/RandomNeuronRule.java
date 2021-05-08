@@ -64,7 +64,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
 
     @Override
     public void update(Neuron neuron) {
-        neuron.setBuffer(randomizer.getRandom());
+        neuron.setActivation(randomizer.getRandom());
     }
 
     @Override

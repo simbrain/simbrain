@@ -64,13 +64,13 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     public void update(Neuron neuron) {
         final double input = neuron.getInput() + (addNoise ? noiseGenerator.getRandom() : 0);
         if (input >= threshold) {
-            neuron.setSpkBuffer(true);
+            neuron.setSpike(true);
             setHasSpiked(true, neuron);
-            neuron.setBuffer(1);
+            neuron.setActivation(1);
         } else {
-            neuron.setSpkBuffer(false);
+            neuron.setSpike(false);
             setHasSpiked(false, neuron);
-            neuron.setBuffer(0); // Make this a separate variable?
+            neuron.setActivation(0); // Make this a separate variable?
         }
 
     }

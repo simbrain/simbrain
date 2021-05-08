@@ -49,9 +49,9 @@ public class ActivationInputManager {
             inputIndex = 0;
         }
         if (inputSpikes) {
-            pc.setInputValues(data[inputIndex]);
+            pc.addInputs(data[inputIndex]);
             for (int i = 0; i < pc.getNeuronList().size(); i++) {
-                pc.getNeuron(i).updateStateFromBuffer();
+                pc.getNeuron(i).update();
             }
         } else {
             pc.forceSetActivations(data[inputIndex]);

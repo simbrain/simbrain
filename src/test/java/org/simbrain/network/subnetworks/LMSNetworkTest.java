@@ -8,7 +8,7 @@
 // import org.deeplearning4j.nn.conf.layers.OutputLayer;
 // import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 // import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
-// import org.junit.Test;
+// import org.junit.jupiter.api.Test;
 // import org.nd4j.evaluation.classification.Evaluation;
 // import org.nd4j.evaluation.regression.RegressionEvaluation;
 // import org.nd4j.linalg.activations.Activation;

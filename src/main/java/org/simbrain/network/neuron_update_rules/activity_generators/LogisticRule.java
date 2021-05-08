@@ -84,7 +84,7 @@ public class LogisticRule extends NeuronUpdateRule implements ActivityGenerator,
         y = growthRate * y * (1 - y);
         x = ((getUpperBound() - getLowerBound()) * y) + getLowerBound();
 
-        neuron.setBuffer(clip(x));
+        neuron.setActivation(clip(x));
     }
 
     public double getGrowthRate() {

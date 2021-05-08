@@ -1,17 +1,17 @@
 package org.simbrain.world.odorworld;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 // Another example of a simple test.  To be updated and improved.  Still in initial experimentation with unit tests...
 public class OdorWorldTest {
 
     OdorWorld world;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         world = new OdorWorld();
     }

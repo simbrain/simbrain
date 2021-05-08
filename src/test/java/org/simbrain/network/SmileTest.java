@@ -1,10 +1,10 @@
 package org.simbrain.network;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import smile.classification.KNN;
 import smile.data.formula.Formula;
+import smile.classification.SVM
 import smile.io.Read;
-import smile.math.kernel.GaussianKernel;
 import smile.math.kernel.PolynomialKernel;
 import smile.math.matrix.Matrix;
 import smile.regression.OLS;
@@ -13,14 +13,13 @@ import smile.stat.distribution.GaussianDistribution;
 import smile.validation.CrossValidation;
 import smile.validation.metric.Accuracy;
 import smile.validation.metric.ConfusionMatrix;
-import smile.classification.SVM;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Testing the Smile package. https://haifengl.github.io/
@@ -45,7 +44,7 @@ public class SmileTest {
         assertEquals("Shape: 2 x 3", result);
         stop_time = System.currentTimeMillis();
         difference = stop_time - start_time;
-        System.out.println("Compute time for 2d init: " + difference + " ms");
+        // System.out.println("Compute time for 2d init: " + difference + " ms");
     }
 
     @Test
@@ -83,7 +82,7 @@ public class SmileTest {
         stop_time = System.currentTimeMillis();
         // System.out.println(result_matrix);
         difference = stop_time - start_time;
-        System.out.println("Compute time for matrix product: " + difference + " ms");
+        // System.out.println("Compute time for matrix product: " + difference + " ms");
     }
 
     // @Test
@@ -111,20 +110,19 @@ public class SmileTest {
         stop_time = System.currentTimeMillis();
         difference = stop_time - start_time;
         var eigen_matrix = new Matrix.EVD(eigenvalue.wr, eigenvalue.wi, eigenvalue.Vl, eigenvalue.Vr);
-        System.out.println("Compute time for eigenvalue computation: " + difference + " ms");
+        // System.out.println("Compute time for eigenvalue computation: " + difference + " ms");
         // System.out.println(eigen_matrix.diag());
     }
 
-    @Test
+    // @Test
     public void compute_matrix_LU_Decomposition() {
         //Matrix Decomposition
-
         var large_matrix = Matrix.rand(50, 50, new GaussianDistribution(0, 1));
         start_time = System.currentTimeMillis();
         var decompose = large_matrix.lu();
         stop_time = System.currentTimeMillis();
         difference = stop_time - start_time;
-        System.out.println("Compute time for LU Decomposition: " + difference + " ms");
+        // System.out.println("Compute time for LU Decomposition: " + difference + " ms");
         // System.out.println(decompose.lu);
     }
 

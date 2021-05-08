@@ -143,7 +143,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             val = clip(val);
         }
 
-        neuron.setBuffer(val);
+        neuron.setActivation(val);
     }
 
     public UpdateType getUpdateType() {

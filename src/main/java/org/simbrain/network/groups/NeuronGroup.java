@@ -162,8 +162,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Override
     public void update() {
+        super.update();
         // if (!inputMode) {
             NetworkKt.updateNeurons(getNeuronList());
+            invalidateCachedActivations();
         // }
     }
 
@@ -322,7 +324,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return retArray;
     }
 
-
     /**
      * @param x x coordinate for neuron group
      * @param y y coordinate for neuron group
@@ -331,21 +332,16 @@ public class NeuronGroup extends AbstractNeuronCollection {
         super.setLocation(new Point2D.Double(x, y));
     }
 
-    /**
-     * Apply any input values to the activations of the neurons in this group.
-     */
-    public void applyInputs() {
-        for (Neuron neuron : getNeuronList()) {
-            neuron.setActivation(neuron.getActivation() + neuron.getInputValue());
-        }
-    }
-
     public Layout getLayout() {
         return layout.getLayout();
     }
 
     public void setLayout(Layout layout) {
         this.layout.setLayout(layout);
+    }
+
+    public Layout.LayoutObject getLayoutObject() {
+        return layout;
     }
 
     /**
@@ -522,9 +518,34 @@ public class NeuronGroup extends AbstractNeuronCollection {
         }
     }
 
-    // TODO
+    /**
+     * Enum for creation dialog.
+     */
     public enum GroupEnum {
-        DEFAULT, WTA, COMPETITIVE, SOM;
+        DEFAULT  {
+            @Override
+            public String toString() {
+                return "Default";
+            }
+        },
+        WTA {
+            @Override
+            public String toString() {
+                return "Winner take all";
+            }
+        },
+        COMPETITIVE {
+            @Override
+            public String toString() {
+                return "Competitive";
+            }
+        },
+        SOM {
+            @Override
+            public String toString() {
+                return "Self organizing map";
+            }
+        };
     }
 
 }

@@ -232,10 +232,11 @@ public class FeedForward extends Subnetwork {
 
         if (isUseNeuronArrays()) {
             for (int i = 0; i < getNAList().size() ; i++) {
+                getNAList().get(i).updateInputs();
                 getNAList().get(i).update();
-                if(getWeightMatrixList().size() > i) {
-                    getWeightMatrixList().get(i).update();
-                }
+                // if(getWeightMatrixList().size() > i) {
+                //     getWeightMatrixList().get(i).update();
+                // }
             }
         } else {
             for (int i = 0; i < getNeuronGroupList().size() ; i++) {

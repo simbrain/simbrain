@@ -4,17 +4,19 @@ package org.simbrain.network.matrix;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 
 /**
- * High performance immutable array backed by ND4J Array.
+ * A "neuron array" backed by a double array.
  */
-public class NeuronArray extends ArrayConnectable implements EditableObject, AttributeContainer {
+public class NeuronArray extends WeightMatrixConnectable implements EditableObject, AttributeContainer {
 
     //TODO: Rename ideas: Array, Layer,Double Array
 
@@ -22,12 +24,6 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
      * Reference to network this array is part of.
      */
     private final Network parent;
-
-    /**
-     * Number of columns in the under laying ND4J Array.
-     */
-    @UserParameter(label = "Nodes", description = "Number of nodes", editable = false, order = 1)
-    private int numNodes = 100;
 
     /**
      * Center of the neuron array.
@@ -40,6 +36,17 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
     private double y;
 
     /**
+     * Array to hold activation values. These are also the outputs that are consumed by
+     * other network components via {@link WeightMatrixConnectable}.
+     */
+    private double[] activations;
+
+    /**
+     * Collects inputs from other network models using arrays.
+     */
+    private double[] inputs;
+
+    /**
      * Render an image showing each activation when true.
      */
     @UserParameter(label = "Show activations", description = "Whether to show activations as a pixel image", order = 4)
@@ -49,12 +56,12 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
      * Construct a neuron array.
      *
      * @param net  parent net
-     * @param numNodes number of nodes
+     * @param size number of components in the array
      */
-    public NeuronArray(Network net, int numNodes) {
-        super(numNodes);
+    public NeuronArray(Network net, int size) {
         parent = net;
-        this.numNodes = numNodes;
+        activations = new double[size];
+        inputs = new double[size];
         randomize();
         setLabel(net.getIdManager().getProposedId(this.getClass()));
     }
@@ -70,7 +77,7 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
         NeuronArray copy = new NeuronArray(newParent, orig.getActivations().length);
         copy.x = orig.x;
         copy.y = orig.y;
-        copy.copyToActivations(orig.getActivations());
+        copy.setActivations(orig.getActivations());
         return copy;
     }
 
@@ -182,21 +189,47 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
 
     @Override
     public void updateInputs() {
-        setInputs(getWeightedInputs());
+        addInputs(getWeightedInputs());
     }
 
     @Override
-    public void updateBuffer() {
-        // TODO: Add "activation functions" for neuron array
-        copyToBuffer(getInputs());
-    }
-
-    @Override
-    public void updateStateFromBuffer() {
-        copyBufferToActivation();
+    public void update() {
+        setActivations(getInputs());
+        inputs = new double[inputs.length]; // clear inputs
         getEvents().fireUpdated();
     }
-    
+
+    @Override
+    protected double[] getInputs() {
+        return inputs;
+    }
+
+    @Override
+    public void addInputs(double[] newInputs) {
+        inputs = SimbrainMath.addVector(inputs, newInputs);
+    }
+
+    @Override
+    public double[] getActivations() {
+        return activations;
+    }
+
+    /**
+     * Set the activations to a one-hot encoding (all 0s and one 1) at provided index.
+     * @see {<a href="https://en.wikipedia.org/wiki/One-hot"></a>}.
+     */
+    public void setOneHot(int index) {
+        clear();
+        activations[index] = 1.0;
+        getEvents().fireUpdated();
+    }
+
+    @Override
+    public void setActivations(double[] newActivations) {
+        activations = Arrays.stream(newActivations).toArray();
+        getEvents().fireUpdated();
+    }
+
     public void fireLocationChange() {
         getEvents().fireLocationChange();
     }
@@ -211,4 +244,9 @@ public class NeuronArray extends ArrayConnectable implements EditableObject, Att
         return parent;
     }
 
+    @Override
+    public String toString() {
+        return getId() + " with " + getActivations().length + " activations: " +
+                Utils.getTruncatedArrayString(getActivations(), 10);
+    }
 }

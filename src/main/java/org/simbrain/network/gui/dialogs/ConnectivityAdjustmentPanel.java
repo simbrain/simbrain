@@ -67,7 +67,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
 
     public ConnectivityAdjustmentPanel(final Sparse connection, final NetworkPanel networkPanel) {
         this.connection = connection;
-        numTargs = networkPanel.getSelectedModels(Neuron.class).size();
+        numTargs = networkPanel.getSelectionManager().filterSelectedModels(Neuron.class).size();
         // fillFieldValues();
         initializeSparseSlider();
         addChangeListeners();

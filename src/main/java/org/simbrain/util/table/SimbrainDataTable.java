@@ -19,7 +19,7 @@
 package org.simbrain.util.table;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.util.Utils;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
@@ -27,8 +27,6 @@ import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.simbrain.util.Utils;
 
 /**
  * Superclass for tables that can be viewed by a SimbrainJTable, and saved in a
@@ -63,7 +61,7 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
 
     // Initialize data
     {
-        rowData = new ArrayList<List<T>>();
+        rowData = new ArrayList<>();
     }
 
     /**

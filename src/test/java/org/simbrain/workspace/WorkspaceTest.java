@@ -1,7 +1,7 @@
 package org.simbrain.workspace;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -13,7 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WorkspaceTest {
 
@@ -21,7 +21,7 @@ public class WorkspaceTest {
 
     Neuron n1, n2;
 
-    @Before
+    @BeforeEach
     public void setUpTestWorkspace() {
         workspace = new Workspace();
         Network net1 = new Network();
@@ -44,7 +44,7 @@ public class WorkspaceTest {
         // Couple them
         workspace.getCouplingManager().createCoupling(
                 workspace.getCouplingManager().getProducer(n1, "getActivation"),
-                workspace.getCouplingManager().getConsumer(n2, "setInputValue"));
+                workspace.getCouplingManager().getConsumer(n2, "addInputValue"));
 
     }
 
@@ -87,8 +87,8 @@ public class WorkspaceTest {
         assertEquals(1, workspace.getCouplingManager().getCouplings().size());
 
         // Can't reuse n1 and n2 because it's been deserialized
-        Neuron newN1 = ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getLooseNeuron(0);
-        Neuron newN2 = ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getLooseNeuron(0);
+        Neuron newN1 = (Neuron) ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getAllModels().get(0);
+        Neuron newN2 = (Neuron) ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getAllModels().get(0);
         newN1.forceSetActivation(.8);
         workspace.simpleIterate();
         assertEquals(.8, newN2.getActivation(), .0001);
@@ -106,8 +106,8 @@ public class WorkspaceTest {
         assertEquals(1, workspace.getCouplingManager().getCouplings().size());
 
         // Can't reuse n1 and n2 because it's been deserialized
-        Neuron newN1 = ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getLooseNeuron(0);
-        Neuron newN2 = ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getLooseNeuron(0);
+        Neuron newN1 = (Neuron) ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getAllModels().get(0);
+        Neuron newN2 = (Neuron) ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getAllModels().get(0);
         newN1.forceSetActivation(.8);
         workspace.simpleIterate();
         assertEquals(.8, newN2.getActivation(), .0001);

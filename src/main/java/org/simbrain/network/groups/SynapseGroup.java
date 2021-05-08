@@ -55,19 +55,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     private final Network parentNetwork;
 
     /**
-     * Id of this group.
-     */
-    @UserParameter(label = "ID", description = "Id of this synapse group", order = -1, editable = false)
-    protected String id;
-
-    /**
-     * Name of this group. Null strings lead to default labeling conventions.
-     */
-    @UserParameter(label = "Label", description = "Synapse group label", useSetter = true,
-            order = 10)
-    private String label;
-
-    /**
      * Event support
      */
     protected transient SynapseGroupEvents events = new SynapseGroupEvents(this);
@@ -160,6 +147,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * possible without ever assigning a synapse to a source neuron of opposing
      * polarity.
      */
+    @UserParameter(label = "Excitatory ratio", editable = false, order = 50)
     private double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
     /**
@@ -565,10 +553,10 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
 
     @Override
     public String toString() {
-        String ret = new String();
-        ret += "with " + this.size() + " synapse(s)" + " from " + getSourceNeuronGroup().getId()
-            + " to " + getTargetNeuronGroup().getId();
-        return ret;
+        return getId() + " with " + this.size()
+                + " synapse(s) from "
+                + getSourceNeuronGroup().getId()
+                + " to " + getTargetNeuronGroup().getId();
     }
 
     /**
@@ -1720,9 +1708,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         }
     }
 
-    /**
-     * Perform operations required after opening a synapse group.
-     */
+    @Override
     public void postUnmarshallingInit() {
 
         if (events == null) {

@@ -1,11 +1,11 @@
 
 package org.simbrain.network.neuron_update_rules;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BinaryRuleTest {
 
@@ -23,23 +23,23 @@ public class BinaryRuleTest {
         br.setLowerBound(0);
 
         // Below threshold
-        n.setInputValue(.4);
+        n.addInputValue(.4);
         net.bufferedUpdate();
         assertEquals(0 ,n.getActivation(),.001);
 
         // Above threshold
-        n.setInputValue(.6);
+        n.addInputValue(.6);
         net.bufferedUpdate();
         assertEquals(1 ,n.getActivation(),.001);
 
         // Test new Threshold
         br.setThreshold(.2);
         // Below
-        n.setInputValue(.19);
+        n.addInputValue(.19);
         net.bufferedUpdate();
         assertEquals(0 ,n.getActivation(),.001);
         // Above
-        n.setInputValue(.3);
+        n.addInputValue(.3);
         net.bufferedUpdate();
         assertEquals(1 ,n.getActivation(),.001);
 

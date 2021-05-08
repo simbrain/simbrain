@@ -7,15 +7,12 @@ import org.jetbrains.kotlinx.dl.datasets.handlers.TEST_IMAGES_ARCHIVE
 import org.jetbrains.kotlinx.dl.datasets.handlers.extractImages
 import org.simbrain.custom_sims.*
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.util.addNeuronGroup
-import org.simbrain.util.ResourceManager
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.toGrayScaleImage
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.world.imageworld.filters.Filter
 import org.simbrain.world.imageworld.filters.ThresholdOp
-import javax.swing.JProgressBar
 
 /**
  * Image world coupled to a neural network.

@@ -19,22 +19,7 @@ import java.util.List;
  * weight matrix (or other layer-to-layer connector, if we add them). Encompasses
  * both {@link NeuronArray} and {@link org.simbrain.network.groups.AbstractNeuronCollection}.
  */
-public abstract class ArrayConnectable extends LocatableModel {
-
-    /**
-     * Array to hold activation values.
-     */
-    private double[] activations;
-
-    /**
-     * For buffered update.
-     */
-    private double[] buffer;
-
-    /**
-     * Collects inputs from other network models using arrays.
-     */
-    private double[] inputs;
+public abstract class WeightMatrixConnectable extends LocatableModel {
 
     /**
      * "Fan-in" of incoming weight matrices.
@@ -53,12 +38,6 @@ public abstract class ArrayConnectable extends LocatableModel {
      * Event support.
      */
     private transient LocationEvents events = new LocationEvents(this);
-
-    public ArrayConnectable(int size) {
-        activations = new double[size];
-        buffer = new double[size];
-        inputs = new double[size];
-    }
 
     public void addIncomingWeightMatrix(WeightMatrix weightMatrix) {
         incomingWeightMatrices.add(weightMatrix);
@@ -84,53 +63,32 @@ public abstract class ArrayConnectable extends LocatableModel {
         return outgoingWeightMatrices;
     }
 
-    @Producible()
-    public double[] getActivations() {
-        return activations;
-    }
+    /**
+     * Return the current weighted inputs. Should be used for internal updating only.
+     */
+    protected abstract double[] getInputs();
+
+    // There should NOT be a setInputs function because it will mess up updating.
 
     @Consumable()
-    public void setActivations(double[] activations) {
-        this.activations = activations;
-    }
+    public abstract void addInputs(double[] newInputs);
 
+    @Producible()
+    public abstract double[] getActivations();
+
+    @Consumable()
+    public abstract void setActivations(double[] activations);
+
+    /**
+     * Iterate through incoming arrayconnetables, multiply by intervening weight matrices, and add the results
+     * to an array which is returned.
+     */
     public double[] getWeightedInputs() {
-        double[] result = new double[inputs.length];
+        double[] result = new double[getInputs().length];
         for (WeightMatrix wm : incomingWeightMatrices) {
-            result = SimbrainMath.addVector(result, wm.getWeightMatrix().mv(wm.getSource().getActivations()));
+            result = SimbrainMath.addVector(result, wm.weightsTimesSource());
         }
         return result;
-    }
-
-    public void copyBufferToActivation() {
-        copyToActivations(buffer);
-    }
-
-    public void copyToActivations(double [] newActivations) {
-        // TODO: Is this the most performant way to copy an array?
-        activations = Arrays.stream(newActivations).toArray();
-    }
-
-    public double[] getInputs() {
-        return inputs;
-    }
-
-    public void copyToInputs(double [] newInputs) {
-        inputs = Arrays.stream(newInputs).toArray();
-    }
-
-    public void copyToBuffer(double [] newBuffer) {
-        buffer = Arrays.stream(newBuffer).toArray();
-    }
-
-    @Consumable()
-    public void setInputs(double[] inputs) {
-        this.inputs = inputs;
-    }
-
-    @Consumable()
-    public void addInputs(double[] newInputs) {
-        this.inputs = SimbrainMath.addVector(inputs, newInputs);
     }
 
     /**
@@ -142,6 +100,7 @@ public abstract class ArrayConnectable extends LocatableModel {
 
     public abstract Rectangle2D getBound();
 
+    @Override
     public void postUnmarshallingInit() {
         if (events == null) {
             events = new LocationEvents(this);
@@ -158,9 +117,11 @@ public abstract class ArrayConnectable extends LocatableModel {
      * Add increment to every entry in weight matrix
      */
     public void increment() {
-        for (int i = 0; i < activations.length; i++) {
-            activations[i] += increment;
-        }
+        double[] newActivations = Arrays
+                .stream(getActivations())
+                .map(a -> a + increment)
+                .toArray();
+        setActivations(newActivations);
         events.fireUpdated();
     }
 
@@ -168,17 +129,20 @@ public abstract class ArrayConnectable extends LocatableModel {
      * Subtract increment from every entry in the array
      */
     public void decrement() {
-        for (int i = 0; i < activations.length; i++) {
-            activations[i] -= increment;
-        }
+        double[] newActivations = Arrays
+                .stream(getActivations())
+                .map(a -> a - increment)
+                .toArray();
+        setActivations(newActivations);
         events.fireUpdated();
     }
 
     /**
-     * Clear activations;
+     * Clear activations.
      */
     public void clear() {
-        activations = new double[activations.length];
+        double[] newActivations = new double[getActivations().length];
+        setActivations(newActivations);
         events.fireUpdated();
     }
 

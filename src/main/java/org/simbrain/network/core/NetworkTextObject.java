@@ -180,10 +180,7 @@ public class NetworkTextObject extends LocatableModel {
         events.fireDeleted();
     }
 
-    /**
-     * Perform any initialization required when creating a text object, but after the
-     * parent network has been added.
-     */
+    @Override
     public void postUnmarshallingInit() {
         events = new NetworkTextEvents(this);
     }

@@ -9,6 +9,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.core.Network.NetworkModelList
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -26,27 +27,15 @@ import kotlin.math.ceil
 import kotlin.math.ln
 
 /**
- * The initial time-step for the network.
+ * <b>Network</b> provides core neural network functionality and is the main neural network model object. The core
+ * data structure is a [NetworkModelList] that associates classes of [NetworkModel] with linked hash sets of
+ * instances of those types.
  */
-private val DEFAULT_TIME_STEP = SimbrainPreferences.getDouble("networkDefaultTimeStep")
-
-/**
- * Constant value for Math.log(10); used to approximate log 10.
- */
-private val LOG_10 = ln(10.0)
-
-/**
- * If a subnetwork or synapse group has more than this many synapses, then the initial synapse visibility flag is
- * set false.
- */
-@Transient
-var synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold")
-
 class Network {
 
     companion object {
         /**
-         * An internal id giving networks unique numbers within the same simbrain session.
+         * An internal "static" id giving networks unique numbers within the same simbrain session.
          */
         private var current_id = 0
     }
@@ -110,6 +99,11 @@ class Network {
      * Local thread flag for starting and stopping the network
      */
     private val _isRunning = AtomicBoolean()
+    var isRunning: Boolean
+        get() = _isRunning.get()
+        set(value) {
+            _isRunning.set(value)
+        }
 
     /**
      * Whether this is a discrete or continuous time network.
@@ -155,14 +149,32 @@ class Network {
      */
     var oneOffRun = false
 
+    /**
+     * Initialize the network.
+     */
     init {
         current_id++
     }
 
+    /**
+     * Returns a linked hash set of models of the specified type.
+     */
     fun <T : NetworkModel> getModels(cls: Class<T>) = networkModels[cls]
+
+    /**
+     * Returns a linked hash set of models of a type specified using a generic.
+     */
     inline fun <reified T : NetworkModel> getModels() = getModels(T::class.java)
 
+    /**
+     * Returns a flattened list of all network models.
+     */
     val allModels get() = networkModels.all
+
+    /**
+     * Returns a list of network models in the order needed to reconstruct a network properly. Example: nodes must be
+     * added before synapses which refer to them.
+     */
     val allModelsInDeserializationOrder get() = networkModels.allInDeserializationOrder
 
     /**
@@ -541,12 +553,6 @@ class Network {
         }
     }
 
-    var isRunning: Boolean
-        get() = _isRunning.get()
-        set(value) {
-            _isRunning.set(value)
-        }
-
     val isRedrawTime: Boolean = oneOffRun || (iterCount % updateFreq == 0)
 
     val looseNeurons get() = networkModels.get<Neuron>()
@@ -740,6 +746,24 @@ class Network {
     }
 
 }
+
+
+/**
+ * The initial time-step for the network.
+ */
+private val DEFAULT_TIME_STEP = SimbrainPreferences.getDouble("networkDefaultTimeStep")
+
+/**
+ * Constant value for Math.log(10); used to approximate log 10.
+ */
+private val LOG_10 = ln(10.0)
+
+/**
+ * If a subnetwork or synapse group has more than this many synapses, then the initial synapse visibility flag is
+ * set false.
+ */
+@Transient
+var synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold")
 
 /**
  * Items must be ordered for deserializing. For example neurons but serialized before synapses.

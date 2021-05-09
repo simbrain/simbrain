@@ -126,7 +126,7 @@ public class HexagonalGridLayout extends Layout {
             }
             if (rowNum % 2 == 0) {
                 neuron.setLocation(initialX + hSpacing / 2 + (i % numColumns) * hSpacing,
-                        initialY + rowNum * vSpacing, false);
+                        initialY + rowNum * vSpacing);
             } else {
                 neuron.setLocation(initialX + (i % numColumns) * hSpacing, initialY + rowNum * vSpacing);
             }

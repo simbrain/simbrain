@@ -15,7 +15,6 @@ package org.simbrain.network.gui.dialogs.layout;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -35,7 +34,7 @@ public class LayoutDialog extends StandardDialog {
     /**
      * Layout to set.
      */
-    private Layout layout = new GridLayout();
+    private Layout.LayoutEditor layoutEditor = new Layout.LayoutEditor();
 
     /**
      * Main panel.
@@ -54,7 +53,7 @@ public class LayoutDialog extends StandardDialog {
      */
     public LayoutDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        mainPanel = new AnnotatedPropertyEditor(layout);
+        mainPanel = new AnnotatedPropertyEditor(layoutEditor);
         setContentPane(mainPanel);
     }
 
@@ -62,8 +61,8 @@ public class LayoutDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         commitChanges();
-        layout.setInitialLocation(getCenterLocation(networkPanel.getSelectionManager().filterSelectedModels(Neuron.class)));
-        layout.layoutNeurons(networkPanel.getSelectionManager().filterSelectedModels(Neuron.class));
+        layoutEditor.getLayout().setInitialLocation(getCenterLocation(networkPanel.getSelectionManager().filterSelectedModels(Neuron.class)));
+        layoutEditor.getLayout().layoutNeurons(networkPanel.getSelectionManager().filterSelectedModels(Neuron.class));
         networkPanel.repaint();
     }
 

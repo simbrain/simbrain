@@ -62,7 +62,7 @@ public class HopfieldCreationDialog extends StandardDialog {
     /**
      * Layout to use in property editor.
      */
-    private Layout layout =  Hopfield.DEFAULT_LAYOUT;
+    private Layout.LayoutEditor layoutEditor =  new Layout.LayoutEditor();
 
     /**
      * Layout panel.
@@ -81,7 +81,6 @@ public class HopfieldCreationDialog extends StandardDialog {
      */
     public HopfieldCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        layoutPanel = new AnnotatedPropertyEditor(layout);
 
         setTitle("New Hopfield Network");
 
@@ -91,8 +90,8 @@ public class HopfieldCreationDialog extends StandardDialog {
         tabLogic.add(hopPropertiesPanel);
 
         // Layout panel
+        layoutPanel = new AnnotatedPropertyEditor(layoutEditor);
         tabLayout.add(layoutPanel);
-        layoutPanel = new AnnotatedPropertyEditor(layout);
 
         // Set it all up
         tabbedPane.addTab("Logic", tabLogic);
@@ -110,8 +109,8 @@ public class HopfieldCreationDialog extends StandardDialog {
         hopPropertiesPanel.commitChanges();
         Hopfield hopfield = hc.create(networkPanel.getNetwork());
         layoutPanel.commitChanges();
-        // layout.getLayout().setInitialLocation(networkPanel.getPlacementManager().getLocationAndIncrement());
-        // hopfield.getNeuronGroup().setLayout(layout.getLayout());
+        layoutEditor.getLayout().setInitialLocation(networkPanel.getPlacementManager().getLocationAndIncrement());
+        hopfield.getNeuronGroup().setLayout(layoutEditor.getLayout());
         hopfield.getNeuronGroup().applyLayout();
         networkPanel.getNetwork().addNetworkModel(hopfield);
         networkPanel.repaint();

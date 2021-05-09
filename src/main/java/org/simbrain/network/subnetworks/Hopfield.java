@@ -24,8 +24,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.trainers.Trainable;
@@ -58,11 +56,6 @@ public class Hopfield extends Subnetwork implements Trainable {
     public static final boolean DEFAULT_PRIORITY = false;
 
     /**
-     * Number of neurons.
-     */
-    private int numUnits = DEFAULT_NUM_UNITS;
-
-    /**
      * The update function used by this Hopfield network.
      */
     @UserParameter(label = "Update function")
@@ -87,11 +80,6 @@ public class Hopfield extends Subnetwork implements Trainable {
     private final TrainingSet trainingSet = new TrainingSet();
 
     /**
-     * Default layout for Hopfield nets.
-     */
-    public static final Layout DEFAULT_LAYOUT = new GridLayout(50, 50);
-
-    /**
      * Creates a new Hopfield network.
      *
      * @param numNeurons Number of neurons in new network
@@ -109,9 +97,7 @@ public class Hopfield extends Subnetwork implements Trainable {
 
         // Create main neuron group
         NeuronGroup neuronGroup = new NeuronGroup(root, numNeurons);
-        neuronGroup.setLayout(DEFAULT_LAYOUT);
         neuronGroup.setLabel("The Neurons");
-        neuronGroup.applyLayout();
         addNeuronGroup(neuronGroup);
 
         // Set neuron rule

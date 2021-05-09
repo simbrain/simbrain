@@ -68,6 +68,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     /**
      * The layout for the neurons in this group.
      */
+    @UserParameter(label = "Layout", isObjectType = true, order = 100)
     private Layout layout = DEFAULT_LAYOUT;
 
     /**
@@ -444,18 +445,24 @@ public class NeuronGroup extends AbstractNeuronCollection {
         /**
          * A label for this Neuron Group for display purposes.
          */
-        @UserParameter(label = "Label", initialValueMethod = "getLabel")
+        @UserParameter(label = "Label", initialValueMethod = "getLabel", order = 10)
         private String label;
 
         /**
          * Initial update rule
          */
-        @UserParameter(label = "Update Rule")
+        @UserParameter(label = "Update Rule", order = 20)
         private UpdateRuleEnum updateRule = UpdateRuleEnum.LINEAR;
         //todo conditional enable based on group type
 
-        @UserParameter(label = "Group type")
+        @UserParameter(label = "Group type", order = 30)
         private GroupEnum groupType = GroupEnum.DEFAULT;
+
+        /**
+         * The layout for the neurons in this group.
+         */
+        @UserParameter(label = "Layout", isObjectType = true, order = 50)
+        private Layout layout = DEFAULT_LAYOUT;
 
         /**
          * Create the template with a proposed label
@@ -484,6 +491,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
             } else if (groupType == GroupEnum.SOM) {
                 ng = new SOMGroup(network, numNeurons);
             }
+            ng.setLayout(layout);
+            ng.applyLayout();
             return ng;
         }
 

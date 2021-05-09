@@ -21,11 +21,9 @@ package org.simbrain.network.gui.dialogs.group;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -63,11 +61,6 @@ public final class NeuronGroupDialog extends StandardDialog {
     private JTextField tfNeuronGroupLabel = new JTextField();
 
     /**
-     * Layout panel.
-     */
-    private AnnotatedPropertyEditor layoutPanel;
-
-    /**
      * If true this is a creation dialog. Otherwise it is an edit dialog.
      */
     private boolean isCreationDialog = false;
@@ -77,11 +70,6 @@ public final class NeuronGroupDialog extends StandardDialog {
      * out. This is what allows the panel to resize when tabs are changed.
      */
     private ArrayList<Component> storedComponents = new ArrayList<Component>();
-
-    /**
-     * Panel for specific group types. Null for bare neuron group.
-     */
-    private EditablePanel specificNeuronGroupPanel;
 
     /**
      * Neuron group summary.
@@ -97,11 +85,6 @@ public final class NeuronGroupDialog extends StandardDialog {
      * Property editor for creating new neuron groups.
      */
     private AnnotatedPropertyEditor neuronGroupCreationEditor;
-
-    /**
-     * Layout object for new or existing neuron groups.
-     */
-    private Layout layout;
 
     /**
      * For creating a new neuron group.
@@ -161,19 +144,6 @@ public final class NeuronGroupDialog extends StandardDialog {
         storedComponents.add(summaryScrollWrapper);
         tabbedPane.addTab("Summary", summaryScrollWrapper);
 
-        // Layout panel
-        if(isCreationDialog) {
-            layout = NeuronGroup.DEFAULT_LAYOUT;
-        } else {
-            layout = neuronGroup.getLayout();
-        }
-        layoutPanel = new AnnotatedPropertyEditor(layout);
-        tabbedPane.addTab("Layout", layoutPanel);
-        JScrollPane layoutWrapper = new JScrollPane(layoutPanel);
-        layoutWrapper.setBorder(null);
-        storedComponents.add(layoutWrapper);
-        tabbedPane.addTab("Layout", layoutWrapper);
-
         if(!isCreationDialog) {
             // Input panel
             NumericMatrix matrix = new NumericMatrix() {
@@ -195,11 +165,6 @@ public final class NeuronGroupDialog extends StandardDialog {
 
         // Set up help button
         Action helpAction = new ShowHelpAction("Pages/Network/groups/NeuronGroup.html");
-
-        // TODO
-        //if (specificNeuronGroupPanel != null) {
-        //    helpAction = new ShowHelpAction(((GroupPropertiesPanel) specificNeuronGroupPanel).getHelpPath());
-        //}
         addButton(new JButton(helpAction));
 
         // Tab-change events
@@ -269,19 +234,11 @@ public final class NeuronGroupDialog extends StandardDialog {
         if (isCreationDialog) {
             neuronGroupCreationEditor.commitChanges();
             neuronGroup = ngCreator.create(networkPanel.getNetwork());
-            layoutPanel.commitChanges();
-            neuronGroup.setLayout(layout);
-            neuronGroup.applyLayout();
             networkPanel.getNetwork().addNetworkModel(neuronGroup);
             networkPanel.getPlacementManager().addNewModelObject(neuronGroup);
         } else {
             summaryPanel.commitChanges();
-            layoutPanel.commitChanges();
             neuronGroup.applyLayout();
-        }
-
-        if (specificNeuronGroupPanel != null) {
-            specificNeuronGroupPanel.commitChanges();
         }
 
         networkPanel.repaint();

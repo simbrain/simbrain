@@ -77,7 +77,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val wandEditModeAction = WandEditModeAction(networkPanel)
     val zoomToFitPageAction = ZoomToFitPageAction(networkPanel)
 
-    val neuronGroupAction = addGroupAction("Add Neuron Group") {
+    val neuronGroupAction = addGroupAction("Add Neuron Group...") {
         NeuronGroupDialog(it)
     }
 

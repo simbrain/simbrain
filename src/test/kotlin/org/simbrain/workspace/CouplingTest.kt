@@ -205,9 +205,9 @@ class CouplingTest {
             )
         }
 
-        // We expect neuron 3 to have  value of 1 after update
+        // We expect neuron 3 to have value of .5-.2 = .3 after update
         workspace.simpleIterate()
-        assertEquals(.3, neuron3.activation, 0.0001)
+        assertEquals(.3, neuron3.activation, 0.0)
     }
 
     @Test
@@ -236,9 +236,9 @@ class CouplingTest {
             )
         }
 
-        // We expect neurons 2 and 3 to have  value of .5 after update
+        // We expect neurons 2 and 3 to have value of .5 after update
         workspace.simpleIterate()
-        assertEquals(.5, neuron2.activation, 0.0001)
-        assertEquals(.5, neuron3.activation, 0.0001)
+        assertEquals(.5, neuron2.activation, 0.0)
+        assertEquals(.5, neuron3.activation, 0.0)
     }
 }

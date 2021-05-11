@@ -61,8 +61,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
 
     /**
      * The <b>default>/b> polarized randomizer associated with excitatory.
-     * <p>
-     * synapse strengths for all synapse groups.
+     * <p> synapse strengths for all synapse groups.
      */
     private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER =
         UniformDistribution.builder()

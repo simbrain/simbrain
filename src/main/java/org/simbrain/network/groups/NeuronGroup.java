@@ -531,4 +531,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
         };
     }
 
+    @Override
+    public void postUnmarshallingInit() {
+        super.postUnmarshallingInit();
+        // NeuronGroup neurons are not loose neurons so they are not deserialized
+        // when Network.readResolve is called
+        getNeuronList().forEach(Neuron::postUnmarshallingInit);
+        getNeuronList().forEach(this::addListener);
+    }
 }

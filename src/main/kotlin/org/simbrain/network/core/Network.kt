@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.annotations.XStreamImplicit
 import com.thoughtworks.xstream.converters.Converter
 import com.thoughtworks.xstream.converters.MarshallingContext
@@ -383,9 +384,9 @@ class Network {
      */
     fun copy(): Network {
         preSaveInit()
-        val xmlRepresentation = Utils.getSimbrainXStream().toXML(this)
+        val xmlRepresentation = getNetworkXStream().toXML(this)
         postSaveReInit()
-        return Utils.getSimbrainXStream().fromXML(xmlRepresentation) as Network
+        return getNetworkXStream().fromXML(xmlRepresentation) as Network
     }
 
     /**
@@ -833,6 +834,12 @@ var List<Neuron>.auxValues: List<Double>
 
 val List<Synapse>.lengths: List<Double>
     get() = map { it.length }
+
+fun getNetworkXStream(): XStream {
+    val xstream = Utils.getSimbrainXStream()
+    xstream.registerConverter(Network.NetworkModelListConverter())
+    return xstream
+}
 
 fun networkUpdateAction(description: String, longDescription: String = description, action: () -> Unit) =
     object : NetworkUpdateAction {

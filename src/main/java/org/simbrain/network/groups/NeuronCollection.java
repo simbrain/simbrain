@@ -134,4 +134,10 @@ public class NeuronCollection extends AbstractNeuronCollection {
     public void addNeurons(Collection<Neuron> neurons) {
         super.addNeurons(neurons);
     }
+
+    @Override
+    public void postUnmarshallingInit() {
+        super.postUnmarshallingInit();
+        getNeuronList().forEach(this::addListener);
+    }
 }

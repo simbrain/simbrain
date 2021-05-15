@@ -725,7 +725,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
             // Don't show text when the canvas is sufficiently zoomed in
             camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                filterScreenElements<NeuronNode>().forEach { it.updateTextVisibility() }
+                GlobalScope.launch(Dispatchers.Main) {
+                    filterScreenElements<NeuronNode>().forEach {
+                        it.updateTextVisibility()
+                    }
+                }
             }
         }
 

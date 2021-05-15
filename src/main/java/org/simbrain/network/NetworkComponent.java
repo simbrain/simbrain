@@ -17,7 +17,6 @@
  */
 package org.simbrain.network;
 
-import com.thoughtworks.xstream.XStream;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.NetworkEvents;
@@ -32,6 +31,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.simbrain.network.core.NetworkKt.getNetworkXStream;
 
 /**
  * Network component.
@@ -138,14 +139,6 @@ public final class NetworkComponent extends WorkspaceComponent {
         network.postSaveReInit();
     }
 
-    /**
-     * Get Xstream with custom converters
-     */
-    private static XStream getNetworkXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
-        xstream.registerConverter(new Network.NetworkModelListConverter());
-        return xstream;
-    }
 
     /**
      * Returns a copy of this NetworkComponent.

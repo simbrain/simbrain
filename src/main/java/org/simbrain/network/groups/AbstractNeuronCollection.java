@@ -195,7 +195,7 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
     /**
      * Add listener to indicated neuron.
      */
-    private void addListener(Neuron n) {
+    protected void addListener(Neuron n) {
         n.getEvents().onLocationChange(fireLocationChange);
         n.getEvents().onActivationChange((aold,anew) -> {
             invalidateCachedActivations();
@@ -690,8 +690,6 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
         if (fireLocationChange == null) {
             fireLocationChange = createFireLocationChange();
         }
-
-        neuronList.forEach(this::addListener);
 
         // TODO: Resave and remove
         if (activationRecorder == null) {

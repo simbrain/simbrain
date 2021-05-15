@@ -86,15 +86,15 @@ public class Clipboard {
         // Unselect "old" copied objects
         net.getSelectionManager().clear();
 
-        // Select copied objects after pasting them
-        copy.forEach(NetworkModel::select);
-
         // Paste objects intelligently using placement
         net.getPlacementManager().pasteObjects(copy.stream()
                 .filter(LocatableModel.class::isInstance)
                 .map(LocatableModel.class::cast)
                 .collect(Collectors.toList())
         );
+
+        // Select copied objects after pasting them
+        copy.forEach(NetworkModel::select);
 
         net.repaint();
     }

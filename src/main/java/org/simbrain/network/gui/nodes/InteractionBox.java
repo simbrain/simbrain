@@ -22,13 +22,12 @@ import org.piccolo2d.PCamera;
 import org.piccolo2d.nodes.PText;
 import org.simbrain.network.gui.NetworkPanel;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeListener;
 
 /**
- * Interaction Box: graphical element for interacting with a group.  Subclasses support custom menus, dialogs, etc.
+ * Interaction Box: graphical element for interacting with a group. Subclasses support custom menus, dialogs, etc.
  */
 public abstract class InteractionBox extends ScreenElement {
 

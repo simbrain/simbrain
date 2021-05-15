@@ -34,7 +34,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
     private InteractionBox interactionBox;
 
     /**
-     * Constitiuent neuron nodes.
+     * Constituent neuron nodes.
      */
     private Set<NeuronNode> neuronNodes = new HashSet<>();
 

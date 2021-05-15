@@ -272,9 +272,7 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
         cachedActivationsDirty = true;
     }
 
-    /**
-     * Randomize all neurons in group.
-     */
+    @Override
     public void randomize() {
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomize();

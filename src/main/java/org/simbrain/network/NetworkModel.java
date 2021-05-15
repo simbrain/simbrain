@@ -90,4 +90,9 @@ public abstract class NetworkModel {
     public void postUnmarshallingInit() {
     }
 
+    /**
+     * Override to provide a means of randomizing elements.
+     */
+    public void randomize() {
+    }
 }

@@ -81,9 +81,7 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
         return copy;
     }
 
-    /**
-     * Simple randomization for now.
-     */
+    @Override
     public void randomize() {
         setActivations(SimbrainMath.randomVector(getActivations().length, -1, 1));
         getEvents().fireUpdated();

@@ -599,9 +599,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         }
     }
 
-    /**
-     * Randomize this neuron to a value between upperBound and lowerBound.
-     */
+    @Override
     public void randomize() {
         forceSetActivation(this.getUpdateRule().getRandomValue());
     }

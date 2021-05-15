@@ -18,13 +18,9 @@
  */
 package org.simbrain.network.gui.actions.edit;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
@@ -51,10 +47,6 @@ public final class RandomizeObjectsAction extends ConditionallyEnabledAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        getNetworkPanel().getSelectionManager().filterSelectedModels(Neuron.class).forEach(Neuron::randomize);
-        getNetworkPanel().getSelectionManager().filterSelectedModels(Synapse.class).forEach(Synapse::randomize);
-        getNetworkPanel().getSelectionManager().filterSelectedModels(NeuronGroup.class).forEach(NeuronGroup::randomize);
-        getNetworkPanel().getSelectionManager().filterSelectedModels(NeuronArray.class).forEach(NeuronArray::randomize);
-        getNetworkPanel().getSelectionManager().filterSelectedModels(WeightMatrix.class).forEach(WeightMatrix::randomize);
+        getNetworkPanel().getSelectionManager().getSelectedModels().forEach(NetworkModel::randomize);
     }
 }

@@ -617,9 +617,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         return getTarget().getFanOut().get(getSource());
     }
 
-    /**
-     * Randomize this weight to a value between its upper and lower bounds.
-     */
+    @Override
     public void randomize() {
         double newStrength = (getUpperBound() - getLowerBound()) * Math.random() + getLowerBound();
         forceSetStrength(newStrength);

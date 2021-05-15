@@ -168,9 +168,7 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         events.fireDeleted();
     }
 
-    /**
-     * Randomize weights in this matrix
-     */
+    @Override
     public void randomize() {
         weightMatrix = Matrix.rand(source.getActivations().length,  target.getActivations().length,
                 new GaussianDistribution(0, 1));

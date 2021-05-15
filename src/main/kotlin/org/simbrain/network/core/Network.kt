@@ -1,16 +1,9 @@
 package org.simbrain.network.core
 
 import com.thoughtworks.xstream.XStream
-import com.thoughtworks.xstream.annotations.XStreamImplicit
-import com.thoughtworks.xstream.converters.Converter
-import com.thoughtworks.xstream.converters.MarshallingContext
-import com.thoughtworks.xstream.converters.UnmarshallingContext
-import com.thoughtworks.xstream.io.HierarchicalStreamReader
-import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.core.Network.NetworkModelList
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -609,145 +602,7 @@ class Network {
         }
     }
 
-    /**
-     * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
-     */
-    private class NetworkModelList {
-
-        /**
-         * Backing for the collection: a map from model types to linked hash sets.
-         */
-        @XStreamImplicit
-        private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = HashMap()
-
-        @Suppress("UNCHECKED_CAST")
-        fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
-            if (modelClass in networkModels) {
-                networkModels[modelClass]!!.add(model)
-            } else {
-                val newSet = LinkedHashSet<T>()
-                newSet.add(model)
-                networkModels[modelClass] = newSet as LinkedHashSet<NetworkModel>
-            }
-        }
-
-        /**
-         * Put in the list without checking type. Needed for de-serialization. Avoid, and if used
-         * use with caution.
-         */
-        fun putUnsafe(modelClass: Class<out NetworkModel>, model: NetworkModel) {
-            if (modelClass in networkModels) {
-                networkModels[modelClass]!!.add(model)
-            } else {
-                val newSet = LinkedHashSet<NetworkModel>()
-                newSet.add(model)
-                networkModels[modelClass] = newSet
-            }
-        }
-
-        /**
-         * Add a collection of network models to the map.
-         */
-        fun addAll(models: Collection<NetworkModel>) {
-            models.forEach { add(it) }
-        }
-
-        /**
-         * Add a network model to the map.
-         */
-        fun add(model: NetworkModel) {
-            if (model is Subnetwork) {
-                put(Subnetwork::class.java, model)
-            } else {
-                put(model.javaClass, model)
-            }
-        }
-
-        /**
-         * Returns an ordered set of network models of a specific type.
-         */
-        @Suppress("UNCHECKED_CAST")
-        operator fun <T : NetworkModel> get(modelClass: Class<T>): LinkedHashSet<T> {
-            return if (networkModels.containsKey(modelClass)) {
-                networkModels[modelClass] as LinkedHashSet<T>
-            } else {
-                LinkedHashSet()
-            }
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        inline fun <reified T : NetworkModel> get() = get(T::class.java)
-
-        //TODO
-        fun unsafeGet(modelClass: Class<*>?): LinkedHashSet<*> {
-            return if (networkModels.containsKey(modelClass)) {
-                networkModels[modelClass]!!
-            } else {
-                LinkedHashSet<NetworkModel>()
-            }
-        }
-
-        val all: List<NetworkModel>
-            get() = networkModels.values.flatMap { it?.map { item -> item } ?: listOf() }
-
-        /**
-         * Returns a list of network models in the order required for proper deserilization.
-         */
-        val allInDeserializationOrder: List<NetworkModel>
-            get() {
-                val keys = networkModels.keys.toMutableSet()
-                return sequence {
-                    for (cls in deserializationOrder) {
-                        networkModels[cls]?.let { yieldAll(it) }
-                        keys.remove(cls)
-                    }
-                    for (cls in keys) {
-                        networkModels[cls]?.let { yieldAll(it) }
-                    }
-                }.toList()
-            }
-
-        fun remove(model: NetworkModel) {
-            if (model is Subnetwork) {
-                networkModels[Subnetwork::class.java]?.remove(model)
-            } else {
-                networkModels[model.javaClass]?.remove(model)
-            }
-        }
-    }
-
-    /**
-     * Custom serializer that stores [Network.networkModels], which is a map, as a flat list of [NetworkModel]s.
-     */
-    class NetworkModelListConverter : Converter {
-
-        override fun canConvert(type: Class<*>?) = NetworkModelList::class.java == type
-
-        override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {
-            val modelList = source as NetworkModelList
-            modelList.allInDeserializationOrder.forEach { model ->
-                writer.startNode(model::class.java.name)
-                context.convertAnother(model)
-                writer.endNode()
-            }
-        }
-
-        override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
-            val modelList = NetworkModelList()
-            while (reader.hasMoreChildren()) {
-                reader.moveDown()
-                val cls = Class.forName(reader.nodeName)
-                val model = context.convertAnother(reader.value, cls) as NetworkModel
-                modelList.putUnsafe(cls as Class<out NetworkModel>, model)
-                reader.moveUp()
-            }
-            return modelList
-        }
-
-    }
-
 }
-
 
 /**
  * The initial time-step for the network.
@@ -769,7 +624,7 @@ var synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisib
 /**
  * Items must be ordered for deserializing. For example neurons but serialized before synapses.
  */
-private val deserializationOrder: List<Class<out NetworkModel>> = listOf(
+public val deserializationOrder: List<Class<out NetworkModel>> = listOf(
     Neuron::class.java,
     NeuronGroup::class.java,
     NeuronCollection::class.java,
@@ -837,7 +692,7 @@ val List<Synapse>.lengths: List<Double>
 
 fun getNetworkXStream(): XStream {
     val xstream = Utils.getSimbrainXStream()
-    xstream.registerConverter(Network.NetworkModelListConverter())
+    xstream.registerConverter(NetworkModelListConverter())
     return xstream
 }
 

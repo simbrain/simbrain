@@ -36,9 +36,9 @@ import static org.simbrain.network.LocatableModelKt.getCenterLocation;
 import static org.simbrain.util.GeomKt.minus;
 
 /**
- * A collection of neuron groups and synapse groups which functions as a subnetwork within the main root network, with
- * its own update rules. Note that no neurons or synapses or other objects are contained in a subnet (as of now), it
- * only contains neuron and synapse groups.
+ * A collection of {@link org.simbrain.network.NetworkModel} objects which functions as a subnetwork within the main
+ * root network, which (1) is shown in the GUI with an outline around it and a custom interaction box and (2) has
+ * a potentially custom update rule.
  */
 public abstract class Subnetwork extends LocatableModel implements EditableObject, AttributeContainer {
 

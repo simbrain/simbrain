@@ -21,6 +21,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -124,4 +125,13 @@ public class NeuronCollection extends AbstractNeuronCollection {
         return true;
     }
 
+    @Override
+    public void addNeuron(Neuron neuron) {
+        super.addNeuron(neuron);
+    }
+
+    @Override
+    public void addNeurons(Collection<Neuron> neurons) {
+        super.addNeurons(neurons);
+    }
 }

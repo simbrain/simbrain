@@ -178,9 +178,9 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
     }
 
     /**
-     * Add a neuron to the collection.
+     * Add a neuron to the collection. Exposed in {@link NeuronCollection} but not in {@link NeuronGroup}
      */
-    public void addNeuron(Neuron neuron) {
+    protected void addNeuron(Neuron neuron) {
         neuronList.add(neuron);
         addListener(neuron);
     }
@@ -188,7 +188,7 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
     /**
      * Add a collection of neurons.
      */
-    public void addNeurons(Collection<Neuron> neurons) {
+    protected void addNeurons(Collection<Neuron> neurons) {
         neurons.forEach(this::addNeuron);
     }
 

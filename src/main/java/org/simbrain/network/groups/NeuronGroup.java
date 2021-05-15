@@ -33,19 +33,24 @@ import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.simbrain.network.LocatableModelKt.getTopLeftLocation;
 
 /**
- * A group of neurons. A primary abstraction for larger network structures. Layers in feed-forward networks are neuron
- * groups. Self-organizing-maps subclass this class. Etc.
- * <br>
- * Updating is done using a collection of neurons, but in a NeuronGroup they must all be the same type. This allows the
- * group to be characterized as spiking vs. non-spiking, for example, and serves other functions. Because this
- * constraint was added after neuron groups were first introduced, it is not yet rigorously enforced in the code.
+ * A group of neurons using a common {@link NeuronUpdateRule}. After creation the update rule may be changed but
+ * neurons should not be added. Intermediate between a {@link NeuronCollection} which is just an
+ * assemblage of potentially heterogeneous neurons that can be treated as a group, and a
+ * {@link org.simbrain.network.matrix.NeuronArray} which is an array that can be updated using static update methods.
+ * <p></p>
+ * A primary abstraction for larger network structures. Layers in feed-forward networks are neuron
+ * groups. Self-organizing-maps subclass this class. Etc. Since all update rules are the same groups can be characterized
+ * as spiking vs. non-spiking.
  */
 public class NeuronGroup extends AbstractNeuronCollection {
 
@@ -107,7 +112,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
         this(net);
-        addNeurons(neurons);
+        neurons.forEach(n -> {
+            super.addNeuron(n);
+            n.setParentGroup(this);
+            n.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
+            subsamplingManager.resetIndices();
+        });
         subsamplingManager.resetIndices();
     }
 
@@ -237,24 +247,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
             }
         }
         return ret;
-    }
-
-    /**
-     * Add a neuron to group.
-     *
-     * @param neuron    neuron to add
-     */
-    public void addNeuron(Neuron neuron) {
-        super.addNeuron(neuron);
-        neuron.setParentGroup(this);
-        neuron.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
-        subsamplingManager.resetIndices();
-    }
-
-    @Override
-    public void addNeurons(Collection<Neuron> neurons) {
-        groupUpdateRule = UpdateRuleEnum.get(neurons.iterator().next().getUpdateRule());
-        super.addNeurons(neurons);
     }
 
     /**

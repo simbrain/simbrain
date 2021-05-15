@@ -228,8 +228,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     /**
      * Add a screen element to the network panel and rezoom the page.
      */
-    private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also {
-        canvas.layer.addChild(it)
+    private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also { node ->
+        canvas.layer.addChild(node)
+        node.model.events.onSelected {
+            selectionManager.add(node)
+        }
         zoomToFitPage()
     }
 

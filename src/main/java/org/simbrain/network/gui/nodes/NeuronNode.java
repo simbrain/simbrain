@@ -212,7 +212,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         events.onClampedChange((o, n) -> updateClampStatus());
         events.onLocationChange(this::pullViewPositionFromModel);
         events.onUpdateRuleChange((o, n) -> updateShape());
-
     }
 
     /**

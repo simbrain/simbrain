@@ -177,4 +177,9 @@ public @interface UserParameter {
      */
     String regexValidation() default "";
 
+    /**
+     * TODO
+     */
+    String widgetForConditionalEnabling() default "";
+
 }

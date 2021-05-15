@@ -57,7 +57,7 @@ public class WinnerTakeAll extends NeuronGroup {
     /**
      * Probability of setting the winner randomly, when useRandom is true.
      */
-    @UserParameter(label = "Random prob", conditionalEnablingMethod = "isUseRandom", order = 80)
+    @UserParameter(label = "Random prob", widgetForConditionalEnabling = "Random winner", order = 80)
     private double randomProb = .1;
 
     /**

@@ -22,10 +22,7 @@ import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.util.propertyeditor.NumericWidget;
-import org.simbrain.util.propertyeditor.ObjectTypeEditor;
+import org.simbrain.util.propertyeditor.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,9 +51,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     private final JComponent component;
 
     /**
-     * The list of objects this parameter is editing.
+     * Parent property editor.
      */
-    private List<? extends EditableObject> editableObjects;
+    private AnnotatedPropertyEditor parent;
 
     /**
      * List of edited objects. Only used in conjunction with {@link
@@ -71,21 +68,18 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
     /**
      * Construct a parameter widget from a parameter, which in turn represents a
-     * field.
-     *
-     * @param parameter       the parameter object
-     * @param editableObjects objects to edit
+     * field.s
      */
-    public ParameterWidget(Parameter parameter, List<? extends EditableObject> editableObjects) {
+    public ParameterWidget(AnnotatedPropertyEditor ape, Parameter parameter) {
+        parent = ape;
         this.parameter = parameter;
-        this.editableObjects = editableObjects;
         if (parameter.isObjectType()) {
             // ObjectTypeEditors require special initialization
 
             // Create a list of objects corresponding to the field associated with the parameter
             // E.g. a list of neuronupdaterules objects within a list of neuron objects
             objectTypeList = new ArrayList<>();
-            for (Object o : editableObjects) {
+            for (Object o : parent.getEditedObjects()) {
                 objectTypeList.add((CopyableObject) parameter.getFieldValue(o));
             }
         }
@@ -98,7 +92,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * If this component should be disabled (based on the {@link UserParameter#
      * conditionalEnablingMethod()} annotation, disable it.
      */
-    private void checkConditionalEnabling() {
+    public void checkConditionalEnabling() {
 
         // Note that parameter widgets defined in makeWidget must override setEnabled in some meaningful way for this
         // to work
@@ -106,12 +100,24 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         String conditionalEnableMethod = parameter.getAnnotation().conditionalEnablingMethod();
         if (!conditionalEnableMethod.isEmpty()) {
             try {
-                Method method = editableObjects.get(0).getClass().
+                Method method = parent.getEditedObjects().get(0).getClass().
                         getDeclaredMethod(conditionalEnableMethod);
-                Boolean enabled = (Boolean) method.invoke(editableObjects.get(0));
+                Boolean enabled = (Boolean) method.invoke(parent.getEditedObjects().get(0));
                 component.setEnabled(enabled);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
+            }
+        }
+
+        // TODO. Rename as needed and improve.
+        // Only works for booleans. Clarify that in relevant javadocs.
+        String otherWidgetName = parameter.getAnnotation().widgetForConditionalEnabling();
+        if (!otherWidgetName.isEmpty()) {
+            ParameterWidget otherWidget = parent.getWidget(otherWidgetName);
+            if (otherWidget != null) {
+                if (otherWidget.component instanceof YesNoNull) {
+                    component.setEnabled(((YesNoNull)otherWidget.component).isSelected());
+                }
             }
         }
     }
@@ -125,9 +131,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         if (!initialValueMethod.isEmpty()) {
             // TODO: type check, or generalize to any object type
             try {
-                Method method = editableObjects.get(0).getClass().
+                Method method = parent.getEditedObjects().get(0).getClass().
                         getDeclaredMethod(initialValueMethod);
-                String initValue = (String) method.invoke(editableObjects.get(0));
+                String initValue = (String) method.invoke(parent.getEditedObjects().get(0));
                 ((TextWithNull) component).setText(initValue);
                 customInitialValue = true;
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -164,7 +170,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         }
 
         if (parameter.isDoubleArray()) {
-            DoubleArrayWidget doubleArrayWidget = new DoubleArrayWidget();
             return new DoubleArrayWidget();
         }
 
@@ -202,14 +207,15 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
             if (parameter.isNumericInteger()) {
                 int step = (int) Math.max(1, stepSize);
-                spinnerModel = new SpinnerNumberModelWithNull((Integer) 0, minValue == null ? null : minValue.intValue(), maxValue == null ? null : maxValue.intValue(), step);
+                spinnerModel = new SpinnerNumberModelWithNull(0, minValue == null ? null : minValue.intValue(), maxValue == null ? null : maxValue.intValue(), step);
             } else {
-                spinnerModel = new SpinnerNumberModelWithNull((Double) 0.0, minValue, maxValue, stepSize);
+                spinnerModel = new SpinnerNumberModelWithNull(0.0, minValue, maxValue, stepSize);
             }
 
             Runnable setNull = () -> setWidgetValue(null);
 
-            NumericWidget ret = new NumericWidget(editableObjects, parameter, spinnerModel, setNull);
+            NumericWidget ret = new NumericWidget(parent.getEditedObjects(), parameter, spinnerModel, setNull);
+
             return ret;
         }
 

@@ -42,7 +42,7 @@ public final class NeuronCollectionAction extends ConditionallyEnabledAction {
         super(networkPanel, "Add Neurons to  Collection", EnablingCondition.NEURONS);
 
         putValue(NAME, "Add Neurons to Collection");
-        putValue(SHORT_DESCRIPTION, "Add selected neurons to a neuron collction (Shift-G)");
+        putValue(SHORT_DESCRIPTION, "Add selected neurons to a neuron collection (Shift-G)");
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('G'), this);
         networkPanel.getActionMap().put(this, this);
 

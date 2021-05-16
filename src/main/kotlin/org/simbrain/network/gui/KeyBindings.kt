@@ -16,8 +16,8 @@ import javax.swing.KeyStroke
  * classes.
  */
 fun NetworkPanel.addKeyBindings() {
-    bind(VK_UP) { contextualIncrementSelectedObjects() }
-    bind(VK_DOWN) { contextualDecrementSelectedObjects() }
+    bind(VK_UP) { incrementSelectedObjects() }
+    bind(VK_DOWN) { decrementSelectedObjects() }
     bind(Shift + VK_UP) { nudge(0, -1) }
     bind(Shift + VK_DOWN) { nudge(0, 1) }
     bind(Shift + VK_LEFT) { nudge(-1, 0) }
@@ -27,6 +27,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(CmdOrCtrl + 'D') { duplicate() }
     bind(VK_ESCAPE) { selectionManager.clear(); selectionManager.clearAllSource() }
     bind("C") { clearSelectedObjects() }
+    bind(Shift + 'C') { hardClearSelectedObjects() }
     bind(Alt + 'D') { println(network) } // Print debug information
     bind(Alt + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }

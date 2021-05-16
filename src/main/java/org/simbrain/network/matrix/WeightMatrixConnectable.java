@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -30,9 +29,6 @@ public abstract class WeightMatrixConnectable extends LocatableModel {
      * "Fan-out" of outgoing weight matrices.
      */
     private final List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
-
-    @UserParameter(label = "Increment amount", increment = .1, order = 20)
-    private double increment = .1;
 
     /**
      * Event support.
@@ -116,10 +112,10 @@ public abstract class WeightMatrixConnectable extends LocatableModel {
     /**
      * Add increment to every entry in weight matrix
      */
-    public void increment() {
+    public void incrementArray(double amount) {
         double[] newActivations = Arrays
                 .stream(getActivations())
-                .map(a -> a + increment)
+                .map(a -> a + amount)
                 .toArray();
         setActivations(newActivations);
         events.fireUpdated();
@@ -128,19 +124,19 @@ public abstract class WeightMatrixConnectable extends LocatableModel {
     /**
      * Subtract increment from every entry in the array
      */
-    public void decrement() {
+    public void decrementArray(double amount) {
         double[] newActivations = Arrays
                 .stream(getActivations())
-                .map(a -> a - increment)
+                .map(a -> a - amount)
                 .toArray();
         setActivations(newActivations);
         events.fireUpdated();
     }
 
     /**
-     * Clear activations.
+     * Clear array values.
      */
-    public void clear() {
+    public void clearArray() {
         double[] newActivations = new double[getActivations().length];
         setActivations(newActivations);
         events.fireUpdated();

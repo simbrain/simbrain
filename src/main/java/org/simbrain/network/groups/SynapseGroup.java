@@ -619,17 +619,14 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         }
     }
 
-    /**
-     * Removes all synapses from this synapse group and the network. Deletes all
-     * synapses in this group.
-     */
+    @Override
     public void clear() {
         for (Synapse toDelete : exSynapseSet) {
             // Remove references to this synapse from parent neurons
             toDelete.getSource().removeEfferent(toDelete);
             toDelete.getTarget().removeAfferent(toDelete);
             if (isDisplaySynapses()) {
-//                toDelete.getNetwork().fireSynapseRemoved(toDelete); // TODO: [event]
+                // toDelete.getNetwork().fireSynapseRemoved(toDelete); // TODO: [event]
             }
 
         }
@@ -637,7 +634,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
             toDelete.getSource().removeEfferent(toDelete);
             toDelete.getTarget().removeAfferent(toDelete);
             if (isDisplaySynapses()) {
-//                toDelete.getNetwork().fireSynapseRemoved(toDelete); // TODO: [event]
+                 // toDelete.getNetwork().fireSynapseRemoved(toDelete); // TODO: [event]
             }
         }
         exSynapseSet.clear();

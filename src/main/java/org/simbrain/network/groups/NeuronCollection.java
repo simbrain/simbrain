@@ -128,7 +128,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
     @Override
     public void addNeuron(Neuron neuron) {
         // These neurons already have ids and listeners
-        getNeuronList().add(neuron);
+        neuronList.add(neuron);
         addListener(neuron);
     }
 

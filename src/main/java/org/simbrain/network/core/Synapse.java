@@ -545,7 +545,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Increment this weight by increment.
      */
-    public void incrementWeight() {
+    public void increment() {
         if (strength < upperBound) {
             forceSetStrength(strength + increment);
         }
@@ -554,7 +554,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Decrement this weight by increment.
      */
-    public void decrementWeight() {
+    public void decrement() {
         if (strength > lowerBound) {
             forceSetStrength(strength - increment);
             strength -= increment;
@@ -566,9 +566,9 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      */
     public void reinforce() {
         if (strength > 0) {
-            incrementWeight();
+            increment();
         } else if (strength < 0) {
-            decrementWeight();
+            decrement();
         } else if (strength == 0) {
             forceSetStrength(0);
         }
@@ -579,9 +579,9 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      */
     public void weaken() {
         if (strength > 0) {
-            decrementWeight();
+            decrement();
         } else if (strength < 0) {
-            incrementWeight();
+            increment();
         } else if (strength == 0) {
             forceSetStrength(0);
         }
@@ -931,9 +931,9 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         this.frozen = frozen;
         // Trying to fire an event from here causes problems relating to
         // template synapses
-        //if (getNetwork() != null && !isTemplate) {
-        //    this.getParentNetwork().fireSynapseChanged(this);
-        //}
+        if (getNetwork() != null && !isTemplate) {
+            getEvents().fireClampChanged();
+        }
     }
 
     /**
@@ -1020,15 +1020,23 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     }
 
+    //  TODO: Without any indication in the GUI this might be unclear to users.
     /**
      * "Clear" the synapse in the sense of setting post synaptic result to 0 and removing all queued activations from
-     * the delay manager.
+     * the delay manager. Do NOT set strength to 0, which his a more radical move, that should not be achieved with
+     * the same GUI actions as the high level "clear".
      */
+    @Override
     public void clear() {
         setPsr(0);
         if (delayManager != null) {
             Arrays.fill(delayManager, 0);
         }
+    }
+
+    @Override
+    public void toggleClamping() {
+        setFrozen(!isFrozen());
     }
 
     public SynapseEvents getEvents() {

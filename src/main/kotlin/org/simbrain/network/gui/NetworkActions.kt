@@ -36,7 +36,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val addSynapseGroupAction = AddSynapseGroupAction(networkPanel)
     val alignHorizontalAction = AlignHorizontalAction(networkPanel)
     val alignVerticalAction = AlignVerticalAction(networkPanel)
-    val clearNodeActivationsAction = ClearNodeActivationsAction(networkPanel)
+    val clearNodeActivationsAction = ClearSelectedObjects(networkPanel)
     val clearSourceNeurons = ClearSourceNeurons(networkPanel)
     val copyAction = CopyAction(networkPanel)
     val cutAction = CutAction(networkPanel)

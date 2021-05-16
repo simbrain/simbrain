@@ -790,13 +790,26 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         return getId() + ": " + getType() + " Activation = " + SimbrainMath.roundDouble(this.getActivation(), 3);
     }
 
-    /**
-     * Forward to updaterule's clearing method. By default set activation to 0.
-     */
+    @Override
     public void clear() {
         inputValue = 0.0;
         setActivation(0.0);
         updateRule.clear(this);
+    }
+
+    @Override
+    public void increment() {
+        updateRule.contextualIncrement(this);
+    }
+
+    @Override
+    public void decrement() {
+        updateRule.contextualDecrement(this);
+    }
+
+    @Override
+    public void toggleClamping() {
+        setClamped(!clamped);
     }
 
     /**
@@ -846,9 +859,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @param clamped Whether this neuron is to be clamped.
      */
     public void setClamped(final boolean clamped) {
-        boolean old = this.clamped;
         this.clamped = clamped;
-        events.fireClampedChange(old, clamped);
+        getEvents().fireClampChanged();
     }
 
     /**

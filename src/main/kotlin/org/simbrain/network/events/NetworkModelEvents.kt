@@ -1,8 +1,6 @@
 package org.simbrain.network.events
 
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.SynapseUpdateRule
 import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
@@ -21,6 +19,9 @@ open class NetworkModelEvents(val model: NetworkModel) : Event(PropertyChangeSup
 
     fun onLabelChange(handler: BiConsumer<String, String>) = "LabelChange".itemChangedEvent(handler)
     fun fireLabelChange(old: String, new: String) = "LabelChange"(old = old, new = new)
+
+    fun onClampChanged(handler: Runnable) = "ClampChanged".event(handler)
+    fun fireClampChanged() = "ClampChanged"()
 
     fun onUpdated(handler: Runnable) = "Updated".event(handler)
     fun fireUpdated() = "Updated"()

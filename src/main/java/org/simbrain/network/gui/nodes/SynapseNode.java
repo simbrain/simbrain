@@ -155,6 +155,7 @@ public final class SynapseNode extends ScreenElement {
             updateColor();
             updateDiameter();
         });
+        events.onClampChanged(this::updateClampStatus);
 
         // Respond to spiking events
         source.neuron.getEvents().onSpiked((o, n) -> updateSpikeColor());

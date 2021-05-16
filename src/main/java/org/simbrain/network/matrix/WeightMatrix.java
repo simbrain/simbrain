@@ -169,7 +169,8 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
     }
 
     @Override
-    public void randomize() {
+    public void
+    randomize() {
         weightMatrix = Matrix.rand(source.getActivations().length,  target.getActivations().length,
                 new GaussianDistribution(0, 1));
         events.fireUpdated();
@@ -179,17 +180,13 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         return events;
     }
 
-    /**
-     * Add increment to every entry in weight matrix
-     */
+    @Override
     public void increment() {
         weightMatrix.add(increment);
         events.fireUpdated();
     }
 
-    /**
-     * Subtract increment from every entry in weight matrix
-     */
+    @Override
     public void decrement() {
         weightMatrix.sub(increment);
         events.fireUpdated();

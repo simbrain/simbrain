@@ -111,6 +111,7 @@ public class Hopfield extends Subnetwork implements Trainable {
     public void randomize() {
         weights.randomize();
     }
+    // TODO: Get back old code that did this symmetrically
 
     @Override
     public void update() {

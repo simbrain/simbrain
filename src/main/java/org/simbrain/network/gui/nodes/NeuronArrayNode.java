@@ -73,6 +73,26 @@ public class NeuronArrayNode extends ScreenElement {
     private boolean gridMode = false;
 
     /**
+     * Width of border in pixels.
+     */
+    private final int borderPixels = 10;
+
+    /**
+     * Height of array when in "flat" mode.
+     */
+    private final int flatPixelArrayHeight = 10;
+
+    /**
+     * Heavy stroke for clamped nodes.
+     */
+    private static final BasicStroke CLAMPED_STROKE = new BasicStroke(2f);
+
+    /**
+     * Stroke to use for bounding box. Toggles from clamped to default.
+     */
+    private Stroke boundaryStroke = DEFAULT_STROKE;
+
+    /**
      * Text showing info about the array.
      */
     private PText infoText;
@@ -119,6 +139,7 @@ public class NeuronArrayNode extends ScreenElement {
             renderArrayToActivationsImage();
             updateInfoText();
         });
+        events.onClampChanged(this::updateClampStatus);
         events.onLocationChange(this::pullViewPositionFromModel);
         events.onLabelChange((o, n) -> {
             //interactionBox.setText((String) evt.getNewValue());
@@ -143,6 +164,17 @@ public class NeuronArrayNode extends ScreenElement {
         // Image array
         renderArrayToActivationsImage();
 
+        updateClampStatus();
+
+    }
+
+    private void updateClampStatus() {
+        if (neuronArray.isClamped()) {
+            boundaryStroke = CLAMPED_STROKE;
+        } else {
+            boundaryStroke = DEFAULT_STROKE;
+        }
+        boundsCache = null;
     }
 
     public void pullViewPositionFromModel() {
@@ -164,10 +196,6 @@ public class NeuronArrayNode extends ScreenElement {
         pushViewPositionToModel();
         super.offset(dx, dy);
     }
-
-    // TODO: Move this to top
-    private final int borderPixels = 10;
-    private final int flatPixelArrayHeight = 10;
 
     /**
      * Render an image and set it to {@link #activationImage} to show the current activationImage.
@@ -270,11 +298,7 @@ public class NeuronArrayNode extends ScreenElement {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 // Toggle grid mode
-                if (gridMode == false) {
-                    gridMode = true;
-                } else {
-                    gridMode = false;
-                }
+                gridMode = !gridMode;
                 renderArrayToActivationsImage();
             }
         };
@@ -380,6 +404,7 @@ public class NeuronArrayNode extends ScreenElement {
             borderBox = PPath.createRectangle(bounds.x-3, bounds.y-3, bounds.width+6, bounds.height+6);
             addChild(borderBox);
             borderBox.lowerToBottom();
+            borderBox.setStroke(boundaryStroke);
 
             // Todo: Magic variables
             var ctr = bounds.getCenter2D();

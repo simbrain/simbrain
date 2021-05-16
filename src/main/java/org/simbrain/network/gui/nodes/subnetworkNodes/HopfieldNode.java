@@ -78,7 +78,7 @@ public class HopfieldNode extends SubnetworkNode {
         menu.addSeparator();
         Action randomizeNet = new AbstractAction("Randomize synapses symmetrically") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getSubnetwork()).randomize();
+                getSubnetwork().randomize();
             }
         };
         menu.add(randomizeNet);

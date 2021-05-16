@@ -91,8 +91,33 @@ public abstract class NetworkModel {
     }
 
     /**
-     * Override to provide a means of randomizing elements.
+     * Override to provide a means of randomizing a model.
      */
     public void randomize() {
     }
+
+    /**
+     * Override to provide a means of "clearing" a model.
+     */
+    public void clear() {
+    }
+
+    /**
+     * Override to provide a means of incrementing a model
+     */
+    public void increment() {
+    }
+
+    /**
+     * Override to provide a means of decrementing a model.
+     */
+    public void decrement() {
+    }
+
+    /**
+     * Override to provide a means of clamping and unclamping a model.
+     */
+    public void toggleClamping() {
+    }
+
 }

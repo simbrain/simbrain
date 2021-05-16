@@ -3,9 +3,7 @@ package org.simbrain.network.events
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.util.Event
-import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
-import java.util.function.Consumer
 
 /**
  * @see Event
@@ -20,9 +18,6 @@ class NeuronEvents(val neuron: Neuron) : LocationEvents(neuron) {
 
     fun onColorChange(handler: Runnable) = "ColorChange".event(handler)
     fun fireColorChange() = "ColorChange"()
-
-    fun onClampedChange(handler: BiConsumer<Boolean, Boolean>) = "ClampedChange".itemChangedEvent(handler)
-    fun fireClampedChange(old: Boolean?, new: Boolean) = "ClampedChange"(old = old, new = new)
 
     fun onUpdateRuleChange(handler: BiConsumer<NeuronUpdateRule, NeuronUpdateRule>) = "UpdateRuleChange".itemChangedEvent(handler)
     fun fireUpdateRuleChange(old: NeuronUpdateRule?, new: NeuronUpdateRule) = "UpdateRuleChange"(old = old, new = new)

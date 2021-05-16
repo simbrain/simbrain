@@ -186,7 +186,7 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
 
     @Override
     public void initNetwork() {
-        clearActivations();
+        // clearActivations();
         hiddenLayer.forceSetActivationLevels(.5);
     }
 

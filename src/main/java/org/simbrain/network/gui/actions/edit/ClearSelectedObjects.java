@@ -25,9 +25,9 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Set all node activations to zero and leave nodes selected.
+ * Clear selected objects.
  */
-public final class ClearNodeActivationsAction extends AbstractAction {
+public final class ClearSelectedObjects extends AbstractAction {
 
     /**
      * Reference to network panel.
@@ -40,7 +40,7 @@ public final class ClearNodeActivationsAction extends AbstractAction {
      *
      * @param networkPanel network panel, must not be null
      */
-    public ClearNodeActivationsAction(final NetworkPanel networkPanel) {
+    public ClearSelectedObjects(final NetworkPanel networkPanel) {
         super("Clear activations of all nodes");
         this.networkPanel = networkPanel;
 
@@ -54,6 +54,6 @@ public final class ClearNodeActivationsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.clearNeurons();
+        networkPanel.clearSelectedObjects();
     }
 }

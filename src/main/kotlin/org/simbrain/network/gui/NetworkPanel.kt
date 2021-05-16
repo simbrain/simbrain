@@ -465,74 +465,28 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     }
 
     fun toggleClamping() {
-        selectionManager.filterSelectedModels<Neuron>().forEach { it.isClamped = !it.isClamped }
-        selectionManager.filterSelectedNodes<SynapseNode>().forEach {
-            with(it.synapse) { isFrozen = !isFrozen }
-
-            // TODO: this should happen via an event
-            //   but firing events from setFrozen causes problems
-            //   when opening saved networks
-            it.updateClampStatus()
-        }
-        revalidate()
+        selectionManager.filterSelectedModels<NetworkModel>().forEach {  it.toggleClamping() }
     }
 
     fun incrementSelectedObjects() {
-        with(selectionManager) {
-            filterSelectedModels<Neuron>().forEach { it.updateRule.incrementActivation(it) }
-            filterSelectedNodes<SynapseNode>().forEach {
-                it.synapse.incrementWeight()
-                it.updateColor()
-                it.updateDiameter()
-            }
-            filterSelectedModels<NeuronArray>().forEach { it.increment() }
-            filterSelectedModels<WeightMatrix>().forEach { it.increment() }
-        }
+        selectionManager.filterSelectedModels<NetworkModel>().forEach {  it.increment() }
     }
 
     fun decrementSelectedObjects() {
-        with(selectionManager) {
-            filterSelectedModels<Neuron>().forEach { it.updateRule.decrementActivation(it) }
-            filterSelectedNodes<SynapseNode>().forEach {
-                it.synapse.decrementWeight()
-                it.updateColor()
-                it.updateDiameter()
-            }
-            filterSelectedModels<NeuronArray>().forEach { it.decrement() }
-            filterSelectedModels<WeightMatrix>().forEach { it.decrement() }
-        }
-    }
-
-    fun contextualIncrementSelectedObjects() {
-        selectionManager.filterSelectedModels<Synapse>().forEach { it.incrementWeight() }
-        selectionManager.filterSelectedModels<Neuron>().forEach { it.updateRule.contextualIncrement(it) }
-        selectionManager.filterSelectedModels<NeuronArray>().forEach { it.increment() }
-        selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.increment() }
-    }
-
-    fun contextualDecrementSelectedObjects() {
-        selectionManager.filterSelectedModels<Synapse>().forEach { it.decrementWeight() }
-        selectionManager.filterSelectedModels<Neuron>().forEach { it.updateRule.contextualDecrement(it) }
-        selectionManager.filterSelectedModels<NeuronArray>().forEach { it.decrement() }
-        selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.decrement() }
+        selectionManager.filterSelectedModels<NetworkModel>().forEach {  it.decrement() }
     }
 
     fun clearSelectedObjects() {
-        with(selectionManager) {
-            filterSelectedModels<Neuron>().forEach { it.clear() }
-            filterSelectedModels<Synapse>().forEach { it.forceSetStrength(0.0) }
-            filterSelectedModels<NeuronArray>().forEach { it.clear() }
-            filterSelectedModels<NeuronGroup>().forEach { it.clear() }
-            filterSelectedModels<WeightMatrix>().forEach { it.clear() }
-        }
+        selectionManager.filterSelectedModels<NetworkModel>().forEach {  it.clear() }
+    }
+
+    fun hardClearSelectedObjects() {
+        clearSelectedObjects();
+        selectionManager.filterSelectedModels<Synapse>().forEach {  it.strength = 0.0 }
     }
 
     fun selectNeuronsInNeuronGroups() {
         selectionManager.filterSelectedNodes<NeuronGroupNode>().forEach { it.selectNeurons() }
-    }
-
-    fun clearNeurons() {
-        filterScreenElements<NeuronNode>().forEach { it.neuron.clear() }
     }
 
     /**

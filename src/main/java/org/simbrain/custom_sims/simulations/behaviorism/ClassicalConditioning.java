@@ -127,11 +127,11 @@ public class ClassicalConditioning extends RegisteredSimulation {
                 if ((bellDetectorNeuron.getActivation() > 0) && (cheeseDetectorNeuron.getActivation() > 0)) {
                     // Learning
                     association.setIncrement(.001); // learning rate
-                    association.incrementWeight();
+                    association.increment();
                 } else if ((bellDetectorNeuron.getActivation() > 0) && (cheeseDetectorNeuron.getActivation() <= 0)) {
                     // Extinction
                     association.setIncrement(.0005); // extinction rate
-                    association.decrementWeight();
+                    association.decrement();
                 }
             }
 

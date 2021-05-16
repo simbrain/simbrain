@@ -18,7 +18,11 @@ import java.util.Arrays;
  */
 public class NeuronArray extends WeightMatrixConnectable implements EditableObject, AttributeContainer {
 
-    //TODO: Rename ideas: Array, Layer,Double Array
+    @UserParameter(label = "Increment amount", increment = .1, order = 20)
+    private double increment = .1;
+
+    @UserParameter(label = "Clamped", description = "Clamping", order = 3)
+    private boolean clamped;
 
     /**
      * Reference to network this array is part of.
@@ -192,6 +196,9 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
 
     @Override
     public void update() {
+        if (clamped) {
+            return;
+        }
         setActivations(getInputs());
         inputs = new double[inputs.length]; // clear inputs
         getEvents().fireUpdated();
@@ -246,5 +253,34 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
     public String toString() {
         return getId() + " with " + getActivations().length + " activations: " +
                 Utils.getTruncatedArrayString(getActivations(), 10);
+    }
+
+    @Override
+    public void clear() {
+        clearArray();
+    }
+
+    @Override
+    public void increment() {
+        incrementArray(increment);
+    }
+
+    @Override
+    public void decrement() {
+        decrementArray(increment);
+    }
+
+    @Override
+    public void toggleClamping() {
+        setClamped(!isClamped());
+    }
+
+    public void setClamped(final boolean clamped) {
+        this.clamped = clamped;
+        getEvents().fireClampChanged();
+    }
+
+    public boolean isClamped() {
+        return clamped;
     }
 }

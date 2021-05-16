@@ -12,6 +12,7 @@ import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.RectangleOutlines;
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -62,7 +63,7 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
     /**
      * References to neurons in this collection
      */
-    private final List<Neuron> neuronList = new CopyOnWriteArrayList<>();
+    protected final List<Neuron> neuronList = new CopyOnWriteArrayList<>();
 
     /**
      * Maintains a matrix of data that can be used to send inputs to this neuron collection.
@@ -78,6 +79,9 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
      * Manage recording activation histories for a network
      */
     protected ActivationRecorder activationRecorder;
+
+    @UserParameter(label = "Increment amount", increment = .1, order = 100)
+    private double increment = .1;
 
     /**
      * Default constructor.
@@ -705,5 +709,20 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
     public String toString() {
         return getId() + " with " + getActivations().length + " activations: " +
                 Utils.getTruncatedArrayString(getActivations(), 10);
+    }
+
+    @Override
+    public void clear() {
+        clearArray();
+    }
+
+    @Override
+    public void increment() {
+        incrementArray(increment);
+    }
+
+    @Override
+    public void decrement() {
+        decrementArray(increment);
     }
 }

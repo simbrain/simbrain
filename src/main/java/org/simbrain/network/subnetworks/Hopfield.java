@@ -21,9 +21,10 @@ package org.simbrain.network.subnetworks;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -44,9 +45,15 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     public static final HopfieldUpdate DEFAULT_UPDATE = HopfieldUpdate.SYNC;
 
-    private WeightMatrix wm;
-
+    /**
+     * The neurons.
+     */
     private NeuronGroup neuronGroup;
+
+    /**
+     * The weights.
+     */
+    private SynapseGroup weights;
 
     /**
      * Default number of neurons.
@@ -56,20 +63,9 @@ public class Hopfield extends Subnetwork implements Trainable {
     /**
      * The update function used by this Hopfield network.
      */
-    public static final boolean DEFAULT_PRIORITY = false;
-
-    /**
-     * The update function used by this Hopfield network.
-     */
     @UserParameter(label = "Update function")
     private HopfieldUpdate updateFunc = DEFAULT_UPDATE;
 
-    /**
-     * If true, if the network's update order is sequential, it will update in
-     * order of priority.
-     */
-    @UserParameter(label = "Sequential (vs. Random) Update")
-    private boolean byPriority = DEFAULT_PRIORITY;
 
     /**
      * Training set.
@@ -106,14 +102,14 @@ public class Hopfield extends Subnetwork implements Trainable {
         neuronGroup.setIncrement(1);
 
         // Connect the neurons together
-        wm = new WeightMatrix(getParentNetwork(), neuronGroup, neuronGroup);
-        addModel(wm);
+        weights = SynapseGroup.createSynapseGroup(neuronGroup, neuronGroup);
+        addModel(weights);
 
     }
 
     @Override
     public void randomize() {
-        wm.randomize();
+        weights.randomize();
     }
 
     @Override
@@ -130,8 +126,8 @@ public class Hopfield extends Subnetwork implements Trainable {
         return neuronGroup;
     }
 
-    public WeightMatrix getWeightMatrix() {
-        return wm;
+    public SynapseGroup getSynapseGroup() {
+        return weights;
     }
 
     @Override
@@ -159,13 +155,12 @@ public class Hopfield extends Subnetwork implements Trainable {
      * main training algorithm, which directly makes use of the input data.
      */
     public void trainOnCurrentPattern() {
-        // TODO
-        // for (Synapse w : this.getSynapseGroup().getAllSynapses()) {
-        //     Neuron src = w.getSource();
-        //     Neuron tar = w.getTarget();
-        //     getSynapseGroup().setSynapseStrength(w, w.getStrength() + bipolar(src.getActivation()) * bipolar(tar.getActivation()));
-        // }
-        //getParentNetwork().fireGroupUpdated(getSynapseGroup());
+        for (Synapse w : this.getSynapseGroup().getAllSynapses()) {
+            Neuron src = w.getSource();
+            Neuron tar = w.getTarget();
+            getSynapseGroup().setSynapseStrength(w, w.getStrength() + bipolar(src.getActivation()) * bipolar(tar.getActivation()));
+        }
+        // TODO: Should an event be fired?
     }
 
     /**
@@ -177,22 +172,6 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     public static double bipolar(double in) {
         return in == 0 ? -1 : in;
-    }
-
-    public HopfieldUpdate getUpdateFunc() {
-        return updateFunc;
-    }
-
-    public void setUpdateFunc(HopfieldUpdate updateFunc) {
-        this.updateFunc = updateFunc;
-    }
-
-    public boolean isByPriority() {
-        return byPriority;
-    }
-
-    public void setByPriority(boolean byPriority) {
-        this.byPriority = byPriority;
     }
 
     /**
@@ -223,21 +202,12 @@ public class Hopfield extends Subnetwork implements Trainable {
         }, SEQ {
             @Override
             public void update(Hopfield hop) {
-                List<Neuron> neurons;
-                if (hop.isByPriority()) {
-                    List<Neuron> copy = new ArrayList<>(hop.getNeuronGroup().getNeuronList());
-                    // TODO: Sort by priority
-                    copy.forEach(n -> {
-                        n.updateInputs();
-                        n.update();
-                    });
-                } else {
-                    hop.getNeuronGroup().getNeuronList().forEach(n -> {
-                        n.updateInputs();
-                        n.update();
-                    });
-                }
-
+                List<Neuron> copy = new ArrayList<>(hop.getNeuronGroup().getNeuronList());
+                // TODO: Sort by priority
+                copy.forEach(n -> {
+                    n.updateInputs();
+                    n.update();
+                });
             }
 
             @Override
@@ -253,13 +223,10 @@ public class Hopfield extends Subnetwork implements Trainable {
         }, SYNC {
             @Override
             public void update(Hopfield hop) {
-                List<Neuron> neurons = hop.getFlatNeuronList();
-                for (Neuron n : neurons) {
+                hop.getNeuronGroup().getNeuronList().forEach(n -> {
+                    n.updateInputs();
                     n.update();
-                }
-                for (Neuron n : neurons) {
-                    n.setActivation(n.getActivation());
-                }
+                });
             }
 
             @Override

@@ -53,7 +53,7 @@ public class HopfieldTrainer extends Trainer {
             throw new DataNotInitializedException("Input data not initalized");
         }
 
-        hopfield.getWeightMatrix().clear();
+        hopfield.getSynapseGroup().clear();
         int numRows = hopfield.getTrainingSet().getInputData().length;
         int numInputs = hopfield.getInputNeurons().size();
         float normConstant = 1 / (float) numRows;

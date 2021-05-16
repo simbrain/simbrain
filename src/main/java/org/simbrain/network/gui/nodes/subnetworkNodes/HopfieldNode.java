@@ -84,7 +84,7 @@ public class HopfieldNode extends SubnetworkNode {
         menu.add(randomizeNet);
         Action clearWeights = new AbstractAction("Set weights to zero") {
             public void actionPerformed(final ActionEvent event) {
-                hopfield.getWeightMatrix().clear();
+                hopfield.getSynapseGroup().clear();
             }
         };
         menu.add(clearWeights);

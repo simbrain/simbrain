@@ -73,7 +73,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     /**
      * The layout for the neurons in this group.
      */
-    @UserParameter(label = "Layout", isObjectType = true, order = 150)
+    @UserParameter(label = "Layout", isObjectType = true, tab = "Layout", order = 150)
     private Layout layout = DEFAULT_LAYOUT;
 
     /**
@@ -450,7 +450,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         /**
          * The layout for the neurons in this group.
          */
-        @UserParameter(label = "Layout", isObjectType = true, order = 50)
+        @UserParameter(label = "Layout", isObjectType = true, tab = "Layout", order = 50)
         private Layout layout = DEFAULT_LAYOUT;
 
         /**

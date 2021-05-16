@@ -84,6 +84,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             }
         }
         component = makeWidget();
+
         checkConditionalEnabling();
         setInitialValue();
     }
@@ -93,9 +94,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * conditionalEnablingMethod()} annotation, disable it.
      */
     public void checkConditionalEnabling() {
-
-        // Note that parameter widgets defined in makeWidget must override setEnabled in some meaningful way for this
-        // to work
 
         String conditionalEnableMethod = parameter.getAnnotation().conditionalEnablingMethod();
         if (!conditionalEnableMethod.isEmpty()) {
@@ -108,15 +106,20 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                 e.printStackTrace();
             }
         }
+    }
 
-        // TODO. Rename as needed and improve.
-        // Only works for booleans. Clarify that in relevant javadocs.
-        String otherWidgetName = parameter.getAnnotation().widgetForConditionalEnabling();
+    /**
+     * Check conditional enabling based on another widget, specified in terms of its
+     * {@link UserParameter#description()}. If the other widget is a drop down box then if it is set to "yes"
+     * this widget is enabled, else it is disabled.
+     */
+    public void checkConditionalEnablingWidget() {
+        String otherWidgetName = parameter.getAnnotation().condtionalEnablingWidget();
         if (!otherWidgetName.isEmpty()) {
             ParameterWidget otherWidget = parent.getWidget(otherWidgetName);
             if (otherWidget != null) {
                 if (otherWidget.component instanceof YesNoNull) {
-                    component.setEnabled(((YesNoNull)otherWidget.component).isSelected());
+                    component.setEnabled(((YesNoNull) otherWidget.component).isSelected());
                 }
             }
         }

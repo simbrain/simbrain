@@ -164,22 +164,22 @@ public @interface UserParameter {
     boolean editable() default true;
 
     /**
-     * Name of a method whose value determines whether this component is {@link java.awt.Component#setEnabled(boolean)}
+     * Name of a method whose value determines whether this component is enabled or not. Only called once when the
+     * editor is opened.
      */
-    // TODO: Note that this only works for initial enabling of items, and even then does not always work properly.
-    //        A problem with this is that the editor checks the object itself but while editing the object does not
-    //        change it.  Unclear how to implement this properly, and a low priority item regardless.
     String conditionalEnablingMethod() default "";
+
+
+    /**
+     * Name of another widget (based on its {@link #description() UserParameter} whose state determines if this widget
+     * is enabled or not. This changes dynamically.  Currently works on booleans only.
+     */
+    String condtionalEnablingWidget() default "";
 
     /**
      * Regular expression to validate (String) values against. This is only
      * applied to parameters that are provided as strings. Optional.
      */
     String regexValidation() default "";
-
-    /**
-     * TODO
-     */
-    String widgetForConditionalEnabling() default "";
 
 }

@@ -27,10 +27,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * Dialog for editing neuron groups.
@@ -51,30 +48,14 @@ public final class NeuronGroupDialog extends StandardDialog {
     private NeuronGroup neuronGroup;
 
     /**
-     * Main tabbed pane.
-     */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /**
-     * Label Field.
-     */
-    private JTextField tfNeuronGroupLabel = new JTextField();
-
-    /**
      * If true this is a creation dialog. Otherwise it is an edit dialog.
      */
     private boolean isCreationDialog = false;
 
     /**
-     * The list of components which are stored here so their tabs can be blanked
-     * out. This is what allows the panel to resize when tabs are changed.
-     */
-    private ArrayList<Component> storedComponents = new ArrayList<Component>();
-
-    /**
      * Neuron group summary.
      */
-    private AnnotatedPropertyEditor summaryPanel;
+    private AnnotatedPropertyEditor mainPanel;
 
     /**
      * Special object to create new neuron groups.
@@ -82,16 +63,10 @@ public final class NeuronGroupDialog extends StandardDialog {
     private NeuronGroup.NeuronGroupCreator ngCreator;
 
     /**
-     * Property editor for creating new neuron groups.
-     */
-    private AnnotatedPropertyEditor neuronGroupCreationEditor;
-
-    /**
      * For creating a new neuron group.
      *
      * @param np  parent panel
      */
-    // Called via reflection
     public NeuronGroupDialog(final NetworkPanel np) {
         networkPanel = np;
         isCreationDialog = true;
@@ -123,26 +98,17 @@ public final class NeuronGroupDialog extends StandardDialog {
         }
 
         setMinimumSize(new Dimension(300, 200));
-        fillFieldValues();
-        setContentPane(tabbedPane);
 
-        // Summary Info
-        JPanel firstTab = new JPanel();
         if (!isCreationDialog) {
-            summaryPanel = new AnnotatedPropertyEditor(neuronGroup);
-            firstTab = summaryPanel;
-
+            mainPanel = new AnnotatedPropertyEditor(neuronGroup);
         } else {
             ngCreator =
                 new NeuronGroup.NeuronGroupCreator(
                         networkPanel.getNetwork().getIdManager().getProposedId(NeuronGroup.class));
-            neuronGroupCreationEditor = new AnnotatedPropertyEditor(ngCreator);
-            firstTab = neuronGroupCreationEditor;
+            mainPanel = new AnnotatedPropertyEditor(ngCreator);
         }
-        JScrollPane summaryScrollWrapper = new JScrollPane(firstTab);
-        summaryScrollWrapper.setBorder(null);
-        storedComponents.add(summaryScrollWrapper);
-        tabbedPane.addTab("Summary", summaryScrollWrapper);
+
+        setContentPane(mainPanel);
 
         if(!isCreationDialog) {
             // Input panel
@@ -159,22 +125,12 @@ public final class NeuronGroupDialog extends StandardDialog {
                 }
             };
             JPanel inputDataPanel = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList(), matrix);
-            storedComponents.add(inputDataPanel);
-            tabbedPane.addTab("Input Data", inputDataPanel);
+            mainPanel.getTabbedPane().addTab("Input Data", inputDataPanel);
         }
 
         // Set up help button
         Action helpAction = new ShowHelpAction("Pages/Network/groups/NeuronGroup.html");
         addButton(new JButton(helpAction));
-
-        // Tab-change events
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                updateTabSizes(((JTabbedPane) e.getSource()).getSelectedIndex());
-            }
-        });
-        updateTabSizes(0);
 
         if (!isCreationDialog) {
             // If editing, make this dialog based on a done button, rather than
@@ -184,60 +140,17 @@ public final class NeuronGroupDialog extends StandardDialog {
     }
 
     /**
-     * Add listeners.
-     */
-    private void updateTabSizes(int selectedTab) {
-        Component current = storedComponents.get(selectedTab);
-        int numTabs = storedComponents.size();
-        for (int i = 0; i < numTabs; i++) {
-            if (i == selectedTab) {
-                tabbedPane.setComponentAt(i, current);
-                tabbedPane.repaint();
-                continue;
-            } else {
-                JPanel tmpPanel = new JPanel();
-                // Hack...
-                // 120 is a guess as to average px length of tabs
-                // (not their panels, just the tabs)
-                // This is here to prevent "scrunching" of the
-                // tabs when one of the panel's widths is too small
-                // to accommodate all the tabs on one line
-                int minPx = tabbedPane.getTabCount() * 120;
-                if (current.getPreferredSize().width < minPx) {
-                    tmpPanel.setPreferredSize(new Dimension(minPx, current.getPreferredSize().height));
-                } else {
-                    tmpPanel.setPreferredSize(current.getPreferredSize());
-                }
-                tabbedPane.setComponentAt(i, tmpPanel);
-            }
-        }
-        // tabbedPane.invalidate();
-        pack();
-    }
-
-    /**
-     * Set the initial values of dialog components.
-     */
-    public void fillFieldValues() {
-        if (!isCreationDialog) {
-            tfNeuronGroupLabel.setText(neuronGroup.getLabel());
-        } else {
-            tfNeuronGroupLabel.setText("Neuron group");
-        }
-    }
-
-    /**
      * Commit changes.
      */
     public void commitChanges() {
 
         if (isCreationDialog) {
-            neuronGroupCreationEditor.commitChanges();
+            mainPanel.commitChanges();
             neuronGroup = ngCreator.create(networkPanel.getNetwork());
             networkPanel.getNetwork().addNetworkModel(neuronGroup);
             networkPanel.getPlacementManager().addNewModelObject(neuronGroup);
         } else {
-            summaryPanel.commitChanges();
+            mainPanel.commitChanges();
             neuronGroup.applyLayout();
         }
 
@@ -250,15 +163,6 @@ public final class NeuronGroupDialog extends StandardDialog {
         commitChanges();
     }
 
-    @Override
-    public void pack() {
-        super.pack();
-        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-        int height = gd.getDisplayMode().getHeight();
-        if(this.getLocation().y + this.getBounds().height > height) {
-            this.setBounds(getLocation().x, getLocation().y, getWidth(), height - getLocation().y);
-        }
-    }
 
 
 }

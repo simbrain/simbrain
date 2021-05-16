@@ -85,9 +85,9 @@ public class CompetitiveGroup extends NeuronGroup {
     private boolean useLeakyLearning = DEFAULT_USE_LEAKY;
 
     /**
-     * Leaky learning rate .
+     * Leaky learning rate.
      */
-    @UserParameter(label = "Leaky learning rate", conditionalEnablingMethod = "getUseLeakyLearning", order = 90)
+    @UserParameter(label = "Leaky learning rate", condtionalEnablingWidget = "Use Leaky learning", order = 90)
     private double leakyLearningRate = DEFAULT_LEAKY_RATE;
 
     /**

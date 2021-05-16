@@ -110,13 +110,12 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         add(mainPanel, BorderLayout.CENTER);
         fillFieldValues(editedObjects);
 
-        // Update conditional enabling
-        // Currently only works with JCombo boxes
-        widgets.forEach(ParameterWidget::checkConditionalEnabling);
+        // Update conditional enabling based on widgets
+        widgets.forEach(ParameterWidget::checkConditionalEnablingWidget);
         widgets.forEach(w -> {
             if(w.getComponent() instanceof JComboBox) {
                 ((JComboBox<?>) w.getComponent()).addActionListener(e -> {
-                    widgets.forEach(ParameterWidget::checkConditionalEnabling);
+                    widgets.forEach(ParameterWidget::checkConditionalEnablingWidget);
                 });
             }
         });

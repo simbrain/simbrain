@@ -100,7 +100,6 @@ public class NumericWidget extends JPanel {
                 dialog.setVisible(true);
                 dialog.isAlwaysOnTop();
 
-
             });
             gridBagConstraints.weightx = 2;
             add(randomizeButton, gridBagConstraints);
@@ -118,5 +117,6 @@ public class NumericWidget extends JPanel {
     @Override
     public void setEnabled(boolean enabled) {
         spinner.setEnabled(enabled);
+        spinner.getEditor().setEnabled(enabled);
     }
 }

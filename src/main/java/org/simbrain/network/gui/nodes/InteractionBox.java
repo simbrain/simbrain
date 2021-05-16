@@ -103,6 +103,9 @@ public abstract class InteractionBox extends ScreenElement {
             return;
         }
 
+        if (text.isEmpty()) {
+            text = " "; // Use a blank string rather than an empty string so that the box does not disappear
+        }
         textLabel.setText(text);
 
         // Make smaller than interaction box if scale is 1

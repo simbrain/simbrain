@@ -124,14 +124,14 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
         inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
         inputLayer.setIncrement(1);
-        addNeuronGroup(inputLayer);
+        addModel(inputLayer);
         inputLayer.setLayoutBasedOnSize(initialPosition);
 
         // Hidden Layer
         hiddenLayer = new NeuronGroup(getParentNetwork(), hiddenLayerNeurons);
         //hiddenLayer.setLabel("Hidden layer (x(t))");
         hiddenLayer.setLabel("Hidden layer");
-        addNeuronGroup(hiddenLayer);
+        addModel(hiddenLayer);
         hiddenLayer.setLowerBound(-1);
         hiddenLayer.setUpperBound(1);
         hiddenLayer.setLayoutBasedOnSize();
@@ -142,13 +142,13 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
         contextLayer = new NeuronGroup(getParentNetwork(), contextLayerNeurons);
         //contextLayer.setLabel("Context Layer (x(t - \u0394t))");
         contextLayer.setLabel("Context Layer");
-        addNeuronGroup(contextLayer);
+        addModel(contextLayer);
         contextLayer.setLayoutBasedOnSize();
         offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST, betweenLayerInterval);
 
         // Output layer
         outputLayer = new NeuronGroup(getParentNetwork(), outputLayerNeurons);
-        addNeuronGroup(outputLayer);
+        addModel(outputLayer);
         outputLayer.setLabel("Output layer");
         outputLayer.setLayoutBasedOnSize();
         offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
@@ -158,9 +158,10 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
         SynapseGroup contToHid = SynapseGroup.createSynapseGroup(contextLayer, hiddenLayer, new AllToAll(false), 0.5);
         SynapseGroup hidToOut = SynapseGroup.createSynapseGroup(hiddenLayer, outputLayer, new AllToAll(false), 0.5);
 
-        addAndLabelSynapseGroup(inToHid);
-        addAndLabelSynapseGroup(contToHid);
-        addAndLabelSynapseGroup(hidToOut);
+        // TODO
+        // addAndLabelSynapseGroup(inToHid);
+        // addAndLabelSynapseGroup(contToHid);
+        // addAndLabelSynapseGroup(hidToOut);
 
         // Initialize activations
         initNetwork();
@@ -210,7 +211,6 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
 
     }
 
-    @Override
     public List<List<Neuron>> getNeuronGroupsAsList() {
         List<List<Neuron>> ret = new ArrayList<List<Neuron>>();
         ret.add(getInputNeurons());
@@ -219,58 +219,36 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
         return ret;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<Neuron> getInputNeurons() {
         return inputLayer.getNeuronList();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<Neuron> getOutputNeurons() {
         return outputLayer.getNeuronList();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TrainingSet getTrainingSet() {
         return trainingSet;
     }
 
-    /**
-     * @return the contextLayer
-     */
     public NeuronGroup getContextLayer() {
         return contextLayer;
     }
 
-    /**
-     * @return the hiddenLayer
-     */
     public NeuronGroup getHiddenLayer() {
         return hiddenLayer;
     }
 
-    /**
-     * @return the input
-     */
     public NeuronGroup getInputLayer() {
         return inputLayer;
     }
 
-    /**
-     * @return the input
-     */
     public NeuronGroup getOutputLayer() {
         return outputLayer;
     }
-
 
     // TOODO
     //@Override

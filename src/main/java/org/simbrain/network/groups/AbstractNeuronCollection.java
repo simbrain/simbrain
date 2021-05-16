@@ -182,6 +182,7 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
      */
     protected void addNeuron(Neuron neuron) {
         neuronList.add(neuron);
+        neuron.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
         addListener(neuron);
     }
 
@@ -190,6 +191,7 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
      */
     protected void addNeurons(Collection<Neuron> neurons) {
         neurons.forEach(this::addNeuron);
+        subsamplingManager.resetIndices();
     }
 
     /**
@@ -326,7 +328,6 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomizeFanIn();
         }
-//        getParentNetwork().fireSynapsesUpdated(getIncomingWeights()); // TODO: [event] let synapse handle this
     }
 
     /**
@@ -336,7 +337,6 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomizeFanOut();
         }
-//        getParentNetwork().fireSynapsesUpdated(getOutgoingWeights()); // TODO: [event] let synapse handle this
     }
 
     public abstract void setNeuronType(String rule);

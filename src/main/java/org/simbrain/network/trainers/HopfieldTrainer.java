@@ -18,10 +18,7 @@
  */
 package org.simbrain.network.trainers;
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.subnetworks.Hopfield;
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
 
 /**
@@ -56,7 +53,7 @@ public class HopfieldTrainer extends Trainer {
             throw new DataNotInitializedException("Input data not initalized");
         }
 
-        hopfield.getSynapseGroup().setStrength(0, Polarity.BOTH);
+        hopfield.getWeightMatrix().clear();
         int numRows = hopfield.getTrainingSet().getInputData().length;
         int numInputs = hopfield.getInputNeurons().size();
         float normConstant = 1 / (float) numRows;
@@ -64,15 +61,16 @@ public class HopfieldTrainer extends Trainer {
         double[] vals = new double[numInputs * numInputs - numInputs];
         for (int row = 0; row < numRows; row++) {
             double[] pattern = hopfield.getTrainingSet().getInputData()[row];
-            Neuron[] neurons = hopfield.getSynapseGroup().getSourceNeurons().toArray(new Neuron[pattern.length]);
-            for (int i = 0; i < pattern.length; i++) {
-                for (int j = 0; j < pattern.length; j++) {
-                    if (i != j) {
-                        Synapse s = neurons[i].getFanOut().get(neurons[j]);
-                        s.setStrength(s.getStrength() + Hopfield.bipolar(pattern[i]) * Hopfield.bipolar(pattern[j]));
-                    }
-                }
-            }
+            // TODO
+            // Neuron[] neurons = hopfield.getSynapseGroup().getSourceNeurons().toArray(new Neuron[pattern.length]);
+            // for (int i = 0; i < pattern.length; i++) {
+            //     for (int j = 0; j < pattern.length; j++) {
+            //         if (i != j) {
+            //             Synapse s = neurons[i].getFanOut().get(neurons[j]);
+            //             s.setStrength(s.getStrength() + Hopfield.bipolar(pattern[i]) * Hopfield.bipolar(pattern[j]));
+            //         }
+            //     }
+            // }
         }
         vals = SimbrainMath.multVector(vals, normConstant);
 

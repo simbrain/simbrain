@@ -18,17 +18,15 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import com.sun.jdi.event.LocatableEvent;
 import org.piccolo2d.PNode;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.events.NetworkModelEvents;
-import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -167,7 +165,7 @@ public class SubnetworkNode extends ScreenElement {
 
     @Override
     public NetworkModel getModel() {
-        return null;
+        return subnetwork;
     }
 
     /**
@@ -282,21 +280,22 @@ public class SubnetworkNode extends ScreenElement {
         }
     };
 
-    /**
-     * Action for adding the current pattern in the network to the training data
-     */
-    protected Action addInputRowAction = new AbstractAction() {
-
-        {
-            putValue(NAME, "Add current pattern to input data...");
-            putValue(SHORT_DESCRIPTION, "Add current pattern to input data...");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            subnetwork.addRowToTrainingSet();
-        }
-    };
+    // TODO
+    // /**
+    //  * Action for adding the current pattern in the network to the training data
+    //  */
+    // protected Action addInputRowAction = new AbstractAction() {
+    //
+    //     {
+    //         putValue(NAME, "Add current pattern to input data...");
+    //         putValue(SHORT_DESCRIPTION, "Add current pattern to input data...");
+    //     }
+    //
+    //     @Override
+    //     public void actionPerformed(ActionEvent arg0) {
+    //         subnetwork.addRowToTrainingSet();
+    //     }
+    // };
 
     /**
      * Action for testing inputs to trainable networks.
@@ -314,7 +313,6 @@ public class SubnetworkNode extends ScreenElement {
             if (subnetwork instanceof Trainable) {
                 TestInputPanel testInputPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(), ((Trainable) subnetwork).getInputNeurons(), ((Trainable) subnetwork).getTrainingSet().getInputDataMatrix());
                 getNetworkPanel().displayPanel(testInputPanel, "Test inputs");
-
             }
         }
     };

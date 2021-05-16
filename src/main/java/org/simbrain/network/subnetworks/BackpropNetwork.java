@@ -13,11 +13,8 @@
  */
 package org.simbrain.network.subnetworks;
 
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 
 import java.awt.geom.Point2D;
@@ -27,7 +24,7 @@ import java.awt.geom.Point2D;
  *
  * @author Jeff Yoshimi
  */
-public class BackpropNetwork extends FeedForward implements Trainable {
+public class BackpropNetwork extends FeedForward  {
 
     /**
      * Training set.
@@ -57,18 +54,5 @@ public class BackpropNetwork extends FeedForward implements Trainable {
         setLabel("Backprop");
     }
 
-    @Override
-    public TrainingSet getTrainingSet() {
-        return trainingSet;
-    }
-
-    @Override
-    public NetworkModel getNetwork() {
-        return this;
-    }
-
-    @Override
-    public void initNetwork() {
-    }
 
 }

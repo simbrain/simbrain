@@ -22,9 +22,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.HopfieldEditTrainDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.Hopfield;
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -37,6 +35,11 @@ import java.awt.event.ActionEvent;
 public class HopfieldNode extends SubnetworkNode {
 
     /**
+     * Reference to hopfield node being edited
+     */
+    private final Hopfield hopfield;
+
+    /**
      * Create a Hopfield Network PNode.
      *
      * @param networkPanel parent panel
@@ -44,6 +47,7 @@ public class HopfieldNode extends SubnetworkNode {
      */
     public HopfieldNode(NetworkPanel networkPanel, Hopfield group) {
         super(networkPanel, group);
+        hopfield = group;
         // setStrokePaint(Color.green);
         setContextMenu();
         // setOutlinePadding(15f);
@@ -64,10 +68,10 @@ public class HopfieldNode extends SubnetworkNode {
         menu.add(renameAction);
         menu.add(removeAction);
         menu.addSeparator();
-        menu.add(addInputRowAction);
+        // menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
-                ((Hopfield) getSubnetwork()).trainOnCurrentPattern();
+                hopfield.trainOnCurrentPattern();
             }
         };
         menu.add(trainNet);
@@ -80,7 +84,7 @@ public class HopfieldNode extends SubnetworkNode {
         menu.add(randomizeNet);
         Action clearWeights = new AbstractAction("Set weights to zero") {
             public void actionPerformed(final ActionEvent event) {
-                getSubnetwork().getSynapseGroup().setStrength(0, Polarity.BOTH);
+                hopfield.getWeightMatrix().clear();
             }
         };
         menu.add(clearWeights);

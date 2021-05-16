@@ -254,8 +254,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         zoomToFitPage()
     }
 
-    private fun createNode(model: NetworkModel) {
-        when(model) {
+    private fun createNode(model: NetworkModel) : ScreenElement {
+        return when(model) {
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
             is NeuronArray -> createNode(model)
@@ -266,6 +266,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
             is SmileClassifier -> createNode(model)
+            else -> throw IllegalArgumentException()
         }
     }
 
@@ -341,16 +342,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        val neuronGroupNodes = subnetwork.neuronGroupList.map { createNode(it) }
-        val neuronArrayNodes = subnetwork.naList.map { createNode(it) }
-        val weightMatrixNodes = subnetwork.weightMatrixList.map { createNode(it) }
-        val synapseGroupNodes = subnetwork.synapseGroupList.map { createNode(it) }
+        val modelNodes = subnetwork.modelList.all.map { createNode(it) }
 
         createSubNetwork().apply {
-            neuronGroupNodes.forEach { addNode(it) }
-            neuronArrayNodes.forEach { addNode(it) }
-            weightMatrixNodes.forEach { addNode(it) }
-            synapseGroupNodes.forEach { addNode(it) }
+            modelNodes.forEach { addNode(it) }
         }
 
     }
@@ -396,7 +391,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         with(networkActions) {
             networkEditingActions.forEach { add(it) }
             add(clearNodeActivationsAction)
-            // TODO
             add(randomizeObjectsAction)
         }
     }
@@ -639,7 +633,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         event.onModelAdded { createNode(it) }
         event.onModelRemoved {
             it.events.fireDeleted()
-            // TODO: For batch delete ideally this would only be called once
             zoomToFitPage()
         }
         event.onUpdateTimeDisplay { timeLabel.update() }

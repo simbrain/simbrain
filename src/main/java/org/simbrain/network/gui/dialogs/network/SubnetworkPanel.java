@@ -68,9 +68,6 @@ public class SubnetworkPanel extends JPanel {
         // Set title
         parentDialog.setTitle("Edit " + subnetwork.getClass().getSimpleName());
 
-        // Add description to panel
-        add(new JLabel(subnetwork.getLongDescription()));
-
         // Set up help button
         Action helpAction;
         helpAction = new ShowHelpAction("Pages/Network/subnetwork.html");

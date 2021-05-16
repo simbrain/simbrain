@@ -19,11 +19,12 @@
 package org.simbrain.network.subnetworks;
 
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.Direction;
@@ -71,18 +72,18 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         this.setLabel("Competitive Network");
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
         inputLayer = new NeuronGroup(net, numInputNeurons);
-        this.addNeuronGroup(competitive);
-        this.addNeuronGroup(inputLayer);
+        this.addModel(competitive);
+        this.addModel(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {
             neuron.setLowerBound(0);
         }
         inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
 
-        this.connectNeuronGroups(inputLayer, competitive);
-        for (Synapse synapse : getSynapseGroup().getAllSynapses()) {
-            synapse.setLowerBound(0);
-        }
+        // Connect layers
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(inputLayer, competitive, new AllToAll());
+        addModel(sg);
+        sg.getAllSynapses().forEach(s -> s.setLowerBound(0));
 
         // Lay out network
         inputLayer.setLayoutBasedOnSize();

@@ -21,7 +21,6 @@ package org.simbrain.network.gui.nodes.subnetworkNodes;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.BackpropEditorDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
-import org.simbrain.network.gui.trainer.TrainerGuiActions;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.util.StandardDialog;
 
@@ -57,8 +56,8 @@ public class BackpropNetworkNode extends SubnetworkNode {
         menu.addSeparator();
         BackpropNetwork network = (BackpropNetwork) getSubnetwork();
         JMenu dataActions = new JMenu("View / Edit Data");
-        dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(), network));
-        dataActions.addSeparator();
+        // dataActions.add(TrainerGuiActions.getEditCombinedDataAction(getNetworkPanel(), network));
+        // dataActions.addSeparator();
         // dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getInputNeurons(), network.getTrainingSet().getInputDataMatrix(), "Input"));
         // dataActions.add(TrainerGuiActions.getEditDataAction(getNetworkPanel(), network.getOutputNeurons(), network.getTrainingSet().getTargetDataMatrix(), "Target"));
         // menu.add(dataActions);

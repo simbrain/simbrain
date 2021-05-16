@@ -268,9 +268,7 @@ class Network {
                 yieldAll(neuronCollection.neuronList)
             }
             for (subnetwork in networkModels.get<Subnetwork>()) {
-                for (neuronGroup in subnetwork.neuronGroupList) {
-                    yieldAll(neuronGroup.neuronList)
-                }
+                yieldAll(subnetwork.modelList.get<NeuronGroup>().flatMap { it.neuronList })
             }
         }.toList()
 
@@ -283,7 +281,7 @@ class Network {
         get() = sequence {
             yieldAll(networkModels.get<Synapse>())
             yieldAll(networkModels.get<Subnetwork>().flatMap { subnetwork ->
-                subnetwork.synapseGroupList.flatMap { it.allSynapses }
+                subnetwork.modelList.get<SynapseGroup>().flatMap { it.allSynapses }
             })
         }.toList()
 
@@ -293,7 +291,7 @@ class Network {
     val flatNeuronGroupList: List<NeuronGroup>
         get() = sequence {
             yieldAll(networkModels.get<NeuronGroup>())
-            yieldAll(networkModels.get<Subnetwork>().flatMap { it.neuronGroupList })
+            yieldAll(networkModels.get<Subnetwork>().flatMap { it.modelList.get() })
         }.toList()
 
     /**
@@ -302,7 +300,7 @@ class Network {
     val flatSynapseGroupList: List<SynapseGroup>
         get() = sequence {
             yieldAll(networkModels.get<SynapseGroup>())
-            yieldAll(networkModels.get<Subnetwork>().flatMap { it.synapseGroupList })
+            yieldAll(networkModels.get<Subnetwork>().flatMap { it.modelList.get() })
         }.toList()
 
     /**
@@ -311,7 +309,7 @@ class Network {
     val flatWeightMatrixList: List<WeightMatrix>
         get() = sequence {
             yieldAll(networkModels.get<WeightMatrix>())
-            yieldAll(networkModels.get<Subnetwork>().flatMap { it.weightMatrixList })
+            yieldAll(networkModels.get<Subnetwork>().flatMap { it.modelList.get() })
         }.toList()
 
     /**
@@ -476,7 +474,7 @@ class Network {
     }
 
     override fun toString(): String =
-        " ---Network--- \n" + networkModels.all.joinToString("\n") { "$it" }
+        " ---Network--- \n" + networkModels
 
     /**
      * Returns a neuron with a matching label.  If more than one

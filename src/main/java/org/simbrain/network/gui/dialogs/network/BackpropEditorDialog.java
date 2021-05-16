@@ -22,9 +22,7 @@ import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
-// import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.network.trainers.IterableTrainer;
-import org.simbrain.network.trainers.Trainer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,7 +73,8 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
      * @param backprop     edited network
      */
     public BackpropEditorDialog(NetworkPanel networkPanel, BackpropNetwork backprop) {
-        super((Frame) SwingUtilities.getRoot(networkPanel), networkPanel, backprop);
+        // Backprop is no longer trainable so null passed along
+        super((Frame) SwingUtilities.getRoot(networkPanel), networkPanel, null);
         this.backprop = backprop;
         init();
         initDefaultTabs();

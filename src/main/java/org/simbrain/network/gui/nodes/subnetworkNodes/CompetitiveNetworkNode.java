@@ -23,7 +23,6 @@ import org.simbrain.network.gui.dialogs.network.CompetitiveTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -62,13 +61,11 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
         menu.add(renameAction);
         menu.add(removeAction);
         menu.addSeparator();
-        menu.add(addInputRowAction);
+        // menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
                 CompetitiveNetwork net = ((CompetitiveNetwork) getSubnetwork());
                 net.update();
-                //TODO
-                // net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(trainNet);
@@ -77,8 +74,6 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
             public void actionPerformed(final ActionEvent event) {
                 CompetitiveNetwork net = ((CompetitiveNetwork) getSubnetwork());
                 net.getCompetitive().randomize();
-                //TODO
-                // net.getParentNetwork().fireGroupUpdated(net.getSynapseGroup());
             }
         };
         menu.add(randomizeNet);

@@ -115,10 +115,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         neurons.forEach(n -> {
             super.addNeuron(n);
             n.setParentGroup(this);
-            n.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
-            subsamplingManager.resetIndices();
         });
-        subsamplingManager.resetIndices();
     }
 
     /**

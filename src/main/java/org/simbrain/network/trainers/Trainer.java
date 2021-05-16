@@ -19,15 +19,11 @@
 package org.simbrain.network.trainers;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.events.TrainerEvents;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,7 +49,7 @@ public abstract class Trainer implements EditableObject {
     /**
      * Handle trainer events.
      */
-    private transient TrainerEvents events = new TrainerEvents(null);
+    private transient TrainerEvents events;
 
     /**
      * Construct the trainer and pass in a reference to the trainable element.
@@ -105,13 +101,13 @@ public abstract class Trainer implements EditableObject {
     // Most trainers should now use dl4j weight matrices
     @Deprecated()
     public void revalidateSynapseGroups() {
-        if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
-            for (SynapseGroup sg : ((Subnetwork) getTrainableNetwork().getNetwork()).getSynapseGroupList()) {
-                if (sg != null) {
-                    sg.revalidateSynapseSets();
-                }
-            }
-        }
+        // if (getTrainableNetwork().getNetwork() instanceof Subnetwork) {
+        //     for (SynapseGroup sg : ((Subnetwork) getTrainableNetwork().getNetwork()).getSynapseGroupList()) {
+        //         if (sg != null) {
+        //             sg.revalidateSynapseSets();
+        //         }
+        //     }
+        // }
     }
 
     /**

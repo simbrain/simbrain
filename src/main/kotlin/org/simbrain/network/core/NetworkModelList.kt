@@ -114,6 +114,9 @@ class NetworkModelList {
             networkModels[model.javaClass]?.remove(model)
         }
     }
+
+    override fun toString(): String =  all.joinToString("\n") { "$it" }
+
 }
 
 /**

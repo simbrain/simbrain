@@ -19,10 +19,12 @@
 package org.simbrain.network.subnetworks;
 
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.Direction;
@@ -69,7 +71,7 @@ public class SOMNetwork extends Subnetwork implements Trainable {
         super(net);
         this.setLabel("SOM Network");
         som = new SOMGroup(net, numSOMNeurons);
-        this.addNeuronGroup(som);
+        this.addModel(som);
         som.applyLayout();
 
         inputLayer = new NeuronGroup(net, numInputNeurons);
@@ -77,13 +79,16 @@ public class SOMNetwork extends Subnetwork implements Trainable {
         if (net == null) {
             return;
         }
-        this.addNeuronGroup(inputLayer);
+        this.addModel(inputLayer);
         for (Neuron neuron : inputLayer.getNeuronList()) {
             neuron.setLowerBound(0);
         }
         inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
-        this.connectNeuronGroups(inputLayer, som);
+        
+        // Connect layers
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(inputLayer, som, new AllToAll());
+        addModel(sg);
 
         layoutNetwork();
     }

@@ -187,13 +187,13 @@ public class LayeredNetworkCreationPanel extends JPanel {
         }
 
         // Set neuron types
-        i = layerList.size() - 1;
-        if (!net.isUseNeuronArrays()) {
-            for (LayerCreationPanel layer : layerList) {
-                net.getNeuronGroup(i).setNeuronType(layer.getNeuronType());
-                i--;
-            }
-        }
+        // i = layerList.size() - 1;
+        // if (!net.isUseNeuronArrays()) {
+        //     for (LayerCreationPanel layer : layerList) {
+        //         net.getNeuronGroup(i).setNeuronType(layer.getNeuronType());
+        //         i--;
+        //     }
+        // }
 
         // Add the new network
         panel.getNetwork().addNetworkModel(net);

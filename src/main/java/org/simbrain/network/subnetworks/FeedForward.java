@@ -14,14 +14,11 @@
 package org.simbrain.network.subnetworks;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.util.Direction;
 
 import java.awt.geom.Point2D;
@@ -39,14 +36,24 @@ import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup
 public class FeedForward extends Subnetwork {
 
     /**
-     * Space to put between layers.  TODO: Redo this for neuron array case.
+     * Space to put between layers.
      */
-    private int betweenLayerInterval = 300;
+    private int betweenLayerInterval = 250;
 
     /**
-     * If true use {@link org.simbrain.network.matrix.NeuronArray}; if false {@link NeuronGroup}
+     * Ordered reference to underlying array list.
      */
-    private boolean useNeuronArrays = true;
+    private List<NeuronArray> layerList = new ArrayList<>();
+
+    /**
+     * Reference to input layer.
+     */
+    private NeuronArray inputLayer;
+
+    /**
+     * Reference to output layer.
+     */
+    private NeuronArray outputLayer;
 
     /**
      * Construct a feed-forward network.
@@ -95,70 +102,30 @@ public class FeedForward extends Subnetwork {
                               final NeuronUpdateRule inputNeuronTemplate) {
 
         setLabel("Layered Network");
-        
-        // TODO: Merge this and the next case
-        if (useNeuronArrays) {
-            NeuronArray inputLayer = new NeuronArray(network ,nodesPerLayer[0]);
-            addNeuronArray(inputLayer);
 
-            // Memory of last layer created
-            NeuronArray lastLayer = inputLayer;
+        inputLayer = new NeuronArray(network, nodesPerLayer[0]);
+        addModel(inputLayer);
+        layerList.add(inputLayer);
 
-            // Make hidden layers and output layer
-            for (int i = 1; i < nodesPerLayer.length; i++) {
-                NeuronArray hiddenLayer = new NeuronArray(network, nodesPerLayer[i]);
-                addNeuronArray(hiddenLayer);
-                offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval/2, 100, 200);
+        // Memory of last layer created
+        NeuronArray lastLayer = inputLayer;
 
-                // Add weight matrix
-                WeightMatrix wm = new WeightMatrix(getParentNetwork(), lastLayer, hiddenLayer);
-                wm.randomize();
-                addWeightMatrix(wm);
+        // Make hidden layers and output layer
+        for (int i = 1; i < nodesPerLayer.length; i++) {
+            NeuronArray hiddenLayer = new NeuronArray(network, nodesPerLayer[i]);
+            addModel(hiddenLayer);
+            layerList.add(hiddenLayer);
+            offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval / 2, 100, 200);
 
-                // Reset last layer
-                lastLayer = hiddenLayer;
-            }
+            // Add weight matrix
+            WeightMatrix wm = new WeightMatrix(getParentNetwork(), lastLayer, hiddenLayer);
+            wm.randomize();
+            addModel(wm);
 
-        } else {
-            List<Neuron> inputLayerNeurons = new ArrayList<Neuron>();
-            for (int i = 0; i < nodesPerLayer[0]; i++) {
-                inputLayerNeurons.add(new Neuron(network, inputNeuronTemplate));
-            }
-            NeuronGroup inputLayer = new NeuronGroup(network, inputLayerNeurons);
-            inputLayer.setClamped(true); // Clamping makes everything easier in the
-            // GUI. The trainer uses forceset.
-            addNeuronGroup(inputLayer);
-            inputLayer.setLayoutBasedOnSize(initialPosition);
-
-            // Memory of last layer created
-            NeuronGroup lastLayer = inputLayer;
-
-            // Make hidden layers and output layer
-            for (int i = 1; i < nodesPerLayer.length; i++) {
-                List<Neuron> hiddenLayerNeurons = new ArrayList<Neuron>();
-                for (int j = 0; j < nodesPerLayer[i]; j++) {
-                    SigmoidalRule rule = new SigmoidalRule();
-                    Neuron neuron = new Neuron(network, rule);
-                    rule.setLowerBound(0);
-                    neuron.setUpdatePriority(i);
-                    hiddenLayerNeurons.add(neuron);
-                }
-
-                NeuronGroup hiddenLayer = new NeuronGroup(network, hiddenLayerNeurons);
-                hiddenLayer.setLayoutBasedOnSize();
-                addNeuronGroup(hiddenLayer);
-                offsetNeuronGroup(lastLayer, hiddenLayer, Direction.NORTH, betweenLayerInterval);
-
-                // Add weight matrix
-                WeightMatrix wm = new WeightMatrix(getParentNetwork(), lastLayer, hiddenLayer);
-                wm.randomize();
-                addWeightMatrix(wm);
-
-                // Reset last layer
-                lastLayer = hiddenLayer;
-            }
+            // Reset last layer
+            lastLayer = hiddenLayer;
         }
-
+        outputLayer = lastLayer;
 
     }
 
@@ -168,54 +135,6 @@ public class FeedForward extends Subnetwork {
 
     public void setBetweenLayerInterval(int betweenLayerInterval) {
         this.betweenLayerInterval = betweenLayerInterval;
-    }
-
-    @Override
-    public void addNeuronGroup(NeuronGroup group) {
-        super.addNeuronGroup(group);
-        group.setLabel("Layer " + getNeuronGroupCount());
-    }
-
-    public NeuronGroup getInputLayer() {
-        return getNeuronGroup(0);
-    }
-
-    public NeuronGroup getHiddenLayer() {
-        return getHiddenLayer(0);
-    }
-
-    /**
-     * Returns a specified hidden layer (1 is just above input layer, etc.).
-     *
-     * @param index hidden layer index
-     * @return the hidden layer
-     */
-    public NeuronGroup getHiddenLayer(int index) {
-        return getNeuronGroup(index + 1);
-    }
-
-    public NeuronGroup getOutputLayer() {
-        return getNeuronGroup(getNeuronGroupCount() - 1);
-    }
-
-    /**
-     * Convenience method for getting the neurons associated with the input
-     * group. Also allows all feed-forward networks to implement Trainable.
-     *
-     * @return the input layer neurons as a list.
-     */
-    public List<Neuron> getInputNeurons() {
-        return getInputLayer().getNeuronList();
-    }
-
-    /**
-     * Convenience method for getting the neurons associated with the output
-     * group. Also allows all feed-forward networks to implement Trainable.
-     *
-     * @return the output layer neurons as a list.
-     */
-    public List<Neuron> getOutputNeurons() {
-        return getOutputLayer().getNeuronList();
     }
 
     @Override
@@ -230,33 +149,16 @@ public class FeedForward extends Subnetwork {
     @Override
     public void update() {
 
-        if (isUseNeuronArrays()) {
-            for (int i = 0; i < getNAList().size() ; i++) {
-                getNAList().get(i).updateInputs();
-                getNAList().get(i).update();
-                // if(getWeightMatrixList().size() > i) {
-                //     getWeightMatrixList().get(i).update();
-                // }
-            }
-        } else {
-            for (int i = 0; i < getNeuronGroupList().size() ; i++) {
-                getNeuronGroupList().get(i).update();
-                if(getSynapseGroupList().size() > i) {
-                    getSynapseGroupList().get(i).update();
-                }
-                if(getWeightMatrixList().size() > i) {
-                    getWeightMatrixList().get(i).update();
-                }
-            }
+        // TODO: Add code below once clamping and linking to other networks possible.
+        // inputLayer.updateInputs();
+        // inputLayer.update();
+        for (int i = 1; i < layerList.size()-1; i++) {
+            layerList.get(i).updateInputs();
+            layerList.get(i).update();
         }
+        outputLayer.updateInputs();
+        outputLayer.update();
 
     }
 
-    public boolean isUseNeuronArrays() {
-        return useNeuronArrays;
-    }
-
-    public void setUseNeuronArrays(boolean useNeuronArrays) {
-        this.useNeuronArrays = useNeuronArrays;
-    }
 }

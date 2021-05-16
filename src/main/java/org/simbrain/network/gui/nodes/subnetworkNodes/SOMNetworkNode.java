@@ -61,13 +61,11 @@ public class SOMNetworkNode extends SubnetworkNode {
         menu.add(renameAction);
         menu.add(removeAction);
         menu.addSeparator();
-        menu.add(addInputRowAction);
+        // menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {
             public void actionPerformed(final ActionEvent event) {
                 SOMNetwork net = ((SOMNetwork) getSubnetwork());
                 net.update();
-                //TODO
-                // net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(trainNet);
@@ -76,8 +74,6 @@ public class SOMNetworkNode extends SubnetworkNode {
             public void actionPerformed(final ActionEvent event) {
                 SOMNetwork net = ((SOMNetwork) getSubnetwork());
                 net.getSom().randomizeIncomingWeights();
-                //TODO
-                // net.getParentNetwork().fireGroupUpdated(net);
             }
         };
         menu.add(randomizeNet);

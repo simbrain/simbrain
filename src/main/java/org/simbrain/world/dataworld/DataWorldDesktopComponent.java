@@ -204,9 +204,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         }
     }
 
-    @Override
     protected void update() {
-        super.update();
         table.updateRowSelection();
     }
 

@@ -39,7 +39,9 @@ import java.io.*;
 /**
  * A gui view on a {@link org.simbrain.workspace.WorkspaceComponent}.
  *
- * For a custom size override {@link #getPreferredSize()}
+ * All desktop component graphical updates should happen via events.
+ *
+ * For custom size overrides {@link #getPreferredSize()}
  *
  * @param <E> the type of the workspace component.
  */
@@ -95,13 +97,11 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
         // Add a default update listener
         WorkspaceComponentEvents events = workspaceComponent.getEvents();
 
-        events.onComponentUpdated(DesktopComponent.this::update);
         events.onGUIToggled(() -> DesktopComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn()));
         events.onComponentClosing(this::close);
 
         Logger.trace(this.getClass().getCanonicalName() + " created");
     }
-
 
     /**
      * If any initialization is needed after adding this component to workspace.
@@ -129,17 +129,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
      * TODO: Rename to guiClosing since workspace has its own
      */
     protected abstract void closing();
-
-    /**
-     * Optional gui update method, which can be overridden for custom GUI update
-     * needs. NOTE: This update method is _not_ automatically called when the
-     * workspace component is updated. A call to fireUpdateEvent() must happen
-     * in the workspace component.
-     */
-    protected void update() {
-        repaint(); // TODO: Is this repaint needed here? Should only be in
-        // subclasses.
-    }
 
     /**
      * Calls up a dialog for opening a workspace component.

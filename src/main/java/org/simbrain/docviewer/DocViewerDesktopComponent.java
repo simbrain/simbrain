@@ -220,7 +220,4 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
     public void closing() {
     }
 
-    @Override
-    protected void update() {
-    }
 }

@@ -3,7 +3,6 @@ package org.simbrain.plot.pixelplot;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.DesktopComponent;
-import org.simbrain.plot.pixelplot.PixelPlotComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,10 +33,7 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         setLayout(new BorderLayout());
         // add(BorderLayout.NORTH,getPixelDisplayToolbar());
         add(BorderLayout.CENTER, emitterPanel);
-        getWorkspaceComponent().getEvents().onComponentUpdated(() -> {
-            System.out.println("PixelPlotDesktopComponent.PixelPlotDesktopComponent");
-            repaint();
-        });
+        getWorkspaceComponent().getEmitter().getEvents().onImageUpdate(this::repaint);
     }
 
     private class EmitterPanel extends JPanel {
@@ -97,7 +93,6 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
 
     @Override
     protected void closing() {
-
     }
 
 }

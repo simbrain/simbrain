@@ -97,8 +97,4 @@ public class TimeSeriesDesktopComponent extends DesktopComponent<TimeSeriesPlotC
     public void closing() {
     }
 
-    @Override
-    public void update() {
-    }
-
 }

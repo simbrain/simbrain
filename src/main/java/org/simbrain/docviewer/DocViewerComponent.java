@@ -88,10 +88,6 @@ public class DocViewerComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void update() {
-    }
-
-    @Override
     public void closing() {
     }
 

@@ -119,10 +119,6 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public void update() {
-    }
-
     public void actionPerformed(ActionEvent e) {
         // As of now, there are no properties to set
         // if (e.getActionCommand().equalsIgnoreCase("dialog")) {

@@ -61,8 +61,4 @@ public class ConsoleComponent extends WorkspaceComponent {
         // TODO implement
     }
 
-    @Override
-    public void update() {
-        // No implementation
-    }
 }

@@ -92,8 +92,4 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         // No implementation
     }
 
-    @Override
-    protected void update() {
-        //  No implementation
-    }
 }

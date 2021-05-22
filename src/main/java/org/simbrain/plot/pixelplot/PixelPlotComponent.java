@@ -85,10 +85,4 @@ public class PixelPlotComponent extends WorkspaceComponent {
     public EmitterMatrix getEmitter() {
         return emitter;
     }
-
-    @Override
-    public void update() {
-        // TODO: Very smelly
-        getEvents().fireComponentUpdated();
-    }
 }

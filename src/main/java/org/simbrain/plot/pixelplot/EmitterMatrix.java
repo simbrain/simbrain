@@ -3,14 +3,14 @@ package org.simbrain.plot.pixelplot;
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
-import org.simbrain.world.imageworld.ImageSource;
+import org.simbrain.world.imageworld.events.ImageEvents;
 import org.simbrain.world.imageworld.filters.Filter;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
 /**
- * An {@link ImageSource} which contains several arrays which can consume
+ * Contains several arrays which can consume
  * array values and then "emit" them as a kind of pixel display.  The consumed
  * values are stored in two arrays, one for rgb colors and
  * another with separate channels for brightness, red, green, and blue.
@@ -45,6 +45,11 @@ public class EmitterMatrix implements AttributeContainer {
      * {@link BufferedImage#getRGB(int, int)}
      */
     private int[] rgbColors;
+
+    /**
+     * Handle Image source Events.
+     */
+    private transient ImageEvents events = new ImageEvents(this);
 
     /**
      * Construct an empty emitter matrix.
@@ -166,7 +171,7 @@ public class EmitterMatrix implements AttributeContainer {
                 }
             }
         }
-
+        events.fireImageUpdate();
     }
 
     public BufferedImage getImage() {
@@ -180,6 +185,15 @@ public class EmitterMatrix implements AttributeContainer {
 
     @Override
     public String getId() {
-        return "";
+        return "Emitter Matrix";
+    }
+
+    public ImageEvents getEvents() {
+        return events;
+    }
+
+    public Object readResolve() {
+        events = new ImageEvents(this);
+        return this;
     }
 }

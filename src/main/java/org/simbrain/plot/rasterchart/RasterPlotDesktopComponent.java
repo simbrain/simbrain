@@ -99,8 +99,4 @@ public class RasterPlotDesktopComponent extends DesktopComponent<RasterPlotCompo
     public void closing() {
     }
 
-    @Override
-    public void update() {
-    }
-
 }

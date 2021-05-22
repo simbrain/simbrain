@@ -18,7 +18,9 @@
  */
 package org.simbrain.plot.projection;
 
-import org.jfree.chart.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.CustomXYToolTipGenerator;
 import org.jfree.chart.labels.StandardXYItemLabelGenerator;
 import org.jfree.chart.labels.XYItemLabelGenerator;
@@ -614,9 +616,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
     /**
      * Update labels at bottom of component.
      */
-    @Override
     protected void update() {
-        super.update();
         chart.fireChartChanged();
         updateToolBar();
         dimsLabel.setText("     Dimensions: " + getWorkspaceComponent().getProjector().getUpstairs().getDimensions());

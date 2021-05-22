@@ -1,8 +1,6 @@
 package org.simbrain.world.imageworld;
 
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.world.imageworld.events.ImageSourceEvents;
+import org.simbrain.world.imageworld.events.ImageEvents;
 
 import java.awt.image.BufferedImage;
 
@@ -33,7 +31,7 @@ public abstract class ImageSource  {
     /**
      * Handle Image source Events.
      */
-    private transient ImageSourceEvents events = new ImageSourceEvents(this);
+    private transient ImageEvents events = new ImageEvents(this);
 
     /**
      * Construct a new ImageSourceAdapter and initialize the current image.
@@ -56,7 +54,7 @@ public abstract class ImageSource  {
      * Return a deserialized ImageSourceAdapter.
      */
     public Object readResolve() {
-        events = new ImageSourceEvents(this);
+        events = new ImageEvents(this);
         return this;
     }
 
@@ -110,7 +108,7 @@ public abstract class ImageSource  {
         return currentImage.getHeight();
     }
 
-    public ImageSourceEvents getEvents() {
+    public ImageEvents getEvents() {
         return events;
     }
 }

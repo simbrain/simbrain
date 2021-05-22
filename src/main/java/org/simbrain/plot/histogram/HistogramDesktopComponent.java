@@ -107,8 +107,4 @@ public class HistogramDesktopComponent extends DesktopComponent<HistogramCompone
     public void closing() {
     }
 
-    @Override
-    public void update() {
-    }
-
 }

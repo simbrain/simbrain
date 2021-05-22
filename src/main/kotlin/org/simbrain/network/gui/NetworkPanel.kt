@@ -231,7 +231,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also { node ->
         canvas.layer.addChild(node)
         node.model.events.onSelected {
-            selectionManager.add(node)
+            if (node is NeuronGroupNode) {
+                selectionManager.add(node.interactionBox)
+            } else {
+                selectionManager.add(node)
+            }
         }
         zoomToFitPage()
     }

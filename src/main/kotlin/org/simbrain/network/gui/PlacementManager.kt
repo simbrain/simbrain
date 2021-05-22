@@ -2,9 +2,9 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.gui.PlacementManager.DefaultOffsets
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.topLeftLocation
 import org.simbrain.util.minus
 import org.simbrain.util.plus
@@ -35,7 +35,7 @@ class PlacementManager {
         operator fun get(model: LocatableModel?) = when (model) {
             is Neuron -> point(45, 0)
             is NeuronArray -> point(0, -145)
-            is NeuronGroup -> point(50, 50)
+            is NeuronGroup -> point(200, 50)
             else -> point(45, 0)
         }
     }

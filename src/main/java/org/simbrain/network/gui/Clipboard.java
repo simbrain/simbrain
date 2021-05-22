@@ -63,7 +63,7 @@ public class Clipboard {
      */
     public static void add(final List<NetworkModel> objects) {
         copiedObjects = objects;
-        //System.out.println("add-->"+ Arrays.asList(objects));
+        // System.out.println("add-->"+ Arrays.asList(objects));
         fireClipboardChanged();
     }
 

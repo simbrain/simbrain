@@ -93,8 +93,4 @@ public class TimeSeriesDesktopComponent extends DesktopComponent<TimeSeriesPlotC
         getParentFrame().setJMenuBar(bar);
     }
 
-    @Override
-    public void closing() {
-    }
-
 }

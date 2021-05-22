@@ -183,10 +183,6 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
     };
 
     @Override
-    public void closing() {
-    }
-
-    @Override
     public void postAddInit() {
         if (this.getParentFrame().getJMenuBar() == null) {
             addMenuBar(table);

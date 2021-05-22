@@ -161,10 +161,4 @@ public class ReaderDesktopComponent extends DesktopComponent<ReaderComponent> {
         getParentFrame().setJMenuBar(menuBar);
     }
 
-    @Override
-    public void closing() {
-        // TODO Auto-generated method stub
-
-    }
-
 }

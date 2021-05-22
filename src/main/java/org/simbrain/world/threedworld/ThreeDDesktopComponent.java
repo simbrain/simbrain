@@ -138,8 +138,4 @@ public class ThreeDDesktopComponent extends DesktopComponent<ThreeDWorldComponen
         return button;
     }
 
-    @Override
-    protected void closing() {
-    }
-
 }

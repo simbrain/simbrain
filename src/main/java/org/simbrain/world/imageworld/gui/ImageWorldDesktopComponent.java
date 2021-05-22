@@ -17,7 +17,9 @@ import org.simbrain.world.imageworld.ImageWorldComponent;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.LinkedList;
 
@@ -403,10 +405,6 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             previousImagesButton.setEnabled(true);
         }
 
-    }
-
-    @Override
-    protected void closing() {
     }
 
     @Override

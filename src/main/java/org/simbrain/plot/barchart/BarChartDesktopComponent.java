@@ -159,10 +159,6 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
     }
 
     @Override
-    public void closing() {
-    }
-
-    @Override
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
             AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(getWorkspaceComponent().getModel());

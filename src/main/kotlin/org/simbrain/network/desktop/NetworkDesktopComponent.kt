@@ -78,8 +78,6 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
         //networkPanel.initGui();
     }
 
-    public override fun closing() {}
-
     override fun showSaveFileDialog() {
         if (showUncompressedSynapseGroupWarning()) {
             super.showSaveFileDialog()

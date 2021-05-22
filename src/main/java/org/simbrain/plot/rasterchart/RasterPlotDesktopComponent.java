@@ -95,8 +95,4 @@ public class RasterPlotDesktopComponent extends DesktopComponent<RasterPlotCompo
         getParentFrame().setJMenuBar(bar);
     }
 
-    @Override
-    public void closing() {
-    }
-
 }

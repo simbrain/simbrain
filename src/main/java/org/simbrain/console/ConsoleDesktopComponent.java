@@ -87,9 +87,4 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         return interpreter;
     }
 
-    @Override
-    public void closing() {
-        // No implementation
-    }
-
 }

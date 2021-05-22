@@ -167,8 +167,4 @@ public class DisplayDesktopComponent extends DesktopComponent<DisplayComponent> 
         getParentFrame().setJMenuBar(menuBar);
     }
 
-    @Override
-    public void closing() {
-    }
-
 }

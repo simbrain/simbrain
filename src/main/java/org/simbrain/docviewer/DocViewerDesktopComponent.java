@@ -216,8 +216,4 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
         textArea.setCaretPosition(0);
     }
 
-    @Override
-    public void closing() {
-    }
-
 }

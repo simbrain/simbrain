@@ -181,13 +181,6 @@ public final class OscWorldDesktopComponent extends DesktopComponent<OscWorldCom
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public void closing() {
-        // empty
-    }
-
-    /**
      * Close action.
      */
     private final class CloseAction extends AbstractAction {

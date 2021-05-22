@@ -120,15 +120,8 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
                 return;
             }
         }
-        closing();
         workspaceComponent.close();
     }
-
-    /**
-     * Perform cleanup after closing.
-     * TODO: Rename to guiClosing since workspace has its own
-     */
-    protected abstract void closing();
 
     /**
      * Calls up a dialog for opening a workspace component.

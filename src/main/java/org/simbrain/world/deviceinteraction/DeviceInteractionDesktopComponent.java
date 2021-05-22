@@ -141,8 +141,4 @@ public class DeviceInteractionDesktopComponent extends DesktopComponent<DeviceIn
         getParentFrame().setJMenuBar(menuBar);
     }
 
-    @Override
-    protected void closing() {
-        //no implementation
-    }
 }

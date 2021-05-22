@@ -609,10 +609,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         getParentFrame().setJMenuBar(bar);
     }
 
-    @Override
-    public void closing() {
-    }
-
     /**
      * Update labels at bottom of component.
      */

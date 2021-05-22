@@ -111,9 +111,4 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         this.menu = menu;
     }
 
-    @Override
-    public void closing() {
-        // TODO Auto-generated method stub
-    }
-
 }

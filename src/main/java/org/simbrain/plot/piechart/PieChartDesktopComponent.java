@@ -114,11 +114,6 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         getParentFrame().setJMenuBar(bar);
     }
 
-    @Override
-    public void closing() {
-        // TODO Auto-generated method stub
-    }
-
     public void actionPerformed(ActionEvent e) {
         // As of now, there are no properties to set
         // if (e.getActionCommand().equalsIgnoreCase("dialog")) {

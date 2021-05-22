@@ -103,8 +103,4 @@ public class HistogramDesktopComponent extends DesktopComponent<HistogramCompone
         return getWorkspaceComponent().getModel();
     }
 
-    @Override
-    public void closing() {
-    }
-
 }

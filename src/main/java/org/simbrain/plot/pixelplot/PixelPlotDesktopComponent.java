@@ -91,8 +91,4 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         return returnList;
     }
 
-    @Override
-    protected void closing() {
-    }
-
 }

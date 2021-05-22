@@ -62,11 +62,4 @@ public class GameDesktopComponent extends DesktopComponent<GameComponent> {
      */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Called when the desktop component is closing.
-     */
-    @Override
-    protected void closing() {
-        /* no implementation */
-    }
 }

@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -239,11 +238,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         public NeuronGroupInteractionBox(NetworkPanel net) {
             super(net);
-        }
-
-        @Override
-        public NeuronGroupNode getNode() {
-            return NeuronGroupNode.this;
         }
 
         @Override

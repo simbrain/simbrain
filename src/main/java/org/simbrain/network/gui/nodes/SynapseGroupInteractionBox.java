@@ -72,11 +72,6 @@ public class SynapseGroupInteractionBox extends InteractionBox {
     }
 
     @Override
-    public SynapseGroupNode getNode() {
-        return synapseGroupNode;
-    }
-
-    @Override
     public SynapseGroup getModel() {
         return synapseGroup;
     }

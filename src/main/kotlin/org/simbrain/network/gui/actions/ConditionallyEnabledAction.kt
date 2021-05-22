@@ -2,7 +2,6 @@ package org.simbrain.network.gui.actions
 
 
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.nodes.NeuronGroupNode
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
 import javax.swing.AbstractAction
@@ -25,7 +24,7 @@ abstract class ConditionallyEnabledAction(
      * designated as source and one neuron group is designated as target.
      */
     enum class EnablingCondition {
-        NEURONS, SYNAPSES, ALLITEMS, SOURCE_NEURONS, SOURCE_AND_TARGET_NEURONS, SOURCE_AND_TARGET_NEURON_GROUPS
+        NEURONS, SYNAPSES, ALLITEMS, SOURCE_NEURONS, SOURCE_AND_TARGET_NEURONS
     }
 
     init {
@@ -42,8 +41,6 @@ abstract class ConditionallyEnabledAction(
                 EnablingCondition.SOURCE_NEURONS -> sourceSelection.any { it is NeuronNode }
                 EnablingCondition.SOURCE_AND_TARGET_NEURONS ->
                     sourceSelection.any { it is NeuronNode } && selection.any { it is NeuronNode }
-                EnablingCondition.SOURCE_AND_TARGET_NEURON_GROUPS ->
-                    sourceSelection.any { it.node is NeuronGroupNode } && selection.any { it.node is NeuronGroupNode }
             }
         }
     }

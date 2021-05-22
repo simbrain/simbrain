@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.nodes;
 
 import org.jetbrains.annotations.Nullable;
-import org.piccolo2d.PNode;
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
@@ -165,14 +164,6 @@ public abstract class ScreenElement extends PPath.Float {
                 });
             }
         }
-    }
-
-    /**
-     * Returns a reference to the the top level PNode of this Screen Element. Usually the ScreenElement is the top level
-     * PNode, but in some cases e.g. an interaction box, it's not.  Override in those cases.
-     */
-    public PNode getNode() {
-        return this;
     }
 
     /**

@@ -204,11 +204,6 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         }
 
         @Override
-        public NeuronCollectionNode getNode() {
-            return NeuronCollectionNode.this;
-        }
-
-        @Override
         public NeuronCollection getModel() {
             return NeuronCollectionNode.this.getNeuronCollection();
         }

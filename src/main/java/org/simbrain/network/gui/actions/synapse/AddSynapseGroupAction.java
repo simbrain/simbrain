@@ -18,10 +18,7 @@
  */
 package org.simbrain.network.gui.actions.synapse;
 
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -29,7 +26,7 @@ import java.awt.event.ActionEvent;
 /**
  * Creates a synapse group connecting two neuron groups.
  */
-public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
+public final class AddSynapseGroupAction extends AbstractAction {
 
     /**
      * Network panel.
@@ -42,7 +39,7 @@ public final class AddSynapseGroupAction extends ConditionallyEnabledAction {
      * @param networkPanel network panel, must not be null
      */
     public AddSynapseGroupAction(final NetworkPanel networkPanel) {
-        super(networkPanel, "Connect Neuron Groups with Synapse Group...", EnablingCondition.SOURCE_AND_TARGET_NEURON_GROUPS);
+        super("Connect Neuron Groups with Synapse Group...");
 
         if (networkPanel == null) {
             throw new IllegalArgumentException("networkPanel must not be null");

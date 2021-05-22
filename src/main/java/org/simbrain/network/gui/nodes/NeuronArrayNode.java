@@ -175,6 +175,7 @@ public class NeuronArrayNode extends ScreenElement {
             boundaryStroke = DEFAULT_STROKE;
         }
         boundsCache = null;
+        validateFullBounds();
     }
 
     public void pullViewPositionFromModel() {

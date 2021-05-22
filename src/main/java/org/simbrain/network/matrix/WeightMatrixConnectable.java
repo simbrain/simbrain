@@ -142,4 +142,18 @@ public abstract class WeightMatrixConnectable extends LocatableModel {
         events.fireUpdated();
     }
 
+    @Override
+    public void delete() {
+        // incomingWeightMatrices.forEach(WeightMatrix::delete);
+        // outgoingWeightMatrices.forEach(WeightMatrix::delete);
+        getEvents().fireDeleted();
+    }
+
+    public Object readResolve() {
+        events = new LocationEvents(this);
+        return this;
+    }
+
+
+
 }

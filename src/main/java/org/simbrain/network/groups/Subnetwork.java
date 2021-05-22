@@ -78,15 +78,25 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     public void addModel(NetworkModel model) {
         modelList.add(model);
         model.setId(getParentNetwork().getIdManager().getAndIncrementId(model.getClass()));
-        parentNetwork.getEvents().onModelRemoved(modelList::remove);
+        model.getEvents().onDeleted(m -> {
+            if (modelList.getSize() == 0) {
+                delete();
+            }
+        });
     }
 
     /**
      * Delete this subnetwork and its children.
      */
     public void delete() {
-        modelList.getAll().forEach(NetworkModel::delete);
+        modelList.getAll().forEach(this::deleteModel);
         events.fireDeleted();
+    }
+
+    public void deleteModel(NetworkModel toDelete) {
+        modelList.remove(toDelete);
+        toDelete.delete();
+        parentNetwork.getEvents().fireModelRemoved(toDelete);
     }
 
     public NetworkModelList getModelList() {
@@ -113,7 +123,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
 
     @Override
     public String toString() {
-        return getId() + ": " + getClass().getSimpleName() + "\n" + modelList.toString();
+        return getId() + ": " + getClass().getSimpleName() + "\n" + modelList.toStringTabbed();
     }
 
     public boolean getEnabled() {

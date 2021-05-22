@@ -69,6 +69,11 @@ public class FeedForward extends Subnetwork {
                        final NeuronUpdateRule inputNeuronTemplate) {
         super(network);
         buildNetwork(network, nodesPerLayer, initialPosition, inputNeuronTemplate);
+        super.events.onDeleted(nm -> {
+            if (nm instanceof NeuronArray) {
+                layerList.remove((NeuronArray) nm);
+            }
+        });
     }
 
     /**
@@ -149,16 +154,14 @@ public class FeedForward extends Subnetwork {
     @Override
     public void update() {
 
-        // TODO: Add code below once clamping and linking to other networks possible.
-        // inputLayer.updateInputs();
-        // inputLayer.update();
+        inputLayer.updateInputs();
+        inputLayer.update();
         for (int i = 1; i < layerList.size()-1; i++) {
             layerList.get(i).updateInputs();
             layerList.get(i).update();
         }
         outputLayer.updateInputs();
         outputLayer.update();
-
     }
 
 }

@@ -474,7 +474,7 @@ class Network {
     }
 
     override fun toString(): String =
-        " ---Network--- \n" + networkModels
+        "------Network------\n" + networkModels
 
     /**
      * Returns a neuron with a matching label.  If more than one

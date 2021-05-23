@@ -487,7 +487,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      * @param wt the value to set the strength of the synapse to
      */
     public void forceSetStrength(final double wt) {
-        double oldweight = strength;
         strength = wt;
         events.fireStrengthUpdate();
     }
@@ -1084,5 +1083,10 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     public void afterAddedToNetwork() {
         initSpikeResponder();
+    }
+
+    public void hardClear() {
+        clear();
+        setStrength(0);
     }
 }

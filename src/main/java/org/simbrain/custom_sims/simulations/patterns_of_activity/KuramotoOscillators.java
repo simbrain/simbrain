@@ -123,7 +123,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         inpSynG.setStrength(40, Polarity.EXCITATORY);
         inpSynG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
             NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
-        inpSynG.randomizeConnectionWeights();
+        inpSynG.randomize();
         inpSynG.setDisplaySynapses(false);
         network.addNetworkModel(inpSynG);
 

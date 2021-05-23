@@ -165,13 +165,13 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * The randomizer governing excitatory synapses. If null new synapses are
      * not randomized.
      */
-    private ProbabilityDistribution exciteRand;
+    private ProbabilityDistribution exciteRand = DEFAULT_EX_RANDOMIZER;
 
     /**
      * The randomizer governing inhibitory synapses. If null new synapses are
      * not randomized.
      */
-    private ProbabilityDistribution inhibRand;
+    private ProbabilityDistribution inhibRand = DEFAULT_IN_RANDOMIZER;
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of
@@ -619,26 +619,9 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         }
     }
 
-    @Override
-    public void clear() {
-        for (Synapse toDelete : exSynapseSet) {
-            // Remove references to this synapse from parent neurons
-            toDelete.getSource().removeEfferent(toDelete);
-            toDelete.getTarget().removeAfferent(toDelete);
-            if (isDisplaySynapses()) {
-                // toDelete.getNetwork().fireSynapseRemoved(toDelete); // TODO: [event]
-            }
-
-        }
-        for (Synapse toDelete : inSynapseSet) {
-            toDelete.getSource().removeEfferent(toDelete);
-            toDelete.getTarget().removeAfferent(toDelete);
-            if (isDisplaySynapses()) {
-                 // toDelete.getNetwork().fireSynapseRemoved(toDelete); // TODO: [event]
-            }
-        }
-        exSynapseSet.clear();
-        inSynapseSet.clear();
+    public void hardClear() {
+        exSynapseSet.forEach(Synapse::hardClear);
+        inSynapseSet.forEach(Synapse::hardClear);
     }
 
     /**
@@ -1234,7 +1217,8 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * {@link #randomizeExcitatoryConnections()}, {@link
      * #randomizeInhibitoryConnections()}
      */
-    public void randomizeConnectionWeights() {
+    @Override
+    public void randomize() {
         randomizeExcitatoryConnections();
         randomizeInhibitoryConnections();
     }

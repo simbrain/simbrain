@@ -371,7 +371,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         synG.setUpperBound(0, Polarity.INHIBITORY);
         synG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
             NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
-        synG.randomizeConnectionWeights();
+        synG.randomize();
     }
 
     public PatternsOfActivity(SimbrainDesktop desktop) {

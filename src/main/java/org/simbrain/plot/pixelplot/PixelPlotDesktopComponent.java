@@ -7,8 +7,6 @@ import org.simbrain.workspace.gui.DesktopComponent;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.LinkedList;
-import java.util.List;
 
 public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotComponent> {
 
@@ -31,7 +29,7 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
     public PixelPlotDesktopComponent(GenericFrame frame, PixelPlotComponent component) {
         super(frame, component);
         setLayout(new BorderLayout());
-        // add(BorderLayout.NORTH,getPixelDisplayToolbar());
+        add(BorderLayout.NORTH, getPixelDisplayToolbar());
         add(BorderLayout.CENTER, emitterPanel);
         getWorkspaceComponent().getEmitter().getEvents().onImageUpdate(this::repaint);
     }
@@ -78,17 +76,17 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
      *
      * @return the list of buttons
      */
-    public java.util.List<JButton> getPixelDisplayToolbar() {
-        List<JButton> returnList = new LinkedList<>();
+    public JToolBar getPixelDisplayToolbar() {
         JButton editEmitterButton = new JButton();
-        editEmitterButton.setIcon(ResourceManager.getSmallIcon("menu_icons/resize.png"));
+        editEmitterButton.setIcon(ResourceManager.getSmallIcon("menu_icons/Prefs.png"));
         editEmitterButton.setToolTipText("Edit Emitter Matrix");
-        // editEmitterButton.addActionListener(evt -> {
-        //     ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog((PixelConsumer) world);
-        //     dialog.setVisible(true);
-        // });
-        returnList.add(editEmitterButton);
-        return returnList;
+        editEmitterButton.addActionListener(evt -> {
+            ResizeEmitterMatrixDialog dialog = new ResizeEmitterMatrixDialog(getWorkspaceComponent().getEmitter());
+            dialog.setVisible(true);
+        });
+        JToolBar toolbar = new JToolBar();
+        toolbar.add(editEmitterButton);
+        return toolbar;
     }
 
 }

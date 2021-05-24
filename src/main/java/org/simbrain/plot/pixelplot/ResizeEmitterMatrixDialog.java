@@ -13,7 +13,7 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
     private EmitterMatrix world;
     private Box mainPanel = Box.createVerticalBox();
     private LabelledItemPanel emitterMatrixPanel = new LabelledItemPanel();
-    private JCheckBox useColorCheckBox = new JCheckBox();
+    // private JCheckBox useColorCheckBox = new JCheckBox();
     private JFormattedTextField widthField = new JFormattedTextField(NumberFormat.getIntegerInstance());
     private JFormattedTextField heightField = new JFormattedTextField(NumberFormat.getIntegerInstance());
 
@@ -28,10 +28,10 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/emitterMatrix.html");
         addButton(new JButton(helpAction));
         mainPanel.add(emitterMatrixPanel);
-        emitterMatrixPanel.addItem("Use Color", useColorCheckBox);
+        // emitterMatrixPanel.addItem("Use Color", useColorCheckBox);
         emitterMatrixPanel.addItem("Width", widthField);
         emitterMatrixPanel.addItem("Height", heightField);
-        readValues();
+        fillFieldValues();
         setContentPane(mainPanel);
         pack();
         setLocationRelativeTo(null);
@@ -43,21 +43,20 @@ public class ResizeEmitterMatrixDialog extends StandardDialog {
         commitChanges();
     }
 
-    public void readValues() {
-        // TODO
+    public void fillFieldValues() {
         // useColorCheckBox.setSelected(world.getUseColorEmitter());
-        // widthField.setValue(world.getEmitterWidth());
-        // heightField.setValue(world.getEmitterHeight());
+        widthField.setValue(world.getImage().getWidth());
+        heightField.setValue(world.getImage().getHeight());
     }
 
     /**
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        boolean useColor = useColorCheckBox.isSelected();
+        // boolean useColor = useColorCheckBox.isSelected();
         int width = Integer.parseInt(widthField.getText());
         int height = Integer.parseInt(heightField.getText());
         // world.setUseColorEmitter(useColor);
-        // world.resizeEmitterMatrix(width, height);
+        world.setSize(width, height);
     }
 }

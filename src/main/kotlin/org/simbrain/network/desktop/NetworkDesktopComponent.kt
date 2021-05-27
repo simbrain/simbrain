@@ -99,7 +99,8 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
      */
     private fun showUncompressedSynapseGroupWarning(): Boolean {
         val showPanel = networkPanel.network.getModels<SynapseGroup>().any {
-            it.allSynapses.size > saveWarningThreshold && !it.isUseFullRepOnSave
+            false // TODO
+            // it.allSynapses.size > saveWarningThreshold && !it.isUseFullRepOnSave w
         }
         if (showPanel) {
             val n = JOptionPane.showConfirmDialog(null, "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. " + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that " + "their weight matrices are compressed.   Otherwise the save will take a " + "long time and the saved file will be large. Click Cancel to go ahead with the save, " + "and OK to return to the network and change settings.</body></html>", "Save Warning", JOptionPane.OK_CANCEL_OPTION)

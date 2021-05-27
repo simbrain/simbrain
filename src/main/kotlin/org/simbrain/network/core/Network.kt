@@ -5,10 +5,7 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents
-import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.groups.Subnetwork
-import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.groups.*
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.*
@@ -374,9 +371,7 @@ class Network {
      * @return the copied network.
      */
     fun copy(): Network {
-        preSaveInit()
         val xmlRepresentation = getNetworkXStream().toXML(this)
-        postSaveReInit()
         return getNetworkXStream().fromXML(xmlRepresentation) as Network
     }
 
@@ -396,23 +391,6 @@ class Network {
         return this
     }
 
-    /**
-     * Perform operations required before saving a network. Post-opening operations occur in [.readResolve].
-     */
-    fun preSaveInit() {
-        for (group in networkModels.get<SynapseGroup>()) {
-            group.preSaveInit()
-        }
-    }
-
-    /**
-     * Returns synapse groups to a usable state after a save is performed.
-     */
-    fun postSaveReInit() {
-        for (group in networkModels.get<SynapseGroup>()) {
-            group.postSaveReInit()
-        }
-    }
 
     /**
      * Returns the current number of iterations.
@@ -691,6 +669,7 @@ val List<Synapse>.lengths: List<Double>
 fun getNetworkXStream(): XStream {
     val xstream = Utils.getSimbrainXStream()
     xstream.registerConverter(NetworkModelListConverter())
+    xstream.registerConverter(SynapseGroupConverter())
     return xstream
 }
 

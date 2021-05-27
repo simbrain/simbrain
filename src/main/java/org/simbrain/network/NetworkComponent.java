@@ -134,9 +134,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public void save(final OutputStream output, final String format) {
-        network.preSaveInit();
         getNetworkXStream().toXML(network, output);
-        network.postSaveReInit();
     }
 
 

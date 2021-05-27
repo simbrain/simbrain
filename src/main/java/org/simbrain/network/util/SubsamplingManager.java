@@ -30,7 +30,7 @@ public class SubsamplingManager {
      * Array to hold subsamples to be used when, for example, plotting the
      * state of large network.
      */
-    private double[] subSampledValues = {};
+    private transient double[] subSampledValues = {};
 
     /**
      * The collection to be subsampled from.

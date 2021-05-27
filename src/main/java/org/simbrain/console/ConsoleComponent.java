@@ -28,11 +28,6 @@ import java.io.OutputStream;
  */
 public class ConsoleComponent extends WorkspaceComponent {
 
-    /**
-     * Constructor.
-     *
-     * @param name name
-     */
     public ConsoleComponent(String name) {
         super(name);
     }

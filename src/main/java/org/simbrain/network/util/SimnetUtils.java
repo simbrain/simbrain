@@ -17,6 +17,7 @@ import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -310,4 +311,33 @@ public class SimnetUtils {
         }
         return ret;
     }
+
+    /**
+     * Take another synapse group and copy it's synapses in to the one provided.
+     */
+    public static void copySynapses(SynapseGroup synapseGroup, SynapseGroup sgToCopy) {
+        if ((synapseGroup.getTargetNeuronGroup().size() != sgToCopy.getTargetNeuronGroup().size()) || (synapseGroup.getSourceNeuronGroup().size() != sgToCopy.getSourceNeuronGroup().size())) {
+
+            throw new IllegalArgumentException("Size of source and target neuron groups of this synapse group do not match size " + "of source and target neuron groups of this synapse group.");
+        }
+
+        synapseGroup.clear();
+
+        List<Neuron> srcNeurons = sgToCopy.getSourceNeuronGroup().getNeuronList();
+        List<Neuron> tarNeurons = sgToCopy.getTargetNeuronGroup().getNeuronList();
+        for (int ii = 0; ii < synapseGroup.getSourceNeuronGroup().size(); ii++) {
+            for (int jj = 0; jj < synapseGroup.getTargetNeuronGroup().size(); jj++) {
+                // Does a synapse exist here?
+                if (srcNeurons.get(ii).getFanOut().containsKey(tarNeurons.get(jj))) {
+                    //TODO: Check that such a synapse actually exists in this group
+                    Synapse newSyn = new Synapse(synapseGroup.getSourceNeuronGroup().getNeuronList().get(ii),
+                            synapseGroup.getTargetNeuronGroup().getNeuronList().get(jj));
+                    newSyn.setStrength(srcNeurons.get(ii).getFanOut().get(tarNeurons.get(jj)).getStrength());
+                    synapseGroup.addSynapseUnsafe(newSyn);
+                }
+            }
+        }
+    }
+
+
 }

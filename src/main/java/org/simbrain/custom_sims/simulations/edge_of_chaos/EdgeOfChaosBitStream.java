@@ -9,6 +9,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainMath;
@@ -102,7 +103,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         // Connect reservoirs
         sgRes1 = EdgeOfChaos.connectReservoir(network, res1, variance, 4);
         sgRes2 = new SynapseGroup(res2, res2);
-        sgRes2.copySynapses(sgRes1);
+        SimnetUtils.copySynapses(sgRes2, sgRes1);
         sgRes2.setLabel("Recurrent Synapses");
 
         network.addNetworkModel(sgRes2);

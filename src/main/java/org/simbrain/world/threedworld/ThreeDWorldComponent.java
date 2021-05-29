@@ -148,7 +148,8 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    protected void closing() {
+    public void close() {
+        super.close();
         world.getEngine().stop(false);
     }
 

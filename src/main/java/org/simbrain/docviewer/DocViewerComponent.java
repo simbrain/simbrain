@@ -87,10 +87,6 @@ public class DocViewerComponent extends WorkspaceComponent {
         }
     }
 
-    @Override
-    public void closing() {
-    }
-
     /**
      * @return the text
      */

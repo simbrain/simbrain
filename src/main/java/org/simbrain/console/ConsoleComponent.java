@@ -32,11 +32,6 @@ public class ConsoleComponent extends WorkspaceComponent {
         super(name);
     }
 
-    @Override
-    public void closing() {
-        // No implementation
-    }
-
     /**
      * Opens a saved component. There isn't much to do here since currently
      * there is nothing to persist with a console. This just ensures that a

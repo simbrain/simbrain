@@ -40,14 +40,6 @@ public class GameComponent extends WorkspaceComponent {
     }
 
     /**
-     * Called when the component is closed.
-     */
-    @Override
-    protected void closing() {
-        /* no implementation */
-    }
-
-    /**
      * Saves the component to the given stream.
      *
      * @param output the output stream.

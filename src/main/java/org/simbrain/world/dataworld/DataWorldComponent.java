@@ -173,10 +173,6 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     }
 
     @Override
-    public void closing() {
-    }
-
-    @Override
     public String getXML() {
         return NumericTable.getXStream().toXML(dataTable);
     }

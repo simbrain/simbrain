@@ -133,15 +133,9 @@ public abstract class WorkspaceComponent {
      * Closes the WorkspaceComponent.
      */
     public void close() {
-        closing();
         getAttributeContainers().forEach(this::fireAttributeContainerRemoved);
         workspace.removeWorkspaceComponent(this);
     }
-
-    /**
-     * Perform cleanup after closing.
-     */
-    protected abstract void closing();
 
     /**
      * Called by Workspace to update the state of the component.

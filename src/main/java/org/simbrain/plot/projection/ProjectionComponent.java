@@ -104,10 +104,6 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
         return false;
     }
 
-    @Override
-    public void closing() {
-    }
-
     /**
      * Get the current state of the dimension objects, send this to the
      * projection algorithm, and update the graphics.

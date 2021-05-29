@@ -18,8 +18,8 @@
  */
 package org.simbrain.plot.rasterchart;
 
-import org.simbrain.plot.timeseries.TimeSeriesModel;
-import org.simbrain.workspace.*;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -99,10 +99,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
     @Override
     public boolean hasChangedSinceLastSave() {
         return false;
-    }
-
-    @Override
-    public void closing() {
     }
 
     @Override

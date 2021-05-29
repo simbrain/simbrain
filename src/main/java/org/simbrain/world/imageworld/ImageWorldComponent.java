@@ -85,10 +85,6 @@ public class ImageWorldComponent extends WorkspaceComponent {
         return stream;
     }
 
-    @Override
-    protected void closing() {
-    }
-
     /**
      * Deserialize an ImageAlbumComponent.
      *

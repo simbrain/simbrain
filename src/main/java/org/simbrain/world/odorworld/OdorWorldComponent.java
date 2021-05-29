@@ -129,10 +129,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void closing() {
-    }
-
-    @Override
     public void update() {
         world.update();
     }

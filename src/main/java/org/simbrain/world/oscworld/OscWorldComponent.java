@@ -85,17 +85,6 @@ public final class OscWorldComponent extends WorkspaceComponent {
     /**
      * {@inheritDoc}
      */
-    public void closing() {
-        //        oscPortIn.stopListening();
-        //        // TODO: always throws SocketException; wrote email to JavaOSC author
-        //        oscPortIn.close();
-        //        oscPortOut.close();
-        //        // TODO: remove list event listeners
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void save(final OutputStream outputStream, final String format) {
         // empty
     }

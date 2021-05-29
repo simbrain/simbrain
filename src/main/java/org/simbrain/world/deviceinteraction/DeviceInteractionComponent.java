@@ -46,10 +46,6 @@ public class DeviceInteractionComponent extends WorkspaceComponent {
     }
 
     @Override
-    protected void closing() {
-    }
-
-    @Override
     public List<AttributeContainer> getAttributeContainers() {
         return Arrays.asList(world);
     }

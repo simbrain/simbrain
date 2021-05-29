@@ -113,10 +113,6 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void closing() {
-    }
-
-    @Override
     public String getXML() {
         return Utils.getSimbrainXStream().toXML(model);
     }

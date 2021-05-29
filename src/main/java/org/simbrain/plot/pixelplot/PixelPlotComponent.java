@@ -78,10 +78,6 @@ public class PixelPlotComponent extends WorkspaceComponent {
         getXStream().toXML(emitter, output);
     }
 
-    @Override
-    protected void closing() {
-    }
-
     public EmitterMatrix getEmitter() {
         return emitter;
     }

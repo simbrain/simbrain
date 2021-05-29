@@ -26,7 +26,6 @@ import org.simbrain.world.textworld.TextWorld.TextItem;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -148,10 +147,6 @@ public class DisplayComponent extends WorkspaceComponent {
     public void save(final OutputStream output, final String format) {
         world.preSaveInit();
         Utils.getSimbrainXStream().toXML(world, output);
-    }
-
-    @Override
-    public void closing() {
     }
 
     @Override

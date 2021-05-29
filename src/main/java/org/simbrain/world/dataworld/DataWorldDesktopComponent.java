@@ -154,6 +154,11 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         mb.add(helpMenu);
 
         getParentFrame().setJMenuBar(mb);
+
+        if (this.getParentFrame().getJMenuBar() == null) {
+            addMenuBar(table);
+        }
+        resizePanel();
     }
 
     /**
@@ -181,14 +186,6 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         public void menuCanceled(final MenuEvent e) {
         }
     };
-
-    @Override
-    public void postAddInit() {
-        if (this.getParentFrame().getJMenuBar() == null) {
-            addMenuBar(table);
-        }
-        resizePanel();
-    }
 
     /**
      * Resize the panel and parent frame.

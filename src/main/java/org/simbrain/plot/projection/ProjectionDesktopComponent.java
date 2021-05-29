@@ -521,13 +521,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
     }
 
     /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
-    }
-
-    /**
      * Creates the menu bar.
      */
     private void createAttachMenuBar() {

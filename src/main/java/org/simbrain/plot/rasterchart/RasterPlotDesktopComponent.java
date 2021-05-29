@@ -57,14 +57,8 @@ public class RasterPlotDesktopComponent extends DesktopComponent<RasterPlotCompo
         this.setLayout(new BorderLayout());
         add("Center", rasterPanel);
 
-    }
-
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         rasterPanel.init();
+
     }
 
     /**

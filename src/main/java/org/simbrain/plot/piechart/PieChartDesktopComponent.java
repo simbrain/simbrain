@@ -72,13 +72,7 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         createAttachMenuBar();
 
         add("Center", chartPanel);
-    }
 
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         chart = ChartFactory.createPieChart("", getWorkspaceComponent().getModel().getDataset(), true, true, false);
         chartPanel.setChart(chart);
     }

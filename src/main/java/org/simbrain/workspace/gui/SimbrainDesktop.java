@@ -918,7 +918,6 @@ public class SimbrainDesktop {
         componentFrame.setVisible(true);
         componentFrame.setTitle(workspaceComponent.getName());
         desktop.add(componentFrame);
-        desktopComponent.postAddInit();
         lastFocusedStack.push(desktopComponent);
         desktopComponent.getParentFrame().pack();
         // System.out.println(lastOpened.getName());
@@ -969,7 +968,6 @@ public class SimbrainDesktop {
         theFrame.setVisible(true);
         theFrame.setBounds(100, 100, 200, 200);
         theFrame.setContentPane(desktopComponent);
-        desktopComponent.postAddInit();
     }
 
     /**

@@ -86,13 +86,7 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
 
         add("Center", chartPanel);
         // add("South", buttonPanel);
-    }
 
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         String title = "";
         String xLabel = "Bar";
         String yLabel = "Value";

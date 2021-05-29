@@ -104,13 +104,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
     }
 
     /**
-     * If any initialization is needed after adding this component to workspace.
-     */
-    public void postAddInit() {
-        /* no implementation */
-    }
-
-    /**
      * Closes this view.
      */
     public void close() {
@@ -172,7 +165,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
         desktopComponent.getParentFrame().setBounds(bounds);
         workspaceComponent.setName(name);
         getParentFrame().setTitle(name);
-        postAddInit();
     }
 
     /**

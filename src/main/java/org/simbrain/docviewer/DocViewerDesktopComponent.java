@@ -186,6 +186,8 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
 
         };
         textArea.addHyperlinkListener(l);
+        htmlEditor.setText(this.getWorkspaceComponent().getText());
+        textArea.setCaretPosition(0);
     }
 
     /**
@@ -208,12 +210,6 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
             }
         }
         return uri;
-    }
-
-    @Override
-    public void postAddInit() {
-        htmlEditor.setText(this.getWorkspaceComponent().getText());
-        textArea.setCaretPosition(0);
     }
 
 }

@@ -59,25 +59,6 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
         return fileMenu
     }
 
-    override fun postAddInit() {
-        if (parentFrame.jMenuBar == null) {
-//            createAndAttachMenus()
-            // TODO: watch out! menus are created with constructor now
-        }
-
-        // TODO
-        //networkPanel.getNetwork().setName(this.getName());
-        //
-        //// TODO: Below only needs to happen when opening; but currently it
-        //// happens also when creating a new network
-        //networkPanel.clearPanel();
-        //if (networkPanel.getNetwork() != this.getWorkspaceComponent().getNetwork()) {
-        //    networkPanel.setNetwork(this.getWorkspaceComponent().getNetwork());
-        //}
-        //networkPanel.initScreenElements();
-        //networkPanel.initGui();
-    }
-
     override fun showSaveFileDialog() {
         if (showUncompressedSynapseGroupWarning()) {
             super.showSaveFileDialog()

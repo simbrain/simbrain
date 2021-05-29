@@ -61,6 +61,11 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
 
         // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
 
+        menu = new OdorWorldFrameMenu(this, worldPanel.getWorld());
+        menu.setUpMenus();
+        getParentFrame().setJMenuBar(menu);
+        worldPanel.syncToModel();
+        setGuiSizeToWorldSize();
     }
 
     /**
@@ -84,15 +89,6 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
      */
     public OdorWorldPanel getWorldPanel() {
         return worldPanel;
-    }
-
-    @Override
-    public void postAddInit() {
-        menu = new OdorWorldFrameMenu(this, worldPanel.getWorld());
-        menu.setUpMenus();
-        getParentFrame().setJMenuBar(menu);
-        worldPanel.syncToModel();
-        setGuiSizeToWorldSize();
     }
 
     /**

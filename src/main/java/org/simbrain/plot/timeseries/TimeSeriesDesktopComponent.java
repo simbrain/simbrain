@@ -55,13 +55,6 @@ public class TimeSeriesDesktopComponent extends DesktopComponent<TimeSeriesPlotC
         createAttachMenuBar();
         this.setLayout(new BorderLayout());
         add("Center", timeSeriesPanel);
-    }
-
-    /**
-     * Initializes frame.
-     */
-    @Override
-    public void postAddInit() {
         timeSeriesPanel.init();
     }
 

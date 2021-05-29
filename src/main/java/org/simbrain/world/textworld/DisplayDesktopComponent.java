@@ -127,12 +127,6 @@ public class DisplayDesktopComponent extends DesktopComponent<DisplayComponent> 
 
     }
 
-    @Override
-    public void postAddInit() {
-        super.postAddInit();
-        this.getParentFrame().pack();
-    }
-
     /**
      * Adds menu bar to the top of TextWorldComponent.
      */

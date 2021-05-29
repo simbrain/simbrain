@@ -120,11 +120,6 @@ public class ReaderDesktopComponent extends DesktopComponent<ReaderComponent> {
             }
         });
 
-    }
-
-    @Override
-    public void postAddInit() {
-        super.postAddInit();
         this.getParentFrame().pack();
     }
 

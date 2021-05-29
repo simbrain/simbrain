@@ -316,6 +316,11 @@ class Network {
         if (networkModel.shouldAdd()) {
             networkModel.id = idManager.getAndIncrementId(networkModel.javaClass)
             networkModels.add(networkModel)
+            networkModel.events.onDeleted{
+                // TODO: Conditional is temporary to test new deletion logic
+                if (it is Subnetwork)
+                    networkModels.remove(it)
+            }
             events.fireModelAdded(networkModel)
         }
     }

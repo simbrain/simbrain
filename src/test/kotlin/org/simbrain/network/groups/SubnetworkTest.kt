@@ -2,6 +2,7 @@ package org.simbrain.network.groups
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.subnetworks.FeedForward
@@ -21,14 +22,17 @@ class SubnetworkTest {
     fun `ff layer deletion` () {
         val ff = FeedForward(net, intArrayOf(2,2,2),  Point2D.Double(0.0,0.0))
         val firstLayer = ff.modelList.get<NeuronArray>().first()
-        ff.deleteModel(firstLayer) // This should get rid of a weight matrix
+        firstLayer.delete() // This should get rid of a weight matrix
         assertEquals(3, ff.modelList.size)
     }
 
-    // @Test
-    // fun `subnet deleted when empty` () {
-    //     // TODO
-    // }
+    @Test
+    fun `subnet deleted when empty` () {
+        val ff = FeedForward(net, intArrayOf(2,2,2),  Point2D.Double(0.0,0.0))
+        net.addNetworkModel(ff);
+        ff.modelList.all.forEach(NetworkModel::delete)
+        assertEquals(0, net.allModels.size)
+    }
 }
 
 

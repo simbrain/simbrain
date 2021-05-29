@@ -19,14 +19,13 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PNode;
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
-import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -82,7 +81,7 @@ public class SubnetworkNode extends ScreenElement {
      * Create a subnetwork node.
      *
      * @param networkPanel parent panel
-     * @param subnet        the layered network
+     * @param subnet       the layered network
      */
     public SubnetworkNode(NetworkPanel networkPanel, Subnetwork subnet) {
         super(networkPanel);
@@ -97,7 +96,7 @@ public class SubnetworkNode extends ScreenElement {
 
         LocationEvents events = subnetwork.getEvents();
         events.onDeleted(n -> removeFromParent());
-        events.onLabelChange((o,n) -> updateText());
+        events.onLabelChange((o, n) -> updateText());
         events.onLocationChange(this::layoutChildren);
     }
 
@@ -108,7 +107,7 @@ public class SubnetworkNode extends ScreenElement {
     public void layoutChildren() {
         outline.resetOutlinedNodes(outlinedObjects);
         interactionBox.setOffset(outline.getFullBounds().getX()
-                + Outline.ARC_SIZE / 2,
+                        + Outline.ARC_SIZE / 2,
                 outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
     }
 
@@ -117,29 +116,15 @@ public class SubnetworkNode extends ScreenElement {
      */
     public void addNode(ScreenElement node) {
         outlinedObjects.add(node);
-
-        if (node instanceof SynapseGroupNode) {
-            node.lowerToBottom();
-            ((SynapseGroupNode) node).getSynapseGroup().getEvents().onDeleted(sg -> {
-                outlinedObjects.remove(node);
-                outline.resetOutlinedNodes(outlinedObjects);
-            });
-        } else if (node instanceof NeuronGroupNode) {
-            NeuronGroup ng = ((NeuronGroupNode) node).getNeuronGroup();
-            ng.getEvents().onDeleted(n -> {
-                outlinedObjects.remove(node);
-                outline.resetOutlinedNodes(outlinedObjects);
-            });
-            ng.getEvents().onLocationChange(() -> outline.resetOutlinedNodes(outlinedObjects));
-        } else if (node instanceof NeuronArrayNode) {
-            NeuronArray na = ((NeuronArrayNode) node).getNeuronArray();
-            na.getEvents().fireLocationChange(); // Forces an initial update of connnected weightmatrices
-            na.getEvents().onDeleted(n -> {
-                outlinedObjects.remove(node);
-                outline.resetOutlinedNodes(outlinedObjects);
-            });
-            na.getEvents().onLocationChange(() -> outline.resetOutlinedNodes(outlinedObjects));
+        node.lowerToBottom();
+        node.getModel().getEvents().onDeleted(sg -> {
+            outlinedObjects.remove(node);
+            outline.resetOutlinedNodes(outlinedObjects);
+        });
+        if (node.getModel() instanceof LocatableModel) {
+            ((LocatableModel)node.getModel()).getEvents().fireLocationChange();
         }
+
         outline.resetOutlinedNodes(outlinedObjects);
         outline.updateBounds();
     }

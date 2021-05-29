@@ -136,7 +136,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, final NeuronGroup toCopy) {
         this(net, toCopy.getNeuronList().stream().map(Neuron::deepCopy).collect(Collectors.toList()));
-        // Copying "custom" labels creates too many problems...
         setLabel(net.getIdManager().getProposedId(this.getClass()));
         this.setLayout(toCopy.getLayout());
         this.setGroupUpdateRule(toCopy.groupUpdateRule);

@@ -159,12 +159,6 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
     public void delete() {
         source.removeOutgoingWeightMatrix(this);
         target.removeIncomingWeightMatrix(this);
-        // target.getOutgoingWeightMatrices().stream()
-        //         .filter(m -> m.getTarget() == source)
-        //         .forEach(m -> { // Even though this is for each but should happen only once.
-        //             m.setUseCurve(false);
-        //             setUseCurve(false);
-        //         });
         events.fireDeleted();
     }
 

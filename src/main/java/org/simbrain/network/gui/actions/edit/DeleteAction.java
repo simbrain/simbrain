@@ -46,10 +46,7 @@ public final class DeleteAction extends ConditionallyEnabledAction {
 
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         SwingUtilities.invokeLater(getNetworkPanel()::deleteSelectedObjects);
     }

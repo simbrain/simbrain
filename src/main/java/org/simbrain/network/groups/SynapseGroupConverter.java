@@ -79,8 +79,7 @@ public class SynapseGroupConverter implements Converter {
 
         writer.startNode("compressedSynapseRep");
         if (ss.getParent().isUseGroupLevelSettings()) {
-            long[] rowCompression = getRowCompressedMatrix(ss);
-            context.convertAnother(toByteArray(rowCompression, Precision.FLOAT_32));
+            context.convertAnother(toByteArray(ss, Precision.FLOAT_64));
         } else {
             context.convertAnother(getFullByteRep(ss));
         }
@@ -400,13 +399,14 @@ public class SynapseGroupConverter implements Converter {
      * index has a value less than 255 it is stored in a single byte, otherwise
      * it is stored as a short, and so on if the index is greater than 65535.
      *
-     * @param rowCompressed row compressed matrix where column values are separated by a
-     *                        new row code (-1 or 0xffffffff) representing positions in a
-     *                        sparse matrix
      * @return the compressed byte array representation of the row compressed
      * matrix riCompressedMat.
      */
-    public static byte[] toByteArray(long[] rowCompressed, Precision precision) {
+    public static byte[] toByteArray(SynapseSet ss, Precision precision) {
+        // row compressed matrix where column values are separated by a new row code (-1 or 0xffffffff) representing
+        //positions in a sparse matrixow compressed matrix where column values are separated by a new row code
+        // (-1 or 0xffffffff) representing positions in a sparse matrix
+        long[] rowCompressed = getRowCompressedMatrix(ss);
         final byte maxByte = -1;
         List<Byte> preByteArray = new ArrayList<>();
         boolean switchedToShorts = false;

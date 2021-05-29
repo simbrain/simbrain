@@ -446,7 +446,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
                 // There is a duplicate connecting src and target
                 // Check that we're not trying to add the exact same synapse...
                 if (!dup.equals(synapse)) {
-                    getNetwork().delete(fanOut.get(synapse.getTarget()));
+                    fanOut.get(synapse.getTarget()).delete();
                     fanOut.put(synapse.getTarget(), synapse);
                 } // Do nothing if we are.
             }
@@ -769,7 +769,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         List<Synapse> fanOutList = getFanOutList();
         fanOut.clear();
         for (Synapse s : fanOutList) {
-            parent.delete(s);
+            s.delete();
         }
     }
 
@@ -781,7 +781,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         List<Synapse> fanInList = getFanInList();
         fanIn.clear();
         for (Synapse synapse : fanInList) {
-            parent.delete(synapse);
+            synapse.delete();
         }
     }
 
@@ -1169,13 +1169,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void delete() {
         getNetwork().updatePriorityList();
         deleteConnectedSynapses();
-
-        if (getParentGroup() != null) {
-            getParentGroup().removeNeuron(this);
-            if (getParentGroup().isEmpty()) {
-                getNetwork().delete(getParentGroup());
-            }
-        }
         events.fireDeleted();
     }
 

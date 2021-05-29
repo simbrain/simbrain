@@ -248,7 +248,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
         undoManager.addUndoableAction(object : UndoableAction {
             override fun undo() {
-                network.delete(neuron)
+                neuron.delete()
             }
             override fun redo() {
                 network.addNetworkModel(neuron)
@@ -359,7 +359,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         fun deleteGroup(interactionBox: InteractionBox) {
             interactionBox.parent.let { groupNode ->
                 if (groupNode is ScreenElement) {
-                    network.delete(groupNode.model)
+                    groupNode.model.delete()
                 }
             }
         }
@@ -368,19 +368,19 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             with(network) {
                 when (screenElement) {
                     is NeuronNode -> {
-                        network.delete(screenElement.model)
+                        screenElement.model.delete()
 
                         undoManager.addUndoableAction(object : UndoableAction {
                             override fun undo() {
                                 network.addNetworkModel(screenElement.model)
                             }
                             override fun redo() {
-                                network.delete(screenElement.model)
+                                screenElement.model.delete()
                             }
                         })
                     }
                     is InteractionBox -> deleteGroup(screenElement)
-                    else -> delete(screenElement.model)
+                    else -> screenElement.model.delete()
                 }
             }
         }

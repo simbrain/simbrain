@@ -281,7 +281,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            getNetworkPanel().getNetwork().delete(neuronGroup);
+            neuronGroup.delete();
         }
     };
 

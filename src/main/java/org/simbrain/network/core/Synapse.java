@@ -1065,20 +1065,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
             getTarget().removeAfferent(this);
         }
 
-        // If this synapse has a parent group, delete that group
-        if (getParentGroup() != null) {
-            SynapseGroup parentGroup = getParentGroup();
-            parentGroup.removeSynapse(this);
-            // TODO
-            // if (parentGroup.isDisplaySynapses()) {
-            //     events.fireModelRemoved(toDelete);
-            // }
-            if (parentGroup.isEmpty()) {
-               parentNetwork.delete(getParentGroup());
-            }
-        } else {
-            getEvents().fireDeleted();
-        }
+        getEvents().fireDeleted();
     }
 
     public void afterAddedToNetwork() {

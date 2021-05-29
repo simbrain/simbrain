@@ -410,8 +410,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
             int finalNumConPerSource = curNumConPerSource - removePerSource;
             for (int i = 0, n = sourceNeurons.length; i < n; i++) {
                 for (int j = curNumConPerSource - 1; j >= finalNumConPerSource; j--) {
-                    Synapse toRemove = NetworkKt.getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]);
-                    net.delete(toRemove);
+                    NetworkKt.getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]).delete();
                 }
                 currentOrderingIndices[i] = finalNumConPerSource;
             }

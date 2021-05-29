@@ -317,21 +317,10 @@ class Network {
             networkModel.id = idManager.getAndIncrementId(networkModel.javaClass)
             networkModels.add(networkModel)
             networkModel.events.onDeleted{
-                // TODO: Conditional is temporary to test new deletion logic
-                if (it is Subnetwork)
-                    networkModels.remove(it)
+                networkModels.remove(it)
             }
             events.fireModelAdded(networkModel)
         }
-    }
-
-    /**
-     * Delete a [NetworkModel].
-     */
-    fun delete(toDelete: NetworkModel) {
-        networkModels.remove(toDelete)
-        toDelete.delete()
-        events.fireModelRemoved(toDelete)
     }
 
     /**

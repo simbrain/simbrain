@@ -122,7 +122,7 @@ public class UndoManager {
 
             @Override
             public void undo() {
-                network.delete(newNeuron);
+                newNeuron.delete();
             }
 
             @Override

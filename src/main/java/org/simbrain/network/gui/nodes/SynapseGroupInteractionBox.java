@@ -254,7 +254,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            getNetworkPanel().getNetwork().delete(synapseGroup);
+            synapseGroup.delete();
         }
     };
 

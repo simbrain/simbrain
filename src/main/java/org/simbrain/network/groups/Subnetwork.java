@@ -20,8 +20,6 @@ import org.simbrain.network.core.NetworkModelList;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
@@ -81,11 +79,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
         modelList.add(model);
         model.setId(getParentNetwork().getIdManager().getAndIncrementId(model.getClass()));
         model.getEvents().onDeleted(m -> {
-            // TODO: Conditional is temporary to test new deletion logic
-            if ((m instanceof WeightMatrix) ||
-                    (m instanceof NeuronArray)){
-                deleteModel(m);
-            }
+            modelList.remove(m);
             if (modelList.getSize() == 0) {
                 delete();
             }
@@ -96,19 +90,10 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
      * Delete this subnetwork and its children.
      */
     public void delete() {
-        modelList.getAll().forEach(this::deleteModel);
+        modelList.getAll().forEach(m -> modelList.remove(m));
         events.fireDeleted();
     }
 
-    private void deleteModel(NetworkModel toDelete) {
-        modelList.remove(toDelete);
-        // TODO: Conditional is temporary to test new deletion logic
-        if (!((toDelete instanceof WeightMatrix)
-                || (toDelete instanceof NeuronArray))) {
-            toDelete.delete();
-            parentNetwork.getEvents().fireModelRemoved(toDelete);
-        }
-    }
 
     public NetworkModelList getModelList() {
         return modelList;

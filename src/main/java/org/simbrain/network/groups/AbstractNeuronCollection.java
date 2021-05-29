@@ -203,8 +203,15 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
      */
     protected void addListener(Neuron n) {
         n.getEvents().onLocationChange(fireLocationChange);
+        n.getEvents().onDeleted(neuronList::remove);
         n.getEvents().onActivationChange((aold,anew) -> {
             invalidateCachedActivations();
+        });
+        n.getEvents().onDeleted(neuron-> {
+            neuronList.remove(neuron);
+            if (isEmpty()) {
+                delete();
+            }
         });
     }
 

@@ -81,7 +81,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
             editedText.getDocument().removeDocumentListener(docListener);
             editedText.setEditing(false);
             if (editedText.getDocument().getLength() == 0) {
-                networkPanel.getNetwork().delete(node.getTextObject());
+                node.getTextObject().delete();
                 editedText.removeFromParent();
             } else {
                 try {

@@ -47,9 +47,11 @@ public abstract class NetworkModel {
     }
 
     /**
-     * Override if cleanup is needed when deleting.
+     * Main public entry point for object deletion.
      */
     public void delete() {
+        // Do NOT create any public deletion methods in network, subnetwork, neurongroup, etc.
+        // Deleting the object should fire an event and all cleanup should occur in response to those events.
     }
 
     /**

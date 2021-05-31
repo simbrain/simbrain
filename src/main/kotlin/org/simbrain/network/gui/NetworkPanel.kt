@@ -244,7 +244,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
      * Add a neuron and use placement manager to lay it out.
      */
     fun placeNeuron(neuron: Neuron) {
-        placementManager.addNewModelObject(neuron)
+        placementManager.placeObject(neuron)
 
         undoManager.addUndoableAction(object : UndoableAction {
             override fun undo() {
@@ -404,7 +404,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
-        placementManager.setNewCopy()
     }
 
     fun cut() {
@@ -590,7 +589,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     private fun addNetworkListeners() {
         val event = network.events
-        event.onModelAdded { createNode(it) }
+        event.onModelAdded {
+            createNode(it)
+            if (it is Subnetwork) {
+                placementManager.placeObject(it)
+            }
+        }
         event.onModelRemoved {
             it.events.fireDeleted()
             zoomToFitPage()

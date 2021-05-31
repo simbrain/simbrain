@@ -79,3 +79,12 @@ val Collection<LocatableModel>.bound: Rectangle2D
 fun Collection<LocatableModel>.translate(vector: Point2D) = forEach { it.location = it.location + vector }
 fun Collection<LocatableModel>.translate(dx: Double, dy: Double) = translate(point(dx, dy))
 
+fun Collection<LocatableModel>.moveTo(target: Point2D) = forEach {
+    val diff = target - topLeftLocation
+    translate(diff)
+}
+
+fun Collection<LocatableModel>.moveToOrigin() = forEach {
+    moveTo(point(0.0,0.0))
+}
+

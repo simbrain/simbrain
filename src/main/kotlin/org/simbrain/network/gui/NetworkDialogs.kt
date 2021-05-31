@@ -56,8 +56,8 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
     AnnotatedPropertyEditor(template).dialog.apply {
         addClosingTask {
             val neuronArray = template.create(network)
-            placementManager.addNewModelObject(neuronArray)
             network.addNetworkModel(neuronArray)
+            placementManager.placeObject(neuronArray)
         }
         pack()
         setLocationRelativeTo(this@showNeuronArrayCreationDialog)

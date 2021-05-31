@@ -129,14 +129,14 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     private transient ArrayList<Synapse> fanIn = new ArrayList<>(PRE_ALLOCATED_NUM_SYNAPSES);
 
     /**
-     * x-coordinate of this neuron in 2-space.
+     * Central x-coordinate of this neuron in 2-space.
      */
-    private double x;
+    private double x = 0;
 
     /**
-     * y-coordinate of this neuron in 2-space.
+     * Central y-coordinate of this neuron in 2-space.
      */
-    private double y;
+    private double y = 0;
 
     /**
      * z-coordinate of this neuron in 3-space. Currently no GUI implementation,

@@ -131,6 +131,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             selectionMarquee.visible = false
         } else {
             priorSelection = setOf()
+            // Only reset last clicked position if nothing was picked
+            // TODO: But should also occur at end of drag
+            if (event.clickCount == null) {
+                networkPanel.placementManager.lastClickedLocation = event.position
+            }
         }
         networkPanel.zoomToFitPage()
     }

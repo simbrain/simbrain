@@ -163,6 +163,4 @@ public final class NeuronGroupDialog extends StandardDialog {
         commitChanges();
     }
 
-
-
 }

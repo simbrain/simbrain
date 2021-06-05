@@ -6,6 +6,8 @@ import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.gui.PlacementManager.DefaultOffsets
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.subnetworks.CompetitiveNetwork
+import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import java.awt.geom.Point2D
@@ -34,7 +36,9 @@ class PlacementManager() {
             is Neuron -> point(45, 0)
             is NeuronArray -> point(0, -145)
             is NeuronGroup -> point(270, 0)
-            is Subnetwork -> point(320, 0)
+            is Hopfield -> point(300, 0)
+            is CompetitiveNetwork -> point(300, 0)
+            is Subnetwork -> point(220, 0)
             else -> point(45, 0)
         }
     }

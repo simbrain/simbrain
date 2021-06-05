@@ -20,7 +20,6 @@ package org.simbrain.network.gui.actions.neuron;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
@@ -59,7 +58,8 @@ public final class NewNeuronAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        Neuron neuron = new Neuron(networkPanel.getNetwork());
-        networkPanel.placeNeuron(neuron);
+        var neuron = new Neuron(networkPanel.getNetwork());
+        networkPanel.getNetwork().addNetworkModel(neuron);
+        networkPanel.getPlacementManager().placeObject(neuron);
     }
 }

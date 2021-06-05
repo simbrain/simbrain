@@ -242,24 +242,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         zoomToFitPage()
     }
 
-    /**
-     * Add a neuron and use placement manager to lay it out.
-     */
-    fun placeNeuron(neuron: Neuron) {
-        placementManager.placeObject(neuron)
-
-        undoManager.addUndoableAction(object : UndoableAction {
-            override fun undo() {
-                neuron.delete()
-            }
-            override fun redo() {
-                network.addNetworkModel(neuron)
-            }
-        })
-        network.addNetworkModel(neuron)
-        zoomToFitPage()
-    }
-
     private fun createNode(model: NetworkModel) : ScreenElement {
         return when(model) {
             is Neuron -> createNode(model)
@@ -277,6 +259,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     }
 
     fun createNode(neuron: Neuron) = addScreenElement {
+        undoManager.addUndoableAction(object : UndoableAction {
+            override fun undo() {
+                neuron.delete()
+            }
+            override fun redo() {
+                network.addNetworkModel(neuron)
+            }
+        })
         Neuron.tempDebugNan(neuron)
         NeuronNode(this, neuron).also {
             (neuronNodeMapping as HashMap)[neuron] = it
@@ -304,10 +294,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     }
 
     fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
-
-//    fun createNode(multiLayerNet: MultiLayerNet) = addScreenElement {
-//        MultiLayerNetworkNode(this, multiLayerNet)
-//    }
 
     fun createNode(classifier : SmileClassifier) = addScreenElement {
         SmileClassifierNode(this, classifier)
@@ -348,8 +334,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             else -> SubnetworkNode(this, subnetwork)
         }
 
+        placementManager.placeObject(subnetwork)
         val modelNodes = subnetwork.modelList.all.map { createNode(it) }
-
         createSubNetwork().apply {
             modelNodes.forEach { addNode(it) }
         }
@@ -594,9 +580,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         val event = network.events
         event.onModelAdded {
             createNode(it)
-            if (it is Subnetwork) {
-                placementManager.placeObject(it)
-            }
         }
         event.onModelRemoved {
             it.events.fireDeleted()

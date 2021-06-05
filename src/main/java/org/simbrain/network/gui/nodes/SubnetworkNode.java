@@ -126,7 +126,6 @@ public class SubnetworkNode extends ScreenElement {
         }
 
         outline.resetOutlinedNodes(outlinedObjects);
-        outline.updateBounds();
     }
 
     /**

@@ -1,14 +1,11 @@
 package org.simbrain.network.gui
 
-import org.simbrain.network.LocatableModel
+import org.simbrain.network.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.gui.PlacementManager.DefaultOffsets
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.moveToOrigin
-import org.simbrain.network.topLeftLocation
-import org.simbrain.network.translate
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import java.awt.geom.Point2D
@@ -36,8 +33,8 @@ class PlacementManager() {
         operator fun get(model: LocatableModel?) = when (model) {
             is Neuron -> point(45, 0)
             is NeuronArray -> point(0, -145)
-            is NeuronGroup -> point(250, 0)
-            is Subnetwork -> point(300, 0)
+            is NeuronGroup -> point(270, 0)
+            is Subnetwork -> point(320, 0)
             else -> point(45, 0)
         }
     }
@@ -45,7 +42,7 @@ class PlacementManager() {
     /**
      * Tells you the location of the most recently placed object.
      */
-    private var anchorPoint =  point(0.0, 0.0)
+    var anchorPoint =  point(0.0, 0.0)
 
     /**
      * Set last location clicked on screen.
@@ -83,12 +80,7 @@ class PlacementManager() {
             return
         }
 
-        // New copies should go back to the origin, like "new" neurons, so the other logic can work the same
-        if (pasted) {
-            // TODO: Why can't remove pasted condition and always move objects to origin in useLastClickedLocation
-            models.moveToOrigin()
-            pasted = false
-        }
+        models.moveToOrigin()
 
         if (useLastClickedLocation) {
             // Reset the anchor to wherever was last clicked and put objects there
@@ -106,21 +98,20 @@ class PlacementManager() {
      */
     private fun update(models: List<LocatableModel>, delta: Point2D) {
 
-        // TODO: Later after this code stabilizes, add back the concept of a delta. After a drag event, compute delta with last
-        //  anchor point, and use that as the new delta.
+        // TODO: Later after this code stabilizes, add back the concept of a drag-based delta.
+        //  After a drag event, delta with last anchor point, and use that as the new delta.
 
         // Move the objects
-        models.translate(anchorPoint + delta)
+        if (models.size == 1) {
+            models.translate(anchorPoint + delta)
+        } else {
+            // Special handling for multiple placed objects
+            // TODO: Remove this once drag-based delta is re-implemented
+            models.translate(point(models.bound.width, models.bound.height + 10) + anchorPoint + delta)
+        }
 
         // Reset anchor point to wherever objects were just pasted
         anchorPoint = models.topLeftLocation
-    }
-
-    /**
-     * Indicates that a paste event has just occurred.
-     */
-    fun setPasted() {
-        pasted = true
     }
 
 }

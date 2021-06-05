@@ -87,7 +87,6 @@ public class Clipboard {
         net.getSelectionManager().clear();
 
         // Paste objects intelligently using placement
-        net.getPlacementManager().setPasted();
         net.getPlacementManager().placeObjects(copy.stream()
                 .filter(LocatableModel.class::isInstance)
                 .map(LocatableModel.class::cast)

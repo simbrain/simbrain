@@ -27,7 +27,9 @@ import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
+import org.simbrain.network.LocatableModel
 import org.simbrain.network.gui.nodes.ScreenElement
+import org.simbrain.network.topLeftLocation
 import org.simbrain.util.Utils
 import org.simbrain.util.minus
 import org.simbrain.util.piccolo.SelectionMarquee
@@ -55,6 +57,13 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         with(marqueeStartPosition) { SelectionMarquee(x.toFloat(), y.toFloat()) }.also {
             networkPanel.canvas.layer.addChild(it)
             it.visible = false
+        }
+    }
+
+    override fun mouseClicked(event: PInputEvent?) {
+        super.mouseClicked(event)
+        event?.position?.let {
+            networkPanel.placementManager.lastClickedLocation = it
         }
     }
 
@@ -103,7 +112,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         when {
             event.isPanKeyDown -> mode = Mode.PAN
             pickedNode is PCamera -> {
-                networkPanel.placementManager.lastClickedLocation = event.position
                 if (!event.isShiftDown) networkPanel.selectionManager.clear()
                 mode = Mode.SELECTION
             }
@@ -131,10 +139,10 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             selectionMarquee.visible = false
         } else {
             priorSelection = setOf()
-            // Only reset last clicked position if nothing was picked
-            // TODO: But should also occur at end of drag
-            if (event.clickCount == null) {
-                networkPanel.placementManager.lastClickedLocation = event.position
+            // If objects are being dragged, reset the anchor position in the placement manager
+            if (event.pickedNode != null) {
+                networkPanel.placementManager.anchorPoint =
+                    networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
             }
         }
         networkPanel.zoomToFitPage()
@@ -176,7 +184,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
     /**
      * Search through what's clicked on, upwards through parents, to find the first draggable item, and then
-     * drag that.  See [screenElements].
+     * drag that. See [screenElements].
      */
     private fun dragItems(event: PInputEvent) {
         val delta = event.position - marqueeEndPosition

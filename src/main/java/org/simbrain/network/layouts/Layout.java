@@ -69,7 +69,6 @@ public abstract class Layout implements CopyableObject {
         return getDescription();
     }
 
-
     /**
      * Helper class for editing layouts using
      * {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.

@@ -8,6 +8,7 @@ import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
@@ -27,6 +28,7 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.WeightMatrixConnectable
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
+import org.simbrain.network.topLeftLocation
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.network.trainers.TrainingSet
 import org.simbrain.util.complement
@@ -401,7 +403,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun copy() {
         if (selectionManager.isEmpty) return
-
+        placementManager.anchorPoint =
+            selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
     }

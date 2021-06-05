@@ -61,7 +61,7 @@ public class TestSim extends RegisteredSimulation {
         Network network = networkComponent.getNetwork();
         NeuronGroup ng = new NeuronGroup(network, numNeurons);
         ng.setLabel("Recurrent network");
-        ng.setNeuronType("DecayRule");
+        // ng.setNeuronType("DecayRule");
         ng.setUpperBound(10);
         network.addNetworkModel(ng);
         ng.randomize();

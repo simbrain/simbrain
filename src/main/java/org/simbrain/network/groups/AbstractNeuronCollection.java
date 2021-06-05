@@ -287,9 +287,7 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
 
     @Override
     public void randomize() {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.randomize();
-        }
+        neuronList.forEach(Neuron::randomize);
         invalidateCachedActivations();
     }
 
@@ -349,8 +347,6 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
             neuron.randomizeFanOut();
         }
     }
-
-    public abstract void setNeuronType(String rule);
 
     @Override
     public void updateInputs() {

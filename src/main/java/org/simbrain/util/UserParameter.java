@@ -164,10 +164,10 @@ public @interface UserParameter {
     boolean editable() default true;
 
     /**
-     * Name of a method whose value determines whether this component is enabled or not. Only called once when the
+     * Name of a method whose value determines whether this component is visible or not. Only called once when the
      * editor is opened.
      */
-    String conditionalEnablingMethod() default "";
+    String conditionalVisibilityMethod() default "";
 
 
     /**

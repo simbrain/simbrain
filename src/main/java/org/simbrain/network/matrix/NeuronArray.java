@@ -3,6 +3,9 @@ package org.simbrain.network.matrix;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
@@ -18,11 +21,19 @@ import java.util.Arrays;
  */
 public class NeuronArray extends WeightMatrixConnectable implements EditableObject, AttributeContainer {
 
+    @UserParameter(label = "Clamped", description = "Clamping", order = 3)
+    private boolean clamped;
+
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
     private double increment = .1;
 
-    @UserParameter(label = "Clamped", description = "Clamping", order = 3)
-    private boolean clamped;
+    @UserParameter(label = "Update Rule", useSetter = true, isObjectType = true, order = 100)
+    NeuronUpdateRule prototypeRule = new LinearRule();
+
+    /**
+     * Holds data for prototype rule.
+     */
+    private DataHolder dataHolder;
 
     /**
      * Reference to network this array is part of.
@@ -68,6 +79,7 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
         inputs = new double[size];
         randomize();
         setLabel(net.getIdManager().getProposedId(this.getClass()));
+        setPrototypeRule(prototypeRule);
     }
 
     /**
@@ -82,6 +94,8 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
         copy.x = orig.x;
         copy.y = orig.y;
         copy.setActivations(orig.getActivations());
+        copy.setPrototypeRule(orig.getPrototypeRule());
+        // TODO: Copy data.
         return copy;
     }
 
@@ -199,7 +213,8 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
         if (clamped) {
             return;
         }
-        setActivations(getInputs());
+        setActivations(prototypeRule.apply(getInputs(), getActivations(), dataHolder));
+
         inputs = new double[inputs.length]; // clear inputs
         getEvents().fireUpdated();
     }
@@ -282,5 +297,15 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
 
     public boolean isClamped() {
         return clamped;
+    }
+
+    public void setPrototypeRule(NeuronUpdateRule prototypeRule) {
+        this.prototypeRule = prototypeRule;
+        dataHolder = prototypeRule.getDataHolder();
+        dataHolder.init(activations.length);
+    }
+
+    public NeuronUpdateRule getPrototypeRule() {
+        return prototypeRule;
     }
 }

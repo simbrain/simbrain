@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -87,19 +88,27 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     @Override
+    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
+        double[] vals = new double[inputs.length];
+        for (int i = 0; i < inputs.length ; i++) {
+            vals[i] = inputs[i] * slope + ((DataHolder.BiasedDataHolder)data).biases[i]; // TODO: Yulin
+            if (addNoise) {
+                vals[i]  += noiseGenerator.getRandom();
+            }
+            if (clipping) {
+                vals[i]  = clip(vals[i]);
+            }
+        }
+        return vals;
+    }
+
+    @Override
+    public DataHolder getDataHolder() {
+        return new DataHolder.BiasedDataHolder();
+    }
+
+    @Override
     public void update(Neuron neuron) {
-        double wtdInput = neuron.getInput();
-        double val = (slope * wtdInput) + bias;
-
-        if (addNoise) {
-            val += noiseGenerator.getRandom();
-        }
-
-        if (clipping) {
-            val = clip(val);
-        }
-
-        neuron.setActivation(val);
     }
 
     @Override

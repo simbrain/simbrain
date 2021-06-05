@@ -89,11 +89,6 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
      */
     private double floor = DEFAULT_FLOOR;
 
-    /**
-     * Local variables as class variables for a minor performance gain.
-     */
-    private double effect, netInput, act;
-
     @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
@@ -119,15 +114,14 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         // annual cog-sci meeting
 
         // Sum of the "active excitors" and "active inhibitors"
-        netInput = neuron.getInput();
+        double netInput = neuron.getInput();
         for (Synapse w : neuron.getFanIn()) {
             if (w.getSource().getActivation() > 0) {
                 netInput += (w.getStrength() * w.getSource().getActivation());
             }
         }
 
-        // Determine "effect" value.
-        effect = 0;
+        double effect = 0;
         if (netInput >= 0) {
             effect = (getUpperBound() - neuron.getActivation()) * netInput;
         } else {
@@ -135,7 +129,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         }
 
         // Update activation using Euler integration of main ODE
-        act = neuron.getActivation() + neuron.getNetwork().getTimeStep() * (effect - decay * (neuron.getActivation() - rest));
+        double act = neuron.getActivation() + neuron.getNetwork().getTimeStep() * (effect - decay * (neuron.getActivation() - rest));
 
         if (addNoise) {
             act += noiseGenerator.getRandom();

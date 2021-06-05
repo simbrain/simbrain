@@ -24,6 +24,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -106,6 +107,45 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
      * The lower bound of the activity if clipping is used.
      */
     private double floor = DEFAULT_FLOOR;
+
+    @Override
+    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
+        double[] vals = new double[inputs.length];
+        for (int i = 0; i < inputs.length ; i++) {
+            vals[i] = activations[i] + inputs[i];
+            double decayVal;
+            if (updateType == UpdateType.Relative) {
+                decayVal = decayFraction * Math.abs(vals[i] - baseLine);
+            } else  {
+                decayVal = decayAmount;
+            }
+
+            if (vals[i] < baseLine) {
+                vals[i] += decayVal;
+                // in case of an overshoot
+                if (vals[i] > baseLine) {
+                    vals[i] = baseLine;
+                }
+            } else if (vals[i] > baseLine) {
+                vals[i] -= decayVal;
+                if (vals[i] < baseLine) {
+                    vals[i] = baseLine;
+                }
+            }
+            if (addNoise) {
+                vals[i]  += noiseGenerator.getRandom();
+            }
+            if (clipping) {
+                vals[i]  = clip(vals[i]);
+            }
+        }
+        return vals;
+    }
+
+    @Override
+    public DataHolder getDataHolder() {
+        return new DataHolder.BiasedDataHolder();
+    }
 
     @Override
     public void update(Neuron neuron) {

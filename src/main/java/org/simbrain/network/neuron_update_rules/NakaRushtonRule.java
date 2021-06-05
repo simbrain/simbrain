@@ -23,6 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -30,7 +31,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 /**
  * <b>NakaRushtonNeuron</b> is a firing-rate based neuron which is intended to
  * model spike rates of real neurons. It is used extensively in Hugh Wilson's
- * Spikes, Decisions, and Action.
+ * Spikes, Decisions, and Action. p. 20-21.
  */
 public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRule, NoisyUpdateRule {
 
@@ -112,16 +113,6 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     private boolean addNoise = false;
 
     /**
-     * Local variable.
-     */
-    private double s = 0;
-
-    /**
-     * Local variable.
-     */
-    private double a = 0;
-
-    /**
      * The upper bound of the activity.
      */
     private double upperBound = DEFAULT_UPPER_BOUND;
@@ -157,33 +148,81 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     }
 
     @Override
+    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
+        double[] vals = new double[inputs.length];
+        for (int i = 0; i < inputs.length ; i++) {
+
+            // Update adaptation term; see Spike, p. 81
+            if (useAdaptation) {
+                ((NakaDataHolder)data).a[i] += (.1 / adaptationTimeConstant)
+                        * (adaptationParameter * activations[i] - ((NakaDataHolder)data).a[i]);
+            } else {
+                ((NakaDataHolder)data).a[i] = 0;
+            }
+
+            double s;
+            if (inputs[i] > 0) {
+                s = (getUpperBound() * Math.pow(inputs[i], steepness))
+                                / (Math.pow(semiSaturationConstant + ((NakaDataHolder)data).a[i],
+                                steepness) + Math.pow(inputs[i], steepness));
+            } else {
+                s = 0;
+            }
+
+            if (addNoise) {
+                vals[i] =
+                        activations[i] + (.1 * (((1 / timeConstant) * (-activations[i] + s)) + noiseGenerator.getRandom()));
+            } else {
+                vals[i] = activations[i] + (.1 * ((1 / timeConstant) * (-activations[i] + s)));
+            }
+
+        }
+        return vals;
+    }
+
+
+    @Override
     public void update(Neuron neuron) {
 
-        // See Spikes (Hugh Wilson), pp. 20-21
+        // double p = neuron.getInput();
+        // double val = neuron.getActivation();
+        //
+        // // Update adaptation term; see Spike, p. 81
+        // if (useAdaptation) {
+        //     a += (neuron.getNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParameter * val - a);
+        // } else {
+        //     a = 0;
+        // }
+        //
+        // double s;
+        // if (p > 0) {
+        //     s = (getUpperBound() * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + a, steepness) + Math.pow(p, steepness));
+        // } else {
+        //     s = 0;
+        // }
+        //
+        // if (addNoise) {
+        //     val += (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator.getRandom()));
+        // } else {
+        //     val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
+        // }
+        //
+        // neuron.setActivation(val);
+    }
 
-        double p = neuron.getInput();
-        double val = neuron.getActivation();
+    @Override
+    public DataHolder getDataHolder() {
+        return new NakaDataHolder();
+    }
 
-        // Update adaptation term; see Spike, p. 81
-        if (useAdaptation) {
-            a += (neuron.getNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParameter * val - a);
-        } else {
-            a = 0;
+    class NakaDataHolder implements DataHolder {
+
+        double[] a;
+
+        @Override
+        public void init(int size) {
+            a = new double[size];
         }
-
-        if (p > 0) {
-            s = (getUpperBound() * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + a, steepness) + Math.pow(p, steepness));
-        } else {
-            s = 0;
-        }
-
-        if (addNoise) {
-            val += (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator.getRandom()));
-        } else {
-            val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
-        }
-
-        neuron.setActivation(val);
     }
 
     @Override
@@ -258,17 +297,6 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     @Override
     public void clear(Neuron neuron) {
         super.clear(neuron);
-        a = 0;
-        s = 0;
-    }
-
-    @Override
-    public String getToolTipText(Neuron neuron) {
-        if (useAdaptation) {
-            return "" + neuron.getActivation() + " A = " + a;
-        } else {
-            return super.getToolTipText(neuron);
-        }
     }
 
     public double getAdaptationParameter() {

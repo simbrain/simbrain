@@ -31,9 +31,8 @@ import java.util.List;
 
 /**
  * Maintains a specific strategy for creating connections between two groups
- * of neurons.  Subclasses correspond to specific types of
- * connection strategy. Applied using static methods for loose
- * neurons and synapse groups.
+ * of neurons. Subclasses correspond to specific types of
+ * connection strategy.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi

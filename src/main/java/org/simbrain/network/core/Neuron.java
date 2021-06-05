@@ -27,6 +27,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
@@ -67,8 +68,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * neuron it is.
      */
     @UserParameter(label = "Update Rule", isObjectType = true, useSetter = true,
-        conditionalEnablingMethod = "notInNeuronGroup", order = 100)
-    private NeuronUpdateRule updateRule;
+        conditionalVisibilityMethod = "notInNeuronGroup", order = 100)
+    private transient NeuronUpdateRule updateRule;
 
     /**
      * Activation value of the neuron. The main state variable.
@@ -201,6 +202,11 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     private transient NeuronEvents events = new NeuronEvents(this);
 
     /**
+     * Local data holder for neuron update rule.
+     */
+    private DataHolder neuronDataHolder = new DataHolder.BiasedDataHolder();
+
+    /**
      * Construct a specific type of neuron.
      *
      * @param parent     The parent network. Be careful not to set this to root network
@@ -210,6 +216,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
         this.parent = parent;
         setUpdateRule(updateRule);
+        neuronDataHolder.init(1);
     }
 
     /**
@@ -234,7 +241,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         this.parent = parent;
         setUpdateRule(updateRule);
     }
-
 
     /**
      * Copy constructor.
@@ -328,7 +334,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule.deepCopy();
-
+        neuronDataHolder = updateRule.getDataHolder();
+        neuronDataHolder.init(1);
         // TODO: No need to change if the neuron is not new, or has not changed from spiking to non-spiking
         // But this check caused problems so commented out for null
         // if (oldRule == null || (oldRule.isSpikingNeuron() != updateRule.isSpikingNeuron())) {
@@ -349,10 +356,20 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public void update() {
+       update(updateRule, neuronDataHolder);
+    }
+
+    /**
+     * TODO
+     */
+    public void update(NeuronUpdateRule rule, DataHolder data) {
         if (isClamped()) {
             return;
         }
-        updateRule.update(this);
+        // TODO: Performance?
+        setActivation(rule.apply(new double[]{inputValue},
+                new double[]{activation}, data)[0]);
+
         inputValue = 0.0;
     }
 
@@ -1172,7 +1189,4 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         events.fireDeleted();
     }
 
-    public void afterAddedToNetwork() {
-        getNetwork().updatePriorityList();
-    }
 }

@@ -664,6 +664,7 @@ fun getNetworkXStream(): XStream {
     val xstream = Utils.getSimbrainXStream()
     xstream.registerConverter(NetworkModelListConverter())
     xstream.registerConverter(SynapseGroupConverter())
+    xstream.registerConverter(DoubleArrayConverter())
     return xstream
 }
 

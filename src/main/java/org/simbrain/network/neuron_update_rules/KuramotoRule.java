@@ -43,7 +43,6 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
         label = "Natural frequency",
         description = "todo.",
             increment = .1, order = 1)
-
     public double naturalFrequency = 1;
 
     /**

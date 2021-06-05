@@ -24,6 +24,7 @@ import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
@@ -217,4 +218,10 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     public static boolean usesCustomZeroPoint(NeuronUpdateRule rule) {
         return usesCustomZeroPoint.contains(rule.getClass());
     }
+
+    public DataHolder getDataHolder() {return null;}
+
+    // TODO: Make abstract and run through
+    public double[] apply(double[] inputs, double[] activations, DataHolder dataHolder) {return null;}
+
 }

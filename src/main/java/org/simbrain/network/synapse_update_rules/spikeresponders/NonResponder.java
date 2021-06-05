@@ -22,7 +22,7 @@ import org.simbrain.network.core.Synapse;
 
 /**
  * A "null" spike responder for the case where non-spiking neurons are connected.
- * The response is pre-synaptic activations times weight strenght.
+ * The response is pre-synaptic activations times weight strength.
  * This facilitates a simpler design for {@link Synapse}s.
  */
 public class NonResponder extends SpikeResponder {

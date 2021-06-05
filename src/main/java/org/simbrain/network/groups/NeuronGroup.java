@@ -17,22 +17,25 @@
  */
 package org.simbrain.network.groups;
 
-import org.simbrain.network.core.*;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
-import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
+import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,12 +61,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * The number of neurons in the group by default.
      */
     public static final int DEFAULT_GROUP_SIZE = 10;
-
-    /**
-     * "Prototype" update rule.
-     */
-    @UserParameter(label = "Group Update Rule", useSetter = true, order = 20)
-    private UpdateRuleEnum groupUpdateRule = UpdateRuleEnum.LINEAR;
 
     /**
      * Default layout for neuron groups.
@@ -97,6 +94,14 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     private int betweenNeuronInterval = 50;
 
+    @UserParameter(label = "Update Rule", useSetter = true, isObjectType = true, order = 100)
+    private NeuronUpdateRule prototypeRule = new LinearRule();
+
+    /**
+     * Data holder for prototype rule.
+     */
+    private DataHolder dataHolder;
+
     /**
      * Create a neuron group without any initial neurons.
      */
@@ -116,6 +121,9 @@ public class NeuronGroup extends AbstractNeuronCollection {
             super.addNeuron(n);
             n.setParentGroup(this);
         });
+        setNeuronType(prototypeRule);
+        dataHolder = prototypeRule.getDataHolder();
+        dataHolder.init(neurons.size());
     }
 
     /**
@@ -138,7 +146,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         this(net, toCopy.getNeuronList().stream().map(Neuron::deepCopy).collect(Collectors.toList()));
         setLabel(net.getIdManager().getProposedId(this.getClass()));
         this.setLayout(toCopy.getLayout());
-        this.setGroupUpdateRule(toCopy.groupUpdateRule);
     }
 
     /**
@@ -168,13 +175,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @Override
     public void update() {
+        neuronList.forEach(Neuron::updateInputs);
+        neuronList.forEach(n -> n.update(prototypeRule, dataHolder));
         super.update();
-        // if (!inputMode) {
-            NetworkKt.updateNeurons(getNeuronList());
-            invalidateCachedActivations();
-        // }
     }
 
+    // TODO: Rename
     /**
      * Set the update rule for the neurons in this group.
      *
@@ -182,40 +188,21 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public void setNeuronType(NeuronUpdateRule base) {
         inputManager.setInputSpikes(base.isSpikingNeuron());
-        groupUpdateRule = UpdateRuleEnum.get(base);
-        for (Neuron neuron : getNeuronList()) {
-            neuron.setUpdateRule(base.deepCopy());
-        }
+        prototypeRule = base;
+        dataHolder = prototypeRule.getDataHolder();
+        dataHolder.init(1);
+        // Have to also set node rules to support randomization, increment, etc.
+        neuronList.forEach(n -> n.setUpdateRule(base));
     }
 
-    /**
-     * Set the update rule using {@link UpdateRuleEnum}.
-     */
-    public void setGroupUpdateRule(UpdateRuleEnum rule) {
-        groupUpdateRule = rule;
-        try {
-            setNeuronType(rule.getRule().getConstructor().newInstance());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+    public void setPrototypeRule(NeuronUpdateRule rule) {
+        setNeuronType(rule);
     }
 
-    /**
-     * Set the string update rule for the neurons in this group.
-     *
-     * @param rule the neuron update rule to set.
-     */
-    public void setNeuronType(String rule) {
-        try {
-            NeuronUpdateRule newRule =
-                    (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + rule).newInstance();
-            inputManager.setInputSpikes(newRule.isSpikingNeuron());
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        for (Neuron neuron : getNeuronList()) {
-            neuron.setUpdateRule(rule);
-        }
+    @Override
+    public void clear() {
+        super.clear();
+        neuronList.forEach(Neuron::clear);
     }
 
     /**
@@ -312,7 +299,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void setLayout(Layout layout) {
         this.layout = layout;
     }
-
 
     /**
      * Apply this group's layout to its neurons.
@@ -435,12 +421,9 @@ public class NeuronGroup extends AbstractNeuronCollection {
         @UserParameter(label = "Label", initialValueMethod = "getLabel", order = 10)
         private String label;
 
-        /**
-         * Initial update rule
-         */
-        @UserParameter(label = "Update Rule", order = 20)
-        private UpdateRuleEnum updateRule = UpdateRuleEnum.LINEAR;
-        //todo conditional enable based on group type
+        // Add this once it's possible enable based on group type
+        // @UserParameter(label = "Update Rule", isObjectType = true, order = 20)
+        // private NeuronUpdateRule prototype = new LinearRule();
 
         @UserParameter(label = "Group type", order = 30)
         private GroupEnum groupType = GroupEnum.DEFAULT;
@@ -469,7 +452,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
             NeuronGroup ng = null;
             if (groupType == GroupEnum.DEFAULT) {
                 ng = new NeuronGroup(network, numNeurons);
-                ng.setGroupUpdateRule(updateRule);
+                // ng.setPrototypeRule(prototype);
                 ng.setLabel(label);
             } else if (groupType == GroupEnum.WTA) {
                 ng = new WinnerTakeAll(network, numNeurons);

@@ -165,11 +165,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     private Polarity polarity = Polarity.BOTH;
 
     /**
-     * Target value.
-     */
-    private double targetValue;
-
-    /**
      * Memory of last activation.
      */
     private double lastActivation;
@@ -837,14 +832,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public String getToolTipText() {
         return updateRule.getToolTipText(this);
-    }
-
-    public double getTargetValue() {
-        return targetValue;
-    }
-
-    public void setTargetValue(final double targetValue) {
-        this.targetValue = targetValue;
     }
 
     /**

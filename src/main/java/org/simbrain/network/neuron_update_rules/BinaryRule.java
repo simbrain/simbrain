@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 
 import java.util.Random;
@@ -66,6 +67,26 @@ public class BinaryRule extends NeuronUpdateRule {
 
 
     public BinaryRule() {
+    }
+
+    @Override
+    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
+        double[] vals = new double[inputs.length];
+
+        for (int i = 0; i < inputs.length ; i++) {
+            vals[i] = inputs[i] + ((DataHolder.BiasedDataHolder)data).biases[i]; // TODO: Yulin
+            if (vals[i] > threshold) {
+                vals[i] = getUpperBound();
+            } else {
+                vals[i] = getLowerBound();
+            }
+        }
+        return vals;
+    }
+
+    @Override
+    public DataHolder getDataHolder() {
+        return new DataHolder.BiasedDataHolder();
     }
 
     public BinaryRule(double floor, double ceil, double threshold) {

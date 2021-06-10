@@ -69,7 +69,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     @UserParameter(label = "Update Rule", isObjectType = true, useSetter = true,
         conditionalVisibilityMethod = "notInNeuronGroup", order = 100)
-    private transient NeuronUpdateRule updateRule;
+    private transient NeuronUpdateRule updateRule = DEFAULT_UPDATE_RULE;
 
     /**
      * Activation value of the neuron. The main state variable.
@@ -268,6 +268,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     @Override
     public void postUnmarshallingInit() {
         events = new NeuronEvents(this);
+        updateRule = DEFAULT_UPDATE_RULE;
         fanOut = new HashMap<>();
         fanIn = new ArrayList<>();
         if (polarity == null) {

@@ -180,7 +180,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         super.update();
     }
 
-    // TODO: Rename
+    // TODO: Replace with setPrototypeRule
     /**
      * Set the update rule for the neurons in this group.
      *

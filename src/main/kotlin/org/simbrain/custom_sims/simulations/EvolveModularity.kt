@@ -12,6 +12,7 @@ import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
 import java.io.File
+import java.lang.Math.abs
 import java.util.*
 
 /**
@@ -190,46 +191,46 @@ val evolveModularity = newSim {
 
         onEval {
 
-            val tarData = listOf(listOf(0.0), listOf(1.0))
+            var error = 0.0
+            for (i in 1..256) {
+                // Randomize patterns
+                rightRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
+                leftRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
+                workspace.iterate()
 
-            // TODO: See https://linear.app/simbrain/issue/SIM-35/implement-clune-paper
+                val left = leftRetina.products.activations in leftInputs
+                val right = rightRetina.products.activations in rightInputs
+                var target = 0.0
+                if (left and right) {
+                    target = 1.0
+                }
+                error += abs((outputChromosome.products[0].activation - target))
 
-            // TODO: Need functions
-            //  - Checks whether left is in leftinputs
-            //  - Checks whether right is in rightinputs
-            //  - Computes the target on that basis
-
-
-            // leftInputs.zip(tarData).map { (i, t) ->
-            //     leftRetina.products.activations = i
-            //     network.apply {
-            //         repeat(4) { bufferedUpdate() }
-            //     }
-            //     t sse outputChromosome.products.activations
-            // }.sum()
-
-            0.0 // so compiler will be quiet
+            }
+            error
         }
-
 
         onPeek {
             val nc = addNetworkComponent("Network", network)
             placeComponent(nc, 170, 0, 400, 400)
             withGui {
-                // TODO: Generalize this with a loop
                 createControlPanel("Control Panel", 5, 10) {
                     addButton("Random pattern") {
                         rightRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                         leftRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                         workspace.iterate()
                     }
-                    addButton("Left Pattern 1") {
-                        leftRetina.products.activations = leftInputs[0]
-                        workspace.iterate()
+                    for (i in 0..7) {
+                        addButton("Left Pattern ${i+1}") {
+                            leftRetina.products.activations = leftInputs[i]
+                            workspace.iterate()
+                        }
                     }
-                    addButton("Right Pattern 2") {
-                        rightRetina.products.activations = rightInputs[1]
-                        workspace.iterate()
+                    for (i in 0..7) {
+                        addButton("Right Pattern ${i+1}") {
+                            rightRetina.products.activations = rightInputs[i]
+                            workspace.iterate()
+                        }
                     }
                 }
             }

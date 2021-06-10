@@ -13,13 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NeuronGroupTest {
 
     Network net = new Network();
-    NeuronGroup ng = new NeuronGroup(net);
+    NeuronGroup ng = new NeuronGroup(net, 2);
 
     {
         ng.setLabel("test");
-        for (int i = 0; i < 2; i++) {
-            ng.addNeuron(new Neuron(net));
-        }
         net.addNetworkModel(ng);
     }
 

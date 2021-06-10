@@ -219,7 +219,8 @@ public abstract class NeuronUpdateRule implements CopyableObject {
         return usesCustomZeroPoint.contains(rule.getClass());
     }
 
-    public DataHolder getDataHolder() {return null;}
+    // TODO: Be more explicit about "default" data holder.
+    public DataHolder getDataHolder() {return new DataHolder.BiasedDataHolder();}
 
     // TODO: Make abstract and run through
     public double[] apply(double[] inputs, double[] activations, DataHolder dataHolder) {return null;}

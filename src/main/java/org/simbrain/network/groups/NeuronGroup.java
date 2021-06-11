@@ -122,8 +122,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
             n.setParentGroup(this);
         });
         setNeuronType(prototypeRule);
-        dataHolder = prototypeRule.getDataHolder();
-        dataHolder.init(neurons.size());
+        dataHolder = prototypeRule.createDataHolder(neurons.size());
     }
 
     /**
@@ -144,6 +143,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, final NeuronGroup toCopy) {
         this(net, toCopy.getNeuronList().stream().map(Neuron::deepCopy).collect(Collectors.toList()));
+        setPrototypeRule(toCopy.prototypeRule);
         setLabel(net.getIdManager().getProposedId(this.getClass()));
         this.setLayout(toCopy.getLayout());
     }
@@ -189,10 +189,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void setNeuronType(NeuronUpdateRule base) {
         inputManager.setInputSpikes(base.isSpikingNeuron());
         prototypeRule = base;
-        dataHolder = prototypeRule.getDataHolder();
-        dataHolder.init(1);
+        dataHolder = prototypeRule.createDataHolder(1);
         // Have to also set node rules to support randomization, increment, etc.
-        neuronList.forEach(n -> n.setUpdateRule(base));
+        // But they don't then use the settings of the prototype rule
+        neuronList.forEach(n -> n.changeUpdateRule(base, dataHolder));
     }
 
     public void setPrototypeRule(NeuronUpdateRule rule) {

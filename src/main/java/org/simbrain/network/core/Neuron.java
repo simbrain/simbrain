@@ -68,7 +68,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * neuron it is.
      */
     @UserParameter(label = "Update Rule", isObjectType = true, useSetter = true,
-        conditionalVisibilityMethod = "notInNeuronGroup", order = 100)
+            conditionalVisibilityMethod = "notInNeuronGroup", order = 100)
     private transient NeuronUpdateRule updateRule = DEFAULT_UPDATE_RULE;
 
     /**
@@ -76,7 +76,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     @UserParameter(label = "Activation", description = "Neuron activation. If you want a value greater" +
             " than upper bound or less than lower bound you must set those first, and close this dialog.",
-        increment = .5, probDist = "Normal", useSetter = true, order = 1)
+            increment = .5, probDist = "Normal", useSetter = true, order = 1)
     private double activation;
 
     /**
@@ -88,10 +88,10 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Amount to increment/decrement activation when manually adjusted.
      */
     @UserParameter(
-        label = "Increment",
-        description = "Amount that a neuron is incremented / decremented when it is manually adjusted.",
-        increment = .5,
-        order = 6)
+            label = "Increment",
+            description = "Amount that a neuron is incremented / decremented when it is manually adjusted.",
+            increment = .5,
+            order = 6)
     protected double increment = DEFAULT_INCREMENT;
 
     /**
@@ -180,7 +180,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * By default, this is set to 0 for all the neurons. If you want a subset of
      * neurons to fire before other neurons, assign it a smaller priority value.
      */
-    @UserParameter(label = "Update Priority",  description = "What order neurons should be updated" +
+    @UserParameter(label = "Update Priority", description = "What order neurons should be updated" +
             "in, starting with lower values. <br> Only used with priority-based network update",
             order = 20)
     private int updatePriority;
@@ -199,7 +199,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Local data holder for neuron update rule.
      */
-    private DataHolder neuronDataHolder = new DataHolder.BiasedDataHolder();
+    private DataHolder neuronDataHolder = new DataHolder.BiasedDataHolder(1);
 
     /**
      * Construct a specific type of neuron.
@@ -211,7 +211,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
         this.parent = parent;
         setUpdateRule(updateRule);
-        neuronDataHolder.init(1);
     }
 
     /**
@@ -226,18 +225,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Construct a specific type of neuron from a string description.
-     *
-     * @param parent     The parent network. Be careful not to set this to root network
-     *                   if the root network is not the parent.
-     * @param updateRule the update method
-     */
-    public Neuron(final Network parent, final String updateRule) {
-        this.parent = parent;
-        setUpdateRule(updateRule);
-    }
-
-    /**
      * Copy constructor.
      *
      * @param parent The parent network. Be careful not to set this to root network
@@ -246,14 +233,23 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public Neuron(final Network parent, final Neuron n) {
         this.parent = parent;
-        setClamped(n.isClamped());
         setUpdateRule(n.getUpdateRule().deepCopy());
+        setClamped(n.isClamped());
         setIncrement(n.getIncrement());
         forceSetActivation(n.getActivation());
         x = n.x;
         y = n.y;
         setUpdatePriority(n.getUpdatePriority());
         setLabel(n.getLabel());
+        setNeuronDataHolder(n.getNeuronDataHolder());
+    }
+
+    public DataHolder getNeuronDataHolder() {
+        return neuronDataHolder;
+    }
+
+    public void setNeuronDataHolder(DataHolder neuronDataHolder) {
+        this.neuronDataHolder = neuronDataHolder;
     }
 
     /**
@@ -330,8 +326,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule.deepCopy();
-        neuronDataHolder = updateRule.getDataHolder();
-        neuronDataHolder.init(1);
+        updateRule.setTimeStepSupplier(parent::getTimeStep);
+        neuronDataHolder = updateRule.createDataHolder(1);
         // TODO: No need to change if the neuron is not new, or has not changed from spiking to non-spiking
         // But this check caused problems so commented out for null
         // if (oldRule == null || (oldRule.isSpikingNeuron() != updateRule.isSpikingNeuron())) {
@@ -345,6 +341,14 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         }
     }
 
+    /**
+     * Change the current update rule but perform no other initialization.
+     */
+    public void changeUpdateRule(final NeuronUpdateRule updateRule, final DataHolder data) {
+        this.updateRule = updateRule;
+        this.neuronDataHolder = data;
+    }
+
     @Override
     public void updateInputs() {
         addInputValue(getWeightedInputs());
@@ -352,7 +356,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public void update() {
-       update(updateRule, neuronDataHolder);
+        update(updateRule, neuronDataHolder);
     }
 
     /**
@@ -362,7 +366,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         if (isClamped()) {
             return;
         }
-        // TODO: Performance?
+        // Some performance cost but there should not be too many loose neurons.
+        // Larger sims should use neuron array, etc.
         setActivation(rule.apply(new double[]{inputValue},
                 new double[]{activation}, data)[0]);
 
@@ -438,7 +443,9 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @return the fan in list. Unsafe because the fan in list and the returned list are the same and thus modifications
      * to one will affect the other. Here for performance reasons.
      */
-    public List<Synapse> getFanInUnsafe() { return fanIn; }
+    public List<Synapse> getFanInUnsafe() {
+        return fanIn;
+    }
 
     /**
      * Adds an efferent synapse to this neuron, i.e. adds a synapse to
@@ -1061,13 +1068,13 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     // TODO: This is just temporary until the source of the problem is identified
     public static void tempDebugNan(Neuron test) {
-        if(Double.isNaN(test.x) || Double.isNaN(test.y)) {
+        if (Double.isNaN(test.x) || Double.isNaN(test.y)) {
             String message = "x = " + test.x + " and y = " + test.y + ", resetting neuron location to (0,0)";
             test.x = (0);
             test.y = (0);
             System.out.println(message);
             Toolkit.getDefaultToolkit().beep();
-            JOptionPane optionPane = new JOptionPane(message,JOptionPane.WARNING_MESSAGE);
+            JOptionPane optionPane = new JOptionPane(message, JOptionPane.WARNING_MESSAGE);
             JDialog dialog = optionPane.createDialog("Warning!");
             dialog.setAlwaysOnTop(true);
             dialog.setVisible(true);
@@ -1082,7 +1089,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         setLocation(point(x, y), fireEvent);
     }
 
-    public double [] getPosition3D() {
+    public double[] getPosition3D() {
         return new double[]{x, y, z};
     }
 
@@ -1121,7 +1128,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     public void setX(final double x, boolean fireEvent) {
         this.x = x;
-        if(fireEvent) {
+        if (fireEvent) {
             events.fireLocationChange();
         }
     }
@@ -1132,7 +1139,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     public void setY(final double y, boolean fireEvent) {
         this.y = y;
-        if(fireEvent) {
+        if (fireEvent) {
             events.fireLocationChange();
         }
     }

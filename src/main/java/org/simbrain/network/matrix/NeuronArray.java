@@ -301,8 +301,7 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
 
     public void setPrototypeRule(NeuronUpdateRule prototypeRule) {
         this.prototypeRule = prototypeRule;
-        dataHolder = prototypeRule.getDataHolder();
-        dataHolder.init(activations.length);
+        dataHolder = prototypeRule.createDataHolder(activations.length);
     }
 
     public NeuronUpdateRule getPrototypeRule() {

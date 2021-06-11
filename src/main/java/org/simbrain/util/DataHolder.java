@@ -7,20 +7,13 @@ package org.simbrain.util;
  */
 public interface DataHolder {
 
-    /**
-     * Initialize the data holder.
-     * @param size
-     */
-    void init(int size);
-
     // TODO: Move these and make fields private as the design stabilizes
 
     class BiasedDataHolder implements DataHolder {
 
         public double[] biases;
 
-        @Override
-        public void init(int size) {
+        public BiasedDataHolder(int size) {
             biases = new double[size];
         }
     }
@@ -30,11 +23,9 @@ public interface DataHolder {
         public boolean[] spikes;
         public double[] lastSpikeTimes;
 
-        @Override
-        public void init(int size) {
+        public SpikingDataHolder(int size) {
             spikes = new boolean[size];
             lastSpikeTimes = new double[size];
         }
-
     }
 }

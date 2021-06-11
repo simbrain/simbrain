@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -61,6 +62,30 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     @Override
+    public DataHolder createDataHolder(int size) {
+        return new DataHolder.SpikingDataHolder(size);
+    }
+
+    @Override
+    public double[] apply(double[] inputs, double[] activations, DataHolder dataHolder) {
+        var dataspk = (DataHolder.SpikingDataHolder)dataHolder;
+        double[] vals = new double[inputs.length];
+        for (int i = 0; i < inputs.length ; i++) {
+            final double input = inputs[i] + (addNoise ? noiseGenerator.getRandom() : 0);
+            if (input >= threshold) {
+                dataspk.spikes[i] = true;
+                // setHasSpiked(true, neuron); // todo
+                vals[i] = 1;
+            } else {
+                dataspk.spikes[i] = false;
+                // setHasSpiked(false, neuron);
+                vals[i] = 0;
+            }
+        }
+        return vals;
+    }
+
+    @Override
     public void update(Neuron neuron) {
         final double input = neuron.getInput() + (addNoise ? noiseGenerator.getRandom() : 0);
         if (input >= threshold) {
@@ -72,7 +97,6 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
             setHasSpiked(false, neuron);
             neuron.setActivation(0); // Make this a separate variable?
         }
-
     }
 
     @Override

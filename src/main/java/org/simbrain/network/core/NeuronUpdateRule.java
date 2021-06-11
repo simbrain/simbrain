@@ -32,6 +32,7 @@ import org.simbrain.util.propertyeditor.CopyableObject;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +61,11 @@ public abstract class NeuronUpdateRule implements CopyableObject {
      * The maximum number of digits to display in the tool tip.
      */
     private static final int MAX_DIGITS = 9;
+
+    /**
+     * Provides the network level time step.
+     */
+    protected Supplier<Double> timeStepSupplier;
 
     /**
      * Rules in this list use a custom zero point.
@@ -220,9 +226,13 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     }
 
     // TODO: Be more explicit about "default" data holder.
-    public DataHolder getDataHolder() {return new DataHolder.BiasedDataHolder();}
+    public DataHolder createDataHolder(int size) {return new DataHolder.BiasedDataHolder(size);
+    }
 
     // TODO: Make abstract and run through
     public double[] apply(double[] inputs, double[] activations, DataHolder dataHolder) {return null;}
 
+    public void setTimeStepSupplier(Supplier<Double> timeStepSupplier) {
+        this.timeStepSupplier = timeStepSupplier;
+    }
 }

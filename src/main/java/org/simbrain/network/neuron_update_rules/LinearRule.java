@@ -89,9 +89,10 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
 
     @Override
     public double[] apply(double[] inputs, double[] activations, DataHolder data) {
+        DataHolder.BiasedDataHolder bdata = (DataHolder.BiasedDataHolder)data;
         double[] vals = new double[inputs.length];
         for (int i = 0; i < inputs.length ; i++) {
-            vals[i] = inputs[i] * slope + ((DataHolder.BiasedDataHolder)data).biases[i]; // TODO: Yulin
+            vals[i] = inputs[i] * slope + bdata.biases[i];
             if (addNoise) {
                 vals[i]  += noiseGenerator.getRandom();
             }
@@ -103,8 +104,8 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     }
 
     @Override
-    public DataHolder getDataHolder() {
-        return new DataHolder.BiasedDataHolder();
+    public DataHolder createDataHolder(int size) {
+        return new DataHolder.BiasedDataHolder(size);
     }
 
     @Override
@@ -254,25 +255,4 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
         this.clipping = clipping;
     }
 
-    // TODO
-
-    // @Override
-    // public void applyFunctionInPlace(INDArray input) {
-    //
-    // }
-    //
-    // @Override
-    // public void applyFunction(INDArray input, INDArray output) {
-    //
-    // }
-
-    // @Override
-    // public void getDerivative(INDArray input, INDArray output) {
-    //
-    // }
-    //
-    // @Override
-    // public void applyFunctionAndDerivative(INDArray input, INDArray output, INDArray derivative) {
-    //
-    // }
 }

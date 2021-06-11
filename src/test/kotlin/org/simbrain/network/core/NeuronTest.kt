@@ -9,9 +9,9 @@ class NeuronTest {
 
     @Test
     fun `test propagation in a 2-1 network`() {
-        val n1 = Neuron(net, "LinearRule")
-        val n2 = Neuron(net, "LinearRule")
-        val n3 = Neuron(net, "LinearRule")
+        val n1 = Neuron(net);
+        val n2 = Neuron(net);
+        val n3 = Neuron(net);
         net.addNetworkModels(listOf(n1,n2,n3))
         net.addSynapse(n1, n3)
         net.addSynapse(n2, n3)

@@ -85,8 +85,8 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
-    public DataHolder getDataHolder() {
-        return new DataHolder.BiasedDataHolder();
+    public DataHolder createDataHolder(int size) {
+        return new DataHolder.BiasedDataHolder(size);
     }
 
     public BinaryRule(double floor, double ceil, double threshold) {

@@ -143,8 +143,8 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     }
 
     @Override
-    public DataHolder getDataHolder() {
-        return new DataHolder.BiasedDataHolder();
+    public DataHolder createDataHolder(int size) {
+        return new DataHolder.BiasedDataHolder(size);
     }
 
     @Override

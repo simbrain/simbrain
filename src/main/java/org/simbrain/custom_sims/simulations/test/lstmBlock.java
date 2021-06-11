@@ -61,7 +61,7 @@ public class lstmBlock extends RegisteredSimulation {
         List gates= new ArrayList();
 
         for(int i=0;i< 4;++i){
-            Neuron neuron=new Neuron(network,"LinearRule");
+            Neuron neuron = new Neuron(network);
             neuron.setIncrement(1);
             neuron.setClamped(true);
             network.addNetworkModel(neuron);

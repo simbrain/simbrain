@@ -12,8 +12,6 @@ import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 
-import java.awt.*;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,43 +48,43 @@ public class NetworkWrapper {
      * Add a neuron at a specified location.
      */
     public Neuron addNeuron(int x, int y) {
-        Neuron neuron = new Neuron(network, "LinearRule");
+        Neuron neuron = new Neuron(network);
         neuron.setLocation(x, y);
         network.addNetworkModel(neuron);
         return neuron;
     }
 
-    /**
-     * Add neurons at a specified location with a specified layout.
-     */
-    public void addNeurons(int x, int y, int numNeurons, String layoutName, String type) {
-
-        List<Neuron> newNeurons = new ArrayList();
-        for (int i = 0; i < numNeurons; i++) {
-            Neuron neuron = new Neuron(network, type);
-            network.addNetworkModel(neuron);
-            newNeurons.add(neuron);
-        }
-
-        // Lay out neurons
-        if (layoutName.equalsIgnoreCase("none")) {
-            return;
-        }
-        if (layoutName.toLowerCase().contains("line")) {
-            if (layoutName.equalsIgnoreCase("vertical line")) {
-                LineLayout lineLayout = new LineLayout(x, y, 50, LineOrientation.VERTICAL);
-                lineLayout.layoutNeurons(newNeurons);
-
-            } else {
-                LineLayout lineLayout = new LineLayout(x, y, 50, LineOrientation.HORIZONTAL);
-                lineLayout.layoutNeurons(newNeurons);
-            }
-        } else if (layoutName.equalsIgnoreCase("grid")) {
-            GridLayout gridLayout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
-            gridLayout.setInitialLocation(new Point(x, y));
-            gridLayout.layoutNeurons(newNeurons);
-        }
-    }
+    // /**
+    //  * Add neurons at a specified location with a specified layout.
+    //  */
+    // public void addNeurons(int x, int y, int numNeurons, String layoutName, String type) {
+    //
+    //     List<Neuron> newNeurons = new ArrayList();
+    //     for (int i = 0; i < numNeurons; i++) {
+    //         Neuron neuron = new Neuron(network, type);
+    //         network.addNetworkModel(neuron);
+    //         newNeurons.add(neuron);
+    //     }
+    //
+    //     // Lay out neurons
+    //     if (layoutName.equalsIgnoreCase("none")) {
+    //         return;
+    //     }
+    //     if (layoutName.toLowerCase().contains("line")) {
+    //         if (layoutName.equalsIgnoreCase("vertical line")) {
+    //             LineLayout lineLayout = new LineLayout(x, y, 50, LineOrientation.VERTICAL);
+    //             lineLayout.layoutNeurons(newNeurons);
+    //
+    //         } else {
+    //             LineLayout lineLayout = new LineLayout(x, y, 50, LineOrientation.HORIZONTAL);
+    //             lineLayout.layoutNeurons(newNeurons);
+    //         }
+    //     } else if (layoutName.equalsIgnoreCase("grid")) {
+    //         GridLayout gridLayout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
+    //         gridLayout.setInitialLocation(new Point(x, y));
+    //         gridLayout.layoutNeurons(newNeurons);
+    //     }
+    // }
 
     /**
      * Make a single source -> target neuron connection with specified upper and lower bounds for the synapses.

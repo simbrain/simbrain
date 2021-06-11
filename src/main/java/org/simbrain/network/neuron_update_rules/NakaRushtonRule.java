@@ -144,27 +144,30 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         rn.setAdaptationParameter(getAdaptationParameter());
         rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
         rn.noiseGenerator = noiseGenerator.deepCopy();
+        rn.timeStepSupplier = timeStepSupplier;
         return rn;
     }
 
     @Override
     public double[] apply(double[] inputs, double[] activations, DataHolder data) {
         double[] vals = new double[inputs.length];
-        for (int i = 0; i < inputs.length ; i++) {
+        NakaDataHolder datan = (NakaDataHolder) data;
+        for (int i = 0; i < inputs.length; i++) {
 
+            // TODO: This is null: timeStepSupplier.get()
             // Update adaptation term; see Spike, p. 81
             if (useAdaptation) {
-                ((NakaDataHolder)data).a[i] += (.1 / adaptationTimeConstant)
-                        * (adaptationParameter * activations[i] - ((NakaDataHolder)data).a[i]);
+                datan.a[i] += ( .1 / adaptationTimeConstant)
+                        * (adaptationParameter * activations[i] - datan.a[i]);
             } else {
-                ((NakaDataHolder)data).a[i] = 0;
+                datan.a[i] = 0;
             }
 
             double s;
             if (inputs[i] > 0) {
                 s = (getUpperBound() * Math.pow(inputs[i], steepness))
-                                / (Math.pow(semiSaturationConstant + ((NakaDataHolder)data).a[i],
-                                steepness) + Math.pow(inputs[i], steepness));
+                        / (Math.pow(semiSaturationConstant + datan.a[i],
+                        steepness) + Math.pow(inputs[i], steepness));
             } else {
                 s = 0;
             }
@@ -211,25 +214,28 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     }
 
     @Override
-    public DataHolder getDataHolder() {
-        return new NakaDataHolder();
+    public DataHolder createDataHolder(int size) {
+        return new NakaDataHolder(size);
     }
 
+    /**
+     * Holds array of a values
+     */
     class NakaDataHolder implements DataHolder {
 
         double[] a;
 
-        @Override
-        public void init(int size) {
+        public NakaDataHolder(int size) {
             a = new double[size];
         }
+
     }
 
     @Override
     public void contextualIncrement(Neuron n) {
         double act = n.getActivation();
         if (act <= getUpperBound()) {
-            if (act + n.getIncrement()> getUpperBound()) {
+            if (act + n.getIncrement() > getUpperBound()) {
                 act = getUpperBound();
             }
             n.forceSetActivation(act);

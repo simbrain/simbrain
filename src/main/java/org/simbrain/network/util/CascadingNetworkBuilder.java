@@ -66,16 +66,6 @@ public final class CascadingNetworkBuilder {
     private Point initialPosition = new Point(50, 50);
 
     /**
-     * Default of neuron to use in network.
-     */
-    private static final String DEFAULT_NEURON_TYPE = "LinearNeuron";
-
-    /**
-     * Type of neuron to use in network.
-     */
-    private String neuronType = DEFAULT_NEURON_TYPE;
-
-    /**
      * Reference to root network.
      */
     private Network network;
@@ -108,7 +98,7 @@ public final class CascadingNetworkBuilder {
      */
     public void buildNetwork() {
 
-        Neuron firstNeuron = new Neuron(network, DEFAULT_NEURON_TYPE);
+        Neuron firstNeuron = new Neuron(network);
         List<Neuron> currentLayer = new ArrayList<Neuron>();
         firstNeuron.setLocation(initialPosition);
         currentLayer.add(firstNeuron);
@@ -217,19 +207,4 @@ public final class CascadingNetworkBuilder {
     public void setInitialPosition(Point initialPosition) {
         this.initialPosition = initialPosition;
     }
-
-    /**
-     * @return the neuronType
-     */
-    public String getNeuronType() {
-        return neuronType;
-    }
-
-    /**
-     * @param neuronType the neuronType to set
-     */
-    public void setNeuronType(String neuronType) {
-        this.neuronType = neuronType;
-    }
-
 }

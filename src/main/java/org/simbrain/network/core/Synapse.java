@@ -22,9 +22,9 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.SynapseEvents;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
@@ -53,7 +53,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * A default spike responder.
      */
-    public static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new ConvolvedJumpAndDecay();
+    public static final SpikeResponder DEFAULT_SPIKE_RESPONDER = new NonResponder();
 
     /**
      * Default upper bound.
@@ -364,11 +364,21 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      * Update this synapse using its current learning rule.
      */
     public void update() {
-        if (!isFrozen()) {
-            learningRule.update(this);
+        if (isFrozen()) {
+            return;
+        }
+        // Update synapse strengths for non-static synapses
+        if (!(learningRule instanceof StaticSynapseRule)) {
+            setStrength(learningRule.apply(source.getActivation(), target.getActivation(), strength,
+                    new DataHolder.EmptyDataHolder()));
+        }
+        // Udpate psr for synapses with a spike responder
+        if(!(spikeResponder instanceof NonResponder)) {
+            setPsr(spikeResponder.apply(strength, psr, source.isSpike()));
         }
     }
 
+    // TODO: Review these functions, consolidate, and add tests.
     /**
      * For spiking source neurons, returns the spike-responder's value times the synapse strength. For non-spiking
      * neurons, returns the pre-synaptic activation times the synapse strength.
@@ -400,7 +410,9 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         if (!enabled) {
             return 0;
         } else {
-            psr = source.getActivation() * strength;
+            if (spikeResponder instanceof  NonResponder) {
+                psr = source.getActivation() * strength;
+            }
             if (delay != 0) {
                 dlyVal = dequeu();
                 enqueu(psr);
@@ -689,31 +701,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         dlyPtr = 0;
     }
 
-    //
-    // /**
-    // *
-    // * @param dly
-    // */
-    // public void setDelayTimeDialate(final int dly) {
-    // if (dly < 0) {
-    // delay = 0;
-    // }
-    // int delayDiff = dly - delay;
-    // delay = dly;
-    // if (delay == 0) {
-    // delayManager = null;
-    //
-    // return;
-    // }
-    // if (delayDiff > 0) {
-    // for (int i = 0; i < delayDiff; i++) {
-    // delayManager.addFirst(0.0);
-    // }
-    // } else {
-    // Iterator<Double> delayIter = delayManager.iterator();
-    // }
-    // }
-
     /**
      * @return Current amount of delay.
      */
@@ -799,31 +786,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     public SynapseUpdateRule getLearningRule() {
         return learningRule;
     }
-
-    // /**
-    // * Sets the update rule using a String description. The provided
-    // description
-    // * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
-    // *
-    // * @param name the "simple name" of the class associated with the neuron
-    // * rule to set.
-    // */
-    // public void setLearningRule(String name) {
-    // try {
-    // SynapseUpdateRule newRule = (SynapseUpdateRule) Class.forName(
-    // "org.simbrain.network.synapse_update_rules." + name)
-    // .newInstance();
-    // setLearningRule(newRule);
-    // } catch (ClassNotFoundException e) {
-    // throw new IllegalArgumentException(
-    // "The provided learning rule name, \""
-    // + name
-    // + "\", does not correspond to a known synapse type."
-    // + "\n Could not find " + e.getMessage());
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // }
-    // }
 
     /**
      * Change this synapse's learning rule.
@@ -942,9 +904,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         return psr;
     }
 
-    /**
-     * @param psr set the post-synaptic response
-     */
     public void setPsr(double psr) {
         this.psr = psr;
     }
@@ -1042,12 +1001,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         return events;
     }
 
-    @Override
-    public String getLabel() {
-        // Label not used for synapse currently
-        return "";
-    }
-
     /**
      * Returns the length in pixels of the "axon" this synapse is at the end of.
      */
@@ -1066,10 +1019,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         }
 
         getEvents().fireDeleted();
-    }
-
-    public void afterAddedToNetwork() {
-        initSpikeResponder();
     }
 
     public void hardClear() {

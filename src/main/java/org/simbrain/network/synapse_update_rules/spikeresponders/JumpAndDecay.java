@@ -73,6 +73,17 @@ public class JumpAndDecay extends SpikeResponder {
         s.setPsr(value);
     }
 
+    public double apply(double strength, double psr, boolean isSpike) {
+        if (isSpike) {
+            psr = jumpHeight * strength;
+        } else {
+            double timeStep = .1; // Todo: Time step
+            psr += timeStep * (baseLine - psr) / timeConstant;
+        }
+        // System.out.println(isSpike + "," + psr);
+        return psr;
+    }
+
     @Override
     public String getDescription() {
         return "Jump and Decay";

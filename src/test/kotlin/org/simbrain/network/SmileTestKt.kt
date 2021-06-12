@@ -1,5 +1,7 @@
 package org.simbrain.network
 
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import smile.math.MathEx.c
 import smile.math.matrix.Matrix
 
@@ -27,4 +29,16 @@ class SmileTestKt {
         // println(test1)
         // println(Matrix.randn(2,2))
     }
+
+    @Test
+    fun outerProduct() {
+        val a = Matrix(doubleArrayOf(1.0, 2.0, 3.0))
+        val b = Matrix(doubleArrayOf(4.0, 5.0, 6.0))
+        val prod = a.mt(b)
+        // println("$a\n$b\n$prod")
+        assertEquals(4.0, prod.get(0,0))
+        assertEquals(3, prod.nrows())
+        assertEquals(3, prod.ncols())
+    }
+
 }

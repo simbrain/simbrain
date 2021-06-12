@@ -71,7 +71,7 @@ public class SmileTest {
         assertEquals(3, matrix_ones.get(0, 2), 0.0);
     }
 
-    @Test
+    // @Test
     public void matrix_multiplication() {
         start_time = System.currentTimeMillis();
         double[][] twos = {{2.0, 2.0, 2.0}, {2.0, 2.0, 2.0}};

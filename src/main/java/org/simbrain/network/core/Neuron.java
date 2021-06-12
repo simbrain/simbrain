@@ -69,7 +69,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     @UserParameter(label = "Update Rule", isObjectType = true, useSetter = true,
             conditionalVisibilityMethod = "notInNeuronGroup", order = 100)
-    private transient NeuronUpdateRule updateRule = DEFAULT_UPDATE_RULE;
+    private NeuronUpdateRule updateRule = DEFAULT_UPDATE_RULE;
 
     /**
      * Activation value of the neuron. The main state variable.
@@ -264,7 +264,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     @Override
     public void postUnmarshallingInit() {
         events = new NeuronEvents(this);
-        updateRule = DEFAULT_UPDATE_RULE;
         fanOut = new HashMap<>();
         fanIn = new ArrayList<>();
         if (polarity == null) {
@@ -366,10 +365,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         if (isClamped()) {
             return;
         }
-        // Some performance cost but there should not be too many loose neurons.
-        // Larger sims should use neuron array, etc.
-        setActivation(rule.apply(new double[]{inputValue},
-                new double[]{activation}, data)[0]);
+
+        setActivation(rule.apply(inputValue, activation, data, events));
 
         inputValue = 0.0;
     }
@@ -1033,13 +1030,16 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     public boolean isSpike() {
-        return spike;
+        if (neuronDataHolder instanceof DataHolder.SpikingDataHolder) {
+            return ((DataHolder.SpikingDataHolder)neuronDataHolder).spikes[0];
+        }
+        return false;
     }
 
+    @Deprecated
     public void setSpike(boolean spike) {
-        var oldSpike = this.spike;
         this.spike = spike;
-        events.fireSpiked(oldSpike, spike);
+        events.fireSpiked();
     }
 
     public double getLastActivation() {

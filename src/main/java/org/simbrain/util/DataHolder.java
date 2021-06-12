@@ -9,6 +9,11 @@ public interface DataHolder {
 
     // TODO: Move these and make fields private as the design stabilizes
 
+    class EmptyDataHolder implements DataHolder {
+        public EmptyDataHolder() {
+        }
+    }
+
     class BiasedDataHolder implements DataHolder {
 
         public double[] biases;

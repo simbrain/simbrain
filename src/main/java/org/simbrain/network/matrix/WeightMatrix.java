@@ -2,8 +2,11 @@ package org.simbrain.network.matrix;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.events.WeightMatrixEvents;
 import org.simbrain.network.groups.AbstractNeuronCollection;
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -44,6 +47,19 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
 
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
     private double increment = .1;
+
+    @UserParameter(label = "Learning Rule", useSetter = true, isObjectType = true, order = 100)
+    SynapseUpdateRule prototypeRule = new StaticSynapseRule();
+
+    /**
+     * Holds data for prototype rule.
+     */
+    private DataHolder dataHolder = new DataHolder.EmptyDataHolder();
+
+    /**
+     * Holds data for spike responder.
+     */
+    private DataHolder spikeResponseHolder = new DataHolder.EmptyDataHolder();
 
     /**
      * The weight matrix object.
@@ -218,11 +234,21 @@ public class WeightMatrix extends NetworkModel implements EditableObject, Attrib
         return weightMatrix.mv(source.getActivations());
     }
 
-    //public Layer asLayer() {
-    //    return new DenseLayer.Builder().nIn(source.arraySize()).nOut(target.arraySize())
-    //            .activation(Activation.SOFTMAX)
-    //            // random initialize weights with values between 0 and 1
-    //            .weightInit(new UniformDistribution(0, 1))
-    //            .build();
-    //}
+    @Override
+    public void update() {
+        // TODO: Check for clamping
+        if (! (prototypeRule instanceof StaticSynapseRule)){
+            weightMatrix = prototypeRule.apply(source.getMatrix(),
+                    target.getMatrix(), weightMatrix, dataHolder);
+            events.fireUpdated();
+        }
+    }
+
+    public SynapseUpdateRule getPrototypeRule() {
+        return prototypeRule;
+    }
+
+    public void setPrototypeRule(SynapseUpdateRule prototypeRule) {
+        this.prototypeRule = prototypeRule;
+    }
 }

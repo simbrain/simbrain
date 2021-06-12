@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
@@ -89,18 +90,24 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
 
     @Override
     public double[] apply(double[] inputs, double[] activations, DataHolder data) {
-        DataHolder.BiasedDataHolder bdata = (DataHolder.BiasedDataHolder)data;
         double[] vals = new double[inputs.length];
         for (int i = 0; i < inputs.length ; i++) {
-            vals[i] = inputs[i] * slope + bdata.biases[i];
-            if (addNoise) {
-                vals[i]  += noiseGenerator.getRandom();
-            }
-            if (clipping) {
-                vals[i]  = clip(vals[i]);
-            }
+            vals[i] = apply(inputs[i], activations[i], data, null);
         }
         return vals;
+    }
+
+    @Override
+    public double apply(double in, double activation, DataHolder dataHolder, NeuronEvents events) {
+        DataHolder.BiasedDataHolder bdata = (DataHolder.BiasedDataHolder)dataHolder;
+        double ret = in * slope + bdata.biases[0];
+        if (addNoise) {
+            ret  += noiseGenerator.getRandom();
+        }
+        if (clipping) {
+            ret  = clip(ret);
+        }
+        return ret;
     }
 
     @Override

@@ -307,4 +307,12 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
     public NeuronUpdateRule getPrototypeRule() {
         return prototypeRule;
     }
+
+    public DataHolder getDataHolder() {
+        return dataHolder;
+    }
+
+    public void setDataHolder(DataHolder dataHolder) {
+        this.dataHolder = dataHolder;
+    }
 }

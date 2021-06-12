@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 
@@ -112,4 +113,14 @@ public abstract class SpikeResponder implements CopyableObject {
         return deepCopy();
     }
 
+
+    // TODO: Make abstract and run through
+    // public double[] apply(Matrix srcActivations, Matrix tarActivations,
+    //                     Matrix weights, DataHolder dataHolder) {return null;}
+
+    public double apply(double strength, double psr, boolean isSpike) { return 0;}
+
+    // TODO: Be more explicit about "default" data holder.
+    public DataHolder createDataHolder() {return new DataHolder.EmptyDataHolder();
+    }
 }

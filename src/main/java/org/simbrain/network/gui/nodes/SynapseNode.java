@@ -158,7 +158,7 @@ public final class SynapseNode extends ScreenElement {
         events.onClampChanged(this::updateClampStatus);
 
         // Respond to spiking events
-        source.neuron.getEvents().onSpiked((o, n) -> updateSpikeColor());
+        source.neuron.getEvents().onSpiked(this::updateSpikeColor);
 
     }
 
@@ -263,7 +263,6 @@ public final class SynapseNode extends ScreenElement {
      * When spiking change the color of the line.
      */
     private void updateSpikeColor() {
-        System.out.println("SynapseNode.updateSpikeColor");
         if (source.getNeuron().isSpike()) {
             line.setStrokePaint(NeuronNode.getSpikingColor());
         } else {

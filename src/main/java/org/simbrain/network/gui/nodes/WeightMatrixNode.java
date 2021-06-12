@@ -239,6 +239,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         tabs.addTab("Weight Matrix", new JLabel("Coming soon"));
         // TODO
 
+        dialog.addClosingTask(ape::commitChanges);
         dialog.setContentPane(tabs);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

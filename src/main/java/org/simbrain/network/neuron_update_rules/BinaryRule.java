@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 
@@ -65,23 +66,7 @@ public class BinaryRule extends NeuronUpdateRule {
             increment = .1, order = 4)
     private double bias = 0;
 
-
     public BinaryRule() {
-    }
-
-    @Override
-    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
-        double[] vals = new double[inputs.length];
-
-        for (int i = 0; i < inputs.length ; i++) {
-            vals[i] = inputs[i] + ((DataHolder.BiasedDataHolder)data).biases[i]; // TODO: Yulin
-            if (vals[i] > threshold) {
-                vals[i] = getUpperBound();
-            } else {
-                vals[i] = getLowerBound();
-            }
-        }
-        return vals;
     }
 
     @Override
@@ -105,9 +90,28 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
+    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
+        double[] vals = new double[inputs.length];
+        for (int i = 0; i < inputs.length ; i++) {
+            vals[i] = apply(inputs[i], activations[i], data, null);
+        }
+        return vals;
+    }
+
+    @Override
+    public double apply(double in, double activation, DataHolder dataHolder, NeuronEvents events) {
+        DataHolder.BiasedDataHolder bdata = (DataHolder.BiasedDataHolder)dataHolder;
+        double wtdInput = in + bdata.biases[0];
+        if (wtdInput > threshold) {
+            return getUpperBound();
+        } else {
+           return getLowerBound();
+        }
+    }
+
+    @Override
     public void update(Neuron neuron) {
         double wtdInput = neuron.getInput() + bias;
-
         if (wtdInput > threshold) {
             neuron.setActivation(getUpperBound());
         } else {

@@ -20,6 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
@@ -68,21 +69,28 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
 
     @Override
     public double[] apply(double[] inputs, double[] activations, DataHolder dataHolder) {
-        var dataspk = (DataHolder.SpikingDataHolder)dataHolder;
         double[] vals = new double[inputs.length];
         for (int i = 0; i < inputs.length ; i++) {
-            final double input = inputs[i] + (addNoise ? noiseGenerator.getRandom() : 0);
-            if (input >= threshold) {
-                dataspk.spikes[i] = true;
-                // setHasSpiked(true, neuron); // todo
-                vals[i] = 1;
-            } else {
-                dataspk.spikes[i] = false;
-                // setHasSpiked(false, neuron);
-                vals[i] = 0;
-            }
+            vals[i] = apply(inputs[i], activations[i], dataHolder, null);
         }
         return vals;
+    }
+
+    @Override
+    public double apply(double in, double activation, DataHolder dataHolder, NeuronEvents events) {
+        var dataspk = (DataHolder.SpikingDataHolder)dataHolder;
+        final double input = in + (addNoise ? noiseGenerator.getRandom() : 0);
+        if (input >= threshold) {
+            dataspk.spikes[0] = true;
+            // dataspk.lastSpikeTimes[0] = getTime; // TODO
+            if (events != null) {
+                events.fireSpiked();
+            }
+            return 1;
+        } else {
+            dataspk.spikes[0] = false;
+            return 0;
+        }
     }
 
     @Override
@@ -105,16 +113,10 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
         return rand.nextBoolean() ? 1 : 0;
     }
 
-    /**
-     * @return the threshold
-     */
     public double getThreshold() {
         return threshold;
     }
 
-    /**
-     * @param threshold the threshold to set
-     */
     public void setThreshold(double threshold) {
         this.threshold = threshold;
     }

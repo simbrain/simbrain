@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
@@ -112,34 +113,39 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     public double[] apply(double[] inputs, double[] activations, DataHolder data) {
         double[] vals = new double[inputs.length];
         for (int i = 0; i < inputs.length ; i++) {
-            vals[i] = activations[i] + inputs[i];
-            double decayVal;
-            if (updateType == UpdateType.Relative) {
-                decayVal = decayFraction * Math.abs(vals[i] - baseLine);
-            } else  {
-                decayVal = decayAmount;
-            }
-
-            if (vals[i] < baseLine) {
-                vals[i] += decayVal;
-                // in case of an overshoot
-                if (vals[i] > baseLine) {
-                    vals[i] = baseLine;
-                }
-            } else if (vals[i] > baseLine) {
-                vals[i] -= decayVal;
-                if (vals[i] < baseLine) {
-                    vals[i] = baseLine;
-                }
-            }
-            if (addNoise) {
-                vals[i]  += noiseGenerator.getRandom();
-            }
-            if (clipping) {
-                vals[i]  = clip(vals[i]);
-            }
+            vals[i] = apply(inputs[i], activations[i], data, null);
         }
         return vals;
+    }
+
+    @Override
+    public double apply(double in, double activation, DataHolder dataHolder, NeuronEvents events) {
+        DataHolder.BiasedDataHolder bdata = (DataHolder.BiasedDataHolder)dataHolder;
+        double val = in  + activation + bdata.biases[0];
+        double decayVal = 0;
+        if (updateType == UpdateType.Relative) {
+            decayVal = decayFraction * Math.abs(val - baseLine);
+        } else  {
+            decayVal = decayAmount;
+        }
+        if (val < baseLine) {
+            val += decayVal;
+            if (val > baseLine) {
+                val = baseLine;
+            }
+        } else if (val > baseLine) {
+            val -= decayVal;
+            if (val < baseLine) {
+                val = baseLine;
+            }
+        }
+        if (addNoise) {
+            val += noiseGenerator.getRandom();
+        }
+        if (clipping) {
+            val = clip(val);
+        }
+        return val;
     }
 
     @Override

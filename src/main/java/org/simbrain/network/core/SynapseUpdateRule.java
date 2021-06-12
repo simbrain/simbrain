@@ -19,9 +19,11 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.synapse_update_rules.*;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
+import smile.math.matrix.Matrix;
 
 import java.util.Arrays;
 import java.util.List;
@@ -100,5 +102,17 @@ public abstract class SynapseUpdateRule implements CopyableObject {
         return deepCopy();
     }
 
+    // TODO: Explicitly separating scalar and array cases to avoid Matrix overhead
+    // Evaluate for use in neuronupdate rule
 
+    // TODO: Make abstract and run through
+    public Matrix apply(Matrix srcActivations, Matrix tarActivations,
+                        Matrix weights, DataHolder dataHolder) {return null;}
+
+    public double apply(double srcActivation, double tarActivation,
+                          double weight, DataHolder dataHolder) {return 0;}
+
+    // TODO: Be more explicit about "default" data holder.
+    public DataHolder createDataHolder() {return new DataHolder.EmptyDataHolder();
+    }
 }

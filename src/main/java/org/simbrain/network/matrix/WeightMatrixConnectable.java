@@ -7,6 +7,7 @@ import org.simbrain.network.events.LocationEvents;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
+import smile.math.matrix.Matrix;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -71,6 +72,11 @@ public abstract class WeightMatrixConnectable extends LocatableModel {
 
     @Producible()
     public abstract double[] getActivations();
+
+    // TODO: Temp until we convert to matrices
+    public Matrix getMatrix() {
+        return new Matrix(getActivations());
+    }
 
     @Consumable()
     public abstract void setActivations(double[] activations);

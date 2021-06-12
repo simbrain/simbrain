@@ -205,6 +205,13 @@ public class NeuronArrayNode extends ScreenElement {
      */
     private void renderArrayToActivationsImage() {
 
+        // if (neuronArray.getPrototypeRule() instanceof SpikingNeuronUpdateRule) {
+        //     // TODO: Use this to place a yellow grid over pixels for spiking components
+        //     System.out.println(
+        //             Arrays.toString(((DataHolder.SpikingDataHolder)
+        //                     neuronArray.getDataHolder()).spikes));
+        // }
+
         if (neuronArray.isRenderActivations()) {
 
             if (gridMode) {

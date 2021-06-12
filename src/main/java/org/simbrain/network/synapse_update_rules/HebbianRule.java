@@ -20,8 +20,10 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.util.DataHolder;
 import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.UserParameter;
+import smile.math.matrix.Matrix;
 
 /**
  * <b>Hebbian</b> implements a standard Hebbian learning rule.
@@ -54,6 +56,18 @@ public class HebbianRule extends SynapseUpdateRule {
         double output = synapse.getTarget().getActivation();
         double strength = synapse.clip(synapse.getStrength() + (learningRate * input * output));
         synapse.setStrength(strength);
+    }
+
+    @Override
+    public Matrix apply(Matrix src, Matrix tar,
+                        Matrix weights, DataHolder dataHolder) {
+        // weights += Learning rate * outer-product(src,tar)
+        return weights.add(src.mt(tar).mul(learningRate));
+    }
+
+    @Override
+    public double apply(double srcActivation, double tarActivation, double weight, DataHolder dataHolder) {
+        return weight + (learningRate * srcActivation * tarActivation);
     }
 
     public double getLearningRate() {

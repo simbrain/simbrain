@@ -19,6 +19,7 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.neuron_update_rules.AdExIFRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
@@ -231,6 +232,8 @@ public abstract class NeuronUpdateRule implements CopyableObject {
 
     // TODO: Make abstract and run through
     public double[] apply(double[] inputs, double[] activations, DataHolder dataHolder) {return null;}
+
+    public double apply(double input, double activation, DataHolder dataHolder, NeuronEvents events) {return activation;}
 
     public void setTimeStepSupplier(Supplier<Double> timeStepSupplier) {
         this.timeStepSupplier = timeStepSupplier;

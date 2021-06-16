@@ -23,9 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
-import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;
@@ -97,7 +95,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
         // Edit
         Action editGroup = new AbstractAction("Edit Synapse Group...") {
             public void actionPerformed(final ActionEvent event) {
-                StandardDialog dialog = SynapseGroupDialog.createSynapseGroupDialog(getNetworkPanel(), synapseGroup);
+                StandardDialog dialog = createSynapseGroupDialog(getNetworkPanel(), synapseGroup);
                 dialog.setLocationRelativeTo(null);
                 dialog.pack();
                 dialog.setVisible(true);
@@ -269,8 +267,9 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      */
     private void setFreezeActionsEnabled() {
         try {
-            freezeSynapsesAction.setEnabled(!synapseGroup.isFrozen(Polarity.BOTH));
-            unfreezeSynapsesAction.setEnabled(synapseGroup.isFrozen(Polarity.BOTH));
+            // TODO
+            // freezeSynapsesAction.setEnabled(!synapseGroup.isFrozen(Polarity.BOTH));
+            // unfreezeSynapsesAction.setEnabled(synapseGroup.isFrozen(Polarity.BOTH));
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -289,7 +288,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            synapseGroup.setFrozen(true, Polarity.BOTH);
+            // synapseGroup.setFrozen(true, Polarity.BOTH);
         }
     };
 
@@ -306,7 +305,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            synapseGroup.setFrozen(false, Polarity.BOTH);
+            // synapseGroup.setFrozen(false, Polarity.BOTH);
         }
     };
 
@@ -324,8 +323,8 @@ public class SynapseGroupInteractionBox extends InteractionBox {
      * is disabled.
      */
     private void setSynapseEnablingActionsEnabled() {
-        enableSynapsesAction.setEnabled(!synapseGroup.isEnabled(Polarity.BOTH));
-        disableSynapsesAction.setEnabled(synapseGroup.isEnabled(Polarity.BOTH));
+        // enableSynapsesAction.setEnabled(!synapseGroup.isEnabled(Polarity.BOTH));
+        // disableSynapsesAction.setEnabled(synapseGroup.isEnabled(Polarity.BOTH));
     }
 
     /**
@@ -341,7 +340,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            synapseGroup.setEnabled(true, Polarity.BOTH);
+            // synapseGroup.setEnabled(true, Polarity.BOTH);
         }
     };
 
@@ -358,7 +357,7 @@ public class SynapseGroupInteractionBox extends InteractionBox {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            synapseGroup.setEnabled(false, Polarity.BOTH);
+            // synapseGroup.setEnabled(false, Polarity.BOTH);
         }
     };
 

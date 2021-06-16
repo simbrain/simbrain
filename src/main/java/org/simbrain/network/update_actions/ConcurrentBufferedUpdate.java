@@ -567,10 +567,11 @@ public class ConcurrentBufferedUpdate implements NetworkUpdateAction {
             s.setFrozen(true);
             s.forceSetStrength(s.getStrength() / 5);
         }
-        sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.EXCITATORY);
+        // TODO: Disabled when refactoring synapse group, which now has separate inhibitory and excitatory sr's
+        // sg.setSpikeResponder(new ConvolvedJumpAndDecay(), Polarity.EXCITATORY);
         ConvolvedJumpAndDecay inhibJD = new ConvolvedJumpAndDecay();
         inhibJD.setTimeConstant(6);
-        sg.setSpikeResponder(inhibJD, Polarity.INHIBITORY);
+        // sg.setSpikeResponder(inhibJD, Polarity.INHIBITORY);
         //STDPRule stdp = new STDPRule();
         //stdp.setLearningRate(0.0001);
         //sg.setLearningRule(stdp, Polarity.BOTH);

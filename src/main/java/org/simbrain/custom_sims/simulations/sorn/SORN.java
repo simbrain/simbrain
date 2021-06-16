@@ -10,9 +10,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
-import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -132,7 +130,8 @@ public class SORN extends RegisteredSimulation {
         // Set up plasticity between exc and exc neurons
         AddSTDPRule stdp = new AddSTDPRule();
         stdp.setLearningRate(0.001);
-        sg_ee.setLearningRule(stdp, SimbrainConstants.Polarity.BOTH);
+        // TODO
+        // sg_ee.setLearningRule(stdp, SimbrainConstants.Polarity.BOTH);
 
         ArrayList<Neuron> inNeurons = new ArrayList<>();
         for (int i = 0; i < 200; i++) {
@@ -159,8 +158,9 @@ public class SORN extends RegisteredSimulation {
         SynapseGroup input_ee = SynapseGroup.createSynapseGroup(input, ng, input_ee_con,
                 1.0, defWtPD, defWtPD);
         input_ee.setLabel("Input -> Excitatory");
-        input_ee.setLearningRule(stdp, Polarity.BOTH);
-        input_ee.setSpikeResponder(new Step(), Polarity.BOTH);
+        // TODO
+        // input_ee.setLearningRule(stdp, Polarity.BOTH);
+        // input_ee.setSpikeResponder(new Step(), Polarity.BOTH);
         network.addNetworkModel(input_ee);
 
 //        Sparse ee_input_con = new Sparse(0.01, false, false);
@@ -174,7 +174,8 @@ public class SORN extends RegisteredSimulation {
         SynapseGroup input_ie = SynapseGroup.createSynapseGroup(input, ngIn,
                 input_ie_con, 1.0, defWtPD, defWtPD);
         input_ie.setLabel("Input -> Inhibitory");
-        input_ie.setSpikeResponder(new Step(), Polarity.BOTH);
+        // TODO
+        // input_ie.setSpikeResponder(new Step(), Polarity.BOTH);
 
         network.addNetworkModel(input_ie);
 
@@ -218,8 +219,9 @@ public class SORN extends RegisteredSimulation {
         SynapseGroup sg = SynapseGroup
                 .createSynapseGroup(src, tar, connector, excRat, random, random);
         sg.setLabel(label);
-        sg.setSpikeResponder(new Step(),
-                SimbrainConstants.Polarity.BOTH);
+        // TODO
+        // sg.setSpikeResponder(new Step(),
+        //         SimbrainConstants.Polarity.BOTH);
         network.addNetworkModel(sg);
         return sg;
     }

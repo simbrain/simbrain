@@ -102,7 +102,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
 
         // Connect reservoirs
         sgRes1 = EdgeOfChaos.connectReservoir(network, res1, variance, 4);
-        sgRes2 = new SynapseGroup(res2, res2);
+        sgRes2 = SynapseGroup.createSynapseGroup(res2, res2);
         SimnetUtils.copySynapses(sgRes2, sgRes1);
         sgRes2.setLabel("Recurrent Synapses");
 

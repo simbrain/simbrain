@@ -92,7 +92,7 @@ fun NetworkPanel.createNeuronGroupDialog(neuronGroup: NeuronGroup) =
         }
 
 fun NetworkPanel.createSynapseGroupDialog(synapseGroup: SynapseGroup) =
-        SynapseGroupDialog.createSynapseGroupDialog(this, synapseGroup).apply {
+    SynapseGroupDialog(this, synapseGroup).apply {
             modalityType = Dialog.ModalityType.MODELESS
         }
 
@@ -137,7 +137,7 @@ fun NetworkPanel.showPiccoloDebugger() {
  * @param networkPanel the network panel in which to add the group.
  */
 fun displaySynapseGroupDialog(networkPanel: NetworkPanel?, src: NeuronGroup?, tar: NeuronGroup?): Boolean {
-    val dialog: JDialog = SynapseGroupDialog.createSynapseGroupDialog(networkPanel, src, tar)
+    val dialog: JDialog = SynapseGroupDialog(networkPanel, src, tar)
     dialog.setLocationRelativeTo(null)
     dialog.pack()
     dialog.isVisible = true

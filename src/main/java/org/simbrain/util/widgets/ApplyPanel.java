@@ -51,6 +51,7 @@ public class ApplyPanel extends JPanel {
      */
     private final GridBagConstraints gbc = new GridBagConstraints();
 
+
     {
         setLayout(layoutManager);
     }
@@ -65,12 +66,7 @@ public class ApplyPanel extends JPanel {
      */
     public static ApplyPanel createApplyPanel(EditablePanel mainPanel) {
         final ApplyPanel ap = new ApplyPanel(mainPanel);
-        ap.applyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                mainPanel.commitChanges();
-            }
-        });
+        ap.applyButton.addActionListener(arg0 -> mainPanel.commitChanges());
         return ap;
     }
 
@@ -79,7 +75,6 @@ public class ApplyPanel extends JPanel {
      * with a custom action associated with pressing apply.
      * @param mainPanel the panel to wrap
      * @param al a listener that is triggered and performs an action when apply is pressed
-     * @return
      */
     public static ApplyPanel createCustomApplyPanel(JPanel mainPanel, ActionListener al) {
         final ApplyPanel ap = new ApplyPanel(mainPanel);

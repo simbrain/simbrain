@@ -161,8 +161,9 @@ public class Hippocampus extends RegisteredSimulation {
         SynapseGroup synGroup = SynapseGroup.createSynapseGroup(source, target,
                new AllToAll() , 1);
         synGroup.setLabel(name);
-        synGroup.setLowerBound(0, Polarity.EXCITATORY);
-        synGroup.setUpperBound(1, Polarity.EXCITATORY);
+        // TODO: Weight matrices?
+        // synGroup.setLowerBound(0, Polarity.EXCITATORY);
+        // synGroup.setUpperBound(1, Polarity.EXCITATORY);
         network.addNetworkModel(synGroup);
         return synGroup;
     }
@@ -388,15 +389,15 @@ public class Hippocampus extends RegisteredSimulation {
      * Enable / disable the hippocampus
      */
     private void enableHippocampus(boolean lesioned) {
-
-        HtoLC1.setEnabled(!lesioned);
-        HtoLC2.setEnabled(!lesioned);
-        HtoRC1.setEnabled(!lesioned);
-        HtoRC2.setEnabled(!lesioned);
-        LC1toH.setEnabled(!lesioned);
-        LC2toH.setEnabled(!lesioned);
-        RC1toH.setEnabled(!lesioned);
-        RC2toH.setEnabled(!lesioned);
+        // TODO Weight matrices
+        // HtoLC1.setEnabled(!lesioned);
+        // HtoLC2.setEnabled(!lesioned);
+        // HtoRC1.setEnabled(!lesioned);
+        // HtoRC2.setEnabled(!lesioned);
+        // LC1toH.setEnabled(!lesioned);
+        // LC2toH.setEnabled(!lesioned);
+        // RC1toH.setEnabled(!lesioned);
+        // RC2toH.setEnabled(!lesioned);
     }
 
     @Override

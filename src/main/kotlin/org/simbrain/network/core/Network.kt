@@ -5,11 +5,13 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents
-import org.simbrain.network.groups.*
+import org.simbrain.network.groups.NeuronCollection
+import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.network.groups.Subnetwork
+import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.*
-import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
 import java.awt.geom.Point2D
 import java.util.concurrent.atomic.AtomicBoolean
@@ -509,7 +511,8 @@ class Network {
     fun freezeSynapses(freeze: Boolean) {
         // Freeze synapses in synapse groups
         for (group in networkModels.get<SynapseGroup>()) {
-            group.setFrozen(freeze, Polarity.BOTH)
+            // TODO
+            // group.setFrozen(freeze, Polarity.BOTH)
         }
         // Freeze loose synapses
         for (synapse in networkModels.get<Synapse>()) {
@@ -663,7 +666,6 @@ val List<Synapse>.lengths: List<Double>
 fun getNetworkXStream(): XStream {
     val xstream = Utils.getSimbrainXStream()
     xstream.registerConverter(NetworkModelListConverter())
-    xstream.registerConverter(SynapseGroupConverter())
     xstream.registerConverter(DoubleArrayConverter())
     return xstream
 }

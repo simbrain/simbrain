@@ -213,8 +213,7 @@ public class NeuronArray extends WeightMatrixConnectable implements EditableObje
         if (clamped) {
             return;
         }
-        setActivations(prototypeRule.apply(getInputs(), getActivations(), dataHolder));
-
+        setActivations(prototypeRule.apply(inputs, activations, dataHolder));
         inputs = new double[inputs.length]; // clear inputs
         getEvents().fireUpdated();
     }

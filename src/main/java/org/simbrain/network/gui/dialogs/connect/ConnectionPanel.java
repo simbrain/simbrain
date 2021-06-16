@@ -66,11 +66,6 @@ public final class ConnectionPanel extends JPanel {
     private ConnectionStrategy connectionStrategy;
 
     /**
-     * Number of target neurons, can be 0
-     */
-    private int noTar;
-
-    /**
      * Whether or not the the connections would be recurrent.
      */
     private boolean rec;
@@ -90,11 +85,10 @@ public final class ConnectionPanel extends JPanel {
      *
      * @param connectionStrategy   the underlying connection object
      */
-    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionStrategy, int noTar, boolean rec,
+    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionStrategy, int numTar, boolean rec,
                            boolean isCreation) {
         this.parentFrame = parent;
         this.connectionStrategy = connectionStrategy;
-        this.noTar = noTar;
         this.rec = rec;
         this.isCreation = isCreation;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -107,7 +101,7 @@ public final class ConnectionPanel extends JPanel {
                 connectionStrategyProperties = SparseConnectionPanel.createSparsityAdjustmentEditor((Sparse) connectionStrategy);
             } else {
                 connectionStrategyProperties = SparseConnectionPanel.createSparsityAdjustmentPanel(
-                        (Sparse) connectionStrategy, noTar, rec);
+                        (Sparse) connectionStrategy, numTar, rec);
             }
         }
 

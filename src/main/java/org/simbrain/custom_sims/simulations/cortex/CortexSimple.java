@@ -10,7 +10,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
-import org.simbrain.network.synapse_update_rules.spikeresponders.UDF;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
@@ -215,16 +214,17 @@ public class CortexSimple extends RegisteredSimulation {
 
         Sparse con = new Sparse(sparsity, false, false);
 
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.65,
-            exRand, inRand);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.65);
+        sg.setRandomizers(exRand, inRand);
         sg.setLabel("Synapses");
 
-        sg.setUpperBound(200, Polarity.EXCITATORY);
-        sg.setLowerBound(0, Polarity.EXCITATORY);
-        sg.setLowerBound(-200, Polarity.INHIBITORY);
-        sg.setUpperBound(0, Polarity.INHIBITORY);
-
-        sg.setSpikeResponder(new UDF(), Polarity.BOTH);
+        // TODO
+        // sg.setUpperBound(200, Polarity.EXCITATORY);
+        // sg.setLowerBound(0, Polarity.EXCITATORY);
+        // sg.setLowerBound(-200, Polarity.INHIBITORY);
+        // sg.setUpperBound(0, Polarity.INHIBITORY);
+        //
+        // sg.setSpikeResponder(new UDF(), Polarity.BOTH);
 
         network.addNetworkModel(sg);
 

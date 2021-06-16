@@ -16,13 +16,10 @@ package org.simbrain.network.gui.dialogs.connect;
 import org.simbrain.network.connections.*;
 import org.simbrain.util.widgets.EditablePanel;
 
-import java.util.List;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.Vector;
 
 /**
  * Panel for selecting a type of connection.
@@ -48,7 +45,6 @@ public class ConnectionSelectorPanel extends EditablePanel {
      * Select connection type.
      */
     private JComboBox<ConnectionStrategy> cbConnectionType;
-
 
     /**
      * The current selected connection panel

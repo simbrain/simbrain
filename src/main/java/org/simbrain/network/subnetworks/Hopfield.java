@@ -159,7 +159,8 @@ public class Hopfield extends Subnetwork implements Trainable {
         for (Synapse w : this.getSynapseGroup().getAllSynapses()) {
             Neuron src = w.getSource();
             Neuron tar = w.getTarget();
-            getSynapseGroup().setSynapseStrength(w, w.getStrength() + bipolar(src.getActivation()) * bipolar(tar.getActivation()));
+            // TODO
+            // getSynapseGroup().setSynapseStrength(w, w.getStrength() + bipolar(src.getActivation()) * bipolar(tar.getActivation()));
         }
         // TODO: Should an event be fired?
     }

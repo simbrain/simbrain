@@ -33,7 +33,6 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
@@ -95,7 +94,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      */
     private Neuron target;
 
-    //TODO: Rename learningRule to synapseupdaterule
     /**
      * The update method of this synapse, which corresponds to what kind of synapse it is.
      */
@@ -104,11 +102,12 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     private SynapseUpdateRule learningRule = DEFAULT_LEARNING_RULE;
 
     /**
-     * Only used of source neuron is a spiking neuron.
+     * Only used if source neuron is a spiking neuron.
      */
     @UserParameter(label = "Spike Responder", isObjectType = true,
             showDetails = false, order = 200)
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
+    // TODO: Conditionally enable based on type of source neuron?
 
     /**
      * The maximum number of digits to display in the tool tip.
@@ -368,6 +367,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
             return;
         }
         // Update synapse strengths for non-static synapses
+        // TODO: creating new data holder each update!
         if (!(learningRule instanceof StaticSynapseRule)) {
             setStrength(learningRule.apply(source.getActivation(), target.getActivation(), strength,
                     new DataHolder.EmptyDataHolder()));
@@ -906,50 +906,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     public void setPsr(double psr) {
         this.psr = psr;
-    }
-
-    public byte[] getNumericValuesAsByteArray() {
-        // 4 for delay, 8 for strength, 8 for psr.
-        // One byte to store enabled and frozen
-        // Eight bytes to store two integers, the indexes of the source and
-        // target neurons (optionally set as it only pertains to neuron groups).
-        int numBytes = 4 + 8 + 8 + 1 + 8 + 4;
-        if (delay > 0) {
-            numBytes += 8 * delay;
-        }
-        // [numDoubleValues<byte>, fieldValues <double>, delayValues<double>,
-        // enabled&frozen]
-        ByteBuffer bBuf = ByteBuffer.allocate(numBytes);
-        bBuf.putInt(delay);
-        bBuf.putDouble(strength);
-        bBuf.putDouble(psr);
-        if (delay > 0) {
-            for (double d : delayManager) {
-                bBuf.putDouble(d);
-            }
-        }
-        bBuf.putInt(dlyPtr);
-        byte enFr = 0x0;
-        byte en = (byte) (enabled ? 2 : 0);
-        byte fr = (byte) (frozen ? 1 : 0);
-        enFr = (byte) (en | fr);
-        bBuf.put(enFr);
-        return bBuf.array();
-    }
-
-    public void decodeNumericByteArray(ByteBuffer byteValues) {
-        setDelay(byteValues.getInt());
-        setStrength(byteValues.getDouble());
-        setPsr(byteValues.getDouble());
-        if (delay > 0) {
-            for (int i = 0; i < delay; i++) {
-                delayManager[i] = byteValues.getDouble();
-            }
-        }
-        dlyPtr = byteValues.getInt();
-        byte enFr = byteValues.get();
-        setEnabled(enFr >= 2);
-        setFrozen(enFr == 1 || enFr == 3);
     }
 
     @Override

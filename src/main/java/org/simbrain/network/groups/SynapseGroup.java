@@ -22,7 +22,6 @@ import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.SynapseSet;
-import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
@@ -32,8 +31,6 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * A group of synapses. Must connect a source and target neuron group.
@@ -65,7 +62,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     /**
      * A set containing all the inhibitory (wt < 0) synapses in the group.
      */
-    private SynapseSet inSynapseSet = new SynapseSet(this, 0);;
+    private SynapseSet inSynapseSet = new SynapseSet(this, 0);
 
     /**
      * Event support
@@ -77,18 +74,18 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * <p> synapse strengths for all synapse groups.
      */
     private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER =
-        UniformDistribution.builder()
-            .polarity(Polarity.EXCITATORY)
-            .build();
+            UniformDistribution.builder()
+                    .polarity(Polarity.EXCITATORY)
+                    .build();
 
     /**
      * The <b>default>/b> polarized randomizer associated with inhibitory
      * synapse strengths for all synapse groups.
      */
     private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER =
-        UniformDistribution.builder()
-            .polarity(Polarity.INHIBITORY)
-            .build();
+            UniformDistribution.builder()
+                    .polarity(Polarity.INHIBITORY)
+                    .build();
 
     /**
      * The default ratio (all excitatory) for all synapse groups.
@@ -123,17 +120,21 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     @UserParameter(label = "Excitatory ratio", editable = false, order = 50)
     private double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
-    /**
-     * A template synapse which can be edited to inform the group as to what
-     * parameters a new "blank" excitatory synapse should be given.
-     */
-    private Synapse excitatoryPrototype = Synapse.getTemplateSynapse();
+    @UserParameter(label = "Excitatory Learning Rule", useSetter = true,
+            isObjectType = true, order = 100)
+    private SynapseUpdateRule exLearningRule = new StaticSynapseRule();
 
-    /**
-     * A template synapse which can be edited to inform the group as to what
-     * parameters a new "blank" inhibitory synapse should be given.
-     */
-    private Synapse inhibitoryPrototype = Synapse.getTemplateSynapse();
+    @UserParameter(label = "Excitatory Spike Responder", isObjectType = true,
+            showDetails = false, order = 200)
+    private SpikeResponder exSpikeResponder = new NonResponder();
+
+    @UserParameter(label = "Inhibitory Learning Rule", useSetter = true,
+            isObjectType = true, order = 100)
+    private SynapseUpdateRule inLearningRule = new StaticSynapseRule();
+
+    @UserParameter(label = "Inhibitory Spike Responder", isObjectType = true,
+            showDetails = false, order = 200)
+    private SpikeResponder inSpikeResponder = new NonResponder();
 
     /**
      * The randomizer governing excitatory synapses. If null new synapses are
@@ -159,140 +160,33 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     private boolean recurrent;
 
     /**
-     * A boolean flag set based on if all the inhibitory synapses in this group
-     * are static. Technically this flag can be set to true even if all the
-     * inhibitory synapses are not static. It is used as an optimization along
-     * with {@link #useGroupLevelSettings} to determine whether or not all the
-     * inhibitory synapses should be iterated over during update. This flag will
-     * have no effect on panels or update procedure if {@link
-     * #useGroupLevelSettings} is <b>false</b>, however if it is
-     * <b>true</b> this flag will be dominant over the actual state of synapses
-     * for the purpose of updating.
-     */
-    private boolean inStatic = true;
-
-    /**
-     * A boolean flag set based on if all the excitatory synapses in this group
-     * are static. Technically this flag can be set to true even if all the
-     * excitatory synapses are not static. It is used as an optimization along
-     * with {@link #useGroupLevelSettings} to determine whether or not all the
-     * excitatory synapses should be iterated over during update. This flag will
-     * have no effect on panels or update procedure if {@link
-     * #useGroupLevelSettings} is <b>false</b>, however if it is
-     * <b>true</b> this flag will be dominant over the actual state of synapses
-     * for the purpose of updating.
-     */
-    private boolean exStatic = false;
-
-    // TODO: redundant with statics? When would group level be on but statics off?
-
-    /**
-     *
-     * If true, use prototype synapses for all synapse properties, except strengths.
-     *
-     * Instead of iterating over all the synapses in the group to supply an answer, the method will return the
-     * result of {@link #excitatoryPrototype}.isFrozen(). [todo]
-     *
-     * This is useful for
-     * cases where synapses within synapse groups are entirely governed by group
-     * level attributes and it is known to the user that individual synapse
-     * settings will/should not be changed apart from the group.
-     * <p>
-     * If set to true a compressed representation of the weight matrix is used
-     * in saving, see SynapseGroupConverter.compressedMatrixRep.
-     */
-    @UserParameter(label = "Compressed representation", order = 60)
-    private boolean useGroupLevelSettings = false;
-
-    /**
-     * Completely creates a synapse group between the two neuron groups with all
-     * default parameters. This method creates the individual connections.
+     * Creates a synapse group with the desired parameters. Last argument is variable argument.
      *
      * @param source the source neuron group.
      * @param target the target neuron group.
-     * @return a synapse group with all default values connecting the source and
-     * target neuron groups.
-     */
-    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target) {
-        return createSynapseGroup(source, target, DEFAULT_CONNECTION_MANAGER);
-    }
-
-    /**
-     * Completely creates a synapse group with the desired parameters. That is
-     * the connections (individual synapses) are created along with the group.
-     *
-     * @param source          the source neuron group.
-     * @param target          the target neuron group. neurons in the group are
-     *                        connected
-     * @param excitatoryRatio the ratio of excitatory to inhibitory synapses [0,
-     *                        1].
-     * @return a synapse group with the above parameters.
-     */
-    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final double excitatoryRatio) {
-        return createSynapseGroup(source, target, DEFAULT_CONNECTION_MANAGER, excitatoryRatio, DEFAULT_EX_RANDOMIZER, DEFAULT_IN_RANDOMIZER);
-    }
-
-    /**
-     * Completely creates a synapse group with the desired parameters. That is
-     * the connections (individual synapses) are created along with the group.
-     *
-     * @param source            the source neuron group.
-     * @param target            the target neuron group.
-     * @param connectionManager the connection manager used to establish which
-     * @return a synapse group with the above parameters.
-     */
-    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager) {
-        SynapseGroup synGroup = new SynapseGroup(source, target, connectionManager);
-        synGroup.setRandomizers(DEFAULT_EX_RANDOMIZER, DEFAULT_IN_RANDOMIZER);
-        synGroup.makeConnections();
-        // Ensure that displayed ratio is consistent with actual ratio.
-        // Process of determining synapse polarity is stochastic.
-        synGroup.excitatoryRatio = synGroup.getExcitatoryRatioPrecise();
-
-        return synGroup;
-    }
-
-    /**
-     * Completely creates a synapse group with the desired parameters. That is
-     * the connections (individual synapses) are created along with the group.
-     *
-     * @param source            the source neuron group.
-     * @param target            the target neuron group.
-     * @param connectionManager the connection manager used to establish which
-     * @param excitatoryRatio   the ratio of excitatory to inhibitory synapses
-     *                          [0, 1].
-     * @return a synapse group with the above parameters.
-     */
-    public static SynapseGroup createSynapseGroup(final NeuronGroup source, final NeuronGroup target, final ConnectionStrategy connectionManager, final double excitatoryRatio) {
-        return createSynapseGroup(source, target, connectionManager, excitatoryRatio, DEFAULT_EX_RANDOMIZER, DEFAULT_IN_RANDOMIZER);
-    }
-
-    /**
-     * Completely creates a synapse group with the desired parameters. That is
-     * the connections (individual synapses) are created along with the group.
-     *
-     * @param source            the source neuron group.
-     * @param target            the target neuron group.
-     * @param connectionManager the connection manager used to establish which
-     * @param excitatoryRatio   the ratio of excitatory to inhibitory synapses
-     *                          [0, 1].
-     * @param exciteRand        the randomizer to be used to determine the
-     *                          weights of excitatory synapses.
-     * @param inhibRand         the randomizer to be used to determine the
-     *                          weights of inhibitory synapses.
+     * @param args   args[0] the connection manager
+     *               args[1] the ratio of excitatory to inhibitory synapses
+     *               args[2]the randomizer to be used to determine the weights of excitatory synapses
+     *               args[3] the randomizer to be used to determine the weights of inhibitory synapses.
      * @return a synapse group with the above parameters.
      */
     public static SynapseGroup createSynapseGroup(
-        final NeuronGroup source,
-        final NeuronGroup target,
-        final ConnectionStrategy connectionManager,
-        double excitatoryRatio,
-        final ProbabilityDistribution exciteRand,
-        final ProbabilityDistribution inhibRand
+            final NeuronGroup source,
+            final NeuronGroup target,
+            Object... args
     ) {
-        SynapseGroup synGroup = new SynapseGroup(source, target, connectionManager);
-        synGroup.setExcitatoryRatio(excitatoryRatio);
-        synGroup.setRandomizers(exciteRand, inhibRand);
+        SynapseGroup synGroup;
+        if (args.length == 0) {
+            synGroup = new SynapseGroup(source, target, DEFAULT_CONNECTION_MANAGER);
+        } else {
+            synGroup = new SynapseGroup(source, target, (ConnectionStrategy) args[0]);
+        }
+        if (args.length >= 1) {
+            synGroup.setExcitatoryRatio((Double) args[1]);
+        }
+        if (args.length >= 2) {
+            synGroup.setRandomizers((ProbabilityDistribution) args[2], (ProbabilityDistribution) args[3]);
+        }
         synGroup.makeConnections();
         // Ensure that displayed ratio is consistent with actual ratio.
         // Process of determining synapse polarity is stochastic.
@@ -301,29 +195,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     }
 
     /**
-     * Creates a blank synapse group between a source and target neuron group
-     * using the default connection manager. Until {@link #makeConnections()} is
-     * called this group will be empty and will not be added to the source or
-     * target neuron groups' respective outgoing and incoming synapse group
-     * sets.
-     *
-     * @param source the source neuron group.
-     * @param target the target neuron group.
-     */
-    public SynapseGroup(final NeuronGroup source, final NeuronGroup target) {
-        parentNetwork = source.getParentNetwork();
-        this.sourceNeuronGroup = source;
-        this.targetNeuronGroup = target;
-        recurrent = testRecurrent();
-        initializeSynapseVisibility();
-        initSpikeResponders();
-        source.addOutgoingSg(this);
-        target.addIncomingSg(this);
-        setLabel(parentNetwork.getIdManager().getProposedId(this.getClass()));
-    }
-
-    /**
-     * Creates a blank synapse group between a source and target neuron group.
+     * Private constructor for static builder methods. Only creates the synapse group.
      * Until {@link #makeConnections()} is called this group will be empty and
      * will not be added to the source or target neuron groups' respective
      * outgoing and incoming synapse group sets.
@@ -339,27 +211,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         this.connectionManager = connectionManager;
         recurrent = testRecurrent();
         initializeSynapseVisibility();
-        initSpikeResponders();
         setLabel(parentNetwork.getIdManager().getProposedId(this.getClass()));
-    }
-
-    /**
-     * Group level analog of {@link Synapse#initSpikeResponder()}
-     */
-    private void initSpikeResponders() {
-        //When the source neuron group is spiking, prototype synapses should have spike responders.
-        if(sourceNeuronGroup.isSpikingNeuronGroup()) {
-            // Do not change existing spike responders if they are there already there
-            if (excitatoryPrototype.getSpikeResponder() instanceof NonResponder) {
-                excitatoryPrototype.setSpikeResponder(Synapse.DEFAULT_SPIKE_RESPONDER.deepCopy());
-            } if (inhibitoryPrototype.getSpikeResponder() instanceof NonResponder) {
-                inhibitoryPrototype.setSpikeResponder(Synapse.DEFAULT_SPIKE_RESPONDER.deepCopy());
-            }
-        } else {
-            excitatoryPrototype.setSpikeResponder(new NonResponder());
-            inhibitoryPrototype.setSpikeResponder(new NonResponder());
-        }
-
     }
 
     /**
@@ -391,11 +243,10 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * containing this synapse group's synapses. This allows expectedNumber of
      * synapses to be added to this synapse group without the synapse list
      * having to perform any operations related to expanding the list size.
-     *
+     * <p>
      * Sets initial capacity of hashsets, so that when you add new synapses
      * you reduce the chances of it rehashing, resizing etc when creating a large
      * synapse group.
-     *
      *
      * @param expectedNumSynapses the number of synapses the connection manager
      *                            predicts will be created.
@@ -405,10 +256,10 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     public void preAllocateSynapses(int expectedNumSynapses) throws IllegalStateException {
         if (!exSynapseSet.isEmpty() || !inSynapseSet.isEmpty()) {
             throw new IllegalArgumentException("Cannot pre-allocate space for"
-                + " some expected number of synapses"
-                + " when one or both synapse sets are already populated."
-                + " Pre-allocations can only occur before connections"
-                + " have been initialized.");
+                    + " some expected number of synapses"
+                    + " when one or both synapse sets are already populated."
+                    + " Pre-allocations can only occur before connections"
+                    + " have been initialized.");
         }
         // Using /0.8 instead of /0.75 because expected number is _expected_
         // but not precisely known.
@@ -451,30 +302,29 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * call super.update() some time during the custom update.
      */
     public void update() {
-        if (useGroupLevelSettings) {
-            // If static, nothing to do!
-            if (!exStatic) {
-                if (!isFrozen(Polarity.EXCITATORY)) {
-                    updateExcitatorySynapses();
-                }
-            }
-            if (!inStatic) {
-                if (!isFrozen(Polarity.INHIBITORY)) {
-                    updateInhibitorySynapses();
-                }
-            }
-        } else {
-            updateExcitatorySynapses();
-            updateInhibitorySynapses();
+
+        if (!(exLearningRule instanceof StaticSynapseRule)) {
+            exSynapseSet.forEach(s -> {
+                s.setStrength(exLearningRule.apply(s.getSource().getActivation(),
+                        s.getTarget().getActivation(), s.getStrength(), null));
+            });
         }
-    }
-
-    private void updateExcitatorySynapses() {
-        exSynapseSet.forEach(Synapse::update);
-    }
-
-    private void updateInhibitorySynapses() {
-        inSynapseSet.forEach(Synapse::update);
+        if (!(inLearningRule instanceof StaticSynapseRule)) {
+            inSynapseSet.forEach(s -> {
+                s.setStrength(inLearningRule.apply(s.getSource().getActivation(),
+                        s.getTarget().getActivation(), s.getStrength(), null));
+            });
+        }
+        if (!(exSpikeResponder instanceof NonResponder)) {
+            exSynapseSet.forEach(s -> {
+                s.setPsr(exSpikeResponder.apply(s.getStrength(), s.getPsr(), s.getSource().isSpike()));
+            });
+        }
+        if (!(inSpikeResponder instanceof NonResponder)) {
+            inSynapseSet.forEach(s -> {
+                s.setPsr(inSpikeResponder.apply(s.getStrength(), s.getPsr(), s.getSource().isSpike()));
+            });
+        }
     }
 
     public int size() {
@@ -487,6 +337,8 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
 
     public void delete() {
         clear();
+        exSynapseSet.forEach(Synapse::delete);
+        inSynapseSet.forEach(Synapse::delete);
         targetNeuronGroup.removeIncomingSg(this);
         sourceNeuronGroup.removeOutgoingSg(this);
         events.fireDeleted();
@@ -566,6 +418,18 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         inSynapseSet.forEach(Synapse::hardClear);
     }
 
+    @Override
+    public void increment() {
+        exSynapseSet.forEach(Synapse::increment);
+        inSynapseSet.forEach(Synapse::increment);
+    }
+
+    @Override
+    public void decrement() {
+        exSynapseSet.forEach(Synapse::decrement);
+        inSynapseSet.forEach(Synapse::decrement);
+    }
+
     /**
      * Adds a new synapse (one which is "blank") to the synapse group. This is
      * the <b>preferred</b> method to use for adding synapses to the synapse
@@ -598,21 +462,22 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      *                group and have its parameters set based on the parameters
      *                of this group.
      */
-    public void addNewExcitatorySynapse(final Synapse synapse)  {
+    public void addNewExcitatorySynapse(final Synapse synapse) {
         synapse.setParentGroup(this);
         if (exciteRand != null) {
             synapse.setStrength(exciteRand.getRandom());
         } else {
             synapse.setStrength(ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
         }
-        synapse.setLearningRule(excitatoryPrototype.getLearningRule().deepCopy());
-        synapse.setFrozen(excitatoryPrototype.isFrozen());
-        synapse.setEnabled(excitatoryPrototype.isEnabled());
-        synapse.setDelay(excitatoryPrototype.getDelay());
-        synapse.setIncrement(excitatoryPrototype.getIncrement());
-        synapse.setUpperBound(excitatoryPrototype.getUpperBound());
-        synapse.setLowerBound(excitatoryPrototype.getLowerBound());
-        synapse.setSpikeResponder(excitatoryPrototype.getSpikeResponder());
+        // TODO
+        // synapse.setLearningRule(excitatoryPrototype.getLearningRule().deepCopy());
+        // synapse.setFrozen(excitatoryPrototype.isFrozen());
+        // synapse.setEnabled(excitatoryPrototype.isEnabled());
+        // synapse.setDelay(excitatoryPrototype.getDelay());
+        // synapse.setIncrement(excitatoryPrototype.getIncrement());
+        // synapse.setUpperBound(excitatoryPrototype.getUpperBound());
+        // synapse.setLowerBound(excitatoryPrototype.getLowerBound());
+        // synapse.setSpikeResponder(excitatoryPrototype.getSpikeResponder());
         exSynapseSet.add(synapse);
         fireSynapseAdded(synapse);
     }
@@ -629,14 +494,15 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         } else {
             synapse.setStrength(ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
         }
-        synapse.setLearningRule(inhibitoryPrototype.getLearningRule().deepCopy());
-        synapse.setFrozen(inhibitoryPrototype.isFrozen());
-        synapse.setEnabled(inhibitoryPrototype.isEnabled());
-        synapse.setDelay(inhibitoryPrototype.getDelay());
-        synapse.setIncrement(inhibitoryPrototype.getIncrement());
-        synapse.setUpperBound(inhibitoryPrototype.getUpperBound());
-        synapse.setLowerBound(inhibitoryPrototype.getLowerBound());
-        synapse.setSpikeResponder(inhibitoryPrototype.getSpikeResponder());
+        // TODO
+        // synapse.setLearningRule(inhibitoryPrototype.getLearningRule().deepCopy());
+        // synapse.setFrozen(inhibitoryPrototype.isFrozen());
+        // synapse.setEnabled(inhibitoryPrototype.isEnabled());
+        // synapse.setDelay(inhibitoryPrototype.getDelay());
+        // synapse.setIncrement(inhibitoryPrototype.getIncrement());
+        // synapse.setUpperBound(inhibitoryPrototype.getUpperBound());
+        // synapse.setLowerBound(inhibitoryPrototype.getLowerBound());
+        // synapse.setSpikeResponder(inhibitoryPrototype.getSpikeResponder());
         inSynapseSet.add(synapse);
         fireSynapseAdded(synapse);
     }
@@ -740,14 +606,15 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
                     } else {
                         s.setStrength(ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
                     }
-                    s.setLearningRule(inhibitoryPrototype.getLearningRule().deepCopy());
-                    s.setFrozen(inhibitoryPrototype.isFrozen());
-                    s.setEnabled(inhibitoryPrototype.isEnabled());
-                    s.setDelay(inhibitoryPrototype.getDelay());
-                    s.setIncrement(inhibitoryPrototype.getIncrement());
-                    s.setUpperBound(inhibitoryPrototype.getUpperBound());
-                    s.setLowerBound(inhibitoryPrototype.getLowerBound());
-                    s.setSpikeResponder(inhibitoryPrototype.getSpikeResponder());
+                    // TODO
+                    // s.setLearningRule(inhibitoryPrototype.getLearningRule().deepCopy());
+                    // s.setFrozen(inhibitoryPrototype.isFrozen());
+                    // s.setEnabled(inhibitoryPrototype.isEnabled());
+                    // s.setDelay(inhibitoryPrototype.getDelay());
+                    // s.setIncrement(inhibitoryPrototype.getIncrement());
+                    // s.setUpperBound(inhibitoryPrototype.getUpperBound());
+                    // s.setLowerBound(inhibitoryPrototype.getLowerBound());
+                    // s.setSpikeResponder(inhibitoryPrototype.getSpikeResponder());
                     inSynapseSet.add(s);
                     numSwitch--;
                 }
@@ -764,14 +631,15 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
                     } else {
                         s.setStrength(ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
                     }
-                    s.setLearningRule(excitatoryPrototype.getLearningRule().deepCopy());
-                    s.setFrozen(excitatoryPrototype.isFrozen());
-                    s.setEnabled(excitatoryPrototype.isEnabled());
-                    s.setDelay(excitatoryPrototype.getDelay());
-                    s.setIncrement(excitatoryPrototype.getIncrement());
-                    s.setUpperBound(excitatoryPrototype.getUpperBound());
-                    s.setLowerBound(excitatoryPrototype.getLowerBound());
-                    s.setSpikeResponder(excitatoryPrototype.getSpikeResponder());
+                    // TODO
+                    // s.setLearningRule(excitatoryPrototype.getLearningRule().deepCopy());
+                    // s.setFrozen(excitatoryPrototype.isFrozen());
+                    // s.setEnabled(excitatoryPrototype.isEnabled());
+                    // s.setDelay(excitatoryPrototype.getDelay());
+                    // s.setIncrement(excitatoryPrototype.getIncrement());
+                    // s.setUpperBound(excitatoryPrototype.getUpperBound());
+                    // s.setLowerBound(excitatoryPrototype.getLowerBound());
+                    // s.setSpikeResponder(excitatoryPrototype.getSpikeResponder());
                     exSynapseSet.add(s);
                     numSwitch--;
                 }
@@ -857,39 +725,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
     }
 
     /**
-     * Sets the strength of a single synapse in the group specified as a
-     * parameter. If the synapse does not exist in this group returns false. If
-     * the this makes the synapse change polarity it will be removed from its
-     * current set and added to the appropriate set.
-     *
-     * @param synapse   sets the strength of an individual synapse in the group
-     * @param newWeight the new weight to set it to
-     * @return true if this group contained the specified synapse, and false if
-     * it did not and thus failed to set the strength value.
-     */
-    public boolean setSynapseStrength(Synapse synapse, double newWeight) {
-        if (synapse.getStrength() >= 0 && exSynapseSet.contains(synapse)) {
-            synapse.setStrength(newWeight);
-            if (newWeight < 0) {
-                exSynapseSet.remove(synapse);
-                inSynapseSet.add(synapse);
-            }
-            return true;
-        }
-        if (synapse.getStrength() <= 0 && inSynapseSet.contains(synapse)) {
-            synapse.setStrength(newWeight);
-            if (newWeight > 0) {
-                inSynapseSet.remove(synapse);
-                exSynapseSet.add(synapse);
-            }
-            return true;
-        }
-        // The Synapse group does not contain the given synapse or the
-        // synapse group is in a bad state.
-        return false;
-    }
-
-    /**
      * Randomizes all the synapses according to their corresponding randomizers.
      * {@link #randomizeExcitatoryConnections()}, {@link
      * #randomizeInhibitoryConnections()}
@@ -929,7 +764,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      *                   for making synaptic connections.
      */
     public void setConnectionManager(ConnectionStrategy connection) {
-            this.connectionManager = connection;
+        this.connectionManager = connection;
     }
 
     /**
@@ -945,7 +780,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      */
     public void setExcitatoryRandomizer(ProbabilityDistribution excitatoryRandomizer) {
         this.exciteRand = excitatoryRandomizer == null ? null : excitatoryRandomizer.deepCopy();
-        if(exciteRand != null)
+        if (exciteRand != null)
             exciteRand.setPolarity(Polarity.EXCITATORY);
     }
 
@@ -955,7 +790,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      */
     public void setInhibitoryRandomizer(ProbabilityDistribution inhibitoryRandomizer) {
         inhibRand = inhibitoryRandomizer == null ? null : inhibitoryRandomizer.deepCopy();
-        if(inhibRand != null)
+        if (inhibRand != null)
             inhibRand.setPolarity(Polarity.INHIBITORY);
     }
 
@@ -1044,225 +879,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         return targetNeuronGroup;
     }
 
-    /**
-     * Reveals the excitatory prototype synapse, allowing more detailed synapse
-     * values to be queried at the group level. To use a prototype to change
-     * many values call {@link #setAndConformToTemplate(Synapse, Polarity)}
-     *
-     * @return the prototype synapse
-     */
-    public Synapse getExcitatoryPrototype() {
-        return Synapse.copyTemplateSynapse(excitatoryPrototype);
-    }
-
-    /**
-     * Reveals the inhibitory prototype synapse, allowing more detailed synapse
-     * values to be queried at the group level. To use a prototype to change
-     * many values call {@link #setAndConformToTemplate(Synapse, Polarity)}
-     *
-     * @return the prototype synapse
-     */
-    public Synapse getInhibitoryPrototype() {
-        return Synapse.copyTemplateSynapse(inhibitoryPrototype);
-    }
-
-    /**
-     * @return whether or not the synapse group is using group-level properties
-     * Homogeneous within synapse type (excitatory/inhibitory) for faster
-     * indexing and optimized updating.
-     */
-    public boolean isUseGroupLevelSettings() {
-        return useGroupLevelSettings;
-    }
-
-    public void setUseGroupLevelSettings(boolean useGroupLevelSettings) {
-        this.useGroupLevelSettings = useGroupLevelSettings;
-    }
-
-    public void setAndConformToTemplate(Synapse template, Polarity polarity) {
-        setDelay(template.getDelay(), polarity);
-        setEnabled(template.isEnabled(), polarity);
-        setFrozen(template.isFrozen(), polarity);
-        setIncrement(template.getIncrement(), polarity);
-        setLearningRule(template.getLearningRule(), polarity);
-        setLowerBound(template.getLowerBound(), polarity);
-        setSpikeResponder(template.getSpikeResponder(), polarity);
-        setUpperBound(template.getUpperBound(), polarity);
-        if (Polarity.EXCITATORY == polarity) {
-            excitatoryPrototype = template;
-        } else if (Polarity.INHIBITORY == polarity) {
-            inhibitoryPrototype = template;
-        } else {
-            excitatoryPrototype = Synapse.copyTemplateSynapse(template);
-            inhibitoryPrototype = Synapse.copyTemplateSynapse(template);
-        }
-    }
-
-    public void setDelay(int delay, Polarity polarity) {
-        setProperty(s -> s.setDelay(delay), Polarity.BOTH);
-    }
-
-    public void setEnabled(boolean enabled) {
-        setProperty(s -> s.setEnabled(enabled), Polarity.BOTH);
-    }
-
-    public void setEnabled(boolean enabled, Polarity polarity) {
-        setProperty(s -> s.setEnabled(enabled), polarity);
-    }
-
-    public void setFrozen(boolean frozen, Polarity polarity) {
-        setProperty(s -> s.setFrozen(frozen), polarity);
-    }
-
-    public void setIncrement(double increment, Polarity polarity) {
-        setProperty(s -> s.setIncrement(increment), polarity);
-    }
-
-    public void setLearningRule(SynapseUpdateRule sur, Polarity polarity) {
-        setProperty(s -> s.setLearningRule(sur), polarity);
-        if (Polarity.EXCITATORY == polarity) {
-            exStatic = sur instanceof StaticSynapseRule;
-        } else if (Polarity.INHIBITORY == polarity) {
-            inStatic = sur instanceof StaticSynapseRule;
-        } else {
-            exStatic = sur instanceof StaticSynapseRule;
-            inStatic = sur instanceof StaticSynapseRule;
-        }
-    }
-
-    public void setLowerBound(double lowerBound, Polarity polarity) {
-        setProperty(s -> s.setLowerBound(lowerBound), polarity);
-    }
-
-    public void setSpikeResponder(SpikeResponder spr, Polarity polarity) {
-        if (spr == null) {
-            return;
-        }
-        setProperty(s -> s.setSpikeResponder(spr), polarity);
-    }
-
-    public void setStrength(double strength, Polarity polarity) {
-        final double str = polarity.value(strength);
-        setProperty(s -> s.setStrength(str), polarity);
-        if (Polarity.BOTH == polarity) {
-            if (strength > 0) {
-                exSynapseSet.addAll(inSynapseSet);
-                inSynapseSet.clear();
-                excitatoryRatio = 1;
-            } else {
-                inSynapseSet.addAll(exSynapseSet);
-                exSynapseSet.clear();
-                excitatoryRatio = 0;
-            }
-        }
-    }
-
-    public void setUpperBound(double upperBound, Polarity polarity) {
-        setProperty(s -> s.setUpperBound(upperBound), polarity);
-    }
-
-    public Integer getDelay(Polarity polarity) {
-        return getProperty(Synapse::getDelay, polarity);
-    }
-
-    public Boolean isEnabled(Polarity polarity) {
-        return getProperty(Synapse::isEnabled, polarity);
-    }
-
-    public Boolean isFrozen(Polarity polarity) {
-        return getProperty(Synapse::isFrozen, polarity);
-    }
-
-    public double getIncrement(Polarity polarity) {
-        return getProperty(Synapse::getIncrement, polarity);
-    }
-
-    public String getLearningRuleDescription(Polarity polarity) {
-        String rule = getProperty(s -> s.getLearningRule().getName(), polarity);
-        return rule == null ? SimbrainConstants.NULL_STRING : rule;
-    }
-
-    public double getLowerBound(Polarity polarity) {
-        Double lowB = getProperty(Synapse::getLowerBound, polarity);
-        return lowB == null ? Double.NaN : lowB;
-    }
-
-    public double getUpperBound(Polarity polarity) {
-        Double upB = getProperty(Synapse::getUpperBound, polarity);
-        return upB == null ? Double.NaN : upB;
-    }
-
-    public String getSpikeResponderDescription(Polarity polarity) {
-        String rule = getProperty(s -> s.getSpikeResponder().getDescription(), polarity);
-        return rule == null ? SimbrainConstants.NULL_STRING : rule;
-    }
-
-    /**
-     * Returns a property associated with the synapse group.  If the property
-     * is consistent throughout the group the consistent value is returned.
-     * If the property is inconsistent null is returned. Polarity can be
-     * specified to only look at excitatory or inhibitory (or all) synapses.
-     *
-     * @param action the function that returns the property, e.g. <code>Synapse::getIncrement</code>
-     * @param polarity which polarity to check
-     * @param <T> the generic type of the returned value
-     * @return the value of this property
-     */
-    public <T> T getProperty(Function<Synapse, T> action, Polarity polarity) {
-
-        Collection<Synapse> synapses;
-
-        // Group level settings or empty group
-        if (Polarity.EXCITATORY == polarity) {
-            synapses = exSynapseSet;
-            if (useGroupLevelSettings || exSynapseSet.isEmpty()) {
-                return action.apply(excitatoryPrototype);
-            }
-        } else if (Polarity.INHIBITORY == polarity) {
-            synapses = inSynapseSet;
-            if (useGroupLevelSettings || inSynapseSet.isEmpty()) {
-                return action.apply(inhibitoryPrototype);
-            }
-        } else {
-            synapses = getAllSynapses();
-            if (synapses.isEmpty()) {
-                return null;
-            }
-        }
-
-        // Return null if they are inconsistent, or the value if they are consistent
-        Iterator<Synapse> synIter = synapses.iterator();
-        T first = action.apply(synIter.next());
-        while (synIter.hasNext()) {
-            if (!first.equals(action.apply(synIter.next()))) {
-                return null;
-            }
-        }
-        return first;
-    }
-
-    /**
-     * Applies a lambda (e.g. setting strength) to synapses in this group,
-     * depending on their polarity.
-     *
-     * @param action the lambda to apply, e.g. <code>s -> s.setStrength(s)</code>
-     * @param polarity which synapses to apply the lambda to
-     */
-    public void setProperty(Consumer<Synapse> action, Polarity polarity) {
-        if(polarity == Polarity.EXCITATORY) {
-            exSynapseSet.forEach(action);
-            action.accept(excitatoryPrototype);
-        } else if (polarity == Polarity.INHIBITORY) {
-            inSynapseSet.forEach(action);
-            action.accept(inhibitoryPrototype);
-        } else {
-            exSynapseSet.forEach(action);
-            inSynapseSet.forEach(action);
-            action.accept(excitatoryPrototype);
-            action.accept(inhibitoryPrototype);
-        }
-    }
-
     @Override
     public void postUnmarshallingInit() {
         if (events == null) {
@@ -1303,5 +919,37 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
 
     public SynapseGroupEvents getEvents() {
         return events;
+    }
+
+    public SynapseUpdateRule getExLearningRule() {
+        return exLearningRule;
+    }
+
+    public void setExLearningRule(SynapseUpdateRule exLearningRule) {
+        this.exLearningRule = exLearningRule;
+    }
+
+    public SpikeResponder getExSpikeResponder() {
+        return exSpikeResponder;
+    }
+
+    public void setExSpikeResponder(SpikeResponder exSpikeResponder) {
+        this.exSpikeResponder = exSpikeResponder;
+    }
+
+    public SynapseUpdateRule getInLearningRule() {
+        return inLearningRule;
+    }
+
+    public void setInLearningRule(SynapseUpdateRule inLearningRule) {
+        this.inLearningRule = inLearningRule;
+    }
+
+    public SpikeResponder getInSpikeResponder() {
+        return inSpikeResponder;
+    }
+
+    public void setInSpikeResponder(SpikeResponder inSpikeResponder) {
+        this.inSpikeResponder = inSpikeResponder;
     }
 }

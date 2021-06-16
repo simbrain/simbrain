@@ -23,7 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -42,17 +42,17 @@ public abstract class ConnectionStrategy implements EditableObject {
     /**
      * Default ratio of excitatory neurons (from 0 to 1).
      */
-    private static final double DEFAULT_EXCITATORY_RATIO = 1.0;
+    private static final double DEFAULT_EXCITATORY_RATIO = .5;
 
     /**
      * Whether excitatory connection should be randomized.
      */
-    private boolean useExcitatoryRandomization = false;
+    private boolean useExcitatoryRandomization = true;
 
     /**
      * Whether inhibitory connection should be randomized.
      */
-    private boolean useInhibitoryRandomization = false;
+    private boolean useInhibitoryRandomization = true;
 
     /**
      * The normalized ratio of excitatory to inhibitory neurons.
@@ -64,7 +64,7 @@ public abstract class ConnectionStrategy implements EditableObject {
      * The randomizer for excitatory synapses.
      */
     private ProbabilityDistribution exRandomizer =
-        UniformDistribution.builder()
+        NormalDistribution.builder()
             .polarity(SimbrainConstants.Polarity.EXCITATORY)
             .build();
 
@@ -72,7 +72,7 @@ public abstract class ConnectionStrategy implements EditableObject {
      * The randomizer for inhibitory synapses.
      */
     private ProbabilityDistribution inRandomizer =
-        UniformDistribution.builder()
+            NormalDistribution.builder()
             .polarity(SimbrainConstants.Polarity.INHIBITORY)
             .build();
 

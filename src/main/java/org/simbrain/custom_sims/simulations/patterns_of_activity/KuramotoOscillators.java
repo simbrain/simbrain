@@ -14,7 +14,6 @@ import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.KuramotoRule;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -101,11 +100,10 @@ public class KuramotoOscillators extends RegisteredSimulation {
         // Set up recurrent synapses
         //EdgeOfChaos.connectReservoir(network, reservoirNet);
 
-        SynapseGroup recSyns = new SynapseGroup(reservoirNet, reservoirNet);
         ConnectionStrategy recConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 1, RadialGaussian.DEFAULT_EI_CONST * 3,
             RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
             50);
-        recConnection.connectNeurons(recSyns);
+        SynapseGroup recSyns = SynapseGroup.createSynapseGroup(reservoirNet, reservoirNet, recConnection);
         network.addNetworkModel(recSyns);
         recSyns.setLabel("Recurrent");
 
@@ -120,9 +118,10 @@ public class KuramotoOscillators extends RegisteredSimulation {
         // Inputs to reservoir
         SynapseGroup inpSynG = SynapseGroup.createSynapseGroup(inputNetwork, reservoirNet,
             new Sparse(0.7, true, false));
-        inpSynG.setStrength(40, Polarity.EXCITATORY);
-        inpSynG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
-            NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
+        // TODO
+        // inpSynG.setStrength(40, Polarity.EXCITATORY);
+        // inpSynG.setRandomizers(NormalDistri bution.builder().mean(10).standardDeviation(2.5).build(),
+        //     NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         inpSynG.randomize();
         inpSynG.setDisplaySynapses(false);
         network.addNetworkModel(inpSynG);

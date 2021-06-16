@@ -52,7 +52,6 @@ import java.util.Hashtable;
 @SuppressWarnings("serial")
 public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
-
     public enum RandBehavior {
         FORCE_ON, DEFAULT, FORCE_OFF;
     }
@@ -161,18 +160,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
 
     }
 
-    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent, final RandBehavior randState) {
-        SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parent, randState);
-        prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, Polarity.EXCITATORY);
-        prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, Polarity.INHIBITORY);
-        prPanel.excitatoryRandomizerPanel.initListeners();
-        prPanel.inhibitoryRandomizerPanel.initListeners();
-        prPanel.initializeContent();
-        prPanel.initializeLayout();
-        prPanel.fillDefaultValues();
-        return prPanel;
-    }
-
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent, final RandBehavior randState, final SynapseGroup synGrp) {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parent, synGrp, randState);
         if (synGrp.isEmpty()) {
@@ -203,28 +190,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         return prPanel;
     }
 
-    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(
-            final Window parent,
-            ProbabilityDistribution exRandomizer2,
-            ProbabilityDistribution inRandomizer2,
-            boolean useExcitatoryRandomization,
-            boolean useInhibitoryRandomization
-    ) {
-        SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parent, RandBehavior.DEFAULT);
-        prPanel.fillDefaultValues();
-        prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, exRandomizer2, useExcitatoryRandomization);
-        prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parent, inRandomizer2, useInhibitoryRandomization);
-        prPanel.excitatoryRandomizerPanel.initListeners();
-        prPanel.inhibitoryRandomizerPanel.initListeners();
-        prPanel.initializeContent();
-        prPanel.initializeLayout();
-        return prPanel;
-    }
-
-    public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent) {
-        return SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(parent, RandBehavior.DEFAULT);
-    }
-
     public static SynapsePolarityAndRandomizerPanel createPolarityRatioPanel(final Window parent, final SynapseGroup synGrp) {
         return SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(parent, RandBehavior.DEFAULT, synGrp);
     }
@@ -238,7 +203,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         this.randomizerState = randState;
         creationPanel = true;
         synapseGroup = null;
-
     }
 
     /**

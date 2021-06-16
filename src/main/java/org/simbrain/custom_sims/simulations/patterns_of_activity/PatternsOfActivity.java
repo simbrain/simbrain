@@ -15,7 +15,6 @@ import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.STDPRule;
-import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.UDF;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
@@ -193,14 +192,15 @@ public class PatternsOfActivity extends RegisteredSimulation {
         sensoryNetR.setLocation(recurrentNetwork.getMaxX() + 300, recurrentNetwork.getMinY() + 100);
 
         // Set up recurrent synapses
-        SynapseGroup recSyns = new SynapseGroup(recurrentNetwork, recurrentNetwork);
+        SynapseGroup recSyns = SynapseGroup.createSynapseGroup(recurrentNetwork, recurrentNetwork,
         new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 3, RadialGaussian.DEFAULT_EI_CONST * 3,
             RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 3,
-            200).connectNeurons(recSyns);
+            200));
         //new Sparse(0.10, false, false)
         //        .connectNeurons(recSyns);
         initializeSynParameters(recSyns);
-        recSyns.setLearningRule(ruleExRec, Polarity.EXCITATORY);
+        // TODO
+        // recSyns.setLearningRule(ruleExRec, Polarity.EXCITATORY);
         for (Neuron n : neuronList) {
             for (Neuron m : neuronList) {
                 if (Math.random() < 0.002 && n != m) {
@@ -220,7 +220,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
         SynapseGroup inpSynGL = SynapseGroup.createSynapseGroup(sensoryNetL, recurrentNetwork,
             new Sparse(0.25, true, false));
         initializeSynParameters(inpSynGL);
-        inpSynGL.setStrength(50, Polarity.EXCITATORY);
+        // TODO
+        // inpSynGL.setStrength(50, Polarity.EXCITATORY);
         //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
         for (Synapse s : inpSynGL.getAllSynapses()) {
             s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
@@ -231,7 +232,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
         SynapseGroup inpSynGR = SynapseGroup.createSynapseGroup(sensoryNetR, recurrentNetwork,
                 new Sparse(0.25, true, false));
         initializeSynParameters(inpSynGR);
-        inpSynGR.setStrength(50, Polarity.EXCITATORY);
+        // TODO
+        // inpSynGR.setStrength(50, Polarity.EXCITATORY);
         //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
         for (Synapse s : inpSynGR.getAllSynapses()) {
             s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
@@ -263,7 +265,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Set up the synapses between the recurrent network and the output
         // Each neuron recieves from one quadrant of the recurrent neurons in terms of location
-        SynapseGroup rec2out = new SynapseGroup(recurrentNetwork, outGroup);
+        SynapseGroup rec2out = SynapseGroup.createSynapseGroup(recurrentNetwork, outGroup);
         initializeSynParameters(rec2out);
         double xEdge = recurrentNetwork.getCenterX();
         double yEdge = recurrentNetwork.getCenterY();
@@ -324,16 +326,17 @@ public class PatternsOfActivity extends RegisteredSimulation {
         }
 
         // Set up the connections to the read out neurons
-        SynapseGroup out2read = new SynapseGroup(outGroup, outputNeurons);
-        out2read.setSpikeResponder(new ConvolvedJumpAndDecay(20), Polarity.BOTH);
-        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(0), outputNeurons.getNeuron(0)));
-        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(1), outputNeurons.getNeuron(0)));
-        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(2), outputNeurons.getNeuron(1)));
-        out2read.addNewSynapse(new Synapse(outGroup.getNeuron(3), outputNeurons.getNeuron(1)));
-        out2read.setDisplaySynapses(false);
-        out2read.setConnectionManager(new AllToAll());
-        out2read.setUpperBound(1000000000, Polarity.BOTH);
-        out2read.setLowerBound(-1000000000, Polarity.BOTH);
+        SynapseGroup out2read = SynapseGroup.createSynapseGroup(outGroup, outputNeurons);
+        // TODO
+        // out2read.setSpikeResponder(new ConvolvedJumpAndDecay(20), Polarity.BOTH);
+        // out2read.addNewSynapse(new Synapse(outGroup.getNeuron(0), outputNeurons.getNeuron(0)));
+        // out2read.addNewSynapse(new Synapse(outGroup.getNeuron(1), outputNeurons.getNeuron(0)));
+        // out2read.addNewSynapse(new Synapse(outGroup.getNeuron(2), outputNeurons.getNeuron(1)));
+        // out2read.addNewSynapse(new Synapse(outGroup.getNeuron(3), outputNeurons.getNeuron(1)));
+        // out2read.setDisplaySynapses(false);
+        // out2read.setConnectionManager(new AllToAll());
+        // out2read.setUpperBound(1000000000, Polarity.BOTH);
+        // out2read.setLowerBound(-1000000000, Polarity.BOTH);
 
         // Make couplings
         sim.createCoupling(sim.getProducer(outputNeurons.getNeuron(0), "getActivation"),
@@ -362,13 +365,14 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
 
     private void initializeSynParameters(SynapseGroup synG) {
-        synG.setLearningRule(ruleEx, Polarity.EXCITATORY);
-        synG.setLearningRule(ruleIn, Polarity.INHIBITORY);
-        synG.setSpikeResponder(spkR, Polarity.BOTH);
-        synG.setUpperBound(200, Polarity.EXCITATORY);
-        synG.setLowerBound(0, Polarity.EXCITATORY);
-        synG.setLowerBound(-200, Polarity.INHIBITORY);
-        synG.setUpperBound(0, Polarity.INHIBITORY);
+        // TODO
+        // synG.setLearningRule(ruleEx, Polarity.EXCITATORY);
+        // synG.setLearningRule(ruleIn, Polarity.INHIBITORY);
+        // synG.setSpikeResponder(spkR, Polarity.BOTH);
+        // synG.setUpperBound(200, Polarity.EXCITATORY);
+        // synG.setLowerBound(0, Polarity.EXCITATORY);
+        // synG.setLowerBound(-200, Polarity.INHIBITORY);
+        // synG.setUpperBound(0, Polarity.INHIBITORY);
         synG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
             NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         synG.randomize();

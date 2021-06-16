@@ -172,10 +172,11 @@ public class EdgeOfChaos extends RegisteredSimulation {
         reservoir.setLabel("Recurrent Synapses");
         parentNet.addNetworkModel(reservoir);
 
-        reservoir.setUpperBound(200, Polarity.EXCITATORY);
-        reservoir.setLowerBound(0, Polarity.EXCITATORY);
-        reservoir.setLowerBound(-200, Polarity.INHIBITORY);
-        reservoir.setUpperBound(0, Polarity.INHIBITORY);
+        // TODO
+        // reservoir.setUpperBound(200, Polarity.EXCITATORY);
+        // reservoir.setLowerBound(0, Polarity.EXCITATORY);
+        // reservoir.setLowerBound(-200, Polarity.INHIBITORY);
+        // reservoir.setUpperBound(0, Polarity.INHIBITORY);
 
         return reservoir;
     }
@@ -212,7 +213,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
             xEnd = tar.getMaxX();
         }
 
-        SynapseGroup src2Res = new SynapseGroup(src, tar);
+        SynapseGroup src2Res = SynapseGroup.createSynapseGroup(src, tar);
         List<Neuron> tarNList = tar.getNeuronList();
         for (int ii = 0; ii < tar.size(); ++ii) {
             double x = tarNList.get(ii).getX();

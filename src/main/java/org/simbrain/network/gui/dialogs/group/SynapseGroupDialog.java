@@ -23,7 +23,6 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixViewer;
 import org.simbrain.network.gui.dialogs.connect.ConnectionSelectorPanel;
-import org.simbrain.network.gui.dialogs.connect.SynapsePropertiesPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -35,7 +34,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
@@ -44,7 +42,6 @@ import java.util.ArrayList;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-@SuppressWarnings("serial")
 public final class SynapseGroupDialog extends StandardDialog {
 
     /**
@@ -60,17 +57,18 @@ public final class SynapseGroupDialog extends StandardDialog {
     /**
      * Main tabbed pane.
      */
-    private JTabbedPane tabbedPane = new JTabbedPane();
+    private final JTabbedPane tabbedPane = new JTabbedPane();
 
     /**
      * Label Field.
      */
-    private JTextField tfSynapseGroupLabel = new JTextField();
+    private final JTextField tfSynapseGroupLabel = new JTextField();
 
     /**
-     * Panel for editing synapses in the group.
+     * The list of components which are stored here so their tabs can be blanked
+     * out. This is what allows the panel to resize when tabs are changed.
      */
-    private SynapsePropertiesPanel editSynapsesPanel;
+    private final ArrayList<Component> storedComponents = new ArrayList<>();
 
     /**
      * Panel for adjusting the connection object.
@@ -86,6 +84,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      * Summary info about synapse group.
      */
     private AnnotatedPropertyEditor sgProperties;
+
     /**
      * If true this is a creation dialog. Otherwise it is an edit dialog.
      */
@@ -102,56 +101,13 @@ public final class SynapseGroupDialog extends StandardDialog {
     private NeuronGroup targetNeuronGroup = null;
 
     /**
-     * The list of components which are stored here so their tabs can be blanked
-     * out. This is what allows the panel to resize when tabs are changed.
-     */
-    private final ArrayList<Component> storedComponents = new ArrayList<>();
-
-    /**
-     * When editing the connection strategy must be explicitly applied with a button press.
-     */
-    private ApplyPanel connectionApplyPanel;
-
-    /**
-     * Creates a synapse group dialog based on a source and target neuron group.
-     * This should be used when the synapse group being "edited" doesn't exist
-     * yet, i.e. it's being created from the parameters in this panel.
-     *
-     * @param np  the network panel
-     * @param src the source neuron group
-     * @param tar the target neuron group
-     * @return a synapse group dialog for creating a synapse group between the
-     * source and target neuron groups.
-     */
-    public static SynapseGroupDialog createSynapseGroupDialog(final NetworkPanel np, NeuronGroup src, NeuronGroup tar) {
-        SynapseGroupDialog sgd = new SynapseGroupDialog(np, src, tar);
-        sgd.tabbedPane.setSelectedIndex(0);
-        return sgd;
-    }
-
-    /**
-     * Creates a synapse group dialog based on a given synapse group it goes
-     * without saying that this means this dialog will be editing the given
-     * synapse group.
-     *
-     * @param np the network panel
-     * @param sg the synapse group being edited
-     * @return a synapse group dialog which can edit the specified synapse group
-     */
-    public static SynapseGroupDialog createSynapseGroupDialog(final NetworkPanel np, final SynapseGroup sg) {
-        SynapseGroupDialog sgd = new SynapseGroupDialog(np, sg);
-        sgd.tabbedPane.setSelectedIndex(0);
-        return sgd;
-    }
-
-    /**
      * Create a new synapse group connecting the indicated neuron groups.
      *
      * @param src source neuron group
      * @param tar target neuron group
      * @param np  parent panel
      */
-    private SynapseGroupDialog(final NetworkPanel np, NeuronGroup src, NeuronGroup tar) {
+    public SynapseGroupDialog(final NetworkPanel np, NeuronGroup src, NeuronGroup tar) {
         networkPanel = np;
         this.sourceNeuronGroup = src;
         this.targetNeuronGroup = tar;
@@ -165,7 +121,7 @@ public final class SynapseGroupDialog extends StandardDialog {
      * @param np Parent network panel
      * @param sg Synapse group being edited
      */
-    private SynapseGroupDialog(final NetworkPanel np, final SynapseGroup sg) {
+    public SynapseGroupDialog(final NetworkPanel np, final SynapseGroup sg) {
         networkPanel = np;
         synapseGroup = sg;
         this.sourceNeuronGroup = sg.getSourceNeuronGroup();
@@ -178,23 +134,17 @@ public final class SynapseGroupDialog extends StandardDialog {
      */
     private void init() {
 
-        if (isCreationDialog) {
-            setTitle("Create Synapse Group");
-        } else {
-            setTitle("Edit " + synapseGroup.getLabel());
-        }
-
         setMinimumSize(new Dimension(500, 300));
-        fillFieldValues();
-        setContentPane(tabbedPane);
 
         // Make the synapse group
         if (isCreationDialog) {
-            synapseGroup = new SynapseGroup(sourceNeuronGroup, targetNeuronGroup);
-        }
-
-        // Summary Info
-        if (!isCreationDialog) {
+            setTitle("Create Synapse Group");
+            synapseGroup = SynapseGroup.createSynapseGroup(sourceNeuronGroup, targetNeuronGroup);
+            tfSynapseGroupLabel.setText("Synapse group");
+        } else {
+            setTitle("Edit " + synapseGroup.getLabel());
+            setContentPane(tabbedPane);
+            tfSynapseGroupLabel.setText(synapseGroup.getLabel());
             sgProperties = new AnnotatedPropertyEditor(synapseGroup);
             JScrollPane summaryScrollWrapper = new JScrollPane(sgProperties);
             summaryScrollWrapper.setBorder(null);
@@ -207,11 +157,11 @@ public final class SynapseGroupDialog extends StandardDialog {
             connectionPanel = new ConnectionSelectorPanel(sourceNeuronGroup.equals(targetNeuronGroup), this, isCreationDialog);
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
-            storedComponents.add(connectWrapper);
-            tabbedPane.addTab("Connection Type", connectWrapper);
+            setContentPane(connectWrapper);
+
         } else {
             connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager(), this, isCreationDialog);
-            connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
+            var connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
                     (ActionEvent e) -> {
                 connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
                 //sumPanel.fillFieldValues(synapseGroup); // TODO
@@ -236,32 +186,6 @@ public final class SynapseGroupDialog extends StandardDialog {
             }
         }
 
-        // Tab for editing synapses
-        editSynapsesPanel = SynapsePropertiesPanel.createSynapsePropertiesPanel(this, synapseGroup);
-        if (!isCreationDialog) {
-            ActionListener al = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            // TODO
-                            //sumPanel.fillFieldValues(synapseGroup);
-                            //sumPanel.repaint();
-                            repaint();
-                            adjustmentPanel.fullUpdate();
-                        }
-                    });
-                }
-            };
-            editSynapsesPanel.addApplyListenerEx(al);
-            editSynapsesPanel.addApplyListenerIn(al);
-        }
-        JScrollPane editSynapseScrollPane = new JScrollPane(editSynapsesPanel);
-        editSynapseScrollPane.setBorder(null);
-        storedComponents.add(editSynapseScrollPane);
-        tabbedPane.addTab("Synapse Type", editSynapseScrollPane);
-
         // Synapse Adjustment Panel
         if(!isCreationDialog) {
             adjustmentPanel = SynapseGroupAdjustmentPanel.createSynapseGroupAdjustmentPanel(this, synapseGroup, isCreationDialog);
@@ -284,12 +208,12 @@ public final class SynapseGroupDialog extends StandardDialog {
                 updateTabSizes(((JTabbedPane) e.getSource()).getSelectedIndex());
             }
         });
-        updateTabSizes(0);
 
         if (!isCreationDialog) {
             // If editing, make this dialog based on a done button, rather than
             // ok and cancel. All edits are done with apply
             setAsDoneDialog();
+            updateTabSizes(0);
         }
     }
 
@@ -303,7 +227,6 @@ public final class SynapseGroupDialog extends StandardDialog {
             if (i == selectedTab) {
                 tabbedPane.setComponentAt(i, current);
                 tabbedPane.repaint();
-                continue;
             } else {
                 JPanel tmpPanel = new JPanel();
                 // Hack...
@@ -321,31 +244,20 @@ public final class SynapseGroupDialog extends StandardDialog {
                 tabbedPane.setComponentAt(i, tmpPanel);
             }
         }
-        // tabbedPane.invalidate();
         pack();
     }
 
-    /**
-     * Set the initial values of dialog components.
-     */
-    public void fillFieldValues() {
-        if (!isCreationDialog) {
-            tfSynapseGroupLabel.setText(synapseGroup.getLabel());
-        } else {
-            tfSynapseGroupLabel.setText("Synapse group");
-        }
-    }
 
     @Override
     protected void closeDialogOk() {
         super.closeDialogOk();
         if (isCreationDialog) {
-            connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
-            editSynapsesPanel.commitChanges();
+            // TODO: Below needed?
+            // connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
             networkPanel.getNetwork().addNetworkModel(synapseGroup);
             networkPanel.repaint();
         } else {
-            // When editing a synpase group most edits are handled by apply buttons
+            // When editing a synapse group most edits are handled by apply buttons
             sgProperties.commitChanges();
         }
     }

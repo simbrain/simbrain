@@ -2,11 +2,14 @@ package org.simbrain.network.gui
 
 //import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.connectors.Connectable
+import org.simbrain.network.connectors.WeightMatrix
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.dialogs.TestInputPanel
+import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
@@ -181,4 +184,18 @@ fun NetworkPanel.showLMSDialog(lms: LMSIterative) {
 //        pack()
 //        isVisible = true
 //    }
+}
+
+/**
+ * Connect all selected [Connectable]s with [WeightMatrix] objects.
+ */
+fun NetworkPanel.createConnector() {
+    with(selectionManager) {
+        val sources = filterSelectedSourceModels<Connectable>()
+        val targets = filterSelectedModels<Connectable>()
+        val dialog = ConnectorDialog(this.networkPanel, sources, targets)
+        dialog.setLocationRelativeTo(null)
+        dialog.pack()
+        dialog.isVisible = true
+    }
 }

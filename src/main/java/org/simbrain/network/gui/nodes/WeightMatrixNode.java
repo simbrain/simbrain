@@ -1,7 +1,10 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.util.PPaintContext;
-import org.simbrain.network.events.WeightMatrixEvents;
+import org.simbrain.network.connectors.Connector;
+import org.simbrain.network.connectors.WeightMatrix;
+import org.simbrain.network.connectors.ZoeZone;
+import org.simbrain.network.events.ConnectorEvents;
 import org.simbrain.network.gui.ImageBox;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixArrow;
@@ -9,7 +12,6 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -24,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 
@@ -32,10 +35,11 @@ import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
  */
 public class WeightMatrixNode extends ScreenElement implements PropertyChangeListener {
 
+    // todo; renam all
     /**
      * The weight matrix this node represents
      */
-    private WeightMatrix weightMatrix;
+    private Connector weightMatrix;
 
     /**
      * A box around the {@link #imageBox}
@@ -57,13 +61,14 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
      */
     private final NetworkPanel networkPanel;
 
-    /**
-     * Construct the weight matrix node.
-     *
-     * @param np parent panel
-     * @param wm the weight matrix being represented
-     */
-    public WeightMatrixNode(NetworkPanel np, WeightMatrix wm) {
+
+   /**
+    * Construct the weight matrix node.
+    *
+    * @param np parent panel
+    * @param wm the weight matrix being represented
+    */
+    public WeightMatrixNode(NetworkPanel np, Connector wm) {
         super(np);
         networkPanel = np;
 
@@ -80,7 +85,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         setPickable(true);
 
-        WeightMatrixEvents events = weightMatrix.getEvents();
+        ConnectorEvents events = weightMatrix.getEvents();
         events.onDeleted(w -> removeFromParent());
         events.onUpdated(this::renderMatrixToImage);
         wm.getSource().getEvents().onLocationChange(arrow::invalidateFullBounds);
@@ -100,9 +105,20 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         BufferedImage img = null;
 
         if (weightMatrix.isEnableRendering()) {
-            double[] pixelArray = weightMatrix.getWeights();
-            img = ImageKt.toSimbrainColorImage(pixelArray, weightMatrix.getWeightMatrix().ncols(),
-                    weightMatrix.getWeightMatrix().nrows());
+
+            if (weightMatrix instanceof ZoeZone) {
+                // TODO: Temp representation. If there is enough divergence can break into separate classes and update
+                //  NetworkPanel.kt accordingly
+                double[] tempArray = new double[100];
+                Arrays.fill(tempArray, .1);
+                img = ImageKt.toSimbrainColorImage(tempArray, 10, 10);
+            } else {
+                double[] pixelArray = ((WeightMatrix)weightMatrix).getWeights();
+                img = ImageKt.toSimbrainColorImage(pixelArray, ((WeightMatrix)weightMatrix).getWeightMatrix().ncols(),
+                        ((WeightMatrix)weightMatrix).getWeightMatrix().nrows());
+
+            }
+
         }
 
         imageBox.setImage(img);
@@ -187,7 +203,10 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
             }
             @Override
             public void actionPerformed(final ActionEvent event) {
-                weightMatrix.diagonalize();
+                // TODO: Clean up instanceof checks and casts
+                if (weightMatrix instanceof WeightMatrix) {
+                    ((WeightMatrix) weightMatrix).diagonalize();
+                }
             }
         };
         contextMenu.add(diagAction);
@@ -196,28 +215,30 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         Action editComponents = new AbstractAction("Edit Components...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
+                // TODO
                 StandardDialog dialog = new StandardDialog();
-                NumericTable table = new NumericTable(weightMatrix.getWeightMatrix().toArray());
+                NumericTable table = new NumericTable(((WeightMatrix) weightMatrix).getWeightMatrix().toArray());
                 SimbrainJTable st = SimbrainJTable.createTable(table);
                 dialog.setContentPane(new SimbrainJTableScrollPanel(st));
 
                 dialog.addClosingTask(() -> {
-                    weightMatrix.setWeights(table.getFlattenedData());
+                    if (weightMatrix instanceof WeightMatrix) {
+                        ((WeightMatrix) weightMatrix).setWeights(table.getFlattenedData());
+                    }
                 });
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-
             }
         };
-        contextMenu.add(editComponents);
+        if (weightMatrix instanceof  WeightMatrix) {
+            contextMenu.add(editComponents);
+        }
 
         // Coupling menu
         contextMenu.addSeparator();
         JMenu couplingMenu = createCouplingMenu(networkPanel.getNetworkComponent(), weightMatrix);
-        if (couplingMenu != null) {
-            contextMenu.add(couplingMenu);
-        }
+        contextMenu.add(couplingMenu);
 
         return contextMenu;
 
@@ -252,7 +273,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
     }
 
     @Override
-    public WeightMatrix getModel() {
+    public Connector getModel() {
         return weightMatrix;
     }
 

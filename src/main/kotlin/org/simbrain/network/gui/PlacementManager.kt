@@ -34,7 +34,7 @@ class PlacementManager() {
     object DefaultOffsets {
         operator fun get(model: LocatableModel?) = when (model) {
             is Neuron -> point(45, 0)
-            is NeuronArray -> point(0, -145)
+            is NeuronArray -> point(0, -250)
             is NeuronGroup -> point(270, 0)
             is Hopfield -> point(300, 0)
             is CompetitiveNetwork -> point(300, 0)

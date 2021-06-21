@@ -2,11 +2,11 @@ package org.simbrain.network.groups;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
+import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.NeuronCollectionEvents;
-import org.simbrain.network.matrix.WeightMatrixConnectable;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
@@ -32,7 +32,7 @@ import static org.simbrain.util.GeomKt.minus;
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
  * neuron update rules and track synapse polarity).
  */
-public abstract class AbstractNeuronCollection extends WeightMatrixConnectable implements CopyableObject, AttributeContainer {
+public abstract class AbstractNeuronCollection extends Connectable implements CopyableObject, AttributeContainer {
 
     /**
      * Reference to the network this group is a part of.
@@ -356,7 +356,8 @@ public abstract class AbstractNeuronCollection extends WeightMatrixConnectable i
         // inputManager.applyCurrentRow(); // TODO
 
         // Add weighted inputs to inputs
-        addInputs(getWeightedInputs());
+        // TODO Convert to matrix
+        addInputs(getSummedOutputs().col(0));
     }
 
     @Override

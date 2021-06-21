@@ -2,11 +2,11 @@ package org.simbrain.network.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.simbrain.network.connectors.WeightMatrix;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.util.Utils;
 
 import java.util.List;

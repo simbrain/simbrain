@@ -1,8 +1,8 @@
 package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
-import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.gui.nodes.WeightMatrixNode
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow
@@ -13,7 +13,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
     private val source get() = weightMatrixNode.model.source
     private val target get() = weightMatrixNode.model.target
-    private fun isBidirectional() = target.outgoingWeightMatrices.any { it.target == source }
+    private fun isBidirectional() = target.outgoingConnectors.any { it.target == source }
 
     private val arrow = if (source == target) {
         RecurrentArrow()

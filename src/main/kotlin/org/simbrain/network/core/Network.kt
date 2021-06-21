@@ -4,13 +4,14 @@ import com.thoughtworks.xstream.XStream
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.connectors.Connector
+import org.simbrain.network.connectors.WeightMatrix
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
 import java.awt.geom.Point2D
@@ -602,7 +603,7 @@ public val deserializationOrder: List<Class<out NetworkModel>> = listOf(
     NeuronGroup::class.java,
     NeuronCollection::class.java,
     NeuronArray::class.java,
-    WeightMatrix::class.java,
+    Connector::class.java,
     SynapseGroup::class.java,
     Subnetwork::class.java,
     Synapse::class.java

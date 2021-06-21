@@ -12,6 +12,8 @@ import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
+import org.simbrain.network.connectors.Connector
+import org.simbrain.network.connectors.WeightMatrix
 import org.simbrain.network.core.*
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -24,8 +26,6 @@ import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.matrix.WeightMatrixConnectable
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.topLeftLocation
@@ -250,7 +250,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
             is SynapseGroup -> createNode(model)
-            is WeightMatrix -> createNode(model)
+            is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
             is SmileClassifier -> createNode(model)
@@ -310,7 +310,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         SynapseGroupNode(this, synapseGroup)
     }.also { it.lowerToBottom() }
 
-    fun createNode(weightMatrix: WeightMatrix) = addScreenElement {
+    fun createNode(weightMatrix: Connector) = addScreenElement {
         WeightMatrixNode(this, weightMatrix).also { it.lower() }
     }
 
@@ -496,7 +496,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
      */
     fun connectSelectedModels() {
 
-
         with(selectionManager) {
 
             // Connect first selected neuron groups with a synapse group, if any are selected
@@ -515,22 +514,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
             quickConnector.applyCurrentConnection(network, sourceNeurons, targetNeurons)
-        }
-    }
-
-    /**
-     * Connect all selected [WeightMatrixConnectable]s with [WeightMatrix] objects.
-     */
-    fun connectWithWeightMatrix() {
-        with(selectionManager) {
-            val sources = filterSelectedSourceModels<WeightMatrixConnectable>()
-            val targets = filterSelectedModels<WeightMatrixConnectable>()
-
-            for (source in sources) {
-                for (target in targets) {
-                    network.addNetworkModel(WeightMatrix(network, source, target));
-                }
-            }
         }
     }
 

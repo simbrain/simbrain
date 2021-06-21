@@ -1,10 +1,9 @@
-package org.simbrain.network.matrix;
+package org.simbrain.network.connectors;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import smile.math.matrix.Matrix;
@@ -16,48 +15,48 @@ import java.util.List;
 
 /**
  * Classes that implement this interface can be the source or target of a
- * weight matrix (or other layer-to-layer connector, if we add them). Encompasses
- * both {@link NeuronArray} and {@link org.simbrain.network.groups.AbstractNeuronCollection}.
+ * {@link Connector}, e.g. a weight matrix. Associated with an activation vector and a separate
+ * input vector that stores summed output from incoming connectors.
  */
-public abstract class WeightMatrixConnectable extends LocatableModel {
+public abstract class Connectable extends LocatableModel {
 
     /**
-     * "Fan-in" of incoming weight matrices.
+     * "Fan-in" of incoming connectors.
      */
-    private final List<WeightMatrix> incomingWeightMatrices = new ArrayList<>();;
+    private final List<Connector> incomingConnectors = new ArrayList<>();;
 
     /**
-     * "Fan-out" of outgoing weight matrices.
+     * "Fan-out" of outgoing connectors.
      */
-    private final List<WeightMatrix> outgoingWeightMatrices = new ArrayList<>();
+    private final List<Connector> outgoingConnectors = new ArrayList<>();
 
     /**
      * Event support.
      */
     private transient LocationEvents events = new LocationEvents(this);
 
-    public void addIncomingWeightMatrix(WeightMatrix weightMatrix) {
-        incomingWeightMatrices.add(weightMatrix);
+    public void addIncomingConnector(Connector connector) {
+        incomingConnectors.add(connector);
     }
 
-    public void removeIncomingWeightMatrix(WeightMatrix weightMatrix) {
-        incomingWeightMatrices.remove(weightMatrix);
+    public void removeIncomingConnector(Connector connector) {
+        incomingConnectors.remove(connector);
     }
 
-    public void addOutgoingWeightMatrix(WeightMatrix weightMatrix) {
-        outgoingWeightMatrices.add(weightMatrix);
+    public void addOutgoingConnector(Connector connector) {
+        outgoingConnectors.add(connector);
     }
 
-    public void removeOutgoingWeightMatrix(WeightMatrix weightMatrix) {
-        outgoingWeightMatrices.remove(weightMatrix);
+    public void removeOutgoingConnector(Connector connector) {
+        outgoingConnectors.remove(connector);
     }
 
-    public List<WeightMatrix> getIncomingWeightMatrices() {
-        return incomingWeightMatrices;
+    public List<Connector> getIncomingConnectors() {
+        return incomingConnectors;
     }
 
-    public List<WeightMatrix> getOutgoingWeightMatrices() {
-        return outgoingWeightMatrices;
+    public List<Connector> getOutgoingConnectors() {
+        return outgoingConnectors;
     }
 
     /**
@@ -74,7 +73,7 @@ public abstract class WeightMatrixConnectable extends LocatableModel {
     public abstract double[] getActivations();
 
     // TODO: Temp until we convert to matrices
-    public Matrix getMatrix() {
+    public Matrix getActivationsAsMatrix() {
         return new Matrix(getActivations());
     }
 
@@ -82,15 +81,21 @@ public abstract class WeightMatrixConnectable extends LocatableModel {
     public abstract void setActivations(double[] activations);
 
     /**
-     * Iterate through incoming arrayconnetables, multiply by intervening weight matrices, and add the results
-     * to an array which is returned.
+     * Iterate through incoming connectors and return their summed outputs.
      */
-    public double[] getWeightedInputs() {
-        double[] result = new double[getInputs().length];
-        for (WeightMatrix wm : incomingWeightMatrices) {
-            result = SimbrainMath.addVector(result, wm.weightsTimesSource());
-        }
+    public Matrix getSummedOutputs() {
+        Matrix  result = new Matrix( getInputs().length,1);
+        for (Connector c : incomingConnectors) {
+                result.add(c.getOutput());
+            }
         return result;
+    }
+
+    /**
+     * Size of activation vector.
+     */
+    public int size() {
+        return getActivations().length;
     }
 
     /**
@@ -157,7 +162,5 @@ public abstract class WeightMatrixConnectable extends LocatableModel {
         events = new LocationEvents(this);
         return this;
     }
-
-
 
 }

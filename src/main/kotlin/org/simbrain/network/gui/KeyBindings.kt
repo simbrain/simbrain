@@ -41,10 +41,10 @@ fun NetworkPanel.addKeyBindings() {
     bind(CmdOrCtrl + 'Y') { redo() }
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModels() }
-    bindTo("3", networkActions.selectIncomingWeightsAction)
-    bindTo("4", networkActions.selectOutgoingWeightsAction)
+    bind("3") {  createConnector() }
     bind("5") { looseWeightsVisible = !looseWeightsVisible }
-    bind("6") { connectWithWeightMatrix() }
+    bindTo("6", networkActions.selectIncomingWeightsAction)
+    bindTo("7", networkActions.selectOutgoingWeightsAction)
     bind("8") {
         network.events.fireDebug()
         selectionManager.selectedModels.filterIsInstance<LocatableModel>().forEach { println(it.location) }

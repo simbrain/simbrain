@@ -4,7 +4,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
@@ -27,12 +28,12 @@ public class WeightMatrix extends Connector {
     /**
      * Holds data for prototype rule.
      */
-    private DataHolder dataHolder = new DataHolder.EmptyDataHolder();
+    private MatrixDataHolder dataHolder = new EmptyMatrixData();
 
     /**
      * Holds data for spike responder.
      */
-    private DataHolder spikeResponseHolder = new DataHolder.EmptyDataHolder();
+    private MatrixDataHolder spikeResponseHolder = new EmptyMatrixData();
 
     /**
      * The weight matrix object.
@@ -96,7 +97,6 @@ public class WeightMatrix extends Connector {
         getEvents().fireUpdated();
     }
 
-
     /**
      * Returns the product of the this matrix its source activations
      */
@@ -107,11 +107,9 @@ public class WeightMatrix extends Connector {
 
     @Override
     public void update() {
-        // TODO: Check for clamping
-        // TODO: Use cache
-        if (! (prototypeRule instanceof StaticSynapseRule)){
-            weightMatrix = prototypeRule.apply(source.getActivationsAsMatrix(),
-                    target.getActivationsAsMatrix(), weightMatrix, dataHolder);
+        // TODO: Check for clamping or "freezing"
+        if (!(prototypeRule instanceof StaticSynapseRule)){
+            prototypeRule.apply(this, dataHolder);
             getEvents().fireUpdated();
         }
     }

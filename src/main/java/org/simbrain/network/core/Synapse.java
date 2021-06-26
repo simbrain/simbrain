@@ -24,7 +24,8 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.EmptyScalarData;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
@@ -190,11 +191,15 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     private final boolean isTemplate;
 
     /**
+     * Data holder for synapse
+     */
+    private ScalarDataHolder dataHolder = new EmptyScalarData();
+
+    /**
      * Support for property change events.
      */
     private transient SynapseEvents events = new SynapseEvents(this);
 
-    /** Initialize properties */
     static {
         Properties properties = Utils.getSimbrainProperties();
         if (properties.containsKey("weightUpperBound")) {
@@ -367,14 +372,12 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
             return;
         }
         // Update synapse strengths for non-static synapses
-        // TODO: creating new data holder each update!
         if (!(learningRule instanceof StaticSynapseRule)) {
-            setStrength(learningRule.apply(source.getActivation(), target.getActivation(), strength,
-                    new DataHolder.EmptyDataHolder()));
+            learningRule.apply(this, dataHolder);
         }
-        // Udpate psr for synapses with a spike responder
+        // Update psr for synapses with a spike responder
         if(!(spikeResponder instanceof NonResponder)) {
-            setPsr(spikeResponder.apply(strength, psr, source.isSpike()));
+            spikeResponder.apply(this);
         }
     }
 
@@ -980,5 +983,9 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     public void hardClear() {
         clear();
         setStrength(0);
+    }
+
+    public ScalarDataHolder getDataHolder() {
+        return dataHolder;
     }
 }

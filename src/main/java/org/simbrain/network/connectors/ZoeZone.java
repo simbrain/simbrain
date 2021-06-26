@@ -3,7 +3,8 @@ package org.simbrain.network.connectors;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
 import smile.math.matrix.Matrix;
 import smile.stat.distribution.GaussianDistribution;
@@ -23,7 +24,7 @@ public class ZoeZone extends Connector {
     /**
      * Holds data for prototype rule.
      */
-    private DataHolder dataHolder = new DataHolder.EmptyDataHolder();
+    private MatrixDataHolder dataHolder = new EmptyMatrixData();
 
     /**
      * Construct the matrix.

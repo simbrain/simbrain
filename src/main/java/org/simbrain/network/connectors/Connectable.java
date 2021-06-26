@@ -60,9 +60,9 @@ public abstract class Connectable extends LocatableModel {
     }
 
     /**
-     * Return the current weighted inputs. Should be used for internal updating only.
+     * Return the current weighted inputs.
      */
-    protected abstract double[] getInputs();
+    public abstract double[] getInputs();
 
     // There should NOT be a setInputs function because it will mess up updating.
 

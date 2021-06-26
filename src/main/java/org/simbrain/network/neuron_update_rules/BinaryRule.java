@@ -18,11 +18,14 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.events.NeuronEvents;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.BiasedMatrixData;
+import org.simbrain.network.util.BiasedScalarData;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 import java.util.Random;
@@ -69,11 +72,6 @@ public class BinaryRule extends NeuronUpdateRule {
     public BinaryRule() {
     }
 
-    @Override
-    public DataHolder createDataHolder(int size) {
-        return new DataHolder.BiasedDataHolder(size);
-    }
-
     public BinaryRule(double floor, double ceil, double threshold) {
         this.ceiling = ceil;
         this.floor = floor;
@@ -90,23 +88,37 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
-    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
-        double[] vals = new double[inputs.length];
-        for (int i = 0; i < inputs.length ; i++) {
-            vals[i] = apply(inputs[i], activations[i], data, null);
+    public void apply(Connectable array, MatrixDataHolder data) {
+        // TODO: Implement using matrix operations
+        double[] vals = new double[array.size()];
+        for (int i = 0; i < vals.length ; i++) {
+            vals[i] = binaryRule(array.getInputs()[i], ((BiasedMatrixData)data).getBiases()[i]);
         }
-        return vals;
+        array.setActivations(vals);
     }
 
     @Override
-    public double apply(double in, double activation, DataHolder dataHolder, NeuronEvents events) {
-        DataHolder.BiasedDataHolder bdata = (DataHolder.BiasedDataHolder)dataHolder;
-        double wtdInput = in + bdata.biases[0];
+    public void apply(Neuron neuron, ScalarDataHolder data) {
+        neuron.setActivation(binaryRule(neuron.getInput(), ((BiasedScalarData)data).getBias()));
+    }
+
+    public double binaryRule(double in, double bias) {
+        double wtdInput = in + bias;
         if (wtdInput > threshold) {
             return getUpperBound();
         } else {
-           return getLowerBound();
+            return getLowerBound();
         }
+    }
+
+    @Override
+    public MatrixDataHolder createMatrixData(int size) {
+        return new BiasedMatrixData(size);
+    }
+
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new BiasedScalarData();
     }
 
     @Override

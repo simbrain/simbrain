@@ -27,7 +27,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.EmptyScalarData;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
@@ -199,7 +200,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Local data holder for neuron update rule.
      */
-    private DataHolder neuronDataHolder = new DataHolder.BiasedDataHolder(1);
+    private ScalarDataHolder neuronDataHolder = new EmptyScalarData();
 
     /**
      * Construct a specific type of neuron.
@@ -244,11 +245,11 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         setNeuronDataHolder(n.getNeuronDataHolder());
     }
 
-    public DataHolder getNeuronDataHolder() {
+    public ScalarDataHolder getNeuronDataHolder() {
         return neuronDataHolder;
     }
 
-    public void setNeuronDataHolder(DataHolder neuronDataHolder) {
+    public void setNeuronDataHolder(ScalarDataHolder neuronDataHolder) {
         this.neuronDataHolder = neuronDataHolder;
     }
 
@@ -325,8 +326,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule.deepCopy();
-        updateRule.setTimeStepSupplier(parent::getTimeStep);
-        neuronDataHolder = updateRule.createDataHolder(1);
+        neuronDataHolder = updateRule.createScalarData();
         // TODO: No need to change if the neuron is not new, or has not changed from spiking to non-spiking
         // But this check caused problems so commented out for null
         // if (oldRule == null || (oldRule.isSpikingNeuron() != updateRule.isSpikingNeuron())) {
@@ -343,7 +343,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Change the current update rule but perform no other initialization.
      */
-    public void changeUpdateRule(final NeuronUpdateRule updateRule, final DataHolder data) {
+    public void changeUpdateRule(final NeuronUpdateRule updateRule, final ScalarDataHolder data) {
         this.updateRule = updateRule;
         this.neuronDataHolder = data;
     }
@@ -355,19 +355,13 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public void update() {
-        update(updateRule, neuronDataHolder);
-    }
-
-    /**
-     * TODO
-     */
-    public void update(NeuronUpdateRule rule, DataHolder data) {
+        if (isSpike()) {
+            setSpike(false);
+        }
         if (isClamped()) {
             return;
         }
-
-        setActivation(rule.apply(inputValue, activation, data, events));
-
+        updateRule.apply(this, neuronDataHolder);
         inputValue = 0.0;
     }
 
@@ -1030,16 +1024,12 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     public boolean isSpike() {
-        if (neuronDataHolder instanceof DataHolder.SpikingDataHolder) {
-            return ((DataHolder.SpikingDataHolder)neuronDataHolder).spikes[0];
-        }
-        return false;
+        return spike;
     }
 
-    @Deprecated
     public void setSpike(boolean spike) {
         this.spike = spike;
-        events.fireSpiked();
+        events.fireSpiked(spike);
     }
 
     public double getLastActivation() {

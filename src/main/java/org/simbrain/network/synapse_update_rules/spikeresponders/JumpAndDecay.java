@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
+import org.simbrain.network.connectors.Connector;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.UserParameter;
 
@@ -62,26 +63,35 @@ public class JumpAndDecay extends SpikeResponder {
     }
 
     @Override
-    public void update(final Synapse s) {
-        value = s.getPsr();
-        if (s.getSource().isSpike()) {
-            value = jumpHeight * s.getStrength();
-        } else {
-            double timeStep = s.getParentNetwork().getTimeStep();
-            value += timeStep * (baseLine - value) / timeConstant;
-        }
-        s.setPsr(value);
+    public void apply(Connector connector) {
+        // TODO
     }
 
-    public double apply(double strength, double psr, boolean isSpike) {
+    @Override
+    public void apply(Synapse s) {
+        s.setPsr(jumpAndDecay(s.getSource().isSpike()
+                , s.getPsr(), s.getStrength(), s.getNetwork().getTimeStep()));
+    }
+
+    // TODO: Ugly
+    public double jumpAndDecay(boolean isSpike, double psr, double wt, double timeStep) {
         if (isSpike) {
-            psr = jumpHeight * strength;
+            return jumpHeight * wt;
         } else {
-            double timeStep = .1; // Todo: Time step
-            psr += timeStep * (baseLine - psr) / timeConstant;
+            return psr + timeStep * ((baseLine - psr) / timeConstant);
         }
-        // System.out.println(isSpike + "," + psr);
-        return psr;
+    }
+
+    @Override
+    public void update(final Synapse s) {
+        // value = s.getPsr();
+        // if (s.getSource().isSpike()) {
+        //     value = jumpHeight * s.getStrength();
+        // } else {
+        //     double timeStep = s.getParentNetwork().getTimeStep();
+        //     value += timeStep * (baseLine - value) / timeConstant;
+        // }
+        // s.setPsr(value);
     }
 
     @Override

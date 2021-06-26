@@ -400,7 +400,7 @@ public abstract class AbstractNeuronCollection extends Connectable implements Co
     }
 
     @Override
-    protected double[] getInputs() {
+    public double[] getInputs() {
         return neuronList.stream()
                 .map(Neuron::getInput)
                 .mapToDouble(Double::doubleValue)

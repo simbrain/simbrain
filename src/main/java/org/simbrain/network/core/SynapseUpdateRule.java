@@ -18,12 +18,15 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.connectors.Connector;
 import org.simbrain.network.synapse_update_rules.*;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.EmptyScalarData;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import smile.math.matrix.Matrix;
 
 import java.util.Arrays;
 import java.util.List;
@@ -64,11 +67,7 @@ public abstract class SynapseUpdateRule implements CopyableObject {
      */
     public abstract void init(Synapse synapse);
 
-    /**
-     * Apply the update rule.
-     *
-     * @param synapse parent synapse
-     */
+    @Deprecated
     public abstract void update(Synapse synapse);
 
     /**
@@ -102,17 +101,17 @@ public abstract class SynapseUpdateRule implements CopyableObject {
         return deepCopy();
     }
 
-    // TODO: Explicitly separating scalar and array cases to avoid Matrix overhead
-    // Evaluate for use in neuronupdate rule
-
     // TODO: Make abstract and run through
-    public Matrix apply(Matrix srcActivations, Matrix tarActivations,
-                        Matrix weights, DataHolder dataHolder) {return null;}
-
-    public double apply(double srcActivation, double tarActivation,
-                          double weight, DataHolder dataHolder) {return 0;}
+    public void apply(Connector connector, MatrixDataHolder dataHolder) {}
 
     // TODO: Be more explicit about "default" data holder.
-    public DataHolder createDataHolder() {return new DataHolder.EmptyDataHolder();
+    public MatrixDataHolder createMatrixData(int size) {return new EmptyMatrixData();
     }
+
+    // TODO: Make abstract and run through
+    public void apply(Synapse synapse, ScalarDataHolder data) {};
+
+    // TODO: Be more explicit about "default" data holder.
+    public ScalarDataHolder createScalarData() {return new EmptyScalarData();}
+
 }

@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
+import org.simbrain.network.connectors.Connector;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.util.DataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 
@@ -62,11 +62,7 @@ public abstract class SpikeResponder implements CopyableObject {
      */
     public abstract SpikeResponder deepCopy();
 
-    /**
-     * Update the synapse.
-     *
-     * @param s the synapse being updated
-     */
+    @Deprecated
     public abstract void update(final Synapse s);
 
     /**
@@ -113,14 +109,13 @@ public abstract class SpikeResponder implements CopyableObject {
         return deepCopy();
     }
 
+    // No spike responders currently maintain state. If that changes, we can add a data holder as argument to the
+    // apply functions.
 
     // TODO: Make abstract and run through
-    // public double[] apply(Matrix srcActivations, Matrix tarActivations,
-    //                     Matrix weights, DataHolder dataHolder) {return null;}
+    public void apply(Connector connector) {}
 
-    public double apply(double strength, double psr, boolean isSpike) { return 0;}
+    // TODO: Make abstract and run through
+    public void apply(Synapse synapse) {};
 
-    // TODO: Be more explicit about "default" data holder.
-    public DataHolder createDataHolder() {return new DataHolder.EmptyDataHolder();
-    }
 }

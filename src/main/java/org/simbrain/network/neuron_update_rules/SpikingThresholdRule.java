@@ -18,11 +18,14 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.EmptyScalarData;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.SpikingMatrixData;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -63,40 +66,25 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     @Override
-    public DataHolder createDataHolder(int size) {
-        return new DataHolder.SpikingDataHolder(size);
-    }
-
-    @Override
-    public double[] apply(double[] inputs, double[] activations, DataHolder dataHolder) {
-        double[] vals = new double[inputs.length];
-        for (int i = 0; i < inputs.length ; i++) {
-            vals[i] = apply(inputs[i], activations[i], dataHolder, null);
-        }
-        return vals;
-    }
-
-    @Override
-    public double apply(double in, double activation, DataHolder dataHolder, NeuronEvents events) {
-        var dataspk = (DataHolder.SpikingDataHolder)dataHolder;
-        final double input = in + (addNoise ? noiseGenerator.getRandom() : 0);
-        if (input >= threshold) {
-            dataspk.spikes[0] = true;
-            // dataspk.lastSpikeTimes[0] = getTime; // TODO
-            if (events != null) {
-                events.fireSpiked();
+    public void apply(Connectable array, MatrixDataHolder data) {
+        // TODO: Implement using matrix operations
+        double[] vals = new double[array.size()];
+        for (int i = 0; i < vals.length; i++) {
+            if (spikingThresholdRule(array.getInputs()[i])) {
+                ((SpikingMatrixData) data).getSpikes()[0] = true;
+                // dataspk.lastSpikeTimes[0] = getTime; // TODO
+                vals[i] = 1;
+            } else {
+                ((SpikingMatrixData) data).getSpikes()[0] = false;
+                vals[i] = 0;
             }
-            return 1;
-        } else {
-            dataspk.spikes[0] = false;
-            return 0;
         }
+        array.setActivations(vals);
     }
 
     @Override
-    public void update(Neuron neuron) {
-        final double input = neuron.getInput() + (addNoise ? noiseGenerator.getRandom() : 0);
-        if (input >= threshold) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
+        if (spikingThresholdRule(neuron.getInput())) {
             neuron.setSpike(true);
             setHasSpiked(true, neuron);
             neuron.setActivation(1);
@@ -105,6 +93,29 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
             setHasSpiked(false, neuron);
             neuron.setActivation(0); // Make this a separate variable?
         }
+    }
+
+    public boolean spikingThresholdRule(double in) {
+        final double input = in + (addNoise ? noiseGenerator.getRandom() : 0);
+        if (input >= threshold) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public MatrixDataHolder createMatrixData(int size) {
+        return new SpikingMatrixData(size);
+    }
+
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new EmptyScalarData();
+    }
+
+    @Override
+    public void update(Neuron neuron) {
     }
 
     @Override

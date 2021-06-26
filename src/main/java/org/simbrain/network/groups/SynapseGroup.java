@@ -305,25 +305,19 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
 
         if (!(exLearningRule instanceof StaticSynapseRule)) {
             exSynapseSet.forEach(s -> {
-                s.setStrength(exLearningRule.apply(s.getSource().getActivation(),
-                        s.getTarget().getActivation(), s.getStrength(), null));
+                exLearningRule.apply(s, s.getDataHolder());
             });
         }
         if (!(inLearningRule instanceof StaticSynapseRule)) {
             inSynapseSet.forEach(s -> {
-                s.setStrength(inLearningRule.apply(s.getSource().getActivation(),
-                        s.getTarget().getActivation(), s.getStrength(), null));
+                inLearningRule.apply(s, s.getDataHolder());
             });
         }
         if (!(exSpikeResponder instanceof NonResponder)) {
-            exSynapseSet.forEach(s -> {
-                s.setPsr(exSpikeResponder.apply(s.getStrength(), s.getPsr(), s.getSource().isSpike()));
-            });
+            exSynapseSet.forEach(exSpikeResponder::apply);
         }
         if (!(inSpikeResponder instanceof NonResponder)) {
-            inSynapseSet.forEach(s -> {
-                s.setPsr(inSpikeResponder.apply(s.getStrength(), s.getPsr(), s.getSource().isSpike()));
-            });
+            inSynapseSet.forEach(inSpikeResponder::apply);
         }
     }
 

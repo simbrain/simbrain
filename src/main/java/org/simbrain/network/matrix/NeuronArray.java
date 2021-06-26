@@ -6,7 +6,7 @@ import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
@@ -34,7 +34,7 @@ public class NeuronArray extends Connectable implements EditableObject, Attribut
     /**
      * Holds data for prototype rule.
      */
-    private DataHolder dataHolder;
+    private MatrixDataHolder dataHolder;
 
     /**
      * Reference to network this array is part of.
@@ -215,13 +215,13 @@ public class NeuronArray extends Connectable implements EditableObject, Attribut
         if (clamped) {
             return;
         }
-        setActivations(prototypeRule.apply(inputs, activations, dataHolder));
+        prototypeRule.apply(this, dataHolder);
         inputs = new double[inputs.length]; // clear inputs
         getEvents().fireUpdated();
     }
 
     @Override
-    protected double[] getInputs() {
+    public double[] getInputs() {
         return inputs;
     }
 
@@ -302,18 +302,18 @@ public class NeuronArray extends Connectable implements EditableObject, Attribut
 
     public void setPrototypeRule(NeuronUpdateRule prototypeRule) {
         this.prototypeRule = prototypeRule;
-        dataHolder = prototypeRule.createDataHolder(activations.length);
+        dataHolder = prototypeRule.createMatrixData(activations.length);
     }
 
     public NeuronUpdateRule getPrototypeRule() {
         return prototypeRule;
     }
 
-    public DataHolder getDataHolder() {
+    public MatrixDataHolder getDataHolder() {
         return dataHolder;
     }
 
-    public void setDataHolder(DataHolder dataHolder) {
+    public void setDataHolder(MatrixDataHolder dataHolder) {
         this.dataHolder = dataHolder;
     }
 }

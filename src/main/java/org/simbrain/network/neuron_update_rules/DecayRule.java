@@ -18,14 +18,17 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.BiasedMatrixData;
+import org.simbrain.network.util.BiasedScalarData;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -110,18 +113,24 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     private double floor = DEFAULT_FLOOR;
 
     @Override
-    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
-        double[] vals = new double[inputs.length];
-        for (int i = 0; i < inputs.length ; i++) {
-            vals[i] = apply(inputs[i], activations[i], data, null);
+    public void apply(Connectable array, MatrixDataHolder data) {
+        // TODO: Implement using matrix operations
+        double[] vals = new double[array.size()];
+        for (int i = 0; i < vals.length ; i++) {
+            vals[i] = decayRule(array.getInputs()[i],
+                    array.getActivations()[i], ((BiasedMatrixData)data).getBiases()[i]);
         }
-        return vals;
+        array.setActivations(vals);
     }
 
     @Override
-    public double apply(double in, double activation, DataHolder dataHolder, NeuronEvents events) {
-        DataHolder.BiasedDataHolder bdata = (DataHolder.BiasedDataHolder)dataHolder;
-        double val = in  + activation + bdata.biases[0];
+    public void apply(Neuron neuron, ScalarDataHolder data) {
+        neuron.setActivation(decayRule(neuron.getInput(),
+                neuron.getActivation(), ((BiasedScalarData)data).getBias()));
+    }
+
+    public double decayRule(double in, double activation, double bias) {
+        double val = in  + activation + bias;
         double decayVal = 0;
         if (updateType == UpdateType.Relative) {
             decayVal = decayFraction * Math.abs(val - baseLine);
@@ -149,8 +158,13 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     }
 
     @Override
-    public DataHolder createDataHolder(int size) {
-        return new DataHolder.BiasedDataHolder(size);
+    public MatrixDataHolder createMatrixData(int size) {
+        return new BiasedMatrixData(size);
+    }
+
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new BiasedScalarData();
     }
 
     @Override

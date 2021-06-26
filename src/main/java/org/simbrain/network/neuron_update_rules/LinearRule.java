@@ -18,12 +18,18 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.events.NeuronEvents;
-import org.simbrain.network.neuron_update_rules.interfaces.*;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.BiasedMatrixData;
+import org.simbrain.network.util.BiasedScalarData;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -31,7 +37,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule,
+public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdateRule,
         BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
     /**
@@ -59,11 +65,6 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     private double slope = 1;
 
     /**
-     * Bias.
-     */
-    private double bias = 0;
-
-    /**
      * Noise generator.
      */
     private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
@@ -89,18 +90,22 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     @Override
-    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
-        double[] vals = new double[inputs.length];
-        for (int i = 0; i < inputs.length ; i++) {
-            vals[i] = apply(inputs[i], activations[i], data, null);
+    public void apply(Connectable array, MatrixDataHolder data) {
+        // TODO: Implement using matrix operations
+        double[] vals = new double[array.size()];
+        for (int i = 0; i < vals.length ; i++) {
+            vals[i] = linearRule(array.getInputs()[i], ((BiasedMatrixData)data).getBiases()[i]);
         }
-        return vals;
+        array.setActivations(vals);
     }
 
     @Override
-    public double apply(double in, double activation, DataHolder dataHolder, NeuronEvents events) {
-        DataHolder.BiasedDataHolder bdata = (DataHolder.BiasedDataHolder)dataHolder;
-        double ret = in * slope + bdata.biases[0];
+    public void apply(Neuron neuron, ScalarDataHolder data) {
+        neuron.setActivation(linearRule(neuron.getInput(), ((BiasedScalarData)data).getBias()));
+    }
+
+    public double linearRule(double input, double bias) {
+        double ret = input * slope + bias;
         if (addNoise) {
             ret  += noiseGenerator.getRandom();
         }
@@ -111,8 +116,13 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     }
 
     @Override
-    public DataHolder createDataHolder(int size) {
-        return new DataHolder.BiasedDataHolder(size);
+    public MatrixDataHolder createMatrixData(int size) {
+        return new BiasedMatrixData(size);
+    }
+
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new BiasedScalarData();
     }
 
     @Override
@@ -138,7 +148,6 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
     @Override
     public LinearRule deepCopy() {
         LinearRule ln = new LinearRule();
-        ln.setBias(getBias());
         ln.setSlope(getSlope());
         ln.setClipped(isClipped());
         ln.setAddNoise(getAddNoise());
@@ -195,16 +204,6 @@ public class LinearRule extends NeuronUpdateRule implements BiasedUpdateRule, Di
 
     public double getSlope() {
         return slope;
-    }
-
-    @Override
-    public double getBias() {
-        return bias;
-    }
-
-    @Override
-    public void setBias(final double bias) {
-        this.bias = bias;
     }
 
     @Override

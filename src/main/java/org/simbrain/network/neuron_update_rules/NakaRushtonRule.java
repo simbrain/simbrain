@@ -18,12 +18,16 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.NakaMatrixData;
+import org.simbrain.network.util.NakaScalarData;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -134,6 +138,10 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     }
 
     @Override
+    public void update(Neuron neuron) {
+    }
+
+    @Override
     public NakaRushtonRule deepCopy() {
         NakaRushtonRule rn = new NakaRushtonRule();
         rn.setSteepness(getSteepness());
@@ -148,87 +156,61 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         return rn;
     }
 
-    @Override
-    public double[] apply(double[] inputs, double[] activations, DataHolder data) {
-        double[] vals = new double[inputs.length];
-        NakaDataHolder datan = (NakaDataHolder) data;
-        for (int i = 0; i < inputs.length; i++) {
-
-            // TODO: This is null: timeStepSupplier.get()
-            // Update adaptation term; see Spike, p. 81
-            if (useAdaptation) {
-                datan.a[i] += ( .1 / adaptationTimeConstant)
-                        * (adaptationParameter * activations[i] - datan.a[i]);
-            } else {
-                datan.a[i] = 0;
-            }
-
-            double s;
-            if (inputs[i] > 0) {
-                s = (getUpperBound() * Math.pow(inputs[i], steepness))
-                        / (Math.pow(semiSaturationConstant + datan.a[i],
-                        steepness) + Math.pow(inputs[i], steepness));
-            } else {
-                s = 0;
-            }
-
-            if (addNoise) {
-                vals[i] =
-                        activations[i] + (.1 * (((1 / timeConstant) * (-activations[i] + s)) + noiseGenerator.getRandom()));
-            } else {
-                vals[i] = activations[i] + (.1 * ((1 / timeConstant) * (-activations[i] + s)));
-            }
-
+    public void apply(Connectable array, MatrixDataHolder data) {
+        double[] vals = new double[array.size()];
+        for (int i = 0; i < vals.length ; i++) {
+            vals[i] = nakaRushtonRule(
+                    array.getInputs()[i],
+                    array.getActivations()[i],
+                    array.getNetwork().getTimeStep(),
+                    ((NakaMatrixData)data).getA()[i]);
         }
-        return vals;
-    }
-
-
-    @Override
-    public void update(Neuron neuron) {
-
-        // double p = neuron.getInput();
-        // double val = neuron.getActivation();
-        //
-        // // Update adaptation term; see Spike, p. 81
-        // if (useAdaptation) {
-        //     a += (neuron.getNetwork().getTimeStep() / adaptationTimeConstant) * (adaptationParameter * val - a);
-        // } else {
-        //     a = 0;
-        // }
-        //
-        // double s;
-        // if (p > 0) {
-        //     s = (getUpperBound() * Math.pow(p, steepness)) / (Math.pow(semiSaturationConstant + a, steepness) + Math.pow(p, steepness));
-        // } else {
-        //     s = 0;
-        // }
-        //
-        // if (addNoise) {
-        //     val += (neuron.getNetwork().getTimeStep() * (((1 / timeConstant) * (-val + s)) + noiseGenerator.getRandom()));
-        // } else {
-        //     val += (neuron.getNetwork().getTimeStep() * ((1 / timeConstant) * (-val + s)));
-        // }
-        //
-        // neuron.setActivation(val);
+        array.setActivations(vals);
     }
 
     @Override
-    public DataHolder createDataHolder(int size) {
-        return new NakaDataHolder(size);
+    public void apply(Neuron neuron, ScalarDataHolder data) {
+        neuron.setActivation(nakaRushtonRule(neuron.getInput(), neuron.getActivation(),
+                neuron.getNetwork().getTimeStep(), ((NakaScalarData)data).getA()));
     }
 
-    /**
-     * Holds array of a values
-     */
-    class NakaDataHolder implements DataHolder {
+    public double nakaRushtonRule(double input, double activation, double timeStep, double a) {
 
-        double[] a;
+        double val = activation;
 
-        public NakaDataHolder(int size) {
-            a = new double[size];
+        // Update adaptation term; see Spike, p. 81
+        if (useAdaptation) {
+            a += (timeStep / adaptationTimeConstant) * (adaptationParameter * val - a);
+        } else {
+            a = 0;
         }
 
+        double s;
+        if (input > 0) {
+            s = (getUpperBound() * Math.pow(input, steepness))
+                            / (Math.pow(semiSaturationConstant + a, steepness)
+                            + Math.pow(input, steepness));
+        } else {
+            s = 0;
+        }
+
+        if (addNoise) {
+            val += (timeStep * (((1 / timeConstant) * (-val + s)) + noiseGenerator.getRandom()));
+        } else {
+            val += (timeStep * ((1 / timeConstant) * (-val + s)));
+        }
+
+        return val;
+    }
+
+    @Override
+    public MatrixDataHolder createMatrixData(int size) {
+        return new NakaMatrixData(size);
+    }
+
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new NakaScalarData();
     }
 
     @Override

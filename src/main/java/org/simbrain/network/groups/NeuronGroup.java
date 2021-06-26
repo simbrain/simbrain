@@ -30,7 +30,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.Producible;
@@ -100,7 +100,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     /**
      * Data holder for prototype rule.
      */
-    private DataHolder dataHolder;
+    private ScalarDataHolder dataHolder;
 
     /**
      * Create a neuron group without any initial neurons.
@@ -122,7 +122,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
             n.setParentGroup(this);
         });
         setNeuronType(prototypeRule);
-        dataHolder = prototypeRule.createDataHolder(neurons.size());
+        dataHolder = prototypeRule.createScalarData();
     }
 
     /**
@@ -176,7 +176,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     @Override
     public void update() {
         neuronList.forEach(Neuron::updateInputs);
-        neuronList.forEach(n -> n.update(prototypeRule, dataHolder));
+        neuronList.forEach(n -> prototypeRule.apply(n, dataHolder));
         super.update();
     }
 
@@ -189,7 +189,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void setNeuronType(NeuronUpdateRule base) {
         inputManager.setInputSpikes(base.isSpikingNeuron());
         prototypeRule = base;
-        dataHolder = prototypeRule.createDataHolder(1);
+        dataHolder = prototypeRule.createScalarData();
         // Have to also set node rules to support randomization, increment, etc.
         // But they don't then use the settings of the prototype rule
         neuronList.forEach(n -> n.changeUpdateRule(base, dataHolder));

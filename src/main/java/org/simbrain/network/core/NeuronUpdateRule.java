@@ -18,14 +18,17 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.neuron_update_rules.AdExIFRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
 import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-import org.simbrain.util.DataHolder;
+import org.simbrain.network.util.BiasedMatrixData;
+import org.simbrain.network.util.BiasedScalarData;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
@@ -85,12 +88,7 @@ public abstract class NeuronUpdateRule implements CopyableObject {
      */
     public abstract TimeType getTimeType();
 
-    /**
-     * Apply the update rule.  Generally applies it to the buffer, so activation is _not_ updated
-     * unless setActivation(getBuffer()) is called.  Supports asynhronous update.
-     *
-     * @param neuron parent neuron
-     */
+    @Deprecated
     public abstract void update(Neuron neuron);
 
     /**
@@ -226,16 +224,17 @@ public abstract class NeuronUpdateRule implements CopyableObject {
         return usesCustomZeroPoint.contains(rule.getClass());
     }
 
+    // TODO: Make abstract and run through
+    public void apply(Connectable array, MatrixDataHolder dataHolder) {}
+
     // TODO: Be more explicit about "default" data holder.
-    public DataHolder createDataHolder(int size) {return new DataHolder.BiasedDataHolder(size);
+    public MatrixDataHolder createMatrixData(int size) {return new BiasedMatrixData(size);
     }
 
     // TODO: Make abstract and run through
-    public double[] apply(double[] inputs, double[] activations, DataHolder dataHolder) {return null;}
+    public void apply(Neuron neuron, ScalarDataHolder data) {};
 
-    public double apply(double input, double activation, DataHolder dataHolder, NeuronEvents events) {return activation;}
+    // TODO: Be more explicit about "default" data holder.
+    public ScalarDataHolder createScalarData() {return new BiasedScalarData();}
 
-    public void setTimeStepSupplier(Supplier<Double> timeStepSupplier) {
-        this.timeStepSupplier = timeStepSupplier;
-    }
 }

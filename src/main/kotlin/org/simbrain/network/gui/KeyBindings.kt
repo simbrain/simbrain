@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.intellij.lang.annotations.MagicConstant
 import org.simbrain.network.LocatableModel
+import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.Utils
 import java.awt.event.ActionEvent
@@ -26,7 +27,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Shift + 'F') { toggleClamping() }
     bind(CmdOrCtrl + 'D') { duplicate() }
     bind(VK_ESCAPE) { selectionManager.clear(); selectionManager.clearAllSource() }
-    bind("C") { clearSelectedObjects() }
+    bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     bind(Shift + 'C') { hardClearSelectedObjects() }
     bind(Alt + 'D') { println(network) } // Print debug information
     bind(Alt + 'P') {showPiccoloDebugger()}

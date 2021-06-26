@@ -46,9 +46,9 @@ public final class ClearSelectedObjects extends AbstractAction {
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
         putValue(SHORT_DESCRIPTION,
-                "Clear all node activations (k)");
+                "Clear all node activations (c)");
         networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                KeyStroke.getKeyStroke('k'), this);
+                KeyStroke.getKeyStroke('c'), this);
         networkPanel.getActionMap().put(this, this);
     }
 

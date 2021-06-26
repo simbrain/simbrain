@@ -2,7 +2,7 @@ package org.simbrain.network.gui
 
 //import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.connectors.Connectable
+import org.simbrain.network.connectors.Layer
 import org.simbrain.network.connectors.WeightMatrix
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
@@ -187,12 +187,12 @@ fun NetworkPanel.showLMSDialog(lms: LMSIterative) {
 }
 
 /**
- * Connect all selected [Connectable]s with [WeightMatrix] objects.
+ * Connect all selected [Layer]s with [WeightMatrix] objects.
  */
 fun NetworkPanel.createConnector() {
     with(selectionManager) {
-        val sources = filterSelectedSourceModels<Connectable>()
-        val targets = filterSelectedModels<Connectable>()
+        val sources = filterSelectedSourceModels<Layer>()
+        val targets = filterSelectedModels<Layer>()
         val dialog = ConnectorDialog(this.networkPanel, sources, targets)
         dialog.setLocationRelativeTo(null)
         dialog.pack()

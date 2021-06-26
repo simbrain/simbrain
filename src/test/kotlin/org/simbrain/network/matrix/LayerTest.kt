@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.connectors.WeightMatrix
 import org.simbrain.network.core.Network
 
-class ConnectableTest {
+class LayerTest {
 
     var net = Network()
     var na1 = NeuronArray(net, 2)

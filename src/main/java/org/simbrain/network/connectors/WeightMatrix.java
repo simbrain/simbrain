@@ -15,7 +15,7 @@ import smile.stat.distribution.GaussianDistribution;
 import java.util.Arrays;
 
 /**
- * An dense weight matrix that connects a source and target {@link Connectable} object.
+ * An dense weight matrix that connects a source and target {@link Layer} object.
  */
 public class WeightMatrix extends Connector {
 
@@ -47,7 +47,7 @@ public class WeightMatrix extends Connector {
      * @param source source layer
      * @param target target layer
      */
-    public WeightMatrix(Network net, Connectable source, Connectable target) {
+    public WeightMatrix(Network net, Layer source, Layer target) {
         super(source, target, net);
 
         source.addOutgoingConnector(this);

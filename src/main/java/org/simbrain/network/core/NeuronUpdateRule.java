@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.connectors.Connectable;
+import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.neuron_update_rules.AdExIFRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
@@ -225,7 +225,7 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     }
 
     // TODO: Make abstract and run through
-    public void apply(Connectable array, MatrixDataHolder dataHolder) {}
+    public void apply(Layer array, MatrixDataHolder dataHolder) {}
 
     // TODO: Be more explicit about "default" data holder.
     public MatrixDataHolder createMatrixData(int size) {return new BiasedMatrixData(size);

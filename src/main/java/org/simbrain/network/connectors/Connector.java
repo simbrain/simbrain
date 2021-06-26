@@ -9,7 +9,7 @@ import org.simbrain.workspace.AttributeContainer;
 import smile.math.matrix.Matrix;
 
 /**
- * Superclass for classes that inherit from {@link Connectable}, i.e.. that either produce or consume
+ * Superclass for classes that inherit from {@link Layer}, i.e.. that either produce or consume
  * vectors of values. Weight matrices are the most obvious examples; they can be used to connect a neuron group or
  * array producing a vector values with another neuron group or array consuming a vector of values.
  */
@@ -23,12 +23,12 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     /**
      * The source for this connector.
      */
-    protected Connectable source;
+    protected Layer source;
 
     /**
      * The target for this connetor.
      */
-    protected Connectable target;
+    protected Layer target;
 
     /**
      * Event support.
@@ -43,7 +43,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     /**
      * Construct a connector and initialize events.
      */
-    public Connector(Connectable source, Connectable target, Network net) {
+    public Connector(Layer source, Layer target, Network net) {
         this.source = source;
         this.target = target;
         this.parent = net;
@@ -81,11 +81,11 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
         getEvents().fireDeleted();
     }
 
-    public Connectable getSource() {
+    public Layer getSource() {
         return source;
     }
 
-    public Connectable getTarget() {
+    public Layer getTarget() {
         return target;
     }
 

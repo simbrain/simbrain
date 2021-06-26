@@ -2,7 +2,7 @@ package org.simbrain.network.matrix;
 
 
 import org.jetbrains.annotations.NotNull;
-import org.simbrain.network.connectors.Connectable;
+import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 /**
  * A "neuron array" backed by a double array.
  */
-public class NeuronArray extends Connectable implements EditableObject, AttributeContainer {
+public class NeuronArray extends Layer implements EditableObject, AttributeContainer {
 
     @UserParameter(label = "Clamped", description = "Clamping", order = 3)
     private boolean clamped;
@@ -53,7 +53,7 @@ public class NeuronArray extends Connectable implements EditableObject, Attribut
 
     /**
      * Array to hold activation values. These are also the outputs that are consumed by
-     * other network components via {@link Connectable}.
+     * other network components via {@link Layer}.
      */
     private double[] activations;
 

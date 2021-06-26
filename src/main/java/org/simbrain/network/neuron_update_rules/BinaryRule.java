@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.connectors.Connectable;
+import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -88,7 +88,7 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
-    public void apply(Connectable array, MatrixDataHolder data) {
+    public void apply(Layer array, MatrixDataHolder data) {
         // TODO: Implement using matrix operations
         double[] vals = new double[array.size()];
         for (int i = 0; i < vals.length ; i++) {

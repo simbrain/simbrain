@@ -2,7 +2,7 @@ package org.simbrain.network.groups;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
-import org.simbrain.network.connectors.Connectable;
+import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -32,7 +32,7 @@ import static org.simbrain.util.GeomKt.minus;
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
  * neuron update rules and track synapse polarity).
  */
-public abstract class AbstractNeuronCollection extends Connectable implements CopyableObject, AttributeContainer {
+public abstract class AbstractNeuronCollection extends Layer implements CopyableObject, AttributeContainer {
 
     /**
      * Reference to the network this group is a part of.

@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
-import org.simbrain.network.connectors.Connectable;
 import org.simbrain.network.connectors.Connector;
+import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.connectors.WeightMatrix;
 import org.simbrain.network.connectors.ZoeZone;
 import org.simbrain.network.gui.NetworkPanel;
@@ -53,17 +53,17 @@ public final class ConnectorDialog extends StandardDialog {
     /**
      * List of incoming sources to this connector.
      */
-    private List<Connectable> sources;
+    private List<Layer> sources;
 
     /**
      * List of outgoing targets of this connector.
      */
-    private List<Connectable> targets;
+    private List<Layer> targets;
 
     /**
      * For creating a new connetor
      */
-    public ConnectorDialog(final NetworkPanel np, List<Connectable> sources, List<Connectable> targets) {
+    public ConnectorDialog(final NetworkPanel np, List<Layer> sources, List<Layer> targets) {
 
         networkPanel = np;
         setTitle("Create Connector");
@@ -87,8 +87,8 @@ public final class ConnectorDialog extends StandardDialog {
     public void commitChanges() {
         var net = networkPanel.getNetwork();
         var widget = (Connector.ConnectorEnum) mainPanel.getWidget("Connector type").getWidgetValue();
-        for (Connectable source: sources) {
-            for (Connectable target: targets) {
+        for (Layer source: sources) {
+            for (Layer target: targets) {
                 if (widget == Connector.ConnectorEnum.DENSE) {
                     net.addNetworkModel(new WeightMatrix(net, source, target));
                 } else if (widget == Connector.ConnectorEnum.ZOE) {

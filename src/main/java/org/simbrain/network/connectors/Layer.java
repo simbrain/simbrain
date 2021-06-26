@@ -14,11 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Classes that implement this interface can be the source or target of a
- * {@link Connector}, e.g. a weight matrix. Associated with an activation vector and a separate
- * input vector that stores summed output from incoming connectors.
+ * Superclass for NeuronArray, NeuronCollection, and in general classes that can be the source or target of a
+ * {@link Connector}.  The Simbrain version of a "Layer" used to build a more complex, generally array based, neural
+ * network model.
+ *
+ * Associated with an activation vector and a separate input vector that stores summed output from incoming connectors.
  */
-public abstract class Connectable extends LocatableModel {
+public abstract class Layer extends LocatableModel {
 
     /**
      * "Fan-in" of incoming connectors.

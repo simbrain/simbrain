@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.connectors.Connectable;
+import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
@@ -66,7 +66,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     @Override
-    public void apply(Connectable array, MatrixDataHolder data) {
+    public void apply(Layer array, MatrixDataHolder data) {
         // TODO: Implement using matrix operations
         double[] vals = new double[array.size()];
         for (int i = 0; i < vals.length; i++) {

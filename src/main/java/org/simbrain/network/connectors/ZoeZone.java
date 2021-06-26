@@ -33,7 +33,7 @@ public class ZoeZone extends Connector {
      * @param source source layer
      * @param target target layer
      */
-    public ZoeZone(Network net, Connectable source, Connectable target) {
+    public ZoeZone(Network net, Layer source, Layer target) {
         super(source, target, net);
         source.addOutgoingConnector(this);
         target.addIncomingConnector(this);

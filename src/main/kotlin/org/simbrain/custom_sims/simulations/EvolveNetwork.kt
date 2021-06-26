@@ -10,7 +10,7 @@ import org.simbrain.network.core.activations
 import org.simbrain.network.core.lengths
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
+import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
 import java.io.File
@@ -68,8 +68,8 @@ val evolveNetwork = newSim {
             }
 
             fun NodeGene.mutateBias() = mutate {
-                updateRule.let {
-                    if (it is BiasedUpdateRule) it.bias += (Random().nextDouble() - 0.5) * 0.2
+                neuronDataHolder.let {
+                    if (it is BiasedScalarData) it.bias += (Random().nextDouble() - 0.5) * 0.2
                 }
             }
 

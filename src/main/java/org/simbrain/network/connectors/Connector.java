@@ -26,7 +26,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     protected Layer source;
 
     /**
-     * The target for this connetor.
+     * The target for this connector.
      */
     protected Layer target;
 

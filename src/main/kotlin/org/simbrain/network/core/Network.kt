@@ -115,6 +115,7 @@ class Network {
      * TODO: Resolve priority update issue. Here as a hack to make the list available to groups that want to update via
      * priorities WITHIN the group... To be resolved.
      */
+    @Transient
     var prioritySortedNeuronList: ArrayList<Neuron> = ArrayList()
         private set
 
@@ -214,8 +215,10 @@ class Network {
      */
     fun updateNeuronsByPriority() {
         for (neuron in prioritySortedNeuronList) {
+            neuron.updateInputs()
             neuron.update()
         }
+        // TODO: Update other models? Or generalize this to work on all network models?
     }
 
     /**
@@ -315,14 +318,15 @@ class Network {
     /**
      * Add a new [NetworkModel]. All network models MUST be added using this method.
      */
-    fun addNetworkModel(networkModel: NetworkModel) {
-        if (networkModel.shouldAdd()) {
-            networkModel.id = idManager.getAndIncrementId(networkModel.javaClass)
-            networkModels.add(networkModel)
-            networkModel.events.onDeleted{
+    fun addNetworkModel(model: NetworkModel) {
+        if (model.shouldAdd()) {
+            model.id = idManager.getAndIncrementId(model.javaClass)
+            networkModels.add(model)
+            model.events.onDeleted{
                 networkModels.remove(it)
             }
-            events.fireModelAdded(networkModel)
+            events.fireModelAdded(model)
+            if (model is Neuron) updatePriorityList()
         }
     }
 
@@ -379,15 +383,16 @@ class Network {
      * @return Initialized object.
      */
     private fun readResolve(): Any {
+
         events = NetworkEvents(this)
         updateCompleted = AtomicBoolean(false)
+        updatePriorityList();
 
         // Initialize update manager
         updateManager.postUnmarshallingInit()
         networkModels.allInDeserializationOrder.forEach { it.postUnmarshallingInit() }
         return this
     }
-
 
     /**
      * Returns the current number of iterations.
@@ -668,6 +673,7 @@ fun getNetworkXStream(): XStream {
     val xstream = Utils.getSimbrainXStream()
     xstream.registerConverter(NetworkModelListConverter())
     xstream.registerConverter(DoubleArrayConverter())
+    xstream.registerConverter(MatrixConverter())
     return xstream
 }
 

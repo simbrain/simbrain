@@ -23,6 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 
@@ -70,7 +71,7 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
     }
 
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
 
         // Update buffer of additive neuron using Euler's method.
         double wtdSum = 0;

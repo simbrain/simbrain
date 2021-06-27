@@ -48,7 +48,7 @@ public class Step extends SpikeResponder {
     private double responseDuration = 1;
 
     @Override
-    public void update(Synapse s) {
+    public void apply(Synapse s) {
         if (s.getSource().isSpike()) {
             timer = responseDuration;
             value = responseHeight * s.getStrength();

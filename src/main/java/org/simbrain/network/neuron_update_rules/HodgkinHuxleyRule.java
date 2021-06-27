@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -127,7 +128,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     private boolean addNoise = false;
 
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
 
         // Advances the model by dt and returns the new voltage
 

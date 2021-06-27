@@ -55,9 +55,6 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
         return TimeType.CONTINUOUS;
     }
 
-    @Override
-    public abstract void update(Neuron neuron);
-
     /**
      * @param hasSpiked the hasSpiked to set
      * @param neuron    the neuron which has (or has not) spiked.

@@ -20,6 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.math.SquashingFunctionEnum;
 
 /**
@@ -55,7 +56,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
     }
 
     @Override
-    public final void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
 
         double val = neuron.getInput() + bias;
 

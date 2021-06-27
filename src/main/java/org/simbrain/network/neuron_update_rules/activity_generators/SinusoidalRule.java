@@ -24,6 +24,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -87,8 +88,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerato
     }
 
     @Override
-    public final void update(Neuron neuron) {
-
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         double upperBound = getUpperBound();
         double lowerBound = getLowerBound();
         double range = upperBound - lowerBound;

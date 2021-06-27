@@ -52,7 +52,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
     }
 
     @Override
-    public void update(final Synapse s) {
+    public void apply(final Synapse s) {
         value = s.getPsr();
         if (s.getSource().isSpike()) {
             value += jumpHeight * s.getStrength();

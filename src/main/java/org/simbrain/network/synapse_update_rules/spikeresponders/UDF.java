@@ -106,7 +106,7 @@ public class UDF extends SpikeResponder {
     }
 
     @Override
-    public void update(Synapse s) {
+    public void apply(Synapse s) {
         if (firstTime) {
             init(s);
             spikeDecay.setTimeConstant(tau);
@@ -121,7 +121,7 @@ public class UDF extends SpikeResponder {
             lastSpikeTime = s.getNetwork().getTime();
             spikeDecay.update(s, A);
         } else {
-            spikeDecay.update(s);
+            spikeDecay.apply(s);
         }
     }
 

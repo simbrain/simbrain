@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.DecayRule;
+import org.simbrain.network.util.ScalarDataHolder;
 
 /**
  * @author Sharai
@@ -69,7 +70,7 @@ public class CreaturesNeuronRule extends DecayRule {
     }
 
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         //        // System.out.println("Updating neuron: " + neuron.getLabel());
         //
         //        // Get input and modulate it with inputGain.
@@ -110,8 +111,7 @@ public class CreaturesNeuronRule extends DecayRule {
         //        }
 
 
-        super.update(neuron);
-
+        super.apply(neuron, neuron.getNeuronDataHolder());
 
     }
 

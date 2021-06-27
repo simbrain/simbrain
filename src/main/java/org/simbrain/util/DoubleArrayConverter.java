@@ -24,43 +24,42 @@ public class DoubleArrayConverter implements Converter {
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         double[] array = (double[]) source;
         // TODO: Finish this. Make it configurable.
-        //  Custom for 1 element to emulate scalars.  Ability to send degree of precision and threshold.
+        //  Ability to send degree of precision and threshold.
         // if (array.length < 100) {
         //     context.convertAnother(Utils.doubleArrayToString(array));
-        // } else {
-        context.convertAnother(Base64.getEncoder().encodeToString(doubleToByteArray(array)));
-        // }
+        context.convertAnother(Base64.getEncoder().encodeToString(toByteArray(array)));
     }
 
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
-        String stringRep = reader.getValue();
-        // TODO: This is not done obviously. Need a clean way to determine storage type.
-        // if (stringRep.startsWith("[")) {
-        //     return Utils.getVectorString(stringRep, ",");
-        // } else {
-        return byteToDoubleArray(Base64.getDecoder().decode(reader.getValue()));
-        // }
+        return toDoubleArray(Base64.getDecoder().decode(reader.getValue()));
     }
 
     /**
      * https://stackoverflow.com/questions/41990732/how-to-convert-double-array-to-base64-string-and-vice-versa-in-java
      */
-    private static byte[] doubleToByteArray(double[] doubleArray) {
+    public static byte[] toByteArray(double[] doubleArray) {
         ByteBuffer buf = ByteBuffer.allocate(Double.SIZE / Byte.SIZE * doubleArray.length);
         buf.asDoubleBuffer().put(doubleArray);
+        return buf.array();
+    }
+
+    public static byte[] toByteArray(double[][] doubleArray) {
+        ByteBuffer buf = ByteBuffer.allocate(Double.SIZE / Byte.SIZE * doubleArray.length * doubleArray[0].length);
+        for (int i = 0; i < doubleArray.length; i++) {
+            buf.put(toByteArray(doubleArray[i]));
+        }
         return buf.array();
     }
 
     /**
      * https://stackoverflow.com/questions/41990732/how-to-convert-double-array-to-base64-string-and-vice-versa-in-java
      */
-    private static double[] byteToDoubleArray(byte[] bytes) {
+    public static double[] toDoubleArray(byte[] bytes) {
         DoubleBuffer buf = ByteBuffer.wrap(bytes).asDoubleBuffer();
         double[] doubleArray = new double[buf.limit()];
         buf.get(doubleArray);
         return doubleArray;
     }
-
 
 }

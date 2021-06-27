@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -113,7 +114,7 @@ public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpda
     }
 
     @Override
-    public void update(final Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         double timeStep = neuron.getNetwork().getTimeStep();
         //        final boolean refractory = getLastSpikeTime() + refractoryPeriod
         //                >= neuron.getNetwork().getTime();

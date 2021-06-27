@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -87,7 +88,8 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule implements Clonea
     }
 
     @Override
-    public void update(Synapse synapse) {
+    public void apply(Synapse synapse, ScalarDataHolder data) {
+
         // Time step in ms.
         final double timeStep = synapse.getNetwork().getTimeStep();
         final boolean preSpiked = synapse.getSource().isSpike();
@@ -202,7 +204,7 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule implements Clonea
     }
 
     /**
-     * @param Amplitude of the weight change for a post-pre spike pair.
+     * @param a2n Amplitude of the weight change for a post-pre spike pair.
      */
     public void setA2N(double a2n) {
         a2N = a2n;
@@ -216,7 +218,7 @@ public class PfisterGerstner2006Rule extends SynapseUpdateRule implements Clonea
     }
 
     /**
-     * @param Amplitude of the triplet term for potentiation.
+     * @param a3p Amplitude of the triplet term for potentiation.
      */
     public void setA3P(double a3p) {
         a3P = a3p;

@@ -18,6 +18,7 @@ import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.UDF;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
@@ -430,7 +431,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         }
 
         @Override
-        public void update(Neuron n) {
+        public void apply(Neuron n, ScalarDataHolder data) {
 
             double dt = n.getNetwork().getTimeStep();
             totalTimeS += dt;
@@ -490,7 +491,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
                         sgn * Math.abs(((STDPRule) s.getLearningRule()).getDelta_w()));
                 }
             }
-            super.update(n);
+            super.apply(n, n.getNeuronDataHolder());
 
         }
 

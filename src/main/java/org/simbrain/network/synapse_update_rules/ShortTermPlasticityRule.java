@@ -21,6 +21,7 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -133,7 +134,8 @@ public class ShortTermPlasticityRule extends SynapseUpdateRule {
     }
 
     @Override
-    public void update(Synapse synapse) {
+    public void apply(Synapse synapse, ScalarDataHolder data) {
+
         // Determine whether to activate short term dynamics
         if (synapse.getSource().getUpdateRule() instanceof SpikingNeuronUpdateRule) {
             if (synapse.getSource().isSpike()) {

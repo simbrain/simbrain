@@ -333,7 +333,7 @@ public class SimnetUtils {
                     Synapse newSyn = new Synapse(synapseGroup.getSourceNeuronGroup().getNeuronList().get(ii),
                             synapseGroup.getTargetNeuronGroup().getNeuronList().get(jj));
                     newSyn.setStrength(srcNeurons.get(ii).getFanOut().get(tarNeurons.get(jj)).getStrength());
-                    synapseGroup.addSynapseUnsafe(newSyn);
+                    synapseGroup.addNewSynapse(newSyn);
                 }
             }
         }

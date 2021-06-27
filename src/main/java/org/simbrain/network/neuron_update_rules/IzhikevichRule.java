@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -107,10 +108,6 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
      */
     private boolean addNoise;
 
-    // Backwards compatibility... to be removed
-    @Deprecated
-    private double inputs;
-
     /**
      * An optional absolute refractory period. In many simulations this
      * promotes network stability.
@@ -135,7 +132,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     }
 
     @Override
-    public void update(final Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         timeStep = neuron.getNetwork().getTimeStep();
         final double activation = neuron.getActivation();
         double inputs = 0;

@@ -21,6 +21,7 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -115,7 +116,8 @@ public class STDPRule extends SynapseUpdateRule {
     private double delta_w = 0;
 
     @Override
-    public void update(Synapse synapse) {
+    public void apply(Synapse synapse, ScalarDataHolder data) {
+
         final double str = synapse.getStrength();
         if (synapse.getSource().isSpike() || synapse.getTarget().isSpike()) {
             try {

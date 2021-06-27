@@ -32,9 +32,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A rule for updating a synapse. A learning rule.
+ * A local learning rule for updating synapses.
  *
- * @author jyoshimi
+ * @author Jeff Yoshimi
  */
 public abstract class SynapseUpdateRule implements CopyableObject {
 
@@ -60,15 +60,56 @@ public abstract class SynapseUpdateRule implements CopyableObject {
     private static final int MAX_DIGITS = 9;
 
     /**
+     * Default data holder for scalar data.
+     */
+    private static final ScalarDataHolder DEFAULT_SCALAR_DATA = new EmptyScalarData();
+
+    /**
+     * Default data holder for matrix data.
+     */
+    private static final MatrixDataHolder DEFAULT_MATRIX_DATA = new EmptyMatrixData();
+
+    /**
+     * Defines the learning rule as it applies to scalar data.
+     *
+     * TODO: Finish doing this for all learning rules.
+     *
+     * @param synapse a reference to a synapse with its parameters and access to source and target neurons, etc.
+     * @param data a scalar data holder that can hold data that must be updated with this rule.
+     */
+    public abstract void apply(Synapse synapse, ScalarDataHolder data);
+
+    /**
+     * Override to return an appropriate data holder for a given rule.
+     */
+    public ScalarDataHolder createScalarData() {
+        return DEFAULT_SCALAR_DATA;
+    }
+
+    /**
+     * Override to define a learning update rule for weight matrices and other connectors.
+     *
+     * NOTE: Only a few of these have been done.
+     *
+     * @param connector reference to a weight matrix or other connector and its matrix-valued data
+     * @param dataHolder a holder for mutable data used in matrix versions of an update rule
+     */
+    public void apply(Connector connector, MatrixDataHolder dataHolder) {}
+
+    /**
+     * Override to return an appropriate data holder for a given rule.
+     */
+    public MatrixDataHolder createMatrixData(int size) {
+        return DEFAULT_MATRIX_DATA;
+    }
+
+    /**
      * Initialize the update rule and make necessary changes to the parent
      * synapse.
      *
      * @param synapse parent synapse
      */
     public abstract void init(Synapse synapse);
-
-    @Deprecated
-    public abstract void update(Synapse synapse);
 
     /**
      * Returns a deep copy of the update rule.
@@ -100,18 +141,5 @@ public abstract class SynapseUpdateRule implements CopyableObject {
     public SynapseUpdateRule copy() {
         return deepCopy();
     }
-
-    // TODO: Make abstract and run through
-    public void apply(Connector connector, MatrixDataHolder dataHolder) {}
-
-    // TODO: Be more explicit about "default" data holder.
-    public MatrixDataHolder createMatrixData(int size) {return new EmptyMatrixData();
-    }
-
-    // TODO: Make abstract and run through
-    public void apply(Synapse synapse, ScalarDataHolder data) {};
-
-    // TODO: Be more explicit about "default" data holder.
-    public ScalarDataHolder createScalarData() {return new EmptyScalarData();}
 
 }

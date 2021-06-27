@@ -28,14 +28,13 @@ import org.simbrain.network.core.Synapse;
 public class NonResponder extends SpikeResponder {
 
     @Override
-    public void update(Synapse s) {
+    public void apply(Synapse s) {
         s.setPsr(s.getSource().getActivation() * s.getStrength());
     }
 
     @Override
     public SpikeResponder deepCopy() {
-        NonResponder nonResponder = new NonResponder();
-        return nonResponder;
+        return new NonResponder();
     }
 
     @Override

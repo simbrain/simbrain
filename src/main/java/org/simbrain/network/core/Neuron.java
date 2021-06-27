@@ -181,7 +181,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * By default, this is set to 0 for all the neurons. If you want a subset of
      * neurons to fire before other neurons, assign it a smaller priority value.
      */
-    @UserParameter(label = "Update Priority", description = "What order neurons should be updated" +
+    @UserParameter(label = "Update Priority", useSetter = true, description = "What order neurons should be updated" +
             "in, starting with lower values. <br> Only used with priority-based network update",
             order = 20)
     private int updatePriority;
@@ -327,12 +327,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule.deepCopy();
         neuronDataHolder = updateRule.createScalarData();
-        // TODO: No need to change if the neuron is not new, or has not changed from spiking to non-spiking
-        // But this check caused problems so commented out for null
-        // if (oldRule == null || (oldRule.isSpikingNeuron() != updateRule.isSpikingNeuron())) {
-        for (Synapse s : getFanOut().values()) {
-            s.initSpikeResponder();
-        }
 
         if (getNetwork() != null) {
             getNetwork().updateTimeType();
@@ -501,17 +495,13 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Sums the weighted signals that are sent to this node. This sums all the
-     * weighted inputs to a neuron in a connectionist sense. No spike responders
-     * are called and thus this is <b>not</b> appropriate for most biological
-     * models.
-     *
-     * @return weighted input to this node
+     * Sums the weighted inputs to this node, by summing the PSRs or post-synaptic responses from incoming synapses,
+     * which can either be connectionist (weight times source activation) or the output of a spike responder.
      */
     public double getWeightedInputs() {
         double wtdSum = 0;
         for (Synapse synapse : fanIn) {
-            wtdSum += synapse.calcWeightedSum();
+            wtdSum += synapse.calcPSR();
         }
         return wtdSum;
     }

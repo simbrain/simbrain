@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 
 /**
  * <b>ClampedSynapse</b>.
@@ -43,7 +44,7 @@ public class StaticSynapseRule extends SynapseUpdateRule {
     }
 
     @Override
-    public void update(Synapse synapse) {
+    public void apply(Synapse synapse, ScalarDataHolder data) {
         // if (clipped) {
         // super.setStrength(Synapse(synapse.getStrength()));
         // }
@@ -54,11 +55,6 @@ public class StaticSynapseRule extends SynapseUpdateRule {
         return "Static";
     }
 
-    /**
-     * Return clipped.
-     *
-     * @return
-     */
     public boolean isClipped() {
         return clipped;
     }

@@ -26,7 +26,7 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
-import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
 
@@ -37,7 +37,7 @@ import java.util.*;
  *
  * @author Zoë Tosi
  */
-public class SynapseGroup extends NetworkModel implements CopyableObject, AttributeContainer {
+public class SynapseGroup extends NetworkModel implements EditableObject, AttributeContainer {
 
     /**
      * Reference to the network this group is a part of.
@@ -166,7 +166,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
      * @param target the target neuron group.
      * @param args   args[0] the connection manager
      *               args[1] the ratio of excitatory to inhibitory synapses
-     *               args[2]the randomizer to be used to determine the weights of excitatory synapses
+     *               args[2] the randomizer to be used to determine the weights of excitatory synapses
      *               args[3] the randomizer to be used to determine the weights of inhibitory synapses.
      * @return a synapse group with the above parameters.
      */
@@ -181,7 +181,7 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         } else {
             synGroup = new SynapseGroup(source, target, (ConnectionStrategy) args[0]);
         }
-        if (args.length >= 1) {
+        if (args.length > 1) {
             synGroup.setExcitatoryRatio((Double) args[1]);
         }
         if (args.length >= 2) {
@@ -313,6 +313,11 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
                 inLearningRule.apply(s, s.getDataHolder());
             });
         }
+
+    }
+
+    @Override
+    public void updateInputs() {
         if (!(exSpikeResponder instanceof NonResponder)) {
             exSynapseSet.forEach(exSpikeResponder::apply);
         }
@@ -498,64 +503,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         // synapse.setLowerBound(inhibitoryPrototype.getLowerBound());
         // synapse.setSpikeResponder(inhibitoryPrototype.getSpikeResponder());
         inSynapseSet.add(synapse);
-        fireSynapseAdded(synapse);
-    }
-
-    /**
-     * Add a synapse to this synapse group adding it to the appropriate synapse
-     * set (excitatory or inhibitory if it's weight is above or below zero
-     * respecively). Using this method is <b>NOT RECOMMENDED</b> under most
-     * circumstances. This is because no checks are performed on the synapse to
-     * ensure that it can sensibly be added to this group. The synapse can also
-     * have parameters which will make the global parameters of the synapse
-     * group no longer accurately apply to the whole group. This is not as
-     * problematic as say not connecting neurons which are in this synapse
-     * group's source and/or target neuron groups, but it does undermine the
-     * purpose of having synapse groups.
-     * <p>
-     * Possible Use Case: When it is known beforehand that the synapse(s) being
-     * added all conform to the parameters of this synapse group.
-     *
-     * @param synapse synapse to add
-     */
-    public void addSynapseUnsafe(final Synapse synapse) {
-        if (synapse.getStrength() > 0) {
-            addExcitatorySynapseUnsafe(synapse);
-        }
-        if (synapse.getStrength() < 0) {
-            addInhibitorySynapseUnsafe(synapse);
-        }
-    }
-
-    /**
-     * See: {@link #addSynapseUnsafe(Synapse)}. Same but specific to excitatory
-     * synapses. This is even less safe however because an inhibitory synapse
-     * could potentially be added to the excitatory set.
-     *
-     * @param synapse the synapse to add.
-     */
-    public void addExcitatorySynapseUnsafe(final Synapse synapse) {
-        exSynapseSet.add(synapse);
-        excitatoryRatio = exSynapseSet.size() / (double) size();
-        if (getParentNetwork() != null) {
-            synapse.setParentGroup(this);
-        }
-        fireSynapseAdded(synapse);
-    }
-
-    /**
-     * See: {@link #addSynapseUnsafe(Synapse)}. Same but specific to inhibitory
-     * synapses. This is even less safe however because an excitatory synapse
-     * could potentially be added to the inhibitory set.
-     *
-     * @param synapse the synapse to add.
-     */
-    public void addInhibitorySynapseUnsafe(final Synapse synapse) {
-        inSynapseSet.add(synapse);
-        excitatoryRatio = exSynapseSet.size() / (double) size();
-        if (getParentNetwork() != null) {
-            synapse.setParentGroup(this);
-        }
         fireSynapseAdded(synapse);
     }
 
@@ -881,12 +828,6 @@ public class SynapseGroup extends NetworkModel implements CopyableObject, Attrib
         exSynapseSet.forEach(Synapse::postUnmarshallingInit);
         inSynapseSet.forEach(Synapse::postUnmarshallingInit);
         revalidateSynapseSets();
-    }
-
-    @Override
-    public SynapseGroup copy() {
-        // TODO
-        return null;
     }
 
     /**

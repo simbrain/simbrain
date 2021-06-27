@@ -5,6 +5,7 @@ import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.loadTileMap
@@ -86,6 +87,12 @@ fun SimulationScope.addImageWorld(name: String?): ImageWorldComponent {
     val imageWorldComponent = ImageWorldComponent(name)
     workspace.addWorkspaceComponent(imageWorldComponent)
     return imageWorldComponent
+}
+
+fun SimulationScope.addTimeSeries(name: String?): TimeSeriesPlotComponent {
+    val timeSeriesPlotComponent = TimeSeriesPlotComponent(name)
+    workspace.addWorkspaceComponent(timeSeriesPlotComponent)
+    return timeSeriesPlotComponent
 }
 
 fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {

@@ -8,6 +8,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -175,7 +176,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
                 .build();
 
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         double dt = neuron.getNetwork().getTimeStep();
         double i_syn = neuron.getInput();
         // Under normal circumstances this will cause no change.

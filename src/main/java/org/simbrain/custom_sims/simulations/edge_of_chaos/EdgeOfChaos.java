@@ -224,7 +224,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
                         if (Math.random() < sparsity) {
                             Synapse syn = new Synapse(src.getNeuronList().get(srcNodeIndices[j]), tarNList.get(ii));
                             syn.setStrength(1);
-                            src2Res.addSynapseUnsafe(syn);
+                            src2Res.addNewSynapse(syn);
                         }
                     }
                 }

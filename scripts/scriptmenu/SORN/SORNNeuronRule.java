@@ -51,12 +51,9 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         snr.setRefractoryPeriod(getRefractoryPeriod());
         return snr;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         // Synaptic Normalization
         neuron.normalizeExcitatoryFanIn();
         // Sum inputs including noise and applied (external) inputs

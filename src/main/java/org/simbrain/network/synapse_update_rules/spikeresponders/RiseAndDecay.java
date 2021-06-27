@@ -54,7 +54,7 @@ public class RiseAndDecay extends SpikeResponder {
     }
 
     @Override
-    public void update(Synapse s) {
+    public void apply(Synapse s) {
         double timeStep = s.getParentNetwork().getTimeStep();
         if (s.getSource().isSpike()) {
             recovery = 1;

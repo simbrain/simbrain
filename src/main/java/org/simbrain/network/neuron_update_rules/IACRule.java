@@ -25,6 +25,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -108,7 +109,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     }
 
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
 
         // Notation and algorithm from McClelland 1981, Proceedings of the third
         // annual cog-sci meeting

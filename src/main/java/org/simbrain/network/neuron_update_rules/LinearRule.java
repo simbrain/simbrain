@@ -126,10 +126,6 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     }
 
     @Override
-    public void update(Neuron neuron) {
-    }
-
-    @Override
     public double clip(double val) {
         if (val > getUpperBound()) {
             return getUpperBound();

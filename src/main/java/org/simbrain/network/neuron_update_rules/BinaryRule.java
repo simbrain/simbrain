@@ -122,16 +122,6 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
-    public void update(Neuron neuron) {
-        double wtdInput = neuron.getInput() + bias;
-        if (wtdInput > threshold) {
-            neuron.setActivation(getUpperBound());
-        } else {
-            neuron.setActivation(getLowerBound());
-        }
-    }
-
-    @Override
     public double getRandomValue() {
         Random rand = new Random();
         return rand.nextBoolean() ? getUpperBound() : getLowerBound();

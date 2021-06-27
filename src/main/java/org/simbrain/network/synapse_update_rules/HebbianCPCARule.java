@@ -20,6 +20,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -77,7 +78,8 @@ public class HebbianCPCARule extends SynapseUpdateRule {
     }
 
     @Override
-    public void update(Synapse synapse) {
+    public void apply(Synapse synapse, ScalarDataHolder data) {
+
         // Updates the synapse (see equation 4.18 in O'Reilly and Munakata).
 
         double input = synapse.getSource().getActivation();

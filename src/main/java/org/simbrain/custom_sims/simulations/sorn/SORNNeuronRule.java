@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations.sorn;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 
@@ -48,12 +49,9 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         snr.setRefractoryPeriod(getRefractoryPeriod());
         return snr;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         // Synaptic Normalization
         neuron.normalizeExcitatoryFanIn();
         // Sum inputs including noise and applied (external) inputs

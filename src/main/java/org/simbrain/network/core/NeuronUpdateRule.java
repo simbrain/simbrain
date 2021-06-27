@@ -67,6 +67,16 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     private static final int MAX_DIGITS = 9;
 
     /**
+     * Default data holder for scalar data.
+     */
+    private static final ScalarDataHolder DEFAULT_SCALAR_DATA = new BiasedScalarData();
+
+    /**
+     * Default data holder for matrix data.
+     */
+    private static final MatrixDataHolder DEFAULT_MATRIX_DATA = new BiasedMatrixData(1);
+
+    /**
      * Provides the network level time step.
      */
     protected Supplier<Double> timeStepSupplier;
@@ -78,8 +88,55 @@ public abstract class NeuronUpdateRule implements CopyableObject {
      * <p>
      * Add an update type to this list if a neuron should use a custom zero point
      */
-    private static HashSet<Class> usesCustomZeroPoint =
+    private static final HashSet<Class> usesCustomZeroPoint =
             new HashSet<>(Arrays.asList(IntegrateAndFireRule.class, AdExIFRule.class, IzhikevichRule.class));
+
+    /**
+     * Defines the update rule as it applies to scalar data.
+     *
+     * TODO: Finish doing this for all update rules.
+     *
+     * @param neuron a reference to a neuron with its parameters and access to parent network (and thus time step, etc).
+     * @param data a scalar data holder that can hold data that must be updated with this rule.
+     */
+    public abstract void apply(Neuron neuron, ScalarDataHolder data);
+
+    /**
+     * Override to return an appropriate data holder for a given rule.
+     */
+    public ScalarDataHolder createScalarData() {
+        return DEFAULT_SCALAR_DATA;
+    }
+
+    /**
+     * Override to define a neural update rule for matrix data.
+     *
+     * NOTE: Only a few of these have been done.
+     *
+     * @param array reference to a layer and its matrix-valued data (inputs, activations).
+     * @param dataHolder a holder for mutable data used in matrix versions of an update rule
+     */
+    public void apply(Layer array, MatrixDataHolder dataHolder) {}
+
+    /**
+     * Override to return an appropriate data holder for a given rule.
+     */
+    public MatrixDataHolder createMatrixData(int size) {
+        return DEFAULT_MATRIX_DATA;
+    }
+
+    /**
+     * Returns a name for this update rule.  Used in combo boxes in the GUI.
+     *
+     * @return the description.
+     */
+    @Override
+    public abstract String getName();
+
+    @Override
+    public NeuronUpdateRule copy() {
+        return deepCopy();
+    }
 
     /**
      * Returns the type of time update (discrete or continuous) associated with this neuron.
@@ -87,9 +144,6 @@ public abstract class NeuronUpdateRule implements CopyableObject {
      * @return the time type
      */
     public abstract TimeType getTimeType();
-
-    @Deprecated
-    public abstract void update(Neuron neuron);
 
     /**
      * Returns a deep copy of the update rule.
@@ -188,13 +242,6 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     }
 
     /**
-     * Returns a name for this update rule.  Used in combo boxes in the GUI.
-     *
-     * @return the description.
-     */
-    public abstract String getName();
-
-    /**
      * Returns string for tool tip or short description. Override to provide custom information.
      *
      * @param neuron reference to parent neuron
@@ -208,11 +255,6 @@ public abstract class NeuronUpdateRule implements CopyableObject {
         return false;
     }
 
-    @Override
-    public NeuronUpdateRule copy() {
-        return deepCopy();
-    }
-
     public double getGraphicalValue(Neuron n) {
         return n.getActivation();
     }
@@ -223,18 +265,5 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     public static boolean usesCustomZeroPoint(NeuronUpdateRule rule) {
         return usesCustomZeroPoint.contains(rule.getClass());
     }
-
-    // TODO: Make abstract and run through
-    public void apply(Layer array, MatrixDataHolder dataHolder) {}
-
-    // TODO: Be more explicit about "default" data holder.
-    public MatrixDataHolder createMatrixData(int size) {return new BiasedMatrixData(size);
-    }
-
-    // TODO: Make abstract and run through
-    public void apply(Neuron neuron, ScalarDataHolder data) {};
-
-    // TODO: Be more explicit about "default" data holder.
-    public ScalarDataHolder createScalarData() {return new BiasedScalarData();}
 
 }

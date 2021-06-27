@@ -81,19 +81,7 @@ public class JumpAndDecay extends SpikeResponder {
             return psr + timeStep * ((baseLine - psr) / timeConstant);
         }
     }
-
-    @Override
-    public void update(final Synapse s) {
-        // value = s.getPsr();
-        // if (s.getSource().isSpike()) {
-        //     value = jumpHeight * s.getStrength();
-        // } else {
-        //     double timeStep = s.getParentNetwork().getTimeStep();
-        //     value += timeStep * (baseLine - value) / timeConstant;
-        // }
-        // s.setPsr(value);
-    }
-
+    
     @Override
     public String getDescription() {
         return "Jump and Decay";

@@ -23,6 +23,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.math.SimbrainMath;
 
 import java.util.ArrayList;
@@ -299,7 +300,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
     }
 
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
 
         // Calculate the excitatory conductance (p. 44, eq. 2.16)
         excitatoryConductance = (1 - netTimeConstant) * excitatoryConductance + netTimeConstant * (getExcitatoryInputs());

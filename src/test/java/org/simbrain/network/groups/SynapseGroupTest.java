@@ -13,13 +13,13 @@ public class SynapseGroupTest {
         Network net = new Network();
         NeuronGroup source = new NeuronGroup(net, 2);
         NeuronGroup target = new NeuronGroup(net, 2);
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(source,target, new AllToAll());
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(source, target, new AllToAll());
         assertEquals(sg.getAllSynapses().size(), 4);
     }
 
     /**
      * When the source neuron group is spiking and the target neuron group is not, the
-     * prototype synapses should have spike responders
+     * prototype synapses should have spike responders.
      */
     // @Test
     // public void spikeResponderTest() {

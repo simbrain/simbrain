@@ -395,11 +395,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         this.gridThreshold = gridThreshold;
     }
 
-    // TODO
-    public boolean isSpikingNeuronGroup() {
-        return inputManager.isInputSpikes();
-    }
-
     @Override
     public NeuronGroup copy() {
         return this.deepCopy(this.getParentNetwork());

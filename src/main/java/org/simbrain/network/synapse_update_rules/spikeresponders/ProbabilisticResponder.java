@@ -56,7 +56,7 @@ public class ProbabilisticResponder extends SpikeResponder {
     }
 
     @Override
-    public void update(Synapse s) {
+    public void apply(Synapse s) {
         if (s.getSource().isSpike()) {
             if (Math.random() > (1 - activationProbability)) {
                 value = responseValue * s.getStrength();

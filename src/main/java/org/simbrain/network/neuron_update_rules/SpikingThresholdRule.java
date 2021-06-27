@@ -115,10 +115,6 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     @Override
-    public void update(Neuron neuron) {
-    }
-
-    @Override
     public double getRandomValue() {
         Random rand = new Random();
         return rand.nextBoolean() ? 1 : 0;

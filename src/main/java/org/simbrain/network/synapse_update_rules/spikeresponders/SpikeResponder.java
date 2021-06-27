@@ -29,8 +29,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * <b>SpikeResponder</b> is a superclass for objects that
- * respond to pre-synaptic spikes with a response that is sent
+ * <b>SpikeResponder</b> is a superclass for objects that respond to pre-synaptic spikes with a response that is sent
  * as input to the post-synaptic neuron.
  */
 public abstract class SpikeResponder implements CopyableObject {
@@ -58,12 +57,26 @@ public abstract class SpikeResponder implements CopyableObject {
     protected double value;
 
     /**
+     * Defines a spike responder for scalar data.
+     *
+     * NOTE: No spike responders currently maintain state. If that changes, we can add a data holder as argument to
+     *     the apply functions.
+     *
+     * @param synapse a reference to a parent synapse whose spikes we respond to. Contains reference to source and
+     *                target neuron, weight, strength, spike time, etc which can be used to defined the response rule.
+     */
+    public abstract void apply(Synapse synapse);
+
+    /**
+     * Override to define a spike responder for matrix data. NOTE: None have yet been defined.
+     */
+    public void apply(Connector connector) {}
+
+
+    /**
      * @return Spike responder to duplicate.
      */
     public abstract SpikeResponder deepCopy();
-
-    @Deprecated
-    public abstract void update(final Synapse s);
 
     /**
      * @return the name of the spike responder
@@ -108,14 +121,5 @@ public abstract class SpikeResponder implements CopyableObject {
     public SpikeResponder copy() {
         return deepCopy();
     }
-
-    // No spike responders currently maintain state. If that changes, we can add a data holder as argument to the
-    // apply functions.
-
-    // TODO: Make abstract and run through
-    public void apply(Connector connector) {}
-
-    // TODO: Make abstract and run through
-    public void apply(Synapse synapse) {};
 
 }

@@ -14,6 +14,7 @@ package org.simbrain.network.synapse_update_rules;
 
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 
 /**
@@ -82,7 +83,7 @@ public class LogSTDPRule extends STDPRule {
      * Updates the synapse's strength using Log-STDP.
      */
     @Override
-    public void update(Synapse synapse) {
+    public void apply(Synapse synapse, ScalarDataHolder data) {
         boolean sourceSpiking = synapse.getSource().getUpdateRule().isSpikingNeuron();
         boolean targetSpiking = synapse.getTarget().getUpdateRule().isSpikingNeuron();
         if (!sourceSpiking || !targetSpiking) {

@@ -1,9 +1,9 @@
 package org.simbrain.custom_sims.simulations.sorn;
 
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.STDPRule;
-import org.simbrain.network.core.Synapse;
-
+import org.simbrain.network.util.ScalarDataHolder;
 
 public class AddSTDPRule extends STDPRule {
 
@@ -32,7 +32,7 @@ public class AddSTDPRule extends STDPRule {
     }
 
     @Override
-    public void update(Synapse synapse) {
+    public void apply(Synapse synapse, ScalarDataHolder data) {
         boolean ss = synapse.getSource().isSpike();
         boolean st = synapse.getTarget().isSpike();
 

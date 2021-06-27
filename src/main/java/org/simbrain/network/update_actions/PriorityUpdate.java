@@ -40,7 +40,6 @@ public class PriorityUpdate implements NetworkUpdateAction {
     @Override
     public void invoke() {
         network.updateNeuronsByPriority();
-        // network.updateLooseSynapses();
     }
 
     @Override

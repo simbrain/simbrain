@@ -2,6 +2,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -98,7 +99,7 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
     }
 
     @Override
-    public void update(Neuron neuron) {
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         if (currentState >= 1) {
             currentState++;
             if (currentState > maxState) {

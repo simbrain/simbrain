@@ -72,10 +72,6 @@ public class HebbianRule extends SynapseUpdateRule {
         synapse.setStrength(strength);
     }
 
-    @Override
-    public void update(Synapse synapse) {
-    }
-
     public double getLearningRate() {
         return learningRate;
     }

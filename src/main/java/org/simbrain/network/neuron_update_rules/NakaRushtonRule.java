@@ -138,10 +138,6 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     }
 
     @Override
-    public void update(Neuron neuron) {
-    }
-
-    @Override
     public NakaRushtonRule deepCopy() {
         NakaRushtonRule rn = new NakaRushtonRule();
         rn.setSteepness(getSteepness());

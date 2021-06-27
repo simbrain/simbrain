@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.util.ScalarDataHolder;
 
 /**
  * @author Sharai
@@ -146,8 +147,8 @@ public class CreaturesSynapseRule extends StaticSynapseRule {
     }
 
     @Override
-    public void update(Synapse synapse) {
-        super.update(synapse);
+    public void apply(Synapse synapse, ScalarDataHolder data) {
+        // super.update(synapse, data);
         //System.out.println("updating synapse: " + synapse.getId());
     }
 

@@ -167,45 +167,6 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
         return new BiasedScalarData();
     }
 
-    @Override
-    public void update(Neuron neuron) {
-        double val = neuron.getActivation() + neuron.getInput();
-        double decayVal = 0;
-
-        if (updateType == UpdateType.Relative) {
-            decayVal = decayFraction * Math.abs(val - baseLine);
-        } else  {
-            decayVal = decayAmount;
-        }
-
-        // Here's where the action happens
-        if (val < baseLine) {
-            val += decayVal;
-
-            // in case of an overshoot
-            if (val > baseLine) {
-                val = baseLine;
-            }
-        } else if (val > baseLine) {
-            val -= decayVal;
-
-            // in case of an overshoot
-            if (val < baseLine) {
-                val = baseLine;
-            }
-        }
-
-        if (addNoise) {
-            val += noiseGenerator.getRandom();
-        }
-
-        if (clipping) {
-            val = clip(val);
-        }
-
-        neuron.setActivation(val);
-    }
-
     public UpdateType getUpdateType() {
         return updateType;
     }

@@ -350,16 +350,9 @@ public class Simulation {
     public void couple(SmellSensor sensor, NeuronGroup ng) {
         Producer sensoryProducer = getProducer(sensor, "getCurrentValues");
         Consumer sensoryConsumer;
-        // TODO: Rules for this not clear? add a parameter for forced or not
-        if (ng.isSpikingNeuronGroup()) {
-            sensoryConsumer = getConsumer(ng, "addInputValues");
-
-        } else {
-            sensoryConsumer = getConsumer(ng, "addInputValues");
-        }
+        sensoryConsumer = getConsumer(ng, "addInputValues");
         createCoupling(sensoryProducer, sensoryConsumer);
     }
-
 
     /**
      * Couple a neuron to an effector on an odor world agent.

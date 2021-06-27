@@ -144,7 +144,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Time to delay sending activation to target neuron.
      */
-    @UserParameter(label = "Delay", description = "delay", minimumValue = 0, order = 5)
+    @UserParameter(label = "Delay", useSetter = true, description = "delay", minimumValue = 0, order = 5)
     private int delay;
 
     /**
@@ -221,7 +221,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      */
     public Synapse(Neuron source, Neuron target) {
         setSourceAndTarget(source, target);
-        initSpikeResponder();
         if (source != null) {
             parentNetwork = source.getNetwork();
         }
@@ -250,7 +249,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      */
     public Synapse(Network newParent, Neuron source, Neuron target, SynapseUpdateRule learningRule) {
         setSourceAndTarget(source, target);
-        initSpikeResponder();
         setLearningRule(learningRule);
         parentNetwork = newParent;
         isTemplate = source == null;
@@ -281,7 +279,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     public Synapse(Network newParent, Neuron source, Neuron target, SynapseUpdateRule learningRule, Synapse templateSynapse) {
         this(templateSynapse); // invoke the copy constructor
         setSourceAndTarget(source, target);
-        initSpikeResponder();
         setLearningRule(learningRule);
         parentNetwork = newParent;
     }
@@ -297,7 +294,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     public Synapse(Neuron source, Neuron target, SynapseUpdateRule learningRule, Network parent) {
         setSourceAndTarget(source, target);
         setLearningRule(learningRule);
-        initSpikeResponder();
         parentNetwork = parent;
         isTemplate = source == null;
     }
@@ -328,7 +324,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         setEnabled(s.isEnabled());
         setDelay(s.getDelay());
         this.frozen = s.frozen;
-        s.initSpikeResponder();
         isTemplate = s.isTemplate;
     }
 
@@ -346,74 +341,39 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     }
 
     /**
-     * Set a default spike responder if the spike responder has not been initialized.
-     *
-     * When a source neuron is spiking, the synapse should have a spike responder,
-     * otherwise not.
-     */
-    public void initSpikeResponder() {
-        if (source != null) {
-            if (source.getUpdateRule() instanceof SpikingNeuronUpdateRule) {
-                // If target neuron is already spiking, don't change the spike responder
-                if (spikeResponder instanceof NonResponder) {
-                    spikeResponder = DEFAULT_SPIKE_RESPONDER.deepCopy();
-                }
-            } else {
-                spikeResponder = new NonResponder();
-            }
-        }
-    }
-
-    /**
      * Update this synapse using its current learning rule.
      */
     public void update() {
         if (isFrozen()) {
             return;
         }
+
         // Update synapse strengths for non-static synapses
         if (!(learningRule instanceof StaticSynapseRule)) {
             learningRule.apply(this, dataHolder);
         }
+    }
+
+    @Override
+    public void updateInputs() {
         // Update psr for synapses with a spike responder
-        if(!(spikeResponder instanceof NonResponder)) {
+        if (!(spikeResponder instanceof NonResponder)) {
             spikeResponder.apply(this);
         }
     }
 
-    // TODO: Review these functions, consolidate, and add tests.
     /**
-     * For spiking source neurons, returns the spike-responder's value times the synapse strength. For non-spiking
-     * neurons, returns the pre-synaptic activation times the synapse strength.
-     *
-     * @return the post-synaptic response as determined by a spike responder.
+     * Computes the "output" or psr (post-synaptic response) for this synapse.
+     * <p>
+     * For connectionist nodes returns source activation times weight.
+     * <p>
+     * If a spike responder is used, returns the output of the spike responder.
      */
     public double calcPSR() {
         if (!enabled) {
             return 0;
         } else {
-            spikeResponder.update(this);
-            if (delay == 0) {
-                return psr;
-            } else {
-                dlyVal = dequeu();
-                enqueu(psr);
-                return dlyVal;
-            }
-        }
-    }
-
-    /**
-     * For non-spiking neurons returns the weighted sum, i.e. the activation of the pre-synaptic (source) neuron
-     * multiplied by the strength of this synapse.
-     *
-     * @return the post synaptic response calculated as a simple weighted sum
-     */
-    public double calcWeightedSum() {
-        if (!enabled) {
-            return 0;
-        } else {
-            if (spikeResponder instanceof  NonResponder) {
+            if (spikeResponder instanceof NonResponder) {
                 psr = source.getActivation() * strength;
             }
             if (delay != 0) {
@@ -498,60 +458,33 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         }
     }
 
-    /**
-     * @param wt the value to set the strength of the synapse to
-     */
     public void forceSetStrength(final double wt) {
         strength = wt;
         events.fireStrengthUpdate();
     }
 
-    /**
-     * @return Upper synapse bound.
-     */
     public double getUpperBound() {
         return upperBound;
     }
 
-    /**
-     * Sets the upper synapse bound.
-     *
-     * @param d bound
-     */
     public void setUpperBound(final double d) {
         upperBound = d;
         events.fireStrengthUpdate(); // to force a graphics update
     }
 
-    /**
-     * @return Lower synapse bound.
-     */
     public double getLowerBound() {
         return lowerBound;
     }
 
-    /**
-     * Sets the lower synapse bound.
-     *
-     * @param d bound
-     */
     public void setLowerBound(final double d) {
         lowerBound = d;
         events.fireStrengthUpdate(); // to force a graphics update
     }
 
-    /**
-     * @return Amount to increment neuron.
-     */
     public double getIncrement() {
         return increment;
     }
 
-    /**
-     * Sets the amount to increment neuron.
-     *
-     * @param d Increment amount
-     */
     public void setIncrement(final double d) {
         increment = d;
     }
@@ -674,7 +607,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     }
 
     public void setSpikeResponder(final SpikeResponder sr) {
-
         // Note that a copy of the spike responder is set. Impacts of this not known yet
         this.spikeResponder = sr.deepCopy();
     }
@@ -798,7 +730,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     public void setLearningRule(SynapseUpdateRule newLearningRule) {
         SynapseUpdateRule oldRule = learningRule;
         this.learningRule = newLearningRule.deepCopy();
-        initSpikeResponder();
         // TODO: Needed for calls to SynapseGroup.postUnmashallingInit, which calls
         // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
         // change support initialized.
@@ -938,6 +869,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     }
 
     //  TODO: Without any indication in the GUI this might be unclear to users.
+
     /**
      * "Clear" the synapse in the sense of setting post synaptic result to 0 and removing all queued activations from
      * the delay manager. Do NOT set strength to 0, which his a more radical move, that should not be achieved with
@@ -976,7 +908,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         if (getTarget() != null) {
             getTarget().removeAfferent(this);
         }
-
         getEvents().fireDeleted();
     }
 

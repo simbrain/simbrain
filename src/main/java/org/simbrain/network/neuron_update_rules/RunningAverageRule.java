@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.util.ScalarDataHolder;
 
 /**
  * <b>RunningAverageNeuron</b> keeps a running average of current and past
@@ -41,18 +42,10 @@ public class RunningAverageRule extends NeuronUpdateRule {
      */
     private double val = 0;
 
-    /**
-     * {@inheritDoc}
-     */
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @param neuron
-     */
     public void init(Neuron neuron) {
         // No implementation
     }
@@ -66,10 +59,8 @@ public class RunningAverageRule extends NeuronUpdateRule {
         return cn;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void update(Neuron neuron) {
+    @Override
+    public void apply(Neuron neuron, ScalarDataHolder data) {
         // "val" on right is activation at last time step
         val = rateConstant * neuron.getInput() + (1 - rateConstant) * val;
         neuron.setActivation(val);

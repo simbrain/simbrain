@@ -72,7 +72,6 @@ public abstract class SpikeResponder implements CopyableObject {
      */
     public void apply(Connector connector) {}
 
-
     /**
      * @return Spike responder to duplicate.
      */

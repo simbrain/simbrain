@@ -96,6 +96,11 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     private Neuron target;
 
     /**
+     * The output of the synapse. For details see {@link #updateOutput()}
+     */
+    private double output;
+
+    /**
      * The update method of this synapse, which corresponds to what kind of synapse it is.
      */
     @UserParameter(label = "Learning Rule", useSetter = true,
@@ -352,37 +357,35 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         if (!(learningRule instanceof StaticSynapseRule)) {
             learningRule.apply(this, dataHolder);
         }
-    }
 
-    @Override
-    public void updateInputs() {
-        // Update psr for synapses with a spike responder
-        if (!(spikeResponder instanceof NonResponder)) {
-            spikeResponder.apply(this);
-        }
     }
 
     /**
-     * Computes the "output" or psr (post-synaptic response) for this synapse.
-     * <p>
-     * For connectionist nodes returns source activation times weight.
-     * <p>
-     * If a spike responder is used, returns the output of the spike responder.
+     * Update output of this synapse. If there is no spike responder then output is just weighted input
+     * ("connectionist style"). If there is a {@link SpikeResponder} it is applied to update the post-synaptic response
+     * (psr) and psr is used as the output.
      */
-    public double calcPSR() {
-        if (!enabled) {
-            return 0;
+    public void updateOutput() {
+
+        if (!isEnabled()) {
+            return;
+        }
+
+        // Update the output of this synapse
+        if (spikeResponder instanceof NonResponder) {
+            // For "connectionist" case
+            output = source.getActivation() * strength;
         } else {
-            if (spikeResponder instanceof NonResponder) {
-                psr = source.getActivation() * strength;
-            }
-            if (delay != 0) {
-                dlyVal = dequeu();
-                enqueu(psr);
-                return dlyVal;
-            } else {
-                return psr;
-            }
+            // Updates psr for spiking source neurons
+            spikeResponder.apply(this);
+            output = psr;
+        }
+
+        // Handle delays
+        if (delay != 0) {
+            dlyVal = dequeu();
+            enqueu(output);
+            output = dlyVal;
         }
     }
 
@@ -918,5 +921,9 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     public ScalarDataHolder getDataHolder() {
         return dataHolder;
+    }
+
+    public double getOutput() {
+        return output;
     }
 }

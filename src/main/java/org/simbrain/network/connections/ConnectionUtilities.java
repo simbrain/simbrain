@@ -447,7 +447,8 @@ public class ConnectionUtilities {
         double e = 0;
         double i = 0;
         for (Synapse s : n.getFanIn()) {
-            double psr = s.calcPSR();
+            s.update();
+            double psr = s.getPsr();
             if (psr > 0) {
                 ei[0] += psr;
                 e++;
@@ -477,7 +478,8 @@ public class ConnectionUtilities {
         // for each neuron
         double[] ei = new double[2];
         for (Synapse s : n.getFanIn()) {
-            double psr = s.calcPSR();
+            s.updateOutput();
+            double psr = s.getPsr();
             if (psr > 0) {
                 ei[0] += psr;
             } else {

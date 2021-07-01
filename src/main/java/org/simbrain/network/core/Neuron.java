@@ -344,6 +344,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public void updateInputs() {
+        fanIn.forEach(Synapse::updateOutput);
         addInputValue(getWeightedInputs());
     }
 
@@ -495,13 +496,13 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Sums the weighted inputs to this node, by summing the PSRs or post-synaptic responses from incoming synapses,
+     * Sums the weighted inputs to this node, by summing the ouptut from incoming synapses,
      * which can either be connectionist (weight times source activation) or the output of a spike responder.
      */
     public double getWeightedInputs() {
         double wtdSum = 0;
         for (Synapse synapse : fanIn) {
-            wtdSum += synapse.calcPSR();
+            wtdSum += synapse.getOutput();
         }
         return wtdSum;
     }

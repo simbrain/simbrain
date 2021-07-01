@@ -250,7 +250,8 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         ei[0] = 0;
         ei[1] = 0;
         for(int ii=0; ii<neuron.getFanIn().size(); ++ii) {
-            double val = neuron.getFanIn().get(ii).calcPSR();
+            neuron.getFanIn().get(ii).updateOutput();
+            double val = neuron.getFanIn().get(ii).getPsr();
             if(neuron.getPolarity() == SimbrainConstants.Polarity.INHIBITORY) {
                 ei[1] += val;
             } else {

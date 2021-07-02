@@ -13,6 +13,8 @@
  */
 package org.simbrain.network.gui.trainer;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.InvalidDataException;
@@ -132,7 +134,7 @@ public class TrainerGuiActions {
      * @param dataHolder the object holding the data
      * @return the action for opening csv files
      */
-    public static Action getOpenCSVAction(final SimbrainJTable table, final NumericMatrix dataHolder) {
+    public static Action getOpenCSVAction(@NotNull final SimbrainJTable table, @Nullable final NumericMatrix dataHolder) {
         return new AbstractAction() {
 
             // Initialize
@@ -149,7 +151,9 @@ public class TrainerGuiActions {
                 if (theFile != null) {
                     try {
                         ((NumericTable) table.getData()).readData(theFile, true, false);
-                        dataHolder.setData(((NumericTable) table.getData()).asDoubleArray());
+                        if (dataHolder != null) {
+                            dataHolder.setData(((NumericTable) table.getData()).asDoubleArray());
+                        }
                     } catch (InvalidDataException exception) {
                         JOptionPane.showMessageDialog(null, exception.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     } catch (TableDataException e) {

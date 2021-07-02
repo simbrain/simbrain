@@ -155,7 +155,7 @@ public abstract class ScreenElement extends PPath.Float {
             if (event.getClickCount() == 2) {
                 event.setHandled(true);
                 SwingUtilities.invokeLater(() -> {
-                    JDialog propertyDialog = getPropertyDialog();
+                    JDialog propertyDialog =    getPropertyDialog();
                     if (propertyDialog != null) {
                         propertyDialog.pack();
                         propertyDialog.setLocationRelativeTo(null);

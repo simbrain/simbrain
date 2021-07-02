@@ -19,6 +19,10 @@ public class SmileClassifier extends NeuronArray {
      */
     private Classifier<double[]> classifier;
 
+    private double[][] x = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+
+    private int[] y = {-1, 1, -1, 1};
+
     /**
      * Construct a neuron array.
      *
@@ -48,6 +52,29 @@ public class SmileClassifier extends NeuronArray {
         setOneHot(result == -1 ? 0 : 1);
     }
 
+    public Classifier<double[]> getClassifier() {
+        return classifier;
+    }
+
+    public void setClassifier(Classifier<double[]> classifier) {
+        this.classifier = classifier;
+    }
+
+    public double[][] getX() {
+        return x;
+    }
+
+    public void setX(double[][] x) {
+        this.x = x;
+    }
+
+    public int[] getY() {
+        return y;
+    }
+
+    public void setY(int[] y) {
+        this.y = y;
+    }
 
     @Override
     public String toString() {

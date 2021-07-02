@@ -246,6 +246,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         return when(model) {
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
+            is SmileClassifier -> createNode(model)
             is NeuronArray -> createNode(model)
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)

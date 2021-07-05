@@ -192,10 +192,11 @@ val evolveModularity = newSim {
         onEval {
 
             var error = 0.0
-            for (i in 1..256) {
+            for (i in 0 until 256) {
                 // Randomize patterns
                 rightRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                 leftRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
+
                 workspace.iterate()
 
                 val left = leftRetina.products.activations in leftInputs

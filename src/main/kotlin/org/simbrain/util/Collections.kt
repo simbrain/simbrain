@@ -24,3 +24,26 @@ infix fun <T,U> Iterable<T>.cartesianProduct(other: Iterable<U>) = this.flatMap 
  */
 infix fun <T, U> Sequence<T>.cartesianProduct(other: Sequence<U>)
     = this.flatMap { a -> other.map { b -> a to b }}
+
+/**
+ * Flatten a 2d double array into a 1-d double array
+ */
+fun flattenArray(array : Array<DoubleArray>) = sequence {
+    for (row in array) {
+        for (element in row) {
+            yield(element)
+        }
+    }
+}.toList().toDoubleArray()
+
+/**
+ * Reshape a 1-d double array into a 2d array with the indicated number of rows and columns.
+ */
+fun reshape(rows: Int, cols: Int, array: DoubleArray) =
+    Array(rows) { i ->
+        val row = DoubleArray(cols)
+        for (j in 0 until cols) {
+            row[j] = array[i * cols + j]
+        }
+        row
+    }

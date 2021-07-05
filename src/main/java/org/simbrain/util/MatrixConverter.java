@@ -7,8 +7,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import smile.math.matrix.Matrix;
 
-import java.util.Base64;
-
 /**
  * Sae Smile Matrices as base 64 byte-streams from double arrays.
  */
@@ -32,12 +30,14 @@ public class MatrixConverter implements Converter {
         writer.endNode();
 
         writer.startNode("data");
-        context.convertAnother(Base64.getEncoder().encodeToString(DoubleArrayConverter.toByteArray(matrix.toArray())));
+        double[] flatArray = CollectionsKt.flattenArray(matrix.toArray());
+        context.convertAnother(DoubleArrayConverter.arrayToString(flatArray));
         writer.endNode();
     }
 
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+
         reader.moveDown();
         int rows = Integer.parseInt(reader.getValue());
         reader.moveUp();
@@ -47,12 +47,10 @@ public class MatrixConverter implements Converter {
         reader.moveUp();
 
         reader.moveDown();
-        // TODO: Not yet working. Temporary code as a base for the working version.
-        double[] flatData = DoubleArrayConverter
-                .toDoubleArray(Base64.getDecoder().decode(reader.getValue()));
+        double[] flatData = DoubleArrayConverter.stringToArray(reader.getValue());
         reader.moveUp();
 
-        return new Matrix(flatData, rows, cols);
+        return new Matrix(CollectionsKt.reshape(rows, cols, flatData));
     }
 
 }

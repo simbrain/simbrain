@@ -218,7 +218,26 @@ class Network {
             neuron.updateInputs()
             neuron.update()
         }
-        // TODO: Update other models? Or generalize this to work on all network models?
+    }
+
+    /**
+     * Update all network models except for neurons.
+     * Obviously a temporary method!
+     */
+    fun updateAllButNeurons() {
+        // TODO: Temporary function until we create a generalized priority based update
+        listOf(NeuronGroup::class.java,
+        NeuronCollection::class.java,
+        NeuronArray::class.java,
+        Connector::class.java,
+        SynapseGroup::class.java,
+        Subnetwork::class.java,
+        Synapse::class.java)
+            .flatMap { networkModels[it] }
+            .forEach {nm ->
+                nm.updateInputs()
+                nm.update()
+            }
     }
 
     /**

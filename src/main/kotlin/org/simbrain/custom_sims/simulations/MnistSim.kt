@@ -3,8 +3,8 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.jetbrains.kotlinx.dl.datasets.handlers.TEST_IMAGES_ARCHIVE
-import org.jetbrains.kotlinx.dl.datasets.handlers.extractImages
+import org.jetbrains.kotlinx.dl.dataset.handler.TEST_IMAGES_ARCHIVE
+import org.jetbrains.kotlinx.dl.dataset.handler.extractImages
 import org.simbrain.custom_sims.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place

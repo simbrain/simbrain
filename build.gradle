@@ -17,11 +17,10 @@ def jmonkeyengine_version = '3.3.2-stable'
 
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 
-sourceCompatibility = 1.10
+sourceCompatibility = 1.11
 
 repositories {
     mavenCentral()
-    jcenter()
     maven {
         url  "https://kotlin.bintray.com/kotlin-datascience"
     }
@@ -41,7 +40,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.4.2'
 
     // Kotlin DL
-    implementation 'org.jetbrains.kotlin-deeplearning:api:0.1.1'
+    implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:0.2.0'
 
     // Smile
     implementation 'com.github.haifengl:smile-kotlin:2.6.0'

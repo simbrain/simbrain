@@ -12,22 +12,6 @@ import java.nio.FloatBuffer
 class TensorFlowTests {
 
     @Test
-    fun `learningAboutTests`() {
-
-        var a = 10
-
-        // Check basic assignment
-        assertEquals(10, a)
-
-        // 20 = 10+10
-        assertEquals(20,a+a)
-
-        // 11 = 10+1
-        a+=1
-        assertEquals(11, a)
-    }
-
-    @Test
     fun `tensor flow basics`() {
 
         // Initial code to create a 2d matrix of floats

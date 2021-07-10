@@ -4,28 +4,27 @@ import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
 import smile.math.matrix.Matrix;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * Superclass for NeuronArray, NeuronCollection, and in general classes that can be the source or target of a
- * {@link Connector}.  The Simbrain version of a "Layer" used to build a more complex, generally array based, neural
- * network model.
+ * Superclass for sources or target of a {@link Connector}.The Simbrain version of a "Layer" used to build a more
+ * complex, generally array based, neural network model.
  *
- * Associated with an activation vector and a separate input vector that stores summed output from incoming connectors.
+ * Simbrain buffered update assumes that inputs are aggregated in one pass then used in update in a second pass. Thus
+ * there is no method to set inputs directly, but only to add to inputs.
+ *
  */
 public abstract class Layer extends LocatableModel {
 
     /**
      * "Fan-in" of incoming connectors.
      */
-    private final List<Connector> incomingConnectors = new ArrayList<>();;
+    private final List<Connector> incomingConnectors = new ArrayList<>();
 
     /**
      * "Fan-out" of outgoing connectors.
@@ -33,9 +32,51 @@ public abstract class Layer extends LocatableModel {
     private final List<Connector> outgoingConnectors = new ArrayList<>();
 
     /**
+     * Return the current inputs as a size x 1 input vector.
+     */
+    public abstract Matrix getInputs();
+
+    /**
+     * Add inputs to input vector. Performed in first pass of {@link org.simbrain.network.update_actions.BufferedUpdate}
+     */
+    public abstract void addInputs(Matrix inputs);
+
+    /**
+     * For "single-layer" layers this is activations. For multi-layer cases it is the output layer.
+     */
+    public abstract Matrix getOutputs();
+
+    /**
+     * Default x coordinate of center of layer.
+     */
+    private double x;
+
+    /**
+     * Default y coordinate of center of layer.
+     */
+    private double y;
+
+    /**
      * Event support.
      */
     private transient LocationEvents events = new LocationEvents(this);
+
+    /**
+     * Returns the size of whatever is used as output for this layer, e.g. an activation vector or output layer
+     * activation vector.
+     */
+    public abstract int size();
+
+    /**
+     * Register a callback function to run when the location of this object is updated.
+     */
+    public void onLocationChange(Runnable task) {
+        events.onLocationChange(task);
+    }
+
+    public abstract Network getNetwork();
+
+    public abstract Rectangle2D getBound();
 
     public void addIncomingConnector(Connector connector) {
         incomingConnectors.add(connector);
@@ -61,54 +102,6 @@ public abstract class Layer extends LocatableModel {
         return outgoingConnectors;
     }
 
-    /**
-     * Return the current weighted inputs.
-     */
-    public abstract double[] getInputs();
-
-    // There should NOT be a setInputs function because it will mess up updating.
-
-    @Consumable()
-    public abstract void addInputs(double[] newInputs);
-
-    @Producible()
-    public abstract double[] getActivations();
-
-    // TODO: Temp until we convert to matrices
-    public Matrix getActivationsAsMatrix() {
-        return new Matrix(getActivations());
-    }
-
-    @Consumable()
-    public abstract void setActivations(double[] activations);
-
-    /**
-     * Iterate through incoming connectors and return their summed outputs.
-     */
-    public Matrix getSummedOutputs() {
-        Matrix  result = new Matrix( getInputs().length,1);
-        for (Connector c : incomingConnectors) {
-                result.add(c.getOutput());
-            }
-        return result;
-    }
-
-    /**
-     * Size of activation vector.
-     */
-    public int size() {
-        return getActivations().length;
-    }
-
-    /**
-     * Register a callback function to run when the location of this object is updated.
-     */
-    public abstract void onLocationChange(Runnable task);
-
-    public abstract Network getNetwork();
-
-    public abstract Rectangle2D getBound();
-
     @Override
     public void postUnmarshallingInit() {
         if (events == null) {
@@ -122,39 +115,6 @@ public abstract class Layer extends LocatableModel {
         return events;
     }
 
-    /**
-     * Add increment to every entry in weight matrix
-     */
-    public void incrementArray(double amount) {
-        double[] newActivations = Arrays
-                .stream(getActivations())
-                .map(a -> a + amount)
-                .toArray();
-        setActivations(newActivations);
-        events.fireUpdated();
-    }
-
-    /**
-     * Subtract increment from every entry in the array
-     */
-    public void decrementArray(double amount) {
-        double[] newActivations = Arrays
-                .stream(getActivations())
-                .map(a -> a - amount)
-                .toArray();
-        setActivations(newActivations);
-        events.fireUpdated();
-    }
-
-    /**
-     * Clear array values.
-     */
-    public void clearArray() {
-        double[] newActivations = new double[getActivations().length];
-        setActivations(newActivations);
-        events.fireUpdated();
-    }
-
     @Override
     public void delete() {
         getEvents().fireDeleted();
@@ -165,4 +125,28 @@ public abstract class Layer extends LocatableModel {
         return this;
     }
 
+    @NotNull
+    @Override
+    public Point2D getLocation() {
+        return new Point2D.Double(x, y);
+    }
+
+    @Override
+    public void setLocation(Point2D location) {
+        this.x = location.getX();
+        this.y = location.getY();
+        events.fireLocationChange();
+    }
+
+    public void setLocation(double x, double y) {
+        setLocation(new Point2D.Double(x,y));
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
 }

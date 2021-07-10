@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.MatrixDataHolder;
@@ -31,6 +31,7 @@ import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
+import smile.math.matrix.Matrix;
 
 /**
  * <b>NakaRushtonNeuron</b> is a firing-rate based neuron which is intended to
@@ -152,16 +153,17 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         return rn;
     }
 
-    public void apply(Layer array, MatrixDataHolder data) {
+    @Override
+    public void apply(NeuronArray array, MatrixDataHolder data) {
         double[] vals = new double[array.size()];
         for (int i = 0; i < vals.length ; i++) {
             vals[i] = nakaRushtonRule(
-                    array.getInputs()[i],
-                    array.getActivations()[i],
+                    array.getInputs().col(0)[i],
+                    array.getActivations().col(0)[i],
                     array.getNetwork().getTimeStep(),
                     ((NakaMatrixData)data).getA()[i]);
         }
-        array.setActivations(vals);
+        array.setActivations(new Matrix(vals));
     }
 
     @Override

@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.neuron_update_rules.AdExIFRule;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.network.neuron_update_rules.IzhikevichRule;
@@ -109,14 +109,14 @@ public abstract class NeuronUpdateRule implements CopyableObject {
     }
 
     /**
-     * Override to define a neural update rule for matrix data.
+     * Override to define a neural update rule for Neuron Arrays
      *
      * NOTE: Only a few of these have been done.
      *
      * @param array reference to a layer and its matrix-valued data (inputs, activations).
      * @param dataHolder a holder for mutable data used in matrix versions of an update rule
      */
-    public void apply(Layer array, MatrixDataHolder dataHolder) {}
+    public void apply(NeuronArray array, MatrixDataHolder dataHolder) {}
 
     /**
      * Override to return an appropriate data holder for a given rule.

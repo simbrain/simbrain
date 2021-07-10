@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.connectors.WeightMatrix
 import org.simbrain.network.core.Network
+import smile.math.matrix.Matrix
 
 class LayerTest {
 
@@ -14,7 +15,7 @@ class LayerTest {
 
     @Test
     internal fun `getWeightedInputs returns correct values`() {
-        na1.activations = doubleArrayOf(1.0,-1.0)
+        na1.activations = Matrix(doubleArrayOf(1.0,-1.0))
         wm.diagonalize()
         assertArrayEquals(doubleArrayOf(1.0,-1.0), wm.output.col(0), 0.0)
     }

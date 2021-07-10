@@ -23,6 +23,7 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
+import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkDialogsKt;
 import org.simbrain.network.gui.NetworkPanel;
@@ -39,6 +40,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
+import smile.math.matrix.Matrix;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,8 +54,8 @@ import static org.simbrain.util.GeomKt.minus;
 import static org.simbrain.util.GeomKt.plus;
 
 /**
- * <b>NeuronNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
- * network model.
+ * The current pnode representation for all {@link Layer} objects. May be broken out into subtypes for different
+ * subclasses of Layer.
  */
 @SuppressWarnings("serial")
 public class NeuronArrayNode extends ScreenElement {
@@ -217,18 +219,18 @@ public class NeuronArrayNode extends ScreenElement {
 
             if (gridMode) {
                 // "Grid" case
-                double[] activations = neuronArray.getActivations();
+                double[] activations = neuronArray.getOutputs().col(0);
                 int len = (int) Math.sqrt(activations.length);
                 BufferedImage img = ImageKt.toSimbrainColorImage(
                         activations,len,len);
                 activationImage.setImage(img);
                 // TODO: Adjust this to look nice
                 // TODO: Magic numbers
-                this.activationImage.setBounds(5, infoText.getHeight() + 10, 100, 100);
+                this.activationImage.setBounds(5, 100, 100, 100);
 
             } else {
                 // "Flat" case
-                double[] activations = neuronArray.getActivations();
+                double[] activations = neuronArray.getOutputs().col(0);
                 BufferedImage img = ImageKt.toSimbrainColorImage(activations,activations.length, 1);
                 activationImage.setImage(img);
                 this.activationImage.setBounds(borderPixels, infoText.getHeight() + borderPixels,
@@ -255,9 +257,10 @@ public class NeuronArrayNode extends ScreenElement {
     private void updateInfoText() {
         infoText.setText(
                 "" + neuronArray.getLabel() + "    " +
-                        "nodes: " + neuronArray.getActivations().length
+                        "nodes: " + neuronArray.size()
                         + "\nmean activation: "
-                        + SimbrainMath.roundDouble(Arrays.stream(neuronArray.getActivations()).average().orElse(0), 4));
+                        + SimbrainMath.roundDouble(Arrays.stream(neuronArray.getActivations().col(0)).average().orElse(0),
+                        4));
     }
 
     @Override
@@ -363,11 +366,11 @@ public class NeuronArrayNode extends ScreenElement {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 StandardDialog dialog = new StandardDialog();
-                NumericTable arrayData = new NumericTable(neuronArray.getActivations());
+                NumericTable arrayData = new NumericTable(neuronArray.getOutputs().col(0));
                 dialog.setContentPane(new SimbrainJTableScrollPanel(
                         SimbrainJTable.createTable(arrayData)));
                 dialog.addClosingTask(() -> {
-                    neuronArray.addInputs(arrayData.getVectorCurrentRow());
+                    neuronArray.addInputs(new Matrix(arrayData.getVectorCurrentRow()));
                     neuronArray.update();
                 });
                 dialog.pack();

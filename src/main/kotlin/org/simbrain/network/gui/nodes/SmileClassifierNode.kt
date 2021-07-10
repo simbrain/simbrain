@@ -39,14 +39,14 @@ class SmileClassifierNode(val np : NetworkPanel, val classifier : SmileClassifie
                 }
 
                 val inputPanel = DataPanel().apply {
-                    table.setData(classifier.x)
+                    table.setData(classifier.trainingInputs)
                     events.onApply { data -> println(data.contentDeepToString()) }
                     addClosingTask { applyData() }
                     dataPanel.add(this)
                 }
 
                 val targetPanel = DataPanel().apply {
-                    table.setData(classifier.y.map { doubleArrayOf(it.toDouble()) }.toTypedArray())
+                    table.setData(classifier.targets.map { doubleArrayOf(it.toDouble()) }.toTypedArray())
                     addClosingTask { applyData() }
                     dataPanel.add(this)
                 }
@@ -64,13 +64,13 @@ class SmileClassifierNode(val np : NetworkPanel, val classifier : SmileClassifie
                 inputPanel.events.onApply { data ->
                     input = data
                     invokeCallback(input, target)
-                    classifier.x = data
+                    classifier.trainingInputs = data
                 }
 
                 targetPanel.events.onApply { data ->
                     target = data.map { it[0].toInt() }.toIntArray()
                     invokeCallback(input, target)
-                    classifier.y = target
+                    classifier.targets = target
                 }
             }.also { pack() })
         }.also {

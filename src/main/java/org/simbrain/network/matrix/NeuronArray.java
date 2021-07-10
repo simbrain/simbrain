@@ -1,7 +1,7 @@
 package org.simbrain.network.matrix;
 
 
-import org.jetbrains.annotations.NotNull;
+import org.simbrain.network.connectors.Connector;
 import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -9,13 +9,12 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
+import smile.math.matrix.Matrix;
+import smile.stat.distribution.GaussianDistribution;
 
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
 
 /**
  * A "neuron array" backed by a double array.
@@ -42,25 +41,15 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
     private final Network parent;
 
     /**
-     * Center of the neuron array.
-     */
-    private double x;
-
-    /**
-     * Center of the neuron array.
-     */
-    private double y;
-
-    /**
      * Array to hold activation values. These are also the outputs that are consumed by
      * other network components via {@link Layer}.
      */
-    private double[] activations;
+    private Matrix activations;
 
     /**
      * Collects inputs from other network models using arrays.
      */
-    private double[] inputs;
+    private Matrix inputs;
 
     /**
      * Render an image showing each activation when true.
@@ -76,8 +65,8 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
      */
     public NeuronArray(Network net, int size) {
         parent = net;
-        activations = new double[size];
-        inputs = new double[size];
+        activations = new Matrix(size, 1);
+        inputs = new Matrix(size, 1);
         randomize();
         setLabel(net.getIdManager().getProposedId(this.getClass()));
         setPrototypeRule(prototypeRule);
@@ -91,37 +80,38 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
      * @return the deep copy
      */
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
-        NeuronArray copy = new NeuronArray(newParent, orig.getActivations().length);
-        copy.x = orig.x;
-        copy.y = orig.y;
+        NeuronArray copy = new NeuronArray(newParent, orig.size());
+        copy.setLocation(orig.getLocation());
         copy.setActivations(orig.getActivations());
         copy.setPrototypeRule(orig.getPrototypeRule());
         // TODO: Copy data.
         return copy;
     }
 
+    public Matrix getActivations() {
+        return activations;
+    }
+
+    @Override
+    public Matrix getOutputs() {
+        return activations;
+    }
+
+    @Override
+    public Matrix getInputs() {
+        return inputs;
+    }
+
     @Override
     public void randomize() {
-        setActivations(SimbrainMath.randomVector(getActivations().length, -1, 1));
+        activations = Matrix.rand(size(),1,
+                new GaussianDistribution(0, 1));
         getEvents().fireUpdated();
-    }
-
-    @NotNull
-    @Override
-    public Point2D getLocation() {
-        return new Point2D.Double(x, y);
-    }
-
-    @Override
-    public void setLocation(Point2D location) {
-        this.x = location.getX();
-        this.y = location.getY();
-        fireLocationChange();
     }
 
     @Override
     public Rectangle2D getBound() {
-        return new Rectangle2D.Double(x - 150 / 2, y - 50 / 2, 150, 50);
+        return new Rectangle2D.Double(getX() - 150 / 2, getY() - 50 / 2, 150, 50);
     }
 
     public boolean isRenderActivations() {
@@ -149,8 +139,7 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
      * @param offsetY y offset for translation.
      */
     public void offset(final double offsetX, final double offsetY) {
-        x += offsetX;
-        y += offsetY;
+        setLocation(getX() + offsetX, getY() + offsetY);
         getEvents().fireUpdated();
     }
 
@@ -204,10 +193,14 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
         }
     }
 
+
     @Override
     public void updateInputs() {
-        // TODO
-        addInputs(getSummedOutputs().col(0));
+        Matrix wtdInputs = new Matrix(size(), 1);
+        for (Connector c : getIncomingConnectors()) {
+            wtdInputs.add(c.getOutput());
+        }
+        addInputs(wtdInputs);
     }
 
     @Override
@@ -216,38 +209,28 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
             return;
         }
         prototypeRule.apply(this, dataHolder);
-        inputs = new double[inputs.length]; // clear inputs
+        inputs.mul(0); // clear inputs
         getEvents().fireUpdated();
     }
 
     @Override
-    public double[] getInputs() {
-        return inputs;
-    }
-
-    @Override
-    public void addInputs(double[] newInputs) {
-        inputs = SimbrainMath.addVector(inputs, newInputs);
-    }
-
-    @Override
-    public double[] getActivations() {
-        return activations;
+    public void addInputs(Matrix newInputs) {
+        inputs.add(newInputs);
     }
 
     /**
      * Set the activations to a one-hot encoding (all 0s and one 1) at provided index.
+     *
      * @see {<a href="https://en.wikipedia.org/wiki/One-hot"></a>}.
      */
     public void setOneHot(int index) {
         clear();
-        activations[index] = 1.0;
+        activations.set(0, index, 1.0);
         getEvents().fireUpdated();
     }
 
-    @Override
-    public void setActivations(double[] newActivations) {
-        activations = Arrays.stream(newActivations).toArray();
+    public void setActivations(Matrix newActivations) {
+        activations = newActivations;
         getEvents().fireUpdated();
     }
 
@@ -256,8 +239,8 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
     }
 
     @Override
-    public void onLocationChange(Runnable task) {
-        getEvents().onLocationChange(task);
+    public int size() {
+        return (int) activations.size();
     }
 
     @Override
@@ -267,23 +250,26 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
 
     @Override
     public String toString() {
-        return getId() + " with " + getActivations().length + " activations: " +
-                Utils.getTruncatedArrayString(getActivations(), 10);
+        return getId() + " with " + activations.size() + " activations: " +
+                Utils.getTruncatedArrayString(getActivations().col(0), 10);
     }
 
     @Override
     public void clear() {
-        clearArray();
+        activations.mul(0);
+        getEvents().fireUpdated();
     }
 
     @Override
     public void increment() {
-        incrementArray(increment);
+        activations.add(increment);
+        getEvents().fireUpdated();
     }
 
     @Override
     public void decrement() {
-        decrementArray(increment);
+        activations.sub(increment);
+        getEvents().fireUpdated();
     }
 
     @Override
@@ -302,7 +288,7 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
 
     public void setPrototypeRule(NeuronUpdateRule prototypeRule) {
         this.prototypeRule = prototypeRule;
-        dataHolder = prototypeRule.createMatrixData(activations.length);
+        dataHolder = prototypeRule.createMatrixData(size());
     }
 
     public NeuronUpdateRule getPrototypeRule() {

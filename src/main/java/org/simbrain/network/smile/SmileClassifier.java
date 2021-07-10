@@ -1,7 +1,6 @@
 package org.simbrain.network.smile;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.matrix.NeuronArray;
 import smile.classification.Classifier;
 import smile.classification.SVM;
@@ -10,18 +9,13 @@ import smile.math.kernel.PolynomialKernel;
 public class SmileClassifier extends NeuronArray {
 
     /**
-     * Event support.
-     */
-    private transient LocationEvents events = new LocationEvents(this);
-
-    /**
      * The classifier object.
      */
     private Classifier<double[]> classifier;
 
-    private double[][] x = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+    private double[][] trainingInputs = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
 
-    private int[] y = {-1, 1, -1, 1};
+    private int[] targets = {-1, 1, -1, 1};
 
     /**
      * Construct a neuron array.
@@ -48,7 +42,7 @@ public class SmileClassifier extends NeuronArray {
     @Override
     public void update() {
         // TODO
-        var result = classifier.predict(getInputs());
+        var result = classifier.predict(getInputs().col(0));
         setOneHot(result == -1 ? 0 : 1);
     }
 
@@ -60,20 +54,20 @@ public class SmileClassifier extends NeuronArray {
         this.classifier = classifier;
     }
 
-    public double[][] getX() {
-        return x;
+    public double[][] getTrainingInputs() {
+        return trainingInputs;
     }
 
-    public void setX(double[][] x) {
-        this.x = x;
+    public void setTrainingInputs(double[][] trainingInputs) {
+        this.trainingInputs = trainingInputs;
     }
 
-    public int[] getY() {
-        return y;
+    public int[] getTargets() {
+        return targets;
     }
 
-    public void setY(int[] y) {
-        this.y = y;
+    public void setTargets(int[] targets) {
+        this.targets = targets;
     }
 
     @Override

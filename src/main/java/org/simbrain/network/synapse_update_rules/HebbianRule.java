@@ -22,6 +22,7 @@ import org.simbrain.network.connectors.Connector;
 import org.simbrain.network.connectors.WeightMatrix;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.SimbrainPreferences;
@@ -57,8 +58,8 @@ public class HebbianRule extends SynapseUpdateRule {
     public void apply(Connector connector, MatrixDataHolder data) {
         if (connector instanceof  WeightMatrix) {
             Matrix wm = ((WeightMatrix)connector).getWeightMatrix();
-            Matrix src = connector.getTarget().getActivationsAsMatrix();
-            Matrix tar = connector.getTarget().getActivationsAsMatrix();
+            Matrix src = ((NeuronArray)connector.getSource()).getActivations();
+            Matrix tar = ((NeuronArray)connector.getTarget()).getActivations();
             // weights += Learning rate * outer-product(src,tar)
             wm.add(src.mt(tar).mul(learningRate));
         }

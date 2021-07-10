@@ -15,7 +15,8 @@ import smile.stat.distribution.GaussianDistribution;
 import java.util.Arrays;
 
 /**
- * An dense weight matrix that connects a source and target {@link Layer} object.
+ * An dense weight matrix that connects a source and target {@link Layer} object. A default way of linking arbitrary
+ * layers.
  */
 public class WeightMatrix extends Connector {
 
@@ -53,11 +54,7 @@ public class WeightMatrix extends Connector {
         source.addOutgoingConnector(this);
         target.addIncomingConnector(this);
 
-        weightMatrix = new Matrix(source.getActivations().length,
-                target.getActivations().length);
-
-        // Hack to initialize backend array so there are no delays later at first computation
-        weightMatrix.aat();
+        weightMatrix = new Matrix(source.size(),target.size());
 
         // Default for "adapter" cases is 1-1
         if (source instanceof AbstractNeuronCollection) {
@@ -93,7 +90,7 @@ public class WeightMatrix extends Connector {
      */
     public void diagonalize() {
         clear();
-        weightMatrix = Matrix.eye(Math.min(source.getActivations().length, target.getActivations().length));
+        weightMatrix = Matrix.eye(source.size(), target.size());
         getEvents().fireUpdated();
     }
 
@@ -102,7 +99,7 @@ public class WeightMatrix extends Connector {
      */
     @Override
     public Matrix getOutput() {
-        return weightMatrix.tm(source.getActivationsAsMatrix());
+        return weightMatrix.tm(source.getOutputs());
     }
 
     @Override
@@ -125,7 +122,7 @@ public class WeightMatrix extends Connector {
     @Override
     public void
     randomize() {
-        weightMatrix = Matrix.rand(source.getActivations().length, target.getActivations().length,
+        weightMatrix = Matrix.rand(getSource().size(), getTarget().size(),
                 new GaussianDistribution(0, 1));
         getEvents().fireUpdated();
     }

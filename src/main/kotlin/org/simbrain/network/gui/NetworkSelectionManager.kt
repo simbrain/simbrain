@@ -149,8 +149,9 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      */
     fun convertSelectedNodesToSourceNodes() = modifySourceSelection {
         clear()
+        // TODO: this should rely on a property of screenelements or their models
         addAll(selection.filter { it is NeuronNode || it is NeuronCollectionNode || it is NeuronArrayNode || it is
-                InteractionBox
+                InteractionBox || it is ZoeLayerNode
         })
     }
 

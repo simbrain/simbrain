@@ -18,15 +18,16 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
+import smile.math.matrix.Matrix;
 
 import java.util.Random;
 
@@ -88,13 +89,13 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
-    public void apply(Layer array, MatrixDataHolder data) {
+    public void apply(NeuronArray array, MatrixDataHolder data) {
         // TODO: Implement using matrix operations
         double[] vals = new double[array.size()];
         for (int i = 0; i < vals.length ; i++) {
-            vals[i] = binaryRule(array.getInputs()[i], ((BiasedMatrixData)data).getBiases()[i]);
+            vals[i] = binaryRule(array.getInputs().col(0)[i], ((BiasedMatrixData)data).getBiases()[i]);
         }
-        array.setActivations(vals);
+        array.setActivations(new Matrix(vals));
     }
 
     @Override

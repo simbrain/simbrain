@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
@@ -33,6 +33,7 @@ import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
+import smile.math.matrix.Matrix;
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
@@ -90,13 +91,14 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     @Override
-    public void apply(Layer array, MatrixDataHolder data) {
+    public void apply(NeuronArray array, MatrixDataHolder data) {
         // TODO: Implement using matrix operations
         double[] vals = new double[array.size()];
         for (int i = 0; i < vals.length ; i++) {
-            vals[i] = linearRule(array.getInputs()[i], ((BiasedMatrixData)data).getBiases()[i]);
+            vals[i] = linearRule(array.getInputs().col(0)[i],
+                    ((BiasedMatrixData)data).getBiases()[i]);
         }
-        array.setActivations(vals);
+        array.setActivations(new Matrix(vals));
     }
 
     @Override

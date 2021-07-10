@@ -2,6 +2,7 @@ package org.simbrain.network.groups;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
+import org.simbrain.network.connectors.Connector;
 import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -14,10 +15,12 @@ import org.simbrain.util.RectangleOutlines;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
+import smile.math.matrix.Matrix;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -56,9 +59,15 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     private double[] activations;
 
     /**
+     * Cache of input values.
+     */
+    private double[] inputs;
+
+    /**
      * Flag to mark whether {@link #activations} is "dirty", that is outdated and in need of updating.
      */
     private boolean cachedActivationsDirty = true;
+    private boolean cachedInputsDirty = true;
 
     /**
      * References to neurons in this collection
@@ -91,6 +100,56 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         inputManager = new ActivationInputManager(this);
         subsamplingManager = new SubsamplingManager(this);
         activationRecorder = new ActivationRecorder(this);
+    }
+
+    @Override
+    public Matrix getOutputs() {
+        // TODO: Performance drain? Consider caching this.
+        return new Matrix(getActivations());
+    }
+
+    @Override
+    public void addInputs(Matrix newInputs) {
+        addInputs(newInputs.col(0));
+    }
+
+    /**
+     * Set input values of neurons using an array of doubles. Assumes the order
+     * of the items in the array matches the order of items in the neuronlist.
+     * <p>
+     * Does not throw an exception if the provided input array and neuron list
+     * do not match in size.
+     */
+    public void addInputs(double[] inputs) {
+        int size = Math.min(inputs.length, neuronList.size());
+        for (int i = 0; i < size; i++) {
+            neuronList.get(i).addInputValue(inputs[i]);
+        }
+        invalidateCachedInputs();
+    }
+
+    // TODO: If this starts being used a lot it should be cached
+    @Override
+    public Matrix getInputs() {
+        return new Matrix(getInputArray());
+    }
+
+    /**
+     * Return inputs as a double array. Either create the array or return a cache of it.
+     */
+    public double[] getInputArray() {
+        if (cachedInputsDirty) {
+            inputs = neuronList.stream()
+                    .map(Neuron::getInput)
+                    .mapToDouble(Double::doubleValue)
+                    .toArray();
+        }
+        return inputs;
+    }
+
+    @Override
+    public int size() {
+        return getActivations().length;
     }
 
     /**
@@ -355,9 +414,11 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         // }
         // inputManager.applyCurrentRow(); // TODO
 
-        // Add weighted inputs to inputs
-        // TODO Convert to matrix
-        addInputs(getSummedOutputs().col(0));
+        double[] wtdInputs = new double[size()];
+        for (Connector c : getIncomingConnectors()) {
+            wtdInputs = SimbrainMath.addVector(wtdInputs, c.getOutput().col(0));
+        }
+        addInputs(wtdInputs);
     }
 
     @Override
@@ -369,7 +430,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     }
 
     @Producible(arrayDescriptionMethod = "getLabelArray")
-    @Override
     public double[] getActivations() {
         if (cachedActivationsDirty) {
             activations = neuronList.stream()
@@ -377,39 +437,8 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
                     .mapToDouble(Double::doubleValue)
                     .toArray();
             cachedActivationsDirty = false;
-            return activations;
-        } else {
-            return activations;
         }
-    }
-
-    /**
-     * Set input values of neurons using an array of doubles. Assumes the order
-     * of the items in the array matches the order of items in the neuronlist.
-     * <p>
-     * Does not throw an exception if the provided input array and neuron list
-     * do not match in size.
-     */
-    @Override
-    @Consumable
-    public void addInputs(double[] inputs) {
-        int size = Math.min(inputs.length, neuronList.size());
-        for (int i = 0; i < size; i++) {
-            neuronList.get(i).addInputValue(inputs[i]);
-        }
-    }
-
-    @Override
-    public double[] getInputs() {
-        return neuronList.stream()
-                .map(Neuron::getInput)
-                .mapToDouble(Double::doubleValue)
-                .toArray();
-    }
-
-    @Override
-    public void onLocationChange(Runnable task) {
-        events.onLocationChange(task);
+        return activations;
     }
 
     /**
@@ -553,6 +582,10 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         cachedActivationsDirty = true;
     }
 
+    protected void invalidateCachedInputs() {
+        cachedInputsDirty = true;
+    }
+
     //TODO
     @Consumable()
     public void forceSetActivations(double[] activations) {
@@ -594,10 +627,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
 
     public boolean isEmpty() {
         return neuronList.isEmpty();
-    }
-
-    public int size() {
-        return neuronList.size();
     }
 
     /**
@@ -728,5 +757,38 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     @Override
     public void decrement() {
         decrementArray(increment);
+    }
+
+    /**
+     * Add increment to every entry in weight matrix
+     */
+    public void incrementArray(double amount) {
+        double[] newActivations = Arrays
+                .stream(getActivations())
+                .map(a -> a + amount)
+                .toArray();
+        setActivations(newActivations);
+        events.fireUpdated();
+    }
+
+    /**
+     * Subtract increment from every entry in the array
+     */
+    public void decrementArray(double amount) {
+        double[] newActivations = Arrays
+                .stream(getActivations())
+                .map(a -> a - amount)
+                .toArray();
+        setActivations(newActivations);
+        events.fireUpdated();
+    }
+
+    /**
+     * Clear array values.
+     */
+    public void clearArray() {
+        double[] newActivations = new double[getActivations().length];
+        setActivations(newActivations);
+        events.fireUpdated();
     }
 }

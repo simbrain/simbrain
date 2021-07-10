@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
-import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
@@ -32,6 +32,7 @@ import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
+import smile.math.matrix.Matrix;
 
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
@@ -113,14 +114,14 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     private double floor = DEFAULT_FLOOR;
 
     @Override
-    public void apply(Layer array, MatrixDataHolder data) {
+    public void apply(NeuronArray array, MatrixDataHolder data) {
         // TODO: Implement using matrix operations
         double[] vals = new double[array.size()];
         for (int i = 0; i < vals.length ; i++) {
-            vals[i] = decayRule(array.getInputs()[i],
-                    array.getActivations()[i], ((BiasedMatrixData)data).getBiases()[i]);
+            vals[i] = decayRule(array.getInputs().col(0)[i],
+                    array.getActivations().col(0)[i], ((BiasedMatrixData)data).getBiases()[i]);
         }
-        array.setActivations(vals);
+        array.setActivations(new Matrix(vals));
     }
 
     @Override

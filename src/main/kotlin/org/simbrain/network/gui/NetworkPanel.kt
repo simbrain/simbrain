@@ -26,6 +26,7 @@ import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.topLeftLocation
@@ -255,6 +256,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
             is SmileClassifier -> createNode(model)
+            is ZoeLayer -> createNode(model)
             else -> throw IllegalArgumentException()
         }
     }
@@ -298,6 +300,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun createNode(classifier : SmileClassifier) = addScreenElement {
         SmileClassifierNode(this, classifier)
+    }
+
+    fun createNode(layer : ZoeLayer) = addScreenElement {
+        ZoeLayerNode(this, layer)
     }
 
     fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
@@ -486,8 +492,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     /**
      * Connect source and target model items.
-     * <br></br>
-     * If a either source or target model items are ND4J, connect with a weight matrix
      * <br></br>
      * If a pair of source and target items are neuron groups, connect with a synapse group
      * <br></br>

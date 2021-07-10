@@ -22,7 +22,7 @@ abstract class LocatableModel() : NetworkModel() {
     /**
      * Implementing classes must fire and handle location events.
      */
-    abstract val events: LocationEvents
+    abstract override fun getEvents(): LocationEvents
 }
 
 /**

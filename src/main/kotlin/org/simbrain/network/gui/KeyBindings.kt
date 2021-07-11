@@ -35,7 +35,7 @@ fun NetworkPanel.addKeyBindings() {
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
     bind(Shift + 'S') { network.addNetworkModel(SmileClassifier(network, 2)) } // TODO: Temp testing key command
-    // bind(Shift + 'D') { network.addNetworkModel(DeepNet(network, 2)) }
+    bind(Shift + 'D') {  showDeepNetCreationDialog() }
     bind(Shift + 'Z') { network.addNetworkModel(ZoeLayer(network, 10)) } // TODO: Temp testing key command
     bindTo("I", networkActions.wandEditModeAction)
     bindTo("G", networkActions.neuronGroupAction)

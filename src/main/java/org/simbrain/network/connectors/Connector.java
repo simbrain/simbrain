@@ -9,9 +9,8 @@ import org.simbrain.workspace.AttributeContainer;
 import smile.math.matrix.Matrix;
 
 /**
- * Superclass for classes that inherit from {@link Layer}, i.e.. that either produce or consume
- * vectors of values. Weight matrices are the most obvious examples; they can be used to connect a neuron group or
- * array producing a vector values with another neuron group or array consuming a vector of values.
+ * Superclass for classes that inherit from {@link Layer}, i.e.. that either produce or consume vectors of values.
+ * Dense connectors, i.e. weight matrices, are the most obvious example. More information is in the layer javadocs.
  */
 public abstract class Connector extends NetworkModel implements EditableObject, AttributeContainer {
 

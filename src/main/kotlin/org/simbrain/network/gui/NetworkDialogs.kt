@@ -4,6 +4,7 @@ package org.simbrain.network.gui
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connectors.Layer
 import org.simbrain.network.connectors.WeightMatrix
+import org.simbrain.network.core.DeepNet
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
@@ -198,4 +199,21 @@ fun NetworkPanel.createConnector() {
         dialog.pack()
         dialog.isVisible = true
     }
+}
+
+/**
+ * Show dialog for LMS training
+ */
+fun NetworkPanel.showDeepNetCreationDialog() {
+    val creator = DeepNet.DeepNetCreator()
+    val dialog = AnnotatedPropertyEditor.getDialog(creator);
+    dialog.setLocationRelativeTo(null)
+    dialog.addClosingTask {
+        val dn = creator.create(network)
+        network.addNetworkModel(dn)
+        placementManager.placeObject(dn)
+    }
+    dialog.pack()
+    dialog.title = "Create Deep Network"
+    dialog.isVisible = true
 }

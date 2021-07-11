@@ -257,6 +257,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is NetworkTextObject -> createNode(model)
             is SmileClassifier -> createNode(model)
             is ZoeLayer -> createNode(model)
+            is DeepNet -> createNode(model)
             else -> throw IllegalArgumentException()
         }
     }
@@ -304,6 +305,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun createNode(layer : ZoeLayer) = addScreenElement {
         ZoeLayerNode(this, layer)
+    }
+
+    fun createNode(dn : DeepNet) = addScreenElement {
+        DeepNetNode(this, dn)
     }
 
     fun createNode(neuronCollection: NeuronCollection) = addScreenElement {

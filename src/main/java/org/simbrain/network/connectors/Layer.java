@@ -12,12 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Superclass for sources or target of a {@link Connector}.The Simbrain version of a "Layer" used to build a more
- * complex, generally array based, neural network model.
+ * Superclass for network models involved in, roughly speaking, array based computations.Simbrain layers are connected
+ * to each other by {@link Connector}s. Subclassses include neuron arrays, collections of neurons, and deep networks,
+ * backed by different data structures, including java arrays, Smile Matrices, and Tensor Flow tensors.
+ * <br>
+ * This class maintains connectors, id, and events, etc.
+ * <br>
+ * Input and output functions must be provided in Matrix format to support communication between different types
+ * of layer. However, specific subclasses can communicate in other ways to support fast or custom communication. For
+ * example, tensor-based layers and connectors could communicate using tensor flow operations, or specialized layers
+ * with multiple arrays could be joined by special connectors making use of those arrays.
  *
- * Simbrain buffered update assumes that inputs are aggregated in one pass then used in update in a second pass. Thus
- * there is no method to set inputs directly, but only to add to inputs.
- *
+ * @author Jeff Yoshimi
+ * @author Yulin Li
  */
 public abstract class Layer extends LocatableModel {
 
@@ -38,6 +45,8 @@ public abstract class Layer extends LocatableModel {
 
     /**
      * Add inputs to input vector. Performed in first pass of {@link org.simbrain.network.update_actions.BufferedUpdate}
+     * Asynchronous buffered update assumes that inputs are aggregated in one pass then updated in a second pass.
+     * Thus setting inputs directly is a dangerous operation and so is not allowed.
      */
     public abstract void addInputs(Matrix inputs);
 

@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.DataPanel
 import org.simbrain.network.smile.SmileClassifier
@@ -10,28 +11,50 @@ import smile.classification.Classifier
 import smile.classification.SVM
 import smile.math.kernel.PolynomialKernel
 import java.awt.Dialog.ModalityType
+import java.awt.FlowLayout
 import javax.swing.BoxLayout
+import javax.swing.JButton
 import javax.swing.JPanel
 
-class SmileClassifierNode(val np : NetworkPanel, val classifier : SmileClassifier) : NeuronArrayNode(np,
-    classifier) {
+class SmileClassifierNode(val np : NetworkPanel, val classifier : SmileClassifier) : ScreenElement(np) {
 
-    init {
+    override fun getModel(): NetworkModel {
+        return classifier
+    }
 
+    override fun isSelectable(): Boolean {
+        return true
+    }
+
+    override fun isDraggable(): Boolean {
+        return true
     }
 
     override fun getPropertyDialog() = StandardDialog().apply {
+
         title = "Smile Classifier"
         modalityType = ModalityType.MODELESS // Set to modeless so the dialog can be left open
 
         fun consumeClassifier(classifier: Classifier<DoubleArray>) {
             this@SmileClassifierNode.classifier.classifier = classifier
-            println("blah")
         }
 
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
-            add(AnnotatedPropertyEditor(classifier))
+            add(JPanel().apply{
+                layout = FlowLayout(FlowLayout.LEFT)
+                add(AnnotatedPropertyEditor(classifier))
+            })
+            add(JPanel().apply{
+                layout = FlowLayout(FlowLayout.LEFT)
+                add(JButton("Train").apply {
+                    addActionListener {
+                        val kernel = PolynomialKernel(2)
+                        // SVM.fit(input, target, kernel, 1000.0, 1E-3)
+                    }
+
+                })
+            })
             add(JPanel().also { dataPanel ->
                 JPanel().apply {
                     contentPane = this

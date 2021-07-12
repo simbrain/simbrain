@@ -1,12 +1,16 @@
 package org.simbrain.network.smile;
 
+import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.util.propertyeditor.EditableObject;
 import smile.classification.Classifier;
 import smile.classification.SVM;
 import smile.math.kernel.PolynomialKernel;
+import smile.math.matrix.Matrix;
 
-public class SmileClassifier extends NeuronArray {
+import java.awt.geom.Rectangle2D;
+
+public class SmileClassifier extends Layer implements EditableObject {
 
     /**
      * The classifier object.
@@ -24,9 +28,9 @@ public class SmileClassifier extends NeuronArray {
      * @param size number of components in the array
      */
     public SmileClassifier(Network net, int size) {
-        super(net, size);
+
         var kernel = new PolynomialKernel(2);
-        // TODO: Add training stuff
+        setLabel(net.getIdManager().getProposedId(SmileClassifier.class));
 
         try {
 
@@ -43,7 +47,7 @@ public class SmileClassifier extends NeuronArray {
     public void update() {
         // TODO
         var result = classifier.predict(getInputs().col(0));
-        setOneHot(result == -1 ? 0 : 1);
+        // setOneHot(result == -1 ? 0 : 1);
     }
 
     public Classifier<double[]> getClassifier() {
@@ -73,5 +77,35 @@ public class SmileClassifier extends NeuronArray {
     @Override
     public String toString() {
         return "SVM classifier " + getLabel();
+    }
+
+    @Override
+    public Matrix getInputs() {
+        return null;
+    }
+
+    @Override
+    public void addInputs(Matrix inputs) {
+
+    }
+
+    @Override
+    public Matrix getOutputs() {
+        return null;
+    }
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public Network getNetwork() {
+        return null;
+    }
+
+    @Override
+    public Rectangle2D getBound() {
+        return null;
     }
 }

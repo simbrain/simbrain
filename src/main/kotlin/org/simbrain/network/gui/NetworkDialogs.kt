@@ -207,13 +207,13 @@ fun NetworkPanel.createConnector() {
 fun NetworkPanel.showDeepNetCreationDialog() {
     val creator = DeepNet.DeepNetCreator()
     val dialog = AnnotatedPropertyEditor.getDialog(creator);
-    dialog.setLocationRelativeTo(null)
     dialog.addClosingTask {
         val dn = creator.create(network)
         network.addNetworkModel(dn)
         placementManager.placeObject(dn)
     }
     dialog.pack()
+    dialog.setLocationRelativeTo(null)
     dialog.title = "Create Deep Network"
     dialog.isVisible = true
 }

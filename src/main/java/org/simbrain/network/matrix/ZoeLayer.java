@@ -5,6 +5,7 @@ import org.simbrain.network.connectors.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
+import org.tensorflow.Tensor;
 import smile.math.matrix.Matrix;
 
 import java.awt.geom.Rectangle2D;
@@ -48,6 +49,8 @@ public class ZoeLayer extends Layer implements EditableObject, AttributeContaine
         System.out.println("Zoë Layer updated");
         getEvents().fireUpdated();
     }
+
+    public Tensor tensor;
 
     @Override
     public Matrix getOutputs() {

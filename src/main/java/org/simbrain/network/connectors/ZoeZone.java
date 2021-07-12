@@ -48,7 +48,8 @@ public class ZoeZone extends Connector {
 
     @Override
     public void update() {
-        // TODO: Do stuff!
+        // ((ZoeLayer)getSource()).weirdThing...
+
     }
 
     public SynapseUpdateRule getPrototypeRule() {

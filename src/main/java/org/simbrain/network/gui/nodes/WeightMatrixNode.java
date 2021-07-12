@@ -1,9 +1,7 @@
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.util.PPaintContext;
-import org.simbrain.network.connectors.Connector;
-import org.simbrain.network.connectors.WeightMatrix;
-import org.simbrain.network.connectors.ZoeZone;
+import org.simbrain.network.core.Connector;
 import org.simbrain.network.events.ConnectorEvents;
 import org.simbrain.network.gui.ImageBox;
 import org.simbrain.network.gui.NetworkPanel;
@@ -12,6 +10,8 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.matrix.ZoeConnector;
 import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -106,7 +106,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         if (weightMatrix.isEnableRendering()) {
 
-            if (weightMatrix instanceof ZoeZone) {
+            if (weightMatrix instanceof ZoeConnector) {
                 // TODO: Temp representation. If there is enough divergence can break into separate classes and update
                 //  NetworkPanel.kt accordingly
                 double[] tempArray = new double[100];

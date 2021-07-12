@@ -1,21 +1,20 @@
-package org.simbrain.network.smile;
+package org.simbrain.network.matrix;
 
-import org.simbrain.network.connectors.Layer;
+import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.propertyeditor.EditableObject;
-import smile.classification.Classifier;
 import smile.classification.SVM;
 import smile.math.kernel.PolynomialKernel;
 import smile.math.matrix.Matrix;
 
 import java.awt.geom.Rectangle2D;
 
-public class SmileClassifier extends Layer implements EditableObject {
+public class Classifier extends Layer implements EditableObject {
 
     /**
      * The classifier object.
      */
-    private Classifier<double[]> classifier;
+    private smile.classification.Classifier classifier;
 
     private double[][] trainingInputs = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
 
@@ -27,10 +26,10 @@ public class SmileClassifier extends Layer implements EditableObject {
      * @param net  parent net
      * @param size number of components in the array
      */
-    public SmileClassifier(Network net, int size) {
+    public Classifier(Network net, int size) {
 
         var kernel = new PolynomialKernel(2);
-        setLabel(net.getIdManager().getProposedId(SmileClassifier.class));
+        setLabel(net.getIdManager().getProposedId(Classifier.class));
 
         try {
 
@@ -50,11 +49,11 @@ public class SmileClassifier extends Layer implements EditableObject {
         // setOneHot(result == -1 ? 0 : 1);
     }
 
-    public Classifier<double[]> getClassifier() {
+    public smile.classification.Classifier getClassifier() {
         return classifier;
     }
 
-    public void setClassifier(Classifier<double[]> classifier) {
+    public void setClassifier(smile.classification.Classifier classifier) {
         this.classifier = classifier;
     }
 

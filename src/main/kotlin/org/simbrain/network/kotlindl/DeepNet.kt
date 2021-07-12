@@ -1,7 +1,8 @@
-package org.simbrain.network.core
+package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.simbrain.network.connectors.Layer
+import org.simbrain.network.core.Layer
+import org.simbrain.network.core.Network
 import org.simbrain.network.util.lenet5Classic
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject

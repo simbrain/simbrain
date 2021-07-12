@@ -1,5 +1,7 @@
-package org.simbrain.network.connectors;
+package org.simbrain.network.matrix;
 
+import org.simbrain.network.core.Connector;
+import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -13,7 +15,7 @@ import smile.stat.distribution.GaussianDistribution;
  * A template connector object for Zoë to edit. Needs data structures, update method, etc.
  * Compare to {@link WeightMatrix}
  */
-public class ZoeZone extends Connector {
+public class ZoeConnector extends Connector {
 
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
     private double increment = .1;
@@ -33,7 +35,7 @@ public class ZoeZone extends Connector {
      * @param source source layer
      * @param target target layer
      */
-    public ZoeZone(Network net, Layer source, Layer target) {
+    public ZoeConnector(Network net, Layer source, Layer target) {
         super(source, target, net);
         source.addOutgoingConnector(this);
         target.addIncomingConnector(this);

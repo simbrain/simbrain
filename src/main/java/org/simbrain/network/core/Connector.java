@@ -1,7 +1,6 @@
-package org.simbrain.network.connectors;
+package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.events.ConnectorEvents;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;

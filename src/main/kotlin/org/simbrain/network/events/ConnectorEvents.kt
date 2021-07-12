@@ -1,6 +1,6 @@
 package org.simbrain.network.events
 
-import org.simbrain.network.connectors.Connector
+import org.simbrain.network.core.Connector
 import org.simbrain.util.Event
 import java.awt.geom.Point2D
 import java.util.function.BiConsumer

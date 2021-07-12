@@ -1,8 +1,7 @@
-package org.simbrain.network.connectors;
+package org.simbrain.network.core;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.events.LocationEvents;
 import smile.math.matrix.Matrix;
 

@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.synapse_update_rules;
 
-import org.simbrain.network.connectors.Connector;
-import org.simbrain.network.connectors.WeightMatrix;
+import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.SimbrainPreferences;

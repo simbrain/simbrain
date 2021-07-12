@@ -2,11 +2,7 @@ package org.simbrain.network.groups;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
-import org.simbrain.network.connectors.Connector;
-import org.simbrain.network.connectors.Layer;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.*;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;

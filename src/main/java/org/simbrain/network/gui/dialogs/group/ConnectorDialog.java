@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
-import org.simbrain.network.connectors.Connector;
-import org.simbrain.network.connectors.Layer;
-import org.simbrain.network.connectors.WeightMatrix;
-import org.simbrain.network.connectors.ZoeZone;
+import org.simbrain.network.core.Connector;
+import org.simbrain.network.core.Layer;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.matrix.ZoeConnector;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
@@ -92,7 +92,7 @@ public final class ConnectorDialog extends StandardDialog {
                 if (widget == Connector.ConnectorEnum.DENSE) {
                     net.addNetworkModel(new WeightMatrix(net, source, target));
                 } else if (widget == Connector.ConnectorEnum.ZOE) {
-                    net.addNetworkModel(new ZoeZone(net, source, target));
+                    net.addNetworkModel(new ZoeConnector(net, source, target));
                 }
             }
         }

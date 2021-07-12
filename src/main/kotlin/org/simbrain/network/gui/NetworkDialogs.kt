@@ -2,9 +2,7 @@ package org.simbrain.network.gui
 
 //import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.connectors.Layer
-import org.simbrain.network.connectors.WeightMatrix
-import org.simbrain.network.core.DeepNet
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
@@ -17,7 +15,9 @@ import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.TextNode
+import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser

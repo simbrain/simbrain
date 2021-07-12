@@ -3,8 +3,8 @@ package org.simbrain.network.gui
 import org.intellij.lang.annotations.MagicConstant
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.gui.nodes.NeuronNode
+import org.simbrain.network.matrix.Classifier
 import org.simbrain.network.matrix.ZoeLayer
-import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.Utils
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent.*
@@ -34,7 +34,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Ctrl + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
-    bind(Shift + 'S') { network.addNetworkModel(SmileClassifier(network, 2)) } // TODO: Temp testing key command
+    bind(Shift + 'S') { network.addNetworkModel(Classifier(network, 2)) } // TODO: Temp testing key command
     bind(Shift + 'D') {  showDeepNetCreationDialog() }
     bind(Shift + 'Z') { network.addNetworkModel(ZoeLayer(network, 10)) } // TODO: Temp testing key command
     bindTo("I", networkActions.wandEditModeAction)

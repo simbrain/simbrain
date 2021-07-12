@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.connectors.Connector;
 import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.EmptyScalarData;

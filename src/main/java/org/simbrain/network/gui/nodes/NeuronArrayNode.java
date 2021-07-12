@@ -23,7 +23,7 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
-import org.simbrain.network.connectors.Layer;
+import org.simbrain.network.core.Layer;
 import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkDialogsKt;
 import org.simbrain.network.gui.NetworkPanel;

@@ -3,13 +3,13 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
-import org.simbrain.network.core.DeepNet;
 import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.kotlindl.DeepNet;
 import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;

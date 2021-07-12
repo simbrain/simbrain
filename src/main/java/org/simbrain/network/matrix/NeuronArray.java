@@ -1,8 +1,8 @@
 package org.simbrain.network.matrix;
 
 
-import org.simbrain.network.connectors.Connector;
-import org.simbrain.network.connectors.Layer;
+import org.simbrain.network.core.Connector;
+import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;

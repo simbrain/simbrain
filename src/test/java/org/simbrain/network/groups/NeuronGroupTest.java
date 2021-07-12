@@ -1,8 +1,8 @@
 package org.simbrain.network.groups;
 
 import org.junit.jupiter.api.Test;
-import org.simbrain.network.connectors.WeightMatrix;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.matrix.WeightMatrix;
 
 import java.util.List;
 

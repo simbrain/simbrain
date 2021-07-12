@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
-import org.simbrain.network.connectors.Connector;
+import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;

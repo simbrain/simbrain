@@ -1,5 +1,7 @@
-package org.simbrain.network.connectors;
+package org.simbrain.network.matrix;
 
+import org.simbrain.network.core.Connector;
+import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.groups.AbstractNeuronCollection;

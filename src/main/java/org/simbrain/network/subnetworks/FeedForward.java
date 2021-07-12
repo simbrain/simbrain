@@ -13,11 +13,11 @@
  */
 package org.simbrain.network.subnetworks;
 
-import org.simbrain.network.connectors.WeightMatrix;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.matrix.NeuronArray;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.util.Direction;
 

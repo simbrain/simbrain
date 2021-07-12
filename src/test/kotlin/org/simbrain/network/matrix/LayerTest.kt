@@ -2,7 +2,6 @@ package org.simbrain.network.matrix
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.connectors.WeightMatrix
 import org.simbrain.network.core.Network
 import smile.math.matrix.Matrix
 

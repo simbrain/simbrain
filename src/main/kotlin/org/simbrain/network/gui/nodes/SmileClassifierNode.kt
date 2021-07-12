@@ -4,11 +4,9 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.DataPanel
-import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.matrix.Classifier
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import smile.classification.Classifier
-import smile.classification.SVM
 import smile.math.kernel.PolynomialKernel
 import java.awt.Dialog.ModalityType
 import java.awt.FlowLayout
@@ -16,7 +14,7 @@ import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JPanel
 
-class SmileClassifierNode(val np : NetworkPanel, val classifier : SmileClassifier) : ScreenElement(np) {
+class SmileClassifierNode(val np : NetworkPanel, val classifier : Classifier) : ScreenElement(np) {
 
     override fun getModel(): NetworkModel {
         return classifier
@@ -35,16 +33,18 @@ class SmileClassifierNode(val np : NetworkPanel, val classifier : SmileClassifie
         title = "Smile Classifier"
         modalityType = ModalityType.MODELESS // Set to modeless so the dialog can be left open
 
-        fun consumeClassifier(classifier: Classifier<DoubleArray>) {
-            this@SmileClassifierNode.classifier.classifier = classifier
-        }
+        // fun consumeClassifier(classifier: Classifier<DoubleArray>) {
+        //     this@SmileClassifierNode.classifier.classifier = classifier
+        // }
 
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
+
             add(JPanel().apply{
                 layout = FlowLayout(FlowLayout.LEFT)
                 add(AnnotatedPropertyEditor(classifier))
             })
+
             add(JPanel().apply{
                 layout = FlowLayout(FlowLayout.LEFT)
                 add(JButton("Train").apply {
@@ -80,7 +80,7 @@ class SmileClassifierNode(val np : NetworkPanel, val classifier : SmileClassifie
                 fun invokeCallback(input: Array<DoubleArray>?, target: IntArray?) {
                     if (input != null && target != null) {
                         val kernel = PolynomialKernel(2)
-                        consumeClassifier(SVM.fit(input, target, kernel, 1000.0, 1E-3))
+                        // consumeClassifier(SVM.fit(input, target, kernel, 1000.0, 1E-3))
                     }
                 }
 
@@ -108,7 +108,7 @@ fun main() {
     val networkComponent = NetworkComponent("net 1")
     val np = NetworkPanel(networkComponent)
     val classifier = with (networkComponent.network) {
-        val classifier = SmileClassifier(this, 2)
+        val classifier = Classifier(this, 2)
         addNetworkModel(classifier)
         classifier
     }

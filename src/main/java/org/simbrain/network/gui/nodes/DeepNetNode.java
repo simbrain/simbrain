@@ -91,6 +91,9 @@ public class DeepNetNode extends ScreenElement {
      */
     private void updateInfoText() {
         infoText.setText(net.toString());
+        PBounds pb = infoText.getBounds();
+        box.setBounds(pb.x-2, pb.y-2, pb.width+20, pb.height+20);
+        setBounds(box.getBounds());
     }
 
     @Override

@@ -6,22 +6,16 @@ import org.simbrain.util.UserParameter
 /**
  * Wrapper for tensor flow dense layer
  */
-class TFDenseLayer : TFLayer() {
+class TFFlattenLayer : TFLayer() {
 
     @UserParameter(label = "Number of outputs", order = 10)
     var nout = 5
 
-    @UserParameter(label = "Activation function", order = 20)
+    @UserParameter(label = "Actiation function", order = 20)
     var activations = Activations.Relu
 
-    @UserParameter(label = "Kernel initializer", order = 30)
-    var kernelInitializer = ""
-
-    @UserParameter(label = "Bias initializer", order = 40)
-    var biasInitializer = ""
-
     override fun getName(): String {
-        return "Dense layer"
+        return "Flatten layer"
     }
 
     companion object {

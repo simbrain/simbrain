@@ -73,8 +73,8 @@ class DeepNet(private val network: Network
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 10
 
-        // @UserParameter(label = "Input layer", isObjectType = true, order = 20)
-        // var TFLayer = TFDenseLayer()
+        @UserParameter(label = "Input layer", isObjectType = true, order = 20)
+        var inputLayer = TFDenseLayer()
 
         @UserParameter(label = "Number of outputs", order = 20)
         var nout = 5

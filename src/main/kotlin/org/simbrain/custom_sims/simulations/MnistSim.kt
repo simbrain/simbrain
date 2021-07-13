@@ -30,6 +30,7 @@ val mnistSim = newSim {
     val pixelNet = network.addNeuronGroup(400, point(-9.25, 95.93)).apply {
         label = "Retina"
         layout = GridLayout(50.0,50.0)
+        setClamped(true)
     }
     pixelNet.applyLayout()
 
@@ -56,7 +57,7 @@ val mnistSim = newSim {
     mainScope.launch {
         val progressWindow = ProgressWindow(1000)
         launch(Dispatchers.Default) {
-            extractImages(TEST_IMAGES_ARCHIVE)
+            extractImages("cache/$TEST_IMAGES_ARCHIVE")
                 .take(1000)
                 .map {it.toGrayScaleImage(28,28)}
                 .forEachIndexed { i, it ->

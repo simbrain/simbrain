@@ -1,5 +1,11 @@
 package org.simbrain.util
 
+import smile.math.matrix.Matrix
+
+/**
+ * Numeric utilities in Kotlin. Comparable to [SimbrainMath] .
+ */
+
 fun <T : Comparable<T>> T.clip(lowerBound: T, upperBound: T) =
         maxOf(minOf(lowerBound, upperBound), minOf(maxOf(upperBound, lowerBound), this))
 
@@ -31,3 +37,9 @@ infix fun Iterable<Int>.sse(other: Iterable<Int>)
 @JvmName("mseInt")
 infix fun Iterable<Int>.mse(other: Iterable<Int>)
         = (this squaredError other).average()
+
+fun getOneHot(index : Int, size: Int, amount: Double = 1.0): Matrix {
+        val ret = Matrix(size, 1)
+        ret[index, 0] = amount
+        return ret
+}

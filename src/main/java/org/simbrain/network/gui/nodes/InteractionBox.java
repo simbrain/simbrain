@@ -134,4 +134,8 @@ public abstract class InteractionBox extends ScreenElement {
         return zoomListener;
     }
 
+    @Override
+    public boolean acceptsSourceHandle() {
+        return true;
+    }
 }

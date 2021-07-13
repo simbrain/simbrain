@@ -2,7 +2,7 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.events.NetworkSelectionEvent
-import org.simbrain.network.gui.nodes.*
+import org.simbrain.network.gui.nodes.ScreenElement
 import java.util.concurrent.CopyOnWriteArraySet
 
 /**
@@ -149,10 +149,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      */
     fun convertSelectedNodesToSourceNodes() = modifySourceSelection {
         clear()
-        // TODO: this should rely on a property of screenelements or their models
-        addAll(selection.filter { it is NeuronNode || it is NeuronCollectionNode || it is NeuronArrayNode || it is
-                InteractionBox || it is ZoeLayerNode
-        })
+        addAll(selection.filter { it.acceptsSourceHandle()})
     }
 
     /**

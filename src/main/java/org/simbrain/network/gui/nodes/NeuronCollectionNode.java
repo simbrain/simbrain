@@ -284,5 +284,9 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         }
     };
 
+    @Override
+    public boolean acceptsSourceHandle() {
+        return true;
+    }
 
 }

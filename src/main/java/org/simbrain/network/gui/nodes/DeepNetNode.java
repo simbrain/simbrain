@@ -196,4 +196,9 @@ public class DeepNetNode extends ScreenElement {
         super.offset(dx, dy);
     }
 
+    @Override
+    public boolean acceptsSourceHandle() {
+        return true;
+    }
+
 }

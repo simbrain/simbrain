@@ -190,4 +190,9 @@ public class ZoeLayerNode extends ScreenElement {
         }
         return super.validateFullBounds();
     }
+
+    @Override
+    public boolean acceptsSourceHandle() {
+        return true;
+    }
 }

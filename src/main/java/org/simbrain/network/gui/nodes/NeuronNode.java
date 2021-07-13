@@ -690,4 +690,8 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         this.customStrokeColor = customColor;
     }
 
+    @Override
+    public boolean acceptsSourceHandle() {
+        return true;
+    }
 }

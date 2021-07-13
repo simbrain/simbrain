@@ -72,6 +72,11 @@ public abstract class ScreenElement extends PPath.Float {
     public abstract boolean isSelectable();
 
     /**
+     * Return true if this screen element accepts a source {@link NodeHandle}.
+     */
+    public boolean acceptsSourceHandle() {return false;}
+
+    /**
      * Return true if this screen element is draggable. Assumes {@link #isSelectable()} is also true.
      */
     public abstract boolean isDraggable();

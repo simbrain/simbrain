@@ -182,4 +182,5 @@ public @interface UserParameter {
      */
     String regexValidation() default "";
 
+    boolean isDataHolder() default false;
 }

@@ -18,6 +18,7 @@
  */
 package org.simbrain.util.widgets;
 
+import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.SimbrainConstants;
@@ -224,6 +225,18 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
         if (parameter.isString()) {
             return new TextWithNull();
+        }
+
+        if (parameter.isDataHolder()) {
+            var panel = new JPanel();
+            panel.setBorder(BorderFactory.createTitledBorder("State Variables"));
+            // TODO: Get the object
+            // TODO: Add triangle
+            // TODO: If instance of empty, then return
+            AnnotatedPropertyEditor ape =
+                    new AnnotatedPropertyEditor(new BiasedScalarData());
+            panel.add(ape);
+            return panel;
         }
 
         throw new IllegalArgumentException("You have annotated a field type that is not yet supported");

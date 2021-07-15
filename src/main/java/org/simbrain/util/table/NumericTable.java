@@ -401,5 +401,4 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
         this.fireTableDataChanged();
     }
 
-
 }

@@ -18,7 +18,6 @@
  */
 package org.simbrain.util.widgets;
 
-import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.util.BiMap;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.SimbrainConstants;
@@ -161,6 +160,22 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                     parameter.getAnnotation().label(), parameter.getAnnotation().showDetails());
         }
 
+        /**
+         * Data holders are treated as property editors themselves.
+         */
+        if (parameter.isDataHolder()) {
+            var panel = new JPanel();
+            panel.setBorder(BorderFactory.createTitledBorder("State Variables"));
+            // TODO: Add triangle
+            // TODO: If instance of empty, then return
+
+            List<? extends EditableObject> dataHolders = parent
+                    .getEditedObjects().stream()
+                    .map(o -> (EditableObject) parameter.getFieldValue(o))
+                    .collect(Collectors.toList());
+            return new AnnotatedPropertyEditor(dataHolders);
+        }
+
         if (!parameter.isEditable()) {
             return new JLabel();
         }
@@ -225,18 +240,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
         if (parameter.isString()) {
             return new TextWithNull();
-        }
-
-        if (parameter.isDataHolder()) {
-            var panel = new JPanel();
-            panel.setBorder(BorderFactory.createTitledBorder("State Variables"));
-            // TODO: Get the object
-            // TODO: Add triangle
-            // TODO: If instance of empty, then return
-            AnnotatedPropertyEditor ape =
-                    new AnnotatedPropertyEditor(new BiasedScalarData());
-            panel.add(ape);
-            return panel;
         }
 
         throw new IllegalArgumentException("You have annotated a field type that is not yet supported");
@@ -336,39 +339,25 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     public Object getWidgetValue() {
 
         if (!parameter.isEditable()) {
-            // Should not happen
-            return null;
-        }
-
-        if (parameter.isBoolean()) {
-            return ((YesNoNull) component).isNull() ? null : ((YesNoNull) component).isSelected();
-        }
-
-        if (parameter.isColor()) {
-            return ((ColorSelector) component).getValue();
-        }
-
-        if (parameter.isDoubleArray()) {
-            return ((DoubleArrayWidget) component).getValues();
-        }
-
-        if (parameter.isNumeric()) {
-            return ((NumericWidget) component).getValue();
-        }
-        if (parameter.getAnnotation().isObjectType()) {
-            return ((ObjectTypeEditor) component).getValue();
-        }
-        if (parameter.isEnum()) {
-            return ((ChoicesWithNull) component).isNull() ? null : ((ChoicesWithNull) component).getSelectedItem();
-        }
-        if (parameter.isString()) {
+            throw new IllegalArgumentException("Trying to edit a non-editable object");
+        } else if (parameter.isString()) {
             return ((TextWithNull) component).isNull() ? null : ((TextWithNull) component).getText();
+        } else if (parameter.isNumeric()) {
+            return ((NumericWidget) component).getValue();
+        } else if (parameter.isBoolean()) {
+            return ((YesNoNull) component).isNull() ? null : ((YesNoNull) component).isSelected();
+        } else if (parameter.isColor()) {
+            return ((ColorSelector) component).getValue();
+        } else if (parameter.isDoubleArray()) {
+            return ((DoubleArrayWidget) component).getValues();
+        } else if (parameter.getAnnotation().isObjectType()) {
+            return ((ObjectTypeEditor) component).getValue();
+        } else if (parameter.isEnum()) {
+            return ((ChoicesWithNull) component).isNull() ? null : ((ChoicesWithNull) component).getSelectedItem();
+        } else {
+            throw new IllegalArgumentException("Trying to retrieve a value from an unsupported widget type");
         }
-
-        throw new IllegalArgumentException("Trying to retrieve a value from an unsupported widget type");
-
     }
-
 
     /**
      * Impose ordering by {@link UserParameter#order()} and then field name.

@@ -29,7 +29,7 @@ interface ScalarDataHolder : EditableObject
 
 class EmptyScalarData : ScalarDataHolder
 
-class BiasedScalarData(@UserParameter(label="bias", order = 100)
+class BiasedScalarData(@UserParameter(label="bias")
                        var bias:  Double = 0.0) : ScalarDataHolder
 
 class NakaScalarData(@UserParameter(label="a") var a:  Double = 0.0) : ScalarDataHolder

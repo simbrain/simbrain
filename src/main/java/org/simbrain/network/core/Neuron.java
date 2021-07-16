@@ -197,7 +197,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     private transient NeuronEvents events = new NeuronEvents(this);
 
-    // TODO: Move to neuron update rule?
     /**
      * Local data holder for neuron update rule.
      */

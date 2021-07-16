@@ -128,6 +128,9 @@ public class Parameter implements Comparable<Parameter> {
         return annotation.isObjectType();
     }
 
+    /**
+     * Returns true if this is an annotation for a DataHolder.
+     */
     public boolean isDataHolder() {
         return annotation.isDataHolder();
     }

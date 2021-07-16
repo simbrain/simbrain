@@ -110,16 +110,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         add(mainPanel, BorderLayout.CENTER);
         fillFieldValues(editedObjects);
 
-        // Update conditional enabling based on widgets
-        widgets.forEach(ParameterWidget::checkConditionalEnablingWidget);
-        widgets.forEach(w -> {
-            if(w.getComponent() instanceof JComboBox) {
-                ((JComboBox<?>) w.getComponent()).addActionListener(e -> {
-                    widgets.forEach(ParameterWidget::checkConditionalEnablingWidget);
-                });
-            }
-        });
-
     }
 
     /**
@@ -141,7 +131,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
         // Create a list of widgets
         widgets = new TreeSet<>();
-
         Parameter.getParameters(editedObjects.get(0).getClass()).forEach(p -> {
             widgets.add(new ParameterWidget(this, p));
         });
@@ -162,6 +151,16 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         if (tabPanels.size() == 1) {
             mainPanel = tabPanels.values().iterator().next();
         }
+
+        // Update conditional enabling based on widgets
+        widgets.forEach(ParameterWidget::checkConditionalEnablingWidget);
+        widgets.forEach(w -> {
+            if(w.getComponent() instanceof JComboBox) {
+                ((JComboBox<?>) w.getComponent()).addActionListener(e -> {
+                    widgets.forEach(ParameterWidget::checkConditionalEnablingWidget);
+                });
+            }
+        });
     }
 
     /**
@@ -197,12 +196,17 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
         // Check to see if the field values are consistent over all given
         // instances.
-        for (ParameterWidget pw : widgets) {
+        for (ParameterWidget pw : getWidgets()) {
 
             // When using a custom initial value then don't do the consistency check.
             // (The objects themselves have not yet been set so custom initial values automatically trigger
             // inconsistency here).
             if (pw.isCustomInitialValue() && objectList.size() == 1) {
+                continue;
+            }
+
+            if (pw.getParameter().isDataHolder()) {
+                ((AnnotatedPropertyEditor)pw.getComponent()).fillFieldValues();
                 continue;
             }
 
@@ -237,7 +241,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 if (pw.getParameter().isObjectType()) {
                     ((ObjectTypeEditor) pw.getComponent()).fillFieldValues();
                 }
-
             }
         }
     }
@@ -294,6 +297,11 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         for (ParameterWidget pw : widgets) {
 
             if (!pw.getParameter().isEditable()) {
+                continue;
+            }
+
+            if (pw.getParameter().isDataHolder()) {
+                ((AnnotatedPropertyEditor)pw.getComponent()).commitChanges();
                 continue;
             }
 

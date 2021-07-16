@@ -169,7 +169,6 @@ public @interface UserParameter {
      */
     String conditionalVisibilityMethod() default "";
 
-
     /**
      * Name of another widget (based on its {@link #description() UserParameter} whose state determines if this widget
      * is enabled or not. This changes dynamically.  Currently works on booleans only.
@@ -182,5 +181,9 @@ public @interface UserParameter {
      */
     String regexValidation() default "";
 
+     /**
+     * Returns true if the annotated field implements {@link org.simbrain.network.util.DataHolder}, in
+     * which case it is treated as an embedded property editor.
+     */
     boolean isDataHolder() default false;
 }

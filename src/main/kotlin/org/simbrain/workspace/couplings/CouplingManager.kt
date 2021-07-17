@@ -204,6 +204,9 @@ class CouplingManager(val workspace: Workspace) {
      */
     infix fun Producer?.couple(consumer: Consumer?) = createCoupling(this, consumer)
 
+    /**
+     * Couple the first type-matched producer-consumer pair, where these are ordered by preference.
+     */
     fun createCoupling(producingContainer: AttributeContainer, consumingContainer: AttributeContainer): Coupling {
         val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers)
             .filter { (a, b) -> a.type == b.type }

@@ -116,6 +116,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
      */
+    @Consumable
     public void addInputs(double[] inputs) {
         int size = Math.min(inputs.length, neuronList.size());
         for (int i = 0; i < size; i++) {
@@ -333,6 +334,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      *
      * @param value the value to set the neurons to
      */
+    @Consumable
     public void forceSetActivationLevels(final double value) {
         for (Neuron n : getNeuronList()) {
             n.forceSetActivation(value);
@@ -582,7 +584,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         cachedInputsDirty = true;
     }
 
-    //TODO
     @Consumable()
     public void forceSetActivations(double[] activations) {
         int size = Math.min(activations.length, neuronList.size());

@@ -5,6 +5,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.jetbrains.kotlinx.dl.dataset.handler.TEST_IMAGES_ARCHIVE
 import org.jetbrains.kotlinx.dl.dataset.handler.extractImages
+import org.jetbrains.kotlinx.dl.dataset.mnist
 import org.simbrain.custom_sims.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
@@ -53,6 +54,9 @@ val mnistSim = newSim {
     world.filterCollection.addFilter(threshold400)
     world.filterCollection.currentFilter = threshold400
 
+    // Loads the mnist into a local cache, if it's not already there
+    mnist()
+
     // TODO: Performance issues..
     mainScope.launch {
         val progressWindow = ProgressWindow(1000)
@@ -73,7 +77,11 @@ val mnistSim = newSim {
     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Fish.gif"))
 
     with(couplingManager) {
-        iwc.world.filterCollection.currentFilter couple pixelNet
+        createCoupling(
+            iwc.world.filterCollection.currentFilter.getProducer("getBrightness"),
+            pixelNet.getConsumer("forceSetActivations")
+        )
+        // iwc.world.filterCollection.currentFilter couple pixelNet
     }
 
     withGui {

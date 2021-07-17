@@ -129,10 +129,10 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
-     * Returns true if this is an annotation for a DataHolder.
+     * Returns true if this is an annotation for an embedded object with its own annotations.
      */
-    public boolean isDataHolder() {
-        return annotation.isDataHolder();
+    public boolean isEmbeddedObject() {
+        return annotation.isEmbeddedObject();
     }
 
     /**

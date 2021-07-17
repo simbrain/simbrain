@@ -56,12 +56,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     private AnnotatedPropertyEditor parent;
 
     /**
-     * List of edited objects. Only used in conjunction with {@link ObjectTypeEditor}, which must be initialized with
-     * edited objects.
-     */
-    private List<CopyableObject> objectList;
-
-    /**
      * If true, then a custom value has been used to initialize the widget.
      */
     public boolean customInitialValue = false;
@@ -73,18 +67,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     public ParameterWidget(AnnotatedPropertyEditor ape, Parameter parameter) {
         parent = ape;
         this.parameter = parameter;
-        if (parameter.isObjectType()) {
-            // Create a list of objects corresponding to the field associated with the parameter
-            // Example: a list of neuronupdaterules objects within a list of neuron objects
-            // TODO: Is this overlapping data holder? Abstract out to: getObjectsOfParameterType.
-            //  list of neurons > list of neuron update rules or > listof data holders
-            objectList = new ArrayList<>();
-            for (Object o : parent.getEditedObjects()) {
-                objectList.add((CopyableObject) parameter.getFieldValue(o));
-            }
-        }
         component = makeWidget();
-
         checkConditionalVisibility();
         setInitialValue();
     }
@@ -155,22 +138,16 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             // Example: NeuronUpdateRule maintains a list of types  of neuronupdaterules.
             String methodName = parameter.getAnnotation().typeListMethod();
             BiMap<String, Class> typeMap = getTypeMap(parameter.getType(), methodName);
-            return ObjectTypeEditor.createEditor(objectList, typeMap,
+            return ObjectTypeEditor.createEditor(getCopyableObjects(), typeMap,
                     parameter.getAnnotation().label(), parameter.getAnnotation().showDetails());
         }
 
-        // Data holders are treated as property editors themselves.
-        if (parameter.isDataHolder()) {
+        // Embedded objects are converted into separate property editors
+        if (parameter.isEmbeddedObject()) {
             var panel = new JPanel();
-            panel.setBorder(BorderFactory.createTitledBorder("State Variables"));
-            // TODO: Add triangle
-            // TODO: If instance of empty, then return
-
-            List<? extends EditableObject> dataHolders = parent
-                    .getEditedObjects().stream()
-                    .map(o -> (EditableObject) parameter.getFieldValue(o))
-                    .collect(Collectors.toList());
-            return new AnnotatedPropertyEditor(dataHolders);
+            panel.setBorder(BorderFactory.createLineBorder(Color.black));
+            // TODO: Add detail triangle
+            return new AnnotatedPropertyEditor(getEditableObjects());
         }
 
         if (!parameter.isEditable()) {
@@ -195,8 +172,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
                 Method method = clazz.getDeclaredMethod("values");
                 // TODO: Not sure the null argument is correct below.
                 Object[] enumValues = (Object[]) method.invoke(null);
-                ChoicesWithNull comboBox = new ChoicesWithNull(enumValues);
-                return comboBox;
+                return new ChoicesWithNull(enumValues);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -230,9 +206,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
 
             Runnable setNull = () -> setWidgetValue(null);
 
-            NumericWidget ret = new NumericWidget(parent.getEditedObjects(), parameter, spinnerModel, setNull);
-
-            return ret;
+            return new NumericWidget(parent.getEditedObjects(), parameter, spinnerModel, setNull);
         }
 
         if (parameter.isString()) {
@@ -430,4 +404,21 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     public boolean isCustomInitialValue() {
         return customInitialValue;
     }
+
+
+    /**
+     * Return a list of objects associated with this field. Example: a list of neuronupdaterules associated with the
+     * updaterule field, one object for each neuron in the list of edited objects.
+     */
+    private List<EditableObject> getEditableObjects() {
+        return  parent.getEditedObjects().stream()
+                .map(o -> (EditableObject) parameter.getFieldValue(o))
+                .collect(Collectors.toList());
+    }
+    private List<CopyableObject> getCopyableObjects() {
+        return  parent.getEditedObjects().stream()
+                .map(o -> (CopyableObject) parameter.getFieldValue(o))
+                .collect(Collectors.toList());
+    }
+
 }

@@ -205,7 +205,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 continue;
             }
 
-            if (pw.getParameter().isDataHolder()) {
+            if (pw.getParameter().isEmbeddedObject()) {
                 ((AnnotatedPropertyEditor)pw.getComponent()).fillFieldValues();
                 continue;
             }
@@ -300,7 +300,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 continue;
             }
 
-            if (pw.getParameter().isDataHolder()) {
+            if (pw.getParameter().isEmbeddedObject()) {
                 ((AnnotatedPropertyEditor)pw.getComponent()).commitChanges();
                 continue;
             }

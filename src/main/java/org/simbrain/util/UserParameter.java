@@ -182,8 +182,8 @@ public @interface UserParameter {
     String regexValidation() default "";
 
      /**
-     * Returns true if the annotated field implements {@link org.simbrain.network.util.DataHolder}, in
-     * which case it is treated as an embedded property editor.
+     * Returns true if the annotated field contains an object with its own annotated fields, allowing for recursie
+      * embedding of property editors.
      */
-    boolean isDataHolder() default false;
+    boolean isEmbeddedObject() default false;
 }

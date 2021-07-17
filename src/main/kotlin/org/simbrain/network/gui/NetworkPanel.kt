@@ -346,7 +346,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        placementManager.placeObject(subnetwork)
         val modelNodes = subnetwork.modelList.all.map { createNode(it) }
         createSubNetwork().apply {
             modelNodes.forEach { addNode(it) }
@@ -569,10 +568,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         }
     }
 
-    private fun addNetworkListeners() {
+    private fun initEventHandlers() {
         val event = network.events
         event.onModelAdded {
             createNode(it)
+            if (it is LocatableModel) {
+                placementManager.placeObject(it)
+            }
         }
         event.onModelRemoved {
             it.events.fireDeleted()
@@ -669,8 +671,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             }
         }
 
-        // Init network change listeners
-        addNetworkListeners()
+        initEventHandlers()
 
         toolbars.apply {
 

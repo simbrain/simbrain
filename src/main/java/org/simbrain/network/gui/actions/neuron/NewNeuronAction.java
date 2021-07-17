@@ -60,6 +60,5 @@ public final class NewNeuronAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         var neuron = new Neuron(networkPanel.getNetwork());
         networkPanel.getNetwork().addNetworkModel(neuron);
-        networkPanel.getPlacementManager().placeObject(neuron);
     }
 }

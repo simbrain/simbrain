@@ -61,7 +61,6 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
         addClosingTask {
             val neuronArray = template.create(network)
             network.addNetworkModel(neuronArray)
-            placementManager.placeObject(neuronArray)
         }
         pack()
         setLocationRelativeTo(this@showNeuronArrayCreationDialog)
@@ -210,7 +209,6 @@ fun NetworkPanel.showDeepNetCreationDialog() {
     dialog.addClosingTask {
         val dn = creator.create(network)
         network.addNetworkModel(dn)
-        placementManager.placeObject(dn)
     }
     dialog.pack()
     dialog.setLocationRelativeTo(null)

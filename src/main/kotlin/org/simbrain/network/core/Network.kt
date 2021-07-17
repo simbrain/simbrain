@@ -549,8 +549,8 @@ class Network {
     val looseNeurons get() = networkModels.get<Neuron>()
 
     fun addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
-        .apply(block)
-        .also(this::addNetworkModel)
+        .apply(this::addNetworkModel)
+        .also(block)
 
     fun addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
         .apply(block)

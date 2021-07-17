@@ -11,12 +11,11 @@ import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 
 class DeepNet(private val network: Network
-    , val inputSize: Int
-    , val outputSize: Int) : Layer(), AttributeContainer, EditableObject {
+    , val inputSize: Int) : Layer(), AttributeContainer, EditableObject {
 
     var deepNetLayers: Sequential = Sequential()
 
-    private var inputs = FloatArray(outputSize)
+    private var inputs = FloatArray(inputSize)
 
     init {
         label = network.idManager.getProposedId(this.javaClass)
@@ -32,7 +31,7 @@ class DeepNet(private val network: Network
     }
 
     override fun getOutputs(): Matrix {
-        val out = Matrix(outputSize, 1)
+        val out = Matrix(10, 1) // todo
         out[deepNetLayers.predict(inputs), 0] = 1.0
         return out
     }
@@ -50,7 +49,7 @@ class DeepNet(private val network: Network
     }
 
     override fun toString(): String {
-        return id + ":\n" + deepNetLayers.layers.joinToString("\n") { it.name }
+        return label + ":\n" + deepNetLayers.layers.joinToString("\n") { it.name }
     }
 
     override fun update() {
@@ -68,23 +67,26 @@ class DeepNet(private val network: Network
     /**
      * Helper class for creating new deep networks.
      */
-    class DeepNetCreator : EditableObject {
+    class DeepNetCreator(prooposedLabel : String) : EditableObject {
+
+        @UserParameter(label = "Label", order = 5)
+        private val label = prooposedLabel
 
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 10
 
-        @UserParameter(label = "Input layer", isObjectType = true, order = 20)
+        @UserParameter(label = "Input layer", isObjectType = true, showDetails = false, order = 20)
         var inputLayer = TFDenseLayer()
 
-        @UserParameter(label = "Number of outputs", order = 20)
-        var nout = 5
+        // @UserParameter(label = "Hidden layers", isEditableList = true, showDetails = false, order = 20)
+        // Need to add hidden layers
 
         override fun getName(): String {
             return "Deep Network"
         }
 
         fun create(net : Network): DeepNet {
-            return DeepNet(net, nin, nout)
+            return DeepNet(net, nin)
         }
 
     }

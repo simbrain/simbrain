@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
+import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
@@ -10,7 +11,8 @@ import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.kotlindl.DeepNet;
-import org.simbrain.util.ResourceManager;
+import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -117,49 +119,17 @@ public class DeepNetNode extends ScreenElement {
         contextMenu.addSeparator();
 
         // Edit Submenu
-        Action editArray = new AbstractAction("Edit...") {
+        Action editNet = new AbstractAction("Edit...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                //StandardDialog dialog = getArrayDialog();
-                //dialog.setVisible(true);
+                StandardDialog dialog = (StandardDialog) getPropertyDialog();
+                dialog.setLocationRelativeTo(null);
+                dialog.pack();
+                dialog.setVisible(true);
             }
         };
-        contextMenu.add(editArray);
+        contextMenu.add(editNet);
         contextMenu.add(new DeleteAction(getNetworkPanel()));
-
-        //contextMenu.addSeparator();
-        //Action randomizeAction = new AbstractAction("Randomize") {
-        //
-        //    {
-        //        putValue(SMALL_ICON, ResourceManager.getImageIcon("Rand.png"));
-        //        putValue(SHORT_DESCRIPTION, "Randomize neuro naarray");
-        //    }
-        //
-        //    @Override
-        //    public void actionPerformed(final ActionEvent event) {
-        //        neuronArray.randomize();
-        //    }
-        //};
-        //contextMenu.add(randomizeAction);
-
-        contextMenu.addSeparator();
-        Action trainAction = new AbstractAction("Train...") {
-
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Properties.png"));
-                putValue(SHORT_DESCRIPTION, "Train multi layer network");
-            }
-
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                // MultiLayerTrainerDialog trainerDialog = new MultiLayerTrainerDialog(net);
-                // trainerDialog.pack();
-                // trainerDialog.setLocationRelativeTo(null);
-                // trainerDialog.setVisible(true);
-            }
-        };
-        contextMenu.add(trainAction);
-        //contextMenu.addSeparator();
 
         // Coupling menu
         //contextMenu.addSeparator();
@@ -201,4 +171,13 @@ public class DeepNetNode extends ScreenElement {
         return true;
     }
 
+    @Nullable
+    @Override
+    public JDialog getPropertyDialog() {
+        StandardDialog dialog = AnnotatedPropertyEditor.getDialog(net);
+        dialog.addClosingTask(() -> {
+                net.getEvents().fireUpdated();
+        });
+        return dialog;
+    }
 }

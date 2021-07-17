@@ -16,18 +16,23 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.kotlindl.DeepNet
+import org.simbrain.network.kotlindl.TFDenseLayer
+import org.simbrain.network.kotlindl.TFFlattenLayer
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.ObjectTypeEditor
+import org.simbrain.util.widgets.EditableList
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import javax.swing.JDialog
-import javax.swing.JFrame
+import java.util.*
+import javax.swing.*
 
 fun NetworkPanel.showTextPropertyDialog(textNodes: List<TextNode>) {
     TextDialog(textNodes).apply {
@@ -201,13 +206,33 @@ fun NetworkPanel.createConnector() {
 }
 
 /**
- * Show dialog for LMS training
+ * Show dialog for deep net creation
  */
 fun NetworkPanel.showDeepNetCreationDialog() {
-    val creator = DeepNet.DeepNetCreator()
-    val dialog = AnnotatedPropertyEditor.getDialog(creator);
+    val creator = DeepNet.DeepNetCreator(network.idManager.getProposedId(DeepNet::class.java))
+    val dialog = StandardDialog()
+
+    fun getEditor(obj : CopyableObject):  JPanel {
+        return ObjectTypeEditor.createEditor(listOf(obj), "getTypes", "Layer",
+            false)
+    }
+
+    val list = EditableList(arrayListOf(getEditor(TFDenseLayer()), getEditor(TFDenseLayer()))).apply {
+        addElementTask = {
+            addElement(getEditor(TFFlattenLayer()))
+        }
+    }
+
+    dialog.contentPane = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
+        add(AnnotatedPropertyEditor(creator))
+        add(list)
+    }
+
     dialog.addClosingTask {
         val dn = creator.create(network)
+        // TODO: Figure out how to get these layers built!
+        list.objects.forEach { p -> println((p as ObjectTypeEditor).value) }
         network.addNetworkModel(dn)
     }
     dialog.pack()

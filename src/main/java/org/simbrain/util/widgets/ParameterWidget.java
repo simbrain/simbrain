@@ -56,10 +56,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     private AnnotatedPropertyEditor parent;
 
     /**
-     * List of edited objects. Only used in conjunction with {@link
-     * ObjectTypeEditor}, which must be initialized with edited objects.
+     * List of edited objects. Only used in conjunction with {@link ObjectTypeEditor}, which must be initialized with
+     * edited objects.
      */
-    private List<CopyableObject> objectTypeList;
+    private List<CopyableObject> objectList;
 
     /**
      * If true, then a custom value has been used to initialize the widget.
@@ -74,13 +74,13 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         parent = ape;
         this.parameter = parameter;
         if (parameter.isObjectType()) {
-            // ObjectTypeEditors require special initialization
-
             // Create a list of objects corresponding to the field associated with the parameter
-            // E.g. a list of neuronupdaterules objects within a list of neuron objects
-            objectTypeList = new ArrayList<>();
+            // Example: a list of neuronupdaterules objects within a list of neuron objects
+            // TODO: Is this overlapping data holder? Abstract out to: getObjectsOfParameterType.
+            //  list of neurons > list of neuron update rules or > listof data holders
+            objectList = new ArrayList<>();
             for (Object o : parent.getEditedObjects()) {
-                objectTypeList.add((CopyableObject) parameter.getFieldValue(o));
+                objectList.add((CopyableObject) parameter.getFieldValue(o));
             }
         }
         component = makeWidget();
@@ -151,18 +151,15 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     protected JComponent makeWidget() {
 
         if (parameter.isObjectType()) {
-            // Assumes the type list is contained in
-            // the class corresponding to the type.  E.g. NeuronUpdateRule maintains a list of types  of neuronupdaterules, and
-            // ProbabilityDistribution maintains a list of types of prob distributions
+            // Assumes the type list is contained in the class corresponding to the parameter.
+            // Example: NeuronUpdateRule maintains a list of types  of neuronupdaterules.
             String methodName = parameter.getAnnotation().typeListMethod();
             BiMap<String, Class> typeMap = getTypeMap(parameter.getType(), methodName);
-            return ObjectTypeEditor.createEditor(objectTypeList, typeMap,
+            return ObjectTypeEditor.createEditor(objectList, typeMap,
                     parameter.getAnnotation().label(), parameter.getAnnotation().showDetails());
         }
 
-        /**
-         * Data holders are treated as property editors themselves.
-         */
+        // Data holders are treated as property editors themselves.
         if (parameter.isDataHolder()) {
             var panel = new JPanel();
             panel.setBorder(BorderFactory.createTitledBorder("State Variables"));
@@ -248,7 +245,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
     /**
      * Takes a class and method name and returns a type map.
      */
-    private BiMap<String, Class> getTypeMap(Class c, String methodName) {
+    public static BiMap<String, Class> getTypeMap(Class c, String methodName) {
         BiMap<String, Class> typeMap = new BiMap<>();
         try {
             Method m = c.getDeclaredMethod(methodName);

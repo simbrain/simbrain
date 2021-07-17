@@ -71,7 +71,7 @@ import java.util.List;
  *
  * <p>
  */
-public class ObjectTypeEditor extends JComponent {
+public class ObjectTypeEditor extends JPanel {
 
     /**
      * The main collection of objects being edited.
@@ -84,13 +84,13 @@ public class ObjectTypeEditor extends JComponent {
     private JComboBox<String> cbObjectType;
 
     /**
-     * Editor panel for the set of objects (null panel if they are
-     * inconsistent).
+     * Editor panel for the set of objects (null panel if they are inconsistent).
      */
     private AnnotatedPropertyEditor editorPanel;
 
     /**
-     * Mapping from labels to types and back again.
+     * Mapping from labels to types and back again, so that combo box text can be used to create prototype objects,
+     * and to associate prototype objects with text for combo box.
      */
     private BiMap<String, Class> typeMap;
 
@@ -138,6 +138,18 @@ public class ObjectTypeEditor extends JComponent {
     private boolean prototypeMode = false;
 
     /**
+     * Provides external access to object type editors for separate use. The method name containing the type list
+     * must be specified.
+     */
+    public static ObjectTypeEditor createEditor(List<CopyableObject> objects, String typeListMethod,
+                                                String label, boolean showDetails) {
+
+        var typeMap = ParameterWidget.getTypeMap(objects.get(0).getClass(), typeListMethod);
+        return new ObjectTypeEditor(
+                objects, typeMap, label, showDetails, null);
+    }
+
+    /**
      * Create the editor.
      *
      * @param objects the objects to edit
@@ -152,8 +164,7 @@ public class ObjectTypeEditor extends JComponent {
     }
 
     /**
-     * Create the editor from a set of objects and a type map. Currently just
-     * used by the test method.  When used in a higher level
+     * Create the editor from a set of objects and a type map. Currently just used by the test method.
      *
      * @param objectList the list of objects to edit
      * @param typeMap    the mapping from strings to types

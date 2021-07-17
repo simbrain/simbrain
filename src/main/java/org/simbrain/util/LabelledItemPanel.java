@@ -206,11 +206,11 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
-     * Add an item which spans the columns.
+     * Add a single item, without a label, which spans the columns.
      *
      * @param item the item to add
      */
-    public void addSpanningItem(final JComponent item) {
+    public void addItem(final JComponent item) {
         GridBagConstraints itemConstraints = new GridBagConstraints();
 
         itemConstraints.gridx = 0;
@@ -222,6 +222,8 @@ public class LabelledItemPanel extends JPanel {
         itemConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         add(item, itemConstraints);
+
+        revalidate();
 
         myNextItemRow++;
     }

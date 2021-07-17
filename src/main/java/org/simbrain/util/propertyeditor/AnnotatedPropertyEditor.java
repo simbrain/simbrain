@@ -470,7 +470,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
     private void addItemToTabPanel(ParameterWidget pw) {
         String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
         addTabPanel(parameterWidgetTabName);
-        tabPanels.get(parameterWidgetTabName).addSpanningItem(pw.getComponent());
+        tabPanels.get(parameterWidgetTabName).addItem(pw.getComponent());
     }
 
     /**

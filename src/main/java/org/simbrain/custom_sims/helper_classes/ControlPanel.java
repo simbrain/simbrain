@@ -57,7 +57,7 @@ public class ControlPanel extends JPanel {
      */
     public void addItem(String text, JComponent component) {
         if (text.equals("")) {
-            mainPanel.addSpanningItem(component);
+            mainPanel.addItem(component);
         } else {
             mainPanel.addItem(text, component);
         }

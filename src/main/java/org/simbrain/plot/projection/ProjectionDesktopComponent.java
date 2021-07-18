@@ -260,7 +260,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         chart.getXYPlot().setRangeGridlinePaint(Color.gray);
         chart.getXYPlot().getDomainAxis().setAutoRange(true);
         chart.getXYPlot().getRangeAxis().setAutoRange(true);
-        //chart.getXYPlot().setForegroundAlpha(.5f); // TODO: Make this settable
+        chart.getXYPlot().setForegroundAlpha(.5f); // TODO: Make this settable
 
         panel = new ChartPanel(chart);
 
@@ -269,7 +269,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         CustomRenderer renderer = new CustomRenderer();
         chart.getXYPlot().setRenderer(renderer);
         // TODO: Make the visibility of series lines and point size adjustible
-        //renderer.setSeriesLinesVisible(0, true);
+        renderer.setSeriesLinesVisible(0, false);
         renderer.setSeriesShape(0, new Ellipse2D.Double(-7, -7, 7, 7));
         CustomToolTipGenerator generator = new CustomToolTipGenerator();
         renderer.setSeriesToolTipGenerator(0, generator);
@@ -282,12 +282,9 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         openBtn.setToolTipText("Open high-dimensional data");
         saveBtn.setToolTipText("Save data");
         projectionList.setMaximumSize(new java.awt.Dimension(200, 100));
-        iterateBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getWorkspaceComponent().getProjector().iterate();
-                update();
-            }
+        iterateBtn.addActionListener(e -> {
+            getWorkspaceComponent().getProjector().iterate();
+            update();
         });
         clearBtn.addActionListener(new ActionListener() {
             @Override

@@ -73,9 +73,6 @@ dependencies {
     // https://mvnrepository.com/artifact/jfree/jfreechart
     compile group: 'jfree', name: 'jfreechart', version: '1.0.12'
 
-    // https://mvnrepository.com/artifact/gov.nist.math/jama
-    compile group: 'gov.nist.math', name: 'jama', version: '1.0.2'
-
     // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
     compile group: 'org.swinglabs', name: 'swingx-core', version: '1.6.2-2'
 

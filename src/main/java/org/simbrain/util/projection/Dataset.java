@@ -18,7 +18,6 @@
  */
 package org.simbrain.util.projection;
 
-import Jama.Matrix;
 import com.Ostermiller.util.CSVPrinter;
 import org.pmw.tinylog.Logger;
 
@@ -675,25 +674,6 @@ public class Dataset {
         }
 
         return sum / (numPoints);
-    }
-
-    /**
-     * Returns a covariance matrix for the dataset.
-     *
-     * @return covariance matrix which describes how the data covary along each dimension
-     */
-    public Matrix getCovarianceMatrix() {
-        Matrix m = new Matrix(dimensions, dimensions);
-        for (int i = 0; i < dimensions; i++) {
-            for (int j = i; j < dimensions; j++) {
-                m.set(i, j, getCovariance(i, j));
-                if (i != j) {
-                    m.set(j, i, m.get(i, j)); // This is a symmetric matrix
-                }
-            }
-        }
-
-        return m;
     }
 
     /**

@@ -18,10 +18,7 @@
  */
 package org.simbrain.util.projection;
 
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
-
-import java.util.Arrays;
+import smile.projection.PCA;
 
 /**
  * <B>ProjectPCA</B> Projects the high-dimensional dataset along its two
@@ -43,77 +40,103 @@ public class ProjectPCA extends ProjectionMethod {
 
     @Override
     public void project() {
-        projectPCAJama();
-        // projectND4J();
+        // projectPCAJama();
+        projectPCASmile();
     }
 
-    /**
-     * Original Projection method from Scott Hotton using Jama.
-     */
-    private void projectPCAJama() {
+    private void projectPCASmile() {
         if (projector.getUpstairs() == null) {
             return;
         }
         if (projector.getUpstairs().getNumPoints() < 1) {
             return;
         }
-
-        int lowdim = projector.getDownstairs().getDimensions();
-        int updim = projector.getUpstairs().getDimensions();
-
-        // Get e-vals and e-vectors of covariance matrix
-        Matrix m = projector.getUpstairs().getCovarianceMatrix();
-        EigenvalueDecomposition ed = m.eig();
-        Matrix eVecs = ed.getV().transpose();
-        double[] evalsArray = ed.getRealEigenvalues();
-        Matrix eVals = new Matrix(evalsArray, updim);
-
-        // printMatrix(e_vecs);
-        // printMatrix(e_vals);
-        // Sort e-vectors and place them in a separate matrix,
-        // "matrix_projector"
-        Matrix combined = new Matrix(updim, updim + 1);
-        Matrix matrixProjector = new Matrix(lowdim, updim);
-        combined.setMatrix(0, updim - 1, 1, updim, eVecs);
-        combined.setMatrix(0, updim - 1, 0, 0, eVals);
-        Arrays.sort(evalsArray);
-
-        // printMatrix(combined);
-        // printArray(evals_array);
-        // Go through the evals_array, starting with the largest value
-        for (int i = updim - 1, k = 0; i >= (updim - lowdim); i--) {
-            double val = evalsArray[i];
-
-            // find the row this corresponds to and set that row
-            for (int j = 0; j < updim; j++) {
-                if (combined.get(j, 0) == val) {
-                    if (k >= lowdim) {
-                        break; // needed for cases of repeated e-vals?
-                    }
-
-                    matrixProjector.setMatrix(k, k, 0, updim - 1, combined.getMatrix(j, j, 1, updim));
-                    k++;
-                }
+        if (projector.getUpstairs().getNumPoints() < 3) {
+            for (int i = 0; i < projector.getUpstairs().getNumPoints(); i++) {
+                double[] newLowDPoint = {projector.getUpstairs().getComponent(i, 1),
+                        projector.getUpstairs().getComponent(i, 2)};
+                projector.getDownstairs().getPoint(i).setData(newLowDPoint);
             }
+            return;
         }
 
-        projector.getDownstairs().clear();
-
-        // printMatrix(matrix_projector);
-        // project the points along the principal components
-        for (int i = 0; i < projector.getUpstairs().getNumPoints(); i++) {
-            Matrix uppoint = new Matrix(updim, 1);
-
-            for (int j = 0; j < updim; ++j) {
-                uppoint.set(j, 0, projector.getUpstairs().getComponent(i, j));
-            }
-
-            Matrix lowpoint = matrixProjector.times(uppoint);
-            double[] columnPackedCopy = lowpoint.getColumnPackedCopy();
-
-            projector.getDownstairs().addPoint(new DataPoint(columnPackedCopy));
-        }
+        PCA pca = PCA.fit(projector.getUpstairs().getDoubleArray());
+        pca.setProjection(2);
+        projector.getDownstairs()
+                .setData(pca.project(projector.getUpstairs().getDoubleArray()));
     }
+
+    // /**
+    //  * Original Projection method from Scott Hotton using Jama.
+    //  */
+    // private void projectPCAJama() {
+    //     if (projector.getUpstairs() == null) {
+    //         return;
+    //     }
+    //     if (projector.getUpstairs().getNumPoints() < 1) {
+    //         return;
+    //     }
+    //
+    //     int lowdim = projector.getDownstairs().getDimensions();
+    //     int updim = projector.getUpstairs().getDimensions();
+    //
+    //     // Get e-vals and e-vectors of covariance matrix
+    //     Matrix m = projector.getUpstairs().getCovarianceMatrix();
+    //     EigenvalueDecomposition ed = m.eig();
+    //     Matrix eVecs = ed.getV().transpose();
+    //     double[] evalsArray = ed.getRealEigenvalues();
+    //     Matrix eVals = new Matrix(evalsArray, updim);
+    //
+    //     // printMatrix(e_vecs);
+    //     // printMatrix(e_vals);
+    //     // Sort e-vectors and place them in a separate matrix,
+    //     // "matrix_projector"
+    //     Matrix combined = new Matrix(updim, updim + 1);
+    //     Matrix matrixProjector = new Matrix(lowdim, updim);
+    //     combined.setMatrix(0, updim - 1, 1, updim, eVecs);
+    //     combined.setMatrix(0, updim - 1, 0, 0, eVals);
+    //     Arrays.sort(evalsArray);
+    //
+    //     // printMatrix(combined);
+    //     // printArray(evals_array);
+    //
+    //     // Go through the evals_array, starting with the largest value
+    //     // Populate matrixProjector
+    //     for (int i = updim - 1, k = 0; i >= (updim - lowdim); i--) {
+    //         double val = evalsArray[i];
+    //
+    //         // find the row this corresponds to and set that row
+    //         for (int j = 0; j < updim; j++) {
+    //             if (combined.get(j, 0) == val) {
+    //                 if (k >= lowdim) {
+    //                     break; // needed for cases of repeated e-vals?
+    //                 }
+    //
+    //                 matrixProjector.setMatrix(k, k, 0, updim - 1, combined.getMatrix(j, j, 1, updim));
+    //                 k++;
+    //             }
+    //         }
+    //     }
+    //
+    //     projector.getDownstairs().clear();
+    //
+    //     // printMatrix(matrix_projector);
+    //
+    //     // Project the points along the principal components
+    //     // Multiply the upstairs data times matrixProjector to get our projection
+    //     for (int i = 0; i < projector.getUpstairs().getNumPoints(); i++) {
+    //         Matrix uppoint = new Matrix(updim, 1);
+    //
+    //         for (int j = 0; j < updim; ++j) {
+    //             uppoint.set(j, 0, projector.getUpstairs().getComponent(i, j));
+    //         }
+    //
+    //         Matrix lowpoint = matrixProjector.times(uppoint);
+    //         double[] columnPackedCopy = lowpoint.getColumnPackedCopy();
+    //
+    //         projector.getDownstairs().addPoint(new DataPoint(columnPackedCopy));
+    //     }
+    // }
 
 
     @Override

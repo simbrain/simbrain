@@ -138,7 +138,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             // Example: NeuronUpdateRule maintains a list of types  of neuronupdaterules.
             String methodName = parameter.getAnnotation().typeListMethod();
             BiMap<String, Class> typeMap = getTypeMap(parameter.getType(), methodName);
-            return ObjectTypeEditor.createEditor(getCopyableObjects(), typeMap,
+            return ObjectTypeEditor.createEditor((List<CopyableObject>) getEditableObjects(), typeMap,
                     parameter.getAnnotation().label(), parameter.getAnnotation().showDetails());
         }
 
@@ -410,14 +410,9 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
      * Return a list of objects associated with this field. Example: a list of neuronupdaterules associated with the
      * updaterule field, one object for each neuron in the list of edited objects.
      */
-    private List<EditableObject> getEditableObjects() {
+    private List<? extends EditableObject> getEditableObjects() {
         return  parent.getEditedObjects().stream()
                 .map(o -> (EditableObject) parameter.getFieldValue(o))
-                .collect(Collectors.toList());
-    }
-    private List<CopyableObject> getCopyableObjects() {
-        return  parent.getEditedObjects().stream()
-                .map(o -> (CopyableObject) parameter.getFieldValue(o))
                 .collect(Collectors.toList());
     }
 

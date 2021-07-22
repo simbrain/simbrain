@@ -59,14 +59,21 @@ val mnistSim = newSim {
 
     // TODO: Performance issues..
     mainScope.launch {
-        val progressWindow = ProgressWindow(1000)
+        val progressWindow = ProgressWindow(1000, "Images Loaded")
+        progressWindow.setUpdateAction(0) { i ->
+            progressWindow.progressBar.value = i
+            progressWindow.valueLabel.text = "Extracted $i/1000 images"
+        }
+
+        progressWindow.valueLabel.text = "Extracted 0/1000 images"
+        progressWindow.pack()
         launch(Dispatchers.Default) {
             extractImages("cache/$TEST_IMAGES_ARCHIVE")
                 .take(1000)
                 .map {it.toGrayScaleImage(28,28)}
                 .forEachIndexed { i, it ->
                     world.imageAlbum.addImage(it)
-                    progressWindow.progressBar.value = i
+                    progressWindow.invokeUpdateAction(i)
                 }
             progressWindow.close()
         }

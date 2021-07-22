@@ -244,13 +244,13 @@ val evolveAvoider = newSim {
     scope.launch {
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(200)
+        val progressWindow = ProgressWindow(200, "Fitness")
 
         launch(Dispatchers.Default) {
 
             val generations = createEvolution().start().onEachGenerationBest { agent, gen ->
                 progressWindow.progressBar.value = gen
-                progressWindow.fitnessScore.text = "Error: ${agent.fitness.format(2)}"
+                progressWindow.valueLabel.text = "Error: ${agent.fitness.format(2)}"
             }
 
             val (best, _) = generations.best

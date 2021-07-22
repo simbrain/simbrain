@@ -125,13 +125,13 @@ val evolveXor = newSim {
 
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(1000)
+        val progressWindow = ProgressWindow(1000, "Fitness")
 
         launch(Dispatchers.Default) {
 
             val generations = evolution.start().onEachGenerationBest { agent, gen ->
                 progressWindow.progressBar.value = gen
-                progressWindow.fitnessScore.text = "Error: ${agent.fitness.format(2)}"
+                progressWindow.valueLabel.text = "Error: ${agent.fitness.format(2)}"
             }
 
             val (best, _) = generations.best

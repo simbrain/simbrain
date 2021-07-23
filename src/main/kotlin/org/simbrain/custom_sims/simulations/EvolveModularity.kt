@@ -11,6 +11,7 @@ import org.simbrain.network.core.activations
 import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
+import org.simbrain.workspace.Workspace
 import java.io.File
 import java.lang.Math.abs
 import java.util.*
@@ -22,6 +23,7 @@ val evolveModularity = newSim {
 
     val evolutionarySim = evolutionarySimulation {
 
+        val workspace = Workspace()
         val network = Network()
 
         fun Neuron.applyDefaultParams() {
@@ -197,7 +199,7 @@ val evolveModularity = newSim {
                 rightRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                 leftRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
 
-                workspace.iterate()
+                workspace.iterate(5)
 
                 val left = leftRetina.products.activations in leftInputs
                 val right = rightRetina.products.activations in rightInputs
@@ -247,7 +249,7 @@ val evolveModularity = newSim {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 250 || fitness < .01 }
+        runUntil { generation == 50 || fitness < .1 }
     }
 
     workspace.clearWorkspace()

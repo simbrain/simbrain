@@ -23,6 +23,7 @@ import bsh.util.JConsole;
 import kotlin.Unit;
 import org.pmw.tinylog.Logger;
 import org.simbrain.console.ConsoleDesktopComponent;
+import org.simbrain.custom_sims.NewSimulation;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.RegisteredSimulationsKt;
 import org.simbrain.util.ResourceManager;
@@ -572,7 +573,11 @@ public class SimbrainDesktop {
         }
         scriptMenu.addSeparator();
         RegisteredSimulationsKt.getSimulations().addToMenu(scriptMenu, newSimulation -> {
-            newSimulation.run(this);
+            if (newSimulation instanceof NewSimulation) {
+                ((NewSimulation)newSimulation).run(this);
+            } else if (newSimulation instanceof RegisteredSimulation) {
+                ((RegisteredSimulation)newSimulation).instantiate(this).run();
+            }
             return Unit.INSTANCE;
         });
         if (actionManager.getScriptActions(this) == null) {

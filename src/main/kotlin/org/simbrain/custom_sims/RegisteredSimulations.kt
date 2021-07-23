@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
+import org.simbrain.custom_sims.simulations.test.lstmBlock
 import org.simbrain.util.dir
 
 /**
@@ -13,9 +14,13 @@ import org.simbrain.util.dir
  * use to call them using "run sim" (see build.gradle#runSim). If duplicate labels are used the first one encountered
  * will be run from the command line.
  */
-val simulations = dir<NewSimulation>("Simulations") {
+val simulations = dir<Any>("Simulations") {
 
     // This supersedes RegisteredSimulation.java. Will have to move that stuff here.
+
+    dir("Imported") {
+        item("LSTM") { lstmBlock() }
+    }
 
     dir("Demos") {
         item("Simple Network") { testSim }
@@ -61,5 +66,8 @@ fun main(args: Array<String>) {
     } catch (e: NoSuchElementException) {
         throw IllegalArgumentException("Index is out of bound")
     }
-    sim.run()
+    when (sim) {
+        is NewSimulation ->  sim.run()
+        is RegisteredSimulation -> sim.run()
+    }
 }

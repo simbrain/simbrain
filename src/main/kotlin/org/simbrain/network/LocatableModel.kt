@@ -23,6 +23,14 @@ abstract class LocatableModel() : NetworkModel() {
      * Implementing classes must fire and handle location events.
      */
     abstract override fun getEvents(): LocationEvents
+
+    /**
+     * Must call this _after_ adding a network model, because adding the model places the model using the layout
+     * manager.
+     */
+    fun setLocation(x: Double, y: Double) {
+        location = Point2D.Double(x,y)
+    }
 }
 
 /**

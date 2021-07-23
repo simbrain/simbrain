@@ -114,10 +114,10 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
         // Sensor nodes
         sensorNodes = new NeuronGroup(network, 6);
-        sensorNodes.setLocation(229, 561);
         sensorNodes.setLabel("Sensors");
         sensorNodes.setClamped(true);
         network.addNetworkModel(sensorNodes);
+        sensorNodes.setLocation(229, 561);
         // Make custom connections from sensor nodes to upper-left and
         // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.

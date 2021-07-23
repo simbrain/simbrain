@@ -1063,10 +1063,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         }
     }
 
-    public void setLocation(final double x, final double y) {
-        setLocation(x, y, true);
-    }
-
     public void setLocation(final double x, final double y, boolean fireEvent) {
         setLocation(point(x, y), fireEvent);
     }

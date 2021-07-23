@@ -80,34 +80,14 @@ public class NetworkTextObject extends LocatableModel {
     // TODO: Temporary so that when added to networkpanel the event is availalble
     public transient PInputEvent inputEvent;
 
-    // TODO: Too many constructors.
-
-    /**
-     * Construct the text object.
-     *
-     * @param parent root network
-     * @param x      x position
-     * @param y      y position
-     */
-    public NetworkTextObject(Network parent, double x, double y, PInputEvent event) {
-        this.parent = parent;
-        this.x = x;
-        this.y = y;
-        this.inputEvent = event;
-    }
-
     /**
      * Construct the text object with initial text.
      *
      * @param parent      root network
-     * @param x           x position
-     * @param y           y position
      * @param initialText text for the text object
      */
-    public NetworkTextObject(Network parent, double x, double y, String initialText) {
+    public NetworkTextObject(Network parent, String initialText) {
         this.parent = parent;
-        this.x = x;
-        this.y = y;
         this.setText(initialText);
     }
 

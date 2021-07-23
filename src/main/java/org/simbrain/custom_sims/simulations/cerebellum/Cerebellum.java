@@ -107,17 +107,17 @@ public class Cerebellum extends RegisteredSimulation {
         NeuronGroup cortex = new NeuronGroup(network, 1);
         cortex.setLabel("Cerebral Cortex");
         cortex.setNeuronType(generalRule);
+        network.addNetworkModel(cortex);
         cortex.setLocation(50, 0);
         cortex.setLowerBound(0);
-        network.addNetworkModel(cortex);
 
         // Red Nucleus
         NeuronGroup redNucleus = new NeuronGroup(network, 2);
         redNucleus.setLabel("Red Nucleus");
         redNucleus.setNeuronType(generalRule);
-        redNucleus.setLocation(50, 200);
         redNucleus.setLowerBound(0);
         network.addNetworkModel(redNucleus);
+        redNucleus.setLocation(50, 200);
 
         // Cortex to Red Nucleus
         network.addNetworkModel(new Synapse(cortex.getNeuronList().get(0),
@@ -127,10 +127,10 @@ public class Cerebellum extends RegisteredSimulation {
         Neuron inferiorOlive = new Neuron(network, new DecayRule());
         inferiorOlive.setLabel("Inferior Olive");
         inferiorOlive.setUpdateRule(inferiorOliveRule);
-        inferiorOlive.setLocation(200, 275);
         inferiorOlive.setLowerBound(0);
         inferiorOlive.forceSetActivation(0.3);
         network.addNetworkModel(inferiorOlive);
+        inferiorOlive.setLocation(200, 275);
 
         // Red Nucleus to Inf. Olive
         network.addNetworkModel(new Synapse(redNucleus.getNeuronList().get(0),
@@ -140,9 +140,9 @@ public class Cerebellum extends RegisteredSimulation {
         NeuronGroup toSpinalCord = new NeuronGroup(network, 2);
         toSpinalCord.setLabel("To Spinal Cord");
         toSpinalCord.setNeuronType(generalRule);
-        toSpinalCord.setLocation(-25, 275);
         toSpinalCord.setLowerBound(0);
         network.addNetworkModel(toSpinalCord);
+        toSpinalCord.setLocation(-25, 275);
 
         // Cortex to Spinal Cord
         network.addNetworkModel(new Synapse(cortex.getNeuronList().get(0),
@@ -156,9 +156,9 @@ public class Cerebellum extends RegisteredSimulation {
         output = new Neuron(network, new DecayRule());
         output.setLabel("Output");
         output.setUpdateRule(generalRule);
-        output.setLocation(0, 325);
         output.setLowerBound(0);
         network.addNetworkModel(output);
+        output.setLocation(0, 325);
 
         // Spinal Cord to Output
         network.addNetworkModel(
@@ -170,9 +170,9 @@ public class Cerebellum extends RegisteredSimulation {
         Neuron thalamus = new Neuron(network);
         thalamus.setLabel("Thalamus");
         thalamus.setUpdateRule(generalRule);
-        thalamus.setLocation(100, 100);
         thalamus.setLowerBound(0);
         network.addNetworkModel(thalamus);
+        thalamus.setLocation(100, 100);
 
         // Thalamus to Cortex
         network.addNetworkModel(
@@ -182,8 +182,8 @@ public class Cerebellum extends RegisteredSimulation {
         NeuronGroup cerebellum = new NeuronGroup(network, 5);
         cerebellum.setLabel("Cerebellum");
         cerebellum.setNeuronType(generalRule);
-        cerebellum.setLocation(175, 125);
         network.addNetworkModel(cerebellum);
+        cerebellum.setLocation(175, 125);
         cerebellum.getNeuronList().get(0).setLabel("Purkinje");
         cerebellum.getNeuronList().get(0).offset(25, 0);
         cerebellum.getNeuronList().get(0).forceSetActivation(0.4);
@@ -234,9 +234,9 @@ public class Cerebellum extends RegisteredSimulation {
         fromSpinalCord.setLabel("From Spinal Cord");
         fromSpinalCord.setClamped(true);
         fromSpinalCord.setNeuronType(generalRule);
-        fromSpinalCord.setLocation(275, 300);
         fromSpinalCord.setLowerBound(0);
         network.addNetworkModel(fromSpinalCord);
+        fromSpinalCord.setLocation(275, 300);
         fromSpinalCord.getNeuronList().get(0).setLabel("Go");
         fromSpinalCord.getNeuronList().get(1).setLabel("No Go");
 
@@ -251,9 +251,9 @@ public class Cerebellum extends RegisteredSimulation {
         // DA
         dopamine = new Neuron(network);
         dopamine.setLabel("Basal Ganglia (GPi)");
-        dopamine.setLocation(150, 50);
         // dopamine.setLowerBound(0);
         network.addNetworkModel(dopamine);
+        dopamine.setLocation(150, 50);
 
         // DA to Thalamus
         network.addNetworkModel(new Synapse(dopamine, thalamus, 1));
@@ -263,24 +263,25 @@ public class Cerebellum extends RegisteredSimulation {
         target.setLabel("Target");
         target.setClamped(true);
         // target.setUpdateRule(targetRule);
-        target.setLocation(240, 50);
         // target.setLowerBound(0);
         network.addNetworkModel(target);
+        target.setLocation(240, 50);
 
         // Labels
-        NetworkTextObject parallelFiberLabel = new NetworkTextObject(network,
-            230, 150, "Parallel Fibers");
-        NetworkTextObject mossyFiberLabel = new NetworkTextObject(network, 265,
-            240, "Mossy Fibers");
-        NetworkTextObject climbingFiberLabel = new NetworkTextObject(network,
-            191, 160, "CF");
+        NetworkTextObject parallelFiberLabel = new NetworkTextObject(network, "Parallel Fibers");
+        // network.addNetworkModel(parallelFiberLabel);
+        parallelFiberLabel.setLocation(230.0, 150.0);
+        NetworkTextObject mossyFiberLabel = new NetworkTextObject(network, "Mossy Fibers");
+        // network.addNetworkModel(mossyFiberLabel);
+        parallelFiberLabel.setLocation(265.0, 240.0);
+        NetworkTextObject climbingFiberLabel = new NetworkTextObject(network, "CF");
+        // network.addNetworkModel(climbingFiberLabel);
+        parallelFiberLabel.setLocation(191.0, 160.0);
+
         // NetworkTextObject goInputLabel = new NetworkTextObject(network, 266,
         // 320, "Go");
         // NetworkTextObject noGoInputLabel = new NetworkTextObject(network,
         // 308, 320, "No Go");
-        network.addNetworkModel(parallelFiberLabel);
-        network.addNetworkModel(mossyFiberLabel);
-        network.addNetworkModel(climbingFiberLabel);
         // network.addText(goInputLabel);
         // network.addText(noGoInputLabel);
 

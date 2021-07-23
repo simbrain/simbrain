@@ -49,8 +49,8 @@ public class NetworkWrapper {
      */
     public Neuron addNeuron(int x, int y) {
         Neuron neuron = new Neuron(network);
-        neuron.setLocation(x, y);
         network.addNetworkModel(neuron);
+        neuron.setLocation(x, y);
         return neuron;
     }
 
@@ -188,10 +188,10 @@ public class NetworkWrapper {
 
         NeuronGroup ng;
         ng = new NeuronGroup(network, numNeurons);
-        ng.setLocation(x,y);
         ng.setNeuronType(rule);
 
         network.addNetworkModel(ng);
+        ng.setLocation(x,y);
         layoutNeuronGroup(ng, x, y, layoutName);
         return ng;
 
@@ -250,9 +250,9 @@ public class NetworkWrapper {
      */
     public WinnerTakeAll addWTAGroup(double x, double y, int numNeurons) {
         WinnerTakeAll wta = new WinnerTakeAll(network, numNeurons);
-        wta.setLocation(x, y);
         layoutNeuronGroup(wta, x, y, "line");
         network.addNetworkModel(wta);
+        wta.setLocation(x, y);
         return wta;
     }
 

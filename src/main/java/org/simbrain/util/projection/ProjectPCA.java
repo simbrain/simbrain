@@ -53,8 +53,8 @@ public class ProjectPCA extends ProjectionMethod {
         }
         if (projector.getUpstairs().getNumPoints() < 3) {
             for (int i = 0; i < projector.getUpstairs().getNumPoints(); i++) {
-                double[] newLowDPoint = {projector.getUpstairs().getComponent(i, 1),
-                        projector.getUpstairs().getComponent(i, 2)};
+                double[] newLowDPoint = {projector.getUpstairs().getComponent(i, 0),
+                        projector.getUpstairs().getComponent(i, 1)};
                 projector.getDownstairs().getPoint(i).setData(newLowDPoint);
             }
             return;

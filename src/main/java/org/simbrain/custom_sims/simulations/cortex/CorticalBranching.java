@@ -84,7 +84,7 @@ public class CorticalBranching extends RegisteredSimulation {
         con.setExcCons(KIN);
         con.setInhCons(KIN);
 
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con, 1.0);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con);
         sg.setRandomizers(exRand, inRand);
         //RadialSimple con = RadialSimpler.builder()
         //        .connectionStyle(RadialSimple.ConnectStyle.DETERMINISTIC)

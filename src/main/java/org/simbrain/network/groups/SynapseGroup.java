@@ -181,10 +181,14 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         } else {
             synGroup = new SynapseGroup(source, target, (ConnectionStrategy) args[0]);
         }
-        if (args.length > 1) {
+
+        if (args.length >= 1) {
             synGroup.setExcitatoryRatio((Double) args[1]);
         }
-        if (args.length >= 2) {
+        if (args.length == 2) {
+            synGroup.setExcitatoryRandomizer((ProbabilityDistribution) args[2]);
+        }
+        if (args.length == 3) {
             synGroup.setRandomizers((ProbabilityDistribution) args[2], (ProbabilityDistribution) args[3]);
         }
         synGroup.makeConnections();
@@ -432,7 +436,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     /**
      * Adds a new synapse (one which is "blank") to the synapse group. This is
      * the <b>preferred</b> method to use for adding synapses to the synapse
-     * group over {@link #addSynapseUnsafe(Synapse)} because it makes the added
+     * group over addSynapseUnsafe(Synapse) because it makes the added
      * synapse conform to the global parameters of this synapse group.
      *
      * @param synapse the blank synapse to be added and assigned new values

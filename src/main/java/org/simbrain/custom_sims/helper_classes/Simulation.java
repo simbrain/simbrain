@@ -275,7 +275,7 @@ public class Simulation {
     }
 
     /**
-     * Helper for creating coupligns in the associated Workspace. Couples the producer
+     * Helper for creating couplings in the associated Workspace. Couples the producer
      * to the consumer if possible, ignores mismatch exceptions for simplicity.
      */
     public Coupling createCoupling(Producer producer, Consumer consumer) {

@@ -66,9 +66,10 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
             startEditing(inputEvent, (PStyledText) pickedNode);
         } else if (pickedNode instanceof PCamera) {
              // Make a new text object and then edit it
-             NetworkTextObject text = new NetworkTextObject(networkPanel.getNetwork(), inputEvent.getPosition().getX(),
-                     inputEvent.getPosition().getY(), inputEvent);
+             NetworkTextObject text = new NetworkTextObject(networkPanel.getNetwork(), "New Text");
+             text.inputEvent = inputEvent;
              networkPanel.getNetwork().addNetworkModel(text);
+             text.setLocation(inputEvent.getPosition().getX(), inputEvent.getPosition().getY());
         }
     }
 

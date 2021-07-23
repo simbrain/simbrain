@@ -146,10 +146,6 @@ public abstract class Layer extends LocatableModel {
         events.fireLocationChange();
     }
 
-    public void setLocation(double x, double y) {
-        setLocation(new Point2D.Double(x,y));
-    }
-
     public double getX() {
         return x;
     }

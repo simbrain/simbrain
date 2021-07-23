@@ -107,6 +107,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net) {
         super(net);
+        setPrototypeRule(prototypeRule);
     }
 
     /**
@@ -180,7 +181,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         super.update();
     }
 
-    // TODO: Replace with setPrototypeRule
+    // TODO: Replace with setPrototypeRule or setUpdateRule
     /**
      * Set the update rule for the neurons in this group.
      *
@@ -284,13 +285,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return retArray;
     }
 
-    /**
-     * @param x x coordinate for neuron group
-     * @param y y coordinate for neuron group
-     */
-    public void setLocation(final double x, final double y) {
-        super.setLocation(new Point2D.Double(x, y));
-    }
 
     public Layout getLayout() {
         return layout;

@@ -8,6 +8,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -144,10 +145,11 @@ public class Hippocampus extends RegisteredSimulation {
                                               double y) {
         AlvarezSquire cg = new AlvarezSquire(this, 4);
         cg.setLabel(label);
+        cg.setLayout(new LineLayout());
         cg.applyLayout();
-        cg.setLocation(x, y);
         cg.setUpdateMethod("AS");
         network.addNetworkModel(cg);
+        cg.setLocation(x, y);
         return cg;
     }
 
@@ -159,7 +161,7 @@ public class Hippocampus extends RegisteredSimulation {
 
         // Initialize with uniform distribution from 0 to .1
         SynapseGroup synGroup = SynapseGroup.createSynapseGroup(source, target,
-               new AllToAll() , 1);
+               new AllToAll());
         synGroup.setLabel(name);
         // TODO: Weight matrices?
         // synGroup.setLowerBound(0, Polarity.EXCITATORY);

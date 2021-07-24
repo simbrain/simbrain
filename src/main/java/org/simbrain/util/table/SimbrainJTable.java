@@ -651,6 +651,9 @@ public class SimbrainJTable extends JXTable {
      */
     public void normalize() {
         if (data instanceof NumericTable) {
+            if (getSelectedColumns().length < 0) {
+                return;
+            }
             for (int i = 0; i < this.getSelectedColumns().length; i++) {
                 ((NumericTable) data).normalizeColumn(getSelectedColumns()[i] - 1);
             }

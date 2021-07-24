@@ -11,6 +11,7 @@ import smile.classification.Classifier
 import smile.classification.SVM
 import smile.math.kernel.PolynomialKernel
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 import javax.swing.BoxLayout
@@ -32,6 +33,7 @@ class DataPanel: JPanel() {
 
     init {
         layout = BorderLayout()
+        preferredSize = Dimension(250, 200)
     }
 
     private val toolbars = JToolBar().also {
@@ -52,12 +54,29 @@ class DataPanel: JPanel() {
     private val scrollPanel = SimbrainJTableScrollPanel(jTable)
         .also { add("Center", it) }
 
-    // Open / Save Tools
+    // Toolbars
+
     private val fileToolBar = JToolBar().apply {
         add(TrainerGuiActions.getOpenCSVAction(jTable, null))
         add(TableActionManager.getSaveCSVAction(table))
         toolbars.add(this)
     }
+
+    private val editToolBar = JToolBar().apply {
+        add(TableActionManager.getInsertRowAction(jTable))
+        add(TableActionManager.getDeleteRowAction(jTable))
+        toolbars.add(this)
+    }
+
+    private val numericEditToolbar = JToolBar().apply {
+        add(TableActionManager.getRandomizeAction(jTable))
+        add(TableActionManager.getNormalizeAction(jTable))
+        add(TableActionManager.getZeroFillAction(jTable))
+        add(TableActionManager.getFillAction(jTable))
+        toolbars.add(this)
+    }
+
+
 
     val events = DataPanelEvents(this)
 

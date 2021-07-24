@@ -17,7 +17,7 @@ import smile.stat.distribution.GaussianDistribution;
 import java.awt.geom.Rectangle2D;
 
 /**
- * A "neuron array" backed by a double array.
+ * A "neuron array" backed by a Smile Matrix.
  */
 public class NeuronArray extends Layer implements EditableObject, AttributeContainer {
 

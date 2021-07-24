@@ -2,6 +2,8 @@ package org.simbrain.network.matrix;
 
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
+import org.simbrain.util.NumberKt;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import smile.classification.SVM;
 import smile.math.kernel.PolynomialKernel;
@@ -16,27 +18,48 @@ public class Classifier extends Layer implements EditableObject {
      */
     private smile.classification.Classifier classifier;
 
-    private double[][] trainingInputs = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
+    // TODO
+    private double[][] trainingInputs;
+    private int[] targets;
 
-    private int[] targets = {-1, 1, -1, 1};
+
+    @UserParameter(label = "Kernel Degree")
+    private int kernelDegree = 2;
+
+
+    private PolynomialKernel kernel = new PolynomialKernel(kernelDegree);
+
+    int result = 0;
+
+    int outputSize;
+
+    Network net;
 
     /**
-     * Construct a neuron array.
-     *
-     * @param net  parent net
-     * @param size number of components in the array
+     * Collects inputs from other network models using arrays.
      */
-    public Classifier(Network net, int size) {
+    private Matrix inputs;
 
-        var kernel = new PolynomialKernel(2);
+    /**
+     * Construct a classifier.
+     */
+    public Classifier(Network net, int inputSize, int outputSize) {
+        this.net = net;
+        inputs = new Matrix(inputSize, 1);
+        int initialNumRows = 20;
+        trainingInputs = new double[initialNumRows][inputSize];
+        targets = new int[initialNumRows];
+
+        this.outputSize = outputSize;
+
         setLabel(net.getIdManager().getProposedId(Classifier.class));
 
+    }
+
+    public void train(double[][] inputs, int[] targets) {
         try {
+            classifier = SVM.fit(inputs,targets, kernel, 1000, 1E-3);
 
-            var x = new double[][] {{0,0},{0,1},{1,0},{1,1}};
-            var y = new int[] {-1,1,1,-1};
-
-            classifier = SVM.fit(x,y, kernel, 1000, 1E-3);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -44,9 +67,7 @@ public class Classifier extends Layer implements EditableObject {
 
     @Override
     public void update() {
-        // TODO
-        var result = classifier.predict(getInputs().col(0));
-        // setOneHot(result == -1 ? 0 : 1);
+        result = classifier.predict(getInputs().col(0));
     }
 
     public smile.classification.Classifier getClassifier() {
@@ -80,17 +101,17 @@ public class Classifier extends Layer implements EditableObject {
 
     @Override
     public Matrix getInputs() {
-        return null;
+        return inputs;
     }
 
     @Override
-    public void addInputs(Matrix inputs) {
-
+    public void addInputs(Matrix newInputs) {
+        inputs.add(newInputs);
     }
 
     @Override
     public Matrix getOutputs() {
-        return null;
+        return NumberKt.getOneHot(result, outputSize, 1.0);
     }
 
     @Override
@@ -100,7 +121,7 @@ public class Classifier extends Layer implements EditableObject {
 
     @Override
     public Network getNetwork() {
-        return null;
+        return net;
     }
 
     @Override

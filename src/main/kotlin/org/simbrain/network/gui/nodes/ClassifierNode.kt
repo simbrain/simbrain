@@ -1,5 +1,9 @@
 package org.simbrain.network.gui.nodes
 
+import org.piccolo2d.nodes.PImage
+import org.piccolo2d.nodes.PPath
+import org.piccolo2d.nodes.PText
+import org.piccolo2d.util.PBounds
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
@@ -8,8 +12,6 @@ import org.simbrain.network.matrix.Classifier
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.NumericTable
-import smile.classification.SVM
-import smile.math.kernel.PolynomialKernel
 import java.awt.Dialog.ModalityType
 import java.awt.FlowLayout
 import javax.swing.BoxLayout
@@ -17,6 +19,53 @@ import javax.swing.JButton
 import javax.swing.JPanel
 
 class SmileClassifierNode(val np : NetworkPanel, val classifier : Classifier) : ScreenElement(np) {
+
+    /**
+     * Square shape around array node.
+     */
+    private val borderBox = PPath.createRectangle(0.0, 0.0, 200.0, 100.0).also {
+        addChild(it)
+        pickable = true
+    }
+
+    /**
+     * Text showing info about the array.
+     */
+    private val infoText = PText().also {
+        it.setFont(NeuronArrayNode.INFO_FONT)
+        addChild(it)
+        it.offset(8.0, 8.0)
+        // updateInfoText()
+    }
+
+    init {
+        setBounds(borderBox.bounds)
+
+        classifier.events.apply {
+            onDeleted{ removeFromParent() }
+            onUpdated{
+                // renderArrayToActivationsImage()
+                updateInfoText()
+            }
+            onClampChanged{}
+            onLocationChange{}
+        }
+    }
+
+    /**
+     * Image to show activationImage.
+     */
+    private val activationImage = PImage()
+
+    /**
+     * Update status text.
+     */
+    private fun updateInfoText() {
+        infoText.setText(classifier.toString())
+        val pb: PBounds = infoText.getBounds()
+        borderBox.setBounds(pb.x - 2, pb.y - 2, pb.width + 20, pb.height + 20)
+        setBounds(borderBox.getBounds())
+    }
 
     override fun getModel(): NetworkModel {
         return classifier
@@ -64,10 +113,7 @@ class SmileClassifierNode(val np : NetworkPanel, val classifier : Classifier) : 
                 layout = FlowLayout(FlowLayout.LEFT)
                 add(JButton("Train").apply {
                     addActionListener {
-                        val kernel = PolynomialKernel(2)
-                        val result = SVM.fit(inputs.table.asDoubleArray(), targets.table.firstColumnAsIntArray(), kernel, 1000.0,
-                            1E-3)
-                        println(result)
+                        classifier.train(inputs.table.asDoubleArray(), targets.table.firstColumnAsIntArray())
                     }
                 })
             })
@@ -92,7 +138,7 @@ fun main() {
     val networkComponent = NetworkComponent("net 1")
     val np = NetworkPanel(networkComponent)
     val classifier = with (networkComponent.network) {
-        val classifier = Classifier(this, 2)
+        val classifier = Classifier(this, 2, 1)
         addNetworkModel(classifier)
         classifier
     }

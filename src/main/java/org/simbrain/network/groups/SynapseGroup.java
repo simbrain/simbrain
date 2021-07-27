@@ -182,14 +182,14 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
             synGroup = new SynapseGroup(source, target, (ConnectionStrategy) args[0]);
         }
 
-        if (args.length >= 1) {
+        if (args.length >= 2) {
             synGroup.setExcitatoryRatio((Double) args[1]);
         }
-        if (args.length == 2) {
+        if (args.length >= 3) {
             synGroup.setExcitatoryRandomizer((ProbabilityDistribution) args[2]);
         }
-        if (args.length == 3) {
-            synGroup.setRandomizers((ProbabilityDistribution) args[2], (ProbabilityDistribution) args[3]);
+        if (args.length >= 4) {
+            synGroup.setRandomizers((ProbabilityDistribution) args[3], (ProbabilityDistribution) args[3]);
         }
         synGroup.makeConnections();
         // Ensure that displayed ratio is consistent with actual ratio.

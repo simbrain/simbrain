@@ -59,24 +59,24 @@ public class ClassicalConditioning extends RegisteredSimulation {
 
         // Construct the network
         Neuron bellDetectorNeuron = new Neuron(network);
-        bellDetectorNeuron.setLocation(295, 194);
         bellDetectorNeuron.setLabel("Bell Detector");
         bellDetectorNeuron.setClamped(true);
         network.addNetworkModel(bellDetectorNeuron);
+        bellDetectorNeuron.setLocation(295, 194);
 
         Neuron cheeseDetectorNeuron = new Neuron(network);
-        cheeseDetectorNeuron.setLocation(160, 194);
         cheeseDetectorNeuron.setLabel("Cheese Detector");
         cheeseDetectorNeuron.setClamped(false);
         network.addNetworkModel(cheeseDetectorNeuron);
+        cheeseDetectorNeuron.setLocation(160, 194);
 
         BinaryRule responseRule = new BinaryRule();
         responseRule.setThreshold(.5);
         responseRule.setLowerBound(0);
         Neuron salivationResponse = new Neuron(network, responseRule);
-        salivationResponse.setLocation(160, 60);
         salivationResponse.setLabel("Salivation");
         network.addNetworkModel(salivationResponse);
+        salivationResponse.setLocation(160, 60);
 
         Synapse cheeseToSalivation = new Synapse(cheeseDetectorNeuron, salivationResponse,1);
         cheeseToSalivation.setUpperBound(1);

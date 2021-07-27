@@ -94,7 +94,7 @@ public class Vehicle {
         Neuron rightInput = net.addNeuron(x + 100, y + 100);
         rightInput.setLabel(objectType + " (R)");
         rightInput.setClamped(true);
-        neurons.add(leftInput);
+        neurons.add(rightInput);
 
         Neuron leftTurn = net.addNeuron(x, y);
         leftTurn.setLabel("Left");
@@ -111,11 +111,11 @@ public class Vehicle {
         neurons.add(rightTurn);
 
         NeuronCollection vehicle = new NeuronCollection(net.getNetwork(), neurons);
-        setNodeDefaults(leftInput, vehicle);
-        setNodeDefaults(rightInput, vehicle);
-        setNodeDefaults(straight, vehicle);
-        setNodeDefaults(rightTurn, vehicle);
-        setNodeDefaults(leftTurn, vehicle);
+        setNodeDefaults(leftInput);
+        setNodeDefaults(rightInput);
+        setNodeDefaults(straight);
+        setNodeDefaults(rightTurn);
+        setNodeDefaults(leftTurn);
         net.getNetwork().addNetworkModel(vehicle);
 
         // Set weights here
@@ -159,14 +159,10 @@ public class Vehicle {
 
     /**
      * Helper method to set default value for vehicle nodes.
-     *
-     * @param neuron the neuron to update.
-     * @param nc     the neuron group the node is in.
      */
-    private void setNodeDefaults(Neuron neuron, NeuronCollection nc) {
+    private void setNodeDefaults(Neuron neuron) {
         neuron.setLowerBound(-100);
         neuron.setUpperBound(200);
-        nc.addNeuron(neuron);
     }
 
 }

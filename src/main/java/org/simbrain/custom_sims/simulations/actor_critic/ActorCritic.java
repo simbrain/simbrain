@@ -277,11 +277,10 @@ public class ActorCritic extends RegisteredSimulation {
         // Set up couplings
         Producer gridProducer = sim.getProducer(sensor, "getValues");
         gridProducer.setDescription(sensor.getLabel());
-        Consumer ngConsumer = sim.getConsumer(sensorNeurons, "addInputValues");
+        Consumer ngConsumer = sim.getConsumer(sensorNeurons, "addInputs");
         Coupling gridCoupling = sim.createCoupling(gridProducer, ngConsumer);
         sensorCouplings.add(gridCoupling);
         setCouplings(oc, nc);
-
     }
 
     /**

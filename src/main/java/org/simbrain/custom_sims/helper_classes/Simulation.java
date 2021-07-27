@@ -350,7 +350,7 @@ public class Simulation {
     public void couple(SmellSensor sensor, NeuronGroup ng) {
         Producer sensoryProducer = getProducer(sensor, "getCurrentValues");
         Consumer sensoryConsumer;
-        sensoryConsumer = getConsumer(ng, "addInputValues");
+        sensoryConsumer = getConsumer(ng, "addInputs");
         createCoupling(sensoryProducer, sensoryConsumer);
     }
 

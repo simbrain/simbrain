@@ -49,6 +49,7 @@ public class SimpleOperant extends RegisteredSimulation {
         // Build a network
         networkWrapper = sim.addNetwork(195, 9, 447, 296, "Behaviors");
         behaviorNet = networkWrapper.addNeuronGroup(-9.25, 95.93, numNeurons);
+        behaviorNet.setLabel("Behaviors");
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
         behaviorNet.applyLayout();
         behaviorNet.setClamped(true);

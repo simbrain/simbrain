@@ -266,7 +266,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         // Couple agent to cheese and flower nodes
         SmellSensor smellSensor = new SmellSensor(mouse);
         mouse.addSensor(smellSensor);
-        sim.couple(smellSensor, sensorNodes);
+        // sim.couple(smellSensor, sensorNodes);
     }
 
     public EdgeOfChaos(SimbrainDesktop desktop) {

@@ -6,7 +6,6 @@ import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -17,8 +16,6 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JInternalFrame;
 
 /**
  * Playground for testing new features. A lot of stuff is commented out but
@@ -60,14 +57,14 @@ public class Braitenberg extends RegisteredSimulation {
 
         NetworkWrapper vehicle1 = sim.addNetwork(260,5,359,342, "Vehicle 1");
         Vehicle vb1 = new Vehicle(sim, vehicle1, world);
-        NeuronCollection ng1 = vb1.addPursuer(1, 1, agent1, EntityType.CIRCLE,
+        NeuronCollection ng1 = vb1.addPursuer(0, 0, agent1, EntityType.CIRCLE,
                 (ObjectSensor)agent1.getSensors().get(0),
                 (ObjectSensor) agent1.getSensors().get(1));
         ng1.setLabel("Vehicle 1");
 
         NetworkWrapper vehicle2 = sim.addNetwork(259,329,361,321, "Vehicle 2");
         Vehicle vb2 = new Vehicle(sim, vehicle2, world);
-        NeuronCollection ng2 = vb2.addPursuer(1, 1, agent2, EntityType.CIRCLE,
+        NeuronCollection ng2 = vb2.addPursuer(0, 0, agent2, EntityType.CIRCLE,
                 (ObjectSensor)agent1.getSensors().get(0),
                 (ObjectSensor)agent1.getSensors().get(1));
         ng2.setLabel("Vehicle 2");

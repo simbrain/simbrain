@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 /**
  * Create a Braitenberg pursuer with a projection plot to sensor neurons.
- * Button to run it from randomized spots to create a set a cognitive map
+ * Button to run it from randomized spots to creates a cognitive map
  * of its input space.
  */
 public class RandomizedPursuer extends RegisteredSimulation {
@@ -100,7 +100,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
                 mouse, EntityType.SWISS,
                 (ObjectSensor) mouse.getSensors().get(0),
                 (ObjectSensor)  mouse.getSensors().get(1));
-
+        vehicleNetwork.setLabel("Pursuer");
         Neuron sensor1 = net.getNeuronByLabel("Swiss (L)");
         Neuron sensor2 = net.getNeuronByLabel("Swiss (R)");
         sensorNodes = new NeuronCollection(net, Arrays.asList(sensor1, sensor2));

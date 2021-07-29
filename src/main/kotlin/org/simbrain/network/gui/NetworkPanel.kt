@@ -573,7 +573,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         event.onModelAdded {
             createNode(it)
             if (it is LocatableModel) {
-                placementManager.placeObject(it)
+                // TODO: Temp to prevent neural collections from being placed.
+                if (it !is NeuronCollection) {
+                    placementManager.placeObject(it)
+                }
             }
         }
         event.onModelRemoved {

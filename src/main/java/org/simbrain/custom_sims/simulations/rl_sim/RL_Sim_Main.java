@@ -1,7 +1,10 @@
 package org.simbrain.custom_sims.simulations.rl_sim;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.*;
+import org.simbrain.custom_sims.helper_classes.ControlPanel;
+import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.custom_sims.helper_classes.Simulation;
+import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -21,6 +24,7 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.Producible;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -103,7 +107,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
     boolean stop = false;
     boolean goalAchieved = false;
     OdorWorld world;
-    OdorWorldWrapper worldBuilder;
+    OdorWorldComponent oc;
     ProjectionComponent plot;
 
     SmellSensor leftSmell, rightSmell;
@@ -171,8 +175,8 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         setUpControlPanel();
 
         // Create the odor world builder with default vals
-        worldBuilder = sim.addOdorWorld(778,3,472,330, "Virtual World");
-        world = worldBuilder.getWorld();
+        oc = sim.addOdorWorld(778,3,472,330, "Virtual World");
+        world = oc.getWorld();
         world.setObjectsBlockMovement(false);
         //world.setWrapAround(false);
         world.setTileMap(TMXUtils.loadTileMap("empty.tmx"));
@@ -197,7 +201,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         clearWeights();
 
         // Set up the vehicle networks
-        setUpVehicleNets(net, worldBuilder);
+        setUpVehicleNets(net, oc);
 
         // Initialize arrays for concatenating left/right inputs
         combinedInputs = new double[leftInputs.size() + rightInputs.size()];
@@ -222,7 +226,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
      */
     private void initializeWorldObjects() {
 
-        mouse = worldBuilder.addEntity(43, 110, EntityType.MOUSE);
+        mouse = oc.getWorld().addEntity(43, 110, EntityType.MOUSE);
         mouse.setHeading(0);
         // Add default effectors
         mouse.addEffector(new StraightMovement(mouse));
@@ -237,11 +241,11 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         mouse.addSensor(rightSmell);
 
         // Set up smell sources
-        cheese = worldBuilder.addEntity(350, 29, EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 1});
+        cheese = oc.getWorld().addEntity(350, 29, EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 1});
         cheese.getSmellSource().setDispersion(350);
-        candle = worldBuilder.addEntity(350, 29, EntityType.CANDLE,  new double[] { 0, 1, 0, 0, 0, -1 });
+        candle = oc.getWorld().addEntity(350, 29, EntityType.CANDLE,  new double[] { 0, 1, 0, 0, 0, -1 });
         candle.getSmellSource().setDispersion(350);
-        flower = worldBuilder.addEntity(350, 212, EntityType.FLOWER, new double[] {0, 0, 1, 0, 0, 1});
+        flower = oc.getWorld().addEntity(350, 212, EntityType.FLOWER, new double[] {0, 0, 1, 0, 0, 1});
         flower.getSmellSource().setDispersion(350);
 
         // Used in Vehicle class
@@ -339,7 +343,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
     /**
      * Set up the vehicle networks
      */
-    private void setUpVehicleNets(NetworkWrapper net, OdorWorldWrapper world) {
+    private void setUpVehicleNets(NetworkWrapper net, OdorWorldComponent world) {
         // Labels for vehicles, which must be the same as the label for
         // the corresponding output node
         String strPursueCheese = "Pursue Cheese";
@@ -352,7 +356,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         // Make the vehicle networks
         // Positions determined by laying by hand and in console running
         // print(getNetwork("Neural Network"));
-        Vehicle vehicleBuilder = new Vehicle(sim, net, world);
+        Vehicle vehicleBuilder = new Vehicle(sim, net);
         NeuronCollection pursueCheese = vehicleBuilder.addPursuer(-509, -460, mouse, EntityType.SWISS, cheeseLeft,
                 cheeseRight);
         pursueCheese.setLabel(strPursueCheese);

@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
@@ -18,6 +17,7 @@ import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -154,28 +154,26 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpWorld() {
 
         // Set up odor world
-        OdorWorldWrapper world = sim.addOdorWorld(338, 10, 436, 516, "World");
-        world.getWorld().setObjectsBlockMovement(false);
-        world.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
+        OdorWorldComponent oc = sim.addOdorWorld(338, 10, 436, 516, "World");
+        oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
 
         // Mouse
-        mouse = world.addEntity(202, 176, EntityType.MOUSE);
+        mouse = oc.getWorld().addEntity(202, 176, EntityType.MOUSE);
         smellSensor = new SmellSensor(mouse, "Smell-Center", 0, 0);
         mouse.addSensor(smellSensor);
         mouse.setHeading(90);
 
         // Objects
-        OdorWorldEntity cheese = world.addEntity(55, 306, EntityType.SWISS,
+        OdorWorldEntity cheese = oc.getWorld().addEntity(55, 306, EntityType.SWISS,
             new double[] {25,0,0});
         cheese.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity flower = world.addEntity(351, 311, EntityType.FLOWER,
+        OdorWorldEntity flower = oc.getWorld().addEntity(351, 311, EntityType.FLOWER,
             new double[] {0,25,0});
         flower.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity fish = world.addEntity(160, 14, EntityType.FISH,
+        OdorWorldEntity fish = oc.getWorld().addEntity(160, 14, EntityType.FISH,
             new double[] {0,0,25});
         fish.getSmellSource().setDispersion(dispersion);
-
-
     }
 
     private void setUpProjectionPlot() {

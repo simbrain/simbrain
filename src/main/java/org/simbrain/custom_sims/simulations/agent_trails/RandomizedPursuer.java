@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations.agent_trails;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -17,6 +16,7 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateComponent;
 import org.simbrain.workspace.updater.WorkspaceUpdater;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
@@ -37,7 +37,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
     NeuronCollection vehicleNetwork;
     NeuronCollection sensorNodes, motorNodes;
 
-    OdorWorldWrapper worldBuilder;
+    OdorWorldComponent oc;
 
     int cheeseX = 200;
     int cheeseY = 250;
@@ -71,31 +71,31 @@ public class RandomizedPursuer extends RegisteredSimulation {
         // Set up custom update
         WorkspaceUpdater updater = sim.getWorkspace().getUpdater();
         updater.getUpdateManager().addAction(
-                new UpdateComponent(updater, worldBuilder.getOdorWorldComponent()),0);
+                new UpdateComponent(updater, oc),0);
 
     }
 
     private void createOdorWorld() {
 
-        worldBuilder = sim.addOdorWorldTMX(629,9,378,350, "empty.tmx");
-        worldBuilder.getWorld().setObjectsBlockMovement(false);
+        oc = sim.addOdorWorld(629,9,378,350, "World");
+        oc.getWorld().setObjectsBlockMovement(false);
 
-        mouse = worldBuilder.addEntity(0, 0, EntityType.MOUSE);
+        mouse = oc.getWorld().addEntity(0, 0, EntityType.MOUSE);
         mouse.setHeading(90);
         mouse.setLocationRelativeToCenter(0, 70);
         mouse.addLeftRightSensors(EntityType.SWISS, 200);
         mouse.addDefaultEffectors();
 
-        cheese = worldBuilder.addEntity(0,0, EntityType.SWISS, new double[]{1, 0, 0});
+        cheese = oc.getWorld().addEntity(0,0, EntityType.SWISS, new double[]{1, 0, 0});
         cheese.setLocationRelativeToCenter(0,-30);
-        worldBuilder.getWorld().update();
+        oc.getWorld().update();
 
     }
 
     private void buildNetwork() {
         networkWrapper = sim.addNetwork(195, 9, 447, 296, "Pursuer");
         Network net = networkWrapper.getNetwork();
-        Vehicle pursuer = new Vehicle(sim, networkWrapper, worldBuilder);
+        Vehicle pursuer = new Vehicle(sim, networkWrapper);
         vehicleNetwork = pursuer.addPursuer(10, 10,
                 mouse, EntityType.SWISS,
                 (ObjectSensor) mouse.getSensors().get(0),

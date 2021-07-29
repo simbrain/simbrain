@@ -3,13 +3,13 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
@@ -40,7 +40,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
     int winningNode;
 
     // World
-    OdorWorldWrapper world;
+    OdorWorldComponent oc;
     OdorWorldEntity mouse;
     OdorWorldEntity cheese, flower, fish;
 
@@ -111,15 +111,15 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 //        network.fireSynapsesUpdated(); // TODO: [event]
 
         // Create the odor world
-        world = sim.addOdorWorld(730,7,315,383, "Three Objects");
-        world.getWorld().setObjectsBlockMovement(false);
-        mouse = world.addEntity(120, 245, EntityType.MOUSE);
+        oc = sim.addOdorWorld(730,7,315,383, "Three Objects");
+        oc.getWorld().setObjectsBlockMovement(false);
+        mouse = oc.getWorld().addEntity(120, 245, EntityType.MOUSE);
         mouse.setHeading(90);
 
         // Set up world
-        cheese = world.addEntity(27, 20, EntityType.CANDLE);
-        flower = world.addEntity(79, 20, EntityType.PANSY);
-        fish = world.addEntity(125, 20, EntityType.FISH);
+        cheese = oc.getWorld().addEntity(27, 20, EntityType.CANDLE);
+        flower = oc.getWorld().addEntity(79, 20, EntityType.PANSY);
+        fish = oc.getWorld().addEntity(125, 20, EntityType.FISH);
 
 
         // Set up object sensors

@@ -43,6 +43,7 @@ public class CorticalBranching extends RegisteredSimulation {
 
     @Override
     public void run() {
+        sim.getWorkspace().clearWorkspace();
         NetworkWrapper wrapper = sim.addNetwork(100, 50, 600, 600, "Cortical Branching");
         network = wrapper.getNetwork();
         buildNetwork();

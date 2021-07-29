@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld;
 
 import org.simbrain.util.SimpleIdManager;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;
@@ -168,8 +169,30 @@ public class OdorWorld implements EditableObject {
         return entity;
     }
 
+    /**
+     * Add entity of a specified type.
+     */
     public OdorWorldEntity addEntity(EntityType type) {
         final var entity = new OdorWorldEntity(this, type);
+        addEntity(entity);
+        return entity;
+    }
+
+    /**
+     * Add entity with a stimulus value.
+     */
+    public OdorWorldEntity addEntity(int x, int y, EntityType type, double[] stimulus) {
+        OdorWorldEntity entity = addEntity(x,y,type);
+        entity.setSmellSource(new SmellSource(stimulus));
+        addEntity(entity);
+        return entity;
+    }
+
+    public OdorWorldEntity addEntity(int x, int y, EntityType type) {
+        OdorWorldEntity entity = new OdorWorldEntity(this, type);
+        entity.setLocation(x, y);
+        entity.setSmellSource(new SmellSource(6));
+        entity.setEntityType(type);
         addEntity(entity);
         return entity;
     }

@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
@@ -22,6 +21,7 @@ import org.simbrain.util.SimbrainConstants;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
@@ -184,15 +184,15 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
 
     private void setUpWorld() {
 
-        OdorWorldWrapper world = sim.addOdorWorldTMX(591, 0, 459, 300, "empty.tmx");
+        OdorWorldComponent oc = sim.addOdorWorld(591, 0, 459, 300, "World");
 
         // Mouse
-        mouse = world.addEntity(187, 113, EntityType.MOUSE);
+        mouse = oc.getWorld().addEntity(187, 113, EntityType.MOUSE);
 
         // Objects
-        OdorWorldEntity cheese = world.addEntity(315, 31, EntityType.SWISS);
+        OdorWorldEntity cheese = oc.getWorld().addEntity(315, 31, EntityType.SWISS);
         worldEntities.add(cheese);
-        OdorWorldEntity flower = world.addEntity(41, 31, EntityType.FLOWER);
+        OdorWorldEntity flower = oc.getWorld().addEntity(41, 31, EntityType.FLOWER);
         flower.getSmellSource().setDispersion(dispersion);
         worldEntities.add(flower);
 

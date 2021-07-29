@@ -2,11 +2,11 @@ package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionAdapter;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -31,7 +31,7 @@ public class CreaturesSim extends RegisteredSimulation {
      */
     private List<Creature> creatureList = new ArrayList<Creature>();
 
-    private OdorWorldWrapper world;
+    private OdorWorldComponent oc;
 
     // TODO: Make this more flexible, editable, etc.
     public OdorWorldEntity toy;
@@ -85,7 +85,7 @@ public class CreaturesSim extends RegisteredSimulation {
 
     private void setUpNPC() {
         // Create a 'non-player character' that talks randomly
-        npc = world.addEntity(350, 250, EntityType.COW);
+        npc = oc.getWorld().addEntity(350, 250, EntityType.COW);
         npc.setName("Cow");
         npc.setSmellSource(new SmellSource(new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0}));
 
@@ -109,38 +109,38 @@ public class CreaturesSim extends RegisteredSimulation {
     private void setUpWorld() {
 
         // Create odor world
-        world = sim.addOdorWorld(601, 0, 456, 597, "World");
-        world.getWorld().setObjectsBlockMovement(false);
+        oc = sim.addOdorWorld(601, 0, 456, 597, "World");
+        oc.getWorld().setObjectsBlockMovement(false);
 
         // TODO: May be able to remove smell sources below since we are new using object sensors
 
         // Create static odor world entities
-        toy = world.addEntity(395, 590, EntityType.BELL);
+        toy = oc.getWorld().addEntity(395, 590, EntityType.BELL);
         toy.setName("Bell");
         toy.setId("Toy");
         toy.setSmellSource(new SmellSource(new double[]{5, 0, 0, 0, 0, 0, 0}));
 
-        fish = world.addEntity(140, 165, EntityType.FISH);
+        fish = oc.getWorld().addEntity(140, 165, EntityType.FISH);
         fish.setName("Fish");
         fish.setId("Fish");
         fish.setSmellSource(new SmellSource(new double[]{0, 5, 0, 0, 0, 0, 0}));
 
-        cheese = world.addEntity(200, 200, EntityType.SWISS);
+        cheese = oc.getWorld().addEntity(200, 200, EntityType.SWISS);
         cheese.setName("Swiss");
         cheese.setId("Cheese");
         cheese.setSmellSource(new SmellSource(new double[]{0, 0, 5, 0, 0, 0, 0}));
 
-        poison = world.addEntity(320, 20, EntityType.POISON);
+        poison = oc.getWorld().addEntity(320, 20, EntityType.POISON);
         poison.setName("Poison");
         poison.setId("Poison");
         poison.setSmellSource(new SmellSource(new double[]{0, 0, 0, 5, 0, 0, 0}));
 
-        hazard = world.addEntity(25, 200, EntityType.CANDLE);
+        hazard = oc.getWorld().addEntity(25, 200, EntityType.CANDLE);
         hazard.setName("Candle");
         hazard.setId("Hazard");
         hazard.setSmellSource(new SmellSource(new double[]{0, 0, 0, 0, 5, 0, 0}));
 
-        flower = world.addEntity(200, 100, EntityType.PANSY);
+        flower = oc.getWorld().addEntity(200, 100, EntityType.PANSY);
         flower.setName("Pansy");
         flower.setId("Flower");
         flower.setSmellSource(new SmellSource(new double[]{0, 0, 0, 0, 0, 5, 0}));
@@ -159,7 +159,7 @@ public class CreaturesSim extends RegisteredSimulation {
 
         updateNPC();
 
-        world.getOdorWorldComponent().update();
+        oc.update();
     }
 
     /**
@@ -195,7 +195,7 @@ public class CreaturesSim extends RegisteredSimulation {
         // net.getNetworkPanel().setAutoZoomMode(false);
         // net.getNetworkPanel().zoomToFitPage(true);
 
-        OdorWorldEntity agent = world.addEntity(250, 250, EntityType.MOUSE);
+        OdorWorldEntity agent = oc.getWorld().addEntity(250, 250, EntityType.MOUSE);
         Creature creature = new Creature(this, name, net, agent);
         creatureList.add(creature);
 

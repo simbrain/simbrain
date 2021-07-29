@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations.actor_critic;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -79,7 +78,7 @@ public class ActorCritic extends RegisteredSimulation {
     boolean stop = false;
     boolean goalAchieved = false;
     OdorWorld world;
-    OdorWorldWrapper ob;
+    OdorWorldComponent oc;
     NetworkWrapper networkWrapper;
 
     /**
@@ -207,7 +206,7 @@ public class ActorCritic extends RegisteredSimulation {
                 sim.getWorkspace().getCouplingManager().updateCouplings(effectorCouplings);
 
                 // Update world
-                ob.getOdorWorldComponent().update();
+                oc.getWorld().update();
 
                 // Update world > tile neurons
                 // sensorcoupling also couples to the time series plot
@@ -227,8 +226,8 @@ public class ActorCritic extends RegisteredSimulation {
      */
     void setUpWorldAndNetwork() {
 
-        ob = sim.addOdorWorldTMX(761, 8, "actor-critic.tmx");
-        world = ob.getWorld();
+        oc = sim.addOdorWorld(761, 8, 300, 300, "actor-critic.tmx");
+        world = oc.getWorld();
         world.setObjectsBlockMovement(false);
         world.setWrapAround(false);
 
@@ -252,7 +251,6 @@ public class ActorCritic extends RegisteredSimulation {
         cheeseSensor.setDecayFunction(decayFunction);
         mouse.addSensor(cheeseSensor);
 
-        OdorWorldComponent oc = ob.getOdorWorldComponent();
         NetworkComponent nc = networkWrapper.getNetworkComponent();
 
         tileNeurons = new ArrayList<>();
@@ -262,7 +260,7 @@ public class ActorCritic extends RegisteredSimulation {
         GridSensor sensor = new GridSensor(
                 mouse,
                 0, 0,
-                ob.getWorld().getWidth() / numTiles, ob.getWorld().getHeight() / numTiles
+                oc.getWorld().getWidth() / numTiles, oc.getWorld().getHeight() / numTiles
         );
         mouse.addSensor(sensor);
 
@@ -358,7 +356,7 @@ public class ActorCritic extends RegisteredSimulation {
     private void setUpInputOutputNetwork(NetworkWrapper net) {
 
         // Outputs
-        outputs = net.addWTAGroup(-43, 7, 4);
+        outputs = net.addWTAGroup(116, -101, 4);
         outputs.setUseRandom(true);
         outputs.setRandomProb(epsilon);
         outputs.setWinValue(tileSize * movementFactor);

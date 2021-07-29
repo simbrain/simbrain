@@ -2,13 +2,13 @@ package org.simbrain.custom_sims.simulations.braitenberg;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
@@ -46,24 +46,24 @@ public class Braitenberg extends RegisteredSimulation {
         workspace.clearWorkspace();
         SimbrainDesktop desktop = sim.getDesktop();
         Simulation sim = new Simulation(desktop);
-        OdorWorldWrapper world = sim.addOdorWorld(610,3,496,646, "World");
-        world.getWorld().setObjectsBlockMovement(false);
-        OdorWorldEntity agent1 = world.addEntity(120, 245, EntityType.CIRCLE);
-        OdorWorldEntity agent2 = world.addEntity(320, 245, EntityType.CIRCLE);
+        OdorWorldComponent oc = sim.addOdorWorld(610,3,496,646, "World");
+        oc.getWorld().setObjectsBlockMovement(false);
+        OdorWorldEntity agent1 = oc.getWorld().addEntity(120, 245, EntityType.CIRCLE);
+        OdorWorldEntity agent2 = oc.getWorld().addEntity(320, 245, EntityType.CIRCLE);
         agent1.addLeftRightSensors(EntityType.CIRCLE, 270);
         agent1.addDefaultEffectors();
         agent2.addLeftRightSensors(EntityType.CIRCLE, 270);
         agent2.addDefaultEffectors();
 
         NetworkWrapper vehicle1 = sim.addNetwork(260,5,359,342, "Vehicle 1");
-        Vehicle vb1 = new Vehicle(sim, vehicle1, world);
+        Vehicle vb1 = new Vehicle(sim, vehicle1);
         NeuronCollection ng1 = vb1.addPursuer(0, 0, agent1, EntityType.CIRCLE,
                 (ObjectSensor)agent1.getSensors().get(0),
                 (ObjectSensor) agent1.getSensors().get(1));
         ng1.setLabel("Vehicle 1");
 
         NetworkWrapper vehicle2 = sim.addNetwork(259,329,361,321, "Vehicle 2");
-        Vehicle vb2 = new Vehicle(sim, vehicle2, world);
+        Vehicle vb2 = new Vehicle(sim, vehicle2);
         NeuronCollection ng2 = vb2.addPursuer(0, 0, agent2, EntityType.CIRCLE,
                 (ObjectSensor)agent1.getSensors().get(0),
                 (ObjectSensor)agent1.getSensors().get(1));

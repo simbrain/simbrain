@@ -192,7 +192,7 @@ public class NetworkWrapper {
 
         network.addNetworkModel(ng);
         ng.setLocation(x,y);
-        layoutNeuronGroup(ng, x, y, layoutName);
+        layoutNeuronGroup(ng, layoutName);
         return ng;
 
     }
@@ -220,19 +220,17 @@ public class NetworkWrapper {
      * Layout a neuron group.
      *
      * @param ng reference to the group
-     * @param x reference x location (upper left)
-     * @param y reference y location (upper left)
      * @param layoutName the type of layout to use: "line" (defaults to horizontal),
      *                   "vertical line", or "grid".  TODO: Add hex.
      */
-    private void layoutNeuronGroup(NeuronGroup ng, double x, double y, String layoutName) {
+    private void layoutNeuronGroup(NeuronGroup ng, String layoutName) {
 
         if (layoutName.toLowerCase().contains("line")) {
             if (layoutName.equalsIgnoreCase("vertical line")) {
-                LineLayout lineLayout = new LineLayout(x, y, 50, LineOrientation.VERTICAL);
+                LineLayout lineLayout = new LineLayout(50, LineOrientation.VERTICAL);
                 ng.setLayout(lineLayout);
             } else {
-                LineLayout lineLayout = new LineLayout(x, y, 50, LineOrientation.HORIZONTAL);
+                LineLayout lineLayout = new LineLayout(50, LineOrientation.HORIZONTAL);
                 ng.setLayout(lineLayout);
             }
         } else if (layoutName.equalsIgnoreCase("grid")) {
@@ -250,8 +248,8 @@ public class NetworkWrapper {
      */
     public WinnerTakeAll addWTAGroup(double x, double y, int numNeurons) {
         WinnerTakeAll wta = new WinnerTakeAll(network, numNeurons);
-        layoutNeuronGroup(wta, x, y, "line");
         network.addNetworkModel(wta);
+        layoutNeuronGroup(wta, "line");
         wta.setLocation(x, y);
         return wta;
     }

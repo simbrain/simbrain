@@ -12,9 +12,8 @@ import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.ResourceManager;
+import org.simbrain.util.SimbrainDesktopKt;
 import org.simbrain.util.Utils;
-import org.simbrain.util.piccolo.TMXUtils;
-import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -30,7 +29,6 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.util.Hashtable;
 
@@ -176,71 +174,6 @@ public class Simulation {
         workspace.addWorkspaceComponent(projectionComponent);
         desktop.getDesktopComponent(projectionComponent).getParentFrame().setBounds(x, y, width, height);
         return projectionComponent;
-    }
-
-    /**
-     * Add an odor world component.
-     */
-    public OdorWorldWrapper addOdorWorld(int x, int y, int width, int height, String name) {
-        OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name);
-        workspace.addWorkspaceComponent(odorWorldComponent);
-        if (desktop != null) {
-            desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
-            desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setPreferredSize(new Dimension(width, height));
-        }
-        odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
-        return new OdorWorldWrapper(odorWorldComponent);
-    }
-
-    /**
-     * Add an odor world component.
-     */
-    public OdorWorldWrapper addOdorWorld(int x, int y, int width, int height, String name, OdorWorld world) {
-        OdorWorldComponent odorWorldComponent = new OdorWorldComponent(name, world);
-        workspace.addWorkspaceComponent(odorWorldComponent);
-        desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setBounds(x, y, width, height);
-        odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
-        return new OdorWorldWrapper(odorWorldComponent);
-    }
-
-    /**
-     * Add an odor world component using a Tiled tmx file.
-     */
-    public OdorWorldWrapper addOdorWorldTMX(int x, int y, int width, int height, String tmxFile) {
-        OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
-        workspace.addWorkspaceComponent(odorWorldComponent);
-
-        TileMap tileMap = TMXUtils.loadTileMap(tmxFile);
-
-        // The following operation will clear the content of all layers, so do it only if the tmx is empty.tmx
-        if (tmxFile.equals("empty.tmx")) {
-            tileMap.updateMapSize(width / tileMap.getTileWidth(), height / tileMap.getTileHeight());
-        }
-
-        odorWorldComponent.getWorld().setTileMap(tileMap);
-
-        return createOdorWorldWrapper(x, y, odorWorldComponent);
-    }
-
-    /**
-     * Add an odor world component using a Tiled tmx file.
-     */
-    public OdorWorldWrapper addOdorWorldTMX(int x, int y, String tmxFile) {
-        OdorWorldComponent odorWorldComponent = new OdorWorldComponent(tmxFile);
-        workspace.addWorkspaceComponent(odorWorldComponent);
-        odorWorldComponent.getWorld().setTileMap(TMXUtils.loadTileMap(tmxFile));
-        return createOdorWorldWrapper(x, y, odorWorldComponent);
-    }
-
-    private OdorWorldWrapper createOdorWorldWrapper(int x, int y, OdorWorldComponent odorWorldComponent) {
-        odorMap.put(odorWorldComponent.getWorld(), odorWorldComponent);
-        if(desktop != null) {
-            desktop.getDesktopComponent(odorWorldComponent).setBounds(x, y,
-                    odorWorldComponent.getWorld().getWidth(), odorWorldComponent.getWorld().getHeight());
-            desktop.getDesktopComponent(odorWorldComponent).getParentFrame().setLocation(x, y);
-        }
-
-        return new OdorWorldWrapper(odorWorldComponent);
     }
 
     /**
@@ -409,6 +342,13 @@ public class Simulation {
      */
     public Workspace getWorkspace() {
         return workspace;
+    }
+
+    public OdorWorldComponent addOdorWorld(int x, int y, int width, int height, String name) {
+        OdorWorldComponent oc = new OdorWorldComponent(name);
+        workspace.addWorkspaceComponent(oc);
+        SimbrainDesktopKt.place(desktop, oc, x, y, width, height);
+        return oc;
     }
 
 }

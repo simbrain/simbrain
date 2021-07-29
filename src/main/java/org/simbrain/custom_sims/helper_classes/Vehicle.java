@@ -27,11 +27,6 @@ public class Vehicle {
     private final NetworkWrapper net;
 
     /**
-     * The world with agents and sensors to attach to the vehicle.
-     */
-    private final OdorWorldWrapper world;
-
-    /**
      * Size of sensor-motor weights. Determines how "sharply" agents turn.
      */
     private int weightSize = 250;
@@ -60,12 +55,10 @@ public class Vehicle {
      *
      * @param sim   the parent simulation object
      * @param net   the network to add the vehicle subnetworks to
-     * @param world the world to link the vehicles to
      */
-    public Vehicle(Simulation sim, NetworkWrapper net, OdorWorldWrapper world) {
+    public Vehicle(Simulation sim, NetworkWrapper net) {
         this.sim = sim;
         this.net = net;
-        this.world = world;
     }
 
     /**
@@ -80,7 +73,6 @@ public class Vehicle {
      */
     public NeuronCollection addVehicle(int x, int y, OdorWorldEntity agent, VehicleType vehicleType, EntityType objectType,
                                   ObjectSensor leftSensor, ObjectSensor rightSensor) {
-
 
         List<Neuron> neurons = new ArrayList<>();
 

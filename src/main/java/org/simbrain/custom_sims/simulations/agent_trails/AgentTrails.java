@@ -3,11 +3,11 @@ package org.simbrain.custom_sims.simulations.agent_trails;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -33,7 +33,7 @@ public class AgentTrails extends RegisteredSimulation {
     Path csvFile;
     List<String> activationList = new ArrayList<String>();
     ProjectionComponent plot;
-    OdorWorldWrapper worldBuilder;
+    OdorWorldComponent oc;
 
     // Default values for these used by buttons
     int dispersion = 100;
@@ -120,10 +120,10 @@ public class AgentTrails extends RegisteredSimulation {
 
     private void createOdorWorld() {
 
-        worldBuilder = sim.addOdorWorldTMX(629, 9, "empty.tmx");
-        worldBuilder.getWorld().setObjectsBlockMovement(false);
+        oc = sim.addOdorWorld(629, 9, 441, 508, "World");
+        oc.getWorld().setObjectsBlockMovement(false);
 
-        mouse = worldBuilder.addEntity(204, 343, EntityType.MOUSE);
+        mouse = oc.getWorld().addEntity(204, 343, EntityType.MOUSE);
         mouse.setHeading(90);
         mouse.addDefaultSensorsEffectors();
         SmellSensor smellSensor = new SmellSensor(mouse);
@@ -131,13 +131,13 @@ public class AgentTrails extends RegisteredSimulation {
         mouse.setManualStraightMovementIncrement(2);
         mouse.setManualMotionTurnIncrement(2);
 
-        cheese = worldBuilder.addEntity(cheeseX, cheeseY, EntityType.SWISS, new double[]{1, 0, 0});
+        cheese = oc.getWorld().addEntity(cheeseX, cheeseY, EntityType.SWISS, new double[]{1, 0, 0});
         cheese.getSmellSource().setDispersion(dispersion);
-        flower = worldBuilder.addEntity(flowerX, flowerY, EntityType.FLOWER, new double[]{0, 1, 0});
+        flower = oc.getWorld().addEntity(flowerX, flowerY, EntityType.FLOWER, new double[]{0, 1, 0});
         flower.getSmellSource().setDispersion(dispersion);
-        fish = worldBuilder.addEntity(fishX, fishY, EntityType.FISH, new double[]{0, 0, 1});
+        fish = oc.getWorld().addEntity(fishX, fishY, EntityType.FISH, new double[]{0, 0, 1});
         fish.getSmellSource().setDispersion(dispersion);
-        worldBuilder.getWorld().update();
+        oc.getWorld().update();
 
         // Couple network to agent
         // TODO: Labelling has changed; fix below

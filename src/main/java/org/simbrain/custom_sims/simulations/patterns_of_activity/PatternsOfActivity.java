@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
@@ -27,6 +26,7 @@ import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
@@ -135,30 +135,30 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
     private OdorWorldEntity buildWorld() {
         // Set up odor world
-        OdorWorldWrapper world = sim.addOdorWorld(547, 5, 504, 548, "World");
-        world.getWorld().setObjectsBlockMovement(false);
-        world.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
-        OdorWorldEntity mouse = world.addEntity(120, 245, EntityType.MOUSE);
+        OdorWorldComponent oc = sim.addOdorWorld(547, 5, 504, 548, "World");
+        oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
+        OdorWorldEntity mouse = oc.getWorld().addEntity(120, 245, EntityType.MOUSE);
         mouse.setUpdateHeadingBasedOnVelocity(true);
         mouse.addSensor(new SmellSensor(mouse, "Smell-Right", Math.PI/5, 40));
         mouse.addSensor(new SmellSensor(mouse, "Smell-Left", -Math.PI/5, 40));
         mouse.setHeading(90);
-        OdorWorldEntity cheese = world.addEntity(72, 220, EntityType.SWISS,
+        OdorWorldEntity cheese = oc.getWorld().addEntity(72, 220, EntityType.SWISS,
             new double[] {18, 0, 5, 10, 5});
         cheese.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity flower = world.addEntity(190, 221, EntityType.FLOWER,
+        OdorWorldEntity flower = oc.getWorld().addEntity(190, 221, EntityType.FLOWER,
             new double[] {3, 18, 2, 5, 10});
         flower.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity cow = world.addEntity(90, 50, EntityType.COW,
+        OdorWorldEntity cow = oc.getWorld().addEntity(90, 50, EntityType.COW,
             new double[] {3, 7, 16, 19, 0});
         cow.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity lion = world.addEntity(300, 54, EntityType.LION,
+        OdorWorldEntity lion = oc.getWorld().addEntity(300, 54, EntityType.LION,
             new double[] {5, 2, 13, 16, 0});
         lion.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity susi = world.addEntity(97, 331, EntityType.SUSI,
+        OdorWorldEntity susi = oc.getWorld().addEntity(97, 331, EntityType.SUSI,
             new double[] {0, 12, 15, 20});
         susi.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity steve = world.addEntity(315, 305, EntityType.STEVE,
+        OdorWorldEntity steve = oc.getWorld().addEntity(315, 305, EntityType.STEVE,
             new double[] {12, 0, 20, 15});
         steve.getSmellSource().setDispersion(dispersion);
         return mouse;

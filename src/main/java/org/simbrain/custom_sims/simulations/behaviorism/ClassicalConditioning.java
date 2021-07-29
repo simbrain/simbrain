@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
-import org.simbrain.custom_sims.helper_classes.OdorWorldWrapper;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
@@ -12,6 +11,7 @@ import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
@@ -33,7 +33,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
     ControlPanel panel;
 
     // World stuff
-    OdorWorldWrapper world;
+    OdorWorldComponent oc;
     OdorWorldEntity mouse;
     OdorWorldEntity cheese, bell;
 
@@ -92,14 +92,14 @@ public class ClassicalConditioning extends RegisteredSimulation {
         networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
 
         // Create the odor world
-        world = sim.addOdorWorld(340,13,377,442, "Environment");
-        world.getWorld().setObjectsBlockMovement(false);
-        mouse = world.addEntity(125, 211, EntityType.MOUSE);
+        oc = sim.addOdorWorld(340,13,377,442, "Environment");
+        oc.getWorld().setObjectsBlockMovement(false);
+        mouse = oc.getWorld().addEntity(125, 211, EntityType.MOUSE);
         mouse.setHeading(90);
 
         // Set up world
-        cheese = world.addEntity(13, 67, EntityType.SWISS);
-        bell = world.addEntity(234, 67, EntityType.BELL);
+        cheese = oc.getWorld().addEntity(13, 67, EntityType.SWISS);
+        bell = oc.getWorld().addEntity(234, 67, EntityType.BELL);
 
         // Set up object sensors
         ObjectSensor swissSensor = mouse.addObjectSensor(EntityType.SWISS, 50, 0, 65);

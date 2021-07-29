@@ -70,7 +70,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
     }
 
     fun AttributeContainer.getProducer(methodName: String): Producer {
-        return javaClass.findMethod(methodName)?.let { method ->
+        return javaClass.findProducibleMethod(methodName)?.let { method ->
             getProducer(method)
         } ?: throw NoSuchMethodException(
                 "No producible method with name $methodName was found in class ${this@CouplingCache.javaClass.simpleName}."
@@ -94,7 +94,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
     }(this)
 
     fun AttributeContainer.getConsumer(methodName: String): Consumer {
-        return javaClass.findMethod(methodName)?.let { method ->
+        return javaClass.findConsumableMethod(methodName)?.let { method ->
             this.getConsumer(method)
         } ?: throw NoSuchMethodException(
                 "No consumable method with name $methodName was found in class ${this@CouplingCache.javaClass.simpleName}."
@@ -210,5 +210,11 @@ class CouplingCache(val couplingManager: CouplingManager) {
     }
 
     private fun Class<AttributeContainer>.findMethod(name: String): Method? = methods.find { it.name == name }
+
+    private fun Class<AttributeContainer>.findConsumableMethod(name: String): Method? = methods.filter { it
+        .isAnnotationPresent(Consumable::class.java) }.first{it.name == name}
+
+    private fun Class<AttributeContainer>.findProducibleMethod(name: String): Method? = methods.filter { it
+        .isAnnotationPresent(Producible::class.java) }.first{it.name == name}
 
 }

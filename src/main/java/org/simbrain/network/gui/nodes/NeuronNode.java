@@ -423,6 +423,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             PBounds bounds = mainShape.getBounds();
             bounds.add(labelText.localToParent(labelText.getBounds()));
             setBounds(bounds);
+
+            // Forces graphical updates in related graphical elements, which is sometimes required for parent nodes
+            // to be sized correctly given the new size of the text.
+            neuron.getEvents().fireLocationChange();
         }
     }
 

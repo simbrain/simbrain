@@ -17,6 +17,7 @@
  */
 package org.simbrain.network.groups;
 
+import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -42,8 +43,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.simbrain.network.LocatableModelKt.getTopLeftLocation;
 
 /**
  * A group of neurons using a common {@link NeuronUpdateRule}. After creation the update rule may be changed but
@@ -298,18 +297,25 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * Apply this group's layout to its neurons.
      */
     public void applyLayout() {
-        layout.setInitialLocation(getTopLeftLocation(getNeuronList()));
+        layout.setInitialLocation(getTopLeftLocation());
         layout.layoutNeurons(getNeuronList());
     }
 
     /**
-     * Apply this group's layout to its neurons based on a specified initial position.
+     * Apply this group's layout to its neurons based on a specified top-left initial position.
      *
      * @param initialPosition the position from which to begin the layout.
      */
     public void applyLayout(Point2D initialPosition) {
         layout.setInitialLocation(initialPosition);
         layout.layoutNeurons(getNeuronList());
+    }
+
+    /**
+     * Forwards to {@link #applyLayout(Point2D)}
+     */
+    public void applyLayout(int x, int y) {
+        applyLayout(new Point2D.Double(x,y));
     }
 
     public HashSet<SynapseGroup> getIncomingSgs() {
@@ -505,5 +511,9 @@ public class NeuronGroup extends AbstractNeuronCollection {
         // when Network.readResolve is called
         getNeuronList().forEach(Neuron::postUnmarshallingInit);
         getNeuronList().forEach(this::addListener);
+    }
+
+    public Point2D.Double getTopLeftLocation() {
+        return LocatableModelKt.getTopLeftLocation(neuronList);
     }
 }

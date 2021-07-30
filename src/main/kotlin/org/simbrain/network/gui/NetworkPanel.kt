@@ -573,7 +573,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         event.onModelAdded {
             createNode(it)
             if (it is LocatableModel) {
-                // TODO: Temp to prevent neural collections from being placed.
+                // Prevents neuron collections from being placed. NeuronCollections are simply wrappers around
+                // neurons and should not be placed, but it should be possible to move them programmatically.
+                // TODO: Find a cleaner way to do this.
                 if (it !is NeuronCollection) {
                     placementManager.placeObject(it)
                 }

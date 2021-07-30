@@ -356,13 +356,14 @@ public class ActorCritic extends RegisteredSimulation {
     private void setUpInputOutputNetwork(NetworkWrapper net) {
 
         // Outputs
-        outputs = net.addWTAGroup(116, -101, 4);
+        outputs = new WinnerTakeAll(network, 4);
+        network.addNetworkModel(outputs);
         outputs.setUseRandom(true);
         outputs.setRandomProb(epsilon);
         outputs.setWinValue(tileSize * movementFactor);
         // Add a little extra spacing between neurons to accommodate labels
         outputs.setLayout(new LineLayout(80, LineLayout.LineOrientation.HORIZONTAL));
-        outputs.applyLayout();
+        outputs.applyLayout(-5,-85);
         outputs.setLabel("Outputs");
     }
 

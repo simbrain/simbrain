@@ -258,7 +258,9 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         @Override
         public String getToolTipText() {
             return "NeuronGroup: " + neuronGroup.getId()
-                    + " Location: (" + Utils.round(neuronGroup.getLocation().getX(), 2) + ","
+                    + " Top-Left: (" + Utils.round(neuronGroup.getTopLeftLocation().x, 2) + ","
+                    + Utils.round(neuronGroup.getTopLeftLocation().y, 2) + ")"
+                    + " Center: (" + Utils.round(neuronGroup.getLocation().getX(), 2) + ","
                     + Utils.round(neuronGroup.getLocation().getY(), 2) + ")";
         }
     }

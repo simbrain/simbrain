@@ -284,7 +284,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         return retArray;
     }
 
-
     public Layout getLayout() {
         return layout;
     }
@@ -316,6 +315,14 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public void applyLayout(int x, int y) {
         applyLayout(new Point2D.Double(x,y));
+    }
+
+    /**
+     * Sets a new layout and applies it, using the groups' current location.
+     */
+    public void applyLayout(Layout newLayout) {
+        layout = newLayout;
+        applyLayout(getLocation());
     }
 
     public HashSet<SynapseGroup> getIncomingSgs() {

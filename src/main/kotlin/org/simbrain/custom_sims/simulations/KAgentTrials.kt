@@ -5,6 +5,7 @@ import org.simbrain.network.core.activations
 import org.simbrain.network.core.auxValues
 import org.simbrain.network.core.labels
 import org.simbrain.network.core.networkUpdateAction
+import org.simbrain.network.layouts.LineLayout
 import org.simbrain.util.component1
 import org.simbrain.util.component2
 import org.simbrain.util.environment.SmellSource
@@ -41,17 +42,20 @@ val kAgentTrails = newSim {
     val sensoryNet = network.addNeuronGroup(3, point(-9.25, 95.93)).apply {
         label = "Sensory"
         neuronList.labels = listOf("Cheese", "Flower", "Fish")
+        applyLayout(LineLayout())
     }
 
     val actionNet = network.addNeuronGroup(3, point(0.0, -0.79)).apply {
         label = "Actions"
         setClamped(true)
         neuronList.labels = listOf("Straight", "Right", "Left")
+        applyLayout(LineLayout())
     }
     val (straightNeuron, rightNeuron, leftNeuron) = actionNet.neuronList
 
     val predictionNet = network.addNeuronGroup(3, point(231.02, 24.74)).apply {
         label = "Predicted"
+        applyLayout(LineLayout())
     }
 
     with(network) {

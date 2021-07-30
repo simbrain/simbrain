@@ -37,10 +37,8 @@ class SimulationScope private constructor(
     fun withGui(block: SimbrainDesktop.() -> Unit) {
         desktop?.run(block)
     }
-
 }
 
-// TODO: Rename to Simulation after Simulation.java is removed
 class NewSimulation(val task: SimulationScope.() -> Unit) {
     fun run(desktop: SimbrainDesktop? = null) {
         SimulationScope(desktop).apply(task)

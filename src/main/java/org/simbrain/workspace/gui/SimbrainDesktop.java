@@ -574,7 +574,7 @@ public class SimbrainDesktop {
         scriptMenu.addSeparator();
         RegisteredSimulationsKt.getSimulations().addToMenu(scriptMenu, newSimulation -> {
             if (newSimulation instanceof NewSimulation) {
-                ((NewSimulation)newSimulation).run(this);
+                ((NewSimulation) newSimulation).run(this);
             } else if (newSimulation instanceof RegisteredSimulation) {
                 ((RegisteredSimulation)newSimulation).instantiate(this).run();
             }

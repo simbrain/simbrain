@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.agent_trails;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class AgentTrails extends RegisteredSimulation {
 
-    NetworkWrapper networkWrapper;
+    NetworkComponent nc;
     OdorWorldEntity mouse;
     OdorWorldEntity cheese, flower, fish;
     ControlPanel panel;
@@ -81,8 +81,8 @@ public class AgentTrails extends RegisteredSimulation {
 
 
     private void buildNetwork() {
-        networkWrapper = sim.addNetwork(195, 9, 447, 296, "Simple Predicter");
-        sensoryNet = networkWrapper.addNeuronGroup(-9.25, 95.93, 3);
+        nc = sim.addNetwork(195, 9, 447, 296, "Simple Predicter");
+        sensoryNet = nc.getNetwork().addNeuronGroup(-9.25, 95.93, 3);
         //sensoryNet.setClamped(true);
         sensoryNet.setLabel("Sensory");
         cheeseNeuron = sensoryNet.getNeuronList().get(0);
@@ -92,7 +92,7 @@ public class AgentTrails extends RegisteredSimulation {
         fishNeuron = sensoryNet.getNeuronList().get(2);
         fishNeuron.setLabel("Fish");
 
-        actionNet = networkWrapper.addNeuronGroup(0, -0.79, 3);
+        actionNet = nc.getNetwork().addNeuronGroup(0, -0.79, 3);
         actionNet.setLabel("Actions");
         actionNet.setClamped(true);
         actionNet.setLabel("Actions");
@@ -104,17 +104,17 @@ public class AgentTrails extends RegisteredSimulation {
         leftNeuron = actionNet.getNeuronList().get(0);
         leftNeuron.setLabel("Left");
 
-        predictionNet = networkWrapper.addNeuronGroup(231.02, 24.74, 3);
+        predictionNet = nc.getNetwork().addNeuronGroup(231.02, 24.74, 3);
         predictionNet.setLabel("Predicted");
 
-        networkWrapper.connectAllToAll(sensoryNet, predictionNet);
-        networkWrapper.connectAllToAll(actionNet, predictionNet);
+        nc.getNetwork().connectAllToAll(sensoryNet, predictionNet);
+        nc.getNetwork().connectAllToAll(actionNet, predictionNet);
 
-        errorNeuron = networkWrapper.addNeuron(268, 108);
+        errorNeuron = nc.getNetwork().addNeuron(268, 108);
         //errorNeuron.setClamped(true);
         errorNeuron.setLabel("Error");
 
-        networkWrapper.getNetwork().addUpdateAction(new TrainPredictionNet(this));
+        nc.getNetwork().addUpdateAction(new TrainPredictionNet(this));
 
     }
 
@@ -172,7 +172,7 @@ public class AgentTrails extends RegisteredSimulation {
         // TODO: Finish fine-tuning all these values so that appropriate "trails" are created
         // Move past cheese
         panel.addButton("Cheese", () -> {
-            networkWrapper.getNetwork().clearActivations();
+            nc.getNetwork().clearActivations();
             mouse.setLocation(cheeseX, cheeseY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
@@ -182,7 +182,7 @@ public class AgentTrails extends RegisteredSimulation {
 
         // Move past Fish
         panel.addButton("Fish", () -> {
-            networkWrapper.getNetwork().clearActivations();
+            nc.getNetwork().clearActivations();
             mouse.setLocation(fishX, fishY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
@@ -193,7 +193,7 @@ public class AgentTrails extends RegisteredSimulation {
 
         // Move past flower
         panel.addButton("Flower", () -> {
-            networkWrapper.getNetwork().clearActivations();
+            nc.getNetwork().clearActivations();
             mouse.setLocation(flowerX, flowerY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
@@ -204,7 +204,7 @@ public class AgentTrails extends RegisteredSimulation {
 
         // Cheese > Fish
         panel.addButton("Cheese > Flower", () -> {
-            networkWrapper.getNetwork().clearActivations();
+            nc.getNetwork().clearActivations();
             mouse.setLocation(cheeseX, cheeseY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
@@ -219,7 +219,7 @@ public class AgentTrails extends RegisteredSimulation {
 
         // Cheese > Flower
         panel.addButton("Cheese > Fish", () -> {
-            networkWrapper.getNetwork().clearActivations();
+            nc.getNetwork().clearActivations();
             mouse.setLocation(cheeseX, cheeseY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(1);
@@ -233,7 +233,7 @@ public class AgentTrails extends RegisteredSimulation {
         });
 
         panel.addButton("Solar System", () -> {
-            networkWrapper.getNetwork().clearActivations();
+            nc.getNetwork().clearActivations();
             cheese.setVelocityX(2.05f);
             cheese.setVelocityY(2.05f);
             flower.setVelocityX(2.5f);

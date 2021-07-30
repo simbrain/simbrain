@@ -56,7 +56,7 @@ public class CheeseFlower extends RL_Sim {
 
         // TODO: May have to disable RL_Update training action for this to work properly
 
-        sim.network.clearActivations();
+        sim.net.clearActivations();
 
         // Get mouse in position
         sim.mouse.setCenterLocation((float) (objectToPass.getCenterX() - 100), (float) objectToPass.getCenterY());

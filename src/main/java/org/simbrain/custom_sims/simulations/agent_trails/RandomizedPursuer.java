@@ -2,8 +2,8 @@ package org.simbrain.custom_sims.simulations.agent_trails;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
@@ -30,7 +30,7 @@ import java.util.Arrays;
  */
 public class RandomizedPursuer extends RegisteredSimulation {
 
-    NetworkWrapper networkWrapper;
+    NetworkComponent nc;
     OdorWorldEntity mouse;
     OdorWorldEntity cheese, flower, fish;
     ControlPanel panel;
@@ -93,9 +93,9 @@ public class RandomizedPursuer extends RegisteredSimulation {
     }
 
     private void buildNetwork() {
-        networkWrapper = sim.addNetwork(195, 9, 447, 296, "Pursuer");
-        Network net = networkWrapper.getNetwork();
-        Vehicle pursuer = new Vehicle(sim, networkWrapper);
+        nc = sim.addNetwork(195, 9, 447, 296, "Pursuer");
+        Network net = nc.getNetwork();
+        Vehicle pursuer = new Vehicle(sim, net);
         vehicleNetwork = pursuer.addPursuer(10, 10,
                 mouse, EntityType.SWISS,
                 (ObjectSensor) mouse.getSensors().get(0),

@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
@@ -37,7 +37,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
     private double u_bar = .5; // I want to try defaulting to 1 so "bits" are obvious
 
     // References
-    Network network;
+    Network net;
     SynapseGroup sgRes1, sgRes2;
     NeuronGroup res1, res2, bitStream1, bitStream2;
 
@@ -48,8 +48,8 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkWrapper net = sim.addNetwork(170, 10, 450, 450, "Edge of Chaos");
-        network = net.getNetwork();
+        NetworkComponent nc = sim.addNetwork(170, 10, 450, 450, "Edge of Chaos");
+        net = nc.getNetwork();
         buildNetwork();
 
         // Set up the time series and a custom action
@@ -92,21 +92,21 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
     }
 
     void buildNetwork() {
-        network.setTimeStep(0.5);
+        net.setTimeStep(0.5);
 
         // Make reservoirs
-        res1 = EdgeOfChaos.createReservoir(network, 10, 10, NUM_NEURONS);
+        res1 = EdgeOfChaos.createReservoir(net, 10, 10, NUM_NEURONS);
         res1.setLabel("Reservoir 1");
-        res2 = EdgeOfChaos.createReservoir(network, (int) res1.getMaxX() + 100, 10, NUM_NEURONS);
+        res2 = EdgeOfChaos.createReservoir(net, (int) res1.getMaxX() + 100, 10, NUM_NEURONS);
         res2.setLabel("Reservoir 2");
 
         // Connect reservoirs
-        sgRes1 = EdgeOfChaos.connectReservoir(network, res1, variance, 4);
+        sgRes1 = EdgeOfChaos.connectReservoir(net, res1, variance, 4);
         sgRes2 = SynapseGroup.createSynapseGroup(res2, res2);
         SimnetUtils.copySynapses(sgRes2, sgRes1);
         sgRes2.setLabel("Recurrent Synapses");
 
-        network.addNetworkModel(sgRes2);
+        net.addNetworkModel(sgRes2);
 
         // Set up "bit-stream" inputs
         bitStream1 = buildBitStream(res1);
@@ -126,14 +126,14 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
     private NeuronGroup buildBitStream(NeuronGroup reservoir) {
         // Offset in pixels of input nodes to right of reservoir
         int offset = 200;
-        NeuronGroup bitStreamInputs = new NeuronGroup(network, 1);
+        NeuronGroup bitStreamInputs = new NeuronGroup(net, 1);
         bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
         BinaryRule b = new BinaryRule(0, u_bar, .5);
         bitStreamInputs.setNeuronType(b);
         bitStreamInputs.setClamped(true);
         bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
         bitStreamInputs.setInputMode(true);
-        network.addNetworkModel(bitStreamInputs);
+        net.addNetworkModel(bitStreamInputs);
         return bitStreamInputs;
     }
 

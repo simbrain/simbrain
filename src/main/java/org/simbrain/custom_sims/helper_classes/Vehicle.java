@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.helper_classes;
 
+import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -24,7 +25,7 @@ public class Vehicle {
     /**
      * Reference to the network to put the vehicle in.
      */
-    private final NetworkWrapper net;
+    private final Network net;
 
     /**
      * Size of sensor-motor weights. Determines how "sharply" agents turn.
@@ -56,7 +57,7 @@ public class Vehicle {
      * @param sim   the parent simulation object
      * @param net   the network to add the vehicle subnetworks to
      */
-    public Vehicle(Simulation sim, NetworkWrapper net) {
+    public Vehicle(Simulation sim, Network net) {
         this.sim = sim;
         this.net = net;
     }
@@ -102,13 +103,13 @@ public class Vehicle {
         rightTurn.setLabel("Right");
         neurons.add(rightTurn);
 
-        NeuronCollection vehicle = new NeuronCollection(net.getNetwork(), neurons);
+        NeuronCollection vehicle = new NeuronCollection(net, neurons);
         setNodeDefaults(leftInput);
         setNodeDefaults(rightInput);
         setNodeDefaults(straight);
         setNodeDefaults(rightTurn);
         setNodeDefaults(leftTurn);
-        net.getNetwork().addNetworkModel(vehicle);
+        net.addNetworkModel(vehicle);
 
         // Set weights here
         if (vehicleType == VehicleType.PURSUER) {

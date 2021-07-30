@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
@@ -28,8 +28,8 @@ import java.util.Map;
 public class OperantWithEnvironment extends RegisteredSimulation {
 
     // Network
-    NetworkDesktopWrapper networkWrapper;
-    Network network;
+    NetworkComponent nc;
+    Network net;
     ControlPanel panel;
     NeuronGroup behaviorNet;
     NeuronGroup stimulusNet;
@@ -57,17 +57,17 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        networkWrapper = (NetworkDesktopWrapper) sim.addNetwork(155,9,575,500, "Brain");
-        network = networkWrapper.getNetwork();
+        nc = sim.addNetwork(155,9,575,500, "Brain");
+        net = nc.getNetwork();
 
         // Behavioral nodes
-        behaviorNet = networkWrapper.addNeuronGroup(-9.25, 95.93, numNeurons);
+        behaviorNet = net.addNeuronGroup(-9.25, 95.93, numNeurons);
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
         behaviorNet.applyLayout();
         behaviorNet.setLabel("Behaviors");
 
         // Stimulus nodes
-        stimulusNet = networkWrapper.addNeuronGroup(-9.25, 295.93, numNeurons);
+        stimulusNet = net.addNeuronGroup(-9.25, 295.93, numNeurons);
         ((LineLayout) stimulusNet.getLayout()).setSpacing(100);
         stimulusNet.applyLayout();
         stimulusNet.setClamped(true);
@@ -75,10 +75,10 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         stimulusNet.setIncrement(1);
 
         // Reward and punish nodes
-        rewardNeuron = networkWrapper.addNeuron((int)stimulusNet.getMaxX() + 100,
+        rewardNeuron = net.addNeuron((int)stimulusNet.getMaxX() + 100,
             (int) stimulusNet.getCenterY());
         rewardNeuron.setLabel("Food Pellet");
-        punishNeuron = networkWrapper.addNeuron((int) rewardNeuron.getX() + 100,
+        punishNeuron = net.addNeuron((int) rewardNeuron.getX() + 100,
             (int) stimulusNet.getCenterY());
         punishNeuron.setLabel("Shock");
 
@@ -101,10 +101,11 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         updateNodeLabels();
 
         // Clear selection
-        networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
+        // TODO
+        // networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
 
         // Connect the layers together
-        List<Synapse> syns = networkWrapper.connectAllToAll(stimulusNet, behaviorNet);
+        List<Synapse> syns = net.connectAllToAll(stimulusNet, behaviorNet);
         for(Synapse s : syns) {
             s.setStrength(0);
         }
@@ -133,8 +134,8 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         sim.couple(fishSensor,stimulusNet.getNeuron(2));
 
         // Add custom network update action
-        network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(new NetworkUpdateAction() {
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(new NetworkUpdateAction() {
 
             @Override
             public void invoke() {
@@ -210,7 +211,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
             setWinningNode(2);
         }
 
-        network.bufferedUpdate();
+        net.bufferedUpdate();
 
     }
 

@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -29,9 +28,9 @@ public class CreaturesBrain {
     private List<NeuronGroup> lobes = new ArrayList();
 
     /**
-     * Reference to the NetworkWrapper object this wraps around.
+     * Reference to the NetworkComponent object this wraps around.
      */
-    private NetworkWrapper netWrapper;
+    private NetworkComponent nc;
 
     /**
      * Reference to network component.
@@ -46,18 +45,17 @@ public class CreaturesBrain {
     /**
      * Constructor.
      *
-     * @param NetworkWrapper
+     * @param NetworkComponent
      */
-    public CreaturesBrain(NetworkWrapper NetworkWrapper, CreaturesSim parentSim) {
-        this.netWrapper = NetworkWrapper;
-        this.netComponent = NetworkWrapper.getNetworkComponent();
+    public CreaturesBrain(NetworkComponent NetworkComponent, CreaturesSim parentSim) {
+        this.nc = NetworkComponent;
         this.parentSim = parentSim;
     }
 
     // Helper methods
 
     public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName, CreaturesNeuronRule neuronRule) {
-        NeuronGroup lobe = netWrapper.addNeuronGroup(x, y, numNeurons, layoutName, neuronRule);
+        NeuronGroup lobe = nc.getNetwork().addNeuronGroup(x, y, numNeurons, layoutName, neuronRule);
         lobe.setLabel(lobeName);
         lobes.add(lobe);
         return lobe;
@@ -68,7 +66,7 @@ public class CreaturesBrain {
     }
 
     public WinnerTakeAll createWTALobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
-        WinnerTakeAll lobe = netWrapper.addWTAGroup(x, y, numNeurons);
+        WinnerTakeAll lobe = new WinnerTakeAll(getNetwork(), numNeurons);
         lobe.setLabel(lobeName);
         lobe.setNeuronType(new CreaturesNeuronRule());
         // TODO: Either make the below method public, or copy & paste it to this
@@ -152,7 +150,7 @@ public class CreaturesBrain {
         // generate a customized ConnectNeurons object to use.
 
         // Temporary method call
-        SynapseGroup synapseGroup = netWrapper.addSynapseGroup(sourceLobe, targetLobe);
+        SynapseGroup synapseGroup = nc.getNetwork().addSynapseGroup(sourceLobe, targetLobe);
 
         synapseGroup.setLabel(groupName);
 
@@ -286,7 +284,7 @@ public class CreaturesBrain {
 
             // Connect
             for (Neuron n : l.getNeuronList()) {
-                netWrapper.connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
+                nc.getNetwork().connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
             }
 
             // Increment pointer for the next loop
@@ -299,15 +297,11 @@ public class CreaturesBrain {
     // Accessor methods below this point
 
     public Network getNetwork() {
-        return netWrapper.getNetwork();
+        return nc.getNetwork();
     }
 
     public List<NeuronGroup> getLobeList() {
         return lobes;
-    }
-
-    public NetworkWrapper getNetworkWrapper() {
-        return netWrapper;
     }
 
     /**

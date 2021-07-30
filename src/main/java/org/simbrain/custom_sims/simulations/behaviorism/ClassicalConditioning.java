@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
@@ -28,8 +28,8 @@ public class ClassicalConditioning extends RegisteredSimulation {
     // TODO: Factor common methods out to a utility class in this directory
 
     // Network stuff
-    NetworkDesktopWrapper networkWrapper;
-    Network network;
+    NetworkComponent nc;
+    Network net;
     ControlPanel panel;
 
     // World stuff
@@ -53,43 +53,42 @@ public class ClassicalConditioning extends RegisteredSimulation {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        networkWrapper = (NetworkDesktopWrapper)
-                sim.addNetwork(0,14,350,444, "Agent Brain (Black Box)");
-        network = networkWrapper.getNetwork();
+        nc = sim.addNetwork(0,14,350,444, "Agent Brain (Black Box)");
+        net = nc.getNetwork();
 
         // Construct the network
-        Neuron bellDetectorNeuron = new Neuron(network);
+        Neuron bellDetectorNeuron = new Neuron(net);
         bellDetectorNeuron.setLabel("Bell Detector");
         bellDetectorNeuron.setClamped(true);
-        network.addNetworkModel(bellDetectorNeuron);
+        net.addNetworkModel(bellDetectorNeuron);
         bellDetectorNeuron.setLocation(295, 194);
 
-        Neuron cheeseDetectorNeuron = new Neuron(network);
+        Neuron cheeseDetectorNeuron = new Neuron(net);
         cheeseDetectorNeuron.setLabel("Cheese Detector");
         cheeseDetectorNeuron.setClamped(false);
-        network.addNetworkModel(cheeseDetectorNeuron);
+        net.addNetworkModel(cheeseDetectorNeuron);
         cheeseDetectorNeuron.setLocation(160, 194);
 
         BinaryRule responseRule = new BinaryRule();
         responseRule.setThreshold(.5);
         responseRule.setLowerBound(0);
-        Neuron salivationResponse = new Neuron(network, responseRule);
+        Neuron salivationResponse = new Neuron(net, responseRule);
         salivationResponse.setLabel("Salivation");
-        network.addNetworkModel(salivationResponse);
+        net.addNetworkModel(salivationResponse);
         salivationResponse.setLocation(160, 60);
 
         Synapse cheeseToSalivation = new Synapse(cheeseDetectorNeuron, salivationResponse,1);
         cheeseToSalivation.setUpperBound(1);
-        network.addNetworkModel(cheeseToSalivation);
+        net.addNetworkModel(cheeseToSalivation);
 
         Synapse association = new Synapse(bellDetectorNeuron, cheeseDetectorNeuron);
         association.setStrength(0);
         association.setLowerBound(0);
         association.setUpperBound(1);
 
-        network.addNetworkModel(association);
+        net.addNetworkModel(association);
         // TODO
-        networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
+        // networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
 
         // Create the odor world
         oc = sim.addOdorWorld(340,13,377,442, "Environment");
@@ -119,7 +118,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
         sim.couple(association, ts1);
 
         // Add custom network update action
-        networkWrapper.getNetwork().addUpdateAction(new NetworkUpdateAction() {
+        nc.getNetwork().addUpdateAction(new NetworkUpdateAction() {
 
             @Override
             public void invoke() {

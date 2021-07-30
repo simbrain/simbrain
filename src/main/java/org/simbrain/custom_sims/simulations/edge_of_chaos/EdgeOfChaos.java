@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -47,7 +47,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     private int K = 4; // in-degree (num connections to each neuron)
 
     // References
-    Network network;
+    Network net;
     SynapseGroup sgReservoir, cheeseToRes, flowersToRes;
     NeuronGroup reservoir, sensorNodes;
     OdorWorldComponent oc;
@@ -60,8 +60,8 @@ public class EdgeOfChaos extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkWrapper netWrapper = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
-        network = netWrapper.getNetwork();
+        NetworkComponent nc = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
+        net = nc.getNetwork();
         buildNetwork();
 
         // Projection plot
@@ -90,21 +90,21 @@ public class EdgeOfChaos extends RegisteredSimulation {
     }
 
     void buildNetwork() {
-        network.setTimeStep(0.5);
+        net.setTimeStep(0.5);
 
         // Make reservoir
-        reservoir = createReservoir(network, 10, 10, NUM_NEURONS);
+        reservoir = createReservoir(net, 10, 10, NUM_NEURONS);
         reservoir.setLabel("Reservoir");
 
         // Connect reservoir
-        sgReservoir = connectReservoir(network, reservoir, variance, K);
+        sgReservoir = connectReservoir(net, reservoir, variance, K);
 
         // Set up sensor nodes
         buildSensorNodes();
 
         // Use concurrent buffered update
-        network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
     }
 
     private void buildSensorNodes() {
@@ -113,18 +113,18 @@ public class EdgeOfChaos extends RegisteredSimulation {
         int offset = 310;
 
         // Sensor nodes
-        sensorNodes = new NeuronGroup(network, 6);
+        sensorNodes = new NeuronGroup(net, 6);
         sensorNodes.setLabel("Sensors");
         sensorNodes.setClamped(true);
-        network.addNetworkModel(sensorNodes);
+        net.addNetworkModel(sensorNodes);
         sensorNodes.setLocation(229, 561);
         // Make custom connections from sensor nodes to upper-left and
         // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.
         cheeseToRes = sensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .8, 1);
-        network.addNetworkModel(cheeseToRes);
+        net.addNetworkModel(cheeseToRes);
         flowersToRes = sensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .8, 3);
-        network.addNetworkModel(flowersToRes);
+        net.addNetworkModel(flowersToRes);
     }
 
     static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {

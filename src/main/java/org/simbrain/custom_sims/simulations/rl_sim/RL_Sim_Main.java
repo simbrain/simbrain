@@ -2,9 +2,9 @@ package org.simbrain.custom_sims.simulations.rl_sim;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -124,7 +124,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
     /**
      * Neural net variables.
      */
-    Network network;
+    Network net;
     Neuron reward;
     Neuron value;
     Neuron tdError;
@@ -168,8 +168,8 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         sim.getWorkspace().clearWorkspace();
 
         // Create the network builder
-        NetworkWrapper net = sim.addNetwork(228, 3,563,597, "Neural Network");
-        network = net.getNetwork();
+        NetworkComponent nc = sim.addNetwork(228, 3,563,597, "Neural Network");
+        net = nc.getNetwork();
 
         // Set up the control panel and tabbed pane
         setUpControlPanel();
@@ -214,9 +214,9 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         setUpProjectionPlot();
 
         // Set custom network update
-        network.getUpdateManager().clear();
+        net.getUpdateManager().clear();
         updateMethod = new RL_Update(this);
-        network.addUpdateAction(updateMethod);
+        net.addUpdateAction(updateMethod);
 
     }
 
@@ -275,15 +275,16 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
     /**
      * Set up main networks
      */
-    private void setupNetworks(NetworkWrapper net) {
+    private void setupNetworks(Network net) {
 
         // WTA network that routes to vehicles
-        wtaNet = net.addWTAGroup(-234, 58, 3);
+        WinnerTakeAll wtaNet = new WinnerTakeAll(net, 3);
+        net.addNetworkModel(wtaNet);
         wtaNet.setUseRandom(true);
         wtaNet.setRandomProb(epsilon);
         // Add a little extra spacing between neurons to accommodate labels
         wtaNet.setLayout(new LineLayout(80, LineLayout.LineOrientation.HORIZONTAL));
-        wtaNet.applyLayout();
+        wtaNet.applyLayout(-234, 58);
         wtaNet.setLabel("Outputs");
 
         // Inputs
@@ -320,7 +321,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
     /**
      * Set up the reward, value and td nodes
      */
-    private void setUpRLNodes(NetworkWrapper net) {
+    private void setUpRLNodes(Network net) {
         reward = net.addNeuron(300, 0);
         //reward.setClamped(true);
         reward.setLabel("Reward");
@@ -343,7 +344,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
     /**
      * Set up the vehicle networks
      */
-    private void setUpVehicleNets(NetworkWrapper net, OdorWorldComponent world) {
+    private void setUpVehicleNets(Network net, OdorWorldComponent world) {
         // Labels for vehicles, which must be the same as the label for
         // the corresponding output node
         String strPursueCheese = "Pursue Cheese";
@@ -493,7 +494,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         goalAchieved = false;
 
         // Clear network activations between trials
-        network.clearActivations();
+        net.clearActivations();
 
         resetMouse();
     }
@@ -566,7 +567,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
      * remove it sometimes while running other simulations.
      */
     void removeCustomAction() {
-        network.getUpdateManager().clear();
+        net.getUpdateManager().clear();
     }
 
     /**
@@ -593,7 +594,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
     /**
      * Set up the time series plot.
      */
-    private void setUpTimeSeries(NetworkWrapper net) {
+    private void setUpTimeSeries(NetworkComponent net) {
         // Create a time series plot
         TimeSeriesPlotComponent ts= sim.addTimeSeries(0, 328, 293, 332, "Time Series");
         TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Reward");

@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.sorn;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.connections.RadialSimple.SelectionStyle;
 import org.simbrain.network.connections.Sparse;
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 
 public class SORN extends RegisteredSimulation {
 
-
     private int numNeurons;
 
     private int gridSpace = 30;
@@ -37,7 +36,7 @@ public class SORN extends RegisteredSimulation {
     private ProbabilityDistribution defWtPD = UniformDistribution.builder()
             .floor(0).ceil(1).build();
     
-    private Network network;
+    private Network net;
 
     public SORN() {
         super();
@@ -61,13 +60,11 @@ public class SORN extends RegisteredSimulation {
     public void run() {
 
         // Set up network
-        NetworkWrapper net = sim.addNetwork(10, 10, 543, 545,
+        NetworkComponent nc = sim.addNetwork(10, 10, 543, 545,
                 "Patterns of Activity");
-        network = net.getNetwork();
-        network.setTimeStep(1);
+        net = nc.getNetwork();
+        net.setTimeStep(1);
         buildNetwork();
-
-
     }
 
     public void buildNetwork() {
@@ -76,7 +73,7 @@ public class SORN extends RegisteredSimulation {
         SORNNeuronRule sornRule = new SORNNeuronRule();
       //  sornRule.sethIP(400.0/numNeurons);
         for (int i = 0; i < numNeurons; i++) {
-            Neuron n = new Neuron(network);
+            Neuron n = new Neuron(net);
          //   sornRule.setMaxThreshold(0.5);
          //   sornRule.setThreshold(0.5 * Math.random() + 0.01);
             sornRule.setRefractoryPeriod(1);
@@ -87,7 +84,7 @@ public class SORN extends RegisteredSimulation {
         }
         SORNNeuronRule str = new SORNNeuronRule();
         for (int i = 0; i < (int) (numNeurons * 0.2); i++) {
-            Neuron n = new Neuron(network);
+            Neuron n = new Neuron(net);
            // str.setThreshold(0.8 * Math.random() + 0.01);
             str.setEtaIP(0); // No Homeostatic Plasticity
             str.setRefractoryPeriod(1);
@@ -97,30 +94,30 @@ public class SORN extends RegisteredSimulation {
             inhibitoryNeurons.add(n);
         }
 
-        NeuronGroup ng = new NeuronGroup(network, neurons);
+        NeuronGroup ng = new NeuronGroup(net, neurons);
         GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math.sqrt(numNeurons));
         ng.setLabel("Excitatory");
-        network.addNetworkModel(ng);
+        net.addNetworkModel(ng);
         ng.setLayout(layout);
         ng.applyLayout(new Point(10, 10));
 
-        NeuronGroup ngIn = new NeuronGroup(network, inhibitoryNeurons);
+        NeuronGroup ngIn = new NeuronGroup(net, inhibitoryNeurons);
         layout = new GridLayout(gridSpace*2, gridSpace*2, (int) Math.sqrt(0.2 * numNeurons));
         ngIn.setLabel("Inhibitory");
-        network.addNetworkModel(ngIn);
+        net.addNetworkModel(ngIn);
         ngIn.setLayout(layout);
         System.out.println(ngIn.size());
         int x_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 300);
         ngIn.applyLayout(new Point(10, 10));
 
         defWtPD.setPolarity(Polarity.EXCITATORY);
-        SynapseGroup sg_ee = connectGroups(network, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
+        SynapseGroup sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
                 "Exc. \u2192 Exc.");
-        connectGroups(network, ngIn, ng, ieKIn,
+        connectGroups(net, ngIn, ng, ieKIn,
                 UniformDistribution.builder().floor(-1).ceil(0).polarity(Polarity.INHIBITORY).build(),
                 Polarity.INHIBITORY,
                 "Inh. \u2192 Exc.");
-        connectGroups(network, ng, ngIn, eiKIn, defWtPD, Polarity.EXCITATORY,
+        connectGroups(net, ng, ngIn, eiKIn, defWtPD, Polarity.EXCITATORY,
                 "Exc. \u2192 Inh.");
 
         // Normalize newly created inhibitory connections
@@ -135,7 +132,7 @@ public class SORN extends RegisteredSimulation {
 
         ArrayList<Neuron> inNeurons = new ArrayList<>();
         for (int i = 0; i < 200; i++) {
-            Neuron n = new Neuron(network);
+            Neuron n = new Neuron(net);
             //SpikingThresholdRule inRule = new SpikingThresholdRule();
             //inRule.setThreshold(0.96);
             sornRule.setMaxThreshold(0.5);
@@ -145,10 +142,10 @@ public class SORN extends RegisteredSimulation {
             inNeurons.add(n);
         }
 
-        NeuronGroup input = new NeuronGroup(network, inNeurons);
+        NeuronGroup input = new NeuronGroup(net, inNeurons);
         layout = new GridLayout(gridSpace, gridSpace, (int) Math.sqrt(0.4 * numNeurons));
         input.setLabel("Input");
-        network.addNetworkModel(input);
+        net.addNetworkModel(input);
         input.setLayout(layout);
         // Todo; get current location of ng above
         int y_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 200);
@@ -161,7 +158,7 @@ public class SORN extends RegisteredSimulation {
         // TODO
         // input_ee.setLearningRule(stdp, Polarity.BOTH);
         // input_ee.setSpikeResponder(new Step(), Polarity.BOTH);
-        network.addNetworkModel(input_ee);
+        net.addNetworkModel(input_ee);
 
 //        Sparse ee_input_con = new Sparse(0.01, false, false);
 //        SynapseGroup ee_input = SynapseGroup.createSynapseGroup(ng, input, ee_input_con, 1.0, exRand, inRand);
@@ -177,7 +174,7 @@ public class SORN extends RegisteredSimulation {
         // TODO
         // input_ie.setSpikeResponder(new Step(), Polarity.BOTH);
 
-        network.addNetworkModel(input_ie);
+        net.addNetworkModel(input_ie);
 
 //        Sparse ie_input_con = new Sparse(0.01, true, false);
 //        SynapseGroup ie_input = SynapseGroup.createSynapseGroup(ngIn, input, input_ie_con, 1.0, exRand, inRand);
@@ -202,9 +199,9 @@ public class SORN extends RegisteredSimulation {
 //            n.normalizeExcitatoryFanIn();
 //        }
 
-        network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
-        network.updateTimeType();
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
+        net.updateTimeType();
     }
 
     private static SynapseGroup connectGroups(Network network, NeuronGroup src, NeuronGroup tar, int kIn,

@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
@@ -63,7 +63,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class PatternsOfActivity extends RegisteredSimulation {
 
     // References
-    Network network;
+    Network net;
 
     private int netSize = 1024;
     private int spacing = 40;
@@ -103,19 +103,19 @@ public class PatternsOfActivity extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Set up network
-        NetworkWrapper net = sim.addNetwork(10, 10, 543, 545,
+        NetworkComponent nc = sim.addNetwork(10, 10, 543, 545,
             "Patterns of Activity");
-        network = net.getNetwork();
-        network.setTimeStep(0.5);
+        net = nc.getNetwork();
+        net.setTimeStep(0.5);
 
         // Set up sensory group and odor world
-        NeuronGroup sensoryNetL = net.addNeuronGroup(-9.25, 95.93, 5);
+        NeuronGroup sensoryNetL =  net.addNeuronGroup(-9.25, 95.93, 5);
         sensoryNetL.setNeuronType(new IntegrateAndFireRule(0.005));
         sensoryNetL.setPolarity(Polarity.EXCITATORY);
         sensoryNetL.setLabel("Sensory Left");
 
         // Set up sensory group and odor world
-        NeuronGroup sensoryNetR = net.addNeuronGroup(-9.25, 155.93, 5);
+        NeuronGroup sensoryNetR =  net.addNeuronGroup(-9.25, 155.93, 5);
         sensoryNetR.setNeuronType(new IntegrateAndFireRule(0.005));
         sensoryNetR.setPolarity(Polarity.EXCITATORY);
         sensoryNetR.setLabel("Sensory Right");
@@ -168,7 +168,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Set up Recurrent portion
         List<Neuron> neuronList = new ArrayList<>();
         for (int ii = 0; ii < netSize; ++ii) {
-            Neuron n = new Neuron(network);
+            Neuron n = new Neuron(net);
             n.setUpdateRule(new NormIFRule(ii));
             if (Math.random() < 0.8) {
                 n.setPolarity(Polarity.EXCITATORY);
@@ -185,7 +185,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
                 .mean(0).standardDeviation(0.2).build());
             neuronList.add(n);
         }
-        recurrentNetwork = new NeuronGroup(network, neuronList);
+        recurrentNetwork = new NeuronGroup(net, neuronList);
         recurrentNetwork.setLabel("Recurrent network");
         new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(netSize))
             .layoutNeurons(recurrentNetwork.getNeuronList());
@@ -244,7 +244,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         }
 
         // Set up the first out group (comprised of LIF neurons to allow for STDP)
-        NeuronGroup outGroup = new NeuronGroup(network, 4);
+        NeuronGroup outGroup = new NeuronGroup(net, 4);
         int tmp = 0;
         for (Neuron n : outGroup.getNeuronList()) {
             if (tmp % 2 == 1) {
@@ -314,7 +314,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Set up the neurons that read from the spiking outputs (converting it to a continuous value) which
         // are coupled to the X and Y velocities of the mouse
-        outputNeurons = new NeuronGroup(network, 2);
+        outputNeurons = new NeuronGroup(net, 2);
         outputNeurons.setLabel("Motor outputs");
         outputNeurons.setLocation(recurrentNetwork.getMaxX() + 350, recurrentNetwork.getMinY() + 380);
         for (Neuron n : outputNeurons.getNeuronList()) {
@@ -348,20 +348,20 @@ public class PatternsOfActivity extends RegisteredSimulation {
         sim.couple((SmellSensor) mouse.getSensor("Smell-Right"), sensoryNetR);
 
         // Add everything to the network
-        network.addNetworkModel(recurrentNetwork);
-        network.addNetworkModel(inpSynGL);
-        network.addNetworkModel(inpSynGR);
-        network.addNetworkModel(recSyns);
-        network.addNetworkModel(outGroup);
-        network.addNetworkModel(rec2out);
-        network.addNetworkModel(outputNeurons);
-        network.addNetworkModel(out2read);
-        network.addNetworkModel(sensoryNetL);
-        network.addNetworkModel(sensoryNetR);
+        net.addNetworkModel(recurrentNetwork);
+        net.addNetworkModel(inpSynGL);
+        net.addNetworkModel(inpSynGR);
+        net.addNetworkModel(recSyns);
+        net.addNetworkModel(outGroup);
+        net.addNetworkModel(rec2out);
+        net.addNetworkModel(outputNeurons);
+        net.addNetworkModel(out2read);
+        net.addNetworkModel(sensoryNetL);
+        net.addNetworkModel(sensoryNetR);
 
         // Set up concurrent buffered update
-        network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
     }
 
 

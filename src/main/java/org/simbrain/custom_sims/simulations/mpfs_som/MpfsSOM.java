@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.mpfs_som;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkDesktopWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.nodes.NeuronNode;
@@ -28,8 +28,8 @@ import java.util.Map;
 public class MpfsSOM extends RegisteredSimulation {
 
     // References
-    NetworkDesktopWrapper netWrapper;
-    Network network;
+    NetworkComponent nc;
+    Network net;
     SOMTrainer trainer;
     SOMNetwork som;
     double[][] data; // input data
@@ -51,12 +51,12 @@ public class MpfsSOM extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        netWrapper = (NetworkDesktopWrapper) sim.addNetwork(144, 11, 550, 680, "Moral-Political SOM");
-        network = netWrapper.getNetwork();
-        som = new SOMNetwork(network, numSOMNodes, 29);
+        nc = (NetworkComponent) sim.addNetwork(144, 11, 550, 680, "Moral-Political SOM");
+        net = nc.getNetwork();
+        som = new SOMNetwork(net, numSOMNodes, 29);
         som.getSom().setLayout(new HexagonalGridLayout(40, 40, 5));
         som.getSom().applyLayout();
-        network.addNetworkModel(som);
+        net.addNetworkModel(som);
         som.getInputLayer().setLayout(new GridLayout(70, 60, 5));
         som.getInputLayer().applyLayout();
 
@@ -133,7 +133,7 @@ public class MpfsSOM extends RegisteredSimulation {
             }
             // TODO
             //network.fireGroupUpdated(som);
-            netWrapper.getNetworkComponent().update();
+            nc.update();
         });
 
         panel.addButton("Color SOM", () -> {
@@ -173,7 +173,8 @@ public class MpfsSOM extends RegisteredSimulation {
             // Custom display of SOM neurons handled here
             for (Neuron neuron : averagePoliticalAffiliation.keySet()) {
 
-                NeuronNode node = netWrapper.getNode(neuron);
+                // NeuronNode node = netWrapper.getNode(neuron);
+                NeuronNode node = null; // TODO
                 if (node == null) {
                     continue;
                 }
@@ -192,7 +193,7 @@ public class MpfsSOM extends RegisteredSimulation {
             }
             //TODO
             //netWrapper.getNetwork().fireGroupUpdated(som);
-            netWrapper.getNetworkComponent().update();
+            nc.update();
         });
 
     }

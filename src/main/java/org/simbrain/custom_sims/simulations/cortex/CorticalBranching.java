@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.cortex;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -34,7 +34,7 @@ public class CorticalBranching extends RegisteredSimulation {
     double KAPPA = 1; // 0.9
     double B_VALUE = 1.5;
 
-    private Network network;
+    private Network net;
 
     public CorticalBranching(SimbrainDesktop desktop) {
         super(desktop);
@@ -44,11 +44,11 @@ public class CorticalBranching extends RegisteredSimulation {
     @Override
     public void run() {
         sim.getWorkspace().clearWorkspace();
-        NetworkWrapper wrapper = sim.addNetwork(100, 50, 600, 600, "Cortical Branching");
-        network = wrapper.getNetwork();
+        NetworkComponent nc = sim.addNetwork(100, 50, 600, 600, "Cortical Branching");
+        net = nc.getNetwork();
         buildNetwork();
-        network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
     }
 
     private void buildNetwork() {
@@ -57,7 +57,7 @@ public class CorticalBranching extends RegisteredSimulation {
         List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
         List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
         for (int i = 0; i < NUM_NEURONS; i++) {
-            Neuron neuron = new Neuron(network);
+            Neuron neuron = new Neuron(net);
             neuron.setPolarity(SimbrainConstants.Polarity.EXCITATORY);
             TimedAccumulatorRule tar = new TimedAccumulatorRule();
             tar.setMaxState(REFRACTORY);
@@ -67,9 +67,9 @@ public class CorticalBranching extends RegisteredSimulation {
             neuron.setUpdateRule(tar);
             neurons.add(neuron);
         }
-        NeuronGroup ng1 = new NeuronGroup(network, neurons);
+        NeuronGroup ng1 = new NeuronGroup(net, neurons);
         ng1.setLabel("CorticalBranching");
-        network.addNetworkModel(ng1);
+        net.addNetworkModel(ng1);
         ng1.setLayout(layout);
         ng1.applyLayout(new Point2D.Double(0.0 ,0.0));
 
@@ -101,7 +101,7 @@ public class CorticalBranching extends RegisteredSimulation {
         }
 
         sg.setLabel("Recurrent Synapses");
-        network.addNetworkModel(sg);
+        net.addNetworkModel(sg);
 
     }
 

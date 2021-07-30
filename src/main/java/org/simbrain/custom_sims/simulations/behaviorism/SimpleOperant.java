@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class SimpleOperant extends RegisteredSimulation {
 
-    NetworkWrapper networkWrapper;
+    NetworkComponent nc;
     ControlPanel panel;
     NeuronGroup behaviorNet;
 
@@ -47,8 +47,8 @@ public class SimpleOperant extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build a network
-        networkWrapper = sim.addNetwork(195, 9, 447, 296, "Behaviors");
-        behaviorNet = networkWrapper.addNeuronGroup(-9.25, 95.93, numNeurons);
+        nc = sim.addNetwork(195, 9, 447, 296, "Behaviors");
+        behaviorNet = nc.getNetwork().addNeuronGroup(-9.25, 95.93, numNeurons);
         behaviorNet.setLabel("Behaviors");
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
         behaviorNet.applyLayout();
@@ -68,7 +68,7 @@ public class SimpleOperant extends RegisteredSimulation {
         updateNodeLabels();
 
         // Add custom network update action
-        networkWrapper.getNetwork().addUpdateAction(new NetworkUpdateAction() {
+        nc.getNetwork().addUpdateAction(new NetworkUpdateAction() {
 
             @Override
             public void invoke() {

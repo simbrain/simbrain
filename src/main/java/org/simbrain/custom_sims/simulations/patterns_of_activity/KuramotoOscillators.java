@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
@@ -34,7 +34,7 @@ import java.util.List;
 public class KuramotoOscillators extends RegisteredSimulation {
 
     // References
-    Network network;
+    Network net;
     ProjectionComponent plot;
     NeuronGroup reservoirNet, predictionRes, inputNetwork;
     SynapseGroup predictionSg;
@@ -68,15 +68,15 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpNetwork() {
 
         // Set up network
-        NetworkWrapper net = sim.addNetwork(10, 10, 337, 588,
+        NetworkComponent nc = sim.addNetwork(10, 10, 337, 588,
             "Patterns of Activity");
-        network = net.getNetwork();
-        network.setTimeStep(0.5);
+        net = nc.getNetwork();
+        net.setTimeStep(0.5);
 
         // Main recurrent net
         List<Neuron> neuronList = new ArrayList<>();
         for (int ii = 0; ii < netSize; ++ii) {
-            Neuron n = new Neuron(network);
+            Neuron n = new Neuron(net);
             n.setUpdateRule(new KuramotoRule());
             if (Math.random() < 0.5) {
                 n.setPolarity(Polarity.EXCITATORY);
@@ -90,9 +90,9 @@ public class KuramotoOscillators extends RegisteredSimulation {
             //    .mean(0).standardDeviation(0.2).build());
             neuronList.add(n);
         }
-        reservoirNet = new NeuronGroup(network, neuronList);
+        reservoirNet = new NeuronGroup(net, neuronList);
         reservoirNet.setLayout(new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(neuronList.size())));
-        network.addNetworkModel(reservoirNet);
+        net.addNetworkModel(reservoirNet);
         reservoirNet.setLocation(150,-242);
         reservoirNet.applyLayout();
         reservoirNet.setLabel("Recurrent Layer");
@@ -104,7 +104,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
             RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
             50);
         SynapseGroup recSyns = SynapseGroup.createSynapseGroup(reservoirNet, reservoirNet, recConnection);
-        network.addNetworkModel(recSyns);
+        net.addNetworkModel(recSyns);
         recSyns.setLabel("Recurrent");
 
         // Inputs
@@ -112,7 +112,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         inputNetwork.setLocation(reservoirNet.getCenterX() - inputNetwork.getWidth()/2, reservoirNet.getMaxY()+150);
         inputNetwork.setLowerBound(-100);
         inputNetwork.setUpperBound(100);
-        network.addNetworkModel(inputNetwork);
+        net.addNetworkModel(inputNetwork);
         inputNetwork.setLabel("Sensory Neurons");
 
         // Inputs to reservoir
@@ -124,7 +124,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         //     NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         inpSynG.randomize();
         inpSynG.setDisplaySynapses(false);
-        network.addNetworkModel(inpSynG);
+        net.addNetworkModel(inpSynG);
 
         // Couple from mouse to input nodes
         sim.couple(smellSensor, inputNetwork);
@@ -139,7 +139,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         predictionSg = net.addSynapseGroup(reservoirNet, predictionRes);
 
         // Train prediction network
-        network.addUpdateAction((new TrainPredictionNet(this)));
+        net.addUpdateAction((new TrainPredictionNet(this)));
 
         // Error
         errorNeuron = net.addNeuron((int) predictionRes.getMinX()-70, (int) predictionRes.getMinY()-45);

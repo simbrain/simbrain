@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.cerebellum;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.*;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.DecayRule;
@@ -28,7 +28,7 @@ public class Cerebellum extends RegisteredSimulation {
     /**
      * Other variables.
      */
-    NetworkWrapper networkWrapper;
+    NetworkComponent nc;
     Network network;
     ControlPanel panel;
     public int currentTrialLength = 200;
@@ -84,8 +84,8 @@ public class Cerebellum extends RegisteredSimulation {
     void buildNetwork() {
 
         // Set up network
-        networkWrapper = sim.addNetwork(246, 9, 538, 595, "Cerebellum");
-        network = networkWrapper.getNetwork();
+        nc = sim.addNetwork(246, 9, 538, 595, "Cerebellum");
+        network = nc.getNetwork();
 
         DecayRule generalRule = new DecayRule();
         generalRule.setDecayFraction(.25);

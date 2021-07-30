@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.cortex;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -54,7 +54,7 @@ public class CortexSimple extends RegisteredSimulation {
     // TODO: Build using z coordinates
 
     // References
-    Network network;
+    Network net;
 
     @Override
     public void run() {
@@ -63,9 +63,9 @@ public class CortexSimple extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkWrapper net = sim.addNetwork(10, 10, 550, 800,
+        NetworkComponent nc = sim.addNetwork(10, 10, 550, 800,
             "Cortical Simulation");
-        network = net.getNetwork();
+        net = nc.getNetwork();
         buildNetwork();
 
         // Set up control panel
@@ -83,7 +83,7 @@ public class CortexSimple extends RegisteredSimulation {
 
     void buildNetwork() {
 
-        network.setTimeStep(0.2);
+        net.setTimeStep(0.2);
 
         // Make the layers.  Params from Petersen, 2009.
         int btwnLayerSpacing = 150;
@@ -161,9 +161,9 @@ public class CortexSimple extends RegisteredSimulation {
         // Todo; Add labels
 
         // Use concurrent buffered update
-        network.getUpdateManager().clear();
-        network.getUpdateManager().addAction(ConcurrentBufferedUpdate
-            .createConcurrentBufferedUpdate(network));
+        net.getUpdateManager().clear();
+        net.getUpdateManager().addAction(ConcurrentBufferedUpdate
+            .createConcurrentBufferedUpdate(net));
     }
 
     private NeuronGroup buildLayer(int numNeurons,
@@ -175,7 +175,7 @@ public class CortexSimple extends RegisteredSimulation {
         List<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
         ThreadLocalRandom locR = ThreadLocalRandom.current();
         for (int i = 0; i < numNeurons; i++) {
-            Neuron neuron = new Neuron(network);
+            Neuron neuron = new Neuron(net);
             IntegrateAndFireRule rule = new IntegrateAndFireRule();
             rule.setRestingPotential(restingPotential[0] + locR.nextDouble() * restingPotential[1]);
             rule.setTimeConstant(timeConstant[0] + locR.nextDouble() * timeConstant[1]);
@@ -188,8 +188,8 @@ public class CortexSimple extends RegisteredSimulation {
             neuron.setUpperBound(rule.getThreshold());
             neurons.add(neuron);
         }
-        NeuronGroup ng = new NeuronGroup(network, neurons);
-        network.addNetworkModel(ng);
+        NeuronGroup ng = new NeuronGroup(net, neurons);
+        net.addNetworkModel(ng);
         //ng.setLayout(layout);
         //ng.applyLayout();
         return ng;
@@ -226,7 +226,7 @@ public class CortexSimple extends RegisteredSimulation {
         //
         // sg.setSpikeResponder(new UDF(), Polarity.BOTH);
 
-        network.addNetworkModel(sg);
+        net.addNetworkModel(sg);
 
         return sg;
 
@@ -240,7 +240,7 @@ public class CortexSimple extends RegisteredSimulation {
 
     public int getDelay(double[] xyz1, double[] xyz2, double maxDist, double maxDly) {
         double dist = SimbrainMath.distance(xyz1, xyz2);
-        return (int) (((dist / maxDist) * maxDly) / network.getTimeStep());
+        return (int) (((dist / maxDist) * maxDly) / net.getTimeStep());
     }
 
     public CortexSimple(SimbrainDesktop desktop) {

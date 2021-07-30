@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations.actor_critic;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -79,7 +78,7 @@ public class ActorCritic extends RegisteredSimulation {
     boolean goalAchieved = false;
     OdorWorld world;
     OdorWorldComponent oc;
-    NetworkWrapper networkWrapper;
+    NetworkComponent nc;
 
     /**
      * Tile World.
@@ -112,7 +111,7 @@ public class ActorCritic extends RegisteredSimulation {
     /**
      * Neural net variables.
      */
-    Network network;
+    Network net;
     List<Neuron> tileNeurons;
     Neuron reward;
     Neuron value;
@@ -150,29 +149,29 @@ public class ActorCritic extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Create the network wrapper
-        networkWrapper = sim.addNetwork(236, 4, 522, 595, "Neural Network");
-        network = networkWrapper.getNetwork();
+        nc = sim.addNetwork(236, 4, 522, 595, "Neural Network");
+        net = nc.getNetwork();
 
         // Set up the control panel and tabbed pane
         makeControlPanel();
         controlPanel.addBottomComponent(tabbedPane);
 
         // Set up the main input-output network that is trained via RL
-        setUpInputOutputNetwork(networkWrapper);
+        setUpInputOutputNetwork(net);
 
         // Set up the reward and td error nodes
-        setUpRLNodes(networkWrapper);
+        setUpRLNodes(net);
 
         // Set up the tile world
         setUpWorldAndNetwork();
 
         // Set up the time series plot
-        setUpPlot(networkWrapper);
+        setUpPlot(nc);
 
         // Set custom network update
-        network.getUpdateManager().clear();
+        net.getUpdateManager().clear();
         updateMethod = new RL_Update(this);
-        network.addUpdateAction(updateMethod);
+        net.addUpdateAction(updateMethod);
 
         // Add docviewer
         sim.addDocViewer(0, 301, 253, 313, "Information",
@@ -213,7 +212,7 @@ public class ActorCritic extends RegisteredSimulation {
                 sim.getWorkspace().getCouplingManager().updateCouplings(sensorCouplings);
 
                 // Fourth: update network
-                networkWrapper.getNetworkComponent().update();
+                nc.update();
             }
 
         };
@@ -251,8 +250,6 @@ public class ActorCritic extends RegisteredSimulation {
         cheeseSensor.setDecayFunction(decayFunction);
         mouse.addSensor(cheeseSensor);
 
-        NetworkComponent nc = networkWrapper.getNetworkComponent();
-
         tileNeurons = new ArrayList<>();
         sensorCouplings = new ArrayList<>();
 
@@ -265,11 +262,12 @@ public class ActorCritic extends RegisteredSimulation {
         mouse.addSensor(sensor);
 
         // Set up location sensor neurons
-        sensorNeurons = networkWrapper.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid", "Linear");
+        sensorNeurons = net.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid",
+                "Linear");
         sensorNeurons.setLabel("Sensor Nodes");
-        List<Synapse> wts = networkWrapper.connectAllToAll(sensorNeurons, value, 0);
+        List<Synapse> wts = net.connectAllToAll(sensorNeurons, value, 0);
         wts.forEach(w -> w.setLowerBound(0));
-        List<Synapse> wts2 =  networkWrapper.connectAllToAll(sensorNeurons, outputs, 0);
+        List<Synapse> wts2 =  net.connectAllToAll(sensorNeurons, outputs, 0);
         wts2.forEach(w -> w.setLowerBound(0));
 
         // Set up couplings
@@ -330,7 +328,7 @@ public class ActorCritic extends RegisteredSimulation {
     /**
      * Set up the time series plot.
      */
-    private void setUpPlot(NetworkWrapper net) {
+    private void setUpPlot(NetworkComponent net) {
         TimeSeriesPlotComponent plot = sim.addTimeSeries(759, 377, 363, 285, "Reward, TD Error");
         plot.getModel().setAutoRange(false);
         plot.getModel().setRangeUpperBound(2);
@@ -353,11 +351,11 @@ public class ActorCritic extends RegisteredSimulation {
     /**
      * Add main input-output network to be trained by RL.
      */
-    private void setUpInputOutputNetwork(NetworkWrapper net) {
+    private void setUpInputOutputNetwork(Network net) {
 
         // Outputs
-        outputs = new WinnerTakeAll(network, 4);
-        network.addNetworkModel(outputs);
+        outputs = new WinnerTakeAll(this.net, 4);
+        this.net.addNetworkModel(outputs);
         outputs.setUseRandom(true);
         outputs.setRandomProb(epsilon);
         outputs.setWinValue(tileSize * movementFactor);
@@ -370,7 +368,7 @@ public class ActorCritic extends RegisteredSimulation {
     /**
      * Set up the reward, value and td nodes
      */
-    private void setUpRLNodes(NetworkWrapper net) {
+    private void setUpRLNodes(Network net) {
         reward = net.addNeuron(300, 0);
         reward.setClamped(true);
         reward.setLabel("Reward");
@@ -410,7 +408,7 @@ public class ActorCritic extends RegisteredSimulation {
 
                     goalAchieved = false;
 
-                    network.clearActivations();
+                    net.clearActivations();
 
                     resetMouse();
 

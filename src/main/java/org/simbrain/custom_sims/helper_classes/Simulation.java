@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.helper_classes;
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.ResourceManager;
@@ -68,58 +67,21 @@ public class Simulation {
     }
 
     /**
-     * Create a network wrapper at the indicated location, with the indicated
-     * name (for the network window that appears in the desktop).
-     */
-    public NetworkWrapper addNetwork(int x, int y, int width, int height, String name) {
-        NetworkComponent networkComponent = new NetworkComponent(name);
-        return addNetwork(networkComponent, y, width, height, x);
-    }
-
-    /**
-     * Create a network wrapper using a provided network component.
-     */
-    public NetworkWrapper addNetwork(NetworkComponent networkComponent, int y, int width, int height, int x) {
-        workspace.addWorkspaceComponent(networkComponent);
-        netMap.put(networkComponent.getNetwork(), networkComponent);
-        if (desktop != null) {
-            NetworkDesktopComponent ndc = (NetworkDesktopComponent) desktop.getDesktopComponent(networkComponent);
-            ndc.getParentFrame().setBounds(x, y, width, height);
-            return new NetworkDesktopWrapper(ndc);
-        } else {
-            return new NetworkWrapper(networkComponent);
-        }
-
-    }
-
-    /**
-     * Add a doc viewer component.
-     *
-     * @param x        x location on screen
-     * @param y        y location on screen
-     * @param width    width of component
-     * @param height   height of component
-     * @param title    title to display at top of panel
-     * @param fileName name of the html file, e.g. "ActorCritic.html"
-     * @return the component
-     */
-    public DocViewerComponent addDocViewer(int x, int y, int width, int height, String title, String fileName) {
-        DocViewerComponent docViewer = new DocViewerComponent(title);
-        String html = ResourceManager.getString("custom_sims"
-                + Utils.FS + fileName);
-        docViewer.setText(html);
-        workspace.addWorkspaceComponent(docViewer);
-        desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height);
-        return docViewer;
-    }
-
-    /**
      * Adds a workspace component and places it at a specific location on the desktop.
      */
     public void addComponent(
             WorkspaceComponent wc, int x, int y, int width, int height) {
         workspace.addWorkspaceComponent(wc);
         SimbrainDesktopKt.place(desktop, wc, x, y, width, height);
+    }
+
+    /**
+     * Add a named {@link NetworkComponent} to a specific location.
+     */
+    public NetworkComponent addNetwork(int x, int y, int width, int height, String name) {
+        NetworkComponent networkComponent = new NetworkComponent(name);
+        addComponent(networkComponent, x, y, width, height);
+        return networkComponent;
     }
 
     /**
@@ -143,12 +105,27 @@ public class Simulation {
     }
 
     /**
-     * Add a named {@link ProjectionComponent} to a specific location,
+     * Add a named {@link ProjectionComponent} to a specific location.
      */
     public ProjectionComponent addProjectionPlot(int x, int y, int width, int height, String name) {
         ProjectionComponent projectionComponent = new ProjectionComponent(name);
         addComponent(projectionComponent, x, y, width, height);
         return projectionComponent;
+    }
+
+    /**
+     * Add a named {@link DocViewerComponent} to a specific location.
+     *
+     * @param fileName name of the html file, e.g. "ActorCritic.html", assumed to be in resource > custom_sims.
+     */
+    public DocViewerComponent addDocViewer(int x, int y, int width, int height, String title, String fileName) {
+        DocViewerComponent docViewer = new DocViewerComponent(title);
+        String html = ResourceManager.getString("custom_sims"
+                + Utils.FS + fileName);
+        docViewer.setText(html);
+        workspace.addWorkspaceComponent(docViewer);
+        desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height);
+        return docViewer;
     }
 
     /**

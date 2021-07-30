@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.hippocampus;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.NetworkWrapper;
+import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
@@ -43,8 +43,8 @@ public class Hippocampus extends RegisteredSimulation {
     /**
      * Other variables.
      */
-    NetworkWrapper net;
-    Network network;
+    NetworkComponent nc;
+    Network net;
     ControlPanel panel;
     boolean hippoLesioned = false;
     boolean learningEnabled = true;
@@ -104,8 +104,8 @@ public class Hippocampus extends RegisteredSimulation {
     private void buildNetwork() {
 
         // Set network variables
-        net = sim.addNetwork(193, 12, 632, 585, "Hippocampus");
-        network = net.getNetwork();
+        nc = sim.addNetwork(193, 12, 632, 585, "Hippocampus");
+        net = nc.getNetwork();
 
         // Add all neuron groups
         LC1 = addCompetitiveGroup("Left Cortex Top", 185, -114);
@@ -148,7 +148,7 @@ public class Hippocampus extends RegisteredSimulation {
         cg.setLayout(new LineLayout());
         cg.applyLayout();
         cg.setUpdateMethod("AS");
-        network.addNetworkModel(cg);
+        net.addNetworkModel(cg);
         cg.setLocation(x, y);
         return cg;
     }
@@ -166,7 +166,7 @@ public class Hippocampus extends RegisteredSimulation {
         // TODO: Weight matrices?
         // synGroup.setLowerBound(0, Polarity.EXCITATORY);
         // synGroup.setUpperBound(1, Polarity.EXCITATORY);
-        network.addNetworkModel(synGroup);
+        net.addNetworkModel(synGroup);
         return synGroup;
     }
 
@@ -180,26 +180,26 @@ public class Hippocampus extends RegisteredSimulation {
 
         // Show pattern one
         panel.addButton("Train All", () -> {
-            train(network, pattern1);
-            train(network, pattern2);
-            train(network, pattern3);
-            train(network, pattern4);
-            train(network, pattern1);
-            train(network, pattern2);
-            train(network, pattern3);
-            train(network, pattern4);
+            train(net, pattern1);
+            train(net, pattern2);
+            train(net, pattern3);
+            train(net, pattern4);
+            train(net, pattern1);
+            train(net, pattern2);
+            train(net, pattern3);
+            train(net, pattern4);
         });
 
         // Test all the patterns
         panel.addButton("Test All", () -> {
             double error = 0;
-            test(network, pattern1);
+            test(net, pattern1);
             error += getError(pattern1);
-            test(network, pattern2);
+            test(net, pattern2);
             error += getError(pattern2);
-            test(network, pattern3);
+            test(net, pattern3);
             error += getError(pattern3);
-            test(network, pattern4);
+            test(net, pattern4);
             error += getError(pattern4);
             error = SimbrainMath.roundDouble(error, 2);
             errorLabel.setText("" + error);
@@ -216,22 +216,22 @@ public class Hippocampus extends RegisteredSimulation {
 
         // Show pattern one
         panel.addButton("Test 1", () -> {
-            test(network, pattern1);
+            test(net, pattern1);
         });
 
         // Show pattern two
         panel.addButton("Test 2", () -> {
-            test(network, pattern2);
+            test(net, pattern2);
         });
 
         // Show pattern three
         panel.addButton("Test 3", () -> {
-            test(network, pattern3);
+            test(net, pattern3);
         });
 
         // Show pattern four
         panel.addButton("Test 4", () -> {
-            test(network, pattern4);
+            test(net, pattern4);
         });
 
         panel.addSeparator();
@@ -281,7 +281,7 @@ public class Hippocampus extends RegisteredSimulation {
                 } else if (actNeuron == 3) {
                     activations = pattern4;
                 }
-                network.clearActivations();
+                net.clearActivations();
                 hippocampus.setClamped(true);
                 hippocampus.forceSetActivations(activations);
                 sim.iterate(Integer.parseInt(conslidationField.getText()));
@@ -298,7 +298,7 @@ public class Hippocampus extends RegisteredSimulation {
      * Initialize weights randomly and uniformly between 0 and .02.
      */
     private void initWeights() {
-        List<Synapse> synapses = network.getFlatSynapseList();
+        List<Synapse> synapses = net.getFlatSynapseList();
         for (Synapse synapse : synapses) {
             synapse.setStrength(.2 * Math.random());
         }

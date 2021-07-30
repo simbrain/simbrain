@@ -215,12 +215,12 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
         // Coupling
         Producer inputProducer = sim.getProducer(toPlot, "getActivations");
         Consumer plotConsumer = sim.getConsumer(pc, "addPoint");
-        sim.createCoupling(inputProducer, plotConsumer);
+        sim.couple(inputProducer, plotConsumer);
 
         // Text of nearest world object to projection plot current dot
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
         Consumer plotText = sim.getConsumer(pc, "setLabel");
-        sim.createCoupling(currentObject, plotText);
+        sim.couple(currentObject, plotText);
 
     }
 

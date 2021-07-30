@@ -106,11 +106,11 @@ public class ClassicalConditioning extends RegisteredSimulation {
         ObjectSensor bellSensor = mouse.addObjectSensor(EntityType.BELL, 50, 0, 65);
 
         // Couple agent to network
-        sim.couple(swissSensor, cheeseDetectorNeuron, false);
+        sim.couple(swissSensor, cheeseDetectorNeuron);
         sim.couple(bellSensor, bellDetectorNeuron);
 
         // Create a time series plot
-        plot = sim.addTimeSeriesPlot(805,16,406,448, "Association Strength");
+        plot = sim.addTimeSeries(805,16,406,448, "Association Strength");
         plot.getModel().removeAllScalarTimeSeries();
         plot.getModel().setAutoRange(false);
         plot.getModel().setFixedWidth(true);

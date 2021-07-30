@@ -453,7 +453,7 @@ public class Creature {
         NetworkComponent nc = brain.getNetworkWrapper().getNetworkComponent();
         Producer chemicalAmount = parentSim.getSim().getProducer(chem, "getAmount");
         Consumer chemReceptor = parentSim.getSim().getConsumer(neuron, "forceSetActivation");
-        parentSim.getSim().createCoupling(chemicalAmount, chemReceptor);
+        parentSim.getSim().couple(chemicalAmount, chemReceptor);
     }
 
     public void approachBehavior(double strength) {

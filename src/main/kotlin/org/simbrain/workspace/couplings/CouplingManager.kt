@@ -141,9 +141,6 @@ class CouplingManager(val workspace: Workspace) {
      */
     val Consumer.preference: Int get() = when {
 
-        // TODO: Possibly find a way to move this to [AttributeContainers], e.g. adding a getAttributeOrdering method
-        //  to AttributeContainer
-
         baseObject is StraightMovement && method.name == "setAmount" -> 10
         baseObject is Turning && method.name == "setAmount" -> 10
         with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10

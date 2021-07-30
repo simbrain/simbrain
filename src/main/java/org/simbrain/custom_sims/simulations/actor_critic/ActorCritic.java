@@ -276,7 +276,7 @@ public class ActorCritic extends RegisteredSimulation {
         Producer gridProducer = sim.getProducer(sensor, "getValues");
         gridProducer.setDescription(sensor.getLabel());
         Consumer ngConsumer = sim.getConsumer(sensorNeurons, "addInputs");
-        Coupling gridCoupling = sim.createCoupling(gridProducer, ngConsumer);
+        Coupling gridCoupling = sim.couple(gridProducer, ngConsumer);
         sensorCouplings.add(gridCoupling);
         setCouplings(oc, nc);
     }
@@ -295,35 +295,35 @@ public class ActorCritic extends RegisteredSimulation {
         Producer northProducer = sim.getProducer(outputs.getNeuronList().get(0), "getActivation");
         Consumer northMovement = sim.getConsumer(mouse, "moveNorth");
         northMovement.setDescription("North");
-        Coupling northCoupling = sim.createCoupling(northProducer, northMovement);
+        Coupling northCoupling = sim.couple(northProducer, northMovement);
         effectorCouplings.add(northCoupling);
 
         outputs.getNeuronList().get(1).setLabel("South");
         Producer southProducer = sim.getProducer(outputs.getNeuronList().get(1), "getActivation");
         Consumer southMovement = sim.getConsumer(mouse, "moveSouth");
         southMovement.setDescription("South");
-        Coupling southCoupling = sim.createCoupling(southProducer, southMovement);
+        Coupling southCoupling = sim.couple(southProducer, southMovement);
         effectorCouplings.add(southCoupling);
 
         outputs.getNeuronList().get(2).setLabel("East");
         Producer eastProducer = sim.getProducer(outputs.getNeuronList().get(2), "getActivation");
         Consumer eastMovement = sim.getConsumer(mouse, "moveEast");
         eastMovement.setDescription("East");
-        Coupling eastCoupling = sim.createCoupling(eastProducer, eastMovement);
+        Coupling eastCoupling = sim.couple(eastProducer, eastMovement);
         effectorCouplings.add(eastCoupling);
 
         outputs.getNeuronList().get(3).setLabel("West");
         Producer westProducer = sim.getProducer(outputs.getNeuronList().get(3), "getActivation");
         Consumer westMovement = sim.getConsumer(mouse, "moveWest");
         westMovement.setDescription("West");
-        Coupling westCoupling = sim.createCoupling(westProducer, westMovement);
+        Coupling westCoupling = sim.couple(westProducer, westMovement);
         effectorCouplings.add(westCoupling);
 
         // Add reward smell coupling
         Producer smell = sim.getProducer(mouse.getSensor("Cheese sensor"), "getCurrentValue");
         smell.setDescription("Reward");
         Consumer rewardConsumer = sim.getConsumer(reward, "forceSetActivation");
-        Coupling rewardCoupling = sim.createCoupling(smell, rewardConsumer);
+        Coupling rewardCoupling = sim.couple(smell, rewardConsumer);
         sensorCouplings.add(rewardCoupling);
     }
 
@@ -331,7 +331,7 @@ public class ActorCritic extends RegisteredSimulation {
      * Set up the time series plot.
      */
     private void setUpPlot(NetworkWrapper net) {
-        TimeSeriesPlotComponent plot = sim.addTimeSeriesPlot(759, 377, 363, 285, "Reward, TD Error");
+        TimeSeriesPlotComponent plot = sim.addTimeSeries(759, 377, 363, 285, "Reward, TD Error");
         plot.getModel().setAutoRange(false);
         plot.getModel().setRangeUpperBound(2);
         plot.getModel().setRangeLowerBound(-1);

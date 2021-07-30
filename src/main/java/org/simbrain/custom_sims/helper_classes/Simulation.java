@@ -3,39 +3,25 @@ package org.simbrain.custom_sims.helper_classes;
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
-import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.plot.projection.ProjectionComponent;
-import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SimbrainDesktopKt;
 import org.simbrain.util.Utils;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.*;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingManager;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
-import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.sensors.Hearing;
-import org.simbrain.world.odorworld.sensors.ObjectSensor;
-import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
 import java.io.File;
 import java.util.Hashtable;
 
 /**
- * A simulation is used to create full Simbrain simulations. Primarily
- * convenience methods for easily creating components and linking them together
- * with couplings.
+ * Helper methods and convenience functions for use in building java-based simulations. You are encouraged to
+ * also try building simualtions using the Kotlin framework; see {@link org.simbrain.custom_sims.SimulationKt}.
  *
  * @author Jeff Yoshimi
  */
@@ -52,21 +38,10 @@ public class Simulation {
     private transient Workspace workspace;
 
     /**
-     * Reference to workspace coupling factory.
-     */
-    private transient CouplingManager couplingManager;
-
-    /**
      * Associate networks with their respective components.
      * Facilitates making couplings using methods with fewer arguments.
      */
     private transient Hashtable<Network, NetworkComponent> netMap = new Hashtable();
-
-    /**
-     * Associate odor worlds with their respective components.
-     * Facilitates making couplings using methods with fewer arguments.
-     */
-    private transient Hashtable<OdorWorld, OdorWorldComponent> odorMap = new Hashtable();
 
     /**
      * Create a new simulation object
@@ -77,7 +52,6 @@ public class Simulation {
         super();
         this.desktop = desktop;
         workspace = desktop.getWorkspace();
-        couplingManager = workspace.getCouplingManager();
     }
 
     /**
@@ -91,7 +65,6 @@ public class Simulation {
         super();
         this.desktop = null;
         this.workspace = workspace;
-        couplingManager = workspace.getCouplingManager();
     }
 
     /**
@@ -109,7 +82,7 @@ public class Simulation {
     public NetworkWrapper addNetwork(NetworkComponent networkComponent, int y, int width, int height, int x) {
         workspace.addWorkspaceComponent(networkComponent);
         netMap.put(networkComponent.getNetwork(), networkComponent);
-        if(desktop != null) {
+        if (desktop != null) {
             NetworkDesktopComponent ndc = (NetworkDesktopComponent) desktop.getDesktopComponent(networkComponent);
             ndc.getParentFrame().setBounds(x, y, width, height);
             return new NetworkDesktopWrapper(ndc);
@@ -141,48 +114,45 @@ public class Simulation {
     }
 
     /**
-     * Add a time series plot and return a plot builder.
-     *
-     * @param x      x location on screen
-     * @param y      y location on screen
-     * @param width  width of component
-     * @param height height of component
-     * @param name   title to display at top of panel
-     * @return the component the plot builder
+     * Adds a workspace component and places it at a specific location on the desktop.
      */
-    public TimeSeriesPlotComponent addTimeSeriesPlot(int x, int y, int width, int height,
-                                             String name) {
+    public void addComponent(
+            WorkspaceComponent wc, int x, int y, int width, int height) {
+        workspace.addWorkspaceComponent(wc);
+        SimbrainDesktopKt.place(desktop, wc, x, y, width, height);
+    }
+
+    /**
+     * Add a named {@link OdorWorldComponent} to a specific location.
+     */
+    public OdorWorldComponent addOdorWorld(int x, int y, int width, int height, String name) {
+        OdorWorldComponent oc = new OdorWorldComponent(name);
+        addComponent(oc, x, y, width, height);
+        return oc;
+    }
+
+    /**
+     * Add a named {@link TimeSeriesPlotComponent} to a specific location.
+     */
+    public TimeSeriesPlotComponent addTimeSeries(int x, int y, int width, int height,
+                                                 String name) {
         TimeSeriesPlotComponent timeSeriesComponent = new TimeSeriesPlotComponent(name);
         timeSeriesComponent.getModel().removeAllScalarTimeSeries();
-        workspace.addWorkspaceComponent(timeSeriesComponent);
-        desktop.getDesktopComponent(timeSeriesComponent).getParentFrame().setBounds(x, y, width, height);
+        addComponent(timeSeriesComponent, x, y, width, height);
         return timeSeriesComponent;
     }
 
     /**
-     * Add a projection plot and return a plot builder.
-     *
-     * @param x      x location on screen
-     * @param y      y location on screen
-     * @param width  width of component
-     * @param height height of component
-     * @param name   title to display at top of panel
-     * @return the component the plot builder
+     * Add a named {@link ProjectionComponent} to a specific location,
      */
     public ProjectionComponent addProjectionPlot(int x, int y, int width, int height, String name) {
         ProjectionComponent projectionComponent = new ProjectionComponent(name);
-        workspace.addWorkspaceComponent(projectionComponent);
-        desktop.getDesktopComponent(projectionComponent).getParentFrame().setBounds(x, y, width, height);
+        addComponent(projectionComponent, x, y, width, height);
         return projectionComponent;
     }
 
     /**
-     * Add an internal frame to a sim.
-     *
-     * @param x    x location on screen
-     * @param y    y location on screen
-     * @param name title to display at top of internal frame
-     * @return reference to the frame
+     * Add a named internal frame to a specific location.
      */
     public JInternalFrame addFrame(int x, int y, String name) {
         JInternalFrame frame = new JInternalFrame(name, true, true);
@@ -208,101 +178,17 @@ public class Simulation {
     }
 
     /**
-     * Helper for creating couplings in the associated Workspace. Couples the producer
-     * to the consumer if possible, ignores mismatch exceptions for simplicity.
+     * Couple a producer to a consumer.
      */
-    public Coupling createCoupling(Producer producer, Consumer consumer) {
+    public Coupling couple(Producer producer, Consumer consumer) {
         return workspace.getCouplingManager().createCoupling(producer, consumer);
     }
 
     /**
-     * Couple a neuron to a specific scalar time series in a time series
-     * plot.
+     * Couple two attribute containers using the preference rules established in {@link CouplingManager} preferences.
      */
-    public Coupling couple(Neuron neuron, TimeSeriesModel.ScalarTimeSeries sts) {
-        Producer neuronProducer = getProducer(neuron, "getActivation");
-        Consumer timeSeriesConsumer = getConsumer(sts, "setValue");
-        return createCoupling(neuronProducer, timeSeriesConsumer);
-    }
-
-    /**
-     * Couple a synapse to a specific time series in a time series plot
-     */
-    public Coupling couple(Synapse synapse, TimeSeriesModel.ScalarTimeSeries ts) {
-        Producer producer = getProducer(synapse, "getStrength");
-        Consumer consumer = getConsumer(ts, "setValue");
-        return createCoupling(producer, consumer);
-    }
-
-    /**
-     * Couple a neuron group to a projection plot.
-     */
-    public void couple(NeuronGroup ng, ProjectionComponent plot) {
-        Producer ngProducer = getProducer(ng, "getActivations");
-        Consumer projConsumer = getConsumer(plot, "addPoint");
-        createCoupling(ngProducer, projConsumer);
-    }
-
-    /**
-     * Copuple a neuron collection to a projection plot
-     */
-    public void couple(NeuronCollection nc, ProjectionComponent plot) {
-        Producer ngProducer = getProducer(nc, "getActivations");
-        Consumer projConsumer = getConsumer(plot, "addPoint");
-        createCoupling(ngProducer, projConsumer);
-    }
-
-    /**
-     * Couple an object sensor to a neuron.
-     *
-     * @param sensor the object sensor
-     * @param neuron the neuron to receive activation
-     * @param forceSet if true, assume the neuron is clamped and use forceSet
-     */
-    public void couple(ObjectSensor sensor, Neuron neuron, boolean forceSet) {
-        Producer sensoryProducer = workspace.getCouplingManager().getProducer(sensor, "getCurrentValue");
-        Consumer sensoryConsumer;
-        if(forceSet) {
-            sensoryConsumer = getConsumer(neuron, "forceSetActivation");
-        } else {
-            sensoryConsumer = getConsumer(neuron, "addInputValue");
-        }
-        createCoupling(sensoryProducer, sensoryConsumer);
-    }
-
-    /**
-     *  Couple an object sensor to a neuron and assume the neuron is clamped.
-     */
-    public void couple(ObjectSensor sensor, Neuron neuron) {
-        couple(sensor,neuron, true);
-    }
-
-    /**
-     * Couple a smell sensor to a neuron group.
-     */
-    public void couple(SmellSensor sensor, NeuronGroup ng) {
-        Producer sensoryProducer = getProducer(sensor, "getCurrentValues");
-        Consumer sensoryConsumer;
-        sensoryConsumer = getConsumer(ng, "addInputs");
-        createCoupling(sensoryProducer, sensoryConsumer);
-    }
-
-    /**
-     * Couple a neuron to an effector on an odor world agent.
-     */
-    public void couple(Neuron neuron, Effector effector) {
-        Producer effectorNeuron = getProducer(neuron, "getActivation");
-        Consumer agentEffector = getConsumer(effector, "setAmount");
-        createCoupling(effectorNeuron, agentEffector);
-    }
-
-    /**
-     * Couple a hearing sensor to a neuron
-     */
-    public void couple(Hearing sensor, Neuron neuron) {
-        Producer agentSensor = getProducer(sensor, "getValue");
-        Consumer sensoryNeuron = getConsumer(neuron, "forceSetActivation");
-        createCoupling(agentSensor, sensoryNeuron);
+    public Coupling couple(AttributeContainer src, AttributeContainer tar) {
+        return workspace.getCouplingManager().couple(src, tar);
     }
 
     /**
@@ -342,13 +228,6 @@ public class Simulation {
      */
     public Workspace getWorkspace() {
         return workspace;
-    }
-
-    public OdorWorldComponent addOdorWorld(int x, int y, int width, int height, String name) {
-        OdorWorldComponent oc = new OdorWorldComponent(name);
-        workspace.addWorkspaceComponent(oc);
-        SimbrainDesktopKt.place(desktop, oc, x, y, width, height);
-        return oc;
     }
 
 }

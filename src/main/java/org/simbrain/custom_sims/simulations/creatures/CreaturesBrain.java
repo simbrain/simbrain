@@ -9,8 +9,8 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.workspace.Consumer;
-import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.Producer;
+import org.simbrain.workspace.couplings.Coupling;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,7 +127,7 @@ public class CreaturesBrain {
                 Consumer consumer = parentSim.getSim().getConsumer(consumerLobe.getNeuronList().get(i), "forceSetActivation");
 
                 // Create the coupling and add it to the list
-                Coupling coupling = parentSim.getSim().createCoupling(producer, consumer);
+                Coupling coupling = parentSim.getSim().couple(producer, consumer);
                 list.add(coupling);
             }
         } else {

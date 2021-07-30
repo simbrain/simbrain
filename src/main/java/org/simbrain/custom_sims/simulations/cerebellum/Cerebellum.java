@@ -462,7 +462,7 @@ public class Cerebellum extends RegisteredSimulation {
     //
     void addTimeSeries() {
 
-        TimeSeriesPlotComponent ts = sim.addTimeSeriesPlot(768, 9, 363, 285,
+        TimeSeriesPlotComponent ts = sim.addTimeSeries(768, 9, 363, 285,
             "Time Series");
         ts.getModel().setFixedWidth(true);
         ts.getModel().setWindowSize(1000);

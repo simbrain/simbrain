@@ -127,7 +127,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         network.addNetworkModel(inpSynG);
 
         // Couple from mouse to input nodes
-        sim.getWorkspace().getCouplingManager().couple(smellSensor, inputNetwork);
+        sim.couple(smellSensor, inputNetwork);
 
         // Prediction net
         predictionRes = net.addNeuronGroup(1,1,  netSize);
@@ -183,14 +183,14 @@ public class KuramotoOscillators extends RegisteredSimulation {
         plot.getProjectionModel().init(reservoirNet.size());
         plot.getProjectionModel().getProjector().setTolerance(1);
         //plot.getProjectionModel().getProjector().setUseColorManager(false);
-        Producer inputProducer = sim.getWorkspace().getCouplingManager().getProducer(reservoirNet, "getActivations");
-        Consumer plotConsumer = sim.getWorkspace().getCouplingManager().getConsumer(plot, "addPoint");
-        sim.getWorkspace().getCouplingManager().createCoupling(inputProducer, plotConsumer);
+        Producer inputProducer = sim.getProducer(reservoirNet, "getActivations");
+        Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
+        sim.couple(inputProducer, plotConsumer);
 
         // Text of nearest world object to projection plot current dot
-        Producer currentObject = sim.getWorkspace().getCouplingManager().getProducer(mouse, "getNearbyObjects");
-        Consumer plotText = sim.getWorkspace().getCouplingManager().getConsumer(plot, "setLabel");
-        sim.getWorkspace().getCouplingManager().createCoupling(currentObject, plotText);
+        Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
+        Consumer plotText = sim.getConsumer(plot, "setLabel");
+        sim.couple(currentObject, plotText);
 
     }
 

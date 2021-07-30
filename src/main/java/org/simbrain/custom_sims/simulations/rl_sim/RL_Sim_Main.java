@@ -595,7 +595,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
      */
     private void setUpTimeSeries(NetworkWrapper net) {
         // Create a time series plot
-        TimeSeriesPlotComponent ts= sim.addTimeSeriesPlot(0, 328, 293, 332, "Time Series");
+        TimeSeriesPlotComponent ts= sim.addTimeSeries(0, 328, 293, 332, "Time Series");
         TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Reward");
         sim.couple(reward, sts1);
         TimeSeriesModel.ScalarTimeSeries sts2 = ts.getModel().addScalarTimeSeries("TD Error");
@@ -610,13 +610,13 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         plot.getProjectionModel().getProjector().setTolerance(.01);
         Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
         Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
-        sim.createCoupling(inputProducer, plotConsumer);
+        sim.couple(inputProducer, plotConsumer);
         sim.getWorkspace().addUpdateAction(new ColorPlot(this));
 
         // Label PCA points based on closest object
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
         Consumer plotText = sim.getConsumer(plot, "setLabel");
-        sim.createCoupling(currentObject, plotText);
+        sim.couple(currentObject, plotText);
     }
 
     @Override

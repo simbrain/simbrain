@@ -123,7 +123,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
         projComp.getProjector().getColorManager().setColoringMethod("Bayesian");
 
         // Time series
-        TimeSeriesPlotComponent tsPlot = sim.addTimeSeriesPlot(626,368,363,285, "Prediction");
+        TimeSeriesPlotComponent tsPlot = sim.addTimeSeries(626,368,363,285, "Prediction");
         tsPlot.getModel().setAutoRange(false);
         tsPlot.getModel().setFixedWidth(false);
         tsPlot.getModel().setWindowSize(1000);
@@ -135,7 +135,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
 
         Producer probability = sim.getProducer(projComp, "getCurrentStateProbability");
         Consumer timeSeries = sim.getConsumer(ts1, "setValue");
-        sim.createCoupling(probability, timeSeries);
+        sim.couple(probability, timeSeries);
 
     }
 

@@ -103,15 +103,14 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         updateNodeLabels();
 
         // Clear selection
-        // TODO
-        // networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
+        sim.getNetworkPanel(nc).getSelectionManager().clear();
 
         // Connect the layers together
         List<Synapse> syns = connectAllToAll(stimulusNet, behaviorNet);
         for(Synapse s : syns) {
             s.setStrength(0);
         }
-//        network.fireSynapsesUpdated(); // TODO: [event]
+       // network.fireSynapsesUpdated(); // TODO: [event]
 
         // Create the odor world
         oc = sim.addOdorWorld(730,7,315,383, "Three Objects");

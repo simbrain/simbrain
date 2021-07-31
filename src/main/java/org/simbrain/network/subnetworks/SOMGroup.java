@@ -247,6 +247,11 @@ public class SOMGroup extends NeuronGroup {
             }
         }
 
+        // TODO: Just getting rid of the npc. Need to diagnose later.
+        if (winner == null) {
+            return;
+        }
+
         // Update Synapses of the neurons within the radius of the winning
         // neuron.
         for (int i = 0; i < getNeuronList().size(); i++) {

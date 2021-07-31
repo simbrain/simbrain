@@ -55,7 +55,7 @@ public class OperantConditioning extends RegisteredSimulation {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        nc = sim.addNetwork(195, 9, 624, 500, "Simulation");
+        nc = sim.addNetwork(215, 9, 624, 500, "Simulation");
         net = nc.getNetwork();
 
         // Behavioral nodes
@@ -73,11 +73,11 @@ public class OperantConditioning extends RegisteredSimulation {
         stimulusNet.setIncrement(1);
 
         // Reward and punish nodes
-        rewardNeuron = net.addNeuron((int)stimulusNet.getMaxX() + 100,
-            (int) stimulusNet.getCenterY());
+        rewardNeuron = net.addNeuron((int) stimulusNet.getMaxX() + 100,
+                (int) stimulusNet.getCenterY());
         rewardNeuron.setLabel("Food Pellet");
         punishNeuron = net.addNeuron((int) rewardNeuron.getX() + 100,
-            (int) stimulusNet.getCenterY());
+                (int) stimulusNet.getCenterY());
         punishNeuron.setLabel("Shock");
 
         // Set base text for behavior labels
@@ -103,10 +103,10 @@ public class OperantConditioning extends RegisteredSimulation {
 
         // Connect the layers together
         List<Synapse> syns = connectAllToAll(stimulusNet, behaviorNet);
-        for(Synapse s : syns) {
+        for (Synapse s : syns) {
             s.setStrength(0);
         }
-//        network.fireSynapsesUpdated(); // TODO: [event]
+        //        network.fireSynapsesUpdated(); // TODO: [event]
 
         // Add custom network update action
         net.getUpdateManager().addAction(new NetworkUpdateAction() {
@@ -144,11 +144,11 @@ public class OperantConditioning extends RegisteredSimulation {
 
         // Select "winning" neuron based on its probability
         double random = Math.random();
-        if(random < firingProbabilities[0]){
+        if (random < firingProbabilities[0]) {
             setWinningNode(0);
-        } else if(random < firingProbabilities[0] + firingProbabilities[1]) {
+        } else if (random < firingProbabilities[0] + firingProbabilities[1]) {
             setWinningNode(1);
-        } else{
+        } else {
             setWinningNode(2);
         }
     }
@@ -165,14 +165,14 @@ public class OperantConditioning extends RegisteredSimulation {
 
     private void setUpControlPanel() {
 
-        panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
+        panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10, 221, 173);
 
         panel.addButton("Reward", () -> {
             learn(1);
             rewardNeuron.addInputValue(1);
             punishNeuron.forceSetActivation(0);
             sim.iterate();
-       });
+        });
 
         panel.addButton("Punish", () -> {
             learn(-1);
@@ -194,25 +194,25 @@ public class OperantConditioning extends RegisteredSimulation {
         double rewardLearningRate = .1;
         double punishLearningRate = .1;
 
-        if(valence > 0) {
+        if (valence > 0) {
             valence *= rewardLearningRate;
         } else {
             valence *= punishLearningRate;
         }
 
-        for(Neuron tar : behaviorNet.getNeuronList()) {
+        for (Neuron tar : behaviorNet.getNeuronList()) {
 
             // The "winning" node
-            if(tar.getActivation() > 0){
+            if (tar.getActivation() > 0) {
 
                 // Update intrinsic probability
                 double p = tar.getAuxValue();
                 tar.setAuxValue(Math.max(p + valence * p, 0));
 
                 // Update weight on active node
-                for(Neuron src : stimulusNet.getNeuronList()) {
+                for (Neuron src : stimulusNet.getNeuronList()) {
                     if (src.getActivation() > 0) {
-                        Synapse s = NetworkKt.getLooseSynapse(src,tar);
+                        Synapse s = NetworkKt.getLooseSynapse(src, tar);
                         s.setStrength(Math.max(s.getStrength() + valence, 0));
                     }
                 }
@@ -225,18 +225,18 @@ public class OperantConditioning extends RegisteredSimulation {
 
     private void normIntrinsicProbabilities() {
         double totalMass = 0;
-        for(Neuron n : behaviorNet.getNeuronList()) {
+        for (Neuron n : behaviorNet.getNeuronList()) {
             totalMass += n.getAuxValue();
         }
-        for(Neuron n : behaviorNet.getNeuronList()) {
-            n.setAuxValue(n.getAuxValue()/totalMass);
+        for (Neuron n : behaviorNet.getNeuronList()) {
+            n.setAuxValue(n.getAuxValue() / totalMass);
         }
     }
 
     private void updateNodeLabels() {
-        for(Neuron n : behaviorNet.getNeuronList()) {
+        for (Neuron n : behaviorNet.getNeuronList()) {
             n.setLabel(nodeToLabel.get(n) + ": "
-                + SimbrainMath.roundDouble(n.getAuxValue(), 2));
+                    + SimbrainMath.roundDouble(n.getAuxValue(), 2));
         }
     }
 
@@ -251,7 +251,8 @@ public class OperantConditioning extends RegisteredSimulation {
     }
 
     @Override
-    public OperantConditioning instantiate(SimbrainDesktop desktop) { return new OperantConditioning(desktop);
+    public OperantConditioning instantiate(SimbrainDesktop desktop) {
+        return new OperantConditioning(desktop);
     }
 
 }

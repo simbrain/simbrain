@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
+import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM
 import org.simbrain.custom_sims.simulations.test.lstmBlock
 import org.simbrain.util.dir
 
@@ -20,6 +21,7 @@ val simulations = dir<Any>("Simulations") {
 
     dir("Imported") {
         item("LSTM") { lstmBlock() }
+        item("MPFS") { MpfsSOM() }
     }
 
     dir("Demos") {

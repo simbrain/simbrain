@@ -3,6 +3,8 @@ package org.simbrain.custom_sims.helper_classes;
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
+import org.simbrain.network.desktop.NetworkDesktopComponent;
+import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.ResourceManager;
@@ -120,12 +122,27 @@ public class Simulation {
      */
     public DocViewerComponent addDocViewer(int x, int y, int width, int height, String title, String fileName) {
         DocViewerComponent docViewer = new DocViewerComponent(title);
-        String html = ResourceManager.getString("custom_sims"
-                + Utils.FS + fileName);
+        String html = getResource(fileName);
         docViewer.setText(html);
         workspace.addWorkspaceComponent(docViewer);
         desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height);
         return docViewer;
+    }
+
+    /**
+     * Returns a string resource from the custom_sim directory.
+     */
+    public String getResource(String fileName) {
+        return ResourceManager.getString("custom_sims"
+                + Utils.FS + fileName);
+    }
+
+    /**
+     * Returns a string resource from the custom_sim directory.
+     */
+    public String getPath(String fileName) {
+        return ClassLoader.getSystemClassLoader().getResource("custom_sims"
+                + Utils.FS + fileName).getPath();
     }
 
     /**
@@ -205,6 +222,13 @@ public class Simulation {
      */
     public Workspace getWorkspace() {
         return workspace;
+    }
+
+    /**
+     * Helper to get a network panel from a network component.
+     */
+    public NetworkPanel getNetworkPanel(NetworkComponent nc) {
+       return ((NetworkDesktopComponent)desktop.getDesktopComponent(nc)).getNetworkPanel();
     }
 
 }

@@ -99,8 +99,7 @@ public class OperantConditioning extends RegisteredSimulation {
         updateNodeLabels();
 
         // Clear selection
-        // TODO
-        // networkWrapper.getNetworkPanel().getSelectionManager().clear();
+        sim.getNetworkPanel(nc).getSelectionManager().clear();
 
         // Connect the layers together
         List<Synapse> syns = connectAllToAll(stimulusNet, behaviorNet);

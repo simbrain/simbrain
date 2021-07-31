@@ -60,9 +60,9 @@ public class MpfsSOM extends RegisteredSimulation {
         som.getInputLayer().setLayout(new GridLayout(70, 60, 5));
         som.getInputLayer().applyLayout();
 
-        data = Utils.getDoubleMatrix(new File("./src/org/simbrain/custom_sims/simulations/mpfs_som/mpfs_data.csv"));
+        data = Utils.getDoubleMatrix(new File(sim.getPath("mpfs/mpfs_data.csv")));
 
-        affiliations = Utils.getDoubleMatrix(new File("./src/org/simbrain/custom_sims/simulations/mpfs_som/mpfs_self_affiliations.csv"));
+        affiliations = Utils.getDoubleMatrix(new File(sim.getPath("mpfs/mpfs_self_affiliations.csv")));
 
         // TODO: Better to shuffle?
         //Collections.reverse(Arrays.asList(data));
@@ -173,8 +173,8 @@ public class MpfsSOM extends RegisteredSimulation {
             // Custom display of SOM neurons handled here
             for (Neuron neuron : averagePoliticalAffiliation.keySet()) {
 
-                // NeuronNode node = netWrapper.getNode(neuron);
-                NeuronNode node = null; // TODO
+                NeuronNode node = sim.getNetworkPanel(nc).getNeuronNodeMapping().get(neuron);
+
                 if (node == null) {
                     continue;
                 }
@@ -206,7 +206,6 @@ public class MpfsSOM extends RegisteredSimulation {
         super();
     }
 
-    ;
 
     @Override
     public String getName() {

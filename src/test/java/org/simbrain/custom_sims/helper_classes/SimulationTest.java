@@ -2,18 +2,19 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.junit.jupiter.api.Test;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SimulationTest {
 
     @Test
-    public void basicTest() {
-        Workspace workspace = new Workspace();
-        Simulation sim = new Simulation(workspace);
+    public void testAddWorld() {
+        SimbrainDesktop desktop = new SimbrainDesktop(new Workspace());
+        Simulation sim = new Simulation(desktop);
         sim.addOdorWorld(0,0,100,100, "Test");
 
-        assertTrue(sim.getWorkspace().getComponentList().size() == 1);
+        assertEquals(1, sim.getWorkspace().getComponentList().size());
 
     }
 }

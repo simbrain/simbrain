@@ -56,19 +56,6 @@ public class Simulation {
     }
 
     /**
-     * Create a simulation without a desktop. For use in non-GUI
-     * simulations.
-     * TODO: This has only been tested for a small part of the code
-     *
-     * @param workspace reference to workspace to use
-     */
-    public Simulation(Workspace workspace) {
-        super();
-        this.desktop = null;
-        this.workspace = workspace;
-    }
-
-    /**
      * Adds a workspace component and places it at a specific location on the desktop.
      */
     public void addComponent(

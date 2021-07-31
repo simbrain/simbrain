@@ -30,6 +30,8 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.simbrain.network.core.NetworkKt.connect;
+
 
 /**
  * Simulate a set of oscillatory brain networks and display their projected
@@ -38,8 +40,8 @@ import java.util.List;
 public class ModularOscillatoryNetwork extends RegisteredSimulation {
 
     // References
-    Network net;
     NetworkComponent nc;
+    Network net;
     NeuronGroup sensory, motor, inputGroup;
     OdorWorldEntity mouse;
     List<OdorWorldEntity> worldEntities = new ArrayList<>();
@@ -73,7 +75,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
         // Set up network
         nc = sim.addNetwork(10, 10, 581, 297,
             "Patterns of Activity");
-        net = net;
+        net = nc.getNetwork();
 
         // Sensory network
         sensory = addModule(-115, 10, 49, "Sensory", new DecayRule());
@@ -120,9 +122,9 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
             Neuron tarNeuron = sensory.getNeuronList().get(j);
             double yloc = tarNeuron.getY();
             if (yloc < yEdge) {
-                net.connect(neuron1, tarNeuron,1);
+                connect(neuron1, tarNeuron,1);
             } else {
-                net.connect(neuron2, tarNeuron,1);
+                connect(neuron2, tarNeuron,1);
             }
         }
 

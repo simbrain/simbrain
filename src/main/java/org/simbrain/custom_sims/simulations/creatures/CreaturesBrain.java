@@ -14,6 +14,8 @@ import org.simbrain.workspace.couplings.Coupling;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.simbrain.network.core.NetworkKt.connect;
+
 /**
  * A helper class for filling in networks, from either a base
  * template or from genetic code.
@@ -284,7 +286,7 @@ public class CreaturesBrain {
 
             // Connect
             for (Neuron n : l.getNeuronList()) {
-                nc.getNetwork().connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
+                connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
             }
 
             // Increment pointer for the next loop

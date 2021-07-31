@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+import static org.simbrain.network.core.NetworkKt.connectAllToAll;
+
 /**
  * Create the actor-critic simulation.
  */
@@ -262,12 +264,12 @@ public class ActorCritic extends RegisteredSimulation {
         mouse.addSensor(sensor);
 
         // Set up location sensor neurons
-        sensorNeurons = net.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid",
-                "Linear");
+        sensorNeurons = net.addNeuronGroup(initTilesX, initTilesY, numTiles*numTiles, "Grid"
+        );
         sensorNeurons.setLabel("Sensor Nodes");
-        List<Synapse> wts = net.connectAllToAll(sensorNeurons, value, 0);
+        List<Synapse> wts = connectAllToAll(sensorNeurons, value, 0);
         wts.forEach(w -> w.setLowerBound(0));
-        List<Synapse> wts2 =  net.connectAllToAll(sensorNeurons, outputs, 0);
+        List<Synapse> wts2 =  connectAllToAll(sensorNeurons, outputs, 0);
         wts2.forEach(w -> w.setLowerBound(0));
 
         // Set up couplings

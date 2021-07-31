@@ -10,6 +10,8 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.simbrain.network.core.NetworkKt.connect;
+
 /**
  * A custom class that makes it easy to add Braitenberg vehicles to a
  * simulation. A vehicle network is added to a network and it is coupled to a
@@ -113,16 +115,16 @@ public class Vehicle {
 
         // Set weights here
         if (vehicleType == VehicleType.PURSUER) {
-            net.connect(leftInput, leftTurn, weightSize, -2 * weightSize, 2 * weightSize);
-            net.connect(rightInput, rightTurn, weightSize, -2 * weightSize, 2 * weightSize);
+            connect(leftInput, leftTurn, weightSize, -2 * weightSize, 2 * weightSize);
+            connect(rightInput, rightTurn, weightSize, -2 * weightSize, 2 * weightSize);
         } else if (vehicleType == VehicleType.AVOIDER) {
-            net.connect(leftInput, rightTurn, weightSize, -2 * weightSize, 2 * weightSize);
-            net.connect(rightInput, leftTurn, weightSize, -2 * weightSize, 2 * weightSize);
+            connect(leftInput, rightTurn, weightSize, -2 * weightSize, 2 * weightSize);
+            connect(rightInput, leftTurn, weightSize, -2 * weightSize, 2 * weightSize);
         }
 
         if (connectSensorToStraightMovement) {
-            net.connect(leftInput, straight, forwardWeights);
-            net.connect(rightInput, straight, forwardWeights);
+            connect(leftInput, straight, forwardWeights);
+            connect(rightInput, straight, forwardWeights);
         }
 
         // Couple network to agent.

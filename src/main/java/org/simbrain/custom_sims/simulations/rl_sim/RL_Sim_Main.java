@@ -38,6 +38,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+import static org.simbrain.network.core.NetworkKt.connect;
+import static org.simbrain.network.core.NetworkKt.connectAllToAll;
+
 /**
  * Class to build RL Simulation.
  *
@@ -313,8 +316,8 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         outputToLeftPrediction = net.addSynapseGroup(wtaNet, predictionLeft);
 
         // Connect input nodes to wta network
-        rightToWta  = net.connectAllToAll(rightInputs, wtaNet);
-        leftToWta = net.connectAllToAll(leftInputs, wtaNet);
+        rightToWta  = connectAllToAll(rightInputs, wtaNet);
+        leftToWta = connectAllToAll(leftInputs, wtaNet);
 
     }
 
@@ -326,11 +329,11 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         //reward.setClamped(true);
         reward.setLabel("Reward");
         //sim.couple((SmellSensor) mouse.getSensor("Smell-Center"), reward);
-        net.connect(leftInputs.getNeuron(5),reward,1);
+        connect(leftInputs.getNeuron(5),reward,1);
         value = net.addNeuron(350, 0);
         value.setLabel("Value");
-        net.connectAllToAll(rightInputs, value);
-        net.connectAllToAll(leftInputs, value);
+        connectAllToAll(rightInputs, value);
+        connectAllToAll(leftInputs, value);
 
         tdError = net.addNeuron(400, 0);
         tdError.setLabel("TD Error");
@@ -392,9 +395,9 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         //wtaNet.getNeuronList().get(5).setLabel(strAvoidCandle);
 
         // Connect output nodes to vehicle nodes
-        net.connect(wtaNet.getNeuronByLabel(strPursueCheese), pursueCheese.getNeuronByLabel("Speed"), 10);
-        net.connect(wtaNet.getNeuronByLabel(strPursueFlower), pursueFlower.getNeuronByLabel("Speed"), 10);
-        net.connect(wtaNet.getNeuronByLabel(strPursueCandle), pursueCandle.getNeuronByLabel("Speed"), 10);
+        connect(wtaNet.getNeuronByLabel(strPursueCheese), pursueCheese.getNeuronByLabel("Speed"), 10);
+        connect(wtaNet.getNeuronByLabel(strPursueFlower), pursueFlower.getNeuronByLabel("Speed"), 10);
+        connect(wtaNet.getNeuronByLabel(strPursueCandle), pursueCandle.getNeuronByLabel("Speed"), 10);
         //net.connect(wtaNet.getNeuronByLabel(strAvoidCheese), avoidCheese.getNeuronByLabel("Speed"), 10);
         //net.connect(wtaNet.getNeuronByLabel(strAvoidFlower), avoidFlower.getNeuronByLabel("Speed"), 10);
         //net.connect(wtaNet.getNeuronByLabel(strAvoidCandle), avoidCandle.getNeuronByLabel("Speed"), 10);

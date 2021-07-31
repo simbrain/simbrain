@@ -30,7 +30,7 @@ public class AlvarezSquire extends CompetitiveGroup {
      * @param numNeurons number neurons
      */
     public AlvarezSquire(Hippocampus hippo, int numNeurons) {
-        super(hippo.network, numNeurons);
+        super(hippo.net, numNeurons);
         this.hippo = hippo;
 
         noiseGenerator =

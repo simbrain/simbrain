@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.simbrain.network.core.NetworkKt.connectAllToAll;
+
 /**
  * Create images and data used in this paper
  * https://mindmodeling.org/cogsci2014/papers/542/paper542.pdf
@@ -107,8 +109,8 @@ public class AgentTrails extends RegisteredSimulation {
         predictionNet = nc.getNetwork().addNeuronGroup(231.02, 24.74, 3);
         predictionNet.setLabel("Predicted");
 
-        nc.getNetwork().connectAllToAll(sensoryNet, predictionNet);
-        nc.getNetwork().connectAllToAll(actionNet, predictionNet);
+        connectAllToAll(sensoryNet, predictionNet);
+        connectAllToAll(actionNet, predictionNet);
 
         errorNeuron = nc.getNetwork().addNeuron(268, 108);
         //errorNeuron.setClamped(true);

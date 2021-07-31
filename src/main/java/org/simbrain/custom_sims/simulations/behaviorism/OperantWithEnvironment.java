@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.simbrain.network.core.NetworkKt.connectAllToAll;
+
 /**
  * Simulation to demonstrate classical and operant conditioning.
  * Discriminative case
@@ -105,7 +107,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         // networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
 
         // Connect the layers together
-        List<Synapse> syns = net.connectAllToAll(stimulusNet, behaviorNet);
+        List<Synapse> syns = connectAllToAll(stimulusNet, behaviorNet);
         for(Synapse s : syns) {
             s.setStrength(0);
         }

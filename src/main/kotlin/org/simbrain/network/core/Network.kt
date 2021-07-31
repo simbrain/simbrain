@@ -583,9 +583,6 @@ class Network {
         }
     }
 
-    fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
-        return AllToAll().connectAllToAll(source.neuronList, target.neuronList)
-    }
 
     fun createNeuronGroupTemplate(template: NeuronGroup.() -> Unit) = fun Network.(
         count: Int,
@@ -611,113 +608,11 @@ class Network {
     }
 
     /**
-     * Make a single source -> target neuron connection.
-     *
-     * @param source the source neuron
-     * @param target the target neuron
-     */
-    fun connect(source: Neuron, target: Neuron, value: Double): Synapse {
-        val synapse = Synapse(source, target)
-        synapse.forceSetStrength(value)
-        source.network.addNetworkModel(synapse)
-        return synapse
-    }
-
-    // /**
-    //  * Add neurons at a specified location with a specified layout.
-    //  */
-    // public void addNeurons(int x, int y, int numNeurons, String layoutName, String type) {
-    //
-    //     List<Neuron> newNeurons = new ArrayList();
-    //     for (int i = 0; i < numNeurons; i++) {
-    //         Neuron neuron = new Neuron(network, type);
-    //         network.addNetworkModel(neuron);
-    //         newNeurons.add(neuron);
-    //     }
-    //
-    //     // Lay out neurons
-    //     if (layoutName.equalsIgnoreCase("none")) {
-    //         return;
-    //     }
-    //     if (layoutName.toLowerCase().contains("line")) {
-    //         if (layoutName.equalsIgnoreCase("vertical line")) {
-    //             LineLayout lineLayout = new LineLayout(x, y, 50, LineOrientation.VERTICAL);
-    //             lineLayout.layoutNeurons(newNeurons);
-    //
-    //         } else {
-    //             LineLayout lineLayout = new LineLayout(x, y, 50, LineOrientation.HORIZONTAL);
-    //             lineLayout.layoutNeurons(newNeurons);
-    //         }
-    //     } else if (layoutName.equalsIgnoreCase("grid")) {
-    //         GridLayout gridLayout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
-    //         gridLayout.setInitialLocation(new Point(x, y));
-    //         gridLayout.layoutNeurons(newNeurons);
-    //     }
-    // }
-    /**
-     * Make a single source -> target neuron connection with specified upper and lower bounds for the synapses.
-     */
-    fun connect(source: Neuron, target: Neuron?, value: Double, lowerBound: Double, upperBound: Double) {
-        val synapse = Synapse(source, target)
-        synapse.forceSetStrength(value)
-        synapse.lowerBound = lowerBound
-        synapse.upperBound = upperBound
-        source.network.addNetworkModel(synapse)
-    }
-
-    /**
-     * Connect source to target with a provided learning rule and value.
-     *
-     * @return the new synapse
-     */
-    public fun connect(source: Neuron, target: Neuron?, rule: SynapseUpdateRule?, value: Double): Synapse? {
-        val synapse = Synapse(source, target, rule)
-        synapse.forceSetStrength(value)
-        source.network.addNetworkModel(synapse)
-        return synapse
-    }
-
-    /**
-     * Connect input nodes to target nodes with weights initialized to a value.
-     */
-    fun connectAllToAll(source: NeuronGroup, target: NeuronGroup, value: Double): List<Synapse>? {
-        val wts = connectAllToAll(source, target)
-        wts.forEach(Consumer { wt: Synapse -> wt.forceSetStrength(value) })
-        return wts
-    }
-
-    /**
-     * Connect a source neuron group to a single target neuron
-     */
-    fun connectAllToAll(inputs: NeuronGroup, target: Neuron?): List<Synapse> {
-        val connector = AllToAll()
-        return connector.connectAllToAll(inputs.neuronList, listOf(target))
-    }
-
-    /**
-     * Connect input nodes to target node with weights initialized to a value.
-     */
-    fun connectAllToAll(source: NeuronGroup, target: Neuron?, value: Double): List<Synapse>? {
-        val wts = connectAllToAll(source, target)
-        wts.forEach(Consumer { wt: Synapse -> wt.forceSetStrength(value) })
-        return wts
-    }
-
-    /**
-     * Connect source and target neuron groups with a provided connection strategy.
-     *
-     * @return the new synapses
-     */
-    fun connect(source: NeuronGroup, target: NeuronGroup, connector: ConnectionStrategy): List<Synapse?>? {
-        return connector.connectNeurons(this, source.neuronList, target.neuronList)
-    }
-
-    /**
      * Add a synapse group between a source and target neuron group
      *
      * @return the new synapse group
      */
-    fun addSynapseGroup(source: NeuronGroup?, target: NeuronGroup?): SynapseGroup? {
+    fun addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup {
         val sg = SynapseGroup.createSynapseGroup(source, target)
         addNetworkModel(sg)
         return sg
@@ -729,10 +624,9 @@ class Network {
      *
      * @return the new neuron group
      */
-    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int, layoutName: String, rule: NeuronUpdateRule?):
-            NeuronGroup? {
-        val ng: NeuronGroup
-        ng = NeuronGroup(this, numNeurons)
+    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int, layoutName: String, rule: NeuronUpdateRule):
+            NeuronGroup {
+        val ng = NeuronGroup(this, numNeurons)
         ng.setNeuronType(rule)
         addNetworkModel(ng)
         ng.setLocation(x, y)
@@ -745,7 +639,7 @@ class Network {
      *
      * @return the new neuron group
      */
-    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int, layoutName: String, type: String?): NeuronGroup? {
+    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int, layoutName: String): NeuronGroup {
         return addNeuronGroup(x, y, numNeurons, layoutName, LinearRule())
     }
 
@@ -754,35 +648,18 @@ class Network {
      *
      * @return the new neuron group.
      */
-    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int): NeuronGroup? {
-        //TODO: Setting location not always working
-        return addNeuronGroup(x, y, numNeurons, "line", "LinearRule")
+    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int): NeuronGroup {
+        return addNeuronGroup(x, y, numNeurons, "line")
     }
 
     /**
-     * Layout a neuron group.
+     * Connect source and target neuron groups with a provided connection strategy.
      *
-     * @param ng reference to the group
-     * @param layoutName the type of layout to use: "line" (defaults to horizontal),
-     * "vertical line", or "grid".  TODO: Add hex.
+     * @return the new synapses
      */
-    private fun layoutNeuronGroup(ng: NeuronGroup, layoutName: String) {
-        if (layoutName.toLowerCase().contains("line")) {
-            if (layoutName.equals("vertical line", ignoreCase = true)) {
-                val lineLayout = LineLayout(50.0, LineOrientation.VERTICAL)
-                ng.layout = lineLayout
-            } else {
-                val lineLayout = LineLayout(50.0, LineOrientation.HORIZONTAL)
-                ng.layout = lineLayout
-            }
-        } else if (layoutName.equals("grid", ignoreCase = true)) {
-            val gridLayout = GridLayout(50.0, 50.0, Math.sqrt(ng.size().toDouble()).toInt()
-            )
-            ng.layout = gridLayout
-        }
-        ng.applyLayout()
+    fun connect(source: NeuronGroup, target: NeuronGroup, connector: ConnectionStrategy): List<Synapse?>? {
+        return connector.connectNeurons(this, source.neuronList, target.neuronList)
     }
-
 
 }
 
@@ -806,7 +683,7 @@ var synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisib
 /**
  * Items must be ordered for deserializing. For example neurons but serialized before synapses.
  */
-public val deserializationOrder: List<Class<out NetworkModel>> = listOf(
+val deserializationOrder: List<Class<out NetworkModel>> = listOf(
     Neuron::class.java,
     NeuronGroup::class.java,
     NeuronCollection::class.java,
@@ -825,12 +702,8 @@ public val deserializationOrder: List<Class<out NetworkModel>> = listOf(
  */
 fun updateNeurons(neuronList: List<Neuron>) {
     // TODO: Update by priority if priority based update?
-    for (neuron in neuronList) {
-        neuron.updateInputs()
-    }
-    for (neuron in neuronList) {
-        neuron.update()
-    }
+    neuronList.forEach(Neuron::updateInputs)
+    neuronList.forEach(Neuron::update)
 }
 
 /**
@@ -886,4 +759,94 @@ fun networkUpdateAction(description: String, longDescription: String = descripti
         override fun getDescription(): String = description
         override fun getLongDescription(): String = longDescription
     }
+
+/**
+ * Layout a neuron group.
+ *
+ * @param ng reference to the group
+ * @param layoutName the type of layout to use: "line" (defaults to horizontal),
+ * "vertical line", or "grid".  TODO: Add hex.
+ */
+fun layoutNeuronGroup(ng: NeuronGroup, layoutName: String) {
+    if (layoutName.toLowerCase().contains("line")) {
+        if (layoutName.equals("vertical line", ignoreCase = true)) {
+            val lineLayout = LineLayout(50.0, LineOrientation.VERTICAL)
+            ng.layout = lineLayout
+        } else {
+            val lineLayout = LineLayout(50.0, LineOrientation.HORIZONTAL)
+            ng.layout = lineLayout
+        }
+    } else if (layoutName.equals("grid", ignoreCase = true)) {
+        val gridLayout = GridLayout(50.0, 50.0, Math.sqrt(ng.size().toDouble()).toInt()
+        )
+        ng.layout = gridLayout
+    }
+    ng.applyLayout()
+}
+
+/**
+ * Make a single source -> target neuron connection.
+ *
+ * @param source the source neuron
+ * @param target the target neuron
+ */
+fun connect(source: Neuron, target: Neuron, value: Double): Synapse {
+    val synapse = Synapse(source, target)
+    synapse.forceSetStrength(value)
+    source.network.addNetworkModel(synapse)
+    return synapse
+}
+
+/**
+ * Make a single source -> target neuron connection with specified upper and lower bounds for the synapses.
+ */
+fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double, upperBound: Double) {
+    val synapse = Synapse(source, target)
+    synapse.forceSetStrength(value)
+    synapse.lowerBound = lowerBound
+    synapse.upperBound = upperBound
+    source.network.addNetworkModel(synapse)
+}
+
+/**
+ * Connect source to target with a provided learning rule and value.
+ *
+ * @return the new synapse
+ */
+fun connect(source: Neuron, target: Neuron, rule: SynapseUpdateRule, value: Double): Synapse? {
+    val synapse = Synapse(source, target, rule)
+    synapse.forceSetStrength(value)
+    source.network.addNetworkModel(synapse)
+    return synapse
+}
+
+/**
+ * Connect input nodes to target nodes with weights initialized to a value.
+ */
+fun connectAllToAll(source: NeuronGroup, target: NeuronGroup, value: Double): List<Synapse>? {
+    val wts = connectAllToAll(source, target)
+    wts.forEach(Consumer { wt: Synapse -> wt.forceSetStrength(value) })
+    return wts
+}
+
+fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
+    return AllToAll().connectAllToAll(source.neuronList, target.neuronList)
+}
+
+/**
+ * Connect a source neuron group to a single target neuron
+ */
+fun connectAllToAll(inputs: NeuronGroup, target: Neuron): List<Synapse> {
+    val connector = AllToAll()
+    return connector.connectAllToAll(inputs.neuronList, listOf(target))
+}
+
+/**
+ * Connect input nodes to target node with weights initialized to a value.
+ */
+fun connectAllToAll(source: NeuronGroup, target: Neuron, value: Double): List<Synapse> {
+    val wts = connectAllToAll(source, target)
+    wts.forEach(Consumer { wt: Synapse -> wt.forceSetStrength(value) })
+    return wts
+}
 

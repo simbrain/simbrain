@@ -20,6 +20,7 @@ import org.simbrain.network.kotlindl.TFDenseLayer
 import org.simbrain.network.kotlindl.TFFlattenLayer
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
@@ -238,5 +239,26 @@ fun NetworkPanel.showDeepNetCreationDialog() {
     dialog.pack()
     dialog.setLocationRelativeTo(null)
     dialog.title = "Create Deep Network"
+    dialog.isVisible = true
+}
+
+/**
+ * Show dialog for Smile classifier creation
+ */
+fun NetworkPanel.showClassifierCreationDialog() {
+    val creator = SmileClassifier.ClassifierCreator(network.idManager.getProposedId(SmileClassifier::class.java))
+    val dialog = StandardDialog()
+
+    dialog.contentPane = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
+        add(AnnotatedPropertyEditor(creator))
+    }
+
+    dialog.addClosingTask {
+        network.addNetworkModel(creator.create(network))
+    }
+    dialog.pack()
+    dialog.setLocationRelativeTo(null)
+    dialog.title = "Create Smile Classifier"
     dialog.isVisible = true
 }

@@ -67,10 +67,10 @@ class DeepNet(private val network: Network
     /**
      * Helper class for creating new deep networks.
      */
-    class DeepNetCreator(prooposedLabel : String) : EditableObject {
+    class DeepNetCreator(proposedLabel : String) : EditableObject {
 
         @UserParameter(label = "Label", order = 5)
-        private val label = prooposedLabel
+        private val label = proposedLabel
 
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 10

@@ -8,7 +8,8 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.DataPanel
-import org.simbrain.network.matrix.Classifier
+import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.NumericTable
@@ -18,7 +19,7 @@ import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JPanel
 
-class SmileClassifierNode(val np : NetworkPanel, val classifier : Classifier) : ScreenElement(np) {
+class SmileClassifierNode(val np : NetworkPanel, val classifier : SmileClassifier) : ScreenElement(np) {
 
     /**
      * Square shape around array node.
@@ -138,7 +139,7 @@ fun main() {
     val networkComponent = NetworkComponent("net 1")
     val np = NetworkPanel(networkComponent)
     val classifier = with (networkComponent.network) {
-        val classifier = Classifier(this, 2, 1)
+        val classifier = SmileClassifier(this, SVMClassifier(), 2, 1)
         addNetworkModel(classifier)
         classifier
     }

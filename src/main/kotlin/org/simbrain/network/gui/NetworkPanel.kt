@@ -24,10 +24,10 @@ import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.kotlindl.DeepNet
-import org.simbrain.network.matrix.Classifier
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
+import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.topLeftLocation
 import org.simbrain.network.trainers.LMSIterative
@@ -247,7 +247,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         return when(model) {
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
-            is Classifier -> createNode(model)
+            is SmileClassifier -> createNode(model)
             is NeuronArray -> createNode(model)
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
@@ -255,7 +255,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
-            is Classifier -> createNode(model)
             is ZoeLayer -> createNode(model)
             is DeepNet -> createNode(model)
             else -> throw IllegalArgumentException()
@@ -299,7 +298,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
     fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
-    fun createNode(classifier : Classifier) = addScreenElement {
+    fun createNode(classifier : SmileClassifier) = addScreenElement {
         SmileClassifierNode(this, classifier)
     }
 

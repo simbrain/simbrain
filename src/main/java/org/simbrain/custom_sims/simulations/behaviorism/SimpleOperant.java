@@ -51,7 +51,7 @@ public class SimpleOperant extends RegisteredSimulation {
         behaviorNet = nc.getNetwork().addNeuronGroup(-9.25, 95.93, numNeurons);
         behaviorNet.setLabel("Behaviors");
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
-        behaviorNet.applyLayout();
+        behaviorNet.applyLayout(-5, -85);
         behaviorNet.setClamped(true);
 
         // Set base text for labels
@@ -113,7 +113,7 @@ public class SimpleOperant extends RegisteredSimulation {
 
     private void setUpControlPanel() {
 
-        panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
+        panel = ControlPanel.makePanel(sim, "Control Panel", 5,9,190,109);
 
         panel.addButton("Reward Agent", () -> {
 

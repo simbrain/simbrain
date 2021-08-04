@@ -110,7 +110,7 @@ public class HopfieldCreationDialog extends StandardDialog {
         Hopfield hopfield = hc.create(networkPanel.getNetwork());
         layoutPanel.commitChanges();
         hopfield.getNeuronGroup().setLayout(layoutEditor.getLayout());
-        hopfield.getNeuronGroup().applyLayout();
+        hopfield.getNeuronGroup().applyLayout(-5, -85);
         networkPanel.getNetwork().addNetworkModel(hopfield);
         networkPanel.repaint();
         super.closeDialogOk();

@@ -109,7 +109,7 @@ public class CreaturesSim extends RegisteredSimulation {
     private void setUpWorld() {
 
         // Create odor world
-        oc = sim.addOdorWorld(601, 0, 456, 597, "World");
+        oc = sim.addOdorWorld(663,83,456,597, "World");
         oc.getWorld().setObjectsBlockMovement(false);
 
         // TODO: May be able to remove smell sources below since we are new using object sensors

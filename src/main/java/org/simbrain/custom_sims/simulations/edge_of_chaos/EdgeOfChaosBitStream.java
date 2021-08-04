@@ -48,7 +48,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkComponent nc = sim.addNetwork(170, 10, 450, 450, "Edge of Chaos");
+        NetworkComponent nc = sim.addNetwork(138,10,450,450, "Edge of Chaos");
         net = nc.getNetwork();
         buildNetwork();
 
@@ -60,7 +60,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5, 10);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5,10,133,136);
         JTextField input_tf = panel.addTextField("Input strength", "" + u_bar);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
@@ -139,7 +139,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
 
     private void setUpTimeSeries() {
         // Set up the plot
-        TimeSeriesPlotComponent ts = sim.addTimeSeries(609, 11, 363, 285, "Time Series");
+        TimeSeriesPlotComponent ts = sim.addTimeSeries(588,10,363,285, "Time Series");
         TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Difference");
 
         sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update time series") {

@@ -73,7 +73,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
     private void setUpNetwork() {
 
         // Set up network
-        nc = sim.addNetwork(10, 10, 581, 297,
+        nc = sim.addNetwork(9,8,581,297,
             "Patterns of Activity");
         net = nc.getNetwork();
 
@@ -102,7 +102,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
         // Alternate form would be based on vectors
         NeuronGroup ng = net.addNeuronGroup(x, y, mouse.getSensors().size());
         ng.setLayout(new LineLayout(LineLayout.LineOrientation.VERTICAL));
-        ng.applyLayout();
+        ng.applyLayout(-5, -85);
         ng.setLabel("Object Sensors");
         int i = 0;
         for (Sensor sensor : mouse.getSensors()) {
@@ -186,7 +186,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
 
     private void setUpWorld() {
 
-        OdorWorldComponent oc = sim.addOdorWorld(591, 0, 459, 300, "World");
+        OdorWorldComponent oc = sim.addOdorWorld(590,9,505,296, "World");
 
         // Mouse
         mouse = oc.getWorld().addEntity(187, 113, EntityType.MOUSE);

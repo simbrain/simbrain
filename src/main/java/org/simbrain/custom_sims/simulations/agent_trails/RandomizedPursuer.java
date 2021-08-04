@@ -77,7 +77,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
 
     private void createOdorWorld() {
 
-        oc = sim.addOdorWorld(629,9,378,350, "World");
+        oc = sim.addOdorWorld(626,8,378,297, "World");
         oc.getWorld().setObjectsBlockMovement(false);
 
         mouse = oc.getWorld().addEntity(0, 0, EntityType.MOUSE);
@@ -93,7 +93,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
     }
 
     private void buildNetwork() {
-        nc = sim.addNetwork(195, 9, 447, 296, "Pursuer");
+        nc = sim.addNetwork(179,8,447,296, "Pursuer");
         Network net = nc.getNetwork();
         Vehicle pursuer = new Vehicle(sim, net);
         vehicleNetwork = pursuer.addPursuer(10, 10,
@@ -111,7 +111,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
     private void setUpPlots() {
 
         // Projection plot
-        ProjectionComponent projComp = sim.addProjectionPlot(194, 312, 441, 308, "Sensory states");
+        ProjectionComponent projComp = sim.addProjectionPlot(178,304,441,308, "Sensory states");
         Projector proj = projComp.getProjector();
         proj.setTolerance(1);
         //proj.setProjectionMethod("Coordinate Projection");
@@ -123,7 +123,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
         projComp.getProjector().getColorManager().setColoringMethod("Bayesian");
 
         // Time series
-        TimeSeriesPlotComponent tsPlot = sim.addTimeSeries(626,368,363,285, "Prediction");
+        TimeSeriesPlotComponent tsPlot = sim.addTimeSeries(619,304,384,308, "Prediction");
         tsPlot.getModel().setAutoRange(false);
         tsPlot.getModel().setFixedWidth(false);
         tsPlot.getModel().setWindowSize(1000);
@@ -146,7 +146,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
 
     private void setUpControlPanel() {
 
-        panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
+        panel = ControlPanel.makePanel(sim, "Control Panel", 77,8,100,76);
 
         panel.addButton("Run", () -> {
             for (int trial = 0; trial  < numTrials; trial ++) {

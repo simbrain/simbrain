@@ -84,7 +84,7 @@ public class Cerebellum extends RegisteredSimulation {
     void buildNetwork() {
 
         // Set up network
-        nc = sim.addNetwork(246, 9, 538, 595, "Cerebellum");
+        nc = sim.addNetwork(234,9,538,595, "Cerebellum");
         network = nc.getNetwork();
 
         DecayRule generalRule = new DecayRule();
@@ -369,7 +369,7 @@ public class Cerebellum extends RegisteredSimulation {
      * Set up the controls.
      */
     void setUpControlPanel() {
-        panel = ControlPanel.makePanel(sim, "Train / Test", 5, 10);
+        panel = ControlPanel.makePanel(sim, "Train / Test", 4,9,230,221);
         
         NeuronGroup inputs = network.getNeuronGroupByLabel("From Spinal Cord");
         Neuron target = network.getNeuronByLabel("Target");
@@ -462,7 +462,7 @@ public class Cerebellum extends RegisteredSimulation {
     //
     void addTimeSeries() {
 
-        TimeSeriesPlotComponent ts = sim.addTimeSeries(768, 9, 363, 285,
+        TimeSeriesPlotComponent ts = sim.addTimeSeries(772,9,363,285,
             "Time Series");
         ts.getModel().setFixedWidth(true);
         ts.getModel().setWindowSize(1000);

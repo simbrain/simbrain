@@ -65,7 +65,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         buildNetwork();
 
         // Projection plot
-        ProjectionComponent pc = sim.addProjectionPlot(451, 260, 412, 365, "PCA");
+        ProjectionComponent pc = sim.addProjectionPlot(447,248,412,372, "PCA");
         sim.couple(reservoir, pc);
 
         // Odor world sim
@@ -76,7 +76,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 847, 10);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 861,1,127,106);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -236,7 +236,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     private void buildOdorWorld() {
 
         // Create the odor world
-        oc = sim.addOdorWorld(440, 9, 413, 248, "Two objects");
+        oc = sim.addOdorWorld(447,1,413,248, "Two objects");
         oc.getWorld().setObjectsBlockMovement(false);
         mouse = oc.getWorld().addEntity(165, 110, EntityType.MOUSE);
         mouse.setHeading(90);

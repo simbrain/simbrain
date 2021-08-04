@@ -55,10 +55,10 @@ public class MpfsSOM extends RegisteredSimulation {
         net = nc.getNetwork();
         som = new SOMNetwork(net, numSOMNodes, 29);
         som.getSom().setLayout(new HexagonalGridLayout(40, 40, 5));
-        som.getSom().applyLayout();
+        som.getSom().applyLayout(-5, -85);
         net.addNetworkModel(som);
         som.getInputLayer().setLayout(new GridLayout(70, 60, 5));
-        som.getInputLayer().applyLayout();
+        som.getInputLayer().applyLayout(-5, -85);
 
         data = Utils.getDoubleMatrix(new File(sim.getPath("mpfs/mpfs_data.csv")));
 

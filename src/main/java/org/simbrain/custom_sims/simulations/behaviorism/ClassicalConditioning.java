@@ -53,7 +53,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
 
         // Clear workspace
         sim.getWorkspace().clearWorkspace();
-        nc = sim.addNetwork(0,14,350,444, "Agent Brain (Black Box)");
+        nc = sim.addNetwork(0,14,350,443, "Agent Brain (Black Box)");
         net = nc.getNetwork();
 
         // Construct the network
@@ -91,7 +91,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
         // networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
 
         // Create the odor world
-        oc = sim.addOdorWorld(340,13,377,442, "Environment");
+        oc = sim.addOdorWorld(351,13,377,444, "Environment");
         oc.getWorld().setObjectsBlockMovement(false);
         mouse = oc.getWorld().addEntity(125, 211, EntityType.MOUSE);
         mouse.setHeading(90);
@@ -109,7 +109,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
         sim.couple(bellSensor, bellDetectorNeuron);
 
         // Create a time series plot
-        plot = sim.addTimeSeries(805,16,406,448, "Association Strength");
+        plot = sim.addTimeSeries(728,13,406,444, "Association Strength");
         plot.getModel().removeAllScalarTimeSeries();
         plot.getModel().setAutoRange(false);
         plot.getModel().setFixedWidth(true);

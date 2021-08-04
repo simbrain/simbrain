@@ -146,7 +146,7 @@ public class Hippocampus extends RegisteredSimulation {
         AlvarezSquire cg = new AlvarezSquire(this, 4);
         cg.setLabel(label);
         cg.setLayout(new LineLayout());
-        cg.applyLayout();
+        cg.applyLayout(-5, -85);
         cg.setUpdateMethod("AS");
         net.addNetworkModel(cg);
         cg.setLocation(x, y);
@@ -175,7 +175,7 @@ public class Hippocampus extends RegisteredSimulation {
      */
     private void setUpControlPanel() {
 
-        panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
+        panel = ControlPanel.makePanel(sim, "Control Panel", 7,13,186,420);
         Random generator = new Random();
 
         // Show pattern one

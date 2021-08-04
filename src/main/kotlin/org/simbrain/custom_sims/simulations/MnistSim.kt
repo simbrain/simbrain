@@ -33,7 +33,7 @@ val mnistSim = newSim {
         layout = GridLayout(50.0,50.0)
         setClamped(true)
     }
-    pixelNet.applyLayout()
+    pixelNet.applyLayout(-5, -85)
 
     println("Total Number of neurons: ${network.looseNeurons.size}")
 
@@ -46,7 +46,7 @@ val mnistSim = newSim {
     }
 
     val iwc = addImageWorld("Image World")
-    placeComponent(iwc,166, 9, 500,500)
+    placeComponent(iwc,166,9,500,405)
     val world = iwc.world
     // world.setCurrentFilter("Threshold 10x10")
 

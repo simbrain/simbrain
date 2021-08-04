@@ -55,14 +55,14 @@ public class Braitenberg extends RegisteredSimulation {
         agent2.addLeftRightSensors(EntityType.CIRCLE, 270);
         agent2.addDefaultEffectors();
 
-        NetworkComponent vehicle1 = sim.addNetwork(260,5,359,342, "Vehicle 1");
+        NetworkComponent vehicle1 = sim.addNetwork(251,1,359,327, "Vehicle 1");
         Vehicle vb1 = new Vehicle(sim, vehicle1.getNetwork());
         NeuronCollection ng1 = vb1.addPursuer(0, 0, agent1, EntityType.CIRCLE,
                 (ObjectSensor)agent1.getSensors().get(0),
                 (ObjectSensor) agent1.getSensors().get(1));
         ng1.setLabel("Vehicle 1");
 
-        NetworkComponent vehicle2 = sim.addNetwork(259,329,361,321, "Vehicle 2");
+        NetworkComponent vehicle2 = sim.addNetwork(249,329,361,319, "Vehicle 2");
         Vehicle vb2 = new Vehicle(sim, vehicle2.getNetwork());
         NeuronCollection ng2 = vb2.addPursuer(0, 0, agent2, EntityType.CIRCLE,
                 (ObjectSensor)agent1.getSensors().get(0),

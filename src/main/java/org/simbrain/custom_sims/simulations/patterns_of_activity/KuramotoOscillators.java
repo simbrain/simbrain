@@ -68,7 +68,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpNetwork() {
 
         // Set up network
-        NetworkComponent nc = sim.addNetwork(10, 10, 337, 588,
+        NetworkComponent nc = sim.addNetwork(10,10,337,499,
             "Patterns of Activity");
         net = nc.getNetwork();
         net.setTimeStep(0.5);
@@ -94,7 +94,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
         reservoirNet.setLayout(new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(neuronList.size())));
         net.addNetworkModel(reservoirNet);
         reservoirNet.setLocation(150,-242);
-        reservoirNet.applyLayout();
+        reservoirNet.applyLayout(-5, -85);
         reservoirNet.setLabel("Recurrent Layer");
 
         // Set up recurrent synapses
@@ -154,7 +154,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpWorld() {
 
         // Set up odor world
-        OdorWorldComponent oc = sim.addOdorWorld(338, 10, 436, 516, "World");
+        OdorWorldComponent oc = sim.addOdorWorld(346,10,510,499, "World");
         oc.getWorld().setObjectsBlockMovement(false);
         oc.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
 
@@ -179,7 +179,7 @@ public class KuramotoOscillators extends RegisteredSimulation {
     private void setUpProjectionPlot() {
 
         // Projection of main reservoir
-        plot = sim.addProjectionPlot(800,10,452,492,"Cognitive Map");
+        plot = sim.addProjectionPlot(855,10,452,499,"Cognitive Map");
         plot.getProjectionModel().init(reservoirNet.size());
         plot.getProjectionModel().getProjector().setTolerance(1);
         //plot.getProjectionModel().getProjector().setUseColorManager(false);

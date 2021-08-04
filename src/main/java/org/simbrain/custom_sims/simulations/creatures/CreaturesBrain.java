@@ -143,7 +143,7 @@ public class CreaturesBrain {
     public void setLobeColumns(NeuronGroup lobe, int numColumns, double gridSpace) {
         GridLayout gridLayout = new GridLayout(gridSpace, gridSpace, numColumns);
         lobe.setLayout(gridLayout);
-        lobe.applyLayout();
+        lobe.applyLayout(-5, -85);
     }
 
     public SynapseGroup createSynapseGroup(NeuronGroup sourceLobe, NeuronGroup targetLobe, String groupName) {

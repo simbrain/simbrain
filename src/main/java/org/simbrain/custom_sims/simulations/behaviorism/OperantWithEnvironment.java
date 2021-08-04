@@ -65,13 +65,13 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         // Behavioral nodes
         behaviorNet = net.addNeuronGroup(-9.25, 95.93, numNeurons);
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
-        behaviorNet.applyLayout();
+        behaviorNet.applyLayout(-5, -85);
         behaviorNet.setLabel("Behaviors");
 
         // Stimulus nodes
         stimulusNet = net.addNeuronGroup(-9.25, 295.93, numNeurons);
         ((LineLayout) stimulusNet.getLayout()).setSpacing(100);
-        stimulusNet.applyLayout();
+        stimulusNet.applyLayout(-5, -85);
         stimulusNet.setClamped(true);
         stimulusNet.setLabel("Stimuli");
         stimulusNet.setIncrement(1);
@@ -231,7 +231,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
     private void setUpControlPanel() {
 
-        panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10);
+        panel = ControlPanel.makePanel(sim, "Control Panel", 5, 10, 150, 189);
 
         panel.addButton("Reward", () -> {
             learn(1);

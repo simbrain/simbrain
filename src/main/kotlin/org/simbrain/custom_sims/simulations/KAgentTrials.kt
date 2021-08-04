@@ -28,8 +28,8 @@ val kAgentTrails = newSim {
 
     withGui {
         place(networkComponent) {
-            location = point(195, 9)
-            width = 447
+            location = point(153,10)
+            width = 439
             height = 296
         }
     }
@@ -143,7 +143,7 @@ val kAgentTrails = newSim {
             projector.tolerance = .001
         }
         place(plot) {
-            location = point(194,312)
+            location = point(152,306)
             width = 441
             height = 308
         }

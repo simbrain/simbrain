@@ -21,7 +21,6 @@ package org.simbrain.network.gui.dialogs.network;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.trainer.DataPanel;
-import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.NumericTable;
@@ -171,7 +170,7 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
                 } else if (index == 3) {
                     // Set validation data to whatever input data currently is
                     if (inputPanel.getTable().getData() != null) {
-                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).asDoubleArray());
+                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).as2DDoubleArray());
                     }
                 }
                 pack();

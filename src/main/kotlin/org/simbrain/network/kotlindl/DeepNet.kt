@@ -37,7 +37,7 @@ class DeepNet(private val network: Network
     }
 
     override fun size(): Int {
-        return deepNetLayers.layers.last().outputShape[1].toInt();
+        return deepNetLayers.layers.first().outputShape[1].toInt();
     }
 
     override fun getNetwork(): Network {

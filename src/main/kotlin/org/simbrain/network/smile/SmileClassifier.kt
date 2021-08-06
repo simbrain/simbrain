@@ -4,25 +4,38 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
-import org.simbrain.util.getOneHot
+import org.simbrain.util.getOneHotMat
 import org.simbrain.util.propertyeditor.EditableObject
-import smile.math.kernel.PolynomialKernel
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 
-class SmileClassifier(var net: Network, val classifier: SVMClassifier, inputSize: Int, outputSize: Int) :
-    Layer(), EditableObject {
+class SmileClassifier(
+    val net: Network,
+    val classifier: ClassifierWrapper,
+    val inputSize: Int,
+    val outputSize: Int,
+    var nsamples: Int
+) : Layer(), EditableObject {
 
-    // TODO
+    /**
+     * A 2d array. Rows correspond to possible inputs to the classifier.
+     * Number of rows must = inputSize
+     *
+     * Xor example: [[0,0],[1,0],[0,1],[1,1]]
+     */
     var trainingInputs: Array<DoubleArray>
+
+    /**
+     * Associates each row of traiingInputs with a classification into one of a set of categories. These can be
+     * represented in different ways depending on the classifier.
+     *
+     * Xor example: [-1,1,1,-1]
+     *
+     * Simbrain will convert these "outputs" of the classifier into an appropriate double array using a one-hot
+     * encoding. E.g. for a 2-category classifiers, -1 -> 1,0 and 1 -> 0,1
+     */
     var targets: IntArray
-
-    @UserParameter(label = "Kernel Degree")
-    private val kernelDegree = 2
-
-    private val kernel = PolynomialKernel(kernelDegree)
-    var result = 0
-    var outputSize: Int
+    // TODO: Enforce these constraints
 
     /**
      * Collects inputs from other network models using arrays.
@@ -30,20 +43,24 @@ class SmileClassifier(var net: Network, val classifier: SVMClassifier, inputSize
     private val inputs: Matrix
 
     /**
+     * Output matrix
+     */
+    private var outputs = Matrix(outputSize, 1)
+
+    var bounds: Rectangle2D.Double? = null
+
+    /**
      * Construct a classifier.
      */
     init {
-        inputs = Matrix(inputSize, 1)
-        val initialNumRows = 20
-        trainingInputs = Array(initialNumRows) { DoubleArray(inputSize) }
-        targets = IntArray(initialNumRows)
-        this.outputSize = outputSize
         label = net.idManager.getProposedId(this::class.java)
+        inputs = Matrix(inputSize, 1)
+        trainingInputs = Array(nsamples) { DoubleArray(inputSize) }
+        targets = IntArray(nsamples)
     }
 
     fun train(inputs: Array<DoubleArray>, targets: IntArray) {
         try {
-            // classifier.fit(inputs, targets, kernel, 1000.0, 1E-3)
             classifier.fit(inputs, targets)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -51,13 +68,27 @@ class SmileClassifier(var net: Network, val classifier: SVMClassifier, inputSize
     }
 
     override fun update() {
-        // result = classifier.predict(getInputs().col(0))
+        if (classifier.model != null) {
+            val pred = classifier.predict(getInputs().col(0))
+            if (classifier.model != null) {
+                // TODO: This is hand-coded for the SVM binary case.
+                // As we get more cases expand this
+                if (pred == -1) {
+                    outputs = getOneHotMat(0, outputSize, 1.0)
+                } else {
+                    outputs = getOneHotMat(1, outputSize, 1.0)
+                }
+            }
+        }
+        events.fireUpdated()
+        inputs.mul(0.0) // clear inputs
     }
 
     override fun toString(): String {
-        return "SVM classifier $label"
+        return "Classifier $label"
     }
 
+    // TODO: Get rid of this. Need not be an abstract method of Layer. Not needed here.
     override fun getInputs(): Matrix {
         return inputs
     }
@@ -66,12 +97,23 @@ class SmileClassifier(var net: Network, val classifier: SVMClassifier, inputSize
         inputs.add(newInputs)
     }
 
+    override fun updateInputs() {
+        val wtdInputs = Matrix(size(), 1)
+        for (c in incomingConnectors) {
+            wtdInputs.add(c.output)
+        }
+        addInputs(wtdInputs)
+    }
+
+    /**
+     * Get predicted output as a matrix
+     */
     override fun getOutputs(): Matrix {
-        return getOneHot(result, outputSize, 1.0)
+        return outputs
     }
 
     override fun size(): Int {
-        return 0
+        return inputSize
     }
 
     override fun getNetwork(): Network {
@@ -79,29 +121,35 @@ class SmileClassifier(var net: Network, val classifier: SVMClassifier, inputSize
     }
 
     override fun getBound(): Rectangle2D? {
-        return null
+        return bounds
     }
 
     /**
      * Helper class for creating classifiers.
      */
-    class ClassifierCreator(proposedLabel : String) : EditableObject {
+    class ClassifierCreator(proposedLabel: String) : EditableObject {
 
         @UserParameter(label = "Label", order = 5)
         private val label = proposedLabel
 
         @UserParameter(label = "Number of inputs", order = 10)
-        var nin = 10
+        var nin = 4
 
-        @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order = 20)
+        @UserParameter(label = "Number of outputs", order = 20)
+        var nout = 2
+
+        @UserParameter(label = "Number of training samples", order = 30)
+        var nsamples = 4
+
+        @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order = 40)
         var classifierType = SVMClassifier()
 
         override fun getName(): String {
             return "Classifier"
         }
 
-        fun create(net : Network): SmileClassifier {
-            return SmileClassifier(net, classifierType, nin, 1)
+        fun create(net: Network): SmileClassifier {
+            return SmileClassifier(net, classifierType, nin, nout, nsamples)
         }
 
     }

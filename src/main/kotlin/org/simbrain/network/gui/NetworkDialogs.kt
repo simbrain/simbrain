@@ -212,6 +212,7 @@ fun NetworkPanel.createConnector() {
 fun NetworkPanel.showDeepNetCreationDialog() {
     val creator = DeepNet.DeepNetCreator(network.idManager.getProposedId(DeepNet::class.java))
     val dialog = StandardDialog()
+    val ape: AnnotatedPropertyEditor
 
     fun getEditor(obj : CopyableObject):  JPanel {
         return ObjectTypeEditor.createEditor(listOf(obj), "getTypes", "Layer",
@@ -226,11 +227,13 @@ fun NetworkPanel.showDeepNetCreationDialog() {
 
     dialog.contentPane = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
-        add(AnnotatedPropertyEditor(creator))
+        ape = AnnotatedPropertyEditor(creator)
+        add(ape)
         add(list)
     }
 
     dialog.addClosingTask {
+        ape.commitChanges()
         val dn = creator.create(network)
         // TODO: Figure out how to get these layers built!
         list.objects.forEach { p -> println((p as ObjectTypeEditor).value) }
@@ -248,13 +251,16 @@ fun NetworkPanel.showDeepNetCreationDialog() {
 fun NetworkPanel.showClassifierCreationDialog() {
     val creator = SmileClassifier.ClassifierCreator(network.idManager.getProposedId(SmileClassifier::class.java))
     val dialog = StandardDialog()
+    val ape: AnnotatedPropertyEditor
 
     dialog.contentPane = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
-        add(AnnotatedPropertyEditor(creator))
+        ape = AnnotatedPropertyEditor(creator)
+        add(ape)
     }
 
     dialog.addClosingTask {
+        ape.commitChanges()
         network.addNetworkModel(creator.create(network))
     }
     dialog.pack()

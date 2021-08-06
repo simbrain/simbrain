@@ -70,8 +70,7 @@ public abstract class Layer extends LocatableModel {
     private transient LocationEvents events = new LocationEvents(this);
 
     /**
-     * Returns the size of whatever is used as output for this layer, e.g. an activation vector or output layer
-     * activation vector.
+     * Returns the size of whatever is receives input for this layer, e.g. an activation vector or input layer.
      */
     public abstract int size();
 
@@ -84,6 +83,9 @@ public abstract class Layer extends LocatableModel {
 
     public abstract Network getNetwork();
 
+    /**
+     * Needed so arrow can be set correctly
+     */
     public abstract Rectangle2D getBound();
 
     public void addIncomingConnector(Connector connector) {

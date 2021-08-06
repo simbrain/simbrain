@@ -109,7 +109,7 @@ public class HopfieldEditTrainDialog extends StandardDialog {
                     inputPanel.commitChanges();
                 } else if (index == 2) {
                     if (inputPanel.getTable().getData() != null) {
-                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).asDoubleArray());
+                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).as2DDoubleArray());
                     }
                 }
             }

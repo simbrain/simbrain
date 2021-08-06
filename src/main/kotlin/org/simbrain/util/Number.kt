@@ -38,8 +38,14 @@ infix fun Iterable<Int>.sse(other: Iterable<Int>)
 infix fun Iterable<Int>.mse(other: Iterable<Int>)
         = (this squaredError other).average()
 
-fun getOneHot(index : Int, size: Int, amount: Double = 1.0): Matrix {
+fun getOneHotMat(index : Int, size: Int, amount: Double = 1.0): Matrix {
         val ret = Matrix(size, 1)
         ret[index, 0] = amount
+        return ret
+}
+
+fun getOneHotArray(index : Int, size: Int, amount: Double = 1.0): DoubleArray {
+        val ret = DoubleArray(size)
+        ret[index] = amount
         return ret
 }

@@ -218,17 +218,6 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
         inputs.add(newInputs);
     }
 
-    /**
-     * Set the activations to a one-hot encoding (all 0s and one 1) at provided index.
-     *
-     * @see {<a href="https://en.wikipedia.org/wiki/One-hot"></a>}.
-     */
-    public void setOneHot(int index) {
-        clear();
-        activations.set(0, index, 1.0);
-        getEvents().fireUpdated();
-    }
-
     public void setActivations(Matrix newActivations) {
         activations = newActivations;
         getEvents().fireUpdated();

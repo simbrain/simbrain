@@ -14,7 +14,6 @@
 package org.simbrain.network.gui.trainer;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -174,7 +173,7 @@ public class DataPanel extends JPanel {
     public boolean commitChanges() {
         // System.out.println("DataPanel commit changes " + table.hasChanged());
         if (table.hasChanged()) {
-            dataHolder.setData(((NumericTable) table.getData()).asDoubleArray());
+            dataHolder.setData(((NumericTable) table.getData()).as2DDoubleArray());
             // Set has changed to false, so that the data only re-committed if
             // the data have changed.
             table.setHasChangedSinceLastSave(false);

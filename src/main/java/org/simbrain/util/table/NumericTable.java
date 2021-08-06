@@ -326,9 +326,8 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
      *
      * @return representation of table as double array
      */
-    public double[][] asDoubleArray() {
-
-        double returnList[][] = new double[getRowCount()][getLogicalColumnCount()];
+    public double[][] as2DDoubleArray() {
+        double[][] returnList = new double[getRowCount()][getLogicalColumnCount()];
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getLogicalColumnCount(); j++) {
                 returnList[i][j] = this.getLogicalValueAt(i, j);

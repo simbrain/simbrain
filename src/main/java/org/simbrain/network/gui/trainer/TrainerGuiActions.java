@@ -152,7 +152,7 @@ public class TrainerGuiActions {
                     try {
                         ((NumericTable) table.getData()).readData(theFile, true, false);
                         if (dataHolder != null) {
-                            dataHolder.setData(((NumericTable) table.getData()).asDoubleArray());
+                            dataHolder.setData(((NumericTable) table.getData()).as2DDoubleArray());
                         }
                     } catch (InvalidDataException exception) {
                         JOptionPane.showMessageDialog(null, exception.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

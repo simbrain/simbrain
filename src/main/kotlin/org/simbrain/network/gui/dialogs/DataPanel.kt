@@ -26,7 +26,6 @@ class DataPanelEvents(dataPanel: DataPanel): Event(PropertyChangeSupport(dataPan
 
     fun onInsert(handler: Consumer<Int>) = "Insert".itemAddedEvent(handler)
     fun fireInsert(rowNumber: Int) = "Insert"(new = rowNumber)
-
 }
 
 class DataPanel: JPanel() {
@@ -49,12 +48,10 @@ class DataPanel: JPanel() {
         }
     }
 
-    private val jTable = SimbrainJTable.createTable(table)
+    val jTable = SimbrainJTable.createTable(table)
 
     private val scrollPanel = SimbrainJTableScrollPanel(jTable)
         .also { add("Center", it) }
-
-    // Toolbars
 
     private val fileToolBar = JToolBar().apply {
         add(TrainerGuiActions.getOpenCSVAction(jTable, null))
@@ -62,11 +59,11 @@ class DataPanel: JPanel() {
         toolbars.add(this)
     }
 
-    private val editToolBar = JToolBar().apply {
-        add(TableActionManager.getInsertRowAction(jTable))
-        add(TableActionManager.getDeleteRowAction(jTable))
-        toolbars.add(this)
-    }
+    // private val editToolBar = JToolBar().apply {
+    //     add(TableActionManager.getInsertRowAction(jTable))
+    //     add(TableActionManager.getDeleteRowAction(jTable))
+    //     toolbars.add(this)
+    // }
 
     private val numericEditToolbar = JToolBar().apply {
         add(TableActionManager.getRandomizeAction(jTable))
@@ -75,8 +72,6 @@ class DataPanel: JPanel() {
         add(TableActionManager.getFillAction(jTable))
         toolbars.add(this)
     }
-
-
 
     val events = DataPanelEvents(this)
 

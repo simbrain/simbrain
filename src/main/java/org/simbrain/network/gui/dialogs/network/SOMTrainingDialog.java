@@ -117,7 +117,7 @@ public class SOMTrainingDialog extends StandardDialog {
                     somPropsPanel.commitChanges();
                 } else if (index == 3) {
                     if (inputPanel.getTable().getData() != null) {
-                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).asDoubleArray());
+                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).as2DDoubleArray());
                     }
                 }
             }

@@ -56,7 +56,7 @@ public class WeightMatrix extends Connector {
         source.addOutgoingConnector(this);
         target.addIncomingConnector(this);
 
-        weightMatrix = new Matrix(source.size(),target.size());
+        weightMatrix = new Matrix(target.size(), source.size());
 
         // Default for "adapter" cases is 1-1
         if (source instanceof AbstractNeuronCollection) {
@@ -92,7 +92,7 @@ public class WeightMatrix extends Connector {
      */
     public void diagonalize() {
         clear();
-        weightMatrix = Matrix.eye(source.size(), target.size());
+        weightMatrix = Matrix.eye(target.size(), source.size());
         getEvents().fireUpdated();
     }
 
@@ -101,7 +101,7 @@ public class WeightMatrix extends Connector {
      */
     @Override
     public Matrix getOutput() {
-        return weightMatrix.tm(source.getOutputs());
+        return weightMatrix.mm(source.getOutputs());
     }
 
     @Override

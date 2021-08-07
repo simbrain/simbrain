@@ -788,4 +788,10 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         setActivations(newActivations);
         events.fireUpdated();
     }
+
+    @Override
+    public void toggleClamping() {
+        neuronList.forEach(Neuron::toggleClamping);
+    }
+
 }

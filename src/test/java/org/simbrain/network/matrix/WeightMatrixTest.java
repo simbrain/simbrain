@@ -50,7 +50,7 @@ public class WeightMatrixTest {
     public void testMatrixProduct() {
         na1.setActivations(new Matrix(new double[]{1, 2}));
         wm.setWeights(new double[]{1, 2, 3, 4});
-        assertArrayEquals(new double[]{7,10}, wm.getOutput().col(0), 0.0);
+        assertArrayEquals(new double[]{5,11}, wm.getOutput().col(0), 0.0);
     }
 
     // @Test

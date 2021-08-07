@@ -47,7 +47,9 @@ class SmileClassifier(
      */
     private var outputs = Matrix(outputSize, 1)
 
-    var bounds: Rectangle2D.Double? = null
+    var width: Double = 0.0
+    var height: Double = 0.0
+
 
     /**
      * Construct a classifier.
@@ -121,7 +123,7 @@ class SmileClassifier(
     }
 
     override fun getBound(): Rectangle2D? {
-        return bounds
+        return Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
     }
 
     /**

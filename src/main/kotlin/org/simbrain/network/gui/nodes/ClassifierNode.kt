@@ -15,7 +15,6 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.NumericTable
 import java.awt.Dialog.ModalityType
 import java.awt.geom.Point2D
-import java.awt.geom.Rectangle2D
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -83,11 +82,8 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
         // Sets border box to size of text
         borderBox.setBounds(pb.x - 5, pb.y - 5, pb.width + 20, pb.height + 20)
         setBounds(borderBox.bounds)
-    }
-
-    override fun setBounds(newBounds: Rectangle2D?): Boolean {
-        smileClassifier.bounds = newBounds as Rectangle2D.Double?
-        return super.setBounds(newBounds)
+        smileClassifier.width = borderBox.width
+        smileClassifier.height = borderBox.height
     }
 
     override fun getModel(): NetworkModel {

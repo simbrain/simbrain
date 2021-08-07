@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import org.piccolo2d.PNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow
@@ -28,6 +29,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
                 }
                 head = when (target) {
                     is NeuronArray -> 5.0
+                    is SmileClassifier -> 5.0
                     else -> default
                 }
             }

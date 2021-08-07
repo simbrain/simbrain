@@ -1,20 +1,31 @@
 package org.simbrain.network.matrix;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.groups.NeuronGroup;
 import smile.math.matrix.Matrix;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WeightMatrixTest {
 
-    Network net = new Network();
-    NeuronArray na1 = new NeuronArray(net, 2);
-    NeuronArray na2 = new NeuronArray(net, 2);
-    WeightMatrix wm = new WeightMatrix(net, na1, na2);
+    Network net;
+    NeuronArray na1;
+    NeuronArray na2;
+    WeightMatrix wm;
 
+    @BeforeEach
+    public void setUp() {
+        net = new Network();
+        na1 = new NeuronArray(net, 2);
+        na2 = new NeuronArray(net, 2);
+        wm = new WeightMatrix(net, na1, na2);
+        net.addNetworkModels(List.of(na1, na2, wm));
+    }
     @Test
     public void testMatrixOperations() {
 
@@ -51,6 +62,31 @@ public class WeightMatrixTest {
         na1.setActivations(new Matrix(new double[]{1, 2}));
         wm.setWeights(new double[]{1, 2, 3, 4});
         assertArrayEquals(new double[]{5,11}, wm.getOutput().col(0), 0.0);
+    }
+
+    @Test
+    public void testArrayToArray() {
+        na1.setActivations(new Matrix(new double[]{.5, -.5}));
+        wm.diagonalize();
+        net.bufferedUpdate(); // input should be cleared and second array updated
+        assertArrayEquals(new double[]{0,0}, na1.getActivations().col(0), 0.0);
+        assertArrayEquals(new double[]{.5,-.5}, na2.getActivations().col(0), 0.0);
+        net.bufferedUpdate(); // All should be cleared on second update
+        assertArrayEquals(new double[]{0,0}, na1.getActivations().col(0), 0.0);
+        assertArrayEquals(new double[]{0,0}, na2.getActivations().col(0), 0.0);
+    }
+
+    @Test
+    public void testArrayToNeuronGroup() {
+        na1.setActivations(new Matrix(new double[]{.5, -.5}));
+        NeuronGroup ng = new NeuronGroup(net, 2);
+        WeightMatrix wm2 = new WeightMatrix(net, na1, ng);
+        wm2.diagonalize();
+        net.addNetworkModels(List.of(ng, wm2));
+        net.bufferedUpdate();
+        assertArrayEquals(new double[]{.5,-.5}, ng.getActivations(), 0.0);
+        net.bufferedUpdate(); // All should be cleared on second update
+        assertArrayEquals(new double[]{0,0}, ng.getActivations(), 0.0);
     }
 
     // @Test

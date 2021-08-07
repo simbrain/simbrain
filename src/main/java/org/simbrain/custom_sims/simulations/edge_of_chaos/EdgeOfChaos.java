@@ -238,6 +238,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         // Create the odor world
         oc = sim.addOdorWorld(447,1,413,248, "Two objects");
         oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setUseCameraCentering(false);
         mouse = oc.getWorld().addEntity(165, 110, EntityType.MOUSE);
         mouse.setHeading(90);
 

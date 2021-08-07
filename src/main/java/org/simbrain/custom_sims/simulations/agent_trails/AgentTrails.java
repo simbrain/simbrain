@@ -124,6 +124,7 @@ public class AgentTrails extends RegisteredSimulation {
 
         oc = sim.addOdorWorld(629, 9, 441, 508, "World");
         oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setUseCameraCentering(false);
 
         mouse = oc.getWorld().addEntity(204, 343, EntityType.MOUSE);
         mouse.setHeading(90);

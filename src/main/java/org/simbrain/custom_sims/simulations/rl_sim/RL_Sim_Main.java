@@ -181,6 +181,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         oc = sim.addOdorWorld(778,3,472,330, "Virtual World");
         world = oc.getWorld();
         world.setObjectsBlockMovement(false);
+        world.setUseCameraCentering(false);
         //world.setWrapAround(false);
         world.setTileMap(TMXUtils.loadTileMap("empty.tmx"));
         initializeWorldObjects();

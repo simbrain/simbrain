@@ -113,7 +113,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
     public void addNeuronNodes(Collection<NeuronNode> neuronNodes) {
         this.neuronNodes.addAll(neuronNodes);
         for (NeuronNode neuronNode : neuronNodes) {
-            // Listen directly to neuronnodes for property change events
+            // Listen directly to neuron nodes for property change events
             NeuronEvents neuronEvents = neuronNode.getNeuron().getEvents();
             neuronEvents.onDeleted(n -> {
                 this.neuronNodes.remove(neuronNode);
@@ -123,7 +123,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             neuronEvents.onLabelChange((o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
         }
         outlinedObjects.resetOutlinedNodes(this.neuronNodes);
-        outlinedObjects.updateBounds();
     }
 
     public void removeNeuronNode(NeuronNode neuronNode) {

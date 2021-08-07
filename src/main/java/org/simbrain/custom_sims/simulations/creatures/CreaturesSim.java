@@ -111,6 +111,7 @@ public class CreaturesSim extends RegisteredSimulation {
         // Create odor world
         oc = sim.addOdorWorld(663,83,456,597, "World");
         oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setUseCameraCentering(false);
 
         // TODO: May be able to remove smell sources below since we are new using object sensors
 

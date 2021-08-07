@@ -286,7 +286,6 @@ public class OdorWorldPanel extends JPanel {
             }
         });
 
-
         world.getTileMap().addPropertyChangeListener(e -> {
             if ("layerImageChanged".equals(e.getPropertyName())) {
                 PImage oldImage = (PImage) e.getOldValue();
@@ -307,6 +306,11 @@ public class OdorWorldPanel extends JPanel {
     }
 
     private void centerCameraToSelectedEntity() {
+        if (!world.isUseCameraCentering()) {
+            repaint();
+            return;
+        }
+
         if (!getSelectedModelEntities().isEmpty()) {
             double worldHeight = world.getHeight();
             double worldWidth = world.getWidth();

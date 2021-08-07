@@ -57,7 +57,6 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     public NeuronCollectionNode(NetworkPanel networkPanel, NeuronCollection nc) {
 
         super(networkPanel, nc);
-
         this.neuronCollection = nc;
 
         NeuronCollectionInteractionBox interactionBox = new NeuronCollectionInteractionBox(networkPanel);

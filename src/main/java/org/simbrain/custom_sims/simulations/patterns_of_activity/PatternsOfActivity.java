@@ -137,6 +137,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
         // Set up odor world
         OdorWorldComponent oc = sim.addOdorWorld(547, 5, 504, 548, "World");
         oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setUseCameraCentering(false);
         oc.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
         OdorWorldEntity mouse = oc.getWorld().addEntity(120, 245, EntityType.MOUSE);
         mouse.setUpdateHeadingBasedOnVelocity(true);

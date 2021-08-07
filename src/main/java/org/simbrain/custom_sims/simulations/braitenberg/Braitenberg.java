@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
  */
 public class Braitenberg extends RegisteredSimulation {
 
-
     public Braitenberg() {
         super();
     }
@@ -48,6 +47,7 @@ public class Braitenberg extends RegisteredSimulation {
         Simulation sim = new Simulation(desktop);
         OdorWorldComponent oc = sim.addOdorWorld(610,3,496,646, "World");
         oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setUseCameraCentering(false);
         OdorWorldEntity agent1 = oc.getWorld().addEntity(120, 245, EntityType.CIRCLE);
         OdorWorldEntity agent2 = oc.getWorld().addEntity(320, 245, EntityType.CIRCLE);
         agent1.addLeftRightSensors(EntityType.CIRCLE, 270);

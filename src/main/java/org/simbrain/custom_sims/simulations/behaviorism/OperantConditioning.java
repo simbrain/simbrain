@@ -61,13 +61,13 @@ public class OperantConditioning extends RegisteredSimulation {
         // Behavioral nodes
         behaviorNet = net.addNeuronGroup(-14, 73, numNeurons);
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
-        behaviorNet.applyLayout(-5, -85);
+        behaviorNet.applyLayout();
         behaviorNet.setLabel("Behaviors");
 
         // Stimulus nodes
         stimulusNet = net.addNeuronGroup(-9.8, 269.93, numNeurons);
         ((LineLayout) stimulusNet.getLayout()).setSpacing(100);
-        stimulusNet.applyLayout(-5, -85);
+        stimulusNet.applyLayout();
         stimulusNet.setClamped(true);
         stimulusNet.setLabel("Stimuli");
         stimulusNet.setIncrement(1);

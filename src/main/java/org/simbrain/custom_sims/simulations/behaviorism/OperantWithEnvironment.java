@@ -65,13 +65,13 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         // Behavioral nodes
         behaviorNet = net.addNeuronGroup(-9.25, 95.93, numNeurons);
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
-        behaviorNet.applyLayout(-5, -85);
+        behaviorNet.applyLayout();
         behaviorNet.setLabel("Behaviors");
 
         // Stimulus nodes
         stimulusNet = net.addNeuronGroup(-9.25, 295.93, numNeurons);
         ((LineLayout) stimulusNet.getLayout()).setSpacing(100);
-        stimulusNet.applyLayout(-5, -85);
+        stimulusNet.applyLayout();
         stimulusNet.setClamped(true);
         stimulusNet.setLabel("Stimuli");
         stimulusNet.setIncrement(1);
@@ -115,6 +115,7 @@ public class OperantWithEnvironment extends RegisteredSimulation {
         // Create the odor world
         oc = sim.addOdorWorld(730,7,315,383, "Three Objects");
         oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setUseCameraCentering(false);
         mouse = oc.getWorld().addEntity(120, 245, EntityType.MOUSE);
         mouse.setHeading(90);
 

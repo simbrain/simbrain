@@ -92,6 +92,8 @@ public class ClassicalConditioning extends RegisteredSimulation {
         // Create the odor world
         oc = sim.addOdorWorld(351,13,377,444, "Environment");
         oc.getWorld().setObjectsBlockMovement(false);
+        oc.getWorld().setUseCameraCentering(false);
+
         mouse = oc.getWorld().addEntity(125, 211, EntityType.MOUSE);
         mouse.setHeading(90);
 

@@ -72,6 +72,11 @@ public class OdorWorld implements EditableObject {
     @UserParameter(label = "Objects block movement", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
     private boolean objectsBlockMovement = true;
 
+    @UserParameter(label = "Use camera centering", description = "For large worlds centers the camera on the current " +
+            "agent. Turn off in particular when not using tilemaps.",
+            order = 20)
+    private boolean useCameraCentering = true;
+
     // TODO: Use the id manager
     /**
      * Entity Id generator.
@@ -560,5 +565,13 @@ public class OdorWorld implements EditableObject {
 
     public OdorWorldEvents getEvents() {
         return events;
+    }
+
+    public void setUseCameraCentering(boolean useCameraCentering) {
+        this.useCameraCentering = useCameraCentering;
+    }
+
+    public boolean isUseCameraCentering() {
+        return useCameraCentering;
     }
 }

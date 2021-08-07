@@ -135,7 +135,7 @@ public class ZoeLayerNode extends ScreenElement {
      * Update status text.
      */
     private void updateInfoText() {
-        infoText.setText(layer.getLabel() + " " +  "nodes: " + layer.size());
+        infoText.setText(layer.getLabel() + " " +  "nodes: " + layer.outputSize());
     }
 
     /**

@@ -1,7 +1,6 @@
 package org.simbrain.network.matrix;
 
 
-import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -19,7 +18,7 @@ import java.awt.geom.Rectangle2D;
 /**
  * A "neuron array" backed by a Smile Matrix.
  */
-public class NeuronArray extends Layer implements EditableObject, AttributeContainer {
+public class NeuronArray extends ArrayLayer implements EditableObject, AttributeContainer {
 
     @UserParameter(label = "Clamped", description = "Clamping", order = 3)
     private boolean clamped;
@@ -36,20 +35,10 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
     private MatrixDataHolder dataHolder;
 
     /**
-     * Reference to network this array is part of.
-     */
-    private final Network parent;
-
-    /**
      * Array to hold activation values. These are also the outputs that are consumed by
      * other network components via {@link Layer}.
      */
     private Matrix activations;
-
-    /**
-     * Collects inputs from other network models using arrays.
-     */
-    private Matrix inputs;
 
     /**
      * Render an image showing each activation when true.
@@ -64,9 +53,8 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
      * @param size number of components in the array
      */
     public NeuronArray(Network net, int size) {
-        parent = net;
+        super(net, size);
         activations = new Matrix(size, 1);
-        inputs = new Matrix(size, 1);
         randomize();
         setLabel(net.getIdManager().getProposedId(this.getClass()));
         setPrototypeRule(prototypeRule);
@@ -80,7 +68,7 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
      * @return the deep copy
      */
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
-        NeuronArray copy = new NeuronArray(newParent, orig.size());
+        NeuronArray copy = new NeuronArray(newParent, orig.outputSize());
         copy.setLocation(orig.getLocation());
         copy.setActivations(orig.getActivations());
         copy.setPrototypeRule(orig.getPrototypeRule());
@@ -95,11 +83,6 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
     @Override
     public Matrix getOutputs() {
         return activations;
-    }
-
-    @Override
-    public Matrix getInputs() {
-        return inputs;
     }
 
     @Override
@@ -193,30 +176,16 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
         }
     }
 
-
-    @Override
-    public void updateInputs() {
-        Matrix wtdInputs = new Matrix(size(), 1);
-        for (Connector c : getIncomingConnectors()) {
-            wtdInputs.add(c.getOutput());
-        }
-        addInputs(wtdInputs);
-    }
-
     @Override
     public void update() {
         if (clamped) {
             return;
         }
         prototypeRule.apply(this, dataHolder);
-        inputs.mul(0); // clear inputs
+        getInputs().mul(0); // clear inputs
         getEvents().fireUpdated();
     }
 
-    @Override
-    public void addInputs(Matrix newInputs) {
-        inputs.add(newInputs);
-    }
 
     public void setActivations(Matrix newActivations) {
         activations = newActivations;
@@ -227,14 +196,21 @@ public class NeuronArray extends Layer implements EditableObject, AttributeConta
         getEvents().fireLocationChange();
     }
 
-    @Override
+    /**
+     * Input and output size are the same for neuron arrays.
+     */
     public int size() {
-        return (int) activations.size();
+        return  (int) activations.size();
     }
 
     @Override
-    public Network getNetwork() {
-        return parent;
+    public int inputSize() {
+        return size();
+    }
+
+    @Override
+    public int outputSize() {
+        return (int) activations.size();
     }
 
     @Override

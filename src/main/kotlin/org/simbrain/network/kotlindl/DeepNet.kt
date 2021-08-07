@@ -1,8 +1,8 @@
 package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
-import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
+import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.network.util.lenet5Classic
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -11,7 +11,7 @@ import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 
 class DeepNet(private val network: Network
-    , val inputSize: Int) : Layer(), AttributeContainer, EditableObject {
+    , val inputSize: Int) : ArrayLayer(network, inputSize), AttributeContainer, EditableObject {
 
     var deepNetLayers: Sequential = Sequential()
 
@@ -36,8 +36,8 @@ class DeepNet(private val network: Network
         return out
     }
 
-    override fun size(): Int {
-        return deepNetLayers.layers.first().outputShape[1].toInt();
+    override fun outputSize(): Int {
+        return deepNetLayers.layers.last().outputShape[1].toInt();
     }
 
     override fun getNetwork(): Network {
@@ -45,7 +45,7 @@ class DeepNet(private val network: Network
     }
 
     override fun getId(): String {
-        return super<Layer>.getId()
+        return super<ArrayLayer>.getId()
     }
 
     override fun toString(): String {

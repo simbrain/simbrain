@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.*;
 import org.simbrain.network.events.NeuronCollectionEvents;
+import org.simbrain.network.matrix.ArrayLayer;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
@@ -30,6 +31,10 @@ import static org.simbrain.util.GeomKt.minus;
 /**
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
  * neuron update rules and track synapse polarity).
+ * <br>
+ * Subclasses maintain lists of neurons and can copy their activations to matrices. To communicate with other
+ * {@link Layer}s it can create output matrices and accept input matrices, but it wil only create and cache these if
+ * relevant methods are called. Matrix based layers should subclass {@link ArrayLayer}
  */
 public abstract class AbstractNeuronCollection extends Layer implements CopyableObject, AttributeContainer {
 
@@ -125,12 +130,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         invalidateCachedInputs();
     }
 
-    // TODO: If this starts being used a lot it should be cached
-    @Override
-    public Matrix getInputs() {
-        return new Matrix(getInputArray());
-    }
-
     /**
      * Return inputs as a double array. Either create the array or return a cache of it.
      */
@@ -144,9 +143,21 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         return inputs;
     }
 
-    @Override
+    /**
+     * Input and output size are the same for collections of neurons.
+     */
     public int size() {
         return getActivations().length;
+    }
+
+    @Override
+    public int outputSize() {
+        return size();
+    }
+
+    @Override
+    public int inputSize() {
+        return size();
     }
 
     /**
@@ -739,6 +750,10 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     public String toString() {
         return getId() + " with " + getActivations().length + " activations: " +
                 Utils.getTruncatedArrayString(getActivations(), 10);
+    }
+
+    public void clearInputs() {
+        neuronList.forEach(n -> n.clearInput());
     }
 
     @Override

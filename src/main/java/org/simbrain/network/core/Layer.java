@@ -40,11 +40,6 @@ public abstract class Layer extends LocatableModel {
     private final List<Connector> outgoingConnectors = new ArrayList<>();
 
     /**
-     * Return the current inputs as a column vector.
-     */
-    public abstract Matrix getInputs();
-
-    /**
      * Add inputs to input vector. Performed in first pass of {@link org.simbrain.network.update_actions.BufferedUpdate}
      * Asynchronous buffered update assumes that inputs are aggregated in one pass then updated in a second pass.
      * Thus setting inputs directly is a dangerous operation and so is not allowed.
@@ -72,14 +67,14 @@ public abstract class Layer extends LocatableModel {
     private transient LocationEvents events = new LocationEvents(this);
 
     /**
-     * Returns the output size.
+     * Returns the output size for this layer.
      */
-    public abstract int size();
+    public abstract int outputSize();
 
-    // TODO: Make abstract
-    public int inputSize() {
-        return size();
-    }
+    /**
+     * Returns the input size for this layer.
+     */
+    public abstract int inputSize();
 
     /**
      * Register a callback function to run when the location of this object is updated.

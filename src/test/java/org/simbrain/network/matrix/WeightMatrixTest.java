@@ -83,9 +83,9 @@ public class WeightMatrixTest {
         WeightMatrix wm2 = new WeightMatrix(net, na1, ng);
         wm2.diagonalize();
         net.addNetworkModels(List.of(ng, wm2));
-        net.bufferedUpdate();
+        net.update();
         assertArrayEquals(new double[]{.5,-.5}, ng.getActivations(), 0.0);
-        net.bufferedUpdate(); // All should be cleared on second update
+        net.update(); // All should be cleared on second update
         assertArrayEquals(new double[]{0,0}, ng.getActivations(), 0.0);
     }
 

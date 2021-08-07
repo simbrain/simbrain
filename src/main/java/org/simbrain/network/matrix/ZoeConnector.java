@@ -44,8 +44,8 @@ public class ZoeConnector extends Connector {
 
     @Override
     public Matrix getOutput() {
-        // For now return output a random matrix
-        return Matrix.rand(getTarget().size(), 1,  new GaussianDistribution(0, 1));
+        // For now return a random matrix
+        return Matrix.rand(getTarget().inputSize(), 1,  new GaussianDistribution(0, 1));
     }
 
     @Override

@@ -800,6 +800,10 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         updateRule.clear(this);
     }
 
+    public void clearInput() {
+        inputValue = 0.0;
+    }
+
     @Override
     public void increment() {
         updateRule.contextualIncrement(this);

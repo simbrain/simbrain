@@ -1,7 +1,6 @@
 package org.simbrain.network.matrix;
 
 
-import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -12,21 +11,16 @@ import java.awt.geom.Rectangle2D;
 /**
  * Template for Zoe Layer
  */
-public class ZoeLayer extends Layer implements EditableObject, AttributeContainer {
-
-    /**
-     * Reference to network this array is part of.
-     */
-    private final Network parent;
+public class ZoeLayer extends ArrayLayer implements EditableObject, AttributeContainer {
 
     /**
      * Construct a neuron array.
      *
      * @param net  parent net
-     * @param size number of components in the array
+     * @param inputSize number of components in the array
      */
-    public ZoeLayer(Network net, int size) {
-        parent = net;
+    public ZoeLayer(Network net, int inputSize) {
+        super(net, inputSize);
         setLabel(net.getIdManager().getProposedId(this.getClass()));
     }
 
@@ -38,7 +32,7 @@ public class ZoeLayer extends Layer implements EditableObject, AttributeContaine
      * @return the deep copy
      */
     public ZoeLayer deepCopy(Network newParent, ZoeLayer orig) {
-        ZoeLayer copy = new ZoeLayer(newParent, orig.size());
+        ZoeLayer copy = new ZoeLayer(newParent, orig.inputSize());
         copy.setLocation(orig.getLocation());
         return copy;
     }
@@ -55,27 +49,13 @@ public class ZoeLayer extends Layer implements EditableObject, AttributeContaine
     }
 
     @Override
-    public int size() {
+    public int outputSize() {
         return 10;
-    }
-
-    @Override
-    public Network getNetwork() {
-        return parent;
     }
 
     @Override
     public Rectangle2D getBound() {
         return new Rectangle2D.Double(getX() - 150 / 2, getY() - 50 / 2, 150, 50);
-    }
-
-    @Override
-    public Matrix getInputs() {
-        return null;
-    }
-
-    @Override
-    public void addInputs(Matrix inputs) {
     }
 
 }

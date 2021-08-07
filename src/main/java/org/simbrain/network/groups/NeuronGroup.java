@@ -177,6 +177,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void update() {
         neuronList.forEach(Neuron::updateInputs);
         neuronList.forEach(n -> prototypeRule.apply(n, dataHolder));
+        neuronList.forEach(Neuron::clearInput);
         super.update();
     }
 

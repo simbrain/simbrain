@@ -1,7 +1,7 @@
 package org.simbrain.network.smile
 
-import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
+import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
@@ -15,7 +15,7 @@ class SmileClassifier(
     val inputSize: Int,
     val outputSize: Int,
     var nsamples: Int = 4
-) : Layer(), EditableObject {
+) : ArrayLayer(net, inputSize), EditableObject {
 
     /**
      * A 2d array. Rows correspond to possible inputs to the classifier.
@@ -35,11 +35,6 @@ class SmileClassifier(
      * encoding. E.g. for a 2-category classifiers, -1 -> 1,0 and 1 -> 0,1
      */
     var targets: IntArray
-
-    /**
-     * Collects inputs from other network models using arrays.
-     */
-    private val inputs = Matrix(inputSize, 1)
 
     /**
      * Output matrix
@@ -105,23 +100,6 @@ class SmileClassifier(
         return "${label} (${classifier.name}): $inputSize -> $outputSize"
     }
 
-    // TODO: Get rid of this. Need not be an abstract method of Layer. Not needed here.
-    override fun getInputs(): Matrix {
-        return inputs
-    }
-
-    override fun addInputs(newInputs: Matrix) {
-        inputs.add(newInputs)
-    }
-
-    override fun updateInputs() {
-        val wtdInputs = Matrix(inputSize, 1)
-        for (c in incomingConnectors) {
-            wtdInputs.add(c.output)
-        }
-        addInputs(wtdInputs)
-    }
-
     /**
      * Get predicted output as a matrix
      */
@@ -129,16 +107,8 @@ class SmileClassifier(
         return outputs
     }
 
-    override fun size(): Int {
+    override fun outputSize(): Int {
         return outputSize
-    }
-
-    override fun inputSize(): Int {
-        return inputSize
-    }
-
-    override fun getNetwork(): Network {
-        return net
     }
 
     override fun getBound(): Rectangle2D? {

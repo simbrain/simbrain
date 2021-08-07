@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.helper_classes;
 
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.core.Network;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.plot.projection.ProjectionComponent;
@@ -18,7 +17,6 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.Hashtable;
 
 /**
  * Helper methods and convenience functions for use in building java-based simulations. You are encouraged to
@@ -37,12 +35,6 @@ public class Simulation {
      * Reference to parent workspace.
      */
     private transient Workspace workspace;
-
-    /**
-     * Associate networks with their respective components.
-     * Facilitates making couplings using methods with fewer arguments.
-     */
-    private transient Hashtable<Network, NetworkComponent> netMap = new Hashtable();
 
     /**
      * Create a new simulation object

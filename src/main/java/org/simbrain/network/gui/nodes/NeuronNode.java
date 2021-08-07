@@ -206,7 +206,10 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
         });
         events.onSpiked(s -> updateSpikeColor());
         events.onColorChange(this::updateColor);
-        events.onLabelChange((o,n) -> updateTextLabel());
+        events.onLabelChange((o,n) -> {
+            updateTextLabel();
+            getNetworkPanel().zoomToFitPage();
+        });
         events.onClampChanged(this::updateClampStatus);
         events.onLocationChange(this::pullViewPositionFromModel);
         events.onUpdateRuleChange((o, n) -> updateShape());
@@ -396,8 +399,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
                 mainShape.setStrokePaint(SynapseNode.getLineColor());
             }
         }
-
-
     }
 
     /**
@@ -423,10 +424,6 @@ public class NeuronNode extends ScreenElement implements PropertyChangeListener 
             PBounds bounds = mainShape.getBounds();
             bounds.add(labelText.localToParent(labelText.getBounds()));
             setBounds(bounds);
-
-            // Forces graphical updates in related graphical elements, which is sometimes required for parent nodes
-            // to be sized correctly given the new size of the text.
-            neuron.getEvents().fireLocationChange();
         }
     }
 

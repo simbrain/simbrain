@@ -58,24 +58,24 @@ public class ClassicalConditioning extends RegisteredSimulation {
 
         // Construct the network
         Neuron bellDetectorNeuron = new Neuron(net);
-        bellDetectorNeuron.setLabel("Bell Detector");
         bellDetectorNeuron.setClamped(true);
         net.addNetworkModel(bellDetectorNeuron);
         bellDetectorNeuron.setLocation(295, 194);
+        bellDetectorNeuron.setLabel("Bell Detector");
 
         Neuron cheeseDetectorNeuron = new Neuron(net);
-        cheeseDetectorNeuron.setLabel("Cheese Detector");
         cheeseDetectorNeuron.setClamped(false);
         net.addNetworkModel(cheeseDetectorNeuron);
         cheeseDetectorNeuron.setLocation(160, 194);
+        cheeseDetectorNeuron.setLabel("Cheese Detector");
 
         BinaryRule responseRule = new BinaryRule();
         responseRule.setThreshold(.5);
         responseRule.setLowerBound(0);
         Neuron salivationResponse = new Neuron(net, responseRule);
-        salivationResponse.setLabel("Salivation");
         net.addNetworkModel(salivationResponse);
         salivationResponse.setLocation(160, 60);
+        salivationResponse.setLabel("Salivation");
 
         Synapse cheeseToSalivation = new Synapse(cheeseDetectorNeuron, salivationResponse,1);
         cheeseToSalivation.setUpperBound(1);
@@ -87,8 +87,7 @@ public class ClassicalConditioning extends RegisteredSimulation {
         association.setUpperBound(1);
 
         net.addNetworkModel(association);
-        // TODO
-        // networkWrapper.getNetworkPanel().getSelectionManager().clear(); // todo: why needed?
+        sim.getNetworkPanel(nc).getSelectionManager().clear();
 
         // Create the odor world
         oc = sim.addOdorWorld(351,13,377,444, "Environment");

@@ -145,7 +145,6 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
                 }
             }
 
-
             val toolbar = JToolBar().apply {
                 // Add row
                 add(JButton().apply {

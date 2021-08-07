@@ -14,7 +14,7 @@ class SmileClassifier(
     val classifier: ClassifierWrapper,
     val inputSize: Int,
     val outputSize: Int,
-    var nsamples: Int
+    var nsamples: Int = 4
 ) : Layer(), EditableObject {
 
     /**
@@ -35,18 +35,20 @@ class SmileClassifier(
      * encoding. E.g. for a 2-category classifiers, -1 -> 1,0 and 1 -> 0,1
      */
     var targets: IntArray
-    // TODO: Enforce these constraints
 
     /**
      * Collects inputs from other network models using arrays.
      */
-    private val inputs: Matrix
+    private val inputs = Matrix(inputSize, 1)
 
     /**
      * Output matrix
      */
     private var outputs = Matrix(outputSize, 1)
 
+    /**
+     * Width and height are in the model for now because arrows must access them in the model.
+     */
     var width: Double = 0.0
     var height: Double = 0.0
 
@@ -55,11 +57,20 @@ class SmileClassifier(
      */
     init {
         label = net.idManager.getProposedId(this::class.java)
-        inputs = Matrix(inputSize, 1)
         trainingInputs = Array(nsamples) { DoubleArray(inputSize) }
         targets = IntArray(nsamples)
     }
 
+    /**
+     * Train using current training data.
+     */
+    fun train() {
+        train(trainingInputs, targets)
+    }
+
+    /**
+     * Train the classiffier.
+     */
     fun train(inputs: Array<DoubleArray>, targets: IntArray) {
         try {
             classifier.fit(inputs, targets)
@@ -68,6 +79,9 @@ class SmileClassifier(
         }
     }
 
+    /**
+     * Update the classifier by apply it to inputs and caching the result as output.
+     */
     override fun update() {
         if (classifier.model != null) {
             val pred = classifier.predict(getInputs().col(0))
@@ -75,8 +89,10 @@ class SmileClassifier(
                 // TODO: This is hand-coded for the SVM binary case.
                 // As we get more cases expand this
                 if (pred == -1) {
+                    // [1,0]
                     outputs = getOneHotMat(0, outputSize, 1.0)
                 } else {
+                    // [0,1]
                     outputs = getOneHotMat(1, outputSize, 1.0)
                 }
             }
@@ -86,7 +102,7 @@ class SmileClassifier(
     }
 
     override fun toString(): String {
-        return "Classifier $label"
+        return "${label} (${classifier.name}): $inputSize -> $outputSize"
     }
 
     // TODO: Get rid of this. Need not be an abstract method of Layer. Not needed here.
@@ -99,7 +115,7 @@ class SmileClassifier(
     }
 
     override fun updateInputs() {
-        val wtdInputs = Matrix(size(), 1)
+        val wtdInputs = Matrix(inputSize, 1)
         for (c in incomingConnectors) {
             wtdInputs.add(c.output)
         }
@@ -114,6 +130,10 @@ class SmileClassifier(
     }
 
     override fun size(): Int {
+        return outputSize
+    }
+
+    override fun inputSize(): Int {
         return inputSize
     }
 
@@ -123,6 +143,12 @@ class SmileClassifier(
 
     override fun getBound(): Rectangle2D? {
         return Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
+    }
+
+    override fun clear() {
+        inputs.mul(0.0)
+        outputs.mul(0.0)
+        events.fireUpdated()
     }
 
     /**

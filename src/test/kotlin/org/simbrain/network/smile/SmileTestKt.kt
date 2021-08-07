@@ -1,4 +1,4 @@
-package org.simbrain.network
+package org.simbrain.network.smile
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

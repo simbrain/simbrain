@@ -11,16 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Superclass for network models involved in, roughly speaking, array based computations.Simbrain layers are connected
+ * Superclass for network models involved in, roughly speaking, array based computations. Simbrain layers are connected
  * to each other by {@link Connector}s. Subclassses include neuron arrays, collections of neurons, and deep networks,
  * backed by different data structures, including java arrays, Smile Matrices, and Tensor Flow tensors.
  * <br>
  * This class maintains connectors, id, and events, etc.
  * <br>
- * Input and output functions must be provided in Matrix format to support communication between different types
- * of layer. However, specific subclasses can communicate in other ways to support fast or custom communication. For
- * example, tensor-based layers and connectors could communicate using tensor flow operations, or specialized layers
- * with multiple arrays could be joined by special connectors making use of those arrays.
+ * Input and output functions must be provided in Smile matrix format to support communication between different types
+ * of layer. Smile matrices are the "lingua franca" of layers.
+ * <br>
+ * However, specific subclasses can communicate in other ways to support fast or custom communication. For example,
+ * tensor-based layers and connectors could communicate using tensor flow operations, or specialized layers with
+ * multiple arrays could be joined by special connectors making use of those arrays.
  *
  * @author Jeff Yoshimi
  * @author Yulin Li
@@ -38,7 +40,7 @@ public abstract class Layer extends LocatableModel {
     private final List<Connector> outgoingConnectors = new ArrayList<>();
 
     /**
-     * Return the current inputs as a size x 1 input vector.
+     * Return the current inputs as a column vector.
      */
     public abstract Matrix getInputs();
 
@@ -70,9 +72,14 @@ public abstract class Layer extends LocatableModel {
     private transient LocationEvents events = new LocationEvents(this);
 
     /**
-     * Returns the size of whatever is receives input for this layer, e.g. an activation vector or input layer.
+     * Returns the output size.
      */
     public abstract int size();
+
+    // TODO: Make abstract
+    public int inputSize() {
+        return size();
+    }
 
     /**
      * Register a callback function to run when the location of this object is updated.

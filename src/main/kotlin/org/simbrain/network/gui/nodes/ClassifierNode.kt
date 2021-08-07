@@ -15,10 +15,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.NumericTable
 import java.awt.Dialog.ModalityType
 import java.awt.geom.Point2D
-import javax.swing.JButton
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JToolBar
+import javax.swing.*
 
 class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassifier) : ScreenElement(np) {
 
@@ -102,7 +99,20 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
         return true
     }
 
-    override fun getPropertyDialog() = StandardDialog().apply {
+    override fun getContextMenu(): JPopupMenu? {
+        return JPopupMenu().apply {
+            add(JMenuItem("Train...").apply { addActionListener {
+                getTrainingDialog().run { makeVisible() }
+            } })
+            add(JMenuItem("Set Properties...").apply { addActionListener {
+                getPropertyDialog().run { makeVisible() }
+            } })
+        }
+    }
+
+    override fun getPropertyDialog() = AnnotatedPropertyEditor.getDialog(smileClassifier.classifier)
+
+    fun getTrainingDialog() = StandardDialog().apply {
 
         // TODO: Move?
 
@@ -195,5 +205,5 @@ fun main() {
         addNetworkModel(classifier)
         classifier
     }
-    SmileClassifierNode(np, classifier).propertyDialog.run { makeVisible() }
+    SmileClassifierNode(np, classifier).getTrainingDialog().run { makeVisible() }
 }

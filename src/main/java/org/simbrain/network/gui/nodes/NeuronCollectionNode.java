@@ -132,7 +132,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         // Test Input Panel
         menu.addSeparator();
-        Action testInputs = new AbstractAction("Input Data") {
+        Action testInputs = new AbstractAction("Input Data...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 // Input panel

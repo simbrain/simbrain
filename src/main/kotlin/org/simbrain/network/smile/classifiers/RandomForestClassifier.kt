@@ -4,6 +4,7 @@ import org.simbrain.network.smile.ClassifierWrapper
 import org.simbrain.util.UserParameter
 import smile.base.cart.SplitRule
 import smile.classification.Classifier
+import smile.math.matrix.Matrix
 
 /**
  * Wrapper for Smile random forest classifier.
@@ -31,6 +32,19 @@ class RandomForestClassifier() : ClassifierWrapper() {
     override fun predict(input: DoubleArray): Int {
         return 0
         // return rf?.predict(input)
+    }
+
+    override fun getOutputVector(result: Int, outputSize: Int): Matrix {
+        return Matrix(outputSize, 1) // TODO
+    }
+
+    override fun copy(): ClassifierWrapper {
+        return RandomForestClassifier().also{
+            it.maxDepth = maxDepth
+            it.ntrees = ntrees
+            it.splitMethod = splitMethod
+            it.sampleRate = sampleRate
+        }
     }
 
     override fun getName(): String {

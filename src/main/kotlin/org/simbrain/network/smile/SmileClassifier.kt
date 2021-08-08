@@ -4,7 +4,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
-import org.simbrain.util.getOneHotMat
 import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
@@ -80,16 +79,9 @@ class SmileClassifier(
     override fun update() {
         if (classifier.model != null) {
             val pred = classifier.predict(getInputs().col(0))
+            println("Prediction of ${this} = $pred")
             if (classifier.model != null) {
-                // TODO: This is hand-coded for the SVM binary case.
-                // As we get more cases expand this
-                if (pred == -1) {
-                    // [1,0]
-                    outputs = getOneHotMat(0, outputSize, 1.0)
-                } else {
-                    // [0,1]
-                    outputs = getOneHotMat(1, outputSize, 1.0)
-                }
+                outputs = classifier.getOutputVector(pred, outputSize)
             }
         }
         events.fireUpdated()
@@ -138,8 +130,9 @@ class SmileClassifier(
         @UserParameter(label = "Number of training samples", order = 30)
         var nsamples = 4
 
-        @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order = 40)
-        var classifierType = SVMClassifier()
+        @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order =
+        40)
+        var classifierType: ClassifierWrapper = SVMClassifier()
 
         override fun getName(): String {
             return "Classifier"

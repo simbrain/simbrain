@@ -4,45 +4,29 @@ import org.simbrain.network.smile.ClassifierWrapper
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
 import smile.classification.Classifier
-import smile.classification.SVM
-import smile.math.kernel.PolynomialKernel
+import smile.classification.KNN
 import smile.math.matrix.Matrix
 import smile.validation.metric.Accuracy
 
 /**
- * Wrapper for Smile SVM Classifier.
+ * Wrapper for Smile KNN Classifier.
  */
-class SVMClassifier(): ClassifierWrapper() {
+class KNNClassifier(): ClassifierWrapper() {
 
-    // TODO: Provide separate object for selecting Kernel
-    @UserParameter(label = "Polynomial Kernel Degree", order = 20)
-    var kernelDegree = 2
-
-    @UserParameter(label = "Soft margin penalty parameter", order = 30)
-    var C = 1000.0
-
-    @UserParameter(label = "Tolerance of convergence test", order = 40)
-    var tolerance = 1E-3
+    @UserParameter(label = "K", order = 10)
+    var k = 5
 
     /**
      * The model.
      */
     override var model: Classifier<DoubleArray>? = null
 
-    override fun copy(): ClassifierWrapper {
-        return SVMClassifier().also {
-            it.kernelDegree = kernelDegree
-            it.C = C
-            it.tolerance = tolerance
-        }
-    }
-
     override fun getName(): String {
-        return "Support Vector Machine"
+        return "K Nearest Neighbors"
     }
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
-        model = SVM.fit(inputs, targets, PolynomialKernel(kernelDegree), C, tolerance)
+        model = KNN.fit(inputs, targets, k)
         val pred = model?.predict(inputs)
         stats = ""  + Accuracy.of(targets, pred)
     }
@@ -52,12 +36,19 @@ class SVMClassifier(): ClassifierWrapper() {
     }
 
     override fun getOutputVector(result: Int, outputSize: Int): Matrix {
+        if (result > outputSize) {
+            throw IllegalArgumentException("Prediction of ${result} > output size of ${outputSize}")
+        }
         if (result == -1) {
-            // [1,0]
-            return getOneHotMat(0, outputSize, 1.0)
+            return Matrix(outputSize, 1)
         } else {
-            // [0,1]
-            return getOneHotMat(1, outputSize, 1.0)
+            return getOneHotMat(result-1, outputSize, 1.0)
+        }
+    }
+
+    override fun copy(): ClassifierWrapper {
+        return KNNClassifier().also {
+            it.k = k
         }
     }
 

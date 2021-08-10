@@ -49,7 +49,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
             onLocationChange { pullViewPositionFromModel() }
         }
         updateInfoText()
-        pushViewPositionToModel()
+        pullViewPositionFromModel()
     }
 
     fun pullViewPositionFromModel() {

@@ -5,7 +5,6 @@ import org.simbrain.network.kotlindl.TFFlattenLayer
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.ObjectTypeEditor
 import java.awt.BorderLayout
@@ -13,18 +12,18 @@ import java.awt.Dimension
 import javax.swing.*
 
 /**
- * A list of items that can be edited with an [AnnotatedPropertyEditor].
+ * A list of graphical items (JComponents) that can be added or removed.
  *
  * @author Jeff Yoshimi
  */
-class EditableList(val objects: ArrayList<JComponent>): JPanel() {
+class EditableList(val components: MutableList<JComponent>) : JPanel() {
 
-    val mainPanel = EditableItemPanel(objects)
+    val mainPanel = EditableItemPanel(components)
 
     init {
         layout = BorderLayout()
 
-        preferredSize = Dimension(400,300)
+        preferredSize = Dimension(400, 300)
 
         add("Center", JScrollPane(mainPanel))
         add("South", JToolBar().apply {
@@ -49,13 +48,13 @@ class EditableList(val objects: ArrayList<JComponent>): JPanel() {
     var addElementTask: () -> Unit = {}
 
     fun addElement(c: JComponent) {
-        objects.add(c)
+        components.add(c)
         mainPanel.addItem(c)
     }
 
     fun removeElement() {
-        if(objects.size > 0) {
-            objects.removeLast()
+        if (components.size > 0) {
+            components.removeLast()
             mainPanel.removeLastItem()
         }
     }
@@ -69,7 +68,7 @@ class EditableList(val objects: ArrayList<JComponent>): JPanel() {
 class EditableItemPanel(var displayedItems: List<JComponent> = ArrayList()) : LabelledItemPanel() {
 
     init {
-        displayedItems.forEach{c -> addItem(c)}
+        displayedItems.forEach { c -> addItem(c) }
     }
 
     /**
@@ -89,12 +88,15 @@ class EditableItemPanel(var displayedItems: List<JComponent> = ArrayList()) : La
  */
 fun main() {
 
-    fun getEditor(obj : CopyableObject):  JPanel {
-        return ObjectTypeEditor.createEditor(listOf(obj), "getTypes", "Layer",
-            false)
+    fun getEditor(obj: CopyableObject): JPanel {
+        return ObjectTypeEditor.createEditor(
+            listOf(obj), "getTypes", "Layer",
+            false
+        )
     }
 
     val objs = arrayListOf<JComponent>(getEditor(TFDenseLayer()), getEditor(TFFlattenLayer()))
+
     StandardDialog().apply {
         val list = EditableList(objs).apply {
             addElementTask = {
@@ -107,7 +109,7 @@ fun main() {
         isVisible = true
         addClosingTask {
             println("Closing..")
-            list.objects.forEach { p -> println((p as ObjectTypeEditor).value) }
+            list.components.forEach { p -> println((p as ObjectTypeEditor).value) }
         }
     }
 

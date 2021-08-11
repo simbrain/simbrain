@@ -49,3 +49,10 @@ fun getOneHotArray(index : Int, size: Int, amount: Double = 1.0): DoubleArray {
         ret[index] = amount
         return ret
 }
+
+/**
+ * https://stackoverflow.com/questions/7513434/convert-a-double-array-to-a-float-array
+ */
+fun toFloatArray(array: DoubleArray): FloatArray {
+        return array.map { it.toFloat() }.toFloatArray()
+}

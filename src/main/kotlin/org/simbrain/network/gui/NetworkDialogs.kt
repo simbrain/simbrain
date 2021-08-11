@@ -18,6 +18,7 @@ import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.kotlindl.TFDenseLayer
 import org.simbrain.network.kotlindl.TFFlattenLayer
+import org.simbrain.network.kotlindl.TFLayer
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.SmileClassifier
@@ -219,7 +220,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
             false)
     }
 
-    val list = EditableList(arrayListOf(getEditor(TFDenseLayer()), getEditor(TFDenseLayer()))).apply {
+    val layerList = EditableList(arrayListOf(getEditor(TFDenseLayer()), getEditor(TFDenseLayer()))).apply {
         addElementTask = {
             addElement(getEditor(TFFlattenLayer()))
         }
@@ -229,15 +230,17 @@ fun NetworkPanel.showDeepNetCreationDialog() {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
         ape = AnnotatedPropertyEditor(creator)
         add(ape)
-        add(list)
+        add(layerList)
     }
 
     dialog.addClosingTask {
         ape.commitChanges()
-        val dn = creator.create(network)
-        // TODO: Figure out how to get these layers built!
-        list.objects.forEach { p -> println((p as ObjectTypeEditor).value) }
-        network.addNetworkModel(dn)
+        layerList.components.filterIsInstance<ObjectTypeEditor>().forEach { it.commitChanges() }
+        val deepNet = creator.create(network,
+            layerList.components.filterIsInstance<ObjectTypeEditor>().map { it.value }
+                .filterIsInstance<TFLayer<*>>().map{it.create()}.toMutableList()
+        )
+        network.addNetworkModel(deepNet)
     }
     dialog.pack()
     dialog.setLocationRelativeTo(null)

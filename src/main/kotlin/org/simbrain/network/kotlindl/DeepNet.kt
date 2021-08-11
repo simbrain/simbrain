@@ -1,39 +1,79 @@
 package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.layer.Layer
+import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
+import org.jetbrains.kotlinx.dl.api.core.loss.Losses
+import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
+import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
+import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
+import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.ArrayLayer
-import org.simbrain.network.util.lenet5Classic
 import org.simbrain.util.UserParameter
+import org.simbrain.util.getOneHotMat
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.toFloatArray
 import org.simbrain.workspace.AttributeContainer
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 
-class DeepNet(private val network: Network
-    , val inputSize: Int) : ArrayLayer(network, inputSize), AttributeContainer, EditableObject {
+class DeepNet(private val network: Network, val inputSize: Int, val layers: List<Layer>) : ArrayLayer(network, inputSize),
+    AttributeContainer,
+    EditableObject {
 
-    var deepNetLayers: Sequential = Sequential()
+    /**
+     * Main deep network object.
+     */
+    var deepNetLayers: Sequential
 
-    private var inputs = FloatArray(inputSize)
+    /**
+     * Output matrix
+     */
+    private var outputs: Matrix? = null
+
+    // TODO: How to edit these?
+    lateinit var trainingInputs: Dataset
+    lateinit var trainingTargets: Dataset
 
     init {
         label = network.idManager.getProposedId(this.javaClass)
-        deepNetLayers = lenet5Classic // TODO: Temp
-    }
-
-    override fun addInputs(newInputs: Matrix?) {
-        for (i in 0 until inputs.size) {
-            if (newInputs != null) {
-                inputs[i] += newInputs.get(i, 0).toFloat()
-            }
+        deepNetLayers = Sequential.of(layers)
+        deepNetLayers.also {
+            it.compile(
+                optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
+                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+                metric = Metrics.ACCURACY
+            )
         }
+        outputs = Matrix(outputSize(), 1)
     }
 
-    override fun getOutputs(): Matrix {
-        val out = Matrix(10, 1) // todo
-        out[deepNetLayers.predict(inputs), 0] = 1.0
-        return out
+    fun train() {
+        // TODO make parameters accessible
+        deepNetLayers.fit(trainingInputs, trainingTargets, 1, 32, 5)
+    }
+
+    fun floatInputs(): FloatArray {
+        return toFloatArray(super.getInputs().col(0))
+    }
+
+    override fun update() {
+        if (deepNetLayers.isModelInitialized) {
+            outputs = getOneHotMat(deepNetLayers.predict(floatInputs()), outputSize())
+        } else {
+            outputs = Matrix(outputSize(), 1)
+        }
+        events.fireUpdated()
+    }
+
+    override fun getOutputs(): Matrix? {
+        return outputs
+    }
+
+    override fun delete() {
+        deepNetLayers.close()
+        super.delete()
     }
 
     override fun outputSize(): Int {
@@ -49,15 +89,8 @@ class DeepNet(private val network: Network
     }
 
     override fun toString(): String {
-        return label + ":\n" + deepNetLayers.layers.joinToString("\n") { it.name }
-    }
-
-    override fun update() {
-        events.fireUpdated()
-    }
-
-    override fun getInputs(): Matrix? {
-        return null
+        return "${label}: : $inputSize -> ${outputSize()}\n" +
+                deepNetLayers.layers.joinToString("\n") { it.name }
     }
 
     override fun getBound(): Rectangle2D {
@@ -75,18 +108,17 @@ class DeepNet(private val network: Network
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 10
 
-        @UserParameter(label = "Input layer", isObjectType = true, showDetails = false, order = 20)
-        var inputLayer = TFDenseLayer()
-
-        // @UserParameter(label = "Hidden layers", isEditableList = true, showDetails = false, order = 20)
-        // Need to add hidden layers
+        // TODO: Find a way to edit input layer
+        // @UserParameter(label = "Input layer", isObjectType = true, showDetails = false, order = 20)
+        // var inputLayer = Input()
 
         override fun getName(): String {
             return "Deep Network"
         }
 
-        fun create(net : Network): DeepNet {
-            return DeepNet(net, nin)
+        fun create(net: Network, layers: MutableList<Layer>): DeepNet {
+            layers.add(0, Input(nin.toLong())) // Add the input layers
+            return DeepNet(net, nin, layers)
         }
 
     }

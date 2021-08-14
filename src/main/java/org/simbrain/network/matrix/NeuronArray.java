@@ -10,6 +10,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Producible;
 import smile.math.matrix.Matrix;
 import smile.stat.distribution.GaussianDistribution;
 
@@ -75,6 +76,9 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         // TODO: Copy data.
         return copy;
     }
+
+    @Producible
+    public double[] getActivationArray() {return activations.col(0);}
 
     public Matrix getActivations() {
         return activations;

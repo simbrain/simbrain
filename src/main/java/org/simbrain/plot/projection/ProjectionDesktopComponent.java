@@ -195,6 +195,10 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         @Override
         public Paint getItemPaint(int row, int column) {
             Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
+            if (column >= projector.getNumPoints()) {
+                System.out.println("getItemPaint:" + column + ">" + projector.getNumPoints());
+                return Color.green;
+            }
             DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(column));
             if (point != null) {
                 return point.getColor();
@@ -215,6 +219,10 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         @Override
         public String generateLabel(XYDataset dataset, int series, int item) {
             Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
+            if (item >= projector.getNumPoints()) {
+                System.out.println("generateLabel:" + item + ">" + projector.getNumPoints());
+                return null;
+            }
             DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(item));
             if (point != null) {
                 return point.getLabel();
@@ -230,7 +238,12 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
     private class CustomToolTipGenerator extends CustomXYToolTipGenerator {
         @Override
         public String generateToolTip(XYDataset data, int series, int item) {
-            DataPoint point = getWorkspaceComponent().getProjector().getUpstairs().getPoint(item);
+            Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
+            if (item >= projector.getNumPoints()) {
+                System.out.println("generateToolTip:" + item + ">" + projector.getNumPoints());
+                return null;
+            }
+            DataPoint point = projector.getUpstairs().getPoint(item);
             if (point != null) {
                 return Utils.doubleArrayToString(point.getVector());
             } else {

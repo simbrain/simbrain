@@ -1,12 +1,14 @@
 package org.simbrain.network.gui
 
 //import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
+import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.gui.dialogs.DataPanel
 import org.simbrain.network.gui.dialogs.TestInputPanel
 import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
@@ -23,6 +25,7 @@ import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.trainers.LMSIterative
+import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -83,28 +86,30 @@ fun NetworkPanel.showMultiLayerNetworkCreationDialog() {
 //    }
 }
 
-val NetworkPanel.neuronDialog get() = selectionManager.filterSelectedModels<Neuron>().let { neurons ->
-    if (neurons.isEmpty()) {
-        null
-    } else {
-        NeuronDialog(neurons).apply { modalityType = Dialog.ModalityType.MODELESS }
+val NetworkPanel.neuronDialog
+    get() = selectionManager.filterSelectedModels<Neuron>().let { neurons ->
+        if (neurons.isEmpty()) {
+            null
+        } else {
+            NeuronDialog(neurons).apply { modalityType = Dialog.ModalityType.MODELESS }
+        }
     }
-}
 
-val NetworkPanel.synapseDialog get() =
-    SynapseDialog.createSynapseDialog(selectionManager.filterSelectedModels<Synapse>())
+val NetworkPanel.synapseDialog
+    get() =
+        SynapseDialog.createSynapseDialog(selectionManager.filterSelectedModels<Synapse>())
 
 fun NetworkPanel.createNeuronGroupDialog(neuronGroup: NeuronGroup) =
-        NeuronGroupDialog(this, neuronGroup).apply {
-            title = "Neuron Group Dialog"
-            setAsDoneDialog()
-            modalityType = Dialog.ModalityType.MODELESS
-        }
+    NeuronGroupDialog(this, neuronGroup).apply {
+        title = "Neuron Group Dialog"
+        setAsDoneDialog()
+        modalityType = Dialog.ModalityType.MODELESS
+    }
 
 fun NetworkPanel.createSynapseGroupDialog(synapseGroup: SynapseGroup) =
     SynapseGroupDialog(this, synapseGroup).apply {
-            modalityType = Dialog.ModalityType.MODELESS
-        }
+        modalityType = Dialog.ModalityType.MODELESS
+    }
 
 /**
  * Display the provided network in a dialog
@@ -157,7 +162,7 @@ fun displaySynapseGroupDialog(networkPanel: NetworkPanel?, src: NeuronGroup?, ta
 /**
  * Shows a dialog that allows the user to send inputs from a [SimbrainDataTable] to the provided neurons.
  */
-fun NetworkPanel.showInputPanel(neurons : List<Neuron>) {
+fun NetworkPanel.showInputPanel(neurons: List<Neuron>) {
     TestInputPanel.createTestInputPanel(this, neurons).apply {
         val dialog = StandardDialog()
         dialog.contentPane = this
@@ -215,9 +220,11 @@ fun NetworkPanel.showDeepNetCreationDialog() {
     val dialog = StandardDialog()
     val ape: AnnotatedPropertyEditor
 
-    fun getEditor(obj : CopyableObject):  JPanel {
-        return ObjectTypeEditor.createEditor(listOf(obj), "getTypes", "Layer",
-            false)
+    fun getEditor(obj: CopyableObject): JPanel {
+        return ObjectTypeEditor.createEditor(
+            listOf(obj), "getTypes", "Layer",
+            false
+        )
     }
 
     val layerList = EditableList(arrayListOf(getEditor(TFDenseLayer()), getEditor(TFDenseLayer()))).apply {
@@ -238,13 +245,95 @@ fun NetworkPanel.showDeepNetCreationDialog() {
         layerList.components.filterIsInstance<ObjectTypeEditor>().forEach { it.commitChanges() }
         val deepNet = creator.create(network,
             layerList.components.filterIsInstance<ObjectTypeEditor>().map { it.value }
-                .filterIsInstance<TFLayer<*>>().map{it.create()}.toMutableList()
+                .filterIsInstance<TFLayer<*>>().map { it.create() }.toMutableList()
         )
         network.addNetworkModel(deepNet)
     }
     dialog.pack()
     dialog.setLocationRelativeTo(null)
     dialog.title = "Create Deep Network"
+    dialog.isVisible = true
+}
+
+/**
+ * Show dialog for Smile classifier creation
+ */
+fun NetworkPanel.showDeepNetTrainingDialog(deepNet: DeepNet) {
+    val dialog = StandardDialog()
+    val ape: AnnotatedPropertyEditor
+
+    dialog.contentPane = JPanel().apply {
+
+        layout = MigLayout()
+
+        // Data Panels
+        val inputs = DataPanel().apply {
+            table.setData(deepNet.inputs)
+        }
+        val targets = DataPanel().apply {
+            table.setData(deepNet.targets.map { floatArrayOf(it) }.toTypedArray())
+        }
+
+        fun commitData() {
+            deepNet.inputs = inputs.table.as2DFloatArray()
+            deepNet.targets = targets.table.as2DFloatArray().map { it[0] }.toFloatArray();
+            deepNet.initializeDatasets()
+        }
+
+        dialog.addClosingTask {
+            inputs.applyData()
+            targets.applyData()
+            commitData()
+        }
+
+        val toolbar = JToolBar().apply {
+            // Add row
+            add(JButton().apply {
+                icon = ResourceManager.getImageIcon("menu_icons/AddTableRow.png")
+                toolTipText = "Insert a row"
+                addActionListener {
+                    inputs.table.insertRow(inputs.jTable.selectedRow)
+                    targets.table.insertRow(inputs.jTable.selectedRow)
+                }
+            })
+            // Delete row
+            // TODO: Delete selected rows. For that abstract out table code
+            add(JButton().apply {
+                icon = ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png")
+                toolTipText = "Delete last row"
+                addActionListener {
+                    inputs.table.removeRow(inputs.jTable.rowCount - 1)
+                    targets.table.removeRow(targets.jTable.rowCount - 1)
+                }
+            })
+        }
+        add(toolbar, "wrap")
+
+        // // Stats label
+        // add(statsLabel, "wrap")
+
+        // Training Button
+        add(JButton("Train").apply {
+            addActionListener {
+                commitData()
+                deepNet.train()
+                // smileClassifier.train(inputs.table.as2DDoubleArray(), targets.table.firstColumnAsIntArray())
+                // statsLabel.text = "Stats: " + smileClassifier.classifier.stats
+            }
+        }, "wrap")
+
+        // Add the data panels
+        add(inputs, "growx")
+        add(targets, "growx")
+    }
+
+    dialog.addClosingTask {
+        // ape.commitChanges()
+        // network.addNetworkModel(creator.create(network))
+    }
+    dialog.pack()
+    dialog.setLocationRelativeTo(null)
+    dialog.title = "Train Deep Network"
     dialog.isVisible = true
 }
 

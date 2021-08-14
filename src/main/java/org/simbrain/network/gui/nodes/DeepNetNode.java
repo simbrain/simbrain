@@ -5,6 +5,7 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.gui.NetworkDialogsKt;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
@@ -29,12 +30,7 @@ public class DeepNetNode extends ScreenElement {
     /**
      * The deep network being represented.
      */
-    private DeepNet net;
-
-    /**
-     * Parent panel.
-     */
-    private NetworkPanel networkPanel;
+    private DeepNet deepNet;
 
     /**
      * Width in pixels of the main display box.
@@ -60,7 +56,7 @@ public class DeepNetNode extends ScreenElement {
 
     public DeepNetNode(NetworkPanel networkPanel, DeepNet dn) {
         super(networkPanel);
-        this.net = dn;
+        this.deepNet = dn;
 
         box.setPickable(true);
         addChild(box);
@@ -68,8 +64,8 @@ public class DeepNetNode extends ScreenElement {
         LocationEvents events = dn.getEvents();
         events.onDeleted(n -> removeFromParent());
         events.onUpdated(() -> {
-            // renderArrayToActivationsImage();
             updateInfoText();
+            System.out.println(deepNet.getOutputs());
         });
 
         // Border box determines bounds
@@ -83,16 +79,16 @@ public class DeepNetNode extends ScreenElement {
         infoText.offset(8, 8);
         updateInfoText();
 
-        this.centerFullBoundsOnPoint(net.getLocation().getX(), net.getLocation().getY());
+        this.centerFullBoundsOnPoint(deepNet.getLocation().getX(), deepNet.getLocation().getY());
 
-        net.getEvents().onLocationChange(this::pullViewPositionFromModel);
+        deepNet.getEvents().onLocationChange(this::pullViewPositionFromModel);
     }
 
     /**
      * Update status text.
      */
     private void updateInfoText() {
-        infoText.setText(net.toString());
+        infoText.setText(deepNet.toString());
         PBounds pb = infoText.getBounds();
         box.setBounds(pb.x-2, pb.y-2, pb.width+20, pb.height+20);
         setBounds(box.getBounds());
@@ -130,6 +126,7 @@ public class DeepNetNode extends ScreenElement {
         };
         contextMenu.add(editNet);
         contextMenu.add(new DeleteAction(getNetworkPanel()));
+        contextMenu.addSeparator();
 
         // Coupling menu
         //contextMenu.addSeparator();
@@ -138,16 +135,24 @@ public class DeepNetNode extends ScreenElement {
         //    contextMenu.add(couplingMenu);
         //}
 
+        // Train Submenu
+        Action trainDeepNet = new AbstractAction("Train...") {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                NetworkDialogsKt.showDeepNetTrainingDialog(getNetworkPanel(), deepNet);
+            }
+        };
+        contextMenu.add(trainDeepNet);
         return contextMenu;
     }
 
     @Override
     public DeepNet getModel() {
-        return net;
+        return deepNet;
     }
 
     public void pullViewPositionFromModel() {
-        Point2D point = minus(net.getLocation(), new Point2D.Double(boxWidth / 2, boxHeight / 2));
+        Point2D point = minus(deepNet.getLocation(), new Point2D.Double(boxWidth / 2, boxHeight / 2));
         this.setGlobalTranslation(point);
     }
 
@@ -157,7 +162,7 @@ public class DeepNetNode extends ScreenElement {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        net.setLocation(new Point2D.Double(p.getX() + boxWidth / 2, p.getY() + boxHeight / 2));
+        deepNet.setLocation(new Point2D.Double(p.getX() + boxWidth / 2, p.getY() + boxHeight / 2));
     }
 
     @Override
@@ -174,9 +179,9 @@ public class DeepNetNode extends ScreenElement {
     @Nullable
     @Override
     public JDialog getPropertyDialog() {
-        StandardDialog dialog = AnnotatedPropertyEditor.getDialog(net);
+        StandardDialog dialog = AnnotatedPropertyEditor.getDialog(deepNet);
         dialog.addClosingTask(() -> {
-                net.getEvents().fireUpdated();
+                deepNet.getEvents().fireUpdated();
         });
         return dialog;
     }

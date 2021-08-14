@@ -138,6 +138,16 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
         fireTableDataChanged();
     }
 
+    public void setData(float[][] data) {
+        reset(data.length, data[0].length);
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[0].length; j++) {
+                this.setLogicalValue(i, j, (double) data[i][j], false);
+            }
+        }
+        fireTableDataChanged();
+    }
+
     /**
      * Set the current row using an array of doubles.
      *
@@ -331,6 +341,16 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
         for (int i = 0; i < getRowCount(); i++) {
             for (int j = 0; j < getLogicalColumnCount(); j++) {
                 returnList[i][j] = this.getLogicalValueAt(i, j);
+            }
+        }
+        return returnList;
+    }
+
+    public float[][] as2DFloatArray() {
+        float[][] returnList = new float[getRowCount()][getLogicalColumnCount()];
+        for (int i = 0; i < getRowCount(); i++) {
+            for (int j = 0; j < getLogicalColumnCount(); j++) {
+                returnList[i][j] = this.getLogicalValueAt(i, j).floatValue();
             }
         }
         return returnList;

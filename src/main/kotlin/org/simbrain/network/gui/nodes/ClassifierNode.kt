@@ -174,6 +174,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
             // Training Button
             add(JButton("Train").apply {
                 addActionListener {
+                    // TODO: Make a separate commit action and then just call smileClassifier.train. See deepnet
                     smileClassifier.train(inputs.table.as2DDoubleArray(), targets.table.firstColumnAsIntArray())
                     statsLabel.text = "Stats: " + smileClassifier.classifier.stats
                 }

@@ -15,6 +15,7 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
@@ -81,7 +82,22 @@ public val lenet5Classic = Sequential.of(
     )
 )
 
+fun testDataset() {
+
+    var dataset = OnHeapDataset.create(
+        arrayOf(floatArrayOf(1f, 2f), floatArrayOf(3f, 4f)),
+        floatArrayOf(1f,2f))
+
+    for (i in 0 until dataset.xSize()) {
+        println("input: ${dataset.getX(i).contentToString()} target: ${dataset.getY(i)}")
+    }
+
+}
+
 fun main() {
+
+    // testDataset()
+
     val (train, test) = mnist()
 
     lenet5Classic.use {

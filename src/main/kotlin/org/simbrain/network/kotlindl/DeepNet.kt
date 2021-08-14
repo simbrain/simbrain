@@ -8,6 +8,7 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.dataset.Dataset
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.UserParameter
@@ -18,7 +19,12 @@ import org.simbrain.workspace.AttributeContainer
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 
-class DeepNet(private val network: Network, val inputSize: Int, val layers: List<Layer>) : ArrayLayer(network, inputSize),
+class DeepNet(
+    private val network: Network,
+    val inputSize: Int,
+    val layers: List<Layer>,
+    var nsamples: Int = 10
+) : ArrayLayer(network, inputSize),
     AttributeContainer,
     EditableObject {
 
@@ -32,9 +38,11 @@ class DeepNet(private val network: Network, val inputSize: Int, val layers: List
      */
     private var outputs: Matrix? = null
 
-    // TODO: How to edit these?
-    lateinit var trainingInputs: Dataset
-    lateinit var trainingTargets: Dataset
+    var inputs: Array<FloatArray>
+    var targets: FloatArray
+
+    lateinit var trainingDataset: Dataset
+    lateinit var testingDataset: Dataset
 
     init {
         label = network.idManager.getProposedId(this.javaClass)
@@ -47,11 +55,24 @@ class DeepNet(private val network: Network, val inputSize: Int, val layers: List
             )
         }
         outputs = Matrix(outputSize(), 1)
+        inputs = Array(nsamples) { FloatArray(inputSize()) }
+        targets = FloatArray(nsamples)
+        println(deepNetLayers.summary())
+    }
+
+    fun initializeDatasets() {
+        val data = OnHeapDataset.create(inputs, targets)
+        // TODO: Make split ratio settable
+        data.shuffle()
+        val (train, test) = data.split(.7)
+        trainingDataset = train
+        testingDataset = test
     }
 
     fun train() {
-        // TODO make parameters accessible
-        deepNetLayers.fit(trainingInputs, trainingTargets, 1, 32, 5)
+        deepNetLayers.fit(trainingDataset, testingDataset, 100, 32, 5)
+        val accuracy = deepNetLayers.evaluate(dataset = testingDataset, batchSize = 10).metrics[Metrics.ACCURACY]
+        println("Accuracy = $accuracy")
     }
 
     fun floatInputs(): FloatArray {
@@ -60,7 +81,8 @@ class DeepNet(private val network: Network, val inputSize: Int, val layers: List
 
     override fun update() {
         if (deepNetLayers.isModelInitialized) {
-            outputs = getOneHotMat(deepNetLayers.predict(floatInputs()), outputSize())
+            println("Output = " + deepNetLayers.predict(floatInputs()))
+            outputs = getOneHotMat(deepNetLayers.predict(floatInputs()),3)
         } else {
             outputs = Matrix(outputSize(), 1)
         }
@@ -97,10 +119,17 @@ class DeepNet(private val network: Network, val inputSize: Int, val layers: List
         return Rectangle2D.Double(x - 150 / 2, y - 50 / 2, 150.0, 50.0)
     }
 
+    override fun readResolve(): Any {
+        // Probably use deepNetLayers.saveModelConfiguration()
+        super.readResolve()
+        initializeDatasets()
+        return this
+    }
+
     /**
      * Helper class for creating new deep networks.
      */
-    class DeepNetCreator(proposedLabel : String) : EditableObject {
+    class DeepNetCreator(proposedLabel: String) : EditableObject {
 
         @UserParameter(label = "Label", order = 5)
         private val label = proposedLabel
@@ -120,7 +149,6 @@ class DeepNet(private val network: Network, val inputSize: Int, val layers: List
             layers.add(0, Input(nin.toLong())) // Add the input layers
             return DeepNet(net, nin, layers)
         }
-
     }
 
 }

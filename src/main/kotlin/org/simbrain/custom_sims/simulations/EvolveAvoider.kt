@@ -249,8 +249,8 @@ val evolveAvoider = newSim {
         launch(Dispatchers.Default) {
 
             val generations = createEvolution().start().onEachGenerationBest { agent, gen ->
-                progressWindow.progressBar.value = gen
-                progressWindow.valueLabel.text = "Error: ${agent.fitness.format(2)}"
+                progressWindow.value = gen
+                progressWindow.text = "Error: ${agent.fitness.format(2)}"
             }
 
             val (best, _) = generations.best

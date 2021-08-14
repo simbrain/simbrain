@@ -9,9 +9,9 @@ import java.util.function.Consumer;
  */
 public class ProgressWindow extends JFrame {
 
-    private JProgressBar progressBar;
+    private final JProgressBar progressBar;
 
-    private JLabel valueLabel;
+    private final JLabel valueLabel;
 
     private Consumer<Integer> updateAction;
 
@@ -33,6 +33,24 @@ public class ProgressWindow extends JFrame {
         setVisible(true);
         setTitle("Progress");
     }
+
+    public void setValue(int val) {
+        progressBar.setValue(val);
+    }
+
+    public int getValue() {
+        return progressBar.getValue();
+    }
+
+    public void setText(String text) {
+        valueLabel.setText(text);
+    }
+
+    public String getText() {
+        return valueLabel.getText();
+    }
+
+
 
     public JProgressBar getProgressBar() {
         return progressBar;

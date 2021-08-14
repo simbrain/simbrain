@@ -61,11 +61,11 @@ val mnistSim = newSim {
     mainScope.launch {
         val progressWindow = ProgressWindow(1000, "Images Loaded")
         progressWindow.setUpdateAction(0) { i ->
-            progressWindow.progressBar.value = i
-            progressWindow.valueLabel.text = "Extracted $i/1000 images"
+            progressWindow.value = i
+            progressWindow.text = "Extracted $i/1000 images"
         }
 
-        progressWindow.valueLabel.text = "Extracted 0/1000 images"
+        progressWindow.text = "Extracted 0/1000 images"
         progressWindow.pack()
         launch(Dispatchers.Default) {
             extractImages("cache/$TEST_IMAGES_ARCHIVE")

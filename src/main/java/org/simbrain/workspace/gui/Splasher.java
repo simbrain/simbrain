@@ -19,9 +19,8 @@
 package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.Utils;
+import smile.math.blas.BLAS;
 
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,6 +56,9 @@ public class Splasher {
         // TODO find a better solution
         Logger.getLogger("com.jme").setLevel(Level.OFF);
         Logger.getLogger("com.jmex").setLevel(Level.OFF);
+
+        // Hack to force initialization of Smile matrix engine at startup and remove subsequent delays
+        BLAS.engine.iamax(new float[]{1f, 2f, 3f});
 
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
         SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop", args);

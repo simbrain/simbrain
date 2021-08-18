@@ -79,6 +79,8 @@ public class Clipboard {
 
         // Create a copy of the clipboard objects.
         List<NetworkModel> copy = SimnetUtils.getCopy(net.getNetwork(), copiedObjects);
+        copy.stream().filter(LocatableModel.class::isInstance)
+                .forEach(l -> ((LocatableModel) l).setShouldBePlaced(false));
 
         // Add the copied object
         net.getNetwork().addNetworkModels(copy);
@@ -86,12 +88,14 @@ public class Clipboard {
         // Unselect "old" copied objects
         net.getSelectionManager().clear();
 
-        // Paste objects intelligently using placement
+        // Paste objects intelligently using placement manager
         net.getPlacementManager().placeObjects(copy.stream()
                 .filter(LocatableModel.class::isInstance)
                 .map(LocatableModel.class::cast)
                 .collect(Collectors.toList())
         );
+        copy.stream().filter(LocatableModel.class::isInstance)
+                .forEach(l -> ((LocatableModel) l).setShouldBePlaced(true));
 
         // Select copied objects after pasting them
         copy.forEach(NetworkModel::select);

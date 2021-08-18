@@ -141,8 +141,9 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             priorSelection = setOf()
             // If objects are being dragged, reset the anchor position in the placement manager
             if (event.pickedNode != null) {
-                networkPanel.placementManager.anchorPoint =
-                    networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
+                val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
+                networkPanel.placementManager.deltaDrag =  topLeft - networkPanel.placementManager.previousAnchorPoint
+                networkPanel.placementManager.anchorPoint = topLeft
             }
         }
         networkPanel.zoomToFitPage()

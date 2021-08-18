@@ -571,13 +571,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         val event = network.events
         event.onModelAdded {
             createNode(it)
-            if (it is LocatableModel) {
-                // Prevents neuron collections from being placed. NeuronCollections are simply wrappers around
-                // neurons and should not be placed, but it should be possible to move them programmatically.
-                // TODO: Find a cleaner way to do this.
-                if (it !is NeuronCollection) {
-                    placementManager.placeObject(it)
-                }
+            if (it is LocatableModel && it.shouldBePlaced) {
+                placementManager.placeObject(it)
             }
         }
         event.onModelRemoved {

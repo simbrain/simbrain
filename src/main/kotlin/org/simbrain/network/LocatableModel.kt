@@ -20,6 +20,13 @@ abstract class LocatableModel() : NetworkModel() {
     abstract var location: Point2D
 
     /**
+     * If true, the [PlacementManager] is used to place the object. Some objects should not be placed
+     * (like [NeuronCollection]), and this can also be used to disable placement (e.g. when pasting collections of
+     * objects).
+     */
+    open var shouldBePlaced = true
+
+    /**
      * Implementing classes must fire and handle location events.
      */
     abstract override fun getEvents(): LocationEvents
@@ -31,6 +38,7 @@ abstract class LocatableModel() : NetworkModel() {
     fun setLocation(x: Double, y: Double) {
         location = Point2D.Double(x,y)
     }
+
 }
 
 /**
@@ -92,7 +100,8 @@ fun Collection<LocatableModel>.moveTo(target: Point2D) = forEach {
     translate(diff)
 }
 
-fun Collection<LocatableModel>.moveToOrigin() = forEach {
-    moveTo(point(0.0,0.0))
+fun Collection<LocatableModel>.moveToOrigin()  {
+    val topLeft = topLeftLocation
+    forEach { it.location -= topLeft}
 }
 

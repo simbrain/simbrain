@@ -109,12 +109,6 @@ public class Dataset {
      * @return the n-dimensional datapoint
      */
     public DataPoint getPoint(final int i) {
-        if (i >= getNumPoints()) {
-            System.err.println("Error: requested datapoint outside of dataset range");
-
-            return null;
-        }
-
         return ntree.get(i);
     }
 

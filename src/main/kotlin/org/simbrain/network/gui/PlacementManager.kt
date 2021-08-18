@@ -1,27 +1,32 @@
 package org.simbrain.network.gui
 
-import org.simbrain.network.*
+import org.simbrain.network.LocatableModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.gui.PlacementManager.DefaultOffsets
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.moveToOrigin
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.Hopfield
+import org.simbrain.network.topLeftLocation
+import org.simbrain.network.translate
 import org.simbrain.util.plus
 import org.simbrain.util.point
+import org.simbrain.util.times
 import java.awt.geom.Point2D
 
 /**
  * Manage intelligent placement of new model elements in a [org.simbrain.network.gui.NetworkPanel].
  *
  * Placement is managed using two concepts. First, an anchor point. Second, a delta between the current anchor point and
- * previous anchor point.  There are cases to keep in mind:
- * 1. The anchor point is reset when you click on the screen, to the point you clicked on.
- * 2. Repeatedly adding an object (using new Neuron, etc) adds them at a fixed offset from the anchor point using
- * [DefaultOffsets]. With each addition, the current and previous anchor points are updated. See [placeObject].
- * 3. Adding an object using copy-paste or duplicate, adds them using the delta between the current anchor point and
- * the previous anchor point. This allows custom "paste trails" to be created.
+ * previous anchor point. There are cases to keep in mind:
+ *
+ *   1. The anchor point is reset when you click on the screen, to the point you clicked on.
+ *   2. Repeatedly adding an object (using new Neuron, etc.) adds them at a fixed offset from the anchor point using
+ *   [DefaultOffsets]. With each addition, the current and previous anchor points are updated. See [placeObject].
+ *   3. Adding an object using copy-paste or duplicate, adds them using the delta between the current anchor point and
+ *   the previous anchor point. This allows custom "paste trails" to be created.
  *
  * @author Yulin Li
  * @author Jeff Yoshimi
@@ -44,16 +49,30 @@ class PlacementManager() {
     }
 
     /**
-     * Tells you the location of the most recently placed object.
+     * Location of the most recently placed object.
      */
-    var anchorPoint =  point(0.0, 0.0)
+    var anchorPoint = point(0.0, 0.0)
+
+    /**
+     * Last anchor point, which is used to compute [deltaDrag]
+     */
+    var previousAnchorPoint = point(0.0, 0.0)
+
+    /**
+     * Difference between last two anchor points, which is set when dragging network objects, and then used when
+     * repeatedly adding objects, which is convenient for creating "paste trails".
+     */
+    var deltaDrag: Point2D? = null
+        set(value) {
+            // println("set deltaDrag = $value")
+            field = value
+        }
 
     /**
      * Set last location clicked on screen.
      */
     var lastClickedLocation: Point2D = point(0, 0)
         set(point) {
-            // println("Reset last clicked")
             field = point
             useLastClickedLocation = true
         }
@@ -62,11 +81,6 @@ class PlacementManager() {
      * Set to true when a location on the screen is clicked.
      */
     private var useLastClickedLocation = true
-
-    /**
-     * Set to true right after duplicating or copy-pasting.
-     */
-    private var pasted = false
 
     /**
      * Place an object.
@@ -87,34 +101,36 @@ class PlacementManager() {
         models.moveToOrigin()
 
         if (useLastClickedLocation) {
+            // println("Case 1: Clicked location")
             // Reset the anchor to wherever was last clicked and put objects there
             anchorPoint = lastClickedLocation
             useLastClickedLocation = false
-            update(models, point(0.0,0.0))
+            offsetFromAnchor(models, point(0.0,0.0))
         } else {
-            // Place objects at a default offset from wherever they were last placed
-            update(models, DefaultOffsets[models[0]])
+            if (deltaDrag == null) {
+                // println("Case 2: Default")
+                // Place objects at a default offset from wherever they were last placed
+                offsetFromAnchor(models, DefaultOffsets[models[0]] * models.size)
+            } else {
+                // println("Case 3: Delta")
+                offsetFromAnchor(models, deltaDrag!!)
+            }
         }
     }
 
     /**
      * Translate models by the anchor point + delta.
      */
-    private fun update(models: List<LocatableModel>, delta: Point2D) {
+    private fun offsetFromAnchor(models: List<LocatableModel>, offset: Point2D) {
 
-        // TODO: Later after this code stabilizes, add back the concept of a drag-based delta.
-        //  After a drag event, delta with last anchor point, and use that as the new delta.
+        // println("\tanchor = $anchorPoint\n\toffset = $offset")
 
         // Move the objects
-        if (models.size == 1) {
-            models.translate(anchorPoint + delta)
-        } else {
-            // Special handling for multiple placed objects
-            // TODO: Remove this once drag-based delta is re-implemented
-            models.translate(point(models.bound.width, models.bound.height + 10) + anchorPoint + delta)
-        }
+        models.translate(anchorPoint + offset)
 
-        // Reset anchor point to wherever objects were just pasted
+        previousAnchorPoint = anchorPoint
+
+        // Reset anchor point to wherever objects were just placed
         anchorPoint = models.topLeftLocation
     }
 

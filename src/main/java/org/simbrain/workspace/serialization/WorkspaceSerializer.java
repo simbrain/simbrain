@@ -53,7 +53,7 @@ import java.util.zip.ZipOutputStream;
  * annotated as {@link Consumable} or {@link Producible}.</li>
  * <li>Mark any fields that should not be serialized as transient.</li>
  * <li>Special initialization before de-serializing can be handled with ReadResolve methods, by calling methods
- * before and after serialization in Save, and soetimes using specail XStream converters.</li>
+ * before and after serialization in Save, and using custom XStream converters.</li>
  * </ol>
  * <br>
  * Some good examples are in {@link org.simbrain.network.NetworkComponent} and {@link

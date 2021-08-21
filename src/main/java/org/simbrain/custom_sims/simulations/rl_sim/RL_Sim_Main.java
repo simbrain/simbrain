@@ -303,7 +303,6 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         sim.couple(rightSmell, rightInputs);
         sim.couple(leftSmell, leftInputs);
 
-
         // Prediction Network
         predictionLeft = net.addNeuronGroup(-589.29, 188.50, 6);
         predictionLeft.setLabel("Predicted (L)");

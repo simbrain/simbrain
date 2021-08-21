@@ -20,7 +20,6 @@ package org.simbrain.custom_sims;
 
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
-import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
 import org.simbrain.custom_sims.simulations.agent_trails.RandomizedPursuer;
 import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning;
@@ -88,7 +87,7 @@ public abstract class RegisteredSimulation {
         REGISTERED_SIMS.add(new RL_Sim_Main());
         REGISTERED_SIMS.add(new Cerebellum());
         REGISTERED_SIMS.add(new CreaturesSim());
-        REGISTERED_SIMS.add(new AgentTrails());
+        // REGISTERED_SIMS.add(new AgentTrails());
         REGISTERED_SIMS.add(new ActorCritic());
         REGISTERED_SIMS.add(new OperantWithEnvironment());
         REGISTERED_SIMS.add(new ClassicalConditioning());

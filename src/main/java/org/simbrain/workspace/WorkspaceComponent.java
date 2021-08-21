@@ -33,12 +33,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Represents a component in a Simbrain {@link Workspace}. Extend this class to
- * create your own component type.
+ * Represents a component in a Simbrain {@link Workspace}. Extend this class to create your own component type.
  * <p>
- * Note that for deserialization sublclasses must have a static "open" method,
- * that is called using reflection by {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}.
- * See {@link org.simbrain.network.NetworkComponent#open(InputStream, String,
+ * For deserialization sublclasses must have a static "open" method, that is called using reflection by
+ * {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}. See
+ * {@link org.simbrain.network.NetworkComponent#open(InputStream, String,
  * String)} for an example.
  */
 public abstract class WorkspaceComponent {

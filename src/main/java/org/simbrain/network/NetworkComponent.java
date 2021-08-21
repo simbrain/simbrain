@@ -137,7 +137,6 @@ public final class NetworkComponent extends WorkspaceComponent {
         getNetworkXStream().toXML(network, output);
     }
 
-
     /**
      * Returns a copy of this NetworkComponent.
      *

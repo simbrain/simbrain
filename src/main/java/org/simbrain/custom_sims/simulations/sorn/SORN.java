@@ -48,9 +48,7 @@ public class SORN extends RegisteredSimulation {
         double percentInhib = 0.2;
         ieKIn = (int)(percentInhib*numNeurons/10);
         eiKIn = numNeurons/50;
-
     }
-
 
     @Override public SORN instantiate(SimbrainDesktop sbd) {
         return new SORN(sbd);
@@ -108,7 +106,7 @@ public class SORN extends RegisteredSimulation {
         ngIn.setLayout(layout);
         System.out.println(ngIn.size());
         int x_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 300);
-        ngIn.applyLayout(new Point(10, 10));
+        ngIn.applyLayout(new Point(1810, 141));
 
         defWtPD.setPolarity(Polarity.EXCITATORY);
         SynapseGroup sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,

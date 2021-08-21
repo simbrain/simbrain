@@ -221,10 +221,10 @@ val kAgentTrails = newSim {
         }
 
         // Uncomment for prediction halo
-        plot.projectionModel.projector.isUseColorManager = false
+        plot.projector.isUseColorManager = false
         workspace.addUpdateAction(updateAction("Color projection points") {
             val predictedState: DoubleArray = predictionNet.activations
-            Halo.makeHalo(plot.projectionModel.projector, predictedState, errorNeuron.activation.toFloat())
+            Halo.makeHalo(plot.projector, predictedState, errorNeuron.activation.toFloat())
         })
     }
 

@@ -158,7 +158,7 @@ public class AgentTrails extends RegisteredSimulation {
         sim.couple(sensoryNet, plot);
 
         // Uncomment for prediction halo
-        plot.getProjectionModel().getProjector().setUseColorManager(false);
+        plot.getProjector().setUseColorManager(false);
         sim.getWorkspace().addUpdateAction(new ColorPlot(this));
 
         // Label PCA points based on closest object

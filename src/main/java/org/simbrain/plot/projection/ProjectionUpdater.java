@@ -42,16 +42,16 @@ public class ProjectionUpdater implements Runnable {
      * {@inheritDoc}
      */
     public void run() {
-        while (!component.getProjectionModel().isRunning()) {
+        while (!component.getProjector().isRunning()) {
             try {
-                component.getProjectionModel().setUpdateCompleted(false);
+                component.getProjector().setUpdateCompleted(false);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         component.getProjector().iterate();
                         component.getEvents().fireComponentUpdated();
                     }
                 });
-                while (!component.getProjectionModel().isUpdateCompleted()) {
+                while (!component.getProjector().isUpdateCompleted()) {
                     Thread.sleep(1); // TODO: make this settable?
                 }
             } catch (InterruptedException e) {

@@ -109,6 +109,18 @@ public class Projector implements AttributeContainer {
      */
     private DataColoringManager colorManager;
 
+
+    /**
+     * Flag which allows the user to start and stop iterative projection
+     * techniques..
+     */
+    private transient volatile boolean isRunning = true;
+
+    /**
+     * Flag for checking that GUI update is completed.
+     */
+    private transient volatile boolean isUpdateCompleted;
+
     {
         init();
     }
@@ -344,6 +356,19 @@ public class Projector implements AttributeContainer {
     }
 
     /**
+     * Standard method call made to objects after they are deserialized. See:
+     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
+     * http://xstream.codehaus.org/faq.html
+     *
+     * @return Initialized object.
+     */
+    private Object readResolve() {
+        init();
+        postOpenInit();
+        return this;
+    }
+
+    /**
      * Reset the projector. Clear the underlying datasets.
      */
     public void reset() {
@@ -466,5 +491,40 @@ public class Projector implements AttributeContainer {
 
     public ProjectorEvents getEvents() {
         return events;
+    }
+
+    /**
+     * @return whether this component being updated by a thread or not.
+     */
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    /**
+     * This flag allows the user to start and stop iterative projection
+     * techniques.
+     *
+     * @param b whether this component being updated by a thread or not.
+     */
+    public void setRunning(boolean b) {
+        isRunning = b;
+    }
+
+    /**
+     * Swing update flag.
+     *
+     * @param b whether updated is completed
+     */
+    public void setUpdateCompleted(final boolean b) {
+        isUpdateCompleted = b;
+    }
+
+    /**
+     * Swing update flag.
+     *
+     * @return whether update is completed or not
+     */
+    public boolean isUpdateCompleted() {
+        return isUpdateCompleted;
     }
 }

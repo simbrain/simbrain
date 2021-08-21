@@ -15,6 +15,7 @@ package org.simbrain.plot.projection;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
+import org.simbrain.util.projection.Projector;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -34,11 +35,8 @@ public class ProjectionPlotActions {
 
     /**
      * Export high dimensional data to .csv.
-     *
-     * @param model
-     * @return the action
      */
-    public static Action getExportDataHi(final ProjectionModel model) {
+    public static Action getExportDataHi(final Projector proj) {
         return new AbstractAction() {
 
             // Initialize
@@ -53,7 +51,7 @@ public class ProjectionPlotActions {
                 SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
-                    model.getProjector().getUpstairs().exportToCSV(theFile);
+                    proj.getUpstairs().exportToCSV(theFile);
                 }
 
             }
@@ -62,11 +60,8 @@ public class ProjectionPlotActions {
 
     /**
      * Export low dimensional data to .csv.
-     *
-     * @param model
-     * @return the action
      */
-    public static Action getExportDataLow(final ProjectionModel model) {
+    public static Action getExportDataLow(final Projector proj) {
         return new AbstractAction() {
 
             // Initialize
@@ -81,7 +76,7 @@ public class ProjectionPlotActions {
                 SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showSaveDialog();
                 if (theFile != null) {
-                    model.getProjector().getDownstairs().exportToCSV(theFile);
+                    proj.getDownstairs().exportToCSV(theFile);
                 }
 
             }
@@ -91,10 +86,9 @@ public class ProjectionPlotActions {
     /**
      * Import high dimensional data from .csv.
      *
-     * @param model parent model
      * @return the action the action
      */
-    public static Action getImportData(final ProjectionModel model) {
+    public static Action getImportData(final Projector proj) {
         return new AbstractAction() {
 
             // Initialize
@@ -109,7 +103,7 @@ public class ProjectionPlotActions {
                 SFileChooser chooser = new SFileChooser(CSV_DIRECTORY, "comma-separated-values (csv)", "csv");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
-                    model.getProjector().importData(theFile);
+                    proj.importData(theFile);
                 }
 
             }

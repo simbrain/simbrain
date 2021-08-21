@@ -611,8 +611,8 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
 
     private void setUpProjectionPlot() {
         plot = sim.addProjectionPlot(779,339,355,330, "Sensory states + Predictions");
-        plot.getProjectionModel().getProjector().setUseColorManager(false);
-        plot.getProjectionModel().getProjector().setTolerance(.01);
+        plot.getProjector().setUseColorManager(false);
+        plot.getProjector().setTolerance(.01);
         Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
         Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
         sim.couple(inputProducer, plotConsumer);

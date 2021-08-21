@@ -181,9 +181,9 @@ public class KuramotoOscillators extends RegisteredSimulation {
 
         // Projection of main reservoir
         plot = sim.addProjectionPlot(855,10,452,499,"Cognitive Map");
-        plot.getProjectionModel().getProjector().init(reservoirNet.size());
-        plot.getProjectionModel().getProjector().setTolerance(1);
-        //plot.getProjectionModel().getProjector().setUseColorManager(false);
+        plot.getProjector().init(reservoirNet.size());
+        plot.getProjector().setTolerance(1);
+        //plot.getProjector().setUseColorManager(false);
         Producer inputProducer = sim.getProducer(reservoirNet, "getActivations");
         Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
         sim.couple(inputProducer, plotConsumer);

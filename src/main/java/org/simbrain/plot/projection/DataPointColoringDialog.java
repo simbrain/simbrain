@@ -16,6 +16,7 @@ package org.simbrain.plot.projection;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.projection.DataColoringManager;
+import org.simbrain.util.projection.Projector;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -44,7 +45,7 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
     /**
      * The projection model.
      */
-    private ProjectionModel projectionModel;
+    private Projector projector;
 
     /**
      * The base color
@@ -116,14 +117,9 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
      */
     private Box mainPanel = Box.createVerticalBox();
 
-    /**
-     * Dialog constructor.
-     *
-     * @param projectionModel the projection model
-     */
-    public DataPointColoringDialog(ProjectionModel projectionModel) {
-        this.projectionModel = projectionModel;
-        colorManager = projectionModel.getProjector().getColorManager();
+    public DataPointColoringDialog(Projector proj) {
+        this.projector = proj;
+        colorManager = projector.getColorManager();
         init();
     }
 
@@ -312,7 +308,7 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
     @Override
     protected void closeDialogOk() {
         commitChanges();
-        projectionModel.getProjector().getEvents().fireColorsChanged();
+        projector.getEvents().fireColorsChanged();
         super.closeDialogOk();
     }
 

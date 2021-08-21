@@ -38,29 +38,30 @@ import java.util.List;
  */
 public class ProjectionComponent extends WorkspaceComponent implements AttributeContainer {
 
+    // /**
+    //  * Data model.
+    //  */
+    // private ProjectionModel projectionModel;
+
     /**
-     * Data model.
+     * The main model object.
      */
-    private ProjectionModel projectionModel;
+    private Projector projector = new Projector();
 
     /**
      * Create new Projection Component.
      */
     public ProjectionComponent(final String name) {
         super(name);
-        projectionModel = new ProjectionModel();
     }
 
     /**
      * Create a projection component from an existing set of data. Used in
      * deserializing.
-     *
-     * @param model projection model
-     * @param name  name of component
      */
-    public ProjectionComponent(final ProjectionModel model, final String name) {
+    public ProjectionComponent(final Projector proj, final String name) {
         super(name);
-        projectionModel = model;
+        projector = proj;
     }
 
     private static XStream getProjectorXStream() {
@@ -83,13 +84,15 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
      * @return component to be opened
      */
     public static ProjectionComponent open(InputStream input, final String name, final String format) {
-        ProjectionModel model = (ProjectionModel) getProjectorXStream().fromXML(input);
-        return new ProjectionComponent(model, name);
+        Projector proj = (Projector) getProjectorXStream().fromXML(input);
+        return new ProjectionComponent(proj, name);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
-        getProjectorXStream().toXML(projectionModel, output);
+        projector.getUpstairs().preSaveInit();
+        projector.getDownstairs().preSaveInit();
+        getProjectorXStream().toXML(projector, output);
     }
 
     @Override
@@ -107,20 +110,15 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
         getEvents().fireComponentUpdated();
     }
 
-    /**
-     * Get reference to underlying projector object.
-     *
-     * @return projector object.
-     */
     public Projector getProjector() {
-        return projectionModel.getProjector();
+        return projector;
     }
 
     /**
      * Clear the dataset.
      */
     public void clearData() {
-        projectionModel.getProjector().reset();
+        projector.reset();
     }
 
     /**
@@ -128,7 +126,6 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
      */
     public void debug() {
         System.out.println("------------ Print contents of dataset ------------");
-        Projector projector = projectionModel.getProjector();
         for (int i = 0; i < projector.getNumPoints(); i++) {
             // System.out.println("<" + i + "> "
             // + projector.getProjectedPoint(i).get(0) + ","
@@ -138,38 +135,31 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     }
 
     /**
-     * @return the projectionModel
-     */
-    public ProjectionModel getProjectionModel() {
-        return projectionModel;
-    }
-
-    /**
      * Probability of the current point relative to past predictions. Only works
      * with Bayesian coloring
      */
     @Producible(defaultVisibility = false)
     public double getCurrentStateProbability() {
-        return projectionModel.getProjector().getCurrentStateProbability();
+        return projector.getCurrentStateProbability();
     }
 
     @Producible
     public double[] getCurrentPoint() {
-        if (projectionModel.getProjector().getCurrentPoint() != null) {
-            return projectionModel.getProjector().getCurrentPoint().getVector();
+        if (projector.getCurrentPoint() != null) {
+            return projector.getCurrentPoint().getVector();
         }
         return null;
     }
 
     @Consumable
     public void setLabel(String text) {
-        if (projectionModel.getProjector().getCurrentPoint() != null) {
-            String currentText = projectionModel.getProjector().getCurrentPoint().getLabel();
+        if (projector.getCurrentPoint() != null) {
+            String currentText = projector.getCurrentPoint().getLabel();
              // Don't empty filled text
              if (text.isEmpty() && !currentText.isEmpty()) {
                  return;
              }
-            projectionModel.getProjector().getCurrentPoint().setLabel(text);
+            projector.getCurrentPoint().setLabel(text);
         }
     }
 
@@ -180,17 +170,17 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
      */
     @Consumable
     public void addPoint(double[] newPoint) {
-        if (newPoint.length != projectionModel.getProjector().getDimensions()) {
-            projectionModel.getProjector().init(newPoint.length);
+        if (newPoint.length != projector.getDimensions()) {
+            projector.init(newPoint.length);
         }
-        projectionModel.getProjector().addDatapoint(new DataPointColored(newPoint));
+        projector.addDatapoint(new DataPointColored(newPoint));
     }
 
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> container = new ArrayList<>();
         container.add(this);
-        container.add(this.projectionModel.getProjector());
+        container.add(this.projector);
         return container;
     }
 

@@ -193,15 +193,15 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         playBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Play.png"));
         playBtn.addActionListener(e -> {
-            if (getWorkspaceComponent().getProjectionModel().isRunning()) {
+            if (getWorkspaceComponent().isRunning()) {
                 playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Stop.png"));
                 playBtn.setToolTipText("Stop iterating projection algorithm");
-                getWorkspaceComponent().getProjectionModel().setRunning(false);
+                getWorkspaceComponent().setRunning(false);
                 Executors.newSingleThreadExecutor().execute(new ProjectionUpdater(getWorkspaceComponent()));
             } else {
                 playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Play.png"));
                 playBtn.setToolTipText("Start iterating projection algorithm");
-                getWorkspaceComponent().getProjectionModel().setRunning(true);
+                getWorkspaceComponent().setRunning(true);
             }
         });
 
@@ -273,7 +273,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         // Other initialization
         initializeComboBoxes();
 
-        Projector proj = getWorkspaceComponent().getProjectionModel().getProjector();
+        Projector proj = getWorkspaceComponent().getProjector();
         proj.getEvents().onPointFound(p -> update());
         proj.getEvents().onPointAdded(() -> {
             resetData();
@@ -438,17 +438,17 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         fileMenu.addSeparator();
         final JMenu exportImport = new JMenu("Export/Import...");
         fileMenu.add(exportImport);
-        exportImport.add(ProjectionPlotActions.getImportData(getWorkspaceComponent().getProjectionModel()));
+        exportImport.add(ProjectionPlotActions.getImportData(getWorkspaceComponent().getProjector()));
         exportImport.addSeparator();
-        exportImport.add(ProjectionPlotActions.getExportDataHi(getWorkspaceComponent().getProjectionModel()));
-        exportImport.add(ProjectionPlotActions.getExportDataLow(getWorkspaceComponent().getProjectionModel()));
+        exportImport.add(ProjectionPlotActions.getExportDataHi(getWorkspaceComponent().getProjector()));
+        exportImport.add(ProjectionPlotActions.getExportDataLow(getWorkspaceComponent().getProjector()));
         fileMenu.addSeparator();
         fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
 
         final JMenu editMenu = new JMenu("Edit");
         final JMenuItem preferencesGeneral = new JMenuItem("Preferences...");
         preferencesGeneral.addActionListener(e -> {
-            ProjectionPreferencesDialog dialog = new ProjectionPreferencesDialog(getWorkspaceComponent().getProjectionModel().getProjector());
+            ProjectionPreferencesDialog dialog = new ProjectionPreferencesDialog(getWorkspaceComponent().getProjector());
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
@@ -458,23 +458,20 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         final JMenuItem setDimensions = new JMenuItem("Set Dimensions...");
         setDimensions.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                String dimsString = JOptionPane.showInputDialog("Dimensions:", getWorkspaceComponent().getProjectionModel().getProjector().getDimensions());
+                String dimsString = JOptionPane.showInputDialog("Dimensions:", getWorkspaceComponent().getProjector().getDimensions());
                 int dims = Integer.parseInt(dimsString); //todo; Catch exception
-                getWorkspaceComponent().getProjectionModel().getProjector().init(dims);
+                getWorkspaceComponent().getProjector().init(dims);
             }
 
         });
         editMenu.add(setDimensions);
 
         final JMenuItem colorPrefs = new JMenuItem("Datapoint Coloring...");
-        colorPrefs.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                DataPointColoringDialog dialog = new DataPointColoringDialog(getWorkspaceComponent().getProjectionModel());
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
-
+        colorPrefs.addActionListener(e -> {
+            DataPointColoringDialog dialog = new DataPointColoringDialog(getWorkspaceComponent().getProjector());
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
         });
         editMenu.add(colorPrefs);
 
@@ -482,7 +479,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         dims.addActionListener(e -> {
             String dimensions = JOptionPane.showInputDialog("Dimensions:");
             if (dimensions != null) {
-                getWorkspaceComponent().getProjectionModel().getProjector().init(Integer.parseInt(dimensions));
+                getWorkspaceComponent().getProjector().init(Integer.parseInt(dimensions));
             }
 
         });
@@ -536,7 +533,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         @Override
         public Paint getItemPaint(int row, int column) {
-            Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
+            Projector projector = getWorkspaceComponent().getProjector();
             if (column >= projector.getNumPoints()) {
                 System.out.println("getItemPaint:" + column + ">" + projector.getNumPoints());
                 return Color.green;

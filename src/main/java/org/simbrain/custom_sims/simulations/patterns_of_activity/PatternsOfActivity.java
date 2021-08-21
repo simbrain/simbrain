@@ -525,9 +525,9 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Create projection component
         ProjectionComponent pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
-        pc.getProjectionModel().getProjector().init(toPlot.size());
-        pc.getProjectionModel().getProjector().setTolerance(tolerance);
-        pc.getProjectionModel().getProjector().getColorManager().setColoringMethod("Bayesian");
+        pc.getProjector().init(toPlot.size());
+        pc.getProjector().setTolerance(tolerance);
+        pc.getProjector().getColorManager().setColoringMethod("Bayesian");
 
         // Coupling
         Producer inputProducer = sim.getProducer(toPlot, methodName);

@@ -151,7 +151,7 @@ public class ActorCritic extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Create the network wrapper
-        nc = sim.addNetwork(236, 4, 522, 595, "Neural Network");
+        nc = sim.addNetwork(283,0,522,595, "Neural Network");
         net = nc.getNetwork();
 
         // Set up the control panel and tabbed pane
@@ -176,7 +176,7 @@ public class ActorCritic extends RegisteredSimulation {
         net.addUpdateAction(updateMethod);
 
         // Add docviewer
-        sim.addDocViewer(0, 301, 253, 313, "Information",
+        sim.addDocViewer(0,301,279,336, "Information",
                 "ActorCritic.html");
 
         // Add method for custom update
@@ -227,7 +227,7 @@ public class ActorCritic extends RegisteredSimulation {
      */
     void setUpWorldAndNetwork() {
 
-        oc = sim.addOdorWorld(761, 8, 300, 300, "actor-critic.tmx");
+        oc = sim.addOdorWorld(807,0,462,503, "actor-critic.tmx");
         world = oc.getWorld();
         world.setObjectsBlockMovement(false);
         world.setWrapAround(false);
@@ -445,7 +445,7 @@ public class ActorCritic extends RegisteredSimulation {
     void makeControlPanel() {
 
         // Create control panel
-        controlPanel = ControlPanel.makePanel(sim, "RL Controls", -6, 1);
+        controlPanel = ControlPanel.makePanel(sim, "RL Controls", 121,-1,161,234);
 
         // Set up text fields
         trialField = controlPanel.addTextField("Trials", "" + numTrials);

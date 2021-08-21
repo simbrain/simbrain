@@ -145,7 +145,7 @@ public class ProjectSammon extends IterableProjectionMethod {
             init();
         }
 
-        yArray = projector.getDownstairs().getDatasetCopy();
+        yArray = projector.getDownstairs().asArrayList();
         d = projector.getDownstairs().getDistances();
 
         // Computes partials

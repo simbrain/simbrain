@@ -210,7 +210,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
 
         // Create projection component
         ProjectionComponent pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
-        pc.getProjectionModel().init(toPlot.size());
+        pc.getProjectionModel().getProjector().init(toPlot.size());
         pc.getProjectionModel().getProjector().setTolerance(tolerance);
         //plot.getProjectionModel().getProjector().useColorManager = false;
 

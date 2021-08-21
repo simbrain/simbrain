@@ -27,6 +27,8 @@ import org.jfree.chart.labels.XYItemLabelGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SimbrainPreferences;
@@ -53,14 +55,19 @@ import java.util.concurrent.Executors;
 public class ProjectionDesktopComponent extends DesktopComponent<ProjectionComponent> {
 
     /**
-     * Open button.
+     * The JFreeChart chart.
      */
-    private JButton openBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Open.png"));
+    private JFreeChart chart;
 
     /**
-     * Save button.
+     * JChart representation of the data.
      */
-    private JButton saveBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Save.png"));
+    private XYSeriesCollection xyCollection;
+
+    /**
+     * List of projector types.
+     */
+    private JComboBox<String> projectionList = new JComboBox<String>();
 
     /**
      * Iterate once.
@@ -71,46 +78,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
      * Play button.
      */
     private JButton playBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Play.png"));
-
-    /**
-     * Preferences button.
-     */
-    private JButton prefsBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Prefs.gif"));
-
-    /**
-     * Clear button.
-     */
-    private JButton clearBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Eraser.png"));
-
-    /**
-     * Random button.
-     */
-    private JButton randomBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Rand.png"));
-
-    /**
-     * List of projector types.
-     */
-    private JComboBox<String> projectionList = new JComboBox<String>();
-
-    /**
-     * Bottom panel.
-     */
-    private Box bottomPanel = Box.createVerticalBox();
-
-    /**
-     * Toolbar for bottom panel.
-     */
-    private JToolBar theToolBar = new JToolBar();
-
-    /**
-     * Status toolbar.
-     */
-    private JToolBar statusBar = new JToolBar();
-
-    /**
-     * Error bar.
-     */
-    private JToolBar errorBar = new JToolBar();
 
     /**
      * Points indicator.
@@ -128,14 +95,14 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
     private JLabel errorLabel = new JLabel();
 
     /**
+     * Error bar.
+     */
+    private JToolBar errorBar = new JToolBar();
+
+    /**
      * Show error option.
      */
     private boolean showError = true;
-
-    /**
-     * Help action used in menu and button.
-     */
-    private ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/projection.html");
 
     /**
      * Warning label.
@@ -143,19 +110,9 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
     private JLabel warningLabel = new JLabel(ResourceManager.getImageIcon("menu_icons/Warning.png"));
 
     /**
-     * Panel for showing Sammon step size and label, both with tooltip.
-     */
-    private Box sammonStepSizePanel = Box.createHorizontalBox();
-
-    /**
-     * Shows the step size for Sammon map.
-     */
-    private JTextField sammonStepSize;
-
-    /**
      * Combo box for first dimension of coordinate projection.
      */
-    private JComboBox<Integer> adjustDimension1 = new JComboBox<Integer>();
+    private JComboBox<Integer> adjustDimension1 = new JComboBox<>();
 
     /**
      * Model for adjustDimension1.
@@ -173,99 +130,22 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
     private DefaultComboBoxModel<Integer> adjustDimension2Model = new DefaultComboBoxModel<Integer>();
 
     /**
-     * Plot Action Manager.
+     * Panel for showing Sammon step size and label, both with tooltip.
      */
-    private PlotActionManager actionManager;
-
-    /**
-     * The JFreeChart chart.
-     */
-    private JFreeChart chart;
-
-    /**
-     * The JFreeChart panel specialized for displaying JFreeCharts.
-     */
-    private ChartPanel panel;
-
-    /**
-     * Custom rendering of scatter plot points
-     */
-    private class CustomRenderer extends XYLineAndShapeRenderer {
-
-        @Override
-        public Paint getItemPaint(int row, int column) {
-            Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
-            if (column >= projector.getNumPoints()) {
-                System.out.println("getItemPaint:" + column + ">" + projector.getNumPoints());
-                return Color.green;
-            }
-            DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(column));
-            if (point != null) {
-                return point.getColor();
-            } else {
-                return Color.green;
-            }
-        }
-
-    }
-
-    /**
-     * Custom label generator that renders a point's label, if any.
-     */
-    public class LegendXYItemLabelGenerator extends StandardXYItemLabelGenerator
-        implements XYItemLabelGenerator
-    {
-
-        @Override
-        public String generateLabel(XYDataset dataset, int series, int item) {
-            Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
-            if (item >= projector.getNumPoints()) {
-                System.out.println("generateLabel:" + item + ">" + projector.getNumPoints());
-                return null;
-            }
-            DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(item));
-            if (point != null) {
-                return point.getLabel();
-            }
-            return null;
-        }
-    }
-
-    /**
-     * Datapoints return a tooltip showing the high dimensional point being
-     * Represented by a given point in the plot.
-     */
-    private class CustomToolTipGenerator extends CustomXYToolTipGenerator {
-        @Override
-        public String generateToolTip(XYDataset data, int series, int item) {
-            Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
-            if (item >= projector.getNumPoints()) {
-                System.out.println("generateToolTip:" + item + ">" + projector.getNumPoints());
-                return null;
-            }
-            DataPoint point = projector.getUpstairs().getPoint(item);
-            if (point != null) {
-                return Utils.doubleArrayToString(point.getVector());
-            } else {
-                return "null";
-            }
-        }
-    }
+    private Box sammonStepSizePanel = Box.createHorizontalBox();
 
     /**
      * Construct the Projection GUI.
-     *
-     * @param frame
-     * @param component
      */
     public ProjectionDesktopComponent(final GenericFrame frame, final ProjectionComponent component) {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
-        actionManager = new PlotActionManager(this);
         setLayout(new BorderLayout());
 
         // Generate the graph
-        chart = ChartFactory.createScatterPlot("", "Projection X", "Projection Y", getWorkspaceComponent().getProjectionModel().getDataset(), PlotOrientation.VERTICAL, false, true, false);
+        xyCollection = new XYSeriesCollection();
+        xyCollection.addSeries(new XYSeries("Data", false, true));
+        chart = ChartFactory.createScatterPlot("", "Projection X", "Projection Y", xyCollection, PlotOrientation.VERTICAL, false, true, false);
         // chart.getXYPlot().getDomainAxis().setRange(-100, 100);
         // chart.getXYPlot().getRangeAxis().setRange(-100, 100);
         chart.getXYPlot().setBackgroundPaint(Color.white);
@@ -275,7 +155,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         chart.getXYPlot().getRangeAxis().setAutoRange(true);
         chart.getXYPlot().setForegroundAlpha(.5f); // TODO: Make this settable
 
-        panel = new ChartPanel(chart);
+        ChartPanel chartPanel = new ChartPanel(chart);
 
         // Custom render points as dots (not squares) and use custom tooltips
         // that show high-d point
@@ -292,46 +172,48 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         renderer.setBaseItemLabelGenerator(new LegendXYItemLabelGenerator());
 
         // Toolbar
+        JButton openBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Open.png"));
         openBtn.setToolTipText("Open high-dimensional data");
+        JButton saveBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Save.png"));
         saveBtn.setToolTipText("Save data");
         projectionList.setMaximumSize(new java.awt.Dimension(200, 100));
+
+        iterateBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Step.png"));
         iterateBtn.addActionListener(e -> {
             getWorkspaceComponent().getProjector().iterate();
             update();
         });
-        clearBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(() -> getWorkspaceComponent().clearData());
+
+        JButton clearBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Eraser.png"));
+        clearBtn.addActionListener(e ->
+                SwingUtilities.invokeLater(() -> {
+                    getWorkspaceComponent().clearData();
+                    xyCollection.getSeries(0).clear();
+                }));
+
+        playBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Play.png"));
+        playBtn.addActionListener(e -> {
+            if (getWorkspaceComponent().getProjectionModel().isRunning()) {
+                playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Stop.png"));
+                playBtn.setToolTipText("Stop iterating projection algorithm");
+                getWorkspaceComponent().getProjectionModel().setRunning(false);
+                Executors.newSingleThreadExecutor().execute(new ProjectionUpdater(getWorkspaceComponent()));
+            } else {
+                playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Play.png"));
+                playBtn.setToolTipText("Start iterating projection algorithm");
+                getWorkspaceComponent().getProjectionModel().setRunning(true);
             }
         });
-        playBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (getWorkspaceComponent().getProjectionModel().isRunning()) {
-                    playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Stop.png"));
-                    playBtn.setToolTipText("Stop iterating projection algorithm");
-                    getWorkspaceComponent().getProjectionModel().setRunning(false);
-                    Executors.newSingleThreadExecutor().execute(new ProjectionUpdater(getWorkspaceComponent()));
-                } else {
-                    playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Play.png"));
-                    playBtn.setToolTipText("Start iterating projection algorithm");
-                    getWorkspaceComponent().getProjectionModel().setRunning(true);
-                }
-            }
+
+        JButton prefsBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Prefs.gif"));
+        prefsBtn.addActionListener(e -> {
+            // TODO (Still working out overall dialog structure).
         });
-        prefsBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO (Still working out overall dialog structure).
-            }
-        });
-        randomBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                getWorkspaceComponent().getProjector().randomize(100);
-            }
-        });
+
+        JButton randomBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Rand.png"));
+        randomBtn.addActionListener(e -> getWorkspaceComponent().getProjector().randomize(100));
+
+        JToolBar theToolBar = new JToolBar();
         theToolBar.add(projectionList);
         playBtn.setToolTipText("Iterate projection algorithm");
         theToolBar.add(playBtn);
@@ -348,12 +230,15 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         String stepSizeToolTip = "Scales the amount points are moved on each iteration";
         JLabel stepSizeLabel = new JLabel("Step Size");
         stepSizeLabel.setToolTipText(stepSizeToolTip);
+
         sammonStepSizePanel.add(stepSizeLabel);
-        sammonStepSize = new JFormattedTextField("" + SimbrainPreferences.getDouble("projectorSammonEpsilon"));
+        JTextField sammonStepSize = new JFormattedTextField("" + SimbrainPreferences.getDouble(
+                "projectorSammonEpsilon"));
         sammonStepSize.setColumns(3);
         sammonStepSize.setToolTipText(stepSizeToolTip);
         sammonStepSizePanel.add(sammonStepSize);
         theToolBar.add(sammonStepSizePanel);
+
         adjustDimension1.setToolTipText("Dimension 1");
         adjustDimension2.setToolTipText("Dimension 2");
         theToolBar.add(adjustDimension1);
@@ -361,33 +246,47 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         // Help button
         JButton helpButton = new JButton();
-        helpButton.setAction(helpAction);
+        helpButton.setAction(new ShowHelpAction("Pages/Plot/projection.html"));
 
         // Setup Menu Bar
         createAttachMenuBar();
 
-        // Status Bar
+        JToolBar statusBar = new JToolBar();
         statusBar.add(pointsLabel);
         statusBar.add(dimsLabel);
+
+        JToolBar errorBar = new JToolBar();
         errorBar.add(errorLabel);
 
-        // Bottom panel
         JPanel southPanel = new JPanel();
         southPanel.add(errorBar);
         southPanel.add(statusBar);
+
+        Box bottomPanel = Box.createVerticalBox();
         bottomPanel.add("South", southPanel);
 
         // Put all panels together
         add("North", theToolBar);
-        add("Center", panel);
+        add("Center", chartPanel);
         add("South", bottomPanel);
 
         // Other initialization
         initializeComboBoxes();
 
         Projector proj = getWorkspaceComponent().getProjectionModel().getProjector();
-        proj.getEvents().onDatasetInitialized(this::update);
-        proj.getEvents().onProjectionMethodChanged(this::update);
+        proj.getEvents().onPointFound(p -> update());
+        proj.getEvents().onPointAdded(() -> {
+            resetData();
+            update();
+        });
+        proj.getEvents().onDatasetInitialized(() -> {
+            resetData();
+            update();
+        });
+        proj.getEvents().onProjectionMethodChanged(() -> {
+            resetData();
+            update();
+        });
         proj.getEvents().onColorsChanged(() -> {
             proj.resetColors();
             update();
@@ -406,9 +305,9 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
                 }
             }
         });
-        updateToolBar();
+        resetData();
         update();
-
+        updateToolBar();
     }
 
     /**
@@ -433,20 +332,15 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         // Init the adjust dimension combo boxes
         updateCoordinateProjectionComboBoxes();
         adjustDimension1.setModel(adjustDimension1Model);
-        adjustDimension1.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ProjectionMethod proj = getWorkspaceComponent().getProjector().getProjectionMethod();
-                if (proj != null) {
-                    if (proj instanceof ProjectCoordinate) {
-                        ((ProjectCoordinate) proj).setHiD1(adjustDimension1.getSelectedIndex());
-                        ((ProjectCoordinate) proj).project();
-                        getWorkspaceComponent().getProjector().getEvents().fireDatasetInitialized();
-                    }
+        adjustDimension1.addActionListener(e -> {
+            ProjectionMethod proj = getWorkspaceComponent().getProjector().getProjectionMethod();
+            if (proj != null) {
+                if (proj instanceof ProjectCoordinate) {
+                    ((ProjectCoordinate) proj).setHiD1(adjustDimension1.getSelectedIndex());
+                    ((ProjectCoordinate) proj).project();
+                    getWorkspaceComponent().getProjector().getEvents().fireDatasetInitialized();
                 }
             }
-
         });
         adjustDimension2.setModel(adjustDimension2Model);
         adjustDimension2.addActionListener(new ActionListener() {
@@ -457,7 +351,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
                 if (proj != null) {
                     if (proj instanceof ProjectCoordinate) {
                         ((ProjectCoordinate) proj).setHiD2(adjustDimension2.getSelectedIndex());
-                        ((ProjectCoordinate) proj).project();
+                        proj.project();
                         getWorkspaceComponent().getProjector().getEvents().fireDatasetInitialized();
                     }
                 }
@@ -515,7 +409,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
     }
 
-
     /**
      * Update the Coordinate projection combo boxes.
      */
@@ -538,6 +431,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         final JMenuBar bar = new JMenuBar();
         final JMenu fileMenu = new JMenu("File");
 
+        PlotActionManager actionManager = new PlotActionManager(this);
         for (Action action : actionManager.getOpenSavePlotActions()) {
             fileMenu.add(action);
         }
@@ -553,14 +447,11 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         final JMenu editMenu = new JMenu("Edit");
         final JMenuItem preferencesGeneral = new JMenuItem("Preferences...");
-        preferencesGeneral.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                ProjectionPreferencesDialog dialog = new ProjectionPreferencesDialog(getWorkspaceComponent().getProjectionModel().getProjector());
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
-
+        preferencesGeneral.addActionListener(e -> {
+            ProjectionPreferencesDialog dialog = new ProjectionPreferencesDialog(getWorkspaceComponent().getProjectionModel().getProjector());
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
         });
         editMenu.add(preferencesGeneral);
 
@@ -569,7 +460,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
             public void actionPerformed(ActionEvent arg0) {
                 String dimsString = JOptionPane.showInputDialog("Dimensions:", getWorkspaceComponent().getProjectionModel().getProjector().getDimensions());
                 int dims = Integer.parseInt(dimsString); //todo; Catch exception
-                getWorkspaceComponent().getProjectionModel().init(dims);
+                getWorkspaceComponent().getProjectionModel().getProjector().init(dims);
             }
 
         });
@@ -582,27 +473,23 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
                 dialog.pack();
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
-
             }
 
         });
         editMenu.add(colorPrefs);
 
         final JMenuItem dims = new JMenuItem("Set dimensions...");
-        dims.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                String dimensions = JOptionPane.showInputDialog("Dimensions:");
-                if (dimensions != null) {
-                    getWorkspaceComponent().getProjectionModel().getProjector().init(Integer.parseInt(dimensions));
-                }
-
+        dims.addActionListener(e -> {
+            String dimensions = JOptionPane.showInputDialog("Dimensions:");
+            if (dimensions != null) {
+                getWorkspaceComponent().getProjectionModel().getProjector().init(Integer.parseInt(dimensions));
             }
 
         });
         // editMenu.add(dims);
 
         JMenu helpMenu = new JMenu("Help");
-        JMenuItem helpItem = new JMenuItem(helpAction);
+        JMenuItem helpItem = new JMenuItem(new ShowHelpAction("Pages/Plot/projection.html"));
         helpMenu.add(helpItem);
 
         bar.add(fileMenu);
@@ -641,5 +528,85 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
             iterateBtn.setEnabled(false);
         }
     }
+
+    /**
+     * Custom rendering of scatter plot points
+     */
+    private class CustomRenderer extends XYLineAndShapeRenderer {
+
+        @Override
+        public Paint getItemPaint(int row, int column) {
+            Projector projector = getWorkspaceComponent().getProjectionModel().getProjector();
+            if (column >= projector.getNumPoints()) {
+                System.out.println("getItemPaint:" + column + ">" + projector.getNumPoints());
+                return Color.green;
+            }
+            DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(column));
+            if (point != null) {
+                return point.getColor();
+            } else {
+                return Color.green;
+            }
+        }
+
+    }
+
+    /**
+     * Custom label generator that renders a point's label, if any.
+     */
+    public class LegendXYItemLabelGenerator extends StandardXYItemLabelGenerator
+            implements XYItemLabelGenerator {
+
+        @Override
+        public String generateLabel(XYDataset dataset, int series, int item) {
+            Projector projector = getWorkspaceComponent().getProjector();
+            if (item >= projector.getNumPoints()) {
+                System.out.println("generateLabel:" + item + ">" + projector.getNumPoints());
+                return null;
+            }
+            DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(item));
+            if (point != null) {
+                return point.getLabel();
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Datapoints return a tooltip showing the high dimensional point being
+     * Represented by a given point in the plot.
+     */
+    private class CustomToolTipGenerator extends CustomXYToolTipGenerator {
+        @Override
+        public String generateToolTip(XYDataset data, int series, int item) {
+            Projector projector = getWorkspaceComponent().getProjector();
+            if (item >= projector.getNumPoints()) {
+                System.out.println("generateToolTip:" + item + ">" + projector.getNumPoints());
+                return null;
+            }
+            DataPoint point = projector.getUpstairs().getPoint(item);
+            if (point != null) {
+                return Utils.doubleArrayToString(point.getVector());
+            } else {
+                return "null";
+            }
+        }
+    }
+
+    public void resetData() {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                xyCollection.getSeries(0).clear();
+                int size = getWorkspaceComponent().getProjector().getNumPoints();
+                for (int i = 0; i < size; i++) {
+                    DataPoint point = getWorkspaceComponent().getProjector().getDownstairs().getPoint(i);
+                    xyCollection.getSeries(0).add(point.get(0), point.get(1));
+                }
+                // setUpdateCompleted(true);
+            }
+        });
+
+    }
+
 
 }

@@ -2,6 +2,7 @@ package org.simbrain.util.projection
 
 import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
+import java.util.function.Consumer
 
 /**
  * See [Event]
@@ -21,6 +22,9 @@ class ProjectorEvents(projector: Projector) : Event(PropertyChangeSupport(projec
     // TODO: Consider passing point as argument
     fun onPointAdded(handler: Runnable) = "PointAdded".event(handler)
     fun firePointAdded() = "PointAdded"()
+
+    fun onPointFound(handler: Consumer<DataPoint>) = "PointFound".itemAddedEvent(handler)
+    fun firePointFound(point: DataPoint) = "PointFound"(new = point)
 
     fun onPointRemoved(handler: Runnable) = "PointRemoved".event(handler)
     fun firePointRemoved() = "PointRemoved"()

@@ -725,14 +725,12 @@ public class Dataset {
     /**
      * @return a reference to the dataset
      */
-    public ArrayList<DataPoint> getDatasetCopy() {
+    public ArrayList<DataPoint> asArrayList() {
         return ntree.asArrayList();
     }
 
     /**
      * Makes this dataset a copy of the passed in dataset.
-     *
-     * @param other the the dataset
      */
     public void mirror(Dataset other) {
         clear();
@@ -773,10 +771,7 @@ public class Dataset {
      * Initializes persistent data. Initializes Dataset from persistent data.
      */
     public void preSaveInit() {
-        persistentData.clear();
-        for (int i = 0; i < getNumPoints(); i++) {
-            persistentData.add(getPoint(i));
-        }
+        persistentData = asArrayList();
     }
 
     /**
@@ -785,7 +780,6 @@ public class Dataset {
     public void postOpenInit() {
         clear();
         for (DataPoint point : persistentData) {
-            //point.setLabel("");
             addPoint(point);
         }
     }

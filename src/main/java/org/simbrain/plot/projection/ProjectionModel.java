@@ -18,14 +18,8 @@
  */
 package org.simbrain.plot.projection;
 
-import com.thoughtworks.xstream.XStream;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.util.Utils;
-import org.simbrain.util.projection.*;
+import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.AttributeContainer;
-
-import java.awt.*;
 
 /**
  * Main data for a projection chart.
@@ -37,10 +31,6 @@ public class ProjectionModel implements AttributeContainer {
      */
     private Projector projector = new Projector();
 
-    /**
-     * Scatter Plot Data.
-     */
-    private transient XYSeriesCollection dataset;
 
     /**
      * Flag which allows the user to start and stop iterative projection
@@ -53,42 +43,13 @@ public class ProjectionModel implements AttributeContainer {
      */
     private transient volatile boolean isUpdateCompleted;
 
+    // TODO: User parameter
+    private int storagePrecision = 10;
+
     /**
      * Default constructor.
      */
     public ProjectionModel() {
-        init(-1);
-    }
-
-    /**
-     * Construct a projection model with a specified number of dimensions.
-     *
-     * @param dimensions dimension of the projector
-     */
-    public ProjectionModel(int dimensions) {
-        init(dimensions);
-    }
-
-    /**
-     * Initialize the projection model with a certain number of data sources.
-     *
-     * @param numDataSources number of sources to initialize model with.
-     */
-    public void init(int numDataSources) {
-        if (dataset == null) {
-            dataset = new XYSeriesCollection();
-            dataset.addSeries(new XYSeries("Data", false, true));
-        }
-        if (numDataSources == -1) {
-            projector = new Projector();
-        } else {
-            projector = new Projector(numDataSources);
-        }
-        //fireChartInitialized(projector.getDimensions());
-        resetData();
-        projector.getEvents().onDatasetInitialized(this::resetData);
-        projector.getEvents().onPointAdded(this::resetData);
-        projector.getEvents().onProjectionMethodChanged(this::resetData);
     }
 
 
@@ -109,46 +70,8 @@ public class ProjectionModel implements AttributeContainer {
      * @return Initialized object.
      */
     private Object readResolve() {
-        dataset = new XYSeriesCollection();
-        dataset.addSeries(new XYSeries("Data", false, true));
         projector.postOpenInit();
         return this;
-    }
-
-    /**
-     * @return the dataset
-     */
-    public XYSeriesCollection getDataset() {
-        return dataset;
-    }
-
-    /**
-     * Convenience method for adding points to dataset.
-     *
-     * @param x x dimension of point to add
-     * @param y y dimension of point to add
-     */
-    public void addPoint(double x, double y) {
-        dataset.getSeries(0).add(x, y, true);
-    }
-
-    /**
-     * Resets the JFreeChart data and re-adds all the datapoints. Invoked when
-     * the projector must be applied to an entire dataset.
-     */
-    public void resetData() {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                dataset.getSeries(0).clear();
-                int size = projector.getNumPoints();
-                for (int i = 0; i < size; i++) {
-                    DataPoint point = projector.getDownstairs().getPoint(i);
-                    dataset.getSeries(0).add(point.get(0), point.get(1));
-                }
-                setUpdateCompleted(true);
-            }
-        });
-
     }
 
     /**

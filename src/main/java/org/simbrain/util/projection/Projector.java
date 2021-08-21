@@ -27,7 +27,8 @@ import org.simbrain.workspace.Producible;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * <b>Projector</b> is a the main class of this package, which provides an
@@ -56,6 +57,7 @@ public class Projector implements AttributeContainer {
      * Reference to current "hot" point.
      */
     private DataPoint currentPoint;
+
     /**
      * Default number of sources. This is the dimensionality of the hi D projectionModel
      */
@@ -85,7 +87,7 @@ public class Projector implements AttributeContainer {
     /**
      * List of projection methods; used in Gui Combo boxes.
      */
-    private final HashMap<Class<?>, String> projectionMethods = new LinkedHashMap<Class<?>, String>();
+    private transient HashMap<Class<?>, String> projectionMethods;
 
     /**
      * One-step ahead prediction used for Bayesian datapoint coloring
@@ -102,22 +104,14 @@ public class Projector implements AttributeContainer {
      */
     private double currentStateProbabilty = 0;
 
-    // Initialization
-    {
-        colorManager = new DataColoringManager(this);
-
-        projectionMethods.put(ProjectCoordinate.class, "Coordinate Projection");
-        projectionMethods.put(ProjectNNSubspace.class, "NN Subspace");
-        projectionMethods.put(ProjectPCA.class, "PCA");
-        projectionMethods.put(ProjectTriangulate.class, "Triangulation");
-        projectionMethods.put(ProjectSammon.class, "Sammon Map");
-
-    }
-
     /**
      * Manages coloring the datapoints.
      */
-    private final DataColoringManager colorManager;
+    private DataColoringManager colorManager;
+
+    {
+        init();
+    }
 
     /**
      * Default constructor for projector.
@@ -149,11 +143,22 @@ public class Projector implements AttributeContainer {
         events.fireDatasetInitialized();
     }
 
+    private void init() {
+        projectionMethods = new LinkedHashMap<>();
+        colorManager = new DataColoringManager(this);
+        projectionMethods.put(ProjectCoordinate.class, "Coordinate Projection");
+        projectionMethods.put(ProjectNNSubspace.class, "NN Subspace");
+        projectionMethods.put(ProjectPCA.class, "PCA");
+        projectionMethods.put(ProjectTriangulate.class, "Triangulation");
+        projectionMethods.put(ProjectSammon.class, "Sammon Map");
+    }
+
     /**
      * Updates datasets from persistent forms of data.
      */
     public void postOpenInit() {
         events = new ProjectorEvents(this);
+        init();
         upstairs.postOpenInit();
         downstairs.postOpenInit();
     }
@@ -184,6 +189,7 @@ public class Projector implements AttributeContainer {
         if (existingPoint != null) {
             // That point was already in the dataset
             currentPoint = existingPoint;
+            events.firePointFound(currentPoint);
         } else {
             // It's a new point
             currentPoint = point;
@@ -335,7 +341,6 @@ public class Projector implements AttributeContainer {
         if (projectionMethod.isIterable()) {
             ((IterableProjectionMethod) projectionMethod).iterate();
         }
-
     }
 
     /**

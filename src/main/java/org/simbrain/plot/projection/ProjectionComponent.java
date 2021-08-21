@@ -18,8 +18,9 @@
  */
 package org.simbrain.plot.projection;
 
+import com.thoughtworks.xstream.XStream;
+import org.simbrain.util.DoubleArrayConverter;
 import org.simbrain.util.Utils;
-import org.simbrain.util.projection.DataPoint;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.AttributeContainer;
@@ -44,8 +45,6 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
 
     /**
      * Create new Projection Component.
-     *
-     * @param name
      */
     public ProjectionComponent(final String name) {
         super(name);
@@ -62,21 +61,17 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     public ProjectionComponent(final ProjectionModel model, final String name) {
         super(name);
         projectionModel = model;
+    }
 
-        // Add the data to the chart.
-        int numPoints = projectionModel.getProjector().getNumPoints();
-        for (int i = 0; i < numPoints; i++) {
-            DataPoint point = projectionModel.getProjector().getDownstairs().getPoint(i);
-            if (point != null) {
-                projectionModel.addPoint(point.get(0), point.get(1));
-            }
-        }
-
+    private static XStream getProjectorXStream() {
+        var xstream = Utils.getSimbrainXStream();
+        xstream.registerConverter(new DoubleArrayConverter());
+        return xstream;
     }
 
     @Override
     public String getXML() {
-        return Utils.getSimbrainXStream().toXML(this);
+        return getProjectorXStream().toXML(getProjector());
     }
 
     /**
@@ -88,15 +83,13 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
      * @return component to be opened
      */
     public static ProjectionComponent open(InputStream input, final String name, final String format) {
-        ProjectionModel model = (ProjectionModel) Utils.getSimbrainXStream().fromXML(input);
+        ProjectionModel model = (ProjectionModel) getProjectorXStream().fromXML(input);
         return new ProjectionComponent(model, name);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
-        projectionModel.getProjector().getUpstairs().preSaveInit();
-        projectionModel.getProjector().getDownstairs().preSaveInit();
-        Utils.getSimbrainXStream().toXML(projectionModel, output);
+        getProjectorXStream().toXML(projectionModel, output);
     }
 
     @Override

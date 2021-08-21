@@ -67,7 +67,7 @@ public class NTree implements Iterable<DataPoint> {
     /**
      * Indexed list of all elements
      */
-    private List<DataPoint> list = new ArrayList<DataPoint>();
+    private List<DataPoint> list = new ArrayList<>();
 
     /**
      * Map of all elements mapped to their leafs
@@ -534,7 +534,7 @@ public class NTree implements Iterable<DataPoint> {
      * @return the tree as an arraylist
      */
     public ArrayList<DataPoint> asArrayList() {
-        return new ArrayList<DataPoint>(list);
+        return new ArrayList<>(list);
     }
 
     /**

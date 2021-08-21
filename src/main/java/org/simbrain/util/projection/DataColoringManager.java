@@ -64,12 +64,12 @@ public class DataColoringManager {
     /**
      * The "hot color" to be used for the current point.
      */
-    private Color hotColor = new Color (8,0,255);
+    private Color hotColor = new Color (252, 5, 5);
 
     /**
      * The base color to be used for all points besides the current point.
      */
-    private Color baseColor = new Color(232, 232, 232);
+    private Color baseColor = new Color(163, 217, 108);
 
     /**
      * Base color of states predicted by the Bayesian method.

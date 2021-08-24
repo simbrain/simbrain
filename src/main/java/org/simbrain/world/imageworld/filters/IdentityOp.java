@@ -24,6 +24,9 @@ public class IdentityOp extends ImageOperation<AffineTransformOp> {
         return "Color";
     }
 
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     public Object readResolve() {
         op = new AffineTransformOp(new AffineTransform(), AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
         return this;

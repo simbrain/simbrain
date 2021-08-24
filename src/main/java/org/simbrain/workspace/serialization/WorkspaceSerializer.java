@@ -52,13 +52,13 @@ import java.util.zip.ZipOutputStream;
  * It should return a list of objects that contain consumers or producers, i.e. that contain methods
  * annotated as {@link Consumable} or {@link Producible}.</li>
  * <li>Mark any fields that should not be serialized as transient.</li>
- * <li>Special initialization before de-serializing can be handled with ReadResolve methods, by calling methods
- * before and after serialization in Save, and using custom XStream converters.</li>
+ * <li>Special initialization when de-serializing can be handled with ReadResolve methods, or by using custom XStream
+ * converters. For details on de-serialization see {@link WorkspaceComponentDeserializer}</li>
  * </ol>
  * <br>
  * Some good examples are in {@link org.simbrain.network.NetworkComponent} and {@link
  * org.simbrain.world.odorworld.OdorWorldComponent}.
- *
+ * <br>
  * @author Matt Watson
  * @author Zoë Tosi
  * @author Jeff Yoshimi

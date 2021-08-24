@@ -18,15 +18,15 @@
  */
 package org.simbrain.world.textworld;
 
+import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Consumable;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
 
 /**
  * <b>TextWorld</b> is an environment for modeling speech and reading and other
@@ -317,11 +317,7 @@ public abstract class TextWorld implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized. See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     *
-     * @return Initialized object.
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     protected Object readResolve() {
         listenerList = new ArrayList<TextListener>();

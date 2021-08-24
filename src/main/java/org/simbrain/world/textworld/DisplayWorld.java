@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.textworld;
 
-import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.projection.DataPoint;
@@ -142,11 +141,7 @@ public class DisplayWorld extends TextWorld {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized. See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     *
-     * @return Initialized object.
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     protected Object readResolve() {
         super.readResolve();

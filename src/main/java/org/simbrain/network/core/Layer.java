@@ -132,6 +132,9 @@ public abstract class Layer extends LocatableModel {
         getEvents().fireDeleted();
     }
 
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     public Object readResolve() {
         events = new LocationEvents(this);
         return this;

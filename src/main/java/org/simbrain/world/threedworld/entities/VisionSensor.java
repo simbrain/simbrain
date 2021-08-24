@@ -74,7 +74,7 @@ public class VisionSensor extends Filter implements Sensor {
     }
 
     /**
-     * @return Returns a deserialized VisionSensor.
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
         initializeView();

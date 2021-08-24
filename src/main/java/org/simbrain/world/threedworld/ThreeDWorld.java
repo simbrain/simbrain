@@ -64,7 +64,7 @@ public class ThreeDWorld implements AppState {
     }
 
     /**
-     * @return A deserialized ThreeDWorld.
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
         events = new ThreeDWorldEvents(this);

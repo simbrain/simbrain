@@ -21,6 +21,9 @@ public class GrayOp extends ImageOperation<ColorConvertOp> {
         return "Gray Scale";
     }
 
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     public Object readResolve() {
         op = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
         return this;

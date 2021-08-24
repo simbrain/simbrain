@@ -42,6 +42,9 @@ public class FilterCollection {
         });
     }
 
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     public Object readResolve() {
         events = new FilterCollectionEvents(this);
         imageSource.getEvents().onResize(() -> {

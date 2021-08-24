@@ -6,7 +6,6 @@ import com.thoughtworks.xstream.annotations.XStreamConverter
 import com.thoughtworks.xstream.converters.extended.NamedMapConverter
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import java.util.*
 
 // Ideal structure for Odor World version / notes for future javadoc comments
 //
@@ -52,11 +51,7 @@ class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, editable 
     var collision: Boolean = false
 
     /**
-     * Standard method call made to objects after they are deserialized. See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     *
-     * @return Initialized object.
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private fun readResolve(): Any {
         type = properties["type"] ?: "$id"

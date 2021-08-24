@@ -192,6 +192,9 @@ public class EmitterMatrix implements AttributeContainer {
         return events;
     }
 
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     public Object readResolve() {
         events = new ImageEvents(this);
         return this;

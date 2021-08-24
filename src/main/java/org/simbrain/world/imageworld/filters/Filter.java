@@ -100,6 +100,9 @@ public class Filter implements AttributeContainer, EditableObject {
         refreshFilter();
     }
 
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     public Object readResolve() {
         refreshFilter();
         return this;

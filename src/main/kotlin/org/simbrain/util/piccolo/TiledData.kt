@@ -90,7 +90,9 @@ class TiledData(width: Int, height: Int) {
 
     }
 
-    @Suppress("unused")
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     private fun readResolve(): Any {
         _gid = decodeData().toMutableList()
         return this

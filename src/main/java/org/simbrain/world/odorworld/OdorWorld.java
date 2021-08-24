@@ -112,10 +112,15 @@ public class OdorWorld implements EditableObject {
             0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
     ));
 
+    {
+        System.out.println("OdorWorld.instance initializer");
+    }
+
     /**
      * Default constructor.
      */
     public OdorWorld() {
+        System.out.println("OdorWorld.OdorWorld");
     }
 
     /**
@@ -379,11 +384,7 @@ public class OdorWorld implements EditableObject {
     }
 
     /**
-     * Standard method call made to objects after they are deserialized. See:
-     * http://java.sun.com/developer/JDCTechTips/2002/tt0205.html#tip2
-     * http://xstream.codehaus.org/faq.html
-     *
-     * @return Initialized object.
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private Object readResolve() {
         if (agentIdGenerator == null) {

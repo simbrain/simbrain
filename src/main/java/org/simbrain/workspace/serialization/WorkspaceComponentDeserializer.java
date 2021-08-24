@@ -28,7 +28,20 @@ import java.util.Map;
 
 /**
  * Class used to assist with deserializing workspace components.
- *
+ * <br>
+ * Components are de-serialized by calling their overridden open function using reflection. This function typically
+ * produces a component using XStream. An example is at {@link org.simbrain.network.NetworkComponent#open(InputStream, String, String)}
+ * <br>
+ * This procedure does NOT invoke the default constructor or any initializers. Any initialization desired must be
+ * placed in a readResolve method (a call made to objects by JDK serialization).
+ * <br>
+ * From the XStream docs: "Stream uses the same mechanism as the JDK serialization. When using the enhanced mode with
+ * the optimized reflection API, it does not invoke the default constructor. The solution is to implement the
+ * readResolve method"
+ * <br>
+ * @see
+ * <a href="https://docs.oracle.com/javase/7/docs/platform/serialization/spec/input.html#5903">Oracle documentation on readresolve</a>
+ * <br>
  * @author Matt Watson
  */
 public class WorkspaceComponentDeserializer {

@@ -51,7 +51,7 @@ public abstract class ImageSource  {
     }
 
     /**
-     * Return a deserialized ImageSourceAdapter.
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
         events = new ImageEvents(this);

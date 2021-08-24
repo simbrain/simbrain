@@ -130,7 +130,9 @@ class TileSet {
         else -> throw IllegalArgumentException("Tile set has only $tilecount tiles, but requesting tile $localId.")
     }
 
-    @Suppress("unused")
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     private fun readResolve(): Any {
         init()
         return this

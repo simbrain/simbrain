@@ -111,7 +111,7 @@ public class WalkingEffector implements Effector {
     }
 
     /**
-     * @return Return a deserialized WalkingEffector.
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
         agent.getModel().setKinematic(true);

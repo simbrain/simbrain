@@ -112,15 +112,10 @@ public class OdorWorld implements EditableObject {
             0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
     ));
 
-    {
-        System.out.println("OdorWorld.instance initializer");
-    }
-
     /**
      * Default constructor.
      */
     public OdorWorld() {
-        System.out.println("OdorWorld.OdorWorld");
     }
 
     /**

@@ -19,6 +19,9 @@ import org.simbrain.workspace.AttributeContainer
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 
+// Optimizer (here or in training dialog?)
+// Train-test Split ratio (here or in training dialog?)
+
 class DeepNet(
     private val network: Network,
     val inputSize: Int,
@@ -119,6 +122,9 @@ class DeepNet(
         return Rectangle2D.Double(x - 150 / 2, y - 50 / 2, 150.0, 50.0)
     }
 
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
     override fun readResolve(): Any {
         // Probably use deepNetLayers.saveModelConfiguration()
         super.readResolve()

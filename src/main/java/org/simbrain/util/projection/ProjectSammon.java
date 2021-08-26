@@ -27,6 +27,7 @@ import java.util.ArrayList;
  * Sammon projection.
  * <p>
  * TODO: Possibly convert all arrays to datapoints.
+ * TODO: Mention MDS
  */
 public class ProjectSammon extends IterableProjectionMethod {
 
@@ -160,7 +161,6 @@ public class ProjectSammon extends IterableProjectionMethod {
                     if (i == m) {
                         continue;
                     }
-
                     yI = yArray.get(i).getVector();
                     partialSum += (((dstar[i][m] - d[i][m]) * (yI[n] - yM[n])) / dstar[i][m] / d[i][m]);
                 }
@@ -181,7 +181,7 @@ public class ProjectSammon extends IterableProjectionMethod {
 
         currentCloseness = e / dstarSum;
         setError(currentCloseness);
-        projector.getEvents().fireDatasetInitialized();
+        projector.getEvents().fireDataChanged();
         // System.out.println("currentCloseness = " + currentCloseness);
     }
 

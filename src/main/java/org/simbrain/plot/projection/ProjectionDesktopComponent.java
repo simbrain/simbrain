@@ -47,6 +47,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.Ellipse2D;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -63,6 +64,11 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
      * JChart representation of the data.
      */
     private XYSeriesCollection xyCollection;
+
+    /**
+     * Executor service for running iterable projection methods.
+     */
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
 
     /**
      * List of projector types.
@@ -142,6 +148,8 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         setPreferredSize(new Dimension(500, 400));
         setLayout(new BorderLayout());
 
+        Projector proj = getWorkspaceComponent().getProjector();
+
         // Generate the graph
         xyCollection = new XYSeriesCollection();
         xyCollection.addSeries(new XYSeries("Data", false, true));
@@ -180,8 +188,31 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         iterateBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Step.png"));
         iterateBtn.addActionListener(e -> {
-            getWorkspaceComponent().getProjector().iterate();
+            proj.iterate();
             update();
+        });
+
+        playBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Play.png"));
+        playBtn.addActionListener(e -> {
+            if (proj.isRunning()) {
+                // If already running, image is stop. Click and it should stop the algorithm and
+                // change the image to play.
+                playBtn.setToolTipText("Start iterating projection algorithm");
+                playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Play.png"));
+                proj.setRunning(false);
+            } else {
+                // If not running, image is play. Click and it should run the algorithm
+                // and change the image to stop.
+                playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Stop.png"));
+                playBtn.setToolTipText("Stop iterating projection algorithm");
+                proj.setRunning(true);
+                executor.execute(() -> {
+                    while (proj.isRunning()) {
+                        proj.iterate();
+                        proj.getEvents().fireDataChanged();
+                    }
+                });
+            }
         });
 
         JButton clearBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Eraser.png"));
@@ -190,20 +221,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
                     getWorkspaceComponent().clearData();
                     xyCollection.getSeries(0).clear();
                 }));
-
-        playBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Play.png"));
-        playBtn.addActionListener(e -> {
-            if (getWorkspaceComponent().isRunning()) {
-                playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Stop.png"));
-                playBtn.setToolTipText("Stop iterating projection algorithm");
-                getWorkspaceComponent().setRunning(false);
-                Executors.newSingleThreadExecutor().execute(new ProjectionUpdater(getWorkspaceComponent()));
-            } else {
-                playBtn.setIcon(ResourceManager.getImageIcon("menu_icons/Play.png"));
-                playBtn.setToolTipText("Start iterating projection algorithm");
-                getWorkspaceComponent().setRunning(true);
-            }
-        });
 
         JButton prefsBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Prefs.gif"));
         prefsBtn.addActionListener(e -> {
@@ -273,17 +290,8 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         // Other initialization
         initializeComboBoxes();
 
-        Projector proj = getWorkspaceComponent().getProjector();
         proj.getEvents().onPointFound(p -> update());
-        proj.getEvents().onPointAdded(() -> {
-            resetData();
-            update();
-        });
-        proj.getEvents().onDatasetInitialized(() -> {
-            resetData();
-            update();
-        });
-        proj.getEvents().onProjectionMethodChanged(() -> {
+        proj.getEvents().onDataChanged(() -> {
             resetData();
             update();
         });
@@ -297,10 +305,10 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         sammonStepSize.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                ProjectionMethod proj = getWorkspaceComponent().getProjector().getProjectionMethod();
-                if (proj != null) {
-                    if (proj instanceof ProjectSammon) {
-                        ((ProjectSammon) proj).setEpsilon(Utils.doubleParsable(sammonStepSize.getText()));
+                ProjectionMethod projMethod = getWorkspaceComponent().getProjector().getProjectionMethod();
+                if (projMethod != null) {
+                    if (projMethod instanceof ProjectSammon) {
+                        ((ProjectSammon) projMethod).setEpsilon(Utils.doubleParsable(sammonStepSize.getText()));
                     }
                 }
             }
@@ -333,30 +341,25 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         updateCoordinateProjectionComboBoxes();
         adjustDimension1.setModel(adjustDimension1Model);
         adjustDimension1.addActionListener(e -> {
-            ProjectionMethod proj = getWorkspaceComponent().getProjector().getProjectionMethod();
-            if (proj != null) {
-                if (proj instanceof ProjectCoordinate) {
-                    ((ProjectCoordinate) proj).setHiD1(adjustDimension1.getSelectedIndex());
-                    ((ProjectCoordinate) proj).project();
-                    getWorkspaceComponent().getProjector().getEvents().fireDatasetInitialized();
+            ProjectionMethod projMethod = getWorkspaceComponent().getProjector().getProjectionMethod();
+            if (projMethod != null) {
+                if (projMethod instanceof ProjectCoordinate) {
+                    ((ProjectCoordinate) projMethod).setHiD1(adjustDimension1.getSelectedIndex());
+                    projMethod.project();
+                    getWorkspaceComponent().getProjector().getEvents().fireDataChanged();
                 }
             }
         });
         adjustDimension2.setModel(adjustDimension2Model);
-        adjustDimension2.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ProjectionMethod proj = getWorkspaceComponent().getProjector().getProjectionMethod();
-                if (proj != null) {
-                    if (proj instanceof ProjectCoordinate) {
-                        ((ProjectCoordinate) proj).setHiD2(adjustDimension2.getSelectedIndex());
-                        proj.project();
-                        getWorkspaceComponent().getProjector().getEvents().fireDatasetInitialized();
-                    }
+        adjustDimension2.addActionListener(e -> {
+            ProjectionMethod projecMethod = getWorkspaceComponent().getProjector().getProjectionMethod();
+            if (projecMethod != null) {
+                if (projecMethod instanceof ProjectCoordinate) {
+                    ((ProjectCoordinate) projecMethod).setHiD2(adjustDimension2.getSelectedIndex());
+                    projecMethod.project();
+                    getWorkspaceComponent().getProjector().getEvents().fireDataChanged();
                 }
             }
-
         });
     }
 
@@ -455,16 +458,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         });
         editMenu.add(preferencesGeneral);
 
-        final JMenuItem setDimensions = new JMenuItem("Set Dimensions...");
-        setDimensions.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                String dimsString = JOptionPane.showInputDialog("Dimensions:", getWorkspaceComponent().getProjector().getDimensions());
-                int dims = Integer.parseInt(dimsString); //todo; Catch exception
-                getWorkspaceComponent().getProjector().init(dims);
-            }
-
-        });
-        editMenu.add(setDimensions);
 
         final JMenuItem colorPrefs = new JMenuItem("Datapoint Coloring...");
         colorPrefs.addActionListener(e -> {
@@ -591,19 +584,15 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
     }
 
     public void resetData() {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                xyCollection.getSeries(0).clear();
-                int size = getWorkspaceComponent().getProjector().getNumPoints();
-                for (int i = 0; i < size; i++) {
-                    DataPoint point = getWorkspaceComponent().getProjector().getDownstairs().getPoint(i);
-                    xyCollection.getSeries(0).add(point.get(0), point.get(1));
-                }
-                // setUpdateCompleted(true);
+        EventQueue.invokeLater(() -> {
+            xyCollection.getSeries(0).clear();
+            int size = getWorkspaceComponent().getProjector().getNumPoints();
+            for (int i = 0; i < size; i++) {
+                DataPoint point = getWorkspaceComponent().getProjector().getDownstairs().getPoint(i);
+                xyCollection.getSeries(0).add(point.get(0), point.get(1));
             }
         });
 
     }
-
 
 }

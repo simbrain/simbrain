@@ -109,26 +109,22 @@ public class Projector implements AttributeContainer {
      */
     private DataColoringManager colorManager;
 
-
     /**
      * Flag which allows the user to start and stop iterative projection
-     * techniques..
+     * techniques.
      */
-    private transient volatile boolean isRunning = true;
+    private transient volatile boolean isRunning = false;
 
     /**
      * Flag for checking that GUI update is completed.
      */
     private transient volatile boolean isUpdateCompleted;
 
-    {
-        init();
-    }
-
     /**
      * Default constructor for projector.
      */
     public Projector() {
+        init();
         setProjectionMethod(DEFAULT_PROJECTION_METHOD);
         init(DEFAULT_NUMBER_OF_DIMENSIONS);
     }
@@ -139,6 +135,7 @@ public class Projector implements AttributeContainer {
      * @param dimension dimensionality of data to be projected
      */
     public Projector(int dimension) {
+        init();
         setProjectionMethod(DEFAULT_PROJECTION_METHOD);
         init(dimension);
     }
@@ -152,7 +149,7 @@ public class Projector implements AttributeContainer {
         // TODO: This seems to be called twice when adding a projection component.
         upstairs = new Dataset(dims);
         downstairs = new Dataset(2);
-        events.fireDatasetInitialized();
+        events.fireDataChanged();
     }
 
     private void init() {
@@ -214,7 +211,7 @@ public class Projector implements AttributeContainer {
             }
             downstairs.addPoint(newPoint);
             projectionMethod.project();
-            events.firePointAdded();
+            events.fireDataChanged();
         }
 
         if (useColorManager) {
@@ -242,7 +239,7 @@ public class Projector implements AttributeContainer {
     public void setProjectionMethod(final ProjectionMethod method) {
         projectionMethod = method;
         method.init();
-        events.fireProjectionMethodChanged();
+        events.fireDataChanged();
         projectionMethod.project();
     }
 
@@ -297,7 +294,7 @@ public class Projector implements AttributeContainer {
         }
         projectionMethod.init();
         projectionMethod.project();
-        events.fireDatasetInitialized();
+        events.fireDataChanged();
     }
 
     /**
@@ -351,7 +348,8 @@ public class Projector implements AttributeContainer {
      */
     public void iterate() {
         if (projectionMethod.isIterable()) {
-            ((IterableProjectionMethod) projectionMethod).iterate();
+            ((IterableProjectionMethod) projectionMethod).
+                    iterate();
         }
     }
 
@@ -370,9 +368,8 @@ public class Projector implements AttributeContainer {
     public void reset() {
         upstairs.clear();
         downstairs.clear();
-        events.fireDatasetInitialized();
+        events.fireDataChanged();
         predictor.clear();
-        // getCurrentProjectionMethod().resetColorIndices();
     }
 
     /**
@@ -418,7 +415,7 @@ public class Projector implements AttributeContainer {
      */
     public void randomize(int upperBound) {
         downstairs.randomize(upperBound);
-        events.fireDatasetInitialized();
+        events.fireDataChanged();
     }
 
     public DataColoringManager getColorManager() {

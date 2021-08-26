@@ -142,11 +142,11 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     }
 
     @Override
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         if (events == null) {
             events = new LocationEvents(this);
         }
-        modelList.getAllInDeserializationOrder().forEach(NetworkModel::postUnmarshallingInit);
+        modelList.getAllInDeserializationOrder().forEach(NetworkModel::postOpenInit);
     }
 
     @Override

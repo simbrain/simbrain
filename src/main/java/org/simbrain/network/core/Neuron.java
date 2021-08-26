@@ -264,7 +264,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     @Override
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         events = new NeuronEvents(this);
         fanOut = new HashMap<>();
         fanIn = new ArrayList<>();

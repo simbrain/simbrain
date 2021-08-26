@@ -409,8 +409,8 @@ class Network {
         updatePriorityList();
 
         // Initialize update manager
-        updateManager.postUnmarshallingInit()
-        networkModels.allInDeserializationOrder.forEach { it.postUnmarshallingInit() }
+        updateManager.postOpenInit()
+        networkModels.allInDeserializationOrder.forEach { it.postOpenInit() }
         return this
     }
 

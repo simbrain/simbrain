@@ -65,7 +65,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     }
 
     @Override
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         if (events == null) {
             events = new ConnectorEvents(this);
         }

@@ -161,7 +161,7 @@ public class NetworkTextObject extends LocatableModel {
     }
 
     @Override
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         events = new NetworkTextEvents(this);
     }
 

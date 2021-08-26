@@ -138,8 +138,8 @@ public class NeuronCollection extends AbstractNeuronCollection {
     }
 
     @Override
-    public void postUnmarshallingInit() {
-        super.postUnmarshallingInit();
+    public void postOpenInit() {
+        super.postOpenInit();
         getNeuronList().forEach(this::addListener);
     }
 }

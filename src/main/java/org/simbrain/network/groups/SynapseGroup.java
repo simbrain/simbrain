@@ -825,12 +825,12 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     }
 
     @Override
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         if (events == null) {
             events = new SynapseGroupEvents(this);
         }
-        exSynapseSet.forEach(Synapse::postUnmarshallingInit);
-        inSynapseSet.forEach(Synapse::postUnmarshallingInit);
+        exSynapseSet.forEach(Synapse::postOpenInit);
+        inSynapseSet.forEach(Synapse::postOpenInit);
         revalidateSynapseSets();
     }
 

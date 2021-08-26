@@ -115,7 +115,7 @@ public abstract class Layer extends LocatableModel {
     }
 
     @Override
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         if (events == null) {
             events = new LocationEvents(this);
         }

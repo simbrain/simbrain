@@ -733,7 +733,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     public void setLearningRule(SynapseUpdateRule newLearningRule) {
         SynapseUpdateRule oldRule = learningRule;
         this.learningRule = newLearningRule.deepCopy();
-        // TODO: Needed for calls to SynapseGroup.postUnmashallingInit, which calls
+        // TODO: Needed for calls to SynapseGroup.postOpenInit, which calls
         // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
         // change support initialized.
         if (events == null) {
@@ -846,7 +846,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     }
 
     @Override
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         events = new SynapseEvents(this);
         if (getTarget() != null) {
             if (getTarget().getFanIn() != null) {

@@ -727,7 +727,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     }
 
     @Override
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         if (events == null) {
             events = new NeuronCollectionEvents(this);
         }

@@ -75,7 +75,7 @@ public class NetworkUpdateManager {
      * UpdateManager will have been created from a default no argument
      * constructor ands its fields populated using xstream.
      */
-    public void postUnmarshallingInit() {
+    public void postOpenInit() {
         Iterator<NetworkUpdateAction> actions = actionList.iterator();
         // TODO: Hack-y solution. Revisit this.
         while (actions.hasNext()) {

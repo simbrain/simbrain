@@ -22,9 +22,9 @@ import org.simbrain.workspace.AttributeContainer
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 
-// Optimizer (here or in training dialog?)
-// Train-test Split ratio (here or in training dialog?)
-
+/**
+ * Simbrain representation of KotlinDL sequential networks
+ */
 class DeepNet(
     private val network: Network,
     val inputSize: Int,
@@ -44,18 +44,40 @@ class DeepNet(
      */
     private var outputs: Matrix? = null
 
+    /**
+     * The data edited.
+     */
     var inputs: Array<FloatArray>
     var targets: FloatArray
 
-    val trainerEvents = TrainerEvents(this)
-
+    /**
+     * The data used internally by KotlinDL.
+     */
     lateinit var trainingDataset: Dataset
     lateinit var testingDataset: Dataset
 
+    /**
+     * Events specific to training, as contrasted with [#events] which are common to all [NetworkModel]s.
+     */
+    val trainerEvents = TrainerEvents(this)
+
+    /**
+     * Parameters editable using an [AnnotatedPropertyEditor]
+     */
     var trainingParams = TrainingParameters()
     var optimizerParams = OptimizerParameters()
 
+    /**
+     * Current loss.
+     */
     var lossValue: Double = 0.0
+
+
+    /**
+     * Width and height are in the model for now because arrows must access them in the model.
+     */
+    var width: Double = 0.0
+    var height: Double = 0.0
 
     init {
         label = network.idManager.getProposedId(this.javaClass)
@@ -152,7 +174,7 @@ class DeepNet(
     }
 
     override fun getBound(): Rectangle2D {
-        return Rectangle2D.Double(x - 150 / 2, y - 50 / 2, 150.0, 50.0)
+        return Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
     }
 
     /**

@@ -35,12 +35,12 @@ public class DeepNetNode extends ScreenElement {
     /**
      * Width in pixels of the main display box.
      */
-    private final float boxWidth = 80;
+    private final float initialWidth = 80;
 
     /**
      * Height in pixels of the main display box.
      */
-    private final float boxHeight = 120;
+    private final float initialHeight = 120;
 
     /**
      * Text showing info about the array.
@@ -52,7 +52,7 @@ public class DeepNetNode extends ScreenElement {
      */
     public static final Font INFO_FONT = new Font("Arial", Font.PLAIN, 8);
 
-    private PPath box = PPath.createRectangle(0, 0, boxWidth, boxHeight);
+    private PPath box = PPath.createRectangle(0, 0, initialWidth, initialHeight);
 
     public DeepNetNode(NetworkPanel networkPanel, DeepNet dn) {
         super(networkPanel);
@@ -79,9 +79,8 @@ public class DeepNetNode extends ScreenElement {
         infoText.offset(8, 8);
         updateInfoText();
 
-        this.centerFullBoundsOnPoint(deepNet.getLocation().getX(), deepNet.getLocation().getY());
-
         deepNet.getEvents().onLocationChange(this::pullViewPositionFromModel);
+        pullViewPositionFromModel();
     }
 
     /**
@@ -152,7 +151,7 @@ public class DeepNetNode extends ScreenElement {
     }
 
     public void pullViewPositionFromModel() {
-        Point2D point = minus(deepNet.getLocation(), new Point2D.Double(boxWidth / 2, boxHeight / 2));
+        Point2D point = minus(deepNet.getLocation(), new Point2D.Double(getWidth() / 2, getHeight() / 2));
         this.setGlobalTranslation(point);
     }
 
@@ -162,7 +161,7 @@ public class DeepNetNode extends ScreenElement {
      */
     public void pushViewPositionToModel() {
         Point2D p = this.getGlobalTranslation();
-        deepNet.setLocation(new Point2D.Double(p.getX() + boxWidth / 2, p.getY() + boxHeight / 2));
+        deepNet.setLocation(new Point2D.Double(p.getX() + getWidth() / 2, p.getY() + getHeight() / 2));
     }
 
     @Override

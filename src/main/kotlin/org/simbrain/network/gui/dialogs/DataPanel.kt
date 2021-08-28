@@ -19,15 +19,6 @@ import javax.swing.JPanel
 import javax.swing.JToolBar
 import javax.swing.event.TableModelEvent
 
-class DataPanelEvents(dataPanel: DataPanel): Event(PropertyChangeSupport(dataPanel)) {
-
-    fun onApply(handler: Consumer<Array<DoubleArray>>) = "Apply".itemAddedEvent(handler)
-    fun fireApply(data: Array<DoubleArray>) = "Apply"(new = data)
-
-    fun onInsert(handler: Consumer<Int>) = "Insert".itemAddedEvent(handler)
-    fun fireInsert(rowNumber: Int) = "Insert"(new = rowNumber)
-}
-
 class DataPanel: JPanel() {
 
     init {
@@ -67,9 +58,10 @@ class DataPanel: JPanel() {
 
     private val numericEditToolbar = JToolBar().apply {
         add(TableActionManager.getRandomizeAction(jTable))
-        add(TableActionManager.getNormalizeAction(jTable))
-        add(TableActionManager.getZeroFillAction(jTable))
-        add(TableActionManager.getFillAction(jTable))
+        // TODO: Icons
+        // add(TableActionManager.getNormalizeAction(jTable))
+        // add(TableActionManager.getZeroFillAction(jTable))
+        // add(TableActionManager.getFillAction(jTable))
         toolbars.add(this)
     }
 
@@ -93,7 +85,14 @@ class DataPanel: JPanel() {
 
 }
 
+class DataPanelEvents(dataPanel: DataPanel): Event(PropertyChangeSupport(dataPanel)) {
 
+    fun onApply(handler: Consumer<Array<DoubleArray>>) = "Apply".itemAddedEvent(handler)
+    fun fireApply(data: Array<DoubleArray>) = "Apply"(new = data)
+
+    fun onInsert(handler: Consumer<Int>) = "Insert".itemAddedEvent(handler)
+    fun fireInsert(rowNumber: Int) = "Insert"(new = rowNumber)
+}
 
 fun main() {
 

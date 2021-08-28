@@ -19,8 +19,11 @@
 package org.simbrain.util.widgets;
 
 import org.simbrain.util.SimbrainConstants;
+import org.simbrain.util.Utils;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import java.awt.*;
 
 /**
  * <b>ChoicesWithNull</b> is a combo box with a null state. Used
@@ -36,11 +39,13 @@ public class ChoicesWithNull extends JComboBox {
      */
     private boolean hasNull = false;
 
+
     /**
      * Default constructor.
      */
     public ChoicesWithNull() {
         super();
+        setRenderer(new TitleCaseRenderer());
     }
 
     /**
@@ -48,7 +53,9 @@ public class ChoicesWithNull extends JComboBox {
      */
     public ChoicesWithNull(Object[] items) {
         super(items);
+        setRenderer(new TitleCaseRenderer());
     }
+
 
     /**
      * Set the items in the combo box, e.g. {"Relative", "Absolute"} or
@@ -92,6 +99,20 @@ public class ChoicesWithNull extends JComboBox {
             return true;
         }
         return false;
+    }
+
+    class TitleCaseRenderer extends BasicComboBoxRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected,
+                    cellHasFocus);
+            // Title case with underscores converted to spaces
+            String itemText = value.toString().toLowerCase();
+            itemText = itemText.replaceAll("_", " ");
+            itemText = Utils.toTitleCase(itemText);
+            setText(itemText);
+            return this;
+        }
     }
 
 }

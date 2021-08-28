@@ -778,6 +778,27 @@ public class Utils {
     }
 
     /**
+     * https://stackoverflow.com/questions/1086123/is-there-a-method-for-string-conversion-to-title-case
+     */
+    public static String toTitleCase(String input) {
+        StringBuilder titleCase = new StringBuilder(input.length());
+        boolean nextTitleCase = true;
+
+        for (char c : input.toCharArray()) {
+            if (Character.isSpaceChar(c)) {
+                nextTitleCase = true;
+            } else if (nextTitleCase) {
+                c = Character.toTitleCase(c);
+                nextTitleCase = false;
+            }
+
+            titleCase.append(c);
+        }
+
+        return titleCase.toString();
+    }
+
+    /**
      * https://stackoverflow.com/questions/7324991/see-if-field-exists-in-class
      *
      * @param object    object class

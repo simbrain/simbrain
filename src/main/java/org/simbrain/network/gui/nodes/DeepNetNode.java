@@ -5,12 +5,12 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.gui.NetworkDialogsKt;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.network.gui.dialogs.DeepNetDialogsKt;
 import org.simbrain.network.kotlindl.DeepNet;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -139,7 +139,7 @@ public class DeepNetNode extends ScreenElement {
         Action trainDeepNet = new AbstractAction("Train...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                NetworkDialogsKt.showDeepNetTrainingDialog(getNetworkPanel(), deepNet);
+                DeepNetDialogsKt.showDeepNetTrainingDialog(deepNet);
             }
         };
         contextMenu.add(trainDeepNet);

@@ -46,14 +46,8 @@ public class Splasher {
      * @param args the command line arguments
      */
     public static void main(final String[] args) {
-        // try {
-        // UIManager.setLookAndFeel(new NimbusLookAndFeel());
-        // } catch (Exception e) {
-        // // If Nimbus is not available, you can set the GUI to another look
-        // // and feel.
-        // }
 
-        // TODO find a better solution
+        // Set up loggers (other logging config for tinylog is in build.gradle)
         Logger.getLogger("com.jme").setLevel(Level.OFF);
         Logger.getLogger("com.jmex").setLevel(Level.OFF);
 

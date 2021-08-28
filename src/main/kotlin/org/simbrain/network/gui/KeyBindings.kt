@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.intellij.lang.annotations.MagicConstant
 import org.simbrain.network.LocatableModel
+import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.util.Utils

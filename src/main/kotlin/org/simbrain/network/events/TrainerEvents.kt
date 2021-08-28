@@ -1,6 +1,5 @@
 package org.simbrain.network.events
 
-import org.simbrain.network.trainers.IterableTrainer
 import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
@@ -8,7 +7,7 @@ import java.util.function.Consumer
 /**
  * @see Event
  */
-class TrainerEvents(val trainer: IterableTrainer) : Event(PropertyChangeSupport(trainer)) {
+class TrainerEvents(val trainer: Any) : Event(PropertyChangeSupport(trainer)) {
 
     fun onBeginTraining(handler: Runnable) = "BeginTraining".event(handler)
     fun fireBeginTraining() = "BeginTraining"()

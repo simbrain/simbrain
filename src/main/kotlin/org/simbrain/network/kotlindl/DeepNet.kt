@@ -1,6 +1,8 @@
 package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.callback.Callback
+import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
 import org.jetbrains.kotlinx.dl.api.core.layer.Layer
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
@@ -10,6 +12,7 @@ import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.simbrain.network.core.Network
+import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
@@ -34,7 +37,7 @@ class DeepNet(
     /**
      * Main deep network object.
      */
-    var deepNetLayers: Sequential
+    lateinit var deepNetLayers: Sequential
 
     /**
      * Output matrix
@@ -44,23 +47,51 @@ class DeepNet(
     var inputs: Array<FloatArray>
     var targets: FloatArray
 
+    val trainerEvents = TrainerEvents(this)
+
     lateinit var trainingDataset: Dataset
     lateinit var testingDataset: Dataset
 
+    var trainingParams = TrainingParameters()
+    var optimizerParams = OptimizerParameters()
+
+    var lossValue: Double = 0.0
+
     init {
         label = network.idManager.getProposedId(this.javaClass)
+        buildNetwork()
+        outputs = Matrix(outputSize(), 1)
+        inputs = Array(nsamples) { FloatArray(inputSize()) }
+        targets = FloatArray(nsamples)
+        // initXor()
+    }
+
+    // TODO Temp
+    // fun initXor() {
+    //     inputs = arrayOf(floatArrayOf(0f, 0f), floatArrayOf(1f, 0f), floatArrayOf(0f, 1f), floatArrayOf(1f, 1f))
+    //     targets = floatArrayOf(0f, 1f, 1f, 0f)
+    // }
+
+    fun buildNetwork() {
         deepNetLayers = Sequential.of(layers)
         deepNetLayers.also {
             it.compile(
                 optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
-                loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
-                metric = Metrics.ACCURACY
+                loss = optimizerParams.lossFunction,
+                metric = optimizerParams.metric,
+                callback = object: Callback() {
+                    override fun onTrainBegin() {
+                        println("Training begin")
+                        trainerEvents.fireBeginTraining()
+                    }
+
+                    override fun onTrainEnd(logs: TrainingHistory) {
+                        println("Training end:")
+                        trainerEvents.fireEndTraining()
+                    }
+                }
             )
         }
-        outputs = Matrix(outputSize(), 1)
-        inputs = Array(nsamples) { FloatArray(inputSize()) }
-        targets = FloatArray(nsamples)
-        println(deepNetLayers.summary())
     }
 
     fun initializeDatasets() {
@@ -73,9 +104,11 @@ class DeepNet(
     }
 
     fun train() {
-        deepNetLayers.fit(trainingDataset, testingDataset, 100, 32, 5)
-        val accuracy = deepNetLayers.evaluate(dataset = testingDataset, batchSize = 10).metrics[Metrics.ACCURACY]
-        println("Accuracy = $accuracy")
+        deepNetLayers.fit(trainingDataset, testingDataset,
+            trainingParams.epochs, trainingParams.batchSize, 5)
+
+        lossValue = deepNetLayers.evaluate(dataset = testingDataset, batchSize = trainingParams.batchSize)
+            .lossValue
     }
 
     fun floatInputs(): FloatArray {
@@ -137,13 +170,14 @@ class DeepNet(
      */
     class DeepNetCreator(proposedLabel: String) : EditableObject {
 
-        @UserParameter(label = "Label", order = 5)
+        @UserParameter(label = "Label", order = 10)
         private val label = proposedLabel
 
-        @UserParameter(label = "Number of inputs", order = 10)
-        var nin = 10
+        @UserParameter(label = "Number of inputs", order = 20)
+        var nin = 2
 
-        // TODO: Find a way to edit input layer
+        // TODO: Find a way to edit input layer.
+        // Possibly as part of the editorlist
         // @UserParameter(label = "Input layer", isObjectType = true, showDetails = false, order = 20)
         // var inputLayer = Input()
 
@@ -159,3 +193,34 @@ class DeepNet(
 
 }
 
+class TrainingParameters (
+
+    @UserParameter(label="Epochs", order = 10)
+    var epochs: Int = 1000,
+
+    @UserParameter(label="BatchSize", order = 20)
+    var batchSize: Int = 10,
+
+
+): EditableObject {
+    override fun getName(): String {
+        return "Trainer parameters"
+    }
+}
+
+class OptimizerParameters (
+
+    @UserParameter(label="Optimizer", isObjectType = true, showDetails = false, order = 10)
+    var optimizer: OptimizerWrapper = AdamWrapper(),
+
+    @UserParameter(label="Loss Function", order = 20)
+    var lossFunction: Losses = Losses.MSE,
+
+    @UserParameter(label="Metric", order = 30)
+    var metric: Metrics = Metrics.MSE,
+
+    ): EditableObject {
+    override fun getName(): String {
+        return "Optimizer parameters"
+    }
+}

@@ -48,6 +48,9 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
      */
     private boolean iterationMode = false;
 
+    // TODO: Temp until table refactors
+    private boolean integerMode = false;
+
     /**
      * Current row.
      */
@@ -378,7 +381,12 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
         for (CellIndex cellIndex : cellIndices) {
             int row = cellIndex.row;
             int col = cellIndex.col;
-            double value = (rand.nextDouble() * range) + getLowerBound();
+            double value;
+            if (integerMode) {
+                value = rand.nextInt(range) + lowerBound ;
+            } else {
+                value = (rand.nextDouble() * range) + getLowerBound();
+            }
             setLogicalValue(row, col, value, false);
         }
         fireTableDataChanged();
@@ -416,4 +424,7 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
         this.fireTableDataChanged();
     }
 
+    public void setIntegerMode(boolean mode) {
+        integerMode = mode;
+    }
 }

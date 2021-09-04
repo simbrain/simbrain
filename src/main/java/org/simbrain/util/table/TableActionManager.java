@@ -179,7 +179,7 @@ public class TableActionManager {
 
             // Initialize
             {
-                // putValue(SMALL_ICON, ResourceManager.getImageIcon(""));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/histogram.png"));
                 putValue(NAME, "Normalize Column(s)");
                 putValue(SHORT_DESCRIPTION, "Normalize Selected Columns");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
@@ -517,7 +517,7 @@ public class TableActionManager {
             // Initialize
             {
                 // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
                 putValue(NAME, "Zero fill cells");
                 putValue(SHORT_DESCRIPTION, "Zero fill selected cells");
                 KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
@@ -544,7 +544,7 @@ public class TableActionManager {
             // Initialize
             {
                 // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/fill.png"));
                 putValue(NAME, "Fill table cells...");
                 putValue(SHORT_DESCRIPTION, "Fill table selected cells with specified value");
             }

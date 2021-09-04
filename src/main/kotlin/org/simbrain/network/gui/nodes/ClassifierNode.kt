@@ -3,7 +3,6 @@ package org.simbrain.network.gui.nodes
 import net.miginfocom.swing.MigLayout
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
-import org.piccolo2d.util.PBounds
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
@@ -34,9 +33,8 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
      * Text showing info about the array.
      */
     private val infoText = PText().also {
-        it.setFont(NeuronArrayNode.INFO_FONT)
+        it.font = NeuronArrayNode.INFO_FONT
         addChild(it)
-        it.offset(8.0, 8.0)
     }
 
     init {
@@ -75,9 +73,10 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
         infoText.text = "Output: (" +
                 Utils.doubleArrayToString(smileClassifier.outputs.col(0), 2) + ")" +
                 "\n\nInput: (" + Utils.doubleArrayToString(smileClassifier.inputs.col(0), 2) + ")"
-        val pb: PBounds = infoText.bounds
-        // Sets border box to size of text
-        borderBox.setBounds(pb.x - 5, pb.y - 5, pb.width + 20, pb.height + 20)
+        // Sets border box to size of text, grown by a margin
+        borderBox.setBounds(infoText.bounds.bounds.apply {
+            grow(10,10)
+        })
         setBounds(borderBox.bounds)
         smileClassifier.width = borderBox.width
         smileClassifier.height = borderBox.height

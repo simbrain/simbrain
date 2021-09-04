@@ -1,7 +1,9 @@
 package org.simbrain.network.gui.dialogs
 
+import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.trainer.TrainerGuiActions
 import org.simbrain.util.Event
+import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
@@ -11,10 +13,10 @@ import smile.classification.Classifier
 import smile.classification.SVM
 import smile.math.kernel.PolynomialKernel
 import java.awt.BorderLayout
-import java.awt.Dimension
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 import javax.swing.BoxLayout
+import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.JToolBar
 import javax.swing.event.TableModelEvent
@@ -23,7 +25,7 @@ class DataPanel: JPanel() {
 
     init {
         layout = BorderLayout()
-        preferredSize = Dimension(250, 200)
+        // preferredSize = Dimension(250, 200)
     }
 
     private val toolbars = JToolBar().also {
@@ -58,10 +60,9 @@ class DataPanel: JPanel() {
 
     private val numericEditToolbar = JToolBar().apply {
         add(TableActionManager.getRandomizeAction(jTable))
-        // TODO: Icons
-        // add(TableActionManager.getNormalizeAction(jTable))
-        // add(TableActionManager.getZeroFillAction(jTable))
-        // add(TableActionManager.getFillAction(jTable))
+        add(TableActionManager.getNormalizeAction(jTable))
+        add(TableActionManager.getZeroFillAction(jTable))
+        add(TableActionManager.getFillAction(jTable))
         toolbars.add(this)
     }
 
@@ -152,5 +153,44 @@ fun main() {
 
     }.run { makeVisible() }
 
+
+}
+
+class InputTargetDataPanel(): JPanel() {
+
+    val inputs = DataPanel()
+    val targets = DataPanel()
+
+    val addRemoveRows = JToolBar().apply {
+        // Add row
+        add(JButton().apply {
+            icon = ResourceManager.getImageIcon("menu_icons/AddTableRow.png")
+            toolTipText = "Insert a row"
+            addActionListener {
+                inputs.table.insertRow(inputs.jTable.selectedRow)
+                targets.table.insertRow(inputs.jTable.selectedRow)
+            }
+        })
+
+        // Delete row
+        // TODO: Delete selected rows. For that abstract out table code
+        add(JButton().apply {
+            icon = ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png")
+            toolTipText = "Delete last row"
+            addActionListener {
+                inputs.table.removeRow(inputs.jTable.rowCount - 1)
+                targets.table.removeRow(targets.jTable.rowCount - 1)
+            }
+        })
+    }
+
+    init {
+        layout = MigLayout()
+        add(addRemoveRows, "wrap")
+
+        // Add the data panels
+        add(inputs, "growx")
+        add(targets, "growx")
+    }
 
 }

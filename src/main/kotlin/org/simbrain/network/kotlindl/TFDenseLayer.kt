@@ -7,10 +7,10 @@ import org.simbrain.util.UserParameter
 /**
  * Wrapper for tensor flow dense layer
  */
-class TFDenseLayer : TFLayer<Dense>() {
+class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
 
     @UserParameter(label = "Number of outputs", order = 10)
-    var nout = 5
+    var nout = size
 
     @UserParameter(label = "Activation function", order = 20)
     var activations = Activations.Relu

@@ -3,8 +3,6 @@ package org.simbrain.network.kotlindl
 import org.jetbrains.kotlinx.dl.api.core.Sequential
 import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
-import org.jetbrains.kotlinx.dl.api.core.layer.Layer
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
@@ -28,8 +26,8 @@ import java.awt.geom.Rectangle2D
 class DeepNet(
     private val network: Network,
     val inputSize: Int,
-    val layers: List<Layer>,
-    var nsamples: Int = 10
+    val editableLayers: ArrayList<TFLayer<*>>,
+    nsamples: Int = 10
 ) : ArrayLayer(network, inputSize),
     AttributeContainer,
     EditableObject {
@@ -47,8 +45,8 @@ class DeepNet(
     /**
      * The data edited.
      */
-    var inputs: Array<FloatArray>
-    var targets: FloatArray
+    var inputData: Array<FloatArray>
+    var targetData: FloatArray
 
     /**
      * The data used internally by KotlinDL.
@@ -57,7 +55,7 @@ class DeepNet(
     lateinit var testingDataset: Dataset
 
     /**
-     * Events specific to training, as contrasted with [#events] which are common to all [NetworkModel]s.
+     * Events specific to training, as contrasted with [events] which are common to all [NetworkModel]s.
      */
     val trainerEvents = TrainerEvents(this)
 
@@ -72,7 +70,6 @@ class DeepNet(
      */
     var lossValue: Double = 0.0
 
-
     /**
      * Width and height are in the model for now because arrows must access them in the model.
      */
@@ -83,18 +80,12 @@ class DeepNet(
         label = network.idManager.getProposedId(this.javaClass)
         buildNetwork()
         outputs = Matrix(outputSize(), 1)
-        inputs = Array(nsamples) { FloatArray(inputSize()) }
-        targets = FloatArray(nsamples)
-        // initXor()
+        inputData = Array(nsamples) { FloatArray(inputSize()) }
+        targetData = FloatArray(nsamples)
     }
 
-    // TODO Temp
-    // fun initXor() {
-    //     inputs = arrayOf(floatArrayOf(0f, 0f), floatArrayOf(1f, 0f), floatArrayOf(0f, 1f), floatArrayOf(1f, 1f))
-    //     targets = floatArrayOf(0f, 1f, 1f, 0f)
-    // }
-
     fun buildNetwork() {
+        val layers = editableLayers.map { it.create() }.toMutableList()
         deepNetLayers = Sequential.of(layers)
         deepNetLayers.also {
             it.compile(
@@ -109,6 +100,7 @@ class DeepNet(
 
                     override fun onTrainEnd(logs: TrainingHistory) {
                         println("Training end:")
+                        lossValue = logs.lastBatchEvent().lossValue
                         trainerEvents.fireEndTraining()
                     }
                 }
@@ -117,7 +109,7 @@ class DeepNet(
     }
 
     fun initializeDatasets() {
-        val data = OnHeapDataset.create(inputs, targets)
+        val data = OnHeapDataset.create(inputData, targetData)
         // TODO: Make split ratio settable
         data.shuffle()
         val (train, test) = data.split(.7)
@@ -128,19 +120,22 @@ class DeepNet(
     fun train() {
         deepNetLayers.fit(trainingDataset, testingDataset,
             trainingParams.epochs, trainingParams.batchSize, 5)
-
-        lossValue = deepNetLayers.evaluate(dataset = testingDataset, batchSize = trainingParams.batchSize)
-            .lossValue
     }
 
     fun floatInputs(): FloatArray {
-        return toFloatArray(super.getInputs().col(0))
+        return toFloatArray(doubleInputs())
+    }
+
+    fun doubleInputs(): DoubleArray {
+        return super.getInputs().col(0)
     }
 
     override fun update() {
+        // TODO: Still specific to one-hot
         if (deepNetLayers.isModelInitialized) {
-            println("Output = " + deepNetLayers.predict(floatInputs()))
-            outputs = getOneHotMat(deepNetLayers.predict(floatInputs()),3)
+            val prediction = deepNetLayers.predict(floatInputs())
+            println("Output = " + prediction)
+            outputs = getOneHotMat(prediction,3) // TODO: 3 -> num class labels
         } else {
             outputs = Matrix(outputSize(), 1)
         }
@@ -157,6 +152,7 @@ class DeepNet(
     }
 
     override fun outputSize(): Int {
+        // TODO: Specific to one-hot case
         return deepNetLayers.layers.last().outputShape[1].toInt();
     }
 
@@ -195,21 +191,12 @@ class DeepNet(
         @UserParameter(label = "Label", order = 10)
         private val label = proposedLabel
 
-        @UserParameter(label = "Number of inputs", order = 20)
-        var nin = 2
-
-        // TODO: Find a way to edit input layer.
-        // Possibly as part of the editorlist
-        // @UserParameter(label = "Input layer", isObjectType = true, showDetails = false, order = 20)
-        // var inputLayer = Input()
-
         override fun getName(): String {
             return "Deep Network"
         }
 
-        fun create(net: Network, layers: MutableList<Layer>): DeepNet {
-            layers.add(0, Input(nin.toLong())) // Add the input layers
-            return DeepNet(net, nin, layers)
+        fun create(net: Network, ninputs: Int, layers: ArrayList<TFLayer<*>>): DeepNet {
+            return DeepNet(net, ninputs, layers)
         }
     }
 
@@ -222,7 +209,6 @@ class TrainingParameters (
 
     @UserParameter(label="BatchSize", order = 20)
     var batchSize: Int = 10,
-
 
 ): EditableObject {
     override fun getName(): String {

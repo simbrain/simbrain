@@ -13,7 +13,7 @@ import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.gui.dialogs.DeepNetDialogsKt;
 import org.simbrain.network.kotlindl.DeepNet;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -65,7 +65,7 @@ public class DeepNetNode extends ScreenElement {
         events.onDeleted(n -> removeFromParent());
         events.onUpdated(() -> {
             updateInfoText();
-            System.out.println(deepNet.getOutputs());
+            // System.out.println(deepNet.getOutputs());
         });
 
         // Border box determines bounds
@@ -76,7 +76,6 @@ public class DeepNetNode extends ScreenElement {
         infoText = new PText();
         infoText.setFont(INFO_FONT);
         addChild(infoText);
-        infoText.offset(8, 8);
         updateInfoText();
 
         deepNet.getEvents().onLocationChange(this::pullViewPositionFromModel);
@@ -87,10 +86,15 @@ public class DeepNetNode extends ScreenElement {
      * Update status text.
      */
     private void updateInfoText() {
-        infoText.setText(deepNet.toString());
-        PBounds pb = infoText.getBounds();
-        box.setBounds(pb.x-2, pb.y-2, pb.width+20, pb.height+20);
+        infoText.setText("Output: (" +
+                Utils.doubleArrayToString(deepNet.getOutputs().col(0), 2) + ")" +
+                "\n\nInput: (" + Utils.doubleArrayToString(deepNet.doubleInputs(), 2) + ")");
+        var newBounds = infoText.getBounds().getBounds();
+        newBounds.grow(10,10); // add a margin
+        box.setBounds(newBounds);
         setBounds(box.getBounds());
+        deepNet.setWidth(box.getWidth());
+        deepNet.setHeight(box.getHeight());
     }
 
     @Override
@@ -178,10 +182,6 @@ public class DeepNetNode extends ScreenElement {
     @Nullable
     @Override
     public JDialog getPropertyDialog() {
-        StandardDialog dialog = AnnotatedPropertyEditor.getDialog(deepNet);
-        dialog.addClosingTask(() -> {
-                deepNet.getEvents().fireUpdated();
-        });
-        return dialog;
+        return DeepNetDialogsKt.getDeepNetEditDialog(deepNet);
     }
 }

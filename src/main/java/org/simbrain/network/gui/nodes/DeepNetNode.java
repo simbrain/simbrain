@@ -88,7 +88,7 @@ public class DeepNetNode extends ScreenElement {
     private void updateInfoText() {
         infoText.setText("Output: (" +
                 Utils.doubleArrayToString(deepNet.getOutputs().col(0), 2) + ")" +
-                "\n\nInput: (" + Utils.doubleArrayToString(deepNet.doubleInputs(), 2) + ")");
+                "\n\nInput: (" + Utils.doubleArrayToString(deepNet.getDoubleInputs(), 2) + ")");
         var newBounds = infoText.getBounds().getBounds();
         newBounds.grow(10,10); // add a margin
         box.setBounds(newBounds);

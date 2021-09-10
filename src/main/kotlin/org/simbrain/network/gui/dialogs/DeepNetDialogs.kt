@@ -29,7 +29,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
     ).apply {
         // Custom action for the "+" Button. Adds a flatten layer by default.
         addElementTask = {
-            addElement(getEditor(TFFlattenLayer()))
+            addElement(getEditor(TFDenseLayer()))
         }
     }
 
@@ -43,7 +43,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
     dialog.addClosingTask {
         ape.commitChanges()
         layerList.commitChanges()
-        val deepNet = creator.create(network, layerList.inputLayer().n_in, layerList.layers)
+        val deepNet = creator.create(network, layerList.inputLayer.n_in, layerList.layers)
         network.addNetworkModel(deepNet)
     }
     dialog.pack()
@@ -69,8 +69,6 @@ fun getDeepNetEditDialog(deepNet: DeepNet): StandardDialog {
     return dialog
 }
 
-
-// TODO: Yulin review
 fun getEditor(obj: CopyableObject): JPanel {
     return ObjectTypeEditor.createEditor(
         listOf(obj), "getTypes", "Layer",
@@ -108,14 +106,11 @@ class LayerEditor(
         }
     }
 
-    // Yulin: Naming conventions
-    fun inputLayer(): TFInputLayer {
-        return layers.first() as TFInputLayer
-    }
+    val inputLayer: TFInputLayer
+        get() = layers.first() as TFInputLayer
 
-    fun mainLayers(): List<TFLayer<*>> {
-        return layers.subList(1, layers.size)
-    }
+    val mainLayers: List<TFLayer<*>>
+        get() = layers.subList(1, layers.size)
 
     fun commitChanges() {
         // Yulin
@@ -147,6 +142,8 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         val dataPanels = InputTargetDataPanel().apply {
             inputs.table.setData(deepNet.inputData)
             targets.table.setIntegerMode(true); // TODO: Temp / for class label case only
+            targets.table.lowerBound = 0
+            targets.table.upperBound = deepNet.deepNetLayers.numberOfClasses.toInt()
             targets.table.setData(deepNet.targetData.map { floatArrayOf(it) }.toTypedArray())
         }
 
@@ -212,8 +209,8 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
 fun main() {
     // TODO: Move some of this to test classes
-    // testLayerList()
-    testTrainingDialog()
+    testLayerList()
+    // testTrainingDialog()
 }
 
 fun testTrainingDialog() {
@@ -230,7 +227,7 @@ fun testTrainingDialog() {
 fun testLayerList() {
 
     StandardDialog().apply {
-        val layerEditor = LayerEditor(arrayListOf(TFInputLayer(), TFDenseLayer())).apply {
+        val layerEditor = LayerEditor(arrayListOf(TFInputLayer(), TFConv2DLayer(), TFDenseLayer())).apply {
             addElementTask = {
                 addLayer(TFFlattenLayer())
             }
@@ -238,8 +235,8 @@ fun testLayerList() {
         addClosingTask {
             println("Closing..")
             layerEditor.commitChanges()
-            println("Input layer: ${layerEditor.inputLayer().create()}")
-            layerEditor.mainLayers().forEach { l -> println("Layer: ${l.create()}") }
+            println("Input layer: ${layerEditor.inputLayer.create()}")
+            layerEditor.mainLayers.forEach { l -> println("Layer: ${l.create()}") }
         }
         contentPane = layerEditor
         pack()

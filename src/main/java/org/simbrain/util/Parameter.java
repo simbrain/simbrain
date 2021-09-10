@@ -180,6 +180,13 @@ public class Parameter implements Comparable<Parameter> {
     }
 
     /**
+     * Returns true if the type of the field or method is double[].
+     */
+    public boolean isIntArray() {
+        return getType().equals(int[].class);
+    }
+
+    /**
      * Returns true iff the type of the field or method is String.
      */
     public boolean isString() {

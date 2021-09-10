@@ -47,3 +47,10 @@ fun reshape(rows: Int, cols: Int, array: DoubleArray) =
         }
         row
     }
+
+/**
+ * Convert integer array to long array
+ */
+fun IntArray.toLongArray(): LongArray {
+    return map { it.toLong() }.toLongArray()
+}

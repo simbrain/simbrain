@@ -9,6 +9,12 @@ import org.simbrain.util.propertyeditor.CopyableObject
  */
 abstract class TFLayer<T : Layer> : CopyableObject {
 
+    @UserParameter(label = "Number of parameters", editable = false, order = 1)
+    fun getNumParams() = layer?.paramCount
+
+    @UserParameter(label = "Trainable", description = "Set to false to \"freeze\" training", order = 2 )
+    val trainable = layer?.isTrainable
+
     override fun copy(): CopyableObject {
         TODO("Not yet implemented")
     }
@@ -32,7 +38,7 @@ abstract class TFLayer<T : Layer> : CopyableObject {
          */
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return listOf(TFDenseLayer::class.java, TFFlattenLayer::class.java)
+            return listOf(TFConv2DLayer::class.java, TFDenseLayer::class.java, TFFlattenLayer::class.java)
         }
     }
 

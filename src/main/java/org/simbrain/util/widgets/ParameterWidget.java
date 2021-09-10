@@ -166,6 +166,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return new DoubleArrayWidget();
         }
 
+        if (parameter.isIntArray()) {
+            return new IntArrayWidget();
+        }
+
         if (parameter.isEnum()) {
             try {
                 Class<?> clazz = parameter.getType();
@@ -213,7 +217,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return new TextWithNull();
         }
 
-        throw new IllegalArgumentException("You have annotated a field type that is not yet supported");
+        throw new IllegalArgumentException("You have annotated a field type (" +
+                parameter.getType().getCanonicalName() + ") that is not yet supported");
     }
 
     /**
@@ -285,6 +290,8 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             ((ColorSelector) component).setValue((Color) value);
         } else if (parameter.isDoubleArray()) {
             ((DoubleArrayWidget) component).setValues((double[]) value);
+        } else if (parameter.isIntArray()) {
+            ((IntArrayWidget) component).setValues((int[]) value);
         } else if (parameter.isNumeric()) {
             ((NumericWidget) component).setValue(value);
         } else if (parameter.getAnnotation().isObjectType()) {
@@ -319,6 +326,10 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return ((YesNoNull) component).isNull() ? null : ((YesNoNull) component).isSelected();
         } else if (parameter.isColor()) {
             return ((ColorSelector) component).getValue();
+        } else if (parameter.isDoubleArray()) {
+            return ((DoubleArrayWidget) component).getValues();
+        } else if (parameter.isIntArray()) {
+            return ((IntArrayWidget) component).getValues();
         } else if (parameter.isDoubleArray()) {
             return ((DoubleArrayWidget) component).getValues();
         } else if (parameter.getAnnotation().isObjectType()) {

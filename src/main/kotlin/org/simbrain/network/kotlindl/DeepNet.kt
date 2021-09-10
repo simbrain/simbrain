@@ -19,6 +19,7 @@ import org.simbrain.util.toFloatArray
 import org.simbrain.workspace.AttributeContainer
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
+import java.util.*
 
 /**
  * Simbrain representation of KotlinDL sequential networks
@@ -105,6 +106,7 @@ class DeepNet(
                     }
                 }
             )
+            deepNetLayers.numberOfClasses = outputSize().toLong()
         }
     }
 
@@ -122,20 +124,22 @@ class DeepNet(
             trainingParams.epochs, trainingParams.batchSize, 5)
     }
 
-    fun floatInputs(): FloatArray {
-        return toFloatArray(doubleInputs())
-    }
+    val floatInputs: FloatArray
+        get() = toFloatArray(doubleInputs)
 
-    fun doubleInputs(): DoubleArray {
-        return super.getInputs().col(0)
-    }
+    val doubleInputs: DoubleArray
+        get() = super.getInputs().col(0)
 
     override fun update() {
         // TODO: Still specific to one-hot
         if (deepNetLayers.isModelInitialized) {
-            val prediction = deepNetLayers.predict(floatInputs())
+            val prediction = deepNetLayers.predict(floatInputs)
             println("Output = " + prediction)
-            outputs = getOneHotMat(prediction,3) // TODO: 3 -> num class labels
+            println("Predict softly:" + deepNetLayers.predictSoftly(floatInputs).joinToString())
+            // TODO: Not sure how to use that function.
+            // println("Predict with activations:" +
+            //         (deepNetLayers.predictAndGetActivations(floatInputs).second.joinToString()))
+            outputs = getOneHotMat(prediction,outputSize()+1)
         } else {
             outputs = Matrix(outputSize(), 1)
         }

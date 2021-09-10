@@ -13,7 +13,7 @@ class TFFlattenLayer : TFLayer<Flatten>() {
     @UserParameter(label = "Number of outputs", order = 10)
     var nout = 5
 
-    @UserParameter(label = "Actiation function", order = 20)
+    @UserParameter(label = "Activation function", order = 20)
     var activations = Activations.Relu
 
     override var layer: Flatten? = null

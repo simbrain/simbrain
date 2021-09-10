@@ -101,6 +101,11 @@ public class Parameter implements Comparable<Parameter> {
         this.getter = getter;
         annotation = getter.getAnnotation(UserParameter.class);
 
+        // No setter needed if annotation is not editable
+        if (!annotation.editable()) {
+            return;
+        }
+
         String setterName = "";
         if(getter.getName().startsWith("is")) {
             setterName = "set" + getter.getName().substring(2);
@@ -391,19 +396,16 @@ public class Parameter implements Comparable<Parameter> {
                         params.add(new Parameter(f));
                     }
                 }
-
-                // Gather method-based annotations in interfaces
-                for (Class<?> i : clazz.getInterfaces()) {
-                    for (Method m : i.getDeclaredMethods()) {
-                        if (m.isAnnotationPresent(UserParameter.class)) {
-                            if (fieldAndMethodNames.contains(m.getName())) {
-                                throw new RuntimeException("A method with the same name, '" + m.getName() + "', is declared in a super-class of " + paramClass.getName());
-                            }
-                            fieldAndMethodNames.add(m.getName());
-                            params.add(new Parameter(m));
+                for (Method m : clazz.getDeclaredMethods()) {
+                    if (m.isAnnotationPresent(UserParameter.class)) {
+                        if (fieldAndMethodNames.contains(m.getName())) {
+                            throw new RuntimeException("A method with the same name, '" + m.getName() + "', is declared in a super-class of " + paramClass.getName());
                         }
+                        fieldAndMethodNames.add(m.getName());
+                        params.add(new Parameter(m));
                     }
                 }
+
             }
 
             classParameters.put(paramClass, Collections.unmodifiableSet(params));

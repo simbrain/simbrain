@@ -9,11 +9,14 @@ import org.simbrain.util.propertyeditor.CopyableObject
  */
 abstract class TFLayer<T : Layer> : CopyableObject {
 
-    @UserParameter(label = "Number of parameters", editable = false, order = 1)
-    fun getNumParams() = layer?.paramCount
+    @get:UserParameter(label = "Number of parameters", editable = false, order = 1)
+    val numParams
+        get() = layer?.paramCount
 
-    @UserParameter(label = "Trainable", description = "Set to false to \"freeze\" training", order = 2 )
-    val trainable = layer?.isTrainable
+    @get:UserParameter(label = "Trainable", description = "Set to false to \"freeze\" training", order = 2 )
+    var trainable
+        get() = layer?.isTrainable
+        set(tr) { layer?.let { it.isTrainable = tr!! }}
 
     override fun copy(): CopyableObject {
         TODO("Not yet implemented")

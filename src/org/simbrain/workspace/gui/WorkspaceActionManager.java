@@ -157,11 +157,6 @@ public class WorkspaceActionManager {
     private final Action openDataWorldAction;
 
     /**
-     * Open network action.
-     */
-    private final Action openNetworkAction;
-
-    /**
      * Open odor world action.
      */
     private final Action openOdorWorldAction;
@@ -262,7 +257,6 @@ public class WorkspaceActionManager {
         clearWorkspaceAction = new ClearWorkspaceAction(desktop);
 
         openDataWorldAction = new OpenDataWorldAction(workspace);
-        openNetworkAction = new OpenNetworkAction(workspace);
         openOdorWorldAction = new OpenOdorWorldAction(workspace);
 
         showPropertyDialogAction = new ShowPropertyDialogAction(workspace);
@@ -512,13 +506,6 @@ public class WorkspaceActionManager {
      */
     public Action getOpenDataWorldAction() {
         return openDataWorldAction;
-    }
-
-    /**
-     * @return the openNetworkAction.
-     */
-    public Action getOpenNetworkAction() {
-        return openNetworkAction;
     }
 
     /**

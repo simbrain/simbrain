@@ -3,9 +3,8 @@ package org.simbrain.world.deviceinteraction;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
+import org.simbrain.workspace.component_actions.ImportAction;
+import org.simbrain.workspace.component_actions.ExportAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
 import javax.swing.*;
@@ -64,8 +63,7 @@ public class DeviceInteractionDesktopComponent extends
         super(frame, component);
         world = component.getWorld();
         JToolBar openSaveToolBar = new JToolBar();
-        openSaveToolBar.add(new OpenAction(this));
-        openSaveToolBar.add(new SaveAction(this));
+        openSaveToolBar.add(new ImportAction(this));
         panel = new DeviceInteractionPanel(world, openSaveToolBar);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         addMenuBar();
@@ -92,9 +90,8 @@ public class DeviceInteractionDesktopComponent extends
 
         // File Menu
         menuBar.add(file);
-        file.add(new OpenAction(this));
-        file.add(new SaveAction(this));
-        file.add(new SaveAsAction(this));
+        file.add(new ImportAction(this));
+        file.add(new ExportAction(this));
         file.addSeparator();
         file.addSeparator();
         file.add(new CloseAction(this.getWorkspaceComponent()));

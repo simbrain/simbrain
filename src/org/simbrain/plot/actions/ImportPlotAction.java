@@ -25,20 +25,20 @@ import javax.swing.AbstractAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Open plot action.
+ * Import plot action.
  */
-public final class OpenPlotAction extends AbstractAction {
+public final class ImportPlotAction extends AbstractAction {
 
     /** Plot GUI component. */
     private final GuiComponent component;
 
     /**
-     * Create a new open plot action.
+     * Import a plot.
      *
      * @param component GUI component, must not be null.
      */
-    public OpenPlotAction(final GuiComponent component) {
-        super("Open...");
+    public ImportPlotAction(final GuiComponent component) {
+        super("Import from xml...");
         if (component == null) {
             throw new IllegalArgumentException(
                     "Desktop component must not be null");
@@ -49,7 +49,7 @@ public final class OpenPlotAction extends AbstractAction {
         // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         component.showOpenFileDialog();
     }

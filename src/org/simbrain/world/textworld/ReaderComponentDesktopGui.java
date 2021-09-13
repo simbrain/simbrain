@@ -31,9 +31,8 @@ import javax.swing.JToolBar;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
+import org.simbrain.workspace.component_actions.ImportAction;
+import org.simbrain.workspace.component_actions.ExportAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
@@ -85,8 +84,7 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
 
         world = component.getWorld();
         JToolBar openSaveToolBar = new JToolBar();
-        openSaveToolBar.add(new OpenAction(this));
-        openSaveToolBar.add(new SaveAction(this));
+        openSaveToolBar.add(new ImportAction(this));
         panel = ReaderPanel.createReaderPanel(world, openSaveToolBar);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         addMenuBar();
@@ -119,9 +117,8 @@ public class ReaderComponentDesktopGui extends GuiComponent<ReaderComponent> {
 
         // File Menu
         menuBar.add(file);
-        file.add(new OpenAction(this));
-        file.add(new SaveAction(this));
-        file.add(new SaveAsAction(this));
+        file.add(new ImportAction(this));
+        file.add(new ExportAction(this));
         file.addSeparator();
         file.add(TextWorldActions.getTextAction(world));
         file.addSeparator();

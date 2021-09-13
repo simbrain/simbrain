@@ -31,7 +31,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Open component action.
  */
-public final class OpenAction extends AbstractAction {
+public final class ImportAction extends AbstractAction {
 
     /** Network panel. */
     private final GuiComponent guiComponent;
@@ -41,9 +41,9 @@ public final class OpenAction extends AbstractAction {
      *
      * @param guiComponent networkPanel, must not be null
      */
-    public OpenAction(final GuiComponent guiComponent) {
+    public ImportAction(final GuiComponent guiComponent) {
 
-        super("Open...");
+        super("Import from xml...");
 
         if (guiComponent == null) {
             throw new IllegalArgumentException("component must not be null");
@@ -51,17 +51,15 @@ public final class OpenAction extends AbstractAction {
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("Open.png"));
 
-        this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
-                KeyEvent.VK_O, Toolkit.getDefaultToolkit()
-                        .getMenuShortcutKeyMask()));
-        putValue(SHORT_DESCRIPTION, "Open a new component");
+        // this.putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+        //         KeyEvent.VK_O, Toolkit.getDefaultToolkit()
+        //                 .getMenuShortcutKeyMask()));
+        putValue(SHORT_DESCRIPTION, "Import from xml.");
 
         this.guiComponent = guiComponent;
     }
 
-    /** @see AbstractAction 
-     * @param event
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         guiComponent.showOpenFileDialog();
     }

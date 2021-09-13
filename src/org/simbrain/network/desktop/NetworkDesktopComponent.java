@@ -33,9 +33,8 @@ import org.simbrain.network.gui.actions.network.ShowNetworkUpdaterDialog;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.WorkspaceComponentListener;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
+import org.simbrain.workspace.component_actions.ImportAction;
+import org.simbrain.workspace.component_actions.ExportAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
@@ -137,9 +136,8 @@ public final class NetworkDesktopComponent extends
 
         JMenu fileMenu = new JMenu("File");
 
-        fileMenu.add(new OpenAction(this));
-        fileMenu.add(new SaveAction(this));
-        fileMenu.add(new SaveAsAction(this));
+        fileMenu.add(new ImportAction(this));
+        fileMenu.add(new ExportAction(this));
         fileMenu.addSeparator();
         fileMenu.add(new ShowNetworkUpdaterDialog(networkPanel));
         fileMenu.add(new ShowNetworkPreferencesAction(networkPanel));

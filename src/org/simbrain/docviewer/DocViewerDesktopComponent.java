@@ -54,9 +54,8 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
+import org.simbrain.workspace.component_actions.ImportAction;
+import org.simbrain.workspace.component_actions.ExportAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
@@ -96,9 +95,8 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
 
         // File Menu
         menuBar.add(file);
-        file.add(new OpenAction(this));
-        file.add(new SaveAction(this));
-        file.add(new SaveAsAction(this));
+        file.add(new ImportAction(this));
+        file.add(new ExportAction(this));
         file.addSeparator();
         JMenuItem item = new JMenuItem("Import html...");
         item.addActionListener(new ActionListener() {

@@ -28,7 +28,7 @@ import org.simbrain.workspace.gui.GuiComponent;
 /**
  * Save as action.
  */
-public final class SaveAsAction extends AbstractAction {
+public final class ExportAction extends AbstractAction {
 
     /** Network panel. */
     private final GuiComponent guiComponent;
@@ -38,23 +38,21 @@ public final class SaveAsAction extends AbstractAction {
      *
      * @param guiComponent networkPanel, must not be null
      */
-    public SaveAsAction(final GuiComponent guiComponent) {
+    public ExportAction(final GuiComponent guiComponent) {
 
-        super("Save As...");
+        super("Export to xml...");
 
         if (guiComponent == null) {
             throw new IllegalArgumentException("component must not be null");
         }
 
         putValue(SMALL_ICON, ResourceManager.getImageIcon("SaveAs.png"));
-        putValue(SHORT_DESCRIPTION, "Save this component with a new name");
+        putValue(SHORT_DESCRIPTION, "Export to xml");
 
         this.guiComponent = guiComponent;
     }
 
-    /** @see AbstractAction 
-     * @param event
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         guiComponent.showSaveFileDialog();
     }

@@ -32,13 +32,10 @@ import org.simbrain.workspace.gui.GuiComponent;
 public class PlotActionManager {
 
     /** Open component action. */
-    private final Action openPlotAction;
-
-    /** Save component action. */
-    private final Action savePlotAction;
+    private final Action exportPlotAction;
 
     /** Save component as action. */
-    private final Action savePlotAsAction;
+    private final Action importPlotAction;
 
     /**
      * Plot component action manager.
@@ -48,37 +45,15 @@ public class PlotActionManager {
     @SuppressWarnings("unchecked")
     public PlotActionManager(GuiComponent component) {
 
-        openPlotAction = new OpenPlotAction(component);
-        savePlotAction = new SavePlotAction(component);
-        savePlotAsAction = new SavePlotAsAction(component);
+        exportPlotAction = new ImportPlotAction(component);
+        importPlotAction = new ExportPlotAction(component);
     }
 
     /**
      * @return the open/save plot actions.
      */
     public List<Action> getOpenSavePlotActions() {
-        return Arrays.asList(new Action[] { openPlotAction, savePlotAction,
-                savePlotAsAction });
+        return Arrays.asList(exportPlotAction, importPlotAction);
     }
 
-    /**
-     * @return the openPlotAction
-     */
-    public Action getOpenPlotAction() {
-        return openPlotAction;
-    }
-
-    /**
-     * @return the savePlotAction
-     */
-    public Action getSavePlotAction() {
-        return savePlotAction;
-    }
-
-    /**
-     * @return the savePlotAsAction
-     */
-    public Action getSavePlotAsAction() {
-        return savePlotAsAction;
-    }
 }

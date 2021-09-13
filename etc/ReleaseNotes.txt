@@ -1,6 +1,8 @@
 Release Notes for Simbrain 3.05 (Fall 2021)
 - Simbrain is no longer launched via the jar, but is packaged as a modern desktop application.
 - Some security issues with xstream have been addressed
+- Component open and save commands have been renamed to import / export, to avoid confusion between those functions and
+the preferred workspace open / save.
 - config.properties file removed
 
 Release Notes for Simbrain 3.04 (Spring 2020)

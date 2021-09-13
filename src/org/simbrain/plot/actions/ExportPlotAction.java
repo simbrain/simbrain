@@ -25,20 +25,20 @@ import javax.swing.AbstractAction;
 import org.simbrain.workspace.gui.GuiComponent;
 
 /**
- * Save plot As Action.
+ * Export plot As Action.
  */
-public final class SavePlotAsAction extends AbstractAction {
+public final class ExportPlotAction extends AbstractAction {
 
     /** Plot GUI component. */
     private final GuiComponent component;
 
     /**
-     * Create a new save plot as action.
+     * Create a new export plot action.
      *
      * @param component GUI Component, must not be null.
      */
-    public SavePlotAsAction(final GuiComponent component) {
-        super("Save As...");
+    public ExportPlotAction(final GuiComponent component) {
+        super("Export xml...");
         if (component == null) {
             throw new IllegalArgumentException(
                     "Desktop component must not be null");
@@ -49,7 +49,7 @@ public final class SavePlotAsAction extends AbstractAction {
         // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void actionPerformed(final ActionEvent event) {
         component.showSaveFileDialog();
     }

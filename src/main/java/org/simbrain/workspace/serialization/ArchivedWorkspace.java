@@ -20,10 +20,10 @@ package org.simbrain.workspace.serialization;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.simbrain.workspace.couplings.Coupling;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.updater.*;
 
 import java.io.OutputStream;
@@ -265,7 +265,7 @@ class ArchivedWorkspace {
      * @return An XStream instance.
      */
     static XStream xstream() {
-        XStream xstream = new XStream(new DomDriver());
+        XStream xstream = Utils.getSimbrainXStream();
         xstream.ignoreUnknownElements();
         xstream.processAnnotations(ArchivedWorkspace.class);
         xstream.processAnnotations(ArchivedWorkspaceComponent.class);

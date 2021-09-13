@@ -22,7 +22,6 @@ import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.pmw.tinylog.Logger;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -742,10 +741,10 @@ public class Utils {
     public static XStream getSimbrainXStream() {
         XStream xstream = new XStream(new DomDriver("UTF-8"));
         xstream.ignoreUnknownElements();
-        XStream.setupDefaultSecurity(xstream);
-        // No obvious downsides to this for Simbrain applications.
-        // Cf. https://x-stream.github.io/security.html
-        xstream.addPermission(AnyTypePermission.ANY);
+        xstream.allowTypesByWildcard(new String[] {
+                "org.simbrain.**", "java.awt.**", "org.jfree.**", "javax.swing.event.**", "java.beans.**",
+                "smile.math.**"
+        });
         return xstream;
     }
 

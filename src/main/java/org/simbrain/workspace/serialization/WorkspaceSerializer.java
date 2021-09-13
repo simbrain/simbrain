@@ -18,10 +18,9 @@
  */
 package org.simbrain.workspace.serialization;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
+import org.simbrain.util.Utils;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.gui.DesktopComponent;
@@ -302,7 +301,8 @@ public class WorkspaceSerializer {
                     WorkspaceComponent wc = deserializer.deserializeWorkspaceComponent(archivedComponent, new ByteArrayInputStream(byteArrays.get(archivedComponent.getUri())));
                     workspace.addWorkspaceComponent(wc);
                     if (archivedComponent.getDesktopComponent() != null) {
-                        Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
+                        Rectangle bounds =
+                                (Rectangle) Utils.getSimbrainXStream().fromXML(new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
                         DesktopComponent<?> desktopComponent = desktop.getDesktopComponent(wc);
                         desktopComponent.getParentFrame().setBounds(bounds);
                     }

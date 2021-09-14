@@ -47,8 +47,7 @@ import static org.simbrain.util.Utils.*;
 public class SFileChooser {
 
     /**
-     * Whether to use the native file chooser, or the Swing file chooser. Set in
-     * the properties file {simbrain}/etc/config.properties.
+     * Whether to use the native file chooser, or the Swing file chooser.
      */
     private static boolean useNativeFileChooser = true;
 

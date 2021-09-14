@@ -152,8 +152,8 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
      */
     public void close() {
         if (workspaceComponent.hasChangedSinceLastSave()) {
-            boolean hasCancelled = showHasChangedDialog();
-            if (hasCancelled) {
+            boolean keepOpen = showHasChangedDialog();
+            if (keepOpen) {
                 return;
             }
         }
@@ -306,19 +306,18 @@ public abstract class GuiComponent<E extends WorkspaceComponent> extends JPanel 
     /**
      * Checks to see if anything has changed and then offers to save if true.
      *
-     * @return true if user cancels
+     * @return true if the dialog should be left open after user action
      */
     public boolean showHasChangedDialog() {
         Object[] options = {"Save", "Don't Save", "Cancel"};
         int s = JOptionPane.showInternalOptionDialog(this,
                 "This component has changed since last save,\n"
-                        + "Would you like to save these changes?",
+                        + "Would you like to save the workspace?",
                 "Component Has Changed", JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[0]);
 
         if (s == JOptionPane.OK_OPTION) {
-            this.save();
-            workspaceComponent.close();
+            desktop.save();
             return false;
         } else if (s == JOptionPane.NO_OPTION) {
             workspaceComponent.close();

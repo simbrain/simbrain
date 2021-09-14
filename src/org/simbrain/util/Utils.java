@@ -37,8 +37,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -61,6 +60,9 @@ public class Utils {
 
     /** User directory where java is launched from. */
     public static final String USER_DIR = System.getProperty("user.dir");
+
+    /** Directory where files should be saved. */
+    public static final String USER_HOME = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
 
     /**
      * Helper method that returns the date and time in a format that can be used

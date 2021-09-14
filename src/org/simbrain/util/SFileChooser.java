@@ -34,7 +34,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import static org.simbrain.util.Utils.FS;
+import static org.simbrain.util.Utils.*;
 
 /**
  * <b>SFileChooser</b> extends java's JFileChooser, providing for automatic
@@ -50,7 +50,7 @@ public class SFileChooser {
      * Whether to use the native file chooser, or the Swing file chooser. Set in
      * the properties file {simbrain}/etc/config.properties.
      */
-    private static boolean useNativeFileChooser;
+    private static boolean useNativeFileChooser = true;
 
     /**
      * The map of extensions and their descriptions in the order of their
@@ -186,7 +186,7 @@ public class SFileChooser {
     private File showOpenDialogSwing() {
 
         JFileChooser chooser = new JFileChooser();
-        setCurrentDirectory(chooser);
+        // TODO: If used, a default directory will have to be passed in
 
         if (exts.size() > 1) {
             chooser.addChoosableFileFilter(new ExtensionSetFileFilter(exts
@@ -206,21 +206,6 @@ public class SFileChooser {
             return chooser.getSelectedFile();
         } else {
             return null;
-        }
-    }
-
-    /**
-     * Sets the current directory for the swing filechooser.
-     *
-     * @param chooser the file chooser
-     */
-    private void setCurrentDirectory(final JFileChooser chooser) {
-        File dir = new File(currentDirectory);
-
-        try {
-            chooser.setCurrentDirectory(dir.getCanonicalFile());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -246,7 +231,7 @@ public class SFileChooser {
     private File showSaveDialogNative(final File file) {
         FileDialog chooser = new FileDialog(new JFrame(), "Save",
                 FileDialog.SAVE);
-        chooser.setDirectory(getCurrentLocation());
+        chooser.setDirectory(USER_HOME);
         if (file != null) {
             if (exts.size() >= 1) {
                 chooser.setFilenameFilter(new ExtensionSetFileFilter(exts
@@ -278,8 +263,7 @@ public class SFileChooser {
      */
     private File showSaveDialogSwing(final File file) {
         JFileChooser chooser = new JFileChooser();
-
-        setCurrentDirectory(chooser);
+        // Filechooser default directory is arleady user-home
         chooser.setAcceptAllFileFilterUsed(false);
         Map<String, ExtensionFileFilter> filters = addExtensions(chooser);
 

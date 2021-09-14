@@ -3,6 +3,7 @@ Release Notes for Simbrain 3.05 (Fall 2021)
 - Some security issues with xstream have been addressed
 - Component open and save commands have been renamed to import / export, to avoid confusion between those functions and
 the preferred workspace open / save.
+- Save dialog opens by default to system-specific "my documents" folder
 - config.properties file removed
 
 Release Notes for Simbrain 3.04 (Spring 2020)

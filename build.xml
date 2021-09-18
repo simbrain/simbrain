@@ -5,7 +5,6 @@
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="lib" location="lib" />
-	<property name="etc" location="etc" />
 	<property name="dist" location="dist" /> <!-- Put final products here -->
 	<property name="build" location="build" /> 	<!-- Staging area -->
 	<property name="build.main" location="${build}/main" /> 
@@ -94,9 +93,6 @@
 				<exclude name="**/archives/**"/>
 			</fileset>
 		</copy>
-		<copy todir="${build.main}" file="${etc}/Readme.txt" />
-		<copy todir="${build.main}" file="${etc}/License.txt" />
-		<copy todir="${build.main}" file="${etc}/ReleaseNotes.txt"/>
 		<zip destfile="${version}.zip" basedir="${build.main}" />
 		<mkdir dir="${dist}"/>
 		<move todir="${dist}" file="${version}.zip" />
@@ -182,7 +178,8 @@
 	<target name="util" depends="removelog4j" description="Compile utils">
 		<mkdir dir="${build}" />
 		<filter token="import org.apache.log4j.Logger" value="import org.simbrain.util.Logger" />
-		<javac srcdir="${removelogger}/org/simbrain/util" destdir="${build}" includeAntRuntime="no" classpathref="lib.path" debug="${comple.debug}">
+		<javac srcdir="${removelogger}/org/simbrain/util" destdir="${build}" includeAntRuntime="no"
+			   classpathref="lib.path" debug="${compile.debug}">
 			<exclude name="environment/**" />
 			<exclude name="projection/**" />
 			<exclude name="widgets/**" />

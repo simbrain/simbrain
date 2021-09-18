@@ -314,6 +314,14 @@ public class SimbrainDesktop {
         INSTANCES.put(workspace, this);
         this.workspace = workspace;
         frame = new JFrame(FRAME_TITLE);
+        frame.setIconImages(Arrays.asList(
+                ResourceManager.getImage("icon_20x20.png"),
+                ResourceManager.getImage("icon_32x32.png"),
+                ResourceManager.getImage("icon_40x40.png"),
+                ResourceManager.getImage("icon_64x64.png"),
+                ResourceManager.getImage("icon_128x128.png"),
+                ResourceManager.getImage("icon_512x512.png")
+        ));
         actionManager = new WorkspaceActionManager(this);
         createAndAttachMenus();
         wsToolBar = createToolBar();

@@ -7,7 +7,7 @@ The default branch is currently Simbrain 4. To see code relating to Simbrain 3.0
 ## Install
 Go to the [downloads](https://simbrain.net/Downloads/downloads_main.html) page and follow the directions.
 
-To run from source are [here](https://github.com/simbrain/simbrain/wiki/Running-from-source).
+To run from source see the instructions [here](https://github.com/simbrain/simbrain/wiki/Running-from-source).
 
 ## Getting Started
 
@@ -39,8 +39,6 @@ The GNU License is in the ./etc directory.
 
 ## Release Notes for Simbrain 3.03 
 (Summer 2018)
-- This is a last or nearly last release in the Simbrain 3.0 series. Development efforts are shifting to 3.1
-- It may be possible to open some 3.02 workspace or networks in 3.03, but results will vary.
 - Improved clamping. Select nodes and / or synapses and click Shift-F. Repeat to toggle. A bold outline indicates clamped nodes or frozen synapses.
 - Improved zooming / panning. Now based on Command / Control drag (rather than Shift-drag). This makes it possible to select items while zoomed in. Also auto-zoom mode changes are now based on single clicks, which is more intuitive.
 - Added a command for resizing all windows. Renamed old window-gathering method "gather windows"

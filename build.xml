@@ -5,6 +5,7 @@
 	<property name="src" location="src" />
 	<property name="bin" location="bin" />
 	<property name="lib" location="lib" />
+	<property name="etc" location="etc" />
 	<property name="dist" location="dist" /> <!-- Put final products here -->
 	<property name="build" location="build" /> 	<!-- Staging area -->
 	<property name="build.main" location="${build}/main" /> 
@@ -93,6 +94,7 @@
 				<exclude name="**/archives/**"/>
 			</fileset>
 		</copy>
+		<copy todir="${build.main}" file="/${etc}/Readme.md" />
 		<zip destfile="${version}.zip" basedir="${build.main}" />
 		<mkdir dir="${dist}"/>
 		<move todir="${dist}" file="${version}.zip" />

@@ -759,7 +759,7 @@ public class Utils {
         XStream xstream = new XStream(new DomDriver("UTF-8"));
         xstream.ignoreUnknownElements();
         xstream.allowTypesByWildcard(new String[] {
-            "org.simbrain.**", "java.awt.**"
+            "org.simbrain.**", "java.awt.**", "org.jfree.**", "javax.swing.event.**", "java.beans.**"
         });
         return xstream;
     }

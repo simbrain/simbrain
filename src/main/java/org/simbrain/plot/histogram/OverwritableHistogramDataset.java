@@ -19,15 +19,14 @@ import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.statistics.SimpleHistogramDataset;
 import org.jfree.data.xy.AbstractIntervalXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.util.ObjectUtilities;
-import org.jfree.util.PublicCloneable;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
+// TODO: See if this code has been updated in the latest JFreechart
 /**
  * A modification of the JFreeChart class HistogramDataset that allows data to
  * be overridden. The main change is the addition of the method overwrriteSeries
@@ -39,7 +38,7 @@ import java.util.Map.Entry;
  * @see HistogramDataset
  * @see SimpleHistogramDataset
  */
-public class OverwritableHistogramDataset extends AbstractIntervalXYDataset implements IntervalXYDataset, Cloneable, PublicCloneable, Serializable {
+public class OverwritableHistogramDataset extends AbstractIntervalXYDataset implements IntervalXYDataset, Cloneable, Serializable {
 
     /**
      * For serialization.
@@ -292,7 +291,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
         List<HistogramBin> bins = getBins(series);
         HistogramBin bin = bins.get(item);
         double x = (bin.getStartBoundary() + bin.getEndBoundary()) / 2.0;
-        return new Double(x);
+        return x;
     }
 
     /**
@@ -310,11 +309,11 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
         List<HistogramBin> bins = getBins(series);
         HistogramBin bin = bins.get(item);
         if (this.type == HistogramType.FREQUENCY) {
-            return new Double(bin.getCount());
+            return bin.getCount();
         } else if (this.type == HistogramType.RELATIVE_FREQUENCY) {
-            return new Double(bin.getCount() / bins.size());
+            return bin.getCount() / bins.size();
         } else if (this.type == HistogramType.SCALE_AREA_TO_1) {
-            return new Double(bin.getCount() / bin.getBinWidth());
+            return bin.getCount() / bin.getBinWidth();
         } else { // pretty sure this shouldn't ever happen
             throw new IllegalStateException();
         }
@@ -333,7 +332,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
     public Number getStartX(int series, int item) {
         List<HistogramBin> bins = getBins(series);
         HistogramBin bin = bins.get(item);
-        return new Double(bin.getStartBoundary());
+        return bin.getStartBoundary();
     }
 
     /**
@@ -349,7 +348,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
     public Number getEndX(int series, int item) {
         List<HistogramBin> bins = getBins(series);
         HistogramBin bin = bins.get(item);
-        return new Double(bin.getEndBoundary());
+        return bin.getEndBoundary();
     }
 
     /**
@@ -397,13 +396,14 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
         if (!(obj.getClass().equals(this.getClass()))) {
             return false;
         }
-        OverwritableHistogramDataset that = (OverwritableHistogramDataset) obj;
-        if (!ObjectUtilities.equal(this.type, that.type)) {
-            return false;
-        }
-        if (!ObjectUtilities.equal(this.dataMap, that.dataMap)) {
-            return false;
-        }
+        // TODO: Commented out after updating JFreechart. Impact not yet known!
+        // OverwritableHistogramDataset that = (OverwritableHistogramDataset) obj;
+        // if (!ObjectUtilities.equal(this.type, that.type)) {
+        //     return false;
+        // }
+        // if (!ObjectUtilities.equal(this.dataMap, that.dataMap)) {
+        //     return false;
+        // }
         return true;
     }
 

@@ -8,7 +8,6 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.texture.FrameBuffer;
 import com.jme3.texture.Image.Format;
 import com.jme3.util.BufferUtils;
-import com.jme3.util.Screenshots;
 import org.simbrain.world.imageworld.ImageSource;
 
 import java.awt.geom.AffineTransform;
@@ -109,7 +108,12 @@ public class ThreeDRenderSource extends ImageSource implements SceneProcessor {
         if (isEnabled()) {
             byteBuffer.clear();
             renderManager.getRenderer().readFrameBuffer(frameBuffer, byteBuffer);
-            Screenshots.convertScreenShot2(intBuffer, rawImage);
+            // TODO: Screenshots have changed in JME. Below is the start of new code.
+            // ScreenshotAppState screenshot = new ScreenshotAppState();
+            // screenshot.takeScreenshot();
+
+            // Below is the prior code
+            // Screenshots.convertScreenShot2(intBuffer, rawImage);
             flip.filter(rawImage, flippedImage);
             setCurrentImage(flippedImage);
         }

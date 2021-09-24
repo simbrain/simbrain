@@ -32,6 +32,8 @@ import java.awt.event.ActionEvent;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -434,9 +436,8 @@ public class Utils {
      * @param helpPage Help page
      */
     public static void showHelpPage(final String helpPage) {
-        String url = new String(System.getProperty("user.dir") + FS + "docs" + FS + helpPage);
+        String url = System.getProperty("user.dir") + FS + "docs" + FS + helpPage;
         displayLocalHtmlInBrowser(url);
-
     }
 
     /**
@@ -448,6 +449,15 @@ public class Utils {
         try {
             java.awt.Desktop.getDesktop().browse(new File(url).toURI());
         } catch (IOException e) {
+            System.err.println("Problem loading URL: " + url);
+            e.printStackTrace();
+        }
+    }
+
+    public static void displayURLInBrowser(final String url) {
+        try {
+            java.awt.Desktop.getDesktop().browse(new URL(url).toURI());
+        } catch (IOException | URISyntaxException e) {
             System.err.println("Problem loading URL: " + url);
             e.printStackTrace();
         }

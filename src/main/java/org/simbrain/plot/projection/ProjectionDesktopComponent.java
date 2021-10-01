@@ -177,8 +177,8 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         // TODO
         // Set up custom label generator, used with some couplings
-        // renderer.setBaseItemLabelsVisible(true);
-        // renderer.setBaseItemLabelGenerator(new LegendXYItemLabelGenerator());
+        renderer.setDefaultItemLabelsVisible(true);
+        renderer.setDefaultItemLabelGenerator(new LegendXYItemLabelGenerator());
 
         // Toolbar
         JButton openBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Open.png"));

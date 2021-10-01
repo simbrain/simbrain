@@ -692,7 +692,7 @@ public class Dataset {
 
         /* Make an array of variances and populate booles */
         for (int i = 0; i < dimensions; i++) {
-            Double var = new Double(getCovariance(i, i));
+            Double var = getCovariance(i, i);
 
             // System.out.println("[" + i + "]=" + var);
             variances[i] = var.doubleValue();

@@ -93,7 +93,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
 
         // Even if the data has not been initialized, initialize it to zero values
         if (component.getDataModel() == null) {
-            component.getDataModel().fill(new Double(0));
+            component.getDataModel().fill(0.0);
         }
 
         // Set up table

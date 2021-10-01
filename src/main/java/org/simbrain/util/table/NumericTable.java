@@ -111,7 +111,7 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
     protected void init(int rows, int cols) {
         rowData.clear();
         for (int i = 0; i < rows; i++) {
-            rowData.add(createNewRow(new Double(0), cols));
+            rowData.add(createNewRow(0.0, cols));
         }
         fireTableStructureChanged();
     }
@@ -123,7 +123,7 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
 
     @Override
     Double getDefaultValue() {
-        return new Double(0);
+        return 0.0;
     }
 
     /**
@@ -314,13 +314,7 @@ public class NumericTable extends MutableTable<Double> implements IterableRowsTa
             for (int i = 0; i < values.length; i++) {
                 for (int j = 0; j < values[0].length; j++) {
                     if ((values[i][j]).length() > 0) {
-                        Double num = new Double(0);
-                        try {
-                            num = Double.valueOf(values[i][j]);
-                        } catch (NumberFormatException exception) {
-                        } finally {
-                            setLogicalValue(i, j, num, false);
-                        }
+                        setLogicalValue(i, j, Double.parseDouble(values[i][j]), false);
                     }
                 }
             }

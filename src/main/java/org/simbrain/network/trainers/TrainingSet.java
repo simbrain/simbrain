@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.trainers;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.math.SimbrainMath;
@@ -90,7 +89,7 @@ public class TrainingSet {
         mainIndices = new ArrayList<Integer>();
         List<Integer> temp = new ArrayList<Integer>();
         for (int i = 0; i < inputData.length; i++) {
-            temp.add(new Integer(i));
+            temp.add(i);
         }
         Collections.shuffle(temp);
         validationIndices = new ArrayList<Integer>(temp.subList(0, numRows));

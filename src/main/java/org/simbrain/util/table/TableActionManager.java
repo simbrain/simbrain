@@ -526,7 +526,7 @@ public class TableActionManager {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                table.fill(new Double(0));
+                table.fill(0.0);
             }
 
         };

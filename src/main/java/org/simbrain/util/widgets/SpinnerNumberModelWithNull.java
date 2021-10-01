@@ -222,23 +222,18 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
 
         Number newValue;
         if ((stepSize instanceof Float) || (stepSize instanceof Double)) {
-            double v = value.doubleValue() + (stepSize.doubleValue() * (double) dir);
-            if (value instanceof Double) {
-                newValue = new Double(v);
-            } else {
-                newValue = new Float(v);
-            }
+            newValue = value.doubleValue() + (stepSize.doubleValue() * (double) dir);
         } else {
             long v = value.longValue() + (stepSize.longValue() * (long) dir);
 
             if (value instanceof Long) {
-                newValue = Long.valueOf(v);
+                newValue = v;
             } else if (value instanceof Integer) {
-                newValue = Integer.valueOf((int) v);
+                newValue = (int) v;
             } else if (value instanceof Short) {
-                newValue = Short.valueOf((short) v);
+                newValue = (short) v;
             } else {
-                newValue = Byte.valueOf((byte) v);
+                newValue = (byte) v;
             }
         }
 

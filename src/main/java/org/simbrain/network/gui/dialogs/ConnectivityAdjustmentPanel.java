@@ -142,8 +142,8 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         sparsitySlider.setPaintTicks(true);
 
         Hashtable<Integer, JLabel> labelTable2 = new Hashtable<Integer, JLabel>();
-        labelTable2.put(new Integer(0), new JLabel("0%"));
-        labelTable2.put(new Integer(100), new JLabel("100%"));
+        labelTable2.put(0, new JLabel("0%"));
+        labelTable2.put(100, new JLabel("100%"));
         sparsitySlider.setLabelTable(labelTable2);
         sparsitySlider.setPaintLabels(true);
     }
@@ -162,7 +162,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
                     if (userFlag) {
                         userFlag = false;
                         double val = (double) (sparsitySlider.getValue()) / 100;
-                        sparsity.setValue(new Double(val));
+                        sparsity.setValue(val);
                     } else {
                         userFlag = true;
                     }
@@ -180,7 +180,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
                         userFlag = false;
                         if (sparsity.getValue() != null) {
                             int sVal = (int) (((Number) sparsity.getValue()).doubleValue() * 100);
-                            sparsitySlider.setValue(new Integer(sVal));
+                            sparsitySlider.setValue(sVal);
                         }
                     } else {
                         userFlag = true;
@@ -210,7 +210,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
      */
     public void fillFieldValues() {
         if (connection == null || !(connection instanceof Sparse)) {
-            sparsity.setValue(new Double(Sparse.DEFAULT_CONNECTION_DENSITY));
+            sparsity.setValue(Sparse.DEFAULT_CONNECTION_DENSITY);
 
         } else {
             sparsity.setValue(((Sparse) connection).getConnectionDensity());

@@ -69,7 +69,7 @@ val evolveXor = newSim {
             })
             when (Random().nextDouble()) {
                 in 0.9..0.95 -> hiddenNodeChromosome.genes.add(nodeGene())
-                //in 0.95..1.0 ->  hiddenNodeChromosome.genes.removeAt(0)
+                // in 0.95..1.0 ->  hiddenNodeChromosome.genes.removeLast() // Does not work
             }
         }
 
@@ -118,14 +118,14 @@ val evolveXor = newSim {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 1000 || fitness < .001 }
+        runUntil { generation == 1000 || fitness < .1 }
     }
 
     MainScope().launch {
 
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(1000, "Fitness")
+        val progressWindow = ProgressWindow(1000, "Error")
 
         launch(Dispatchers.Default) {
 

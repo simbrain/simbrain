@@ -206,7 +206,7 @@ val evolveMouse = newSim {
         launch(Dispatchers.Default) {
 
             withGui {
-                val progressWindow = ProgressWindow(200, "Fitness")
+                val progressWindow = ProgressWindow(200, "Error")
                 generations.onEachGenerationBest { agent, gen ->
                     progressWindow.value = gen
                     progressWindow.text = "Error: ${agent.fitness.format(2)}"

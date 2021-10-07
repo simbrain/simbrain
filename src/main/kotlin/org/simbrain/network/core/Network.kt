@@ -739,6 +739,9 @@ var List<Neuron>.auxValues: List<Double>
         this[index].auxValue = value
     }
 
+/**
+ * Length in pixels of synapses. See Syanpse.length.
+ */
 val List<Synapse>.lengths: List<Double>
     get() = map { it.length }
 

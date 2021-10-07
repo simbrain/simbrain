@@ -243,7 +243,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         y = n.y;
         setUpdatePriority(n.getUpdatePriority());
         setLabel(n.getLabel());
-        setNeuronDataHolder(n.getNeuronDataHolder());
+        setNeuronDataHolder(n.getNeuronDataHolder().copy());
     }
 
     public ScalarDataHolder getNeuronDataHolder() {

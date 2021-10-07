@@ -237,14 +237,14 @@ val evolveAvoider = newSim {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-            runUntil { generation == 50 || fitness > 50 }
+            runUntil { generation == 10 || fitness > 50 }
         }
     }
 
     scope.launch {
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(200, "Fitness")
+        val progressWindow = ProgressWindow(200, "Error")
 
         launch(Dispatchers.Default) {
 

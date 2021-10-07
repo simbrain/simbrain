@@ -110,7 +110,7 @@ public class Workspace {
     /**
      * The updater used to manage component updates.
      */
-    private transient Object updaterLock = new Object();
+    private final transient Object updaterLock = new Object();
 
     /**
      * Delay in milliseconds between update cycles. Used to artificially slow

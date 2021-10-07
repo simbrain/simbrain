@@ -205,7 +205,7 @@ val evolvePursuer = newSim {
 
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(200, "Fitness")
+        val progressWindow = ProgressWindow(200, "Error")
 
         launch(Dispatchers.Default) {
 

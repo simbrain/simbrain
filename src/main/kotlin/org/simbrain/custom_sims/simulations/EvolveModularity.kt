@@ -217,22 +217,23 @@ val evolveModularity = newSim {
             val nc = addNetworkComponent("Network", network)
             placeComponent(nc, 170, 0, 400, 400)
             withGui {
+                val wspace = this@newSim.workspace
                 createControlPanel("Control Panel", 5, 10) {
                     addButton("Random pattern") {
                         rightRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                         leftRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
-                        workspace.iterate()
+                        wspace.iterate()
                     }
                     for (i in 0..7) {
                         addButton("Left Pattern ${i+1}") {
                             leftRetina.products.activations = leftInputs[i]
-                            workspace.iterate()
+                            wspace.iterate()
                         }
                     }
                     for (i in 0..7) {
                         addButton("Right Pattern ${i+1}") {
                             rightRetina.products.activations = rightInputs[i]
-                            workspace.iterate()
+                            wspace.iterate()
                         }
                     }
                 }
@@ -249,7 +250,7 @@ val evolveModularity = newSim {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 50 || fitness < .1 }
+        runUntil { generation == 10 || fitness < .1 }
     }
 
     workspace.clearWorkspace()

@@ -79,10 +79,17 @@ val evolveNetwork = newSim {
 
             // Apply mutations across chromosomes
 
-            // New nodes
+            // Add nodes
             if (Random().nextDouble() > .95) {
                 nodeChromosome.genes.add(nodeGene())
             }
+
+            // // Remove node. Does not work.
+            // if (Random().nextDouble() > .95) {
+            //     if (nodeChromosome.genes.isNotEmpty()) {
+            //         nodeChromosome.genes.removeLast()
+            //     }
+            // }
 
             motivations.genes.forEach {
                 it.mutateBias()
@@ -141,19 +148,22 @@ val evolveNetwork = newSim {
                 val m1error = abs(m1.activation - 2.5)
                 val m2error = abs(m2.activation + 3)
 
-                // TODO: Normalize errors
-                val numNodesError = abs(network.looseNeurons.size - 20).toDouble()
+                // TODO: Normalize errors and provide for weightings
+                val numNodesError = abs(nodeChromosome.products.size - 20).toDouble()
                 val numWeightsError = abs(numWeights - 40)
-                val axonLengthError = abs(avgLength - 50)
+                val axonLengthError = abs(avgLength - 250)
                 val avgActivationError = abs(avgActivation - 5)
                 val totalActivationError = abs(totalActivation - 10)
 
+                // Area in thousands of pixels
                 val bounds  = network.looseNeurons.bound
-                val size = bounds.height * bounds.width / 10_000
-                val sizeError = abs(size - 10)
+                val size = (bounds.height * bounds.width) / 10_000
+                val areaError = abs(size - 10)
 
-                return m1error + m2error + numNodesError + numWeightsError + axonLengthError +
-                        totalActivationError + sizeError
+                // return m1error + m2error + numNodesError + numWeightsError + axonLengthError +
+                //         totalActivationError + areaError
+
+                return numNodesError + axonLengthError + totalActivationError
 
             }
 
@@ -174,9 +184,9 @@ val evolveNetwork = newSim {
 
     val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
-        eliminationRatio = 0.5
+        eliminationRatio = 0.25
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 250 || fitness < .01 }
+        runUntil { generation == 1000 || fitness < .1 }
     }
 
     workspace.clearWorkspace()

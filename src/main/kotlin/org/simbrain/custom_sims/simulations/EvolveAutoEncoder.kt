@@ -9,6 +9,7 @@ import org.simbrain.custom_sims.placeComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
+import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
@@ -75,6 +76,8 @@ val evolveAutoAssociator = newSim {
 
         onEval {
             (0..5).map {
+
+                // Repeating pattern detection
                 val even = (Random().nextDouble() - 0.5) * 2
                 val odd = (Random().nextDouble() - 0.5) * 2
                 inputs.products.activations = inputs.products.mapIndexed { index, _ ->
@@ -101,8 +104,9 @@ val evolveAutoAssociator = newSim {
             network {
                 if (visible) {
                     +inputs.asGroup {
-                        label = "Input"
+                        // label = "Input"
                         location = point(0, 100)
+                        layout = LineLayout()
                     }
 
                     val (n1, n2) = +nodes
@@ -110,8 +114,10 @@ val evolveAutoAssociator = newSim {
                     n2.location = point(100, 0)
 
                     +outputs.asGroup {
-                        label = "Output"
+                        // label = "Output"
                         location = point(0, -100)
+                        layout = LineLayout()
+
                     }
                 } else {
                     +inputs
@@ -126,16 +132,16 @@ val evolveAutoAssociator = newSim {
 
     val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
-        eliminationRatio = 0.5
+        eliminationRatio = 0.25
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 500 || fitness < .2 }
+        runUntil { generation == 500 || fitness < .01 }
     }
 
     mainScope.launch {
 
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(1000, "Fitness")
+        val progressWindow = ProgressWindow(1000, "Error")
 
         launch(Dispatchers.Default) {
 

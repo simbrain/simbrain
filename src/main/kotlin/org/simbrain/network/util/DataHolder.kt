@@ -2,24 +2,38 @@ package org.simbrain.network.util
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
+import java.util.*
 
 /**
  * Holders for matrix valued data used in array based update rules. E.g. [NeuronArray]
  */
-interface MatrixDataHolder
+interface MatrixDataHolder : CopyableObject {
+    override fun copy(): MatrixDataHolder
+}
 
-class EmptyMatrixData : MatrixDataHolder
+class EmptyMatrixData : MatrixDataHolder {
+    override fun copy() = EmptyMatrixData()
+}
 
 class BiasedMatrixData(var size: Int) : MatrixDataHolder {
     var biases = DoubleArray(size)
+    override fun copy() = BiasedMatrixData(size).also {
+        it.biases = biases.copyOf()
+    }
 }
 
 class SpikingMatrixData(var size: Int) : MatrixDataHolder {
     var spikes = BooleanArray(size)
+    override fun copy() = SpikingMatrixData(size).also {
+        it.spikes = spikes.copyOf()
+    }
 }
 
-class NakaMatrixData(size: Int) : MatrixDataHolder {
+class NakaMatrixData(var size: Int) : MatrixDataHolder {
     var a = DoubleArray(size)
+    override fun copy() = NakaMatrixData(size).also {
+        it.a = a.copyOf()
+    }
 }
 
 /**

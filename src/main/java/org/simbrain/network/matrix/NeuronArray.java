@@ -73,7 +73,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         copy.setLocation(orig.getLocation());
         copy.setActivations(orig.getActivations());
         copy.setPrototypeRule(orig.getPrototypeRule());
-        // TODO: Copy data.
+        copy.setDataHolder(orig.getDataHolder().copy());
         return copy;
     }
 

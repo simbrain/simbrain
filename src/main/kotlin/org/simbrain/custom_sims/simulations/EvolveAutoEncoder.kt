@@ -18,6 +18,9 @@ import org.simbrain.util.sse
 import org.simbrain.util.widgets.ProgressWindow
 import java.util.*
 
+/**
+ * Evolve a network which associates input vectors with the same output vectors through a smaller hidden layer.
+ */
 val evolveAutoAssociator = newSim {
 
     val mainScope = MainScope()
@@ -26,18 +29,24 @@ val evolveAutoAssociator = newSim {
 
         val network = Network()
 
-        val inputs = chromosome(8) { index ->
+        // Size of input and output layers
+        val size = 8
+
+        // Play with hidden layer size to study compressibility of representations
+        val hiddenSize = 4
+
+        val inputs = chromosome(size) { index ->
             nodeGene {
                 isClamped = true
-                label = "Input ${index + 1}"
+                // label = "Input ${index + 1}"
             }
         }
 
-        val nodes = chromosome(2) { nodeGene() }
+        val hiddenNodes = chromosome(hiddenSize) { nodeGene() }
 
-        val outputs = chromosome(8) { index ->
+        val outputs = chromosome(size) { index ->
             nodeGene {
-                label = "Output ${index + 1}"
+                // label = "Output ${index + 1}"
             }
         }
 
@@ -55,19 +64,24 @@ val evolveAutoAssociator = newSim {
                 strength += (Random().nextDouble() - 0.5) * 0.2
             }
 
-            nodes.forEach { it.mutateBias() }
+            hiddenNodes.forEach { it.mutateBias() }
 
             connections.forEach { it.mutateWeight() }
 
+            // Create synapses
             val (source, target) = if (Random().nextBoolean()) {
-                val source = (inputs.genes + nodes.genes).shuffled().first()
-                val target = nodes.genes.shuffled().first()
+                // Input to hidden
+                val source = inputs.genes.shuffled().first()
+                val target = hiddenNodes.genes.shuffled().first()
                 Pair(source, target)
             } else {
-                val source = nodes.genes.shuffled().first()
-                val target = (outputs.genes + nodes.genes).shuffled().first()
+                // Hidden to output
+                val source = hiddenNodes.genes.shuffled().first()
+                val target = outputs.genes.shuffled().first()
                 Pair(source, target)
             }
+            // Can add conditions for recurrent connections
+            // e.g. source = node.genes, target = node.genes.
 
             connections.genes.add(connectionGene(source, target) {
                 strength = (Random().nextDouble() - 0.5) * 0.2
@@ -75,13 +89,22 @@ val evolveAutoAssociator = newSim {
         }
 
         onEval {
-            (0..5).map {
 
-                // Repeating pattern detection
-                val even = (Random().nextDouble() - 0.5) * 2
-                val odd = (Random().nextDouble() - 0.5) * 2
+            // Evaluate error by setting inputs to random numbers treating error as difference between input and
+            // output activations
+            val iterations = 10
+            (0..iterations).map {
+
+                // Set outputs in an odd/even pattern, e.g. (.5,.1,.5,.1...)
+                // val even = (Random().nextDouble() - 0.5) * 2
+                // val odd = (Random().nextDouble() - 0.5) * 2
+                // inputs.products.activations = inputs.products.mapIndexed { index, _ ->
+                //     if (index % 2 == 0) even else odd
+                // }
+
+                // Randomize inputs
                 inputs.products.activations = inputs.products.mapIndexed { index, _ ->
-                    if (index % 2 == 0) even else odd
+                    (Random().nextDouble() - 0.5) * 2
                 }
 
                 network.apply {
@@ -96,32 +119,33 @@ val evolveAutoAssociator = newSim {
 
         onPeek {
             val nc = addNetworkComponent("Network", network)
-            placeComponent(nc, 0, 0, 200, 200)
-
+            placeComponent(nc, 0, 0, 500, 500)
         }
 
         onBuild { visible ->
             network {
                 if (visible) {
                     +inputs.asGroup {
-                        // label = "Input"
+                        label = "Inputs"
                         location = point(0, 100)
                         layout = LineLayout()
                     }
 
-                    val (n1, n2) = +nodes
-                    n1.location = point(50, 0)
-                    n2.location = point(100, 0)
+                    +hiddenNodes.asGroup {
+                        label = "Compressed layer"
+                        location = point(20, 0)
+                        layout = LineLayout()
+                    }
 
                     +outputs.asGroup {
-                        // label = "Output"
+                        label = "Outputs"
                         location = point(0, -100)
                         layout = LineLayout()
 
                     }
                 } else {
                     +inputs
-                    +nodes
+                    +hiddenNodes
                     +outputs
                 }
                 +connections
@@ -132,9 +156,9 @@ val evolveAutoAssociator = newSim {
 
     val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
-        eliminationRatio = 0.25
+        eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 500 || fitness < .01 }
+        runUntil { generation == 500 || fitness < .1 }
     }
 
     mainScope.launch {

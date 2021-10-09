@@ -38,6 +38,7 @@ dependencies {
     // Smile
     implementation 'com.github.haifengl:smile-kotlin:2.6.0'
     implementation 'com.github.haifengl:smile-mkl:2.6.0'
+    implementation 'com.github.haifengl:smile-plot:2.6.0'
 
     // JUnit
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'

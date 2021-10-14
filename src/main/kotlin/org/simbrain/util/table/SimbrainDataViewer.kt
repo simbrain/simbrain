@@ -2,8 +2,7 @@ package org.simbrain.util.table
 
 import org.jdesktop.swingx.JXTable
 import org.simbrain.util.StandardDialog
-import smile.io.Read
-import java.awt.Point
+import java.awt.Color
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JPopupMenu
@@ -11,36 +10,27 @@ import javax.swing.JScrollPane
 
 
 /**
- * Wrapper for Smile DataFrame
+ *
+ * The main Simbrain table visualization. Can be used to represent mutable or immutable data, which can be numeric or
+ * mixed. Provides ability to edit the table, randomize numeric values, produce plots and visualizations, etc.
+ *
+ * Visualization for [SimbrainDataModel], which in turns wraps several types of table. Depending on whether the
+ * model is mutable or not, different GUI actions are enabled. These actions can be further customized  depending on
+ * the context.
  */
 class SimbrainDataViewer(val model : SimbrainDataModel) : JXTable(model) {
 
-    /**
-     * Whether to display the default popup menu.
-     */
-    private val displayPopUpMenu = true
-
-    var selectedPoint: Point? = null
-
     init {
+
         columnSelectionAllowed = true
-        isRolloverEnabled = true
-        setRowSelectionAllowed(true)
-        setGridColor(gridColor)
+
+        setGridColor(Color.gray)
 
         addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
-                selectedPoint = e.point
-                if (e.isPopupTrigger && displayPopUpMenu) {
+                if (e.isPopupTrigger) {
                     val menu = buildPopupMenu()
-                    menu.show(this@SimbrainDataViewer, selectedPoint!!.getX().toInt(), selectedPoint!!.getY().toInt())
-                }
-            }
-
-            override fun mouseReleased(e: MouseEvent) {
-                if (e.isPopupTrigger && displayPopUpMenu) {
-                    val menu: JPopupMenu = buildPopupMenu()
-                    menu.show(this@SimbrainDataViewer, selectedPoint!!.getX().toInt(), selectedPoint!!.getY().toInt())
+                    menu.show(this@SimbrainDataViewer, e.x, e.y)
                 }
             }
         })
@@ -48,8 +38,10 @@ class SimbrainDataViewer(val model : SimbrainDataModel) : JXTable(model) {
 
     fun buildPopupMenu(): JPopupMenu {
         val ret = JPopupMenu()
-        // TODO: Make generic to SimbrainDataModel
-        ret.add(getShowPlotAction(model as DataFrameWrapper))
+        if (model.isMutable) {
+            ret.add(getRandomizeAction())
+        }
+        ret.add(getShowPlotAction())
         return ret
     }
 
@@ -57,13 +49,13 @@ class SimbrainDataViewer(val model : SimbrainDataModel) : JXTable(model) {
 
 fun main() {
 
-    val df = Read.csv("simulations/tables/iris_input.csv")
-    val sdv = SimbrainDataViewer(DataFrameWrapper(df))
+    // val sdv = SimbrainDataViewer(DataFrameWrapper(Read.arff("simulations/tables/iris.arff")))
+    val sdv = SimbrainDataViewer(DoubleDataWrapper(arrayOf(doubleArrayOf(1.0,2.0,3.0), doubleArrayOf(4.0,5.0,6.0))))
 
     StandardDialog().apply {
         contentPane = JScrollPane(sdv)
         isVisible = true
-        setLocationRelativeTo(null)
         pack()
+        setLocationRelativeTo(null)
     }
 }

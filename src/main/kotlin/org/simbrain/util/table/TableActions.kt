@@ -1,5 +1,8 @@
 package org.simbrain.util.table
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.SFileChooser
 import org.simbrain.util.StandardDialog
@@ -124,25 +127,38 @@ fun getSaveCSVAction(table: SimbrainDataTable<*>): Action {
     }
 }
 
-fun SimbrainJTable.getRandomizeAction(): Action {
-    return object : AbstractAction() {
+// fun SimbrainJTable.getRandomizeAction(): Action {
+//     return object : AbstractAction() {
+//
+//         init {
+//             putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"))
+//             putValue(NAME, "Randomize")
+//             putValue(SHORT_DESCRIPTION, "Randomize selected cells")
+//             putValue(ACCELERATOR_KEY, KeyEvent.META_DOWN_MASK + KeyEvent.VK_R)
+//         }
+//
+//         override fun actionPerformed(arg0: ActionEvent) {
+//             randomize()
+//         }
+//     }
+// }
 
-        init {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"))
-            putValue(NAME, "Randomize")
-            putValue(SHORT_DESCRIPTION, "Randomize selected cells")
-            putValue(ACCELERATOR_KEY, KeyEvent.META_DOWN_MASK + KeyEvent.VK_R)
-        }
+fun SimbrainDataViewer.getRandomizeAction() = object : AbstractAction() {
 
-        override fun actionPerformed(arg0: ActionEvent) {
-            randomize()
-        }
+    init {
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"))
+        putValue(NAME, "Randomize column")
+        putValue(SHORT_DESCRIPTION, "Randomize cells in selected column")
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke('R', java.awt.event.InputEvent.META_DOWN_MASK))
+    }
+
+    override fun actionPerformed(e: ActionEvent) {
+        model.randomizeColumn(selectedColumn)
     }
 }
 
 
-// TODO: Temp
-fun getShowPlotAction(model: DataFrameWrapper): Action {
+fun SimbrainDataViewer.getShowPlotAction(): Action {
     return object : AbstractAction() {
 
         init {
@@ -152,12 +168,16 @@ fun getShowPlotAction(model: DataFrameWrapper): Action {
         }
 
         override fun actionPerformed(arg0: ActionEvent) {
-            val canvas = BoxPlot.of(model.df.doubleVector(0).toDoubleArray()).canvas();
-            canvas.window()
+
+            GlobalScope.launch(context = Dispatchers.Default) {
+                val canvas = BoxPlot.of(*model.getColumnMajorArray()).canvas();
+                // val canvas = BoxPlot.of(*transpose(model.df.toArray())).canvas()
+                // // val canvas = ScatterPlot.of(*transpose(model.df.toArray())).canvas()
+                canvas.window()
+            }
         }
     }
 }
-
 
 /**
  * Action for normalizing selected parts of a table.

@@ -1,13 +1,16 @@
 package org.simbrain.util.table
 
 import smile.data.DataFrame
+import smile.data.type.*
 
 /**
- * Wrapper for Smile DataFrame
+ * Wrapper for Smile DataFrame. These are immutable tables similar to pandas dataframes.
  */
 class DataFrameWrapper(val df : DataFrame): SimbrainDataModel() {
 
-    // Can add secondary constructors to convert what we pass in
+    override val isMutable = false
+
+    override fun getDataTypeAtColumn(col: Int) = df.types()[col].getType()
 
     override fun getRowCount(): Int {
         return df.nrows()
@@ -21,5 +24,18 @@ class DataFrameWrapper(val df : DataFrame): SimbrainDataModel() {
         return df[rowIndex, columnIndex]
     }
 
+    override fun getColumnName(column: Int): String {
+        return df.column(column).name()
+    }
 }
 
+fun DataType.getType(): Class<*> {
+    return when (this) {
+        is DoubleType -> Double::class.java
+        is FloatType -> Float::class.java
+        is IntegerType -> Int::class.java
+        is StringType -> String::class.java
+        is ByteType -> Byte::class.java
+        else -> Double::class.java
+    }
+}

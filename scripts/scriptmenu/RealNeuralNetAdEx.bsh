@@ -40,12 +40,14 @@ import org.simbrain.workspace.*;
     final boolean STDP_ON = false;
     int NUM_NEURONS;
     int GRID_SPACE = 25;
-    String DIR = "./scripts/scriptmenu/RealNeuralNetAdExResources/";
+    String FS = System.getProperty("file.separator");
+    String USER_DIR = System.getProperty("user.dir");
     List<Double> prefFiringRates = new ArrayList<Double>();
     List<Double> sorted = new ArrayList<Double>();
     Scanner scan = null;
     try {
-        FileReader fr = new FileReader(DIR+"firingRates.csv");
+        FileReader fr = new FileReader(USER_DIR + FS + "scripts" + FS + "scriptmenu" + FS
+            +  "RealNeuralNetAdExResources" +  FS + "firingRates.csv");
         Scanner scan = new Scanner(fr);
         scan.useDelimiter(",|\\n");
         while (scan.hasNextDouble()) {
@@ -120,7 +122,8 @@ import org.simbrain.workspace.*;
     ng1.setLabel("AdExIF Network " + new Date().toString() + " ");
 
     // Set neuron coordinates for connection...
-    ng1.setXYZCoordinatesFromFile(DIR+"xyCoors.csv");
+    ng1.setXYZCoordinatesFromFile(USER_DIR + FS + "scripts" + FS + "scriptmenu" + FS +
+        "RealNeuralNetAdExResources" +  FS + "xyCoors.csv");
 
     NeuronGroup outs = new NeuronGroup(network, outNeurons);
     outs.setLabel("Spike Visualizer");
@@ -131,7 +134,8 @@ import org.simbrain.workspace.*;
 	SynapseGroup sg = new SynapseGroup(ng1, ng1);
     Scanner wtSc = null;
     try {
-        wtSc = new Scanner(new File(DIR+"weightMat.csv"));
+        wtSc = new Scanner(new File(USER_DIR + FS + "scripts" + FS + "scriptmenu" +
+           FS + "RealNeuralNetAdExResources" +  FS + "weightMat.csv"));
         int i = 0;
         int j;
         Scanner lineScan = null;

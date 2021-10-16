@@ -1,5 +1,7 @@
 package org.simbrain.util.table
 
+import org.simbrain.util.UserParameter
+import org.simbrain.util.math.ProbabilityDistribution
 import java.util.*
 import javax.swing.table.AbstractTableModel
 
@@ -20,27 +22,23 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     abstract fun getDataTypeAtColumn(col: Int): Class<*>
 
     /**
+     * Table-wide cell randomizer for arbitrary groups of cells.
+     */
+    @UserParameter(label = "Table Randomizer", isObjectType = true)
+    var cellRandomizer = ProbabilityDistribution.Randomizer()
+
+    /**
+     * Map from column indices to randomizers.
+     */
+    // val columnRandomizer = (0 until columnCount).associateWith { NormalDistribution() }.toMutableMap()
+
+    /**
      * Returns a column (assumed to be numeric) as a double array.
      */
     fun getDoubleArray(col: Int): DoubleArray {
-        if(getDataTypeAtColumn(col) == Float::class.java) {
+        if (isColumnNumeric(col))  {
             return (0 until rowCount)
-                .map{(getValueAt(it, col) as Float).toDouble()}
-                .toDoubleArray()
-        }
-        if(getDataTypeAtColumn(col) == Int::class.java) {
-            return (0 until rowCount)
-                .map{(getValueAt(it, col) as Int).toDouble()}
-                .toDoubleArray()
-        }
-        if(getDataTypeAtColumn(col) == Byte::class.java) {
-            return (0 until rowCount)
-                .map{(getValueAt(it, col) as Byte).toDouble()}
-                .toDoubleArray()
-        }
-        if(getDataTypeAtColumn(col) == Double::class.java) {
-            return (0 until rowCount)
-                .map{getValueAt(it, col) as Double}
+                .map{(getValueAt(it, col) as Number).toDouble()}
                 .toDoubleArray()
         }
 
@@ -51,11 +49,23 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     /**
      * Returns all double columns as an array of double arrays.
      */
-    fun getColumnMajorArray() : Array<DoubleArray> {
+    fun getColumnMajorArray(): Array<DoubleArray> {
         return (0 until columnCount)
-            .filter{getDataTypeAtColumn(it) == Double::class.java}
+            .filter{isColumnNumeric(it)}
             .map{getDoubleArray(it)}
             .toTypedArray()
+    }
+
+    fun isColumnNumeric(col: Int): Boolean {
+        // TODO:  Is there a concise way to do this with Kotlin number?
+        return when (getDataTypeAtColumn(col))  {
+            Double::class.java -> true
+            Float::class.java -> true
+            Int::class.java -> true
+            Byte::class.java -> true
+            else -> false
+        }
+
     }
 
     fun randomizeColumn(col: Int) {

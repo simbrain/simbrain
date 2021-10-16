@@ -2,6 +2,8 @@ package org.simbrain.util.table
 
 import org.jdesktop.swingx.JXTable
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.cartesianProduct
+import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -27,6 +29,7 @@ class SimbrainDataViewer(val model : SimbrainDataModel) : JXTable(model) {
         setGridColor(Color.gray)
 
         addMouseListener(object : MouseAdapter() {
+
             override fun mousePressed(e: MouseEvent) {
                 if (e.isPopupTrigger) {
                     val menu = buildPopupMenu()
@@ -36,11 +39,39 @@ class SimbrainDataViewer(val model : SimbrainDataModel) : JXTable(model) {
         })
     }
 
+    fun getSelectedCells(): List<Pair<Int, Int>> {
+        return selectedRows.toList().cartesianProduct(selectedColumns.toList())
+    }
+
+    fun randomizeSelectedCells() {
+        getSelectedCells().forEach{ (x,y) ->
+            model.setValueAt(model.cellRandomizer.random, x,y)
+        }
+    }
+
+    fun fillSelectedCells(fillVal: Double) {
+        getSelectedCells().forEach{ (x,y) ->
+            model.setValueAt(fillVal, x,y)
+        }
+    }
+
+    fun zeroFillSelectedCells() {
+        fillSelectedCells(0.0)
+    }
+
     fun buildPopupMenu(): JPopupMenu {
         val ret = JPopupMenu()
         if (model.isMutable) {
+            ret.add(getFillAction())
+            ret.add(getZeroFillAction())
             ret.add(getRandomizeAction())
+            ret.add(getEditRandomizerAction())
+            ret.add(getRandomizeColumnAction())
         }
+        if (model is DataFrameWrapper) {
+            ret.add(model.getShowScatterPlotAction())
+        }
+        ret.add(getShowHistogramAction())
         ret.add(getShowPlotAction())
         return ret
     }
@@ -50,7 +81,7 @@ class SimbrainDataViewer(val model : SimbrainDataModel) : JXTable(model) {
 fun main() {
 
     // val sdv = SimbrainDataViewer(DataFrameWrapper(Read.arff("simulations/tables/iris.arff")))
-    val sdv = SimbrainDataViewer(DoubleDataWrapper(arrayOf(doubleArrayOf(1.0,2.0,3.0), doubleArrayOf(4.0,5.0,6.0))))
+    val sdv = SimbrainDataViewer(DoubleDataWrapper(Matrix.randn(10,4).toArray()))
 
     StandardDialog().apply {
         contentPane = JScrollPane(sdv)

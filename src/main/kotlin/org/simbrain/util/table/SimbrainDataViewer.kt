@@ -3,12 +3,14 @@ package org.simbrain.util.table
 import org.jdesktop.swingx.JXTable
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.cartesianProduct
+import org.simbrain.util.widgets.RowNumberTable
 import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
+import javax.swing.JTable
 
 
 /**
@@ -84,7 +86,17 @@ fun main() {
     val sdv = SimbrainDataViewer(DoubleDataWrapper(Matrix.randn(10,4).toArray()))
 
     StandardDialog().apply {
-        contentPane = JScrollPane(sdv)
+
+        // TODO: Abstraact out the scrollpaane
+        val scrollPane = JScrollPane(sdv)
+        val rowTable: JTable = RowNumberTable(sdv)
+        scrollPane.setRowHeaderView(rowTable)
+        scrollPane.setCorner(
+            JScrollPane.UPPER_LEFT_CORNER,
+            rowTable.tableHeader
+        )
+        contentPane = scrollPane
+
         isVisible = true
         pack()
         setLocationRelativeTo(null)

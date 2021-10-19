@@ -22,6 +22,8 @@ import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
 import org.pmw.tinylog.Logger;
 import org.simbrain.util.math.SimbrainMath;
 
@@ -451,6 +453,25 @@ public class Utils {
             System.err.println("Problem loading URL: " + url);
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Return the text associated with a URL.
+     * TODO: Explain more what this is returning.
+     * TODO: Rename to "scrapeFromURL"?
+     */
+    public static String getTextFromURL(final String url) {
+        // TODO: Use JSoup to parse out more stuff
+        Connection session = Jsoup.newSession()
+                .timeout(20 * 1000);
+        try {
+            String html = session.newRequest()
+                    .url(url).get().html();
+            return Jsoup.parse(html).body().text();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void displayURLInBrowser(final String url) {

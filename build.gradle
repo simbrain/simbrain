@@ -39,6 +39,7 @@ dependencies {
     implementation 'com.github.haifengl:smile-kotlin:2.6.0'
     implementation 'com.github.haifengl:smile-mkl:2.6.0'
     implementation 'com.github.haifengl:smile-plot:2.6.0'
+    implementation 'com.github.haifengl:smile-nlp:2.6.0'
 
     // JUnit
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
@@ -51,6 +52,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/ca.umontreal.iro.simul/ssj
     implementation group: 'ca.umontreal.iro.simul', name: 'ssj', version: '3.3.1'
+
+    // jsoup HTML parser library @ https://jsoup.org/
+    implementation 'org.jsoup:jsoup:1.14.3'
 
     //https://mvnrepository.com/artifact/org.ostermiller/utils
     implementation group: 'org.ostermiller', name: 'utils', version: '1.07.00'

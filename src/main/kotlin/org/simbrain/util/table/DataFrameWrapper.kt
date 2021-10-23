@@ -6,7 +6,7 @@ import smile.data.type.*
 /**
  * Wrapper for Smile DataFrame. These are immutable tables similar to pandas dataframes.
  */
-class DataFrameWrapper(val df : DataFrame): SimbrainDataModel() {
+class DataFrameWrapper(var df : DataFrame): SimbrainDataModel() {
 
     override val isMutable = false
 

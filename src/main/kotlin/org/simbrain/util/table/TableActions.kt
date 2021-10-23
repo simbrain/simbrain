@@ -4,13 +4,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.simbrain.util.ResourceManager
+import org.simbrain.util.SFileChooser
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import smile.io.Read
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
 import java.awt.event.ActionEvent
+import java.io.File
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JOptionPane
@@ -64,6 +67,22 @@ fun DataViewerTable.getFillAction() = object : AbstractAction() {
     }
 }
 
+fun DataFrameWrapper.getImportArff() = object : AbstractAction() {
+
+    init {
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Import.png"))
+        putValue(NAME, "Import arff file...")
+        putValue(SHORT_DESCRIPTION, "Import WEKA arff file")
+    }
+
+    override fun actionPerformed(e: ActionEvent) {
+        val chooser = SFileChooser(CSV_DIRECTORY, "", "arff")
+        val arffFile: File = chooser.showOpenDialog() ?: return
+        df = Read.arff(arffFile.absolutePath)
+        fireTableStructureChanged()
+    }
+}
+
 fun DataViewerTable.getRandomizeColumnAction() = object : AbstractAction() {
 
     init {
@@ -83,7 +102,7 @@ fun DataViewerTable.getEditRandomizerAction() = object : AbstractAction() {
     init {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"))
         putValue(NAME, "Edit randomizer")
-        putValue(SHORT_DESCRIPTION, "Edit table wide randoomizer")
+        putValue(SHORT_DESCRIPTION, "Edit table wide randomizer")
     }
 
     override fun actionPerformed(e: ActionEvent) {

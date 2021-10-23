@@ -5,7 +5,7 @@ import org.jdesktop.swingx.JXTable
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.widgets.RowNumberTable
-import smile.math.matrix.Matrix
+import smile.io.Read
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -42,6 +42,7 @@ class SimbrainDataViewer(val model : SimbrainDataModel): JPanel() {
                 add(table.getRandomizeColumnAction())
             }
             if (model is DataFrameWrapper) {
+                add(model.getImportArff())
                 add(model.getShowScatterPlotAction())
             }
             add(table.getShowHistogramAction())
@@ -185,8 +186,8 @@ class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
 
 fun main() {
 
-    // val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
-    val model = DoubleDataWrapper(Matrix.randn(10,4).toArray())
+    val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
+    // val model = DoubleDataWrapper(Matrix.randn(10,4).toArray())
 
     StandardDialog().apply {
         contentPane = SimbrainDataViewer(model)

@@ -11,7 +11,9 @@ import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.table.DoubleDataWrapper
 import org.simbrain.util.table.NumericTable
+import org.simbrain.util.table.SimbrainDataViewer
 import java.awt.Dialog.ModalityType
 import java.awt.geom.Point2D
 import javax.swing.*
@@ -128,14 +130,12 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
             add(AnnotatedPropertyEditor(smileClassifier), "wrap")
 
             // Data Panels
-            val inputs = DataPanel().apply {
-                table.setData(smileClassifier.trainingInputs)
-                // events.onApply { data -> println(data.contentDeepToString()) }
+            val inputs = SimbrainDataViewer(DoubleDataWrapper(smileClassifier.trainingInputs)).apply {
                 addClosingTask {
-                    applyData()
-                    smileClassifier.trainingInputs = this.table.as2DDoubleArray()
+                    smileClassifier.trainingInputs = this.model.getColumnMajorArray()
                 }
             }
+
             val targets = DataPanel().apply {
                 table.setData(smileClassifier.targets.map { doubleArrayOf(it.toDouble()) }.toTypedArray())
                 addClosingTask {
@@ -150,8 +150,8 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
                     icon = ResourceManager.getImageIcon("menu_icons/AddTableRow.png")
                     toolTipText = "Insert a row"
                     addActionListener {
-                        inputs.table.insertRow(inputs.jTable.selectedRow)
-                        targets.table.insertRow(inputs.jTable.selectedRow)
+                        // inputs.table.insertRow(inputs.jTable.selectedRow)
+                        // targets.table.insertRow(inputs.jTable.selectedRow)
                     }
                 })
                 // Delete row
@@ -160,7 +160,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
                     icon = ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png")
                     toolTipText = "Delete last row"
                     addActionListener {
-                        inputs.table.removeRow(inputs.jTable.rowCount - 1)
+                        // inputs.table.removeRow(inputs.jTable.rowCount - 1)
                         targets.table.removeRow(targets.jTable.rowCount - 1)
                     }
                 })
@@ -174,7 +174,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
             add(JButton("Train").apply {
                 addActionListener {
                     // TODO: Make a separate commit action and then just call smileClassifier.train. See deepnet
-                    smileClassifier.train(inputs.table.as2DDoubleArray(), targets.table.firstColumnAsIntArray())
+                    smileClassifier.train(inputs.table.model.getColumnMajorArray(), targets.table.firstColumnAsIntArray())
                     statsLabel.text = "Stats: " + smileClassifier.classifier.stats
                 }
             }, "wrap")
@@ -188,6 +188,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
 
 }
 
+// TODO: Get rid of this after converting to SimbrainDataViewer
 fun NumericTable.firstColumnAsIntArray(): IntArray {
     val returnList = IntArray(rowCount)
     for (i in 0 until rowCount) {

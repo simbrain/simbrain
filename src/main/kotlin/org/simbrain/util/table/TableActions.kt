@@ -21,7 +21,7 @@ import javax.swing.KeyStroke
  */
 private val CSV_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
 
-fun SimbrainDataViewer.getRandomizeAction() = object : AbstractAction() {
+fun DataViewerTable.getRandomizeAction() = object : AbstractAction() {
 
     init {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"))
@@ -34,7 +34,7 @@ fun SimbrainDataViewer.getRandomizeAction() = object : AbstractAction() {
     }
 }
 
-fun SimbrainDataViewer.getZeroFillAction() = object : AbstractAction() {
+fun DataViewerTable.getZeroFillAction() = object : AbstractAction() {
 
     init {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Fill.png"))
@@ -50,7 +50,7 @@ fun SimbrainDataViewer.getZeroFillAction() = object : AbstractAction() {
     }
 }
 
-fun SimbrainDataViewer.getFillAction() = object : AbstractAction() {
+fun DataViewerTable.getFillAction() = object : AbstractAction() {
 
     init {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Fill.png"))
@@ -64,7 +64,7 @@ fun SimbrainDataViewer.getFillAction() = object : AbstractAction() {
     }
 }
 
-fun SimbrainDataViewer.getRandomizeColumnAction() = object : AbstractAction() {
+fun DataViewerTable.getRandomizeColumnAction() = object : AbstractAction() {
 
     init {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"))
@@ -78,7 +78,7 @@ fun SimbrainDataViewer.getRandomizeColumnAction() = object : AbstractAction() {
     }
 }
 
-fun SimbrainDataViewer.getEditRandomizerAction() = object : AbstractAction() {
+fun DataViewerTable.getEditRandomizerAction() = object : AbstractAction() {
 
     init {
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"))
@@ -122,7 +122,7 @@ fun DataFrameWrapper.getShowScatterPlotAction(): Action {
 }
 
 
-fun SimbrainDataViewer.getShowHistogramAction(): Action {
+fun DataViewerTable.getShowHistogramAction(): Action {
     return object : AbstractAction() {
 
         init {
@@ -141,7 +141,7 @@ fun SimbrainDataViewer.getShowHistogramAction(): Action {
     }
 }
 
-fun SimbrainDataViewer.getShowPlotAction(): Action {
+fun DataViewerTable.getShowPlotAction(): Action {
     return object : AbstractAction() {
 
         init {

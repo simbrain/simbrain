@@ -1,5 +1,7 @@
 package org.simbrain.util.table
 
+import org.pmw.tinylog.Logger
+
 /**
  * Mutable 2d array of doubles.
  */
@@ -28,9 +30,17 @@ class DoubleDataWrapper(val data: Array<DoubleArray>): SimbrainDataModel() {
     }
 
     override fun setValueAt(value: Any?, rowIndex: Int, columnIndex: Int) {
+        if (value is String) {
+            try {
+                data[rowIndex][columnIndex] = value.toDouble()
+            } catch (e: NumberFormatException) {
+                Logger.warn("Warning: A string was entered in the table")
+            }
+        }
         if (value is Double) {
             data[rowIndex][columnIndex] = value
         }
+        fireTableDataChanged()
     }
 }
 

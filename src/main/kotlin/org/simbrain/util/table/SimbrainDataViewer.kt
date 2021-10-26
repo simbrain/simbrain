@@ -5,7 +5,7 @@ import org.jdesktop.swingx.JXTable
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.widgets.RowNumberTable
-import smile.io.Read
+import smile.read
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -28,28 +28,13 @@ import javax.swing.text.JTextComponent
 class SimbrainDataViewer(val model : SimbrainDataModel): JPanel() {
 
     val table = DataViewerTable(model)
+    val toolbar = JToolBar()
 
     init {
         layout = MigLayout()
 
-        val toolbar = JToolBar().apply() {
-            // TODO: Repeated code
-            if (model.isMutable) {
-                add(table.getFillAction())
-                add(table.getZeroFillAction())
-                add(table.getRandomizeAction())
-                add(table.getEditRandomizerAction())
-                add(table.getRandomizeColumnAction())
-            }
-            if (model is DataFrameWrapper) {
-                add(model.getImportArff())
-                add(model.getShowScatterPlotAction())
-            }
-            add(table.getShowHistogramAction())
-            add(table.getShowPlotAction())
-        }
-
         add(toolbar, "wrap")
+        initDefaultToolbar()
 
         // Scroll panel
         val scrollPane = JScrollPane(table)
@@ -64,6 +49,32 @@ class SimbrainDataViewer(val model : SimbrainDataModel): JPanel() {
 
     }
 
+    fun initDefaultToolbar() {
+        toolbar.apply() {
+            // TODO: Repeated code
+            if (model.isMutable) {
+                add(table.getFillAction())
+                add(table.zeroFillAction)
+                add(table.randomizeAction)
+                add(table.getEditRandomizerAction())
+                add(table.getRandomizeColumnAction())
+            }
+            if (model is DataFrameWrapper) {
+                add(model.getImportArff())
+                add(model.getShowScatterPlotAction())
+            }
+            add(table.getShowHistogramAction())
+            add(table.getShowPlotAction())
+        }
+    }
+
+    /**
+     * Configure toolbar with a custom toolbar.
+     */
+    fun configureToolbar(block: JComponent.() -> Unit) {
+        toolbar.block()
+    }
+
 }
 
 class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
@@ -72,8 +83,17 @@ class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
 
         columnSelectionAllowed = true
 
+        // setSelectionModel(object : DefaultListSelectionModel() {
+        //     override fun setSelectionInterval(i1: Int, i2: Int) {
+        //         println("$i1, $i2")
+        //         super.setSelectionInterval(i1, i2)
+        //     }
+        //
+        // })
+
         setGridColor(Color.gray)
 
+        // mouseListeners.forEach { l -> removeMouseListener(l) }
         addMouseListener(object : MouseAdapter() {
 
             override fun mousePressed(e: MouseEvent) {
@@ -85,17 +105,17 @@ class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
         })
     }
 
-
     override fun isCellEditable(row: Int, column: Int): Boolean {
         return model.isMutable
     }
 
+    // TODO: Recreated every time
     fun buildPopupMenu(): JPopupMenu {
         val ret = JPopupMenu()
         if (model.isMutable) {
             ret.add(getFillAction())
-            ret.add(getZeroFillAction())
-            ret.add(getRandomizeAction())
+            ret.add(zeroFillAction)
+            ret.add(randomizeAction)
             ret.add(getEditRandomizerAction())
             ret.add(getRandomizeColumnAction())
         }
@@ -186,7 +206,8 @@ class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
 
 fun main() {
 
-    val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
+    val model = DataFrameWrapper(read.csv("simulations/tables/toy-test.txt", delimiter='\t', header=false))
+    // val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
     // val model = DoubleDataWrapper(Matrix.randn(10,4).toArray())
 
     StandardDialog().apply {

@@ -24,34 +24,43 @@ import javax.swing.KeyStroke
  */
 private val CSV_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
 
-fun DataViewerTable.getRandomizeAction() = object : AbstractAction() {
-
-    init {
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"))
-        putValue(NAME, "Randomize")
-        putValue(SHORT_DESCRIPTION, "Randomize selected cells")
+/**
+ * Similar to Utils.createAction but using Kotlin context.
+ */
+fun <T> T.createAction(
+    iconPath: String,
+    name: String,
+    description: String = name,
+    block: T.() -> Unit
+): AbstractAction {
+    return object : AbstractAction() {
+        init {
+            putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+            putValue(NAME, name)
+        }
+        override fun actionPerformed(e: ActionEvent) {
+            block()
+        }
     }
+}
 
-    override fun actionPerformed(e: ActionEvent) {
+val DataViewerTable.randomizeAction
+    get() = createAction(
+        "menu_icons/Rand.png",
+        "Randomize"
+    ) {
         randomizeSelectedCells()
     }
-}
 
-fun DataViewerTable.getZeroFillAction() = object : AbstractAction() {
-
-    init {
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Fill.png"))
-        putValue(NAME, "Zero Fill")
-        putValue(SHORT_DESCRIPTION, "Zero Fill selected cells")
-    }
-
-    override fun actionPerformed(e: ActionEvent) {
-        // val `val` = JOptionPane.showInputDialog(this, "Value:", "0")
-        // fill(`val`.toDouble())
-
+val DataViewerTable.zeroFillAction
+    get() = createAction(
+        "menu_icons/Fill.png",
+        "Zero Fill",
+        "Zero Fill selected cells"
+    ) {
         zeroFillSelectedCells()
     }
-}
+
 
 fun DataViewerTable.getFillAction() = object : AbstractAction() {
 
@@ -131,9 +140,9 @@ fun DataFrameWrapper.getShowScatterPlotAction(): Action {
         override fun actionPerformed(arg0: ActionEvent) {
 
             GlobalScope.launch(context = Dispatchers.Default) {
-                // TODO: Set column to use
+                // TODO: Set column to use for class
                 // TODO: Set mark
-                val canvas = PlotGrid.splom(df, '.', "class")
+                val canvas = PlotGrid.splom(df, '.', "V1")
                 canvas.window()
             }
         }
@@ -153,7 +162,7 @@ fun DataViewerTable.getShowHistogramAction(): Action {
         override fun actionPerformed(arg0: ActionEvent) {
 
             GlobalScope.launch(context = Dispatchers.Default) {
-                val canvas = Histogram.of(model.getDoubleArray(selectedColumn)).canvas();
+                val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas();
                 canvas.window()
             }
         }

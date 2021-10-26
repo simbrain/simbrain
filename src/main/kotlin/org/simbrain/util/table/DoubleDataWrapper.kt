@@ -13,6 +13,21 @@ class DoubleDataWrapper(val data: Array<DoubleArray>): SimbrainDataModel() {
         }
     )
 
+    /**
+     * Create a single column table.
+     */
+    constructor(columnVector: DoubleArray) : this(
+        columnVector.map{arrayOf(it).toDoubleArray()}.toTypedArray()
+    )
+
+    /**
+     * Create a single column table.
+     */
+    constructor(columnVector: IntArray) : this(
+        columnVector.map{arrayOf(it.toDouble()).toDoubleArray()}.toTypedArray()
+    )
+
+
     override val isMutable = true
 
     override fun getDataTypeAtColumn(col: Int) = Double::class.java

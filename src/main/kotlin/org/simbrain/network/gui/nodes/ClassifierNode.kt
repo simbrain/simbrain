@@ -6,13 +6,11 @@ import org.piccolo2d.nodes.PText
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.dialogs.DataPanel
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.DoubleDataWrapper
-import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainDataViewer
 import java.awt.Dialog.ModalityType
 import java.awt.geom.Point2D
@@ -24,7 +22,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
     private val initialHeight = 100.0
 
     /**
-     * Square shape around array node.
+     * Square shape around the classier node.
      */
     private val borderBox = PPath.createRectangle(0.0, 0.0, initialWidth, initialHeight).also {
         addChild(it)
@@ -32,7 +30,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
     }
 
     /**
-     * Text showing info about the array.
+     * Text showing info about the classifier.
      */
     private val infoText = PText().also {
         it.font = NeuronArrayNode.INFO_FONT
@@ -66,7 +64,6 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
         val p = this.globalTranslation
         smileClassifier.location = point(p.x + width / 2, p.y + height / 2)
     }
-
 
     /**
      * Update status text.
@@ -106,7 +103,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
                 getTrainingDialog().run { makeVisible() }
             } })
             add(JMenuItem("Set Properties...").apply { addActionListener {
-                getPropertyDialog().run { makeVisible() }
+                propertyDialog.run { makeVisible() }
             } })
         }
     }
@@ -115,7 +112,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
 
     fun getTrainingDialog() = StandardDialog().apply {
 
-        // TODO: Move?
+        // TODO: Generalize concept of training dialog and move somewhere else?
 
         title = "Smile Classifier"
         modalityType = ModalityType.MODELESS // Set to modeless so the dialog can be left open
@@ -136,11 +133,9 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
                 }
             }
 
-            val targets = DataPanel().apply {
-                table.setData(smileClassifier.targets.map { doubleArrayOf(it.toDouble()) }.toTypedArray())
+            val targets = SimbrainDataViewer(DoubleDataWrapper(smileClassifier.targets)).apply {
                 addClosingTask {
-                    applyData()
-                    smileClassifier.targets = this.table.as2DDoubleArray().map { it[0].toInt() }.toIntArray();
+                    smileClassifier.trainingInputs = this.model.getColumnMajorArray()
                 }
             }
 
@@ -161,7 +156,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
                     toolTipText = "Delete last row"
                     addActionListener {
                         // inputs.table.removeRow(inputs.jTable.rowCount - 1)
-                        targets.table.removeRow(targets.jTable.rowCount - 1)
+                        // targets.table.removeRow(targets.jTable.rowCount - 1)
                     }
                 })
             }
@@ -174,7 +169,9 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
             add(JButton("Train").apply {
                 addActionListener {
                     // TODO: Make a separate commit action and then just call smileClassifier.train. See deepnet
-                    smileClassifier.train(inputs.table.model.getColumnMajorArray(), targets.table.firstColumnAsIntArray())
+                    // TODO: Generalize to more than one column?
+                    smileClassifier.train(inputs.table.model.getRowMajorDoubleArray()
+                        , targets.table.model.getIntColumn(0))
                     statsLabel.text = "Stats: " + smileClassifier.classifier.stats
                 }
             }, "wrap")
@@ -186,15 +183,6 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
 
     }
 
-}
-
-// TODO: Get rid of this after converting to SimbrainDataViewer
-fun NumericTable.firstColumnAsIntArray(): IntArray {
-    val returnList = IntArray(rowCount)
-    for (i in 0 until rowCount) {
-        returnList[i] = this.getLogicalValueAt(i, 0).toInt()
-    }
-    return returnList
 }
 
 fun main() {

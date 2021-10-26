@@ -5,7 +5,7 @@ import org.jdesktop.swingx.JXTable
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.widgets.RowNumberTable
-import smile.read
+import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -83,17 +83,17 @@ class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
 
         columnSelectionAllowed = true
 
-        // setSelectionModel(object : DefaultListSelectionModel() {
-        //     override fun setSelectionInterval(i1: Int, i2: Int) {
-        //         println("$i1, $i2")
-        //         super.setSelectionInterval(i1, i2)
-        //     }
-        //
-        // })
+        setSelectionModel(object : DefaultListSelectionModel() {
+            override fun setSelectionInterval(i1: Int, i2: Int) {
+                println("$i1, $i2")
+                super.setSelectionInterval(i1, i2)
+            }
+
+        })
 
         setGridColor(Color.gray)
 
-        // mouseListeners.forEach { l -> removeMouseListener(l) }
+        mouseListeners.forEach { l -> removeMouseListener(l) }
         addMouseListener(object : MouseAdapter() {
 
             override fun mousePressed(e: MouseEvent) {
@@ -206,9 +206,9 @@ class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
 
 fun main() {
 
-    val model = DataFrameWrapper(read.csv("simulations/tables/toy-test.txt", delimiter='\t', header=false))
+    // val model = DataFrameWrapper(read.csv("simulations/tables/toy-test.txt", delimiter='\t', header=false))
     // val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
-    // val model = DoubleDataWrapper(Matrix.randn(10,4).toArray())
+    val model = DoubleDataWrapper(Matrix.randn(10,4).toArray())
 
     StandardDialog().apply {
         contentPane = SimbrainDataViewer(model)

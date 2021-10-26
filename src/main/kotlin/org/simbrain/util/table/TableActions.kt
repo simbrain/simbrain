@@ -3,10 +3,7 @@ package org.simbrain.util.table
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.simbrain.util.ResourceManager
-import org.simbrain.util.SFileChooser
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Utils
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import smile.io.Read
 import smile.plot.swing.BoxPlot
@@ -14,10 +11,7 @@ import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
 import java.awt.event.ActionEvent
 import java.io.File
-import javax.swing.AbstractAction
-import javax.swing.Action
-import javax.swing.JOptionPane
-import javax.swing.KeyStroke
+import javax.swing.*
 
 /**
  * Default directory where tables are stored.
@@ -27,16 +21,22 @@ private val CSV_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
 /**
  * Similar to Utils.createAction but using Kotlin context.
  */
-fun <T> T.createAction(
+fun <T: JComponent> T.createAction(
     iconPath: String,
     name: String,
     description: String = name,
+    keyBinding: KeyCombination? = null,
     block: T.() -> Unit
 ): AbstractAction {
     return object : AbstractAction() {
         init {
             putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
             putValue(NAME, name)
+            putValue(SHORT_DESCRIPTION, description)
+            if (keyBinding != null) {
+                putValue(ACCELERATOR_KEY, keyBinding)
+                // bindTo(keyBinding, this) // CLOSE!
+            }
         }
         override fun actionPerformed(e: ActionEvent) {
             block()
@@ -47,7 +47,9 @@ fun <T> T.createAction(
 val DataViewerTable.randomizeAction
     get() = createAction(
         "menu_icons/Rand.png",
-        "Randomize"
+        "Randomize",
+        "Randomize selected cells",
+        CmdOrCtrl + 'D'
     ) {
         randomizeSelectedCells()
     }

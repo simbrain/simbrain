@@ -72,6 +72,12 @@ fun JComponent.bindTo(key: String, action: AbstractAction) {
     actionMap.put(keyName, action)
 }
 
+fun JComponent.bindTo(keystroke: KeyStroke, action: AbstractAction) {
+    val keyName = keystroke.toString()
+    putInputMap(keystroke, keystroke.toString())
+    actionMap.put(keyName, action)
+}
+
 inline fun <C: JComponent> C.bind(vararg keys: String, crossinline action: C.() -> Unit) {
     val keyName = "Key ${keys.joinToString("")}"
     keys.forEach { key -> putInputMap(KeyStroke.getKeyStroke(key.toUpperCase()), keyName) }

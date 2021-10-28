@@ -11,45 +11,23 @@ import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
 import java.awt.event.ActionEvent
 import java.io.File
-import javax.swing.*
+import javax.swing.AbstractAction
+import javax.swing.Action
+import javax.swing.JOptionPane
+import javax.swing.KeyStroke
 
 /**
  * Default directory where tables are stored.
  */
 private val CSV_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
 
-/**
- * Similar to Utils.createAction but using Kotlin context.
- */
-fun <T: JComponent> T.createAction(
-    iconPath: String,
-    name: String,
-    description: String = name,
-    keyBinding: KeyCombination? = null,
-    block: T.() -> Unit
-): AbstractAction {
-    return object : AbstractAction() {
-        init {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
-            putValue(NAME, name)
-            putValue(SHORT_DESCRIPTION, description)
-            if (keyBinding != null) {
-                putValue(ACCELERATOR_KEY, keyBinding)
-                // bindTo(keyBinding, this) // CLOSE!
-            }
-        }
-        override fun actionPerformed(e: ActionEvent) {
-            block()
-        }
-    }
-}
 
 val DataViewerTable.randomizeAction
     get() = createAction(
         "menu_icons/Rand.png",
         "Randomize",
         "Randomize selected cells",
-        CmdOrCtrl + 'D'
+        CmdOrCtrl + 'R'
     ) {
         randomizeSelectedCells()
     }
@@ -58,7 +36,8 @@ val DataViewerTable.zeroFillAction
     get() = createAction(
         "menu_icons/Fill.png",
         "Zero Fill",
-        "Zero Fill selected cells"
+        "Zero Fill selected cells",
+        keyCombo = CmdOrCtrl + 'Z'
     ) {
         zeroFillSelectedCells()
     }

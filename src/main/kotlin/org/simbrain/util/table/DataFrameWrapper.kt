@@ -20,7 +20,7 @@ class DataFrameWrapper(var df : DataFrame): SimbrainDataModel() {
         return df.ncols()
     }
 
-    override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
+    override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
         return df[rowIndex, columnIndex]
     }
 

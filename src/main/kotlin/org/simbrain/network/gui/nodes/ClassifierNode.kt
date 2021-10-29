@@ -12,6 +12,8 @@ import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.DoubleDataWrapper
 import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.randomizeAction
+import org.simbrain.util.table.zeroFillAction
 import java.awt.Dialog.ModalityType
 import java.awt.geom.Point2D
 import javax.swing.*
@@ -126,14 +128,22 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
 
             add(AnnotatedPropertyEditor(smileClassifier), "wrap")
 
+            fun SimbrainDataViewer.addCustomActions()  {
+                // TODO: Fine tune
+                addAction(table.zeroFillAction)
+                addAction(table.randomizeAction)
+            }
+
             // Data Panels
-            val inputs = SimbrainDataViewer(DoubleDataWrapper(smileClassifier.trainingInputs)).apply {
+            val inputs = SimbrainDataViewer(DoubleDataWrapper(smileClassifier.trainingInputs), false).apply {
+                addCustomActions()
                 addClosingTask {
                     smileClassifier.trainingInputs = this.model.getColumnMajorArray()
                 }
             }
 
             val targets = SimbrainDataViewer(DoubleDataWrapper(smileClassifier.targets)).apply {
+                addCustomActions()
                 addClosingTask {
                     smileClassifier.trainingInputs = this.model.getColumnMajorArray()
                 }

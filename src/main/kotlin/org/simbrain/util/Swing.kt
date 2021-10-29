@@ -48,3 +48,16 @@ fun <T: JComponent> T.createAction(
         }
     }
 }
+
+/**
+ * Create an action with a char rather than a key combinaation
+ */
+fun <T: JComponent> T.createAction(
+    iconPath: String,
+    name: String,
+    description: String = name,
+    keyPress: Char,
+    block: T.() -> Unit
+): AbstractAction {
+    return createAction(iconPath, name, description, KeyCombination(keyPress), block)
+}

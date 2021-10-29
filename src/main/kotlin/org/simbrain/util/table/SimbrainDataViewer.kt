@@ -25,7 +25,7 @@ import javax.swing.text.JTextComponent
  * model is mutable or not, different GUI actions are enabled. These actions can be further customized  depending on
  * the context.
  */
-class SimbrainDataViewer(val model : SimbrainDataModel): JPanel() {
+class SimbrainDataViewer(val model: SimbrainDataModel, val useDefaultToolbarAndMenu: Boolean = true) : JPanel() {
 
     val table = DataViewerTable(model)
     val toolbar = JToolBar()
@@ -34,72 +34,68 @@ class SimbrainDataViewer(val model : SimbrainDataModel): JPanel() {
         layout = MigLayout()
 
         add(toolbar, "wrap")
-        initDefaultToolbar()
+        if (useDefaultToolbarAndMenu) {
+            initDefaultToolbarAndMenu()
+        }
 
         // Scroll panel
         val scrollPane = JScrollPane(table)
         val rowTable: JTable = RowNumberTable(table)
+        // scrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
         scrollPane.setRowHeaderView(rowTable)
         scrollPane.setCorner(
             JScrollPane.UPPER_LEFT_CORNER,
             rowTable.tableHeader
         )
-
         add(scrollPane, "wrap")
-
     }
 
-    fun initDefaultToolbar() {
-        toolbar.apply() {
-            // TODO: Repeated code
-            if (model.isMutable) {
-                add(table.getFillAction())
-                add(table.zeroFillAction)
-                add(table.randomizeAction)
-                add(table.getEditRandomizerAction())
-                add(table.getRandomizeColumnAction())
-            }
-            if (model is DataFrameWrapper) {
-                add(model.getImportArff())
-                add(model.getShowScatterPlotAction())
-            }
-            add(table.getShowHistogramAction())
-            add(table.getShowPlotAction())
+    fun initDefaultToolbarAndMenu() {
+        if (model.isMutable) {
+            addAction(table.fillAction)
+            addAction(table.zeroFillAction)
+            addAction(table.randomizeAction)
+            addAction(table.editRadomizerAction)
+            addAction(table.randomizeColumnAction)
         }
+        if (model is DataFrameWrapper) {
+            addAction(table.importArff)
+            addAction(table.showScatterPlotAction)
+        }
+        addSeparator()
+        addAction(table.showHistogramAction)
+        addAction(table.showBoxPlotAction)
+    }
+
+    fun addSeparator() {
+        toolbar.addSeparator()
+        table.popUpMenu.addSeparator()
     }
 
     /**
-     * Configure toolbar with a custom toolbar.
+     * Add an action to both the toolbar and popupmenu.
      */
-    fun configureToolbar(block: JComponent.() -> Unit) {
-        toolbar.block()
+    fun addAction(a: AbstractAction) {
+        toolbar.add(a)
+        table.popUpMenu.add(a)
     }
 
 }
 
-class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
+class DataViewerTable(val model: SimbrainDataModel) : JXTable(model) {
+
+    val popUpMenu = JPopupMenu()
 
     init {
-
         columnSelectionAllowed = true
-
-        setSelectionModel(object : DefaultListSelectionModel() {
-            override fun setSelectionInterval(i1: Int, i2: Int) {
-                println("$i1, $i2")
-                super.setSelectionInterval(i1, i2)
-            }
-
-        })
 
         setGridColor(Color.gray)
 
         mouseListeners.forEach { l -> removeMouseListener(l) }
         addMouseListener(object : MouseAdapter() {
-
             override fun mousePressed(e: MouseEvent) {
                 if (e.isPopupTrigger) {
-                    val menu = buildPopupMenu()
-                    menu.show(this@DataViewerTable, e.x, e.y)
+                    popUpMenu.show(this@DataViewerTable, e.x, e.y)
                 }
             }
         })
@@ -109,37 +105,19 @@ class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
         return model.isMutable
     }
 
-    // TODO: Recreated every time
-    fun buildPopupMenu(): JPopupMenu {
-        val ret = JPopupMenu()
-        if (model.isMutable) {
-            ret.add(getFillAction())
-            ret.add(zeroFillAction)
-            ret.add(randomizeAction)
-            ret.add(getEditRandomizerAction())
-            ret.add(getRandomizeColumnAction())
-        }
-        if (model is DataFrameWrapper) {
-            ret.add(model.getShowScatterPlotAction())
-        }
-        ret.add(getShowHistogramAction())
-        ret.add(getShowPlotAction())
-        return ret
-    }
-
     fun getSelectedCells(): List<Pair<Int, Int>> {
         return selectedRows.toList().cartesianProduct(selectedColumns.toList())
     }
 
     fun randomizeSelectedCells() {
-        getSelectedCells().forEach{ (x,y) ->
-            model.setValueAt(model.cellRandomizer.random, x,y)
+        getSelectedCells().forEach { (x, y) ->
+            model.setValueAt(model.cellRandomizer.random, x, y)
         }
     }
 
     fun fillSelectedCells(fillVal: Double) {
-        getSelectedCells().forEach{ (x,y) ->
-            model.setValueAt(fillVal, x,y)
+        getSelectedCells().forEach { (x, y) ->
+            model.setValueAt(fillVal, x, y)
         }
     }
 
@@ -197,21 +175,21 @@ class DataViewerTable(val model: SimbrainDataModel): JXTable(model) {
         if (e is MouseEvent && isSelectAllForMouseEvent) {
             SwingUtilities.invokeLater { editor.selectAll() }
         }
+
+        // Camick end
     }
-
-    // Camick end
-
-
 }
+
 
 fun main() {
 
     // val model = DataFrameWrapper(read.csv("simulations/tables/toy-test.txt", delimiter='\t', header=false))
     // val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
-    val model = DoubleDataWrapper(Matrix.randn(10,4).toArray())
+    val model = DoubleDataWrapper(Matrix.randn(10, 4).toArray())
 
     StandardDialog().apply {
-        contentPane = SimbrainDataViewer(model)
+        val table = SimbrainDataViewer(model)
+        contentPane = table
         isVisible = true
         pack()
         setLocationRelativeTo(null)

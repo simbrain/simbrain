@@ -127,12 +127,45 @@ val DataViewerTable.importArff
         "Import WEKA arff file"
     ) {
         val chooser = SFileChooser(CSV_DIRECTORY, "", "arff")
+        // TODO: Deal with cancel
         val arffFile: File = chooser.showOpenDialog()
-        if (model is DataFrameWrapper) {
-            model.df = Read.arff(arffFile.absolutePath)
-            model.fireTableStructureChanged()
+        model.let {
+            if (it is DataFrameWrapper) {
+                it.df = Read.arff(arffFile.absolutePath)
+                it.fireTableStructureChanged()
+            } else if (it is DoubleDataWrapper) {
+                val df = Read.arff(arffFile.absolutePath)
+                val columns = df.names().zip(df.types())
+                    .map { (name, type) -> Column(name, getDataType(type.getType())) }.toMutableList()
+                val dfData = (0 until df.nrows()).map { i ->
+                    (0 until df.ncols()).map { j ->
+                        df[i][j]
+                    }.toTypedArray()
+                }.toTypedArray()
+                it.data = dfData
+                it.columns = columns
+                it.fireTableStructureChanged()
+            }
         }
     }
 
+val DataViewerTable.editColumnAction
+    get() = createAction(
+        "menu_icons/Prefs.png",
+        "Edit column...",
+        "Edit column properties"
+    ) {
+        if (model is DoubleDataWrapper) {
+            if (selectedColumn >= 0) {
+                val editor = AnnotatedPropertyEditor(model.columns[selectedColumn])
+                val dialog: StandardDialog = editor.dialog
+                dialog.addClosingTask { model.fireTableStructureChanged() }
+                // TODO: Add access to histogram etc. from here?
+                dialog.isModal = true
+                dialog.pack()
+                dialog.setLocationRelativeTo(null)
+                dialog.isVisible = true
+            }
 
-
+        }
+    }

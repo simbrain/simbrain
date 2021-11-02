@@ -17,7 +17,6 @@ import javax.swing.text.JTextComponent
 
 
 /**
- *
  * The main Simbrain table visualization. Can be used to represent mutable or immutable data, which can be numeric or
  * mixed. Provides ability to edit the table, randomize numeric values, produce plots and visualizations, etc.
  *
@@ -25,10 +24,20 @@ import javax.swing.text.JTextComponent
  * model is mutable or not, different GUI actions are enabled. These actions can be further customized  depending on
  * the context.
  */
-class SimbrainDataViewer(val model: SimbrainDataModel, val useDefaultToolbarAndMenu: Boolean = true) : JPanel() {
+class SimbrainDataViewer(
+    model: SimbrainDataModel,
+    val useDefaultToolbarAndMenu: Boolean = true
+) : JPanel() {
 
     val table = DataViewerTable(model)
     val toolbar = JToolBar()
+
+    var model:SimbrainDataModel = model
+        set(value) {
+            field = value
+            value.fireTableStructureChanged()
+        }
+
 
     init {
         layout = MigLayout()
@@ -57,9 +66,10 @@ class SimbrainDataViewer(val model: SimbrainDataModel, val useDefaultToolbarAndM
             addAction(table.randomizeAction)
             addAction(table.editRadomizerAction)
             addAction(table.randomizeColumnAction)
+            table.popUpMenu.add(table.editColumnAction)
+            addAction(table.importArff)
         }
         if (model is DataFrameWrapper) {
-            addAction(table.importArff)
             addAction(table.showScatterPlotAction)
         }
         addSeparator()
@@ -91,7 +101,7 @@ class DataViewerTable(val model: SimbrainDataModel) : JXTable(model) {
 
         setGridColor(Color.gray)
 
-        mouseListeners.forEach { l -> removeMouseListener(l) }
+        // mouseListeners.forEach { l -> removeMouseListener(l) }
         addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
                 if (e.isPopupTrigger) {
@@ -185,7 +195,7 @@ fun main() {
 
     // val model = DataFrameWrapper(read.csv("simulations/tables/toy-test.txt", delimiter='\t', header=false))
     // val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
-    val model = DoubleDataWrapper(Matrix.randn(10, 4).toArray())
+    val model = createFromDoubleArray(Matrix.randn(10, 4).toArray())
 
     StandardDialog().apply {
         val table = SimbrainDataViewer(model)

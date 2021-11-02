@@ -10,6 +10,12 @@ class DataFrameWrapper(var df : DataFrame): SimbrainDataModel() {
 
     override val isMutable = false
 
+    override var columns: MutableList<Column>
+        get() = TODO()
+        set(value) = TODO()
+
+        // get() = df.types().map { it.getType() }
+
     override fun getDataTypeAtColumn(col: Int) = df.types()[col].getType()
 
     override fun getRowCount(): Int {
@@ -29,6 +35,7 @@ class DataFrameWrapper(var df : DataFrame): SimbrainDataModel() {
     }
 }
 
+// TODO: Replace with one that returns out data type
 fun DataType.getType(): Class<*> {
     return when (this) {
         is DoubleType -> Double::class.java

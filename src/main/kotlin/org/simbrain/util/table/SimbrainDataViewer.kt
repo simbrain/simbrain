@@ -1,7 +1,7 @@
 package org.simbrain.util.table
 
 import net.miginfocom.swing.MigLayout
-import org.jdesktop.swingx.JXTable
+import org.jdesktop.swingx.JXTableHeader
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.widgets.RowNumberTable
@@ -32,12 +32,15 @@ class SimbrainDataViewer(
     val table = DataViewerTable(model)
     val toolbar = JToolBar()
 
+    val scrollPane = JScrollPane(table)
+    val rowTable = RowNumberTable(table)
+
     var model:SimbrainDataModel = model
         set(value) {
+            // Reset the table data
             field = value
             value.fireTableStructureChanged()
         }
-
 
     init {
         layout = MigLayout()
@@ -47,9 +50,6 @@ class SimbrainDataViewer(
             initDefaultToolbarAndMenu()
         }
 
-        // Scroll panel
-        val scrollPane = JScrollPane(table)
-        val rowTable: JTable = RowNumberTable(table)
         // scrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
         scrollPane.setRowHeaderView(rowTable)
         scrollPane.setCorner(
@@ -57,6 +57,11 @@ class SimbrainDataViewer(
             rowTable.tableHeader
         )
         add(scrollPane, "wrap")
+
+
+        model.addTableModelListener {
+            table.tableHeader.revalidate()
+        }
     }
 
     fun initDefaultToolbarAndMenu() {
@@ -64,8 +69,9 @@ class SimbrainDataViewer(
             addAction(table.fillAction)
             addAction(table.zeroFillAction)
             addAction(table.randomizeAction)
-            addAction(table.editRadomizerAction)
+            addAction(table.editRandomizerAction)
             addAction(table.randomizeColumnAction)
+            addAction(table.insertColumnAction)
             table.popUpMenu.add(table.editColumnAction)
             addAction(table.importArff)
         }
@@ -92,12 +98,14 @@ class SimbrainDataViewer(
 
 }
 
-class DataViewerTable(val model: SimbrainDataModel) : JXTable(model) {
+class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
 
     val popUpMenu = JPopupMenu()
 
     init {
         columnSelectionAllowed = true
+
+        tableHeader = JXTableHeader(columnModel)
 
         setGridColor(Color.gray)
 
@@ -117,6 +125,10 @@ class DataViewerTable(val model: SimbrainDataModel) : JXTable(model) {
 
     fun getSelectedCells(): List<Pair<Int, Int>> {
         return selectedRows.toList().cartesianProduct(selectedColumns.toList())
+    }
+
+    fun insertColumnAtSelectedPoint() {
+        model.insertColumn(selectedColumn)
     }
 
     fun randomizeSelectedCells() {

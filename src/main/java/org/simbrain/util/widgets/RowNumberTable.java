@@ -36,7 +36,6 @@ public class RowNumberTable extends JTable
         setAutoCreateColumnsFromModel( false );
         setSelectionModel( main.getSelectionModel() );
 
-
         TableColumn column = new TableColumn();
         column.setHeaderValue(" ");
         addColumn( column );

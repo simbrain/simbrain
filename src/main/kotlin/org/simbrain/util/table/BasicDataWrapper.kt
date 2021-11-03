@@ -3,10 +3,10 @@ package org.simbrain.util.table
 import org.pmw.tinylog.Logger
 
 /**
- * Mutable 2d array of doubles.
- * TODO: Change name to something more generic!
+ * Mutable table whose columns have arbitrary types.
  */
-class DoubleDataWrapper(var data: Array<Array<Any>>, columns: MutableList<Column>?): SimbrainDataModel() {
+class BasicDataWrapper(var data: MutableList<MutableList<Any>>, columns: MutableList<Column>?): SimbrainDataModel
+    () {
 
     // TODO
     override var columns: MutableList<Column>
@@ -33,11 +33,19 @@ class DoubleDataWrapper(var data: Array<Array<Any>>, columns: MutableList<Column
     //     columnVector.map{arrayOf(it)}.toTypedArray()
     // )
 
+    override fun insertColumn(colIndex: Int) {
+        // TODO: Move this to a general check
+        if (colIndex > -1 && colIndex < columnCount) {
+            // TODO: Deal with columns and default values
+            columns.add(colIndex, Column("Todo", Column.DataType.DoubleType))
+            data.forEach { row -> row.add(colIndex, 0) }
+            fireTableStructureChanged()
+        }
+    }
 
     override fun getRowCount(): Int {
         return data.size
     }
-
 
     override fun getColumnCount(): Int {
         return data[0].size
@@ -70,15 +78,15 @@ class DoubleDataWrapper(var data: Array<Array<Any>>, columns: MutableList<Column
     }
 }
 
-fun createFromDoubleArray(data: Array<DoubleArray>) : DoubleDataWrapper {
-   return DoubleDataWrapper(data.map {it.toTypedArray() as Array<Any> }.toTypedArray(), null)
+fun createFromDoubleArray(data: Array<DoubleArray>) : BasicDataWrapper {
+   return BasicDataWrapper(data.map {it.toMutableList() as MutableList<Any>}.toMutableList(), null) // TODO
 }
 
-fun createFromColumn(data: DoubleArray) : DoubleDataWrapper {
-    return DoubleDataWrapper(data.map { arrayOf(it as Any) }.toTypedArray(), null)
+fun createFromColumn(data: DoubleArray) : BasicDataWrapper {
+    return BasicDataWrapper(data.map { mutableListOf(it as Any) }.toMutableList(), null)
 }
 
-fun createFromColumn(data: IntArray) : DoubleDataWrapper {
-    return DoubleDataWrapper(data.map { arrayOf(it as Any) }.toTypedArray(), null)
+fun createFromColumn(data: IntArray) : BasicDataWrapper {
+    return BasicDataWrapper(data.map { mutableListOf(it as Any) }.toMutableList(), null)
 }
 

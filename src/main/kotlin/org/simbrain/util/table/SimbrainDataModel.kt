@@ -44,6 +44,8 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     @UserParameter(label = "Table Randomizer")
     var cellRandomizer = ProbabilityDistribution.Randomizer()
 
+
+    // TODO: Review below based on new design
     /**
      * Returns a column (assumed to be numeric) as a double array.
      */
@@ -131,6 +133,11 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
             fireTableDataChanged()
         }
     }
+
+    /**
+     * Override to provide this functionality.
+     */
+    open fun insertColumn(selectedColumn: Int) {}
 
 }
 

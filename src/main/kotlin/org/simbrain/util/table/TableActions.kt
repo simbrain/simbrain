@@ -61,8 +61,7 @@ val DataViewerTable.fillAction
         fillSelectedCells(fillVal)
     }
 
-
-val DataViewerTable.editRadomizerAction
+val DataViewerTable.editRandomizerAction
     get() = createAction(
         "menu_icons/Prefs.png",
         "Edit randomizer...",
@@ -75,6 +74,15 @@ val DataViewerTable.editRadomizerAction
         dialog.pack()
         dialog.setLocationRelativeTo(null)
         dialog.isVisible = true
+    }
+
+val DataViewerTable.insertColumnAction
+    get() = createAction(
+        "menu_icons/AddTableColumn.png",
+        "Insert column",
+        "Insert column (to the right) of clicked point"
+    ) {
+        insertColumnAtSelectedPoint()
     }
 
 val DataViewerTable.showHistogramAction
@@ -133,15 +141,15 @@ val DataViewerTable.importArff
             if (it is DataFrameWrapper) {
                 it.df = Read.arff(arffFile.absolutePath)
                 it.fireTableStructureChanged()
-            } else if (it is DoubleDataWrapper) {
+            } else if (it is BasicDataWrapper) {
                 val df = Read.arff(arffFile.absolutePath)
                 val columns = df.names().zip(df.types())
                     .map { (name, type) -> Column(name, getDataType(type.getType())) }.toMutableList()
                 val dfData = (0 until df.nrows()).map { i ->
                     (0 until df.ncols()).map { j ->
                         df[i][j]
-                    }.toTypedArray()
-                }.toTypedArray()
+                    }.toMutableList()
+                }.toMutableList()
                 it.data = dfData
                 it.columns = columns
                 it.fireTableStructureChanged()
@@ -155,7 +163,7 @@ val DataViewerTable.editColumnAction
         "Edit column...",
         "Edit column properties"
     ) {
-        if (model is DoubleDataWrapper) {
+        if (model is BasicDataWrapper) {
             if (selectedColumn >= 0) {
                 val editor = AnnotatedPropertyEditor(model.columns[selectedColumn])
                 val dialog: StandardDialog = editor.dialog

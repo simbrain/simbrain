@@ -14,10 +14,6 @@ class DataFrameWrapper(var df : DataFrame): SimbrainDataModel() {
         get() = TODO()
         set(value) = TODO()
 
-        // get() = df.types().map { it.getType() }
-
-    override fun getDataTypeAtColumn(col: Int) = df.types()[col].getType()
-
     override fun getRowCount(): Int {
         return df.nrows()
     }
@@ -35,14 +31,23 @@ class DataFrameWrapper(var df : DataFrame): SimbrainDataModel() {
     }
 }
 
-// TODO: Replace with one that returns out data type
-fun DataType.getType(): Class<*> {
+/**
+ * Map from Smile data types to Simbrain data types
+ */
+fun DataType.getColumnDataType(): Column.DataType {
     return when (this) {
-        is DoubleType -> Double::class.java
-        is FloatType -> Float::class.java
-        is IntegerType -> Int::class.java
-        is StringType -> String::class.java
-        is ByteType -> Byte::class.java
-        else -> Double::class.java
+        is DoubleType -> Column.DataType.DoubleType
+        is FloatType -> Column.DataType.DoubleType
+        is IntegerType -> Column.DataType.IntType
+        is StringType -> Column.DataType.StringType
+        is ByteType -> Column.DataType.IntType
+        is ObjectType -> when(objectClass) {
+            Double::class.java -> Column.DataType.DoubleType
+            Float::class.java -> Column.DataType.DoubleType
+            Integer::class.java -> Column.DataType.IntType
+            Byte::class.java -> Column.DataType.IntType
+            else-> Column.DataType.DoubleType
+        }
+        else -> Column.DataType.DoubleType
     }
 }

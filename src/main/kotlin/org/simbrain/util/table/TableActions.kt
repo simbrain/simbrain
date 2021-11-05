@@ -172,7 +172,7 @@ val DataViewerTable.importArff
             } else if (it is BasicDataWrapper) {
                 val df = Read.arff(arffFile.absolutePath)
                 val columns = df.names().zip(df.types())
-                    .map { (name, type) -> Column(name, getDataType(type.getType())) }.toMutableList()
+                    .map { (name, type) -> Column(name, type.getColumnDataType()) }.toMutableList()
                 val dfData = (0 until df.nrows()).map { i ->
                     (0 until df.ncols()).map { j ->
                         df[i][j]

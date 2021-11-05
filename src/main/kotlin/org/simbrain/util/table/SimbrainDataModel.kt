@@ -19,15 +19,9 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     // constructor with both
     // But replace construction logic with function
 
-    // TODO: Remove when we use the overridden versino
-    /**
-     * Returns the data type of a column, as a Java class.
-     */
-    open fun getDataTypeAtColumn(col: Int) = columns[col].type.clazz()
-
-    // override fun getColumnClass(col: Int): Class<*> {
-    //     return columns.get(col).type.clazz()
-    // }
+    override fun getColumnClass(columnIndex: Int): Class<*> {
+        return columns[columnIndex].type.clazz()
+    }
 
     override fun getColumnName(col: Int): String {
         return columns[col].name
@@ -81,7 +75,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     fun columnsSameType(clazz: Class<*>): Boolean {
         return (0 until columnCount).all {
-            getDataTypeAtColumn(it) == clazz
+            getColumnClass(it) == clazz
         }
     }
 
@@ -110,7 +104,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     fun isColumnNumeric(col: Int): Boolean {
         // TODO:  Is there a concise way to do this with Kotlin number?
-        return when (getDataTypeAtColumn(col)) {
+        return when (getColumnClass(col)) {
             Double::class.java -> true
             Float::class.java -> true
             Int::class.java -> true

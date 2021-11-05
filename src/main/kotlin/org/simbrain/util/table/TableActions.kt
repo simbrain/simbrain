@@ -15,7 +15,7 @@ import javax.swing.JOptionPane
 /**
  * Default directory where tables are stored.
  */
-private val CSV_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
+private val TABLE_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
 
 fun SimbrainDataViewer.addSimpleDefaults()  {
     addAction(table.zeroFillAction)
@@ -80,10 +80,38 @@ val DataViewerTable.insertColumnAction
     get() = createAction(
         "menu_icons/AddTableColumn.png",
         "Insert column",
-        "Insert column (to the right) of clicked point"
+        "Insert column to the right of selected column, or as the left-most column if none is selected."
     ) {
-        insertColumnAtSelectedPoint()
+        insertColumn()
     }
+
+val DataViewerTable.deleteColumnAction
+    get() = createAction(
+        "menu_icons/DeleteColumnTable.png",
+        "Delete column",
+        "Delete selected column"
+    ) {
+        deleteSelectedColumn()
+    }
+
+val DataViewerTable.insertRowAction
+    get() = createAction(
+        "menu_icons/AddTableRow.png",
+        "Insert row",
+        "Insert row to above the selected row, or as the bottom row if none is selected."
+    ) {
+        insertRow()
+    }
+
+val DataViewerTable.deleteRowAction
+    get() = createAction(
+        "menu_icons/DeleteRowTable.png",
+        "Delete row",
+        "Delete selected row"
+    ) {
+        deleteSelectedRow()
+    }
+
 
 val DataViewerTable.showHistogramAction
     get() = createAction(
@@ -134,7 +162,7 @@ val DataViewerTable.importArff
         "Import arff file...",
         "Import WEKA arff file"
     ) {
-        val chooser = SFileChooser(CSV_DIRECTORY, "", "arff")
+        val chooser = SFileChooser(TABLE_DIRECTORY, "", "arff")
         // TODO: Deal with cancel
         val arffFile: File = chooser.showOpenDialog()
         model.let {

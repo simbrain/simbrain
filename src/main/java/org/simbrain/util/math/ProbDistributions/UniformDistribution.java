@@ -45,7 +45,7 @@ public class UniformDistribution extends ProbabilityDistribution {
     }
 
     public int nextRandInt() {
-        return (int) nextRand();
+        return (int) Math.round(nextRand());
     }
 
     public UniformDist getBestFit(double[] observations, int numObs) {

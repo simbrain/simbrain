@@ -66,14 +66,20 @@ class SimbrainDataViewer(
 
     fun initDefaultToolbarAndMenu() {
         if (model.isMutable) {
+            addAction(table.importArff)
+            addSeparator()
+            addAction(table.insertColumnAction)
+            addAction(table.deleteColumnAction)
+            addAction(table.insertRowAction)
+            addAction(table.deleteRowAction)
+            addSeparator()
             addAction(table.fillAction)
             addAction(table.zeroFillAction)
             addAction(table.randomizeAction)
             addAction(table.editRandomizerAction)
+            addSeparator()
             addAction(table.randomizeColumnAction)
-            addAction(table.insertColumnAction)
-            table.popUpMenu.add(table.editColumnAction)
-            addAction(table.importArff)
+            addAction(table.editColumnAction)
         }
         if (model is DataFrameWrapper) {
             addAction(table.showScatterPlotAction)
@@ -127,8 +133,19 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
         return selectedRows.toList().cartesianProduct(selectedColumns.toList())
     }
 
-    fun insertColumnAtSelectedPoint() {
+    fun insertColumn() {
         model.insertColumn(selectedColumn)
+    }
+    fun insertRow() {
+        model.insertRow(selectedRow)
+    }
+
+    fun deleteSelectedColumn() {
+        model.deleteColumn(selectedColumn)
+    }
+
+    fun deleteSelectedRow() {
+        model.deleteRow(selectedRow)
     }
 
     fun randomizeSelectedCells() {

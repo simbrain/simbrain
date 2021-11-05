@@ -290,13 +290,17 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         }
 
         /**
-         * Returns a random number from the underlying probabiliyt distribution,
+         * Returns a random number from the underlying probability distribution,
          * whose properties are set by the property editor.
          *
          * @return the random number
          */
         public double getRandom() {
             return probabilityDistribution.nextRand();
+        }
+
+        public double getRandomInt() {
+            return probabilityDistribution.nextRandInt();
         }
 
         @Override

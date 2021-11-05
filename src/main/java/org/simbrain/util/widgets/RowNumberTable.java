@@ -32,6 +32,9 @@ public class RowNumberTable extends JTable
         main.addPropertyChangeListener( this );
         main.getModel().addTableModelListener( this );
 
+
+        setGridColor(Color.gray);
+
         setFocusable( false );
         setAutoCreateColumnsFromModel( false );
         setSelectionModel( main.getSelectionModel() );

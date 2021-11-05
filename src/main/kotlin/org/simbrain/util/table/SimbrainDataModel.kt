@@ -139,6 +139,12 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
      */
     open fun insertColumn(selectedColumn: Int) {}
 
+    open fun deleteColumn(selectedColumn: Int) {}
+
+    open fun insertRow(selectedRow: Int) {}
+
+    open fun deleteRow(selectedRow: Int) {}
+
 }
 
 class Column (
@@ -162,8 +168,7 @@ class Column (
         if (type == DataType.DoubleType) {
             return columnRandomizer.random
         } else if (type == DataType.IntType) {
-            // TODO: Something better for int, and make the randomizer type depend on type
-            return columnRandomizer.random.toInt().toDouble()
+            return columnRandomizer.randomInt
         }
         return 0
     }

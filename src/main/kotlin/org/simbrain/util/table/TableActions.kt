@@ -9,7 +9,6 @@ import smile.io.Read
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
-import java.io.File
 import javax.swing.JOptionPane
 
 /**
@@ -163,24 +162,46 @@ val DataViewerTable.importArff
         "Import WEKA arff file"
     ) {
         val chooser = SFileChooser(TABLE_DIRECTORY, "", "arff")
-        // TODO: Deal with cancel
-        val arffFile: File = chooser.showOpenDialog()
-        model.let {
-            if (it is DataFrameWrapper) {
-                it.df = Read.arff(arffFile.absolutePath)
-                it.fireTableStructureChanged()
-            } else if (it is BasicDataWrapper) {
-                val df = Read.arff(arffFile.absolutePath)
-                val columns = df.names().zip(df.types())
-                    .map { (name, type) -> Column(name, type.getColumnDataType()) }.toMutableList()
-                val dfData = (0 until df.nrows()).map { i ->
-                    (0 until df.ncols()).map { j ->
-                        df[i][j]
+        val arffFile = chooser.showOpenDialog()
+        if (arffFile != null) {
+            model.let {
+                if (it is DataFrameWrapper) {
+                    it.df = Read.arff(arffFile.absolutePath)
+                    it.fireTableStructureChanged()
+                } else if (it is BasicDataWrapper) {
+                    val df = Read.arff(arffFile.absolutePath)
+                    val columns = df.names().zip(df.types())
+                        .map { (name, type) -> Column(name, type.getColumnDataType()) }.toMutableList()
+                    val dfData = (0 until df.nrows()).map { i ->
+                        (0 until df.ncols()).map { j ->
+                            df[i][j]
+                        }.toMutableList()
                     }.toMutableList()
-                }.toMutableList()
-                it.data = dfData
-                it.columns = columns
-                it.fireTableStructureChanged()
+                    it.data = dfData
+                    it.columns = columns
+                    it.fireTableStructureChanged()
+                }
+            }
+        }
+    }
+
+val DataViewerTable.importCsv
+    get() = createAction(
+        "menu_icons/Import.png",
+        "Import csv...",
+        "Import comma separated values file"
+    ) {
+        val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
+        val csvFile = chooser.showOpenDialog()
+        if (csvFile != null) {
+            model.let {
+                if (it is BasicDataWrapper) {
+                    it.data = createFrom2DArray(Utils.getStringMatrix(csvFile)).data
+                    it.fireTableStructureChanged()
+                } else if (it is DataFrameWrapper) {
+                    it.df = Read.csv(csvFile.absolutePath)
+                    it.fireTableStructureChanged()
+                }
             }
         }
     }

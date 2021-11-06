@@ -3,27 +3,25 @@ package org.simbrain.util.table
 /**
  * Mutable table whose columns have arbitrary types.
  */
-class BasicDataWrapper(var data: MutableList<MutableList<Any?>>, columns: MutableList<Column>?) : SimbrainDataModel
-    () {
-
-    // TODO
-    override var columns: MutableList<Column>
-        get() = _columns
-        set(value) {
-            _columns = value
-        }
-
-    private var _columns = data[0].mapIndexed { i, _ -> Column("Column ${i + 1}", Column.DataType.IntType) }
-        .toMutableList()
+class BasicDataWrapper(
+    data: MutableList<MutableList<Any?>>,
+    override var columns: MutableList<Column> = inferColumn(data)
+) : SimbrainDataModel() {
 
     override val isMutable = true
+
+    var data: MutableList<MutableList<Any?>> = data
+        set(value) {
+            field = value
+            columns = inferColumn(value)
+        }
 
     /**
      * Insert column to left, unless the index is -1 (no selection) in which case it is added as the right-most column.
      */
     override fun insertColumn(colIndex: Int) {
-        val newColIndex = if (colIndex == - 1) columnCount else colIndex
-        if(colIndex in -1 until columnCount) {
+        val newColIndex = if (colIndex == -1) columnCount else colIndex
+        if (colIndex in -1 until columnCount) {
             columns.add(newColIndex, Column("Todo", Column.DataType.DoubleType))
             data.forEach { row -> row.add(newColIndex, null) }
             fireTableStructureChanged()
@@ -31,7 +29,7 @@ class BasicDataWrapper(var data: MutableList<MutableList<Any?>>, columns: Mutabl
     }
 
     override fun deleteColumn(colIndex: Int) {
-        if(validateColumnIndex(colIndex)) {
+        if (validateColumnIndex(colIndex)) {
             data.forEach { row -> row.removeAt(colIndex) }
             fireTableStructureChanged()
         }
@@ -41,15 +39,15 @@ class BasicDataWrapper(var data: MutableList<MutableList<Any?>>, columns: Mutabl
      * Insert row above, unless the index is -1 (no selection) in which case it is added as the bottom.
      */
     override fun insertRow(rowIndex: Int) {
-        val newRowIndex = if (rowIndex == - 1) rowCount else rowIndex
-        if(rowIndex in -1 until rowCount) {
+        val newRowIndex = if (rowIndex == -1) rowCount else rowIndex
+        if (rowIndex in -1 until rowCount) {
             data.add(newRowIndex, MutableList(columnCount) { null })
             fireTableStructureChanged()
         }
     }
 
     override fun deleteRow(rowIndex: Int) {
-        if(validateRowIndex(rowIndex)) {
+        if (validateRowIndex(rowIndex)) {
             data.removeAt(rowIndex)
             fireTableStructureChanged()
         }
@@ -64,7 +62,7 @@ class BasicDataWrapper(var data: MutableList<MutableList<Any?>>, columns: Mutabl
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
-        if(validateRowIndex(rowIndex) && validateColumnIndex(columnIndex)) {
+        if (validateRowIndex(rowIndex) && validateColumnIndex(columnIndex)) {
             return data[rowIndex][columnIndex]
         }
         return null
@@ -85,7 +83,7 @@ class BasicDataWrapper(var data: MutableList<MutableList<Any?>>, columns: Mutabl
     }
 
     override fun setValueAt(value: Any?, rowIndex: Int, colIndex: Int) {
-        if(validateRowIndex(rowIndex) && validateColumnIndex(colIndex)) {
+        if (validateRowIndex(rowIndex) && validateColumnIndex(colIndex)) {
             withValidatedValue(value, colIndex) {
                 data[rowIndex][colIndex] = it
                 fireTableDataChanged()
@@ -111,11 +109,11 @@ class BasicDataWrapper(var data: MutableList<MutableList<Any?>>, columns: Mutabl
     /**
      * Parse the provided value into a double if possible, else throw an exception
      */
-    private fun tryParsingDouble(value: Any?): Double  {
+    private fun tryParsingDouble(value: Any?): Double {
         if (value is Double) {
             return value
         }
-        if (value is String){
+        if (value is String) {
             return value.toDouble()
         }
         if (value is Int) {
@@ -127,11 +125,11 @@ class BasicDataWrapper(var data: MutableList<MutableList<Any?>>, columns: Mutabl
     /**
      * Parse the provided value into an integer if possible, else throw an exception.
      */
-    fun tryParsingInt(value: Any?): Int  {
+    fun tryParsingInt(value: Any?): Int {
         if (value is Int) {
             return value
         }
-        if (value is String){
+        if (value is String) {
             return value.toInt()
         }
         if (value is Double) {
@@ -150,15 +148,27 @@ class BasicDataWrapper(var data: MutableList<MutableList<Any?>>, columns: Mutabl
     }
 }
 
+/**
+ * Infer a column from a 2d array of data.
+ */
+private fun inferColumn(data: MutableList<MutableList<Any?>>) =
+    data[0].mapIndexed { i, value ->
+        createColumn("Column ${i + 1}", value)
+    }.toMutableList()
+
+fun createFrom2DArray(data: Array<out Array<out Any?>>): BasicDataWrapper {
+    return BasicDataWrapper(data.map { it.toMutableList() }.toMutableList())
+}
+
 fun createFromDoubleArray(data: Array<DoubleArray>): BasicDataWrapper {
-    return BasicDataWrapper(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList(), null)
+    return BasicDataWrapper(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
 }
 
 fun createFromColumn(data: DoubleArray): BasicDataWrapper {
-    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList(), null)
+    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
 fun createFromColumn(data: IntArray): BasicDataWrapper {
-    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList(), null)
+    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 

@@ -1,6 +1,9 @@
 package org.simbrain.util.table
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.isIntegerValued
+import org.simbrain.util.isNumeric
+import org.simbrain.util.isRealValued
 import org.simbrain.util.math.ProbabilityDistribution
 import org.simbrain.util.propertyeditor.EditableObject
 import java.util.*
@@ -44,7 +47,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
      * Returns a column (assumed to be numeric) as a double array.
      */
     fun getDoubleColumn(col: Int): DoubleArray {
-        if (isColumnNumeric(col)) {
+        if (columns[col].isRealValued()) {
             return (0 until rowCount)
                 .map { (getValueAt(it, col) as Number).toDouble() }
                 .toDoubleArray()
@@ -55,7 +58,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     }
 
     fun getIntColumn(col: Int): IntArray {
-        if (isColumnNumeric(col)) {
+        if (columns[col].isIntegerValued()) {
             return (0 until rowCount)
                 .map { (getValueAt(it, col) as Number).toInt() }
                 .toIntArray()
@@ -68,7 +71,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
      */
     fun getColumnMajorArray(): Array<DoubleArray> {
         return (0 until columnCount)
-            .filter { isColumnNumeric(it) }
+            .filter { it.isRealValued() }
             .map { getDoubleColumn(it) }
             .toTypedArray()
     }
@@ -97,21 +100,9 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     fun getColumnMajorIntArray(): Array<IntArray> {
         return (0 until columnCount)
-            .filter { isColumnNumeric(it) }
+            .filter { it.isNumeric() }
             .map { getIntColumn(it) }
             .toTypedArray()
-    }
-
-    fun isColumnNumeric(col: Int): Boolean {
-        // TODO:  Is there a concise way to do this with Kotlin number?
-        return when (getColumnClass(col)) {
-            Double::class.java -> true
-            Float::class.java -> true
-            Int::class.java -> true
-            Byte::class.java -> true
-            else -> false
-        }
-
     }
 
     // TODO: Possibly remove or merge with overriding version
@@ -191,6 +182,35 @@ class Column (
         abstract fun clazz(): Class<*>
 
     }
+
+}
+
+/**
+ * Create a column from a value of unknown type. Try treating it as integer, then double, and if that fails treat it as
+ * a String.
+ */
+fun createColumn(name: String, value: Any?) : Column  {
+    if (value.isIntegerValued()) {
+        return Column(name, Column.DataType.IntType)
+    }
+    if (value.isRealValued()) {
+        return Column(name, Column.DataType.DoubleType)
+    }
+    if (value is String) {
+        try {
+            value.toInt()
+            return Column(name, Column.DataType.IntType)
+        } catch (e: NumberFormatException) {
+            // Do nothing, move on to the next case
+        }
+        try {
+            value.toDouble()
+            return Column(name, Column.DataType.DoubleType)
+        }  catch (e: NumberFormatException) {
+            // Do nothing, move on to the next case
+        }
+    }
+    return Column(name, Column.DataType.StringType)
 
 }
 

@@ -42,10 +42,10 @@ fun DataType.getColumnDataType(): Column.DataType {
         is StringType -> Column.DataType.StringType
         is ByteType -> Column.DataType.IntType
         is ObjectType -> when(objectClass) {
-            Double::class.java -> Column.DataType.DoubleType
-            Float::class.java -> Column.DataType.DoubleType
-            Integer::class.java -> Column.DataType.IntType
-            Byte::class.java -> Column.DataType.IntType
+            java.lang.Double::class.java -> Column.DataType.DoubleType
+            java.lang.Float::class.java -> Column.DataType.DoubleType
+            java.lang.Integer::class.java -> Column.DataType.IntType
+            java.lang.Byte::class.java -> Column.DataType.IntType
             else-> Column.DataType.DoubleType
         }
         else -> Column.DataType.DoubleType

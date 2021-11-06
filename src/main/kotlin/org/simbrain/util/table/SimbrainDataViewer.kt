@@ -66,6 +66,7 @@ class SimbrainDataViewer(
 
     fun initDefaultToolbarAndMenu() {
         if (model.isMutable) {
+            addAction(table.importCsv)
             addAction(table.importArff)
             addSeparator()
             addAction(table.insertColumnAction)

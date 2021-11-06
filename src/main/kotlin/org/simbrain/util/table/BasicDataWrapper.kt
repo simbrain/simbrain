@@ -22,16 +22,18 @@ class BasicDataWrapper(
     override fun insertColumn(colIndex: Int) {
         val newColIndex = if (colIndex == -1) columnCount else colIndex
         if (colIndex in -1 until columnCount) {
-            columns.add(newColIndex, Column("Todo", Column.DataType.DoubleType))
+            columns.add(newColIndex, Column("New Column"))
             data.forEach { row -> row.add(newColIndex, null) }
             fireTableStructureChanged()
         }
     }
 
-    override fun deleteColumn(colIndex: Int) {
+    override fun deleteColumn(colIndex: Int, fireEvent: Boolean) {
         if (validateColumnIndex(colIndex)) {
             data.forEach { row -> row.removeAt(colIndex) }
-            fireTableStructureChanged()
+            if (fireEvent) {
+                fireTableStructureChanged()
+            }
         }
     }
 
@@ -46,10 +48,12 @@ class BasicDataWrapper(
         }
     }
 
-    override fun deleteRow(rowIndex: Int) {
+    override fun deleteRow(rowIndex: Int, fireEvent: Boolean) {
         if (validateRowIndex(rowIndex)) {
             data.removeAt(rowIndex)
-            fireTableStructureChanged()
+            if (fireEvent) {
+                fireTableStructureChanged()
+            }
         }
     }
 

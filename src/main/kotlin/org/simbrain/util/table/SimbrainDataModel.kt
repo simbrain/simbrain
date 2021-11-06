@@ -124,11 +124,11 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
      */
     open fun insertColumn(selectedColumn: Int) {}
 
-    open fun deleteColumn(selectedColumn: Int) {}
+    open fun deleteColumn(selectedColumn: Int, fireEvent: Boolean = true) {}
 
     open fun insertRow(selectedRow: Int) {}
 
-    open fun deleteRow(selectedRow: Int) {}
+    open fun deleteRow(selectedRow: Int, fireEvent: Boolean = true) {}
 
 }
 
@@ -137,7 +137,7 @@ class Column (
     val columName: String,
 
     @UserParameter(label = "Type", order = 2)
-    val type: DataType
+    val type: DataType = DataType.DoubleType
 ) : EditableObject {
 
     @UserParameter(label = "Enabled", order = 10)

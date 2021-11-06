@@ -141,12 +141,26 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
         model.insertRow(selectedRow)
     }
 
-    fun deleteSelectedColumn() {
-        model.deleteColumn(selectedColumn)
+    fun deleteSelectedColumns() {
+        // TODO: Non-contiguous selections once we have them
+        val firstIndex = selectedColumns.firstOrNull()
+        if (firstIndex != null) {
+            selectedColumns.forEach {
+                model.deleteColumn(firstIndex, false)
+            }
+            model.fireTableStructureChanged()
+        }
     }
 
-    fun deleteSelectedRow() {
-        model.deleteRow(selectedRow)
+    fun deleteSelectedRows() {
+        // TODO: Non-contiguous selections once we have them
+        val firstIndex = selectedRows.firstOrNull()
+        if (firstIndex != null && firstIndex >= 0) {
+            selectedRows.forEach {
+                model.deleteRow(firstIndex, false)
+            }
+            model.fireTableStructureChanged()
+        }
     }
 
     fun randomizeSelectedCells() {

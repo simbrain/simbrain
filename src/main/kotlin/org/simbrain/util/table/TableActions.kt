@@ -87,10 +87,10 @@ val DataViewerTable.insertColumnAction
 val DataViewerTable.deleteColumnAction
     get() = createAction(
         "menu_icons/DeleteColumnTable.png",
-        "Delete column",
-        "Delete selected column"
+        "Delete columns",
+        "Delete selected columns"
     ) {
-        deleteSelectedColumn()
+        deleteSelectedColumns()
     }
 
 val DataViewerTable.insertRowAction
@@ -105,10 +105,10 @@ val DataViewerTable.insertRowAction
 val DataViewerTable.deleteRowAction
     get() = createAction(
         "menu_icons/DeleteRowTable.png",
-        "Delete row",
-        "Delete selected row"
+        "Delete rows",
+        "Delete selected rows"
     ) {
-        deleteSelectedRow()
+        deleteSelectedRows()
     }
 
 

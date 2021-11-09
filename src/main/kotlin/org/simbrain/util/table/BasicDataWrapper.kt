@@ -72,20 +72,6 @@ class BasicDataWrapper(
         return null
     }
 
-    /**
-     * Check that the provided column index is within range
-     */
-    private fun validateColumnIndex(colIndex: Int): Boolean {
-        return colIndex in 0 until columnCount
-    }
-
-    /**
-     * Check that the provided row index is within range
-     */
-    private fun validateRowIndex(rowIndex: Int): Boolean {
-        return rowIndex in 0 until rowCount
-    }
-
     override fun setValueAt(value: Any?, rowIndex: Int, colIndex: Int) {
         if (validateRowIndex(rowIndex) && validateColumnIndex(colIndex)) {
             withValidatedValue(value, colIndex) {

@@ -42,6 +42,20 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     var cellRandomizer = ProbabilityDistribution.Randomizer()
 
 
+    /**
+     * Check that the provided column index is within range
+     */
+    fun validateColumnIndex(colIndex: Int): Boolean {
+        return colIndex in 0 until columnCount
+    }
+
+    /**
+     * Check that the provided row index is within range
+     */
+    fun validateRowIndex(rowIndex: Int): Boolean {
+        return rowIndex in 0 until rowCount
+    }
+
     // TODO: Review below based on new design
     /**
      * Returns a column (assumed to be numeric) as a double array.

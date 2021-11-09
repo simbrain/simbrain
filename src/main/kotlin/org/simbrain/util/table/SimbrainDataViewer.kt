@@ -15,7 +15,6 @@ import java.util.*
 import javax.swing.*
 import javax.swing.text.JTextComponent
 
-
 /**
  * The main Simbrain table visualization. Can be used to represent mutable or immutable data, which can be numeric or
  * mixed. Provides ability to edit the table, randomize numeric values, produce plots and visualizations, etc.
@@ -26,14 +25,13 @@ import javax.swing.text.JTextComponent
  */
 class SimbrainDataViewer(
     model: SimbrainDataModel,
-    val useDefaultToolbarAndMenu: Boolean = true
+    useDefaultToolbarAndMenu: Boolean = true
 ) : JPanel() {
 
     val table = DataViewerTable(model)
     val toolbar = JToolBar()
 
-    val scrollPane = JScrollPane(table)
-    val rowTable = RowNumberTable(table)
+    val scrollPane = DataViewerScrollPane(table)
 
     var model:SimbrainDataModel = model
         set(value) {
@@ -43,26 +41,20 @@ class SimbrainDataViewer(
         }
 
     init {
-        layout = MigLayout()
+        layout = MigLayout("fillx")
 
         add(toolbar, "wrap")
         if (useDefaultToolbarAndMenu) {
             initDefaultToolbarAndMenu()
         }
 
-        // scrollPane.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
-        scrollPane.setRowHeaderView(rowTable)
-        scrollPane.setCorner(
-            JScrollPane.UPPER_LEFT_CORNER,
-            rowTable.tableHeader
-        )
-        add(scrollPane, "wrap")
-
+        add(scrollPane, "grow")
 
         model.addTableModelListener {
             table.tableHeader.revalidate()
         }
     }
+
 
     fun initDefaultToolbarAndMenu() {
         if (model.isMutable) {
@@ -105,6 +97,24 @@ class SimbrainDataViewer(
 
 }
 
+class DataViewerScrollPane(val table: JTable): JScrollPane(table) {
+
+    /**
+     * Custom table with row numbers shown
+     */
+    val rowTable = RowNumberTable(table)
+
+    init {
+        setRowHeaderView(rowTable)
+        table.autoResizeMode = JTable.AUTO_RESIZE_OFF;
+        setCorner(
+            UPPER_LEFT_CORNER,
+            rowTable.tableHeader
+        )
+    }
+
+}
+
 class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
 
     val popUpMenu = JPopupMenu()
@@ -142,25 +152,24 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
     }
 
     fun deleteSelectedColumns() {
-        // TODO: Non-contiguous selections once we have them
-        val firstIndex = selectedColumns.firstOrNull()
-        if (firstIndex != null) {
-            selectedColumns.forEach {
-                model.deleteColumn(firstIndex, false)
+        for (i in 0 until selectedColumns.size) {
+            if (columnCount <= 0) {
+                break
             }
-            model.fireTableStructureChanged()
+            model.deleteColumn(selectedColumn, false)
         }
+        model.fireTableStructureChanged()
     }
 
     fun deleteSelectedRows() {
-        // TODO: Non-contiguous selections once we have them
-        val firstIndex = selectedRows.firstOrNull()
-        if (firstIndex != null && firstIndex >= 0) {
-            selectedRows.forEach {
-                model.deleteRow(firstIndex, false)
+        for (i in 0 until selectedRows.size) {
+            // Allowing removal of all rows causes weird behavior, so we just aren't allowing it
+            if (rowCount <= 1) {
+                break
             }
-            model.fireTableStructureChanged()
+            model.deleteRow(selectedRow, false)
         }
+        model.fireTableStructureChanged()
     }
 
     fun randomizeSelectedCells() {

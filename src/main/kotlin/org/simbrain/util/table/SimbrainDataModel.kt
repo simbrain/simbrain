@@ -2,11 +2,9 @@ package org.simbrain.util.table
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.isIntegerValued
-import org.simbrain.util.isNumeric
 import org.simbrain.util.isRealValued
 import org.simbrain.util.math.ProbabilityDistribution
 import org.simbrain.util.propertyeditor.EditableObject
-import java.util.*
 import javax.swing.table.AbstractTableModel
 
 /**
@@ -56,23 +54,20 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
         return rowIndex in 0 until rowCount
     }
 
-    // TODO: Review below based on new design
     /**
      * Returns a column (assumed to be numeric) as a double array.
      */
     fun getDoubleColumn(col: Int): DoubleArray {
-        if (columns[col].isRealValued()) {
+        if (columns[col].isNumeric()) {
             return (0 until rowCount)
                 .map { (getValueAt(it, col) as Number).toDouble() }
                 .toDoubleArray()
         }
-
         throw Error("getDoubleArray called on a non-numeric column")
-
     }
 
     fun getIntColumn(col: Int): IntArray {
-        if (columns[col].isIntegerValued()) {
+        if (columns[col].isNumeric()) {
             return (0 until rowCount)
                 .map { (getValueAt(it, col) as Number).toInt() }
                 .toIntArray()
@@ -80,12 +75,13 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
         throw Error("getIntArray called on a non-numeric column")
     }
 
+
     /**
      * Returns all double columns as an array of double arrays.
      */
     fun getColumnMajorArray(): Array<DoubleArray> {
         return (0 until columnCount)
-            .filter { it.isRealValued() }
+            .filter { columns[it].isNumeric()}
             .map { getDoubleColumn(it) }
             .toTypedArray()
     }
@@ -114,24 +110,12 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     fun getColumnMajorIntArray(): Array<IntArray> {
         return (0 until columnCount)
-            .filter { it.isNumeric() }
+            .filter { columns[it].isNumeric()}
             .map { getIntColumn(it) }
             .toTypedArray()
     }
 
-    // TODO: Possibly remove or merge with overriding version
-    open fun randomizeColumn(col: Int) {
-        // TODO: Check datatype of column
-        if (isMutable) {
-            // TODO: Provide the random function and have it be associated with a column
-            // See NumericTable
-            val rand = Random()
-            (0 until rowCount).forEach {
-                setValueAt(rand.nextDouble(), it, col)
-            }
-            fireTableDataChanged()
-        }
-    }
+    open fun randomizeColumn(col: Int) {}
 
     /**
      * Override to provide this functionality.
@@ -146,8 +130,8 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
 }
 
-class Column (
-    @UserParameter(label = "Name", order =  1)
+class Column(
+    @UserParameter(label = "Name", order = 1)
     val columName: String,
 
     @UserParameter(label = "Type", order = 2)
@@ -197,13 +181,17 @@ class Column (
 
     }
 
+    fun isNumeric(): Boolean {
+        return type == DataType.DoubleType || type == DataType.IntType
+    }
+
 }
 
 /**
  * Create a column from a value of unknown type. Try treating it as integer, then double, and if that fails treat it as
  * a String.
  */
-fun createColumn(name: String, value: Any?) : Column  {
+fun createColumn(name: String, value: Any?): Column {
     if (value.isIntegerValued()) {
         return Column(name, Column.DataType.IntType)
     }
@@ -220,7 +208,7 @@ fun createColumn(name: String, value: Any?) : Column  {
         try {
             value.toDouble()
             return Column(name, Column.DataType.DoubleType)
-        }  catch (e: NumberFormatException) {
+        } catch (e: NumberFormatException) {
             // Do nothing, move on to the next case
         }
     }

@@ -56,11 +56,6 @@ fun Any?.isRealValued(): Boolean {
         return this is Double || this is Float
 }
 
-
 fun Any?.isIntegerValued(): Boolean {
         return this is Short || this is Long ||  this is Int || this is Byte
-}
-
-fun Any?.isNumeric(): Boolean {
-        return isRealValued() || isIntegerValued()
 }

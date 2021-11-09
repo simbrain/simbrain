@@ -119,8 +119,11 @@ val DataViewerTable.showHistogramAction
         "Create histograms for data in selected column"
     ) {
         GlobalScope.launch(context = Dispatchers.Default) {
-            val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas();
-            canvas.window()
+            try {
+                val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas();
+                canvas.window()
+            } catch(e: Exception){
+            }
         }
     }
 
@@ -128,7 +131,7 @@ val DataViewerTable.showBoxPlotAction
     get() = createAction(
         "menu_icons/BarChart.png", // TODO Better Icon
         "Boxplot column",
-        "Create boxplot for data in selected column"
+        "Create boxplot for data all numeric columns"
     ) {
         GlobalScope.launch(context = Dispatchers.Default) {
             val canvas = BoxPlot.of(*model.getColumnMajorArray()).canvas();

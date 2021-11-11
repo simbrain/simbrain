@@ -6,6 +6,7 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.widgets.RowNumberTable
 import smile.math.matrix.Matrix
+import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -13,6 +14,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.util.*
 import javax.swing.*
+import javax.swing.table.TableModel
 import javax.swing.text.JTextComponent
 
 /**
@@ -41,17 +43,25 @@ class SimbrainDataViewer(
         }
 
     init {
-        layout = MigLayout("fillx")
 
-        add(toolbar, "wrap")
+        // Putting the toolbar in the top part of a border layout to avoid problems with horizontal scrollbars in the
+        // main panel
+        layout = BorderLayout()
+        add(toolbar, BorderLayout.NORTH)
+
+        // The main panel uses the mig layout
+        val mainPanel = JPanel(MigLayout("fillx"))
+        add(mainPanel)
+
         if (useDefaultToolbarAndMenu) {
             initDefaultToolbarAndMenu()
         }
 
-        add(scrollPane, "grow")
+        mainPanel.add(scrollPane, "grow")
 
         model.addTableModelListener {
             table.tableHeader.revalidate()
+            scrollPane.updateResizeMode(it.source as TableModel)
         }
     }
 
@@ -106,11 +116,25 @@ class DataViewerScrollPane(val table: JTable): JScrollPane(table) {
 
     init {
         setRowHeaderView(rowTable)
-        table.autoResizeMode = JTable.AUTO_RESIZE_OFF;
+        updateResizeMode(table.model)
         setCorner(
             UPPER_LEFT_CORNER,
             rowTable.tableHeader
         )
+    }
+
+    /**
+     * If less than 5 columns use auto-resize. Otherwise turn auto-resize off so that horizontal scroll bars work
+     * property.
+     */
+    fun updateResizeMode(model: TableModel) {
+        // TODO: It may be possible to achieve better results using model.getColumn.minWidth and
+        //  AUTO_RESIZE_ALL_COLUMNS but we have not succeeded in this yet.
+        if (model.columnCount < 5)  {
+            table.autoResizeMode = JTable.AUTO_RESIZE_ALL_COLUMNS
+        } else {
+            table.autoResizeMode = JTable.AUTO_RESIZE_OFF
+        }
     }
 
 }

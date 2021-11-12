@@ -24,7 +24,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
      */
     public static List<Class> DIST_LIST = Arrays.asList(ExponentialDistribution.class,
         GammaDistribution.class, LogNormalDistribution.class,
-        NormalDistribution.class, ParetoDistribution.class, UniformDistribution.class);
+        NormalDistribution.class, ParetoDistribution.class, TwoValued.class, UniformDistribution.class);
 
     /**
      * Called via reflection using {@link UserParameter#typeListMethod()}.

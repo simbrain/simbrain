@@ -9,9 +9,11 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.*
+import org.simbrain.util.math.ProbDistributions.TwoValued
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.*
 import java.awt.Dialog.ModalityType
+import java.awt.Dimension
 import java.awt.geom.Point2D
 import javax.swing.*
 
@@ -121,19 +123,20 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
         contentPane = mainPanel
         mainPanel.apply {
 
-            layout = MigLayout()
-
-            add(AnnotatedPropertyEditor(smileClassifier), "wrap")
+            layout = MigLayout("fillx")
 
             fun SimbrainDataViewer.addCustomActions()  {
-                // TODO: Fine tune
-                addAction(table.zeroFillAction)
-                addAction(table.randomizeAction)
+                addAction(table.importCsv)
+                addAction(table.randomizeColumnAction)
+                addAction(table.editColumnAction)
             }
 
             // Data Panels
             val inputs = SimbrainDataViewer(createFromDoubleArray(smileClassifier.trainingInputs), false).apply {
                 addCustomActions()
+                addSeparator()
+                addAction(table.randomizeAction)
+                preferredSize = Dimension(300, 300)
                 addClosingTask {
                     smileClassifier.trainingInputs = this.model.getColumnMajorArray()
                 }
@@ -141,39 +144,36 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
 
             val targets = SimbrainDataViewer(createFromColumn(smileClassifier.targets), false).apply {
                 addCustomActions()
+                table.model.columns[0].columnRandomizer.probabilityDistribution =
+                    TwoValued.TwoValuedBuilder().upper(1).lower(-1).build()
+                preferredSize = Dimension(200, 300)
                 addClosingTask {
                     smileClassifier.trainingInputs = this.model.getColumnMajorArray()
                 }
             }
 
-            val toolbar = JToolBar().apply {
+            val addRemoveRows = JToolBar().apply {
                 // Add row
                 add(JButton().apply {
                     icon = ResourceManager.getImageIcon("menu_icons/AddTableRow.png")
-                    toolTipText = "Insert a row"
+                    toolTipText = "Insert row at bottom of input and target tables"
                     addActionListener {
-                        // inputs.table.insertRow(inputs.jTable.selectedRow)
-                        // targets.table.insertRow(inputs.jTable.selectedRow)
+                        inputs.table.insertRow()
+                        targets.table.insertRow()
                     }
                 })
-                // Delete row
-                // TODO: Delete selected rows. For that abstract out table code
                 add(JButton().apply {
                     icon = ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png")
-                    toolTipText = "Delete last row"
+                    toolTipText = "Delete last row of input and target tables"
                     addActionListener {
-                        // inputs.table.removeRow(inputs.jTable.rowCount - 1)
-                        // targets.table.removeRow(targets.jTable.rowCount - 1)
+                        inputs.table.model.deleteRow(inputs.table.rowCount-1)
+                        targets.table.model.deleteRow(targets.table.rowCount-1)
                     }
                 })
             }
-            add(toolbar, "wrap")
-
-            // Stats label
-            add(statsLabel, "wrap")
 
             // Training Button
-            add(JButton("Train").apply {
+            val trainButton = JButton("Train").apply {
                 addActionListener {
                     // TODO: Make a separate commit action and then just call smileClassifier.train. See deepnet
                     // TODO: Generalize to more than one column?
@@ -181,11 +181,17 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
                         , targets.table.model.getIntColumn(0))
                     statsLabel.text = "Stats: " + smileClassifier.classifier.stats
                 }
-            }, "wrap")
+            }
 
-            // Add the data panels
-            add(inputs, "growx")
-            add(targets, "growx")
+            // Add all components
+            add(AnnotatedPropertyEditor(smileClassifier), "wrap")
+            add(JSeparator(), "growx, span, wrap")
+            add(trainButton)
+            add(statsLabel, "wrap")
+            add(JSeparator(), "span, growx, wrap")
+            add(inputs)
+            add(targets, "wrap")
+            add(addRemoveRows)
         }
 
     }
@@ -197,6 +203,13 @@ fun main() {
     val np = NetworkPanel(networkComponent)
     val classifier = with(networkComponent.network) {
         val classifier = SmileClassifier(this, SVMClassifier(), 2, 1, 4)
+        classifier.trainingInputs = arrayOf(
+                doubleArrayOf(0.0, 0.0),
+                doubleArrayOf(1.0, 0.0),
+                doubleArrayOf(0.0, 1.0),
+                doubleArrayOf(1.0, 1.0)
+            )
+        classifier.targets = intArrayOf(-1,1,1,-1)
         addNetworkModel(classifier)
         classifier
     }

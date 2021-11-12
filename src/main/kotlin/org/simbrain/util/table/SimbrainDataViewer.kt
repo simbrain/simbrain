@@ -188,6 +188,7 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
     fun deleteSelectedRows() {
         for (i in 0 until selectedRows.size) {
             // Allowing removal of all rows causes weird behavior, so we just aren't allowing it
+            //  TODO: Empty tables should be possible.
             if (rowCount <= 1) {
                 break
             }

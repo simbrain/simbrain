@@ -49,6 +49,11 @@ class BasicDataWrapper(
     }
 
     override fun deleteRow(rowIndex: Int, fireEvent: Boolean) {
+        // Allowing removal of all rows causes weird behavior, so we just aren't allowing it
+        //  TODO: Empty tables should be possible.
+        if (rowCount == 1) {
+            return
+        }
         if (validateRowIndex(rowIndex)) {
             data.removeAt(rowIndex)
             if (fireEvent) {

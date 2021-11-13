@@ -63,7 +63,16 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
                 .map { (getValueAt(it, col) as Number).toDouble() }
                 .toDoubleArray()
         }
-        throw Error("getDoubleArray called on a non-numeric column")
+        throw Error("getDoubleColumn called on a non-numeric column")
+    }
+
+    fun getFloatColumn(col: Int): FloatArray {
+        if (columns[col].isNumeric()) {
+            return (0 until rowCount)
+                .map { (getValueAt(it, col) as Number).toFloat() }
+                .toFloatArray()
+        }
+        throw Error("getFloatColumn called on a non-numeric column")
     }
 
     fun getIntColumn(col: Int): IntArray {
@@ -74,7 +83,6 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
         }
         throw Error("getIntArray called on a non-numeric column")
     }
-
 
     /**
      * Returns all double columns as an array of double arrays.
@@ -99,12 +107,28 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
             .toDoubleArray()
     }
 
+    private fun getFloatRowUnsafe(row: Int): FloatArray {
+        // No type check
+        return (0 until columnCount)
+            .map { (getValueAt(row, it) as Number).toFloat() }
+            .toFloatArray()
+    }
+
     fun getRowMajorDoubleArray(): Array<DoubleArray> {
         if (!columnsSameType(Double::class.java)) {
             throw Error("getDoubleArray called on a non-numeric column")
         }
         return (0 until rowCount)
             .map { getDoubleRowUnsafe(it) }
+            .toTypedArray()
+    }
+
+    fun getRowMajorFloatArray(): Array<FloatArray> {
+        if (!columnsSameType(Double::class.java)) {
+            throw Error("getFloatArray called on a non-numeric column")
+        }
+        return (0 until rowCount)
+            .map { getFloatRowUnsafe(it) }
             .toTypedArray()
     }
 

@@ -1,6 +1,5 @@
 package org.simbrain.network.gui.dialogs
 
-import com.sun.java.accessibility.util.AWTEventMonitor.addActionListener
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
@@ -10,8 +9,12 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.ObjectTypeEditor
+import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.createFromFloatArray
 import org.simbrain.util.widgets.EditableList
+import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.FlowLayout
 import java.util.concurrent.Executors
 import javax.swing.*
 
@@ -125,9 +128,8 @@ class LayerEditor(
 
 }
 
-
 /**
- * Show dialog for deep net traiing
+ * Show dialog for deep net training
  */
 fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
@@ -136,33 +138,30 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
     dialog.contentPane = JPanel().apply {
 
-        layout = MigLayout()
+        layout = MigLayout("wrap 3")
 
         // Data Panels
-        val dataPanels = InputTargetDataPanel().apply {
-            inputs.table.setData(deepNet.inputData)
-            targets.table.setIntegerMode(true); // TODO: Temp / for class label case only
-            targets.table.lowerBound = 0
-            targets.table.upperBound = deepNet.deepNetLayers.numberOfClasses.toInt()
-            targets.table.setData(deepNet.targetData.map { floatArrayOf(it) }.toTypedArray())
-        }
+        val inputPanel = SimbrainDataViewer(createFromFloatArray(deepNet.inputData))
+        val targetPanel = SimbrainDataViewer(createFromFloatArray(deepNet.inputData))
 
         // Optimizer
         val optimizerParams = AnnotatedPropertyEditor(deepNet.optimizerParams)
-        add(optimizerParams, "growx, span 2, wrap")
-        add(JSeparator(), "growx, span 2, wrap")
 
         // Trainer
-        val trainerPanel = JPanel()
         val trainingParams = AnnotatedPropertyEditor(deepNet.trainingParams)
-        trainerPanel.add(trainingParams)
         fun commitData() {
-            deepNet.inputData = dataPanels.inputs.table.as2DFloatArray()
-            deepNet.targetData = dataPanels.targets.table.as2DFloatArray().map { it[0] }.toFloatArray();
+            deepNet.inputData = inputPanel.model.getRowMajorFloatArray()
+            deepNet.targetData = targetPanel.model.getFloatColumn(0) // TODO: Why a single column?
             deepNet.initializeDatasets()
         }
-        trainerPanel.add(JButton("Train").apply {
+
+        // Trainer States
+        val console = JEditorPane().apply {
+            preferredSize = Dimension(300, 100)
+        }
+        val trainButton = JButton("Train").apply {
             addActionListener {
+                // TODO
                 executor.submit {
                     commitData()
                     trainingParams.commitChanges()
@@ -171,32 +170,51 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
                     deepNet.train()
                 }
             }
-        })
-        trainerPanel.add(JButton("Reset")).apply {
+        }
+        val resetButton = JButton("Reset").apply {
             addActionListener {
-                deepNet.deepNetLayers.init() // TODO: Does not work
+                if (!deepNet.deepNetLayers.isModelCompiled) {
+                    deepNet.deepNetLayers.init()
+                }
             }
         }
-        val stats = JEditorPane()
-        stats.preferredSize = Dimension(300, 100)
+        val clearWindow = JButton("Clear").apply {
+            addActionListener {
+                console.text = ""
+            }
+        }
+        val statsPanel = JPanel().apply {
+            layout = BorderLayout()
+            add(JScrollPane(console), BorderLayout.CENTER)
+            add(JPanel().apply {
+                layout = FlowLayout(FlowLayout.LEFT)
+                add(trainButton)
+                add(resetButton)
+                add(clearWindow)
+            }, BorderLayout.SOUTH)
+        }
+
+        // Register events
         deepNet.trainerEvents.onBeginTraining {
-            stats.text += "Begin training\n"
-            stats.caretPosition = stats.text.length
+            console.text += "Begin training\n"
+            console.caretPosition = console.text.length
         }
         deepNet.trainerEvents.onEndTraining {
-            stats.text += "End training\n"
-            stats.text += "Loss = ${SimbrainMath.roundDouble(deepNet.lossValue, 10)}\n"
-            stats.caretPosition = stats.text.length
+            console.text += "End training\n"
+            console.text += "Loss = ${SimbrainMath.roundDouble(deepNet.lossValue, 10)}\n"
+            console.caretPosition = console.text.length
         }
-        trainerPanel.add(JScrollPane(stats))
-        add(trainerPanel, "span 2, wrap")
-        add(JSeparator(), "growx, span 2, wrap")
 
-        add(dataPanels, "wrap")
+        // Add components to miglayout
+        add(optimizerParams, "span 1, wrap")
+        add(JSeparator(), "grow, span, wrap")
+        add(trainingParams)
+        add(statsPanel, "wrap")
+        add(JSeparator(), "grow, span, wrap")
+        add(inputPanel, "span 1, w 200:300:400, h 200!,")
+        add(targetPanel, "span 1, w 150:250:300,h 200!, wrap")
 
         dialog.addClosingTask {
-            dataPanels.inputs.applyData()
-            dataPanels.targets.applyData()
             commitData()
         }
     }
@@ -209,8 +227,8 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
 fun main() {
     // TODO: Move some of this to test classes
-    testLayerList()
-    // testTrainingDialog()
+    // testLayerList()
+    testTrainingDialog()
 }
 
 fun testTrainingDialog() {

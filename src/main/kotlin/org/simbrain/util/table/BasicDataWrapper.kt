@@ -159,6 +159,10 @@ fun createFromDoubleArray(data: Array<DoubleArray>): BasicDataWrapper {
     return BasicDataWrapper(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
 }
 
+fun createFromFloatArray(data: Array<FloatArray>): BasicDataWrapper {
+    return BasicDataWrapper(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
+}
+
 fun createFromColumn(data: DoubleArray): BasicDataWrapper {
     return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
 }

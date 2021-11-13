@@ -11,6 +11,7 @@ import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.topLeftLocation
 import org.simbrain.network.translate
+import org.simbrain.util.magnitude
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import org.simbrain.util.times
@@ -65,7 +66,10 @@ class PlacementManager() {
     var deltaDrag: Point2D? = null
         set(value) {
             // println("set deltaDrag = $value")
-            field = value
+            // Mouse clicks are treated as drag events so need to disregard very small deltas
+            if (value != null && value.magnitude > .1) {
+                field = value
+            }
         }
 
     /**

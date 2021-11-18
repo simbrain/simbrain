@@ -159,7 +159,7 @@ class Column(
     val columName: String,
 
     @UserParameter(label = "Type", order = 2)
-    val type: DataType = DataType.DoubleType
+    var type: DataType = DataType.DoubleType
 ) : EditableObject {
 
     @UserParameter(label = "Enabled", order = 10)

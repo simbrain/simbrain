@@ -51,6 +51,9 @@ fun getOneHotArray(index: Int, size: Int, amount: Double = 1.0): DoubleArray {
 fun toFloatArray(array: DoubleArray): FloatArray {
     return array.map { it.toFloat() }.toFloatArray()
 }
+fun toDoubleArray(array: FloatArray): DoubleArray {
+    return array.map { it.toDouble() }.toDoubleArray()
+}
 
 fun Any?.isRealValued(): Boolean {
         return this is Double || this is Float

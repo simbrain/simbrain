@@ -15,6 +15,7 @@ import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toFloatArray
 import org.simbrain.workspace.AttributeContainer
 import smile.math.matrix.Matrix
@@ -42,6 +43,10 @@ class DeepNet(
      * Output matrix
      */
     private var outputs: Matrix? = null
+
+    @UserParameter(label = "Output Probabilities", description = "If yes, output probabilities over class labels, " +
+            "else output a one-hot encoded class label", order = 10)
+    var outputProbabilities: Boolean = false
 
     /**
      * The data edited.
@@ -131,19 +136,21 @@ class DeepNet(
         get() = super.getInputs().col(0)
 
     override fun update() {
-        // TODO: Still specific to one-hot
         if (deepNetLayers.isModelInitialized) {
-            val prediction = deepNetLayers.predict(floatInputs)
-            println("Output = " + prediction)
-            println("Predict softly:" + deepNetLayers.predictSoftly(floatInputs).joinToString())
-            // TODO: Not sure how to use that function.
-            // println("Predict with activations:" +
-            //         (deepNetLayers.predictAndGetActivations(floatInputs).second.joinToString()))
-            outputs = getOneHotMat(prediction,outputSize()+1)
+            if (outputProbabilities) {
+                val predictions = deepNetLayers.predictSoftly(floatInputs)
+                outputs = Matrix(toDoubleArray(predictions))
+                // println("Output (probabilities):" + predictions.joinToString())
+            } else {
+                val prediction = deepNetLayers.predict(floatInputs)
+                outputs = getOneHotMat(prediction,outputSize())
+                // println("Output (one hot):" + prediction)
+            }
         } else {
             outputs = Matrix(outputSize(), 1)
         }
         events.fireUpdated()
+        inputs.mul(0.0) // clear inputs
     }
 
     override fun getOutputs(): Matrix? {
@@ -156,7 +163,6 @@ class DeepNet(
     }
 
     override fun outputSize(): Int {
-        // TODO: Specific to one-hot case
         return deepNetLayers.layers.last().outputShape[1].toInt();
     }
 

@@ -189,25 +189,45 @@ val DataViewerTable.importArff
     }
 
 val DataViewerTable.importCsv
-    get() = createAction(
-        "menu_icons/Import.png",
-        "Import csv...",
-        "Import comma separated values file"
-    ) {
-        val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
-        val csvFile = chooser.showOpenDialog()
-        if (csvFile != null) {
-            model.let {
-                if (it is BasicDataWrapper) {
-                    it.data = createFrom2DArray(Utils.getStringMatrix(csvFile)).data
+    get() = importCSVAction()
+
+fun DataViewerTable.importCSVAction(fixedColumns: Boolean = false) = createAction(
+    "menu_icons/Import.png",
+    "Import csv...",
+    "Import comma separated values file"
+) {
+    val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
+    val csvFile = chooser.showOpenDialog()
+    fun checkColumns(numColumns: Int): Boolean {
+        if (numColumns != model.columnCount) {
+            JOptionPane.showOptionDialog(
+                null,
+                "Trying to import a table with the wrong number of columns ",
+                "Warning",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, null, null)
+            return false
+        }
+        return true
+    }
+    if (csvFile != null) {
+        model.let {
+            if (it is BasicDataWrapper) {
+                val importedData = createFrom2DArray(Utils.getStringMatrix(csvFile))
+                if (checkColumns(importedData.columnCount)) {
+                    it.data = importedData.data
                     it.fireTableStructureChanged()
-                } else if (it is DataFrameWrapper) {
-                    it.df = Read.csv(csvFile.absolutePath)
+                }
+            } else if (it is DataFrameWrapper) {
+                val data = Read.csv(csvFile.absolutePath)
+                if (checkColumns(data.ncols())) {
+                    it.df = data
                     it.fireTableStructureChanged()
                 }
             }
         }
     }
+}
 
 val DataViewerTable.editColumnAction
     get() = createAction(
@@ -226,6 +246,5 @@ val DataViewerTable.editColumnAction
                 dialog.setLocationRelativeTo(null)
                 dialog.isVisible = true
             }
-
         }
     }

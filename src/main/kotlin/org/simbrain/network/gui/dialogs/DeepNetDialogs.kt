@@ -5,12 +5,12 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.kotlindl.*
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.math.ProbDistributions.UniformDistribution
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.ObjectTypeEditor
-import org.simbrain.util.table.SimbrainDataViewer
-import org.simbrain.util.table.createFromFloatArray
+import org.simbrain.util.table.*
 import org.simbrain.util.widgets.EditableList
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -84,6 +84,7 @@ fun getEditor(obj: CopyableObject): JPanel {
  */
 class LayerEditor(
     val layers: ArrayList<TFLayer<*>>,
+    // True  only at creation when layers can be added or removed.
     val addRemove: Boolean = true
 ) : EditableList(addRemove) {
 
@@ -140,18 +141,41 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
         layout = MigLayout("wrap 3")
 
+        fun SimbrainDataViewer.addFixedColumnActions() {
+            addAction(table.importCSVAction(true))
+            addAction(table.zeroFillAction)
+            addAction(table.randomizeColumnAction)
+            addAction(table.editRandomizerAction)
+            addAction(table.editColumnAction)
+        }
+
         // Data Panels
-        val inputPanel = SimbrainDataViewer(createFromFloatArray(deepNet.inputData))
-        val targetPanel = SimbrainDataViewer(createFromFloatArray(deepNet.inputData))
+        val inputPanel = SimbrainDataViewer(createFromFloatArray(deepNet.inputData), useDefaultToolbarAndMenu =
+        false).apply {
+            addFixedColumnActions()
+            addAction(table.randomizeAction)
+        }
+        val targetPanel = SimbrainDataViewer(createFromColumn(deepNet.targetData), useDefaultToolbarAndMenu =
+        false).apply {
+            addFixedColumnActions()
+            val numClasses = deepNet.deepNetLayers.numberOfClasses.toInt()
+            if (numClasses != -1)  {
+                table.model.columns[0].type = Column.DataType.IntType
+                table.model.columns[0].columnRandomizer.probabilityDistribution =
+                    UniformDistribution.builder().upperBound(numClasses.toDouble()).lowerBound(0.0).build()
+            }
+        }
 
         // Optimizer
         val optimizerParams = AnnotatedPropertyEditor(deepNet.optimizerParams)
 
         // Trainer
         val trainingParams = AnnotatedPropertyEditor(deepNet.trainingParams)
+
+        // Helper to commit data from data tables
         fun commitData() {
             deepNet.inputData = inputPanel.model.getRowMajorFloatArray()
-            deepNet.targetData = targetPanel.model.getFloatColumn(0) // TODO: Why a single column?
+            deepNet.targetData = targetPanel.model.getFloatColumn(0)
             deepNet.initializeDatasets()
         }
 

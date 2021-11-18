@@ -122,10 +122,10 @@ fun main() {
         // println("Prediction: " + it.predictSoftly(train.getX(0)).contentToString()) // Predict outputs a class label
         //
         // // Print and return activations, which  are massive. We may want to get them though for graphical purposes
-        // val (first, second) = it.predictAndGetActivations(train.getX(0))
-        // println("Class index: " + first)
-        // println("Activations: " + second.map { e -> (e as Array<*>).contentDeepToString()}
-        //     .joinToString ("\n-----------\n"))
+        val (first, second) = it.predictAndGetActivations(train.getX(0))
+        println("Class index: " + first)
+        println("Activations: " + second.map { e -> (e as Array<*>).contentDeepToString()}
+            .joinToString ("\n-----------\n"))
 
         it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
 

@@ -327,7 +327,9 @@ public class Parameter implements Comparable<Parameter> {
 
             value = constructor.newInstance(value);
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw new RuntimeException("Something went wrong while interpreting the given value: " + e.getMessage(), e);
+            var message = "Something went wrong while interpreting the given value: " + value + "\n" + e.getMessage();
+            System.err.println(message);
+            throw new RuntimeException(message, e);
         }
 
         return value;

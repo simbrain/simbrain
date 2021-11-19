@@ -28,6 +28,10 @@ public class NumericWidget extends JPanel {
      */
     private JButton randomizeButton = new JButton(ResourceManager.getImageIcon("menu_icons/Rand.png"));
 
+    /**
+     * Class associated with the underlying parameter to facilitate type conversions. Currently only used for real
+     * valued numbers
+     */
     private Class<?> paramClass;
 
     /**

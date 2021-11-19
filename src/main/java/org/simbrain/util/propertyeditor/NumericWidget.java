@@ -28,6 +28,8 @@ public class NumericWidget extends JPanel {
      */
     private JButton randomizeButton = new JButton(ResourceManager.getImageIcon("menu_icons/Rand.png"));
 
+    private Class<?> paramClass;
+
     /**
      * Construct a numeric widget.
      *
@@ -54,6 +56,8 @@ public class NumericWidget extends JPanel {
         randomizeButton.setToolTipText("Randomize this parameter. Note that upon pressing OK the value" +
             " will be updated immediately.");
         String probDist =parameter.getAnnotation().probDist();
+
+        paramClass = parameter.getType();
 
         // Handle randomizer button
         if (!probDist.isEmpty()) {
@@ -107,6 +111,15 @@ public class NumericWidget extends JPanel {
     }
 
     public Object getValue() {
+        if (paramClass == Float.class || paramClass == float.class) {
+            return Float.valueOf("" + spinner.getValue());
+        }
+        if (paramClass == Double.class || paramClass == double.class) {
+            return Double.valueOf("" + spinner.getValue());
+        }
+        if (paramClass == Integer.class || paramClass == int.class) {
+            return Integer.valueOf("" + spinner.getValue());
+        }
         return spinner.getValue();
     }
 

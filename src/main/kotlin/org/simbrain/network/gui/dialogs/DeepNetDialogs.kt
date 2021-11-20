@@ -29,12 +29,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
 
     val layerList = LayerEditor(
         arrayListOf(TFInputLayer(), TFDenseLayer(), TFDenseLayer())
-    ).apply {
-        // Custom action for the "+" Button. Adds a flatten layer by default.
-        addElementTask = {
-            addElement(getEditor(TFDenseLayer()))
-        }
-    }
+    )
 
     dialog.contentPane = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
@@ -43,10 +38,11 @@ fun NetworkPanel.showDeepNetCreationDialog() {
         add(layerList)
     }
 
+    dialog.setClosingCheck { layerList.checkValidLayers() }
     dialog.addClosingTask {
         ape.commitChanges()
         layerList.commitChanges()
-        val deepNet = creator.create(network, layerList.inputLayer.n_in, layerList.layers)
+        val deepNet = creator.create(network, layerList.layers)
         network.addNetworkModel(deepNet)
     }
     dialog.pack()
@@ -80,7 +76,7 @@ fun getEditor(obj: CopyableObject): JPanel {
 }
 
 /**
- * Assumes first layer is an input layer
+ * Assumes first layer is an input layer. Populated with [TFLayer] objects which can then be used to create a [DeepNet].
  */
 class LayerEditor(
     val layers: ArrayList<TFLayer<*>>,
@@ -89,18 +85,13 @@ class LayerEditor(
 ) : EditableList(addRemove) {
 
     init {
-        layers.forEach() {
-            if (it is TFInputLayer) {
-                addElement(AnnotatedPropertyEditor(it))
-            } else {
-                addElement(getEditor(it))
-            }
+        // By default add dense layers
+        newElementTask = {
+            addElement(getEditor(TFDenseLayer()))
         }
-    }
-
-    fun addLayer(layer: TFLayer<*>) {
-        layers.add(layer)
-        addElement(getEditor(layer))
+        layers.forEach() {
+            addElement(getEditor(it))
+        }
     }
 
     override fun removeElement() {
@@ -113,15 +104,29 @@ class LayerEditor(
     val inputLayer: TFInputLayer
         get() = layers.first() as TFInputLayer
 
-    val mainLayers: List<TFLayer<*>>
-        get() = layers.subList(1, layers.size)
+    /**
+     * Check that the layers currently in the list are a valid kotlindl network.
+     */
+    fun checkValidLayers(): Boolean {
+        var validLayerSequence = true
+        var errorMessage = "Invalid sequence of layers"
+        components.filterIsInstance<ObjectTypeEditor>().map { it.value }.windowed(2) { (first, second) ->
+            if (second is TFDenseLayer) {
+                if (first !is TFFlattenLayer && first !is TFDenseLayer && first !is TFInputLayer) {
+                    errorMessage = "Dense layers must come after input, flatten, or dense layers"
+                    validLayerSequence = false
+                }
+            }
+        }
+        if (!validLayerSequence) {
+            JOptionPane.showMessageDialog(null, errorMessage)
+        }
+        return validLayerSequence
+    }
 
     fun commitChanges() {
-        // Yulin
         layers.clear();
-        (components.first() as AnnotatedPropertyEditor).commitChanges()
-        layers.add((components.first() as AnnotatedPropertyEditor).editedObject as TFLayer<*>)
-        components.subList(1, components.size).filterIsInstance<ObjectTypeEditor>().forEach {
+        components.filterIsInstance<ObjectTypeEditor>().forEach {
             it.commitChanges()
             layers.add(it.value as TFLayer<*>)
         }
@@ -150,16 +155,21 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         }
 
         // Data Panels
-        val inputPanel = SimbrainDataViewer(createFromFloatArray(deepNet.inputData), useDefaultToolbarAndMenu =
-        false).apply {
+        val inputPanel = SimbrainDataViewer(
+            createFromFloatArray(deepNet.inputData), useDefaultToolbarAndMenu =
+            false
+        ).apply {
             addFixedColumnActions()
             addAction(table.randomizeAction)
         }
-        val targetPanel = SimbrainDataViewer(createFromColumn(deepNet.targetData), useDefaultToolbarAndMenu =
-        false).apply {
+
+        val targetPanel = SimbrainDataViewer(
+            createFromColumn(deepNet.targetData), useDefaultToolbarAndMenu =
+            false
+        ).apply {
             addFixedColumnActions()
             val numClasses = deepNet.deepNetLayers.numberOfClasses.toInt()
-            if (numClasses != -1)  {
+            if (numClasses != -1) {
                 table.model.columns[0].type = Column.DataType.IntType
                 table.model.columns[0].columnRandomizer.probabilityDistribution =
                     UniformDistribution.builder().upperBound(numClasses.toDouble()).lowerBound(0.0).build()
@@ -251,14 +261,15 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
 fun main() {
     // TODO: Move some of this to test classes
-    // testLayerList()
-    testTrainingDialog()
+    testLayerList()
+    // testTrainingDialog()
 }
 
 fun testTrainingDialog() {
     val dn = DeepNet(
-        Network(), 3,
-        arrayListOf(TFInputLayer(2), TFDenseLayer(2), TFDenseLayer(1)), 4
+        Network(),
+        arrayListOf(TFInputLayer(2), TFDenseLayer(2), TFDenseLayer(1)),
+        4
     )
     dn.inputData = arrayOf(floatArrayOf(0f, 0f), floatArrayOf(1f, 0f), floatArrayOf(0f, 1f), floatArrayOf(1f, 1f))
     dn.targetData = floatArrayOf(0f, 1f, 1f, 0f)
@@ -269,16 +280,13 @@ fun testTrainingDialog() {
 fun testLayerList() {
 
     StandardDialog().apply {
-        val layerEditor = LayerEditor(arrayListOf(TFInputLayer(), TFConv2DLayer(), TFDenseLayer())).apply {
-            addElementTask = {
-                addLayer(TFFlattenLayer())
-            }
-        }
+        val layerEditor = LayerEditor(arrayListOf(TFInputLayer(), TFConv2DLayer(), TFDenseLayer()))
+        setClosingCheck { layerEditor.checkValidLayers() }
         addClosingTask {
             println("Closing..")
             layerEditor.commitChanges()
-            println("Input layer: ${layerEditor.inputLayer.create()}")
-            layerEditor.mainLayers.forEach { l -> println("Layer: ${l.create()}") }
+            val dn = DeepNet(Network(), layerEditor.layers)
+            // println(dn.deepNetLayers.summary())
         }
         contentPane = layerEditor
         pack()

@@ -24,7 +24,10 @@ class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
     override var layer: Dense? = null
 
     override fun create() : Dense {
-        return Dense(nout).also {
+        return Dense(
+            nout,
+            activation = activations
+        ).also {
             layer = it
         }
     }

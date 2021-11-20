@@ -27,10 +27,9 @@ import java.util.*
  */
 class DeepNet(
     private val network: Network,
-    val inputSize: Int,
     val editableLayers: ArrayList<TFLayer<*>>,
     nsamples: Int = 10
-) : ArrayLayer(network, inputSize),
+): ArrayLayer(network, (editableLayers[0] as TFInputLayer).size),
     AttributeContainer,
     EditableObject {
 
@@ -162,6 +161,10 @@ class DeepNet(
         super.delete()
     }
 
+    override fun inputSize(): Int {
+        return deepNetLayers.layers.first().outputShape[1].toInt();
+    }
+
     override fun outputSize(): Int {
         return deepNetLayers.layers.last().outputShape[1].toInt();
     }
@@ -175,7 +178,7 @@ class DeepNet(
     }
 
     override fun toString(): String {
-        return "${label}: : $inputSize -> ${outputSize()}\n" +
+        return "${label}: : ${inputSize()} -> ${outputSize()}\n" +
                 deepNetLayers.layers.joinToString("\n") { it.name }
     }
 
@@ -205,8 +208,8 @@ class DeepNet(
             return "Deep Network"
         }
 
-        fun create(net: Network, ninputs: Int, layers: ArrayList<TFLayer<*>>): DeepNet {
-            return DeepNet(net, ninputs, layers)
+        fun create(net: Network, layers: ArrayList<TFLayer<*>>): DeepNet {
+            return DeepNet(net, layers)
         }
     }
 

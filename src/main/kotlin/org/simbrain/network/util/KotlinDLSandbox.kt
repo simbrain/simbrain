@@ -36,6 +36,7 @@ public val lenet5Classic = Sequential.of(
     Conv2D(
         filters = 6,
         kernelSize = longArrayOf(5, 5),
+        //  batch, height, width, channels
         strides = longArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
         kernelInitializer = GlorotNormal(SEED),
@@ -43,8 +44,8 @@ public val lenet5Classic = Sequential.of(
         padding = ConvPadding.SAME
     ),
     AvgPool2D(
-        poolSize = intArrayOf(1, 2, 2, 1),
-        strides = intArrayOf(1, 2, 2, 1),
+        poolSize = intArrayOf(1, 2, 2, 1),  // 2x2 pool filters
+        strides = intArrayOf(1, 2, 2, 1),   // moving  2 steps at a time
         padding = ConvPadding.VALID
     ),
     Conv2D(
@@ -108,29 +109,29 @@ fun main() {
         )
 
         it.summary()
-        it.init()
-
-        // Studying prediction functions. Run these before training to save time.
-        println("Number of classes " + it.numberOfClasses)
-        println("Output shape "  + it.layers.last().outputShape[1].toInt())
-
+        // it.init()
         //
-        // // Predict outputs a class label
-        // // println("Prediction: " + it.predict(train.getX(0)))
+        // // Studying prediction functions. Run these before training to save time.
+        // println("Number of classes " + it.numberOfClasses)
+        // println("Output shape "  + it.layers.last().outputShape[1].toInt())
         //
-        // // Predict softly outputs a probability for each class label
-        // println("Prediction: " + it.predictSoftly(train.getX(0)).contentToString()) // Predict outputs a class label
+        // //
+        // // // Predict outputs a class label
+        // // // println("Prediction: " + it.predict(train.getX(0)))
+        // //
+        // // // Predict softly outputs a probability for each class label
+        // // println("Prediction: " + it.predictSoftly(train.getX(0)).contentToString()) // Predict outputs a class label
+        // //
+        // // // Print and return activations, which  are massive. We may want to get them though for graphical purposes
+        // val (first, second) = it.predictAndGetActivations(train.getX(0))
+        // println("Class index: " + first)
+        // println("Activations: " + second.map { e -> (e as Array<*>).contentDeepToString()}
+        //     .joinToString ("\n-----------\n"))
+
+        // it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
         //
-        // // Print and return activations, which  are massive. We may want to get them though for graphical purposes
-        val (first, second) = it.predictAndGetActivations(train.getX(0))
-        println("Class index: " + first)
-        println("Activations: " + second.map { e -> (e as Array<*>).contentDeepToString()}
-            .joinToString ("\n-----------\n"))
-
-        it.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
-
-        val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
-
-        println("Accuracy: $accuracy")
+        // val accuracy = it.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+        //
+        // println("Accuracy: $accuracy")
     }
 }

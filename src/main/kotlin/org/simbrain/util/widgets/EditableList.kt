@@ -9,14 +9,21 @@ import javax.swing.*
 /**
  * A list of graphical items (JComponents) that can be added or removed.
  *
+ * @param showAddRemove if true, show the +/- signs. In that case [newElementTask] must be defined for the + button.
+ *
  * @author Jeff Yoshimi
  */
-open class EditableList(val showAddRemove: Boolean = true) : JPanel() {
+open class EditableList(private val showAddRemove: Boolean = true) : JPanel() {
+
 
     val components: MutableList<JComponent> = arrayListOf()
     val mainPanel = EditableItemPanel(components)
 
-    // Yulin
+    /**
+     * This is the block that gets executed when the plus button is pressed.
+     */
+    var newElementTask: () -> Unit = {}
+
     init {
 
         layout = BorderLayout()
@@ -28,7 +35,7 @@ open class EditableList(val showAddRemove: Boolean = true) : JPanel() {
                 add(JButton(ResourceManager.getImageIcon("menu_icons/plus.png")).apply {
                     toolTipText = "Add an item to the list"
                     addActionListener {
-                        addElementTask.invoke()
+                        newElementTask.invoke()
                     }
                 })
                 add(JButton(ResourceManager.getImageIcon("menu_icons/minus.png")).apply {
@@ -40,11 +47,6 @@ open class EditableList(val showAddRemove: Boolean = true) : JPanel() {
             }
         })
     }
-
-    /**
-     * Allows a custom add action to be set.
-     */
-    var addElementTask: () -> Unit = {}
 
     fun addElement(c: JComponent) {
         components.add(c)

@@ -21,13 +21,11 @@ package org.simbrain.util;
 import org.simbrain.util.genericframe.GenericJDialog;
 
 import javax.swing.*;
-import java.security.Key;
-import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * <b>StandardDialog</b> implements a standard data entry dialog with "Ok" and
@@ -101,6 +99,12 @@ public class StandardDialog extends GenericJDialog {
      * are _not_ invoked).
      */
     private List<Runnable> invokeWhenClosing = new ArrayList<>();
+
+    /**
+     * A lambda which, if false, prevents the dialog from being closed when the OK button is pressed. Can be used to
+     * check the integrity of whatever is being set before it is committed.
+     */
+    private Supplier<Boolean> closingCheck = () -> true;
 
     /**
      * This method is the default constructor.
@@ -219,10 +223,17 @@ public class StandardDialog extends GenericJDialog {
         invokeWhenClosing.add(task);
     }
 
+    public void setClosingCheck(Supplier<Boolean> closingCheck) {
+        this.closingCheck = closingCheck;
+    }
+
     /**
      * Override to perform specific clean up when dialog closed.
      */
     protected void closeDialogOk() {
+        if (!closingCheck.get()) {
+            return;
+        }
         for (Runnable task : invokeWhenClosing) {
             task.run();
         }

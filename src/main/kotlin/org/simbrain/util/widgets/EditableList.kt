@@ -27,7 +27,7 @@ open class EditableList(private val showAddRemove: Boolean = true) : JPanel() {
     init {
 
         layout = BorderLayout()
-        preferredSize = Dimension(400, 300)
+        preferredSize = Dimension(400, 450)
 
         add("Center", JScrollPane(mainPanel))
         add("South", JToolBar().apply {

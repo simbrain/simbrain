@@ -9,12 +9,8 @@ import java.awt.*;
  */
 public class IntArrayWidget extends JPanel {
 
-    // TODO: There may be a way to abstract betwee this and DoubleArrayWidget, but for now this was easy enough
-
-    /**
-     * Values this widget holds
-     */
-    private int[] values;
+    // TODO: Abstract between this and DoubleArrayWidget?
+    // TODO: Write values as soon as cell is changed (now must click outside a cell)
 
     /**
      * The table component
@@ -42,7 +38,11 @@ public class IntArrayWidget extends JPanel {
      * @return the values
      */
     public int[] getValues() {
-        return values;
+        int[] vals = new int[model.getRowCount()];
+        for (int i = 0; i < vals.length; i++) {
+            vals[i] = Integer.parseInt(model.getValueAt(i,0).toString());
+        }
+        return vals;
     }
 
     /**
@@ -50,7 +50,6 @@ public class IntArrayWidget extends JPanel {
      * @param values the values to set
      */
     public void setValues(int[] values) {
-        this.values = values;
         if (values.length != model.getRowCount()) {
             model = new DefaultTableModel(values.length, 1);
         }

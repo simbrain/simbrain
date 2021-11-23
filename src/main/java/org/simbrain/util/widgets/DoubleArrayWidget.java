@@ -9,12 +9,6 @@ import java.awt.*;
  * Moved from ReflectivePropertyEditor.
  */
 public class DoubleArrayWidget extends JPanel {
-
-    /**
-     * Values this widget holds
-     */
-    private double[] values;
-
     /**
      * The table component
      */
@@ -41,7 +35,11 @@ public class DoubleArrayWidget extends JPanel {
      * @return the values
      */
     public double[] getValues() {
-        return values;
+        double[] vals = new double[model.getRowCount()];
+        for (int i = 0; i < vals.length; i++) {
+            vals[i] = Double.parseDouble(model.getValueAt(i,0).toString());
+        }
+        return vals;
     }
 
     /**
@@ -49,7 +47,6 @@ public class DoubleArrayWidget extends JPanel {
      * @param values the values to set
      */
     public void setValues(double[] values) {
-        this.values = values;
         if (values.length != model.getRowCount()) {
             model = new DefaultTableModel(values.length, 1);
         }

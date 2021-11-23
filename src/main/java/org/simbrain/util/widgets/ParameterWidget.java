@@ -330,8 +330,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             return ((DoubleArrayWidget) component).getValues();
         } else if (parameter.isIntArray()) {
             return ((IntArrayWidget) component).getValues();
-        } else if (parameter.isDoubleArray()) {
-            return ((DoubleArrayWidget) component).getValues();
         } else if (parameter.getAnnotation().isObjectType()) {
             return ((ObjectTypeEditor) component).getValue();
         } else if (parameter.isEnum()) {

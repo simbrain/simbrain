@@ -280,7 +280,7 @@ fun testTrainingDialog() {
 fun testLayerList() {
 
     StandardDialog().apply {
-        val layerEditor = LayerEditor(arrayListOf(TFInputLayer(), TFConv2DLayer(), TFDenseLayer()))
+        val layerEditor = LayerEditor(arrayListOf(TFInputLayer(), TFConv2DLayer(), TFFlattenLayer(), TFDenseLayer()))
         setClosingCheck { layerEditor.checkValidLayers() }
         addClosingTask {
             println("Closing..")

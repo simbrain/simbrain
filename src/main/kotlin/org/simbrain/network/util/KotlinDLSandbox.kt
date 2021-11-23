@@ -109,6 +109,7 @@ fun main() {
         )
 
         it.summary()
+        println(it.layers.map { l -> l.outputShape.rank() }.joinToString(","))
         // it.init()
         //
         // // Studying prediction functions. Run these before training to save time.

@@ -35,6 +35,19 @@ abstract class TFLayer<T : Layer> : CopyableObject {
     abstract fun create(): T
 
     /**
+     * A concept of rank usable in Simbrain. Takes the tensor flow rank, ignores the first "batch" component, and
+     * ignores all components of size 1 or less.
+     *
+     * @See https://www.tensorflow.org/api_docs/python/tf/shape
+     */
+    fun getRank(): Int? {
+        return layer?.let{ l ->
+            val numDimsOne = l.outputShape.dims().count { it <= 1L }
+            return l.outputShape.rank() - numDimsOne
+        }
+    }
+
+    /**
      * To get a static method
      */
     companion object {

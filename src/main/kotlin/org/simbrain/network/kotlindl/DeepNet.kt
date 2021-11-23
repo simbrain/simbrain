@@ -27,9 +27,9 @@ import java.util.*
  */
 class DeepNet(
     private val network: Network,
-    val editableLayers: ArrayList<TFLayer<*>>,
+    val tfLayers: ArrayList<TFLayer<*>>,
     nsamples: Int = 10
-): ArrayLayer(network, (editableLayers[0] as TFInputLayer).size),
+): ArrayLayer(network, (tfLayers[0] as TFInputLayer).size),
     AttributeContainer,
     EditableObject {
 
@@ -90,7 +90,7 @@ class DeepNet(
     }
 
     fun buildNetwork() {
-        val layers = editableLayers.map { it.create() }.toMutableList()
+        val layers = tfLayers.map { it.create() }.toMutableList()
         deepNetLayers = Sequential.of(layers)
         deepNetLayers.also {
             it.compile(
@@ -167,6 +167,20 @@ class DeepNet(
 
     override fun outputSize(): Int {
         return deepNetLayers.layers.last().outputShape[1].toInt();
+    }
+
+    /**
+     * See [TFLayer.getRank]
+     */
+    fun inputRank(): Int? {
+        return tfLayers.first().getRank()
+    }
+
+    /**
+     * See [TFLayer.getRank]
+     */
+    fun outputRank(): Int? {
+        return tfLayers.last().getRank()
     }
 
     override fun getNetwork(): Network {

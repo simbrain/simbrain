@@ -55,7 +55,7 @@ fun getDeepNetEditDialog(deepNet: DeepNet): StandardDialog {
     val editor = AnnotatedPropertyEditor(deepNet)
     val panel = JPanel(MigLayout())
     panel.add(editor, "wrap")
-    val layerEditor = LayerEditor(deepNet.editableLayers, false)
+    val layerEditor = LayerEditor(deepNet.tfLayers, false)
     panel.add(layerEditor)
     val dialog = StandardDialog()
     dialog.contentPane = panel
@@ -119,7 +119,7 @@ class LayerEditor(
             }
         }
         if (!validLayerSequence) {
-            JOptionPane.showMessageDialog(null, errorMessage)
+            JOptionPane.showMessageDialog(null, "Invalid layer sequence: " + errorMessage)
         }
         return validLayerSequence
     }
@@ -286,7 +286,9 @@ fun testLayerList() {
             println("Closing..")
             layerEditor.commitChanges()
             val dn = DeepNet(Network(), layerEditor.layers)
+            println(dn.tfLayers.map { it.getRank() }.joinToString(","))
             // println(dn.deepNetLayers.summary())
+
         }
         contentPane = layerEditor
         pack()

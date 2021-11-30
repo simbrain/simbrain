@@ -82,7 +82,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         if (!conditionalVisibilityMethod.isEmpty()) {
             try {
                 Method method = parent.getEditedObjects().get(0).getClass().
-                        getDeclaredMethod(conditionalVisibilityMethod);
+                        getMethod(conditionalVisibilityMethod);
                 Boolean enabled = (Boolean) method.invoke(parent.getEditedObjects().get(0));
                 component.setVisible(enabled);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {

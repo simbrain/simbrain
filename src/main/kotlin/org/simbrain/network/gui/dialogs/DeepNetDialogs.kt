@@ -28,7 +28,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
     val ape: AnnotatedPropertyEditor
 
     val layerList = LayerEditor(
-        arrayListOf(TFInputLayer(), TFDenseLayer(), TFDenseLayer())
+        arrayListOf(TFInputLayer(10), TFDenseLayer(), TFDenseLayer())
     )
 
     dialog.contentPane = JPanel().apply {
@@ -261,14 +261,14 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
 fun main() {
     // TODO: Move some of this to test classes
-    testLayerList()
-    // testTrainingDialog()
+//    testLayerList()
+     testTrainingDialog()
 }
 
 fun testTrainingDialog() {
     val dn = DeepNet(
         Network(),
-        arrayListOf(TFInputLayer(2), TFDenseLayer(2), TFDenseLayer(1)),
+        arrayListOf(TFInputLayer(2), TFDenseLayer(5), TFDenseLayer(1)),
         4
     )
     dn.inputData = arrayOf(floatArrayOf(0f, 0f), floatArrayOf(1f, 0f), floatArrayOf(0f, 1f), floatArrayOf(1f, 1f))

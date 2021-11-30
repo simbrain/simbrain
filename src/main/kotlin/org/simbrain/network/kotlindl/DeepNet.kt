@@ -5,8 +5,6 @@ import org.jetbrains.kotlinx.dl.api.core.callback.Callback
 import org.jetbrains.kotlinx.dl.api.core.history.TrainingHistory
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
-import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
-import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.simbrain.network.core.Network
@@ -29,7 +27,7 @@ class DeepNet(
     private val network: Network,
     val tfLayers: ArrayList<TFLayer<*>>,
     nsamples: Int = 10
-): ArrayLayer(network, (tfLayers[0] as TFInputLayer).size),
+): ArrayLayer(network, (tfLayers[0] as TFInputLayer).rows),
     AttributeContainer,
     EditableObject {
 
@@ -94,7 +92,7 @@ class DeepNet(
         deepNetLayers = Sequential.of(layers)
         deepNetLayers.also {
             it.compile(
-                optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
+                optimizer = optimizerParams.optimizerWrapper.optimizer,
                 loss = optimizerParams.lossFunction,
                 metric = optimizerParams.metric,
                 callback = object: Callback() {
@@ -124,8 +122,10 @@ class DeepNet(
     }
 
     fun train() {
+        // Fixing batch size to 1 to make things simpler
+        // TODO: Think about this...
         deepNetLayers.fit(trainingDataset, testingDataset,
-            trainingParams.epochs, trainingParams.batchSize, 5)
+            trainingParams.epochs, 1, 1)
     }
 
     val floatInputs: FloatArray
@@ -141,9 +141,12 @@ class DeepNet(
                 outputs = Matrix(toDoubleArray(predictions))
                 // println("Output (probabilities):" + predictions.joinToString())
             } else {
-                val prediction = deepNetLayers.predict(floatInputs)
+                val (prediction, activations) = deepNetLayers.predictAndGetActivations(floatInputs)
                 outputs = getOneHotMat(prediction,outputSize())
-                // println("Output (one hot):" + prediction)
+                 println("""
+                        Output (one hot): ${prediction}
+                        Activations: ${activations}
+                     """.trimIndent())
             }
         } else {
             outputs = Matrix(outputSize(), 1)
@@ -232,10 +235,7 @@ class DeepNet(
 class TrainingParameters (
 
     @UserParameter(label="Epochs", order = 10)
-    var epochs: Int = 1000,
-
-    @UserParameter(label="BatchSize", order = 20)
-    var batchSize: Int = 10,
+    var epochs: Int = 100,
 
 ): EditableObject {
     override fun getName(): String {
@@ -246,7 +246,7 @@ class TrainingParameters (
 class OptimizerParameters (
 
     @UserParameter(label="Optimizer", isObjectType = true, showDetails = false, order = 10)
-    var optimizer: OptimizerWrapper = AdamWrapper(),
+    var optimizerWrapper: OptimizerWrapper = AdamWrapper(),
 
     @UserParameter(label="Loss Function", order = 20)
     var lossFunction: Losses = Losses.MSE,

@@ -7,19 +7,29 @@ import org.simbrain.util.toLongArray
 /**
  * Wrapper for tensor flow input layer
  */
-class TFInputLayer(val size: Int = 5) : TFLayer<Input>() {
+class TFInputLayer(val rows: Int = 10, val cols: Int = 1, val channels: Int = 1) : TFLayer<Input>() {
 
-    // TODO: Should  argument to constructor be a shape?
-
-    // TODO: Improve and work through cases
-    @UserParameter(label = "Input shape", order = 20)
-    var inputShape = intArrayOf(size,25,1)
+    // TODO: Possibly break out into three scalar parameters
+    @UserParameter(label = "Input shape", order = 20, conditionalVisibilityMethod = "isInitialized")
+    var inputShape = intArrayOf(rows, cols, channels)
 
     override var layer: Input? = null
 
     override fun create() : Input {
-        return Input(*inputShape.toLongArray()).also {
-            layer = it
+        // Hack to convert from shape array to var-args.
+        // TODO.
+        if (cols <= 1) {
+            return Input(inputShape[0].toLong()).also {
+                layer = it
+            }
+        } else if (channels <= 1) {
+            return Input(inputShape[0].toLong(), inputShape[1].toLong()).also {
+                layer = it
+            }
+        } else {
+            return Input(inputShape[0].toLong(), inputShape[1].toLong(), inputShape[2].toLong()).also {
+                layer = it
+            }
         }
     }
 

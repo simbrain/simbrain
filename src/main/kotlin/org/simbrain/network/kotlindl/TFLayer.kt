@@ -35,6 +35,14 @@ abstract class TFLayer<T : Layer> : CopyableObject {
     abstract fun create(): T
 
     /**
+     * Returns true if this layer has been initialized, false otherwise.
+     * TODO: Not working!
+     */
+    fun isInitialized(): Boolean {
+        return layer != null
+    }
+
+    /**
      * A concept of rank usable in Simbrain. Takes the tensor flow rank, ignores the first "batch" component, and
      * ignores all components of size 1 or less.
      *

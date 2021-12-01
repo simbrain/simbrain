@@ -13,25 +13,25 @@ import org.simbrain.util.toLongArray
  */
 class TFConv2DLayer : TFLayer<Conv2D>() {
 
-    @UserParameter(label = "Number of filters", order = 10)
+    @UserParameter(label = "Number of filters",  conditionalEnablingMethod = "creationMode", order = 10)
     var nfilters = 5
 
-    @UserParameter(label = "Kernel size", order = 20)
+    @UserParameter(label = "Kernel size",  conditionalEnablingMethod = "creationMode", order = 20)
     var kernelSize = intArrayOf(3,3)
 
-    @UserParameter(label = "Strides", order = 30)
+    @UserParameter(label = "Strides",  conditionalEnablingMethod = "creationMode", order = 30)
     var strides = intArrayOf(1,1,1,1)
 
-    @UserParameter(label = "Dilations", order = 40)
+    @UserParameter(label = "Dilations",  conditionalEnablingMethod = "creationMode", order = 40)
     var dilations = intArrayOf(1,1,1,1)
 
-    @UserParameter(label = "Activation function", order = 50)
+    @UserParameter(label = "Activation function",  conditionalEnablingMethod = "creationMode", order = 50)
     var activations = Activations.Relu
 
-    @UserParameter(label = "Padding", order = 80)
+    @UserParameter(label = "Padding",  conditionalEnablingMethod = "creationMode", order = 80)
     var padding = ConvPadding.SAME
 
-    @UserParameter(label = "Use bias", order = 90)
+    @UserParameter(label = "Use bias",  conditionalEnablingMethod = "creationMode", order = 90)
     var useBias = true
 
     override var layer: Conv2D? = null

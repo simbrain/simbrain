@@ -170,6 +170,12 @@ public @interface UserParameter {
     String conditionalVisibilityMethod() default "";
 
     /**
+     * Name of a method whose value determines whether this component is enabled or not. Only called once when the editor
+     * is opened.
+     */
+    String conditionalEnablingMethod() default "";
+
+    /**
      * Name of another widget (based on its {@link #description() UserParameter} whose state determines if this widget
      * is enabled or not. This changes dynamically.  Currently works on booleans only.
      */

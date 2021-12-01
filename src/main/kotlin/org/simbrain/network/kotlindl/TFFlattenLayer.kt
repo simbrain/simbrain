@@ -10,7 +10,7 @@ import org.simbrain.util.UserParameter
  */
 class TFFlattenLayer : TFLayer<Flatten>() {
 
-    @UserParameter(label = "Number of outputs", order = 10)
+    @UserParameter(label = "Number of outputs",  conditionalEnablingMethod = "creationMode", order = 10)
     var nout = 5
 
     @UserParameter(label = "Activation function", order = 20)

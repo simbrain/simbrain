@@ -9,16 +9,16 @@ import org.simbrain.util.UserParameter
  */
 class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
 
-    @UserParameter(label = "Number of outputs", order = 10)
+    @UserParameter(label = "Number of outputs",  conditionalEnablingMethod = "creationMode", order = 10)
     var nout = size
 
-    @UserParameter(label = "Activation function", order = 20)
+    @UserParameter(label = "Activation function",  conditionalEnablingMethod = "creationMode",  order = 20)
     var activations = Activations.Relu
 
-    @UserParameter(label = "Kernel initializer", order = 30)
+    @UserParameter(label = "Kernel initializer",  conditionalEnablingMethod = "creationMode", order = 30)
     var kernelInitializer = ""
 
-    @UserParameter(label = "Bias initializer", order = 40)
+    @UserParameter(label = "Bias initializer",  conditionalEnablingMethod = "creationMode", order = 40)
     var biasInitializer = ""
 
     override var layer: Dense? = null

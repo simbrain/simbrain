@@ -35,11 +35,11 @@ abstract class TFLayer<T : Layer> : CopyableObject {
     abstract fun create(): T
 
     /**
-     * Returns true if this layer has been initialized, false otherwise.
-     * TODO: Not working!
+     * Returns true if the layer has not been initialized so that this laye is in "creation mode".
+     * Called by reflection from a [UserParameter]
      */
-    fun isInitialized(): Boolean {
-        return layer != null
+    fun creationMode(): Boolean {
+        return layer == null
     }
 
     /**

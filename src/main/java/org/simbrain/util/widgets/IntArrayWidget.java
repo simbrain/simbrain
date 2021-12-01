@@ -58,4 +58,13 @@ public class IntArrayWidget extends JPanel {
         }
         table.setModel(model);
     }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        table.setEnabled(enabled);
+        if (!enabled) {
+            table.setForeground(Color.gray);
+        }
+    }
 }

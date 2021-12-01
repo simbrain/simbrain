@@ -69,6 +69,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         this.parameter = parameter;
         component = makeWidget();
         checkConditionalVisibility();
+        checkConditionalEnabling();
         setInitialValue();
     }
 
@@ -83,8 +84,28 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
             try {
                 Method method = parent.getEditedObjects().get(0).getClass().
                         getMethod(conditionalVisibilityMethod);
+                Boolean visible = (Boolean) method.invoke(parent.getEditedObjects().get(0));
+                component.setVisible(visible);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    /**
+     * Check if this component should be enabled or not, based on
+     * {@link UserParameter#conditionalEnablingMethod()} ()}.
+     */
+    public void checkConditionalEnabling() {
+
+        String conditionalEnablingMethod = parameter.getAnnotation().conditionalEnablingMethod();
+        if (!conditionalEnablingMethod.isEmpty()) {
+            try {
+                Method method = parent.getEditedObjects().get(0).getClass().
+                        getMethod(conditionalEnablingMethod);
                 Boolean enabled = (Boolean) method.invoke(parent.getEditedObjects().get(0));
-                component.setVisible(enabled);
+                component.setEnabled(enabled);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }

@@ -2,7 +2,7 @@
 
 Main repository for Simbrain code, documentation, and simulations.
 
-The default branch is currently Simbrain 4. To see code relating to Simbrain 3.0x select `master` branch.
+The default branch is currently Simbrain 4. To see code relating to Simbrain 3.0x select the `Simbrain3` branch.
 
 ## Install
 Go to the [downloads](https://simbrain.net/Downloads/downloads_main.html) page and follow the directions.

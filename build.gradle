@@ -33,7 +33,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.5.2-native-mt'
 
     // Kotlin DL
-    implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:0.2.0'
+    implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:0.3.0'
 
     // Smile
     implementation 'com.github.haifengl:smile-kotlin:2.6.0'

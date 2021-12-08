@@ -37,6 +37,43 @@ fun flattenArray(array : Array<DoubleArray>) = sequence {
 }.toList().toDoubleArray()
 
 /**
+ * Flatten a 2d double array into a 1-d double array
+ */
+fun flattenArray(array : Array<FloatArray>) = sequence {
+    for (row in array) {
+        for (element in row) {
+            yield(element)
+        }
+    }
+}.toList().toFloatArray()
+
+/**
+ * Recursively get the shape of each dimension of an arbitrarily deep array
+ */
+val Array<*>.shape: IntArray get() {
+    fun sizeOf(array: Any) = when(array) {
+        is Array<*> -> array.size
+        is FloatArray -> array.size
+        else -> 0
+    }
+    fun firstOrNullOf(array: Any) = when(array) {
+        is Array<*> -> array.firstOrNull()
+        is FloatArray -> array.firstOrNull()
+        else -> null
+    }
+    fun getShape(current: Any): IntArray {
+        val size = sizeOf(current)
+        val first = firstOrNullOf(current)
+        return if (first is Array<*> || first is FloatArray) {
+            intArrayOf(size, *getShape(first))
+        } else {
+            intArrayOf(size)
+        }
+    }
+    return getShape(this)
+}
+
+/**
  * Reshape a 1-d double array into a 2d array with the indicated number of rows and columns.
  */
 fun reshape(rows: Int, cols: Int, array: DoubleArray) =

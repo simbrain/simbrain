@@ -10,11 +10,8 @@ import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.matrix.ArrayLayer
-import org.simbrain.util.UserParameter
-import org.simbrain.util.getOneHotMat
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.toDoubleArray
-import org.simbrain.util.toFloatArray
 import org.simbrain.workspace.AttributeContainer
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
@@ -79,6 +76,8 @@ class DeepNet(
     var width: Double = 0.0
     var height: Double = 0.0
 
+    var activations: List<FloatArray> = ArrayList<FloatArray>()
+
     init {
         label = network.idManager.getProposedId(this.javaClass)
         buildNetwork()
@@ -139,14 +138,14 @@ class DeepNet(
             if (outputProbabilities) {
                 val predictions = deepNetLayers.predictSoftly(floatInputs)
                 outputs = Matrix(toDoubleArray(predictions))
+                val test = deepNetLayers.predictAndGetActivations(floatInputs)
                 // println("Output (probabilities):" + predictions.joinToString())
             } else {
                 val (prediction, activations) = deepNetLayers.predictAndGetActivations(floatInputs)
                 outputs = getOneHotMat(prediction,outputSize())
-                 println("""
-                        Output (one hot): ${prediction}
-                        Activations: ${activations}
-                     """.trimIndent())
+                this.activations = activations.filterIsInstance<Array<*>>().flatMap { layer ->
+                    layer.filterIsInstance<FloatArray>() // TODO: conv2d
+                }
             }
         } else {
             outputs = Matrix(outputSize(), 1)

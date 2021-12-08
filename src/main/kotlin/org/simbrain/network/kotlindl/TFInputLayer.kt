@@ -18,11 +18,11 @@ class TFInputLayer(val rows: Int = 10, val cols: Int = 1, val channels: Int = 1)
     override fun create() : Input {
         // Hack to convert from shape array to var-args.
         // TODO.
-        if (cols <= 1) {
+        if (inputShape[1] <= 1) {
             return Input(inputShape[0].toLong()).also {
                 layer = it
             }
-        } else if (channels <= 1) {
+        } else if (inputShape[2] < 1) {
             return Input(inputShape[0].toLong(), inputShape[1].toLong()).also {
                 layer = it
             }

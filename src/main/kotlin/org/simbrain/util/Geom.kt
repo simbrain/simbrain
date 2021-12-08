@@ -127,6 +127,13 @@ val RectangleVertices.outlines get() = RectangleOutlines(
         line(topLeft, bottomLeft)
 )
 
+fun Rectangle2D.addPadding(px: Double): Rectangle2D {
+    return rectangle(
+        vertices.topLeft - point(px, px),
+        vertices.bottomRight + point(px, px)
+    )
+}
+
 // Polygons
 fun polygon(vararg points: Point2D) = points.toList().toPolygon()
 fun polygon(points: Collection<Point2D>) = points.toPolygon()

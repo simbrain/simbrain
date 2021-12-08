@@ -30,6 +30,8 @@ fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor()
     BufferedImage(colorModel, raster, false, null)
 }
 
+fun Array<FloatArray>.toSimbrainColorImage() = flattenArray(this).toSimbrainColorImage(first().size, size)
+
 fun IntArray.toRGBImage(width: Int, height: Int): BufferedImage {
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)

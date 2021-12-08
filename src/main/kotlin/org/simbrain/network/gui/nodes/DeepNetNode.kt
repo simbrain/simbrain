@@ -1,6 +1,8 @@
 package org.simbrain.network.gui.nodes
 
+import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.actions.edit.CopyAction
@@ -10,13 +12,13 @@ import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.dialogs.getDeepNetEditDialog
 import org.simbrain.network.gui.dialogs.showDeepNetTrainingDialog
 import org.simbrain.network.kotlindl.DeepNet
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Utils
-import org.simbrain.util.minus
-import org.simbrain.util.point
+import org.simbrain.util.*
 import java.awt.Font
+import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
+import java.awt.image.BufferedImage
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JDialog
@@ -47,6 +49,8 @@ class DeepNetNode(
      */
     private val infoText: PText
     private val box = createRectangle(0f, 0f, initialWidth, initialHeight)
+
+    private var activationImages = listOf<PImage>()
 
     /**
      * Update status text.
@@ -148,6 +152,14 @@ class DeepNetNode(
         val INFO_FONT = Font("Arial", Font.PLAIN, 8)
     }
 
+    override fun paint(paintContext: PPaintContext) {
+        paintContext.graphics.setRenderingHint(
+            RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        )
+        super.paint(paintContext)
+    }
+
     init {
         box.pickable = true
         addChild(box)
@@ -155,14 +167,41 @@ class DeepNetNode(
         events.onDeleted { n: NetworkModel? -> removeFromParent() }
         events.onUpdated { updateInfoText() }
 
-        // Border box determines bounds
-        val bounds = box.bounds
-        setBounds(bounds)
+        val layerImageHeight = 5.0
+        val layerImageWidth = initialWidth - 10.0
+        val layerImagePadding = 2.0
+
+        events.onUpdated {
+            val output = deepNet.outputs!!.col(0).map { it.toFloat() }.toFloatArray()
+            val input = deepNet.floatInputs
+            val allActivations = listOf(input) + deepNet.activations + listOf(output)
+            activationImages.forEach { removeChild(it) }
+            val totalHeight = activationImages.size * 7.0
+            activationImages = allActivations.mapIndexed { index, layer ->
+                PImage(layer.toSimbrainColorImage(layer.size, 1)).also { image ->
+                    image.setBounds(
+                        0.0,
+                        totalHeight - index * (layerImageHeight + layerImagePadding),
+                        layerImageWidth,
+                        layerImageHeight
+                    )
+                }
+            }
+            activationImages.forEach {
+                addChild(it)
+            }
+            val allActivationsBound = activationImages.map { it.bounds.bounds2D }.reduce { acc, bound ->
+                acc.createUnion(bound)
+            }
+            val newBounds = allActivationsBound.addPadding(10.0)
+            box.setBounds(newBounds)
+            setBounds(newBounds)
+        }
 
         // Info text
         infoText = PText()
         infoText.font = INFO_FONT
-        addChild(infoText)
+        // addChild(infoText)
         updateInfoText()
         deepNet.events.onLocationChange { pullViewPositionFromModel() }
         pullViewPositionFromModel()

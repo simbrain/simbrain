@@ -4,7 +4,6 @@ import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.MatrixDataHolder;
@@ -57,14 +56,7 @@ public class WeightMatrix extends Connector {
         target.addIncomingConnector(this);
 
         weightMatrix = new Matrix(target.inputSize(), source.outputSize());
-
-        // Default for "adapter" cases is 1-1
-        if (source instanceof AbstractNeuronCollection) {
-            diagonalize();
-        } else {
-            // For now randomize new matrices between arrays
-            randomize();
-        }
+        diagonalize();
     }
 
     public Matrix getWeightMatrix() {

@@ -1,7 +1,6 @@
 package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.optimizer.*
-import org.jetbrains.kotlinx.dl.api.core.optimizer.RMSProp
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 
@@ -63,9 +62,8 @@ class AdaGradWrapper() : OptimizerWrapper() {
     @UserParameter(label = "InitialAccumulatorValue", order = 20)
     private val initialAccumulatorValue: Float = 0.01f
 
-
     init {
-        optimizer = org.jetbrains.kotlinx.dl.api.core.optimizer.AdaGrad()
+        optimizer = AdaGrad()
     }
 
     override fun copy(): OptimizerWrapper {
@@ -93,7 +91,7 @@ class AdaGradaWrapper() : OptimizerWrapper() {
 
 
     init {
-        optimizer = org.jetbrains.kotlinx.dl.api.core.optimizer.AdaGradDA()
+        optimizer = AdaGradDA()
     }
 
     override fun copy(): OptimizerWrapper {
@@ -108,18 +106,17 @@ class AdaGradaWrapper() : OptimizerWrapper() {
 
 class AdamWrapper() : OptimizerWrapper() {
 
-    @UserParameter(label = "LearningRate", order = 10)
+    @UserParameter(label = "LearningRate",  minimumValue = 0.0, increment = .01, order = 10)
     private val learningRate: Float = 0.001f
 
-    @UserParameter(label = "Beta1", order = 20)
+    @UserParameter(label = "Beta1", minimumValue = 0.0, maximumValue = 1.0, order = 20)
     private val beta1: Float = 0.9f
 
-    @UserParameter(label = "Beta2", order = 30)
+    @UserParameter(label = "Beta2", minimumValue = 0.0, maximumValue = 1.0, increment = .01, order = 30)
     private val beta2: Float = 0.999f
 
-    @UserParameter(label = "Epsilon", order = 40)
+    @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .01, order = 40)
     private val epsilon: Float = 1e-07f
-
 
     @UserParameter(label = "UseNesterov", order = 50)
     private val useNesterov: Boolean = false
@@ -127,6 +124,10 @@ class AdamWrapper() : OptimizerWrapper() {
 
     init {
         optimizer = Adam()
+    }
+
+    override fun onCommit() {
+        optimizer = Adam(learningRate = learningRate, beta1 = beta1, beta2=beta2, epsilon=epsilon, useNesterov = useNesterov)
     }
 
     override fun copy(): OptimizerWrapper {

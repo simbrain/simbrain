@@ -261,7 +261,6 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
         return incrValue(+1);
     }
 
-
     /**
      * Returns the previous number in the sequence.
      *
@@ -275,7 +274,6 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
     public Object getPreviousValue() {
         return incrValue(-1);
     }
-
 
     /**
      * Returns the value of the current element of the sequence,
@@ -326,6 +324,9 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
             }
             if (!value.equals(this.value)) {
                 Number newValue = (Number) value;
+                if (newValue instanceof Float) {
+                    newValue = newValue.doubleValue();
+                }
 
                 if ((maximum != null) && (maximum.compareTo(newValue) < 0)) {
                     newValue = (Number) maximum;

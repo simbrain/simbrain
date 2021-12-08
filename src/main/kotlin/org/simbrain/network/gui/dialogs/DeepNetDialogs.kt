@@ -195,21 +195,21 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         }
         val trainButton = JButton("Train").apply {
             addActionListener {
-                // TODO
                 executor.submit {
                     commitData()
                     trainingParams.commitChanges()
                     optimizerParams.commitChanges()
-                    deepNet.buildNetwork() // for optimizer
                     deepNet.train()
                 }
             }
         }
-        val resetButton = JButton("Reset").apply {
+        // Must call this after changing optimizer, etc.
+        val resetButton = JButton("Rebuild").apply {
             addActionListener {
-                if (!deepNet.deepNetLayers.isModelCompiled) {
-                    deepNet.deepNetLayers.init()
-                }
+                commitData()
+                trainingParams.commitChanges()
+                optimizerParams.commitChanges()
+                deepNet.buildNetwork()
             }
         }
         val clearWindow = JButton("Clear").apply {
@@ -240,6 +240,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         }
 
         // Add components to miglayout
+        add(JLabel("After changing these items you must click rebuild"), "span 1, wrap")
         add(optimizerParams, "span 1, wrap")
         add(JSeparator(), "grow, span, wrap")
         add(trainingParams)

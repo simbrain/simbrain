@@ -32,6 +32,16 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
     private Number stepSize, value;
     private Comparable minimum, maximum;
 
+    /**
+     * Flag indicating if the spinner has reached the minimum value
+     */
+    private boolean isMin = false;
+
+    /**
+     * Flag indicating if the spinner has reached the maximum value
+     */
+    private boolean isMax = false;
+
 
     /**
      * Constructs a <code>SpinnerModel</code> that represents
@@ -238,11 +248,21 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
         }
 
         if ((maximum != null) && (maximum.compareTo(newValue) < 0)) {
-            return null;
+            if (isMax) {
+                return null;
+            } else {
+                return (Number) maximum;
+            }
         }
         if ((minimum != null) && (minimum.compareTo(newValue) > 0)) {
-            return null;
+            if (isMin) {
+                return null;
+            } else {
+                return (Number) minimum;
+            }
         } else {
+            isMin = false;
+            isMax = false;
             return newValue;
         }
     }

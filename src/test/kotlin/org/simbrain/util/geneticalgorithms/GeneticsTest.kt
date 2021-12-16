@@ -4,14 +4,17 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.activations
 import org.simbrain.workspace.Workspace
 
 class GeneticsTest {
 
+    private val chromosome = Chromosome<Neuron, NodeGene>()
+
      @Test
      fun `node gene creates product specified in template`() {
-         val node = nodeGene { activation = 0.7 }
+         val node = chromosome.add { nodeGene { activation = 0.7 } }
 
          val neuron = node.buildWithContext(NetworkGeneticsContext(Network()))
 
@@ -20,8 +23,8 @@ class GeneticsTest {
 
      @Test
      fun `node gene creates specified product after copied`() {
-         val node = nodeGene { activation = 0.7 }
-         val copy = node.copy()
+         val node = chromosome.add { nodeGene { activation = 0.7 } }
+         val copy = node.copy(chromosome)
          val neuron = copy.buildWithContext(NetworkGeneticsContext(Network()))
          assertEquals(0.7, neuron.activation, 0.01)
      }
@@ -60,20 +63,20 @@ class GeneticsTest {
 
             val network = Network()
 
-            val nodes = chromosome(
-                    *defaultActivations.map {
-                        nodeGene { activation = it }
-                    }.toTypedArray()
-            )
+            val nodes = defaultActivations.map {
+                chromosome.add {
+                    nodeGene { activation = it }
+                }
+            }
 
             onBuild {
                 network {
-                    +nodes
+                    +chromosome
                 }
             }
 
             onEval {
-                (nodes.products.activations zip defaultActivations).forEach { (actual, expected) ->
+                (chromosome.products.activations zip defaultActivations).forEach { (actual, expected) ->
                     assertEquals(expected, actual, 0.01)
                 }
                 0.0
@@ -130,10 +133,11 @@ class GeneticsTest {
                 nodeGene()
             }
 
-            val synapses = chromosome(
-                    connectionGene(inputs.genes[0], outputs.genes[1]),
-                    connectionGene(inputs.genes[1], outputs.genes[0]),
-            )
+            val synapses = chromosome(1) {
+                connectionGene(inputs[0], outputs[1])
+            }.apply {
+                add { connectionGene(inputs[1], outputs[0]) }
+            }
 
             onBuild {
                 network {
@@ -144,13 +148,13 @@ class GeneticsTest {
             }
 
             onEval {
-                assertTrue(synapses.genes[0].let {
-                    it.source === inputs.genes[0]
-                            && it.target === outputs.genes[1]
+                assertTrue(synapses[0].let {
+                    it.source === inputs[0]
+                            && it.target === outputs[1]
                 })
-                assertTrue(synapses.genes[1].let {
-                    it.source === inputs.genes[1]
-                            && it.target === outputs.genes[0]
+                assertTrue(synapses[1].let {
+                    it.source === inputs[1]
+                            && it.target === outputs[0]
                 })
                 0.0
             }
@@ -173,10 +177,11 @@ class GeneticsTest {
                 nodeGene()
             }
 
-            val synapses = chromosome(
-                    connectionGene(inputs.genes[0], outputs.genes[1]),
-                    connectionGene(inputs.genes[1], outputs.genes[0]),
-            )
+            val synapses = chromosome(1) {
+                connectionGene(inputs[0], outputs[1])
+            }.apply {
+                add { connectionGene(inputs[1], outputs[0]) }
+            }
 
             onBuild {
                 network {
@@ -187,11 +192,9 @@ class GeneticsTest {
             }
 
             onMutate {
-                val source = nodeGene()
-                val target = nodeGene()
-                inputs.genes.add(source)
-                outputs.genes.add(target)
-                synapses.genes.add(connectionGene(source, target))
+                val source = inputs.add { nodeGene() }
+                val target = outputs.add { nodeGene() }
+                synapses.add { connectionGene(source, target) }
             }
 
             onEval {

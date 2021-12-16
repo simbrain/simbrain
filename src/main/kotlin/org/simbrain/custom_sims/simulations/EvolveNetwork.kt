@@ -4,10 +4,7 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.placeComponent
 import org.simbrain.network.bound
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.activations
-import org.simbrain.network.core.lengths
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.util.BiasedScalarData
@@ -30,7 +27,7 @@ val evolveNetwork = newSim {
          * Testing evolution of nodes with fixed characteristics
          */
         val motivations = chromosome(2) {
-            nodeGene() {
+            nodeGene {
                 label = "Fixed node ${it+1}"
                 location = point(it*100,-50)
                 lowerBound = -10.0
@@ -39,7 +36,7 @@ val evolveNetwork = newSim {
         }
 
         val nodeChromosome = chromosome(2) {
-            nodeGene() {
+            nodeGene {
                 lowerBound = -10.0
                 upperBound = 10.0
             }
@@ -81,15 +78,17 @@ val evolveNetwork = newSim {
 
             // Add nodes
             if (Random().nextDouble() > .95) {
-                nodeChromosome.genes.add(nodeGene())
+                nodeChromosome.add { nodeGene() }
             }
 
-            // // Remove node. Does not work.
-            // if (Random().nextDouble() > .95) {
-            //     if (nodeChromosome.genes.isNotEmpty()) {
-            //         nodeChromosome.genes.removeLast()
-            //     }
-            // }
+            // Remove node. Does not work.
+            if (Random().nextDouble() > .95) {
+                // nodeChromosome.selection.remove // Selection<NodeGene>.remove // so no NodeGene.remove
+                // nodeChromesome.add() // add to the end
+                if (nodeChromosome.genes.isNotEmpty()) {
+                    nodeChromosome.genes.last().delete()
+                }
+            }
 
             motivations.genes.forEach {
                 it.mutateBias()
@@ -108,9 +107,11 @@ val evolveNetwork = newSim {
             // New connections
             val source = nodeChromosome.genes.shuffled().first()
             val target = nodeChromosome.genes.shuffled().first()
-            connectionChromosome.genes.add(connectionGene(source, target) {
-                strength = (Random().nextDouble() - 0.5) * 0.2
-            })
+            val newConnectionGene = connectionChromosome.add {
+                connectionGene(source, target) {
+                    strength = (Random().nextDouble() - 0.5) * 0.2
+                }
+            }
 
             // Weight mutations
             connectionChromosome.forEach { it.mutateWeight() }
@@ -163,14 +164,17 @@ val evolveNetwork = newSim {
                 // return m1error + m2error + numNodesError + numWeightsError + axonLengthError +
                 //         totalActivationError + areaError
 
-                return numNodesError + axonLengthError + totalActivationError
+                return numNodesError + totalActivationError
 
             }
+
+            // print("${network.looseNeurons.size},")
 
             fitness()
         }
 
         onPeek {
+
             val nc = addNetworkComponent("Network", network)
             placeComponent(nc, 0,0,400,400)
 

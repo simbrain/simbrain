@@ -3,6 +3,7 @@ package org.simbrain.util.geneticalgorithms
 import org.simbrain.util.propertyeditor.CopyableObject
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import kotlin.collections.LinkedHashSet
 import kotlin.random.Random
 import kotlin.streams.toList
 
@@ -18,7 +19,9 @@ import kotlin.streams.toList
  *
  * @param P the phenotype of the gene product. For example, the phenotype of [NodeGene] is [Neuron]
  */
-abstract class Gene<P> : CopyableObject {
+abstract class Gene<P, G: Gene<P, G>> {
+
+    protected abstract val chromosome: Chromosome<P, G>
 
     /**
      * The phenotype expressed by the gene. Not expressed until onBuild is called.
@@ -30,6 +33,12 @@ abstract class Gene<P> : CopyableObject {
      */
     protected inline fun completeWith(block: () -> P): P {
         return block().also { product.complete(it) }
+    }
+
+    abstract fun copy(chromosome: Chromosome<P, G>): G
+
+    open fun delete() {
+        chromosome.genes.remove(this)
     }
 
 }
@@ -51,17 +60,34 @@ interface TopLevelGene<T> {
 /**
  * A list of genes that is memoized during evolution.
  */
-class Chromosome<T, G : Gene<T>>(val genes: MutableList<G>) : CopyableObject {
+class Chromosome<T, G : Gene<T, G>>(val genes: LinkedHashSet<G> = LinkedHashSet()) {
     @Suppress("UNCHECKED_CAST")
-    override fun copy(): Chromosome<T, G> {
-        return Chromosome(genes.map { it.copy() as G }.toMutableList())
+    fun copy(): Chromosome<T, G> {
+        val chromosome = Chromosome<T, G>(LinkedHashSet())
+        genes.forEach { chromosome.genes.add(it.copy(chromosome)) }
+        return chromosome
     }
 
-    inline fun forEach(block: (G) -> Unit) = genes.forEach(block)
+    fun forEach(block: (G) -> Unit) = genes.forEach(block)
 
-    operator fun get(index: Int) = genes[index]
+    operator fun get(index: Int) = genes.asSequence().drop(index).first()
+
+    operator fun plus(other: Chromosome<T, G>): Chromosome<T, G> {
+        val thing = genes.toMutableList()
+        thing.addAll(other.genes)
+        return Chromosome(LinkedHashSet(thing))
+    }
+
+    val size get() = genes.size
 
     val products get() = genes.map { it.product.get() }
+
+    fun add(block: Chromosome<T, G>.() -> G): G {
+        val gene = block()
+        genes.add(gene)
+        return gene
+    }
+
 }
 
 /**
@@ -110,7 +136,7 @@ class TopLevelBuilderContext {
      */
     operator fun <T, G, C> C.unaryPlus(): List<T>
             where
-            G : Gene<T>,
+            G : Gene<T, G>,
             G : TopLevelGene<T>,
             C : Chromosome<T, G> = genes.map { with(it) { build() } }
 
@@ -228,7 +254,7 @@ class AgentBuilder private constructor(
         peekFunction = peek
     }
 
-    private inline fun <T, G : Gene<T>> createChromosome(initializeValue: () -> Chromosome<T, G>): Chromosome<T, G> {
+    private inline fun <T, G : Gene<T, G>> createChromosome(crossinline initializeValue: () -> Chromosome<T, G>): Chromosome<T, G> {
         return if (isInitial) {
             initializeValue().also { chromosomeList.add(it) }
         } else {
@@ -240,29 +266,35 @@ class AgentBuilder private constructor(
     /**
      * Use this to create a chromosome with a set number of genes.
      */
-    fun <T, G : Gene<T>> chromosome(initialCount: Int, genes: (index: Int) -> G): Chromosome<T, G> {
-        return createChromosome { Chromosome(List(initialCount) { genes(it) }.toMutableList()) }
+    fun <T, G : Gene<T, G>> chromosome(initialCount: Int, @BuilderInference genes: Chromosome<T, G>.(index: Int) -> G): Chromosome<T, G> {
+        return createChromosome {
+            val chromosome = Chromosome<T, G>()
+            repeat(initialCount) {
+                chromosome.genes.add(chromosome.genes(it))
+            }
+            chromosome
+        }
     }
 
     /**
      * Use this to create a chromosome from existing genes
      */
-    fun <T, G : Gene<T>> chromosome(vararg genes: G): Chromosome<T, G> {
-        return createChromosome { Chromosome(mutableListOf(*genes)) }
+    fun <T, G : Gene<T, G>> chromosome(vararg genes: G): Chromosome<T, G> {
+        return createChromosome { Chromosome(LinkedHashSet(listOf(*genes))) }
     }
 
     /**
      * Use this to create a chromosome from a collection of genes
      */
-    fun <T, G : Gene<T>> chromosome(genes: Iterable<G>): Chromosome<T, G> {
-        return createChromosome { Chromosome(genes.toMutableList()) }
+    fun <T, G : Gene<T, G>> chromosome(genes: Iterable<G>): Chromosome<T, G> {
+        return createChromosome { Chromosome() }
     }
 
     /**
      * Use this when more complex logic is needed...
      */
-    fun <T, G : Gene<T>> chromosome(listBuilder: MutableList<G>.() -> Unit): Chromosome<T, G> {
-        return createChromosome { Chromosome(mutableListOf<G>().apply(listBuilder)) }
+    fun <T, G : Gene<T, G>> chromosome(@BuilderInference listBuilder: Chromosome<T, G>.() -> Unit): Chromosome<T, G> {
+        return createChromosome { Chromosome(LinkedHashSet<G>()).apply(listBuilder) }
     }
 
 }

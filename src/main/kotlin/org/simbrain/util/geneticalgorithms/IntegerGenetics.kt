@@ -22,8 +22,8 @@ class IntWrapper(var value: Int = 0) : CopyableObject {
 /**
  * Builder function for [IntGene].
  */
-inline fun intGene(initVal: IntWrapper.() -> Unit = { }): IntGene {
-    return IntGene(IntWrapper().apply(initVal))
+inline fun Chromosome<Int, IntGene>.intGene(initVal: IntWrapper.() -> Unit = { }): IntGene {
+    return IntGene(this, IntWrapper().apply(initVal))
 }
 
 /**
@@ -31,12 +31,12 @@ inline fun intGene(initVal: IntWrapper.() -> Unit = { }): IntGene {
  * [Gene] and implements [TopLevelGene], which allows you to add this gene directly into an onBuild context.
  * function.
  */
-class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<Int> {
+class IntGene(override val chromosome: Chromosome<Int, IntGene>, private val template: IntWrapper) : Gene<Int, IntGene>(), TopLevelGene<Int> {
 
     override val product = CompletableFuture<Int>()
 
-    override fun copy(): IntGene {
-        return IntGene(template.copy());
+    override fun copy(chromosome: Chromosome<Int, IntGene>): IntGene {
+        return IntGene(chromosome, template.copy())
     }
 
     override fun TopLevelBuilderContext.build(): Int {

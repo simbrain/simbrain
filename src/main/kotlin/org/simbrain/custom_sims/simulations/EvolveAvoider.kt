@@ -75,14 +75,15 @@ val evolveAvoider = newSim {
                 }
             }
 
-            val straightMovement = chromosome(
+            val straightMovement = chromosome(1) {
                 straightMovementGene()
-            )
+            }
 
-            val turning = chromosome(
-                turningGene { direction = -1.0 },
-                turningGene { direction = 1.0 }
-            )
+            val turning = chromosome(1) {
+                turningGene { direction = -1.0 }
+            }.apply {
+                add { turningGene { direction = 1.0 } }
+            }
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
                 setCenterLocation(200.0, 200.0)
@@ -180,19 +181,21 @@ val evolveAvoider = newSim {
                 }
 
                 // Random source neuron
-                val source = (inputs.genes + hiddens.genes).let {
+                val source = (inputs + hiddens).let {
                     val index = random.nextInt(0, it.size)
                     it[index]
                 }
                 // Random target neuron
-                val target = (outputs.genes + hiddens.genes).let {
+                val target = (outputs + hiddens).let {
                     val index = random.nextInt(0, it.size)
                     it[index]
                 }
                 // Add the connection
-                connections.genes.add(connectionGene(source, target) {
-                    strength = random.nextDouble(-0.2, 0.2)
-                })
+                connections.add {
+                    connectionGene(source, target) {
+                        strength = random.nextDouble(-0.2, 0.2)
+                    }
+                }
             }
 
             //

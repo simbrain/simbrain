@@ -83,9 +83,11 @@ val evolveAutoAssociator = newSim {
             // Can add conditions for recurrent connections
             // e.g. source = node.genes, target = node.genes.
 
-            connections.genes.add(connectionGene(source, target) {
-                strength = (Random().nextDouble() - 0.5) * 0.2
-            })
+            connections.add {
+                connectionGene(source, target) {
+                    strength = (Random().nextDouble() - 0.5) * 0.2
+                }
+            }
         }
 
         onEval {

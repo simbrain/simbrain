@@ -8,6 +8,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
+import org.simbrain.network.gui.dialogs.synapse.SynapseAdjustmentPanel
 import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
@@ -81,7 +82,7 @@ val evolveModularity = newSim {
         }
 
         // Utility to create connections
-        fun createInitialConnection(
+        fun Chromosome<Synapse, ConnectionGene>.createInitialConnection(
             sourceLayer: Chromosome<Neuron, NodeGene>,
             targetLayer: Chromosome<Neuron, NodeGene>,
         ): ConnectionGene {
@@ -93,11 +94,11 @@ val evolveModularity = newSim {
         }
 
         val connectionChromosome = chromosome<Synapse, ConnectionGene>() {
-            repeat(4) { add(createInitialConnection(leftRetina, layer1Chromosome)) }
-            repeat(4) { add(createInitialConnection(rightRetina, layer1Chromosome)) }
-            repeat(4) { add(createInitialConnection(layer1Chromosome, layer2Chromosome)) }
-            repeat(3) { add(createInitialConnection(layer2Chromosome, layer3Chromosome)) }
-            repeat(2) { add(createInitialConnection(layer3Chromosome, outputChromosome)) }
+            repeat(4) { add { createInitialConnection(leftRetina, layer1Chromosome) } }
+            repeat(4) { add { createInitialConnection(rightRetina, layer1Chromosome) } }
+            repeat(4) { add { createInitialConnection(layer1Chromosome, layer2Chromosome) } }
+            repeat(3) { add { createInitialConnection(layer2Chromosome, layer3Chromosome) } }
+            repeat(2) { add { createInitialConnection(layer3Chromosome, outputChromosome) } }
         }
 
         val thresholds = listOf(-2.0,-1.0,0.0,1.0,2.0)

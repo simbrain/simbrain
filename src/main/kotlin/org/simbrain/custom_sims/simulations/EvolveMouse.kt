@@ -63,14 +63,15 @@ val evolveMouse = newSim {
                 }
             }
 
-            val straightMovement = chromosome(
+            val straightMovement = chromosome(1) {
                 straightMovementGene()
-            )
+            }
 
-            val turning = chromosome(
-                turningGene { direction = -1.0 },
-                turningGene { direction = 1.0 }
-            )
+            val turning = chromosome(1) {
+                turningGene { direction = -1.0 }
+            }.apply {
+                add { turningGene { direction = 1.0 } }
+            }
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
                 setCenterLocation(50.0, 200.0)
@@ -145,17 +146,17 @@ val evolveMouse = newSim {
                         strength += random.nextDouble(-0.2, 0.2)
                     }
                 }
-                val source = (inputs.genes + hiddens.genes).let {
-                    val index = random.nextInt(0, it.size)
-                    it[index]
-                }
-                val target = (outputs.genes + hiddens.genes).let {
-                    val index = random.nextInt(0, it.size)
-                    it[index]
-                }
-                connections.genes.add(connectionGene(source, target) {
-                    strength = random.nextDouble(-0.2, 0.2)
-                })
+                // val source = (inputs.genes + hiddens.genes).let {
+                //     val index = random.nextInt(0, it.size)
+                //     it[index]
+                // }
+                // val target = (outputs.genes + hiddens.genes).let {
+                //     val index = random.nextInt(0, it.size)
+                //     it[index]
+                // }
+                // connections.genes.add(connectionGene(source, target) {
+                //     strength = random.nextDouble(-0.2, 0.2)
+                // })
             }
 
             onEval {

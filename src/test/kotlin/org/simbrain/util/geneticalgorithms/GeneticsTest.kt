@@ -133,10 +133,11 @@ class GeneticsTest {
                 nodeGene()
             }
 
-            val synapses = chromosome(1) {
-                connectionGene(inputs[0], outputs[1])
-            }.apply {
-                add { connectionGene(inputs[1], outputs[0]) }
+            val synapses = chromosome() {
+                listOf(
+                    connectionGene(inputs[0], outputs[1]),
+                    connectionGene(inputs[1], outputs[0])
+                )
             }
 
             onBuild {
@@ -177,10 +178,11 @@ class GeneticsTest {
                 nodeGene()
             }
 
-            val synapses = chromosome(1) {
-                connectionGene(inputs[0], outputs[1])
-            }.apply {
-                add { connectionGene(inputs[1], outputs[0]) }
+            val synapses = chromosome() {
+                listOf(
+                    connectionGene(inputs[0], outputs[1]),
+                    connectionGene(inputs[1], outputs[0])
+                )
             }
 
             onBuild {

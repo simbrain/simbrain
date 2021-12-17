@@ -56,12 +56,12 @@ val evolveXor = newSim {
             }
             // Either connect input to hidden or hidden to output, or hidden to hidden
             val (source, target) = if (Random().nextBoolean()) {
-                val source = (inputChromosome.genes + hiddenNodeChromosome.genes).shuffled().first()
-                val target = hiddenNodeChromosome.genes.shuffled().first()
+                val source = (inputChromosome + hiddenNodeChromosome).selectRandom()
+                val target = hiddenNodeChromosome.selectRandom()
                 Pair(source, target)
             } else {
-                val source = hiddenNodeChromosome.genes.shuffled().first()
-                val target = (outputChromosome.genes + hiddenNodeChromosome.genes).shuffled().first()
+                val source = hiddenNodeChromosome.selectRandom()
+                val target = (outputChromosome + hiddenNodeChromosome).selectRandom()
                 Pair(source, target)
             }
             connectionChromosome.add {

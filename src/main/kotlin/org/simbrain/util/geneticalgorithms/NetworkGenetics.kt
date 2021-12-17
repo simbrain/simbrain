@@ -1,6 +1,5 @@
 package org.simbrain.util.geneticalgorithms
 
-import org.jetbrains.kotlin.backend.common.push
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -13,30 +12,12 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.util.propertyeditor.CopyableObject
 import java.util.*
 import java.util.concurrent.CompletableFuture
-import kotlin.collections.LinkedHashMap
-import kotlin.collections.LinkedHashSet
-
-/**
- * Helper functions to create genes
- */
-fun Chromosome<Neuron, NodeGene>.nodeGene(options: Neuron.() -> Unit = { }): NodeGene {
-    return NodeGene(this, options)
-}
-inline fun Chromosome<Synapse, ConnectionGene>.connectionGene(source: NodeGene, target: NodeGene, options: Synapse.() -> Unit = { }): ConnectionGene {
-    return ConnectionGene(this, Synapse(null, null as Neuron?).apply(options), source, target)
-}
-inline fun Chromosome<Layout, LayoutGene>.layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
-    val layout = GridLayout().apply(options)
-    return LayoutGene(this, LayoutWrapper(layout, layout.hSpacing, layout.vSpacing))
-}
 
 /**
  * Subclasses are genes that express products that can be added to a [Network].
  */
 sealed class NetworkGene<P: NetworkModel, G: NetworkGene<P, G>>: Gene<P, G>() {
-
     abstract fun buildWithContext(context: NetworkGeneticsContext): P
-
 }
 
 class NodeGene private constructor(override val chromosome: Chromosome<Neuron, NodeGene>, private val template: Neuron = Neuron(null)): NetworkGene<Neuron, NodeGene>() {
@@ -90,8 +71,6 @@ class ConnectionGene(override val chromosome: Chromosome<Synapse, ConnectionGene
     private lateinit var sourceCopy: NodeGene
     private lateinit var targetCopy: NodeGene
 
-    var something: (ConnectionGene) -> Unit = { }
-
     init {
         source.fanOut.add(this)
         target.fanIn.add(this)
@@ -127,9 +106,7 @@ class ConnectionGene(override val chromosome: Chromosome<Synapse, ConnectionGene
  * Needed so we can evolve different types of layout.
  */
 class LayoutWrapper(var layout: Layout, var hSpacing: Double, var vSpacing: Double): CopyableObject {
-
     override fun copy() = LayoutWrapper(layout.copy(), hSpacing, vSpacing)
-
 }
 
 class LayoutGene(override val chromosome: Chromosome<Layout, LayoutGene>, private val template: LayoutWrapper) : Gene<Layout, LayoutGene>(), TopLevelGene<Layout> {
@@ -169,10 +146,9 @@ class LayoutGene(override val chromosome: Chromosome<Layout, LayoutGene>, privat
 
 }
 
-operator fun Network.invoke(block: NetworkGeneticsContext.() -> Unit) {
-    NetworkGeneticsContext(this).apply(block)
-}
-
+/**
+ * Provides DSL helpers for network genetics.
+ */
 class NetworkGeneticsContext(val network: Network) {
 
     fun <T, G: NetworkGene<T, G>> express(chromosome: Chromosome<T, G>): List<T> = chromosome.genes.map {
@@ -193,3 +169,21 @@ class NetworkGeneticsContext(val network: Network) {
 
 }
 
+operator fun Network.invoke(block: NetworkGeneticsContext.() -> Unit) {
+    NetworkGeneticsContext(this).apply(block)
+}
+
+
+/**
+ * Helper functions to create genes
+ */
+fun Chromosome<Neuron, NodeGene>.nodeGene(options: Neuron.() -> Unit = { }): NodeGene {
+    return NodeGene(this, options)
+}
+inline fun Chromosome<Synapse, ConnectionGene>.connectionGene(source: NodeGene, target: NodeGene, options: Synapse.() -> Unit = { }): ConnectionGene {
+    return ConnectionGene(this, Synapse(null, null as Neuron?).apply(options), source, target)
+}
+inline fun Chromosome<Layout, LayoutGene>.layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
+    val layout = GridLayout().apply(options)
+    return LayoutGene(this, LayoutWrapper(layout, layout.hSpacing, layout.vSpacing))
+}

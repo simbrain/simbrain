@@ -70,10 +70,11 @@ val evolvePursuer = newSim {
                 straightMovementGene()
             }
 
-            val turning = chromosome(1) {
-                turningGene { direction = -1.0 }
-            }.apply {
-                add { turningGene { direction = 1.0 } }
+            val turning = chromosome {
+                listOf(
+                    turningGene { direction = -1.0 },
+                    turningGene { direction = 1.0 }
+                )
             }
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
@@ -174,6 +175,7 @@ val evolvePursuer = newSim {
                         }
                     }
                 }
+
                 evolutionWorkspace.apply {
                     repeat(1000) {
                         simpleIterate()
@@ -181,8 +183,6 @@ val evolvePursuer = newSim {
                         score -= energy / 1000
                     }
                 }
-
-
 
                 val partial = cheeses.map { cheese -> 100 - mouse.getRadiusTo(cheese) }
                     .maxOf { it }

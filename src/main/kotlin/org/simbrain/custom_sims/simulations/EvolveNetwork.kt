@@ -4,7 +4,10 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.placeComponent
 import org.simbrain.network.bound
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.activations
+import org.simbrain.network.core.lengths
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.util.BiasedScalarData
@@ -81,13 +84,9 @@ val evolveNetwork = newSim {
                 nodeChromosome.add { nodeGene() }
             }
 
-            // Remove node. Does not work.
+            // Remove node mutation
             if (Random().nextDouble() > .95) {
-                // nodeChromosome.selection.remove // Selection<NodeGene>.remove // so no NodeGene.remove
-                // nodeChromesome.add() // add to the end
-                if (nodeChromosome.genes.isNotEmpty()) {
-                    nodeChromosome.genes.last().delete()
-                }
+                nodeChromosome.selectRandom().delete()
             }
 
             motivations.genes.forEach {

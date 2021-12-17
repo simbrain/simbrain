@@ -79,10 +79,11 @@ val evolveAvoider = newSim {
                 straightMovementGene()
             }
 
-            val turning = chromosome(1) {
-                turningGene { direction = -1.0 }
-            }.apply {
-                add { turningGene { direction = 1.0 } }
+            val turning = chromosome {
+                listOf(
+                    turningGene { direction = -1.0 },
+                    turningGene { direction = 1.0 }
+                )
             }
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {

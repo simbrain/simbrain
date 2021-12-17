@@ -557,7 +557,7 @@ public class Workspace {
     public void openFromZipData(byte[] zipData) {
         try {
             clearWorkspace();
-            WorkspaceSerializer serializer =  new WorkspaceSerializer(this);
+            WorkspaceSerializer serializer = new WorkspaceSerializer(this);
             ByteArrayInputStream bis = new ByteArrayInputStream(zipData);
             serializer.deserialize(bis);
             bis.close();

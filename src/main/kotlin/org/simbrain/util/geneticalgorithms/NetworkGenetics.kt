@@ -151,13 +151,13 @@ class LayoutGene(override val chromosome: Chromosome<Layout, LayoutGene>, privat
  */
 class NetworkGeneticsContext(val network: Network) {
 
-    fun <T, G: NetworkGene<T, G>> express(chromosome: Chromosome<T, G>): List<T> = chromosome.genes.map {
+    fun <P, G: NetworkGene<P, G>> express(chromosome: Chromosome<P, G>): List<P> = chromosome.genes.map {
         it.buildWithContext(this).also { product ->
             if (product is Neuron) network.addNetworkModel(product)
         }
     }
 
-    operator fun <T, G: NetworkGene<T, G>> Chromosome<T, G>.unaryPlus(): List<T> = express(this)
+    operator fun <P, G: NetworkGene<P, G>> Chromosome<P, G>.unaryPlus(): List<P> = express(this)
 
     fun Chromosome<Neuron, NodeGene>.asGroup(block: NeuronGroup.() -> Unit = { }) = fun(network: Network): NeuronGroup {
         return genes.map { it.buildWithContext(this@NetworkGeneticsContext) }

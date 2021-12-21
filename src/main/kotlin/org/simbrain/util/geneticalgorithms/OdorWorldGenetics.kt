@@ -31,8 +31,8 @@ inline fun entity(type: EntityType, crossinline template: OdorWorldEntity.() -> 
     return { world -> OdorWorldEntity(world, type).apply(template) }
 }
 
-abstract class OdorWorldEntityGene<T, G: OdorWorldEntityGene<T, G>>: Gene<T, G>() {
-    abstract fun build(odorWorldEntity: OdorWorldEntity): T
+abstract class OdorWorldEntityGene<P, G: OdorWorldEntityGene<P, G>>: Gene<P, G>() {
+    abstract fun build(odorWorldEntity: OdorWorldEntity): P
 }
 
 class SmellSensorGene(override val chromosome: Chromosome<SmellSensor, SmellSensorGene>, private val template: SmellSensor):
@@ -97,7 +97,7 @@ class TurningGene(override val chromosome: Chromosome<Turning, TurningGene>, pri
 
 class OdorWorldEntityGeneticsContext(val entity: OdorWorldEntity) {
 
-    fun <T, G: OdorWorldEntityGene<T, G>> express(chromosome: Chromosome<T, G>): List<T> =
+    fun <P, G: OdorWorldEntityGene<P, G>> express(chromosome: Chromosome<P, G>): List<P> =
         chromosome.genes.map {
             it.build(entity).also { peripheralAttribute ->
                 when (peripheralAttribute) {
@@ -107,7 +107,7 @@ class OdorWorldEntityGeneticsContext(val entity: OdorWorldEntity) {
             } 
         }
 
-    operator fun <T, G: OdorWorldEntityGene<T, G>> Chromosome<T, G>.unaryPlus(): List<T> = express(this)
+    operator fun <P, G: OdorWorldEntityGene<P, G>> Chromosome<P, G>.unaryPlus(): List<P> = express(this)
 
 }
 

@@ -30,6 +30,15 @@ class GeneticsTest {
      }
 
     @Test
+    fun `node events are working properly`() {
+        val node = chromosome.add { nodeGene() }
+        var counter = 0
+        node.events.onCopy{counter++}
+        node.copy(chromosome)
+        assertEquals(counter, 1)
+    }
+
+    @Test
     fun `node chromosome with repeating default genes creates specified neurons`() {
         val environment = evolutionarySimulation {
 

@@ -9,9 +9,11 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.util.Event
 import org.simbrain.util.propertyeditor.CopyableObject
-import java.util.*
+import java.beans.PropertyChangeSupport
 import java.util.concurrent.CompletableFuture
+import java.util.function.Consumer
 
 /**
  * Subclasses are genes that express products that can be added to a [Network].
@@ -27,23 +29,14 @@ class NodeGene private constructor(override val chromosome: Chromosome<Neuron, N
     }
 
     val fanOut = LinkedHashSet<ConnectionGene>()
-
     val fanIn = LinkedHashSet<ConnectionGene>()
 
     override val product = CompletableFuture<Neuron>()
 
-    private val copyListeners = LinkedList<(NodeGene) -> Unit>()
-
-    fun onCopy(task: (NodeGene) -> Unit) {
-        copyListeners.add(task)
-    }
+    val events = NodeGeneEvents(this)
 
     fun mutate(config: Neuron.() -> Unit) {
         template.apply(config)
-    }
-
-    private fun fireCopied(newGene: NodeGene) {
-        copyListeners.forEach { it(newGene) }
     }
 
     override fun delete() {
@@ -54,7 +47,7 @@ class NodeGene private constructor(override val chromosome: Chromosome<Neuron, N
 
     override fun copy(chromosome: Chromosome<Neuron, NodeGene>): NodeGene {
         val newGene = NodeGene(chromosome, template.deepCopy())
-        fireCopied(newGene)
+        events.fireCopied(newGene)
         return newGene
     }
 
@@ -63,6 +56,12 @@ class NodeGene private constructor(override val chromosome: Chromosome<Neuron, N
     }
 
 }
+
+class NodeGeneEvents(nodeGene: NodeGene) : Event(PropertyChangeSupport(nodeGene)) {
+    fun onCopy(handler: Consumer<NodeGene>) = "Copy".itemAddedEvent(handler)
+    fun fireCopied(copied: NodeGene) = "Copy"(new = copied)
+}
+
 
 class ConnectionGene(override val chromosome: Chromosome<Synapse, ConnectionGene>, private val template: Synapse, val source: NodeGene, val target: NodeGene) : NetworkGene<Synapse, ConnectionGene>() {
 
@@ -74,8 +73,8 @@ class ConnectionGene(override val chromosome: Chromosome<Synapse, ConnectionGene
     init {
         source.fanOut.add(this)
         target.fanIn.add(this)
-        source.onCopy { sourceCopy = it }
-        target.onCopy { targetCopy = it }
+        source.events.onCopy { sourceCopy = it }
+        target.events.onCopy { targetCopy = it }
     }
 
     fun mutate(block: Synapse.() -> Unit) {

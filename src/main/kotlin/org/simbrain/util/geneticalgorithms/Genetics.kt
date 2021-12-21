@@ -413,7 +413,7 @@ class Evaluator(agentBuilder: AgentBuilder) {
                 val builderFitnessPairs = population.parallelStream().map {
                     val build = it.build()
                     val score = build.eval()
-                    BuilderFitnessPair(it, score)
+                    BuilderFitnessPair(it.copy(), score)
                 }.toList()
                     .sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
 

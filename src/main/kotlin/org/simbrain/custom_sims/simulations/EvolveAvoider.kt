@@ -20,6 +20,7 @@ import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import kotlin.random.Random
 
 val evolveAvoider = newSim {
 
@@ -47,6 +48,7 @@ val evolveAvoider = newSim {
                     updateRule.let {
                         if (it is LinearRule) {
                             it.lowerBound = 0.0
+                            it.upperBound = 10.0
                         }
                     }
                 }
@@ -120,11 +122,8 @@ val evolveAvoider = newSim {
                             label = "Hidden"
                             location = point(0, 100)
                         }
-                        val outputGroup = +outputs.asGroup {
-                            label = "Output"
-                            location = point(0, 0)
-                        }
-                        outputGroup.neuronList.labels = listOf("right", "left", "right")
+                        +outputs
+                        // outputGroup.neuronList.labels = listOf("right", "left", "right")
 
                     } else {
                         // This is update when graphics are off
@@ -165,6 +164,11 @@ val evolveAvoider = newSim {
                         }
                     }
                 }
+                if (Random.nextDouble() > 0.95) {
+                    hiddens.add {
+                        nodeGene()
+                    }
+                }
                 outputs.genes.forEach {
                     it.mutate {
                         when (random.nextInt(3)) {
@@ -194,7 +198,7 @@ val evolveAvoider = newSim {
                 // Add the connection
                 connections.add {
                     connectionGene(source, target) {
-                        strength = random.nextDouble(-0.2, 0.2)
+                        strength = random.nextDouble(-10.0, 10.0)
                     }
                 }
             }
@@ -218,7 +222,7 @@ val evolveAvoider = newSim {
                 poison3.handleCollision();
 
                 evolutionWorkspace.apply {
-                    score += (0..5000).map {
+                    score += (0..1000).map {
                         simpleIterate()
                         minOf(
                             poison1.getRadiusTo(mouse),
@@ -241,20 +245,28 @@ val evolveAvoider = newSim {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-            runUntil { generation == 10 || fitness > 50 }
+            runUntil { generation == 100 || fitness > 50 }
         }
     }
 
     scope.launch {
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(200, "Error")
+        val progressWindow = if (desktop != null) {
+            ProgressWindow(100, "Error")
+        } else {
+            null
+        }
 
         launch(Dispatchers.Default) {
 
             val generations = createEvolution().start().onEachGenerationBest { agent, gen ->
-                progressWindow.value = gen
-                progressWindow.text = "Error: ${agent.fitness.format(2)}"
+                if (progressWindow == null) {
+                    println("[$gen] Fitness: ${agent.fitness.format(2)}")
+                } else {
+                    progressWindow.value = gen
+                    progressWindow.text = "Fitness: ${agent.fitness.format(2)}"
+                }
             }
 
             val (best, _) = generations.best
@@ -265,11 +277,13 @@ val evolveAvoider = newSim {
 
             build.peek()
 
-            progressWindow.close()
+            progressWindow?.close()
 
         }
     }
 
+}
 
-
+fun main() {
+    evolveAvoider.run()
 }

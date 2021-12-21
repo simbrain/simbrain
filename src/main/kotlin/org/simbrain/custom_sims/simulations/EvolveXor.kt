@@ -122,7 +122,7 @@ val evolveXor = newSim {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 1000 || fitness < .1 }
+        runUntil { generation == 1000 || fitness < .01 }
     }
 
     MainScope().launch {

@@ -765,7 +765,7 @@ public class Utils {
         xstream.ignoreUnknownElements();
         xstream.allowTypesByWildcard(new String[] {
                 "org.simbrain.**", "java.awt.**", "org.jfree.**", "javax.swing.event.**", "java.beans.**",
-                "smile.math.**"
+                "smile.math.**", "java.util.concurrent.**"
         });
         return xstream;
     }

@@ -7,12 +7,10 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addOdorWorldComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.labels
 import org.simbrain.network.neuron_update_rules.DecayRule
-import org.simbrain.network.neuron_update_rules.LinearRule
-import org.simbrain.network.neuron_update_rules.SigmoidalRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
+import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
@@ -26,10 +24,13 @@ val evolveAvoider = newSim {
 
     val scope = MainScope()
 
+    /**
+     * Max generation to run before giving up
+     */
+    val maxGenerations = 10
+
     fun createEvolution(): Evaluator {
         val evolutionarySimulation = evolutionarySimulation(1) {
-
-            // Set up the chromosomes.
 
             val inputs = chromosome(3) {
                 nodeGene()
@@ -46,23 +47,35 @@ val evolveAvoider = newSim {
             val outputs = chromosome(3) {
                 nodeGene {
                     updateRule.let {
-                        if (it is LinearRule) {
-                            it.lowerBound = 0.0
+                        if (it is BoundedUpdateRule) {
+                            it.lowerBound = -10.0
                             it.upperBound = 10.0
                         }
                     }
                 }
             }
 
-            val evolutionWorkspace = Workspace()
+            // Pre-populate with a few connections
+            val connections = chromosome() {
+                listOf(connectionGene(inputs[0],hiddens[0]),
+                connectionGene(inputs[1],hiddens[1]),
+                connectionGene(inputs[1],hiddens[0]),
+                connectionGene(inputs[1],hiddens[1]),
+                connectionGene(hiddens[1],outputs[0]),
+                connectionGene(hiddens[1],outputs[1]),
+                connectionGene(hiddens[2],outputs[0]),
+                connectionGene(hiddens[2],outputs[1]))
+            }
 
-            val connections = chromosome<Synapse, ConnectionGene>()
+            val evolutionWorkspace = Workspace()
 
             val networkComponent = evolutionWorkspace { addNetworkComponent("Avoider") }
 
             val network = networkComponent.network
 
-            val odorworldComponent = evolutionWorkspace { addOdorWorldComponent("World") }
+            val odorworldComponent = evolutionWorkspace {
+                addOdorWorldComponent("World")
+            }
 
             val odorworld = odorworldComponent.world.apply {
                 isObjectsBlockMovement = false
@@ -115,15 +128,18 @@ val evolveAvoider = newSim {
                     if (visible) {
                         val inputGroup = +inputs.asGroup {
                             label = "Input"
-                            location = point(0, 200)
+                            location = point(250, 280)
                         }
                         inputGroup.neuronList.labels = listOf("center", "left", "right")
                         +hiddens.asGroup {
                             label = "Hidden"
                             location = point(0, 100)
                         }
-                        +outputs
-                        // outputGroup.neuronList.labels = listOf("right", "left", "right")
+                        val outputGroup = +outputs.asGroup {
+                            label = "Output"
+                            location = point(250, 40)
+                        }
+                        outputGroup.neuronList.labels = listOf("right", "left", "right")
 
                     } else {
                         // This is update when graphics are off
@@ -169,16 +185,16 @@ val evolveAvoider = newSim {
                         nodeGene()
                     }
                 }
-                outputs.genes.forEach {
-                    it.mutate {
-                        when (random.nextInt(3)) {
-                            0 -> updateRule = SigmoidalRule()
-                            1 -> updateRule = DecayRule()
-                            2 -> {
-                            } // Leave the same
-                        }
-                    }
-                }
+                // outputs.genes.forEach {
+                //     it.mutate {
+                //         when (random.nextInt(3)) {
+                //             0 -> updateRule = LinearRule()
+                //             1 -> updateRule = DecayRule()
+                //             2 -> {
+                //             } // Leave the same
+                //         }
+                //     }
+                // }
                 connections.genes.forEach {
                     it.mutate {
                         strength += random.nextDouble(-0.5, 0.5)
@@ -221,16 +237,17 @@ val evolveAvoider = newSim {
                 poison2.handleCollision();
                 poison3.handleCollision();
 
-                evolutionWorkspace.apply {
-                    score += (0..1000).map {
-                        simpleIterate()
-                        minOf(
-                            poison1.getRadiusTo(mouse),
-                            poison2.getRadiusTo(mouse),
-                            poison3.getRadiusTo(mouse)
-                        ) / 100
-                    }.minOf { it }
-                }
+               evolutionWorkspace.apply {
+                   repeat(5000) {simpleIterate()}
+                   // score += (0..1000).map {
+                   //     simpleIterate()
+                   //     minOf(
+                   //         poison1.getRadiusTo(mouse),
+                   //         poison2.getRadiusTo(mouse),
+                   //         poison3.getRadiusTo(mouse)
+                   //     ) / 100
+                   // }.minOf { it }
+               }
 
                 score
             }
@@ -245,7 +262,7 @@ val evolveAvoider = newSim {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-            runUntil { generation == 100 || fitness > 50 }
+            runUntil { generation == maxGenerations || fitness > -5 }
         }
     }
 
@@ -253,7 +270,7 @@ val evolveAvoider = newSim {
         workspace.clearWorkspace()
 
         val progressWindow = if (desktop != null) {
-            ProgressWindow(100, "Error")
+            ProgressWindow(maxGenerations, "Fitness")
         } else {
             null
         }
@@ -271,7 +288,7 @@ val evolveAvoider = newSim {
 
             val (best, _) = generations.best
 
-            println(best)
+            // println(best)
 
             val build = best.visibleBuild()
 

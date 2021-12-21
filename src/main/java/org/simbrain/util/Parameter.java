@@ -398,8 +398,11 @@ public class Parameter implements Comparable<Parameter> {
                         params.add(new Parameter(f));
                     }
                 }
-                for (Method m : clazz.getDeclaredMethods()) {
+                for (Method m : clazz.getMethods()) {
+                    System.out.println(m.getName());
+                    System.out.println(Arrays.toString(m.getAnnotations()));
                     if (m.isAnnotationPresent(UserParameter.class)) {
+                        System.out.println("Parameter.getParameters");
                         if (fieldAndMethodNames.contains(m.getName())) {
                             throw new RuntimeException("A method with the same name, '" + m.getName() + "', is declared in a super-class of " + paramClass.getName());
                         }

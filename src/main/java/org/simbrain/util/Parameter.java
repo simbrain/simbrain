@@ -384,9 +384,9 @@ public class Parameter implements Comparable<Parameter> {
             Set<Parameter> params = new TreeSet<>();
             Set<String> fieldAndMethodNames = new HashSet<>();
 
-            // Get all super-classes too so that we can set their fields.
-            for (Class<?> clazz : getSuperClasses(paramClass)) {
-                //System.out.println("paramClass = [" + paramClass + "]");
+            // Get all parent classes, which may also contain annotations
+            for (Class<?> clazz : getParentClasses(paramClass)) {
+                // System.out.println("paramClass = [" + paramClass + "]");
                 for (Field f : clazz.getDeclaredFields()) {
                     //System.out.println("declaredField = [" + f + "]");
                     if (f.isAnnotationPresent(UserParameter.class)) {
@@ -399,10 +399,7 @@ public class Parameter implements Comparable<Parameter> {
                     }
                 }
                 for (Method m : clazz.getMethods()) {
-                    System.out.println(m.getName());
-                    System.out.println(Arrays.toString(m.getAnnotations()));
                     if (m.isAnnotationPresent(UserParameter.class)) {
-                        System.out.println("Parameter.getParameters");
                         if (fieldAndMethodNames.contains(m.getName())) {
                             throw new RuntimeException("A method with the same name, '" + m.getName() + "', is declared in a super-class of " + paramClass.getName());
                         }
@@ -421,16 +418,19 @@ public class Parameter implements Comparable<Parameter> {
 
 
     /**
-     * Gets a list containing this class and all its super-classes up to the
+     * Gets a list containing this class and all its superclasses and interfaecs up to the
      * parent ConfigurableBase. The list is ordered from super to this class.
      */
-    protected static List<Class<?>> getSuperClasses(final Class<?> clazz) {
-        List<Class<?>> classes = new ArrayList<Class<?>>();
-        Class<?> superClass = clazz;
-        while (!superClass.equals(Object.class)) {
-            classes.add(superClass);
-            superClass = classes.get(classes.size() - 1).getSuperclass();
+    protected static List<Class<?>> getParentClasses(final Class<?> clazz) {
+        List<Class<?>> classes = new ArrayList<>();
+        Class<?> parentClass = clazz;
+        // Add superclasses
+        while (!parentClass.equals(Object.class)) {
+            classes.add(parentClass);
+            parentClass = classes.get(classes.size() - 1).getSuperclass();
         }
+        // Add interfaces
+        classes.addAll(Arrays.asList(clazz.getInterfaces()));
         Collections.reverse(classes);
         return classes;
     }

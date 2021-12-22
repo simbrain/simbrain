@@ -12,12 +12,24 @@ class GeneticsTest {
 
     private val chromosome = Chromosome<Neuron, NodeGene>()
 
+    @Test
+    fun `node copy copies neuron properties correctly`() {
+        val node = chromosome.add { nodeGene() {
+            activation = .5
+            lowerBound = -1.2
+            upperBound = 1.5
+        } }
+        val copy = node.copy(chromosome)
+        val neuronCopy = copy.buildWithContext(NetworkGeneticsContext(Network()))
+        assertEquals(.5, neuronCopy.activation)
+        assertEquals(-1.2, neuronCopy.lowerBound)
+        assertEquals(1.5, neuronCopy.upperBound)
+    }
+
      @Test
      fun `node gene creates product specified in template`() {
          val node = chromosome.add { nodeGene { activation = 0.7 } }
-
          val neuron = node.buildWithContext(NetworkGeneticsContext(Network()))
-
          assertEquals(0.7, neuron.activation, 0.01)
      }
 

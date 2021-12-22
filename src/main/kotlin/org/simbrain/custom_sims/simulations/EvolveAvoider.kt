@@ -27,7 +27,7 @@ val evolveAvoider = newSim {
     /**
      * Max generation to run before giving up
      */
-    val maxGenerations = 10
+    val maxGenerations = 100
 
     fun createEvolution(): Evaluator {
         val evolutionarySimulation = evolutionarySimulation(1) {
@@ -138,6 +138,8 @@ val evolveAvoider = newSim {
                         val outputGroup = +outputs.asGroup {
                             label = "Output"
                             location = point(250, 40)
+                            // TODO: Easier way to get a ref to neuron
+                            setPrototypeRule(outputs[0].buildWithContext(NetworkGeneticsContext(network)).updateRule)
                         }
                         outputGroup.neuronList.labels = listOf("right", "left", "right")
 
@@ -262,7 +264,7 @@ val evolveAvoider = newSim {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-            runUntil { generation == maxGenerations || fitness > -5 }
+            runUntil { generation == maxGenerations || fitness > -3 }
         }
     }
 

@@ -20,10 +20,9 @@ class GeneticsTest {
             upperBound = 1.5
         } }
         val copy = node.copy(chromosome)
-        val neuronCopy = copy.buildWithContext(NetworkGeneticsContext(Network()))
-        assertEquals(.5, neuronCopy.activation)
-        assertEquals(-1.2, neuronCopy.lowerBound)
-        assertEquals(1.5, neuronCopy.upperBound)
+        assertEquals(.5, copy.template.activation)
+        assertEquals(-1.2, copy.template.lowerBound)
+        assertEquals(1.5, copy.template.upperBound)
     }
 
      @Test

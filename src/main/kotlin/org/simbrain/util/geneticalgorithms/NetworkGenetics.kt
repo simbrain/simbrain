@@ -22,7 +22,10 @@ sealed class NetworkGene<P: NetworkModel, G: NetworkGene<P, G>>: Gene<P, G>() {
     abstract fun buildWithContext(context: NetworkGeneticsContext): P
 }
 
-class NodeGene private constructor(override val chromosome: Chromosome<Neuron, NodeGene>, private val template: Neuron = Neuron(null)): NetworkGene<Neuron, NodeGene>() {
+/**
+ * Create a node gene in a chromosome using a template.
+ */
+class NodeGene private constructor(override val chromosome: Chromosome<Neuron, NodeGene>, val template: Neuron = Neuron(null)): NetworkGene<Neuron, NodeGene>() {
 
     constructor(chromosome: Chromosome<Neuron, NodeGene>, config: Neuron.() -> Unit): this(chromosome, Neuron(null)) {
         template.apply(config)

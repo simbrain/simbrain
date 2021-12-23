@@ -138,8 +138,7 @@ val evolveAvoider = newSim {
                         val outputGroup = +outputs.asGroup {
                             label = "Output"
                             location = point(250, 40)
-                            // TODO: Easier way to get a ref to neuron
-                            setPrototypeRule(outputs[0].buildWithContext(NetworkGeneticsContext(network)).updateRule)
+                            setPrototypeRule(outputs[0].template.updateRule)
                         }
                         outputGroup.neuronList.labels = listOf("right", "left", "right")
 

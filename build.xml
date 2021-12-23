@@ -75,6 +75,9 @@
 	<!-- Run simbrain. -->
 	<target name="run" depends="jar" description="Run jar file">
 		<java jar="${jarfile}" fork="yes" failonerror="true">
+			<jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED" />
+			<jvmarg value="--add-opens=java.desktop/java.awt=ALL-UNNAMED" />
+			<jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" />
 		</java>
 	</target>
 

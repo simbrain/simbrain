@@ -20,9 +20,11 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     // constructor with both
     // But replace construction logic with function
 
-    override fun getColumnClass(columnIndex: Int): Class<*> {
-        return columns[columnIndex].type.clazz()
-    }
+    /**
+     * Index list of column classes. Prevoiusly overrode [getColumnClass] but this created problems.
+     */
+    val columnClasses: List<Class<*>>
+        get() = columns.map { it.type.clazz() }
 
     override fun getColumnName(col: Int): String {
         return columns[col].name
@@ -38,7 +40,6 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
      */
     @UserParameter(label = "Table Randomizer")
     var cellRandomizer = ProbabilityDistribution.Randomizer()
-
 
     /**
      * Check that the provided column index is within range
@@ -96,7 +97,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     fun columnsSameType(clazz: Class<*>): Boolean {
         return (0 until columnCount).all {
-            getColumnClass(it) == clazz
+            columnClasses[it] == clazz
         }
     }
 

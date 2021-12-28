@@ -109,6 +109,7 @@ class NetworkModelList {
 
     fun remove(model: NetworkModel) {
         if (model is Subnetwork) {
+            // Forces all subclasses of subnetwork to be grouped with the subnetwork class
             networkModels[Subnetwork::class.java]?.remove(model)
         } else {
             networkModels[model.javaClass]?.remove(model)

@@ -347,6 +347,7 @@ class Network {
             networkModels.add(model)
             model.events.onDeleted{
                 networkModels.remove(it)
+                events.fireModelRemoved(it)
             }
             events.fireModelAdded(model)
             if (model is Neuron) updatePriorityList()

@@ -8,20 +8,18 @@ import org.simbrain.world.odorworld.effectors.Turning
 import java.lang.reflect.Method
 
 /**
- * Maintains a list of [Coupling]'s, and of potential [Producer] and
- * [Consumer] objects.  Supports creation of couplings, setting of producer
- * and consumer visibility, and filtering of all three types of object, e.g.
+ * Maintains a list of [Coupling]s, and of potential [Producer] and [Consumer] objects. Supports creation of
+ * couplings, setting of producer and consumer visibility, and filtering of all three types of objecs.
+ *
+ * Couplings can be created in a many-to-many fashion. Many-to-one couplings were not allowed in earlier versions of
+ * Simbrain, because they can produce unexpected behaviors, where one producer will overrwrite the value of another.
+ * However, many-to-one couplings can be useful, for example to aggregate many sources of inputs. Examples include Neuron.addInputValue
+ * and OdorWorld' StraightMovement effector which has an addAmount method.
+ *
+ * Coupling creation should rely on the factory methods here rather than by invoking constructors on Coupling
+ * directly, so that couplings will be properly managed and serialized.Serialization is handled by [ArchivedCoupling].
  *
  * This is a transient field of [Workspace] which is thus not persisted.
- *
- * Couplings can be created in a many-to-many fashion. One to many coupligns were not allowed in earlier versions of
- * Simbrain, because they can produce unexpected behaviors, where one producer will overrwrite the value of another.
- * However, many-to-one couplings can be useful, and are handled by special consumers, e.g. Neuron.addInputValue
- * or OdorWorld's effectors like StraightMovement, which has an addAmount method.
- *
- * Coupling creation should rely on the factory methods here
- * rather than by invoking constructors on Coupling directly so that couplings will
- * be properly managed and serialized.
  */
 class CouplingManager(val workspace: Workspace) {
 
@@ -56,9 +54,7 @@ class CouplingManager(val workspace: Workspace) {
         get() = sequence {
             workspace.componentList.forEach { component ->
                 component.attributeContainers.forEach { container ->
-                    couplingCache.getMethods(container)
-                            .filter { couplingCache.getVisibility(it) }
-                            .forEach { yield(it) }
+                    couplingCache.getMethods(container).filter { couplingCache.getVisibility(it) }.forEach { yield(it) }
                 }
             }
         }.toSet()
@@ -69,9 +65,7 @@ class CouplingManager(val workspace: Workspace) {
     val WorkspaceComponent.producerMethods: Set<Method>
         get() = sequence {
             attributeContainers.forEach { container ->
-                couplingCache.getMethods(container)
-                        .filter { it.isProducible() }
-                        .forEach { yield(it) }
+                couplingCache.getMethods(container).filter { it.isProducible() }.forEach { yield(it) }
             }
         }.toSet()
 
@@ -81,9 +75,7 @@ class CouplingManager(val workspace: Workspace) {
     val WorkspaceComponent.consumerMethods: Set<Method>
         get() = sequence {
             attributeContainers.forEach { container ->
-                couplingCache.getMethods(container)
-                        .filter { it.isConsumable() }
-                        .forEach { yield(it) }
+                couplingCache.getMethods(container).filter { it.isConsumable() }.forEach { yield(it) }
             }
         }.toSet()
 
@@ -139,21 +131,23 @@ class CouplingManager(val workspace: Workspace) {
      * Induces a priority on consumers which allows for auto-coupling, i.e. making couplings between
      * [AttributeContainer]s without specifying specific consumers or producers.
      */
-    val Consumer.preference: Int get() = when {
+    val Consumer.preference: Int
+        get() = when {
 
-        baseObject is StraightMovement && method.name == "setAmount" -> 10
-        baseObject is Turning && method.name == "setAmount" -> 10
-        with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
-        with(baseObject) { this is Neuron && !isClamped && method.name == "addInputValue" } -> 10
-        else -> 0
-    }
+            baseObject is StraightMovement && method.name == "setAmount" -> 10
+            baseObject is Turning && method.name == "setAmount" -> 10
+            with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
+            with(baseObject) { this is Neuron && !isClamped && method.name == "addInputValue" } -> 10
+            else -> 0
+        }
 
     /**
      * See [Consumer.preference]
      */
-    val Producer.preference: Int get() = when {
-        else -> 0
-    }
+    val Producer.preference: Int
+        get() = when {
+            else -> 0
+        }
 
 
     /**
@@ -173,14 +167,14 @@ class CouplingManager(val workspace: Workspace) {
     /**
      * A collection of all [compatibleProducers] in a given [WorkspaceComponent]
      */
-    fun Consumer.compatiblesOfComponent(component: WorkspaceComponent)
-            = couplingCache.getCompatibleVisibleProducers(this, component)
+    fun Consumer.compatiblesOfComponent(component: WorkspaceComponent) =
+        couplingCache.getCompatibleVisibleProducers(this, component)
 
     /**
      * A collection of all [compatibleConsumers] in a given [WorkspaceComponent]
      */
-    fun Producer.compatiblesOfComponent(component: WorkspaceComponent)
-            = couplingCache.getCompatibleVisibleConsumers(this, component)
+    fun Producer.compatiblesOfComponent(component: WorkspaceComponent) =
+        couplingCache.getCompatibleVisibleConsumers(this, component)
 
     /**
      * Create a coupling from a producer and consumer of the same type.
@@ -205,17 +199,15 @@ class CouplingManager(val workspace: Workspace) {
      * Couple the first type-matched producer-consumer pair, where these are ordered by preference.
      */
     fun createCoupling(producingContainer: AttributeContainer, consumingContainer: AttributeContainer): Coupling {
-        val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers)
-            .filter { (a, b) -> a.type == b.type }
-            .sortedByDescending { (a, b) -> a.preference + b.preference }
-            .firstOrNull() ?: throw RuntimeException(
-                    "No compatible attributes found between $producingContainer and $consumingContainer"
-            )
+        val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers).filter { (a, b) -> a.type == b.type }
+            .sortedByDescending { (a, b) -> a.preference + b.preference }.firstOrNull() ?: throw RuntimeException(
+            "No compatible attributes found between $producingContainer and $consumingContainer"
+        )
         return producer couple consumer
     }
 
-    infix fun AttributeContainer.couple(consumingContainer: AttributeContainer)
-        = createCoupling(this, consumingContainer)
+    infix fun AttributeContainer.couple(consumingContainer: AttributeContainer) =
+        createCoupling(this, consumingContainer)
 
     /**
      * Create a coupling from each producer to every consumer of the same type.
@@ -256,12 +248,11 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     fun createOneToOneCouplings(
-        producers: Collection<AttributeContainer>,
-        consumers: Collection<AttributeContainer>
+        producers: Collection<AttributeContainer>, consumers: Collection<AttributeContainer>
     ): List<Coupling> = (producers zip consumers).map { (producer, consumer) -> producer couple consumer }
 
-    infix fun Collection<AttributeContainer>.couple(consumers: Collection<AttributeContainer>): List<Coupling>
-        = createOneToOneCouplings(this, consumers)
+    infix fun Collection<AttributeContainer>.couple(consumers: Collection<AttributeContainer>): List<Coupling> =
+        createOneToOneCouplings(this, consumers)
 
     fun removeCouplings(couplings: List<Coupling>) {
         couplings.forEach { coupling ->

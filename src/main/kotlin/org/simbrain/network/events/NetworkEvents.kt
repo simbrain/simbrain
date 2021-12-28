@@ -7,7 +7,7 @@ import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
 /**
- * All Network events are defined here.  Main docs at [Event].
+ * All Network events are defined here. Main docs at [Event].
  */
 class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 
@@ -17,6 +17,7 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
     fun onModelAdded(handler: Consumer<NetworkModel>) = "Added".itemAddedEvent(handler)
     fun fireModelAdded(model: NetworkModel) = "Added"(new = model)
 
+    // Forwards the model.onDeleted event, so that we don't have to register the onDeleted event on every model.
     fun onModelRemoved(handler: Consumer<NetworkModel>) = "Removed".itemAddedEvent(handler)
     fun fireModelRemoved(model: NetworkModel) = "Removed"(new = model)
 

@@ -28,8 +28,5 @@ class WorkspaceComponentEvents(wc: WorkspaceComponent) : Event(PropertyChangeSup
 
     fun onAttributeContainerRemoved(handler: Consumer<AttributeContainer>) = "AttributeContainerRemoved".itemRemovedEvent(handler)
     fun fireAttributeContainerRemoved(ac: AttributeContainer) = "AttributeContainerRemoved"(old = ac)
-
-    fun onAttributeContainerChanged(handler: Runnable) = "AttributeContainerChanged".event(handler)
-    fun fireAttributeContainerChanged() = "AttributeContainerChanged"()
     
 }

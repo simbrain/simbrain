@@ -7,7 +7,7 @@ import java.util.function.BiConsumer
 import java.util.function.Consumer
 
 /**
- * @see Event
+ * @see [Event].
  */
 open class NetworkModelEvents(val model: NetworkModel) : Event(PropertyChangeSupport(model)) {
 

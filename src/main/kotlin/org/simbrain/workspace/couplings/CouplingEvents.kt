@@ -4,6 +4,9 @@ import org.simbrain.util.Event
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
+/**
+ * Attribute events are handled in [WorkspaceComponentEvents]
+ */
 class CouplingEvents(couplingManager: CouplingManager) : Event(PropertyChangeSupport(couplingManager)) {
 
     fun onCouplingAdded(handler: Consumer<Coupling>) = "CouplingAdded".itemAddedEvent(handler)

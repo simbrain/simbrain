@@ -576,7 +576,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             }
         }
         event.onModelRemoved {
-            it.events.fireDeleted()
             zoomToFitPage()
         }
         event.onUpdateTimeDisplay { timeLabel.update() }

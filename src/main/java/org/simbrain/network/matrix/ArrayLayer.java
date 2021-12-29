@@ -3,6 +3,7 @@ package org.simbrain.network.matrix;
 import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
+import org.simbrain.workspace.Consumable;
 import smile.math.matrix.Matrix;
 
 /**
@@ -46,6 +47,11 @@ public abstract class ArrayLayer extends Layer {
     @Override
     public void addInputs(Matrix newInputs) {
         inputs.add(newInputs);
+    }
+
+    @Consumable
+    public void addInputs(double[] inputs) {
+        addInputs(new Matrix(inputs));
     }
 
     @Override

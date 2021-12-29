@@ -18,7 +18,8 @@ import java.awt.geom.Rectangle2D
 import java.util.*
 
 /**
- * Simbrain representation of KotlinDL sequential networks
+ * Simbrain representation of a KotlinDL sequential network, i.e. a deep network. Once initialized the data and some
+ * parameters can be changed but the structure of the network (number of layers and type of layer) cannot be.
  */
 class DeepNet(
     private val network: Network,
@@ -43,7 +44,19 @@ class DeepNet(
     var outputProbabilities: Boolean = false
 
     /**
-     * The data edited.
+     * External inputs to deep net, from parent [ArrayLayer] level. Can be set by couplings.
+     */
+    val doubleInputs: DoubleArray
+        get() = super.getInputs().col(0)
+
+    /**
+     * Float representation of [doubleInputs].
+     */
+    val floatInputs: FloatArray
+        get() = toFloatArray(doubleInputs)
+
+    /**
+     * The training data that can be edited by the user.
      */
     var inputData: Array<FloatArray>
     var targetData: FloatArray
@@ -76,6 +89,9 @@ class DeepNet(
     var width: Double = 0.0
     var height: Double = 0.0
 
+    /**
+     * A list of arrays, one for each layer, used in representing the internal activations of the network.
+     */
     var activations: List<FloatArray> = ArrayList<FloatArray>()
 
     init {
@@ -127,20 +143,18 @@ class DeepNet(
             trainingParams.epochs, 1, 1)
     }
 
-    val floatInputs: FloatArray
-        get() = toFloatArray(doubleInputs)
-
-    val doubleInputs: DoubleArray
-        get() = super.getInputs().col(0)
-
     override fun update() {
         if (deepNetLayers.isModelInitialized) {
             if (outputProbabilities) {
+                // Softmax case
                 val predictions = deepNetLayers.predictSoftly(floatInputs)
                 outputs = Matrix(toDoubleArray(predictions))
+                // TODO: Below _should_ use predictSoftlyAndGetActivations, but that is not currently exposed in
+                //  kotlindl
                 val test = deepNetLayers.predictAndGetActivations(floatInputs)
                 // println("Output (probabilities):" + predictions.joinToString())
             } else {
+                // One-hot case
                 val (prediction, activations) = deepNetLayers.predictAndGetActivations(floatInputs)
                 outputs = getOneHotMat(prediction,outputSize())
                 this.activations = activations.filterIsInstance<Array<*>>().flatMap { layer ->
@@ -164,7 +178,7 @@ class DeepNet(
     }
 
     override fun inputSize(): Int {
-        return deepNetLayers.layers.first().outputShape[1].toInt();
+        return deepNetLayers.layers.first().outputShape.numElements().toInt()
     }
 
     override fun outputSize(): Int {

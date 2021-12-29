@@ -18,19 +18,16 @@
 package org.simbrain.network;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.NetworkEvents;
-import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.simbrain.network.core.NetworkKt.getNetworkXStream;
 
@@ -115,16 +112,10 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public List<AttributeContainer> getAttributeContainers() {
-        List<AttributeContainer> retList = new ArrayList<>();
-        retList.addAll(network.getFlatNeuronList());
-        retList.addAll(network.getModels(Synapse.class));
-        retList.addAll(network.getFlatNeuronGroupList());
-        retList.addAll(network.getFlatSynapseGroupList());
-        retList.addAll(network.getFlatWeightMatrixList());
-        retList.addAll(network.getModels(NeuronCollection.class));
-        retList.addAll(network.getModels(NeuronArray.class));
-
-        return retList;
+        return network.getAllModels().stream()
+                .filter(m -> (m instanceof AttributeContainer))
+                .map(m -> (AttributeContainer) m )
+                .collect(Collectors.toList());
     }
 
     public static NetworkComponent open(final InputStream input, final String name, final String format) {

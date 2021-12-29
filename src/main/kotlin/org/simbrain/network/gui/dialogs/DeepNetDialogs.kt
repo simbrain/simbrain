@@ -272,6 +272,7 @@ fun testTrainingDialog() {
         arrayListOf(TFInputLayer(2), TFDenseLayer(5), TFDenseLayer(1)),
         4
     )
+    // XOR
     dn.inputData = arrayOf(floatArrayOf(0f, 0f), floatArrayOf(1f, 0f), floatArrayOf(0f, 1f), floatArrayOf(1f, 1f))
     dn.targetData = floatArrayOf(0f, 1f, 1f, 0f)
     dn.initializeDatasets()

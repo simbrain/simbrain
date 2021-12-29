@@ -4,11 +4,12 @@ import org.simbrain.workspace.*
 import java.lang.reflect.Method
 import java.lang.reflect.Type
 
-
 /**
- * A pair containing a producer and a consumer.  When updated, the producer produces a value
- * and the consumer consumes it.  See http://www.simbrain.net/Documentation/docs/Pages/Workspace/Couplings.html
- * and https://www.youtube.com/watch?v=zDUY9mUKZ-I
+ * A pair containing a producer and a consumer. When updated, the producer produces a value
+ * and the consumer consumes it.
+ *
+ * @see http://www.simbrain.net/Documentation/docs/Pages/Workspace/Couplings.html
+ * @see https://www.youtube.com/watch?v=zDUY9mUKZ-I
  *
  * @param <T> the type of the coupling. E.g a double coupling is a link that gets a double value from a producer
  *           and then sets a double value on a consumer.

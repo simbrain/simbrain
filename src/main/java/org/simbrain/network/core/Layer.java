@@ -29,6 +29,9 @@ import java.util.List;
  */
 public abstract class Layer extends LocatableModel {
 
+    // TODO: Currently Smile Matrices are the "lingua Franca" for different layers.
+    //  Keep an eye on Kotlin's Multik as a possible alternative
+
     /**
      * "Fan-in" of incoming connectors.
      */

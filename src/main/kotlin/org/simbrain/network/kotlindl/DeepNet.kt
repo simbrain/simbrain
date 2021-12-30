@@ -100,7 +100,7 @@ class DeepNet(
     /**
      * A list of arrays, one for each layer, used in representing the internal activations of the network.
      */
-    var activations: List<FloatArray> = ArrayList<FloatArray>()
+    var activations: List<FloatArray> = List(tfLayers.size - 2) { floatArrayOf(0.0f) }
 
     init {
         label = network.idManager.getProposedId(this.javaClass)

@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.nodes.PImage
+import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkModel
@@ -13,7 +14,12 @@ import org.simbrain.network.gui.dialogs.getDeepNetEditDialog
 import org.simbrain.network.gui.dialogs.showDeepNetTrainingDialog
 import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.component1
+import org.simbrain.util.piccolo.component2
+import org.simbrain.util.piccolo.component3
+import org.simbrain.util.piccolo.component4
 import org.simbrain.workspace.gui.CouplingMenu
+import java.awt.Color
 import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
@@ -50,6 +56,7 @@ class DeepNetNode(
     private val box = createRectangle(0f, 0f, initialWidth, initialHeight)
 
     private var activationImages = listOf<PImage>()
+    private var activationImagesBoxes = listOf<PPath>()
 
     /**
      * Update status text.
@@ -170,35 +177,8 @@ class DeepNetNode(
         events.onDeleted { n: NetworkModel? -> removeFromParent() }
         events.onUpdated { updateInfoText() }
 
-        val layerImageHeight = 5.0
-        val layerImageWidth = initialWidth - 10.0
-        val layerImagePadding = 2.0
-
         events.onUpdated {
-            val output = deepNet.outputs!!.col(0).map { it.toFloat() }.toFloatArray()
-            val input = deepNet.floatInputs
-            val allActivations = listOf(input) + deepNet.activations + listOf(output)
-            activationImages.forEach { removeChild(it) }
-            val totalHeight = activationImages.size * 7.0
-            activationImages = allActivations.mapIndexed { index, layer ->
-                PImage(layer.toSimbrainColorImage(layer.size, 1)).also { image ->
-                    image.setBounds(
-                        0.0,
-                        totalHeight - index * (layerImageHeight + layerImagePadding),
-                        layerImageWidth,
-                        layerImageHeight
-                    )
-                }
-            }
-            activationImages.forEach {
-                addChild(it)
-            }
-            val allActivationsBound = activationImages.map { it.bounds.bounds2D }.reduce { acc, bound ->
-                acc.createUnion(bound)
-            }
-            val newBounds = allActivationsBound.addPadding(10.0)
-            box.setBounds(newBounds)
-            setBounds(newBounds)
+            renderActivations()
         }
 
         // Info text
@@ -208,5 +188,46 @@ class DeepNetNode(
         updateInfoText()
         deepNet.events.onLocationChange { pullViewPositionFromModel() }
         pullViewPositionFromModel()
+        renderActivations()
+    }
+
+    private fun renderActivations() {
+        val layerImageHeight = 5.0
+        val layerImageWidth = initialWidth - 10.0
+        val layerImagePadding = 2.0
+
+        val output = deepNet.outputs!!.col(0).map { it.toFloat() }.toFloatArray()
+        val input = deepNet.floatInputs
+        val allActivations = listOf(input) + deepNet.activations + listOf(output)
+        activationImages.forEach { removeChild(it) }
+        activationImagesBoxes.forEach { removeChild(it) }
+        val totalHeight = activationImages.size * 7.0
+        activationImages = allActivations.mapIndexed { index, layer ->
+            PImage(layer.toSimbrainColorImage(layer.size, 1)).also { image ->
+                image.setBounds(
+                    0.0,
+                    totalHeight - index * (layerImageHeight + layerImagePadding),
+                    layerImageWidth,
+                    layerImageHeight
+                )
+            }
+        }
+        activationImagesBoxes = activationImages.map {
+            val (x, y, w, h) = it.bounds
+            val box = PPath.createRectangle(x, y, w, h)
+            box.strokePaint = Color.BLACK
+            box.paint = null
+            box
+        }
+
+        activationImages.forEach { addChild(it) }
+        activationImagesBoxes.forEach { addChild(it) }
+
+        val allActivationsBound = activationImages.map { it.bounds.bounds2D }.reduce { acc, bound ->
+            acc.createUnion(bound)
+        }
+        val newBounds = allActivationsBound.addPadding(10.0)
+        box.setBounds(newBounds)
+        setBounds(newBounds)
     }
 }

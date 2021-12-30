@@ -13,6 +13,7 @@ import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 import java.util.*
@@ -25,7 +26,7 @@ class DeepNet(
     private val network: Network,
     val tfLayers: ArrayList<TFLayer<*>>,
     nsamples: Int = 10
-): ArrayLayer(network, (tfLayers[0] as TFInputLayer).rows),
+): ArrayLayer(network, (tfLayers[0] as TFInputLayer).numElements),
     AttributeContainer,
     EditableObject {
 
@@ -54,6 +55,13 @@ class DeepNet(
      */
     val floatInputs: FloatArray
         get() = toFloatArray(doubleInputs)
+
+    /**
+     * Outputs as double array for use with couplings.
+     */
+    val outputArray: DoubleArray
+        @Producible(description="Outputs")
+        get() = outputs?.col(0) ?: DoubleArray(outputSize())
 
     /**
      * The training data that can be edited by the user.

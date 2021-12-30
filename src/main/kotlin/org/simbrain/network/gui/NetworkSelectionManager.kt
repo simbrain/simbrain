@@ -145,6 +145,11 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     fun unselect(screenElements: Collection<ScreenElement>) = screenElements.forEach { unselect(it) }
 
     /**
+     * Returns true if the provided screen element is selected.
+     */
+    fun isSelected(screenElement: ScreenElement) = screenElement in selection
+
+    /**
      * Convert all selected nodes to selected source "red" nodes.
      */
     fun convertSelectedNodesToSourceNodes() = modifySourceSelection {

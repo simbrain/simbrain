@@ -7,7 +7,6 @@ import javax.swing.JMenu
 import javax.swing.JMenuItem
 import javax.swing.JSeparator
 
-
 /**
  * A JMenu that appears relative to some object (an [AttributeContainer]) in
  * a workspace component. The menu allows you to create a coupling from that object

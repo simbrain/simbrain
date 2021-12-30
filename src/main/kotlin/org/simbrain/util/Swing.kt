@@ -27,7 +27,7 @@ inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {
  * Similar to Utils.createAction but using Kotlin context.
  */
 fun <T: JComponent> T.createAction(
-    iconPath: String,
+    iconPath: String? = null,
     name: String,
     description: String = name,
     keyCombo: KeyCombination? = null,
@@ -35,7 +35,10 @@ fun <T: JComponent> T.createAction(
 ): AbstractAction {
     return object : AbstractAction() {
         init {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+            if (iconPath != null) {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+            }
+
             putValue(NAME, name)
             putValue(SHORT_DESCRIPTION, description)
             if (keyCombo != null) {
@@ -53,8 +56,8 @@ fun <T: JComponent> T.createAction(
  * Create an action with a char rather than a key combinaation
  */
 fun <T: JComponent> T.createAction(
-    iconPath: String,
-    name: String,
+    iconPath: String = "",
+    name: String = "",
     description: String = name,
     keyPress: Char,
     block: T.() -> Unit

@@ -13,12 +13,11 @@ import org.simbrain.network.gui.dialogs.getDeepNetEditDialog
 import org.simbrain.network.gui.dialogs.showDeepNetTrainingDialog
 import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.util.*
+import org.simbrain.workspace.gui.CouplingMenu
 import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.awt.geom.Point2D
-import java.awt.geom.Rectangle2D
-import java.awt.image.BufferedImage
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JDialog
@@ -69,6 +68,9 @@ class DeepNetNode(
         deepNet.height = box.height
     }
 
+    override fun getToolTipText(): String? {
+        return deepNet.toString()
+    }
     override fun isSelectable(): Boolean {
         return true
     }
@@ -97,20 +99,21 @@ class DeepNetNode(
         contextMenu.add(DeleteAction(networkPanel))
         contextMenu.addSeparator()
 
-        // Coupling menu
-        //contextMenu.addSeparator();
-        //JMenu couplingMenu = networkPanel.getCouplingMenu(neuronArray);
-        //if (couplingMenu != null) {
-        //    contextMenu.add(couplingMenu);
-        //}
-
         // Train Submenu
-        val trainDeepNet: Action = object : AbstractAction("Train...") {
-            override fun actionPerformed(event: ActionEvent) {
+        val trainDeepNet = networkPanel.createAction(
+            name = "Train...",
+            keyCombo = CmdOrCtrl + 'T'
+        ) {
+            if (selectionManager.isSelected(this@DeepNetNode)) {
                 showDeepNetTrainingDialog(deepNet)
             }
         }
         contextMenu.add(trainDeepNet)
+
+        // Coupling menu
+        contextMenu.addSeparator()
+        contextMenu.add(CouplingMenu(networkPanel.networkComponent, deepNet))
+
         return contextMenu
     }
 

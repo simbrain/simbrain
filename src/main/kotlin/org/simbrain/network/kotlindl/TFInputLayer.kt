@@ -39,6 +39,9 @@ class TFInputLayer(
         return "Input layer"
     }
 
+    val numElements
+        get() = rows * cols * channels
+
     companion object {
         @JvmStatic
         fun getTypes(): List<Class<*>> {

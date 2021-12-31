@@ -53,6 +53,7 @@ class DeepNetNode(
      * Text showing info about the array.
      */
     private val infoText: PText
+
     private val box = createRectangle(0f, 0f, initialWidth, initialHeight)
 
     private var activationImages = listOf<PImage>()
@@ -62,17 +63,15 @@ class DeepNetNode(
      * Update status text.
      */
     private fun updateInfoText() {
-        infoText.text = """
-             Output: (${Utils.doubleArrayToString(deepNet.outputs!!.col(0), 2)})
-             
-             Input: (${Utils.doubleArrayToString(deepNet.doubleInputs, 2)})
-             """.trimIndent()
-        val newBounds = infoText.bounds.bounds
-        newBounds.grow(10, 10) // add a margin
-        box.setBounds(newBounds)
-        setBounds(box.bounds)
-        deepNet.width = box.width
-        deepNet.height = box.height
+        infoText.text = deepNet.id
+        // infoText.text = """
+        //      Output: (${Utils.doubleArrayToString(deepNet.outputs!!.col(0), 2)})
+        //
+        //      Input: (${Utils.doubleArrayToString(deepNet.doubleInputs, 2)})
+        //      """.trimIndent()
+        val (x,y,width,height) = infoText.bounds
+        val topPadding = -10.0
+        infoText.setBounds(0.0, topPadding, width, height)
     }
 
     override fun getToolTipText(): String? {
@@ -173,22 +172,27 @@ class DeepNetNode(
     init {
         box.pickable = true
         addChild(box)
+
         val events = deepNet.events
         events.onDeleted { n: NetworkModel? -> removeFromParent() }
-        events.onUpdated { updateInfoText() }
-
         events.onUpdated {
             renderActivations()
+            updateInfoText()
+            updateBounds()
         }
+        deepNet.events.onLocationChange { pullViewPositionFromModel() }
 
         // Info text
         infoText = PText()
         infoText.font = INFO_FONT
-        // addChild(infoText)
-        updateInfoText()
-        deepNet.events.onLocationChange { pullViewPositionFromModel() }
+        addChild(infoText)
+
+        // Initialize gui stuff
         pullViewPositionFromModel()
         renderActivations()
+        updateInfoText()
+        updateBounds()
+
     }
 
     private fun renderActivations() {
@@ -223,10 +227,13 @@ class DeepNetNode(
         activationImages.forEach { addChild(it) }
         activationImagesBoxes.forEach { addChild(it) }
 
-        val allActivationsBound = activationImages.map { it.bounds.bounds2D }.reduce { acc, bound ->
+    }
+
+    private fun updateBounds() {
+        val allBounds = (activationImages + infoText).map { it.bounds.bounds2D }.reduce { acc, bound ->
             acc.createUnion(bound)
         }
-        val newBounds = allActivationsBound.addPadding(10.0)
+        val newBounds = allBounds.addPadding(10.0)
         box.setBounds(newBounds)
         setBounds(newBounds)
     }

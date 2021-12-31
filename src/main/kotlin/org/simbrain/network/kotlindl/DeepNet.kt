@@ -99,6 +99,7 @@ class DeepNet(
 
     /**
      * A list of arrays, one for each layer, used in representing the internal activations of the network.
+     * Note that input and output activations are stored in [doubleInputs] and [outputArray].
      */
     var activations: List<FloatArray> = List(tfLayers.size - 2) { floatArrayOf(0.0f) }
 

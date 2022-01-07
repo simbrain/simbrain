@@ -4,6 +4,7 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
@@ -164,6 +165,15 @@ class NetworkGeneticsContext(val network: Network) {
     fun Chromosome<Neuron, NodeGene>.asGroup(block: NeuronGroup.() -> Unit = { }) = fun(network: Network): NeuronGroup {
         return genes.map { it.buildWithContext(this@NetworkGeneticsContext) }
             .let { NeuronGroup(network, it).apply(block) }
+            .also { network.addNetworkModel(it) }
+    }
+
+    fun Chromosome<Neuron, NodeGene>.asNeuronCollection(block: NeuronCollection.() -> Unit = { }) = fun(network: Network):
+            NeuronCollection {
+        return genes.map { it.buildWithContext(this@NetworkGeneticsContext) }
+            .let {
+                it.forEach(network::addNetworkModel)
+                NeuronCollection(network, it).apply(block) }
             .also { network.addNetworkModel(it) }
     }
 

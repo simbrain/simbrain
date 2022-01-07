@@ -8,6 +8,8 @@ import org.simbrain.custom_sims.addOdorWorldComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.labels
+import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule
@@ -126,19 +128,22 @@ val evolveAvoider = newSim {
             onBuild { visible ->
                 network {
                     if (visible) {
-                        val inputGroup = +inputs.asGroup {
+                        val inputGroup = +inputs.asNeuronCollection {
                             label = "Input"
+                            layout(LineLayout())
                             location = point(250, 280)
                         }
                         inputGroup.neuronList.labels = listOf("center", "left", "right")
-                        +hiddens.asGroup {
+                        +hiddens.asNeuronCollection {
                             label = "Hidden"
+                            layout(GridLayout())
                             location = point(0, 100)
                         }
-                        val outputGroup = +outputs.asGroup {
+                        val outputGroup = +outputs.asNeuronCollection {
                             label = "Output"
+                            layout(LineLayout())
                             location = point(250, 40)
-                            setPrototypeRule(outputs[0].template.updateRule)
+                            setNeuronType(outputs[0].template.updateRule)
                         }
                         outputGroup.neuronList.labels = listOf("right", "left", "right")
 
@@ -263,7 +268,7 @@ val evolveAvoider = newSim {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-            runUntil { generation == maxGenerations || fitness > -3 }
+            runUntil { generation == maxGenerations || fitness > -1 }
         }
     }
 

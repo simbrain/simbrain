@@ -22,13 +22,8 @@ class TFInputLayer(
             return Input(rows.toLong()).also {
                 layer = it
             }
-        } else if (channels == 1) {
-            // Rank 2 case
-            return Input(rows.toLong(),cols.toLong()).also {
-                layer = it
-            }
         } else {
-            // Rank 3 case
+            // Rank 2 and 3 case
             return Input(rows.toLong(), cols.toLong(), channels.toLong()).also {
                 layer = it
             }

@@ -20,6 +20,7 @@ package org.simbrain.network.groups;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.layouts.Layout;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * A collection of loose neurons (neurons in a {@link NeuronGroup} can be added to a collection). Allows them to be
  * labelled, moved around as a unit, coupled to, etc. However no special processing occurs in neuron collections. They
- * are a convenience. NeuronCollections can overlap each other.
+ * are a convenience. NeuronCollections can overlap each other in the sense of having neurons in common.
  */
 public class NeuronCollection extends AbstractNeuronCollection {
 
@@ -141,5 +142,12 @@ public class NeuronCollection extends AbstractNeuronCollection {
     public void postOpenInit() {
         super.postOpenInit();
         getNeuronList().forEach(this::addListener);
+    }
+
+    /**
+     * Convenience method for applying a {@link Layout} to a neuron collection.
+     */
+    public void layout(Layout layout) {
+        layout.layoutNeurons(neuronList);
     }
 }

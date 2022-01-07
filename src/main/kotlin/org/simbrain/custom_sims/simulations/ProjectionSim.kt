@@ -14,17 +14,18 @@ import org.simbrain.util.point
  */
 val projectionSim = newSim {
 
+    // Basic setup
     workspace.clearWorkspace()
-
     val networkComponent = addNetworkComponent("Network")
-
     val network = networkComponent.network
 
     // Add a self-connected neuron array to the network
-    val na = NeuronArray(network, 25)
-    val wm = WeightMatrix(network, na, na)
-    network.addNetworkModels(listOf(na, wm))
+    val neuronArray = NeuronArray(network, 25)
+    val weightMatrix = WeightMatrix(network, neuronArray, neuronArray)
+    weightMatrix.randomize()
+    network.addNetworkModels(listOf(neuronArray, weightMatrix))
 
+    // Location of the network in the desktop
     withGui {
         place(networkComponent) {
             location = point(0, 0)
@@ -33,8 +34,8 @@ val projectionSim = newSim {
         }
     }
 
+    // Location of the projection in the desktop
     val projectionPlot = addProjectionPlot("Activations")
-
     withGui {
         place(projectionPlot) {
             location = point(410, 0)
@@ -43,8 +44,9 @@ val projectionSim = newSim {
         }
     }
 
+    // Couple the neuron array to the projection plot
     with(couplingManager) {
-        na couple projectionPlot
+        neuronArray couple projectionPlot
     }
 
 }

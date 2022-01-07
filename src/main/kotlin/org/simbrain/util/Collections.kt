@@ -85,6 +85,18 @@ fun reshape(rows: Int, cols: Int, array: DoubleArray) =
         row
     }
 
+fun FloatArray.reshape(rows: Int, cols: Int, channels: Int): Array<Array<FloatArray>> {
+    return Array(channels) { c ->
+        Array(rows) { i ->
+            val row = FloatArray(cols)
+            for (j in 0 until cols) {
+                row[j] = this[c * rows * cols + i * cols + j]
+            }
+            row
+        }
+    }
+}
+
 /**
  * Convert integer array to long array
  */

@@ -13,6 +13,7 @@ import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.dialogs.getDeepNetEditDialog
 import org.simbrain.network.gui.dialogs.showDeepNetTrainingDialog
 import org.simbrain.network.kotlindl.DeepNet
+import org.simbrain.network.kotlindl.TFInputLayer
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.component1
 import org.simbrain.util.piccolo.component2
@@ -69,9 +70,9 @@ class DeepNetNode(
         //
         //      Input: (${Utils.doubleArrayToString(deepNet.doubleInputs, 2)})
         //      """.trimIndent()
-        val (x,y,width,height) = infoText.bounds
-        val topPadding = -10.0
-        infoText.setBounds(0.0, topPadding, width, height)
+        // val (x,y,width,height) = infoText.bounds
+        // val topPadding = -10.0
+        // infoText.setBounds(0.0, topPadding, width, height)
     }
 
     override fun getToolTipText(): String? {
@@ -177,8 +178,8 @@ class DeepNetNode(
         events.onDeleted { n: NetworkModel? -> removeFromParent() }
         events.onUpdated {
             renderActivations()
-            updateInfoText()
-            updateBounds()
+            // updateInfoText()
+            // updateBounds()
         }
         deepNet.events.onLocationChange { pullViewPositionFromModel() }
 
@@ -189,33 +190,70 @@ class DeepNetNode(
 
         // Initialize gui stuff
         pullViewPositionFromModel()
-        renderActivations()
         updateInfoText()
+        renderActivations()
         updateBounds()
 
     }
 
     private fun renderActivations() {
-        val layerImageHeight = 5.0
+        val denseLayerImageHeight = 5.0
+        val convLayerImageHeight = 10.0
         val layerImageWidth = initialWidth - 10.0
         val layerImagePadding = 2.0
 
         val output = deepNet.outputs!!.col(0).map { it.toFloat() }.toFloatArray()
         val input = deepNet.floatInputs
-        val allActivations = listOf(input) + deepNet.activations + listOf(output)
+        val inputLayer = (deepNet.tfLayers[0] as TFInputLayer)
+        val inputActivations = if (inputLayer.getRank() == 3) {
+            listOf(input.reshape(inputLayer.rows, inputLayer.cols, inputLayer.channels).toList())
+        } else {
+            listOf(input)
+        }
+        val allActivations = inputActivations + deepNet.activations + listOf(output)
         activationImages.forEach { removeChild(it) }
         activationImagesBoxes.forEach { removeChild(it) }
-        val totalHeight = activationImages.size * 7.0
-        activationImages = allActivations.mapIndexed { index, layer ->
-            PImage(layer.toSimbrainColorImage(layer.size, 1)).also { image ->
-                image.setBounds(
-                    0.0,
-                    totalHeight - index * (layerImageHeight + layerImagePadding),
-                    layerImageWidth,
-                    layerImageHeight
-                )
+        var totalHeight = infoText.height
+        activationImages = sequence {
+            allActivations.forEachIndexed { index, layer ->
+                if (layer is FloatArray) {
+                    val height = denseLayerImageHeight + layerImagePadding
+                    totalHeight += height
+                    yield(PImage(layer.toSimbrainColorImage(layer.size, 1)).also { image ->
+                        image.setBounds(
+                            0.0,
+                            -totalHeight,
+                            layerImageWidth,
+                            denseLayerImageHeight
+                        )
+                    })
+                } else if (layer is List<*>) {
+                    totalHeight += convLayerImageHeight + layerImagePadding
+                    val width = layerImageWidth / layer.size - layerImagePadding * ((layer.size - 1.0) / layer.size)
+                    layer.filterIsInstance<Array<FloatArray>>().forEachIndexed { x, array ->
+                        yield(PImage(array.toSimbrainColorImage()).also { image ->
+                            image.setBounds(
+                                x * (width + layerImagePadding),
+                                -totalHeight,
+                                width,
+                                convLayerImageHeight
+                            )
+                        })
+                    }
+                } else {
+                    val height = denseLayerImageHeight + layerImagePadding
+                    totalHeight += height
+                    yield(PImage(floatArrayOf(-1.0f).toSimbrainColorImage(1, 1)).also { image ->
+                        image.setBounds(
+                            0.0,
+                            -totalHeight,
+                            layerImageWidth,
+                            denseLayerImageHeight
+                        )
+                    })
+                }
             }
-        }
+        }.toList()
         activationImagesBoxes = activationImages.map {
             val (x, y, w, h) = it.bounds
             val box = PPath.createRectangle(x, y, w, h)
@@ -230,6 +268,10 @@ class DeepNetNode(
     }
 
     private fun updateBounds() {
+        val padding = 5.0
+        val lastImage = activationImages.last()
+        val (x, _, w, h) = infoText.bounds
+        infoText.setBounds(x, lastImage.y - h - padding, w, h)
         val allBounds = (activationImages + infoText).map { it.bounds.bounds2D }.reduce { acc, bound ->
             acc.createUnion(bound)
         }

@@ -101,7 +101,7 @@ class DeepNet(
      * A list of arrays, one for each layer, used in representing the internal activations of the network.
      * Note that input and output activations are stored in [doubleInputs] and [outputArray].
      */
-    var activations: List<FloatArray> = List(tfLayers.size - 2) { floatArrayOf(0.0f) }
+    var activations: List<*>
 
     init {
         label = network.idManager.getProposedId(this.javaClass)
@@ -109,6 +109,14 @@ class DeepNet(
         outputs = Matrix(outputSize(), 1)
         inputData = Array(nsamples) { FloatArray(inputSize()) }
         targetData = FloatArray(nsamples)
+        activations = deepNetLayers.layers.dropLast(1).filter { it.hasActivation }.map {
+            if (it.outputShape.rank() == 4) {
+                val filters = it.outputShape[3].toInt()
+                List(filters) { arrayOf(floatArrayOf(0.0f)) }
+            } else {
+                floatArrayOf(0.0f)
+            }
+        }
     }
 
     fun buildNetwork() {
@@ -166,8 +174,22 @@ class DeepNet(
                 // One-hot case
                 val (prediction, activations) = deepNetLayers.predictAndGetActivations(floatInputs)
                 outputs = getOneHotMat(prediction,outputSize())
-                this.activations = activations.filterIsInstance<Array<*>>().flatMap { layer ->
-                    layer.filterIsInstance<FloatArray>() // TODO: conv2d
+                this.activations = activations.filterIsInstance<Array<*>>().map { layer ->
+                    val shape = layer.shape
+                    when(shape.size) {
+                        2 -> layer[0]
+                        4 -> {
+                            val (_, w, h, f) = shape
+                            (0 until f).map { a ->
+                                (0 until w).map { i ->
+                                    (0 until h).map { j ->
+                                        (layer as Array<Array<Array<FloatArray>>>)[0][i][j][a]
+                                    }.toFloatArray()
+                                }.toTypedArray()
+                            }
+                        }
+                        else -> floatArrayOf(0.0f)
+                    }
                 }
             }
         } else {

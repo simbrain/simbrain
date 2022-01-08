@@ -1,7 +1,6 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Neuron
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.AttributeContainer
@@ -53,7 +52,8 @@ val NetworkPanel.insertMenu
             addSeparator()
             add(addNeuronsAction)
             add(addNeuronArrayAction)
-            add(addMultiLayerNet)
+            add(addDeepNetAction)
+            add(addSmileClassifier)
             addSeparator()
             add(newNetworkMenu)
             add(testInputAction)
@@ -105,7 +105,8 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
         add(newNeuronAction)
         add(addNeuronsAction)
         add(addNeuronArrayAction)
-        add(addMultiLayerNet)
+        add(addDeepNetAction)
+        add(addSmileClassifier)
         add(newNetworkMenu)
         addSeparator()
 

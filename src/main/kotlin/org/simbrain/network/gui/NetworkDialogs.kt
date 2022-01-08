@@ -1,14 +1,11 @@
 package org.simbrain.network.gui
 
-//import org.simbrain.network.gui.dialogs.dl4j.MultiLayerNetCreationDialog
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.dialogs.TestInputPanel
-import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
@@ -16,7 +13,6 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
@@ -66,14 +62,6 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
         setLocationRelativeTo(this@showNeuronArrayCreationDialog)
         isVisible = true
     }
-}
-
-fun NetworkPanel.showMultiLayerNetworkCreationDialog() {
-//    MultiLayerNetCreationDialog(this).apply {
-//        pack()
-//        setLocationRelativeTo(this)
-//        isVisible = true
-//    }
 }
 
 val NetworkPanel.neuronDialog
@@ -186,20 +174,6 @@ fun NetworkPanel.showLMSDialog(lms: LMSIterative) {
 //        pack()
 //        isVisible = true
 //    }
-}
-
-/**
- * Connect all selected [Layer]s with [WeightMatrix] objects.
- */
-fun NetworkPanel.createConnector() {
-    with(selectionManager) {
-        val sources = filterSelectedSourceModels<Layer>()
-        val targets = filterSelectedModels<Layer>()
-        val dialog = ConnectorDialog(this.networkPanel, sources, targets)
-        dialog.setLocationRelativeTo(null)
-        dialog.pack()
-        dialog.isVisible = true
-    }
 }
 
 /**

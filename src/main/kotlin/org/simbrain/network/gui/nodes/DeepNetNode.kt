@@ -111,9 +111,11 @@ class DeepNetNode(
             name = "Train...",
             keyCombo = CmdOrCtrl + 'T'
         ) {
-            if (selectionManager.isSelected(this@DeepNetNode)) {
+            // TODO: Commented out code prevents the dialog being opened for multiple
+            //  deep net nodes, but prevents it being called from right click node.
+            // if (selectionManager.isSelected(this@DeepNetNode)) {
                 showDeepNetTrainingDialog(deepNet)
-            }
+            // }
         }
         contextMenu.add(trainDeepNet)
 

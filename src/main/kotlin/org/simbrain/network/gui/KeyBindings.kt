@@ -1,7 +1,6 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.LocatableModel
-import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.util.*
@@ -28,8 +27,6 @@ fun NetworkPanel.addKeyBindings() {
     bind(Ctrl + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
-    bind(Shift + 'S') { showClassifierCreationDialog() }
-    bind(Shift + 'D') {  showDeepNetCreationDialog() }
     bind(Shift + 'Z') { network.addNetworkModel(ZoeLayer(network, 10)) } // TODO: Temp testing key command
     bindTo("I", networkActions.wandEditModeAction)
     bindTo("G", networkActions.neuronGroupAction)
@@ -39,7 +36,6 @@ fun NetworkPanel.addKeyBindings() {
     bind(CmdOrCtrl + 'Y') { redo() }
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModels() }
-    bind("3") {  createConnector() }
     bind("5") { looseWeightsVisible = !looseWeightsVisible }
     bindTo("6", networkActions.selectIncomingWeightsAction)
     bindTo("7", networkActions.selectOutgoingWeightsAction)

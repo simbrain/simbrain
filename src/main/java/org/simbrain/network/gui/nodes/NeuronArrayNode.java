@@ -25,7 +25,6 @@ import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.gui.NetworkDialogsKt;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
@@ -297,18 +296,7 @@ public class NeuronArrayNode extends ScreenElement {
         contextMenu.add(editArray);
         contextMenu.add(new DeleteAction(getNetworkPanel()));
         contextMenu.addSeparator();
-
-        Action connectArrays = new AbstractAction("Connect arrays...") {
-            {
-                putValue(SHORT_DESCRIPTION, "Connect arrays with a connector");
-            }
-
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                NetworkDialogsKt.createConnector(networkPanel);
-            }
-        };
-        contextMenu.add(connectArrays);
+        contextMenu.add(networkPanel.getNetworkActions().getConnectSelectedModels());
         contextMenu.addSeparator();
 
 

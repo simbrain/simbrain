@@ -24,7 +24,7 @@ inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {
 }
 
 /**
- * Similar to Utils.createAction but using Kotlin context.
+ * Similar to Utils.createAction but using Kotlin context. Can be used with any JComponent.
  */
 fun <T: JComponent> T.createAction(
     iconPath: String? = null,

@@ -19,6 +19,7 @@ import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.actions.edit.ToggleAutoZoom
+import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
@@ -506,12 +507,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
         with(selectionManager) {
 
-            // Connect first selected neuron groups with a synapse group, if any are selected
-            val src = networkPanel.selectionManager.filterSelectedSourceModels(NeuronGroup::class.java)
-            val tar = networkPanel.selectionManager.filterSelectedModels(NeuronGroup::class.java)
-            if (src.isNotEmpty() && tar.isNotEmpty()) {
-                displaySynapseGroupDialog(this.networkPanel, src.get(0), tar.get(0))
-                return;
+            // Connect layers
+            if (connectNeuronGroups()) {
+                return
+            }
+
+            // Connect neuron groups
+            if (connectLayers()) {
+                return
             }
 
             // Connect loose neurons with loose synapses using quick connector
@@ -524,6 +527,55 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
             quickConnector.applyCurrentConnection(network, sourceNeurons, targetNeurons)
         }
     }
+
+    /**
+     * Connect [Layer] objects.
+     *
+     * @retrun false if there source and target neurons did not have a [Layer]
+     */
+    private fun NetworkSelectionManager.connectLayers(): Boolean {
+        val sources = filterSelectedSourceModels(Layer::class.java)
+        val targets = filterSelectedModels(Layer::class.java)
+        if (sources.isNotEmpty() && targets.isNotEmpty()) {
+            val dialog = ConnectorDialog(this.networkPanel, sources, targets)
+            dialog.setLocationRelativeTo(null)
+            dialog.pack()
+            dialog.isVisible = true
+            return true
+        }
+        return false
+    }
+
+
+    /**
+     * Connect all selected [Layer]s with [WeightMatrix] objects.
+     */
+    fun NetworkPanel.createConnector() {
+        with(selectionManager) {
+            val sources = filterSelectedSourceModels<Layer>()
+            val targets = filterSelectedModels<Layer>()
+            val dialog = ConnectorDialog(this.networkPanel, sources, targets)
+            dialog.setLocationRelativeTo(null)
+            dialog.pack()
+            dialog.isVisible = true
+        }
+    }
+
+    /**
+     * Connect first selected neuron groups with a synapse group, if any are selected.
+     *
+     * @retrun false if there source and target neurons did not have a neuron group.
+     */
+    private fun NetworkSelectionManager.connectNeuronGroups(): Boolean {
+        val src = filterSelectedSourceModels(NeuronGroup::class.java)
+        val tar = filterSelectedModels(NeuronGroup::class.java)
+        if (src.isNotEmpty() && tar.isNotEmpty()) {
+            displaySynapseGroupDialog(this.networkPanel, src.get(0), tar.get(0))
+            return true;
+        }
+        return false
+    }
+
 
     // TODO: Move to NetworkDialogs.kt
     @Deprecated("Consider removing or refactor out of NetworkPanel")

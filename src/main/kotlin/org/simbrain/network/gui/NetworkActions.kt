@@ -7,7 +7,6 @@ import org.simbrain.network.gui.actions.TestInputAction
 import org.simbrain.network.gui.actions.connection.ApplyConnectionAction
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons
-import org.simbrain.network.gui.actions.dl4j.AddMultiLayerNet
 import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction
 import org.simbrain.network.gui.actions.edit.*
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction
@@ -24,13 +23,17 @@ import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
+import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
+import org.simbrain.util.CmdOrCtrl
+import org.simbrain.util.Shift
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.createAction
 import javax.swing.AbstractAction
 
 
 class NetworkActions(val networkPanel: NetworkPanel) {
 
-    val addMultiLayerNet = AddMultiLayerNet(networkPanel)
+    // TODO: Convert these to inline actions as below.
     val addNeuronArrayAction = AddNeuronArrayAction(networkPanel)
     val addNeuronsAction = AddNeuronsAction(networkPanel)
     val addSynapseGroupAction = AddSynapseGroupAction(networkPanel)
@@ -76,6 +79,29 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val textEditModeAction = TextEditModeAction(networkPanel)
     val wandEditModeAction = WandEditModeAction(networkPanel)
     val zoomToFitPageAction = ZoomToFitPageAction(networkPanel)
+
+    val addDeepNetAction = networkPanel.createAction(
+        name = "Add Deep Network...",
+        description = "Create a new deep network",
+        keyCombo = CmdOrCtrl + Shift + 'D'
+    ) {
+        showDeepNetCreationDialog()
+    }
+
+    val addSmileClassifier = networkPanel.createAction(
+        name = "Add Smile Classifier...",
+        description = "Create a new Smile classifier",
+        keyCombo = CmdOrCtrl + Shift + 'S'
+    ) {
+        showClassifierCreationDialog()
+    }
+
+    val connectSelectedModels = networkPanel.createAction(
+        name = "Connected selected objects...",
+        description = "Creates synapse, weight matrix, etc. between selected source and target entities",
+    ) {
+        connectSelectedModels()
+    }
 
     val neuronGroupAction = addGroupAction("Add Neuron Group...") {
         NeuronGroupDialog(it)

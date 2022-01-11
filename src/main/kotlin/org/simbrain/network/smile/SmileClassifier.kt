@@ -41,18 +41,13 @@ class SmileClassifier(
     private var outputs = Matrix(outputSize, 1)
 
     /**
-     * Width and height are in the model for now because arrows must access them in the model.
-     */
-    var width: Double = 0.0
-    var height: Double = 0.0
-
-    /**
      * Construct a classifier.
      */
     init {
         label = net.idManager.getProposedId(this::class.java)
         trainingInputs = Array(nsamples) { DoubleArray(inputSize) }
         targets = IntArray(nsamples)
+
     }
 
     /**

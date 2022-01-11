@@ -55,14 +55,24 @@ public abstract class Layer extends LocatableModel {
     public abstract Matrix getOutputs();
 
     /**
-     * Default x coordinate of center of layer.
+     * x coordinate of center of layer.
      */
     private double x;
 
     /**
-     * Default y coordinate of center of layer.
+     * y coordinate of center of layer.
      */
     private double y;
+
+    /**
+     * Width of layer. Mainly used by graphica arrows drawn to represent {@link Connector}s.
+     */
+    private double width;
+
+    /**
+     * Height of layer
+     */
+    private double height;
 
     /**
      * Event support.
@@ -163,4 +173,23 @@ public abstract class Layer extends LocatableModel {
     public double getY() {
         return y;
     }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+        events.fireLocationChange();
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+        events.fireLocationChange();
+    }
+
 }

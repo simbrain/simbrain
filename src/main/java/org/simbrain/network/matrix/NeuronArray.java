@@ -98,7 +98,8 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     @Override
     public Rectangle2D getBound() {
-        return new Rectangle2D.Double(getX() - 150 / 2, getY() - 50 / 2, 150, 50);
+        return new Rectangle2D.Double(getX() - getWidth() / 2, getY() - getHeight() / 2,
+                getWidth(), getHeight());
     }
 
     public boolean isRenderActivations() {

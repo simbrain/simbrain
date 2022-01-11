@@ -92,12 +92,6 @@ class DeepNet(
     var lossValue: Double = 0.0
 
     /**
-     * Width and height are in the model for now because arrows must access them in the model.
-     */
-    var width: Double = 0.0
-    var height: Double = 0.0
-
-    /**
      * A list of arrays, one for each layer, used in representing the internal activations of the network.
      * Note that input and output activations are stored in [doubleInputs] and [outputArray].
      */

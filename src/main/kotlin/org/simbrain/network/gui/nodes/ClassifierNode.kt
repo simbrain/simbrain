@@ -39,7 +39,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
     }
 
     init {
-
+        pullViewPositionFromModel()
         smileClassifier.events.apply {
             onDeleted { removeFromParent() }
             onUpdated {
@@ -48,7 +48,6 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
             onLocationChange { pullViewPositionFromModel() }
         }
         updateInfoText()
-        pullViewPositionFromModel()
     }
 
     fun pullViewPositionFromModel() {
@@ -56,14 +55,20 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
         this.globalTranslation = point
     }
 
+
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        pushViewPositionToModel()
+        pushPositionToModel()
         super.offset(dx, dy)
     }
 
-    fun pushViewPositionToModel() {
+    fun pushPositionToModel() {
         val p = this.globalTranslation
         smileClassifier.location = point(p.x + width / 2, p.y + height / 2)
+    }
+
+    fun pushBoundsToModel() {
+        smileClassifier.width = bounds.width
+        smileClassifier.height = bounds.height
     }
 
     /**
@@ -73,13 +78,16 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
         infoText.text = "Output: (" +
                 Utils.doubleArrayToString(smileClassifier.outputs.col(0), 2) + ")" +
                 "\n\nInput: (" + Utils.doubleArrayToString(smileClassifier.inputs.col(0), 2) + ")"
+        updateBounds()
+    }
+
+    fun updateBounds() {
         // Sets border box to size of text, grown by a margin
         borderBox.setBounds(infoText.bounds.bounds.apply {
             grow(10,10)
         })
         setBounds(borderBox.bounds)
-        smileClassifier.width = borderBox.width
-        smileClassifier.height = borderBox.height
+        pushBoundsToModel()
     }
 
     override fun getModel(): NetworkModel {

@@ -80,7 +80,7 @@ public class NeuronArrayNode extends ScreenElement {
     private final int borderPixels = 10;
 
     /**
-     * Height of array when in "flat" mode.
+     * Height of image when in "flat" mode.
      */
     private final int flatPixelArrayHeight = 10;
 
@@ -154,6 +154,8 @@ public class NeuronArrayNode extends ScreenElement {
         borderBox = PPath.createRectangle(0, 0, getWidth(), getHeight());
         addChild(borderBox);
 
+        pullViewPositionFromModel();
+
         // Info text
         infoText = new PText();
         infoText.setFont(INFO_FONT);
@@ -161,10 +163,11 @@ public class NeuronArrayNode extends ScreenElement {
         infoText.offset(8, 8);
         updateInfoText();
 
-        pullViewPositionFromModel();
-
         // Image array
         renderArrayToActivationsImage();
+
+        validateFullBounds();
+        pushBoundsToModel();
 
         updateClampStatus();
 
@@ -189,14 +192,19 @@ public class NeuronArrayNode extends ScreenElement {
      * Update the position of the model neuron based on the global coordinates
      * of this pnode.
      */
-    public void pushViewPositionToModel() {
+    public void pushPositionToModel() {
         Point2D p = this.getGlobalTranslation();
         neuronArray.setLocation(plus(p, new Point2D.Double(getWidth() / 2, getHeight() / 2)));
     }
 
+    public void pushBoundsToModel() {
+        neuronArray.setWidth(getBounds().width);
+        neuronArray.setHeight(getBounds().height);
+    }
+
     @Override
     public void offset(double dx, double dy) {
-        pushViewPositionToModel();
+        pushPositionToModel();
         super.offset(dx, dy);
     }
 
@@ -223,10 +231,8 @@ public class NeuronArrayNode extends ScreenElement {
                 BufferedImage img = ImageKt.toSimbrainColorImage(
                         activations,len,len);
                 activationImage.setImage(img);
-                // TODO: Adjust this to look nice
-                // TODO: Magic numbers
-                this.activationImage.setBounds(5, 100, 100, 100);
-
+                this.activationImage.setBounds(borderPixels, infoText.getHeight() + borderPixels,
+                        infoText.getWidth() - borderPixels,infoText.getWidth() - borderPixels);
             } else {
                 // "Flat" case
                 double[] activations = neuronArray.getOutputs().col(0);
@@ -313,6 +319,7 @@ public class NeuronArrayNode extends ScreenElement {
                 // Toggle grid mode
                 gridMode = !gridMode;
                 renderArrayToActivationsImage();
+                pushBoundsToModel();
             }
         };
         contextMenu.add(switchStyle);

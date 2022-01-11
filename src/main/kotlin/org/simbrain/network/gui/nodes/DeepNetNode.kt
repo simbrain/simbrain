@@ -139,13 +139,13 @@ class DeepNetNode(
      * Update the position of the model neuron based on the global coordinates
      * of this pnode.
      */
-    fun pushViewPositionToModel() {
+    fun pushPositionToModel() {
         val p = this.globalTranslation
         deepNet.location = point(p.x + width / 2, p.y + height / 2)
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        pushViewPositionToModel()
+        pushPositionToModel()
         super.offset(dx, dy)
     }
 
@@ -196,6 +196,14 @@ class DeepNetNode(
         renderActivations()
         updateBounds()
 
+        // The size of the node should not change since after creation the deep net node does not change
+        pushBoundsToModel()
+
+    }
+
+    fun pushBoundsToModel() {
+        deepNet.width = bounds.width
+        deepNet.height = bounds.height
     }
 
     private fun renderActivations() {

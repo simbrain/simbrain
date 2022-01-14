@@ -14,10 +14,13 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.*
 import java.awt.Dialog.ModalityType
 import java.awt.Dimension
+import java.awt.Font
 import java.awt.geom.Point2D
 import javax.swing.*
 
 class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassifier) : ScreenElement(np) {
+
+    private val INFO_FONT = Font("Arial", Font.PLAIN, 8)
 
     private val initialWidth = 200.0
     private val initialHeight = 100.0
@@ -34,7 +37,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
      * Text showing info about the classifier.
      */
     private val infoText = PText().also {
-        it.font = NeuronArrayNode.INFO_FONT
+        it.font = INFO_FONT
         addChild(it)
     }
 

@@ -168,3 +168,8 @@ fun CubicCurve2D.p(t: Double): Point2D {
 
     return line(m21, m22).p(t)
 }
+
+operator fun Rectangle2D.component1() = x
+operator fun Rectangle2D.component2() = y
+operator fun Rectangle2D.component3() = width
+operator fun Rectangle2D.component4() = height

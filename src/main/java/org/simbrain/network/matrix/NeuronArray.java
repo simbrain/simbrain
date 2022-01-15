@@ -21,9 +21,6 @@ import java.awt.geom.Rectangle2D;
  */
 public class NeuronArray extends ArrayLayer implements EditableObject, AttributeContainer {
 
-    @UserParameter(label = "Clamped", description = "Clamping", order = 3)
-    private boolean clamped;
-
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
     private double increment = .1;
 
@@ -183,7 +180,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     @Override
     public void update() {
-        if (clamped) {
+        if (isClamped()) {
             return;
         }
         prototypeRule.apply(this, dataHolder);
@@ -240,20 +237,6 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public void decrement() {
         activations.sub(increment);
         getEvents().fireUpdated();
-    }
-
-    @Override
-    public void toggleClamping() {
-        setClamped(!isClamped());
-    }
-
-    public void setClamped(final boolean clamped) {
-        this.clamped = clamped;
-        getEvents().fireClampChanged();
-    }
-
-    public boolean isClamped() {
-        return clamped;
     }
 
     public void setPrototypeRule(NeuronUpdateRule prototypeRule) {

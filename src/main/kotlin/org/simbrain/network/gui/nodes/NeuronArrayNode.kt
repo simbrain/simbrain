@@ -18,9 +18,7 @@
  */
 package org.simbrain.network.gui.nodes
 
-import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
-import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.gui.NetworkPanel
@@ -36,8 +34,6 @@ import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
 import org.simbrain.util.table.SimbrainJTableScrollPanel
 import smile.math.matrix.Matrix
-import java.awt.BasicStroke
-import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.util.*
@@ -48,11 +44,7 @@ import kotlin.math.sqrt
  * The current pnode representation for all [Layer] objects. May be broken out into subtypes for different
  * subclasses of Layer.
  */
-class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) : ScreenElement(networkPanel) {
-
-    private val CLAMPED_STROKE = BasicStroke(2f)
-
-    private val INFO_FONT = Font("Arial", Font.PLAIN, 8)
+class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) : ArrayLayerNode(neuronArray, networkPanel) {
 
     /**
      * If true, show the image array as a grid; if false show it as a horizontal line.
@@ -64,19 +56,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         updateBorder()
     }
 
-    private val margin = 10.0
+    override val margin = 10.0
 
     /**
      * Height of array when in "flat" mode.
      */
     private val flatPixelArrayHeight = 10
-
-    /**
-     * Container for info text and activations
-     */
-    private val mainNode = PNode().also {
-        addChild(it)
-    }
 
     /**
      * Text showing info about the array.
@@ -93,19 +78,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     private val activationImage = PImage().apply {
         mainNode.addChild(this)
         offset(0.0, infoText.height)
-    }
-
-    /**
-     * Square shape around array node.
-     */
-    private var borderBox = createBorder()
-    set(value) {
-        removeChild(field)
-        addChild(value)
-        value.lowerToBottom()
-        setBounds(value.bounds)
-        pushBoundsToModel()
-        field = value
     }
 
     private fun updateActivationImage() {
@@ -131,22 +103,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
     }
 
-    private fun createBorder(): PPath {
-        val newBound = mainNode.fullBounds.addPadding(margin)
-        val (x, y, w, h) = newBound
-        val newBorder = PPath.createRectangle(x, y, w, h)
-        newBorder.stroke = if (neuronArray.isClamped) {
-            CLAMPED_STROKE
-        } else {
-            DEFAULT_STROKE
-        }
-        return newBorder
-    }
-
-    private fun updateBorder() {
-        borderBox = createBorder()
-    }
-
     /**
      * Create a new neuron array node.
      *
@@ -155,43 +111,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
      */
     init {
         val events = neuronArray.events
-        events.onDeleted { removeFromParent() }
         events.onUpdated {
             updateActivationImage()
             updateInfoText()
         }
-        events.onClampChanged { updateBorder() }
-        events.onLocationChange { pullViewPositionFromModel() }
-
-        // Set up main items
-        pickable = true
-
-        pullViewPositionFromModel()
 
         updateActivationImage()
         updateBorder()
-    }
-
-    private fun pullViewPositionFromModel() {
-        this.globalTranslation = neuronArray.location - point(width / 2, height / 2) + point(margin, margin)
-    }
-
-    /**
-     * Update the position of the model neuron based on the global coordinates
-     * of this pnode.
-     */
-    private fun pushViewPositionToModel() {
-        neuronArray.location = globalTranslation + point(width / 2, height / 2) - point(margin, margin)
-    }
-
-    private fun pushBoundsToModel() {
-        neuronArray.width = bounds.width
-        neuronArray.height = bounds.height
-    }
-
-    override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        pushViewPositionToModel()
-        super.offset(dx, dy)
     }
 
     private fun computeInfoText() = """
@@ -205,12 +131,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     private fun updateInfoText() {
         infoText.text = computeInfoText()
     }
-
-    override fun isSelectable() = true
-
-    override fun acceptsSourceHandle() = true
-
-    override fun isDraggable() = true
 
     override fun getToolTipText() = neuronArray.toString()
 

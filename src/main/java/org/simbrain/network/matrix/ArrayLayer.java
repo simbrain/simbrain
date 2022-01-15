@@ -3,6 +3,7 @@ package org.simbrain.network.matrix;
 import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
+import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
 import smile.math.matrix.Matrix;
 
@@ -10,6 +11,9 @@ import smile.math.matrix.Matrix;
  * Array based layers (based on Smile matrices) should extend this. Maintains an input vector for summing inputs.
  */
 public abstract class ArrayLayer extends Layer {
+
+    @UserParameter(label = "Clamped", description = "Clamping", order = 3)
+    private boolean clamped;
 
     /**
      * Reference to network this array is part of.
@@ -57,6 +61,21 @@ public abstract class ArrayLayer extends Layer {
     @Override
     public Network getNetwork() {
         return parent;
+    }
+
+
+    @Override
+    public void toggleClamping() {
+        setClamped(!isClamped());
+    }
+
+    public void setClamped(final boolean clamped) {
+        this.clamped = clamped;
+        getEvents().fireClampChanged();
+    }
+
+    public boolean isClamped() {
+        return clamped;
     }
 
 }

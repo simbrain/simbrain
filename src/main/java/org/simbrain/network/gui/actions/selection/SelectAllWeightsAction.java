@@ -20,6 +20,7 @@ package org.simbrain.network.gui.actions.selection;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.network.gui.nodes.WeightMatrixNode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -57,5 +58,6 @@ public final class SelectAllWeightsAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         networkPanel.getSelectionManager().clear();
         networkPanel.getSelectionManager().set(networkPanel.filterScreenElements(SynapseNode.class));
+        networkPanel.getSelectionManager().add(networkPanel.filterScreenElements(WeightMatrixNode.class));
     }
 }

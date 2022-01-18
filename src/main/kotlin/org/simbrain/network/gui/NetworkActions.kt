@@ -59,7 +59,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setNeuronPropertiesAction = SetNeuronPropertiesAction(networkPanel)
     val setSourceNeurons = SetSourceNeurons(networkPanel)
     val setSynapsePropertiesAction = SetSynapsePropertiesAction(networkPanel)
-//    val setTextPropertiesAction = SetTextPropertiesAction(networkPanel) TODO
+    // val setTextPropertiesAction = SetTextPropertiesAction(networkPanel) TODO
     val showAdjustConnectivityDialog = ShowAdjustConnectivityDialog(networkPanel)
     val showAdjustSynapsesDialog = ShowAdjustSynapsesDialog(networkPanel)
     val showDebugAction = ShowDebugAction(networkPanel)

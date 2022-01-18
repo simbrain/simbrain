@@ -76,6 +76,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         setUpSelectionEvents()
     }
 
+    /**
+     * Holder for all actions, which are unique and can be accessed from multiple places.
+     */
     val networkActions = NetworkActions(this)
 
     /**
@@ -507,12 +510,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
 
         with(selectionManager) {
 
-            // Connect layers
             if (connectNeuronGroups()) {
                 return
             }
 
-            // Connect neuron groups
             if (connectLayers()) {
                 return
             }
@@ -531,16 +532,23 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     /**
      * Connect [Layer] objects.
      *
-     * @retrun false if there source and target neurons did not have a [Layer]
+     * @retrun false if the source and target selections did not have a [Layer]
      */
-    private fun NetworkSelectionManager.connectLayers(): Boolean {
+    private fun NetworkSelectionManager.connectLayers(useDialog: Boolean = false): Boolean {
         val sources = filterSelectedSourceModels(Layer::class.java)
         val targets = filterSelectedModels(Layer::class.java)
         if (sources.isNotEmpty() && targets.isNotEmpty()) {
-            val dialog = ConnectorDialog(this.networkPanel, sources, targets)
-            dialog.setLocationRelativeTo(null)
-            dialog.pack()
-            dialog.isVisible = true
+            if (useDialog) {
+                val dialog = ConnectorDialog(this.networkPanel, sources, targets)
+                dialog.setLocationRelativeTo(null)
+                dialog.pack()
+                dialog.isVisible = true
+            } else {
+                // TODO: Ability to set defaults for weight matrix that is added
+                sources.zip(targets) { s,t ->
+                    network.addNetworkModel(WeightMatrix(network, s, t))
+                }
+            }
             return true
         }
         return false

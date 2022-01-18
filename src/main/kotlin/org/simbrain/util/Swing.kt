@@ -4,6 +4,7 @@ import java.awt.Component
 import java.awt.event.*
 import javax.swing.AbstractAction
 import javax.swing.JComponent
+import javax.swing.JDialog
 
 fun StandardDialog.present() = apply { isVisible = true }
 
@@ -13,6 +14,12 @@ inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = 
             block(e)
         }
     })
+}
+
+fun JDialog.display() {
+    pack()
+    setLocationRelativeTo(null)
+    isVisible = true
 }
 
 inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {

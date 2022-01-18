@@ -26,6 +26,11 @@ val evolvePursuer = newSim {
 
     val mainScope = MainScope()
 
+    /**
+     * Max generation to run before giving up
+     */
+    val maxGenerations = 100
+
     fun createEvolution(): Evaluator {
         val evolutionarySimulation = evolutionarySimulation(1) {
 
@@ -200,7 +205,7 @@ val evolvePursuer = newSim {
         return evaluator(evolutionarySimulation) {
             populationSize = 100
             eliminationRatio = 0.5
-            runUntil { generation == 200 || fitness > 50 }
+            runUntil { generation == maxGenerations || fitness > 5 }
         }
     }
 
@@ -208,7 +213,7 @@ val evolvePursuer = newSim {
 
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(200, "Error")
+        val progressWindow = ProgressWindow(maxGenerations, "Error")
 
         launch(Dispatchers.Default) {
 

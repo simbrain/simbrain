@@ -2,18 +2,24 @@ package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Font
+import java.awt.RenderingHints
 
-abstract class ArrayLayerNode(val layer: ArrayLayer, networkPanel: NetworkPanel): ScreenElement(networkPanel) {
+abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer):
+    ScreenElement(networkPanel) {
 
     protected val CLAMPED_STROKE = BasicStroke(2f)
 
     protected val INFO_FONT = Font("Arial", Font.PLAIN, 8)
 
+    /**
+     * Margin around main box in pixels. Override to specify further.
+     */
     open protected val margin = 10.0
 
     init {
@@ -27,12 +33,15 @@ abstract class ArrayLayerNode(val layer: ArrayLayer, networkPanel: NetworkPanel)
         pullViewPositionFromModel()
     }
 
+    /**
+     * All children should be added to this so that bound computations are correct.
+     */
     val mainNode = PNode().also {
         addChild(it)
     }
 
     /**
-     * Square shape around array node.
+     * Box drawn around the [mainNode] together with the [margin].
      */
     private var borderBox = createBorder()
         set(value) {
@@ -45,7 +54,9 @@ abstract class ArrayLayerNode(val layer: ArrayLayer, networkPanel: NetworkPanel)
         }
 
     private fun pullViewPositionFromModel() {
-        this.globalTranslation = layer.location - point(width / 2, height / 2) + point(margin, margin)
+        val (x,y) = fullBounds // top left of full bounds in local coordinates
+        val (x2,y2) = globalTranslation
+        this.globalTranslation = layer.location - point(width / 2, height / 2) + point(x2-x,y2-y)
     }
 
     /**
@@ -53,7 +64,9 @@ abstract class ArrayLayerNode(val layer: ArrayLayer, networkPanel: NetworkPanel)
      * of this pnode.
      */
     private fun pushViewPositionToModel() {
-        layer.location = globalTranslation + point(width / 2, height / 2) - point(margin, margin)
+        val (x,y) = fullBounds
+        val (x2,y2) = globalTranslation
+        layer.location = globalTranslation + point(width / 2, height / 2) - point(x2-x,y2-y)
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
@@ -87,4 +100,15 @@ abstract class ArrayLayerNode(val layer: ArrayLayer, networkPanel: NetworkPanel)
     override fun acceptsSourceHandle() = true
 
     override fun isDraggable() = true
+
+    /**
+     * Forces sharp rendering.
+     */
+    override fun paint(paintContext: PPaintContext) {
+        paintContext.graphics.setRenderingHint(
+            RenderingHints.KEY_INTERPOLATION,
+            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        )
+        super.paint(paintContext)
+    }
 }

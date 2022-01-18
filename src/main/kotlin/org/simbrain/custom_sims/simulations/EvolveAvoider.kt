@@ -29,7 +29,12 @@ val evolveAvoider = newSim {
     /**
      * Max generation to run before giving up
      */
-    val maxGenerations = 100
+    val maxGenerations = 150
+
+    /**
+     * Iterations to run for each simulation. If < 3000 success is usually by luck.
+     */
+    val iterationsPerRun = 7500
 
     fun createEvolution(): Evaluator {
         val evolutionarySimulation = evolutionarySimulation(1) {
@@ -145,7 +150,7 @@ val evolveAvoider = newSim {
                             location = point(250, 40)
                             setNeuronType(outputs[0].template.updateRule)
                         }
-                        outputGroup.neuronList.labels = listOf("right", "left", "right")
+                        outputGroup.neuronList.labels = listOf("straight", "left", "right")
 
                     } else {
                         // This is update when graphics are off
@@ -191,6 +196,8 @@ val evolveAvoider = newSim {
                         nodeGene()
                     }
                 }
+                // Mutation that changes the activation function for the output nodes
+                // Could try on hidden nodes and also try more rule types...
                 // outputs.genes.forEach {
                 //     it.mutate {
                 //         when (random.nextInt(3)) {
@@ -244,7 +251,7 @@ val evolveAvoider = newSim {
                 poison3.handleCollision();
 
                evolutionWorkspace.apply {
-                   repeat(5000) {simpleIterate()}
+                   repeat(iterationsPerRun) {simpleIterate()}
                    // score += (0..1000).map {
                    //     simpleIterate()
                    //     minOf(
@@ -268,7 +275,7 @@ val evolveAvoider = newSim {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-            runUntil { generation == maxGenerations || fitness > -1 }
+            runUntil { generation == maxGenerations || fitness > -2 }
         }
     }
 

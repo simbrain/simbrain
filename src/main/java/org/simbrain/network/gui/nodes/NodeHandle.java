@@ -6,7 +6,9 @@ import org.piccolo2d.extras.util.PNodeLocator;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * "Selection" handle for PNodes,
@@ -94,7 +96,8 @@ public class NodeHandle extends PHandle {
         double width = parentNode.getBounds().getWidth() + 2 * (parentNode.getBounds().getWidth() * ef);
         double height = parentNode.getBounds().getHeight() + 2 * (parentNode.getBounds().getHeight() * ef);
 
-        this.reset(); // TODO: Check with Heuer
+        // Without this repeated actions like clamping fail to remove old pixels
+        this.reset();
         append(new Rectangle2D.Float((float) x, (float) y, (float) width, (float) height), false);
     }
 

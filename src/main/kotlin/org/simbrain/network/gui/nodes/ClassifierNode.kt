@@ -1,112 +1,58 @@
 package org.simbrain.network.gui.nodes
 
 import net.miginfocom.swing.MigLayout
-import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
-import org.simbrain.util.*
+import org.simbrain.util.ResourceManager
+import org.simbrain.util.StandardDialog
+import org.simbrain.util.Utils
 import org.simbrain.util.math.ProbDistributions.TwoValued
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.*
 import java.awt.Dialog.ModalityType
 import java.awt.Dimension
-import java.awt.Font
-import java.awt.geom.Point2D
 import javax.swing.*
 
-class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassifier) : ScreenElement(np) {
-
-    private val INFO_FONT = Font("Arial", Font.PLAIN, 8)
-
-    private val initialWidth = 200.0
-    private val initialHeight = 100.0
-
-    /**
-     * Square shape around the classier node.
-     */
-    private val borderBox = PPath.createRectangle(0.0, 0.0, initialWidth, initialHeight).also {
-        addChild(it)
-        pickable = true
-    }
+class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifier: SmileClassifier):
+    ArrayLayerNode(networkPanel, smileClassifier) {
 
     /**
      * Text showing info about the classifier.
      */
-    private val infoText = PText().also {
-        it.font = INFO_FONT
-        addChild(it)
+    private val infoText = PText().apply {
+        font = INFO_FONT
+        text = computeInfoText()
+        mainNode.addChild(this)
     }
+
 
     init {
-        pullViewPositionFromModel()
-        smileClassifier.events.apply {
-            onDeleted { removeFromParent() }
-            onUpdated {
-                updateInfoText()
-            }
-            onLocationChange { pullViewPositionFromModel() }
+        val events = smileClassifier.events
+        events.onUpdated {
+            updateInfoText()
+            updateBorder()
         }
         updateInfoText()
-    }
-
-    fun pullViewPositionFromModel() {
-        val point: Point2D = smileClassifier.location.minus(Point2D.Double(width / 2, height / 2))
-        this.globalTranslation = point
-    }
-
-
-    override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        pushPositionToModel()
-        super.offset(dx, dy)
-    }
-
-    fun pushPositionToModel() {
-        val p = this.globalTranslation
-        smileClassifier.location = point(p.x + width / 2, p.y + height / 2)
-    }
-
-    fun pushBoundsToModel() {
-        smileClassifier.width = bounds.width
-        smileClassifier.height = bounds.height
+        updateBorder()
     }
 
     /**
      * Update status text.
      */
-    private fun updateInfoText() {
-        infoText.text = "Output: (" +
+    private fun computeInfoText() = "Output: (" +
                 Utils.doubleArrayToString(smileClassifier.outputs.col(0), 2) + ")" +
                 "\n\nInput: (" + Utils.doubleArrayToString(smileClassifier.inputs.col(0), 2) + ")"
-        updateBounds()
-    }
 
-    fun updateBounds() {
-        // Sets border box to size of text, grown by a margin
-        borderBox.setBounds(infoText.bounds.bounds.apply {
-            grow(10,10)
-        })
-        setBounds(borderBox.bounds)
-        pushBoundsToModel()
+    private fun updateInfoText() {
+        infoText.text = computeInfoText()
     }
 
     override fun getModel(): NetworkModel {
         return smileClassifier
-    }
-
-    override fun isSelectable(): Boolean {
-        return true
-    }
-
-    override fun isDraggable(): Boolean {
-        return true
-    }
-
-    override fun acceptsSourceHandle(): Boolean {
-        return true
     }
 
     override fun getContextMenu(): JPopupMenu? {
@@ -120,7 +66,7 @@ class SmileClassifierNode(val np: NetworkPanel, val smileClassifier: SmileClassi
         }
     }
 
-    override fun getPropertyDialog() = AnnotatedPropertyEditor.getDialog(smileClassifier.classifier)
+    override fun getPropertyDialog(): StandardDialog = AnnotatedPropertyEditor.getDialog(smileClassifier.classifier)
 
     fun getTrainingDialog() = StandardDialog().apply {
 

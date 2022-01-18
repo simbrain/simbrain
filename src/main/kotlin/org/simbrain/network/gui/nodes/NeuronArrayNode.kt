@@ -20,7 +20,6 @@ package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
-import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.actions.edit.CopyAction
 import org.simbrain.network.gui.actions.edit.CutAction
@@ -34,7 +33,6 @@ import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
 import org.simbrain.util.table.SimbrainJTableScrollPanel
 import smile.math.matrix.Matrix
-import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.*
@@ -44,7 +42,8 @@ import kotlin.math.sqrt
  * The current pnode representation for all [Layer] objects. May be broken out into subtypes for different
  * subclasses of Layer.
  */
-class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) : ArrayLayerNode(neuronArray, networkPanel) {
+class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
+    ArrayLayerNode(networkPanel, neuronArray) {
 
     /**
      * If true, show the image array as a grid; if false show it as a horizontal line.
@@ -63,6 +62,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
      */
     private val flatPixelArrayHeight = 10
 
+
     /**
      * Text showing info about the array.
      */
@@ -78,6 +78,23 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     private val activationImage = PImage().apply {
         mainNode.addChild(this)
         offset(0.0, infoText.height)
+    }
+
+    /**
+     * Create a new neuron array node.
+     *
+     * @param np Reference to NetworkPanel
+     * @param na reference to model neuron array
+     */
+    init {
+        val events = neuronArray.events
+        events.onUpdated {
+            updateActivationImage()
+            updateInfoText()
+        }
+
+        updateActivationImage()
+        updateBorder()
     }
 
     private fun updateActivationImage() {
@@ -103,27 +120,16 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
     }
 
-    /**
-     * Create a new neuron array node.
-     *
-     * @param np Reference to NetworkPanel
-     * @param na reference to model neuron array
-     */
-    init {
-        val events = neuronArray.events
-        events.onUpdated {
-            updateActivationImage()
-            updateInfoText()
-        }
-
-        updateActivationImage()
-        updateBorder()
-    }
-
     private fun computeInfoText() = """
             ${neuronArray.label}    nodes: ${neuronArray.size()}
             mean activation: ${neuronArray.activations.col(0).average().format(4)}
             """.trimIndent()
+            // if (neuronArray.getPrototypeRule() instanceof SpikingNeuronUpdateRule) {
+            //     // TODO: Use this to place a yellow grid over pixels for spiking components
+            //     System.out.println(
+            //             Arrays.toString(((DataHolder.SpikingDataHolder)
+            //                     neuronArray.getDataHolder()).spikes));
+            // }
 
     /**
      * Update status text.
@@ -240,13 +246,5 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     override fun getModel(): NeuronArray {
         return neuronArray
-    }
-
-    override fun paint(paintContext: PPaintContext) {
-        paintContext.graphics.setRenderingHint(
-            RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
-        )
-        super.paint(paintContext)
     }
 }

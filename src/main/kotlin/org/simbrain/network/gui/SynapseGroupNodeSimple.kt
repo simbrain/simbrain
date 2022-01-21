@@ -36,6 +36,6 @@ class SynapseGroupNodeSimple(private val synapseGroupNode: SynapseGroupNode) : P
 
     }.also { addChild(it) }
 
-    override fun layoutChildren() = arrow.update(source.outlines, target.outlines, isBidirectional())
+    override fun layoutChildren() = arrow.layout(source.outlines, target.outlines, isBidirectional())
 
 }

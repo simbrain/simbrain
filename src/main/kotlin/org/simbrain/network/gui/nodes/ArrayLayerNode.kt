@@ -54,9 +54,8 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         }
 
     private fun pullViewPositionFromModel() {
-        val (x,y) = fullBounds // top left of full bounds in local coordinates
-        val (x2,y2) = globalTranslation
-        this.globalTranslation = layer.location - point(width / 2, height / 2) + point(x2-x,y2-y)
+        val (x1,y1) = bounds // top left of full bounds in local coordinates
+        this.globalTranslation = layer.location - point(layer.width / 2, layer.height / 2) - point(x1, y1)
     }
 
     /**
@@ -64,9 +63,8 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
      * of this pnode.
      */
     private fun pushViewPositionToModel() {
-        val (x,y) = fullBounds
-        val (x2,y2) = globalTranslation
-        layer.location = globalTranslation + point(width / 2, height / 2) - point(x2-x,y2-y)
+        val centerLocation = globalFullBounds.center2D
+        layer.location = centerLocation
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {

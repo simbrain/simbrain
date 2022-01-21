@@ -34,20 +34,23 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
     private val updateEvent = template.updateEvent
 
     /**
-     * The triangle at the tip of the arrow. This triangle is constructed only once, and during [update] the this
+     * The triangle at the tip of the arrow. This triangle is constructed only once, and during [layout] the this
      * triangle will be placed onto the correct location
      */
-    private val arrowTip = listOf(point(0, 0), point(0.5, -0.866025), point(-0.5, -0.866025))
+    private val arrowTip = listOf(point(0.0, -sin60deg), point(0.5, 0.0), point(-0.5, 0.0))
             .map { it * (thickness * 2.0) }.toPolygon()
             .let { polygon -> PArea(polygon, null) }
-            .apply { paint = color }
+            .apply {
+                paint = color
+                transparency = 0.5f
+            }
 
     /**
      * Update the shape of the arrow base on the outlines of source and target.
      *
      * @return the updated curve model
      */
-    fun update(sourceOutlines: RectangleOutlines, targetOutlines: RectangleOutlines, bidirectional: Boolean) {
+    fun layout(sourceOutlines: RectangleOutlines, targetOutlines: RectangleOutlines, bidirectional: Boolean) {
 
         // 0. clear old arrow
         removeAllChildren()
@@ -56,8 +59,8 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         val (deltaVector, sourceSide, targetSide) = (sourceOutlines.toList() cartesianProduct targetOutlines.toList())
                 .map { (source, target) -> Triple(target.headOffset - source.tailOffset, source, target) }
                 .filter { (line, source, target) ->
-                    // make sure the curve does not bent backward
-                    line.norm dot source.unitNormal > 0.2 && line.norm dot target.unitNormal < -0.2
+                    // make sure the curve does not bend backward
+                    line.norm dot source.unitNormal > 0.3 && line.norm dot target.unitNormal < -0.3
                 }
                 .let {
                     if (bidirectional) {
@@ -69,7 +72,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
 
         // 2. put the arrow tip at the right location and orient it at the right angle
         arrowTip.getTransformReference(true).apply {
-            setToTranslation(targetSide.tipOffset.x, targetSide.tipOffset.y)
+            setToTranslation(targetSide.headOffset.x, targetSide.headOffset.y)
             val theta = targetSide.normalTheta
             rotate(theta)
         }
@@ -84,7 +87,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         )
 
         // 4. create the curve PNode
-        val curveView = PPath.Double(curveModel, BasicStroke(thickness)).apply {
+        val curveView = PPath.Double(curveModel, BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)).apply {
             paint = null
             strokePaint = color
             transparency = 0.5f
@@ -103,19 +106,13 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
      * Given a side of a rectangle bound, find the location of where an arrow tail would go.
      */
     private val Line2D.tailOffset
-        get() = p(lateralOffset) + unitNormal * tailPadding
+        get() = p(lateralOffset) + (unitNormal * tailPadding)
 
     /**
      * Given a side of a rectangle bound, find the location of where an arrow head would go.
      */
     private val Line2D.headOffset
-        get() = p(1 - lateralOffset) + unitNormal * ((thickness * 1.5) + headPadding)
-
-    /**
-     * Given a side of a rectangle bound, find the location of where the tip of an arrow would go.
-     */
-    private val Line2D.tipOffset
-        get() = p(1 - lateralOffset) + unitNormal * headPadding
+        get() = p(1 - lateralOffset) + (unitNormal * headPadding)
 }
 
 @DslMarker
@@ -126,7 +123,7 @@ class BezierArrowTemplate {
 
     var color: Color = Color.GREEN
 
-    var thickness: Float = 20.0f
+    var thickness = 20.0f
 
     val padding = PaddingBuilder()
 
@@ -143,8 +140,11 @@ class BezierArrowTemplate {
         }
 
         val default get() = 35.0
-        var head = default
-        var tail = default
+        val arrowSize get() = this@BezierArrowTemplate.thickness * 2 * sin60deg
+        val defaultHead get() = default + arrowSize
+        val defaultTail get() = default
+        var head = defaultHead
+        var tail = defaultTail
     }
 
     fun lateralOffset(block: () -> Double) {

@@ -80,15 +80,18 @@ val Line2D.unitNormal
 val Line2D.normalTheta
     get() = with(unitNormal) {
         if (x == 0.0) {
-            acos(-y)
+            acos(y)
         } else {
-            asin(x)
+            -asin(x)
         }
     }
 
 val Line2D.midPoint
     get() = p(0.5)
 
+/**
+ * Returns the point at t% of the line
+ */
 fun Line2D.p(t: Double) = point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t)
 
 // Rectangles
@@ -173,3 +176,5 @@ operator fun Rectangle2D.component1() = x
 operator fun Rectangle2D.component2() = y
 operator fun Rectangle2D.component3() = width
 operator fun Rectangle2D.component4() = height
+
+val sin60deg = sin(Math.toRadians(60.0))

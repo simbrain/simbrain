@@ -20,38 +20,39 @@ import kotlin.math.sin
 class RecurrentArrow : PNode() {
 
     private val radius = 100.0
-    private val startDeg = 10.0
+    private val startDeg = 0.0
     private val endDeg = 300.0
 
     /**
-     * The triangle at the tip of the arrow. This triangle is constructed only once, and during [update] this
+     * The triangle at the tip of the arrow. This triangle is constructed only once, and during [layout] this
      * triangle will be placed onto the correct location
      */
-    private val arrowTip = listOf(point(0, 0), point(0.5, -0.866025), point(-0.5, -0.866025))
-            .map { it * 40.0 }
+    private val arrowTip = listOf(point(-1, 0), point(1, 0), point(0, -1))
+            .map { it * 30.0 }
             .toPolygon()
             .let { polygon -> PArea(polygon, null) }
-            .apply { paint = Color.ORANGE }
+            .apply {
+                paint = Color.ORANGE
+                val arrowTipRadian = endDeg.toRadian()
+                rotate(-arrowTipRadian)
+                offset(cos(arrowTipRadian) * radius, -sin(arrowTipRadian) * radius)
+                transparency = 0.5f
+                this@RecurrentArrow.addChild(this)
+            }
+
+    private val arc = PPath.createArc(-radius, -radius, 2 * radius, 2 * radius, startDeg, endDeg, Arc2D.OPEN)
+        .apply {
+            paint = null
+            stroke = BasicStroke(20.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
+            strokePaint = Color.ORANGE
+            transparency = 0.5f
+        }.also { addChild(it) }
 
     /**
      * Pass in where you want to center the recurrent arrow, and then any additional action to perform
      */
-    fun update(location: Point2D, callback: (Point2D) -> Unit) {
-        removeAllChildren()
-        val (x, y) = location + point(-radius, 0.0)
-        PPath.createArc(x - radius, y - radius, 2 * radius, 2 * radius, startDeg, endDeg, Arc2D.OPEN)
-                .apply {
-                    paint = null
-                    stroke = BasicStroke(20.0f)
-                    strokePaint = Color.ORANGE
-                    transparency = 0.5f
-                }.also { addChild(it) }
-        val arrowTipRadian = (endDeg + 30).toRadian()
-        arrowTip.getTransformReference(true).apply {
-            setToTranslation(x + cos(arrowTipRadian) * (radius + 10), y - sin(arrowTipRadian) * (radius + 10))
-            rotate(arrowTipRadian + 265.toRadian())
-        }
-        addChild(arrowTip)
+    fun layout(location: Point2D, callback: (Point2D) -> Unit) {
+        globalTranslation = location - point(radius, 0.0)
         callback(location - point(2*radius, 0.0))
     }
 }

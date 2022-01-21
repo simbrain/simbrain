@@ -1,11 +1,8 @@
 package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
-import org.simbrain.network.gui.nodes.DeepNetNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
-import org.simbrain.network.kotlindl.DeepNet
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow
@@ -26,14 +23,12 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
             padding {
                 tail = when (source) {
-                    is NeuronArray -> 10.0
-                    else -> default
+                    is ArrayLayer -> 5.0
+                    else -> defaultTail
                 }
                 head = when (target) {
-                    is NeuronArray -> 5.0
-                    is SmileClassifier -> 5.0
-                    is DeepNet -> 5.0
-                    else -> default
+                    is ArrayLayer -> 5.0 + arrowSize
+                    else -> defaultHead
                 }
             }
 
@@ -52,8 +47,8 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
     override fun layoutChildren() {
         when (arrow) {
-            is RecurrentArrow -> arrow.update(source.location) { (x, y) -> weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y) }
-            is BezierArrow -> arrow.update(source.bound.outlines, target.bound.outlines, isBidirectional())
+            is RecurrentArrow -> arrow.layout(source.location) { (x, y) -> weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y) }
+            is BezierArrow -> arrow.layout(source.bound.outlines, target.bound.outlines, isBidirectional())
         }
     }
 }

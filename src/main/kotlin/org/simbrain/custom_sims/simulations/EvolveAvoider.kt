@@ -151,7 +151,6 @@ val evolveAvoider = newSim {
                             setNeuronType(outputs[0].template.updateRule)
                         }
                         outputGroup.neuronList.labels = listOf("straight", "left", "right")
-
                     } else {
                         // This is update when graphics are off
                         +inputs

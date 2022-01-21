@@ -33,7 +33,7 @@ class SmileClassifier(
      * Simbrain will convert these "outputs" of the classifier into an appropriate double array using a one-hot
      * encoding. E.g. for a 2-category classifiers, -1 -> 1,0 and 1 -> 0,1
      */
-    var targets: IntArray
+    var trainingTargets: IntArray
 
     /**
      * Output matrix
@@ -46,7 +46,7 @@ class SmileClassifier(
     init {
         label = net.idManager.getProposedId(this::class.java)
         trainingInputs = Array(nsamples) { DoubleArray(inputSize) }
-        targets = IntArray(nsamples)
+        trainingTargets = IntArray(nsamples)
 
     }
 
@@ -54,7 +54,7 @@ class SmileClassifier(
      * Train using current training data.
      */
     fun train() {
-        train(trainingInputs, targets)
+        train(trainingInputs, trainingTargets)
     }
 
     /**

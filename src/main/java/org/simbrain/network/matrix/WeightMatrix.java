@@ -18,6 +18,13 @@ import java.util.Arrays;
 /**
  * An dense weight matrix that connects a source and target {@link Layer} object. A default way of linking arbitrary
  * layers.
+ *
+ * The matrix has as many rows as the target layer and as many columns as the source layer.
+ * The matrix is multiplied by the transpose of the source layer column to produce the output activations.
+ *
+ * Since in Simbrain the source layer is typically shown as a row already, it's easy to visualize
+ * the rows of the weight matrix being dotted with the source layer.
+ *
  */
 public class WeightMatrix extends Connector {
 

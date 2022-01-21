@@ -99,13 +99,13 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
                 }
             }
 
-            val targets = SimbrainDataViewer(createFromColumn(smileClassifier.targets), false).apply {
+            val targets = SimbrainDataViewer(createFromColumn(smileClassifier.trainingTargets), false).apply {
                 addCustomActions()
                 table.model.columns[0].columnRandomizer.probabilityDistribution =
                     TwoValued.TwoValuedBuilder().upper(1).lower(-1).build()
                 preferredSize = Dimension(200, 300)
                 addClosingTask {
-                    smileClassifier.trainingInputs = this.model.getColumnMajorArray()
+                    smileClassifier.trainingTargets = this.model.getIntColumn(0)
                 }
             }
 
@@ -134,7 +134,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
                 addActionListener {
                     // TODO: Make a separate commit action and then just call smileClassifier.train. See deepnet
                     // TODO: Generalize to more than one column?
-                    smileClassifier.train(inputs.table.model.getRowMajorDoubleArray()
+                    smileClassifier.train(inputs.table.model.getColumnMajorArray()
                         , targets.table.model.getIntColumn(0))
                     statsLabel.text = "Stats: " + smileClassifier.classifier.stats
                 }
@@ -166,7 +166,7 @@ fun main() {
                 doubleArrayOf(0.0, 1.0),
                 doubleArrayOf(1.0, 1.0)
             )
-        classifier.targets = intArrayOf(-1,1,1,-1)
+        classifier.trainingTargets = intArrayOf(-1,1,1,-1)
         addNetworkModel(classifier)
         classifier
     }

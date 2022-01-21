@@ -24,7 +24,7 @@ class SmileClassifierTest {
             doubleArrayOf(0.0, 1.0, 0.0),
             doubleArrayOf(1.0, 1.0, 0.0)
         )
-        this.targets = intArrayOf(-1, 1, 1, -1)
+        this.trainingTargets = intArrayOf(-1, 1, 1, -1)
         this.train()
     }
 

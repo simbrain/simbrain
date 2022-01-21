@@ -48,6 +48,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Shift + 'Z') { network.addNetworkModel(ZoeLayer(network, 10)) } // TODO: Temp testing key command
     bind(CmdOrCtrl + 'Z') { undo() }
     bind(CmdOrCtrl + Shift + 'Z') { redo() }
+
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModels() }
     // TODO: Add Shift+2 to add models with a creation dialog

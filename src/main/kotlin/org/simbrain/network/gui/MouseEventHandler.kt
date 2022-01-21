@@ -138,6 +138,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         if (mode == Mode.SELECTION) {
             selectionMarquee.visible = false
         } else {
+            dragItems(event)
             priorSelection = setOf()
             // If objects are being dragged, reset the anchor position in the placement manager
             if (event.pickedNode != null) {

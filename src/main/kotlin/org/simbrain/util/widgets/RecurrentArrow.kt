@@ -20,8 +20,8 @@ import kotlin.math.sin
 class RecurrentArrow : PNode() {
 
     private val radius = 100.0
-    private val startDeg = 0.0
-    private val endDeg = 300.0
+    private val startDeg = 20.0
+    private val endDeg = 320.0
 
     /**
      * The triangle at the tip of the arrow. This triangle is constructed only once, and during [layout] this
@@ -40,7 +40,8 @@ class RecurrentArrow : PNode() {
                 this@RecurrentArrow.addChild(this)
             }
 
-    private val arc = PPath.createArc(-radius, -radius, 2 * radius, 2 * radius, startDeg, endDeg, Arc2D.OPEN)
+    private val arc = PPath.createArc(-radius, -radius, 2 * radius, 2 * radius, startDeg,
+        endDeg - startDeg, Arc2D.OPEN)
         .apply {
             paint = null
             stroke = BasicStroke(20.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)

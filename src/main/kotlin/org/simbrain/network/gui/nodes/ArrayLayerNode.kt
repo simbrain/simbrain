@@ -54,8 +54,11 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         }
 
     private fun pullViewPositionFromModel() {
-        val (x1,y1) = bounds // top left of full bounds in local coordinates
-        this.globalTranslation = layer.location - point(layer.width / 2, layer.height / 2) - point(x1, y1)
+        // Top left of bounds in local coordinates
+        // Note that we cannot use fullbounds here because they include the node handle
+        val (x,y) = bounds
+        // Convert model's center location to top-left location, then subtract the padding
+        this.globalTranslation = layer.location - point(layer.width / 2, layer.height / 2) - point(x, y)
     }
 
     /**
@@ -63,6 +66,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
      * of this pnode.
      */
     private fun pushViewPositionToModel() {
+        // Networkmodels use the center location
         val centerLocation = globalFullBounds.center2D
         layer.location = centerLocation
     }

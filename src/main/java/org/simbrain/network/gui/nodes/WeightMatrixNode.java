@@ -49,12 +49,12 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
     /**
      * Width of the {@link #imageBox}
      */
-    private int imageWidth = 100;
+    private int imageWidth = 90;
 
     /**
      * Height of the {@link #imageBox}
      */
-    private int imageHeight = 100;
+    private int imageHeight = 90;
 
     /**
      * Parent network panel.

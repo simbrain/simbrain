@@ -15,7 +15,7 @@ class ImageBox(val width: Int, val height: Int, thickness: Float) : PNode() {
         set(image) {
             field = image
             SwingUtilities.invokeLater {
-                pImage.image = image!!.scale(100, 100)
+                pImage.image = image!!.scale(width, height)
                 setBounds(0.0, 0.0, width.toDouble(), height.toDouble())
             }
         }

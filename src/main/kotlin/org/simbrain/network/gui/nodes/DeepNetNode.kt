@@ -161,15 +161,16 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
                     })
                 } else if (layer is List<*>) {
                     // Rank 3 case (Rank 2 is also handled here)
-                    totalHeight += convLayerImageHeight + layerImagePadding
                     val width = layerImageWidth / layer.size - layerImagePadding * ((layer.size - 1.0) / layer.size)
+                    // totalHeight += convLayerImageHeight + layerImagePadding // Old case
+                    totalHeight += width
                     layer.filterIsInstance<Array<FloatArray>>().forEachIndexed { x, array ->
                         yield(PImage(array.toSimbrainColorImage()).also { image ->
                             image.setBounds(
                                 x * (width + layerImagePadding),
                                 -totalHeight,
                                 width,
-                                convLayerImageHeight
+                                width
                             )
                         })
                     }

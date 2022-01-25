@@ -14,12 +14,8 @@ import org.simbrain.network.gui.dialogs.showDeepNetTrainingDialog
 import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.kotlindl.TFInputLayer
 import org.simbrain.util.*
-import org.simbrain.util.piccolo.component1
-import org.simbrain.util.piccolo.component2
-import org.simbrain.util.piccolo.component3
-import org.simbrain.util.piccolo.component4
+import org.simbrain.util.piccolo.addBox
 import org.simbrain.workspace.gui.CouplingMenu
-import java.awt.Color
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -57,7 +53,6 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
 
         renderActivations()
         updateBorder()
-
     }
 
     /**
@@ -150,7 +145,6 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
         // Set up the images.
         // Images are added from the bottom-up, so that the y value is negative with an increasing absolute value.
         activationImages.forEach { removeChild(it) }
-        activationImagesBoxes.forEach { removeChild(it) }
         activationImages = sequence {
             allActivations.forEachIndexed { index, layer ->
                 // Rank 1 case
@@ -199,18 +193,9 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
         infoText.setBounds(0.0, activationImages.last().y - infoText.height - 7,
             infoText.width, infoText.height)
 
-        // Set up the boxes
-        activationImagesBoxes = activationImages.map {
-            val (x, y, w, h) = it.bounds
-            val box = PPath.createRectangle(x, y, w, h)
-            box.strokePaint = Color.BLACK
-            box.paint = null
-            box
-        }
-
         // Add these as children to the main node
         activationImages.forEach { mainNode.addChild(it) }
-        activationImagesBoxes.forEach { mainNode.addChild(it) }
+        activationImages.forEach { it.addBox() }
 
     }
 

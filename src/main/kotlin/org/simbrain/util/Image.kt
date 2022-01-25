@@ -16,6 +16,9 @@ fun DoubleArray.toSimbrainColor() = map { value ->
     }
 }.toIntArray()
 
+/**
+ * Width and height in pixels
+ */
 fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor().let {
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)
@@ -23,6 +26,9 @@ fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor(
     BufferedImage(colorModel, raster, false, null)
 }
 
+/**
+ * Width and height in pixels.
+ */
 fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor().let {
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)

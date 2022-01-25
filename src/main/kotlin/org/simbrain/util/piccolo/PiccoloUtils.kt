@@ -2,8 +2,11 @@ package org.simbrain.util.piccolo
 
 import org.piccolo2d.PNode
 import org.piccolo2d.event.PInputEvent
+import org.piccolo2d.nodes.PImage
+import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.gui.nodes.ScreenElement
+import java.awt.Color
 import java.awt.event.MouseEvent
 
 val PNode.parents
@@ -20,6 +23,17 @@ val PNode?.hasScreenElement
 
 val PInputEvent.isDoubleClick
     get() = clickCount == 2 && button == MouseEvent.BUTTON1
+
+/**
+ * Add a black box as a border around a PImage. Must be called after the image's bounds have been set.
+ */
+fun PImage.addBox () {
+    val (x, y, w, h) = bounds
+    val box = PPath.createRectangle(x, y, w, h)
+    box.strokePaint = Color.BLACK
+    box.paint = null
+    addChild(box)
+}
 
 operator fun PBounds.component1() = x
 operator fun PBounds.component2() = y

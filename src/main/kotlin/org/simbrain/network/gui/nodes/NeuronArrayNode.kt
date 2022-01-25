@@ -28,6 +28,7 @@ import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.addBox
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
@@ -62,7 +63,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
      */
     private val flatPixelArrayHeight = 10
 
-
     /**
      * Text showing info about the array.
      */
@@ -77,7 +77,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
      */
     private val activationImage = PImage().apply {
         mainNode.addChild(this)
-        offset(0.0, infoText.height)
     }
 
     /**
@@ -92,8 +91,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
             updateActivationImage()
             updateInfoText()
         }
-
         updateActivationImage()
+        activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
+        activationImage.addBox()
         updateBorder()
     }
 

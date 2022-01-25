@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import net.miginfocom.swing.MigLayout
+import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
@@ -9,10 +10,11 @@ import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.Utils
 import org.simbrain.util.math.ProbDistributions.TwoValued
+import org.simbrain.util.piccolo.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.*
+import org.simbrain.util.toSimbrainColorImage
 import java.awt.Dialog.ModalityType
 import java.awt.Dimension
 import javax.swing.*
@@ -20,32 +22,59 @@ import javax.swing.*
 class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifier: SmileClassifier):
     ArrayLayerNode(networkPanel, smileClassifier) {
 
-    /**
-     * Text showing info about the classifier.
-     */
     private val infoText = PText().apply {
         font = INFO_FONT
         text = computeInfoText()
         mainNode.addChild(this)
     }
 
+    private val outputImage = PImage().apply {
+        mainNode.addChild(this)
+    }
+
+    private val inputImage = PImage().apply {
+        mainNode.addChild(this)
+    }
 
     init {
         val events = smileClassifier.events
         events.onUpdated {
+            updateActivationImages()
             updateInfoText()
             updateBorder()
         }
+
+        // Set up components from top to bottom
         updateInfoText()
+        updateActivationImages()
+        outputImage.offset(0.0,  infoText.offset.y + infoText.height + 5)
+        outputImage.addBox()
+        inputImage.offset(0.0, outputImage.offset.y + outputImage.height + 5)
+        inputImage.addBox()
         updateBorder()
+    }
+
+    private fun updateActivationImages() {
+        // TODO: Magic Numbers
+        inputImage.apply {
+            image =   smileClassifier.inputs.col(0).toSimbrainColorImage(smileClassifier.inputSize(), 1)
+            val (x, y, w, h) = bounds
+            setBounds(x, y, 100.0, 20.0)
+        }
+        outputImage.apply {
+            image =   smileClassifier.outputs.col(0).toSimbrainColorImage(smileClassifier.outputSize(), 1)
+            val (x, y, w, h) = bounds
+            setBounds(x, y, 100.0, 20.0)
+        }
     }
 
     /**
      * Update status text.
      */
-    private fun computeInfoText() = "Output: (" +
-                Utils.doubleArrayToString(smileClassifier.outputs.col(0), 2) + ")" +
-                "\n\nInput: (" + Utils.doubleArrayToString(smileClassifier.inputs.col(0), 2) + ")"
+    private fun computeInfoText() = smileClassifier.id
+        // "Output: (" +
+        //         Utils.doubleArrayToString(smileClassifier.outputs.col(0), 2) + ")" +
+        //         "\n\nInput: (" + Utils.doubleArrayToString(smileClassifier.inputs.col(0), 2) + ")"
 
     private fun updateInfoText() {
         infoText.text = computeInfoText()

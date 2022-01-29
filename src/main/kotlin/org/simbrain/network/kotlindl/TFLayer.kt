@@ -64,7 +64,8 @@ abstract class TFLayer<T : Layer> : CopyableObject {
          */
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return listOf(TFConv2DLayer::class.java, TFDenseLayer::class.java, TFFlattenLayer::class.java)
+            return listOf(TFConv2DLayer::class.java, TFDenseLayer::class.java,
+                TFAvgPool2DLayer::class.java, TFFlattenLayer::class.java)
         }
     }
 

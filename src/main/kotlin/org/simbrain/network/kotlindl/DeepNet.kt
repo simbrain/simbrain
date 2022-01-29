@@ -40,6 +40,9 @@ class DeepNet(
      */
     private var outputs: Matrix? = null
 
+    var prediction: Int = -1
+    private set
+
     @UserParameter(label = "Output Probabilities", description = "If yes, output probabilities over class labels, " +
             "else output a one-hot encoded class label", order = 10)
     var outputProbabilities: Boolean = false
@@ -147,11 +150,11 @@ class DeepNet(
         testingDataset = test
     }
 
-    fun train() {
+    fun train(trainBatchSize: Int = 1, validationBatchSize: Int = 1) {
         // Fixing batch size to 1 to make things simpler
         // TODO: Think about this...
         deepNetLayers.fit(trainingDataset, testingDataset,
-            trainingParams.epochs, 1, 1)
+            trainingParams.epochs, trainBatchSize, validationBatchSize)
     }
 
     override fun update() {
@@ -168,6 +171,7 @@ class DeepNet(
                 // One-hot case
                 val (prediction, activations) = deepNetLayers.predictAndGetActivations(floatInputs)
                 outputs = getOneHotMat(prediction,outputSize())
+                this.prediction = prediction
                 this.activations = activations.filterIsInstance<Array<*>>().map { layer ->
                     val shape = layer.shape
                     when(shape.size) {

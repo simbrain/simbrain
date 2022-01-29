@@ -3,6 +3,7 @@ package org.simbrain.network.kotlindl
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeNormal
 import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
+import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.simbrain.util.UserParameter
@@ -34,6 +35,10 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
     @UserParameter(label = "Use bias",  conditionalEnablingMethod = "creationMode", order = 90)
     var useBias = true
 
+    var kernelInitializer: Initializer = HeNormal()
+
+    var biasInitializer: Initializer = HeUniform()
+
     override var layer: Conv2D? = null
 
     override fun create() : Conv2D {
@@ -42,8 +47,8 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
             strides = strides.toLongArray(),
             dilations = dilations.toLongArray(),
             activation = activations,
-            kernelInitializer = HeNormal(),
-            biasInitializer = HeUniform(),
+            kernelInitializer = kernelInitializer,
+            biasInitializer = biasInitializer,
             padding = ConvPadding.SAME,
             useBias = useBias
         ).also {

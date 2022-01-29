@@ -48,6 +48,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
 
         val events = deepNet.events
         events.onUpdated {
+            infoText.text = computeInfoText()
             renderActivations()
         }
 
@@ -58,7 +59,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
     /**
      * Update status text.
      */
-    private fun computeInfoText() = deepNet.id
+    private fun computeInfoText() = "${deepNet.id} : ${deepNet.prediction}"
     // infoText.text = """
     //      Output: (${Utils.doubleArrayToString(deepNet.outputs!!.col(0), 2)})
     //
@@ -135,7 +136,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
         val output = deepNet.outputs!!.col(0).map { it.toFloat() }.toFloatArray()
         val input = deepNet.floatInputs
         val inputLayer = (deepNet.tfLayers[0] as TFInputLayer)
-        val inputActivations = if (inputLayer.getRank() == 3) {
+        val inputActivations = if (inputLayer.layer?.outputShape?.rank() == 4) {
             listOf(input.reshape(inputLayer.rows, inputLayer.cols, inputLayer.channels).toList())
         } else {
             listOf(input)

@@ -49,7 +49,6 @@ public class JNumberSpinnerWithNull extends JSpinner {
         return super.createEditor(model);
     }
 
-
     public static class NumberEditorWithNull extends JSpinner.NumberEditor {
         public NumberEditorWithNull(JNumberSpinnerWithNull spinner) {
             this(spinner, (DecimalFormat) NumberFormat.getNumberInstance(spinner.getLocale()));
@@ -65,6 +64,7 @@ public class JNumberSpinnerWithNull extends JSpinner {
                 throw new IllegalArgumentException("model not a SpinnerNumberModel");
             }
 
+            format.setMaximumFractionDigits(Integer.MAX_VALUE);
             SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
             NumberFormatter formatterEditor = new NumberEditorFormatter(model, format);
             NumberFormatter formatterDisplay = new NumberEditorFormatterWithNull(model, format);

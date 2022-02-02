@@ -1,5 +1,7 @@
 package org.simbrain.util.table
 
+import smile.math.matrix.Matrix
+
 /**
  * Mutable table whose columns have arbitrary types.
  */
@@ -157,6 +159,13 @@ fun createFrom2DArray(data: Array<out Array<out Any?>>): BasicDataWrapper {
 
 fun createFromDoubleArray(data: Array<DoubleArray>): BasicDataWrapper {
     return BasicDataWrapper(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
+}
+
+fun createFromMatrix(data: Matrix): BasicDataWrapper {
+    return BasicDataWrapper(
+        data.toArray().map { it.toMutableList() as MutableList<Any?> }.toMutableList(),
+        (1..data.ncols()).map { createColumn("$it", 0.0) }.toMutableList()
+    )
 }
 
 fun createFromFloatArray(data: Array<FloatArray>): BasicDataWrapper {

@@ -16,9 +16,9 @@ import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.table.NumericTable;
-import org.simbrain.util.table.SimbrainJTable;
-import org.simbrain.util.table.SimbrainJTableScrollPanel;
+import org.simbrain.util.table.BasicDataWrapperKt;
+import org.simbrain.util.table.SimbrainDataViewer;
+import org.simbrain.util.table.TableActionsKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,9 @@ import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
  */
 public class WeightMatrixNode extends ScreenElement implements PropertyChangeListener {
 
-    // todo; renam all
+    // TODO: Make this cover other subclasses of Connector besides WeightMatrix.
+    // But for now we are only using WeightMatrix
+
     /**
      * The weight matrix this node represents
      */
@@ -211,30 +213,6 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         };
         contextMenu.add(diagAction);
 
-        contextMenu.addSeparator();
-        Action editComponents = new AbstractAction("Edit Components...") {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                // TODO
-                StandardDialog dialog = new StandardDialog();
-                NumericTable table = new NumericTable(((WeightMatrix) weightMatrix).getWeightMatrix().toArray());
-                SimbrainJTable st = SimbrainJTable.createTable(table);
-                dialog.setContentPane(new SimbrainJTableScrollPanel(st));
-
-                dialog.addClosingTask(() -> {
-                    if (weightMatrix instanceof WeightMatrix) {
-                        ((WeightMatrix) weightMatrix).setWeights(table.getFlattenedData());
-                    }
-                });
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
-        };
-        if (weightMatrix instanceof  WeightMatrix) {
-            contextMenu.add(editComponents);
-        }
-
         // Coupling menu
         contextMenu.addSeparator();
         JMenu couplingMenu = createCouplingMenu(networkPanel.getNetworkComponent(), weightMatrix);
@@ -255,12 +233,20 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         // Property Editor
         AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(weightMatrix);
         tabs.addTab("Properties", ape);
+        dialog.addClosingTask(ape::commitChanges);
 
         // Weight matrix
-        tabs.addTab("Weight Matrix", new JLabel("Coming soon"));
-        // TODO
+        if (weightMatrix instanceof WeightMatrix) {
+            var wm = BasicDataWrapperKt.createFromMatrix(((WeightMatrix) weightMatrix).getWeightMatrix());
+            var wmViewer = new SimbrainDataViewer(wm, false);
+            TableActionsKt.addSimpleDefaults(wmViewer);
+            tabs.addTab("Weight Matrix", wmViewer);
+            dialog.addClosingTask(() -> {
+                ((WeightMatrix) weightMatrix).setWeights(wm.getRowMajorDoubleArray());
+                weightMatrix.getEvents().fireUpdated();
+            });
+        }
 
-        dialog.addClosingTask(ape::commitChanges);
         dialog.setContentPane(tabs);
         dialog.pack();
         dialog.setLocationRelativeTo(null);

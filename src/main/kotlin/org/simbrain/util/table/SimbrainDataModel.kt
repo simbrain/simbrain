@@ -21,7 +21,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     // But replace construction logic with function
 
     /**
-     * Index list of column classes. Prevoiusly overrode [getColumnClass] but this created problems.
+     * Index list of column classes. Previously overrode [getColumnClass] but this created problems.
      */
     val columnClasses: List<Class<*>>
         get() = columns.map { it.type.clazz() }

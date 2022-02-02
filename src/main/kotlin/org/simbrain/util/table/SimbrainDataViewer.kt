@@ -156,6 +156,10 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
                 if (e.isPopupTrigger) {
                     popUpMenu.show(this@DataViewerTable, e.x, e.y)
                 }
+                // We need a way to commit cell contents even clicking outside of the cell.
+                // This won't work because it's local to the window. We don't even know if
+                // stopCEllEditing() will force the commit.
+                // getCellEditor().stopCellEditing()
             }
         })
     }
@@ -267,7 +271,6 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
         // Camick end
     }
 }
-
 
 fun main() {
 

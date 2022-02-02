@@ -29,7 +29,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Widget to display the synaptic connections between two layers of neurons as a
@@ -206,18 +205,15 @@ public class WeightMatrixViewer extends SimbrainJTableScrollPanel {
             }
         }
 
-
         @Override
         public void setLogicalValue(int row, int column, Double value, boolean fireEvent) {
             setValue(row, column + 1, value, fireEvent);
         }
 
-
         @Override
         public Double getLogicalValueAt(int row, int col) {
             return getValueAt(row, col + 1);
         }
-
 
     }
 

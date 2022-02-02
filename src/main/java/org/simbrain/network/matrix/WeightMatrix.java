@@ -77,6 +77,17 @@ public class WeightMatrix extends Connector {
                 .toArray();
     }
 
+    /**
+     * Set the weights using a double array.
+     */
+    public void setWeights(double[][] newWeights) {
+        for (int i = 0; i <  newWeights.length; i++) {
+                for (int j = 0; j < newWeights[i].length; j++) {
+                weightMatrix.set(i,j,newWeights[i][j]);
+            }
+        }
+    }
+
     @Consumable
     public void setWeights(double[] newWeights) {
         int len = Math.min((int) weightMatrix.size(), newWeights.length);

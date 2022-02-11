@@ -86,20 +86,15 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
 
     override fun getContextMenu(): JPopupMenu? {
         return JPopupMenu().apply {
-            add(JMenuItem("Train...").apply { addActionListener {
-                getTrainingDialog().run { makeVisible() }
-            } })
-            add(JMenuItem("Set Properties...").apply { addActionListener {
+            add(JMenuItem("Set Properties / Train ...").apply { addActionListener {
                 propertyDialog.run { makeVisible() }
             } })
         }
     }
 
-    override fun getPropertyDialog(): StandardDialog = AnnotatedPropertyEditor.getDialog(smileClassifier.classifier)
+    override fun getPropertyDialog(): StandardDialog = StandardDialog().apply {
 
-    fun getTrainingDialog() = StandardDialog().apply {
-
-        // TODO: Generalize concept of training dialog and move somewhere else?
+        // TODO: Generalize training dialog and move
 
         title = "Smile Classifier"
         modalityType = ModalityType.MODELESS // Set to modeless so the dialog can be left open
@@ -111,16 +106,9 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
 
             layout = MigLayout("fillx")
 
-            fun SimbrainDataViewer.addCustomActions()  {
-                addAction(table.importCsv)
-                addAction(table.randomizeColumnAction)
-                addAction(table.editColumnAction)
-            }
-
             // Data Panels
             val inputs = SimbrainDataViewer(createFromDoubleArray(smileClassifier.trainingInputs), false).apply {
-                addCustomActions()
-                addSeparator()
+                addAction(table.importCsv)
                 addAction(table.randomizeAction)
                 preferredSize = Dimension(300, 300)
                 addClosingTask {
@@ -129,7 +117,8 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             }
 
             val targets = SimbrainDataViewer(createFromColumn(smileClassifier.trainingTargets), false).apply {
-                addCustomActions()
+                addAction(table.importCsv)
+                addAction(table.randomizeColumnAction)
                 table.model.columns[0].columnRandomizer.probabilityDistribution =
                     TwoValued.TwoValuedBuilder().upper(1).lower(-1).build()
                 preferredSize = Dimension(200, 300)
@@ -138,7 +127,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
                 }
             }
 
-            val addRemoveRows = JToolBar().apply {
+            val addRemoveRows = JPanel().apply {
                 // Add row
                 add(JButton().apply {
                     icon = ResourceManager.getImageIcon("menu_icons/AddTableRow.png")
@@ -172,12 +161,20 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             // Add all components
             add(AnnotatedPropertyEditor(smileClassifier), "wrap")
             add(JSeparator(), "growx, span, wrap")
+            add(AnnotatedPropertyEditor(smileClassifier.classifier), "wrap")
+            add(JSeparator(), "growx, span, wrap")
             add(trainButton)
             add(statsLabel, "wrap")
             add(JSeparator(), "span, growx, wrap")
+            add(JLabel("Inputs"))
+            add(JLabel("Labels (1/-1)"))
+            add(JSeparator(), "span, growx, wrap")
             add(inputs)
             add(targets, "wrap")
-            add(addRemoveRows)
+            add(JPanel().apply{
+                add(JLabel("Add / Remove training instances:"))
+                add(addRemoveRows)
+            })
         }
 
     }
@@ -199,5 +196,5 @@ fun main() {
         addNetworkModel(classifier)
         classifier
     }
-    SmileClassifierNode(np, classifier).getTrainingDialog().run { makeVisible() }
+    SmileClassifierNode(np, classifier).getPropertyDialog().run { makeVisible() }
 }

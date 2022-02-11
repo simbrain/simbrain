@@ -21,6 +21,7 @@ val evolveXor = newSim {
 
     val evolutionarySimulation = evolutionarySimulation {
 
+        // Set up the basic simulation
         val network = Network()
 
         val inputChromosome = chromosome(2) { index ->
@@ -41,7 +42,9 @@ val evolveXor = newSim {
 
         val connectionChromosome = chromosome<Synapse, ConnectionGene>()
 
+        // Set up Mutations
         onMutate {
+            // Mutate bias
             hiddenNodeChromosome.forEach {
                 it.mutate {
                     neuronDataHolder.let {
@@ -49,11 +52,13 @@ val evolveXor = newSim {
                     }
                 }
             }
+            // Mutate weights
             connectionChromosome.forEach {
                 it.mutate {
                     strength += (Random().nextDouble() - 0.5) * 0.2
                 }
             }
+            // Create new connections
             // Either connect input to hidden or hidden to output, or hidden to hidden
             val (source, target) = if (Random().nextBoolean()) {
                 val source = (inputChromosome + hiddenNodeChromosome).selectRandom()
@@ -77,6 +82,7 @@ val evolveXor = newSim {
             }
         }
 
+        // Fitness function for XOR
         onEval {
             val inputData = listOf(listOf(0.0, 0.0), listOf(1.0, 0.0), listOf(0.0, 1.0), listOf(1.0, 1.0))
             val tarData = listOf(listOf(0.0), listOf(1.0), listOf(1.0), listOf(0.0))
@@ -89,10 +95,12 @@ val evolveXor = newSim {
             }.sum()
         }
 
+        // Add winning network to sim
         onPeek {
             addNetworkComponent("Network", network)
         }
 
+        // How to lay out the winning network
         onBuild { visible ->
             network {
                 if (visible) {
@@ -118,6 +126,7 @@ val evolveXor = newSim {
 
     }
 
+    // Params of evolutionary sim
     val evolution = evaluator(evolutionarySimulation) {
         populationSize = 100
         eliminationRatio = 0.5
@@ -125,6 +134,7 @@ val evolveXor = newSim {
         runUntil { generation == 1000 || fitness < .01 }
     }
 
+    // Running the sim
     MainScope().launch {
 
         workspace.clearWorkspace()

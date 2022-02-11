@@ -23,7 +23,8 @@ import java.util.Arrays;
  * The matrix is multiplied by the transpose of the source layer column to produce the output activations.
  *
  * Since in Simbrain the source layer is typically shown as a row already, it's easy to visualize
- * the rows of the weight matrix being dotted with the source layer.
+ * the rows of the weight matrix being dotted one at a time with the rows of the source layer, to
+ * generate the target.
  *
  */
 public class WeightMatrix extends Connector {

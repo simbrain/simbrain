@@ -33,6 +33,7 @@ fun NetworkPanel.addKeyBindings() {
     bindTo("G", networkActions.neuronGroupAction)
     bindTo("I", networkActions.wandEditModeAction)
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
+    // TODO: Is this the right place for this?
     bind(Shift + 'I') {
         selectionManager.filterSelectedModels<WeightMatrix>().forEach {
             it.diagonalize()

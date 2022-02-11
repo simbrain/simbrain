@@ -42,7 +42,6 @@ val deepNetSim = newSim {
     val network = networkComponent.network
 
     // Add a self-connected neuron array to the network
-    // TODO: Maybe make it possible to set conv2dlayer props in constructor
     val deepNet = DeepNet(network,
         arrayListOf(
             TFInputLayer(28,28,1),
@@ -84,6 +83,8 @@ val deepNetSim = newSim {
     network.addNetworkModel(deepNet)
     deepNet.trainingDataset = trainingSet
     deepNet.testingDataset = testingSet
+
+    // TODO: Add progress window
     deepNet.trainingParams.apply {
         epochs = 10
     }

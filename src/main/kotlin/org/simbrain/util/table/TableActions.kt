@@ -33,7 +33,7 @@ val DataViewerTable.randomizeAction
 
 val DataViewerTable.randomizeColumnAction
     get() = createAction(
-        "menu_icons/Rand.png",
+        "menu_icons/Rand_C.png",
         "Randomize column",
         "Randomize cells in selected column",
     ) {
@@ -42,7 +42,7 @@ val DataViewerTable.randomizeColumnAction
 
 val DataViewerTable.zeroFillAction
     get() = createAction(
-        "menu_icons/Fill.png",
+        "menu_icons/Fill_0.png",
         "Zero Fill",
         "Zero Fill selected cells",
         'Z'

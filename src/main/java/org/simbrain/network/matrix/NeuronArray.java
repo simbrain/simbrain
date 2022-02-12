@@ -1,6 +1,7 @@
 package org.simbrain.network.matrix;
 
 
+import org.simbrain.network.core.ArrayLayer;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
@@ -20,9 +21,6 @@ import java.awt.geom.Rectangle2D;
  * A "neuron array" backed by a Smile Matrix.
  */
 public class NeuronArray extends ArrayLayer implements EditableObject, AttributeContainer {
-
-    @UserParameter(label = "Increment amount", increment = .1, order = 20)
-    private double increment = .1;
 
     @UserParameter(label = "Update Rule", useSetter = true, isObjectType = true, order = 100)
     NeuronUpdateRule prototypeRule = new LinearRule();
@@ -229,13 +227,13 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     @Override
     public void increment() {
-        activations.add(increment);
+        activations.add(getIncrement());
         getEvents().fireUpdated();
     }
 
     @Override
     public void decrement() {
-        activations.sub(increment);
+        activations.sub(getIncrement());
         getEvents().fireUpdated();
     }
 

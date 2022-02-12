@@ -3,8 +3,8 @@ package org.simbrain.network.gui.nodes
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Font

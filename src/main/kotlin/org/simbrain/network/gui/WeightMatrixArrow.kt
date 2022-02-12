@@ -1,8 +1,8 @@
 package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
+import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.gui.nodes.WeightMatrixNode
-import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow

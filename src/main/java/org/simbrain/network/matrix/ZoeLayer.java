@@ -1,6 +1,7 @@
 package org.simbrain.network.matrix;
 
 
+import org.simbrain.network.core.ArrayLayer;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;

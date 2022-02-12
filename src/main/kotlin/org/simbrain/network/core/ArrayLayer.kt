@@ -1,81 +1,88 @@
-package org.simbrain.network.matrix;
+package org.simbrain.network.core
 
-import org.simbrain.network.core.Connector;
-import org.simbrain.network.core.Layer;
-import org.simbrain.network.core.Network;
-import org.simbrain.util.UserParameter;
-import org.simbrain.workspace.Consumable;
-import smile.math.matrix.Matrix;
+import org.simbrain.util.UserParameter
+import org.simbrain.util.math.ProbDistributions.UniformDistribution
+import org.simbrain.util.randomize
+import org.simbrain.workspace.Consumable
+import smile.math.matrix.Matrix
 
 /**
  * Array based layers (based on Smile matrices) should extend this. Maintains an input vector for summing inputs.
  */
-public abstract class ArrayLayer extends Layer {
-
-    @UserParameter(label = "Clamped", description = "Clamping", order = 3)
-    private boolean clamped;
-
+abstract class ArrayLayer(
     /**
      * Reference to network this array is part of.
      */
-    private final Network parent;
+    private val parent: Network, inputSize: Int
+) : Layer() {
+
+    @UserParameter(label = "Increment amount", increment = .1, order = 20)
+    val increment = .1
+        get() = field
+
+    @UserParameter(label = "Clamped", description = "Clamping", order = 3)
+    var isClamped = false
+        set(clamped) {
+            field = clamped
+            events.fireClampChanged()
+        }
 
     /**
      * Collects inputs from other network models using arrays.
      */
-    private Matrix inputs;
+    val inputs: Matrix
 
-    public ArrayLayer(Network net, int inputSize) {
-        parent = net;
-        inputs = new Matrix(inputSize, 1);
+    init {
+        inputs = Matrix(inputSize, 1)
     }
 
-    public Matrix getInputs() {
-        return inputs;
+    override fun inputSize(): Int {
+        return inputs.size().toInt()
     }
 
-    @Override
-    public int inputSize() {
-        return (int) inputs.size();
-    }
-
-    @Override
-    public void updateInputs() {
-        Matrix wtdInputs = new Matrix(inputSize(), 1);
-        for (Connector c : getIncomingConnectors()) {
-            wtdInputs.add(c.getOutput());
+    override fun updateInputs() {
+        val wtdInputs = Matrix(inputSize(), 1)
+        for (c in incomingConnectors) {
+            wtdInputs.add(c.output)
         }
-        addInputs(wtdInputs);
+        addInputs(wtdInputs)
     }
 
-    @Override
-    public void addInputs(Matrix newInputs) {
-        inputs.add(newInputs);
+    override fun addInputs(newInputs: Matrix) {
+        inputs.add(newInputs)
     }
 
     @Consumable
-    public void addInputs(double[] inputs) {
-        addInputs(new Matrix(inputs));
+    fun addInputs(inputs: DoubleArray?) {
+        addInputs(Matrix(inputs))
     }
 
-    @Override
-    public Network getNetwork() {
-        return parent;
+    override fun randomize() {
+        // TODO: Make randomizer settable
+        inputs.randomize(UniformDistribution.create())
+        events.fireUpdated()
     }
 
-
-    @Override
-    public void toggleClamping() {
-        setClamped(!isClamped());
+    override fun clear() {
+        inputs.mul(0.0)
+        events.fireUpdated();
     }
 
-    public void setClamped(final boolean clamped) {
-        this.clamped = clamped;
-        getEvents().fireClampChanged();
+    override fun increment() {
+        inputs.add(increment)
+        events.fireUpdated()
     }
 
-    public boolean isClamped() {
-        return clamped;
+    override fun decrement() {
+        inputs.sub(increment)
+        events.fireUpdated()
     }
 
+    override fun getNetwork(): Network {
+        return parent
+    }
+
+    override fun toggleClamping() {
+        isClamped = !isClamped
+    }
 }

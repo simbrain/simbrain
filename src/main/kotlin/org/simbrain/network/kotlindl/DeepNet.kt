@@ -7,11 +7,10 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
-import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.util.*
-import org.simbrain.util.math.ProbDistributions.UniformDistribution
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -53,7 +52,7 @@ class DeepNet(
      * To access the actual inputs use getInputs().
      */
     val doubleInputs: DoubleArray
-        get() = super.getInputs().col(0)
+        get() = super.inputs.col(0)
 
     /**
      * Float representation of [doubleInputs].
@@ -241,28 +240,6 @@ class DeepNet(
     override fun toString(): String {
         return "${label}: : ${inputSize()} -> ${outputSize()}\n" +
                 deepNetLayers.layers.joinToString("\n") { it.name }
-    }
-
-    // TODO: Should this be at super class?
-    override fun randomize() {
-        // TODO: Make randomizer settable
-        getInputs().randomize(UniformDistribution.create())
-        events.fireUpdated()
-    }
-
-    override fun clear() {
-        inputs.mul(0.0)
-        events.fireUpdated();
-    }
-
-    override fun increment() {
-        inputs.add(1.0) // TODO: Make settable, or use a common interface
-        events.fireUpdated()
-    }
-
-    override fun decrement() {
-        inputs.sub(1.0) // TODO: Make settable, or use a common interface
-        events.fireUpdated()
     }
 
     override fun getBound(): Rectangle2D {

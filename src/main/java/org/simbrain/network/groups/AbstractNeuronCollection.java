@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.*;
 import org.simbrain.network.events.NeuronCollectionEvents;
-import org.simbrain.network.matrix.ArrayLayer;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;

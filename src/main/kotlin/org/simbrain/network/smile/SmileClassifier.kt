@@ -1,7 +1,7 @@
 package org.simbrain.network.smile
 
+import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
-import org.simbrain.network.matrix.ArrayLayer
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -73,7 +73,7 @@ class SmileClassifier(
      */
     override fun update() {
         if (classifier.model != null) {
-            val pred = classifier.predict(getInputs().col(0))
+            val pred = classifier.predict(inputs.col(0))
             println("Prediction of ${this} = $pred")
             if (classifier.model != null) {
                 outputs = classifier.getOutputVector(pred, outputSize)
@@ -100,12 +100,6 @@ class SmileClassifier(
 
     override fun getBound(): Rectangle2D? {
         return Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
-    }
-
-    override fun clear() {
-        inputs.mul(0.0)
-        outputs.mul(0.0)
-        events.fireUpdated()
     }
 
     /**

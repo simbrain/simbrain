@@ -48,9 +48,9 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
         updateInfoText()
         updateActivationImages()
         outputImage.offset(0.0,  infoText.offset.y + infoText.height + 5)
-        outputImage.addBox()
+        outputImage.addBorder()
         inputImage.offset(0.0, outputImage.offset.y + outputImage.height + 5)
-        inputImage.addBox()
+        inputImage.addBorder()
         updateBorder()
     }
 

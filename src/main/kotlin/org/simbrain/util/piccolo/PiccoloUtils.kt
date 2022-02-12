@@ -25,14 +25,15 @@ val PInputEvent.isDoubleClick
     get() = clickCount == 2 && button == MouseEvent.BUTTON1
 
 /**
- * Add a black box as a border around a PImage. Must be called after the image's bounds have been set.
+ * Add a black border around a PImage. Must be called after the image's bounds have been set.
  */
-fun PImage.addBox () {
+fun PImage.addBorder(): PNode {
     val (x, y, w, h) = bounds
     val box = PPath.createRectangle(x, y, w, h)
     box.strokePaint = Color.BLACK
     box.paint = null
     addChild(box)
+    return box
 }
 
 operator fun PBounds.component1() = x

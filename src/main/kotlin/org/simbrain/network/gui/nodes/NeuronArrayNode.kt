@@ -28,7 +28,7 @@ import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.*
-import org.simbrain.util.piccolo.addBox
+import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
@@ -93,14 +93,15 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
         }
         updateActivationImage()
         activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
-        activationImage.addBox()
+        activationImage.addBorder()
         updateBorder()
     }
 
     private fun updateActivationImage() {
+        activationImage.removeAllChildren()
+        val activations = neuronArray.outputs.col(0)
         if (gridMode) {
             // "Grid" case
-            val activations = neuronArray.outputs.col(0)
             val len = sqrt(activations.size.toDouble()).toInt()
             val img = activations.toSimbrainColorImage(len, len)
             activationImage.image = img
@@ -110,7 +111,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
             )
         } else {
             // "Flat" case
-            val activations = neuronArray.outputs.col(0)
             val img = activations.toSimbrainColorImage(activations.size, 1)
             activationImage.image = img
             activationImage.setBounds(
@@ -118,6 +118,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
                 infoText.width, flatPixelArrayHeight.toDouble()
             )
         }
+        activationImage.addBorder()
     }
 
     private fun computeInfoText() = """
@@ -172,23 +173,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
         }
         contextMenu.add(switchStyle)
 
-        // Example of how to use radio buttons in case we end up with three designs
-        val switchStyleMenu = JMenu("Switch Styles")
-        val styles = ButtonGroup()
-        val state1 = JRadioButtonMenuItem("Style 1", true)
-        styles.add(state1)
-        state1.addActionListener { println("State 1") }
-        switchStyleMenu.add(state1)
-        val state2 = JRadioButtonMenuItem("Style 2")
-        styles.add(state2)
-        state2.addActionListener { println("State 2") }
-        switchStyleMenu.add(state2)
-        val state3 = JRadioButtonMenuItem("Style 3")
-        state3.addActionListener { println("State 3") }
-        styles.add(state3)
-        switchStyleMenu.add(state3)
-        contextMenu.add(switchStyleMenu)
-        contextMenu.addSeparator()
 
         // Randomize Action
         val randomizeAction: Action = object : AbstractAction("Randomize") {

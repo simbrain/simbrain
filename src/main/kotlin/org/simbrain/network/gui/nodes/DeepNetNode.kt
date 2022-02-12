@@ -14,7 +14,7 @@ import org.simbrain.network.gui.dialogs.showDeepNetTrainingDialog
 import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.kotlindl.TFInputLayer
 import org.simbrain.util.*
-import org.simbrain.util.piccolo.addBox
+import org.simbrain.util.piccolo.addBorder
 import org.simbrain.workspace.gui.CouplingMenu
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
@@ -196,7 +196,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
 
         // Add these as children to the main node
         activationImages.forEach { mainNode.addChild(it) }
-        activationImages.forEach { it.addBox() }
+        activationImages.forEach { it.addBorder() }
 
     }
 

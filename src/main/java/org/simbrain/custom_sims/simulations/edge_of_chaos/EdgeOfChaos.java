@@ -11,7 +11,6 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
@@ -76,7 +75,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 861,1,127,106);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 844,2,215,133);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -102,9 +101,9 @@ public class EdgeOfChaos extends RegisteredSimulation {
         // Set up sensor nodes
         buildSensorNodes();
 
-        // Use concurrent buffered update
-        net.getUpdateManager().clear();
-        net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
+        // // Use concurrent buffered update
+        // net.getUpdateManager().clear();
+        // net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
     }
 
     private void buildSensorNodes() {
@@ -115,7 +114,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         // Sensor nodes
         sensorNodes = new NeuronGroup(net, 6);
         sensorNodes.setLabel("Sensors");
-        sensorNodes.setClamped(true);
+        // sensorNodes.setClamped(true);
         net.addNetworkModel(sensorNodes);
         sensorNodes.setLocation(229, 561);
         // Make custom connections from sensor nodes to upper-left and
@@ -267,7 +266,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         // Couple agent to cheese and flower nodes
         SmellSensor smellSensor = new SmellSensor(mouse);
         mouse.addSensor(smellSensor);
-        // sim.couple(smellSensor, sensorNodes);
+        sim.couple(smellSensor, sensorNodes);
     }
 
     public EdgeOfChaos(SimbrainDesktop desktop) {

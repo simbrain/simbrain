@@ -26,6 +26,8 @@ import javax.swing.*;
  */
 public class EdgeOfChaosBitStream extends RegisteredSimulation {
 
+    //TODO: Docviewer definitely needed
+
     // Simulation Parameters
     int NUM_NEURONS = 120;
     static int GRID_SPACE = 25;
@@ -48,7 +50,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkComponent nc = sim.addNetwork(138,10,450,450, "Edge of Chaos");
+        NetworkComponent nc = sim.addNetwork(201,10,480,590, "Edge of Chaos");
         net = nc.getNetwork();
         buildNetwork();
 
@@ -60,7 +62,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5,10,133,136);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5,10,205,180);
         JTextField input_tf = panel.addTextField("Input strength", "" + u_bar);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
@@ -123,28 +125,32 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         //                .createConcurrentBufferedUpdate(network));
     }
 
+    NeuronGroup bitStreamInputs;
+
     private NeuronGroup buildBitStream(NeuronGroup reservoir) {
         // Offset in pixels of input nodes to right of reservoir
         int offset = 200;
-        NeuronGroup bitStreamInputs = new NeuronGroup(net, 1);
-        bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
+        bitStreamInputs = new NeuronGroup(net, 1);
         BinaryRule b = new BinaryRule(0, u_bar, .5);
         bitStreamInputs.setNeuronType(b);
         bitStreamInputs.setClamped(true);
         bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
         bitStreamInputs.setInputMode(true);
         net.addNetworkModel(bitStreamInputs);
+        bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
         return bitStreamInputs;
     }
 
     private void setUpTimeSeries() {
         // Set up the plot
-        TimeSeriesPlotComponent ts = sim.addTimeSeries(588,10,363,285, "Time Series");
+        TimeSeriesPlotComponent ts = sim.addTimeSeries(681,15,363,285, "Time Series");
         TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Difference");
 
         sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update time series") {
             @Override
             public void invoke() {
+                bitStream1.getInputManager().applyCurrentRow();
+                bitStream2.getInputManager().applyCurrentRow();
                 double activationDiff = SimbrainMath.distance(res1.getActivations(), res2.getActivations());
                 ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
             }

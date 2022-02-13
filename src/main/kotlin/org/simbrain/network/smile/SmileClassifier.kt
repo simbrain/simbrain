@@ -58,7 +58,7 @@ class SmileClassifier(
     }
 
     /**
-     * Train the classiffier.
+     * Train the classifier.
      */
     fun train(inputs: Array<DoubleArray>, targets: IntArray) {
         try {

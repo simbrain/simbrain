@@ -112,7 +112,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
                 addAction(table.randomizeAction)
                 preferredSize = Dimension(300, 300)
                 addClosingTask {
-                    smileClassifier.trainingInputs = this.model.getColumnMajorArray()
+                    smileClassifier.trainingInputs = this.model.getRowMajorDoubleArray()
                 }
             }
 

@@ -13,7 +13,6 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import smile.math.matrix.Matrix;
@@ -35,7 +34,7 @@ import static org.simbrain.util.GeomKt.minus;
  * {@link Layer}s it can create output matrices and accept input matrices, but it wil only create and cache these if
  * relevant methods are called. Matrix based layers should subclass {@link ArrayLayer}
  */
-public abstract class AbstractNeuronCollection extends Layer implements CopyableObject, AttributeContainer {
+public abstract class AbstractNeuronCollection extends Layer implements CopyableObject {
 
     /**
      * Reference to the network this group is a part of.

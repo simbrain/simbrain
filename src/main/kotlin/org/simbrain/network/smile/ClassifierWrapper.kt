@@ -1,6 +1,7 @@
 package org.simbrain.network.smile
 
 import org.simbrain.network.smile.classifiers.KNNClassifier
+import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.RandomForestClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
@@ -52,7 +53,10 @@ abstract class ClassifierWrapper(): CopyableObject {
          */
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return listOf(SVMClassifier::class.java, KNNClassifier::class.java, RandomForestClassifier::class.java)
+            return listOf(
+                LogisticRegClassifier::class.java, SVMClassifier::class.java, KNNClassifier::class.java,
+                RandomForestClassifier::class
+                .java)
         }
     }
 

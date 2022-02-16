@@ -53,7 +53,8 @@ public abstract class ScreenElement extends PPath.Float {
         addInputEventListener(new PropertyDialogEventHandler());
         addInputEventListener(new ToolTipTextUpdater(networkPanel) {
             protected String getToolTipText() {
-                return ScreenElement.this.getToolTipText();
+                return ScreenElement.this.
+                        getToolTipText();
             }
         });
     }

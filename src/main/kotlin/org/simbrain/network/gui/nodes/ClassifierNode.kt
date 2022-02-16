@@ -10,6 +10,7 @@ import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.Utils
 import org.simbrain.util.math.ProbDistributions.TwoValued
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -47,9 +48,19 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
         // Set up components from top to bottom
         updateInfoText()
         updateActivationImages()
-        outputImage.offset(0.0,  infoText.offset.y + infoText.height + 5)
+
+        val outLabel = PText("Out:")
+        outLabel.font = INFO_FONT
+        outLabel.offset(0.0,  infoText.offset.y + infoText.height + 7)
+        addChild(outLabel)
+        outputImage.offset(20.0,  infoText.offset.y + infoText.height + 5)
         outputImage.addBorder()
-        inputImage.offset(0.0, outputImage.offset.y + outputImage.height + 5)
+
+        val inLabel = PText("In:")
+        inLabel.font = INFO_FONT
+        inLabel.offset(0.0,  outputImage.offset.y + outputImage.height + 7)
+        addChild(inLabel)
+        inputImage.offset(20.0, outputImage.offset.y + outputImage.height + 5)
         inputImage.addBorder()
         updateBorder()
     }
@@ -68,20 +79,26 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
         }
     }
 
-    /**
-     * Update status text.
-     */
-    private fun computeInfoText() = smileClassifier.id
-        // "Output: (" +
-        //         Utils.doubleArrayToString(smileClassifier.outputs.col(0), 2) + ")" +
-        //         "\n\nInput: (" + Utils.doubleArrayToString(smileClassifier.inputs.col(0), 2) + ")"
-
     private fun updateInfoText() {
         infoText.text = computeInfoText()
     }
 
+    /**
+     * Update status text.
+     */
+    private fun computeInfoText() = "Winning class: " + smileClassifier.winner
+
     override fun getModel(): NetworkModel {
         return smileClassifier
+    }
+
+    override fun getToolTipText(): String {
+        return  """ 
+                <html>
+                Output: (${Utils.doubleArrayToString(smileClassifier.outputs.col(0), 2)})<br>
+                Input: (${Utils.doubleArrayToString(smileClassifier.inputs.col(0), 2)})
+                </html>
+                """.trimIndent()
     }
 
     override fun getContextMenu(): JPopupMenu? {
@@ -159,20 +176,26 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             }
 
             // Add all components
-            add(AnnotatedPropertyEditor(smileClassifier), "wrap")
+            val classfierGeneralProps = AnnotatedPropertyEditor(smileClassifier)
+            add(classfierGeneralProps, "wrap")
+            addClosingTask(classfierGeneralProps::commitChanges)
             add(JSeparator(), "growx, span, wrap")
-            add(AnnotatedPropertyEditor(smileClassifier.classifier), "wrap")
-            add(JSeparator(), "growx, span, wrap")
+            val classfierProps = AnnotatedPropertyEditor(smileClassifier.classifier)
+            if (!classfierProps.widgets.isEmpty()) {
+                add(classfierProps, "wrap")
+                addClosingTask(classfierProps::commitChanges)
+                add(JSeparator(), "growx, span, wrap")
+            }
             add(trainButton)
             add(statsLabel, "wrap")
             add(JSeparator(), "span, growx, wrap")
             add(JLabel("Inputs"))
-            add(JLabel("Labels (1/-1)"))
+            add(JLabel("Target Labels"))
             add(JSeparator(), "span, growx, wrap")
             add(inputs)
             add(targets, "wrap")
             add(JPanel().apply{
-                add(JLabel("Add / Remove training instances:"))
+                add(JLabel("Add / Remove rows:"))
                 add(addRemoveRows)
             })
         }
@@ -185,7 +208,7 @@ fun main() {
     val networkComponent = NetworkComponent("net 1")
     val np = NetworkPanel(networkComponent)
     val classifier = with(networkComponent.network) {
-        val classifier = SmileClassifier(this, SVMClassifier(), 2, 1, 4)
+        val classifier = SmileClassifier(this, SVMClassifier(), 2)
         classifier.trainingInputs = arrayOf(
                 doubleArrayOf(0.0, 0.0),
                 doubleArrayOf(1.0, 0.0),

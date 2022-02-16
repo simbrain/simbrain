@@ -48,17 +48,12 @@ class SVMClassifier(): ClassifierWrapper() {
     }
 
     override fun predict(input: DoubleArray): Int {
-        return model?.predict(input) ?: -1
+        val res = model?.predict(input) ?: 0
+        return if (res == -1) 0 else 1
     }
 
     override fun getOutputVector(result: Int, outputSize: Int): Matrix {
-        if (result == -1) {
-            // [1,0]
-            return getOneHotMat(0, outputSize, 1.0)
-        } else {
-            // [0,1]
-            return getOneHotMat(1, outputSize, 1.0)
-        }
+        return getOneHotMat(result, outputSize)
     }
 
     // Kotlin hack to support "static method in superclass"

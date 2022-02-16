@@ -3,6 +3,7 @@ package org.simbrain.network.core;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.events.LocationEvents;
+import org.simbrain.workspace.AttributeContainer;
 import smile.math.matrix.Matrix;
 
 import java.awt.geom.Point2D;
@@ -27,7 +28,7 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Yulin Li
  */
-public abstract class Layer extends LocatableModel {
+public abstract class Layer extends LocatableModel implements AttributeContainer {
 
     // TODO: Currently Smile Matrices are the "lingua Franca" for different layers.
     //  Keep an eye on Kotlin's Multik as a possible alternative

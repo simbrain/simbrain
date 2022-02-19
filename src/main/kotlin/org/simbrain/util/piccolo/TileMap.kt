@@ -127,6 +127,13 @@ class TileMap {
         layer.renderImage(tileSets)
     }
 
+    /**
+     * Edit tiles in first layer.
+     */
+    fun editTile(x: Int, y: Int, tileID: Int) {
+        getLayer("Tile Layer 1").editTile(x, y, tileID)
+    }
+
     fun editTile(layerName: String, x: Int, y: Int, tileID: Int) {
         getLayer(layerName).editTile(x, y, tileID)
     }

@@ -33,6 +33,10 @@ val simulations = dir<Any>("Simulations") {
         item("Agent Trails") { kAgentTrails }
     }
 
+    dir("Cognitive Science") {
+        item("Cortex (PCI)") { cortexPCI }
+    }
+
     dir("Evolution") {
         item("Evolve Avoider") { evolveAvoider }
         item("Evolve AutoEncoder") { evolveAutoAssociator }

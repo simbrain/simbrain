@@ -122,6 +122,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
         mainPanel.apply {
 
             layout = MigLayout("fillx")
+            // layout = MigLayout("debug")
 
             // Data Panels
             val inputs = SimbrainDataViewer(createFromDoubleArray(smileClassifier.trainingInputs), false).apply {

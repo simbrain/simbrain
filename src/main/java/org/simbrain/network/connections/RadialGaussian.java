@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * This connection type makes four types of distance-based connection
- * probabilistically.
+ * This connection type makes four types of distance-based connection probabilistically.
  * <ol>
  * <li>Excitatory to Excitatory (EE)</li>
  * <li>Excitatory to Inhibitory (EI)</li>
@@ -90,65 +89,65 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
      * The connection constant for connections between 2 excitatory neurons.
      */
     @UserParameter(label = "Exc. \u2192 Exc. Constant",
-            minimumValue = 0, maximumValue = 1, increment = .1, order = 2 )
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 2)
     private double eeDistConst = DEFAULT_EE_CONST;
 
     /**
-     * The connection constant for connection from an excitatory to an
-     * inhibitory neuron.
+     * The connection constant for connection from an excitatory to an inhibitory neuron.
      */
     @UserParameter(label = "Exc. \u2192 Inh. Constant",
-            minimumValue = 0, maximumValue = 1, increment = .1, order = 3 )
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 3)
     private double eiDistConst = DEFAULT_EI_CONST;
 
     /**
-     * The connection constant for connection from an inhibitory to an
-     * excitatory neuron.
+     * The connection constant for connection from an inhibitory to an excitatory neuron.
      */
     @UserParameter(label = "Inh. \u2192 Exc. Constant",
-            minimumValue = 0, maximumValue = 1, increment = .1, order = 4 )
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 4)
     private double ieDistConst = DEFAULT_IE_CONST;
 
     /**
      * The connection constant for connections between 2 inhibitory neurons.
      */
     @UserParameter(label = "Inh. \u2192 Inh. Constant",
-            minimumValue = 0, maximumValue = 1, increment = .1, order = 5 )
+            minimumValue = 0, maximumValue = 1, increment = .1, order = 5)
     private double iiDistConst = DEFAULT_II_CONST;
 
     /**
-     * The connection constant for general connections. Used in cases where
-     * neurons have no explicit polarity.
+     * The connection constant for general connections. Used in cases where neurons have no explicit polarity.
      */
     @UserParameter(label = "No Polarity Constant", description = "Connection probability for" +
-        "non-polar synapses", minimumValue = 0, maximumValue = 1, increment = .1,
-        order = 6 )
+            "non-polar synapses", minimumValue = 0, maximumValue = 1, increment = .1,
+            order = 6)
     private double distConst = DEFAULT_DIST_CONST;
 
     /**
-     * A regulating constant governing overall connection density. Higher values
-     * create denser connections. Lambda can be thought of as the average
-     * connection distance in pixels.
+     * A regulating constant governing overall connection density. Higher values create denser connections. Lambda can
+     * be thought of as the average connection distance in pixels.
      */
     @UserParameter(label = "Distance Drop-off", increment = 5,
-            minimumValue = 0.01, order = 1 )
+            minimumValue = 0.01, order = 1)
     private double lambda = DEFAULT_LAMBDA;
 
     private SynapseGroup synapseGroup;
 
     /**
+     * Create synpases using default.
+     */
+    public static List<Synapse> connectRadialPolarized(final List<Neuron> source, final List<Neuron> target) {
+        return connectRadialPolarized(source, target, DEFAULT_EE_CONST, DEFAULT_EI_CONST,
+                DEFAULT_IE_CONST, DEFAULT_II_CONST, DEFAULT_DIST_CONST, DEFAULT_LAMBDA, true);
+    }
+
+    /**
      * @param source      the source neurons.
      * @param target      the target neurons.
-     * @param eeDistConst the connection constant for connections between 2
-     *                    excitatory neurons.
-     * @param eiDistConst the connection constant for connection from an
-     *                    excitatory to an inhibitory neuron.
-     * @param ieDistConst the connection constant for connection from an
-     *                    inhibitory to an excitatory neuron.
-     * @param iiDistConst the connection constant for connections between 2
-     *                    inhibitory neurons.
-     * @param distConst   the connection constant for general connections. Used
-     *                    in cases where neurons have no explicit polarity.
+     * @param eeDistConst the connection constant for connections between 2 excitatory neurons.
+     * @param eiDistConst the connection constant for connection from an excitatory to an inhibitory neuron.
+     * @param ieDistConst the connection constant for connection from an inhibitory to an excitatory neuron.
+     * @param iiDistConst the connection constant for connections between 2 inhibitory neurons.
+     * @param distConst   the connection constant for general connections. Used in cases where neurons have no explicit
+     *                    polarity.
      * @param lambda      average connection distance.
      * @param loose
      * @return synapses
@@ -183,7 +182,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
                 }
                 if (randVal < probability) {
                     Synapse s = new Synapse(src, tar);
-                    if(src.getPolarity() == Polarity.INHIBITORY) {
+                    if (src.getPolarity() == Polarity.INHIBITORY) {
                         s.forceSetStrength(-1);
                     } else {
                         s.forceSetStrength(1);
@@ -201,8 +200,8 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
     /**
      * @param source    the source neurons
      * @param target    the target neurons
-     * @param distConst the connection constant for general connections. Used in
-     *                  cases where neurons have no explicit polarity.
+     * @param distConst the connection constant for general connections. Used in cases where neurons have no explicit
+     *                  polarity.
      * @param lambda    average connection distance.
      * @param loose
      * @return array of synapses
@@ -244,8 +243,8 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
     }
 
     /**
-     * @param distConst the connection constant for general connections. Used in
-     *                  cases where neurons have no explicit polarity.
+     * @param distConst the connection constant for general connections. Used in cases where neurons have no explicit
+     *                  polarity.
      * @param lambda    average connection distance.
      */
     public RadialGaussian(double distConst, double lambda) {
@@ -255,14 +254,10 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
     }
 
     /**
-     * @param eeDistConst the connection constant for connections between 2
-     *                    excitatoy neurons
-     * @param eiDistConst the connection constant for connection from an
-     *                    excitatory to an inhibitory neuron.
-     * @param ieDistConst the connectino constant for connection from an
-     *                    inhibitory to an excitatory neuron.
-     * @param iiDistConst the conneciton constant for connections between 2
-     *                    inhibitory neurons.
+     * @param eeDistConst the connection constant for connections between 2 excitatoy neurons
+     * @param eiDistConst the connection constant for connection from an excitatory to an inhibitory neuron.
+     * @param ieDistConst the connectino constant for connection from an inhibitory to an excitatory neuron.
+     * @param iiDistConst the conneciton constant for connections between 2 inhibitory neurons.
      * @param lambda      average connection distance.
      */
     public RadialGaussian(double eeDistConst, double eiDistConst, double ieDistConst, double iiDistConst, double lambda) {
@@ -277,17 +272,16 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
     public List<Synapse> connectNeurons(Network network, List source, List target) {
         List<Synapse> syns = connectRadialPolarized(source, target, eeDistConst,
                 eiDistConst, ieDistConst, iiDistConst, distConst, lambda, true);
-        for(Synapse s : syns) {
+        for (Synapse s : syns) {
             network.addNetworkModel(s);
         }
         return syns;
     }
 
-        /**
-         * Specifically: Connects neurons based on a probability
-         * function related to their distance from one another, which exponentially
-         * decays with distance.
-         */
+    /**
+     * Specifically: Connects neurons based on a probability function related to their distance from one another, which
+     * exponentially decays with distance.
+     */
     @Override
     public void connectNeurons(SynapseGroup synGroup) {
         this.synapseGroup = synGroup;
@@ -362,11 +356,11 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
             }
         }
 
-//        if (synGroup.isRecurrent()) {
-//            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * (synGroup.getSourceNeuronGroup().size() - 1));
-//        } else {
-//            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * synGroup.getTargetNeuronGroup().size());
-//        }
+        //        if (synGroup.isRecurrent()) {
+        //            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * (synGroup.getSourceNeuronGroup().size() - 1));
+        //        } else {
+        //            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * synGroup.getTargetNeuronGroup().size());
+        //        }
         source = null;
         target = null;
         synapses = null;
@@ -376,8 +370,8 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
     /**
      * @param src       the source neuron.
      * @param tar       the target neuron.
-     * @param distConst the connection constant for general connections. Used in
-     *                  cases where neurons have no explicit polarity.
+     * @param distConst the connection constant for general connections. Used in cases where neurons have no explicit
+     *                  polarity.
      * @param lambda    average connection distance.
      * @return
      */
@@ -474,10 +468,10 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
         }
 
         UniformDistribution rand =
-            UniformDistribution.builder()
-                .lowerBound(0)
-                .upperBound(1)
-                .build();
+                UniformDistribution.builder()
+                        .lowerBound(0)
+                        .upperBound(1)
+                        .build();
 
         @Override
         public Collection<Synapse> call() throws Exception {
@@ -560,7 +554,7 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
                 estimateDensity = (double) count / (synapseGroup.getSourceNeuronGroup().size() * (synapseGroup.getSourceNeuronGroup().size() - 1));
             } else {
                 estimateDensity = (double) count / (synapseGroup.
-                    getSourceNeuronGroup().size() * synapseGroup.getTargetNeuronGroup().size());
+                        getSourceNeuronGroup().size() * synapseGroup.getTargetNeuronGroup().size());
             }
             synchronized (this) {
                 notify();

@@ -153,7 +153,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * @param targetNeurons the target neurons
      * @return the newly creates synapses connecting source to target
      */
-    public List<Synapse> connectSparse(List<Neuron> sourceNeurons, List<Neuron> targetNeurons) {
+    public List<Synapse> connect(List<Neuron> sourceNeurons, List<Neuron> targetNeurons) {
         return connectSparse(sourceNeurons, targetNeurons, connectionDensity, selfConnectionAllowed, equalizeEfferents, true);
     }
 
@@ -271,7 +271,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
                 connectRandom(synapseGroup);
             }
         } else {
-            List<Synapse> syns = this.connectSparse(synapseGroup.getSourceNeurons(), synapseGroup.getTargetNeurons());
+            List<Synapse> syns = this.connect(synapseGroup.getSourceNeurons(), synapseGroup.getTargetNeurons());
             for (Synapse s : syns) {
                 synapseGroup.addNewSynapse(s);
             }
@@ -281,7 +281,7 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
 
     @Override
     public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-        return connectSparse(source, target);
+        return connect(source, target);
     }
 
     /**

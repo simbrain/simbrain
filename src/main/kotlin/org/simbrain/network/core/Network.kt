@@ -25,6 +25,16 @@ import kotlin.math.ceil
 import kotlin.math.ln
 
 /**
+ * The initial time-step for the network.
+ */
+private val DEFAULT_TIME_STEP = SimbrainPreferences.getDouble("networkDefaultTimeStep")
+
+/**
+ * Constant value for Math.log(10); used to approximate log 10.
+ */
+private val LOG_10 = ln(10.0)
+
+/**
  * <b>Network</b> provides core neural network functionality and is the main neural network model object. The core
  * data structure is a [NetworkModelList] that associates classes of [NetworkModel] with linked hash sets of
  * instances of those types.
@@ -500,13 +510,17 @@ class Network {
     }
 
     /**
-     * Add an update action to the network' action list (the sequence of actions invoked on each iteration of the
-     * network).
-     *
-     * @param action new action
+     * Forward to [NetworkUpdateManager.addAction]
      */
     fun addUpdateAction(action: NetworkUpdateAction?) {
         updateManager.addAction(action)
+    }
+
+    /**
+     * Forward to [NetworkUpdateManager.removeAction]
+     */
+    fun removeUpdateAction(action: NetworkUpdateAction?) {
+        updateManager.removeAction(action)
     }
 
     /**
@@ -662,16 +676,6 @@ class Network {
 }
 
 /**
- * The initial time-step for the network.
- */
-private val DEFAULT_TIME_STEP = SimbrainPreferences.getDouble("networkDefaultTimeStep")
-
-/**
- * Constant value for Math.log(10); used to approximate log 10.
- */
-private val LOG_10 = ln(10.0)
-
-/**
  * If a subnetwork or synapse group has more than this many synapses, then the initial synapse visibility flag is
  * set false.
  */
@@ -691,6 +695,8 @@ val deserializationOrder: List<Class<out NetworkModel>> = listOf(
     Subnetwork::class.java,
     Synapse::class.java
 )
+
+// TODO: Much of what is below could be moved to a future NetworkUtils file.
 
 /**
  * Convenience method for asynchronously updating a set of neurons, by calling each neuron's update function (which
@@ -851,3 +857,10 @@ fun connectAllToAll(source: NeuronGroup, target: Neuron, value: Double): List<Sy
     return wts
 }
 
+fun Network.createNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {
+   val neurons =  (0 until numNeurons).map {
+         Neuron(this).apply(template)
+    }
+    addNetworkModels(neurons)
+    return neurons
+}

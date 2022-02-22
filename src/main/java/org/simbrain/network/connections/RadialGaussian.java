@@ -131,12 +131,13 @@ public class RadialGaussian extends ConnectionStrategy implements EditableObject
 
     private SynapseGroup synapseGroup;
 
-    /**
-     * Create synpases using default.
-     */
     public static List<Synapse> connectRadialPolarized(final List<Neuron> source, final List<Neuron> target) {
+        return connectRadialPolarized(source, target, true);
+    }
+
+    public static List<Synapse> connectRadialPolarized(final List<Neuron> source, final List<Neuron> target, boolean free) {
         return connectRadialPolarized(source, target, DEFAULT_EE_CONST, DEFAULT_EI_CONST,
-                DEFAULT_IE_CONST, DEFAULT_II_CONST, DEFAULT_DIST_CONST, DEFAULT_LAMBDA, true);
+                DEFAULT_IE_CONST, DEFAULT_II_CONST, DEFAULT_DIST_CONST, DEFAULT_LAMBDA, free);
     }
 
     /**

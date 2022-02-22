@@ -66,14 +66,12 @@ class TileMap {
     @XStreamAsAttribute
     val tileWidth = 0
 
-
     /**
      * The height of a tile.
      */
     @XStreamAlias("tileheight")
     @XStreamAsAttribute
     val tileHeight = 0
-
 
     /**
      * Get the map height in pixels.

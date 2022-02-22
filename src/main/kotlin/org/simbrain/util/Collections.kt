@@ -25,6 +25,12 @@ infix fun <T,U> Iterable<T>.cartesianProduct(other: Iterable<U>) = this.flatMap 
 infix fun <T, U> Sequence<T>.cartesianProduct(other: Sequence<U>)
     = this.flatMap { a -> other.map { b -> a to b }}
 
+fun List<List<Double>>.toDoubleArray() : Array<DoubleArray> {
+    return map{
+        it.toDoubleArray()
+    }.toTypedArray()
+}
+
 /**
  * Flatten a 2d double array into a 1-d double array
  */

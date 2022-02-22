@@ -1415,7 +1415,6 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
         setLocation(midX + x, midY + y);
     }
 
-
     /**
      * Remove all sensors.
      */
@@ -1464,4 +1463,5 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
     public EntityEvents getEvents() {
         return events;
     }
+
 }

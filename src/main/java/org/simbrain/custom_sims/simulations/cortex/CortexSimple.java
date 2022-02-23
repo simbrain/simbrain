@@ -251,8 +251,7 @@ public class CortexSimple extends RegisteredSimulation {
         super();
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Brain";
     }
 

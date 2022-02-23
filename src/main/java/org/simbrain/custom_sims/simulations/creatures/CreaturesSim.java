@@ -224,8 +224,7 @@ public class CreaturesSim extends RegisteredSimulation {
         return new CreaturesSim(desktop);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Evolution";
     }
 

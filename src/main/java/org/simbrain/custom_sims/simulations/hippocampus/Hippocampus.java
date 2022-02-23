@@ -402,8 +402,7 @@ public class Hippocampus extends RegisteredSimulation {
         // RC2toH.setEnabled(!lesioned);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Brain";
     }
 

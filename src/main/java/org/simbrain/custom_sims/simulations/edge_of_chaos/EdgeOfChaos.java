@@ -277,8 +277,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         super();
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Chaos";
     }
 

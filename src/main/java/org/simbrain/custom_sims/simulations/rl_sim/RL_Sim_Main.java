@@ -623,8 +623,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         sim.couple(currentObject, plotText);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Reinforcement Learning";
     }
 

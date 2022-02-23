@@ -472,8 +472,7 @@ public class Cerebellum extends RegisteredSimulation {
         sim.couple(output, sts2);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Brain";
     }
 

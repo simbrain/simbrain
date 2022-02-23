@@ -234,8 +234,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
         super();
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Cognitive Maps";
     }
 

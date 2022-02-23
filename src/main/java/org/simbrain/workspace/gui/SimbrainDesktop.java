@@ -541,37 +541,6 @@ public class SimbrainDesktop {
      */
     private JMenu createScriptMenu() {
         JMenu scriptMenu = new JMenu("Simulations");
-        // scriptMenu.add(actionManager.getRunScriptAction());
-        scriptMenu.add(actionManager.getShowScriptEditorAction());
-        scriptMenu.addSeparator();
-        scriptMenu.addMenuListener(menuListener);
-        for (RegisteredSimulation rs : RegisteredSimulation.getRegisteredSims()) {
-
-            JMenuItem menuItem = new JMenuItem(rs.getName());
-            menuItem.addActionListener(ae -> {
-                rs.instantiate(this).run();
-            });
-
-            String submenuName = rs.getSubmenuName();
-            if (submenuName == null) {
-                // There is no submenu; add to main menu
-                scriptMenu.add(menuItem);
-            } else {
-                // Check whether the script menu contains the submenu
-                JMenu existingMenu = submenuMap.get(submenuName);
-                if(existingMenu == null) {
-                    // Create a new submenu
-                    JMenu submenu = new JMenu(submenuName);
-                    submenuMap.put(submenuName, submenu);
-                    submenu.add(menuItem);
-                    scriptMenu.add(submenu);
-                } else {
-                    // Add to existing submenu
-                    existingMenu.add(menuItem);
-                }
-            }
-        }
-        scriptMenu.addSeparator();
         RegisteredSimulationsKt.getSimulations().addToMenu(scriptMenu, newSimulation -> {
             if (newSimulation instanceof NewSimulation) {
                 ((NewSimulation) newSimulation).run(this);
@@ -580,15 +549,6 @@ public class SimbrainDesktop {
             }
             return Unit.INSTANCE;
         });
-        if (actionManager.getScriptActions(this) == null) {
-            JOptionPane.showOptionDialog(null, "To use scripts place Simbrain.jar in the same directory as the scripts directory and restart.", "Warning", JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, null, null);
-        } else {
-            scriptMenu.addSeparator();
-            for (Action action : actionManager.getScriptActions(this)) {
-                scriptMenu.add(action);
-            }
-        }
         return scriptMenu;
     }
 

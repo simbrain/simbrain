@@ -125,8 +125,7 @@ public class ReadSim extends RegisteredSimulation {
         super(desktop);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Utils";
     }
 

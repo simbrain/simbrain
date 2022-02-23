@@ -226,8 +226,7 @@ public class SORN extends RegisteredSimulation {
         return "Self-Organizing Recurrent Network";
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Brain";
     }
 }

@@ -93,8 +93,7 @@ public class TestSim extends RegisteredSimulation {
 
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Test";
     }
 

@@ -108,8 +108,7 @@ public class lstmBlock extends RegisteredSimulation {
 
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "LSTM";
     }
 

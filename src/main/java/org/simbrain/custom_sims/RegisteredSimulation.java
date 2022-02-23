@@ -19,35 +19,7 @@
 package org.simbrain.custom_sims;
 
 import org.simbrain.custom_sims.helper_classes.Simulation;
-import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
-import org.simbrain.custom_sims.simulations.agent_trails.RandomizedPursuer;
-import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning;
-import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning;
-import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment;
-import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant;
-import org.simbrain.custom_sims.simulations.braitenberg.Braitenberg;
-import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum;
-import org.simbrain.custom_sims.simulations.cortex.CortexSimple;
-import org.simbrain.custom_sims.simulations.cortex.CorticalBranching;
-import org.simbrain.custom_sims.simulations.creatures.CreaturesSim;
-import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
-import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream;
-import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus;
-import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators;
-import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillatoryNetwork;
-import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity;
-import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main;
-import org.simbrain.custom_sims.simulations.sorn.SORN;
-import org.simbrain.custom_sims.simulations.test.ConvertSim;
-import org.simbrain.custom_sims.simulations.test.ReadSim;
-import org.simbrain.custom_sims.simulations.test.TestSim;
-import org.simbrain.custom_sims.simulations.test.lstmBlock;
-import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * Super class for all custom simulations. Also has code to manage custom
@@ -62,54 +34,9 @@ import java.util.List;
 public abstract class RegisteredSimulation {
 
     /**
-     * The list used by calling classes to determine what custom simulations are
-     * available. Any custom simulations added to simbrain must be added to this
-     * list in order to show up in the gui menu. All items are sorted
-     * alphabetically by name.
-     */
-    private static final List<RegisteredSimulation> REGISTERED_SIMS = new ArrayList<>();
-
-    /**
      * The main simulation object.
      */
     protected final Simulation sim;
-
-    /**
-     * Handle simulation completion events. See {@link #simulationCompleted()}.
-     */
-    private Runnable completionHandler;
-
-    static {
-        // TODO: Commented out items are not ready for prime time
-        REGISTERED_SIMS.add(new EdgeOfChaos());
-        REGISTERED_SIMS.add(new EdgeOfChaosBitStream());
-        REGISTERED_SIMS.add(new Hippocampus());
-        REGISTERED_SIMS.add(new RL_Sim_Main());
-        REGISTERED_SIMS.add(new Cerebellum());
-        REGISTERED_SIMS.add(new CreaturesSim());
-        // REGISTERED_SIMS.add(new AgentTrails());
-        REGISTERED_SIMS.add(new ActorCritic());
-        REGISTERED_SIMS.add(new OperantWithEnvironment());
-        REGISTERED_SIMS.add(new ClassicalConditioning());
-        REGISTERED_SIMS.add(new OperantConditioning());
-        REGISTERED_SIMS.add(new SimpleOperant());
-        REGISTERED_SIMS.add(new CorticalBranching());
-        REGISTERED_SIMS.add(new CortexSimple());
-        REGISTERED_SIMS.add(new ConvertSim());
-        REGISTERED_SIMS.add(new ReadSim());
-        REGISTERED_SIMS.add(new ModularOscillatoryNetwork());
-        REGISTERED_SIMS.add(new RandomizedPursuer());
-        REGISTERED_SIMS.add(new PatternsOfActivity());
-        REGISTERED_SIMS.add(new KuramotoOscillators());
-        REGISTERED_SIMS.add(new SORN());
-        REGISTERED_SIMS.add(new TestSim());
-        REGISTERED_SIMS.add(new lstmBlock());
-        REGISTERED_SIMS.add(new Braitenberg());
-
-        // Alphabetize
-        // TODO: Find a way to sort by submenu name as well.
-        REGISTERED_SIMS.sort(Comparator.comparing(RegisteredSimulation::getSubmenuName));
-    }
 
     /**
      * No argument constructor used for registering the simulation.
@@ -141,34 +68,9 @@ public abstract class RegisteredSimulation {
     public abstract String getName();
 
     /**
-     * Override to return a submenu name. If it is set, the simulation will be placed in a menu of that name.
-     *
-     * @return the name of the submenu used, if any
-     */
-    public String getSubmenuName() {
-        return null;
-    };
-
-    /**
      * Run the simulation.
      */
     public abstract void run();
-
-    /**
-     * See {@link #simulationCompleted()}.
-     */
-    public void onCompleted(Runnable handler) {
-        completionHandler = handler;
-    }
-
-    /**
-     * Call when the simulation is completed for proper termination when run outside of GUI.
-     */
-    public void simulationCompleted() {
-        if (completionHandler != null) {
-            completionHandler.run();
-        }
-    };
 
     /**
      * Instantiates a registered simulation class the same as the caller.
@@ -181,47 +83,5 @@ public abstract class RegisteredSimulation {
      */
     public abstract RegisteredSimulation instantiate(SimbrainDesktop desktop);
 
-    /**
-     * Add a registered simulation to this list of available registered
-     * simulations.
-     *
-     * @param rs the registered simulation to add to the directory of registered
-     *           sims
-     */
-    public static void register(final RegisteredSimulation rs) {
-        if (!REGISTERED_SIMS.contains(rs)) {
-            REGISTERED_SIMS.add(rs);
-        }
-    }
 
-    public static List<RegisteredSimulation> getRegisteredSims() {
-        return REGISTERED_SIMS;
-    }
-
-    /**
-     * This can be called from gradle using "runSim"
-     */
-    public static void main(String[] args) {
-       run(args[0]);
-    }
-
-    /**
-     * Run a simulation with the given name, outside the GUI.  Used, for example, to run
-     * evolution scripts on a server.
-     *
-     * @param simName the name of the simulation to run
-     */
-    public static void run(String simName) {
-        RegisteredSimulation sim = REGISTERED_SIMS.stream()
-                .filter(s -> s.getName().equals(simName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Simulation named " + simName + " does not exist"));
-
-        sim = sim.instantiate(new SimbrainDesktop(new Workspace()));
-        sim.onCompleted(() -> {
-            System.exit(0);
-        });
-        sim.run();
-
-    }
 }

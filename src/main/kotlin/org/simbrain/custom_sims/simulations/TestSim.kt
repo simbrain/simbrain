@@ -21,14 +21,9 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.io.File
-import kotlin.collections.List
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.component3
-import kotlin.collections.contentDeepToString
-import kotlin.collections.forEach
-import kotlin.collections.map
-import kotlin.collections.mutableListOf
 
 /**
  * Sample simulation showing how to do basic stuff.
@@ -101,44 +96,39 @@ val testSim = newSim {
     var straightMovement: Effector
     var turnLeft: Effector
     var turnRight: Effector
-    var smellSensor: Sensor
+    var smellSensors: List<Sensor>
 
     odorWorld.apply {
 
-        val mouse = addEntity(EntityType.MOUSE).apply {
-            setLocation(204.0, 343.0)
+
+
+        val cow = addEntity(50, 50, EntityType.COW).apply {
             heading = 90.0
             addDefaultEffectors()
             addSensor(SmellSensor(this))
+            addSensor(SmellSensor(this).apply { theta = Math.PI / 8  })
+            addSensor(SmellSensor(this).apply { theta = -Math.PI / 8  })
             manualStraightMovementIncrement = 2.0
             manualMotionTurnIncrement = 2.0
         }
 
-        val cheese = odorWorld.addEntity(EntityType.SWISS).apply {
-            setLocation(100.0, 100.0)
-            smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0)).apply {
-                this.dispersion = dispersion
-            }
+        odorWorld.addEntity(100, 160, EntityType.FLAX).apply {
+            smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0))
+        }
+        odorWorld.addEntity(110, 120, EntityType.FLAX).apply {
+            smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0))
+        }
+        odorWorld.addEntity(10, 10, EntityType.FLOWER).apply {
+            smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0))
+        }
+        odorWorld.addEntity(15, 25, EntityType.FLOWER).apply {
+            smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0))
         }
 
-        val flower = odorWorld.addEntity(EntityType.FLOWER).apply {
-            setLocation(10.0, 0.0)
-            smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0)).apply {
-                this.dispersion = dispersion
-            }
-        }
-
-        val fish = odorWorld.addEntity(EntityType.FISH).apply {
-            setLocation(10.0, 10.0)
-            smellSource = SmellSource(doubleArrayOf(0.0, 0.0, 1.0)).apply {
-                this.dispersion = dispersion
-            }
-        }
-
-        straightMovement = mouse.effectors[0]
-        turnLeft = mouse.effectors[1]
-        turnRight = mouse.effectors[2]
-        smellSensor = mouse.sensors[0]
+        straightMovement = cow.effectors[0]
+        turnLeft = cow.effectors[1]
+        turnRight = cow.effectors[2]
+        smellSensors = cow.sensors
 
     }
 
@@ -156,7 +146,10 @@ val testSim = newSim {
         straightNeuron couple straightMovement
         leftNeuron couple turnLeft
         rightNeuron couple turnRight
-        smellSensor couple region1
+        // TODO: Make a separate bank of input nodes
+        smellSensors[0] couple region1
+        smellSensors[1] couple region1
+        smellSensors[2] couple region1
     }
 
     // ----- Train network ------

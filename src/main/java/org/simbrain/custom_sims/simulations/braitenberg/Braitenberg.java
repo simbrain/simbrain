@@ -144,8 +144,7 @@ public class Braitenberg extends RegisteredSimulation {
         desktop.addInternalFrame(internalFrame);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Braitenberg";
     }
 

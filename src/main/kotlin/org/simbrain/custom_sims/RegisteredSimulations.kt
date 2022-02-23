@@ -121,6 +121,6 @@ fun main(args: Array<String>) {
     }
     when (sim) {
         is NewSimulation ->  sim.run()
-        is RegisteredSimulation -> sim.run()
+        is Simulation -> sim.run()
     }
 }

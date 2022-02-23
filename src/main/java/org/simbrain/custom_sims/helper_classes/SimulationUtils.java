@@ -24,7 +24,7 @@ import java.io.File;
  *
  * @author Jeff Yoshimi
  */
-public class Simulation {
+public class SimulationUtils {
 
     /**
      * Reference to parent desktop.
@@ -41,7 +41,7 @@ public class Simulation {
      *
      * @param desktop reference to Simbrain desktop
      */
-    public Simulation(SimbrainDesktop desktop) {
+    public SimulationUtils(SimbrainDesktop desktop) {
         super();
         this.desktop = desktop;
         workspace = desktop.getWorkspace();

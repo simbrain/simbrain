@@ -166,9 +166,9 @@ public class ControlPanel extends JPanel {
 
     /**
      * Make a control panel with a specified width and height.
-     * Otherwise see {@link #makePanel(Simulation, String, int, int)}
+     * Otherwise see {@link #makePanel(SimulationUtils, String, int, int)}
      */
-    public static ControlPanel makePanel(Simulation sim, String name, int x, int y, int width, int height) {
+    public static ControlPanel makePanel(SimulationUtils sim, String name, int x, int y, int width, int height) {
         ControlPanel panel = makePanel(sim, name, x, y);
         panel.internalFrame.setPreferredSize(new Dimension(width, height));
         return panel;
@@ -183,7 +183,7 @@ public class ControlPanel extends JPanel {
      * @param y    y coordinate of frame
      * @return the internal frame
      */
-    public static ControlPanel makePanel(Simulation sim, String name, int x, int y) {
+    public static ControlPanel makePanel(SimulationUtils sim, String name, int x, int y) {
         return makePanel(sim.getDesktop(), name, x, y);
     }
 

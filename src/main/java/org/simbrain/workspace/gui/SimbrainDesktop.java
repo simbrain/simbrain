@@ -24,8 +24,8 @@ import kotlin.Unit;
 import org.pmw.tinylog.Logger;
 import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.custom_sims.NewSimulation;
-import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.RegisteredSimulationsKt;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.StandardDialog;
@@ -192,7 +192,7 @@ public class SimbrainDesktop {
     private static Map<WorkspaceComponent, DesktopComponent<?>> guiComponents = new LinkedHashMap<WorkspaceComponent, DesktopComponent<?>>();
 
     /**
-     * Associates script submenunames ({@link RegisteredSimulation#getSubmenuName()})
+     * Associates script submenunames ({@link Simulation#getSubmenuName()})
      * with submenus in the script menu.
      */
     private HashMap<String, JMenu> submenuMap = new HashMap<>();
@@ -544,8 +544,8 @@ public class SimbrainDesktop {
         RegisteredSimulationsKt.getSimulations().addToMenu(scriptMenu, newSimulation -> {
             if (newSimulation instanceof NewSimulation) {
                 ((NewSimulation) newSimulation).run(this);
-            } else if (newSimulation instanceof RegisteredSimulation) {
-                ((RegisteredSimulation)newSimulation).instantiate(this).run();
+            } else if (newSimulation instanceof Simulation) {
+                ((Simulation)newSimulation).instantiate(this).run();
             }
             return Unit.INSTANCE;
         });

@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.ConnectionStrategy;
@@ -37,7 +37,7 @@ import static org.simbrain.network.core.NetworkKt.connect;
  * Simulate a set of oscillatory brain networks and display their projected
  * activity when exposed to inputs in a simple 2d world.
  */
-public class ModularOscillatoryNetwork extends RegisteredSimulation {
+public class ModularOscillatoryNetwork extends Simulation {
 
     // References
     NetworkComponent nc;

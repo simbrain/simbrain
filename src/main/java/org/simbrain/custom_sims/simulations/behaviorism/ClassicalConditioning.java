@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.behaviorism;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
@@ -23,7 +23,7 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
  * @author Tim Meyer
  * @author Jeff Yoshimi
  */
-public class ClassicalConditioning extends RegisteredSimulation {
+public class ClassicalConditioning extends Simulation {
 
     // TODO: Factor common methods out to a utility class in this directory
 

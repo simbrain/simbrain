@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.test;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -15,7 +15,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  * (1) Run a conversion script in Simbrain 3.X.  (2) Copy the resulting "script text".  (3) Paste
  * that text in the run method of this class.  (4) Run this simulation.  (5) Save the resulting workspace.
  */
-public class ReadSim extends RegisteredSimulation {
+public class ReadSim extends Simulation {
 
     @Override
     public void run() {
@@ -135,7 +135,7 @@ public class ReadSim extends RegisteredSimulation {
     }
 
     @Override
-    public RegisteredSimulation instantiate(SimbrainDesktop desktop) {
+    public Simulation instantiate(SimbrainDesktop desktop) {
         return new ReadSim(desktop);
     }
 }

@@ -22,7 +22,7 @@ public class Vehicle {
     /**
      * The simulation object.
      */
-    private final Simulation sim;
+    private final SimulationUtils sim;
 
     /**
      * Reference to the network to put the vehicle in.
@@ -59,7 +59,7 @@ public class Vehicle {
      * @param sim   the parent simulation object
      * @param net   the network to add the vehicle subnetworks to
      */
-    public Vehicle(Simulation sim, Network net) {
+    public Vehicle(SimulationUtils sim, Network net) {
         this.sim = sim;
         this.net = net;
     }

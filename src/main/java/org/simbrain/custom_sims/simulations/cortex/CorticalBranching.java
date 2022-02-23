@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.cortex;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.core.Network;
@@ -22,7 +22,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CorticalBranching extends RegisteredSimulation {
+public class CorticalBranching extends Simulation {
 
     // Simulation Parameters
     int NUM_NEURONS = 1024; // 4096

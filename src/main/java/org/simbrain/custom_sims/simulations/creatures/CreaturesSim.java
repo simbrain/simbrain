@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.Simulation;
+import org.simbrain.custom_sims.Simulation;
+import org.simbrain.custom_sims.helper_classes.SimulationUtils;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -24,7 +24,7 @@ import java.util.Random;
  *
  * @author Sharai
  */
-public class CreaturesSim extends RegisteredSimulation {
+public class CreaturesSim extends Simulation {
 
     /**
      * A list of creatures. Good for updating and maintaining multiple creatures.
@@ -238,7 +238,7 @@ public class CreaturesSim extends RegisteredSimulation {
         return creatureList;
     }
 
-    public Simulation getSim() {
+    public SimulationUtils getSim() {
         return sim;
     }
 

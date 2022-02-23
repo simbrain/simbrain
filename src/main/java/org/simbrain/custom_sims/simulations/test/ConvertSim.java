@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.test;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -13,7 +13,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  * Utility to convert older workspace files to new ones. Developing the code here and then will use it
  * in older 3.x Simbrain. For instructions on use see {@link ReadSim}.
  */
-public class ConvertSim extends RegisteredSimulation {
+public class ConvertSim extends Simulation {
 
     public ConvertSim() {
         super();
@@ -67,7 +67,7 @@ public class ConvertSim extends RegisteredSimulation {
     }
 
     @Override
-    public RegisteredSimulation instantiate(SimbrainDesktop desktop) {
+    public Simulation instantiate(SimbrainDesktop desktop) {
         return new ConvertSim(desktop);
     }
 }

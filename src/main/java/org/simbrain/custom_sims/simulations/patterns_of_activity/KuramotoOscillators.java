@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
@@ -31,7 +31,7 @@ import java.util.List;
  * and visualize the "cognitive maps" that develop in a PCA projetion labelled
  * by environmental inputs.
  */
-public class KuramotoOscillators extends RegisteredSimulation {
+public class KuramotoOscillators extends Simulation {
 
     // References
     Network net;

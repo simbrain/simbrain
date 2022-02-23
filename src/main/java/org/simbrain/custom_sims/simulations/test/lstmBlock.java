@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.test;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -20,9 +20,9 @@ import java.util.List;
  * should work.
  *
  * To add a sim, copy paste this, put in whatever menu you want it to be in, at {@link #getSubmenuName()}, and be
- * sure to register it at {@link RegisteredSimulation}.
+ * sure to register it at {@link Simulation}.
  */
-public class lstmBlock extends RegisteredSimulation {
+public class lstmBlock extends Simulation {
 
 
     public lstmBlock() {

@@ -18,7 +18,7 @@
  */
 package org.simbrain.custom_sims;
 
-import org.simbrain.custom_sims.helper_classes.Simulation;
+import org.simbrain.custom_sims.helper_classes.SimulationUtils;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 /**
@@ -31,17 +31,17 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
  * @author ztosi
  * @author jyoshimi
  */
-public abstract class RegisteredSimulation {
+public abstract class Simulation {
 
     /**
      * The main simulation object.
      */
-    protected final Simulation sim;
+    protected final SimulationUtils sim;
 
     /**
      * No argument constructor used for registering the simulation.
      */
-    protected RegisteredSimulation() {
+    protected Simulation() {
         sim = null;
     }
 
@@ -51,11 +51,11 @@ public abstract class RegisteredSimulation {
      *
      * @param desk the simbrain desktop where this will be instantiated
      */
-    protected RegisteredSimulation(final SimbrainDesktop desk) {
+    protected Simulation(final SimbrainDesktop desk) {
         if (desk == null) {
             sim = null;
         } else {
-            sim = new Simulation(desk);
+            sim = new SimulationUtils(desk);
         }
     }
 
@@ -81,7 +81,7 @@ public abstract class RegisteredSimulation {
      * type) that has its Simbrain desktop parameter initialized to a
      * non null
      */
-    public abstract RegisteredSimulation instantiate(SimbrainDesktop desktop);
+    public abstract Simulation instantiate(SimbrainDesktop desktop);
 
 
 }

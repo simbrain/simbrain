@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.RadialGaussian;
@@ -60,7 +60,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * Connections within the recurrent neurons are based on distance in a gaussian
  * manner but with the parameters tuned to down regulate tails.
  */
-public class PatternsOfActivity extends RegisteredSimulation {
+public class PatternsOfActivity extends Simulation {
 
     // References
     Network net;

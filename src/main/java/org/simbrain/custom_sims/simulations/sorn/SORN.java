@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.sorn;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.connections.RadialSimple.SelectionStyle;
@@ -19,7 +19,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class SORN extends RegisteredSimulation {
+public class SORN extends Simulation {
 
     private int numNeurons;
 

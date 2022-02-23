@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.test;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.Sparse;
@@ -22,9 +22,9 @@ import java.util.List;
  * Playground for testing new features.
  *
  * To add a sim, copy paste this, put in whatever menu you want it to be in, at {@link #getSubmenuName()}, and be
- * sure to register it at {@link RegisteredSimulation}.
+ * sure to register it at {@link Simulation}.
  */
-public class TestSim extends RegisteredSimulation {
+public class TestSim extends Simulation {
 
 
     public TestSim() {

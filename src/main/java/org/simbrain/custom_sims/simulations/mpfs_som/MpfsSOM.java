@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.mpfs_som;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
@@ -25,7 +25,7 @@ import java.util.Map;
  * @author Karie Moorman
  * @author Jeff Yoshimi
  */
-public class MpfsSOM extends RegisteredSimulation {
+public class MpfsSOM extends Simulation {
 
     // References
     NetworkComponent nc;

@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.edge_of_chaos;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.RadialSimple;
@@ -33,7 +33,7 @@ import java.util.List;
  * edge of chaos in recurrent neural networks." Neural computation 16.7 (2004):
  * 1413-1436.
  */
-public class EdgeOfChaos extends RegisteredSimulation {
+public class EdgeOfChaos extends Simulation {
 
     // TODO: Add more objects
 

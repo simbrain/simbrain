@@ -39,7 +39,6 @@ val testSim = newSim {
 
     // Subnetwork 1
     val neuronList1 = network.createNeurons(30)
-    network.addNetworkModels(neuronList1)
     val region1 = NeuronCollection(network, neuronList1)
     network.addNetworkModel(region1)
     region1.apply {
@@ -61,7 +60,6 @@ val testSim = newSim {
             decayFraction = .2
         }
     }
-    network.addNetworkModels(neuronList2)
     val region2 = NeuronCollection(network, neuronList2)
     network.addNetworkModel(region2)
     region2.apply {
@@ -99,8 +97,6 @@ val testSim = newSim {
     var smellSensors: List<Sensor>
 
     odorWorld.apply {
-
-
 
         val cow = addEntity(50, 50, EntityType.COW).apply {
             heading = 90.0
@@ -164,6 +160,7 @@ val testSim = newSim {
     network.removeUpdateAction(initialLearning)
 
     // ----- Add pulse and record activations  ------
+    // (Note the pulse has not been actually added yet)
 
     val activations = mutableListOf<List<Double>>()
     region1.randomize()

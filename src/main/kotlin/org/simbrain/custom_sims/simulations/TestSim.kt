@@ -1,26 +1,19 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addOdorWorldComponent
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RadialSimple
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.createNeurons
-import org.simbrain.network.core.networkUpdateAction
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
-import org.simbrain.util.Utils
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.toDoubleArray
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
-import java.io.File
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.component3
@@ -130,7 +123,7 @@ val testSim = newSim {
 
     withGui {
         place(odorWorldComponent) {
-            location = point(386, 0)
+            location = point(403, 0)
             width = 400
             height = 400
         }
@@ -148,32 +141,34 @@ val testSim = newSim {
         smellSensors[2] couple region1
     }
 
-    // ----- Train network ------
-
-    val initialLearning = networkUpdateAction("Learning") {
-        neuronList1.forEach { n -> n.randomizeBias(0.0, 1.0) }
-        region1_to_2_weights.forEach { w -> w.strength += .1 * Math.random() }
-        println("Learning update: ${workspace.time}")
+    // Location of the projection in the desktop
+    val projectionPlot = addProjectionPlot("Activations")
+    withGui {
+        place(projectionPlot) {
+            location = point(810, 0)
+            width = 400
+            height = 400
+        }
     }
-    network.addUpdateAction(initialLearning)
-    workspace.iterate(100)
-    network.removeUpdateAction(initialLearning)
 
-    // ----- Add pulse and record activations  ------
-    // (Note the pulse has not been actually added yet)
-
-    val activations = mutableListOf<List<Double>>()
-    region1.randomize()
-    val recordActivations = networkUpdateAction("Record activations") {
-        val acts = network.looseNeurons.map { n -> n.activation }
-        activations.add(acts)
+    // Couple the neuron array to the projection plot
+    with(couplingManager) {
+        region2 couple projectionPlot
     }
-    network.addUpdateAction(recordActivations)
-    workspace.iterate(10)
-    network.removeUpdateAction(recordActivations)
-    // Save activations
-    val actArray = activations.toDoubleArray()
-    println(actArray.contentDeepToString())
-    Utils.writeMatrix(actArray, File("activations.csv"))
+
+
+
+    // TODO: For reservoir
+    // // ----- Train network ------
+    //
+    // val initialLearning = networkUpdateAction("Learning") {
+    //     neuronList1.forEach { n -> n.randomizeBias(0.0, 1.0) }
+    //     region1_to_2_weights.forEach { w -> w.strength += .1 * Math.random() }
+    //     println("Learning update: ${workspace.time}")
+    // }
+    // network.addUpdateAction(initialLearning)
+    // workspace.iterate(100)
+    // network.removeUpdateAction(initialLearning)
+
 }
 

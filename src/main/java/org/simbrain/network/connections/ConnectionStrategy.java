@@ -94,6 +94,15 @@ public abstract class ConnectionStrategy implements EditableObject {
      */
     public abstract List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target);
 
+    /**
+     * Connect free neurons using this strategy and both return weights and add them to the network.
+     */
+    public List<Synapse> connect(Network network, List<Neuron> source, List<Neuron> target) {
+        var syns = connectNeurons(network, source, target);
+        network.addNetworkModels(syns);
+        return syns;
+    }
+
     public boolean isUseExcitatoryRandomization() {
         return useExcitatoryRandomization;
     }

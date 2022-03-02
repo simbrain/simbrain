@@ -93,7 +93,7 @@ class TileMapLayer(
      */
     operator fun get(x: Int, y: Int): Int {
         infix fun Int.wrap(other: Int) = (this + other) % other
-        return data.gid[(x wrap width) + (y wrap height) * width]
+        return data[x wrap width, y wrap height]
     }
 
     /**
@@ -106,7 +106,7 @@ class TileMapLayer(
      * @param y the y coordinate on map
      */
     operator fun set(x: Int, y: Int, tileID: Int) {
-        data.gid[x + y * width] = tileID
+        data[x, y] = tileID
     }
 
     /**

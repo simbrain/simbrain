@@ -2,10 +2,16 @@ package org.simbrain.util.piccolo
 
 import com.Ostermiller.util.CSVParser
 import com.thoughtworks.xstream.annotations.XStreamAlias
-import com.thoughtworks.xstream.annotations.XStreamConverter
-import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter
+import com.thoughtworks.xstream.converters.MarshallingContext
+import com.thoughtworks.xstream.converters.UnmarshallingContext
+import com.thoughtworks.xstream.converters.reflection.ReflectionConverter
+import com.thoughtworks.xstream.converters.reflection.ReflectionProvider
+import com.thoughtworks.xstream.io.HierarchicalStreamReader
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter
+import com.thoughtworks.xstream.mapper.Mapper
+import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.Network
 import java.io.ByteArrayInputStream
-import java.io.CharArrayReader
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -18,37 +24,25 @@ import java.util.zip.InflaterInputStream
  * Cannot handle xml encoded data for now.
  */
 @XStreamAlias("data")
-@XStreamConverter(value = ToAttributedValueConverter::class, strings = ["data"])
-class TiledData(width: Int, height: Int) {
+class TiledData(val gid: MutableList<MutableList<Int>>) {
+    constructor(width: Int, height: Int) : this(MutableList(height) { MutableList(width) { 0 } })
+    operator fun get(x: Int, y: Int) = gid[y][x]
+    operator fun set(x: Int, y: Int, tileId: Int) {
+        gid[y][x] = tileId
+    }
+}
 
-    /**
-     * The encoding used to encode the tile layer data. When used, it can be “base64” and “csv” at the moment.
-     */
-    private val encoding: String? = null
+/**
+ * Custom serializer that stores [Network.networkModels], which is a map, as a flat list of [NetworkModel]s.
+ */
+class TiledDataConverter(mapper: Mapper, reflectionProvider: ReflectionProvider) :
+    ReflectionConverter(mapper, reflectionProvider, TiledData::class.java) {
 
-    /**
-     * The compression used to compress the tile layer data. Tiled supports “gzip” and “zlib”.
-     */
-    private val compression: String? = null
-
-    /**
-     * Raw content of the data.
-     *
-     * Not handling embedded image for now.
-     */
-    private lateinit var data: CharArray
-
-    @Transient
-    private var _gid: MutableList<Int>? = null
-
-    /**
-     * The flat list of tile id from the raw data.
-     */
-    val gid: MutableList<Int>
-        get() = _gid ?: decodeData().toMutableList().also { _gid = it }
-
-    init {
-        _gid = MutableList(width * height) { 0 }
+    override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+        val data = source as TiledData
+        writer.addAttribute("encoding", "csv")
+        val csv = data.gid.joinToString("\n") { it.joinToString(",") }
+        writer.setValue(csv)
     }
 
     /**
@@ -56,45 +50,48 @@ class TiledData(width: Int, height: Int) {
      *
      * @return the list of tile id this data represents.
      */
-    private fun decodeData(): List<Int> {
+    private fun decodeData(value: String, encoding: String, compression: String?): List<List<Int>> {
 
         fun decodeCSV() =
-                CSVParser(CharArrayReader(data)).allValues
-                        .flatten()
-                        .filter { it.isNotEmpty() }
+            CSVParser(value.byteInputStream()).allValues
+                .map { row ->
+                    row.filter { it.isNotEmpty() }
                         .map { it.toInt() }
+                }
 
-        fun decodeBase64() = String(data).replace("[ \n]".toRegex(), "")
-                .let { Base64.getDecoder().decode(it)!! }
+        fun decodeBase64() = value.split("[ \n]".toRegex())
+            .map { row -> row.let { Base64.getDecoder().decode(it)!! } }
+
 
         fun ByteArray.decompressGzip() = GZIPInputStream(ByteArrayInputStream(this))
-                .use { it.readAllBytes()!! }
+            .use { it.readAllBytes()!! }
 
         fun ByteArray.decompressZlib() = InflaterInputStream(ByteArrayInputStream(this)).readAllBytes()!!
 
         fun ByteBuffer.asIntSequence() = sequence {
             while(hasRemaining()) {
-                yield(getInt())
+                yield(int)
             }
         }
 
         return when (encoding) {
             "csv" -> decodeCSV()
             "base64" -> when(compression) {
-                "gzip" -> decodeBase64().decompressGzip()
-                "zlib" -> decodeBase64().decompressZlib()
+                "gzip" -> decodeBase64().map { it.decompressGzip() }
+                "zlib" -> decodeBase64().map { it.decompressZlib() }
                 else -> decodeBase64()
-            }.let { ByteBuffer.wrap(it).apply { order(ByteOrder.LITTLE_ENDIAN) } }.asIntSequence().toList()
+            }.map { ByteBuffer.wrap(it).apply { order(ByteOrder.LITTLE_ENDIAN) }.asIntSequence().toList() }
             else -> throw IllegalStateException("Unknown encoding $encoding")
         }
 
     }
 
-    /**
-     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
-     */
-    private fun readResolve(): Any {
-        _gid = decodeData().toMutableList()
-        return this
+    override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
+        val encoding = reader.getAttribute("encoding")
+        val compression = reader.getAttribute("compression")
+        val gid = decodeData(reader.value, encoding, compression)
+            .map { it.toMutableList() }
+            .toMutableList()
+        return TiledData(gid)
     }
 }

@@ -32,7 +32,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public final class WorldSelectionModel {
 
-    //TODO: Move to util class and reuse
+    //TODO: Move to util class and reuse. Or reuse / draw from NetworkSelectionManager
 
     /**
      * Listener list.

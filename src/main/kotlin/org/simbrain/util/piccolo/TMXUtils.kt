@@ -4,6 +4,7 @@ package org.simbrain.util.piccolo
 
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PLayer
+import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -50,6 +51,11 @@ fun loadTileMap(filename: String): TileMap {
     return XStream.fromXML(OdorWorldResourceManager.getFileURL("tilemap" +
             File.separator + filename)) as TileMap
 }
+
+/**
+ * Makes it possible to click on a PImage and get the global id associated with the underlying image.
+ */
+class PTiledImage(image: Image, val gid: Int) : PImage(image)
 
 /**
  * Returns a dialog that is used to pick a tile image.

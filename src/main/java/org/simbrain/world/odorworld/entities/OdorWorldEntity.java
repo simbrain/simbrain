@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld.entities;
 
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.Utils;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.math.SimbrainRandomizer;
@@ -79,7 +80,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
     /**
      * Actual collision bound.
      */
-    private RectangleCollisionBound collisionBound;
+    private transient RectangleCollisionBound collisionBound;
 
     /**
      * X Velocity. Used internally for {@link #simpleMotion()}.
@@ -234,13 +235,17 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
      */
     public OdorWorldEntity(OdorWorld world) {
         this.parentWorld = world;
+        initCollisionBounds();
+    }
+
+    private void initCollisionBounds() {
         collisionBound = new RectangleCollisionBound(
-            new Rectangle2D.Double(
-                0,
-                0,
-                getEntityType().getImageWidth(),
-                getEntityType().getImageHeight()
-            ));
+                new Rectangle2D.Double(
+                        0,
+                        0,
+                        getEntityType().getImageWidth(),
+                        getEntityType().getImageHeight()
+                ));
         updateCollisionBound();
     }
 
@@ -1464,4 +1469,17 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
         return events;
     }
 
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
+    private Object readResolve() {
+        events = new EntityEvents(this);
+        initCollisionBounds();
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return id + ":" + getEntityType() + " (" + Utils.doubleArrayToString(getCenterLocation(), 2) + ")";
+    }
 }

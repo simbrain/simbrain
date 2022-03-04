@@ -8,7 +8,6 @@ public class RectangleCollisionBound extends CollisionBound {
 
     private Rectangle2D.Double shape;
 
-
     public RectangleCollisionBound(Rectangle2D.Double rect) {
         shape = rect;
         collisionBounds.put("up", new Line2D.Double());

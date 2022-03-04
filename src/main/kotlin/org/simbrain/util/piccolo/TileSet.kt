@@ -5,6 +5,14 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import com.thoughtworks.xstream.annotations.XStreamImplicit
 import java.awt.Image
 
+/**
+ * A set of tiles based on an underlying image, e.g. . See https://en.wikipedia.org/wiki/Tile-based_video_game
+ *
+ * As an example see tileset_kenney.png.
+ *
+ * Tiles are accessed using a global id or "gid". 0 is reserved for an empty slot, and the index can span multiple
+ * tilesets.  Hence the [#firstgid] is set to 1 for the first tileset, and to another nubmer for subsequent tileset.
+ */
 @XStreamAlias("tileset")
 class TileSet {
 
@@ -92,7 +100,7 @@ class TileSet {
     }
 
     fun init() {
-        idTileMap = HashMap()
+        idTileMap = tiles?.associate { it.id to it }?.toMutableMap()?:HashMap()
     }
 
     /**
@@ -122,12 +130,7 @@ class TileSet {
      */
     operator fun get(gid: Int): Tile {
         val localId = gid - firstgid
-        return idTileMap[localId] ?: cacheNewTile(gid)
-    }
-
-    private fun cacheNewTile(localId: Int): Tile = when (localId) {
-        in 0..tilecount -> (idTileMap[localId] ?: Tile(localId).also { idTileMap[localId] = it })
-        else -> throw IllegalArgumentException("Tile set has only $tilecount tiles, but requesting tile $localId.")
+        return idTileMap[localId] ?: Tile(localId).also { idTileMap[localId] = it }
     }
 
     /**

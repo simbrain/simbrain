@@ -108,7 +108,7 @@ public class OdorWorld implements EditableObject {
      */
     private Point2D lastClickedPosition = new Point2D.Double(50,50);
 
-    private RectangleCollisionBound worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
+    private transient RectangleCollisionBound worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
             0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
     ));
 
@@ -382,11 +382,17 @@ public class OdorWorld implements EditableObject {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private Object readResolve() {
+
+        events = new OdorWorldEvents(this);
+
         if (agentIdGenerator == null) {
             agentIdGenerator = new SimpleIdManager.SimpleId("Agent", 1);
         }
 
-        events = new OdorWorldEvents(this);
+        worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
+                0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
+        ));
+
 
         for (OdorWorldEntity entity : entityList) {
             entity.postSerializationInit();
@@ -570,4 +576,5 @@ public class OdorWorld implements EditableObject {
     public boolean isUseCameraCentering() {
         return useCameraCentering;
     }
+
 }

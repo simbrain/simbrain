@@ -20,6 +20,8 @@ package org.simbrain.world.odorworld.entities;
 
 /**
  * The type of an odor world entity (swiss, candle, etc).
+ *
+ * For the mapping from type to image, see {@link EntityNode}.
  */
 public enum EntityType {
 

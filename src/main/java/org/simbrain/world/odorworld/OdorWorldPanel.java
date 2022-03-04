@@ -69,8 +69,10 @@ public class OdorWorldPanel extends JPanel {
      */
     private final WorldSelectionModel selectionModel;
 
+    /**
+     * Provisional interface for selecting tiles.
+     */
     private PNode tileSelectionBox = null;
-
     private Rectangle tileSelectionModel = null;
 
     /**
@@ -107,7 +109,6 @@ public class OdorWorldPanel extends JPanel {
 
     /**
      * List corresponding to the layers of a tmx file.
-     *
      */
     private List<PImage> layerImageList;
 

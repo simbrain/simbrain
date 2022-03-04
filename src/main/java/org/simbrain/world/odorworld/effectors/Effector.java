@@ -71,7 +71,7 @@ public abstract class Effector implements PeripheralAttribute {
     /**
      * Handle events.
      */
-    private AttributeEvents events = new AttributeEvents(this);
+    private transient AttributeEvents events = new AttributeEvents(this);
 
     /**
      * Construct an effector.

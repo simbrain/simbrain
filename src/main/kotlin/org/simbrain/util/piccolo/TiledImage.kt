@@ -33,7 +33,6 @@ class TiledImage {
     @XStreamAsAttribute
     private val height = 0
 
-
     /**
      * The tileset image
      */

@@ -12,11 +12,9 @@ import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.component3
 
 /**
  * Sample simulation showing how to do basic stuff.
@@ -31,7 +29,7 @@ val testSim = newSim {
     val network = networkComponent.network
 
     // Subnetwork 1
-    val neuronList1 = network.createNeurons(30)
+    val neuronList1 = network.createNeurons(6)
     val region1 = NeuronCollection(network, neuronList1)
     network.addNetworkModel(region1)
     region1.apply {
@@ -39,13 +37,22 @@ val testSim = newSim {
         layout(GridLayout())
         location = point(-100, -100)
     }
+
+    // Connection strategies to use below
     val radial = RadialSimple().apply {
         excitatoryRatio = .2
     }
-    val syns = radial.connectNeurons(network, neuronList1, neuronList1)
+    val sparse = Sparse().apply {
+        connectionDensity = .3
+        excitatoryRatio = .1
+    }
+
+    val syns = sparse.connectNeurons(network, neuronList1, neuronList1)
     network.addNetworkModels(syns)
     // Set up some references
-    val (straightNeuron, leftNeuron, rightNeuron) = neuronList1
+    val straightNeuron = neuronList1[2]
+    val leftNeuron = neuronList1[3]
+    val rightNeuron =  neuronList1[4]
 
     // Subnetwork 2
     val neuronList2 = network.createNeurons(20) {
@@ -64,12 +71,13 @@ val testSim = newSim {
     network.addNetworkModels(region2weights)
 
     // Make connections between regions
-    val sparse = Sparse().apply {
-        connectionDensity = .3
-        excitatoryRatio = .2
-    }
     val region1_to_2_weights = sparse.connect(neuronList1, neuronList2)
     network.addNetworkModels(region1_to_2_weights)
+
+    // TODO: Temp because excitatory ratio not working
+    region1.randomizeIncomingWeights()
+    region2.randomizeIncomingWeights()
+
 
     // Location of the network in the desktop
     withGui {
@@ -89,9 +97,17 @@ val testSim = newSim {
     var turnRight: Effector
     var smellSensors: List<Sensor>
 
+    val cow : OdorWorldEntity
+
     odorWorld.apply {
 
-        val cow = addEntity(50, 50, EntityType.COW).apply {
+        wrapAround = false
+
+        // tileMap = loadTileMap("yulins_world.tmx")
+        // tileMap.editTile(1,1,1)
+        // tileMap.editTile(5,5,12)
+
+        cow = addEntity(50, 50, EntityType.COW).apply {
             heading = 90.0
             addDefaultEffectors()
             addSensor(SmellSensor(this))
@@ -101,16 +117,16 @@ val testSim = newSim {
             manualMotionTurnIncrement = 2.0
         }
 
-        odorWorld.addEntity(100, 160, EntityType.FLAX).apply {
+        odorWorld.addEntity(200, 260, EntityType.FLAX).apply {
             smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0))
         }
-        odorWorld.addEntity(110, 120, EntityType.FLAX).apply {
-            smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0))
+        odorWorld.addEntity(210, 120, EntityType.SWISS).apply {
+            smellSource = SmellSource(doubleArrayOf(1.0, 0.5, 0.0))
         }
         odorWorld.addEntity(10, 10, EntityType.FLOWER).apply {
-            smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0))
+            smellSource = SmellSource(doubleArrayOf(0.0, 0.5, 0.5))
         }
-        odorWorld.addEntity(15, 25, EntityType.FLOWER).apply {
+        odorWorld.addEntity(59, 200, EntityType.CANDLE).apply {
             smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0))
         }
 
@@ -156,6 +172,14 @@ val testSim = newSim {
         region2 couple projectionPlot
     }
 
+    // val odorWorldStuff = object : UpdateActionAdapter("WorldStuff") {
+    //     override fun invoke() {
+    //         println(cow)
+    //     }
+    // }
+    // workspace.addUpdateAction(odorWorldStuff)
+    // workspace.iterate(100)
+    // workspace.removeUpdateAction(odorWorldStuff)
 
 
     // TODO: For reservoir

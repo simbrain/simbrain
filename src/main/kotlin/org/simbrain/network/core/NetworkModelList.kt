@@ -11,6 +11,7 @@ import org.simbrain.network.groups.Subnetwork
 
 /**
  * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
+ * Backed by a linked hash set.  Hash set deals with duplication; linked provides an iterator.
  */
 class NetworkModelList {
 
@@ -78,8 +79,11 @@ class NetworkModelList {
     @Suppress("UNCHECKED_CAST")
     inline fun <reified T : NetworkModel> get() = get(T::class.java)
 
-    //TODO
-    fun unsafeGet(modelClass: Class<*>?): LinkedHashSet<*> {
+    /**
+     * Returns a set corresponding to the provided network model type.
+     * Does not guarantee that the returned set contains models of that type.
+     */
+    fun getRawModelSet(modelClass: Class<*>?): LinkedHashSet<*> {
         return if (networkModels.containsKey(modelClass)) {
             networkModels[modelClass]!!
         } else {

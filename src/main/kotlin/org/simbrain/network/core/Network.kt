@@ -136,7 +136,7 @@ class Network {
     /**
      * Manage ids for all network elements.
      */
-    val idManager = SimpleIdManager { cls -> networkModels.unsafeGet(cls).size + 1 }
+    val idManager = SimpleIdManager { cls -> networkModels.getRawModelSet(cls).size + 1 }
 
     /**
      * An optional name for the network that defaults to "Network[current_id]".

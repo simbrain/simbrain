@@ -39,7 +39,8 @@ public class SimpleIdManager {
     private final Function<Class<?>, Integer> initIdFunction;
 
     /**
-     * Initialize with a initialization function
+     * Initialize with an initialization function. See Network.kt for an example.
+     * Associate class for which we provide ids with integer ids.
      */
     public SimpleIdManager(Function<Class<?>, Integer> initIdFunction) {
         this.initIdFunction = initIdFunction;

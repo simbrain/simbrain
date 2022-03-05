@@ -78,6 +78,7 @@ val simulations = dir<Any>("Simulations") {
     dir("Cognitive Science") {
         item("Cortex (PCI)") { cortexPCI }
         item("Reservoir") { reservoir }
+        item("Isopod Simulation") { isopodSim }
     }
 
     dir("Evolution") {

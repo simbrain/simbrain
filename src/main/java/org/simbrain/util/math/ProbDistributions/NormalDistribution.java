@@ -12,17 +12,15 @@ public class NormalDistribution extends ProbabilityDistribution {
 
     @UserParameter(
             label = "Mean (\u03BC)",
-            description = "The expected value of the distribution.",
+            description = "The expected value or center of the distribution.",
             order = 1)
     private double mean = 1.0;
-
 
     @UserParameter(
             label = "Std. Dev. (\u03C3)",
             description = "The average squared distance from the mean.",
             order = 2)
     private double standardDeviation = 0.5;
-
 
     /**
      * For all but uniform, upper bound is only used in conjunction with
@@ -55,10 +53,18 @@ public class NormalDistribution extends ProbabilityDistribution {
     private Polarity polarity = Polarity.BOTH;
 
     /**
-     * Public constructor for reflection-based creation. You are encourage to use
+     * Public constructor for reflection-based creation. You are encouraged to use
      * the builder pattern provided for ProbabilityDistributions.
      */
     public NormalDistribution() {
+    }
+
+    /**
+     * Create a normal dist with specified mean and stdev
+     */
+    public NormalDistribution(double mean, double stdev) {
+        this.mean = mean;
+        this.standardDeviation = stdev;
     }
 
     public double nextRand() {

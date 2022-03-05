@@ -34,7 +34,6 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
      */
     public static final String DEFAULT_LABEL = "SmellSensor";
 
-
     /**
      * Current value of this sensor, as an array of doubles.
      */

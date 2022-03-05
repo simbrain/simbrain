@@ -77,7 +77,6 @@ public class OdorWorld implements EditableObject {
             order = 20)
     private boolean useCameraCentering = true;
 
-    // TODO: Use the id manager
     /**
      * Entity Id generator.
      */
@@ -385,14 +384,9 @@ public class OdorWorld implements EditableObject {
 
         events = new OdorWorldEvents(this);
 
-        if (agentIdGenerator == null) {
-            agentIdGenerator = new SimpleIdManager.SimpleId("Agent", 1);
-        }
-
         worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
                 0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
         ));
-
 
         for (OdorWorldEntity entity : entityList) {
             entity.postSerializationInit();

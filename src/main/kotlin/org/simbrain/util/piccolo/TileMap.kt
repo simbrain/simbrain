@@ -25,7 +25,8 @@ import java.util.*
  *
  * To get a sense of this see a sample tmx file like `aris_world.tmx`.
  *
- * This object does not returns a list of separate PImages, but rather one big image for each layer. See [#createImageList]
+ * This object does not return a list of separate PImages, but rather one big image for each layer. See [#createImageList]
+ * This image is rendered only when the map changes.
  *
  * The XStream annotations in this class allow XStream to read in a .tmx file in its default format.
  *
@@ -139,6 +140,17 @@ class TileMap {
         getLayer(layerName).editTile(x, y, tileID)
     }
 
+    /**
+     * Set all tiles on first layer to specified tile id.
+     */
+    fun fill(tileId: Int) {
+        (0 until width).forEach { i ->
+            (0 until height).forEach { j ->
+                editTile(i, j, tileId)
+            }
+        }
+    }
+
     // TODO: should not be able to edit tile map layers that don't belong to this map
     fun TileMapLayer.editTile(x: Int, y: Int, tileID: Int) {
         this[x, y] = tileID
@@ -246,7 +258,7 @@ class TileMap {
             layers.firstOrNull { name == it.name } ?: throw IllegalArgumentException("$name not a tile layer name")
 
     /**
-     * Clear and resize the map to the specified size
+     * Clear and resize the map to the specified size. Maintains current tilemap.
      *
      * TODO: consider creating empty map instead of using this to avoid mutability
      *

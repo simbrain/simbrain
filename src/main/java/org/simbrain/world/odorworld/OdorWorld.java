@@ -39,8 +39,12 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Core model class of Odor World, which contains a list of entities in the
- * world. Some code from Developing Games in Java, by David Brackeen.
+ * A 2d environment. Contains a list of {@link OdorWorldEntity}s, which can either be agents or static objects.
+ *
+ * Agents have sensors for detecting objects, and effectors for moving.
+ *
+ * Contains a {@link TileMap} which is a grid of tiles. This tilemap determines the size of the world.
+ * The world's size cannot be set directly.
  */
 public class OdorWorld implements EditableObject {
 

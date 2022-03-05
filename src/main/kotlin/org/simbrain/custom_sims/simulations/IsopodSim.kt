@@ -93,7 +93,9 @@ val isopodSim = newSim {
         wrapAround = true
         isObjectsBlockMovement = false
 
-        // TODO: Fill with water tile
+        tileMap.updateMapSize(10,10)
+        events.fireTileMapChanged() // TODO
+        tileMap.fill(2)
 
         // Body could be represented by a triangle or rhombus
         isopod = addEntity(150, 150, EntityType.MOUSE).apply {

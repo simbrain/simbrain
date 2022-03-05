@@ -1176,8 +1176,10 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
     public boolean collideOn(String direction) {
 
         if (!parentWorld.getWrapAround()) {
-            return collisionBound.collide
-                    (direction, parentWorld.getWorldBoundary());
+            var collision = collisionBound.collide(direction, parentWorld.getWorldBoundary());
+            if (collision) {
+                return true;
+            }
         }
 
         if(!parentWorld.isObjectsBlockMovement()) {

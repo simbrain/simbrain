@@ -137,6 +137,10 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
     addClosingTask { block(pickedTile) }
 }
 
+fun showTilePicker(tileSets: List<TileSet>) : StandardDialog {
+    return tileSets.tilePicker(1) {}.also { it.pack() }.present()
+}
+
 /**
  * Returns the main editor dialog.
  */

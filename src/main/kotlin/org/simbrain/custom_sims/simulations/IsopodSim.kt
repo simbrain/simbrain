@@ -8,6 +8,7 @@ import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.math.ProbDistributions.NormalDistribution
+import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.effectors.Effector
@@ -93,8 +94,7 @@ val isopodSim = newSim {
         wrapAround = true
         isObjectsBlockMovement = false
 
-        tileMap.updateMapSize(10,10)
-        events.fireTileMapChanged() // TODO
+        tileMap = TileMap(30,15)
         tileMap.fill(2)
 
         // Body could be represented by a triangle or rhombus

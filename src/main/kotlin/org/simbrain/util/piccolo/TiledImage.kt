@@ -5,21 +5,17 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import org.simbrain.world.odorworld.OdorWorldResourceManager
 import java.awt.image.BufferedImage
 
-
+/**
+ * An image containing multiple tile images. [source] is the path to this master image.
+ */
 @XStreamAlias("image")
-class TiledImage {
+class TiledImage (@XStreamAsAttribute private val source: String = "tileset_kenney.png") {
 
     /**
      * Used for embedded images, in combination with a data child element. Not yet supported.
      */
     @XStreamAsAttribute
     private val format = ""
-
-    /**
-     * The reference to the tileset image file.
-     */
-    @XStreamAsAttribute
-    private val source = ""
 
     /**
      * The image width in pixels (optional).

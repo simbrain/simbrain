@@ -48,10 +48,9 @@ class TileMapLayer(
         get() = _properties ?: HashMap<String, String?>().also { _properties = it }
 
     /**
-     * The data from parsing tmx file.
-     * Use [TiledData.getGid] to retrieve the processed data (tile id list)
+     * An intermediate data structure for persistence.
      */
-    private var data: TiledData
+    private var data: TileMapLayerData
 
     /**
      * The rendered image of the layer
@@ -138,7 +137,7 @@ class TileMapLayer(
     fun clear(width: Int = this.width, height: Int = this.height) {
         this.width = width
         this.height = height
-        data = TiledData(width, height)
+        data = TileMapLayerData(width, height)
     }
 
     fun setProperty(propertyName: String, propertyValue: String?) {
@@ -147,7 +146,7 @@ class TileMapLayer(
 
     init {
         properties["collision"] = if (collision) "true" else "false"
-        data = TiledData(width, height)
+        data = TileMapLayerData(width, height)
     }
 
 }
@@ -156,11 +155,11 @@ class TileMapLayer(
  * Stores the grid of global ids that correspond to the data for a [TileMapLayer]
  */
 @XStreamAlias("data")
-class TiledData(val gid: MutableList<MutableList<Int>>) {
+class TileMapLayerData(val gidMatrix: MutableList<MutableList<Int>>) {
     constructor(width: Int, height: Int) : this(MutableList(height) { MutableList(width) { 0 } })
-    operator fun get(x: Int, y: Int) = gid[y][x]
+    operator fun get(x: Int, y: Int) = gidMatrix[y][x]
     operator fun set(x: Int, y: Int, tileId: Int) {
-        gid[y][x] = tileId
+        gidMatrix[y][x] = tileId
     }
 }
 
@@ -168,12 +167,12 @@ class TiledData(val gid: MutableList<MutableList<Int>>) {
  * Custom serializer that stores [Network.networkModels], which is a map, as a flat list of [NetworkModel]s.
  */
 class TiledDataConverter(mapper: Mapper, reflectionProvider: ReflectionProvider) :
-    ReflectionConverter(mapper, reflectionProvider, TiledData::class.java) {
+    ReflectionConverter(mapper, reflectionProvider, TileMapLayerData::class.java) {
 
     override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {
-        val data = source as TiledData
+        val data = source as TileMapLayerData
         writer.addAttribute("encoding", "csv")
-        val csv = data.gid.joinToString("\n") { it.joinToString(",") }
+        val csv = data.gidMatrix.joinToString("\n") { it.joinToString(",") }
         writer.setValue(csv)
     }
 
@@ -223,6 +222,6 @@ class TiledDataConverter(mapper: Mapper, reflectionProvider: ReflectionProvider)
         val gid = decodeData(reader.value, encoding, compression)
             .map { it.toMutableList() }
             .toMutableList()
-        return TiledData(gid)
+        return TileMapLayerData(gid)
     }
 }

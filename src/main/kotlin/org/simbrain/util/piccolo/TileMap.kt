@@ -32,7 +32,7 @@ import java.util.*
  *
  */
 @XStreamAlias("map")
-class TileMap {
+class TileMap(width: Int, height: Int) {
 
     /**
      * The TMX format version. Was “1.0” so far, and will be incremented to match minor Tiled releases.
@@ -50,14 +50,14 @@ class TileMap {
      * The map width in tiles.
      */
     @XStreamAsAttribute
-    var width = 0
+    var width = width
         private set
 
     /**
      * The map height in tiles.
      */
     @XStreamAsAttribute
-    var height = 0
+    var height = height
         private set
 
     /**
@@ -65,14 +65,14 @@ class TileMap {
      */
     @XStreamAlias("tilewidth")
     @XStreamAsAttribute
-    val tileWidth = 0
+    val tileWidth = 32
 
     /**
      * The height of a tile.
      */
     @XStreamAlias("tileheight")
     @XStreamAsAttribute
-    val tileHeight = 0
+    val tileHeight = 32
 
     /**
      * Get the map height in pixels.
@@ -91,13 +91,13 @@ class TileMap {
      */
     @XStreamImplicit
     @XStreamAlias("tileset")
-    val tileSets: List<TileSet> = ArrayList()
+    val tileSets: List<TileSet> = listOf(TileSet())
 
     /**
      * The layers of this map.
      */
     @XStreamImplicit
-    val layers = ArrayList<TileMapLayer>()
+    val layers = mutableListOf(TileMapLayer("Default Layer", width, height, true))
 
     /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)

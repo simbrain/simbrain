@@ -40,8 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.simbrain.util.SwingKt.present;
-import static org.simbrain.util.piccolo.TMXUtils.editor;
+import static org.simbrain.util.piccolo.TMXUtils.showTilePicker;
 
 /**
  * Handle simbrain drag events, which pan the canvas, create lassos for
@@ -149,7 +148,8 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             } else {
-                present(editor(odorWorldPanel.getWorld().getTileMap(), event.getPosition()));
+                // TODO: Submenu with layers
+                showTilePicker(odorWorldPanel.getWorld().getTileMap().getTileSets());
             }
             return;
         }

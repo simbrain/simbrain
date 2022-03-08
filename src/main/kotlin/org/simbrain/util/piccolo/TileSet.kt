@@ -11,10 +11,10 @@ import java.awt.Image
  * As an example see tileset_kenney.png.
  *
  * Tiles are accessed using a global id or "gid". 0 is reserved for an empty slot, and the index can span multiple
- * tilesets.  Hence the [#firstgid] is set to 1 for the first tileset, and to another nubmer for subsequent tileset.
+ * tilesets. Hence the [#firstgid] is set to 1 for the first tileset, and to another nubmer for subsequent tileset.
  */
 @XStreamAlias("tileset")
-class TileSet {
+class TileSet() {
 
     /**
      * The first global tile ID of this tileset (this global ID maps to the first tile in this tileset).
@@ -79,7 +79,7 @@ class TileSet {
     /**
      * The tileset image
      */
-    private lateinit var image: TiledImage
+    private var image: TiledImage = TiledImage()
 
     /**
      * List of tile explicitly defined in the tmx/tsx. This is used only when parsing.

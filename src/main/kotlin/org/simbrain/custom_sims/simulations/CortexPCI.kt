@@ -57,7 +57,7 @@ val cortexPCI = newSim {
         layout(GridLayout())
         location = point(-100, -100)
     }
-    radial.connect(network, region1neurons, region1neurons)
+    radial.connectNeurons(network, region1neurons, region1neurons)
 
 
     // Region 2
@@ -69,7 +69,7 @@ val cortexPCI = newSim {
        layout(GridLayout())
        location = point(100, 100)
     }
-    radial.connect(network, region2neurons, region2neurons)
+    radial.connectNeurons(network, region2neurons, region2neurons)
 
     // Region 3
     val region3neurons = network.createNeurons(10) { kuramotoTemplate() }
@@ -80,13 +80,13 @@ val cortexPCI = newSim {
         layout(GridLayout())
         location = point(400, -100)
     }
-    radial.connect(network, region3neurons, region3neurons)
+    radial.connectNeurons(network, region3neurons, region3neurons)
 
-    // Make connections between regions
-    sparse.connect(network, region2neurons, region1neurons)
-    sparse.connect(network, region1neurons, region2neurons)
-    sparse.connect(network, region2neurons, region3neurons)
-    sparse.connect(network, region3neurons, region2neurons)
+    // Make connectNeuronsions between regions
+    sparse.connectNeurons(network, region2neurons, region1neurons)
+    sparse.connectNeurons(network, region1neurons, region2neurons)
+    sparse.connectNeurons(network, region2neurons, region3neurons)
+    sparse.connectNeurons(network, region3neurons, region2neurons)
 
     // Location of the network in the desktop
     withGui {

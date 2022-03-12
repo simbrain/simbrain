@@ -171,11 +171,13 @@ public final class ConnectionPanel extends JPanel {
     }
 
     /**
-     * Commit changes made in this panel to loose  synapses.
+     * Commit changes made in this panel to free synapses.
      */
     public void commitChanges(NetworkPanel networkPanel) {
 
         commitSettings();
+
+        // Make the connections
         List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(),
                 networkPanel.getSelectionManager().filterSelectedSourceModels(Neuron.class),
                 networkPanel.getSelectionManager().filterSelectedModels(Neuron.class));
@@ -188,11 +190,14 @@ public final class ConnectionPanel extends JPanel {
         }
         //TODO: Consider moving the below to connection manager
         if (isCreation) {
+            // Set the weights to have the desired excitatory-inhibitory ratio
             ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
             if (polarityPanel.exRandomizerEnabled()) {
+                // Apply probability distribution to excitatory weights
                 ConnectionUtilities.randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
             }
             if (polarityPanel.inRandomizerEnabled()) {
+                // Apply probability distributio to inhibitory weights
                 ConnectionUtilities.randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
             }
         }
@@ -209,6 +214,7 @@ public final class ConnectionPanel extends JPanel {
         connectionStrategyProperties.commitChanges();
         connectionStrategy.connectNeurons(synapseGroup);
         if (isCreation) {
+            // Calls SynapseGroup.setExcitatoryRatio
             polarityPanel.commitChanges();
             if (polarityPanel.exRandomizerEnabled()) {
                 ConnectionUtilities.randomizeExcitatorySynapses(

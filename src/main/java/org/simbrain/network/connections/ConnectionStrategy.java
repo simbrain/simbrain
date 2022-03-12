@@ -27,12 +27,19 @@ import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.EditableObject;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
- * Maintains a specific strategy for creating connections between two groups
- * of neurons. Subclasses correspond to specific types of
- * connection strategy.
+ * Maintains a specific strategy for creating connections between two groups of neurons. Subclasses correspond to
+ * specific types of connection strategy. Methods for creating free synapses are generally distinct from those for
+ * creating them in synapse groups. Another distinction is between strategies that use polarity and those that do not.
+ *
+ * Note that connections are generally made in the following order.
+ * 1) Weights are made using this class
+ * 2) Their excitatory / inhibitory ratio is set using {@link ConnectionUtilities#polarizeSynapses(Collection, double)}
+ *   for free synapses, or {@link SynapseGroup#setExcitatoryRatio(double)} in synapse groups
+ * 3) The two sets of weights are then randomized using probability distributions.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
@@ -93,15 +100,6 @@ public abstract class ConnectionStrategy implements EditableObject {
      * other operations
      */
     public abstract List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target);
-
-    /**
-     * Connect free neurons using this strategy and both return weights and add them to the network.
-     */
-    public List<Synapse> connect(Network network, List<Neuron> source, List<Neuron> target) {
-        var syns = connectNeurons(network, source, target);
-        network.addNetworkModels(syns);
-        return syns;
-    }
 
     public boolean isUseExcitatoryRandomization() {
         return useExcitatoryRandomization;

@@ -39,10 +39,11 @@ import java.util.stream.Collectors;
  * from it, and make excitatory and inhibitory synapses with them according to
  * some probability. Inhibitory and excitatory synapses are created separately
  * and use separate parameters. Therefore the total number of connections that will
- * be made depends upon both sets of parameters. 
- * <p>
- * Currently this is not accessible in the GUI, and is only used by some
- * scripts. // TODO: Add full repetoire of probabilities EE,EI,IE,II...
+ * be made depends upon both sets of parameters.
+ *
+ * Does not use excitatory ratio
+ *
+ * TODO: Add full repetoire of probabilities EE,EI,IE,II...
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi

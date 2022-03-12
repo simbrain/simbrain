@@ -14,7 +14,33 @@ import java.awt.Image
  * tilesets. Hence the [#firstgid] is set to 1 for the first tileset, and to another nubmer for subsequent tileset.
  */
 @XStreamAlias("tileset")
-class TileSet() {
+class TileSet(
+
+    /**
+     * Path to image containing the tile map image.
+     */
+    @XStreamAsAttribute
+    private val source: String,
+
+    /**
+     * The spacing in pixels between the tiles in this tileset (applies to the tileset image).
+     */
+    @XStreamAsAttribute
+    private val spacing: Int = 0,
+
+    /**
+     * The number of tiles in this tileset (since 0.13)
+     */
+    @XStreamAsAttribute
+    val tilecount: Int = 0,
+
+    /**
+     * The number of tile columns in the tileset. For image collection tilesets it is editable and is used when displaying the tileset. (since 0.15)
+     */
+    @XStreamAsAttribute
+    val columns: Int = 1
+
+) {
 
     /**
      * The first global tile ID of this tileset (this global ID maps to the first tile in this tileset).
@@ -40,29 +66,12 @@ class TileSet() {
     @XStreamAsAttribute
     val tileheight = 32
 
-    /**
-     * The spacing in pixels between the tiles in this tileset (applies to the tileset image).
-     */
-    @XStreamAsAttribute
-    private val spacing = 0
 
     /**
      * The margin around the tiles in this tileset (applies to the tileset image).
      */
     @XStreamAsAttribute
     private val margin = 0
-
-    /**
-     * The number of tiles in this tileset (since 0.13)
-     */
-    @XStreamAsAttribute
-    val tilecount = 0
-
-    /**
-     * The number of tile columns in the tileset. For image collection tilesets it is editable and is used when displaying the tileset. (since 0.15)
-     */
-    @XStreamAsAttribute
-    val columns = 1
 
     /**
      * Horizontal offset in pixels
@@ -79,10 +88,10 @@ class TileSet() {
     /**
      * The tileset image
      */
-    private var image: TiledImage = TiledImage()
+    private var image: TiledImage = TiledImage(source)
 
     /**
-     * List of tile explicitly defined in the tmx/tsx. This is used only when parsing.
+     * List of tiles explicitly defined in the tmx/tsx. This is used only when parsing.
      * It is complicated to directly parse the tile info into a map, so first the tiles are store in this list,
      * and later when the tiles are access, they will be store into the [.idTileMap].
      */
@@ -142,3 +151,9 @@ class TileSet() {
     }
 }
 
+/**
+ * Create tileset with parameters for the default TiledImage.
+ */
+fun createDefaultTileSet(): TileSet {
+    return TileSet("tileset_kenney.png", 2, 1767, 57)
+}

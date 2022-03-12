@@ -19,9 +19,7 @@
 package org.simbrain.world.odorworld;
 
 import com.thoughtworks.xstream.XStream;
-import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.TMXUtils;
-import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -88,8 +86,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        XStream xstream = Utils.getSimbrainXStream();
-        xstream.processAnnotations(TileMap.class);
+        XStream xstream = TMXUtils.getXStream();
         return xstream.toXML(world);
     }
 

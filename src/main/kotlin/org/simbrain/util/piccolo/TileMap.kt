@@ -91,7 +91,7 @@ class TileMap(width: Int, height: Int) {
      */
     @XStreamImplicit
     @XStreamAlias("tileset")
-    val tileSets: List<TileSet> = listOf(TileSet())
+    val tileSets: List<TileSet> = listOf(createDefaultTileSet())
 
     /**
      * The layers of this map.
@@ -242,6 +242,8 @@ class TileMap(width: Int, height: Int) {
      * @return the corresponding tile location
      */
     fun pixelToTileCoordinate(x: Double, y: Double) = Point((x / tileWidth).toInt(), (y / tileHeight).toInt())
+
+    fun pixelToTileCoordinate(p: Point2D) = pixelToTileCoordinate(p.x, p.y)
 
     /**
      * Converts pixel location to tile coordinate.

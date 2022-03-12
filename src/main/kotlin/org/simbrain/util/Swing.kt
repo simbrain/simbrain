@@ -6,8 +6,6 @@ import javax.swing.AbstractAction
 import javax.swing.JComponent
 import javax.swing.JDialog
 
-fun StandardDialog.present() = apply { isVisible = true }
-
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
     addWindowListener(object : WindowAdapter() {
         override fun windowClosed(e: WindowEvent?) {

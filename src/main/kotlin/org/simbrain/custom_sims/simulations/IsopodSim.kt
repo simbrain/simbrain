@@ -1,20 +1,19 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addOdorWorldComponent
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.math.ProbDistributions.NormalDistribution
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.sensors.ObjectSensor
+import org.simbrain.world.odorworld.sensors.SmellSensor
 
 /**
  * A simulation of Isopod navigation. With Peter Hinow and Kaiden Schmidt.
@@ -32,18 +31,23 @@ val isopodSim = newSim {
 
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
+    val noiseSource = NormalDistribution(1.0, .9)
 
     val neuronLeftSensor = network.addNeuron {
         location = point(0,100)
         upperBound = 10.0
         label = "Left"
+        with (updateRule as LinearRule) {
+            noiseGenerator = noiseSource
+            addNoise = true
+        }
     }
     val neuronRightSensor = network.addNeuron {
         location = point(100,100)
         upperBound = 10.0
         label = "Right"
         with (updateRule as LinearRule) {
-            noiseGenerator = NormalDistribution(0.0, 1.5)
+            noiseGenerator = noiseSource
             addNoise = true
         }
     }
@@ -70,7 +74,7 @@ val isopodSim = newSim {
     // Location of the network in the desktop
     withGui {
         place(networkComponent) {
-            location = point(0, 0)
+            location = point(145, 10)
             width = 400
             height = 400
         }
@@ -85,20 +89,20 @@ val isopodSim = newSim {
     val straightMovement : Effector
     val turnLeft : Effector
     val turnRight : Effector
-    var leftSensor : ObjectSensor
-    var rightSensor : ObjectSensor
+    var leftSensor : SmellSensor
+    var rightSensor : SmellSensor
     val isopod : OdorWorldEntity
 
     odorWorld.apply {
 
-        wrapAround = true
+        wrapAround = false
         isObjectsBlockMovement = false
 
-        tileMap = TileMap(30,15)
+        tileMap = TileMap(20,20)
         tileMap.fill(2)
 
         // Body could be represented by a triangle or rhombus
-        isopod = addEntity(150, 150, EntityType.MOUSE).apply {
+        isopod = addEntity(300, 300, EntityType.MOUSE).apply {
             heading = 90.0
             addDefaultEffectors()
             straightMovement = effectors[0]
@@ -107,37 +111,39 @@ val isopodSim = newSim {
 
             // Can add more smell sensors here
             // Options: new sensor in back; triangular array
-            // TODO: Object or smell?
-            leftSensor = ObjectSensor(this).apply {
+            leftSensor = SmellSensor(this).apply {
                 radius = 40.0
                 theta = Math.PI / 4
-                setObjectType(EntityType.FISH)
-                decayFunction.dispersion = 400.0
                 addSensor(this)
             }
-            rightSensor = ObjectSensor(this).apply {
+            rightSensor = SmellSensor(this).apply {
                 radius = 40.0
                 theta = -Math.PI / 4
-                setObjectType(EntityType.FISH)
-                decayFunction.dispersion = 400.0
                 addSensor(this)
             }
             manualStraightMovementIncrement = 2.0
             manualMotionTurnIncrement = 2.0
         }
 
-        odorWorld.addEntity(290, 290, EntityType.FISH)
-        odorWorld.addEntity(10, 290, EntityType.FISH)
-        odorWorld.addEntity(10, 10, EntityType.FISH)
-        odorWorld.addEntity(290, 10, EntityType.FISH)
+        fun addFish(x: Int, y: Int) {
+            odorWorld.addEntity(x, y, EntityType.FISH).apply {
+               smellSource = SmellSource.createScalarSource(1).apply {
+                    dispersion = 300.0
+                }
+            }
+        }
+
+        addFish(590, 590)
+        addFish(10, 590)
+        addFish(10, 10)
+        addFish(590, 10)
 
     }
 
     withGui {
         place(odorWorldComponent) {
-            location = point(403, 0)
-            width = 400
-            height = 400
+            location = point(530, 10)
+            (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).setGuiSizeToWorldSize()
         }
     }
 
@@ -151,5 +157,25 @@ val isopodSim = newSim {
         rightSensor couple neuronRightSensor
     }
 
-}
+    withGui {
+        createControlPanel("Control Panel", 5, 10) {
+            addButton("Button 1") {
+                println("Button 1")
+            }
+            addButton("Button 1") {
+                println("Button 1")
+            }
+        }
 
+        // addDocViewer("Test", "Braitenberg.html").apply {
+        //     place(this) {
+        //         location = point(145, 421)
+        //         width = 400
+        //         height = 330
+        //     }
+        // }
+
+    }
+
+
+}

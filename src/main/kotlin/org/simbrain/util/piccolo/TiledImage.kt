@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage
  * An image containing multiple tile images. [source] is the path to this master image.
  */
 @XStreamAlias("image")
-class TiledImage (@XStreamAsAttribute private val source: String = "tileset_kenney.png") {
+class TiledImage (@XStreamAsAttribute private val source: String) {
 
     /**
      * Used for embedded images, in combination with a data child element. Not yet supported.

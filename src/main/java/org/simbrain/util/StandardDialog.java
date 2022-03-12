@@ -365,5 +365,4 @@ public class StandardDialog extends GenericJDialog {
         setLocationRelativeTo(null);
     }
 
-
 }

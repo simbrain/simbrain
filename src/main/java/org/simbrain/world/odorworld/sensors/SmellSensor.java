@@ -111,6 +111,19 @@ public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
         return currentValue;
     }
 
+    /**
+     * Returns a scalar value associated to the current smell vector.
+     */
+    @Producible(description = "Scalar smell")
+    public double getCurrentScalarValue() {
+        if (currentValue.length == 1) {
+            return currentValue[0];
+        } else {
+            // TODO: Provide other options for producing a scalar smell value from a vector, e.g. mean value or norm.
+            return SimbrainMath.sum(currentValue);
+        }
+    }
+
     @Override
     public void setParent(OdorWorldEntity parent) {
         this.parent = parent;

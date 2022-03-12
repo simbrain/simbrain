@@ -13,17 +13,18 @@ import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
 import java.io.File
+import java.util.function.Consumer
 import javax.swing.*
 import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
 
-
 val zeroTile by lazy { Tile(0) }
 
-val XStream get() = Utils.getSimbrainXStream()!!.apply {
-    processAnnotations(TileMap::class.java)
-    registerConverter(TiledDataConverter(mapper, reflectionProvider))
-}
+val XStream
+    get() = Utils.getSimbrainXStream()!!.apply {
+        processAnnotations(TileMap::class.java)
+        registerConverter(TiledDataConverter(mapper, reflectionProvider))
+    }
 
 val missingTexture by lazy { OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png") }
 
@@ -48,8 +49,9 @@ fun loadTileMap(file: File?): TileMap {
  * @return the tilemap object from the given file
  */
 fun loadTileMap(filename: String): TileMap {
-    return XStream.fromXML(OdorWorldResourceManager.getFileURL("tilemap" +
-            File.separator + filename)) as TileMap
+    return XStream.fromXML(
+        OdorWorldResourceManager.getFileURL("tilemap" + File.separator + filename)
+    ) as TileMap
 }
 
 /**
@@ -57,8 +59,14 @@ fun loadTileMap(filename: String): TileMap {
  */
 class PTiledImage(image: Image, val gid: Int) : PImage(image)
 
+fun showTilePicker(tileSets: List<TileSet>, block: Consumer<Int>): StandardDialog {
+    return tileSets.tilePicker(1) {
+        block.accept(it)
+    }.apply { makeVisible() }
+}
+
 /**
- * Returns a dialog that is used to pick a tile image.
+ * Returns a dialog that is used to pick a tile from a tilset. Double clicking edits the tile.
  */
 fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDialog().apply {
 
@@ -71,15 +79,15 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
     fun PLayer.renderTileSet(tileSet: TileSet) {
         with(tileSet) {
             (firstgid until firstgid + tilecount).map { PTiledImage(getTileImage(it), it) }
-                    .chunked(tileSet.columns)
-                    .mapIndexed { y, tiles ->
-                        tiles.mapIndexed { x, image ->
-                            image.let {
-                                it.translate((x * tilewidth).toDouble(), (y * tileheight).toDouble())
-                                this@renderTileSet.addChild(it)
-                            }
+                .chunked(tileSet.columns)
+                .mapIndexed { y, tiles ->
+                    tiles.mapIndexed { x, image ->
+                        image.let {
+                            it.translate((x * tilewidth).toDouble(), (y * tileheight).toDouble())
+                            this@renderTileSet.addChild(it)
                         }
                     }
+                }
         }
     }
 
@@ -89,7 +97,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
     /**
      * Black rectangle around tile
      */
-    fun PTiledImage.select(){
+    fun PTiledImage.select() {
         // Remove any previous black rectangle
         selectionBoxRemover()
         addChild(PPath.createRectangle(-1.0, -1.0, 32.0, 32.0).apply {
@@ -100,14 +108,14 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
     }
 
     // Set content pane to a set of tabs, each showing a tileset
-    contentPane = JTabbedPane().apply {
+    val tabbedPane = JTabbedPane().apply {
         this@tilePicker.forEach { tileSet ->
             // Add a new tab for each tileset
             addTab(tileSet.name, PCanvas().apply {
                 layer.renderTileSet(tileSet)
 
                 // Select the tile that was initially clicked on
-                this.layer.allNodes.filterIsInstance<PTiledImage>().find { it.gid == pickedTile}?.let{
+                this.layer.allNodes.filterIsInstance<PTiledImage>().find { it.gid == pickedTile }?.let {
                     it.select()
                     //camera.centerBoundsOnPoint(it.bounds.centerX, it.bounds.centerY)
                     // TODO: Figure out what to center on what.
@@ -120,29 +128,22 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
                             it.select()
                             pickedTile = it.gid
                         } else if (it is PTiledImage && event.clickCount == 2) {
-                            AnnotatedPropertyEditor.getDialog(tileSet[pickedTile]).apply {
-                                pack()
-                                isModal = true;
-                                setLocationRelativeTo(null)
-                                setVisible(true)
-                            }
+                            AnnotatedPropertyEditor.getDialog(tileSet[pickedTile]).makeVisible()
                         }
                     }
                 }
             }.apply {
-                preferredSize = Dimension(300,600) })
+                preferredSize = Dimension(300, 600)
+            })
         }
     }
-
+    contentPane = ScrollPane().apply { add(tabbedPane) }
     addClosingTask { block(pickedTile) }
 }
 
-fun showTilePicker(tileSets: List<TileSet>) : StandardDialog {
-    return tileSets.tilePicker(1) {}.also { it.pack() }.present()
-}
 
 /**
- * Returns the main editor dialog.
+ * Returns a dialog that shows the images in each layer at a point.
  */
 fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
 
@@ -152,7 +153,7 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
 
     title = "Set tile(s) at ($x, $y)"
 
-    preferredSize = Dimension(250,350)
+    preferredSize = Dimension(250, 350)
 
     val mainPanel = JPanel().apply {
         layout = GridBagLayout()
@@ -178,7 +179,7 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
                 tileSets.tilePicker(tile.id) {
                     this@button.icon = ImageIcon(tileImage(it))
                     onCommit = { change(it) }
-                }.also { it.pack() }.present()
+                }.also { it.makeVisible() }
             }
         }
 
@@ -188,14 +189,14 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
             autoCreateContainerGaps = true
 
             setHorizontalGroup(
-                    createSequentialGroup()
-                            .addComponent(tileViewer)
-                    //.addComponent(propertiesPanel)
+                createSequentialGroup()
+                    .addComponent(tileViewer)
+                //.addComponent(propertiesPanel)
             )
             setVerticalGroup(
-                    createParallelGroup(GroupLayout.Alignment.CENTER)
-                            .addComponent(tileViewer)
-                    //.addComponent(propertiesPanel)
+                createParallelGroup(GroupLayout.Alignment.CENTER)
+                    .addComponent(tileViewer)
+                //.addComponent(propertiesPanel)
             )
         }
 
@@ -204,8 +205,8 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
     }
 
     val panels = (layers zip getTileStackAt(x, y)).reversed()
-            .map { (layer, tile) -> tilePanel(layer.name, tile) { layer.editTile(x, y, it) } }
-            .onEach { mainPanel.add(it, gbc) }
+        .map { (layer, tile) -> tilePanel(layer.name, tile) { layer.editTile(x, y, it) } }
+        .onEach { mainPanel.add(it, gbc) }
 
     addClosingTask { panels.forEach { it.onCommit() } }
 

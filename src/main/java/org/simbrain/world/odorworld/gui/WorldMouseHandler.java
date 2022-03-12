@@ -148,8 +148,14 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
                 dialog.setLocationRelativeTo(null);
                 dialog.setVisible(true);
             } else {
-                // TODO: Submenu with layers
-                showTilePicker(odorWorldPanel.getWorld().getTileMap().getTileSets());
+                // TODO: On right click, show sub-menu with layers, then show dialog below
+
+                var tileMap = odorWorldPanel.getWorld().getTileMap();
+                showTilePicker(tileMap.getTileSets(), (tileId) -> {
+                    var p= tileMap.pixelToTileCoordinate(world.getLastClickedPosition());
+                    odorWorldPanel.getWorld().getTileMap().editTile(p.x, p.y, tileId);
+                });
+
             }
             return;
         }

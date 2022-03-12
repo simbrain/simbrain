@@ -1067,7 +1067,7 @@ public class OdorWorldEntity implements EditableObject, AttributeContainer, Copy
     }
 
     /**
-     * Add left, right, and straight movement effectors.
+     * Add straight, left, and right effectors, in that order.
      */
     public void addDefaultEffectors() {
         addEffector(new StraightMovement(this));

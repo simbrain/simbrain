@@ -581,9 +581,11 @@ public class OdorWorldPanel extends JPanel {
         return defaultHeight;
     }
 
+    @Override
     public Dimension getPreferredSize() {
-        return new Dimension(defaultWidth < getWorld().getWidth() ? defaultWidth : getWorld().getWidth(),
-            defaultHeight < getWorld().getHeight() ? defaultHeight : getWorld().getHeight());
+        return new Dimension(
+                Math.min(defaultWidth, getWorld().getWidth()),
+                Math.min(defaultHeight, getWorld().getHeight()));
     }
 
     /**

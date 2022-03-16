@@ -40,6 +40,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import static org.simbrain.network.connections.AllToAllKt.connectAllToAll;
+import static org.simbrain.network.connections.SparseKt.connectSparse;
 
 /**
  * The <b>SparsityAdjustmentPanel</b> is a sub-panel for other connection panels
@@ -523,7 +524,8 @@ public class SparseConnectionPanel extends EditablePanel {
             }
         }
         if (allowSelfConnectChkBx.isEnabled()) {
-            connection.setSelfConnectionAllowed(allowSelfConnectChkBx.isSelected());
+            // TODO
+            // connection.setSelfConnectionAllowed(allowSelfConnectChkBx.isSelected());
         }
         return true;
     }
@@ -534,7 +536,7 @@ public class SparseConnectionPanel extends EditablePanel {
             if (density == 1.0) {
                 return connectAllToAll(source, target, Utils.intersects(source, target), allowSelfConnect, true);
             } else {
-                return Sparse.connectSparse(source, target, density, allowSelfConnect, equalizeEfferentsChkBx.isSelected(), true);
+                return connectSparse(source, target, density, allowSelfConnect, equalizeEfferentsChkBx.isSelected(), true);
             }
         }
         return null;

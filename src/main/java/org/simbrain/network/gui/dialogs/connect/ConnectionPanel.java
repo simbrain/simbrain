@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -34,6 +33,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+
+import static org.simbrain.network.connections.ConnectionUtilitiesKt.*;
 
 /**
  * Panel for editing connection manager, the ratio of inhibition to excitation
@@ -129,7 +130,7 @@ public final class ConnectionPanel extends JPanel {
         add(connectionContainer);
 
         // E/I Ratio and Randomizers
-        if (isCreation) {
+        if (isCreation && !connectionStrategy.getOverridesPolarity()) {
             polarityPanel = SynapsePolarityAndRandomizerPanel.createPolarityRatioPanel(connectionStrategy, parentFrame);
             add(polarityPanel);
         }
@@ -160,7 +161,7 @@ public final class ConnectionPanel extends JPanel {
      */
     public void commitSettings() {
         connectionStrategyProperties.commitChanges();
-        if (isCreation) {
+        if (isCreation && !connectionStrategy.getOverridesPolarity()) {
             polarityPanel.commitChanges(connectionStrategy);
         }
     }
@@ -184,16 +185,16 @@ public final class ConnectionPanel extends JPanel {
             return;
         }
         //TODO: Consider moving the below to connection manager
-        if (isCreation) {
+        if (isCreation && !connectionStrategy.getOverridesPolarity()) {
             // Set the weights to have the desired excitatory-inhibitory ratio
-            ConnectionUtilities.polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
+            polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
             if (polarityPanel.exRandomizerEnabled()) {
                 // Apply probability distribution to excitatory weights
-                ConnectionUtilities.randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
+                randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
             }
             if (polarityPanel.inRandomizerEnabled()) {
                 // Apply probability distribution to inhibitory weights
-                ConnectionUtilities.randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
+                randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
             }
         }
 //        networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
@@ -208,18 +209,18 @@ public final class ConnectionPanel extends JPanel {
         synapseGroup.clear();
         connectionStrategyProperties.commitChanges();
         connectionStrategy.connectNeurons(synapseGroup);
-        if (isCreation) {
+        if (isCreation && !connectionStrategy.getOverridesPolarity()) {
             // Calls SynapseGroup.setExcitatoryRatio
             polarityPanel.commitChanges();
             if (polarityPanel.exRandomizerEnabled()) {
-                ConnectionUtilities.randomizeExcitatorySynapses(
+                randomizeExcitatorySynapses(
                         synapseGroup.getExcitatorySynapses(),
                         polarityPanel.getExRandomizer());
                 synapseGroup.setExcitatoryRandomizer(polarityPanel
                         .getExRandomizer());
             }
             if (polarityPanel.inRandomizerEnabled()) {
-                ConnectionUtilities.randomizeInhibitorySynapses(
+                randomizeInhibitorySynapses(
                         synapseGroup.getInhibitorySynapses(),
                         polarityPanel.getInRandomizer());
                 synapseGroup.setInhibitoryRandomizer(polarityPanel

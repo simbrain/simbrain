@@ -10,20 +10,16 @@
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.connections;
+package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.util.OrientationComparator;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.EditableObject;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.util.OrientationComparator
+import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.EditableObject
+import java.util.*
 
 /**
  * Connect each source neuron to a single target.
@@ -31,49 +27,18 @@ import java.util.List;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class OneToOne extends ConnectionStrategy implements EditableObject {
-
+class OneToOne : ConnectionStrategy(), EditableObject {
     /**
      * If true, synapses are added in both directions.
      */
     @UserParameter(label = "Bi-directional", order = 2)
-    private boolean useBidirectionalConnections = false;
-
-    /**
-     * Default orientation used to make the connections.
-     */
-    public static OrientationComparator DEFAULT_ORIENTATION = OrientationComparator.X_ORDER;
+    private val useBidirectionalConnections = false
 
     /**
      * Orientation of how to connect neurons.
      */
     @UserParameter(label = "Orientation", order = 1)
-    private OrientationComparator connectOrientation = DEFAULT_ORIENTATION;
-
-    /**
-     * Use this connection object to make connections.
-     *
-     * @param sourceNeurons the starting neurons
-     * @param targetNeurons the targeted neurons
-     * @return the new synapses
-     */
-    public List<Synapse> connectOneToOne(List<Neuron> sourceNeurons, final List<Neuron> targetNeurons) {
-        return connectOneToOne(sourceNeurons, targetNeurons, useBidirectionalConnections, true);
-    }
-
-    /**
-     * Returns a sorted list of neurons, given a comparator.
-     *
-     * @param neuronList the base list of neurons.
-     * @param comparator the comparator.
-     * @return the sorted list.
-     */
-    private static List<Neuron> getSortedNeuronList(final List<Neuron> neuronList, final OrientationComparator comparator) {
-        ArrayList<Neuron> list = new ArrayList<Neuron>();
-        list.addAll(neuronList);
-        Collections.sort(list, comparator);
-        return list;
-    }
+    private val connectOrientation = DEFAULT_ORIENTATION
 
     /**
      * Source and target neuron groups must have the same number of neurons.
@@ -81,102 +46,130 @@ public class OneToOne extends ConnectionStrategy implements EditableObject {
      * exactly one target neuron (and vice versa if connections are
      * bidirectional).
      */
-    @Override
-    public void connectNeurons(SynapseGroup synGroup) {
-        List<Synapse> syns = connectOneToOne(synGroup.getSourceNeurons(), synGroup.getTargetNeurons(), useBidirectionalConnections, false);
-        for (Synapse s : syns) {
-            synGroup.addNewSynapse(s);
+    override fun connectNeurons(synGroup: SynapseGroup) {
+        val syns = connectOneToOne(synGroup.sourceNeurons, synGroup.targetNeurons, useBidirectionalConnections, false)
+        for (s in syns) {
+            synGroup.addNewSynapse(s)
         }
     }
 
-    @Override
-    public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-        return connectOneToOne(source, target, useBidirectionalConnections, true);
+    override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+        return connectOneToOne(source, target, useBidirectionalConnections, true)
     }
 
-    /**
-     * @param sourceNeurons               the starting neurons
-     * @param targetNeurons               the targeted neurons
-     * @param useBidirectionalConnections the useBidirectionalConnections to set
-     * @param looseSynapses               whether loose synapses are being connected
-     * @return array of synpases
-     */
-    public static List<Synapse> connectOneToOne(final List<Neuron> sourceNeurons, final List<Neuron> targetNeurons, final boolean useBidirectionalConnections, final boolean looseSynapses) {
+    override fun getName(): String {
+        return "One to one"
+    }
 
-        double srcWidth = OrientationComparator.findMaxX(sourceNeurons) - OrientationComparator.findMinX(sourceNeurons);
-        double srcHeight = OrientationComparator.findMaxY(sourceNeurons) - OrientationComparator.findMinY(sourceNeurons);
-        double tarWidth = OrientationComparator.findMaxX(targetNeurons) - OrientationComparator.findMinX(targetNeurons);
-        double tarHeight = OrientationComparator.findMaxY(targetNeurons) - OrientationComparator.findMinY(targetNeurons);
+    override fun toString(): String {
+        return name
+    }
 
-        // Sort by axis of maximal variance
-        boolean srcSortX = srcWidth > srcHeight;
-        boolean tarSortX = tarWidth > tarHeight;
+    companion object {
+        /**
+         * Default orientation used to make the connections.
+         */
+        var DEFAULT_ORIENTATION = OrientationComparator.X_ORDER
 
-        OrientationComparator srcComparator;
-        OrientationComparator tarComparator;
-
-        // srcSortX XOR tarSortX means that one should be sorted vertically
-        // and the other horizonally.
-        if (srcSortX != tarSortX) {
-            double midpointXSrc = OrientationComparator.findMidpointX(sourceNeurons);
-            double midpointXTar = OrientationComparator.findMidpointX(targetNeurons);
-            double midpointYSrc = OrientationComparator.findMidpointY(sourceNeurons);
-            double midpointYTar = OrientationComparator.findMidpointY(targetNeurons);
-
-            if (srcSortX) { // source is horizontal
-                // Go over source in regular or reverse order based on the
-                // relative positions of the source and target midpoints.
-                srcComparator = midpointXSrc > midpointXTar ? OrientationComparator.X_REVERSE : OrientationComparator.X_ORDER;
-                // Go over target in regular or reverse order based on the
-                // relative positions of the source and target midpoints.
-                tarComparator = midpointYSrc > midpointYTar ? OrientationComparator.Y_ORDER : OrientationComparator.Y_REVERSE;
-            } else {// source is vertical
-                srcComparator = midpointYSrc > midpointYTar ? OrientationComparator.Y_REVERSE : OrientationComparator.Y_ORDER;
-                tarComparator = midpointXSrc > midpointXTar ? OrientationComparator.X_ORDER : OrientationComparator.X_REVERSE;
-            }
-        } else {
-            // Either we are sorting both vertically or both horizontally...
-            srcComparator = srcSortX ? OrientationComparator.X_ORDER : OrientationComparator.Y_ORDER;
-            tarComparator = tarSortX ? OrientationComparator.X_ORDER : OrientationComparator.Y_ORDER;
+        /**
+         * Returns a sorted list of neurons, given a comparator.
+         *
+         * @param neuronList the base list of neurons.
+         * @param comparator the comparator.
+         * @return the sorted list.
+         */
+        private fun getSortedNeuronList(neuronList: List<Neuron>, comparator: OrientationComparator): List<Neuron> {
+            val list = ArrayList<Neuron>()
+            list.addAll(neuronList)
+            Collections.sort(list, comparator)
+            return list
         }
+        /**
+         * @param sourceNeurons               the starting neurons
+         * @param targetNeurons               the targeted neurons
+         * @param useBidirectionalConnections the useBidirectionalConnections to set
+         * @param looseSynapses               whether loose synapses are being connected
+         * @return array of synpases
+         */
+        /**
+         * Use this connection object to make connections.
+         *
+         * @param sourceNeurons the starting neurons
+         * @param targetNeurons the targeted neurons
+         * @return the new synapses
+         */
+        @JvmOverloads
+        fun connectOneToOne(
+            sourceNeurons: List<Neuron>,
+            targetNeurons: List<Neuron>,
+            useBidirectionalConnections: Boolean = false,
+            looseSynapses: Boolean = true
+        ): List<Synapse> {
+            val srcWidth = OrientationComparator.findMaxX(sourceNeurons) - OrientationComparator.findMinX(sourceNeurons)
+            val srcHeight =
+                OrientationComparator.findMaxY(sourceNeurons) - OrientationComparator.findMinY(sourceNeurons)
+            val tarWidth = OrientationComparator.findMaxX(targetNeurons) - OrientationComparator.findMinX(targetNeurons)
+            val tarHeight =
+                OrientationComparator.findMaxY(targetNeurons) - OrientationComparator.findMinY(targetNeurons)
 
-        ArrayList<Synapse> syns = new ArrayList<Synapse>();
+            // Sort by axis of maximal variance
+            val srcSortX = srcWidth > srcHeight
+            val tarSortX = tarWidth > tarHeight
+            val srcComparator: OrientationComparator
+            val tarComparator: OrientationComparator
 
-        Iterator<Neuron> targets = getSortedNeuronList(targetNeurons, tarComparator).iterator();
-
-        for (Iterator<Neuron> sources = getSortedNeuronList(sourceNeurons, srcComparator).iterator(); sources.hasNext(); ) {
-            Neuron source = sources.next();
-            if (targets.hasNext()) {
-                Neuron target = targets.next();
-                Synapse synapse = new Synapse(source, target);
-                if (looseSynapses) {
-                    source.getNetwork().addNetworkModel(synapse);
-                }
-                syns.add(synapse);
-                // Allow neurons to be connected back to source.
-                if (useBidirectionalConnections) {
-                    Synapse espanys = new Synapse(target, source);
-                    if (looseSynapses) {
-                        source.getNetwork().addNetworkModel(espanys);
-                    }
-                    syns.add(espanys);
+            // srcSortX XOR tarSortX means that one should be sorted vertically
+            // and the other horizonally.
+            if (srcSortX != tarSortX) {
+                val midpointXSrc = OrientationComparator.findMidpointX(sourceNeurons)
+                val midpointXTar = OrientationComparator.findMidpointX(targetNeurons)
+                val midpointYSrc = OrientationComparator.findMidpointY(sourceNeurons)
+                val midpointYTar = OrientationComparator.findMidpointY(targetNeurons)
+                if (srcSortX) { // source is horizontal
+                    // Go over source in regular or reverse order based on the
+                    // relative positions of the source and target midpoints.
+                    srcComparator =
+                        if (midpointXSrc > midpointXTar) OrientationComparator.X_REVERSE else OrientationComparator.X_ORDER
+                    // Go over target in regular or reverse order based on the
+                    // relative positions of the source and target midpoints.
+                    tarComparator =
+                        if (midpointYSrc > midpointYTar) OrientationComparator.Y_ORDER else OrientationComparator.Y_REVERSE
+                } else { // source is vertical
+                    srcComparator =
+                        if (midpointYSrc > midpointYTar) OrientationComparator.Y_REVERSE else OrientationComparator.Y_ORDER
+                    tarComparator =
+                        if (midpointXSrc > midpointXTar) OrientationComparator.X_ORDER else OrientationComparator.X_REVERSE
                 }
             } else {
-                break;
+                // Either we are sorting both vertically or both horizontally...
+                srcComparator = if (srcSortX) OrientationComparator.X_ORDER else OrientationComparator.Y_ORDER
+                tarComparator = if (tarSortX) OrientationComparator.X_ORDER else OrientationComparator.Y_ORDER
             }
+            val syns = ArrayList<Synapse>()
+            val targets = getSortedNeuronList(targetNeurons, tarComparator).iterator()
+            val sources = getSortedNeuronList(sourceNeurons, srcComparator).iterator()
+            while (sources.hasNext()) {
+                val source = sources.next()
+                if (targets.hasNext()) {
+                    val target = targets.next()
+                    val synapse = Synapse(source, target)
+                    if (looseSynapses) {
+                        source.network.addNetworkModel(synapse)
+                    }
+                    syns.add(synapse)
+                    // Allow neurons to be connected back to source.
+                    if (useBidirectionalConnections) {
+                        val espanys = Synapse(target, source)
+                        if (looseSynapses) {
+                            source.network.addNetworkModel(espanys)
+                        }
+                        syns.add(espanys)
+                    }
+                } else {
+                    break
+                }
+            }
+            return syns
         }
-        return syns;
-
     }
-
-    @Override
-    public String getName() {
-        return "One to one";
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
-
 }

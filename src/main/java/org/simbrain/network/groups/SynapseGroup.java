@@ -14,7 +14,6 @@ package org.simbrain.network.groups;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.*;
 import org.simbrain.network.events.SynapseGroupEvents;
@@ -31,6 +30,8 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
 
 import java.util.*;
+
+import static org.simbrain.network.connections.ConnectionUtilitiesKt.*;
 
 /**
  * A group of synapses. Must connect a source and target neuron group.
@@ -470,7 +471,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         if (exciteRand != null) {
             synapse.setStrength(exciteRand.getRandom());
         } else {
-            synapse.setStrength(ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
+            synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
         }
         // TODO
         // synapse.setLearningRule(excitatoryPrototype.getLearningRule().deepCopy());
@@ -495,7 +496,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         if (inhibRand != null) {
             synapse.setStrength(inhibRand.getRandom());
         } else {
-            synapse.setStrength(ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
+            synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
         }
         // TODO
         // synapse.setLearningRule(inhibitoryPrototype.getLearningRule().deepCopy());
@@ -549,7 +550,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
                     if (inhibRand != null) {
                         s.setStrength(inhibRand.getRandom());
                     } else {
-                        s.setStrength(ConnectionUtilities.DEFAULT_INHIBITORY_STRENGTH);
+                        s.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                     }
                     // TODO
                     // s.setLearningRule(inhibitoryPrototype.getLearningRule().deepCopy());
@@ -574,7 +575,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
                     if (exciteRand != null) {
                         s.setStrength(exciteRand.getRandom());
                     } else {
-                        s.setStrength(ConnectionUtilities.DEFAULT_EXCITATORY_STRENGTH);
+                        s.setStrength(DEFAULT_EXCITATORY_STRENGTH);
                     }
                     // TODO
                     // s.setLearningRule(excitatoryPrototype.getLearningRule().deepCopy());
@@ -688,7 +689,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * #revalidateSynapseSets()} first.
      */
     public void randomizeExcitatoryConnections() {
-        ConnectionUtilities.randomizeExcitatorySynapsesUnsafe(exSynapseSet, exciteRand);
+        randomizeExcitatorySynapsesUnsafe(exSynapseSet, exciteRand);
     }
 
     /**
@@ -699,7 +700,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * #revalidateSynapseSets()} first.
      */
     public void randomizeInhibitoryConnections() {
-        ConnectionUtilities.randomizeInhibitorySynapsesUnsafe(inSynapseSet, inhibRand);
+        randomizeInhibitorySynapsesUnsafe(inSynapseSet, inhibRand);
     }
 
     /**

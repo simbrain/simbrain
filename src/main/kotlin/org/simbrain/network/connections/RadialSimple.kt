@@ -185,6 +185,12 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
     )
     var inhCons = 5
 
+    /**
+     * Radial simple sets the polarity implicitly.
+     */
+    override val overridesPolarity: Boolean
+        get() = true
+
     // TODO: Keep?
     /**
      * Reference to network in which radial connections will be made on loose
@@ -233,7 +239,7 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
 
     }
 
-    override fun connectNeurons(synGroup: SynapseGroup?) {
+    override fun connectNeurons(synGroup: SynapseGroup) {
 
         // No implementation yet.
         val target = synGroup!!.targetNeurons

@@ -16,47 +16,44 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.connections;
+package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.Utils;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
+import org.simbrain.util.SimbrainPreferences
+import org.simbrain.util.Utils
 
 /**
  * Manage quick connection preferences, where a connection is applied using key
  * commands. A repository of connection objects whose settings can be
  * changed.
- * <p>
+ *
  * Not thread-safe. This class is used by gui methods, and is not intended to be
  * used in settings where concurrent threads are simultaneously building network
  * objects.
  *
  * @author Jeff Yoshimi
  */
-public class QuickConnectionManager {
+class QuickConnectionManager {
 
     /**
      * The current connection object.
      */
-    private ConnectionStrategy currentConnector;
+    private var currentConnector: ConnectionStrategy? = null
 
     /**
      * Construct the quick connection manager.
      */
-    public QuickConnectionManager() {
+    init {
 
         // Set the current connection strategy based on user preferences
-        String xml = SimbrainPreferences.getString("quickConnector");
-        if (xml == null || xml.isEmpty() || !xml.startsWith("<org")) {
+        val xml: String? = SimbrainPreferences.getString("quickConnector")
+        if ((xml == null) || xml.isEmpty() || !xml.startsWith("<org")) {
             // If no viable preferences found, default to All to All
-            currentConnector = new AllToAll();
+            currentConnector = AllToAll()
         } else {
-            currentConnector = (ConnectionStrategy) Utils.getSimbrainXStream().fromXML(xml);
+            currentConnector = Utils.getSimbrainXStream().fromXML(xml) as ConnectionStrategy?
         }
     }
 
@@ -68,26 +65,24 @@ public class QuickConnectionManager {
      * @param source source neurons
      * @param target target neurons
      */
-    public void applyCurrentConnection(Network net, List<Neuron> source, List<Neuron> target) {
-        List<Synapse> retList = currentConnector.connectNeurons(net, source, target);
-        if (retList != null) {
-            ConnectionUtilities.polarizeSynapses(retList, currentConnector.getExcitatoryRatio());
-            if (currentConnector.isUseExcitatoryRandomization()) {
-                ConnectionUtilities.randomizeExcitatorySynapses(retList, currentConnector.getExRandomizer());
-            }
-            if (currentConnector.isUseInhibitoryRandomization()) {
-                ConnectionUtilities.randomizeInhibitorySynapses(retList, currentConnector.getInRandomizer());
-            }
+    fun applyCurrentConnection(net: Network, source: List<Neuron>, target: List<Neuron>) {
+        val retList: List<Synapse> = currentConnector!!.connectNeurons(net, source, target)
+        polarizeSynapses(retList, currentConnector!!.excitatoryRatio)
+        if (currentConnector!!.isUseExcitatoryRandomization) {
+            randomizeExcitatorySynapses(retList, currentConnector!!.exRandomizer)
+        }
+        if (currentConnector!!.isUseInhibitoryRandomization) {
+            randomizeInhibitorySynapses(retList, currentConnector!!.inRandomizer)
         }
     }
 
-    public ConnectionStrategy getCurrentConnector() {
-        return currentConnector;
+    fun getCurrentConnector(): ConnectionStrategy? {
+        return currentConnector
     }
 
-    public void setCurrentConnector(ConnectionStrategy currentConnector) {
+    fun setCurrentConnector(currentConnector: ConnectionStrategy?) {
         // Store the preferences using xml
-        SimbrainPreferences.putString("quickConnector", Utils.getSimbrainXStream().toXML(currentConnector));
-        this.currentConnector = currentConnector;
+        SimbrainPreferences.putString("quickConnector", Utils.getSimbrainXStream().toXML(currentConnector))
+        this.currentConnector = currentConnector
     }
 }

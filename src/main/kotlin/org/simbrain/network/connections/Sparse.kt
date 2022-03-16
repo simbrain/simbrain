@@ -15,21 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.connections;
+package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkKt;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor.EditableObject;
-import umontreal.ssj.randvar.BinomialGen;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.getLooseSynapse
+import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.propertyeditor.EditableObject
+import umontreal.ssj.randvar.BinomialGen
+import java.util.*
 
 /**
  * A superclass for all connectors whose primary parameter is related to base
@@ -38,24 +34,7 @@ import java.util.Random;
  *
  * @author Zoë Tosi
  */
-public class Sparse extends ConnectionStrategy implements EditableObject {
-
-    /**
-     * The default preference as to whether or not self connections are allowed.
-     */
-    public static boolean DEFAULT_SELF_CONNECT_PREF;
-
-    /**
-     * Sets the default behavior concerning whether or not the number of
-     * efferents of each source neurons should be equalized.
-     */
-    public static boolean DEFAULT_FF_PREF;
-
-    /**
-     * The default sparsity (between 0 and 1).
-     */
-    public static double DEFAULT_CONNECTION_DENSITY = 0.1;
-
+class Sparse() : ConnectionStrategy(), EditableObject {
     /**
      * Whether or not each source neuron is given an equal number of efferent
      * synapses. If true, every source neuron will have exactly the same number
@@ -69,13 +48,13 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * 50% (more exact the more neurons/synapses there are). However the number
      * of targets any given source neuron connects to is by no means guaranteed.
      */
-    private boolean equalizeEfferents = DEFAULT_FF_PREF;
+    var isEqualizeEfferents = DEFAULT_FF_PREF
 
     /**
      * A tag for whether or not this sparse connector supports density editing
      * (changing the number of connections after construction).
      */
-    private boolean permitDensityEditing = true;
+    var isPermitDensityEditing = true
 
     /**
      * A map of permutations governing in what order connections to target
@@ -83,54 +62,58 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * neuron. Maps which index of target neuron will be the next to be given a
      * connection, or in what order connections are removed for each source
      * neuron if density is lowered.
-     * <br>
+     * <br></br>
      * This is the thing that allows permitDensityEditing.  This is what makes it
      * expensive.
      */
-    private transient int[][] sparseOrdering;
+    @Transient
+    private var sparseOrdering: Array<IntArray>? = null
 
     /**
      * If efferent synapses are not equalized among source neurons, this array
      * contains the number of possible target neurons a given source neuron is
      * connected to.
      */
-    private transient int[] currentOrderingIndices;
+    @Transient
+    private lateinit var currentOrderingIndices: IntArray
 
     /**
      * The source neurons.
      */
-    private transient Neuron[] sourceNeurons;
+    @Transient
+    private lateinit var sourceNeurons: Array<Neuron>
 
     /**
      * The target neurons.
      */
-    private transient Neuron[] targetNeurons;
-
+    @Transient
+    private lateinit var targetNeurons: Array<Neuron>
+    /**
+     * @return the synapse group tied to this sparse object.
+     */
     /**
      * The synapse group associated with this connection object.
      */
-    private SynapseGroup synapseGroup;
+    var synapseGroup: SynapseGroup? = null
+        private set
 
     /**
      * Generally speaking the connectionDensity parameter represents a
      * probability reflecting how many possible connections between a given
      * source neuron and all available target neurons will actually be made.
      */
-    protected double connectionDensity;
+    var connectionDensity = .8 // TODO
+        set(value) {
+            field = value
+        }
 
     /**
      * Whether or not connections where the source and target are the same
      * neuron are allowed. Only applicable if the source and target neuron sets
      * are the same.
      */
-    protected boolean selfConnectionAllowed = DEFAULT_SELF_CONNECT_PREF;
+    protected var selfConnectionAllowed = false
 
-    /**
-     * Default constructor.
-     */
-    public Sparse() {
-        this.connectionDensity = DEFAULT_CONNECTION_DENSITY;
-    }
 
     /**
      * Construct a sparse object from main arguments. Used in scripts.
@@ -139,10 +122,10 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * @param equalizeEfferents     whether to equalize efferents
      * @param selfConnectionAllowed whether self-connections should be allowed.
      */
-    public Sparse(double sparsity, boolean equalizeEfferents, boolean selfConnectionAllowed) {
-        this.connectionDensity = sparsity;
-        this.equalizeEfferents = equalizeEfferents;
-        this.selfConnectionAllowed = selfConnectionAllowed;
+    constructor(sparsity: Double, equalizeEfferents: Boolean, selfConnectionAllowed: Boolean) : this() {
+        connectionDensity = sparsity
+        isEqualizeEfferents = equalizeEfferents
+        this.selfConnectionAllowed = selfConnectionAllowed
     }
 
     /**
@@ -153,135 +136,49 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * @param targetNeurons the target neurons
      * @return the newly creates synapses connecting source to target
      */
-    public List<Synapse> connect(List<Neuron> sourceNeurons, List<Neuron> targetNeurons) {
-        return connectSparse(sourceNeurons, targetNeurons, connectionDensity, selfConnectionAllowed, equalizeEfferents, true);
-    }
-
-    /**
-     * Connects two lists of neurons with synapses assigning connections between
-     * source and target neurons randomly in such a way that results in
-     * "sparsity" percentage of possible connections being created.
-     *
-     * @param sourceNeurons         source neurons
-     * @param targetNeurons         target neurons
-     * @param sparsity              sparsity of connection
-     * @param selfConnectionAllowed whether to allow self-connections
-     * @param equalizeEfferents     whether or not the number of efferents of each
-     *                              source neurons should be equalized.
-     * @param looseSynapses         are these loose synapses
-     * @return the new synapses
-     */
-    public static List<Synapse> connectSparse(List<Neuron> sourceNeurons, List<Neuron> targetNeurons, double sparsity, boolean selfConnectionAllowed, boolean equalizeEfferents, boolean looseSynapses) {
-        boolean recurrent = ConnectionUtilities.testRecurrence(sourceNeurons, targetNeurons);
-        Neuron source;
-        Neuron target;
-        Synapse synapse;
-        ArrayList<Synapse> syns = new ArrayList<Synapse>();
-        Random rand = new Random(System.nanoTime());
-        if (equalizeEfferents) {
-            ArrayList<Integer> targetList = new ArrayList<Integer>();
-            ArrayList<Integer> tListCopy;
-            for (int i = 0; i < targetNeurons.size(); i++) {
-                targetList.add(i);
-            }
-            int numSyns;
-            if (!selfConnectionAllowed && sourceNeurons == targetNeurons) {
-                numSyns = (int) (sparsity * sourceNeurons.size() * (targetNeurons.size() - 1));
-            } else {
-                numSyns = (int) (sparsity * sourceNeurons.size() * targetNeurons.size());
-            }
-            int synsPerSource = numSyns / sourceNeurons.size();
-            int targStart = 0;
-            int targEnd = synsPerSource;
-            if (synsPerSource > numSyns / 2) {
-                synsPerSource = numSyns - synsPerSource;
-                targStart = synsPerSource;
-                targEnd = targetList.size();
-            }
-
-            for (int i = 0; i < sourceNeurons.size(); i++) {
-                source = sourceNeurons.get(i);
-                if (!selfConnectionAllowed && recurrent) {
-                    tListCopy = new ArrayList<Integer>();
-                    for (int k = 0; k < targetList.size(); k++) {
-                        if (k == i) { // Exclude oneself as a possible target
-                            continue;
-                        }
-                        tListCopy.add(targetList.get(k));
-                    }
-                    randShuffleK(tListCopy, synsPerSource, rand);
-                } else {
-                    randShuffleK(targetList, synsPerSource, rand);
-                    tListCopy = targetList;
-                }
-
-                for (int j = targStart; j < targEnd; j++) {
-                    target = targetNeurons.get(tListCopy.get(j));
-                    synapse = new Synapse(source, target);
-                    if (looseSynapses) {
-                        source.getNetwork().addNetworkModel(synapse);
-                    }
-                    syns.add(synapse);
-                }
-            }
-        } else {
-            for (int i = 0; i < sourceNeurons.size(); i++) {
-                for (int j = 0; j < targetNeurons.size(); j++) {
-                    if (!selfConnectionAllowed && recurrent && i == j) {
-                        continue;
-                    } else {
-                        if (Math.random() < sparsity) {
-                            source = sourceNeurons.get(i);
-                            target = targetNeurons.get(j);
-                            synapse = new Synapse(source, target);
-                            if (looseSynapses) {
-                                source.getNetwork().addNetworkModel(synapse);
-                            }
-                            syns.add(synapse);
-                        }
-                    }
-                }
-
-            }
-        }
-        return syns;
-
+    fun connect(sourceNeurons: List<Neuron>, targetNeurons: List<Neuron>): List<Synapse> {
+        return connectSparse(
+            sourceNeurons,
+            targetNeurons,
+            connectionDensity,
+            selfConnectionAllowed,
+            isEqualizeEfferents,
+            true
+        )
     }
 
     /**
      * Should only be called for initialization.
      *
      * @param synapseGroup The synapse group that the connections this class
-     *                     will generate will be added to.
+     * will generate will be added to.
      */
-    public void connectNeurons(SynapseGroup synapseGroup) {
-        this.synapseGroup = synapseGroup;
-        boolean recurrent = synapseGroup.isRecurrent();
-        int numSrc = synapseGroup.getSourceNeurons().size();
-        int numTar = synapseGroup.getTargetNeurons().size();
-        setPermitDensityEditing(numSrc * numTar < 10E8);
-        sourceNeurons = synapseGroup.getSourceNeurons().toArray(new Neuron[numSrc]);
-        targetNeurons = recurrent ? sourceNeurons : synapseGroup.getTargetNeurons().toArray(new Neuron[numTar]);
+    override fun connectNeurons(synapseGroup: SynapseGroup) {
+        this.synapseGroup = synapseGroup
+        val recurrent = synapseGroup.isRecurrent
+        val numSrc = synapseGroup.sourceNeurons.size
+        val numTar = synapseGroup.targetNeurons.size
+        isPermitDensityEditing = numSrc * numTar < 10E8
+        sourceNeurons = synapseGroup.sourceNeurons.toTypedArray()
+        targetNeurons = if (recurrent) sourceNeurons else synapseGroup.targetNeurons.toTypedArray()
         // Are you initializing with the intention of editing later on?
-        if (isPermitDensityEditing()) {
-            generateSparseOrdering(recurrent);
-            if (equalizeEfferents) {
-                connectEqualized(synapseGroup);
+        if (isPermitDensityEditing) {
+            generateSparseOrdering(recurrent)
+            if (isEqualizeEfferents) {
+                connectEqualized(synapseGroup)
             } else {
-                connectRandom(synapseGroup);
+                connectRandom(synapseGroup)
             }
         } else {
-            List<Synapse> syns = this.connect(synapseGroup.getSourceNeurons(), synapseGroup.getTargetNeurons());
-            for (Synapse s : syns) {
-                synapseGroup.addNewSynapse(s);
+            val syns = connect(synapseGroup.sourceNeurons, synapseGroup.targetNeurons)
+            for (s in syns) {
+                synapseGroup.addNewSynapse(s)
             }
         }
-
     }
 
-    @Override
-    public List<Synapse> connectNeurons(Network network, List<Neuron> source, List<Neuron> target) {
-        return connect(source, target);
+    override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+        return connect(source, target)
     }
 
     /**
@@ -295,26 +192,29 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      *
      * @param synapseGroup
      */
-    private void connectEqualized(SynapseGroup synapseGroup) {
-        currentOrderingIndices = new int[sourceNeurons.length];
-        int numConnectsPerSrc;
-        int expectedNumSyns;
-        if (synapseGroup.isRecurrent() && !selfConnectionAllowed) {
-            numConnectsPerSrc = (int) (connectionDensity * (sourceNeurons.length - 1));
+    private fun connectEqualized(synapseGroup: SynapseGroup) {
+        currentOrderingIndices = IntArray(sourceNeurons.size)
+        val numConnectsPerSrc: Int
+        val expectedNumSyns: Int
+        numConnectsPerSrc = if (synapseGroup.isRecurrent && !selfConnectionAllowed) {
+            (connectionDensity * (sourceNeurons.size - 1)).toInt()
         } else {
-            numConnectsPerSrc = (int) (connectionDensity * targetNeurons.length);
+            (connectionDensity * targetNeurons.size).toInt()
         }
-        expectedNumSyns = numConnectsPerSrc * sourceNeurons.length;
-        synapseGroup.preAllocateSynapses(expectedNumSyns);
-        for (int i = 0, n = sourceNeurons.length; i < n; i++) {
-            currentOrderingIndices[i] = numConnectsPerSrc;
-            Neuron src = sourceNeurons[i];
-            Neuron tar;
-            for (int j = 0; j < numConnectsPerSrc; j++) {
-                tar = targetNeurons[sparseOrdering[i][j]];
-                Synapse s = new Synapse(src, tar);
-                synapseGroup.addNewSynapse(s);
+        expectedNumSyns = numConnectsPerSrc * sourceNeurons.size
+        synapseGroup.preAllocateSynapses(expectedNumSyns)
+        var i = 0
+        val n = sourceNeurons.size
+        while (i < n) {
+            currentOrderingIndices[i] = numConnectsPerSrc
+            val src = sourceNeurons[i]
+            var tar: Neuron
+            for (j in 0 until numConnectsPerSrc) {
+                tar = targetNeurons[sparseOrdering!![i][j]]
+                val s = Synapse(src, tar)
+                synapseGroup.addNewSynapse(s)
             }
+            i++
         }
     }
 
@@ -325,161 +225,173 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * strength. The number of efferent synapses assigned to each source neuron
      * is drawn from a binomial distribution with a mean of
      * NumberOfTargetNeurons * sparsity
-     * <br>
-     * Assumes {@link #permitDensityEditing} is true.  Uses machinery for that.
+     * <br></br>
+     * Assumes [.permitDensityEditing] is true.  Uses machinery for that.
      * This is for _initialization_ (of a connection that will allow permitdensity
      * editing), not re-editing.
      *
      *
      * @param synapseGroup
      */
-    private void connectRandom(SynapseGroup synapseGroup) {
-        currentOrderingIndices = new int[sourceNeurons.length];
-        int numTars = synapseGroup.isRecurrent() && !selfConnectionAllowed ? (sourceNeurons.length - 1) : targetNeurons.length;
-        synapseGroup.clear(); // TODO: Zoe? Make
-        synapseGroup.preAllocateSynapses((int) (sourceNeurons.length * numTars * connectionDensity));
-        for (int i = 0, n = sourceNeurons.length; i < n; i++) {
-            currentOrderingIndices[i] = BinomialGen.nextInt(SimbrainMath.DEFAULT_RANDOM_STREAM, numTars, connectionDensity);
-            Neuron src = sourceNeurons[i];
-            Neuron tar;
-            int tarLen = targetNeurons.length - 1;
-            int[] o = null;
-            if (sourceNeurons == targetNeurons && !selfConnectionAllowed) {
-                o = SimbrainMath.randPermuteWithExclusion(0, tarLen + 1, i);
+    private fun connectRandom(synapseGroup: SynapseGroup) {
+        currentOrderingIndices = IntArray(sourceNeurons.size)
+        val numTars =
+            if (synapseGroup.isRecurrent && !selfConnectionAllowed) sourceNeurons.size - 1 else targetNeurons.size
+        synapseGroup.clear() // TODO: Zoe? Make
+        synapseGroup.preAllocateSynapses((sourceNeurons.size * numTars * connectionDensity).toInt())
+        var i = 0
+        val n = sourceNeurons.size
+        while (i < n) {
+            currentOrderingIndices[i] =
+                BinomialGen.nextInt(SimbrainMath.DEFAULT_RANDOM_STREAM, numTars, connectionDensity)
+            val src = sourceNeurons[i]
+            var tar: Neuron
+            val tarLen = targetNeurons.size - 1
+            var o: IntArray? = null
+            o = if (sourceNeurons == targetNeurons && !selfConnectionAllowed) {
+                SimbrainMath.randPermuteWithExclusion(0, tarLen + 1, i)
             } else {
-                o = SimbrainMath.randPermute(0, tarLen + 1);
+                SimbrainMath.randPermute(0, tarLen + 1)
             }
-            for (int j = 0; j < currentOrderingIndices[i]; j++) {
-                tar = targetNeurons[o[j]];
-                Synapse s = new Synapse(src, tar);
-                synapseGroup.addNewSynapse(s);
+            for (j in 0 until currentOrderingIndices[i]) {
+                tar = targetNeurons[o[j]]
+                val s = Synapse(src, tar)
+                synapseGroup.addNewSynapse(s)
             }
+            i++
         }
-
     }
 
     /**
      * @param recurrent
      */
-    private void generateSparseOrdering(boolean recurrent) {
-        int srcLen = sourceNeurons.length;
+    private fun generateSparseOrdering(recurrent: Boolean) {
+        val srcLen = sourceNeurons.size
         if (recurrent && !selfConnectionAllowed) {
-            int tarLen = targetNeurons.length - 1;
-            sparseOrdering = new int[sourceNeurons.length][tarLen];
-            for (int i = 0; i < srcLen; i++) {
-                sparseOrdering[i] = SimbrainMath.randPermuteWithExclusion(0, tarLen + 1, i);
+            val tarLen = targetNeurons.size - 1
+            sparseOrdering = Array(sourceNeurons.size) { IntArray(tarLen) }
+            for (i in 0 until srcLen) {
+                sparseOrdering!![i] = SimbrainMath.randPermuteWithExclusion(0, tarLen + 1, i)
             }
         } else {
-            int tarLen = targetNeurons.length;
-            sparseOrdering = new int[sourceNeurons.length][tarLen];
-            for (int i = 0; i < srcLen; i++) {
-                sparseOrdering[i] = SimbrainMath.randPermute(0, tarLen);
+            val tarLen = targetNeurons.size
+            sparseOrdering = Array(sourceNeurons.size) { IntArray(tarLen) }
+            for (i in 0 until srcLen) {
+                sparseOrdering!![i] = SimbrainMath.randPermute(0, tarLen)
             }
-        }
-    }
-
-    /**
-     * Randomly shuffles k integers in a list. The first k elements are randomly
-     * swapped with other elements in the list. This method will alter the list
-     * passed to it, so situations where this would be undesirable should pass
-     * this method a copy.
-     *
-     * @param inds a list of integers. This methods WILL shuffle inds, so pass a
-     *             copy unless inds being shuffled is not a problem.
-     * @param k    how many elements will be shuffled
-     * @param rand a random number generator
-     */
-    public static void randShuffleK(ArrayList<Integer> inds, int k, Random rand) {
-        for (int i = 0; i < k; i++) {
-            Collections.swap(inds, i, rand.nextInt(inds.size()));
         }
     }
 
     /**
      * @param newSparsity new sparsity connection
      */
-    public void removeToSparsity(double newSparsity) {
-        if (newSparsity >= connectionDensity) {
-            throw new IllegalArgumentException("Cannot 'removeToSparsity' to" + " a higher connectivity density.");
-        }
-        Network net = sourceNeurons[0].getNetwork();
-        int removeTotal = (synapseGroup.size() - (int) (newSparsity * getMaxPossibleConnections()));
-        if (equalizeEfferents) {
-            int curNumConPerSource = synapseGroup.size() / sourceNeurons.length;
-            int removePerSource = removeTotal / sourceNeurons.length;
-            int finalNumConPerSource = curNumConPerSource - removePerSource;
-            for (int i = 0, n = sourceNeurons.length; i < n; i++) {
-                for (int j = curNumConPerSource - 1; j >= finalNumConPerSource; j--) {
-                    NetworkKt.getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]).delete();
+    fun removeToSparsity(newSparsity: Double) {
+        require(newSparsity < connectionDensity) { "Cannot 'removeToSparsity' to" + " a higher connectivity density." }
+        val net = sourceNeurons[0].network
+        val removeTotal = synapseGroup!!.size() - (newSparsity * maxPossibleConnections).toInt()
+        if (isEqualizeEfferents) {
+            val curNumConPerSource = synapseGroup!!.size() / sourceNeurons.size
+            val removePerSource = removeTotal / sourceNeurons.size
+            val finalNumConPerSource = curNumConPerSource - removePerSource
+            var i = 0
+            val n = sourceNeurons.size
+            while (i < n) {
+                for (j in curNumConPerSource - 1 downTo finalNumConPerSource) {
+                    getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering!![i][j]])!!.delete()
                 }
-                currentOrderingIndices[i] = finalNumConPerSource;
+                currentOrderingIndices[i] = finalNumConPerSource
+                i++
             }
         } else {
-            for (int i = 0, n = sourceNeurons.length; i < n; i++) {
-                int numToRemove = BinomialGen.nextInt(SimbrainMath.DEFAULT_RANDOM_STREAM, synapseGroup.getTargetNeuronGroup().size(), newSparsity);
+            var i = 0
+            val n = sourceNeurons.size
+            while (i < n) {
+                val numToRemove = BinomialGen.nextInt(
+                    SimbrainMath.DEFAULT_RANDOM_STREAM,
+                    synapseGroup!!.targetNeuronGroup.size(),
+                    newSparsity
+                )
                 if (numToRemove < currentOrderingIndices[i]) {
-                    List<Synapse> remove = decreaseDensity(i, numToRemove);
-                    for (Synapse s : remove) {
-                        synapseGroup.removeSynapse(s);
+                    val remove = decreaseDensity(i, numToRemove)
+                    for (s in remove) {
+                        synapseGroup!!.removeSynapse(s)
                     }
                 } else {
-                    List<Synapse> add = increaseDensity(i, numToRemove);
-                    for (Synapse s : add) {
-                        synapseGroup.addNewSynapse(s);
+                    val add = increaseDensity(i, numToRemove)
+                    for (s in add) {
+                        synapseGroup!!.addNewSynapse(s)
                     }
                 }
-                currentOrderingIndices[i] = numToRemove;
+                currentOrderingIndices[i] = numToRemove
+                i++
             }
         }
-        this.connectionDensity = newSparsity;
+        connectionDensity = newSparsity
     }
 
     /**
      * @param newSparsity new sparsity connection
      */
-    public void addToSparsity(double newSparsity) {
-        if (newSparsity <= connectionDensity) {
-            throw new IllegalArgumentException("Cannot 'addToSparsity' to" + " a lower connectivity density.");
-        }
-        int addTotal = ((int) (newSparsity * getMaxPossibleConnections()) - synapseGroup.size());
-        List<Synapse> addList = new ArrayList<Synapse>(addTotal);
-        if (equalizeEfferents) {
-            int curNumConPerSource = synapseGroup.size() / sourceNeurons.length;
-            int addPerSource = addTotal / sourceNeurons.length;
-            int finalNumConPerSource = curNumConPerSource + addPerSource;
-            if (finalNumConPerSource > sparseOrdering[0].length) {
-                finalNumConPerSource = sparseOrdering[0].length;
+    fun addToSparsity(newSparsity: Double) {
+        require(newSparsity > connectionDensity) { "Cannot 'addToSparsity' to" + " a lower connectivity density." }
+        val addTotal = (newSparsity * maxPossibleConnections).toInt() - synapseGroup!!.size()
+        val addList: MutableList<Synapse> = ArrayList(addTotal)
+        if (isEqualizeEfferents) {
+            val curNumConPerSource = synapseGroup!!.size() / sourceNeurons.size
+            val addPerSource = addTotal / sourceNeurons.size
+            var finalNumConPerSource = curNumConPerSource + addPerSource
+            if (finalNumConPerSource > sparseOrdering!![0].size) {
+                finalNumConPerSource = sparseOrdering!![0].size
             }
-            for (int i = 0, n = sourceNeurons.length; i < n; i++) {
-                for (int j = curNumConPerSource; j < finalNumConPerSource; j++) {
-                    Synapse toAdd = new Synapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]);
-                    addList.add(toAdd);
+            var i = 0
+            val n = sourceNeurons.size
+            while (i < n) {
+                for (j in curNumConPerSource until finalNumConPerSource) {
+                    val toAdd = Synapse(sourceNeurons[i], targetNeurons[sparseOrdering!![i][j]])
+                    addList.add(toAdd)
                 }
-                currentOrderingIndices[i] = finalNumConPerSource;
+                currentOrderingIndices[i] = finalNumConPerSource
+                i++
             }
         } else {
-            for (int i = 0, n = sourceNeurons.length; i < n; i++) {
-                int numToAdd = BinomialGen.nextInt(SimbrainMath.DEFAULT_RANDOM_STREAM, synapseGroup.getTargetNeuronGroup().size(), newSparsity);
-                int finalNumConPerSource = numToAdd >= currentOrderingIndices[i] ? numToAdd : currentOrderingIndices[i];
-                if (finalNumConPerSource > sparseOrdering[i].length) {
-                    finalNumConPerSource = sparseOrdering[i].length;
+            var i = 0
+            val n = sourceNeurons.size
+            while (i < n) {
+                val numToAdd = BinomialGen.nextInt(
+                    SimbrainMath.DEFAULT_RANDOM_STREAM,
+                    synapseGroup!!.targetNeuronGroup.size(),
+                    newSparsity
+                )
+                var finalNumConPerSource =
+                    if (numToAdd >= currentOrderingIndices[i]) numToAdd else currentOrderingIndices[i]
+                if (finalNumConPerSource > sparseOrdering!![i].size) {
+                    finalNumConPerSource = sparseOrdering!![i].size
                 }
                 if (finalNumConPerSource >= currentOrderingIndices[i]) {
-                    addList.addAll(increaseDensity(i, finalNumConPerSource));
+                    addList.addAll(increaseDensity(i, finalNumConPerSource))
                 } else {
-                    List<Synapse> remove = decreaseDensity(i, finalNumConPerSource);
-                    for (Synapse s : remove) {
-                        synapseGroup.removeSynapse(s);
+                    val remove = decreaseDensity(i, finalNumConPerSource)
+                    for (s in remove) {
+                        synapseGroup!!.removeSynapse(s)
                     }
-
                 }
-                currentOrderingIndices[i] = finalNumConPerSource;
+                currentOrderingIndices[i] = finalNumConPerSource
+                i++
             }
         }
-        for (Synapse s : addList) {
-            synapseGroup.addNewSynapse(s);
+        for (s in addList) {
+            synapseGroup!!.addNewSynapse(s)
         }
-        this.connectionDensity = newSparsity;
+        connectionDensity = newSparsity
+    }
+
+    private fun increaseDensity(i: Int, finalNumConnections: Int): List<Synapse> {
+        val added: MutableList<Synapse> = ArrayList(finalNumConnections - currentOrderingIndices[i])
+        for (j in currentOrderingIndices[i] until finalNumConnections) {
+            val toAdd = Synapse(sourceNeurons[i], targetNeurons[sparseOrdering!![i][j]])
+            added.add(toAdd)
+        }
+        return added
     }
 
     /**
@@ -487,134 +399,217 @@ public class Sparse extends ConnectionStrategy implements EditableObject {
      * @param finalNumConnections
      * @return
      */
-    private List<Synapse> increaseDensity(int i, int finalNumConnections) {
-        List<Synapse> added = new ArrayList<Synapse>(finalNumConnections - currentOrderingIndices[i]);
-        for (int j = currentOrderingIndices[i]; j < finalNumConnections; j++) {
-            Synapse toAdd = new Synapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]);
-            added.add(toAdd);
+    private fun decreaseDensity(i: Int, finalNumConnections: Int): List<Synapse?> {
+        val removed: MutableList<Synapse?> = ArrayList(currentOrderingIndices[i] - finalNumConnections)
+        for (j in currentOrderingIndices[i] - 1 downTo finalNumConnections) {
+            val toRemove = getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering!![i][j]])
+            removed.add(toRemove)
         }
-        return added;
+        return removed
     }
 
-    /**
-     * @param i
-     * @param finalNumConnections
-     * @return
-     */
-    private List<Synapse> decreaseDensity(int i, int finalNumConnections) {
-        List<Synapse> removed = new ArrayList<Synapse>(currentOrderingIndices[i] - finalNumConnections);
-        for (int j = currentOrderingIndices[i] - 1; j >= finalNumConnections; j--) {
-            Synapse toRemove = NetworkKt.getLooseSynapse(sourceNeurons[i], targetNeurons[sparseOrdering[i][j]]);
-            removed.add(toRemove);
-        }
-        return removed;
-    }
-
-    public int getMaxPossibleConnections() {
-        if (selfConnectionAllowed || !synapseGroup.isRecurrent()) {
-            return sourceNeurons.length * targetNeurons.length;
+    val maxPossibleConnections: Int
+        get() = if (selfConnectionAllowed || !synapseGroup!!.isRecurrent) {
+            sourceNeurons.size * targetNeurons.size
         } else {
-            return sourceNeurons.length * (sourceNeurons.length - 1);
+            sourceNeurons.size * (sourceNeurons.size - 1)
         }
-    }
 
-    public boolean isEqualizeEfferents() {
-        return equalizeEfferents;
-    }
-
-    public void setEqualizeEfferents(boolean equalizeEfferents) {
-        this.equalizeEfferents = equalizeEfferents;
-    }
-
-    public boolean isPermitDensityEditing() {
-        return permitDensityEditing;
-    }
-
-    public void setPermitDensityEditing(boolean permitDensityEditing) {
-        this.permitDensityEditing = permitDensityEditing;
-    }
-
-    public double getConnectionDensity() {
-        return connectionDensity;
-    }
-
-    /**
-     * Set how dense the connections are between source and target neurons,
-     * generally speaking the connectionDensity parameter represents a
-     * probability reflecting how many possible connections between a given
-     * source neuron and all available target neurons will actually be made.
-     *
-     * @param connectionDensity
-     */
-    public void setConnectionDensity(final double connectionDensity) {
-        // Don't change connection density if it's not permitted...
-        if (!permitDensityEditing) {
-            return;
-        }
-        if (sparseOrdering == null) {
-            this.connectionDensity = connectionDensity;
-        } else {
-            if (connectionDensity > this.connectionDensity) {
-                addToSparsity(connectionDensity);
-            } else if (connectionDensity < this.connectionDensity) {
-                removeToSparsity(connectionDensity);
-            }
-        }
-    }
+    // TODO
+    // /**
+    //  * Set how dense the connections are between source and target neurons,
+    //  * generally speaking the connectionDensity parameter represents a
+    //  * probability reflecting how many possible connections between a given
+    //  * source neuron and all available target neurons will actually be made.
+    //  *
+    //  * @param connectionDensity
+    //  */
+    // fun setConnectionDensity(connectionDensity: Double) {
+    //     // Don't change connection density if it's not permitted...
+    //     if (!isPermitDensityEditing) {
+    //         return
+    //     }
+    //     if (sparseOrdering == null) {
+    //         this.connectionDensity = connectionDensity
+    //     } else {
+    //         if (connectionDensity > this.connectionDensity) {
+    //             addToSparsity(connectionDensity)
+    //         } else if (connectionDensity < this.connectionDensity) {
+    //             removeToSparsity(connectionDensity)
+    //         }
+    //     }
+    // }
 
     /**
      * @return whether or not self connections (connections where the source and
      * target neuron are the same neuron) are allowed.
      */
-    public boolean isSelfConnectionAllowed() {
-        return selfConnectionAllowed;
+    fun isSelfConnectionAllowed(): Boolean {
+        return selfConnectionAllowed
     }
 
-    /**
-     * Set whether or not self connections (connections where the source and
-     * target neuron are the same neuron) are allowed.
-     *
-     * @param selfConnectionAllowed Connections are allowed to connect to themselves.
-     */
-    public void setSelfConnectionAllowed(boolean selfConnectionAllowed) {
-        if (this.selfConnectionAllowed != selfConnectionAllowed) {
-            this.selfConnectionAllowed = selfConnectionAllowed;
-            if (!selfConnectionAllowed && synapseGroup != null) {
-                // Self connections were allowed but no longer and we're editing
-                // an extant synapse group...
-                if (synapseGroup.isRecurrent()) {
-                    // Only matters if the synapse group is recurrent
-                    for (Neuron n : synapseGroup.getSourceNeurons()) {
-                        // Connects the neuron to itself
-                        Synapse toRemove = n.getFanOut().get(n);
-                        if (toRemove != null) {
-                            // Remove from the synapse group
-                            synapseGroup.removeSynapse(toRemove);
-                            // Remove from the neuron
-                            n.removeEfferent(toRemove);
+    // /**
+    //  * Set whether or not self connections (connections where the source and
+    //  * target neuron are the same neuron) are allowed.
+    //  *
+    //  * @param selfConnectionAllowed Connections are allowed to connect to themselves.
+    //  */
+    // fun setSelfConnectionAllowed(selfConnectionAllowed: Boolean) {
+    //     if (this.selfConnectionAllowed != selfConnectionAllowed) {
+    //         this.selfConnectionAllowed = selfConnectionAllowed
+    //         if (!selfConnectionAllowed && synapseGroup != null) {
+    //             // Self connections were allowed but no longer and we're editing
+    //             // an extant synapse group...
+    //             if (synapseGroup!!.isRecurrent) {
+    //                 // Only matters if the synapse group is recurrent
+    //                 for (n in synapseGroup!!.sourceNeurons) {
+    //                     // Connects the neuron to itself
+    //                     val toRemove = n.fanOut[n]
+    //                     if (toRemove != null) {
+    //                         // Remove from the synapse group
+    //                         synapseGroup!!.removeSynapse(toRemove)
+    //                         // Remove from the neuron
+    //                         n.removeEfferent(toRemove)
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    override fun getName(): String {
+        return "Sparse"
+    }
+
+    override fun toString(): String {
+        return name
+    }
+
+}
+
+/**
+ * The default preference as to whether or not self connections are allowed.
+ */
+const val DEFAULT_SELF_CONNECT_PREF = false
+
+/**
+ * Sets the default behavior concerning whether or not the number of
+ * efferents of each source neurons should be equalized.
+ */
+const val DEFAULT_FF_PREF = false
+
+/**
+ * The default sparsity (between 0 and 1).
+ */
+const val DEFAULT_CONNECTION_DENSITY = 0.1
+
+/**
+ * Connects two lists of neurons with synapses assigning connections between
+ * source and target neurons randomly in such a way that results in
+ * "sparsity" percentage of possible connections being created.
+ *
+ * @param sourceNeurons         source neurons
+ * @param targetNeurons         target neurons
+ * @param sparsity              sparsity of connection
+ * @param selfConnectionAllowed whether to allow self-connections
+ * @param equalizeEfferents     whether or not the number of efferents of each
+ * source neurons should be equalized.
+ * @param looseSynapses         are these loose synapses
+ * @return the new synapses
+ */
+fun connectSparse(
+    sourceNeurons: List<Neuron>,
+    targetNeurons: List<Neuron>,
+    sparsity: Double,
+    selfConnectionAllowed: Boolean,
+    equalizeEfferents: Boolean,
+    looseSynapses: Boolean
+): List<Synapse> {
+    val recurrent = testRecurrence(sourceNeurons, targetNeurons)
+    var source: Neuron
+    var target: Neuron
+    var synapse: Synapse
+    val syns = ArrayList<Synapse>()
+    val rand = Random(System.nanoTime())
+    if (equalizeEfferents) {
+        val targetList = ArrayList<Int?>()
+        var tListCopy: ArrayList<Int?>
+        for (i in targetNeurons.indices) {
+            targetList.add(i)
+        }
+        val numSyns: Int
+        numSyns = if (!selfConnectionAllowed && sourceNeurons === targetNeurons) {
+            (sparsity * sourceNeurons.size * (targetNeurons.size - 1)).toInt()
+        } else {
+            (sparsity * sourceNeurons.size * targetNeurons.size).toInt()
+        }
+        var synsPerSource = numSyns / sourceNeurons.size
+        var targStart = 0
+        var targEnd = synsPerSource
+        if (synsPerSource > numSyns / 2) {
+            synsPerSource = numSyns - synsPerSource
+            targStart = synsPerSource
+            targEnd = targetList.size
+        }
+        for (i in sourceNeurons.indices) {
+            source = sourceNeurons[i]
+            if (!selfConnectionAllowed && recurrent) {
+                tListCopy = ArrayList()
+                for (k in targetList.indices) {
+                    if (k == i) { // Exclude oneself as a possible target
+                        continue
+                    }
+                    tListCopy.add(targetList[k])
+                }
+                randShuffleK(tListCopy, synsPerSource, rand)
+            } else {
+                randShuffleK(targetList, synsPerSource, rand)
+                tListCopy = targetList
+            }
+            for (j in targStart until targEnd) {
+                target = targetNeurons[tListCopy[j]!!]
+                synapse = Synapse(source, target)
+                if (looseSynapses) {
+                    source.network.addNetworkModel(synapse)
+                }
+                syns.add(synapse)
+            }
+        }
+    } else {
+        for (i in sourceNeurons.indices) {
+            for (j in targetNeurons.indices) {
+                if (!selfConnectionAllowed && recurrent && i == j) {
+                    continue
+                } else {
+                    if (Math.random() < sparsity) {
+                        source = sourceNeurons[i]
+                        target = targetNeurons[j]
+                        synapse = Synapse(source, target)
+                        if (looseSynapses) {
+                            source.network.addNetworkModel(synapse)
                         }
+                        syns.add(synapse)
                     }
                 }
-
             }
         }
     }
+    return syns
+}
 
-    /**
-     * @return the synapse group tied to this sparse object.
-     */
-    public SynapseGroup getSynapseGroup() {
-        return synapseGroup;
+/**
+ * Randomly shuffles k integers in a list. The first k elements are randomly
+ * swapped with other elements in the list. This method will alter the list
+ * passed to it, so situations where this would be undesirable should pass
+ * this method a copy.
+ *
+ * @param inds a list of integers. This methods WILL shuffle inds, so pass a
+ * copy unless inds being shuffled is not a problem.
+ * @param k    how many elements will be shuffled
+ * @param rand a random number generator
+ */
+fun randShuffleK(inds: ArrayList<Int?>, k: Int, rand: Random) {
+    for (i in 0 until k) {
+        Collections.swap(inds, i, rand.nextInt(inds.size))
     }
-
-    @Override
-    public String getName() {
-        return "Sparse";
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
-
 }

@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.ConnectionUtilities;
-import org.simbrain.network.connections.RadialSimple;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -106,12 +105,8 @@ public final class ConnectionPanel extends JPanel {
         }
 
         // Set up detail triangle and connection strategy
-        boolean dropDownOpen= true;
-        if (connectionStrategy.getClass() == RadialSimple.class) {
-            dropDownOpen = false;
-        }
         detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.LEFT,
-            dropDownOpen, "Show", "Hide", parentFrame);
+            true, "Show", "Hide", parentFrame);
         detailTriangle.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -197,7 +192,7 @@ public final class ConnectionPanel extends JPanel {
                 ConnectionUtilities.randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
             }
             if (polarityPanel.inRandomizerEnabled()) {
-                // Apply probability distributio to inhibitory weights
+                // Apply probability distribution to inhibitory weights
                 ConnectionUtilities.randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
             }
         }

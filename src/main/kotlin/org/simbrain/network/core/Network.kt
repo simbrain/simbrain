@@ -837,7 +837,7 @@ fun connectAllToAll(source: NeuronGroup, target: NeuronGroup, value: Double): Li
 }
 
 fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
-    return AllToAll().connectAllToAll(source.neuronList, target.neuronList)
+    return AllToAll().connectNeurons(source.network, source.neuronList, target.neuronList)
 }
 
 /**
@@ -845,7 +845,7 @@ fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
  */
 fun connectAllToAll(inputs: NeuronGroup, target: Neuron): List<Synapse> {
     val connector = AllToAll()
-    return connector.connectAllToAll(inputs.neuronList, listOf(target))
+    return connector.connectNeurons(inputs.network, inputs.neuronList, listOf(target))
 }
 
 /**

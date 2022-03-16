@@ -18,13 +18,10 @@
  */
 package org.simbrain.network.gui.dialogs.connect;
 
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
@@ -39,10 +36,10 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.text.NumberFormat;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
+
+import static org.simbrain.network.connections.AllToAllKt.connectAllToAll;
 
 /**
  * The <b>SparsityAdjustmentPanel</b> is a sub-panel for other connection panels
@@ -535,7 +532,7 @@ public class SparseConnectionPanel extends EditablePanel {
         double density = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(density)) {
             if (density == 1.0) {
-                return AllToAll.connectAllToAll(source, target, Utils.intersects(source, target), allowSelfConnect, true);
+                return connectAllToAll(source, target, Utils.intersects(source, target), allowSelfConnect, true);
             } else {
                 return Sparse.connectSparse(source, target, density, allowSelfConnect, equalizeEfferentsChkBx.isSelected(), true);
             }

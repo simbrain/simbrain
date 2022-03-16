@@ -116,8 +116,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         bitStream2 = buildBitStream(res2);
         bitStream2.setLabel("Bit stream 2");
         AllToAll connector = new AllToAll();
-        connector.connectAllToAll(bitStream1.getNeuronList(), res1.getNeuronList());
-        connector.connectAllToAll(bitStream2.getNeuronList(), res2.getNeuronList());
+        connector.connectNeurons(net, bitStream1.getNeuronList(), res1.getNeuronList());
+        connector.connectNeurons(net, bitStream2.getNeuronList(), res2.getNeuronList());
 
         // Use concurrent buffered update
         //        network.getUpdateManager().clear();

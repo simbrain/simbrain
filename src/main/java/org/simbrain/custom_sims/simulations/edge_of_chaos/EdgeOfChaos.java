@@ -159,7 +159,7 @@ public class EdgeOfChaos extends Simulation {
                 .standardDeviation(Math.sqrt(variance))
                 .build();
 
-        RadialSimple con = new RadialSimple(parentNet, res.getNeuronList());
+        RadialSimple con = new RadialSimple();
         con.setExcCons(k/2);
         con.setExcitatoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
         con.setInhCons(k/2);

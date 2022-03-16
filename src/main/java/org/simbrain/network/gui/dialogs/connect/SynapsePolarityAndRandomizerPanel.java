@@ -148,9 +148,9 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         SynapsePolarityAndRandomizerPanel prPanel = new SynapsePolarityAndRandomizerPanel(parentFrame, RandBehavior.DEFAULT);
         prPanel.fillDefaultValues();
         prPanel.excitatoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame,
-                connection.getExRandomizer(), connection.isUseExcitatoryRandomization());
+                connection.getExRandomizer(),false);
         prPanel.inhibitoryRandomizerPanel = prPanel.new EditableRandomizerPanel(parentFrame,
-                connection.getInRandomizer(), connection.isUseInhibitoryRandomization());
+                connection.getInRandomizer(), false);
         prPanel.excitatoryRandomizerPanel.initListeners();
         prPanel.inhibitoryRandomizerPanel.initListeners();
         prPanel.initializeContent();

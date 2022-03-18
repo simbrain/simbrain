@@ -120,10 +120,13 @@ class RadialProbabilistic(
     }
 
     override fun connectNeurons(synGroup: SynapseGroup) {
-        // TODO: Pass in params
-        val syns = connectProbabilistically(synGroup.sourceNeurons,
-            synGroup.targetNeurons, excitatoryProbability, excitatoryRadius)
-        syns.forEach { s -> synGroup.addNewSynapse(s) }
+        val exc = connectProbabilistically(synGroup.sourceNeurons, synGroup.targetNeurons, excitatoryProbability,
+            excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1, 0.0, 1.0))
+        exc.forEach{s -> synGroup.addExcitatorySynapse(s)}
+        val inh = connectProbabilistically(synGroup.sourceNeurons, synGroup.targetNeurons, excitatoryProbability,
+            excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1, -1.0, 0.0))
+        inh.forEach{s -> synGroup.addInhibitorySynapse(s)}
+        synGroup.revalidateSynapseSets()
     }
 
     override fun getName(): String {

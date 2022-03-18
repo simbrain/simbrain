@@ -119,10 +119,6 @@ public class EdgeOfChaosBitStream extends Simulation {
         connector.connectNeurons(net, bitStream1.getNeuronList(), res1.getNeuronList());
         connector.connectNeurons(net, bitStream2.getNeuronList(), res2.getNeuronList());
 
-        // Use concurrent buffered update
-        //        network.getUpdateManager().clear();
-        //        network.getUpdateManager().addAction(ConcurrentBufferedUpdate
-        //                .createConcurrentBufferedUpdate(network));
     }
 
     NeuronGroup bitStreamInputs;
@@ -151,7 +147,7 @@ public class EdgeOfChaosBitStream extends Simulation {
             public void invoke() {
                 bitStream1.getInputManager().applyCurrentRow();
                 bitStream2.getInputManager().applyCurrentRow();
-                double activationDiff = SimbrainMath.distance(res1.getActivations(), res2.getActivations());
+                int activationDiff = SimbrainMath.hamming(res1.getActivations(), res2.getActivations());
                 ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
             }
         });

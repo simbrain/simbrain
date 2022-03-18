@@ -17,6 +17,7 @@ import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.*;
 import org.simbrain.network.events.SynapseGroupEvents;
+import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
@@ -35,6 +36,9 @@ import static org.simbrain.network.connections.ConnectionUtilitiesKt.*;
 
 /**
  * A group of synapses. Must connect a source and target neuron group.
+ *
+ * Previously contained many optimizations. However, for larger uses cases we now moving to matrix backed entities,
+ * like {@link WeightMatrix}.
  *
  * @author Zoë Tosi
  */
@@ -434,6 +438,15 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         inSynapseSet.forEach(Synapse::decrement);
     }
 
+    // TODO: Checks.
+    public void addExcitatorySynapse(final Synapse s) {
+        exSynapseSet.add(s);
+    }
+
+    public void addInhibitorySynapse(final Synapse s) {
+        inSynapseSet.add(s);
+    }
+
     /**
      * Adds a new synapse (one which is "blank") to the synapse group. This is
      * the <b>preferred</b> method to use for adding synapses to the synapse
@@ -466,7 +479,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      *                group and have its parameters set based on the parameters
      *                of this group.
      */
-    public void addNewExcitatorySynapse(final Synapse synapse) {
+    private void addNewExcitatorySynapse(final Synapse synapse) {
         synapse.setParentGroup(this);
         if (exciteRand != null) {
             synapse.setStrength(exciteRand.getRandom());
@@ -491,7 +504,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      *                group and have its parameters set based on the parameters
      *                of this group.
      */
-    public void addNewInhibitorySynapse(final Synapse synapse) {
+    private void addNewInhibitorySynapse(final Synapse synapse) {
         synapse.setParentGroup(this);
         if (inhibRand != null) {
             synapse.setStrength(inhibRand.getRandom());

@@ -29,7 +29,7 @@ import javax.swing.*;
 import static org.simbrain.network.connections.ConnectionUtilitiesKt.testRecurrence;
 
 /**
- * Dialog for using connection objects to create connections between loose neurons.
+ * Dialog for using connection objects to create connections between free nodes.
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi

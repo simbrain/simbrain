@@ -364,12 +364,8 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
         histogramPanel.getModel().setSeriesColor(SynapseView.EXCITATORY.toString(), HistogramPanel.getDefault_Pallet()[0]);
         histogramPanel.getModel().setSeriesColor(SynapseView.INHIBITORY.toString(), HistogramPanel.getDefault_Pallet()[1]);
         histogramPanel.reRender();
-
     }
 
-    /**
-     *
-     */
     public void commitChanges() {
         excitatoryPercentPanel.commitChanges(synapseGroup);
     }
@@ -440,9 +436,6 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
             repaint();
         }
 
-        /**
-         *
-         */
         public void layoutPanel() {
             this.setLayout(new GridLayout(3, 4));
             add(new JLabel("Synapses:"));
@@ -470,10 +463,6 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
             stdDev = getStdDev(synapses);
         }
 
-        /**
-         * @param synapses
-         * @return
-         */
         public double getMean(Collection<Synapse> synapses) {
             double tot = 0;
             if (synapses.size() == 0) {
@@ -491,10 +480,6 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
             return tot / synapses.size();
         }
 
-        /**
-         * @param synapses
-         * @return
-         */
         public double getMedian(Collection<Synapse> synapses) {
             double[] vals = new double[synapses.size()];
             int index = 0;
@@ -518,10 +503,6 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
             }
         }
 
-        /**
-         * @param synapses
-         * @return
-         */
         public double getStdDev(Collection<Synapse> synapses) {
             double tot = 0;
             if (synapses.isEmpty()) {

@@ -131,7 +131,7 @@ class RadialGaussian(
     // based on distance, but a specific number of connections are guaranteed to be made.
 
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
-        val syns: List<Synapse> = connectRadialPolarized(source, target)
+        val syns: List<Synapse> = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
         network.addNetworkModels(syns)
         return syns
     }
@@ -146,7 +146,7 @@ class RadialGaussian(
         var target: List<Neuron> = synGroup.targetNeurons
         var synapses: List<Synapse>
         if (source.size < 500) {
-            synapses = connectRadialPolarized(source, target)
+            synapses = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
             synapses.forEach { s -> synGroup.addNewSynapse(s) }
         } else {
             val workers: MutableList<Callable<Collection<Synapse>>> = ArrayList()
@@ -226,7 +226,7 @@ class RadialGaussian(
     }
 
     public override fun toString(): String {
-        return "Radial"
+        return "Radial (Gaussian)"
     }
 
     private inner class ConnectorService constructor(

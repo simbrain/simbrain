@@ -188,6 +188,7 @@ public final class ConnectionPanel extends JPanel {
         if (isCreation && !connectionStrategy.getOverridesPolarity()) {
             // Set the weights to have the desired excitatory-inhibitory ratio
             polarizeSynapses(synapses, polarityPanel.getPercentExcitatory());
+            // TODO: Separate these panels out
             if (polarityPanel.exRandomizerEnabled()) {
                 // Apply probability distribution to excitatory weights
                 randomizeExcitatorySynapses(synapses, polarityPanel.getExRandomizer());
@@ -197,7 +198,6 @@ public final class ConnectionPanel extends JPanel {
                 randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
             }
         }
-//        networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
     }
 
     /**

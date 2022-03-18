@@ -359,11 +359,7 @@ private fun checkPolarityMatches(inQuestion: ProbabilityDistribution?, expectedP
 }
 
 /**
- * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
- * @param exciteCount
- * @param inhibCount
- * @param s
- * @return
+ * @param excitatoryRatio the ratio of excitatory to inhibitory synapses.
  */
 private fun shouldBeExcitatory(excitatoryRatio: Double, exciteCount: Int, inhibCount: Int, s: Synapse): Boolean {
     var excitatory = false

@@ -218,7 +218,6 @@ public class SparseConnectionPanel extends EditablePanel {
 //            }
         }
 
-
     }
 
     /**
@@ -534,9 +533,9 @@ public class SparseConnectionPanel extends EditablePanel {
         double density = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(density)) {
             if (density == 1.0) {
-                return connectAllToAll(source, target, Utils.intersects(source, target), allowSelfConnect, true);
+                return connectAllToAll(source, target, Utils.intersects(source, target), allowSelfConnect);
             } else {
-                return connectSparse(source, target, density, allowSelfConnect, equalizeEfferentsChkBx.isSelected(), true);
+                return connectSparse(source, target, density, allowSelfConnect, equalizeEfferentsChkBx.isSelected());
             }
         }
         return null;

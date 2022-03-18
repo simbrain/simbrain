@@ -73,7 +73,7 @@ public class TestSim extends Simulation {
 
         // CREATE SYNAPSES
         connectSparse(network.getFlatNeuronList(),
-                network.getFlatNeuronList(), sparsity, false, false, true);
+                network.getFlatNeuronList(), sparsity, false, false);
         randomizeAndPolarizeSynapses(network.getModels(Synapse.class), excitatoryRatio);
 
         //MAKE BARCHART

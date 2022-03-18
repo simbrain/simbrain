@@ -25,6 +25,8 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.simbrain.network.connections.RadialGaussianKt.*;
+
 
 /**
  * Simulate a reservoir of Kuramoto oscillators exposed to smell inputs
@@ -100,9 +102,8 @@ public class KuramotoOscillators extends Simulation {
         // Set up recurrent synapses
         //EdgeOfChaos.connectReservoir(network, reservoirNet);
 
-        ConnectionStrategy recConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 1, RadialGaussian.DEFAULT_EI_CONST * 3,
-            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
-            50);
+        ConnectionStrategy recConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 3,
+            DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50);
         SynapseGroup recSyns = SynapseGroup.createSynapseGroup(reservoirNet, reservoirNet, recConnection);
         net.addNetworkModel(recSyns);
         recSyns.setLabel("Recurrent");

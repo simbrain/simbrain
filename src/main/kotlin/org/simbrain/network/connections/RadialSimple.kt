@@ -35,41 +35,12 @@ import java.util.*
  * and use separate parameters. Therefore the total number of connections that will
  * be made depends upon both sets of parameters.
  *
- * Does not use excitatory ratio
- *
  * TODO: Add full repetoire of probabilities EE,EI,IE,II...
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class RadialSimple() : ConnectionStrategy(), EditableObject {
-
-    /**
-     * When connecting neurons within a radius of a given neuron they can be chosen
-     * stochastically, based on some probability parameter ([.PROBABILISTIC]) or
-     * deterministically based upon a predefined number of requested connections
-     * ([.DETERMINISTIC]).
-     */
-    enum class ConnectStyle(private val description: String) {
-        PROBABILISTIC("Probabilistic"), DETERMINISTIC("Deterministic");
-        override fun toString(): String {
-            return description
-        }
-    }
-
-    /**
-     * Are neurons within a given radius being connected <emp>to</emp> the neuron in
-     * question ([.IN] or are they being connected <emp>from</emp> the neuron in
-     * question ([.OUT])? Equivalently is the neuron for which are checking for
-     * other neurons within a given distance the target of the connections that will
-     * made or the source?
-     */
-    enum class SelectionStyle(private val description: String) {
-        OUT("Outward"), IN("Inward");
-        override fun toString(): String {
-            return description
-        }
-    }
+class RadialSimple(
 
     /**
      * Should connections be selected randomly from a given neighborhood or in a prescribed way
@@ -80,14 +51,14 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         description = "Make local connections based on a specified in-degree (determnistic) or randomly (probabilistic)",
         order = 1
     )
-    var conMethod = ConnectStyle.PROBABILISTIC
+    var conMethod: ConnectStyle = ConnectStyle.PROBABILISTIC,
 
     @UserParameter(
         label = "Inward / Outward",
         description = "Are the connections to be made 'inward' (connections sent in to each neuron) or 'outward' (connections radiating out from each neuron).",
         order = 2
     )
-    var selectMethod = SelectionStyle.IN
+    var selectMethod: SelectionStyle = SelectionStyle.IN,
 
     /**
      * Whether to allow self-connections.
@@ -97,12 +68,7 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         description = "Can there exist synapses whose source and target are the same?",
         order = 9
     )
-    var isAllowSelfConnections = false
-
-    /**
-     * Template synapse for excitatory synapses.
-     */
-    var baseExcitatorySynapse = Synapse.getTemplateSynapse()
+    var isAllowSelfConnections: Boolean = false,
 
     /**
      * Probability of making connections to neighboring excitatory neurons. Also used for
@@ -116,7 +82,7 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         increment = .1,
         order = 5
     )
-    var excitatoryProbability = .8
+    var excitatoryProbability: Double = .8,
 
     /**
      * Probability of designating a given synapse excitatory. If not, it's
@@ -130,7 +96,7 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         increment = .1,
         order = 6
     )
-    var inhibitoryProbability = .8
+    var inhibitoryProbability: Double = .8,
 
     /**
      * The number of connections allowed with excitatory (or non-polar) neurons. If there
@@ -143,7 +109,7 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         minimumValue = 0.0,
         order = 7
     )
-    var excCons = 5
+    var excCons: Double = 5.0,
 
     /**
      * Radius within which to connect excitatory excNeurons.
@@ -154,12 +120,7 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         minimumValue = 0.0,
         order = 3
     )
-    var excitatoryRadius = 100.0
-
-    /**
-     * Template synapse for inhibitory synapses.
-     */
-    var baseInhibitorySynapse = Synapse.getTemplateSynapse()
+    var excitatoryRadius: Double = 100.0,
 
     /**
      * Radius within which to connect inhibitory excNeurons.
@@ -170,7 +131,7 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         minimumValue = 0.0,
         order = 4
     )
-    var inhibitoryRadius = 80.0
+    var inhibitoryRadius: Double = 80.0,
 
     /**
      * The number of connections allowed with inhibitory neurons. If there
@@ -183,20 +144,31 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         minimumValue = 0.0,
         order = 8
     )
-    var inhCons = 5
+    var inhCons: Double = 5.0
+
+
+) : ConnectionStrategy(), EditableObject {
+
+    /**
+     * When connecting neurons within a radius of a given neuron they can be chosen
+     * stochastically, based on some probability parameter ([.PROBABILISTIC]) or
+     * deterministically based upon a predefined number of requested connections
+     * ([.DETERMINISTIC]).
+     */
+    enum class ConnectStyle(private val description: String) {
+        PROBABILISTIC("Probabilistic"), DETERMINISTIC("Deterministic");
+
+        override fun toString(): String {
+            return description
+        }
+    }
+
 
     /**
      * Radial simple sets the polarity implicitly.
      */
     override val overridesPolarity: Boolean
         get() = true
-
-    // TODO: Keep?
-    /**
-     * Reference to network in which radial connections will be made on loose
-     * synapses.
-     */
-    private var network: Network? = null
 
     /**
      * List containing neurons with excitatory polarity among the neurons selected
@@ -216,12 +188,11 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
      */
     private var nonPolarNeurons: List<Neuron>? = null
 
-
     /**
-     * Connect neurons. TODO: source / target distinction not needed.
+     * Connect neurons.
      */
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
-        this.network = network
+
         val neurons = HashSet(source + target)
 
         val grouped = neurons.groupBy { it.polarity }
@@ -231,8 +202,8 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
 
         val syns = ArrayList<Synapse>()
         neurons.forEach { n ->
-            makeExcitatory(n, syns, true)
-            makeInhibitory(n, syns, true)
+            makeExcitatory(n, syns)
+            makeInhibitory(n, syns)
         }
         network.addNetworkModels(syns)
         return syns
@@ -242,23 +213,21 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
     override fun connectNeurons(synGroup: SynapseGroup) {
 
         // No implementation yet.
-        val target = synGroup!!.targetNeurons
-        val source = synGroup!!.sourceNeurons
+        val target = synGroup.targetNeurons
+        val source = synGroup.sourceNeurons
         val syns = ArrayList<Synapse>()
 
+        // TODO: Why selection style here when used in make connects?
         if (selectMethod == SelectionStyle.IN) {
-            for (tar in target) {
-                makeConnects(tar, source, syns)
-            }
+            target.forEach{tar ->  makeConnects(tar, source, syns)}
         } else {
-            for (src in source) {
-                makeConnects(src, target, syns)
-            }
+            source.forEach{src ->  makeConnects(src, target, syns)}
         }
-        for (s in syns) {
-            synGroup!!.addNewSynapse(s)
-        }
+        syns.forEach{s -> synGroup.addNewSynapse(s)}
+
     }
+
+    // TODO: Just remove the next two functions?
 
     /**
      * Make an inhibitory neuron, in the sense of connecting this neuron with
@@ -266,14 +235,14 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
      *
      * @param neuron
      */
-    private fun makeInhibitory(neuron: Neuron, syns: MutableList<Synapse>?, looseSynapses: Boolean) {
+    private fun makeInhibitory(neuron: Neuron, syns: MutableList<Synapse>) {
 
         // TODO: abstract what is common to make excitatory?
-        var degreeCounter = 0
+
         val neusInRadius = SimnetUtils.getNeuronsInRadius(neuron, nonPolarNeurons, inhibitoryRadius)
         neusInRadius.addAll(SimnetUtils.getNeuronsInRadius(neuron, nonPolarNeurons, inhibitoryRadius))
         if (conMethod == ConnectStyle.DETERMINISTIC) {
-            Collections.shuffle(neusInRadius)
+            neusInRadius.shuffle()
         }
         for (otherNeu in neusInRadius) {
             // Don't add a connection if there is already one present
@@ -290,36 +259,19 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
                     var synapse: Synapse
                     if (selectMethod == SelectionStyle.IN) {
                         synapse = Synapse(otherNeu, neuron)
-                        synapse.strength = Math.random()
+                        synapse.strength = -Math.random()
                     } else {
                         synapse = Synapse(neuron, otherNeu)
                     }
-                    syns?.add(synapse)
-                    // if (looseSynapses) {
-                    //     network!!.addNetworkModel(synapse)
-                    // } else {
-                    //     syns?.add(synapse)
-                    // }
+                    syns.add(synapse)
                 }
             } else {
-                var synapse: Synapse = if (selectMethod == SelectionStyle.IN) 
+                val synapse: Synapse = if (selectMethod == SelectionStyle.IN)
                     Synapse(otherNeu, neuron) else {
                     Synapse(neuron, otherNeu)
                 }
                 synapse.strength = -Math.random()
-                // if (looseSynapses) {
-                //     network!!.addNetworkModel(synapse)
-                // } else {
-                //     syns?.add(synapse)
-                // }
-                degreeCounter++
-                if (degreeCounter >= inhCons) {
-//                    network.fireSynapsesUpdated(); // TODO: [event]
-                    break
-                }
-            }
-            if (network != null) {
-//                network.fireSynapsesUpdated(); // TODO: [event]
+                syns.add(synapse)
             }
         }
     }
@@ -329,13 +281,12 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
      *
      * @param neuron neuron neuron
      */
-    private fun makeExcitatory(neuron: Neuron, syns: MutableList<Synapse>?, looseSynapses: Boolean) {
-        val degreeCounter = 0
+    private fun makeExcitatory(neuron: Neuron, syns: MutableList<Synapse>) {
         // TODO: Currently broken since it only focuses on non-polar neurons
         val neusInRadius = SimnetUtils.getNeuronsInRadius(neuron, nonPolarNeurons, excitatoryRadius)
         // neusInRadius.addAll(SimnetUtils.getNeuronsInRadius(neuron, nonPolarNeurons, excitatoryRadius))
         if (conMethod == ConnectStyle.DETERMINISTIC) {
-            Collections.shuffle(neusInRadius)
+            neusInRadius.shuffle()
         }
         for (otherNeu in neusInRadius) {
             // Don't add a connection if there is already one present
@@ -349,70 +300,41 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
             }
             if (conMethod == ConnectStyle.PROBABILISTIC) {
                 if (Math.random() < excitatoryProbability) {
-                    var synapse: Synapse
-                    synapse = if (selectMethod == SelectionStyle.IN) Synapse(otherNeu, neuron) else {
+                    val synapse: Synapse = if (selectMethod == SelectionStyle.IN) Synapse(otherNeu, neuron) else {
                         Synapse(neuron, otherNeu)
                     }
                     synapse.strength = Math.random()
-                    syns?.add(synapse)
-                    // if (looseSynapses) {
-                    //     // TODO: Adding a model directly rather than
-                    //     network.addNetworkModel(synapse);
-                    // } else {
-                    //     if (syns != null)
-                    //         syns.add(synapse);
-                    // }
+                    syns.add(synapse)
                 }
             } else {
-                var synapse: Synapse
-                synapse = if (selectMethod == SelectionStyle.IN) Synapse(otherNeu, neuron) else {
+                val synapse: Synapse = if (selectMethod == SelectionStyle.IN) Synapse(otherNeu, neuron) else {
                     Synapse(neuron, otherNeu)
                 }
                 synapse.strength = Math.random()
-                syns?.add(synapse)
-
-                // if (looseSynapses) {
-                //     network.addNetworkModel(synapse);
-                // } else {
-                //     if (syns != null)
-                //         syns.add(synapse);
-                // }
-                // degreeCounter++;
-                // if(degreeCounter >= excCons) {
-                //     network.fireSynapsesUpdated();
-                //     break;
-                // }
+                syns.add(synapse)
             }
-            // if (network != null) {
-            //     network.fireSynapsesUpdated();
-            // }
         }
     }
-
 
     /**
      * Makes connections between a neuron and some other neurons and returns a synapse list.
      * Accounts for connection and selection styles of various kinds and polarity.
-     * @param neu
-     * @param others
-     * @param retList
-     * @return
      */
-    fun makeConnects(neu: Neuron?, others: List<Neuron?>, retList: MutableList<Synapse>): List<Synapse> {
+    fun makeConnects(neu: Neuron, others: List<Neuron>, retList: MutableList<Synapse>): List<Synapse> {
         var others = others
         others = SimnetUtils.getNeuronsInRadius(neu, others, excitatoryRadius)
         if (others.isEmpty()) {
             return retList
         }
+        // TODO: What about non-polar?
         return if (conMethod == ConnectStyle.PROBABILISTIC) {
-            val p = if (neu!!.polarity !== Polarity.INHIBITORY) excitatoryProbability else inhibitoryProbability
+            val p = if (neu.polarity !== Polarity.INHIBITORY) excitatoryProbability else inhibitoryProbability
             connectProb(neu, others, retList, selectMethod, p)
         } else {
-            val noCons = if (neu!!.polarity !== Polarity.INHIBITORY) excCons else inhCons
-            connectDet(neu, others, retList, selectMethod, noCons)
+            val noCons = if (neu.polarity !== Polarity.INHIBITORY) excCons else inhCons
+            connectDet(neu, others, retList, selectMethod, noCons.toInt())
         }
     }
-
 
     override fun getName(): String {
         return "Radial (Simple)"
@@ -422,67 +344,74 @@ class RadialSimple() : ConnectionStrategy(), EditableObject {
         return name
     }
 
-    companion object {
-        /**
-         * Connects a neuron to a list of possible neurons to connect to probabilistically. Synapses
-         * are assigned weight values based on source polarity.
-         * @param n The neuron of interest. If selection style is IN, it is the neuron the others send
-         * connections to. If selection style is OUT, it is the neuron sending connections to the others.
-         * @param others
-         * @param retList
-         * @param selectionStyle
-         * @param p
-         * @return
-         */
-        private fun connectProb(
-            n: Neuron?, others: List<Neuron?>,
-            retList: MutableList<Synapse>,
-            selectionStyle: SelectionStyle, p: Double
-        ): List<Synapse> {
-            for (o in others) {
-                if (Math.random() < p) {
-                    if (selectionStyle == SelectionStyle.IN) {
-                        retList.add(Synapse(o, n, o!!.polarity.value(Math.random())))
-                    } else {
-                        retList.add(Synapse(n, o, n!!.polarity.value(Math.random())))
-                    }
-                }
-            }
-            return retList
-        }
-
-        /**
-         * Connects a neuron to a list of possible neurons to connect to "deterministically".
-         * An exact number of neurons to connect with are chosen randomly, but the number itself
-         * is guaranteed. Synapses are assigned weight values based on source polarity.
-         * @param n The neuron of interest. If selection style is IN, it is the neuron the others send
-         * connections to. If selection style is OUT, it is the neuron sending connections to the others.
-         * @param others
-         * @param retList
-         * @param selectionStyle
-         * @param N
-         * @return
-         */
-        private fun connectDet(
-            n: Neuron?, others: List<Neuron?>,
-            retList: MutableList<Synapse>,
-            selectionStyle: SelectionStyle, N: Int
-        ): List<Synapse> {
-            var N = N
-            if (N > others.size) {
-                N = others.size
-            } else {
-                Collections.shuffle(others)
-            }
-            for (ii in 0 until N) {
-                val o = others[ii]
+    /**
+     * Connects a neuron to a list of possible neurons to connect to probabilistically. Synapses
+     * are assigned weight values based on source polarity.
+     * @param n The neuron of interest. If selection style is IN, it is the neuron the others send
+     * connections to. If selection style is OUT, it is the neuron sending connections to the others.
+     */
+    private fun connectProb(
+        n: Neuron?, others: List<Neuron?>,
+        retList: MutableList<Synapse>,
+        selectionStyle: SelectionStyle,
+        prob: Double
+    ): List<Synapse> {
+        for (o in others) {
+            if (Math.random() < prob) {
                 if (selectionStyle == SelectionStyle.IN) {
                     retList.add(Synapse(o, n, o!!.polarity.value(Math.random())))
                 } else {
                     retList.add(Synapse(n, o, n!!.polarity.value(Math.random())))
                 }
             }
-            return retList
         }
+        return retList
+    }
+
+    /**
+     * Connects a neuron to a list of possible neurons to connect to "deterministically".
+     * An exact number of neurons to connect with are chosen randomly, but the number itself
+     * is guaranteed. Synapses are assigned weight values based on source polarity.
+     * @param n The neuron of interest. If selection style is IN, it is the neuron the others send
+     * connections to. If selection style is OUT, it is the neuron sending connections to the others.
+     */
+    private fun connectDet(
+        n: Neuron,
+        others: List<Neuron>,
+        retList: MutableList<Synapse>,
+        selectionStyle: SelectionStyle,
+        N: Int
+    ): List<Synapse> {
+        var N = N
+        if (N > others.size) {
+            N = others.size
+        } else {
+            Collections.shuffle(others)
+        }
+        for (ii in 0 until N) {
+            val o = others[ii]
+            if (selectionStyle == SelectionStyle.IN) {
+                retList.add(Synapse(o, n, o!!.polarity.value(Math.random())))
+            } else {
+                retList.add(Synapse(n, o, n!!.polarity.value(Math.random())))
+            }
+        }
+        return retList
+    }
+
+}
+
+/**
+ * Are neurons within a given radius being connected <emp>to</emp> the neuron in
+ * question (IN) or are they being connected <emp>from</emp> the neuron in
+ * question (OUT)? Equivalently is the neuron for which are checking for
+ * other neurons within a given distance the target of the connections that will
+ * be made or the source?
+ */
+enum class SelectionStyle(private val description: String) {
+    OUT("Outward"), IN("Inward");
+
+    override fun toString(): String {
+        return description
     }
 }

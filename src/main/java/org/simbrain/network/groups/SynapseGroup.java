@@ -93,7 +93,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      */
     public static final double DEFAULT_EXCITATORY_RATIO = .5;
 
-    public static final ConnectionStrategy DEFAULT_CONNECTION_MANAGER = new Sparse(.1, false, false);
+    public static final ConnectionStrategy DEFAULT_CONNECTION_MANAGER = new Sparse();
 
     /**
      * Connection strategy associated with this group.

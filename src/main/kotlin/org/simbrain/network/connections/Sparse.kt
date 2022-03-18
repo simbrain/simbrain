@@ -24,6 +24,7 @@ import org.simbrain.network.core.getLooseSynapse
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.randShuffleK
 import umontreal.ssj.randvar.BinomialGen
 import java.util.*
 
@@ -35,6 +36,7 @@ import java.util.*
  * @author Zoë Tosi
  */
 class Sparse() : ConnectionStrategy(), EditableObject {
+
     /**
      * Whether or not each source neuron is given an equal number of efferent
      * synapses. If true, every source neuron will have exactly the same number
@@ -48,7 +50,7 @@ class Sparse() : ConnectionStrategy(), EditableObject {
      * 50% (more exact the more neurons/synapses there are). However the number
      * of targets any given source neuron connects to is by no means guaranteed.
      */
-    var isEqualizeEfferents = DEFAULT_FF_PREF
+    var isEqualizeEfferents = DEFAULT_EE_PREF
 
     /**
      * A tag for whether or not this sparse connector supports density editing
@@ -88,6 +90,7 @@ class Sparse() : ConnectionStrategy(), EditableObject {
      */
     @Transient
     private lateinit var targetNeurons: Array<Neuron>
+
     /**
      * @return the synapse group tied to this sparse object.
      */
@@ -102,9 +105,29 @@ class Sparse() : ConnectionStrategy(), EditableObject {
      * probability reflecting how many possible connections between a given
      * source neuron and all available target neurons will actually be made.
      */
-    var connectionDensity = .8 // TODO
-        set(value) {
-            field = value
+    var connectionDensity = .8
+        /**
+         * Set how dense the connections are between source and target neurons,
+         * generally speaking the connectionDensity parameter represents a
+         * probability reflecting how many possible connections between a given
+         * source neuron and all available target neurons will actually be made.
+         *
+         * @param connectionDensity
+         */
+        set(connectionDensity) {
+            // Don't change connection density if it's not permitted...
+            if (!isPermitDensityEditing) {
+                return
+            }
+            if (sparseOrdering == null) {
+                field = connectionDensity
+            } else {
+                if (connectionDensity > field) {
+                    addToSparsity(connectionDensity)
+                } else if (connectionDensity < field) {
+                    removeToSparsity(connectionDensity)
+                }
+            }
         }
 
     /**
@@ -142,8 +165,7 @@ class Sparse() : ConnectionStrategy(), EditableObject {
             targetNeurons,
             connectionDensity,
             selfConnectionAllowed,
-            isEqualizeEfferents,
-            true
+            isEqualizeEfferents
         )
     }
 
@@ -170,15 +192,15 @@ class Sparse() : ConnectionStrategy(), EditableObject {
                 connectRandom(synapseGroup)
             }
         } else {
-            val syns = connect(synapseGroup.sourceNeurons, synapseGroup.targetNeurons)
-            for (s in syns) {
-                synapseGroup.addNewSynapse(s)
-            }
+            val syns = connectSparse(synapseGroup.sourceNeurons, synapseGroup.targetNeurons)
+            syns.forEach{s -> synapseGroup.addNewSynapse(s)}
         }
     }
 
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
-        return connect(source, target)
+        val syns = connectSparse(source, target)
+        network.addNetworkModels(syns)
+        return syns
     }
 
     /**
@@ -415,30 +437,6 @@ class Sparse() : ConnectionStrategy(), EditableObject {
             sourceNeurons.size * (sourceNeurons.size - 1)
         }
 
-    // TODO
-    // /**
-    //  * Set how dense the connections are between source and target neurons,
-    //  * generally speaking the connectionDensity parameter represents a
-    //  * probability reflecting how many possible connections between a given
-    //  * source neuron and all available target neurons will actually be made.
-    //  *
-    //  * @param connectionDensity
-    //  */
-    // fun setConnectionDensity(connectionDensity: Double) {
-    //     // Don't change connection density if it's not permitted...
-    //     if (!isPermitDensityEditing) {
-    //         return
-    //     }
-    //     if (sparseOrdering == null) {
-    //         this.connectionDensity = connectionDensity
-    //     } else {
-    //         if (connectionDensity > this.connectionDensity) {
-    //             addToSparsity(connectionDensity)
-    //         } else if (connectionDensity < this.connectionDensity) {
-    //             removeToSparsity(connectionDensity)
-    //         }
-    //     }
-    // }
 
     /**
      * @return whether or not self connections (connections where the source and
@@ -447,35 +445,6 @@ class Sparse() : ConnectionStrategy(), EditableObject {
     fun isSelfConnectionAllowed(): Boolean {
         return selfConnectionAllowed
     }
-
-    // /**
-    //  * Set whether or not self connections (connections where the source and
-    //  * target neuron are the same neuron) are allowed.
-    //  *
-    //  * @param selfConnectionAllowed Connections are allowed to connect to themselves.
-    //  */
-    // fun setSelfConnectionAllowed(selfConnectionAllowed: Boolean) {
-    //     if (this.selfConnectionAllowed != selfConnectionAllowed) {
-    //         this.selfConnectionAllowed = selfConnectionAllowed
-    //         if (!selfConnectionAllowed && synapseGroup != null) {
-    //             // Self connections were allowed but no longer and we're editing
-    //             // an extant synapse group...
-    //             if (synapseGroup!!.isRecurrent) {
-    //                 // Only matters if the synapse group is recurrent
-    //                 for (n in synapseGroup!!.sourceNeurons) {
-    //                     // Connects the neuron to itself
-    //                     val toRemove = n.fanOut[n]
-    //                     if (toRemove != null) {
-    //                         // Remove from the synapse group
-    //                         synapseGroup!!.removeSynapse(toRemove)
-    //                         // Remove from the neuron
-    //                         n.removeEfferent(toRemove)
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 
     override fun getName(): String {
         return "Sparse"
@@ -496,7 +465,7 @@ const val DEFAULT_SELF_CONNECT_PREF = false
  * Sets the default behavior concerning whether or not the number of
  * efferents of each source neurons should be equalized.
  */
-const val DEFAULT_FF_PREF = false
+val DEFAULT_EE_PREF = false
 
 /**
  * The default sparsity (between 0 and 1).
@@ -514,16 +483,14 @@ const val DEFAULT_CONNECTION_DENSITY = 0.1
  * @param selfConnectionAllowed whether to allow self-connections
  * @param equalizeEfferents     whether or not the number of efferents of each
  * source neurons should be equalized.
- * @param looseSynapses         are these loose synapses
  * @return the new synapses
  */
 fun connectSparse(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
-    sparsity: Double,
-    selfConnectionAllowed: Boolean,
-    equalizeEfferents: Boolean,
-    looseSynapses: Boolean
+    sparsity: Double = DEFAULT_CONNECTION_DENSITY,
+    selfConnectionAllowed: Boolean = DEFAULT_SELF_CONNECT_PREF,
+    equalizeEfferents: Boolean = DEFAULT_EE_PREF
 ): List<Synapse> {
     val recurrent = testRecurrence(sourceNeurons, targetNeurons)
     var source: Neuron
@@ -569,9 +536,6 @@ fun connectSparse(
             for (j in targStart until targEnd) {
                 target = targetNeurons[tListCopy[j]!!]
                 synapse = Synapse(source, target)
-                if (looseSynapses) {
-                    source.network.addNetworkModel(synapse)
-                }
                 syns.add(synapse)
             }
         }
@@ -585,9 +549,6 @@ fun connectSparse(
                         source = sourceNeurons[i]
                         target = targetNeurons[j]
                         synapse = Synapse(source, target)
-                        if (looseSynapses) {
-                            source.network.addNetworkModel(synapse)
-                        }
                         syns.add(synapse)
                     }
                 }
@@ -595,21 +556,4 @@ fun connectSparse(
         }
     }
     return syns
-}
-
-/**
- * Randomly shuffles k integers in a list. The first k elements are randomly
- * swapped with other elements in the list. This method will alter the list
- * passed to it, so situations where this would be undesirable should pass
- * this method a copy.
- *
- * @param inds a list of integers. This methods WILL shuffle inds, so pass a
- * copy unless inds being shuffled is not a problem.
- * @param k    how many elements will be shuffled
- * @param rand a random number generator
- */
-fun randShuffleK(inds: ArrayList<Int?>, k: Int, rand: Random) {
-    for (i in 0 until k) {
-        Collections.swap(inds, i, rand.nextInt(inds.size))
-    }
 }

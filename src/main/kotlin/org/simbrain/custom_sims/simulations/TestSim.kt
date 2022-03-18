@@ -71,7 +71,7 @@ val testSim = newSim {
     network.addNetworkModels(region2weights)
 
     // Make connections between regions
-    val region1_to_2_weights = sparse.connect(neuronList1, neuronList2)
+    val region1_to_2_weights = sparse.connectNeurons(network, neuronList1, neuronList2)
     network.addNetworkModels(region1_to_2_weights)
 
     // TODO: Temp because excitatory ratio not working

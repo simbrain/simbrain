@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations.sorn;
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.RadialSimple;
-import org.simbrain.network.connections.RadialSimple.SelectionStyle;
+import org.simbrain.network.connections.SelectionStyle;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;

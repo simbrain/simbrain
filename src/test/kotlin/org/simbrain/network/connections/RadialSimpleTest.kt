@@ -20,7 +20,7 @@ class RadialSimpleTest {
     fun setUp() {
         rs = RadialSimple()
         rs.conMethod = RadialSimple.ConnectStyle.DETERMINISTIC
-        rs.selectMethod = RadialSimple.SelectionStyle.IN
+        rs.selectMethod = SelectionStyle.IN
         rs.excitatoryRadius = 60.0
         rs.inhibitoryRadius = 60.0
 
@@ -35,24 +35,24 @@ class RadialSimpleTest {
 
     @Test
     fun `check deterministic-in produces correct number of weights`() {
-        rs.excCons = 1
-        rs.inhCons = 0
+        rs.excCons = 1.0
+        rs.inhCons = 0.0
         val syns = rs.connectNeurons(net, listOf(n1, n2, n3), listOf(n1, n2, n3))
         assertEquals(3, syns.size)
     }
 
     @Test
     fun `check deterministic-in produces excitatory weights`() {
-        rs.excCons = 1
-        rs.inhCons = 0
+        rs.excCons = 1.0
+        rs.inhCons = 0.0
         val syns = rs.connectNeurons(net, listOf(n1, n2, n3), listOf(n1, n2, n3))
         assertTrue(syns[0].strength > 0.0)
     }
 
     @Test
     fun `check deterministic-in produces inhibitory weights`() {
-        rs.excCons = 0
-        rs.inhCons = 1
+        rs.excCons = 0.0
+        rs.inhCons = 1.0
         val syns = rs.connectNeurons(net, listOf(n1, n2, n3), listOf(n1, n2, n3))
         print(net)
         assertTrue(syns[0].strength < 0.0)

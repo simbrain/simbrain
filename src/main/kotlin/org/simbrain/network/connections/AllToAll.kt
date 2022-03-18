@@ -26,7 +26,7 @@ import org.simbrain.util.propertyeditor.EditableObject
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class AllToAll(allowSelfConnect: Boolean = false) : ConnectionStrategy(), EditableObject {
+class AllToAll(
 
     /**
      * Whether or not connections where the source and target are the same
@@ -38,8 +38,9 @@ class AllToAll(allowSelfConnect: Boolean = false) : ConnectionStrategy(), Editab
         description = "Can there exist synapses whose source and target are the same?",
         order = 1
     )
-    var isSelfConnectionAllowed = false
+    var isSelfConnectionAllowed: Boolean = false
 
+) : ConnectionStrategy(), EditableObject {
 
     override fun getName(): String {
         return "All to All"
@@ -62,32 +63,19 @@ class AllToAll(allowSelfConnect: Boolean = false) : ConnectionStrategy(), Editab
             synGroup.sourceNeurons,
             synGroup.targetNeurons,
             synGroup.isRecurrent,
-            isSelfConnectionAllowed,
-            false
+            isSelfConnectionAllowed
         )
         // Set the capacity of the synapse group's list to accommodate the
         // synapses this group will add.
         synGroup.preAllocateSynapses(synGroup.sourceNeuronGroup.size() * synGroup.targetNeuronGroup.size())
-        for (s in syns) {
-            synGroup.addNewSynapse(s)
-        }
+        syns.forEach{s -> synGroup.addNewSynapse(s)}
     }
 
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
-        val retList: MutableList<Synapse> = ArrayList()
-        for (src in source) {
-            for (tar in target) {
-                if (src === tar && !isSelfConnectionAllowed) {
-                    continue
-                }
-                val syn = Synapse(src, tar)
-                retList.add(syn)
-                network.addNetworkModel(syn)
-            }
-        }
-        return retList
+        val syns = connectAllToAll(source, target)
+        network.addNetworkModels(syns)
+        return syns
     }
-
 }
 
 /**
@@ -96,8 +84,6 @@ class AllToAll(allowSelfConnect: Boolean = false) : ConnectionStrategy(), Editab
  * connection will be made between a neuron and itself if self connections
  * aren't allowed. Will produce n^2 synapses if self connections are allowed
  * and n(n-1) if they are not.
- *
- *  Used by quick connect.
  *
  * @param sourceNeurons       the source neurons
  * @param targetNeurons       the target neurons
@@ -113,8 +99,7 @@ fun connectAllToAll(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
     recurrent: Boolean = Utils.intersects(sourceNeurons, targetNeurons),
-    allowSelfConnection: Boolean = false,
-    looseSynapses: Boolean = true
+    allowSelfConnection: Boolean = false
 ): List<Synapse> {
     val syns = ArrayList<Synapse>((targetNeurons.size * sourceNeurons.size))
     // Optimization: separately handle case where we have to worry about
@@ -137,13 +122,6 @@ fun connectAllToAll(
                 s.strength = 1.0
                 syns.add(s)
             }
-        }
-    }
-    // If loose add directly to the network.
-    if (looseSynapses) {
-        for (s in syns) {
-            s.strength = 1.0
-            s.source.network.addNetworkModel(s)
         }
     }
     return syns

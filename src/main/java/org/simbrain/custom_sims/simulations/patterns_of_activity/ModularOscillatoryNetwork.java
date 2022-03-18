@@ -30,6 +30,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.simbrain.network.connections.RadialGaussianKt.*;
 import static org.simbrain.network.core.NetworkKt.connect;
 
 
@@ -166,9 +167,8 @@ public class ModularOscillatoryNetwork extends Simulation {
     }
 
     private SynapseGroup connectRadialGaussian(NeuronGroup sourceNg, NeuronGroup targetNg) {
-        ConnectionStrategy radialConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 1, RadialGaussian.DEFAULT_EI_CONST * 2,
-            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
-            50);
+        ConnectionStrategy radialConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 2,
+            DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50.0);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(sourceNg, targetNg, radialConnection);
         net.addNetworkModel(sg);
         sg.setDisplaySynapses(false);

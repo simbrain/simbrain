@@ -4,6 +4,7 @@ import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.RadialSimple;
+import org.simbrain.network.connections.SelectionStyle;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -24,7 +25,6 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -128,14 +128,9 @@ public class EdgeOfChaos extends Simulation {
 
     static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
-        List<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
-        for (int i = 0; i < numNeurons; i++) {
-            Neuron neuron = new Neuron(parentNet);
-            BinaryRule thresholdUnit = new BinaryRule();
-            neuron.setUpdateRule(thresholdUnit);
-            neurons.add(neuron);
-        }
-        NeuronGroup ng = new NeuronGroup(parentNet, neurons);
+        NeuronGroup ng = new NeuronGroup(parentNet, numNeurons);
+        BinaryRule thresholdUnit = new BinaryRule();
+        ng.setPrototypeRule(thresholdUnit);
         parentNet.addNetworkModel(ng);
 
         ng.setLayout(layout);
@@ -164,7 +159,7 @@ public class EdgeOfChaos extends Simulation {
         con.setExcitatoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
         con.setInhCons(k/2);
         con.setInhibitoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
-        con.setSelectMethod(RadialSimple.SelectionStyle.IN);
+        con.setSelectMethod(SelectionStyle.IN);
 
         SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con,
                 0.5, exRand, inRand);

@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.connections.RadialSimple
+import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.createNeurons
@@ -41,7 +41,7 @@ val cortexPCI = newSim {
     }
 
     // Radial connectivity
-    val radial = RadialSimple().apply {
+    val radial = RadialProbabilistic().apply {
         excitatoryRadius = 150.0
         excitatoryProbability = .4
         inhibitoryRadius = 150.0

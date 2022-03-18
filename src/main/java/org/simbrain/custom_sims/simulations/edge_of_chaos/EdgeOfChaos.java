@@ -3,8 +3,8 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.RadialSimple;
-import org.simbrain.network.connections.SelectionStyle;
+import org.simbrain.network.connections.Direction;
+import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -154,12 +154,9 @@ public class EdgeOfChaos extends Simulation {
                 .standardDeviation(Math.sqrt(variance))
                 .build();
 
-        RadialSimple con = new RadialSimple();
-        con.setExcCons(k/2);
-        con.setExcitatoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
-        con.setInhCons(k/2);
-        con.setInhibitoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
-        con.setSelectMethod(SelectionStyle.IN);
+        FixedDegree con = new FixedDegree();
+        con.setDegree(k);
+        con.setDirection(Direction.IN);
 
         SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con,
                 0.5, exRand, inRand);

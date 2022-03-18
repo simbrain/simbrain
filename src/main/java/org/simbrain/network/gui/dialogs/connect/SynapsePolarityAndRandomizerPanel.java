@@ -449,7 +449,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         eRatio.setValue((int) (ratio * 100));
         iRatio.setValue((int) ((1 - ratio) * 100));
         ratioSlider.setValue((int) (ratio * 100));
-
     }
 
     /**

@@ -2,8 +2,8 @@ package org.simbrain.custom_sims.simulations.sorn;
 
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.RadialSimple;
-import org.simbrain.network.connections.SelectionStyle;
+import org.simbrain.network.connections.Direction;
+import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -66,14 +66,14 @@ public class SORN extends Simulation {
     }
 
     public void buildNetwork() {
-        ArrayList<Neuron> neurons = new ArrayList<>();
-        ArrayList<Neuron> inhibitoryNeurons = new ArrayList<>();
+        var neurons = new ArrayList<Neuron>();
+        var inhibitoryNeurons = new ArrayList<Neuron>();
         SORNNeuronRule sornRule = new SORNNeuronRule();
-      //  sornRule.sethIP(400.0/numNeurons);
+        //  sornRule.sethIP(400.0/numNeurons);
         for (int i = 0; i < numNeurons; i++) {
             Neuron n = new Neuron(net);
-         //   sornRule.setMaxThreshold(0.5);
-         //   sornRule.setThreshold(0.5 * Math.random() + 0.01);
+            // sornRule.setMaxThreshold(0.5);
+            // sornRule.setThreshold(0.5 * Math.random() + 0.01);
             sornRule.setRefractoryPeriod(1);
             sornRule.setAddNoise(true);
             n.setPolarity(Polarity.EXCITATORY);
@@ -83,7 +83,7 @@ public class SORN extends Simulation {
         SORNNeuronRule str = new SORNNeuronRule();
         for (int i = 0; i < (int) (numNeurons * 0.2); i++) {
             Neuron n = new Neuron(net);
-           // str.setThreshold(0.8 * Math.random() + 0.01);
+            // str.setThreshold(0.8 * Math.random() + 0.01);
             str.setEtaIP(0); // No Homeostatic Plasticity
             str.setRefractoryPeriod(1);
             str.setAddNoise(true);
@@ -205,12 +205,14 @@ public class SORN extends Simulation {
     private static SynapseGroup connectGroups(Network network, NeuronGroup src, NeuronGroup tar, int kIn,
                                ProbabilityDistribution random, Polarity polarity, String label) {
         double excRat = polarity != Polarity.INHIBITORY ? 1.0 : 0.0;
-        RadialSimple connector = new RadialSimple();
-        connector.setSelectMethod(SelectionStyle.IN);
-        connector.setConMethod(RadialSimple.ConnectStyle.DETERMINISTIC);
-        src.setPolarity(polarity);
-        connector.setExcCons(kIn);
-        connector.setInhCons(kIn);
+        FixedDegree connector = new FixedDegree();
+        connector.setDirection(Direction.IN);
+        connector.setDegree(kIn);
+        // connector.setSelectMethod(SelectionStyle.IN);
+        // connector.setConMethod(RadialSimple.ConnectStyle.DETERMINISTIC);
+        // src.setPolarity(polarity);
+        // connector.setExcCons(kIn);
+        // connector.setInhCons(kIn);
         SynapseGroup sg = SynapseGroup
                 .createSynapseGroup(src, tar, connector, excRat, random, random);
         sg.setLabel(label);

@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
-import org.simbrain.network.connections.RadialSimple
+import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.createNeurons
 import org.simbrain.network.groups.NeuronCollection
@@ -39,7 +39,7 @@ val testSim = newSim {
     }
 
     // Connection strategies to use below
-    val radial = RadialSimple().apply {
+    val radial = RadialProbabilistic().apply {
         excitatoryRatio = .2
     }
     val sparse = Sparse().apply {

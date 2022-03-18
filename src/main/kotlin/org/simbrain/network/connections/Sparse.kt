@@ -167,6 +167,7 @@ class Sparse() : ConnectionStrategy(), EditableObject {
             selfConnectionAllowed,
             isEqualizeEfferents
         )
+
     }
 
     /**

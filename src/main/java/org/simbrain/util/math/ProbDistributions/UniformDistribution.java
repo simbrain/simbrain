@@ -40,6 +40,14 @@ public class UniformDistribution extends ProbabilityDistribution {
     public UniformDistribution() {
     }
 
+    /**
+     * Create a uniform dist with specified floor and ceiling
+     */
+    public UniformDistribution(double floor, double ceil) {
+        this.floor = floor;
+        this.ceil = ceil;
+    }
+
     public double nextRand() {
         return ThreadLocalRandom.current().nextDouble(this.floor, this.ceil);
     }

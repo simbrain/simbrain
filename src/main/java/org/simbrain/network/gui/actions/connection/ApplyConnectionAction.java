@@ -68,8 +68,8 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
             connectionPanel = new AnnotatedPropertyEditor((OneToOne) connection);
         }  else if (connection instanceof Sparse) {
             connectionPanel = new AnnotatedPropertyEditor((Sparse) connection);
-        }  else if (connection instanceof RadialSimple) {
-            connectionPanel = new AnnotatedPropertyEditor((RadialSimple) connection);
+        }  else if (connection instanceof RadialProbabilistic) {
+            connectionPanel = new AnnotatedPropertyEditor((RadialProbabilistic) connection);
         }
 
         ConnectionDialog dialog = new ConnectionDialog(getNetworkPanel(), connection);

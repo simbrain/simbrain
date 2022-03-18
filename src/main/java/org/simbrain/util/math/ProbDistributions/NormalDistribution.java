@@ -67,6 +67,13 @@ public class NormalDistribution extends ProbabilityDistribution {
         this.standardDeviation = stdev;
     }
 
+    public NormalDistribution(double mean, double stdev, double floor, double ceil) {
+        this.mean = mean;
+        this.standardDeviation = stdev;
+        this.floor = floor;
+        this.ceil = ceil;
+    }
+
     public double nextRand() {
         return clipping(this,
                 (ThreadLocalRandom.current().nextGaussian() * standardDeviation) + mean,

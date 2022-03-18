@@ -2,7 +2,8 @@ package org.simbrain.custom_sims.simulations.cortex;
 
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.RadialSimple;
+import org.simbrain.network.connections.Direction;
+import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -78,21 +79,16 @@ public class CorticalBranching extends Simulation {
         ProbabilityDistribution inRand = LogNormalDistribution.builder()
                 .polarity(Polarity.INHIBITORY).location(1.5).scale(3).build();
 
-        RadialSimple con = new RadialSimple();
-        con.setConMethod(RadialSimple.ConnectStyle.DETERMINISTIC);
-        con.setExcitatoryRadius(RADIUS);
-        con.setInhibitoryRadius(RADIUS);
-        con.setExcCons(KIN);
-        con.setInhCons(KIN);
+        FixedDegree con = new FixedDegree();
+        con.setDirection(Direction.IN);
+        con.setDegree(KIN);
+        con.setUseRadius(true);
+        con.setRadius(RADIUS);
 
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con);
         sg.setRandomizers(exRand, inRand);
-        //RadialSimple con = RadialSimpler.builder()
-        //        .connectionStyle(RadialSimple.ConnectStyle.DETERMINISTIC)
-        //        .numConns(KIN)
-        //        .radius(RADIUS)
-        //        .build(network, ng1.getNeuronList());
-
+        sg.setConnectionManager(con);
+        sg.makeConnections();
 
         // TODO: Band-aid... issue with synapse bounds needs addressing
         for(Synapse s : sg.getAllSynapses()) {

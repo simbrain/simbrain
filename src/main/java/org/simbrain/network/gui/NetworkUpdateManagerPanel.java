@@ -21,13 +21,13 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.scripteditor.ScriptEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.workspace.updater.UpdateAction;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -245,7 +245,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
          */
         public void actionPerformed(ActionEvent arg0) {
             for (Object action : currentActionJList.getSelectedValuesList()) {
-                network.getUpdateManager().removeAction((NetworkUpdateAction) action);
+                network.getUpdateManager().removeAction((UpdateAction) action);
             }
         }
     };
@@ -276,10 +276,10 @@ public class NetworkUpdateManagerPanel extends JPanel {
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
-            if (!dialog.hasUserCancelled()) {
-                CustomUpdate updateAction = new CustomUpdate(network, panel.getTextArea().getText());
-                network.getUpdateManager().addAction(updateAction);
-            }
+            // if (!dialog.hasUserCancelled()) {
+            //     CustomUpdate updateAction = new CustomUpdate(network, panel.getTextArea().getText());
+            //     network.getUpdateManager().addAction(updateAction);
+            // }
 
         }
     };
@@ -306,7 +306,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
             availableListScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             availableActionJList.setModel(listModel);
             listModel.clear();
-            for (NetworkUpdateAction action : network.getUpdateManager().getAvailableActionList()) {
+            for (UpdateAction action : network.getUpdateManager().getAvailableActionList()) {
                 listModel.addElement(action);
             }
             configureAvailableJList(availableActionJList);
@@ -315,7 +315,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
                 protected void closeDialogOk() {
                     super.closeDialogOk();
                     for (Object action : availableActionJList.getSelectedValuesList()) {
-                        network.getUpdateManager().addAction((NetworkUpdateAction) action);
+                        network.getUpdateManager().addAction((UpdateAction) action);
                     }
                     ;
                 }
@@ -352,7 +352,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
      */
     private void updateCurrentActionsList() {
         currentActionListModel.clear();
-        for (NetworkUpdateAction action : network.getUpdateManager().getActionList()) {
+        for (UpdateAction action : network.getUpdateManager().getActionList()) {
             currentActionListModel.addElement(action);
         }
         repaint();

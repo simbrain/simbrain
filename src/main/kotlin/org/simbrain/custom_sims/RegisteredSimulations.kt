@@ -26,6 +26,7 @@ val simulations = dir<Any>("Simulations") {
 
     dir("Demos") {
         item("Simple Network") { testSim }
+        item("Linked Neuron List") { linkedNeuronList }
         item("Projection") { projectionSim }
         item("Deep Net") { deepNetSim }
         item("Spiking Network") { spikingNetwork }

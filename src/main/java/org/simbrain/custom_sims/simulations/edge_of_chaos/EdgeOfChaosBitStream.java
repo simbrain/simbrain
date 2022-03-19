@@ -14,7 +14,7 @@ import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.updater.UpdateActionAdapter;
+import org.simbrain.workspace.updater.UpdateActionKt;
 
 import javax.swing.*;
 
@@ -146,15 +146,12 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         TimeSeriesPlotComponent ts = sim.addTimeSeries(681,15,363,285, "Time Series");
         TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Difference");
 
-        sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update time series") {
-            @Override
-            public void invoke() {
-                bitStream1.getInputManager().applyCurrentRow();
-                bitStream2.getInputManager().applyCurrentRow();
-                double activationDiff = SimbrainMath.distance(res1.getActivations(), res2.getActivations());
-                ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
-            }
-        });
+        sim.getWorkspace().addUpdateAction(UpdateActionKt.create("Update time series", () -> {
+            bitStream1.getInputManager().applyCurrentRow();
+            bitStream2.getInputManager().applyCurrentRow();
+            double activationDiff = SimbrainMath.distance(res1.getActivations(), res2.getActivations());
+            ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
+        }));
     }
 
     public EdgeOfChaosBitStream(SimbrainDesktop desktop) {

@@ -16,43 +16,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.update_actions;
+package org.simbrain.network.update_actions
 
-import org.simbrain.network.NetworkModel;
-import org.simbrain.network.core.NetworkUpdateAction;
+import org.simbrain.network.NetworkModel
+import org.simbrain.workspace.updater.UpdateAction
 
 /**
  * Action to update a specific network model (NeuronGroup, SynapseGroup, etc.).
  *
  * @author jyoshimi
  */
-public class UpdateNetworkModel implements NetworkUpdateAction {
-
-    /**
-     * Reference to group.
-     */
-    private final NetworkModel networkModel;
-
-    /**
-     * Construct a new updater.
-     */
-    public UpdateNetworkModel(NetworkModel networkModel) {
-        this.networkModel = networkModel;
+class UpdateNetworkModel(private val networkModel: NetworkModel) : UpdateAction(
+    networkModel.label,
+    "Update ${networkModel.label}"
+) {
+    override suspend operator fun invoke() {
+        networkModel.update()
     }
-
-    @Override
-    public void invoke() {
-        networkModel.update();
-    }
-
-    @Override
-    public String getDescription() {
-        return networkModel.getLabel();
-    }
-
-    @Override
-    public String getLongDescription() {
-        return "Update " + networkModel.getLabel();
-    }
-
 }

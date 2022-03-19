@@ -16,56 +16,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.updater;
+package org.simbrain.workspace.updater
 
-import org.simbrain.workspace.couplings.Coupling;
+import org.simbrain.workspace.couplings.Coupling
 
 /**
  * Updates a coupling.
  *
  * @author jyoshimi
  */
-public class UpdateCoupling implements UpdateAction {
-
-    /**
-     * of couplings to update.
-     */
-    private final transient Coupling coupling;
-
-    /**
-     * Construct the action.
-     *
-     * @param coupling coupling to update
-     */
-    public UpdateCoupling(Coupling coupling) {
-        this.coupling = coupling;
+class UpdateCoupling(@field:Transient val coupling: Coupling) : UpdateAction("Update coupling (${coupling.producer}>${coupling.consumer})") {
+    override suspend operator fun invoke() {
+        coupling.update()
     }
-
-    @Override
-    public void invoke() {
-        coupling.update();
-    }
-
-    @Override
-    public String getDescription() {
-        if (coupling == null) {
-            return "Invalid action";
-        } else {
-            return "Update coupling (" + coupling.getProducer() + ">" + coupling.getConsumer() + ")";
-        }
-    }
-
-    @Override
-    public String getLongDescription() {
-        if (coupling == null) {
-            return "Invalid action";
-        } else {
-            return coupling.toString();
-        }
-    }
-
-    public Coupling getCoupling() {
-        return coupling;
-    }
-
 }

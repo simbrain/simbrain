@@ -25,9 +25,15 @@ import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
-import org.simbrain.network.update_actions.*;
+import org.simbrain.network.update_actions.BufferedUpdate;
+import org.simbrain.network.update_actions.PriorityUpdate;
+import org.simbrain.network.update_actions.UpdateNetworkModel;
+import org.simbrain.workspace.updater.UpdateAction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,7 +50,7 @@ public class NetworkUpdateManager {
      * The list of update actions, in a specific order. One run through these
      * actions constitutes a single "update" in the network.
      */
-    private final List<NetworkUpdateAction> actionList = new ArrayList<>();
+    private final List<UpdateAction> actionList = new ArrayList<>();
 
     /**
      * Reference to parent network.
@@ -63,47 +69,38 @@ public class NetworkUpdateManager {
     }
 
     /**
-     * Invokes the actions in the action list consecutively. By default {@link BufferedUpdate} is
-     * all that is called.
-     */
-    public void invokeAllUpdates() {
-        actionList.forEach(NetworkUpdateAction::invoke);
-    }
-
-    /**
      * Perform any initialization required after opening a network from xml.
      * UpdateManager will have been created from a default no argument
      * constructor ands its fields populated using xstream.
      */
     public void postOpenInit() {
-        Iterator<NetworkUpdateAction> actions = actionList.iterator();
-        // TODO: Hack-y solution. Revisit this.
-        while (actions.hasNext()) {
-            NetworkUpdateAction action = actions.next();
-            if (action instanceof ConcurrentBufferedUpdate) {
-                actions.remove();
-                actionList.add(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
-                break;
-            }
-        }
-
-        for (NetworkUpdateAction action : getActionList()) {
-            if (action instanceof CustomUpdate) {
-                ((CustomUpdate) action).init();
-            }
-        }
+        // Iterator<NetworkUpdateAction> actions = actionList.iterator();
+        // // TODO: Hack-y solution. Revisit this.
+        // while (actions.hasNext()) {
+        //     NetworkUpdateAction action = actions.next();
+        //     if (action instanceof ConcurrentBufferedUpdate) {
+        //         actions.remove();
+        //         actionList.add(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
+        //         break;
+        //     }
+        // }
+        //
+        // for (NetworkUpdateAction action : getActionList()) {
+        //     if (action instanceof CustomUpdate) {
+        //         ((CustomUpdate) action).init();
+        //     }
+        // }
     }
 
     /**
      * This is the list of actions that are available to be added manually.
      */
-    public List<NetworkUpdateAction> getAvailableActionList() {
-        final List<NetworkUpdateAction> availableActionList = new ArrayList<>();
+    public List<UpdateAction> getAvailableActionList() {
+        final List<UpdateAction> availableActionList = new ArrayList<>();
 
         // By default these actions are always available
         availableActionList.add(new BufferedUpdate(network));
         availableActionList.add(new PriorityUpdate(network));
-        availableActionList.add(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
 
         // TODO: If added, these should be removed when any corresponding object is removed
 
@@ -125,7 +122,7 @@ public class NetworkUpdateManager {
     /**
      * Return the list of current update actions.
      */
-    public List<NetworkUpdateAction> getActionList() {
+    public List<UpdateAction> getActionList() {
         return actionList;
     }
 
@@ -143,7 +140,7 @@ public class NetworkUpdateManager {
     /**
      * Add the specified action to the update manager.
      */
-    public void addAction(NetworkUpdateAction action) {
+    public void addAction(UpdateAction action) {
         actionList.add(action);
         network.getEvents().fireUpdateActionsChanged();
     }
@@ -151,7 +148,7 @@ public class NetworkUpdateManager {
     /**
      * Remove the specified action from the update manager.
      */
-    public void removeAction(NetworkUpdateAction action) {
+    public void removeAction(UpdateAction action) {
         actionList.remove(action);
         network.getEvents().fireUpdateActionsChanged();
     }

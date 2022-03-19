@@ -18,11 +18,12 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.trainers.IterableTrainer;
+import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.workspace.updater.UpdateActionKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,26 +46,17 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
     /**
      * An update action to update the backprop trainer when the network is updated.
      */
-    private NetworkUpdateAction updater = new NetworkUpdateAction() {
-        @Override
-        public void invoke() {
-            try {
-                currentTrainer.apply();
-            } catch (IterableTrainer.DataNotInitializedException ex) {
-                JOptionPane.showMessageDialog(null, "Unable to apply trainer: data not initialized.");
+    private final UpdateAction updater = UpdateActionKt.create(
+            "Apply Backprop Trainer",
+            "Applies one training step (usually one epoch) of the currently opened trainer dialog to the\" + \"associated BackpropNetwork.",
+            () -> {
+                try {
+                    currentTrainer.apply();
+                } catch (IterableTrainer.DataNotInitializedException ex) {
+                    JOptionPane.showMessageDialog(null, "Unable to apply trainer: data not initialized.");
+                }
             }
-        }
-
-        @Override
-        public String getDescription() {
-            return "Apply Backprop Trainer";
-        }
-
-        @Override
-        public String getLongDescription() {
-            return "Applies one training step (usually one epoch) of the currently opened trainer dialog to the" + "associated BackpropNetwork.";
-        }
-    };
+    );
 
     /**
      * Default constructor.

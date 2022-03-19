@@ -2,9 +2,9 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.updateAction
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.networkUpdateAction
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
@@ -18,8 +18,6 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.component3
-import kotlin.collections.forEach
-import kotlin.collections.map
 import kotlin.random.Random
 
 /**
@@ -91,7 +89,7 @@ val reservoir = newSim {
     }
 
     // Custom actions to perform when pressing run button
-    network.addUpdateAction(networkUpdateAction("K Custom Learning Rule") {
+    network.addUpdateAction(updateAction("K Custom Learning Rule") {
         println("Custom update....")
     })
 

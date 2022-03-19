@@ -10,7 +10,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -197,8 +196,8 @@ public class SORN extends RegisteredSimulation {
 //            n.normalizeExcitatoryFanIn();
 //        }
 
-        net.getUpdateManager().clear();
-        net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
+        // net.getUpdateManager().clear();
+        // net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
         net.updateTimeType();
     }
 

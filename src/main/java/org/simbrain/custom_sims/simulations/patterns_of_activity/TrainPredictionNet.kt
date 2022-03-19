@@ -1,76 +1,56 @@
-package org.simbrain.custom_sims.simulations.patterns_of_activity;
+package org.simbrain.custom_sims.simulations.patterns_of_activity
 
-import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
+import org.simbrain.workspace.updater.UpdateAction
 
 /**
  * Training the prediction sub-network.
  */
-public class TrainPredictionNet implements NetworkUpdateAction {
-
+class TrainPredictionNet(
     /**
      * Reference to simulation object that has all the main variables used.
      */
-    KuramotoOscillators sim;
-
+    var sim: KuramotoOscillators
+) : UpdateAction("Custom Learning Rule") {
     // TODO
-    double[] lastPrediction;
-    double learningRate = .1;
+    var lastPrediction: DoubleArray
+    var learningRate = .1
 
     /**
      * Construct the updater.
      */
-    public TrainPredictionNet(KuramotoOscillators sim) {
-        super();
-        this.sim = sim;
-        lastPrediction = sim.predictionRes.getActivations();
+    init {
+        lastPrediction = sim.predictionRes.activations
     }
-
-    @Override
-    public String getDescription() {
-        return "Custom Learning Rule";
-    }
-
-    @Override
-    public String getLongDescription() {
-        return "Custom Learning Rule";
-    }
-
-    @Override
-    public void invoke() {
-        mainUpdateMethod();
+    override suspend operator fun invoke() {
+        mainUpdateMethod()
     }
 
     /**
      * Training synapses using delta rule.
      */
-    private void mainUpdateMethod() {
-
-        int i = 0;
-        double error = 0;
-        double sumError = 0;
-        for (Neuron neuron : sim.predictionRes.getNeuronList()) {
+    private fun mainUpdateMethod() {
+        var i = 0
+        var error = 0.0
+        var sumError = 0.0
+        for (neuron in sim.predictionRes.neuronList) {
             // error = target - actual
             // error = current sensory - last prediction
-            error = sim.reservoirNet.getNeuronList().get(i).getActivation() - lastPrediction[i];
-            sumError += error * error;
+            error = sim.reservoirNet.neuronList[i].activation - lastPrediction[i]
+            sumError += error * error
             // System.out.println(i + ":" + error + ":" + neuron.getId());
-            neuron.setAuxValue(error);
-            i++;
+            neuron.auxValue = error
+            i++
         }
 
         // Update error neuron
-        sim.errorNeuron.forceSetActivation(Math.sqrt(sumError));
+        sim.errorNeuron.forceSetActivation(Math.sqrt(sumError))
 
         // Update all synapses
-        for (Synapse synapse : sim.predictionSg.getAllSynapses()) {
-            double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
-            synapse.setStrength(newStrength);
+        for (synapse in sim.predictionSg.allSynapses) {
+            val newStrength = synapse.strength + learningRate * synapse.source.activation * synapse.target.auxValue
+            synapse.strength = newStrength
             // System.out.println(newStrength);
         }
-
-        lastPrediction = sim.predictionRes.getActivations();
+        lastPrediction = sim.predictionRes.activations
     }
-
 }

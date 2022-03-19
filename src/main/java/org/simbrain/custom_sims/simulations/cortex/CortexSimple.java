@@ -10,7 +10,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -161,9 +160,9 @@ public class CortexSimple extends RegisteredSimulation {
         // Todo; Add labels
 
         // Use concurrent buffered update
-        net.getUpdateManager().clear();
-        net.getUpdateManager().addAction(ConcurrentBufferedUpdate
-            .createConcurrentBufferedUpdate(net));
+        // net.getUpdateManager().clear();
+        // net.getUpdateManager().addAction(ConcurrentBufferedUpdate
+        //     .createConcurrentBufferedUpdate(net));
     }
 
     private NeuronGroup buildLayer(int numNeurons,

@@ -21,6 +21,7 @@ package org.simbrain.workspace.gui;
 import bsh.Interpreter;
 import bsh.util.JConsole;
 import kotlin.Unit;
+import kotlinx.coroutines.CoroutineScopeKt;
 import org.pmw.tinylog.Logger;
 import org.simbrain.console.ConsoleDesktopComponent;
 import org.simbrain.custom_sims.NewSimulation;
@@ -38,7 +39,6 @@ import org.simbrain.util.widgets.ToggleButton;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
-import org.simbrain.workspace.updater.InterceptingEventQueue;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 import javax.swing.*;
@@ -267,7 +267,7 @@ public class SimbrainDesktop {
             updateTimeLabel();
         });
 
-        events.onComponentAdded(this::addDesktopComponent);
+        events.onComponentAdded(workspaceComponent -> addDesktopComponent(workspaceComponent));
 
         events.onComponentRemoved(wc -> {
             DesktopComponent<?> component = guiComponents.get(wc);
@@ -1083,7 +1083,9 @@ public class SimbrainDesktop {
      */
     public static void main(final String[] args) {
 
-        final Workspace workspace = new Workspace();
+        var coroutineScope = CoroutineScopeKt.MainScope();
+
+        final Workspace workspace = new Workspace(coroutineScope);
 
         try {
             // Line below for Ubuntu so that icons don't turn on by default
@@ -1097,11 +1099,12 @@ public class SimbrainDesktop {
             e.printStackTrace();
         }
 
-        InterceptingEventQueue eventQueue = new InterceptingEventQueue(workspace);
+        // InterceptingEventQueue eventQueue = new InterceptingEventQueue(workspace);
+        //
+        // workspace.setTaskSynchronizationManager(eventQueue);
+        //
+        // Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
 
-        workspace.setTaskSynchronizationManager(eventQueue);
-
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override

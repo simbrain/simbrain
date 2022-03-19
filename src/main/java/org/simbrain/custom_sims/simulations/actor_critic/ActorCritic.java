@@ -19,6 +19,7 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.workspace.updater.UpdateActionKt;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -189,35 +190,20 @@ public class ActorCritic extends RegisteredSimulation {
      */
     private void addCustomWorkspaceUpdate() {
         // Custom workspace update rule
-        UpdateAction workspaceUpdateAction = new UpdateAction() {
-            @Override
-            public String getDescription() {
-                return "Actor Critic";
-            }
+        UpdateAction workspaceUpdateAction = UpdateActionKt.create("Actor Critic", () -> {
+            // Update net > movement couplings
+            sim.getWorkspace().getCouplingManager().updateCouplings(effectorCouplings);
 
-            @Override
-            public String getLongDescription() {
-                return "Actor Critic";
-            }
+            // Update world
+            oc.getWorld().update();
 
-            @Override
-            public void invoke() {
+            // Update world > tile neurons
+            // sensorcoupling also couples to the time series plot
+            sim.getWorkspace().getCouplingManager().updateCouplings(sensorCouplings);
 
-                // Update net > movement couplings
-                sim.getWorkspace().getCouplingManager().updateCouplings(effectorCouplings);
-
-                // Update world
-                oc.getWorld().update();
-
-                // Update world > tile neurons
-                // sensorcoupling also couples to the time series plot
-                sim.getWorkspace().getCouplingManager().updateCouplings(sensorCouplings);
-
-                // Fourth: update network
-                nc.update();
-            }
-
-        };
+            // Fourth: update network
+            nc.update();
+        });
         sim.getWorkspace().getUpdater().getUpdateManager().clear();
         sim.getWorkspace().addUpdateAction(workspaceUpdateAction);
     }

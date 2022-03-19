@@ -2,6 +2,8 @@ package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
@@ -37,10 +39,7 @@ import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.widgets.EditablePanel
 import org.simbrain.util.widgets.ToggleButton
-import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.Cursor
-import java.awt.FlowLayout
+import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.util.Timer
@@ -53,7 +52,9 @@ import kotlin.concurrent.timerTask
 /**
  * Main GUI representation of a [Network].
  */
-class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
+class NetworkPanel constructor(val networkComponent: NetworkComponent, val channel: Channel<Runnable>) : JPanel() {
+
+    val mainScope = MainScope()
 
     /**
      * Main Piccolo canvas object.
@@ -65,7 +66,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
     /**
      * Reference to the model network
      */
-    val network = networkComponent.network
+    val network: Network = networkComponent.network
 
     /**
      * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
@@ -631,9 +632,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel() {
         val event = network.events
         event.onModelAdded {
             createNode(it)
-            if (it is LocatableModel && it.shouldBePlaced) {
-                placementManager.placeObject(it)
-            }
+            // if (it is LocatableModel && it.shouldBePlaced) {
+            //     placementManager.placeObject(it)
+            // }
         }
         event.onModelRemoved {
             zoomToFitPage()

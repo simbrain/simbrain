@@ -4,6 +4,7 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
+import org.simbrain.custom_sims.simulations.utils.ColorPlotKt;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -615,7 +616,11 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         Producer inputProducer = sim.getProducer(this, "getCombinedInputs");
         Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
         sim.couple(inputProducer, plotConsumer);
-        sim.getWorkspace().addUpdateAction(new ColorPlot(this));
+        sim.getWorkspace().addUpdateAction(ColorPlotKt.createColorPlotUpdateAction(
+                plot.getProjector(),
+                combinedPredicted,
+                preditionError + 0.1
+        ));
 
         // Label PCA points based on closest object
         Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");

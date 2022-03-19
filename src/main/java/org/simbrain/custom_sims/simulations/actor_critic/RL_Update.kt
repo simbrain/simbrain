@@ -1,80 +1,63 @@
-package org.simbrain.custom_sims.simulations.actor_critic;
+package org.simbrain.custom_sims.simulations.actor_critic
 
-import org.simbrain.network.core.NetworkKt;
-import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-
-import java.util.Collections;
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.updateNeurons
+import org.simbrain.workspace.updater.UpdateAction
 
 /**
  * A custom updater for use in applying TD Learning and other custom update
  * features (e.g. only activating one vehicle network at a time based on the
  * output of a feed-forward net).
- * <p>
+ *
+ *
  * For background on TD Learning see.
  * http://www.scholarpedia.org/article/Temporal_difference_learning
  */
 // CHECKSTYLE:OFF
-public class RL_Update implements NetworkUpdateAction {
-
-    /**
-     * Reference to RL_Sim object that has all the main variables used.
-     */
-    ActorCritic sim;
-
+class RL_Update(var sim: ActorCritic) : UpdateAction("Custom TD Rule") {
     /**
      * Reference to main neurons used in td learning.
      */
-    Neuron reward, value, tdError;
+    var reward: Neuron
+    var value: Neuron
+    var tdError: Neuron
 
     /**
      * Construct the updater.
      */
-    public RL_Update(ActorCritic sim) {
-        super();
-        this.sim = sim;
-        reward = sim.reward;
-        value = sim.value;
-        tdError = sim.tdError;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Custom TD Rule";
-    }
-
-    @Override
-    public String getLongDescription() {
-        return "Custom TD Rule";
+    init {
+        reward = sim.reward
+        value = sim.value
+        tdError = sim.tdError
     }
 
     /**
      * Custom update of the network, including application of TD Rules.
      */
-    @Override
-    public void invoke() {
+    override suspend operator fun invoke() {
 
         // Update neurons and networks
-        sim.sensorNeurons.update();
-        NetworkKt.updateNeurons(Collections.singletonList(sim.value));
-        NetworkKt.updateNeurons(Collections.singletonList(sim.reward));
-        sim.outputs.update();
+        sim.sensorNeurons.update()
+        updateNeurons(listOf(sim.value))
+        updateNeurons(listOf(sim.reward))
+        sim.outputs.update()
 
         // System.out.println("td error:" + value.getActivation() + " + " +
         // reward.getActivation() + " - " + value.getLastActivation());
-        sim.tdError.forceSetActivation((reward.getActivation()
-                + sim.gamma * value.getActivation())
-                - value.getLastActivation());
+        sim.tdError.forceSetActivation(
+            (reward.activation
+                    + sim.gamma * value.activation)
+                    - value.lastActivation
+        )
 
         // Update all value synapses
-        for (Synapse synapse : value.getFanIn()) {
-            Neuron sourceNeuron = synapse.getSource();
+        for (synapse in value.fanIn) {
+            val sourceNeuron = synapse.source
             // Reinforce based on the source neuron's last activation (not its
             // current value),
             // since that is what the current td error reflects.
-            double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * sourceNeuron.getLastActivation();
-            synapse.setStrength(synapse.clip(newStrength));
+            val newStrength = synapse.strength + sim.alpha * tdError.activation * sourceNeuron.lastActivation
+            synapse.strength = synapse.clip(newStrength)
             //synapse.forceSetStrength(newStrength);
             // System.out.println("Value Neuron / Tile neuron (" +
             // sourceNeuron.getId() + "):" + newStrength);
@@ -82,23 +65,21 @@ public class RL_Update implements NetworkUpdateAction {
 
         // Update all actor neurons. Reinforce input > output connection that
         // were active at the last time-step.
-        for (Neuron neuron : sim.outputs.getNeuronList()) {
+        for (neuron in sim.outputs.neuronList) {
             // Just update the last winner
-            if (neuron.getLastActivation() > 0) {
-                for (Synapse synapse : neuron.getFanIn()) {
-                    Neuron sourceNeuron = synapse.getSource();
-                    if (sourceNeuron.getLastActivation() > 0) {
-                        double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * sourceNeuron.getLastActivation();
-                        synapse.setStrength(synapse.clip(newStrength));
+            if (neuron.lastActivation > 0) {
+                for (synapse in neuron.fanIn) {
+                    val sourceNeuron = synapse.source
+                    if (sourceNeuron.lastActivation > 0) {
+                        val newStrength =
+                            synapse.strength + sim.alpha * tdError.activation * sourceNeuron.lastActivation
+                        synapse.strength = synapse.clip(newStrength)
                         //synapse.forceSetStrength(newStrength);
                         // System.out.println(tdError.getActivation() + "," +
                         // sourceNeuron.getLastActivation());
                     }
                 }
-
             }
         }
-
     }
-
 }

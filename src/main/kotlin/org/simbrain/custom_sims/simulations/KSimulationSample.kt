@@ -1,10 +1,13 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.*
 import org.simbrain.custom_sims.addImageWorld
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.helper_classes.Simulation
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.util.place
 import org.simbrain.util.point
 
@@ -47,4 +50,27 @@ val testSim = newSim {
         }
     }
 
+}
+
+val linkedNeuronList = newSim {
+    val networkComponent = addNetworkComponent("Neuron List")
+
+    val network = networkComponent.network
+
+    GlobalScope.launch(Dispatchers.Main) {
+        val neurons = (1..10000).map {
+            async(Dispatchers.Default) { Neuron(network) }
+        }.awaitAll()
+
+        neurons.forEach { network.addNetworkModel(it) }
+
+        val synapses = with(network) {
+            neurons.windowed(2) { (n1, n2) ->
+                addSynapse(n1, n2) {
+                    strength = 1.0
+                }
+            }
+        }
+        HexagonalGridLayout.layoutNeurons(neurons, 40, 40)
+    }
 }

@@ -16,7 +16,6 @@ import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.UDF;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -361,8 +360,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
         net.addNetworkModel(sensoryNetR);
 
         // Set up concurrent buffered update
-        net.getUpdateManager().clear();
-        net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
+        // net.getUpdateManager().clear();
+        // net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
     }
 
 

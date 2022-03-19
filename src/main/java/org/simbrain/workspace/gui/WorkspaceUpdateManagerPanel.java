@@ -15,22 +15,16 @@ package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
-import org.simbrain.util.scripteditor.ScriptEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updater.SynchronizedTaskUpdateAction;
 import org.simbrain.workspace.updater.UpdateAction;
-import org.simbrain.workspace.updater.UpdateActionCustom;
 import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
-import org.simbrain.workspace.updater.WorkspaceDelayAction;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
-import java.io.File;
 
 /**
  * Panel for display and ordering of workspace update actions.
@@ -161,23 +155,6 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     };
 
     /**
-     * Action which allows for creation of custom action.
-     */
-    Action addCustomAction = new AbstractAction() {
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/plus.png"));
-            putValue(NAME, "Add Custom");
-            putValue(SHORT_DESCRIPTION, "Add a custom scripted update action to the update sequence.");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            showCustomUpdateActionDialog();
-        }
-    };
-
-    /**
      * Construct workspace update manager panel.
      *
      * @param workspace    parent workspace
@@ -204,8 +181,6 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         JPanel buttonPanel = new JPanel();
         JButton addActionsButton = new JButton(addPresetAction);
         buttonPanel.add(addActionsButton);
-        JButton customActionButton = new JButton(addCustomAction);
-        buttonPanel.add(customActionButton);
         JButton deleteActionsButton = new JButton(deleteActionsAction);
         buttonPanel.add(deleteActionsButton);
 
@@ -259,11 +234,6 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
                     // When double clicking on custom actions open an editor
                     int clickedIndex = currentActionJList.locationToIndex(e.getPoint());
                     UpdateAction action = currentActionJList.getModel().getElementAt(clickedIndex);
-                    if (action instanceof UpdateActionCustom) {
-                        openScriptEditorPanel(action);
-                    } else if (action instanceof WorkspaceDelayAction) {
-                        ((WorkspaceDelayAction) action).showDialog();
-                    }
                 }
             }
         });
@@ -298,11 +268,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
 
     private void deleteSelectedUpdateActions() {
         for (UpdateAction action : currentActionJList.getSelectedValuesList()) {
-            if (action instanceof SynchronizedTaskUpdateAction) {
-                JOptionPane.showMessageDialog(null, "Synchronized task update can not be removed.");
-            } else {
-                workspace.getUpdater().getUpdateManager().removeAction(action);
-            }
+            workspace.getUpdater().getUpdateManager().removeAction(action);
         }
     }
 
@@ -335,71 +301,10 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     }
 
     /**
-     * Open the script editor panel with appropriate defaults.
-     *
-     * @param action the action
-     */
-    private void openScriptEditorPanel(UpdateAction action) {
-        ScriptEditor panel = new ScriptEditor(((UpdateActionCustom) action).getScriptString(), SCRIPT_DIR);
-        StandardDialog dialog = panel.getDialog(panel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-        if (!dialog.hasUserCancelled()) {
-            ((UpdateActionCustom) action).setScriptString(panel.getTextArea().getText());
-            ((UpdateActionCustom) action).init();
-        }
-    }
-
-    private void showCustomUpdateActionDialog() {
-        File defaultScript = new File(System.getProperty("user.dir") + "/etc/customWorkspaceUpdateTemplate.bsh");
-        ScriptEditor panel = new ScriptEditor(Utils.readFileContents(defaultScript), SCRIPT_DIR);
-        panel.setScriptFile(defaultScript);
-        StandardDialog dialog = panel.getDialog(panel);
-        // Setting script file to null prevents the template script from being saved. Forces "save as"
-        // if save button pressed.
-        panel.setScriptFile(null);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-        if (!dialog.hasUserCancelled()) {
-            UpdateActionCustom updateAction = new UpdateActionCustom(workspace.getUpdater(), panel.getTextArea().getText());
-            workspace.getUpdater().getUpdateManager().addAction(updateAction);
-        }
-    }
-
-    /**
      * Configure the available JList panel.
      */
     private void configureAvailableJList(JList<UpdateAction> availableActionJList) {
         availableActionJList.setCellRenderer(this::getUpdateActionCell);
-        availableActionJList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    UpdateAction action = (UpdateAction) availableActionJList.getModel().getElementAt(availableActionJList.locationToIndex(e.getPoint()));
-                    if (action instanceof UpdateActionCustom) {
-                        openScriptEditorPanel((UpdateActionCustom) action);
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * Open the script editor panel with appropriate defaults.
-     *
-     * @param action the action
-     */
-    private void openScriptEditorPanel(UpdateActionCustom action) {
-        ScriptEditor panel = new ScriptEditor(action.getScriptString(), SCRIPT_DIR);
-        StandardDialog dialog = panel.getDialog(panel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-        if (!dialog.hasUserCancelled()) {
-            action.setScriptString(panel.getTextArea().getText());
-            action.init();
-        }
     }
 
     /**

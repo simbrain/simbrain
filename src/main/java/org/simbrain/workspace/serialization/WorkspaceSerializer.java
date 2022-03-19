@@ -333,9 +333,6 @@ public class WorkspaceSerializer {
                 manager.addAction(archive.createUpdateAction(workspace, deserializer, archivedAction));
             }
         }
-        if (!manager.getActionList().contains(workspace.getUpdater().getSyncUpdateAction())) {
-            manager.addAction(workspace.getUpdater().getSyncUpdateAction());
-        }
     }
 
     private void deserializeWorkspaceParameters(ArchivedWorkspace archive) {

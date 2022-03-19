@@ -21,7 +21,6 @@ package org.simbrain.workspace.actions;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.Utils;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.serialization.WorkspaceSerializer;

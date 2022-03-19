@@ -4,13 +4,13 @@ import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.updater.UpdateActionKt;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -119,32 +119,17 @@ public class ClassicalConditioning extends RegisteredSimulation {
         sim.couple(association, ts1);
 
         // Add custom network update action
-        nc.getNetwork().addUpdateAction(new NetworkUpdateAction() {
-
-            @Override
-            public void invoke() {
-
-                if ((bellDetectorNeuron.getActivation() > 0) && (cheeseDetectorNeuron.getActivation() > 0)) {
-                    // Learning
-                    association.setIncrement(.001); // learning rate
-                    association.increment();
-                } else if ((bellDetectorNeuron.getActivation() > 0) && (cheeseDetectorNeuron.getActivation() <= 0)) {
-                    // Extinction
-                    association.setIncrement(.0005); // extinction rate
-                    association.decrement();
-                }
+        nc.getNetwork().addUpdateAction(UpdateActionKt.create("Custom behaviorism update", () -> {
+            if ((bellDetectorNeuron.getActivation() > 0) && (cheeseDetectorNeuron.getActivation() > 0)) {
+                // Learning
+                association.setIncrement(.001); // learning rate
+                association.increment();
+            } else if ((bellDetectorNeuron.getActivation() > 0) && (cheeseDetectorNeuron.getActivation() <= 0)) {
+                // Extinction
+                association.setIncrement(.0005); // extinction rate
+                association.decrement();
             }
-
-            @Override
-            public String getDescription() {
-                return "Custom behaviorism update";
-            }
-
-            @Override
-            public String getLongDescription() {
-                return "Custom behaviorism update";
-            }
-        });
+        }));
 
     }
 

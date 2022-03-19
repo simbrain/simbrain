@@ -1,5 +1,8 @@
 package org.simbrain.util
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.Point
@@ -15,15 +18,19 @@ data class Placement(
 )
 
 fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, placement: Placement.() -> Unit) {
-    val (location, width, height) = Placement().apply(placement)
-    val desktopComponent = getDesktopComponent(workspaceComponent)
-    val bounds = desktopComponent.parentFrame.bounds
-    desktopComponent.parentFrame.bounds = Rectangle(
-        location?.x ?: bounds.x,
-        location?.y ?: bounds.y,
-        width ?: bounds.width,
-        height ?: bounds.height
-    )
+    workspace.coroutineScope.launch {
+        val (location, width, height) = Placement().apply(placement)
+        val desktopComponent = withContext(Dispatchers.Main) {
+            getDesktopComponent(workspaceComponent)
+        }
+        val bounds = desktopComponent.parentFrame.bounds
+        desktopComponent.parentFrame.bounds = Rectangle(
+            location?.x ?: bounds.x,
+            location?.y ?: bounds.y,
+            width ?: bounds.width,
+            height ?: bounds.height
+        )
+    }
 }
 
 fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {

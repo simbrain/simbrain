@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.simulations.utils.ColorPlotKt;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
@@ -147,7 +148,11 @@ public class KuramotoOscillators extends RegisteredSimulation {
         errorNeuron.setLabel("Error");
 
         // "Halo" based on prediction error
-        sim.getWorkspace().addUpdateAction((new ColorPlotKuramoto(this)));
+        sim.getWorkspace().addUpdateAction(ColorPlotKt.createColorPlotUpdateAction(
+                plot.getProjector(),
+                predictionRes,
+                errorNeuron.getActivation()
+        ));
 
     }
 

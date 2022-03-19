@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.channels.Channel
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
@@ -97,7 +98,7 @@ fun NetworkPanel.createSynapseGroupDialog(synapseGroup: SynapseGroup) =
 fun showNetwork(networkComponent: NetworkComponent) {
     // TODO: Creation outside of desktop lacks menus
     val frame = JFrame()
-    val np = NetworkPanel(networkComponent)
+    val np = NetworkPanel(networkComponent, Channel())
     // component?.getDesktop()?.addInternalFrame(frame)
     //np.initScreenElements()
     frame.contentPane = np

@@ -16,10 +16,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.update_actions;
+package org.simbrain.network.update_actions
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
+import org.simbrain.network.core.Network
+import org.simbrain.workspace.updater.UpdateAction
 
 /**
  * Buffered update of all network models.  Write values to appropriate buffers.  Then read all values from them,
@@ -27,30 +27,8 @@ import org.simbrain.network.core.NetworkUpdateAction;
  *
  * @author jyoshimi
  */
-public class BufferedUpdate implements NetworkUpdateAction {
-
-    /**
-     * Reference to network to update.
-     */
-    private Network network;
-
-    public BufferedUpdate(Network network) {
-        this.network = network;
+class BufferedUpdate(private val network: Network) : UpdateAction("Loose neurons (buffered) and synapses", "Buffered update of loose items") {
+    override suspend operator fun invoke() {
+        network.bufferedUpdate()
     }
-
-    @Override
-    public void invoke() {
-        network.bufferedUpdate();
-    }
-
-    @Override
-    public String getDescription() {
-        return "Loose neurons (buffered) and synapses";
-    }
-
-    @Override
-    public String getLongDescription() {
-        return "Buffered update of loose items";
-    }
-
 }

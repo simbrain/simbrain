@@ -18,9 +18,9 @@
  */
 package org.simbrain.workspace.updater;
 
+import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingEvents;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
 
 import java.util.ArrayList;
@@ -69,12 +69,12 @@ public class UpdateActionManager {
      * The list of update actions, in a specific order. One run through these
      * actions constitutes a single iteration of the workspace.
      */
-    private final List<UpdateAction> actionList = new CopyOnWriteArrayList<UpdateAction>();
+    private final List<UpdateAction> actionList = new CopyOnWriteArrayList<>();
 
     /**
      * List of listeners on this update manager.
      */
-    private final transient List<UpdateManagerListener> listeners = new ArrayList<UpdateManagerListener>();
+    private final transient List<UpdateManagerListener> listeners = new ArrayList<>();
 
     /**
      * Reference to workspace.
@@ -119,7 +119,7 @@ public class UpdateActionManager {
         WorkspaceEvents events = workspaceUpdater.getWorkspace().getEvents();
 
         events.onComponentAdded(wc -> {
-            UpdateComponent componentAction = new UpdateComponent(workspaceUpdater, wc);
+            UpdateComponent componentAction = new UpdateComponent(wc);
             componentActionMap.put(wc, componentAction);
         });
 
@@ -230,7 +230,7 @@ public class UpdateActionManager {
     public void setDefaultUpdateActions() {
         clear();
         addAction(new UpdateAllAction(workspaceUpdater));
-        addAction(workspaceUpdater.getSyncUpdateAction());
+        // addAction(workspaceUpdater.getSyncUpdateAction());
     }
 
     /**
@@ -280,11 +280,10 @@ public class UpdateActionManager {
 
         // Default updater
         availableActionList.add(new UpdateAllAction(workspaceUpdater));
-        availableActionList.add(new WorkspaceDelayAction(workspaceUpdater.getWorkspace()));
 
         // Add update actions for all components available
         for (WorkspaceComponent component : workspaceUpdater.getComponents()) {
-            availableActionList.add(new UpdateComponent(workspaceUpdater, component));
+            availableActionList.add(new UpdateComponent(component));
         }
 
         // Add update actions for all components available

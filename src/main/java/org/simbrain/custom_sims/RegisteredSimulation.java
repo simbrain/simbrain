@@ -18,6 +18,7 @@
  */
 package org.simbrain.custom_sims;
 
+import kotlinx.coroutines.CoroutineScopeKt;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.RandomizedPursuer;
@@ -217,7 +218,9 @@ public abstract class RegisteredSimulation {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Simulation named " + simName + " does not exist"));
 
-        sim = sim.instantiate(new SimbrainDesktop(new Workspace()));
+        var coroutineScope = CoroutineScopeKt.MainScope();
+
+        sim = sim.instantiate(new SimbrainDesktop(new Workspace(coroutineScope)));
         sim.onCompleted(() -> {
             System.exit(0);
         });

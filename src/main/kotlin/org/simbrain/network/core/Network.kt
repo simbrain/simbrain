@@ -1,6 +1,12 @@
 package org.simbrain.network.core
 
 import com.thoughtworks.xstream.XStream
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
@@ -17,7 +23,9 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.workspace.updater.UpdateAction
 import java.awt.geom.Point2D
+import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Consumer
 import kotlin.math.abs
@@ -103,6 +111,13 @@ class Network {
             _isRunning.set(value)
         }
 
+    val timer = flow {
+        while (true) {
+            delay(1000)
+            emit(Unit)
+        }
+    }.buffer(1)
+
     /**
      * Whether this is a discrete or continuous time network.
      */
@@ -153,6 +168,12 @@ class Network {
      */
     init {
         current_id++
+        GlobalScope.launch {
+            timer.collect {
+                delay(1500)
+                println(LocalDateTime.now())
+            }
+        }
     }
 
     /**
@@ -183,7 +204,11 @@ class Network {
     fun update() {
 
         // Main update
-        updateManager.invokeAllUpdates()
+        updateManager.actionList.forEach {
+            runBlocking {
+                it()
+            }
+        }
 
         updateTime()
         events.fireUpdateTimeDisplay(false)
@@ -505,7 +530,7 @@ class Network {
      *
      * @param action new action
      */
-    fun addUpdateAction(action: NetworkUpdateAction?) {
+    fun addUpdateAction(action: UpdateAction) {
         updateManager.addAction(action)
     }
 

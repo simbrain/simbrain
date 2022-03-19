@@ -16,72 +16,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.updater;
+package org.simbrain.workspace.updater
 
-import org.simbrain.workspace.WorkspaceComponent;
+import org.simbrain.workspace.WorkspaceComponent
 
 /**
  * Update a specific workspace component.
  *
  * @author jyoshimi
  */
-public class UpdateComponent implements UpdateAction {
-
-    /**
-     * Reference to component.
-     */
-    private final transient WorkspaceComponent component;
-
-    /**
-     * Provides access to update controls.
-     */
-    private final transient WorkspaceUpdater updater;
-
-    /**
-     * @param updater
-     * @param component component to update
-     */
-    public UpdateComponent(WorkspaceUpdater updater, WorkspaceComponent component) {
-        this.updater = updater;
-        this.component = component;
+class UpdateComponent(
+    val component: WorkspaceComponent
+) : UpdateAction("Update ${component.name}") {
+    override suspend operator fun invoke() {
+        component.update()
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void invoke() {
-        // TODO: Is the below needed? Would component.update() suffice?
-        //        LatchCompletionSignal latch = new LatchCompletionSignal(1);
-        //        updater.updateComponent(component, latch);
-        //        latch.await();
-        component.update();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDescription() {
-        if (component == null) {
-            return "Invalid action";
-        } else if (component.getName() != null) {
-            return "Update " + component.getName();
-        } else {
-            return "Action description is null";
-        }
-    }
-
-    @Override
-    public String getLongDescription() {
-        return getDescription();
-    }
-
-    /**
-     * Returns a reference to this component.
-     *
-     * @return the component
-     */
-    public WorkspaceComponent getComponent() {
-        return component;
-    }
-
 }

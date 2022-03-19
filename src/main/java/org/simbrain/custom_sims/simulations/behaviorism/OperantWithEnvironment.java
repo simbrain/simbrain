@@ -3,12 +3,16 @@ package org.simbrain.custom_sims.simulations.behaviorism;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.core.*;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkKt;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.updater.UpdateActionKt;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -137,24 +141,10 @@ public class OperantWithEnvironment extends RegisteredSimulation {
 
         // Add custom network update action
         net.getUpdateManager().clear();
-        net.getUpdateManager().addAction(new NetworkUpdateAction() {
-
-            @Override
-            public void invoke() {
-                updateNetwork();
-                updateBehaviors();
-            }
-
-            @Override
-            public String getDescription() {
-                return "Custom behaviorism update";
-            }
-
-            @Override
-            public String getLongDescription() {
-                return "Custom behaviorism update";
-            }
-        });
+        net.getUpdateManager().addAction(UpdateActionKt.create("Custom behaviorism update", () -> {
+            updateNetwork();
+            updateBehaviors();
+        }));
 
         setUpControlPanel();
 

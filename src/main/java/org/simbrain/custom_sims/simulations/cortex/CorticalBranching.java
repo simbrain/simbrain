@@ -10,7 +10,6 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.TimedAccumulatorRule;
-import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
@@ -47,8 +46,8 @@ public class CorticalBranching extends RegisteredSimulation {
         NetworkComponent nc = sim.addNetwork(100, 50, 600, 600, "Cortical Branching");
         net = nc.getNetwork();
         buildNetwork();
-        net.getUpdateManager().clear();
-        net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
+        // net.getUpdateManager().clear();
+        // net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
     }
 
     private void buildNetwork() {

@@ -1,126 +1,114 @@
-package org.simbrain.custom_sims.simulations.rl_sim;
+package org.simbrain.custom_sims.simulations.rl_sim
 
-import org.simbrain.network.core.NetworkKt;
-import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.updateNeurons
+import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.workspace.updater.UpdateAction
 
 /**
  * A custom updater for use in applying TD Learning and other custom update
  * features (e.g. only activating one vehicle network at a time based on the
  * output of a feed-forward net).
- * <p>
+ *
+ *
  * For background on TD Learning see.
  * http://www.scholarpedia.org/article/Temporal_difference_learning
  */
 //CHECKSTYLE:OFF
-public class RL_Update implements NetworkUpdateAction {
-
+class RL_Update(
     /**
      * Reference to RL_Sim object that has all the main variables used.
      */
-    RL_Sim_Main sim;
-
+    var sim: RL_Sim_Main
+) : UpdateAction("Custom TD Rule") {
     /**
      * Reference to main neurons used in td learning.
      */
-    Neuron reward, value, tdError;
+    var reward: Neuron
+    var value: Neuron
+    var tdError: Neuron
 
     /**
      * This variable is a hack needed because the reward neuron's lastactivation
      * value is not being updated properly in this simulation now.
-     * <p>
+     *
+     *
      * Todo: Remove after fixing the issue. The issue is probably based on
      * coupling update.
      */
-    double lastReward;
+    var lastReward = 0.0
 
     /**
      * Current winning output neuron.
      */
-    Neuron winner;
+    var winner: Neuron? = null
 
     /**
      * For training the prediction network.
      */
-    double[] lastPredictionLeft;
-    double[] lastPredictionRight;
-    double learningRate = .1;
+    var lastPredictionLeft: DoubleArray
+    var lastPredictionRight: DoubleArray
+    var learningRate = .1
 
     // TODO: The machinery to handle iterations between weight updates is
     // fishy... but works for now
-
     /* Iterations to leave vehicle on between weight updates. */
-    private final int iterationsBetweenWeightUpdates = 1;
+    private val iterationsBetweenWeightUpdates = 1
 
     // Variables to help with the above
-    private double previousReward;
-    double[] previousInput;
-    int counter = 0;
+    private var previousReward = 0.0
+    lateinit var previousInput: DoubleArray
+    var counter = 0
 
     // Helper which associates neurons with integer indices of the array that
     // tracks past states
-    Map<Neuron, Integer> neuronIndices = new HashMap();
+    var neuronIndices: MutableMap<Neuron?, Int?> = HashMap<Neuron?, Int?>()
 
     /**
      * Construct the updater.
      */
-    public RL_Update(RL_Sim_Main sim) {
-        super();
-        this.sim = sim;
-        reward = sim.reward;
-        value = sim.value;
-        tdError = sim.tdError;
-        initMap();
-        lastPredictionLeft = sim.predictionLeft.getActivations();
-        lastPredictionRight = sim.predictionRight.getActivations();
+    init {
+        reward = sim.reward
+        value = sim.value
+        tdError = sim.tdError
+        initMap()
+        lastPredictionLeft = sim.predictionLeft.activations
+        lastPredictionRight = sim.predictionRight.activations
     }
 
-    @Override
-    public String getDescription() {
-        return "Custom TD Rule";
-    }
-
-    @Override
-    public String getLongDescription() {
-        return "Custom TD Rule";
-    }
+    override val description: String
+        get() = "Custom TD Rule"
+    override val longDescription: String
+        get() = "Custom TD Rule"
 
     /**
      * Custom update of the network, including application of TD Rules.
      */
-    @Override
-    public void invoke() {
+    override suspend operator fun invoke() {
 
         // Update input nodes
-        sim.leftInputs.update();
-        sim.rightInputs.update();
+        sim.leftInputs.update()
+        sim.rightInputs.update()
 
         // Update prediction nodes
-        sim.predictionLeft.update();
-        sim.predictionRight.update();
+        sim.predictionLeft.update()
+        sim.predictionRight.update()
 
         // Reward node
-        NetworkKt.updateNeurons(Collections.singletonList(sim.reward));
+        updateNeurons(listOf(sim.reward))
 
         // Train prediction nodes
-        trainPredictionNodes();
+        trainPredictionNodes()
 
         // Value node
-        NetworkKt.updateNeurons(Collections.singletonList(sim.value));
+        updateNeurons(listOf(sim.value))
 
 
         // Outputs and vehicles
         if (winner != null) {
-            updateVehicleNet(winner);
+            updateVehicleNet(winner!!)
         }
 
         // Apply Actor-critic stuff. Update reward "critic" synapses and actor
@@ -129,87 +117,86 @@ public class RL_Update implements NetworkUpdateAction {
         if (counter++ % iterationsBetweenWeightUpdates == 0) {
 
             // Find the winning output neuron
-            sim.wtaNet.update();
-            winner = sim.wtaNet.getWinner();
+            sim.wtaNet.update()
+            winner = sim.wtaNet.winner
 
             // Update the reward neuron and the change in reward
-            NetworkKt.updateNeurons(Collections.singletonList(sim.reward));
-            updateDeltaReward();
-
-            updateTDError();
-
-            updateCritic();
-
-            updateActor();
+            updateNeurons(listOf(sim.reward))
+            updateDeltaReward()
+            updateTDError()
+            updateCritic()
+            updateActor()
 
             // Record the "before" state of the system.
-            previousReward = sim.reward.getActivation();
-            System.arraycopy(sim.leftInputs.getActivations(), 0, previousInput, 0, sim.leftInputs.getActivations().length);
-            System.arraycopy(sim.rightInputs.getActivations(), 0, previousInput, sim.leftInputs.getActivations().length, sim.rightInputs.getActivations().length);
+            previousReward = sim.reward.activation
+            System.arraycopy(sim.leftInputs.activations, 0, previousInput, 0, sim.leftInputs.activations.size)
+            System.arraycopy(
+                sim.rightInputs.activations,
+                0,
+                previousInput,
+                sim.leftInputs.activations.size,
+                sim.rightInputs.activations.size
+            )
         }
     }
 
     /**
      * Train the prediction nodes to predict the next input states.
      */
-    private void trainPredictionNodes() {
-
-        setErrors(sim.leftInputs, sim.predictionLeft, lastPredictionLeft);
-        setErrors(sim.rightInputs, sim.predictionRight, lastPredictionRight);
-
-        trainDeltaRule(sim.rightToWta);
-        trainDeltaRule(sim.leftToWta);
-
-        trainDeltaRule(sim.outputToLeftPrediction);
-        trainDeltaRule(sim.rightInputToRightPrediction);
-        trainDeltaRule(sim.outputToRightPrediction);
-
-        lastPredictionLeft = sim.predictionLeft.getActivations();
-        lastPredictionRight = sim.predictionRight.getActivations();
+    private fun trainPredictionNodes() {
+        setErrors(sim.leftInputs, sim.predictionLeft, lastPredictionLeft)
+        setErrors(sim.rightInputs, sim.predictionRight, lastPredictionRight)
+        trainDeltaRule(sim.rightToWta)
+        trainDeltaRule(sim.leftToWta)
+        trainDeltaRule(sim.outputToLeftPrediction)
+        trainDeltaRule(sim.rightInputToRightPrediction)
+        trainDeltaRule(sim.outputToRightPrediction)
+        lastPredictionLeft = sim.predictionLeft.activations
+        lastPredictionRight = sim.predictionRight.activations
     }
 
     /**
      * Set errors on neuron groups.
      */
-    void setErrors(NeuronGroup inputs, NeuronGroup predictions, double[] lastPrediction) {
-        int i = 0;
-        double error = 0;
-        sim.preditionError = 0;
-        for (Neuron neuron : predictions.getNeuronList()) {
-            error = inputs.getNeuronList().get(i).getActivation() - lastPrediction[i];
-            sim.preditionError += error * error;
-            neuron.setAuxValue(error);
-            i++;
+    fun setErrors(inputs: NeuronGroup, predictions: NeuronGroup, lastPrediction: DoubleArray) {
+        var i = 0
+        var error = 0.0
+        sim.preditionError = 0.0
+        for (neuron in predictions.neuronList) {
+            error = inputs.neuronList[i].activation - lastPrediction[i]
+            sim.preditionError += error * error
+            neuron.auxValue = error
+            i++
         }
-        sim.preditionError = Math.sqrt(sim.preditionError);
+        sim.preditionError = Math.sqrt(sim.preditionError)
     }
 
     /**
      * Train the synapses in a synapse group
      */
-    void trainDeltaRule(SynapseGroup group) {
-        for (Synapse synapse : group.getAllSynapses()) {
-            double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
-            synapse.setStrength(newStrength);
+    fun trainDeltaRule(group: SynapseGroup) {
+        for (synapse in group.allSynapses) {
+            val newStrength = synapse.strength + learningRate * synapse.source.activation * synapse.target.auxValue
+            synapse.strength = newStrength
         }
     }
 
     /**
      * Train the synapses directly
-=     */
-    void trainDeltaRule(List<Synapse> synapses) {
-        for (Synapse synapse : synapses) {
-            double newStrength = synapse.getStrength() + learningRate * synapse.getSource().getActivation() * synapse.getTarget().getAuxValue();
-            synapse.setStrength(newStrength);
+     * =      */
+    fun trainDeltaRule(synapses: List<Synapse>) {
+        for (synapse in synapses) {
+            val newStrength = synapse.strength + learningRate * synapse.source.activation * synapse.target.auxValue
+            synapse.strength = newStrength
         }
     }
 
     /**
      * TD Error. Used to drive all learning in the network.
      */
-    void updateTDError() {
-        double val = sim.deltaReward.getActivation() + sim.gamma * value.getActivation() - value.getLastActivation();
-        tdError.forceSetActivation(sim.deltaReward.getActivation() + sim.gamma * value.getActivation() - value.getLastActivation());
+    fun updateTDError() {
+        val `val` = sim.deltaReward.activation + sim.gamma * value.activation - value.lastActivation
+        tdError.forceSetActivation(sim.deltaReward.activation + sim.gamma * value.activation - value.lastActivation)
     }
 
     /**
@@ -217,12 +204,12 @@ public class RL_Update implements NetworkUpdateAction {
      *
      * @param winner
      */
-    void updateVehicleNet(Neuron winner) {
-        for (NeuronCollection vehicle : sim.vehicles) {
-            if (vehicle.getLabel().equalsIgnoreCase(winner.getLabel())) {
-                vehicle.update();
+    fun updateVehicleNet(winner: Neuron) {
+        for (vehicle in sim.vehicles) {
+            if (vehicle.label.equals(winner.label, ignoreCase = true)) {
+                vehicle.update()
             } else {
-                vehicle.clear();
+                vehicle.clear()
             }
         }
     }
@@ -230,11 +217,11 @@ public class RL_Update implements NetworkUpdateAction {
     /**
      * Update value synapses. Learn the value function. The "critic".
      */
-    void updateCritic() {
-        for (Synapse synapse : value.getFanIn()) {
-            Neuron sourceNeuron = (Neuron) synapse.getSource();
-            double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * sourceNeuron.getLastActivation();
-            synapse.setStrength(newStrength);
+    fun updateCritic() {
+        for (synapse in value.fanIn) {
+            val sourceNeuron = synapse.source as Neuron
+            val newStrength = synapse.strength + sim.alpha * tdError.activation * sourceNeuron.lastActivation
+            synapse.strength = newStrength
         }
     }
 
@@ -242,15 +229,15 @@ public class RL_Update implements NetworkUpdateAction {
      * Update all "actor" neurons. (Roughly) If the last input > output
      * connection led to reward, reinforce that connection.
      */
-    void updateActor() {
-        for (Neuron neuron : sim.wtaNet.getNeuronList()) {
+    fun updateActor() {
+        for (neuron in sim.wtaNet.neuronList) {
             // Just update the last winner
-            if (neuron.getLastActivation() > 0) {
-                for (Synapse synapse : neuron.getFanIn()) {
-                    double previousActivation = getPreviousNeuronValue(synapse.getSource());
-                    double newStrength = synapse.getStrength() + sim.alpha * tdError.getActivation() * previousActivation;
+            if (neuron.lastActivation > 0) {
+                for (synapse in neuron.fanIn) {
+                    val previousActivation = getPreviousNeuronValue(synapse.source)
+                    val newStrength = synapse.strength + sim.alpha * tdError.activation * previousActivation
                     // synapse.setStrength(synapse.clip(newStrength));
-                    synapse.setStrength(newStrength);
+                    synapse.strength = newStrength
                 }
             }
         }
@@ -259,36 +246,36 @@ public class RL_Update implements NetworkUpdateAction {
     /**
      * Returns the "before" state of the given neuron.
      */
-    private double getPreviousNeuronValue(Neuron neuron) {
+    private fun getPreviousNeuronValue(neuron: Neuron): Double {
         // System.out.println(previousInput[neuronIndices.get(neuron)]);
-        return previousInput[neuronIndices.get(neuron)];
+        return previousInput[neuronIndices[neuron]!!]
     }
 
     /**
      * Initialize the map from neurons to indices.
      */
-    void initMap() {
-        int index = 0;
-        for (Neuron neuron : sim.leftInputs.getNeuronList()) {
-            neuronIndices.put(neuron, index++);
+    fun initMap() {
+        var index = 0
+        for (neuron in sim.leftInputs.neuronList) {
+            neuronIndices[neuron] = index++
         }
-        for (Neuron neuron : sim.rightInputs.getNeuronList()) {
-            neuronIndices.put(neuron, index++);
+        for (neuron in sim.rightInputs.neuronList) {
+            neuronIndices[neuron] = index++
         }
-        previousInput = new double[index];
+        previousInput = DoubleArray(index)
     }
 
     /**
      * Update the delta-reward neuron, by taking the difference between the
      * reward neuron's last state and its current state.
-     * <p>
+     *
+     *
      * TODO: Rename needed around here? This is now the "reward" used by the TD
      * algorithm, which is different from the reward signal coming directory
      * from the environment.
      */
-    private void updateDeltaReward() {
-        double diff = reward.getActivation() - previousReward;
-        sim.deltaReward.forceSetActivation(diff);
+    private fun updateDeltaReward() {
+        val diff = reward.activation - previousReward
+        sim.deltaReward.forceSetActivation(diff)
     }
-
 }

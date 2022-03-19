@@ -3,12 +3,16 @@ package org.simbrain.custom_sims.simulations.cerebellum;
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.core.*;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkTextObject;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
+import org.simbrain.workspace.updater.UpdateActionKt;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -300,57 +304,42 @@ public class Cerebellum extends RegisteredSimulation {
         List<Synapse> p_fibers = purkinje.getFanIn();
         Neuron i_olive = network.getNeuronByLabel("Inferior Olive");
 
-        NetworkUpdateAction networkUpdateAction = new NetworkUpdateAction() {
-            public String getDescription() {
-                return "Update basal ganglia";
-            }
-
-            public String getLongDescription() {
-                return "Update basal ganglia";
-            }
-
-            public void invoke() {
-                if (toggleLearning) {
-                    // dampedTarget + zeta * (target.getActivation() -
-                    // dampedTarget);
-                    // dampedTarget = target.getActivation();
-                    // double dopDelt = gamma * (dampedTarget -
-                    // output.getActivation());
-                    // dopamine.addInputValue(dopamine.getActivation() +
-                    // dopDelt);
-                    dopamine.addInputValue(
+        var networkUpdateAction = UpdateActionKt.create("Update basal ganglia", () -> {
+            if (toggleLearning) {
+                // dampedTarget + zeta * (target.getActivation() -
+                // dampedTarget);
+                // dampedTarget = target.getActivation();
+                // double dopDelt = gamma * (dampedTarget -
+                // output.getActivation());
+                // dopamine.addInputValue(dopamine.getActivation() +
+                // dopDelt);
+                dopamine.addInputValue(
                         target.getActivation() - output.getActivation());
 
-                    // Update parallel fiber weights
-                    for (Synapse p_fiber : p_fibers) {
-                        if (!p_fiber.getSource().getLabel()
+                // Update parallel fiber weights
+                for (Synapse p_fiber : p_fibers) {
+                    if (!p_fiber.getSource().getLabel()
                             .equalsIgnoreCase("Inferior Olive"))
-                        {
-                            double delta_w = eta
+                    {
+                        double delta_w = eta
                                 * p_fiber.getSource().getActivation()
                                 * (alpha - xi * i_olive.getActivation());
-                            p_fiber.setStrength(
+                        p_fiber.setStrength(
                                 p_fiber.getStrength() + delta_w);
-                        }
                     }
-
-                    // Update Alpha (stable IO firing rate)
-                    alpha = (1 - alphaTimeConstant) * i_olive.getActivation();
-                    // + alpha * alphaTimeConstant;
-                    // System.out.println("IO: " + i_olive.getActivation()
-                    // + " | alpha:" + alpha);
-                    // System.out.println("Target: " + target.getActivation() +
-                    // " | Damped Target:" + dampedTarget + " | Damped Damped
-                    // DA:" + dopamine.getActivation());
                 }
+
+                // Update Alpha (stable IO firing rate)
+                alpha = (1 - alphaTimeConstant) * i_olive.getActivation();
+                // + alpha * alphaTimeConstant;
+                // System.out.println("IO: " + i_olive.getActivation()
+                // + " | alpha:" + alpha);
+                // System.out.println("Target: " + target.getActivation() +
+                // " | Damped Target:" + dampedTarget + " | Damped Damped
+                // DA:" + dopamine.getActivation());
             }
-
-        };
+        });
         network.addUpdateAction(networkUpdateAction);
-
-        // Moves the custom update to the top of the update sequence
-        // TODO
-        //network.getUpdateManager().swapElements(6, 0);
     }
 
     //

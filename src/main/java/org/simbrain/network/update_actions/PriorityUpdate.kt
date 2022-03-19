@@ -11,10 +11,10 @@
  * program; if not, write to the Free Software Foundation, Inc., 59 Temple Place
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
-package org.simbrain.network.update_actions;
+package org.simbrain.network.update_actions
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
+import org.simbrain.network.core.Network
+import org.simbrain.workspace.updater.UpdateAction
 
 /**
  * Loose neurons (neurons not in groups) are updated in accordance with an
@@ -23,33 +23,9 @@ import org.simbrain.network.core.NetworkUpdateAction;
  *
  * @author jyoshimi
  */
-public class PriorityUpdate implements NetworkUpdateAction {
-
-    /**
-     * Reference to network to update.
-     */
-    private Network network;
-
-    /**
-     * @param network
-     */
-    public PriorityUpdate(Network network) {
-        this.network = network;
-    }
-
-    @Override
-    public void invoke() {
-        network.updateNeuronsByPriority();
-        network.updateAllButNeurons();
-    }
-
-    @Override
-    public String getDescription() {
-        return "Loose neurons (priority) and synapses";
-    }
-
-    @Override
-    public String getLongDescription() {
-        return "Priority update of loose items";
+class PriorityUpdate(private val network: Network): UpdateAction("Loose neurons (priority) and synapses", "Priority update of loose items") {
+    override suspend fun invoke() {
+        network.updateNeuronsByPriority()
+        network.updateAllButNeurons()
     }
 }

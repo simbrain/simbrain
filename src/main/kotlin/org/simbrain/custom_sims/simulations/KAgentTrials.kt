@@ -1,7 +1,10 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
-import org.simbrain.network.core.*
+import org.simbrain.network.core.activations
+import org.simbrain.network.core.auxValues
+import org.simbrain.network.core.connectAllToAll
+import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.util.component1
 import org.simbrain.util.component2
@@ -65,7 +68,7 @@ val kAgentTrails = newSim {
 
     var lastPredicted = predictionNet.neuronList.activations
 
-    network.addUpdateAction(networkUpdateAction("K Custom Learning Rule") {
+    network.addUpdateAction(updateAction("K Custom Learning Rule") {
         val learningRate = 0.1
 
         val errors = (sensoryNet.neuronList.activations zip lastPredicted).map { (a, b) -> a - b }

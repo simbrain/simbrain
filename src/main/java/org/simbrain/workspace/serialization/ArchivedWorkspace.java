@@ -202,14 +202,6 @@ class ArchivedWorkspace {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (serializedAction instanceof UpdateActionCustom) {
-            try {
-                String script = ((UpdateActionCustom) archivedAction.getUpdateAction()).getScriptString();
-                Class<? extends UpdateAction> type = serializedAction.getClass();
-                action = type.getConstructor(WorkspaceUpdater.class, String.class).newInstance(workspace.getUpdater(), script);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         } else if (serializedAction instanceof UpdateCoupling) {
             try {
                 String id = archivedAction.getCouplingId();
@@ -219,8 +211,6 @@ class ArchivedWorkspace {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (serializedAction instanceof SynchronizedTaskUpdateAction) {
-            return workspace.getUpdater().getSyncUpdateAction();
         }
         return action;
     }

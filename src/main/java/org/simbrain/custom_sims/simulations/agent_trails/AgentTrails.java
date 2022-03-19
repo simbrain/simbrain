@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations.agent_trails;
 
 import org.simbrain.custom_sims.RegisteredSimulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
+import org.simbrain.custom_sims.simulations.utils.ColorPlotKt;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronGroup;
@@ -159,7 +160,11 @@ public class AgentTrails extends RegisteredSimulation {
 
         // Uncomment for prediction halo
         plot.getProjector().setUseColorManager(false);
-        sim.getWorkspace().addUpdateAction(new ColorPlot(this));
+        sim.getWorkspace().addUpdateAction(ColorPlotKt.createColorPlotUpdateAction(
+                plot.getProjector(),
+                predictionNet,
+                errorNeuron.getActivation()
+        ));
 
         // Label PCA points based on closest object
         // (how nice this looks depends on tolerance. if tolerance too low then too many labels are created)

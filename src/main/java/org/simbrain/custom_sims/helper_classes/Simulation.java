@@ -53,7 +53,7 @@ public class Simulation {
     public void addComponent(
             WorkspaceComponent wc, int x, int y, int width, int height) {
         workspace.addWorkspaceComponent(wc);
-        SimbrainDesktopKt.place(desktop, wc, x, y, width, height);
+        SwingUtilities.invokeLater(() -> SimbrainDesktopKt.place(desktop, wc, x, y, width, height));
     }
 
     /**
@@ -104,7 +104,7 @@ public class Simulation {
         String html = getResource(fileName);
         docViewer.setText(html);
         workspace.addWorkspaceComponent(docViewer);
-        desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height);
+        SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height));
         return docViewer;
     }
 

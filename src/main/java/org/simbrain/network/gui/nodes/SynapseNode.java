@@ -158,7 +158,7 @@ public final class SynapseNode extends ScreenElement {
         events.onClampChanged(this::updateClampStatus);
 
         // Respond to spiking events
-        source.neuron.getEvents().onSpiked(s -> updateSpikeColor());
+        source.getNeuron().getEvents().onSpiked(s -> updateSpikeColor());
 
     }
 
@@ -343,7 +343,7 @@ public final class SynapseNode extends ScreenElement {
         double weightX = 0;
         double weightY = 0;
 
-        int neuronOffset = NeuronNode.getDIAMETER() / 2;
+        int neuronOffset = NeuronNode.DIAMETER / 2;
 
         if (sourceX < targetX) {
             weightX = targetX - (neuronOffset * Math.cos(alpha));

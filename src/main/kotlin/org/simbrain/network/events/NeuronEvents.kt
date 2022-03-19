@@ -1,5 +1,8 @@
 package org.simbrain.network.events
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.util.Event
@@ -11,7 +14,9 @@ import java.util.function.Consumer
  */
 class NeuronEvents(val neuron: Neuron) : LocationEvents(neuron) {
 
-    fun onActivationChange(handler: BiConsumer<Double, Double>) = "ActivationChange".itemChangedEvent(handler)
+    fun onActivationChange(handler: BiConsumer<Double, Double>) = GlobalScope.launch(Dispatchers.Main) {
+        "ActivationChange".itemChangedEvent(handler)
+    }
     fun fireActivationChange(old: Double, new: Double) = "ActivationChange"(old = old, new = new)
 
     fun onSpiked(handler: Consumer<Boolean>) = "Spiked".itemAddedEvent(handler)

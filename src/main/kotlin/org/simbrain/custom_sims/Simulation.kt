@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims
 
+import kotlinx.coroutines.MainScope
 import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
@@ -23,7 +24,7 @@ class SimulationScope private constructor(
     val workspace: Workspace
 ) {
 
-    constructor(desktop: SimbrainDesktop? = null): this(desktop, desktop?.workspace ?: Workspace())
+    constructor(desktop: SimbrainDesktop? = null): this(desktop, desktop?.workspace ?: Workspace(MainScope()))
 
     private constructor(workspace: Workspace): this(null, workspace)
 
@@ -128,9 +129,9 @@ fun SimbrainDesktop.createControlPanel(name: String, x: Int, y: Int, config: Con
 }
 
 fun updateAction(description: String, longDescription: String = description, action: () -> Unit)
-        = object : UpdateAction {
-    override fun invoke() = action()
-    override fun getDescription(): String = description
-    override fun getLongDescription(): String = longDescription
+        = object : UpdateAction(description, longDescription) {
+    override suspend fun invoke() {
+        action()
+    }
 }
 

@@ -51,6 +51,8 @@ public class Splasher {
      */
     public static void main(final String[] args) {
 
+        System.setProperty("sun.java2d.opengl", "true");
+
         // Set up loggers (other logging config for tinylog is in build.gradle)
         Logger.getLogger("com.jme").setLevel(Level.OFF);
         Logger.getLogger("com.jmex").setLevel(Level.OFF);

@@ -5,7 +5,7 @@ import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.updater.UpdateActionAdapter;
+import org.simbrain.workspace.updater.UpdateActionKt;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -74,12 +74,7 @@ public class CreaturesSim extends RegisteredSimulation {
         setUpNPC();
 
         // Create update action
-        sim.getWorkspace().addUpdateAction(new UpdateActionAdapter("Update Creatures Sim") {
-            @Override
-            public void invoke() {
-                updateCreaturesSim();
-            }
-        });
+        sim.getWorkspace().addUpdateAction(UpdateActionKt.create("Update Creatures Sim", this::updateCreaturesSim));
 
     }
 

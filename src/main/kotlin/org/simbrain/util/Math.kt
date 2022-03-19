@@ -3,7 +3,7 @@ package org.simbrain.util
 import smile.math.matrix.Matrix
 
 /**
- * Numeric utilities in Kotlin. Comparable to [SimbrainMath] .
+ * Numeric utilities in Kotlin. Comparable to [SimbrainMath].
  */
 
 fun <T : Comparable<T>> T.clip(lowerBound: T, upperBound: T) =

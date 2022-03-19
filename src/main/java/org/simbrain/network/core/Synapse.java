@@ -288,6 +288,12 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         parentNetwork = newParent;
     }
 
+    public Synapse(Network newParent, Neuron source, Neuron target, Synapse templateSynapse) {
+        this(templateSynapse); // invoke the copy constructor
+        setSourceAndTarget(source, target);
+        parentNetwork = newParent;
+    }
+
     /**
      * Construct a synapse using a source and target neuron, and a specified learning rule.
      *

@@ -2,11 +2,11 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.updateAction
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.createNeurons
-import org.simbrain.network.core.networkUpdateAction
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.KuramotoRule
@@ -102,7 +102,7 @@ val cortexPCI = newSim {
 
     val activations = mutableListOf<List<Double>>()
     region1.randomize()
-    val recordActivations = networkUpdateAction("Record activations") {
+    val recordActivations = updateAction("Record activations") {
         val acts = network.looseNeurons.map { n -> n.activation }
         activations.add(acts)
     }

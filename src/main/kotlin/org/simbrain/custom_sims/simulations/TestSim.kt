@@ -1,11 +1,14 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.*
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.createNeurons
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
@@ -196,3 +199,26 @@ val testSim = newSim {
 
 }
 
+
+val linkedNeuronList = newSim {
+    val networkComponent = addNetworkComponent("Neuron List")
+
+    val network = networkComponent.network
+
+    GlobalScope.launch(Dispatchers.Main) {
+        val neurons = (1..10000).map {
+            async(Dispatchers.Default) { Neuron(network) }
+        }.awaitAll()
+
+        neurons.forEach { network.addNetworkModel(it) }
+
+        val synapses = with(network) {
+            neurons.windowed(2) { (n1, n2) ->
+                addSynapse(n1, n2) {
+                    strength = 1.0
+                }
+            }
+        }
+        HexagonalGridLayout.layoutNeurons(neurons, 40, 40)
+    }
+}

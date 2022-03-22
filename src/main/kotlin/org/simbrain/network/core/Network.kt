@@ -544,7 +544,7 @@ class Network {
     /**
      * Forward to [NetworkUpdateManager.removeAction]
      */
-    fun removeUpdateAction(action: NetworkUpdateAction?) {
+    fun removeUpdateAction(action: UpdateAction) {
         updateManager.removeAction(action)
     }
 

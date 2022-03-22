@@ -1,8 +1,9 @@
 package org.simbrain.custom_sims.simulations.cortex;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.RadialSimple;
+import org.simbrain.network.connections.Direction;
+import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -21,7 +22,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CorticalBranching extends RegisteredSimulation {
+public class CorticalBranching extends Simulation {
 
     // Simulation Parameters
     int NUM_NEURONS = 1024; // 4096
@@ -77,21 +78,16 @@ public class CorticalBranching extends RegisteredSimulation {
         ProbabilityDistribution inRand = LogNormalDistribution.builder()
                 .polarity(Polarity.INHIBITORY).location(1.5).scale(3).build();
 
-        RadialSimple con = new RadialSimple();
-        con.setConMethod(RadialSimple.ConnectStyle.DETERMINISTIC);
-        con.setExcitatoryRadius(RADIUS);
-        con.setInhibitoryRadius(RADIUS);
-        con.setExcCons(KIN);
-        con.setInhCons(KIN);
+        FixedDegree con = new FixedDegree();
+        con.setDirection(Direction.IN);
+        con.setDegree(KIN);
+        con.setUseRadius(true);
+        con.setRadius(RADIUS);
 
         SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con);
         sg.setRandomizers(exRand, inRand);
-        //RadialSimple con = RadialSimpler.builder()
-        //        .connectionStyle(RadialSimple.ConnectStyle.DETERMINISTIC)
-        //        .numConns(KIN)
-        //        .radius(RADIUS)
-        //        .build(network, ng1.getNeuronList());
-
+        sg.setConnectionManager(con);
+        sg.makeConnections();
 
         // TODO: Band-aid... issue with synapse bounds needs addressing
         for(Synapse s : sg.getAllSynapses()) {
@@ -108,8 +104,7 @@ public class CorticalBranching extends RegisteredSimulation {
         super();
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Brain";
     }
 

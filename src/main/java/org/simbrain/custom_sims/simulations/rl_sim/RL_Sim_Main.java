@@ -1,8 +1,8 @@
 package org.simbrain.custom_sims.simulations.rl_sim;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
-import org.simbrain.custom_sims.helper_classes.Simulation;
+import org.simbrain.custom_sims.helper_classes.SimulationUtils;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.custom_sims.simulations.utils.ColorPlotKt;
 import org.simbrain.network.NetworkComponent;
@@ -53,7 +53,7 @@ import static org.simbrain.network.core.NetworkKt.connectAllToAll;
  * At any time, only the "winning" vehicle subnetwork is updated.
  */
 // CHECKSTYLE:OFF
-public class RL_Sim_Main extends RegisteredSimulation implements AttributeContainer {
+public class RL_Sim_Main extends Simulation implements AttributeContainer {
 
     /**
      * List of "sub-simulations" available from this one.
@@ -628,8 +628,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         sim.couple(currentObject, plotText);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Reinforcement Learning";
     }
 
@@ -643,7 +642,7 @@ public class RL_Sim_Main extends RegisteredSimulation implements AttributeContai
         return new RL_Sim_Main(desktop);
     }
 
-    public Simulation getSimulation() {
+    public SimulationUtils getSimulation() {
         return sim;
     }
 

@@ -30,7 +30,6 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import javax.swing.AbstractAction
 
-
 class NetworkActions(val networkPanel: NetworkPanel) {
 
     // TODO: Convert these to inline actions as below.
@@ -59,6 +58,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setNeuronPropertiesAction = SetNeuronPropertiesAction(networkPanel)
     val setSourceNeurons = SetSourceNeurons(networkPanel)
     val setSynapsePropertiesAction = SetSynapsePropertiesAction(networkPanel)
+
     // val setTextPropertiesAction = SetTextPropertiesAction(networkPanel) TODO
     val showAdjustConnectivityDialog = ShowAdjustConnectivityDialog(networkPanel)
     val showAdjustSynapsesDialog = ShowAdjustSynapsesDialog(networkPanel)
@@ -116,13 +116,15 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val networkEditingActions
         get() = listOf(newNeuronAction, deleteAction)
 
-    val networkModeActions get() = listOf<AbstractAction>(
+    val networkModeActions
+        get() = listOf<AbstractAction>(
             selectionEditModeAction,
             textEditModeAction,
             wandEditModeAction
-    )
+        )
 
-    val newNetworkActions get() = listOf(
+    val newNetworkActions
+        get() = listOf(
             addGroupAction("Backprop") { BackpropCreationDialog(networkPanel) },
             addGroupAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addGroupAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
@@ -130,21 +132,23 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 //            addGroupAction("LMS (Least Mean Squares)") { LMSCreationDialog(networkPanel) },
             addGroupAction("SOM Network") { SOMCreationDialog(networkPanel) },
 //            addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
-    )
+        )
 
-    val connectionActions get() = listOf(
+    val connectionActions
+        get() = listOf(
             applyConnectionAction("All to all", AllToAll()),
             applyConnectionAction("One-to-one", OneToOne()),
             applyConnectionAction("Radial (Gaussian)", RadialGaussian()),
-            applyConnectionAction("Radial (Simple)", RadialSimple()),
+            applyConnectionAction("Radial (Probalistic)", RadialProbabilistic()),
+            applyConnectionAction("Fixed degree", FixedDegree()),
             applyConnectionAction("Sparse", Sparse())
-    )
+        )
 
     // TODO: Note: the lambda parameter `NetworkPanel` is not used
-    private fun addGroupAction(name: String, createDialog: AddGroupAction.(NetworkPanel) -> StandardDialog)
-            = AddGroupAction(networkPanel, name, createDialog)
+    private fun addGroupAction(name: String, createDialog: AddGroupAction.(NetworkPanel) -> StandardDialog) =
+        AddGroupAction(networkPanel, name, createDialog)
 
     private fun applyConnectionAction(name: String, connectionStrategy: ConnectionStrategy) =
-            ApplyConnectionAction(networkPanel, connectionStrategy, name)
+        ApplyConnectionAction(networkPanel, connectionStrategy, name)
 
 }

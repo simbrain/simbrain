@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.braitenberg;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
-import org.simbrain.custom_sims.helper_classes.Simulation;
+import org.simbrain.custom_sims.Simulation;
+import org.simbrain.custom_sims.helper_classes.SimulationUtils;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.groups.NeuronCollection;
@@ -22,9 +22,9 @@ import java.awt.event.ActionListener;
  * should work.
  *
  * To add a sim, copy paste this, put in whatever menu you want it to be in, at {@link #getSubmenuName()}, and be
- * sure to register it at {@link RegisteredSimulation}.
+ * sure to register it at {@link Simulation}.
  */
-public class Braitenberg extends RegisteredSimulation {
+public class Braitenberg extends Simulation {
 
     public Braitenberg() {
         super();
@@ -44,7 +44,7 @@ public class Braitenberg extends RegisteredSimulation {
         // Clear workspace
         workspace.clearWorkspace();
         SimbrainDesktop desktop = sim.getDesktop();
-        Simulation sim = new Simulation(desktop);
+        SimulationUtils sim = new SimulationUtils(desktop);
         OdorWorldComponent oc = sim.addOdorWorld(610,3,496,646, "World");
         oc.getWorld().setObjectsBlockMovement(false);
         oc.getWorld().setUseCameraCentering(false);
@@ -144,8 +144,7 @@ public class Braitenberg extends RegisteredSimulation {
         desktop.addInternalFrame(internalFrame);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Braitenberg";
     }
 

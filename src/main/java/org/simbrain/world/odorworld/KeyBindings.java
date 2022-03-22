@@ -11,7 +11,7 @@ import java.awt.event.KeyEvent;
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
  * not found here are in the action classes.
  *
- * TODO: Migrate to KeystrokeUitls.kt
+ * TODO: Migrate to KeystrokeUtils.kt
  */
 public class KeyBindings {
 

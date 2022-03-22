@@ -1,5 +1,7 @@
 package org.simbrain.util
 
+import java.util.*
+
 /**
  * Consider sets A and B.  "Left complement" is in A but not B.  "Right complement" is in B but not A.
  */
@@ -24,6 +26,12 @@ infix fun <T,U> Iterable<T>.cartesianProduct(other: Iterable<U>) = this.flatMap 
  */
 infix fun <T, U> Sequence<T>.cartesianProduct(other: Sequence<U>)
     = this.flatMap { a -> other.map { b -> a to b }}
+
+fun List<List<Double>>.toDoubleArray() : Array<DoubleArray> {
+    return map{
+        it.toDoubleArray()
+    }.toTypedArray()
+}
 
 /**
  * Flatten a 2d double array into a 1-d double array
@@ -102,4 +110,21 @@ fun FloatArray.reshape(rows: Int, cols: Int, channels: Int): Array<Array<FloatAr
  */
 fun IntArray.toLongArray(): LongArray {
     return map { it.toLong() }.toLongArray()
+}
+
+/**
+ * Randomly shuffles k integers in a list. The first k elements are randomly
+ * swapped with other elements in the list. This method will alter the list
+ * passed to it, so situations where this would be undesirable should pass
+ * this method a copy.
+ *
+ * @param inds a list of integers. This methods WILL shuffle inds, so pass a
+ * copy unless inds being shuffled is not a problem.
+ * @param k    how many elements will be shuffled
+ * @param rand a random number generator
+ */
+fun randShuffleK(inds: ArrayList<Int?>, k: Int, rand: Random) {
+    for (i in 0 until k) {
+        Collections.swap(inds, i, rand.nextInt(inds.size))
+    }
 }

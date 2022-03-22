@@ -53,7 +53,7 @@ public class AddNeuronsDialog extends StandardDialog {
     /**
      * Default number of neurons.
      */
-    private static final int DEFAULT_NUM_NEURONS = 25;
+    private static final int DEFAULT_NUM_NEURONS = 100;
 
     /**
      * The network panel neurons will be added to.
@@ -196,8 +196,8 @@ public class AddNeuronsDialog extends StandardDialog {
                 ng.applyLayout();
                 ng.setLabel(groupPanel.tfGroupName.getText());
             } else {
-                layoutObject.getLayout().layoutNeurons(addedNeurons);
                 addedNeurons.forEach(networkPanel.getNetwork()::addNetworkModel);
+                layoutObject.getLayout().layoutNeurons(addedNeurons);
             }
         }
     }
@@ -252,7 +252,7 @@ public class AddNeuronsDialog extends StandardDialog {
         public NeuronGroupPanelLite(NetworkPanel np) {
             addListeners();
             setLayout(new BorderLayout());
-            addToGroup.setSelected(true);
+            addToGroup.setSelected(false);
 
             JPanel groupPanel = new JPanel();
             groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.X_AXIS));

@@ -5,12 +5,14 @@
   <tile id="5">
    <properties>
     <property name="type" value="Grass"/>
+    <property name="label" value="Grass1"/>
    </properties>
   </tile>
   <tile id="62">
    <properties>
     <property name="type" value="Grass"/>
-   </properties>
+    <property name="label" value="Grass2"/>
+    </properties>
   </tile>
   <tile id="293">
    <properties>
@@ -21,7 +23,8 @@
    <properties>
     <property name="label" value="DirtRoadTurnDownRight"/>
     <property name="type" value="DirtRoad"/>
-   </properties>
+    <property name="tileName" value="DirtRoad"/>
+    </properties>
   </tile>
  </tileset>
  <layer id="1" name="u_ground" width="15" height="15">

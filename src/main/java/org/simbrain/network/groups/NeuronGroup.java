@@ -121,6 +121,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
             super.addNeuron(n);
             n.setParentGroup(this);
         });
+        prototypeRule = neurons.get(0).getUpdateRule();
         setNeuronType(prototypeRule);
         dataHolder = prototypeRule.createScalarData();
     }

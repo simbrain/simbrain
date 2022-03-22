@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.cortex;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.Sparse;
@@ -33,7 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-public class CortexSimple extends RegisteredSimulation {
+public class CortexSimple extends Simulation {
 
     // Simulation Parameters
     int NUM_NEURONS = 120;
@@ -250,8 +250,7 @@ public class CortexSimple extends RegisteredSimulation {
         super();
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Brain";
     }
 

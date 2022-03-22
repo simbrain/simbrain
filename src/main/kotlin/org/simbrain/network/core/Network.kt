@@ -33,6 +33,16 @@ import kotlin.math.ceil
 import kotlin.math.ln
 
 /**
+ * The initial time-step for the network.
+ */
+private val DEFAULT_TIME_STEP = SimbrainPreferences.getDouble("networkDefaultTimeStep")
+
+/**
+ * Constant value for Math.log(10); used to approximate log 10.
+ */
+private val LOG_10 = ln(10.0)
+
+/**
  * <b>Network</b> provides core neural network functionality and is the main neural network model object. The core
  * data structure is a [NetworkModelList] that associates classes of [NetworkModel] with linked hash sets of
  * instances of those types.
@@ -141,7 +151,7 @@ class Network {
     /**
      * Manage ids for all network elements.
      */
-    val idManager = SimpleIdManager { cls -> networkModels.unsafeGet(cls).size + 1 }
+    val idManager = SimpleIdManager { cls -> networkModels.getRawModelSet(cls).size + 1 }
 
     /**
      * An optional name for the network that defaults to "Network[current_id]".
@@ -525,13 +535,17 @@ class Network {
     }
 
     /**
-     * Add an update action to the network' action list (the sequence of actions invoked on each iteration of the
-     * network).
-     *
-     * @param action new action
+     * Forward to [NetworkUpdateManager.addAction]
      */
     fun addUpdateAction(action: UpdateAction) {
         updateManager.addAction(action)
+    }
+
+    /**
+     * Forward to [NetworkUpdateManager.removeAction]
+     */
+    fun removeUpdateAction(action: NetworkUpdateAction?) {
+        updateManager.removeAction(action)
     }
 
     /**
@@ -687,16 +701,6 @@ class Network {
 }
 
 /**
- * The initial time-step for the network.
- */
-private val DEFAULT_TIME_STEP = SimbrainPreferences.getDouble("networkDefaultTimeStep")
-
-/**
- * Constant value for Math.log(10); used to approximate log 10.
- */
-private val LOG_10 = ln(10.0)
-
-/**
  * If a subnetwork or synapse group has more than this many synapses, then the initial synapse visibility flag is
  * set false.
  */
@@ -716,6 +720,8 @@ val deserializationOrder: List<Class<out NetworkModel>> = listOf(
     Subnetwork::class.java,
     Synapse::class.java
 )
+
+// TODO: Much of what is below could be moved to a future NetworkUtils file.
 
 /**
  * Convenience method for asynchronously updating a set of neurons, by calling each neuron's update function (which
@@ -856,7 +862,7 @@ fun connectAllToAll(source: NeuronGroup, target: NeuronGroup, value: Double): Li
 }
 
 fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
-    return AllToAll().connectAllToAll(source.neuronList, target.neuronList)
+    return AllToAll().connectNeurons(source.network, source.neuronList, target.neuronList)
 }
 
 /**
@@ -864,7 +870,7 @@ fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
  */
 fun connectAllToAll(inputs: NeuronGroup, target: Neuron): List<Synapse> {
     val connector = AllToAll()
-    return connector.connectAllToAll(inputs.neuronList, listOf(target))
+    return connector.connectNeurons(inputs.network, inputs.neuronList, listOf(target))
 }
 
 /**
@@ -876,3 +882,10 @@ fun connectAllToAll(source: NeuronGroup, target: Neuron, value: Double): List<Sy
     return wts
 }
 
+fun Network.createNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {
+   val neurons =  (0 until numNeurons).map {
+         Neuron(this).apply(template)
+    }
+    addNetworkModels(neurons)
+    return neurons
+}

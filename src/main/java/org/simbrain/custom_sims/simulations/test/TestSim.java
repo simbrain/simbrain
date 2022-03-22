@@ -1,9 +1,7 @@
 package org.simbrain.custom_sims.simulations.test;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.ConnectionUtilities;
-import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -18,13 +16,16 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import java.awt.*;
 import java.util.List;
 
+import static org.simbrain.network.connections.ConnectionUtilitiesKt.randomizeAndPolarizeSynapses;
+import static org.simbrain.network.connections.SparseKt.connectSparse;
+
 /**
  * Playground for testing new features.
  *
  * To add a sim, copy paste this, put in whatever menu you want it to be in, at {@link #getSubmenuName()}, and be
- * sure to register it at {@link RegisteredSimulation}.
+ * sure to register it at {@link Simulation}.
  */
-public class TestSim extends RegisteredSimulation {
+public class TestSim extends Simulation {
 
 
     public TestSim() {
@@ -71,9 +72,9 @@ public class TestSim extends RegisteredSimulation {
         layout.layoutNeurons((List<Neuron>) network.getLooseNeurons());
 
         // CREATE SYNAPSES
-        Sparse.connectSparse(network.getFlatNeuronList(),
-                network.getFlatNeuronList(), sparsity, false, false, true);
-        ConnectionUtilities.randomizeAndPolarizeSynapses(network.getModels(Synapse.class), excitatoryRatio);
+        connectSparse(network.getFlatNeuronList(),
+                network.getFlatNeuronList(), sparsity, false, false);
+        randomizeAndPolarizeSynapses(network.getModels(Synapse.class), excitatoryRatio);
 
         //MAKE BARCHART
         BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network");
@@ -93,8 +94,7 @@ public class TestSim extends RegisteredSimulation {
 
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Test";
     }
 

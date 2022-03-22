@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.edge_of_chaos;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
@@ -9,7 +9,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.util.SimnetUtils;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainMath;
@@ -24,7 +23,7 @@ import javax.swing.*;
  * edge of chaos in recurrent neural networks." Neural computation 16.7 (2004):
  * 1413-1436.
  */
-public class EdgeOfChaosBitStream extends RegisteredSimulation {
+public class EdgeOfChaosBitStream extends Simulation {
 
     //TODO: Docviewer definitely needed
 
@@ -104,10 +103,8 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
 
         // Connect reservoirs
         sgRes1 = EdgeOfChaos.connectReservoir(net, res1, variance, 4);
-        sgRes2 = SynapseGroup.createSynapseGroup(res2, res2);
-        SimnetUtils.copySynapses(sgRes2, sgRes1);
+        sgRes2 = sgRes1.copy(res2, res2);
         sgRes2.setLabel("Recurrent Synapses");
-
         net.addNetworkModel(sgRes2);
 
         // Set up "bit-stream" inputs
@@ -116,13 +113,9 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         bitStream2 = buildBitStream(res2);
         bitStream2.setLabel("Bit stream 2");
         AllToAll connector = new AllToAll();
-        connector.connectAllToAll(bitStream1.getNeuronList(), res1.getNeuronList());
-        connector.connectAllToAll(bitStream2.getNeuronList(), res2.getNeuronList());
+        connector.connectNeurons(net, bitStream1.getNeuronList(), res1.getNeuronList());
+        connector.connectNeurons(net, bitStream2.getNeuronList(), res2.getNeuronList());
 
-        // Use concurrent buffered update
-        //        network.getUpdateManager().clear();
-        //        network.getUpdateManager().addAction(ConcurrentBufferedUpdate
-        //                .createConcurrentBufferedUpdate(network));
     }
 
     NeuronGroup bitStreamInputs;
@@ -149,7 +142,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         sim.getWorkspace().addUpdateAction(UpdateActionKt.create("Update time series", () -> {
             bitStream1.getInputManager().applyCurrentRow();
             bitStream2.getInputManager().applyCurrentRow();
-            double activationDiff = SimbrainMath.distance(res1.getActivations(), res2.getActivations());
+            int activationDiff = SimbrainMath.hamming(res1.getActivations(), res2.getActivations());
             ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
         }));
     }
@@ -162,8 +155,7 @@ public class EdgeOfChaosBitStream extends RegisteredSimulation {
         super();
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Chaos";
     }
 

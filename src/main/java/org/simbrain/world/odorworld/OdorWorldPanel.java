@@ -69,8 +69,10 @@ public class OdorWorldPanel extends JPanel {
      */
     private final WorldSelectionModel selectionModel;
 
+    /**
+     * Provisional interface for selecting tiles.
+     */
     private PNode tileSelectionBox = null;
-
     private Rectangle tileSelectionModel = null;
 
     /**
@@ -107,7 +109,6 @@ public class OdorWorldPanel extends JPanel {
 
     /**
      * List corresponding to the layers of a tmx file.
-     *
      */
     private List<PImage> layerImageList;
 
@@ -580,9 +581,11 @@ public class OdorWorldPanel extends JPanel {
         return defaultHeight;
     }
 
+    @Override
     public Dimension getPreferredSize() {
-        return new Dimension(defaultWidth < getWorld().getWidth() ? defaultWidth : getWorld().getWidth(),
-            defaultHeight < getWorld().getHeight() ? defaultHeight : getWorld().getHeight());
+        return new Dimension(
+                Math.min(defaultWidth, getWorld().getWidth()),
+                Math.min(defaultHeight, getWorld().getHeight()));
     }
 
     /**

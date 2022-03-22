@@ -60,8 +60,8 @@ public final class SelectIncomingWeightsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
+        var selectedNeurons = networkPanel.getSelectionManager().filterSelectedModels(Neuron.class);
         networkPanel.getSelectionManager().clear();
-        networkPanel.getSelectionManager()
-                .filterSelectedModels(Neuron.class).forEach(n -> n.getFanIn().forEach(Synapse::select));
+        selectedNeurons.forEach(n -> n.getFanIn().forEach(Synapse::select));
     }
 }

@@ -39,8 +39,12 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Core model class of Odor World, which contains a list of entities in the
- * world. Some code from Developing Games in Java, by David Brackeen.
+ * A 2d environment. Contains a list of {@link OdorWorldEntity}s, which can either be agents or static objects.
+ *
+ * Agents have sensors for detecting objects, and effectors for moving.
+ *
+ * Contains a {@link TileMap} which is a grid of tiles. This tilemap determines the size of the world.
+ * The world's size cannot be set directly.
  */
 public class OdorWorld implements EditableObject {
 
@@ -77,7 +81,6 @@ public class OdorWorld implements EditableObject {
             order = 20)
     private boolean useCameraCentering = true;
 
-    // TODO: Use the id manager
     /**
      * Entity Id generator.
      */
@@ -108,7 +111,7 @@ public class OdorWorld implements EditableObject {
      */
     private Point2D lastClickedPosition = new Point2D.Double(50,50);
 
-    private RectangleCollisionBound worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
+    private transient RectangleCollisionBound worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
             0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
     ));
 
@@ -225,7 +228,6 @@ public class OdorWorld implements EditableObject {
 
     public void addTile() {
         tileMap.editTile(
-                "program_layer",
                 (int) lastClickedPosition.getX() / tileMap.getTileWidth(),
                 (int) lastClickedPosition.getY() / tileMap.getTileHeight(),
                 61
@@ -382,11 +384,12 @@ public class OdorWorld implements EditableObject {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private Object readResolve() {
-        if (agentIdGenerator == null) {
-            agentIdGenerator = new SimpleIdManager.SimpleId("Agent", 1);
-        }
 
         events = new OdorWorldEvents(this);
+
+        worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
+                0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
+        ));
 
         for (OdorWorldEntity entity : entityList) {
             entity.postSerializationInit();
@@ -570,4 +573,5 @@ public class OdorWorld implements EditableObject {
     public boolean isUseCameraCentering() {
         return useCameraCentering;
     }
+
 }

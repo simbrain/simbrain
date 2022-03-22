@@ -100,6 +100,10 @@ public class SmellSource {
         }
     }
 
+    public static SmellSource createScalarSource(final int val) {
+        return new SmellSource(new double[] {val});
+    }
+
     /**
      * Default constructor.
      */

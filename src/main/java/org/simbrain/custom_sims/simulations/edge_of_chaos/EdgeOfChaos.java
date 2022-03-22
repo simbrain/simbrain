@@ -1,9 +1,10 @@
 package org.simbrain.custom_sims.simulations.edge_of_chaos;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.RadialSimple;
+import org.simbrain.network.connections.Direction;
+import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
@@ -24,7 +25,6 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +33,7 @@ import java.util.List;
  * edge of chaos in recurrent neural networks." Neural computation 16.7 (2004):
  * 1413-1436.
  */
-public class EdgeOfChaos extends RegisteredSimulation {
+public class EdgeOfChaos extends Simulation {
 
     // TODO: Add more objects
 
@@ -128,14 +128,9 @@ public class EdgeOfChaos extends RegisteredSimulation {
 
     static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
-        List<Neuron> neurons = new ArrayList<Neuron>(numNeurons);
-        for (int i = 0; i < numNeurons; i++) {
-            Neuron neuron = new Neuron(parentNet);
-            BinaryRule thresholdUnit = new BinaryRule();
-            neuron.setUpdateRule(thresholdUnit);
-            neurons.add(neuron);
-        }
-        NeuronGroup ng = new NeuronGroup(parentNet, neurons);
+        NeuronGroup ng = new NeuronGroup(parentNet, numNeurons);
+        BinaryRule thresholdUnit = new BinaryRule();
+        ng.setPrototypeRule(thresholdUnit);
         parentNet.addNetworkModel(ng);
 
         ng.setLayout(layout);
@@ -159,12 +154,9 @@ public class EdgeOfChaos extends RegisteredSimulation {
                 .standardDeviation(Math.sqrt(variance))
                 .build();
 
-        RadialSimple con = new RadialSimple(parentNet, res.getNeuronList());
-        con.setExcCons(k/2);
-        con.setExcitatoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
-        con.setInhCons(k/2);
-        con.setInhibitoryRadius((int) (Math.sqrt(res.getNeuronList().size()) * GRID_SPACE / 2));
-        con.setSelectMethod(RadialSimple.SelectionStyle.IN);
+        FixedDegree con = new FixedDegree();
+        con.setDegree(k);
+        con.setDirection(Direction.IN);
 
         SynapseGroup reservoir = SynapseGroup.createSynapseGroup(res, res, con,
                 0.5, exRand, inRand);
@@ -277,8 +269,7 @@ public class EdgeOfChaos extends RegisteredSimulation {
         super();
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Chaos";
     }
 

@@ -57,7 +57,7 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
 
-        worldPanel.getWorld().getEvents().onTileMapChanged(this::setGuiSizeToWorldSize);
+        worldPanel.getWorld().getEvents().onTileMapChanged(this::setGuiMaxSizeToWorldSize);
 
         // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
 
@@ -69,17 +69,32 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
     }
 
     /**
+     * Sets the size of the window based on the size of the underlying world / tilemap.
+     * Ignore the default panel preferences.
+     */
+    public void setGuiSizeToWorldSize() {
+        int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
+        int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
+        getParentFrame().setPreferredSize(new Dimension(worldPanel.getWorld().getWidth() + widthOffset,
+                worldPanel.getWorld().getHeight() + heightOffset));
+        getParentFrame().setMaximumSize(
+                new Dimension(worldPanel.getWorld().getWidth() + widthOffset,
+                worldPanel.getWorld().getHeight() + heightOffset));
+        getParentFrame().pack();
+    }
+
+    /**
      * Sets the max size of the window based on the size of the underlying world / tilemap;
      * set the default size base don the panel preferences.
      */
-    private void setGuiSizeToWorldSize() {
+    private void setGuiMaxSizeToWorldSize() {
         worldPanel.setPreferredSize(worldPanel.getPreferredSize());
-        // The world's height and width are based on the underlying tilemap
-        getParentFrame().pack();
         int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
-        int heightOffet = getParentFrame().getSize().height - worldPanel.getHeight();
-        getParentFrame().setMaximumSize(new Dimension(worldPanel.getWorld().getWidth() + widthOffset,
-                worldPanel.getWorld().getHeight() + heightOffet));
+        int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
+        getParentFrame().setMaximumSize(
+                new Dimension(worldPanel.getWorld().getWidth() + widthOffset,
+                        worldPanel.getWorld().getHeight() + heightOffset));
+        getParentFrame().pack();
     }
 
     /**

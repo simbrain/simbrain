@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.actor_critic;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
@@ -38,7 +38,7 @@ import static org.simbrain.network.core.NetworkKt.connectAllToAll;
  * Create the actor-critic simulation.
  */
 // CHECKSTYLE:OFF
-public class ActorCritic extends RegisteredSimulation {
+public class ActorCritic extends Simulation {
 
     /**
      * Number of trials per run.
@@ -453,8 +453,7 @@ public class ActorCritic extends RegisteredSimulation {
 
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Reinforcement Learning";
     }
 

@@ -24,7 +24,7 @@ import org.simbrain.util.UserParameter;
  * <b>Biased Neuron</b> is for neuron's with a bias, e.g. sigmoidal and linear
  * neurons.
  * <p>
- * TODO: Add upper and lower bound parameters? Add randomize option?
+ * TODO: Remove now that we have BiasedScalarData
  */
 public interface BiasedUpdateRule {
 

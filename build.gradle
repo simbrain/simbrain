@@ -67,7 +67,7 @@ dependencies {
     runtimeOnly group: 'org.tinylog', name: 'slf4j-tinylog', version: '2.4.1'
 
     // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-    implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.18'
+    implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.19'
 
     // https://mvnrepository.com/artifact/org.piccolo2d/piccolo2d-extras
     implementation group: 'org.piccolo2d', name: 'piccolo2d-extras', version: '3.0.1'
@@ -89,10 +89,10 @@ dependencies {
     implementation group: 'org.beanshell', name: 'bsh', version: '2.0b5'
 
     // JMonkeyEngine
-    implementation "org.jmonkeyengine:jme3-core:3.5.0-beta9"
-    implementation "org.jmonkeyengine:jme3-jbullet:3.5.0-beta9"
-    implementation "org.jmonkeyengine:jme3-desktop:3.5.0-beta9"
-    implementation "org.jmonkeyengine:jme3-lwjgl3:3.5.0-beta9"
+    implementation 'org.jmonkeyengine:jme3-core:3.5.0-stable'
+    implementation 'org.jmonkeyengine:jme3-jbullet:3.5.0-stable'
+    implementation 'org.jmonkeyengine:jme3-desktop:3.5.0-stable'
+    implementation 'org.jmonkeyengine:jme3-lwjgl3:3.5.0-stable'
 
 }
 

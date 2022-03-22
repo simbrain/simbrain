@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.RadialGaussian;
@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static org.simbrain.network.connections.RadialGaussianKt.*;
+
 
 /**
  * * Architecture:
@@ -59,7 +61,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * Connections within the recurrent neurons are based on distance in a gaussian
  * manner but with the parameters tuned to down regulate tails.
  */
-public class PatternsOfActivity extends RegisteredSimulation {
+public class PatternsOfActivity extends Simulation {
 
     // References
     Network net;
@@ -194,9 +196,8 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
         // Set up recurrent synapses
         SynapseGroup recSyns = SynapseGroup.createSynapseGroup(recurrentNetwork, recurrentNetwork,
-        new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 3, RadialGaussian.DEFAULT_EI_CONST * 3,
-            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 3,
-            200));
+        new RadialGaussian(DEFAULT_EE_CONST * 3, DEFAULT_EI_CONST * 3,
+            DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 3, .25, 200));
         //new Sparse(0.10, false, false)
         //        .connectNeurons(recSyns);
         initializeSynParameters(recSyns);
@@ -540,8 +541,7 @@ public class PatternsOfActivity extends RegisteredSimulation {
 
 
     }
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Cognitive Maps";
     }
 

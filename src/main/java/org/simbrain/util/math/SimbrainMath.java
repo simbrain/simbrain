@@ -709,6 +709,24 @@ public class SimbrainMath {
     }
 
     /**
+     * Returns the hamming distances for a pair of double arrays, in the sense of a number indicating how many
+     * components they differ on.
+     *
+     * TODO: Deal with precision
+     */
+    public static int hamming(final double[] src, final double[] tar) {
+        if (src.length != tar.length) {
+            throw new IllegalArgumentException("Source and target vector lengths do not match");
+        }
+        int diff = 0;
+        for (int i = 0; i < src.length; i++) {
+            if (src[i] != tar[i]) diff += 1;
+        }
+        return diff;
+    }
+
+
+    /**
      * Returns the mean squared error between a source and target vector.
      *
      * @param src source vector

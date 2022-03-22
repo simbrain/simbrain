@@ -17,21 +17,22 @@ import java.util.*
 /**
  * Java representation of a .tmx tilemap produced by the Tiled app
  * (https://doc.mapeditor.org/en/stable/)
- * <br></br>
- * A tilemap contains a list of [TileMapLayer] objects and a [TileSet]
- * object. Each layer is basically a grid of tiles, each of which points to a
- * member of a tileset, which is like a sprite sheet. To get a sense of
- * this see a sample tmx file like `aris_world.tmx`.
- * <br></br>
- * The map returns a list of PImages, one per layer, which can be rendered in a
- * Piccolo canvas.
- * <br></br>
- * The XStream annotations in this class allow XStream to read in a .tmx file in its
- * default format.
+ *
+ * A tilemap contains a list of [TileMapLayer]s and a list of [TileSet]s.
+ *
+ * Each layer is basically a grid of tiles, each of which points to a
+ * member of a tileset.
+ *
+ * To get a sense of this see a sample tmx file like `aris_world.tmx`.
+ *
+ * This object does not return a list of separate PImages, but rather one big image for each layer. See [#createImageList]
+ * This image is rendered only when the map changes.
+ *
+ * The XStream annotations in this class allow XStream to read in a .tmx file in its default format.
  *
  */
 @XStreamAlias("map")
-class TileMap {
+class TileMap(width: Int, height: Int) {
 
     /**
      * The TMX format version. Was “1.0” so far, and will be incremented to match minor Tiled releases.
@@ -49,14 +50,14 @@ class TileMap {
      * The map width in tiles.
      */
     @XStreamAsAttribute
-    var width = 0
+    var width = width
         private set
 
     /**
      * The map height in tiles.
      */
     @XStreamAsAttribute
-    var height = 0
+    var height = height
         private set
 
     /**
@@ -64,16 +65,14 @@ class TileMap {
      */
     @XStreamAlias("tilewidth")
     @XStreamAsAttribute
-    val tileWidth = 0
-
+    val tileWidth = 32
 
     /**
      * The height of a tile.
      */
     @XStreamAlias("tileheight")
     @XStreamAsAttribute
-    val tileHeight = 0
-
+    val tileHeight = 32
 
     /**
      * Get the map height in pixels.
@@ -92,13 +91,13 @@ class TileMap {
      */
     @XStreamImplicit
     @XStreamAlias("tileset")
-    val tileSets: List<TileSet> = ArrayList()
+    val tileSets: List<TileSet> = listOf(createDefaultTileSet())
 
     /**
      * The layers of this map.
      */
     @XStreamImplicit
-    val layers = ArrayList<TileMapLayer>()
+    val layers = mutableListOf(TileMapLayer("Default Layer", width, height, true))
 
     /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)
@@ -128,14 +127,28 @@ class TileMap {
     }
 
     /**
-     * Edit tiles in first layer.
+     * Edit tiles in first layer. Use with care; assumes just one layer.
      */
     fun editTile(x: Int, y: Int, tileID: Int) {
-        getLayer("Tile Layer 1").editTile(x, y, tileID)
+        layers.first().editTile(x, y, tileID)
     }
 
+    /**
+     * Edit tile in a named layer
+     */
     fun editTile(layerName: String, x: Int, y: Int, tileID: Int) {
         getLayer(layerName).editTile(x, y, tileID)
+    }
+
+    /**
+     * Set all tiles on first layer to specified tile id.
+     */
+    fun fill(tileId: Int) {
+        (0 until width).forEach { i ->
+            (0 until height).forEach { j ->
+                editTile(i, j, tileId)
+            }
+        }
     }
 
     // TODO: should not be able to edit tile map layers that don't belong to this map
@@ -176,7 +189,6 @@ class TileMap {
      * @return a list of tiles at that location in the same order as in the xml file
      */
     fun getTileStackAt(x: Int, y: Int) = layers.map { getTile(it[x, y]) }
-
 
     /**
      * Check if a given tile location contains any tiles or layers that with the collision property.
@@ -231,6 +243,8 @@ class TileMap {
      */
     fun pixelToTileCoordinate(x: Double, y: Double) = Point((x / tileWidth).toInt(), (y / tileHeight).toInt())
 
+    fun pixelToTileCoordinate(p: Point2D) = pixelToTileCoordinate(p.x, p.y)
+
     /**
      * Converts pixel location to tile coordinate.
      *
@@ -246,7 +260,7 @@ class TileMap {
             layers.firstOrNull { name == it.name } ?: throw IllegalArgumentException("$name not a tile layer name")
 
     /**
-     * Clear and resize the map to the specified size
+     * Clear and resize the map to the specified size. Maintains current tilemap.
      *
      * TODO: consider creating empty map instead of using this to avoid mutability
      *

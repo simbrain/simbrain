@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.cerebellum;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
@@ -25,7 +25,7 @@ import java.util.List;
  * TODO.
  */
 // CHECKSTYLE:OFF
-public class Cerebellum extends RegisteredSimulation {
+public class Cerebellum extends Simulation {
 
     // TODO: Stop button
 
@@ -461,8 +461,7 @@ public class Cerebellum extends RegisteredSimulation {
         sim.couple(output, sts2);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Brain";
     }
 

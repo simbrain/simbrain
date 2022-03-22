@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.hippocampus;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
  * @author Alex Pabst
  */
 // CHECKSTYLE:OFF
-public class Hippocampus extends RegisteredSimulation {
+public class Hippocampus extends Simulation {
 
     /**
      * Randomizer for creating new synapse groups.
@@ -402,8 +402,7 @@ public class Hippocampus extends RegisteredSimulation {
         // RC2toH.setEnabled(!lesioned);
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Brain";
     }
 

@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.agent_trails;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.simulations.utils.ColorPlotKt;
 import org.simbrain.network.NetworkComponent;
@@ -23,7 +23,7 @@ import static org.simbrain.network.core.NetworkKt.connectAllToAll;
  * Create images and data used in this paper
  * https://mindmodeling.org/cogsci2014/papers/542/paper542.pdf
  */
-public class AgentTrails extends RegisteredSimulation {
+public class AgentTrails extends Simulation {
 
     NetworkComponent nc;
     OdorWorldEntity mouse;
@@ -272,8 +272,7 @@ public class AgentTrails extends RegisteredSimulation {
 
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Cognitive Maps";
     }
 

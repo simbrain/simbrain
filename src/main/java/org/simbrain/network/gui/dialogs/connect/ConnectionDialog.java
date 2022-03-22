@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.connections.ConnectionUtilities;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
@@ -27,8 +26,10 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
 
+import static org.simbrain.network.connections.ConnectionUtilitiesKt.testRecurrence;
+
 /**
- * Dialog for using connection objects to create connections between loose neurons.
+ * Dialog for using connection objects to create connections between free nodes.
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
@@ -54,7 +55,7 @@ public class ConnectionDialog extends StandardDialog {
     public ConnectionDialog(final NetworkPanel networkPanel, final ConnectionStrategy connection) {
         this.networkPanel = networkPanel;
         this.connectionPanel = new ConnectionPanel(this, connection,
-                networkPanel.getSelectionManager().filterSelectedModels(Neuron.class).size(), ConnectionUtilities.
+                networkPanel.getSelectionManager().filterSelectedModels(Neuron.class).size(),
                 testRecurrence(networkPanel.getSelectionManager().filterSelectedModels(Neuron.class),
                         networkPanel.getSelectionManager().filterSelectedSourceModels(Neuron.class)), true);
         setContentPane(connectionPanel);

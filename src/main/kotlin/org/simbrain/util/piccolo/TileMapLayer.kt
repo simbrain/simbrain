@@ -1,12 +1,28 @@
 package org.simbrain.util.piccolo
 
+import com.Ostermiller.util.CSVParser
 import com.thoughtworks.xstream.annotations.XStreamAlias
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import com.thoughtworks.xstream.annotations.XStreamConverter
+import com.thoughtworks.xstream.converters.MarshallingContext
+import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.converters.extended.NamedMapConverter
+import com.thoughtworks.xstream.converters.reflection.ReflectionConverter
+import com.thoughtworks.xstream.converters.reflection.ReflectionProvider
+import com.thoughtworks.xstream.io.HierarchicalStreamReader
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter
+import com.thoughtworks.xstream.mapper.Mapper
 import org.piccolo2d.nodes.PImage
+import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.Network
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.util.*
+import java.util.zip.GZIPInputStream
+import java.util.zip.InflaterInputStream
 
 @XStreamAlias("layer")
 class TileMapLayer(
@@ -32,10 +48,9 @@ class TileMapLayer(
         get() = _properties ?: HashMap<String, String?>().also { _properties = it }
 
     /**
-     * The data from parsing tmx file.
-     * Use [TiledData.getGid] to retrieve the processed data (tile id list)
+     * An intermediate data structure for persistence.
      */
-    private var data: TiledData
+    private var data: TileMapLayerData
 
     /**
      * The rendered image of the layer
@@ -93,7 +108,7 @@ class TileMapLayer(
      */
     operator fun get(x: Int, y: Int): Int {
         infix fun Int.wrap(other: Int) = (this + other) % other
-        return data.gid[(x wrap width) + (y wrap height) * width]
+        return data[x wrap width, y wrap height]
     }
 
     /**
@@ -106,7 +121,7 @@ class TileMapLayer(
      * @param y the y coordinate on map
      */
     operator fun set(x: Int, y: Int, tileID: Int) {
-        data.gid[x + y * width] = tileID
+        data[x, y] = tileID
     }
 
     /**
@@ -122,7 +137,7 @@ class TileMapLayer(
     fun clear(width: Int = this.width, height: Int = this.height) {
         this.width = width
         this.height = height
-        data = TiledData(width, height)
+        data = TileMapLayerData(width, height)
     }
 
     fun setProperty(propertyName: String, propertyValue: String?) {
@@ -131,7 +146,82 @@ class TileMapLayer(
 
     init {
         properties["collision"] = if (collision) "true" else "false"
-        data = TiledData(width, height)
+        data = TileMapLayerData(width, height)
     }
 
+}
+
+/**
+ * Stores the grid of global ids that correspond to the data for a [TileMapLayer]
+ */
+@XStreamAlias("data")
+class TileMapLayerData(val gidMatrix: MutableList<MutableList<Int>>) {
+    constructor(width: Int, height: Int) : this(MutableList(height) { MutableList(width) { 0 } })
+    operator fun get(x: Int, y: Int) = gidMatrix[y][x]
+    operator fun set(x: Int, y: Int, tileId: Int) {
+        gidMatrix[y][x] = tileId
+    }
+}
+
+/**
+ * Custom serializer that stores [Network.networkModels], which is a map, as a flat list of [NetworkModel]s.
+ */
+class TiledDataConverter(mapper: Mapper, reflectionProvider: ReflectionProvider) :
+    ReflectionConverter(mapper, reflectionProvider, TileMapLayerData::class.java) {
+
+    override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+        val data = source as TileMapLayerData
+        writer.addAttribute("encoding", "csv")
+        val csv = data.gidMatrix.joinToString("\n") { it.joinToString(",") }
+        writer.setValue(csv)
+    }
+
+    /**
+     * Decode the raw [data] into a list of tile ids.
+     *
+     * @return the list of tile id this data represents.
+     */
+    private fun decodeData(value: String, encoding: String, compression: String?): List<List<Int>> {
+
+        fun decodeCSV() =
+            CSVParser(value.byteInputStream()).allValues
+                .map { row ->
+                    row.filter { it.isNotEmpty() }
+                        .map { it.toInt() }
+                }
+
+        fun decodeBase64() = value.split("[ \n]".toRegex())
+            .map { row -> row.let { Base64.getDecoder().decode(it)!! } }
+
+        fun ByteArray.decompressGzip() = GZIPInputStream(ByteArrayInputStream(this))
+            .use { it.readAllBytes()!! }
+
+        fun ByteArray.decompressZlib() = InflaterInputStream(ByteArrayInputStream(this)).readAllBytes()!!
+
+        fun ByteBuffer.asIntSequence() = sequence {
+            while(hasRemaining()) {
+                yield(int)
+            }
+        }
+
+        return when (encoding) {
+            "csv" -> decodeCSV()
+            "base64" -> when(compression) {
+                "gzip" -> decodeBase64().map { it.decompressGzip() }
+                "zlib" -> decodeBase64().map { it.decompressZlib() }
+                else -> decodeBase64()
+            }.map { ByteBuffer.wrap(it).apply { order(ByteOrder.LITTLE_ENDIAN) }.asIntSequence().toList() }
+            else -> throw IllegalStateException("Unknown encoding $encoding")
+        }
+
+    }
+
+    override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
+        val encoding = reader.getAttribute("encoding")
+        val compression = reader.getAttribute("compression")
+        val gid = decodeData(reader.value, encoding, compression)
+            .map { it.toMutableList() }
+            .toMutableList()
+        return TileMapLayerData(gid)
+    }
 }

@@ -48,9 +48,9 @@ val NetworkPanel.insertMenu
     get() = JMenu("Insert").apply {
         with(networkActions) {
             add(newNeuronAction)
-            add(neuronGroupAction)
-            addSeparator()
             add(addNeuronsAction)
+            addSeparator()
+            add(neuronGroupAction)
             add(addNeuronArrayAction)
             add(addDeepNetAction)
             add(addSmileClassifier)

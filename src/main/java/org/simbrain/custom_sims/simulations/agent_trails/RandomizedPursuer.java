@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.agent_trails;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.network.NetworkComponent;
@@ -28,7 +28,7 @@ import java.util.Arrays;
  * Button to run it from randomized spots to creates a cognitive map
  * of its input space.
  */
-public class RandomizedPursuer extends RegisteredSimulation {
+public class RandomizedPursuer extends Simulation {
 
     NetworkComponent nc;
     OdorWorldEntity mouse;
@@ -157,8 +157,7 @@ public class RandomizedPursuer extends RegisteredSimulation {
 
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Cognitive Maps";
     }
 

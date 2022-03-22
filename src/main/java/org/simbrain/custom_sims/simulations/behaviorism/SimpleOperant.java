@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.behaviorism;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
@@ -19,7 +19,7 @@ import java.util.Map;
  * @author Tim Meyer
  * @author Jeff Yoshimi
  */
-public class SimpleOperant extends RegisteredSimulation {
+public class SimpleOperant extends Simulation {
 
     NetworkComponent nc;
     ControlPanel panel;
@@ -145,8 +145,7 @@ public class SimpleOperant extends RegisteredSimulation {
         }
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Behaviorism";
     }
 

@@ -383,7 +383,6 @@ public class SynapseAdjustmentPanel extends JPanel {
                     }
                 }
                 fullUpdate();
-//                networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
             }
         });
 
@@ -394,20 +393,20 @@ public class SynapseAdjustmentPanel extends JPanel {
                 SynapseView view = (SynapseView) synTypeSelector.getSelectedItem();
                 // Commit appropriate randomizer to panel
                 switch (view) {
-//                    case ALL:
-//                        // TODO: Deal with changes in polarity...
-//                        randomPanel.commitRandom(allRandomizer);
-//                        break;
-//                    case OVERLAY:
-//                        randomPanel.commitRandom(excitatoryRandomizer);
-//                        randomPanel.commitRandom(inhibitoryRandomizer);
-//                        break;
-//                    case INHIBITORY:
-//                        randomPanel.commitRandom(inhibitoryRandomizer);
-//                        break;
-//                    case EXCITATORY:
-//                        randomPanel.commitRandom(excitatoryRandomizer);
-//                        break;
+                   case ALL:
+                       // TODO: Deal with changes in polarity...
+                       randomPanel.commitChanges(List.of(allRandomizer));
+                       break;
+                   case OVERLAY:
+                       randomPanel.commitChanges(List.of(excitatoryRandomizer));
+                       randomPanel.commitChanges(List.of(inhibitoryRandomizer));
+                       break;
+                   case INHIBITORY:
+                       randomPanel.commitChanges(List.of(inhibitoryRandomizer));
+                       break;
+                   case EXCITATORY:
+                       randomPanel.commitChanges(List.of(excitatoryRandomizer));
+                       break;
                 }
                 // Randomize synapses appropriately
                 for (Synapse synapse : synapses) {
@@ -434,7 +433,6 @@ public class SynapseAdjustmentPanel extends JPanel {
                     }
                 }
                 fullUpdate();
-//                networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
             }
         });
 
@@ -449,14 +447,14 @@ public class SynapseAdjustmentPanel extends JPanel {
                 getParent().repaint();
                 SynapseView view = (SynapseView) synTypeSelector.getSelectedItem();
                 switch (view) {
-//                    case ALL:
-//                        randomPanel.fillFieldValues(allRandomizer);
-//                    case OVERLAY:
-//                        randomPanel.fillFieldValues(allRandomizer);
-//                    case INHIBITORY:
-//                        randomPanel.fillFieldValues(inhibitoryRandomizer);
-//                    case EXCITATORY:
-//                        randomPanel.fillFieldValues(excitatoryRandomizer);
+                   case ALL:
+                       randomPanel.fillFieldValues(List.of(allRandomizer));
+                   case OVERLAY:
+                       randomPanel.fillFieldValues(List.of(allRandomizer));
+                   case INHIBITORY:
+                       randomPanel.fillFieldValues(List.of(inhibitoryRandomizer));
+                   case EXCITATORY:
+                       randomPanel.fillFieldValues(List.of(excitatoryRandomizer));
                 }
             }
         });
@@ -790,7 +788,6 @@ public class SynapseAdjustmentPanel extends JPanel {
                         }
                     }
                     fullUpdate();
-//                    networkPanel.getNetwork().fireSynapsesUpdated(synapses); // TODO: [event]
                 }
             });
         }

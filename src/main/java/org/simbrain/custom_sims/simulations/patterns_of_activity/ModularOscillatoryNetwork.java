@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.ConnectionStrategy;
@@ -30,6 +30,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.simbrain.network.connections.RadialGaussianKt.*;
 import static org.simbrain.network.core.NetworkKt.connect;
 
 
@@ -37,7 +38,7 @@ import static org.simbrain.network.core.NetworkKt.connect;
  * Simulate a set of oscillatory brain networks and display their projected
  * activity when exposed to inputs in a simple 2d world.
  */
-public class ModularOscillatoryNetwork extends RegisteredSimulation {
+public class ModularOscillatoryNetwork extends Simulation {
 
     // References
     NetworkComponent nc;
@@ -166,9 +167,8 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
     }
 
     private SynapseGroup connectRadialGaussian(NeuronGroup sourceNg, NeuronGroup targetNg) {
-        ConnectionStrategy radialConnection = new RadialGaussian(RadialGaussian.DEFAULT_EE_CONST * 1, RadialGaussian.DEFAULT_EI_CONST * 2,
-            RadialGaussian.DEFAULT_IE_CONST * 3, RadialGaussian.DEFAULT_II_CONST * 0,
-            50);
+        ConnectionStrategy radialConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 2,
+            DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50.0);
         SynapseGroup sg = SynapseGroup.createSynapseGroup(sourceNg, targetNg, radialConnection);
         net.addNetworkModel(sg);
         sg.setDisplaySynapses(false);
@@ -234,8 +234,7 @@ public class ModularOscillatoryNetwork extends RegisteredSimulation {
         super();
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Cognitive Maps";
     }
 

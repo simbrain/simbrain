@@ -2,14 +2,19 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.connections.RadialGaussian
+import org.simbrain.network.connections.RadialProbabilistic
+import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.createNeurons
+import org.simbrain.network.core.networkUpdateAction
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.KuramotoRule
-import org.simbrain.util.SimbrainConstants
+import org.simbrain.util.Utils
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.toDoubleArray
+import java.io.File
 
 /**
  * Create a simulation of Cortex...
@@ -21,62 +26,67 @@ val cortexPCI = newSim {
     val networkComponent = addNetworkComponent("Cortex Simulation")
     val network = networkComponent.network
 
-    // Function to create nodes
-    fun getNeurons(numNodes: Int): List<Neuron> {
-        return (0..numNodes).map {
-            val rule = KuramotoRule()
-            rule.naturalFrequency = 100 * Math.random()
-            val neuron = Neuron(network, rule)
-            if (Math.random() < 0.5) {
-                neuron.polarity = SimbrainConstants.Polarity.INHIBITORY
-            } else {
-                neuron.polarity = SimbrainConstants.Polarity.EXCITATORY
-            }
-            neuron.upperBound = 5.0
-            neuron
+    // Template for Kuramoto neuron
+    fun Neuron.kuramotoTemplate() {
+        updateRule = KuramotoRule().apply {
+            naturalFrequency = 100 * Math.random()
         }
+        upperBound = 5.0
     }
 
-    // Add a self-connected neuron array to the network
-    val neuronList1 = getNeurons(5)
-    network.addNetworkModels(neuronList1)
-    val region1 = NeuronCollection(network, neuronList1)
+    // Sparse connectivity
+    val sparse = Sparse().apply {
+        connectionDensity = .3
+        excitatoryRatio = .2
+    }
+
+    // Radial connectivity
+    val radial = RadialProbabilistic().apply {
+        excitatoryRadius = 150.0
+        excitatoryProbability = .4
+        inhibitoryRadius = 150.0
+        inhibitoryProbability = .9
+    }
+
+    // Subnetwork 1
+    val region1neurons = network.createNeurons(5) { kuramotoTemplate() }
+    val region1 = NeuronCollection(network, region1neurons)
     network.addNetworkModel(region1)
-    region1.label = "Region 1"
-    region1.layout(GridLayout())
-    region1.location = point(-100,-100)
-    var syns = RadialGaussian.connectRadialPolarized(neuronList1, neuronList1)
-    print(syns.size)
-    network.addNetworkModels(syns)
+    region1.apply {
+        label = "Region 1"
+        layout(GridLayout())
+        location = point(-100, -100)
+    }
+    radial.connectNeurons(network, region1neurons, region1neurons)
 
-    val neuronList2 = getNeurons(10)
-    network.addNetworkModels(neuronList2)
-    val region2 = NeuronCollection(network, neuronList2)
+
+    // Region 2
+    val region2neurons = network.createNeurons(10) { kuramotoTemplate() }
+    val region2 = NeuronCollection(network, region2neurons)
     network.addNetworkModel(region2)
-    region2.label = "Region 2"
-    region2.layout(GridLayout())
-    region2.location = point(0,0)
-    syns = RadialGaussian.connectRadialPolarized(neuronList2, neuronList2)
-    // syns = Sparse.connectSparse(neuronList2, neuronList2, .8, true, true, true)
-    print(syns.size)
-    network.addNetworkModels(syns)
+    region2.apply {
+       label = "Region 2"
+       layout(GridLayout())
+       location = point(100, 100)
+    }
+    radial.connectNeurons(network, region2neurons, region2neurons)
 
-
-    val neuronList3 = getNeurons(8)
-    network.addNetworkModels(neuronList3)
-    val region3 = NeuronCollection(network, neuronList3 )
+    // Region 3
+    val region3neurons = network.createNeurons(10) { kuramotoTemplate() }
+    val region3 = NeuronCollection(network, region3neurons)
     network.addNetworkModel(region3)
-    region3.label = "Region 3"
-    region3.layout(GridLayout())
-    region3.location = point(100,100)
+    region3.apply {
+        label = "Region 3"
+        layout(GridLayout())
+        location = point(400, -100)
+    }
+    radial.connectNeurons(network, region3neurons, region3neurons)
 
-    // Make connections between regions
-    syns = RadialGaussian.connectRadialPolarized(neuronList1, neuronList2)
-    network.addNetworkModels(syns)
-    syns = RadialGaussian.connectRadialPolarized(neuronList2, neuronList3)
-    network.addNetworkModels(syns)
-
-    // TODO: Code to create the pulse and log the data
+    // Make connectNeuronsions between regions
+    sparse.connectNeurons(network, region2neurons, region1neurons)
+    sparse.connectNeurons(network, region1neurons, region2neurons)
+    sparse.connectNeurons(network, region2neurons, region3neurons)
+    sparse.connectNeurons(network, region3neurons, region2neurons)
 
     // Location of the network in the desktop
     withGui {
@@ -87,4 +97,19 @@ val cortexPCI = newSim {
         }
     }
 
+    // ----- Add pulse and record activations  ------
+    // (Note the pulse has not been actually added yet)
+
+    val activations = mutableListOf<List<Double>>()
+    region1.randomize()
+    val recordActivations = networkUpdateAction("Record activations") {
+        val acts = network.looseNeurons.map { n -> n.activation }
+        activations.add(acts)
+    }
+    network.addUpdateAction(recordActivations)
+    workspace.iterate(10)
+    network.removeUpdateAction(recordActivations)
+
+    // Save activations
+    Utils.writeMatrix(activations.toDoubleArray(), File("activations.csv"))
 }

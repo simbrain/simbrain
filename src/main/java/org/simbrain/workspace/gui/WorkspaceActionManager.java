@@ -29,10 +29,10 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Workspace action manager contains references to all the actions for a Workspace.
@@ -260,33 +260,6 @@ public class WorkspaceActionManager {
      */
     public List<Action> getPlotActions() {
         return newChartActions;
-    }
-
-    /**
-     * Make a list of script actions by iterating through script menu
-     * directory.
-     *
-     * @param desktop workspace reference
-     * @return script action
-     */
-    public List<ScriptAction> getScriptActions(final SimbrainDesktop desktop) {
-        ArrayList<ScriptAction> list = new ArrayList();
-        File dir = new File(SCRIPT_MENU_DIRECTORY);
-        if (!dir.isDirectory()) {
-            return null; // Throw exception instead?
-        }
-        // TODO: look for other endings and invoke relevant script types
-        for (File file : dir.listFiles()) {
-            if (file.isDirectory()) {
-                continue;
-            }
-            // TODO: Maybe try sourcing additional files here.  Maybe those in a subdir.
-            if (file.getName().endsWith(".bsh")) {
-                list.add(new ScriptAction(desktop, file.getName()));
-            }
-        }
-        Collections.sort(list);
-        return list;
     }
 
     public Action getNewNetworkAction() {

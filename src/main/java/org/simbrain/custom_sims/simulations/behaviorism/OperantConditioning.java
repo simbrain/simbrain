@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.behaviorism;
 
-import org.simbrain.custom_sims.RegisteredSimulation;
+import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
@@ -26,7 +26,7 @@ import static org.simbrain.network.core.NetworkKt.connectAllToAll;
  * @author Tim Meyer
  * @author Jeff Yoshimi
  */
-public class OperantConditioning extends RegisteredSimulation {
+public class OperantConditioning extends Simulation {
 
     //TODO: Test.
 
@@ -227,8 +227,7 @@ public class OperantConditioning extends RegisteredSimulation {
         }
     }
 
-    @Override
-    public String getSubmenuName() {
+    private String getSubmenuName() {
         return "Behaviorism";
     }
 

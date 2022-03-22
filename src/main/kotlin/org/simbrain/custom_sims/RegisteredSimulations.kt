@@ -1,7 +1,28 @@
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
+import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic
+import org.simbrain.custom_sims.simulations.agent_trails.RandomizedPursuer
+import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning
+import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
+import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment
+import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
+import org.simbrain.custom_sims.simulations.braitenberg.Braitenberg
+import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum
+import org.simbrain.custom_sims.simulations.cortex.CortexSimple
+import org.simbrain.custom_sims.simulations.cortex.CorticalBranching
+import org.simbrain.custom_sims.simulations.creatures.CreaturesSim
+import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
+import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
+import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
 import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM
+import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
+import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillatoryNetwork
+import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity
+import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main
+import org.simbrain.custom_sims.simulations.sorn.SORN
+import org.simbrain.custom_sims.simulations.test.ConvertSim
+import org.simbrain.custom_sims.simulations.test.ReadSim
 import org.simbrain.custom_sims.simulations.test.lstmBlock
 import org.simbrain.util.dir
 
@@ -17,15 +38,36 @@ import org.simbrain.util.dir
  */
 val simulations = dir<Any>("Simulations") {
 
-    // This supersedes RegisteredSimulation.java. Will have to move that stuff here.
-
+    // TODO: Finish classifying
     dir("Imported") {
         item("LSTM") { lstmBlock() }
         item("MPFS") { MpfsSOM() }
+        item("Braitenberg") { Braitenberg() }
+        item("Edge Of Chaos") { EdgeOfChaos() }
+        item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
+        item("Hippocampus") { Hippocampus() }
+        item("RL_Sim_Main") { RL_Sim_Main() }
+        item("Cerebellum") { Cerebellum() }
+        item("Creatures") { CreaturesSim() }
+        item("Actor Critic") { ActorCritic() }
+        item("Operant With Environment") { OperantWithEnvironment() }
+        item("Classical Conditioning") { ClassicalConditioning() }
+        item("Operant Conditioning") {OperantConditioning()}
+        item("Simple Operant") {SimpleOperant()}
+        item("Cortical Branching") {CorticalBranching()}
+        item("Cortex Simple") {CortexSimple()}
+        item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
+        item("RandomizedPursuer") {RandomizedPursuer()}
+        item("PatternsOfActivity") {PatternsOfActivity()}
+        item("KuramotoOscillators") {KuramotoOscillators()}
+        item("SORN") { SORN() }
+        item("lstmBlock") {lstmBlock()}
+        item("ConvertSim") { ConvertSim() }
+        item("ReadSim") { ReadSim() }
     }
 
     dir("Demos") {
-        item("Simple Network") { testSim }
+        item("Test Sim") { testSim }
         item("Linked Neuron List") { linkedNeuronList }
         item("Projection") { projectionSim }
         item("Deep Net") { deepNetSim }
@@ -37,6 +79,8 @@ val simulations = dir<Any>("Simulations") {
     dir("Cognitive Science") {
         item("Cortex (PCI)") { cortexPCI }
         item("Reservoir") { reservoir }
+        item("Binary Reservoir") {binaryReservoir }
+        item("Isopod Simulation") { isopodSim }
     }
 
     dir("Evolution") {
@@ -49,6 +93,7 @@ val simulations = dir<Any>("Simulations") {
         item("Evolve Mouse (Sandbox)") { evolveMouse }
         item("Evolve XOR") { evolveXor }
     }
+
 }
 
 /**
@@ -79,6 +124,6 @@ fun main(args: Array<String>) {
     }
     when (sim) {
         is NewSimulation ->  sim.run()
-        is RegisteredSimulation -> sim.run()
+        is Simulation -> sim.run()
     }
 }

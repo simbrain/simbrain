@@ -25,7 +25,7 @@ import javax.swing.*;
  */
 public class EdgeOfChaosBitStream extends Simulation {
 
-    //TODO: Docviewer definitely needed
+    //TODO: Docviewer definitely needed. Note that we have preliminary documentation on a google doc. It just has to be ported over!
 
     // Simulation Parameters
     int NUM_NEURONS = 120;

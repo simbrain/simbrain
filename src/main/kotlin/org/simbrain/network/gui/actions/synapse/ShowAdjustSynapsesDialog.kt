@@ -20,7 +20,7 @@ package org.simbrain.network.gui.actions.synapse
 
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.dialogs.synapse.SynapseAdjustmentPanel
+import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
 import org.simbrain.util.ResourceManager
 import java.awt.Toolkit
 import java.awt.event.ActionEvent
@@ -50,10 +50,7 @@ class ShowAdjustSynapsesDialog(val networkPanel: NetworkPanel) : AbstractAction(
     override fun actionPerformed(event: ActionEvent) {
         JDialog().apply {
             title = "Adjust selected synapses"
-            contentPane = SynapseAdjustmentPanel.createSynapseAdjustmentPanel(
-                            networkPanel,
-                            networkPanel.selectionManager.filterSelectedModels<Synapse>()
-            )
+            contentPane = createSynapseAdjustmentPanel(networkPanel.selectionManager.filterSelectedModels<Synapse>())
             pack()
             setLocationRelativeTo(networkPanel)
             isVisible = true

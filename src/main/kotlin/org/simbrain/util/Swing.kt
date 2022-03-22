@@ -5,6 +5,7 @@ import java.awt.event.*
 import javax.swing.AbstractAction
 import javax.swing.JComponent
 import javax.swing.JDialog
+import javax.swing.JPanel
 
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
     addWindowListener(object : WindowAdapter() {
@@ -12,6 +13,15 @@ inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = 
             block(e)
         }
     })
+}
+
+/**
+ * Place the panel in a [StandardDialog] and show the dialog.
+ */
+fun JPanel.displayInDialog() {
+    val dialog = StandardDialog()
+    dialog.contentPane = this
+    dialog.makeVisible()
 }
 
 fun JDialog.display() {

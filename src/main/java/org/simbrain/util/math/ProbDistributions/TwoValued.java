@@ -7,6 +7,7 @@ import org.simbrain.util.math.ProbabilityDistribution;
 /**
  * Returns one of two values.
  * TODO: Do this in terms of proper theory
+ * TODO: Interact with polarity
  */
 public class TwoValued extends ProbabilityDistribution {
 

@@ -168,8 +168,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
      */
     private ListCellRenderer listRenderer = (list, updateAction, index, isSelected, cellHasFocus) -> {
 
-        JLabel label = new JLabel((index + 1) + ": " + ((NetworkUpdateAction) updateAction).getDescription());
-        label.setToolTipText(((NetworkUpdateAction) updateAction).getLongDescription());
+        JLabel label = new JLabel((index + 1) + ": " + ((UpdateAction) updateAction).getDescription());
+        label.setToolTipText(((UpdateAction) updateAction).getLongDescription());
         if (index == 0) {
             label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.LIGHT_GRAY));
         } else {

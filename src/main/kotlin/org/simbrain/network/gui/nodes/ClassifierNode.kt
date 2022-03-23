@@ -1,6 +1,5 @@
 package org.simbrain.network.gui.nodes
 
-import kotlinx.coroutines.channels.Channel
 import net.miginfocom.swing.MigLayout
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
@@ -208,7 +207,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
 
 fun main() {
     val networkComponent = NetworkComponent("net 1")
-    val np = NetworkPanel(networkComponent, Channel())
+    val np = NetworkPanel(networkComponent)
     val classifier = with(networkComponent.network) {
         val classifier = SmileClassifier(this, SVMClassifier(), 2)
         classifier.trainingInputs = arrayOf(

@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.desktop
 
-import kotlinx.coroutines.channels.Channel
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.*
@@ -40,7 +39,7 @@ import javax.swing.JOptionPane
  */
 class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent) : DesktopComponent<NetworkComponent?>(frame, component) {
 
-    val networkPanel = NetworkPanel(component, Channel())
+    val networkPanel = NetworkPanel(component)
 
     /**
      * Create and return a new File menu for this Network panel.

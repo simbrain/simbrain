@@ -3,7 +3,6 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
@@ -52,7 +51,7 @@ import kotlin.concurrent.timerTask
 /**
  * Main GUI representation of a [Network].
  */
-class NetworkPanel constructor(val networkComponent: NetworkComponent, val channel: Channel<Runnable>) : JPanel() {
+class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel() {
 
     val mainScope = MainScope()
 
@@ -632,9 +631,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent, val chann
         val event = network.events
         event.onModelAdded {
             createNode(it)
-            // if (it is LocatableModel && it.shouldBePlaced) {
-            //     placementManager.placeObject(it)
-            // }
+            if (it is LocatableModel && it.shouldBePlaced) {
+                placementManager.placeObject(it)
+            }
         }
         event.onModelRemoved {
             zoomToFitPage()

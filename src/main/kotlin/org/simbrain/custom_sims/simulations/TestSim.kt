@@ -1,6 +1,9 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
@@ -205,7 +208,7 @@ val linkedNeuronList = newSim {
 
     val network = networkComponent.network
 
-    GlobalScope.launch(Dispatchers.Main) {
+    workspace.coroutineScope.launch(Dispatchers.Main) {
         val neurons = (1..10000).map {
             async(Dispatchers.Default) { Neuron(network) }
         }.awaitAll()

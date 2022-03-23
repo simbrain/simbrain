@@ -62,3 +62,10 @@ fun Any?.isRealValued(): Boolean {
 fun Any?.isIntegerValued(): Boolean {
         return this is Short || this is Long ||  this is Int || this is Byte
 }
+
+/**
+ * Return a string representation of a 2-d array in the form of a list of list of doubles
+ */
+fun List<List<Double>>.toCsvString(): String {
+    return joinToString("\n") { it.joinToString(",") }
+}

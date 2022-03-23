@@ -8,6 +8,8 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.showSaveDialog
+import org.simbrain.util.toCsvString
 import javax.swing.JTextField
 
 /**
@@ -19,13 +21,16 @@ val binaryReservoir = newSim {
     // U_bar
     // Measure of chaos, etc.
 
+    var k = 2
+    var variance = .1
+
     // Basic setup
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Reservoir Sim")
     val network = networkComponent.network
 
     // Add a self-connected neuron array to the network
-    val resNeurons = (0..100).map {
+    val resNeurons = List(100) {
         val rule = BinaryRule()
         rule.threshold = .5
         val neuron = Neuron(network, rule)
@@ -38,15 +43,34 @@ val binaryReservoir = newSim {
     reservoir.layout(GridLayout())
     reservoir.location = point(0, 0)
 
-    var k = 2
-    var variance = .1
-
     val conn = FixedDegree(degree = k)
     conn.connectNeurons(network, resNeurons, resNeurons)
 
+    fun perturbAndRunNetwork() {
+
+        // Clear the network
+        reservoir.clear()
+
+        // Baseline window
+        repeat(10) { network.update() }
+
+        // Perturb 10 nodes
+        resNeurons.take(10).forEach { n -> n.activation = 1.0 }
+
+        // Response window
+        repeat(100) { network.update() }
+    }
+
+    // Each row is an activation vector at a time.
+    // Rows correspond to times, and columns to nodes
+    val activations = mutableListOf<List<Double>>()
+    network.addUpdateAction(updateAction("Record activations") {
+        activations.add(resNeurons.map { n -> n.activation })
+    })
+
     withGui {
         place(networkComponent) {
-            location = point(179,10)
+            location = point(249, 10)
             width = 400
             height = 400
         }
@@ -58,11 +82,26 @@ val binaryReservoir = newSim {
                 // Update variance of weight strengths
                 // TODO: Confusing because it is not a flat scaling, but relative
                 val new_variance = tf_stdev.text.toDouble()
-                network.flatSynapseList.forEach{ synapse ->
+                network.flatSynapseList.forEach { synapse ->
                     synapse.strength = synapse.strength * (new_variance / variance)
                 }
                 variance = new_variance
             }
+            addButton("Run one trial") {
+                perturbAndRunNetwork()
+                showSaveDialog("", "Save Activations") {
+                    writeText(activations.toCsvString())
+                }
+            }
+
+            // addButton("Run one trial per parameter") {
+            //     listOf(.1, .2, .3, .4, .5, .6, .7, .8, .9).forEach {
+            //         variance = it
+            //         perturbAndRunNetwork()
+            //         println("${variance}: ${activations}")
+            //     }
+            // }
+
         }
 
     }
@@ -71,7 +110,7 @@ val binaryReservoir = newSim {
     val projectionPlot = addProjectionPlot("Activations")
     withGui {
         place(projectionPlot) {
-            location = point(570, 10)
+            location = point(630, 10)
             width = 400
             height = 400
         }

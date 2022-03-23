@@ -2,6 +2,7 @@ package org.simbrain.util
 
 import java.awt.Component
 import java.awt.event.*
+import java.io.File
 import javax.swing.AbstractAction
 import javax.swing.JComponent
 import javax.swing.JDialog
@@ -13,6 +14,14 @@ inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = 
             block(e)
         }
     })
+}
+
+fun showSaveDialog(dir: String, dialogName: String = "Save File", block: File.() -> Unit) {
+    val chooser = SFileChooser(dir, dialogName)
+    val theFile = chooser.showSaveDialog()
+    if (theFile != null) {
+        theFile.block()
+    }
 }
 
 /**

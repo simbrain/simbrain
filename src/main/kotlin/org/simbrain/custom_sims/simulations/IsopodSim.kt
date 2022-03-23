@@ -138,6 +138,10 @@ val isopodSim = newSim {
         addFish(10, 10)
         addFish(590, 10)
 
+        workspace.addUpdateAction(updateAction("Track location") {
+            println("Location: ${isopod.location}")
+        })
+
     }
 
     withGui {

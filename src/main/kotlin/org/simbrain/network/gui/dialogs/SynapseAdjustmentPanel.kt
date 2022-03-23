@@ -657,7 +657,7 @@ fun createSynapseAdjustmentPanel(synapses: List<Synapse>): SynapseAdjustmentPane
 fun main() {
 
     val net = Network()
-    val neurons = (0..20).map { Neuron(net) }
+    val neurons = List(20) { Neuron(net) }
     // val neurons = mutableListOf<Neuron>() // To test empty list case
     val conn = RadialProbabilistic()
     val syns = conn.connectNeurons(net, neurons, neurons)

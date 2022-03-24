@@ -1,9 +1,5 @@
 package org.simbrain.util
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
 import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
@@ -46,7 +42,7 @@ open class Event(private val changeSupport: PropertyChangeSupport) {
      * Overload "operator" with an argument. Used for "firing" events with an argument
      */
     protected operator fun <T> String.invoke(old: T? = null, new: T? = null) {
-        GlobalScope.launch(Dispatchers.Swing) { changeSupport.firePropertyChange(this@invoke, old, new) }
+        changeSupport.firePropertyChange(this@invoke, old, new)
         // changeSupport.firePropertyChange(this@invoke, old, new)
         Logger.debug("${this}Event")
     }

@@ -3,10 +3,7 @@ package org.simbrain.util
 import java.awt.Component
 import java.awt.event.*
 import java.io.File
-import javax.swing.AbstractAction
-import javax.swing.JComponent
-import javax.swing.JDialog
-import javax.swing.JPanel
+import javax.swing.*
 
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
     addWindowListener(object : WindowAdapter() {
@@ -16,11 +13,52 @@ inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = 
     })
 }
 
-fun showSaveDialog(dir: String, dialogName: String = "Save File", block: File.() -> Unit) {
-    val chooser = SFileChooser(dir, dialogName)
-    val theFile = chooser.showSaveDialog()
+fun showSaveDialog(initialDirectory: String = "",
+                   initialFileName: String? = null,
+                   block: File.()  -> Unit) {
+    val chooser = SFileChooser(initialDirectory, "")
+    val theFile = if (initialFileName != null) {
+        chooser.showSaveDialog(initialFileName)
+    } else {
+        chooser.showSaveDialog()
+    }
     if (theFile != null) {
         theFile.block()
+    }
+}
+
+fun showOpenDialog(initialDirectory: String = "",
+                   extension: String? = null,
+                   block: File.() -> Unit) {
+    val chooser = SFileChooser(initialDirectory, "")
+    if (extension != null) {
+        chooser.addExtension(extension)
+    }
+    val theFile = chooser.showOpenDialog()
+    if (theFile != null) {
+        theFile.block()
+    }
+}
+
+fun main() {
+    // showOpenDialog(extension = "txt") {
+    //     println(this.readText())
+    // }
+    showSaveDialog("", "test.txt") {
+        writeText("testing...")
+    }
+}
+
+/**
+ * Shows a dialog that lets you select a directory, then returns that directory path as a string.
+ */
+fun showDirectorySelectionDialog(): String? {
+    val chooser = JFileChooser()
+    chooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+    return if (chooser.showDialog(null, "Open") == JFileChooser.APPROVE_OPTION) {
+        chooser.currentDirectory.path
+    } else {
+        null
     }
 }
 

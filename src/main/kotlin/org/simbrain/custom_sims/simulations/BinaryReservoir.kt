@@ -6,10 +6,9 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.BinaryRule
-import org.simbrain.util.place
-import org.simbrain.util.point
-import org.simbrain.util.showSaveDialog
-import org.simbrain.util.toCsvString
+import org.simbrain.util.*
+import org.simbrain.util.Utils.FS
+import java.io.File
 import javax.swing.JTextField
 
 /**
@@ -89,18 +88,23 @@ val binaryReservoir = newSim {
             }
             addButton("Run one trial") {
                 perturbAndRunNetwork()
-                showSaveDialog("", "Save Activations") {
+                showSaveDialog("activations.csv", "Save Activations") {
                     writeText(activations.toCsvString())
                 }
             }
 
-            // addButton("Run one trial per parameter") {
-            //     listOf(.1, .2, .3, .4, .5, .6, .7, .8, .9).forEach {
-            //         variance = it
-            //         perturbAndRunNetwork()
-            //         println("${variance}: ${activations}")
-            //     }
-            // }
+            addButton("Run one trial per parameter") {
+                // Choose directory for files
+                val path = showDirectorySelectionDialog()
+                if (path != null) {
+                    listOf(.1, .2, .3, .4, .5, .6, .7, .8, .9).forEach {
+                        variance = it
+                        perturbAndRunNetwork()
+                        // println("${variance}: ${activations}")
+                        File(path + FS + "activations${variance}.csv").writeText(activations.toCsvString())
+                    }
+                }
+            }
 
         }
 

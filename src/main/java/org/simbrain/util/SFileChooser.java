@@ -36,6 +36,8 @@ import java.util.*;
  */
 public class SFileChooser {
 
+    // TODO: Consider removing or renaming the description field.
+
     /**
      * Whether to use the native file chooser, or the Swing file chooser. Set in
      * the properties file {simbrain}/etc/config.properties.
@@ -271,7 +273,7 @@ public class SFileChooser {
     /**
      * Shows dialog for saving files.
      *
-     * @param file
+     * @param file initial file name
      * @return Name of file saved
      */
     public File showSaveDialog(final File file) {

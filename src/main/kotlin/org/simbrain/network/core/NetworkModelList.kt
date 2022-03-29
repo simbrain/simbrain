@@ -7,6 +7,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.groups.Subnetwork
 
 /**
@@ -21,6 +22,8 @@ class NetworkModelList {
     @XStreamImplicit
     private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = HashMap()
 
+    private val shouldAsync: HashMap<Boolean, LinkedHashSet<NetworkModel>> = HashMap()
+
     @Suppress("UNCHECKED_CAST")
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
         if (modelClass in networkModels) {
@@ -30,6 +33,11 @@ class NetworkModelList {
             newSet.add(model)
             networkModels[modelClass] = newSet as LinkedHashSet<NetworkModel>
         }
+        if (model is ArrayLayer || model is AbstractNeuronCollection) {
+            shouldAsync.getOrPut(true) { LinkedHashSet() }
+        } else {
+            shouldAsync.getOrPut(false) { LinkedHashSet() }
+        }.add(model)
     }
 
     /**
@@ -44,6 +52,11 @@ class NetworkModelList {
             newSet.add(model)
             networkModels[modelClass] = newSet
         }
+        if (model is ArrayLayer || model is AbstractNeuronCollection) {
+            shouldAsync.getOrPut(true) { LinkedHashSet() }
+        } else {
+            shouldAsync.getOrPut(false) { LinkedHashSet() }
+        }.add(model)
     }
 
     /**
@@ -119,6 +132,9 @@ class NetworkModelList {
             networkModels[model.javaClass]?.remove(model)
         }
     }
+
+    fun getAsyncModels() = shouldAsync[true] ?: LinkedHashSet()
+    fun getNonAsyncModels() = shouldAsync[false] ?: LinkedHashSet()
 
     override fun toString(): String =  all.joinToString("\n") { "$it" }
 

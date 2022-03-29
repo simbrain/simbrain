@@ -1,6 +1,9 @@
 package org.simbrain.network.core
 
 import com.thoughtworks.xstream.XStream
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
@@ -266,6 +269,13 @@ class Network {
     fun bufferedUpdate() {
         networkModels.all.forEach { it.updateInputs() }
         networkModels.all.forEach { it.update() }
+    }
+
+    suspend fun asyncBufferedUpdate()  = coroutineScope {
+        networkModels.getAsyncModels().map { async { it.updateInputs() } }.awaitAll()
+        networkModels.getNonAsyncModels().forEach { it.updateInputs() }
+        networkModels.getAsyncModels().map { async { it.update() } }.awaitAll()
+        networkModels.getNonAsyncModels().forEach { it.update() }
     }
 
     /**

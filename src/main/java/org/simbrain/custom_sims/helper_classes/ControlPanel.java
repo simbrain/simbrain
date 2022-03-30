@@ -83,9 +83,7 @@ public class ControlPanel extends JPanel {
      */
     public JButton addButton(String buttonText, String buttonLabel, Runnable task) {
         JButton button = new JButton(buttonLabel);
-        button.addActionListener(e -> {
-            Executors.newSingleThreadExecutor().execute(task);
-        });
+        button.addActionListener(e -> task.run());
         this.addItem(buttonText, button);
         pack();
         return button;

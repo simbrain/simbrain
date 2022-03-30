@@ -9,6 +9,7 @@ import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.util.*
 import org.simbrain.util.Utils.FS
 import java.io.File
+import javax.swing.JOptionPane
 import javax.swing.JTextField
 
 /**
@@ -20,8 +21,15 @@ val binaryReservoir = newSim {
     // U_bar
     // Measure of chaos, etc.
 
-    var k = 2
+    val k = 2
     var variance = .1
+    val baseIterations = 400
+    val responseIterations = 300
+
+    // Stored activations
+    // Each row is an activation vector at a time.
+    // Rows correspond to times, and columns to nodes
+    val activations = mutableListOf<List<Double>>()
 
     // Basic setup
     workspace.clearWorkspace()
@@ -45,24 +53,40 @@ val binaryReservoir = newSim {
     val conn = FixedDegree(degree = k)
     conn.connectNeurons(network, resNeurons, resNeurons)
 
+    /**
+     * Resets the variance by rescaling synapses. Assumes valid variance to begin with.
+     */
+    fun setVariance(newVariance: Double) {
+        if (newVariance !in (0.0..1.0)) {
+            JOptionPane.showMessageDialog(null, "Variance must be between 0 and 1")
+            return
+        }
+        // Scales existing variance up and down by a scaling factor
+        network.flatSynapseList.forEach { synapse ->
+            synapse.strength = synapse.strength * (newVariance / variance)
+        }
+        variance = newVariance
+
+    }
+
     fun perturbAndRunNetwork() {
 
-        // Clear the network
-        reservoir.clear()
+        println("Variance: ${variance}")
+
+        // Clear the network and activations
+        reservoir.randomize()
+        activations.clear()
 
         // Baseline window
-        repeat(10) { network.update() }
+        repeat(baseIterations) { network.update() }
 
         // Perturb 10 nodes
         resNeurons.take(10).forEach { n -> n.activation = 1.0 }
 
         // Response window
-        repeat(100) { network.update() }
+        repeat(responseIterations) { network.update() }
     }
 
-    // Each row is an activation vector at a time.
-    // Rows correspond to times, and columns to nodes
-    val activations = mutableListOf<List<Double>>()
     network.addUpdateAction(updateAction("Record activations") {
         activations.add(resNeurons.map { n -> n.activation })
     })
@@ -78,32 +102,27 @@ val binaryReservoir = newSim {
             val tf_stdev: JTextField = addTextField("Weight stdev", "" + variance)
             addComponent(tf_stdev)
             addButton("Apply Variance") {
-                // Update variance of weight strengths
-                // TODO: Confusing because it is not a flat scaling, but relative
-                val new_variance = tf_stdev.text.toDouble()
-                network.flatSynapseList.forEach { synapse ->
-                    synapse.strength = synapse.strength * (new_variance / variance)
-                }
-                variance = new_variance
+                val newVariance = tf_stdev.text.toDouble()
+                setVariance(newVariance)
             }
             addButton("Run one trial") {
                 perturbAndRunNetwork()
-                showSaveDialog("activations.csv", "Save Activations") {
+                showSaveDialog("", "activations.csv") {
                     writeText(activations.toCsvString())
                 }
             }
 
             addButton("Run one trial per parameter") {
-                // Choose directory for files
-                val path = showDirectorySelectionDialog()
-                if (path != null) {
-                    listOf(.1, .2, .3, .4, .5, .6, .7, .8, .9).forEach {
-                        variance = it
-                        perturbAndRunNetwork()
-                        // println("${variance}: ${activations}")
-                        File(path + FS + "activations${variance}.csv").writeText(activations.toCsvString())
+                    val path = showDirectorySelectionDialog()
+                    if (path != null) {
+                        (5..95 step 5).forEach {
+                            setVariance(it/100.0)
+                            perturbAndRunNetwork()
+                            // println("${variance}: ${activations}")
+                            File(path + FS + "activations${variance}.csv").writeText(activations.toCsvString())
+                        }
                     }
-                }
+
             }
 
         }

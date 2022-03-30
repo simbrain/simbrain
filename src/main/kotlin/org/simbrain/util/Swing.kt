@@ -44,9 +44,10 @@ fun main() {
     // showOpenDialog(extension = "txt") {
     //     println(this.readText())
     // }
-    showSaveDialog("", "test.txt") {
-        writeText("testing...")
-    }
+    // showSaveDialog("", "test.txt") {
+    //     writeText("testing...")
+    // }
+    print(showDirectorySelectionDialog())
 }
 
 /**
@@ -55,8 +56,12 @@ fun main() {
 fun showDirectorySelectionDialog(): String? {
     val chooser = JFileChooser()
     chooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
-    return if (chooser.showDialog(null, "Open") == JFileChooser.APPROVE_OPTION) {
-        chooser.currentDirectory.path
+    return if (chooser.showDialog(null, "Select Folder") == JFileChooser.APPROVE_OPTION) {
+        return if (chooser.selectedFile.isDirectory) {
+            chooser.selectedFile.path
+        } else {
+            chooser.currentDirectory.path
+        }
     } else {
         null
     }

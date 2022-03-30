@@ -3,7 +3,7 @@ package org.simbrain.util
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class NumberKtTest {
+class MathKtTest {
 
     @Test
     fun `test one hot matrix`() {

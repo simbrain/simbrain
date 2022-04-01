@@ -22,13 +22,13 @@ repositories {
 dependencies {
 
     // Kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.6.0'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-jvm-host:1.6.0'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-jsr223:1.6.0'
-    implementation 'org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.0'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.6.0'
-    implementation 'org.jetbrains.kotlin:kotlin-script-util:1.6.0'
-    implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.6.0'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.6.10'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-jvm-host:1.6.10'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-jsr223:1.6.10'
+    implementation 'org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.10'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.6.10'
+    implementation 'org.jetbrains.kotlin:kotlin-script-util:1.6.10'
+    implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.6.10'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.0-native-mt'
 
@@ -85,16 +85,16 @@ dependencies {
     implementation group: 'com.miglayout', name: 'miglayout-swing', version: '11.0'
 
     // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
-    implementation group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.1.6'
+    implementation group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.2.0'
 
     // https://mvnrepository.com/artifact/org.beanshell/bsh
     implementation group: 'org.beanshell', name: 'bsh', version: '2.0b5'
 
     // JMonkeyEngine
-    implementation 'org.jmonkeyengine:jme3-core:3.5.0-stable'
-    implementation 'org.jmonkeyengine:jme3-jbullet:3.5.0-stable'
-    implementation 'org.jmonkeyengine:jme3-desktop:3.5.0-stable'
-    implementation 'org.jmonkeyengine:jme3-lwjgl3:3.5.0-stable'
+    implementation 'org.jmonkeyengine:jme3-core:3.5.1-stable'
+    implementation 'org.jmonkeyengine:jme3-jbullet:3.5.1-stable'
+    implementation 'org.jmonkeyengine:jme3-desktop:3.5.1-stable'
+    implementation 'org.jmonkeyengine:jme3-lwjgl3:3.5.1-stable'
 
 }
 

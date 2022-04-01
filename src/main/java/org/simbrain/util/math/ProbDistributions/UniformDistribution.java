@@ -48,12 +48,12 @@ public class UniformDistribution extends ProbabilityDistribution {
         this.ceil = ceil;
     }
 
-    public double nextRand() {
+    public double nextDouble() {
         return ThreadLocalRandom.current().nextDouble(this.floor, this.ceil);
     }
 
-    public int nextRandInt() {
-        return (int) Math.round(nextRand());
+    public int nextInt() {
+        return (int) Math.round(nextDouble());
     }
 
     public UniformDist getBestFit(double[] observations, int numObs) {
@@ -90,16 +90,6 @@ public class UniformDistribution extends ProbabilityDistribution {
     @Override
     public void setLowerBound(double floor) {
         this.floor = floor;
-    }
-
-    @Override
-    public void setPolarity(Polarity polarity) {
-        this.polarity = polarity;
-    }
-
-    @Override
-    public Polarity getPolarity() {
-        return this.polarity;
     }
 
     public static UniformDistributionBuilder builder() {

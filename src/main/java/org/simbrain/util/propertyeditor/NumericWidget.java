@@ -89,9 +89,9 @@ public class NumericWidget extends JPanel {
                 dialog.addClosingTask(() -> {
                     editableObjects.forEach(o -> {
                         if (parameter.isNumericInteger()) {
-                            parameter.setFieldValue(o, pd.nextRandInt());
+                            parameter.setFieldValue(o, pd.nextInt());
                         } else {
-                            parameter.setFieldValue(o, pd.nextRand());
+                            parameter.setFieldValue(o, pd.nextDouble());
                         }
                     });
                     if(editableObjects.size() == 1) {

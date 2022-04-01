@@ -61,7 +61,7 @@ public class SigmoidalRule extends AbstractSigmoidalRule {
         double val = neuron.getInput() + bias;
 
         if (addNoise) {
-            val += noiseGenerator.getRandom();
+            val += noiseGenerator.nextDouble();
         }
 
         val = sFunction.valueOf(val, getUpperBound(), getLowerBound(), getSlope());

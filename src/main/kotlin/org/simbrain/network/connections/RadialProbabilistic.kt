@@ -168,7 +168,7 @@ fun Neuron.connectProbabilistically(
         }
         .filter { Math.random() < prob }
         .map { otherNeuron ->
-            Synapse(this, otherNeuron, otherNeuron.polarity.value(randomizer.nextRand()))
+            Synapse(this, otherNeuron, otherNeuron.polarity.value(randomizer.nextDouble()))
         }
 }
 

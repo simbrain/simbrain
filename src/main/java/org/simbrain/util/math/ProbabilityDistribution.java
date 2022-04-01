@@ -1,6 +1,5 @@
 package org.simbrain.util.math;
 
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.propertyeditor.CopyableObject;
@@ -10,8 +9,6 @@ import umontreal.ssj.rng.RandomStream;
 
 import java.util.Arrays;
 import java.util.List;
-
-//TODO: Allow seed to be set
 
 /**
  * Base class for all ProbabilityDistribution.
@@ -40,14 +37,14 @@ public abstract class ProbabilityDistribution implements CopyableObject {
      *
      * @return a random number
      */
-    public abstract double nextRand();
+    public abstract double nextDouble();
 
     /**
      * Get a random integer number from a probability distribution
      *
      * @return a random number
      */
-    public abstract int nextRandInt();
+    public abstract int nextInt();
 
     public abstract ProbabilityDistribution deepCopy();
 
@@ -58,10 +55,6 @@ public abstract class ProbabilityDistribution implements CopyableObject {
     public abstract void setUpperBound(double ceiling);
 
     public abstract void setLowerBound(double floor);
-
-    public abstract void setPolarity(Polarity polarity);
-
-    public abstract Polarity getPolarity();
 
     @Override
     public ProbabilityDistribution copy() {
@@ -93,7 +86,7 @@ public abstract class ProbabilityDistribution implements CopyableObject {
             //TODO: Parameterize 20, so it's not a magic number
             if (cnt >= 20)
                 break;
-            result = dist.nextRand();
+            result = dist.nextDouble();
             cnt++;
         } while(result < lowerBound || result > upperBound);
 
@@ -105,13 +98,6 @@ public abstract class ProbabilityDistribution implements CopyableObject {
             }
         }
         return result;
-    }
-
-    /**
-     * Return the next sampled value from this probability distribution.
-     */
-    public double getRandom() {
-        return getPolarity().value(nextRand());
     }
 
     /**
@@ -243,18 +229,6 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         }
 
         /**
-         * Sets if the random number generated should be only positive,
-         * negative, or both.
-         *
-         * @param polarity the polarity
-         * @return the Builder instance (for use in chained initialization)
-         */
-        public B polarity(Polarity polarity) {
-            product().setPolarity(polarity);
-            return (B) this;
-        }
-
-        /**
          * Builds a instance of specific {@link ProbabilityDistribution} of
          * given states.
          *
@@ -296,11 +270,11 @@ public abstract class ProbabilityDistribution implements CopyableObject {
          * @return the random number
          */
         public double getRandom() {
-            return probabilityDistribution.nextRand();
+            return probabilityDistribution.nextDouble();
         }
 
         public double getRandomInt() {
-            return probabilityDistribution.nextRandInt();
+            return probabilityDistribution.nextInt();
         }
 
         @Override

@@ -548,7 +548,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          * negative values allowed; exciatory -&#62; only positive values
          * allowed).
          */
-        private final Polarity polarity;
+        private final Polarity polarity = null;
 
         /**
          * The PolaraizedRandomizer this panel will either use to fill field
@@ -583,7 +583,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          */
         public EditableRandomizerPanel(Window parent, ProbabilityDistribution dist, boolean enabled) {
             this.randomizer.setProbabilityDistribution(dist);
-            polarity = randomizer.getProbabilityDistribution().getPolarity();
+            // polarity = randomizer.getProbabilityDistribution().getPolarity();
             enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, enabled, "Disabled", "Enabled", parent);
             enableStatusTriangle.setUpLabelColor(new Color(200, 0, 0));
             enableStatusTriangle.setDownLabelColor(new Color(0, 160, 0));
@@ -608,11 +608,8 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          */
         public EditableRandomizerPanel(Window parent, Polarity polarity) {
 
-                this.polarity = polarity;
-
                 randomizer.setProbabilityDistribution(
                         UniformDistribution.builder()
-                                .polarity(polarity)
                                 .build());
 
                 enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, !creationPanel, "Disabled", "Enabled", parent);
@@ -735,8 +732,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         /**
          * Adds an additional listener to the apply button so that other panels
          * can perform other actions if the button is pressed.
-         *
-         * @param al
          */
         public void addApplyActionListener(ActionListener al) {
             applyButton.addActionListener(al);
@@ -750,7 +745,6 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
         public void commitChanges() {
             if (enableStatusTriangle.isDown() || randomizerState == RandBehavior.FORCE_ON) {
                 randomizerPanel.commitChanges();
-                randomizer.getProbabilityDistribution().setPolarity(polarity);
             }
         }
 

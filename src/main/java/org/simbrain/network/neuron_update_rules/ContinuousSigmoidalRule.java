@@ -125,7 +125,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         double dt = neuron.getNetwork().getTimeStep();
 
         if (addNoise) {
-            inputTerm = (dt / tau) * (neuron.getInput() + bias + noiseGenerator.getRandom());
+            inputTerm = (dt / tau) * (neuron.getInput() + bias + noiseGenerator.nextDouble());
         } else {
             inputTerm = (dt / tau) * (neuron.getInput() + bias);
         }

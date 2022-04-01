@@ -65,7 +65,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
 
     @Override
     public void apply(Neuron neuron, ScalarDataHolder data) {
-        neuron.setActivation(randomizer.getRandom());
+        neuron.setActivation(randomizer.nextDouble());
     }
 
     @Override
@@ -75,7 +75,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
 
     @Override
     public double getRandomValue() {
-        return randomizer.getRandom();
+        return randomizer.nextDouble();
     }
 
     @Override

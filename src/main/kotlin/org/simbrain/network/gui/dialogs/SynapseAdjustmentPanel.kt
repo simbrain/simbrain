@@ -25,7 +25,6 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.LabelledItemPanel
-import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.math.ProbDistributions.UniformDistribution
 import org.simbrain.util.math.ProbabilityDistribution
@@ -55,17 +54,14 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
      * Random source for randomizing inhibitory synapses.
      */
     private val inhibitoryRandomizer: ProbabilityDistribution = UniformDistribution.builder()
-        .polarity(Polarity.INHIBITORY)
         .build()
 
     /**
      * Random source for randomizing excitatory synapses.
      */
     private val excitatoryRandomizer: ProbabilityDistribution = UniformDistribution.builder()
-        .polarity(Polarity.EXCITATORY)
         .build()
 
-    // TODO: Nonpolar randomizer?
 
     /**
      * A collection of the selected synaptic weights, such that the first row
@@ -227,7 +223,7 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             val view = synTypeSelector.selectedItem as SynapseView
             for (synapse in synapses) {
                 if (view.synapseIsAdjustable(synapse)) {
-                    synapse.forceSetStrength(synapse.strength + perturber.random)
+                    synapse.forceSetStrength(synapse.strength + perturber.nextDouble())
                 }
             }
             fullUpdate()
@@ -255,14 +251,14 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
                     SynapseView.ALL -> s.forceSetStrength(chooseRandomizer.random)
                     SynapseView.OVERLAY -> {
                         if (SynapseView.INHIBITORY.synapseIsAdjustable(s)) {
-                            s.forceSetStrength(inhibitoryRandomizer.random)
+                            s.forceSetStrength(inhibitoryRandomizer.nextDouble())
                         }
                         if (SynapseView.EXCITATORY.synapseIsAdjustable(s)) {
-                            s.forceSetStrength(excitatoryRandomizer.random)
+                            s.forceSetStrength(excitatoryRandomizer.nextDouble())
                         }
                     }
-                    SynapseView.EXCITATORY -> s.forceSetStrength(excitatoryRandomizer.random)
-                    SynapseView.INHIBITORY -> s.forceSetStrength(inhibitoryRandomizer.random)
+                    SynapseView.EXCITATORY -> s.forceSetStrength(excitatoryRandomizer.nextDouble())
+                    SynapseView.INHIBITORY -> s.forceSetStrength(inhibitoryRandomizer.nextDouble())
                 }
             }
             // Update the histogram, stats panel, etc

@@ -1,6 +1,5 @@
 package org.simbrain.util.math.ProbDistributions;
 
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
 
@@ -34,12 +33,12 @@ public class TwoValued extends ProbabilityDistribution {
     public TwoValued() {
     }
 
-    public double nextRand() {
+    public double nextDouble() {
         return Math.random() > p ? upper : lower;
     }
 
-    public int nextRandInt() {
-        return (int) nextRand();
+    public int nextInt() {
+        return (int) nextDouble();
     }
 
 
@@ -70,17 +69,6 @@ public class TwoValued extends ProbabilityDistribution {
     @Override
     public void setLowerBound(double floor) {
         this.lower = floor;
-    }
-
-    @Override
-    public void setPolarity(Polarity polarity) {
-        // TODO
-    }
-
-
-    @Override
-    public Polarity getPolarity() {
-        return Polarity.BOTH;
     }
 
     public static TwoValuedBuilder builder() {

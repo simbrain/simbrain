@@ -193,7 +193,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         }
 
         if (addNoise) {
-            val += (timeStep * (((1 / timeConstant) * (-val + s)) + noiseGenerator.getRandom()));
+            val += (timeStep * (((1 / timeConstant) * (-val + s)) + noiseGenerator.nextDouble()));
         } else {
             val += (timeStep * ((1 / timeConstant) * (-val + s)));
         }

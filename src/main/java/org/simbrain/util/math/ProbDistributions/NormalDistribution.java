@@ -74,7 +74,7 @@ public class NormalDistribution extends ProbabilityDistribution {
         this.ceil = ceil;
     }
 
-    public double nextRand() {
+    public double nextDouble() {
         return clipping(this,
                 (ThreadLocalRandom.current().nextGaussian() * standardDeviation) + mean,
                 floor,
@@ -82,8 +82,8 @@ public class NormalDistribution extends ProbabilityDistribution {
                 );
     }
 
-    public int nextRandInt() {
-        return (int) nextRand();
+    public int nextInt() {
+        return (int) nextDouble();
     }
 
     public Distribution getBestFit(double[] observations, int numObs) {
@@ -143,16 +143,6 @@ public class NormalDistribution extends ProbabilityDistribution {
     @Override
     public void setLowerBound(double floor) {
         this.floor = floor;
-    }
-
-    @Override
-    public void setPolarity(Polarity polarity) {
-        this.polarity = polarity;
-    }
-
-    @Override
-    public Polarity getPolarity() {
-        return this.polarity;
     }
 
     public static NormalDistributionBuilder builder() {

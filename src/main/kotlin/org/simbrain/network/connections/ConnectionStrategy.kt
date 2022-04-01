@@ -22,7 +22,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.SynapseGroup
-import org.simbrain.util.SimbrainConstants
 import org.simbrain.util.math.ProbDistributions.NormalDistribution
 import org.simbrain.util.math.ProbabilityDistribution
 import org.simbrain.util.propertyeditor.EditableObject
@@ -63,14 +62,12 @@ abstract class ConnectionStrategy : EditableObject {
      * The randomizer for excitatory synapses.
      */
     var exRandomizer: ProbabilityDistribution = NormalDistribution.builder()
-        .polarity(SimbrainConstants.Polarity.EXCITATORY)
         .build()
 
     /**
      * The randomizer for inhibitory synapses.
      */
     var inRandomizer: ProbabilityDistribution = NormalDistribution.builder()
-        .polarity(SimbrainConstants.Polarity.INHIBITORY)
         .build()
 
     /**

@@ -270,7 +270,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
 
         // Add noise if there is any to be added
         if (addNoise) {
-            ibg += noiseGenerator.getRandom();
+            ibg += noiseGenerator.nextDouble();
         }
 
         // Calc dV/dt for membrane potential

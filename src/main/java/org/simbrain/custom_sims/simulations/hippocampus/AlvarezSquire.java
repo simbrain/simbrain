@@ -69,7 +69,7 @@ public class AlvarezSquire extends CompetitiveGroup {
      */
     private void alvarezSquireUpdate(Neuron neuron) {
         // TODO: Use library for clipping
-        double val = .7 * neuron.getActivation() + neuron.getWeightedInputs() + noiseGenerator.getRandom();
+        double val = .7 * neuron.getActivation() + neuron.getWeightedInputs() + noiseGenerator.nextDouble();
         neuron.forceSetActivation((val > 0) ? val : 0);
         neuron.forceSetActivation((val < 1) ? val : 1);
     }

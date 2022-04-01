@@ -107,11 +107,10 @@ public class SORN extends Simulation {
         int x_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 300);
         ngIn.applyLayout(new Point(1810, 141));
 
-        defWtPD.setPolarity(Polarity.EXCITATORY);
         SynapseGroup sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
                 "Exc. \u2192 Exc.");
         connectGroups(net, ngIn, ng, ieKIn,
-                UniformDistribution.builder().floor(-1).ceil(0).polarity(Polarity.INHIBITORY).build(),
+                UniformDistribution.builder().floor(-1).ceil(0).build(),
                 Polarity.INHIBITORY,
                 "Inh. \u2192 Exc.");
         connectGroups(net, ng, ngIn, eiKIn, defWtPD, Polarity.EXCITATORY,

@@ -150,7 +150,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             }
         }
         if (addNoise) {
-            val += noiseGenerator.getRandom();
+            val += noiseGenerator.nextDouble();
         }
         if (clipping) {
             val = clip(val);

@@ -116,7 +116,7 @@ public abstract class DecayFunction implements CopyableObject {
     public double[] apply(double distance, double[] vector) {
         double[] ret = new double[vector.length];
         for (int i = 0; i < vector.length; i++) {
-            ret[i] = vector[i] * getScalingFactor(distance) + (addNoise ? randomizer.nextRand() : 0);
+            ret[i] = vector[i] * getScalingFactor(distance) + (addNoise ? randomizer.nextDouble() : 0);
         }
         return ret;
     }
@@ -131,7 +131,7 @@ public abstract class DecayFunction implements CopyableObject {
     public List<Double> apply(double distance, List<Double> vector) {
         List<Double> ret = new ArrayList<>();
         for (Double e : vector) {
-            ret.add(e * getScalingFactor(distance) + (addNoise ? randomizer.nextRand() : 0));
+            ret.add(e * getScalingFactor(distance) + (addNoise ? randomizer.nextDouble() : 0));
         }
         return ret;
     }

@@ -95,7 +95,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerato
         double val = ((range / 2) * Math.sin(frequency * neuron.getNetwork().getTime() + phase)) + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {
-            val += noiseGenerator.getRandom();
+            val += noiseGenerator.nextDouble();
         }
 
         neuron.setActivation(val);

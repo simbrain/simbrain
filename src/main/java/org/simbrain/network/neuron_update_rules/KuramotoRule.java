@@ -96,7 +96,7 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
         theta = theta % (2 * Math.PI);
 
         // if (addNoise) {
-        // val += noiseGenerator.getRandom();
+        // val += noiseGenerator.nextRand();
         // }
         //
         // if (clipping) {

@@ -133,7 +133,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         double act = neuron.getActivation() + neuron.getNetwork().getTimeStep() * (effect - decay * (neuron.getActivation() - rest));
 
         if (addNoise) {
-            act += noiseGenerator.getRandom();
+            act += noiseGenerator.nextDouble();
         }
 
         if (clipping) {

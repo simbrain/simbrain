@@ -204,7 +204,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
         double i_ion = i_Ca + i_K + i_L;
         double i_noise = 0;
         if (getAddNoise()) {
-            i_noise = noiseGenerator.getRandom();
+            i_noise = noiseGenerator.nextDouble();
         }
         return ((i_bg - i_ion + i_syn + i_noise) / cMembrane);
     }

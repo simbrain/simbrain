@@ -88,12 +88,12 @@ fun randomizeAndPolarizeSynapses(
         excitatory = shouldBeExcitatory(excitatoryRatio, exciteCount, inhibCount, s)
         // Set the strength based on the polarity.
         if (excitatory) {
-            s.strength = if (exciteRand != null) exciteRand.random else DEFAULT_EXCITATORY_STRENGTH
+            s.strength = if (exciteRand != null) exciteRand.nextDouble() else DEFAULT_EXCITATORY_STRENGTH
             exciteCount--
             // Change the excitatoryRatio to maintain balance
             excitatoryRatio = exciteCount / remaining.toDouble()
         } else {
-            s.strength = if (inhibRand != null) inhibRand.random else DEFAULT_INHIBITORY_STRENGTH
+            s.strength = if (inhibRand != null) inhibRand.nextDouble() else DEFAULT_INHIBITORY_STRENGTH
             inhibCount--
             // Change the excitatoryRatio to maintain balance.
             excitatoryRatio = (remaining - inhibCount) / remaining.toDouble()
@@ -111,10 +111,8 @@ fun randomizeAndPolarizeSynapses(
  */
 fun randomizeAndPolarizeSynapses(synapses: Collection<Synapse>, excitatoryRatio: Double) {
     val exciteRand: ProbabilityDistribution = UniformDistribution.builder()
-        .polarity(Polarity.EXCITATORY)
         .build()
     val inhibRand: ProbabilityDistribution = UniformDistribution.builder()
-        .polarity(Polarity.INHIBITORY)
         .build()
     randomizeAndPolarizeSynapses(synapses, exciteRand, inhibRand, excitatoryRatio)
 }
@@ -141,9 +139,9 @@ fun randomizeSynapses(
             excitatory = s.strength > 0
             // Set the strength based on the polarity.
             if (excitatory) {
-                s.strength = if (exciteRand != null) exciteRand.random else DEFAULT_EXCITATORY_STRENGTH
+                s.strength = if (exciteRand != null) exciteRand.nextDouble() else DEFAULT_EXCITATORY_STRENGTH
             } else {
-                s.strength = if (inhibRand != null) inhibRand.random else DEFAULT_INHIBITORY_STRENGTH
+                s.strength = if (inhibRand != null) inhibRand.nextDouble() else DEFAULT_INHIBITORY_STRENGTH
             }
         }
     }
@@ -161,7 +159,7 @@ fun randomizeExcitatorySynapses(synapses: Collection<Synapse>, exciteRand: Proba
     checkPolarityMatches(exciteRand, Polarity.EXCITATORY)
     for (s in synapses) {
         if (Polarity.EXCITATORY == s.source.polarity || s.strength > 0) {
-            s.strength = if (exciteRand != null) exciteRand.random else DEFAULT_EXCITATORY_STRENGTH
+            s.strength = if (exciteRand != null) exciteRand.nextDouble() else DEFAULT_EXCITATORY_STRENGTH
         }
     }
 }
@@ -179,7 +177,7 @@ fun randomizeExcitatorySynapses(synapses: Collection<Synapse>, exciteRand: Proba
 fun randomizeExcitatorySynapsesUnsafe(synapses: Collection<Synapse>, exciteRand: ProbabilityDistribution?) {
     checkPolarityMatches(exciteRand, Polarity.EXCITATORY)
     for (s in synapses) {
-        s.strength = if (exciteRand != null) exciteRand.random else DEFAULT_EXCITATORY_STRENGTH
+        s.strength = if (exciteRand != null) exciteRand.nextDouble() else DEFAULT_EXCITATORY_STRENGTH
     }
 }
 
@@ -195,7 +193,7 @@ fun randomizeInhibitorySynapses(synapses: Collection<Synapse>, inhibRand: Probab
     checkPolarityMatches(inhibRand, Polarity.INHIBITORY)
     for (s in synapses) {
         if (Polarity.INHIBITORY == s.source.polarity || s.strength < 0) {
-            s.strength = if (inhibRand != null) inhibRand.random else DEFAULT_INHIBITORY_STRENGTH
+            s.strength = if (inhibRand != null) inhibRand.nextDouble() else DEFAULT_INHIBITORY_STRENGTH
         }
     }
 }
@@ -213,7 +211,7 @@ fun randomizeInhibitorySynapses(synapses: Collection<Synapse>, inhibRand: Probab
 fun randomizeInhibitorySynapsesUnsafe(synapses: Collection<Synapse>, inhibRand: ProbabilityDistribution?) {
     checkPolarityMatches(inhibRand, Polarity.INHIBITORY)
     for (s in synapses) {
-        s.strength = if (inhibRand != null) inhibRand.random else DEFAULT_INHIBITORY_STRENGTH
+        s.strength = if (inhibRand != null) inhibRand.nextDouble() else DEFAULT_INHIBITORY_STRENGTH
     }
 }
 
@@ -351,11 +349,11 @@ private fun checkPolarityMatches(inQuestion: ProbabilityDistribution?, expectedP
         return
     }
 
-    // TODO: I'm commenting this out for now just to test code, but
-    //     it's being thrown a lot and testing is needed.
-    if (expectedPolarity != inQuestion.polarity) {
-        throw IllegalArgumentException("Randomizer's polarity does" + " not match its implied polarity")
-    }
+    // // TODO: I'm commenting this out for now just to test code, but
+    // //     it's being thrown a lot and testing is needed.
+    // if (expectedPolarity != inQuestion.polarity) {
+    //     throw IllegalArgumentException("Randomizer's polarity does" + " not match its implied polarity")
+    // }
 }
 
 /**

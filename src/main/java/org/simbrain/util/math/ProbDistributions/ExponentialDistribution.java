@@ -54,7 +54,7 @@ public class ExponentialDistribution extends ProbabilityDistribution {
     }
 
     @Override
-    public double nextRand() {
+    public double nextDouble() {
         return clipping(this,
                 ExponentialGen.nextDouble(DEFAULT_RANDOM_STREAM, lambda),
                 floor,
@@ -63,8 +63,8 @@ public class ExponentialDistribution extends ProbabilityDistribution {
     }
 
     @Override
-    public int nextRandInt() {
-        return (int) nextRand();
+    public int nextInt() {
+        return (int) nextDouble();
     }
 
     @Override
@@ -113,16 +113,6 @@ public class ExponentialDistribution extends ProbabilityDistribution {
     public void setLowerBound(double floor) {
         if(floor >= 0 )
             this.floor = floor;
-    }
-
-    @Override
-    public void setPolarity(Polarity polarity) {
-        this.polarity = polarity;
-    }
-
-    @Override
-    public Polarity getPolarity() {
-        return this.polarity;
     }
 
     public static ExponentialDistributionBuilder builder() {

@@ -168,7 +168,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         double synCurrent = neuron.getNetwork().getTime() < (getLastSpikeTime() + refractoryPeriod) ? 0 : neuron.getInput() + backgroundCurrent;
 
         if (addNoise) {
-            synCurrent += noiseGenerator.getRandom();
+            synCurrent += noiseGenerator.nextDouble();
         }
 
         double timeStep = neuron.getNetwork().getTimeStep();

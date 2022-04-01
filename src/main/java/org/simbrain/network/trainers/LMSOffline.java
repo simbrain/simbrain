@@ -147,7 +147,7 @@
 //             double[][] stateMat = network.getTrainingSet().getInputData();
 //             for (int i = 0, n = stateMat.length; i < n; i++) {
 //                 for (int j = 0, m = stateMat[i].length; j < m; j++) {
-//                     network.getTrainingSet().getInputData()[i][j] = stateMat[i][j] + noiseGen.getRandom();
+//                     network.getTrainingSet().getInputData()[i][j] = stateMat[i][j] + noiseGen.nextRand();
 //                 }
 //             }
 //         }

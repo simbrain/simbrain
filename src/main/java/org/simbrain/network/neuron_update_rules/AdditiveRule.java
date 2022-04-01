@@ -86,7 +86,7 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
         double val = neuron.getActivation() + neuron.getNetwork().getTimeStep() * (-neuron.getActivation() / resistance + wtdSum);
 
         if (addNoise) {
-            val += noiseGenerator.getRandom();
+            val += noiseGenerator.nextDouble();
         }
 
         neuron.setActivation(val);

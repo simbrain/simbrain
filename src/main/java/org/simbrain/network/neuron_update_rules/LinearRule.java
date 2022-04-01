@@ -109,7 +109,7 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     public double linearRule(double input, double bias) {
         double ret = input * slope + bias;
         if (addNoise) {
-            ret  += noiseGenerator.getRandom();
+            ret  += noiseGenerator.nextDouble();
         }
         if (clipping) {
             ret  = clip(ret);

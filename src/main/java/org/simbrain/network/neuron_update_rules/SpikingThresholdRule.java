@@ -97,7 +97,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     public boolean spikingThresholdRule(double in) {
-        final double input = in + (addNoise ? noiseGenerator.getRandom() : 0);
+        final double input = in + (addNoise ? noiseGenerator.nextDouble() : 0);
         if (input >= threshold) {
             return true;
         } else {

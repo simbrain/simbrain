@@ -77,7 +77,7 @@ public class ProductRule extends LinearRule {
         }
 
         if (this.getAddNoise()) {
-            val += getNoiseGenerator().getRandom();
+            val += getNoiseGenerator().nextDouble();
         }
 
         if (this.isClipped()) {

@@ -9,7 +9,6 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
@@ -35,10 +34,7 @@ public class Hippocampus extends Simulation {
     /**
      * Randomizer for creating new synapse groups.
      */
-    ProbabilityDistribution exRand =
-            UniformDistribution.builder()
-                    .polarity(Polarity.EXCITATORY)
-                    .build();
+    ProbabilityDistribution exRand = UniformDistribution.builder().build();
 
     /**
      * Other variables.

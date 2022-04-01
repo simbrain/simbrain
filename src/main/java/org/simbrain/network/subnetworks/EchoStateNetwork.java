@@ -528,7 +528,7 @@
 //      * @return noise reservoir noise.
 //      */
 //     private double reservoirNoise() {
-//         return noiseGenerator.getRandom();
+//         return noiseGenerator.nextRand();
 //     }
 //
 //     /**

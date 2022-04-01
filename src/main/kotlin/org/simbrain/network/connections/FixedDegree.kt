@@ -158,9 +158,9 @@ fun Neuron.connectToN(
         .take(N)
         .map { otherNeuron ->
             if (direction == Direction.IN) {
-                Synapse(otherNeuron, this, otherNeuron.polarity.value(randomizer.nextRand()))
+                Synapse(otherNeuron, this, otherNeuron.polarity.value(randomizer.nextDouble()))
             } else {
-                Synapse(this, otherNeuron, this.polarity.value(randomizer.nextRand()))
+                Synapse(this, otherNeuron, this.polarity.value(randomizer.nextDouble()))
             }
         }
 }

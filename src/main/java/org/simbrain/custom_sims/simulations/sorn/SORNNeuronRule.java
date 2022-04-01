@@ -56,7 +56,7 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         neuron.normalizeExcitatoryFanIn();
         // Sum inputs including noise and applied (external) inputs
         double input = neuron.getInput()
-                + (addNoise ? noiseGenerator.getRandom() : 0)
+                + (addNoise ? noiseGenerator.nextDouble() : 0)
                 + getAppliedInput();
         // Check that we're not still in the refractory period
         boolean outOfRef = neuron.getNetwork().getTime()

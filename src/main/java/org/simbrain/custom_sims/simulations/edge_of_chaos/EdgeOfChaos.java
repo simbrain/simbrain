@@ -13,7 +13,6 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.plot.projection.ProjectionComponent;
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
@@ -142,14 +141,12 @@ public class EdgeOfChaos extends Simulation {
 
         ProbabilityDistribution exRand =
             NormalDistribution.builder()
-                .polarity(Polarity.EXCITATORY)
                 .mean(0)
                 .standardDeviation(Math.sqrt(variance))
                 .build();
 
         ProbabilityDistribution inRand =
             NormalDistribution.builder()
-                .polarity(Polarity.INHIBITORY)
                 .mean(0)
                 .standardDeviation(Math.sqrt(variance))
                 .build();

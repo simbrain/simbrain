@@ -247,7 +247,7 @@ class RadialGaussian(
                 ArrayList(Math.ceil(srcColl.size * targColl!!.size * 0.2 * 0.75).toInt())
             for (src: Neuron in srcColl) {
                 for (tar: Neuron in targColl) {
-                    val randVal: Double = rand.nextRand()
+                    val randVal: Double = rand.nextDouble()
                     var probability: Double
                     if (src.getPolarity() === Polarity.EXCITATORY) {
                         if (tar.getPolarity() === Polarity.EXCITATORY) {

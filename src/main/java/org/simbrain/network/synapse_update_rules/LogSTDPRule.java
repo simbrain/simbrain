@@ -106,7 +106,7 @@ public class LogSTDPRule extends STDPRule {
                     (1 + NormalDistribution.builder()
                             .mean(0)
                             .standardDeviation(noiseVar)
-                            .build().nextRand()
+                            .build().nextDouble()
                     );
             if (delta_t < 0) {
                 calcW_plusTerm(synapse);

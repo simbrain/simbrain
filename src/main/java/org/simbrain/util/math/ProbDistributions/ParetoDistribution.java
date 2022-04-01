@@ -58,7 +58,7 @@ public class ParetoDistribution extends ProbabilityDistribution{
     }
 
     @Override
-    public double nextRand() {
+    public double nextDouble() {
         return clipping(this,
                 ParetoGen.nextDouble(DEFAULT_RANDOM_STREAM, slope, min),
                 floor,
@@ -67,8 +67,8 @@ public class ParetoDistribution extends ProbabilityDistribution{
     }
 
     @Override
-    public int nextRandInt() {
-        return (int) nextRand();
+    public int nextInt() {
+        return (int) nextDouble();
     }
 
     @Override
@@ -123,16 +123,6 @@ public class ParetoDistribution extends ProbabilityDistribution{
     public void setCeil(double ceiling) {setUpperBound(ceiling);} // For APE
 
     public void setFloor(double floor) {setLowerBound(floor);} // For APE
-
-    @Override
-    public void setPolarity(Polarity polarity) {
-        this.polarity = polarity;
-    }
-
-    @Override
-    public Polarity getPolarity() {
-        return this.polarity;
-    }
 
     public static ParetoDistributionBuilder builder() {
         return new ParetoDistributionBuilder();

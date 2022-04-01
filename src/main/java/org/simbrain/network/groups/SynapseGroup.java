@@ -81,7 +81,6 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      */
     private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER =
             UniformDistribution.builder()
-                    .polarity(Polarity.EXCITATORY)
                     .build();
 
     /**
@@ -89,7 +88,6 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      */
     private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER =
             UniformDistribution.builder()
-                    .polarity(Polarity.INHIBITORY)
                     .build();
 
     /**
@@ -500,7 +498,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     private void addNewExcitatorySynapse(final Synapse synapse) {
         synapse.setParentGroup(this);
         if (exciteRand != null) {
-            synapse.setStrength(exciteRand.getRandom());
+            synapse.setStrength(exciteRand.nextDouble());
         } else {
             synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
         }
@@ -524,7 +522,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     private void addNewInhibitorySynapse(final Synapse synapse) {
         synapse.setParentGroup(this);
         if (inhibRand != null) {
-            synapse.setStrength(inhibRand.getRandom());
+            synapse.setStrength(inhibRand.nextDouble());
         } else {
             synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
         }
@@ -574,7 +572,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
                 if (!s.getSource().isPolarized() && numSwitch > 0) {
                     setIterator.remove();
                     if (inhibRand != null) {
-                        s.setStrength(inhibRand.getRandom());
+                        s.setStrength(inhibRand.nextDouble());
                     } else {
                         s.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                     }
@@ -599,7 +597,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
                 if (!s.getSource().isPolarized() && numSwitch > 0) {
                     setIterator.remove();
                     if (exciteRand != null) {
-                        s.setStrength(exciteRand.getRandom());
+                        s.setStrength(exciteRand.nextDouble());
                     } else {
                         s.setStrength(DEFAULT_EXCITATORY_STRENGTH);
                     }
@@ -743,8 +741,6 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      */
     public void setExcitatoryRandomizer(ProbabilityDistribution excitatoryRandomizer) {
         this.exciteRand = excitatoryRandomizer == null ? null : excitatoryRandomizer.deepCopy();
-        if (exciteRand != null)
-            exciteRand.setPolarity(Polarity.EXCITATORY);
     }
 
     /**
@@ -752,8 +748,6 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      */
     public void setInhibitoryRandomizer(ProbabilityDistribution inhibitoryRandomizer) {
         inhibRand = inhibitoryRandomizer == null ? null : inhibitoryRandomizer.deepCopy();
-        if (inhibRand != null)
-            inhibRand.setPolarity(Polarity.INHIBITORY);
     }
 
     public void setRandomizers(ProbabilityDistribution excitatoryRandomizer, ProbabilityDistribution inhibitoryRandomizer) {

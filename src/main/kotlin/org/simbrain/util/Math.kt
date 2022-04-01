@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import smile.math.matrix.Matrix
+import kotlin.math.pow
 
 /**
  * Numeric utilities in Kotlin. Comparable to [SimbrainMath].
@@ -69,3 +70,10 @@ fun Any?.isIntegerValued(): Boolean {
 fun List<List<Double>>.toCsvString(): String {
     return joinToString("\n") { it.joinToString(",") }
 }
+
+fun DoubleArray.variance(): Double {
+    val avg = average()
+    return sumOf { n -> (n - avg).pow(2.0)  } / size
+}
+
+fun DoubleArray.stdev(): Double = kotlin.math.sqrt(variance())

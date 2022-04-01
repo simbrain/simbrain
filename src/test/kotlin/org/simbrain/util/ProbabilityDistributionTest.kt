@@ -1,6 +1,6 @@
 package org.simbrain.util
 
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.util.math.ProbDistributions.NormalDistribution
 import org.simbrain.util.math.ProbDistributions.UniformDistribution
@@ -27,8 +27,29 @@ internal class ProbabilityDistributionTest {
     @Test
     fun `test normal`() {
         val dist = NormalDistribution(1.0, .5)
-        val nums = sample(10000, dist)
+        var nums = sample(N, dist)
         assertTrue(nums.average() in ((1.0 - CI)..(1.0 + CI)))
         assertTrue(nums.stdev() in ((0.5 - CI)..(0.5 + CI)))
+        dist.mean = -.5
+        dist.standardDeviation = .25
+        nums = sample(N, dist)
+        assertTrue(nums.average() in ((-.5 - CI)..(-.5 + CI)))
+        assertTrue(nums.stdev() in ((0.25 - CI)..(.25 + CI)))
+    }
+
+    @Test
+    fun `test same results from same seed` () {
+        val dist1 = NormalDistribution(1.0, .5)
+        dist1.setSeed(1)
+        val dist2 = NormalDistribution(1.0, .5)
+        dist2.setSeed(1)
+        assertEquals(dist1.nextDouble(), dist2.nextDouble())
+    }
+
+    @Test
+    fun `test different results if no seed set` () {
+        val dist1 = NormalDistribution(1.0, .5)
+        val dist2 = NormalDistribution(1.0, .5)
+        assertNotEquals(dist1.nextDouble(), dist2.nextDouble())
     }
 }

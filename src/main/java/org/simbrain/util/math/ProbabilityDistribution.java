@@ -1,5 +1,6 @@
 package org.simbrain.util.math;
 
+import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbDistributions.*;
 import org.simbrain.util.propertyeditor.CopyableObject;
@@ -30,6 +31,11 @@ public abstract class ProbabilityDistribution implements CopyableObject {
         return DIST_LIST;
     }
 
+    /**
+     * Random generator for pseudo-random sequences on which a seed can be set.
+     */
+    protected final JDKRandomGenerator randomGenerator = new JDKRandomGenerator();
+
     public static final RandomStream DEFAULT_RANDOM_STREAM = new LFSR113();
 
     /**
@@ -59,6 +65,15 @@ public abstract class ProbabilityDistribution implements CopyableObject {
     @Override
     public ProbabilityDistribution copy() {
         return deepCopy();
+    }
+
+    /**
+     * Use this to ensure two probability distributions return the same pseudo-random sequence of numbers.
+     * See ProbabilityDistributionTest.kt for exmamples
+     *
+     */
+    public void setSeed(int seed) {
+        randomGenerator.setSeed(seed);
     }
 
     /**

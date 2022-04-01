@@ -1,12 +1,7 @@
 package org.simbrain.util.math.ProbDistributions;
 
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
-import umontreal.ssj.probdist.Distribution;
-import umontreal.ssj.probdist.NormalDist;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class NormalDistribution extends ProbabilityDistribution {
 
@@ -50,24 +45,31 @@ public class NormalDistribution extends ProbabilityDistribution {
             order = 5)
     private boolean clipping = false;
 
-    private Polarity polarity = Polarity.BOTH;
+    /**
+     * Backing for this distribution.
+     */
+    private org.apache.commons.math3.distribution.NormalDistribution dist;
+
 
     /**
      * Public constructor for reflection-based creation. You are encouraged to use
      * the builder pattern provided for ProbabilityDistributions.
      */
     public NormalDistribution() {
+        dist = new org.apache.commons.math3.distribution.NormalDistribution(randomGenerator, mean, standardDeviation);
     }
 
     /**
      * Create a normal dist with specified mean and stdev
      */
     public NormalDistribution(double mean, double stdev) {
+        dist = new org.apache.commons.math3.distribution.NormalDistribution(randomGenerator, mean, stdev);
         this.mean = mean;
         this.standardDeviation = stdev;
     }
 
     public NormalDistribution(double mean, double stdev, double floor, double ceil) {
+        dist = new org.apache.commons.math3.distribution.NormalDistribution(randomGenerator, mean, stdev);
         this.mean = mean;
         this.standardDeviation = stdev;
         this.floor = floor;
@@ -75,31 +77,20 @@ public class NormalDistribution extends ProbabilityDistribution {
     }
 
     public double nextDouble() {
-        return clipping(this,
-                (ThreadLocalRandom.current().nextGaussian() * standardDeviation) + mean,
-                floor,
-                ceil
-                );
+        return clipping(this, dist.sample(), floor, ceil);
     }
 
     public int nextInt() {
         return (int) nextDouble();
     }
 
-    public Distribution getBestFit(double[] observations, int numObs) {
-        return NormalDist.getInstanceFromMLE(observations, numObs);
-    }
-
-    public double[] getBestFitParams(double[] observations, int numObs) {
-        return NormalDist.getMLE(observations, numObs);
-    }
-    
     public double getMean() {
         return mean;
     }
 
     public void setMean(double mean) {
         this.mean = mean;
+        dist = new org.apache.commons.math3.distribution.NormalDistribution(randomGenerator, mean, standardDeviation);
     }
 
     public double getStandardDeviation() {
@@ -108,6 +99,7 @@ public class NormalDistribution extends ProbabilityDistribution {
 
     public void setStandardDeviation(double standardDeviation) {
         this.standardDeviation = standardDeviation;
+        dist = new org.apache.commons.math3.distribution.NormalDistribution(randomGenerator, mean, standardDeviation);
     }
 
     public String getName() {

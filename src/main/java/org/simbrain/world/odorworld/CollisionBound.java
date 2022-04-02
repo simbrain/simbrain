@@ -31,11 +31,10 @@ public abstract class CollisionBound {
      */
     private Point2D.Double velocity = new Point2D.Double(0.0, 0.0);
 
-
     /**
      * Check if this entity is colliding with other entity in a given direction.
      *
-     * @param other     the other entity
+     * @param other the other entity
      * @return true if collided
      */
     public boolean collide(CollisionBound other) {

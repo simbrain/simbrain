@@ -67,7 +67,13 @@ fun Any?.isIntegerValued(): Boolean {
 /**
  * Return a string representation of a 2-d array in the form of a list of list of doubles
  */
+@JvmName("listOfListToCSV")
 fun List<List<Double>>.toCsvString(): String {
+    return joinToString("\n") { it.joinToString(",") }
+}
+
+@JvmName("listOfArrayToCSV")
+fun List<DoubleArray>.toCsvString(): String {
     return joinToString("\n") { it.joinToString(",") }
 }
 

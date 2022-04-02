@@ -8,8 +8,9 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.util.*
 import org.simbrain.util.Utils.FS
+import org.simbrain.util.math.ProbDistributions.NormalDistribution
 import java.io.File
-import javax.swing.JOptionPane
+import java.lang.Math.sqrt
 import javax.swing.JTextField
 
 /**
@@ -25,6 +26,10 @@ val binaryReservoir = newSim {
     var variance = .1
     val baseIterations = 400
     val responseIterations = 300
+
+    var normalDist = NormalDistribution(0.0, 1.0)
+    normalDist.setSeed(1)
+    // TODO: Use this in building the network itself
 
     // Stored activations
     // Each row is an activation vector at a time.
@@ -57,15 +62,18 @@ val binaryReservoir = newSim {
      * Resets the variance by rescaling synapses. Assumes valid variance to begin with.
      */
     fun setVariance(newVariance: Double) {
-        if (newVariance !in (0.0..1.0)) {
-            JOptionPane.showMessageDialog(null, "Variance must be between 0 and 1")
-            return
-        }
-        // Scales existing variance up and down by a scaling factor
+        // if (newVariance !in (0.0..1.0)) {
+        //     JOptionPane.showMessageDialog(null, "Variance must be between 0 and 1")
+        //     return
+        // }
+        normalDist.standardDeviation = sqrt(newVariance)
         network.flatSynapseList.forEach { synapse ->
-            synapse.strength = synapse.strength * (newVariance / variance)
+            synapse.strength = normalDist.nextDouble()
         }
         variance = newVariance
+
+        val av = network.flatSynapseList.map { it.strength }.toDoubleArray().variance()
+        println("Variance set to ${variance}; Actual variance: ${av}")
 
     }
 

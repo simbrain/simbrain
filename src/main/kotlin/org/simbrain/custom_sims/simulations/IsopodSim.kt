@@ -9,6 +9,8 @@ import org.simbrain.util.math.ProbDistributions.NormalDistribution
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.showSaveDialog
+import org.simbrain.util.toCsvString
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
@@ -20,12 +22,11 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
  */
 val isopodSim = newSim {
 
-    // TODO
-    //  Button panel
-    //  Logging
-    //  Plots (time series, histogram; add easy hooks)
-
     workspace.clearWorkspace()
+
+    // x coordinate, y coordinate
+    // TODO success v failure (0/1), time of success vs. failure
+    val trialData = mutableListOf<DoubleArray>()
 
     // ----- Network construction ------
 
@@ -34,7 +35,7 @@ val isopodSim = newSim {
     val noiseSource = NormalDistribution(1.0, .9)
 
     val neuronLeftSensor = network.addNeuron {
-        location = point(0,100)
+        location = point(0, 100)
         upperBound = 10.0
         label = "Left"
         with (updateRule as LinearRule) {
@@ -43,7 +44,7 @@ val isopodSim = newSim {
         }
     }
     val neuronRightSensor = network.addNeuron {
-        location = point(100,100)
+        location = point(100, 100)
         upperBound = 10.0
         label = "Right"
         with (updateRule as LinearRule) {
@@ -52,17 +53,17 @@ val isopodSim = newSim {
         }
     }
     val neuronLeftTurning = network.addNeuron {
-        location = point(0,0)
+        location = point(0, 0)
         upperBound = 10.0
         label = "Turn Left"
     }
     val neuronRightTurning = network.addNeuron {
-        location = point(100,0)
+        location = point(100, 0)
         upperBound = 10.0
         label = "Turn Right"
     }
     val neuronStraight = network.addNeuron {
-        location = point(50,0)
+        location = point(50, 0)
         upperBound = 10.0
         label = "Straight"
         (neuronDataHolder as BiasedScalarData).bias = 2.0
@@ -86,19 +87,21 @@ val isopodSim = newSim {
     val odorWorld = odorWorldComponent.world
 
     // Object references we'll need later
-    val straightMovement : Effector
-    val turnLeft : Effector
-    val turnRight : Effector
-    var leftSensor : SmellSensor
-    var rightSensor : SmellSensor
-    val isopod : OdorWorldEntity
+    val straightMovement: Effector
+    val turnLeft: Effector
+    val turnRight: Effector
+    var leftSensor: SmellSensor
+    var rightSensor: SmellSensor
+    val isopod: OdorWorldEntity
+
+    var fishCollision = false
 
     odorWorld.apply {
 
         wrapAround = false
         isObjectsBlockMovement = false
 
-        tileMap = TileMap(20,20)
+        tileMap = TileMap(20, 20)
         tileMap.fill(2)
 
         // Body could be represented by a triangle or rhombus
@@ -127,8 +130,13 @@ val isopodSim = newSim {
 
         fun addFish(x: Int, y: Int) {
             odorWorld.addEntity(x, y, EntityType.FISH).apply {
-               smellSource = SmellSource.createScalarSource(1).apply {
+                smellSource = SmellSource.createScalarSource(1).apply {
                     dispersion = 300.0
+                }
+                onCollide {
+                    fishCollision = true
+                    // TODO: Magic numbers for fish collision
+                    trialData.add(doubleArrayOf(-1.0, 1.0))
                 }
             }
         }
@@ -139,7 +147,7 @@ val isopodSim = newSim {
         addFish(590, 10)
 
         workspace.addUpdateAction(updateAction("Track location") {
-            println("Location: ${isopod.location}")
+            trialData.add(isopod.location);
         })
 
     }
@@ -163,23 +171,28 @@ val isopodSim = newSim {
 
     withGui {
         createControlPanel("Control Panel", 5, 10) {
-            addButton("Button 1") {
-                println("Button 1")
-            }
-            addButton("Button 1") {
-                println("Button 1")
+            addButton("Run one trial") {
+                var iteration = 0
+                trialData.clear()
+                while (++iteration < 1000 && !fishCollision) {
+                    workspace.iterate()
+                }
+                fishCollision = false
+                // println("TrialData: ${trialData}")
+                showSaveDialog("", "trialData.csv") {
+                    writeText(trialData.toCsvString())
+                }
             }
         }
 
-        // addDocViewer("Test", "Braitenberg.html").apply {
-        //     place(this) {
-        //         location = point(145, 421)
-        //         width = 400
-        //         height = 330
-        //     }
-        // }
-
     }
 
+    // addDocViewer("Test", "Braitenberg.html").apply {
+    //     place(this) {
+    //         location = point(145, 421)
+    //         width = 400
+    //         height = 330
+    //     }
+    // }
 
 }

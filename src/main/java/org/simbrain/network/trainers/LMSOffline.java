@@ -75,7 +75,7 @@
 //      * The noise generator from which random values are taken if randomizing
 //      * the input state matrix.
 //      */
-//     private ProbabilityDistribution noiseGen = UniformDistribution.create();
+//     private ProbabilityDistribution noiseGen = new UniformDistribution();
 //
 //     /**
 //      * Construct the LMSOOffline object, with a trainable network the Synapse

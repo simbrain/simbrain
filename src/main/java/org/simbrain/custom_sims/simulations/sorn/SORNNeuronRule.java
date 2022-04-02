@@ -18,10 +18,7 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         NoisyUpdateRule {
 
     /** The noise generating randomizer. */
-    private ProbabilityDistribution noiseGenerator =
-            NormalDistribution.builder()
-                    .standardDeviation(0.05).mean(0)
-                .build();
+    private ProbabilityDistribution noiseGenerator = new NormalDistribution(0, .05);
 
     /** Whether or not to add noise to the inputs . */
     private boolean addNoise;

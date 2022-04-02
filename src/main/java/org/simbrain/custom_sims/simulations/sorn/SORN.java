@@ -32,9 +32,8 @@ public class SORN extends Simulation {
 
     private int eiKIn;// = (int)(numNeurons/50);
 
-    private ProbabilityDistribution defWtPD = UniformDistribution.builder()
-            .floor(0).ceil(1).build();
-    
+    private ProbabilityDistribution defWtPD = new UniformDistribution(0,1);
+
     private Network net;
 
     public SORN() {
@@ -109,8 +108,7 @@ public class SORN extends Simulation {
 
         SynapseGroup sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
                 "Exc. \u2192 Exc.");
-        connectGroups(net, ngIn, ng, ieKIn,
-                UniformDistribution.builder().floor(-1).ceil(0).build(),
+        connectGroups(net, ngIn, ng, ieKIn, new UniformDistribution(-1,0),
                 Polarity.INHIBITORY,
                 "Inh. \u2192 Exc.");
         connectGroups(net, ng, ngIn, eiKIn, defWtPD, Polarity.EXCITATORY,

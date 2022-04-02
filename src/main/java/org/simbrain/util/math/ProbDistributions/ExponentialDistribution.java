@@ -3,10 +3,7 @@ package org.simbrain.util.math.ProbDistributions;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
-import umontreal.ssj.probdist.Distribution;
-import umontreal.ssj.probdist.ExponentialDist;
 import umontreal.ssj.randvar.ExponentialGen;
-
 
 public class ExponentialDistribution extends ProbabilityDistribution {
 
@@ -55,16 +52,7 @@ public class ExponentialDistribution extends ProbabilityDistribution {
 
     @Override
     public double nextDouble() {
-        return clipping(this,
-                ExponentialGen.nextDouble(DEFAULT_RANDOM_STREAM, lambda),
-                floor,
-                ceil
-                );
-    }
-
-    @Override
-    public int nextInt() {
-        return (int) nextDouble();
+        return ExponentialGen.nextDouble(DEFAULT_RANDOM_STREAM, lambda);
     }
 
     @Override
@@ -82,68 +70,12 @@ public class ExponentialDistribution extends ProbabilityDistribution {
         return "Exponential";
     }
 
-    public Distribution getBestFit(double[] observations, int numObs) {
-        return ExponentialDist.getInstanceFromMLE(observations, numObs);
-    }
-
-    public double[] getBestFitParams(double[] observations, int numObs) {
-        return ExponentialDist.getMLE(observations, numObs);
-    }
-
     public double getLambda() {
         return lambda;
     }
 
     public void setLambda(double lambda) {
         this.lambda = lambda;
-    }
-
-    @Override
-    public void setClipping(boolean clipping) {
-        this.clipping = clipping;
-    }
-    @Override
-    public void setUpperBound(double ceiling) {
-        if(ceiling > 0) {
-            this.ceil = ceiling;
-        }
-    }
-
-    @Override
-    public void setLowerBound(double floor) {
-        if(floor >= 0 )
-            this.floor = floor;
-    }
-
-    public static ExponentialDistributionBuilder builder() {
-        return new ExponentialDistributionBuilder();
-    }
-
-    public static ExponentialDistribution create() {
-        return new ExponentialDistribution();
-    }
-
-    public static class ExponentialDistributionBuilder
-        extends ProbabilityDistributionBuilder<
-            ExponentialDistributionBuilder,
-            ExponentialDistribution> {
-
-        ExponentialDistribution product = new ExponentialDistribution();
-
-        public ExponentialDistributionBuilder lambda(double lambda) {
-            product.setLambda(lambda);
-            return this;
-        }
-
-        @Override
-        public ExponentialDistribution build() {
-            return product;
-        }
-
-        @Override
-        protected ExponentialDistribution product() {
-            return product;
-        }
     }
 
 }

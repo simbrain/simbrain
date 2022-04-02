@@ -1,6 +1,5 @@
 package org.simbrain.util.math.ProbDistributions;
 
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
 import umontreal.ssj.randvar.LognormalGen;
@@ -47,8 +46,6 @@ public class LogNormalDistribution extends ProbabilityDistribution {
             order = 5)
     private boolean clipping = false;
 
-    private Polarity polarity = Polarity.BOTH;
-
     /**
      * Public constructor for reflection-based creation. You are encourage to use
      * the builder pattern provided for ProbabilityDistributions.
@@ -58,16 +55,7 @@ public class LogNormalDistribution extends ProbabilityDistribution {
 
     @Override
     public double nextDouble() {
-        return clipping(this,
-                LognormalGen.nextDouble(DEFAULT_RANDOM_STREAM, location, scale),
-                floor,
-                ceil
-                );
-    }
-
-    @Override
-    public int nextInt() {
-        return (int) nextDouble();
+        return LognormalGen.nextDouble(DEFAULT_RANDOM_STREAM, location, scale);
     }
 
     @Override
@@ -102,64 +90,4 @@ public class LogNormalDistribution extends ProbabilityDistribution {
         this.scale = scale;
     }
 
-    @Override
-    public void setClipping(boolean clipping) {
-        this.clipping = clipping;
-    }
-
-    @Override
-    public void setUpperBound(double ceiling) {
-        if(ceiling > 0) {
-            this.ceil = ceiling;
-        }
-    }
-
-    @Override
-    public void setLowerBound(double floor) {
-        if(floor >= 0 )
-            this.floor = floor;
-    }
-
-    public void setCeil(double ceiling) {setUpperBound(ceiling);} // For APE
-
-    public void setFloor(double floor) {setLowerBound(floor);} // For APE
-
-    public static LogNormalDistributionBuilder builder() {
-        return new LogNormalDistributionBuilder();
-    }
-
-    public static LogNormalDistribution create() {
-        return new LogNormalDistribution();
-    }
-
-    /**
-     * {@inheritDoc}.
-     */
-    public static class LogNormalDistributionBuilder
-        extends ProbabilityDistributionBuilder<
-            LogNormalDistributionBuilder,
-            LogNormalDistribution> {
-
-        LogNormalDistribution product = new LogNormalDistribution();
-
-        public LogNormalDistributionBuilder location(double location) {
-            product.setLocation(location);
-            return this;
-        }
-
-        public LogNormalDistributionBuilder scale(double scale) {
-            product.setScale(scale);
-            return this;
-        }
-
-        @Override
-        public LogNormalDistribution build() {
-            return product;
-        }
-
-        @Override
-        protected LogNormalDistribution product() {
-            return product;
-        }
-    }
 }

@@ -79,16 +79,12 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * The <b>default>/b> polarized randomizer associated with excitatory.
      * <p> synapse strengths for all synapse groups.
      */
-    private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER =
-            UniformDistribution.builder()
-                    .build();
+    private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER = new UniformDistribution();
 
     /**
      * The <b>default>/b> polarized randomizer associated with inhibitory synapse strengths for all synapse groups.
      */
-    private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER =
-            UniformDistribution.builder()
-                    .build();
+    private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER = new UniformDistribution();
 
     /**
      * The default ratio (all excitatory) for all synapse groups.

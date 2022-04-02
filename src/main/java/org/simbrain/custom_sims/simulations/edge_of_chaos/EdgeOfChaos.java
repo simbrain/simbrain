@@ -139,17 +139,8 @@ public class EdgeOfChaos extends Simulation {
 
     public static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res, double variance, int k) {
 
-        ProbabilityDistribution exRand =
-            NormalDistribution.builder()
-                .mean(0)
-                .standardDeviation(Math.sqrt(variance))
-                .build();
-
-        ProbabilityDistribution inRand =
-            NormalDistribution.builder()
-                .mean(0)
-                .standardDeviation(Math.sqrt(variance))
-                .build();
+        ProbabilityDistribution exRand = new NormalDistribution(0.0, Math.sqrt(variance));
+        ProbabilityDistribution inRand =  new NormalDistribution(0.0, Math.sqrt(variance));
 
         FixedDegree con = new FixedDegree();
         con.setDegree(k);

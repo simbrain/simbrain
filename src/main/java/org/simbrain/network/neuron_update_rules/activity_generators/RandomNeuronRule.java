@@ -36,7 +36,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
     /**
      * Noise source.
      */
-    private ProbabilityDistribution randomizer = UniformDistribution.create();
+    private ProbabilityDistribution randomizer = new UniformDistribution();
 
     private double ceiling = 1.0;
 

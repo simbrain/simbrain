@@ -34,7 +34,7 @@ public class Hippocampus extends Simulation {
     /**
      * Randomizer for creating new synapse groups.
      */
-    ProbabilityDistribution exRand = UniformDistribution.builder().build();
+    ProbabilityDistribution exRand = new UniformDistribution(0, .02);
 
     /**
      * Other variables.
@@ -71,7 +71,6 @@ public class Hippocampus extends Simulation {
      */
     public Hippocampus(SimbrainDesktop desktop) {
         super(desktop);
-        exRand.setUpperBound(0.02); // Set up randomizer
     }
 
     /**

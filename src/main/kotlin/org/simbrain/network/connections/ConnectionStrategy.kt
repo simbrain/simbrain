@@ -61,14 +61,12 @@ abstract class ConnectionStrategy : EditableObject {
     /**
      * The randomizer for excitatory synapses.
      */
-    var exRandomizer: ProbabilityDistribution = NormalDistribution.builder()
-        .build()
+    var exRandomizer: ProbabilityDistribution = NormalDistribution();
 
     /**
      * The randomizer for inhibitory synapses.
      */
-    var inRandomizer: ProbabilityDistribution = NormalDistribution.builder()
-        .build()
+    var inRandomizer: ProbabilityDistribution = NormalDistribution();
 
     /**
      * Subclasses should set to true if the strategy itself produces inhibitory and excitatory weights and thus

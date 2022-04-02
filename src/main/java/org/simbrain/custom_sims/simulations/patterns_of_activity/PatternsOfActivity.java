@@ -183,8 +183,8 @@ public class PatternsOfActivity extends Simulation {
             }
             ((IntegrateAndFireRule) n.getUpdateRule()).setAddNoise(true);
             ((IntegrateAndFireRule) n.getUpdateRule()).setBackgroundCurrent(18);
-            ((IntegrateAndFireRule) n.getUpdateRule()).setNoiseGenerator(NormalDistribution.builder()
-                .mean(0).standardDeviation(0.2).build());
+            ((IntegrateAndFireRule) n.getUpdateRule()).setNoiseGenerator(
+                    new NormalDistribution(0, 0.2));
             neuronList.add(n);
         }
         recurrentNetwork = new NeuronGroup(net, neuronList);
@@ -375,8 +375,9 @@ public class PatternsOfActivity extends Simulation {
         // synG.setLowerBound(0, Polarity.EXCITATORY);
         // synG.setLowerBound(-200, Polarity.INHIBITORY);
         // synG.setUpperBound(0, Polarity.INHIBITORY);
-        synG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
-            NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
+        synG.setRandomizers(
+                new NormalDistribution(10, 2.5),
+                new NormalDistribution(-10, 2.5));
         synG.randomize();
     }
 

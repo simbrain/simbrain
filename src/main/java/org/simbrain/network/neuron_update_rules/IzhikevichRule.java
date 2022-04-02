@@ -101,7 +101,7 @@ public class IzhikevichRule extends SpikingNeuronUpdateRule implements NoisyUpda
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.

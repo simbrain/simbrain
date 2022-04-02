@@ -1,10 +1,7 @@
 package org.simbrain.util.math.ProbDistributions;
 
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
-import umontreal.ssj.probdist.Distribution;
-import umontreal.ssj.probdist.GammaDist;
 import umontreal.ssj.randvar.GammaGen;
 
 public class GammaDistribution extends ProbabilityDistribution {
@@ -14,7 +11,6 @@ public class GammaDistribution extends ProbabilityDistribution {
             description = "Shape (k).",
             order = 1)
     private double shape = 2.0;
-
 
     @UserParameter(
             label = "Scale (\u03B8)",
@@ -50,8 +46,6 @@ public class GammaDistribution extends ProbabilityDistribution {
             order = 5)
     private boolean clipping = false;
 
-    private Polarity polarity = Polarity.BOTH;
-
     /**
      * Public constructor for reflection-based creation. You are encourage to use
      * the builder pattern provided for ProbabilityDistributions.
@@ -61,16 +55,7 @@ public class GammaDistribution extends ProbabilityDistribution {
 
     @Override
     public double nextDouble() {
-        return clipping(this,
-                GammaGen.nextDouble(DEFAULT_RANDOM_STREAM, shape, scale),
-                floor,
-                ceil
-                );
-    }
-
-    @Override
-    public int nextInt() {
-        return (int) nextDouble();
+        return GammaGen.nextDouble(DEFAULT_RANDOM_STREAM, shape, scale);
     }
 
     @Override
@@ -105,69 +90,4 @@ public class GammaDistribution extends ProbabilityDistribution {
         this.scale = scale;
     }
 
-    public Distribution getBestFit(double[] observations, int numObs) {
-        return GammaDist.getInstanceFromMLE(observations, numObs);
-    }
-
-    public double[] getBestFitParams(double[] observations, int numObs) {
-        return GammaDist.getMLE(observations, numObs);
-    }
-
-    @Override
-    public void setClipping(boolean clipping) {
-        this.clipping = clipping;
-    }
-
-    @Override
-    public void setUpperBound(double ceiling) {
-        if(ceiling > 0) {
-            this.ceil = ceiling;
-        }
-    }
-
-    @Override
-    public void setLowerBound(double floor) {
-        if(floor >= 0 )
-            this.floor = floor;
-    }
-
-    public void setCeil(double ceiling) {setUpperBound(ceiling);} // For APE
-
-    public void setFloor(double floor) {setLowerBound(floor);} // For APE
-
-    public static GammaDistributionBuilder builder() {
-        return new GammaDistributionBuilder();
-    }
-
-    public static GammaDistribution create() {
-        return new GammaDistribution();
-    }
-
-    public static class GammaDistributionBuilder
-        extends ProbabilityDistributionBuilder<
-            GammaDistributionBuilder,
-            GammaDistribution> {
-
-        GammaDistribution product = new GammaDistribution();
-
-        public GammaDistributionBuilder shape(double shape) {
-            product.setShape(shape);
-            return this;
-        }
-
-        public GammaDistributionBuilder scale(double scale) {
-            product.setScale(scale);
-            return this;
-        }
-
-        @Override
-        public GammaDistribution build() {
-            return product;
-        }
-
-        @Override
-        protected GammaDistribution product() {
-            return product;
-        }
-    }
 }

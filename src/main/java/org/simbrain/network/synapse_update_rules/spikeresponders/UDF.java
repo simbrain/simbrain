@@ -160,12 +160,12 @@ public class UDF extends SpikeResponder {
      *          neurons the synapse connects and draw values based on that.
      */
     public void init(Synapse s) {
-        NormalDistribution rand =
-                NormalDistribution.builder()
-                    .upperBound(Double.MAX_VALUE)
-                    .lowerBound(0.0000001)
-                    .clipping(true)
-                    .build();
+        NormalDistribution rand = new NormalDistribution();
+                // NormalDistribution.builder()
+                //     .upperBound(Double.MAX_VALUE)
+                //     .lowerBound(0.0000001)
+                //     .clipping(true)
+                //     .build();
 
         if (s.getSource().getPolarity() == Polarity.EXCITATORY
          && s.getTarget().getPolarity() == Polarity.EXCITATORY) {

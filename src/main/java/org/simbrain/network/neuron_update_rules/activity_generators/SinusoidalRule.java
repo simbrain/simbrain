@@ -65,7 +65,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerato
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.

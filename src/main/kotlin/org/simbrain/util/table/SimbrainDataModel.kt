@@ -176,7 +176,8 @@ class Column(
         if (type == DataType.DoubleType) {
             return columnRandomizer.random
         } else if (type == DataType.IntType) {
-            return columnRandomizer.randomInt
+            // TODO
+            return columnRandomizer.random
         }
         return 0
     }

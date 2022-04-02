@@ -234,10 +234,10 @@ class RadialGaussian(
         private val targColl: Collection<Neuron>?,
         private val loose: Boolean,
     ) : Callable<Collection<Synapse>> {
-        var rand: UniformDistribution = UniformDistribution.builder()
-            .lowerBound(0.0)
-            .upperBound(1.0)
-            .build()
+        var rand: UniformDistribution = UniformDistribution();
+            // .lowerBound(0.0)
+            // .upperBound(1.0)
+            // .build()
 
         @Throws(Exception::class)
         public override fun call(): Collection<Synapse> {

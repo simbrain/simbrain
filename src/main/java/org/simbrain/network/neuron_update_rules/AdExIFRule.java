@@ -216,7 +216,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     /**
      * The noise generator randomizer.
      */
-    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * An absolute refractory period. Not normally a part of AdEx, but can

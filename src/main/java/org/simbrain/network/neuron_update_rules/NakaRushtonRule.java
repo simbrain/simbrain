@@ -110,7 +110,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to neuron.

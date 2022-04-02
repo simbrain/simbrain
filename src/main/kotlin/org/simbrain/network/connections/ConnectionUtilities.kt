@@ -110,10 +110,8 @@ fun randomizeAndPolarizeSynapses(
  * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
  */
 fun randomizeAndPolarizeSynapses(synapses: Collection<Synapse>, excitatoryRatio: Double) {
-    val exciteRand: ProbabilityDistribution = UniformDistribution.builder()
-        .build()
-    val inhibRand: ProbabilityDistribution = UniformDistribution.builder()
-        .build()
+    val exciteRand: ProbabilityDistribution = UniformDistribution()
+    val inhibRand: ProbabilityDistribution = UniformDistribution()
     randomizeAndPolarizeSynapses(synapses, exciteRand, inhibRand, excitatoryRatio)
 }
 

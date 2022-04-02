@@ -3,6 +3,7 @@ package org.simbrain.util.propertyeditor;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.math.ProbDistributions.NormalDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.widgets.JNumberSpinnerWithNull;
 import org.simbrain.util.widgets.SpinnerNumberModelWithNull;
@@ -69,17 +70,18 @@ public class NumericWidget extends JPanel {
 
                 double param1 = parameter.getAnnotation().probParam1();
                 double param2 = parameter.getAnnotation().probParam2();
-                ProbabilityDistribution.ProbabilityDistributionBuilder pb;
+                // ProbabilityDistribution.ProbabilityDistributionBuilder pb;
                 if(parameter.hasMaxValue() || parameter.hasMinValue()) {
                     double upBound = parameter.hasMaxValue() ?
                             parameter.getAnnotation().maximumValue() : Double.POSITIVE_INFINITY;
                     double lowBound = parameter.hasMinValue() ?
                             parameter.getAnnotation().minimumValue() : Double.NEGATIVE_INFINITY;
-                    pb = ProbabilityDistribution.getBuilder(probDist, param1,param2, lowBound, upBound);
+                    // pb = ProbabilityDistribution.getBuilder(probDist, param1,param2, lowBound, upBound);
                 } else {
-                    pb = ProbabilityDistribution.getBuilder(probDist, param1, param2);
+                    // pb = ProbabilityDistribution.getBuilder(probDist, param1, param2);
                 }
-                ProbabilityDistribution pd = pb.build();
+                // ProbabilityDistribution pd = pb.build();
+                ProbabilityDistribution pd = new NormalDistribution();
 
                 AnnotatedPropertyEditor randEditor = new AnnotatedPropertyEditor(new ProbabilityDistribution.Randomizer(pd));
                 StandardDialog dialog = new StandardDialog();
@@ -89,7 +91,7 @@ public class NumericWidget extends JPanel {
                 dialog.addClosingTask(() -> {
                     editableObjects.forEach(o -> {
                         if (parameter.isNumericInteger()) {
-                            parameter.setFieldValue(o, pd.nextInt());
+                            parameter.setFieldValue(o, (int) pd.nextDouble());
                         } else {
                             parameter.setFieldValue(o, pd.nextDouble());
                         }

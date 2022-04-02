@@ -147,7 +147,7 @@
 //     /**
 //      * A noise generator.
 //      */
-//     private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
+//     private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 //
 //     /**
 //      * Input data. The sequence of inputs to be fed to the ESN's input layer.

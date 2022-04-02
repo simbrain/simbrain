@@ -59,7 +59,7 @@ abstract class ArrayLayer(
 
     override fun randomize() {
         // TODO: Make randomizer settable
-        inputs.randomize(UniformDistribution.create())
+        inputs.randomize(UniformDistribution())
         events.fireUpdated()
     }
 

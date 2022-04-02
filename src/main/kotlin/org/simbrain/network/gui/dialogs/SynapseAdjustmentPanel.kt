@@ -53,15 +53,12 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
     /**
      * Random source for randomizing inhibitory synapses.
      */
-    private val inhibitoryRandomizer: ProbabilityDistribution = UniformDistribution.builder()
-        .build()
+    private val inhibitoryRandomizer: ProbabilityDistribution = UniformDistribution(-1.0, 0.9)
 
     /**
      * Random source for randomizing excitatory synapses.
      */
-    private val excitatoryRandomizer: ProbabilityDistribution = UniformDistribution.builder()
-        .build()
-
+    private val excitatoryRandomizer: ProbabilityDistribution = UniformDistribution(0.0, 1.0)
 
     /**
      * A collection of the selected synaptic weights, such that the first row
@@ -78,7 +75,7 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
     private val inhibitoryPanel = AnnotatedPropertyEditor(inhibitoryRandomizer)
     private val randomizeButton = JButton("Apply")
 
-    private val perturber: ProbabilityDistribution = UniformDistribution.create()
+    private val perturber: ProbabilityDistribution = UniformDistribution()
     private val perturberRandomizer = Randomizer()
     private val perturberPanel = AnnotatedPropertyEditor(perturberRandomizer)
     private val perturbButton = JButton("Apply")
@@ -121,8 +118,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         extractWeightValues(synapses)
 
         perturberRandomizer.probabilityDistribution = perturber
-        inhibitoryRandomizer.setUpperBound(0.0)
-        excitatoryRandomizer.setLowerBound(0.0)
         histogramPanel.setxAxisName("Synapse Strength")
         histogramPanel.setyAxisName("# of Synapses")
 

@@ -120,7 +120,7 @@ public class HodgkinHuxleyRule extends NeuronUpdateRule implements NoisyUpdateRu
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = UniformDistribution.create();
+    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
 
     /**
      * Add noise to the neuron.

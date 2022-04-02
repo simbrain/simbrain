@@ -171,8 +171,8 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
             val numClasses = deepNet.deepNetLayers.numberOfClasses.toInt()
             if (numClasses != -1) {
                 table.model.columns[0].type = Column.DataType.IntType
-                table.model.columns[0].columnRandomizer.probabilityDistribution =
-                    UniformDistribution.builder().upperBound(numClasses.toDouble()).lowerBound(0.0).build()
+                table.model.columns[0].columnRandomizer.probabilityDistribution = UniformDistribution();
+                    // UniformDistribution.builder().upperBound(numClasses.toDouble()).lowerBound(0.0).build()
             }
         }
 

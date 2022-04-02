@@ -11,7 +11,6 @@ import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
-import org.simbrain.util.math.ProbDistributions.TwoValued
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.*
@@ -137,8 +136,8 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             val targets = SimbrainDataViewer(createFromColumn(smileClassifier.trainingTargets), false).apply {
                 addAction(table.importCsv)
                 addAction(table.randomizeColumnAction)
-                table.model.columns[0].columnRandomizer.probabilityDistribution =
-                    TwoValued.TwoValuedBuilder().upper(1).lower(-1).build()
+                // table.model.columns[0].columnRandomizer.probabilityDistribution = TwoValued()
+                    // TwoValued.TwoValuedBuilder().upper(1).lower(-1).build()
                 preferredSize = Dimension(200, 300)
                 addClosingTask {
                     smileClassifier.trainingTargets = this.model.getIntColumn(0)

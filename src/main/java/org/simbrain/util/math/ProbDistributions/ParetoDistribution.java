@@ -1,6 +1,5 @@
 package org.simbrain.util.math.ProbDistributions;
 
-import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.ProbabilityDistribution;
 import umontreal.ssj.randvar.ParetoGen;
@@ -48,8 +47,6 @@ public class ParetoDistribution extends ProbabilityDistribution{
             order = 5)
     private boolean clipping = false;
 
-    private Polarity polarity = Polarity.BOTH;
-
     /**
      * Public constructor for reflection-based creation. You are encourage to use
      * the builder pattern provided for ProbabilityDistributions.
@@ -59,16 +56,7 @@ public class ParetoDistribution extends ProbabilityDistribution{
 
     @Override
     public double nextDouble() {
-        return clipping(this,
-                ParetoGen.nextDouble(DEFAULT_RANDOM_STREAM, slope, min),
-                floor,
-                ceil
-                );
-    }
-
-    @Override
-    public int nextInt() {
-        return (int) nextDouble();
+        return ParetoGen.nextDouble(DEFAULT_RANDOM_STREAM, slope, min);
     }
 
     @Override
@@ -101,63 +89,6 @@ public class ParetoDistribution extends ProbabilityDistribution{
     @Override
     public String getName() {
         return "Pareto";
-    }
-
-    @Override
-    public void setClipping(boolean clipping) {
-        this.clipping = clipping;
-    }
-
-    @Override
-    public void setUpperBound(double ceiling) {
-        if(ceiling > min)
-            this.ceil = ceiling;
-    }
-
-    @Override
-    public void setLowerBound(double floor) {
-        if(floor >= min)
-            this.floor = floor;
-    }
-
-    public void setCeil(double ceiling) {setUpperBound(ceiling);} // For APE
-
-    public void setFloor(double floor) {setLowerBound(floor);} // For APE
-
-    public static ParetoDistributionBuilder builder() {
-        return new ParetoDistributionBuilder();
-    }
-
-    public static ParetoDistribution create() {
-        return new ParetoDistribution();
-    }
-
-    public static class ParetoDistributionBuilder
-        extends ProbabilityDistributionBuilder<
-            ParetoDistributionBuilder,
-            ParetoDistribution> {
-
-        ParetoDistribution product = new ParetoDistribution();
-
-        public ParetoDistributionBuilder slope(double slope) {
-            product.setSlope(slope);
-            return this;
-        }
-
-        public ParetoDistributionBuilder min(double min) {
-            product.setMin(min);
-            return this;
-        }
-
-        @Override
-        public ParetoDistribution build() {
-            return product;
-        }
-
-        @Override
-        protected ParetoDistribution product() {
-            return product;
-        }
     }
 
 }

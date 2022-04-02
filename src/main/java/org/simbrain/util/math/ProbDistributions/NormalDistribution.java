@@ -46,12 +46,6 @@ public class NormalDistribution extends ProbabilityDistribution {
     private boolean clipping = false;
 
     /**
-     * Backing for this distribution.
-     */
-    private org.apache.commons.math3.distribution.NormalDistribution dist;
-
-
-    /**
      * Public constructor for reflection-based creation. You are encouraged to use
      * the builder pattern provided for ProbabilityDistributions.
      */
@@ -77,7 +71,7 @@ public class NormalDistribution extends ProbabilityDistribution {
     }
 
     public double nextDouble() {
-        return clipping(this, dist.sample(), floor, ceil);
+        return dist.sample();
     }
 
     public int nextInt() {
@@ -106,10 +100,6 @@ public class NormalDistribution extends ProbabilityDistribution {
         return "Normal";
     }
 
-    @Override
-    public String toString() {
-        return "Normal";
-    }
 
     @Override
     public NormalDistribution deepCopy() {
@@ -120,57 +110,6 @@ public class NormalDistribution extends ProbabilityDistribution {
         cpy.floor = this.floor;
         cpy.clipping = this.clipping;
         return cpy;
-    }
-
-    @Override
-    public void setClipping(boolean clipping) {
-        this.clipping = clipping;
-    }
-
-    @Override
-    public void setUpperBound(double ceiling) {
-        this.ceil = ceiling;
-    }
-
-    @Override
-    public void setLowerBound(double floor) {
-        this.floor = floor;
-    }
-
-    public static NormalDistributionBuilder builder() {
-        return new NormalDistributionBuilder();
-    }
-
-    public static NormalDistribution create() {
-        return new NormalDistribution();
-    }
-
-    public static class NormalDistributionBuilder
-        extends ProbabilityDistributionBuilder<
-            NormalDistributionBuilder,
-            NormalDistribution> {
-
-        NormalDistribution product = new NormalDistribution();
-
-        public NormalDistributionBuilder mean(double mean) {
-            product.setMean(mean);
-            return this;
-        }
-
-        public NormalDistributionBuilder standardDeviation(double standardDeviation) {
-            product.setStandardDeviation(standardDeviation);
-            return this;
-        }
-
-        @Override
-        public NormalDistribution build() {
-            return product;
-        }
-
-        @Override
-        protected NormalDistribution product() {
-            return product;
-        }
     }
 
 }

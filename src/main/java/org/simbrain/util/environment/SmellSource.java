@@ -93,7 +93,7 @@ public class SmellSource {
      * @param numDimensions number of dimensions of the stimulus vector.
      */
     public SmellSource(final int numDimensions) {
-        UniformDistribution randomizer = UniformDistribution.create();
+        UniformDistribution randomizer = new UniformDistribution();
         this.stimulusVector = new double[numDimensions];
         for (int i = 0; i < numDimensions; i++) {
             stimulusVector[i] = randomizer.nextDouble();
@@ -140,11 +140,7 @@ public class SmellSource {
      * Randomize values.
      */
     public void randomize() {
-        UniformDistribution randomizer =
-                UniformDistribution.builder()
-                .lowerBound(0)
-                .upperBound(10)
-                .build();
+        UniformDistribution randomizer = new UniformDistribution(0, 10);
 
         for (int i = 0; i < getStimulusDimension(); i++) {
             stimulusVector[i] = randomizer.nextDouble();

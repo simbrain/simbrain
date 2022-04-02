@@ -16,6 +16,7 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.math.ProbabilityDistribution;
 
 /**
  * An implementation of Log-STDP as introduced in:
@@ -79,6 +80,8 @@ public class LogSTDPRule extends STDPRule {
 
     private double delta_w=0;
 
+    private ProbabilityDistribution dist = new NormalDistribution(0, noiseVar);
+
     /**
      * Updates the synapse's strength using Log-STDP.
      */
@@ -102,12 +105,7 @@ public class LogSTDPRule extends STDPRule {
         //        }
 
         if (synapse.getStrength() >= 0) {
-            double noise =
-                    (1 + NormalDistribution.builder()
-                            .mean(0)
-                            .standardDeviation(noiseVar)
-                            .build().nextDouble()
-                    );
+            double noise = 1 + dist.nextDouble();
             if (delta_t < 0) {
                 calcW_plusTerm(synapse);
                 delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t / tau_plus)) * (1 + noise);

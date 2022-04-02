@@ -19,10 +19,6 @@ import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.EditableObject;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Superclass for all types of trainer which can be iterated and which return an
  * error when they are iterated.
@@ -93,7 +89,7 @@ public abstract class IterableTrainer implements EditableObject {
     }
 
     @UserParameter(label = "Randomizer", isObjectType = true, order = 200)
-    private ProbabilityDistribution randomizer = UniformDistribution.create();
+    private ProbabilityDistribution randomizer = new UniformDistribution();
 
     /**
      * Get the current MSE error.

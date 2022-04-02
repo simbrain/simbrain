@@ -55,7 +55,7 @@ public abstract class DecayFunction implements CopyableObject {
      * Noise generator for this decay function if {@link DecayFunction#addNoise} is true.
      */
     @UserParameter(label = "Randomizer", isObjectType = true, order = 1000, tab = "Noise")
-    private ProbabilityDistribution randomizer = UniformDistribution.create();
+    private ProbabilityDistribution randomizer = new UniformDistribution();
 
     /**
      * If true, add noise to object's stimulus vector.

@@ -170,10 +170,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     /**
      * A source of noise (nA).
      */
-    private ProbabilityDistribution noiseGenerator =
-            NormalDistribution.builder()
-                .standardDeviation(1)
-                .build();
+    private ProbabilityDistribution noiseGenerator = new NormalDistribution(0.0,1.0);
 
     @Override
     public void apply(Neuron neuron, ScalarDataHolder data) {

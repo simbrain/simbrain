@@ -124,7 +124,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         notifyWorkspaceUpdateStarted()
-        GlobalScope.launch {
+        runBlocking {
             doUpdate()
             notifyWorkspaceUpdateCompleted()
             isRunning = false

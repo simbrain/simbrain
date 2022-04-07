@@ -608,6 +608,10 @@ public class Utils {
         return Utils.getOSMatches("Mac OS X");
     }
 
+    public static boolean isM1Mac() {
+        return Utils.getOSMatches("Mac OS X") && System.getProperty("os.arch").toLowerCase(Locale.ENGLISH).equals("aarch64");
+    }
+
     /**
      * Determines whether the system is a Mac os x.
      *

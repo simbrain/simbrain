@@ -27,8 +27,10 @@ import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
 import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.Shift
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.Utils
 import org.simbrain.util.createAction
 import javax.swing.AbstractAction
+import javax.swing.JOptionPane
 
 class NetworkActions(val networkPanel: NetworkPanel) {
 
@@ -80,12 +82,22 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val wandEditModeAction = WandEditModeAction(networkPanel)
     val zoomToFitPageAction = ZoomToFitPageAction(networkPanel)
 
-    val addDeepNetAction = networkPanel.createAction(
-        name = "Add Deep Network...",
-        description = "Create a new deep network",
-        keyCombo = CmdOrCtrl + Shift + 'D'
-    ) {
-        showDeepNetCreationDialog()
+    val addDeepNetAction = if (Utils.isM1Mac()) {
+        networkPanel.createAction(
+            name = "Add Deep Network...",
+            description = "Deep Network is not currently supported on M1 Macs",
+            keyCombo = CmdOrCtrl + Shift + 'D'
+        ) {
+            JOptionPane.showConfirmDialog(null, "Deep Network / TensorFlow for Java is not currently supported on M1 Macs.")
+        }.also { it.isEnabled = false }
+    } else {
+        networkPanel.createAction(
+            name = "Add Deep Network...",
+            description = "Create a new deep network",
+            keyCombo = CmdOrCtrl + Shift + 'D'
+        ) {
+            showDeepNetCreationDialog()
+        }
     }
 
     val addSmileClassifier = networkPanel.createAction(

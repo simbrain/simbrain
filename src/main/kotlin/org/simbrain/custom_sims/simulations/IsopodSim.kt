@@ -5,11 +5,11 @@ import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.environment.SmellSource
-import org.simbrain.util.math.ProbDistributions.NormalDistribution
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.showSaveDialog
+import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.toCsvString
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.effectors.Effector

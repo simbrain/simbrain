@@ -24,8 +24,8 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * <b>AdditiveNeuron</b> See Haykin (2002), section 14.5. Used with continuous
@@ -48,7 +48,7 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * For adding noise to the neuron.
@@ -86,7 +86,7 @@ public class AdditiveRule extends NeuronUpdateRule implements NoisyUpdateRule {
         double val = neuron.getActivation() + neuron.getNetwork().getTimeStep() * (-neuron.getActivation() / resistance + wtdSum);
 
         if (addNoise) {
-            val += noiseGenerator.nextDouble();
+            val += noiseGenerator.sampleDouble();
         }
 
         neuron.setActivation(val);

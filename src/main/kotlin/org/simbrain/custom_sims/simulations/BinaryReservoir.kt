@@ -8,7 +8,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.util.*
 import org.simbrain.util.Utils.FS
-import org.simbrain.util.math.ProbDistributions.NormalDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 import java.io.File
 import java.lang.Math.sqrt
 import javax.swing.JTextField
@@ -68,7 +68,7 @@ val binaryReservoir = newSim {
         // }
         normalDist.standardDeviation = sqrt(newVariance)
         network.flatSynapseList.forEach { synapse ->
-            synapse.strength = normalDist.nextDouble()
+            synapse.strength = normalDist.sampleDouble()
         }
         variance = newVariance
 

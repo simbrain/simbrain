@@ -5,8 +5,9 @@ import org.simbrain.util.math.DecayFunctions.GaussianDecayFunction;
 import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.math.DecayFunctions.QuadraticDecayFunction;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
 import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +56,7 @@ public abstract class DecayFunction implements CopyableObject {
      * Noise generator for this decay function if {@link DecayFunction#addNoise} is true.
      */
     @UserParameter(label = "Randomizer", isObjectType = true, order = 1000, tab = "Noise")
-    private ProbabilityDistribution randomizer = new UniformDistribution();
+    private ProbabilityDistribution randomizer = new UniformRealDistribution();
 
     /**
      * If true, add noise to object's stimulus vector.
@@ -116,7 +117,7 @@ public abstract class DecayFunction implements CopyableObject {
     public double[] apply(double distance, double[] vector) {
         double[] ret = new double[vector.length];
         for (int i = 0; i < vector.length; i++) {
-            ret[i] = vector[i] * getScalingFactor(distance) + (addNoise ? randomizer.nextDouble() : 0);
+            ret[i] = vector[i] * getScalingFactor(distance) + (addNoise ? randomizer.sampleDouble() : 0);
         }
         return ret;
     }
@@ -131,7 +132,7 @@ public abstract class DecayFunction implements CopyableObject {
     public List<Double> apply(double distance, List<Double> vector) {
         List<Double> ret = new ArrayList<>();
         for (Double e : vector) {
-            ret.add(e * getScalingFactor(distance) + (addNoise ? randomizer.nextDouble() : 0));
+            ret.add(e * getScalingFactor(distance) + (addNoise ? randomizer.sampleDouble() : 0));
         }
         return ret;
     }

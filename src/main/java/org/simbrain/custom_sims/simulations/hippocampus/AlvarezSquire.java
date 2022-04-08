@@ -4,8 +4,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * Extends competitive group with functions specific to the hippocampus
@@ -16,7 +16,7 @@ public class AlvarezSquire extends CompetitiveGroup {
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Reference to parent simulation.
@@ -33,7 +33,7 @@ public class AlvarezSquire extends CompetitiveGroup {
         super(hippo.net, numNeurons);
         this.hippo = hippo;
 
-        noiseGenerator = new UniformDistribution(-.05, .05);
+        noiseGenerator = new UniformRealDistribution(-.05, .05);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class AlvarezSquire extends CompetitiveGroup {
      */
     private void alvarezSquireUpdate(Neuron neuron) {
         // TODO: Use library for clipping
-        double val = .7 * neuron.getActivation() + neuron.getWeightedInputs() + noiseGenerator.nextDouble();
+        double val = .7 * neuron.getActivation() + neuron.getWeightedInputs() + noiseGenerator.sampleDouble();
         neuron.forceSetActivation((val > 0) ? val : 0);
         neuron.forceSetActivation((val < 1) ? val : 1);
     }

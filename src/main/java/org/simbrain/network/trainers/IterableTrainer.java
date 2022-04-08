@@ -15,9 +15,9 @@ package org.simbrain.network.trainers;
 
 import org.simbrain.network.events.TrainerEvents;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * Superclass for all types of trainer which can be iterated and which return an
@@ -89,7 +89,7 @@ public abstract class IterableTrainer implements EditableObject {
     }
 
     @UserParameter(label = "Randomizer", isObjectType = true, order = 200)
-    private ProbabilityDistribution randomizer = new UniformDistribution();
+    private ProbabilityDistribution randomizer = new UniformRealDistribution();
 
     /**
      * Get the current MSE error.

@@ -29,8 +29,8 @@ import org.simbrain.network.util.NakaMatrixData;
 import org.simbrain.network.util.NakaScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 import smile.math.matrix.Matrix;
 
 /**
@@ -110,7 +110,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Add noise to neuron.
@@ -193,7 +193,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         }
 
         if (addNoise) {
-            val += (timeStep * (((1 / timeConstant) * (-val + s)) + noiseGenerator.nextDouble()));
+            val += (timeStep * (((1 / timeConstant) * (-val + s)) + noiseGenerator.sampleDouble()));
         } else {
             val += (timeStep * ((1 / timeConstant) * (-val + s)));
         }

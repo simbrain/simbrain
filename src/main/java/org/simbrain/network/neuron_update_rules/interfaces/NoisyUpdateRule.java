@@ -19,7 +19,7 @@
 package org.simbrain.network.neuron_update_rules.interfaces;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
 
 /**
  * An interface which should be implemented by any neuron update rule that uses

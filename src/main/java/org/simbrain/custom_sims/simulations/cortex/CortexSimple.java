@@ -11,9 +11,9 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.LogNormalDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.util.ArrayList;
@@ -40,8 +40,8 @@ public class CortexSimple extends Simulation {
     int GRID_SPACE = 25;
 
     // Location and scale params for lognormal dist of all synapse groups
-//    double location = -1.0;
-//    double scale = .35;
+    double location = -1.0;
+    double scale = .35;
     double exlocation = 0;
     double exscale = .5;
 
@@ -197,16 +197,8 @@ public class CortexSimple extends Simulation {
     private SynapseGroup connectLayers(NeuronGroup src, NeuronGroup tar,
                                        double sparsity) {
 
-        ProbabilityDistribution exRand = new LogNormalDistribution();
-            // LogNormalDistribution.builder()
-            //     .location(exlocation)
-            //     .scale(exscale)
-            //     .build();
-        ProbabilityDistribution inRand = new LogNormalDistribution();
-            // LogNormalDistribution.builder()
-            //     .location(-exlocation)
-            //     .scale(exscale)
-            //     .build();
+        ProbabilityDistribution exRand = new LogNormalDistribution(exlocation, exscale);
+        ProbabilityDistribution inRand = new LogNormalDistribution(-exlocation, exscale);
 
         Sparse con = new Sparse(sparsity, false, false);
 

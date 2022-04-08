@@ -38,8 +38,8 @@
 // import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 // import org.simbrain.network.util.SimnetUtils;
 // import org.simbrain.util.math.Matrices;
-// import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-// import org.simbrain.util.math.ProbabilityDistribution;
+// import org.simbrain.util.stats.distributions.UniformDistribution;
+// import org.simbrain.util.stats.ProbabilityDistribution;
 //
 // import javax.swing.*;
 //

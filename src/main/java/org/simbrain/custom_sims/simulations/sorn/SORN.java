@@ -11,8 +11,8 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.awt.*;
@@ -32,7 +32,7 @@ public class SORN extends Simulation {
 
     private int eiKIn;// = (int)(numNeurons/50);
 
-    private ProbabilityDistribution defWtPD = new UniformDistribution(0,1);
+    private ProbabilityDistribution defWtPD = new UniformRealDistribution(0,1);
 
     private Network net;
 
@@ -108,7 +108,7 @@ public class SORN extends Simulation {
 
         SynapseGroup sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
                 "Exc. \u2192 Exc.");
-        connectGroups(net, ngIn, ng, ieKIn, new UniformDistribution(-1,0),
+        connectGroups(net, ngIn, ng, ieKIn, new UniformRealDistribution(-1,0),
                 Polarity.INHIBITORY,
                 "Inh. \u2192 Exc.");
         connectGroups(net, ng, ngIn, eiKIn, defWtPD, Polarity.EXCITATORY,
@@ -199,7 +199,7 @@ public class SORN extends Simulation {
     }
 
     private static SynapseGroup connectGroups(Network network, NeuronGroup src, NeuronGroup tar, int kIn,
-                               ProbabilityDistribution random, Polarity polarity, String label) {
+                                              ProbabilityDistribution random, Polarity polarity, String label) {
         double excRat = polarity != Polarity.INHIBITORY ? 1.0 : 0.0;
         FixedDegree connector = new FixedDegree();
         connector.setDirection(Direction.IN);

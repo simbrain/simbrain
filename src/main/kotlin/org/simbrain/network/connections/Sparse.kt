@@ -25,7 +25,6 @@ import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.randShuffleK
-import umontreal.ssj.randvar.BinomialGen
 import java.util.*
 
 /**
@@ -265,8 +264,9 @@ class Sparse() : ConnectionStrategy(), EditableObject {
         var i = 0
         val n = sourceNeurons.size
         while (i < n) {
-            currentOrderingIndices[i] =
-                BinomialGen.nextInt(SimbrainMath.DEFAULT_RANDOM_STREAM, numTars, connectionDensity)
+            // TODO
+            currentOrderingIndices[i] = 1
+                // BinomialGen.nextInt(SimbrainMath.DEFAULT_RANDOM_STREAM, numTars, connectionDensity)
             val src = sourceNeurons[i]
             var tar: Neuron
             val tarLen = targetNeurons.size - 1
@@ -329,11 +329,13 @@ class Sparse() : ConnectionStrategy(), EditableObject {
             var i = 0
             val n = sourceNeurons.size
             while (i < n) {
-                val numToRemove = BinomialGen.nextInt(
-                    SimbrainMath.DEFAULT_RANDOM_STREAM,
-                    synapseGroup!!.targetNeuronGroup.size(),
-                    newSparsity
-                )
+                // TODO
+                val numToRemove = 1
+                // BinomialGen.nextInt(
+                //     SimbrainMath.DEFAULT_RANDOM_STREAM,
+                //     synapseGroup!!.targetNeuronGroup.size(),
+                //     newSparsity
+                // )
                 if (numToRemove < currentOrderingIndices[i]) {
                     val remove = decreaseDensity(i, numToRemove)
                     for (s in remove) {
@@ -380,11 +382,13 @@ class Sparse() : ConnectionStrategy(), EditableObject {
             var i = 0
             val n = sourceNeurons.size
             while (i < n) {
-                val numToAdd = BinomialGen.nextInt(
-                    SimbrainMath.DEFAULT_RANDOM_STREAM,
-                    synapseGroup!!.targetNeuronGroup.size(),
-                    newSparsity
-                )
+                val numToAdd = 1
+                // TODO
+                // BinomialGen.nextInt(
+                //     SimbrainMath.DEFAULT_RANDOM_STREAM,
+                //     synapseGroup!!.targetNeuronGroup.size(),
+                //     newSparsity
+                // )
                 var finalNumConPerSource =
                     if (numToAdd >= currentOrderingIndices[i]) numToAdd else currentOrderingIndices[i]
                 if (finalNumConPerSource > sparseOrdering!![i].size) {

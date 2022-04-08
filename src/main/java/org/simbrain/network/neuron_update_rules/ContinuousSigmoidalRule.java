@@ -23,8 +23,8 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SquashingFunctionEnum;
+import org.simbrain.util.stats.ProbabilityDistribution;
 
 /**
  * <b>Continuous Sigmoidal Rule</b> provides various squashing function
@@ -125,7 +125,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         double dt = neuron.getNetwork().getTimeStep();
 
         if (addNoise) {
-            inputTerm = (dt / tau) * (neuron.getInput() + bias + noiseGenerator.nextDouble());
+            inputTerm = (dt / tau) * (neuron.getInput() + bias + noiseGenerator.sampleDouble());
         } else {
             inputTerm = (dt / tau) * (neuron.getInput() + bias);
         }

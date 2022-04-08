@@ -1,8 +1,8 @@
 package org.simbrain.network.core
 
 import org.simbrain.util.UserParameter
-import org.simbrain.util.math.ProbDistributions.UniformDistribution
 import org.simbrain.util.randomize
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.Consumable
 import smile.math.matrix.Matrix
 
@@ -58,8 +58,8 @@ abstract class ArrayLayer(
     }
 
     override fun randomize() {
-        // TODO: Make randomizer settable
-        inputs.randomize(UniformDistribution())
+        // TODO: Find non-obtrusive way to set randomizer for cases besides neuronarray
+        inputs.randomize(UniformRealDistribution())
         events.fireUpdated()
     }
 

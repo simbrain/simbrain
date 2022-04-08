@@ -44,9 +44,6 @@ abstract class ClassifierWrapper(): CopyableObject {
      */
     abstract override fun copy(): ClassifierWrapper
 
-    /**
-     * To get a static method
-     */
     companion object {
         /**
          * Called via reflection using [UserParameter.typeListMethod].

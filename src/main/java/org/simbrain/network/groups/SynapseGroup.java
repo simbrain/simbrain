@@ -24,9 +24,9 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.SynapseSet;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
 
@@ -79,12 +79,12 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * The <b>default>/b> polarized randomizer associated with excitatory.
      * <p> synapse strengths for all synapse groups.
      */
-    private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER = new UniformDistribution();
+    private static final ProbabilityDistribution DEFAULT_EX_RANDOMIZER = new UniformRealDistribution();
 
     /**
      * The <b>default>/b> polarized randomizer associated with inhibitory synapse strengths for all synapse groups.
      */
-    private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER = new UniformDistribution();
+    private static final ProbabilityDistribution DEFAULT_IN_RANDOMIZER = new UniformRealDistribution();
 
     /**
      * The default ratio (all excitatory) for all synapse groups.
@@ -494,7 +494,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     private void addNewExcitatorySynapse(final Synapse synapse) {
         synapse.setParentGroup(this);
         if (exciteRand != null) {
-            synapse.setStrength(exciteRand.nextDouble());
+            synapse.setStrength(exciteRand.sampleDouble());
         } else {
             synapse.setStrength(DEFAULT_EXCITATORY_STRENGTH);
         }
@@ -518,7 +518,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     private void addNewInhibitorySynapse(final Synapse synapse) {
         synapse.setParentGroup(this);
         if (inhibRand != null) {
-            synapse.setStrength(inhibRand.nextDouble());
+            synapse.setStrength(inhibRand.sampleDouble());
         } else {
             synapse.setStrength(DEFAULT_INHIBITORY_STRENGTH);
         }
@@ -568,7 +568,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
                 if (!s.getSource().isPolarized() && numSwitch > 0) {
                     setIterator.remove();
                     if (inhibRand != null) {
-                        s.setStrength(inhibRand.nextDouble());
+                        s.setStrength(inhibRand.sampleDouble());
                     } else {
                         s.setStrength(DEFAULT_INHIBITORY_STRENGTH);
                     }
@@ -593,7 +593,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
                 if (!s.getSource().isPolarized() && numSwitch > 0) {
                     setIterator.remove();
                     if (exciteRand != null) {
-                        s.setStrength(exciteRand.nextDouble());
+                        s.setStrength(exciteRand.sampleDouble());
                     } else {
                         s.setStrength(DEFAULT_EXCITATORY_STRENGTH);
                     }

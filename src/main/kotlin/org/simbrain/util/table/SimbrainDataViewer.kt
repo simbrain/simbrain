@@ -203,7 +203,7 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
 
     fun randomizeSelectedCells() {
         getSelectedCells().forEach { (x, y) ->
-            model.setValueAt(model.cellRandomizer.random, x, y)
+            model.setValueAt(model.cellRandomizer.sampleDouble(), x, y)
         }
     }
 

@@ -22,7 +22,7 @@
 // import org.simbrain.network.trainers.LMSOffline.SolutionType;
 // import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
 // import org.simbrain.network.trainers.TrainerListener;
-// import org.simbrain.util.math.ProbabilityDistribution;
+// import org.simbrain.util.stats.ProbabilityDistribution;
 // import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 // import org.simbrain.util.widgets.DropDownTriangle;
 // import org.simbrain.util.widgets.DropDownTriangle.UpDirection;

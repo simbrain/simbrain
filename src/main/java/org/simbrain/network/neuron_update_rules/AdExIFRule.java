@@ -24,8 +24,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * An implementation of adaptive exponential integrate and fire. This version
@@ -216,7 +216,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     /**
      * The noise generator randomizer.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * An absolute refractory period. Not normally a part of AdEx, but can
@@ -270,7 +270,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
 
         // Add noise if there is any to be added
         if (addNoise) {
-            ibg += noiseGenerator.nextDouble();
+            ibg += noiseGenerator.sampleDouble();
         }
 
         // Calc dV/dt for membrane potential

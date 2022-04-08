@@ -21,7 +21,7 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
+import org.simbrain.util.stats.distributions.NormalDistribution;
 
 /**
  * An experimental no-GUI only implementation of the UDF synapse. This is a
@@ -88,6 +88,8 @@ public class UDF extends SpikeResponder {
      * initializes the variables.
      */
     private boolean firstTime = true;
+
+    NormalDistribution rand = new NormalDistribution();
 
     /**
      * Default constructor.
@@ -160,85 +162,78 @@ public class UDF extends SpikeResponder {
      *          neurons the synapse connects and draw values based on that.
      */
     public void init(Synapse s) {
-        NormalDistribution rand = new NormalDistribution();
-                // NormalDistribution.builder()
-                //     .upperBound(Double.MAX_VALUE)
-                //     .lowerBound(0.0000001)
-                //     .clipping(true)
-                //     .build();
-
         if (s.getSource().getPolarity() == Polarity.EXCITATORY
          && s.getTarget().getPolarity() == Polarity.EXCITATORY) {
             rand.setMean(0.5);
             rand.setStandardDeviation(0.25);
-            U = rand.nextDouble();
+            U = rand.sampleDouble();
 
             rand.setMean(1100);
             rand.setStandardDeviation(550);
-            D = rand.nextDouble();
+            D = rand.sampleDouble();
 
             rand.setMean(50);
             rand.setStandardDeviation(25);
-            F = rand.nextDouble();
+            F = rand.sampleDouble();
 
             spikeDecay.setTimeConstant(3);
         } else if (s.getSource().getPolarity() == Polarity.EXCITATORY
                 && s.getTarget().getPolarity() == Polarity.INHIBITORY) {
             rand.setMean(0.05);
             rand.setStandardDeviation(0.025);
-            U = rand.nextDouble();
+            U = rand.sampleDouble();
 
             rand.setMean(125);
             rand.setStandardDeviation(62.5);
-            D = rand.nextDouble();
+            D = rand.sampleDouble();
 
             rand.setMean(120);
             rand.setStandardDeviation(60);
-            F = rand.nextDouble();
+            F = rand.sampleDouble();
 
             spikeDecay.setTimeConstant(3);
         } else if (s.getSource().getPolarity() == Polarity.INHIBITORY
                 && s.getTarget().getPolarity() == Polarity.EXCITATORY) {
             rand.setMean(0.25);
             rand.setStandardDeviation(0.125);
-            U = rand.nextDouble();
+            U = rand.sampleDouble();
 
             rand.setMean(700);
             rand.setStandardDeviation(350);
-            D = rand.nextDouble();
+            D = rand.sampleDouble();
 
             rand.setMean(20);
             rand.setStandardDeviation(10);
-            F = rand.nextDouble();
+            F = rand.sampleDouble();
 
             spikeDecay.setTimeConstant(6);
         } else if (s.getSource().getPolarity() == Polarity.INHIBITORY
                 && s.getTarget().getPolarity() == Polarity.EXCITATORY) {
             rand.setMean(0.32);
             rand.setStandardDeviation(0.16);
-            U = rand.nextDouble();
+            U = rand.sampleDouble();
 
             rand.setMean(144);
             rand.setStandardDeviation(72);
-            D = rand.nextDouble();
+            D = rand.sampleDouble();
 
             rand.setMean(60);
             rand.setStandardDeviation(30);
-            F = rand.nextDouble();
+            F = rand.sampleDouble();
 
             spikeDecay.setTimeConstant(6);
         } else {
             rand.setMean(0.5);
             rand.setStandardDeviation(0.25);
-            U = rand.nextDouble();
+            U = rand.sampleDouble();
 
             rand.setMean(1100);
             rand.setStandardDeviation(550);
-            D = rand.nextDouble();
+            D = rand.sampleDouble();
 
             rand.setMean(50);
             rand.setStandardDeviation(25);
-            F = rand.nextDouble();
+            F = rand.sampleDouble();
 
             spikeDecay.setTimeConstant(3);
         }

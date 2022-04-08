@@ -31,8 +31,8 @@ import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 import smile.math.matrix.Matrix;
 
 /**
@@ -68,7 +68,7 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Add noise to the neuron.
@@ -109,7 +109,7 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     public double linearRule(double input, double bias) {
         double ret = input * slope + bias;
         if (addNoise) {
-            ret  += noiseGenerator.nextDouble();
+            ret  += noiseGenerator.sampleDouble();
         }
         if (clipping) {
             ret  = clip(ret);

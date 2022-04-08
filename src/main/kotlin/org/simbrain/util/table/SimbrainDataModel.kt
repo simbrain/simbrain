@@ -3,8 +3,9 @@ package org.simbrain.util.table
 import org.simbrain.util.UserParameter
 import org.simbrain.util.isIntegerValued
 import org.simbrain.util.isRealValued
-import org.simbrain.util.math.ProbabilityDistribution
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import javax.swing.table.AbstractTableModel
 
 /**
@@ -38,7 +39,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     /**
      * Table-wide cell randomizer for arbitrary groups of cells.
      */
-    @UserParameter(label = "Table Randomizer")
+    @UserParameter(label = "Table Randomizer", isObjectType = true)
     var cellRandomizer = ProbabilityDistribution.Randomizer()
 
     /**
@@ -170,14 +171,13 @@ class Column(
      * Randomizer for this column.
      */
     @UserParameter(label = "Column Randomizer", isEmbeddedObject = true, order = 20)
-    var columnRandomizer = ProbabilityDistribution.Randomizer()
+    var columnRandomizer: ProbabilityDistribution = UniformRealDistribution()
 
     fun getRandom(): Number {
         if (type == DataType.DoubleType) {
-            return columnRandomizer.random
+            return columnRandomizer.sampleDouble()
         } else if (type == DataType.IntType) {
-            // TODO
-            return columnRandomizer.random
+            return columnRandomizer.sampleInt()
         }
         return 0
     }

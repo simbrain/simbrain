@@ -1,7 +1,7 @@
-// package org.simbrain.util.math.ProbDistributions;
+package org.simbrain.util.stats.distributions;// package org.simbrain.util.math.ProbDistributions;
 //
 // import org.simbrain.util.UserParameter;
-// import org.simbrain.util.math.ProbabilityDistribution;
+// import org.simbrain.util.stats.ProbabilityDistribution;
 //
 // /**
 //  * Returns one of two values.

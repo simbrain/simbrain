@@ -21,7 +21,7 @@ package org.simbrain.util.environment;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.DecayFunction;
 import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
@@ -93,10 +93,10 @@ public class SmellSource {
      * @param numDimensions number of dimensions of the stimulus vector.
      */
     public SmellSource(final int numDimensions) {
-        UniformDistribution randomizer = new UniformDistribution();
+        UniformRealDistribution randomizer = new UniformRealDistribution();
         this.stimulusVector = new double[numDimensions];
         for (int i = 0; i < numDimensions; i++) {
-            stimulusVector[i] = randomizer.nextDouble();
+            stimulusVector[i] = randomizer.sampleDouble();
         }
     }
 
@@ -140,10 +140,10 @@ public class SmellSource {
      * Randomize values.
      */
     public void randomize() {
-        UniformDistribution randomizer = new UniformDistribution(0, 10);
+        UniformRealDistribution randomizer = new UniformRealDistribution(0, 10);
 
         for (int i = 0; i < getStimulusDimension(); i++) {
-            stimulusVector[i] = randomizer.nextDouble();
+            stimulusVector[i] = randomizer.sampleDouble();
         }
     }
 

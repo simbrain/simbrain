@@ -18,9 +18,6 @@
  */
 package org.simbrain.util.math;
 
-import umontreal.ssj.rng.LFSR258;
-import umontreal.ssj.rng.RandomStream;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.util.*;
@@ -29,12 +26,6 @@ import java.util.*;
  * <b>SimbrainMath</b> is the math functions used in simbrain.
  */
 public class SimbrainMath {
-
-    /**
-     * A default random stream that can be used by any calls to SSJ
-     * classes/functions.
-     */
-    public static final RandomStream DEFAULT_RANDOM_STREAM = new LFSR258();
 
     public static final double log10of2 = Math.log10(2);
 

@@ -23,9 +23,9 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter
-import org.simbrain.util.math.ProbDistributions.NormalDistribution
-import org.simbrain.util.math.ProbabilityDistribution
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 
 /**
  * For each neuron, consider every neuron in a radius and make excitatory and inhibitory synapses with them according to
@@ -111,9 +111,11 @@ class RadialProbabilistic(
      */
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
         val exc = connectProbabilistically(source, target, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1, 0.0, 1.0))
+            excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1)
+        )
         val inh = connectProbabilistically(source, target, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1, -1.0, 0.0))
+            excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1)
+        )
         val syns = exc + inh
         network.addNetworkModels(syns)
         return syns
@@ -121,10 +123,12 @@ class RadialProbabilistic(
 
     override fun connectNeurons(synGroup: SynapseGroup) {
         val exc = connectProbabilistically(synGroup.sourceNeurons, synGroup.targetNeurons, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1, 0.0, 1.0))
+            excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1)
+        )
         exc.forEach{s -> synGroup.addExcitatorySynapse(s)}
         val inh = connectProbabilistically(synGroup.sourceNeurons, synGroup.targetNeurons, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1, -1.0, 0.0))
+            excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1)
+        )
         inh.forEach{s -> synGroup.addInhibitorySynapse(s)}
         synGroup.revalidateSynapseSets()
     }
@@ -168,7 +172,7 @@ fun Neuron.connectProbabilistically(
         }
         .filter { Math.random() < prob }
         .map { otherNeuron ->
-            Synapse(this, otherNeuron, otherNeuron.polarity.value(randomizer.nextDouble()))
+            Synapse(this, otherNeuron, otherNeuron.polarity.value(randomizer.sampleDouble()))
         }
 }
 

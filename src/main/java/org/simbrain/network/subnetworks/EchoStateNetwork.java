@@ -33,8 +33,8 @@
 // import org.simbrain.network.trainers.TrainingSet;
 // import org.simbrain.network.util.Direction;
 // import org.simbrain.util.math.NumericMatrix;
-// import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-// import org.simbrain.util.math.ProbabilityDistribution;
+// import org.simbrain.util.stats.distributions.UniformDistribution;
+// import org.simbrain.util.stats.ProbabilityDistribution;
 // import org.simbrain.util.math.SimbrainMath;
 //
 // import java.awt.geom.Point2D;

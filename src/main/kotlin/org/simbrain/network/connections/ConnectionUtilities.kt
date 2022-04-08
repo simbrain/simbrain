@@ -22,8 +22,8 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseUpdateRule
 import org.simbrain.util.SimbrainConstants.Polarity
-import org.simbrain.util.math.ProbDistributions.UniformDistribution
-import org.simbrain.util.math.ProbabilityDistribution
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 /**
  * Utility functions/interfaces/etc for manipulating synapses.
@@ -88,12 +88,12 @@ fun randomizeAndPolarizeSynapses(
         excitatory = shouldBeExcitatory(excitatoryRatio, exciteCount, inhibCount, s)
         // Set the strength based on the polarity.
         if (excitatory) {
-            s.strength = if (exciteRand != null) exciteRand.nextDouble() else DEFAULT_EXCITATORY_STRENGTH
+            s.strength = if (exciteRand != null) exciteRand.sampleDouble() else DEFAULT_EXCITATORY_STRENGTH
             exciteCount--
             // Change the excitatoryRatio to maintain balance
             excitatoryRatio = exciteCount / remaining.toDouble()
         } else {
-            s.strength = if (inhibRand != null) inhibRand.nextDouble() else DEFAULT_INHIBITORY_STRENGTH
+            s.strength = if (inhibRand != null) inhibRand.sampleDouble() else DEFAULT_INHIBITORY_STRENGTH
             inhibCount--
             // Change the excitatoryRatio to maintain balance.
             excitatoryRatio = (remaining - inhibCount) / remaining.toDouble()
@@ -110,8 +110,8 @@ fun randomizeAndPolarizeSynapses(
  * @param excitatoryRatio the ration of excitatory to inhibitory synapses.
  */
 fun randomizeAndPolarizeSynapses(synapses: Collection<Synapse>, excitatoryRatio: Double) {
-    val exciteRand: ProbabilityDistribution = UniformDistribution()
-    val inhibRand: ProbabilityDistribution = UniformDistribution()
+    val exciteRand: ProbabilityDistribution = UniformRealDistribution()
+    val inhibRand: ProbabilityDistribution = UniformRealDistribution()
     randomizeAndPolarizeSynapses(synapses, exciteRand, inhibRand, excitatoryRatio)
 }
 
@@ -137,9 +137,9 @@ fun randomizeSynapses(
             excitatory = s.strength > 0
             // Set the strength based on the polarity.
             if (excitatory) {
-                s.strength = if (exciteRand != null) exciteRand.nextDouble() else DEFAULT_EXCITATORY_STRENGTH
+                s.strength = if (exciteRand != null) exciteRand.sampleDouble() else DEFAULT_EXCITATORY_STRENGTH
             } else {
-                s.strength = if (inhibRand != null) inhibRand.nextDouble() else DEFAULT_INHIBITORY_STRENGTH
+                s.strength = if (inhibRand != null) inhibRand.sampleDouble() else DEFAULT_INHIBITORY_STRENGTH
             }
         }
     }
@@ -157,7 +157,7 @@ fun randomizeExcitatorySynapses(synapses: Collection<Synapse>, exciteRand: Proba
     checkPolarityMatches(exciteRand, Polarity.EXCITATORY)
     for (s in synapses) {
         if (Polarity.EXCITATORY == s.source.polarity || s.strength > 0) {
-            s.strength = if (exciteRand != null) exciteRand.nextDouble() else DEFAULT_EXCITATORY_STRENGTH
+            s.strength = if (exciteRand != null) exciteRand.sampleDouble() else DEFAULT_EXCITATORY_STRENGTH
         }
     }
 }
@@ -175,7 +175,7 @@ fun randomizeExcitatorySynapses(synapses: Collection<Synapse>, exciteRand: Proba
 fun randomizeExcitatorySynapsesUnsafe(synapses: Collection<Synapse>, exciteRand: ProbabilityDistribution?) {
     checkPolarityMatches(exciteRand, Polarity.EXCITATORY)
     for (s in synapses) {
-        s.strength = if (exciteRand != null) exciteRand.nextDouble() else DEFAULT_EXCITATORY_STRENGTH
+        s.strength = if (exciteRand != null) exciteRand.sampleDouble() else DEFAULT_EXCITATORY_STRENGTH
     }
 }
 
@@ -191,7 +191,7 @@ fun randomizeInhibitorySynapses(synapses: Collection<Synapse>, inhibRand: Probab
     checkPolarityMatches(inhibRand, Polarity.INHIBITORY)
     for (s in synapses) {
         if (Polarity.INHIBITORY == s.source.polarity || s.strength < 0) {
-            s.strength = if (inhibRand != null) inhibRand.nextDouble() else DEFAULT_INHIBITORY_STRENGTH
+            s.strength = if (inhibRand != null) inhibRand.sampleDouble() else DEFAULT_INHIBITORY_STRENGTH
         }
     }
 }
@@ -209,7 +209,7 @@ fun randomizeInhibitorySynapses(synapses: Collection<Synapse>, inhibRand: Probab
 fun randomizeInhibitorySynapsesUnsafe(synapses: Collection<Synapse>, inhibRand: ProbabilityDistribution?) {
     checkPolarityMatches(inhibRand, Polarity.INHIBITORY)
     for (s in synapses) {
-        s.strength = if (inhibRand != null) inhibRand.nextDouble() else DEFAULT_INHIBITORY_STRENGTH
+        s.strength = if (inhibRand != null) inhibRand.sampleDouble() else DEFAULT_INHIBITORY_STRENGTH
     }
 }
 

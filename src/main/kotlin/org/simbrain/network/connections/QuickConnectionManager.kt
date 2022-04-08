@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.SimbrainPreferences
-import org.simbrain.util.Utils
+import org.simbrain.util.stats.ProbabilityDistribution
 
 /**
  * Manage quick connection preferences, where a connection is applied using key
@@ -53,7 +53,7 @@ class QuickConnectionManager {
             // If no viable preferences found, default to All to All
             currentConnector = AllToAll()
         } else {
-            currentConnector = Utils.getSimbrainXStream().fromXML(xml) as ConnectionStrategy?
+            currentConnector = ProbabilityDistribution.getXStream().fromXML(xml) as ConnectionStrategy?
         }
     }
 
@@ -82,7 +82,7 @@ class QuickConnectionManager {
 
     fun setCurrentConnector(currentConnector: ConnectionStrategy?) {
         // Store the preferences using xml
-        SimbrainPreferences.putString("quickConnector", Utils.getSimbrainXStream().toXML(currentConnector))
+        SimbrainPreferences.putString("quickConnector", ProbabilityDistribution.getXStream().toXML(currentConnector))
         this.currentConnector = currentConnector
     }
 }

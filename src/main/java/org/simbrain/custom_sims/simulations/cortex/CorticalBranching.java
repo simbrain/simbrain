@@ -12,8 +12,8 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.TimedAccumulatorRule;
 import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.NormalDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.awt.*;
@@ -72,12 +72,8 @@ public class CorticalBranching extends Simulation {
         ng1.setLayout(layout);
         ng1.applyLayout(new Point2D.Double(0.0 ,0.0));
 
-        ProbabilityDistribution exRand = new NormalDistribution();
-        ProbabilityDistribution inRand = new NormalDistribution();
-        // ProbabilityDistribution exRand = LogNormalDistribution.builder().
-        //         location(1.5).scale(.5).upperBound(10000).clipping(false).build();
-        // ProbabilityDistribution inRand = LogNormalDistribution.builder().
-        //         location(-1.5).scale(3).build();
+        ProbabilityDistribution exRand = new NormalDistribution(1.5, .5);
+        ProbabilityDistribution inRand = new NormalDistribution(-1.5, 3.0);
 
         FixedDegree con = new FixedDegree();
         con.setDirection(Direction.IN);
@@ -93,7 +89,7 @@ public class CorticalBranching extends Simulation {
         // TODO: Band-aid... issue with synapse bounds needs addressing
         for(Synapse s : sg.getAllSynapses()) {
             s.setUpperBound(10000);
-            s.forceSetStrength(exRand.nextDouble());
+            s.forceSetStrength(exRand.sampleDouble());
         }
 
         sg.setLabel("Recurrent Synapses");

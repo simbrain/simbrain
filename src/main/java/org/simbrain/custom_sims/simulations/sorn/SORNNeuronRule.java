@@ -4,8 +4,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.NormalDistribution;
 
 /**
  * An implementation of the specific type of threshold neuron used in Lazar,
@@ -53,7 +53,7 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
         neuron.normalizeExcitatoryFanIn();
         // Sum inputs including noise and applied (external) inputs
         double input = neuron.getInput()
-                + (addNoise ? noiseGenerator.nextDouble() : 0)
+                + (addNoise ? noiseGenerator.sampleDouble() : 0)
                 + getAppliedInput();
         // Check that we're not still in the refractory period
         boolean outOfRef = neuron.getNetwork().getTime()

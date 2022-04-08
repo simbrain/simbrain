@@ -13,6 +13,7 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.table.*
 import org.simbrain.util.toSimbrainColorImage
 import java.awt.Dialog.ModalityType
@@ -136,8 +137,8 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             val targets = SimbrainDataViewer(createFromColumn(smileClassifier.trainingTargets), false).apply {
                 addAction(table.importCsv)
                 addAction(table.randomizeColumnAction)
-                // table.model.columns[0].columnRandomizer.probabilityDistribution = TwoValued()
-                    // TwoValued.TwoValuedBuilder().upper(1).lower(-1).build()
+                // TODO: Should be 1, -1.
+                table.model.columns[0].columnRandomizer = UniformIntegerDistribution(-1,1)
                 preferredSize = Dimension(200, 300)
                 addClosingTask {
                     smileClassifier.trainingTargets = this.model.getIntColumn(0)

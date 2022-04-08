@@ -7,8 +7,8 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * TODO
@@ -54,7 +54,7 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Add noise to the neuron.

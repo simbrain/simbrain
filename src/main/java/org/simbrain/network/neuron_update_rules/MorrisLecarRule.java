@@ -10,8 +10,8 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.NormalDistribution;
 
 public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
 
@@ -201,7 +201,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
         double i_ion = i_Ca + i_K + i_L;
         double i_noise = 0;
         if (getAddNoise()) {
-            i_noise = noiseGenerator.nextDouble();
+            i_noise = noiseGenerator.sampleDouble();
         }
         return ((i_bg - i_ion + i_syn + i_noise) / cMembrane);
     }

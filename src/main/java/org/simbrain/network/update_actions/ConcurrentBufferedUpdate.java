@@ -32,9 +32,9 @@
 // import org.simbrain.network.update_actions.concurrency_tools.BufferedUpdateTask;
 // import org.simbrain.network.update_actions.concurrency_tools.Task;
 // import org.simbrain.util.SimbrainConstants.Polarity;
-// import org.simbrain.util.math.ProbDistributions.LogNormalDistribution;
-// import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-// import org.simbrain.util.math.ProbabilityDistribution;
+// import org.simbrain.util.stats.distributions.LogNormalDistribution;
+// import org.simbrain.util.stats.distributions.NormalDistribution;
+// import org.simbrain.util.stats.ProbabilityDistribution;
 // import org.simbrain.util.math.SimbrainMath;
 // import org.simbrain.workspace.updater.UpdateAction;
 //

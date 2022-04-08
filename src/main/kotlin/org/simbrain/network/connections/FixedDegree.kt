@@ -22,9 +22,9 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.UserParameter
-import org.simbrain.util.math.ProbDistributions.NormalDistribution
-import org.simbrain.util.math.ProbabilityDistribution
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 
 /**
  * For each source neuron, create a fixed number of connections to or from target neurons (fixed indegree vs. fixed
@@ -158,9 +158,9 @@ fun Neuron.connectToN(
         .take(N)
         .map { otherNeuron ->
             if (direction == Direction.IN) {
-                Synapse(otherNeuron, this, otherNeuron.polarity.value(randomizer.nextDouble()))
+                Synapse(otherNeuron, this, otherNeuron.polarity.value(randomizer.sampleDouble()))
             } else {
-                Synapse(this, otherNeuron, this.polarity.value(randomizer.nextDouble()))
+                Synapse(this, otherNeuron, this.polarity.value(randomizer.sampleDouble()))
             }
         }
 }

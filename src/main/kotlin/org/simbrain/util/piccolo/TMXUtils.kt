@@ -23,7 +23,8 @@ val zeroTile by lazy { Tile(0) }
 val XStream
     get() = Utils.getSimbrainXStream()!!.apply {
         processAnnotations(TileMap::class.java)
-        registerConverter(TiledDataConverter(mapper, reflectionProvider))
+        registerConverter(
+            TiledDataConverter(mapper, reflectionProvider))
     }
 
 val missingTexture by lazy { OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png") }

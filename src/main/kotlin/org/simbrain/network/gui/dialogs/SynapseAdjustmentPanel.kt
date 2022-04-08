@@ -26,11 +26,11 @@ import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.displayInDialog
-import org.simbrain.util.math.ProbDistributions.UniformDistribution
-import org.simbrain.util.math.ProbabilityDistribution
-import org.simbrain.util.math.ProbabilityDistribution.Randomizer
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.ProbabilityDistribution.Randomizer
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.awt.GridLayout
@@ -53,12 +53,12 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
     /**
      * Random source for randomizing inhibitory synapses.
      */
-    private val inhibitoryRandomizer: ProbabilityDistribution = UniformDistribution(-1.0, 0.9)
+    private val inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.9)
 
     /**
      * Random source for randomizing excitatory synapses.
      */
-    private val excitatoryRandomizer: ProbabilityDistribution = UniformDistribution(0.0, 1.0)
+    private val excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0)
 
     /**
      * A collection of the selected synaptic weights, such that the first row
@@ -75,7 +75,7 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
     private val inhibitoryPanel = AnnotatedPropertyEditor(inhibitoryRandomizer)
     private val randomizeButton = JButton("Apply")
 
-    private val perturber: ProbabilityDistribution = UniformDistribution()
+    private val perturber: ProbabilityDistribution = UniformRealDistribution()
     private val perturberRandomizer = Randomizer()
     private val perturberPanel = AnnotatedPropertyEditor(perturberRandomizer)
     private val perturbButton = JButton("Apply")
@@ -218,7 +218,7 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             val view = synTypeSelector.selectedItem as SynapseView
             for (synapse in synapses) {
                 if (view.synapseIsAdjustable(synapse)) {
-                    synapse.forceSetStrength(synapse.strength + perturber.nextDouble())
+                    synapse.forceSetStrength(synapse.strength + perturber.sampleDouble())
                 }
             }
             fullUpdate()
@@ -243,17 +243,17 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             // Randomize synapses appropriately
             synapses.filter { s -> view.synapseIsAdjustable(s) }.forEach { s ->
                 when (view) {
-                    SynapseView.ALL -> s.forceSetStrength(chooseRandomizer.random)
+                    SynapseView.ALL -> s.forceSetStrength(chooseRandomizer.sampleDouble())
                     SynapseView.OVERLAY -> {
                         if (SynapseView.INHIBITORY.synapseIsAdjustable(s)) {
-                            s.forceSetStrength(inhibitoryRandomizer.nextDouble())
+                            s.forceSetStrength(inhibitoryRandomizer.sampleDouble())
                         }
                         if (SynapseView.EXCITATORY.synapseIsAdjustable(s)) {
-                            s.forceSetStrength(excitatoryRandomizer.nextDouble())
+                            s.forceSetStrength(excitatoryRandomizer.sampleDouble())
                         }
                     }
-                    SynapseView.EXCITATORY -> s.forceSetStrength(excitatoryRandomizer.nextDouble())
-                    SynapseView.INHIBITORY -> s.forceSetStrength(inhibitoryRandomizer.nextDouble())
+                    SynapseView.EXCITATORY -> s.forceSetStrength(excitatoryRandomizer.sampleDouble())
+                    SynapseView.INHIBITORY -> s.forceSetStrength(inhibitoryRandomizer.sampleDouble())
                 }
             }
             // Update the histogram, stats panel, etc

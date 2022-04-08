@@ -5,11 +5,11 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.kotlindl.*
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.math.ProbDistributions.UniformDistribution
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.ObjectTypeEditor
+import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.EditableList
 import java.awt.BorderLayout
@@ -171,8 +171,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
             val numClasses = deepNet.deepNetLayers.numberOfClasses.toInt()
             if (numClasses != -1) {
                 table.model.columns[0].type = Column.DataType.IntType
-                table.model.columns[0].columnRandomizer.probabilityDistribution = UniformDistribution();
-                    // UniformDistribution.builder().upperBound(numClasses.toDouble()).lowerBound(0.0).build()
+                table.model.columns[0].columnRandomizer = UniformIntegerDistribution(0, numClasses)
             }
         }
 

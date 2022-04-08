@@ -25,8 +25,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
@@ -36,7 +36,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
     /**
      * Noise source.
      */
-    private ProbabilityDistribution randomizer = new UniformDistribution();
+    private ProbabilityDistribution randomizer = new UniformRealDistribution();
 
     private double ceiling = 1.0;
 
@@ -65,7 +65,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
 
     @Override
     public void apply(Neuron neuron, ScalarDataHolder data) {
-        neuron.setActivation(randomizer.nextDouble());
+        neuron.setActivation(randomizer.sampleDouble());
     }
 
     @Override
@@ -75,7 +75,7 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
 
     @Override
     public double getRandomValue() {
-        return randomizer.nextDouble();
+        return randomizer.sampleDouble();
     }
 
     @Override

@@ -30,8 +30,8 @@ import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 import smile.math.matrix.Matrix;
 
 /**
@@ -96,7 +96,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Add noise to the neuron.
@@ -150,7 +150,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             }
         }
         if (addNoise) {
-            val += noiseGenerator.nextDouble();
+            val += noiseGenerator.sampleDouble();
         }
         if (clipping) {
             val = clip(val);

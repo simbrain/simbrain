@@ -25,9 +25,9 @@ import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.SwitchableChangeListener;
 import org.simbrain.util.SwitchablePropertyChangeListener;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 import org.simbrain.util.widgets.DropDownTriangle;
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection;
 
@@ -608,7 +608,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
          */
         public EditableRandomizerPanel(Window parent, Polarity polarity) {
 
-                randomizer.setProbabilityDistribution(new UniformDistribution());
+                randomizer.setProbabilityDistribution(new UniformRealDistribution());
                 enableStatusTriangle = new DropDownTriangle(UpDirection.LEFT, !creationPanel, "Disabled", "Enabled", parent);
                 enableStatusTriangle.setUpLabelColor(new Color(200, 0, 0));
                 enableStatusTriangle.setDownLabelColor(new Color(0, 160, 0));
@@ -622,7 +622,7 @@ public class SynapsePolarityAndRandomizerPanel extends JPanel {
             randomizerPanel = new AnnotatedPropertyEditor(randomizer);
             setLayout(new GridBagLayout());
             Border colorBorder = BorderFactory.createLineBorder(Polarity.EXCITATORY.equals(polarity) ? Color.red : Color.blue);
-            this.setBorder(BorderFactory.createTitledBorder(colorBorder, polarity.title()));
+            // this.setBorder(BorderFactory.createTitledBorder(colorBorder, polarity.title()));
 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.anchor = GridBagConstraints.NORTHWEST;

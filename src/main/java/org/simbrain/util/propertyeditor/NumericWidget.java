@@ -3,8 +3,8 @@ package org.simbrain.util.propertyeditor;
 import org.simbrain.util.Parameter;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.math.ProbDistributions.NormalDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.NormalDistribution;
 import org.simbrain.util.widgets.JNumberSpinnerWithNull;
 import org.simbrain.util.widgets.SpinnerNumberModelWithNull;
 
@@ -68,22 +68,10 @@ public class NumericWidget extends JPanel {
         if (!probDist.isEmpty()) {
             randomizeButton.addActionListener((evt) -> {
 
-                double param1 = parameter.getAnnotation().probParam1();
-                double param2 = parameter.getAnnotation().probParam2();
-                // ProbabilityDistribution.ProbabilityDistributionBuilder pb;
-                if(parameter.hasMaxValue() || parameter.hasMinValue()) {
-                    double upBound = parameter.hasMaxValue() ?
-                            parameter.getAnnotation().maximumValue() : Double.POSITIVE_INFINITY;
-                    double lowBound = parameter.hasMinValue() ?
-                            parameter.getAnnotation().minimumValue() : Double.NEGATIVE_INFINITY;
-                    // pb = ProbabilityDistribution.getBuilder(probDist, param1,param2, lowBound, upBound);
-                } else {
-                    // pb = ProbabilityDistribution.getBuilder(probDist, param1, param2);
-                }
-                // ProbabilityDistribution pd = pb.build();
-                ProbabilityDistribution pd = new NormalDistribution();
+                ProbabilityDistribution dist = new NormalDistribution();
 
-                AnnotatedPropertyEditor randEditor = new AnnotatedPropertyEditor(new ProbabilityDistribution.Randomizer(pd));
+                AnnotatedPropertyEditor randEditor =
+                        new AnnotatedPropertyEditor(new ProbabilityDistribution.Randomizer(dist));
                 StandardDialog dialog = new StandardDialog();
                 dialog.setContentPane(randEditor);
                 dialog.pack();
@@ -91,9 +79,9 @@ public class NumericWidget extends JPanel {
                 dialog.addClosingTask(() -> {
                     editableObjects.forEach(o -> {
                         if (parameter.isNumericInteger()) {
-                            parameter.setFieldValue(o, (int) pd.nextDouble());
+                            parameter.setFieldValue(o, dist.sampleInt());
                         } else {
-                            parameter.setFieldValue(o, pd.nextDouble());
+                            parameter.setFieldValue(o, dist.sampleDouble());
                         }
                     });
                     if(editableObjects.size() == 1) {

@@ -23,8 +23,8 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
-import org.simbrain.util.math.ProbDistributions.UniformDistribution
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.util.concurrent.*
 import kotlin.math.floor
 
@@ -234,11 +234,7 @@ class RadialGaussian(
         private val targColl: Collection<Neuron>?,
         private val loose: Boolean,
     ) : Callable<Collection<Synapse>> {
-        var rand: UniformDistribution = UniformDistribution();
-            // .lowerBound(0.0)
-            // .upperBound(1.0)
-            // .build()
-
+        var rand: UniformRealDistribution = UniformRealDistribution(0.0, 1.0);
         @Throws(Exception::class)
         public override fun call(): Collection<Synapse> {
             // Attempting to pre-allocate... assumes that connection density
@@ -247,7 +243,7 @@ class RadialGaussian(
                 ArrayList(Math.ceil(srcColl.size * targColl!!.size * 0.2 * 0.75).toInt())
             for (src: Neuron in srcColl) {
                 for (tar: Neuron in targColl) {
-                    val randVal: Double = rand.nextDouble()
+                    val randVal: Double = rand.sampleDouble()
                     var probability: Double
                     if (src.getPolarity() === Polarity.EXCITATORY) {
                         if (tar.getPolarity() === Polarity.EXCITATORY) {

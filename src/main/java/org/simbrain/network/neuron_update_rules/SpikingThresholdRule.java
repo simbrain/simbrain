@@ -27,8 +27,8 @@ import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.network.util.SpikingMatrixData;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 import smile.math.matrix.Matrix;
 
 import java.util.Random;
@@ -52,7 +52,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     /**
      * The noise generating randomizer.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Whether or not to add noise to the inputs .
@@ -97,7 +97,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     public boolean spikingThresholdRule(double in) {
-        final double input = in + (addNoise ? noiseGenerator.nextDouble() : 0);
+        final double input = in + (addNoise ? noiseGenerator.sampleDouble() : 0);
         if (input >= threshold) {
             return true;
         } else {

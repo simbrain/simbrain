@@ -22,9 +22,9 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.SynapseGroup
-import org.simbrain.util.math.ProbDistributions.NormalDistribution
-import org.simbrain.util.math.ProbabilityDistribution
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 
 /**
  * Maintains a specific strategy for creating connections between two groups of neurons. Subclasses correspond to

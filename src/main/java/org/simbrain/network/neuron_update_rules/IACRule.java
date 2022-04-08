@@ -27,8 +27,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
@@ -68,7 +68,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Add noise to the neuron.
@@ -133,7 +133,7 @@ public class IACRule extends NeuronUpdateRule implements BoundedUpdateRule, Clip
         double act = neuron.getActivation() + neuron.getNetwork().getTimeStep() * (effect - decay * (neuron.getActivation() - rest));
 
         if (addNoise) {
-            act += noiseGenerator.nextDouble();
+            act += noiseGenerator.sampleDouble();
         }
 
         if (clipping) {

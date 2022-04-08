@@ -9,9 +9,9 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
@@ -34,7 +34,7 @@ public class Hippocampus extends Simulation {
     /**
      * Randomizer for creating new synapse groups.
      */
-    ProbabilityDistribution exRand = new UniformDistribution(0, .02);
+    ProbabilityDistribution exRand = new UniformRealDistribution(0, .02);
 
     /**
      * Other variables.

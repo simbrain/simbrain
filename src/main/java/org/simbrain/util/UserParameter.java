@@ -18,7 +18,7 @@
  */
 package org.simbrain.util;
 
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
 
 import java.lang.annotation.*;
 

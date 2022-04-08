@@ -26,8 +26,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave.
@@ -65,7 +65,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerato
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Add noise to the neuron.
@@ -95,7 +95,7 @@ public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerato
         double val = ((range / 2) * Math.sin(frequency * neuron.getNetwork().getTime() + phase)) + ((upperBound + lowerBound) / 2);
 
         if (addNoise) {
-            val += noiseGenerator.nextDouble();
+            val += noiseGenerator.sampleDouble();
         }
 
         neuron.setActivation(val);

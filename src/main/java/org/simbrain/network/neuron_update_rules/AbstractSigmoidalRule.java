@@ -21,9 +21,9 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.*;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.ProbDistributions.UniformDistribution;
-import org.simbrain.util.math.ProbabilityDistribution;
 import org.simbrain.util.math.SquashingFunctionEnum;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 /**
  * An abstract superclass for discrete and continuous time sigmodial squashing
@@ -71,7 +71,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     /**
      * Noise generator.
      */
-    protected ProbabilityDistribution noiseGenerator = new UniformDistribution();
+    protected ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
      * Adds noise to neuron.

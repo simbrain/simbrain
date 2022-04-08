@@ -55,6 +55,13 @@ fun toFloatArray(array: DoubleArray): FloatArray {
 fun toDoubleArray(array: FloatArray): DoubleArray {
     return array.map { it.toDouble() }.toDoubleArray()
 }
+fun IntArray.toDoubleArray(): DoubleArray {
+    return map { it.toDouble() }.toDoubleArray()
+}
+fun DoubleArray.toIntArray(): IntArray {
+    return map { it.toInt() }.toIntArray()
+}
+
 
 fun Any?.isRealValued(): Boolean {
         return this is Double || this is Float

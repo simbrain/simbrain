@@ -23,14 +23,14 @@ class AllToAllTest {
 
     @Test
     fun `check correct number of weights are created`() {
-        conn.isSelfConnectionAllowed = false
+        conn.allowSelfConnection = false
         val syns = conn.connectNeurons(net, listOf(n1, n2), listOf(n1, n2))
         assertEquals(2, syns.size)
     }
 
     @Test
     fun `check self-connections are created`() {
-        conn.isSelfConnectionAllowed = true
+        conn.allowSelfConnection = true
         val syns = conn.connectNeurons(net, listOf(n1, n2), listOf(n1, n2))
         assertEquals(4, syns.size)
     }

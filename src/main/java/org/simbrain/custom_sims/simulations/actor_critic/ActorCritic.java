@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import static org.simbrain.network.core.NetworkKt.connectAllToAll;
+import static org.simbrain.network.core.NetworkUtilsKt.connectAllToAll;
 
 /**
  * Create the actor-critic simulation.

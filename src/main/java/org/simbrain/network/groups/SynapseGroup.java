@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.simbrain.network.connections.ConnectionUtilitiesKt.*;
+import static org.simbrain.network.core.NetworkUtilsKt.getSynapseVisibilityThreshold;
 
 /**
  * A group of synapses. Must connect a source and target neuron group.
@@ -383,7 +384,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * visibility threshold, then individual synapses will not be displayed.
      */
     public void initializeSynapseVisibility() {
-        int threshold = NetworkKt.getSynapseVisibilityThreshold();
+        int threshold = getSynapseVisibilityThreshold();
         if (sourceNeuronGroup.size() * targetNeuronGroup.size() > threshold) {
             displaySynapses = false;
         } else {

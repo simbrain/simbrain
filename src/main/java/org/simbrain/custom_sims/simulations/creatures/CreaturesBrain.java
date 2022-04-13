@@ -14,7 +14,7 @@ import org.simbrain.workspace.couplings.Coupling;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.simbrain.network.core.NetworkKt.connect;
+import static org.simbrain.network.core.NetworkUtilsKt.connect;
 
 /**
  * A helper class for filling in networks, from either a base

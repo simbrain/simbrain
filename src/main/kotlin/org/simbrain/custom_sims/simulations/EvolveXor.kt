@@ -8,6 +8,7 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
+
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.format

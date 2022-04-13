@@ -14,7 +14,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
-import static org.simbrain.network.core.NetworkKt.connect;
+import static org.simbrain.network.core.NetworkUtilsKt.connect;
 
 /**
  * Each instance of this class represents one particular creature in the simulation.

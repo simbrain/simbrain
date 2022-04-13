@@ -39,8 +39,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-import static org.simbrain.network.core.NetworkKt.connect;
-import static org.simbrain.network.core.NetworkKt.connectAllToAll;
+import static org.simbrain.network.core.NetworkUtilsKt.connect;
+import static org.simbrain.network.core.NetworkUtilsKt.connectAllToAll;
 
 /**
  * Class to build RL Simulation.

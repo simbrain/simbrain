@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
+
 import org.simbrain.network.core.activations
 import org.simbrain.network.core.auxValues
 import org.simbrain.network.core.connectAllToAll

@@ -10,7 +10,7 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.simbrain.network.core.NetworkKt.connect;
+import static org.simbrain.network.core.NetworkUtilsKt.connect;
 
 /**
  * A custom class that makes it easy to add Braitenberg vehicles to a

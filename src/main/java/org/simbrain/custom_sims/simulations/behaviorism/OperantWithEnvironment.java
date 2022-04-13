@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.simbrain.network.core.NetworkKt.connectAllToAll;
+import static org.simbrain.network.core.NetworkUtilsKt.connectAllToAll;
+import static org.simbrain.network.core.NetworkUtilsKt.getLooseSynapse;
+
 
 /**
  * Simulation to demonstrate classical and operant conditioning.
@@ -263,7 +265,7 @@ public class OperantWithEnvironment extends Simulation {
         // If there are inputs, update weights
         if(totalActivation > .1) {
             Neuron src = WinnerTakeAll.getWinner(stimulusNet.getNeuronList(), true);
-            Synapse s_r = NetworkKt.getLooseSynapse(src,winner);
+            Synapse s_r = getLooseSynapse(src,winner);
             // Strengthen or weaken active S-R Pair
             s_r.setStrength(s_r.getStrength() + valence);
 

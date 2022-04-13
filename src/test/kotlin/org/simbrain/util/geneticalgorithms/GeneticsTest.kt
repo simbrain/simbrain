@@ -6,6 +6,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.activations
+
 import org.simbrain.workspace.Workspace
 
 class GeneticsTest {

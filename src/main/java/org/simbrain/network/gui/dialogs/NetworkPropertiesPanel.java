@@ -35,6 +35,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import static org.simbrain.network.core.NetworkUtilsKt.getSynapseVisibilityThreshold;
+import static org.simbrain.network.core.NetworkUtilsKt.setSynapseVisibilityThreshold;
+
 /**
  * <b>NetworkPropertiesPanel</b> is a panel for setting the properties of the
  * neural network, mainly the GUI. If the user presses ok, values become default
@@ -320,7 +323,7 @@ public class NetworkPropertiesPanel extends JPanel {
         timeStepField.setText(Double.toString(networkPanel.getNetwork().getTimeStep()));
         iterUpdateField.setText(Integer.toString(networkPanel.getNetwork().getUpdateFreq()));
         nudgeAmountField.setText(Double.toString(networkPanel.getNudgeAmount()));
-        tfSynapseVisibilityThreshold.setText(Integer.toString(NetworkKt.getSynapseVisibilityThreshold()));
+        tfSynapseVisibilityThreshold.setText(Integer.toString(getSynapseVisibilityThreshold()));
     }
 
     /**
@@ -333,7 +336,7 @@ public class NetworkPropertiesPanel extends JPanel {
         upF = upF < 1 ? 1 : upF;
         networkPanel.getNetwork().setUpdateFreq(upF);
         networkPanel.setNudgeAmount(Double.parseDouble(nudgeAmountField.getText()));
-        NetworkKt.setSynapseVisibilityThreshold(Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
+        setSynapseVisibilityThreshold(Integer.parseInt(tfSynapseVisibilityThreshold.getText()));
         EditMode.setWandRadius(Integer.parseInt(wandRadiusField.getText()));
         if (networkPanel.getEditMode().isWand()) {
             networkPanel.getEditMode().resetWandCursor();

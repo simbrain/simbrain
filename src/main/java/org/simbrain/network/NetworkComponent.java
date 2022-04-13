@@ -29,7 +29,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.simbrain.network.core.NetworkKt.getNetworkXStream;
+import static org.simbrain.network.core.NetworkUtilsKt.getNetworkXStream;
 
 /**
  * Network component.

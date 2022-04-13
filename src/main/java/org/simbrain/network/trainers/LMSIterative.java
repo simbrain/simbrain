@@ -25,6 +25,8 @@ import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
 
 import java.util.List;
 
+import static org.simbrain.network.core.NetworkUtilsKt.updateNeurons;
+
 /**
  * Train loose neurons using least mean squares. Assumes they are connected.
  *
@@ -128,7 +130,7 @@ public class LMSIterative extends IterableTrainer {
             }
 
             // Update output node
-            NetworkKt.updateNeurons(outputs);
+            updateNeurons(outputs);
 
             // Iterate through weights and biases and update them
             for (int i = 0; i < numOutputs; i++) {

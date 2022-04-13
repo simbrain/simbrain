@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.simbrain.network.core.NetworkKt.connectAllToAll;
+import static org.simbrain.network.core.NetworkUtilsKt.connectAllToAll;
 
 /**
  * Create images and data used in this paper

@@ -15,6 +15,10 @@ import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.MatrixConverter
 import org.simbrain.util.SimbrainPreferences
 import org.simbrain.util.Utils
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.util.stats.distributions.UniformIntegerDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 /**
  * If a subnetwork or synapse group has more than this many synapses, then the initial synapse visibility flag is
@@ -197,9 +201,26 @@ fun connectAllToAll(source: NeuronGroup, target: Neuron, value: Double): List<Sy
 }
 
 fun Network.createNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {
-    val neurons =  (0 until numNeurons).map {
+    val neurons = (0 until numNeurons).map {
         Neuron(this).apply(template)
     }
     addNetworkModels(neurons)
     return neurons
+}
+
+/**
+ * Convenience methods to set parameters for inhibitory methods in a prob. dist
+ */
+fun ProbabilityDistribution.useInhibitoryParams() {
+    when(this) {
+        is UniformRealDistribution -> {
+            ceil = 0.0
+            floor = -1.0
+        }
+        is NormalDistribution ->   mean = -1.0
+        is UniformIntegerDistribution -> {
+            ceil = 0
+            floor = -1
+        }
+    }
 }

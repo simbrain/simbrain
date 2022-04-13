@@ -10,7 +10,7 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
     @UserParameter(
         label = "Mean (\u03BC)",
         description = "The expected value or center of the distribution.",
-        order = 1
+        increment = .1, order = 1
     )
     var mean: Double = mean
         set(value) {
@@ -18,7 +18,10 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
             dist = org.apache.commons.math3.distribution.NormalDistribution(randomGenerator, value, standardDeviation)
         }
 
-    @UserParameter(label = "Std. Dev. (\u03C3)", description = "The average squared distance from the mean.", order = 2)
+    @UserParameter(
+        label = "Std. Dev. (\u03C3)",
+        description = "The average squared distance from the mean.",
+        increment = .1, order = 2)
     var standardDeviation: Double = standardDeviation
         set(value) {
             field = value

@@ -19,15 +19,14 @@
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.connections.RadialProbabilistic
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.ObjectTypeEditor
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.ProbabilityDistribution.Randomizer
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -51,16 +50,6 @@ import javax.swing.*
 class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
 
     /**
-     * Random source for randomizing inhibitory synapses.
-     */
-    private val inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.9)
-
-    /**
-     * Random source for randomizing excitatory synapses.
-     */
-    private val excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0)
-
-    /**
      * A collection of the selected synaptic weights, such that the first row
      * represents excitatory weights and the 2nd row represents inhibitory
      * weights. All inhibitory weights are stored as their absolute value. Note
@@ -69,10 +58,14 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
      */
     private val weights = arrayOfNulls<DoubleArray>(2)
 
-    private val chooseRandomizer = Randomizer() // To select current randomzier
-    private val chooseRandomizerPanel = AnnotatedPropertyEditor(chooseRandomizer)
+    private val allRandomizer = Randomizer(UniformRealDistribution(-1.0, 1.0))
+    private val allPanel = AnnotatedPropertyEditor(allRandomizer)
+    private val excitatoryRandomizer = Randomizer(UniformRealDistribution(0.0, 1.0))
     private val excitatoryPanel = AnnotatedPropertyEditor(excitatoryRandomizer)
+    private val inhibitoryRandomizer = Randomizer(UniformRealDistribution(-1.0, 0.0))
     private val inhibitoryPanel = AnnotatedPropertyEditor(inhibitoryRandomizer)
+
+    private var chooseRandomizerPanel = JPanel()
     private val randomizeButton = JButton("Apply")
 
     private val perturber: ProbabilityDistribution = UniformRealDistribution()
@@ -120,6 +113,11 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         perturberRandomizer.probabilityDistribution = perturber
         histogramPanel.setxAxisName("Synapse Strength")
         histogramPanel.setyAxisName("# of Synapses")
+
+        (inhibitoryPanel.widgets.first().component as ObjectTypeEditor).dropDown.addActionListener {
+            inhibitoryRandomizer.probabilityDistribution.useInhibitoryParams()
+            inhibitoryPanel.fillFieldValues()
+        }
 
         layout = GridBagLayout()
         val synTypePanel = JPanel().apply {
@@ -205,6 +203,7 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         updateStats()
         updateHistogram()
         addActionListeners()
+        initRandomizerPanel()
     }
 
     /**
@@ -214,7 +213,7 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
      */
     fun addActionListeners() {
         perturbButton.addActionListener {
-            chooseRandomizerPanel.commitChanges()
+//            chooseRandomizerPanel.commitChanges(
             val view = synTypeSelector.selectedItem as SynapseView
             for (synapse in synapses) {
                 if (view.synapseIsAdjustable(synapse)) {
@@ -224,34 +223,17 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             fullUpdate()
         }
         randomizeButton.addActionListener {
-            chooseRandomizerPanel.commitChanges()
+//            chooseRandomizerPanel.commitChanges()
             val view = synTypeSelector.selectedItem as SynapseView
-            // Set the randomizer
-            // TODO: Deal with changes in polarity...or at leat allow non polar randomization
             when (view) {
-                SynapseView.ALL -> {
-                    excitatoryPanel.commitChanges()
-                    inhibitoryPanel.commitChanges()
-                }
-                SynapseView.OVERLAY -> {
-                    excitatoryPanel.commitChanges()
-                    inhibitoryPanel.commitChanges()
-                }
+                SynapseView.ALL, SynapseView.OVERLAY -> { allPanel.commitChanges() }
                 SynapseView.INHIBITORY -> inhibitoryPanel.commitChanges()
                 SynapseView.EXCITATORY -> excitatoryPanel.commitChanges()
             }
             // Randomize synapses appropriately
             synapses.filter { s -> view.synapseIsAdjustable(s) }.forEach { s ->
                 when (view) {
-                    SynapseView.ALL -> s.forceSetStrength(chooseRandomizer.sampleDouble())
-                    SynapseView.OVERLAY -> {
-                        if (SynapseView.INHIBITORY.synapseIsAdjustable(s)) {
-                            s.forceSetStrength(inhibitoryRandomizer.sampleDouble())
-                        }
-                        if (SynapseView.EXCITATORY.synapseIsAdjustable(s)) {
-                            s.forceSetStrength(excitatoryRandomizer.sampleDouble())
-                        }
-                    }
+                    SynapseView.ALL, SynapseView.OVERLAY  -> s.forceSetStrength(allRandomizer.sampleDouble())
                     SynapseView.EXCITATORY -> s.forceSetStrength(excitatoryRandomizer.sampleDouble())
                     SynapseView.INHIBITORY -> s.forceSetStrength(inhibitoryRandomizer.sampleDouble())
                 }
@@ -261,25 +243,29 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         }
         // Show stats and histogram only for selected type(s)...
         synTypeSelector.addActionListener {
-            updateHistogram()
-            updateStats()
+            initRandomizerPanel()
+        }
+    }
+
+    private fun initRandomizerPanel() {
+        updateHistogram()
+        updateStats()
+        if(parent!= null) {
             parent.revalidate()
             parent.repaint()
-            when (synTypeSelector.selectedItem as SynapseView) {
-                SynapseView.ALL -> {
-                    excitatoryPanel.fillFieldValues()
-                    inhibitoryPanel.fillFieldValues()
-                }
-                SynapseView.OVERLAY -> {
-                    excitatoryPanel.fillFieldValues()
-                    inhibitoryPanel.fillFieldValues()
-                }
-                SynapseView.INHIBITORY -> {
-                    inhibitoryPanel.fillFieldValues()
-                }
-                SynapseView.EXCITATORY -> {
-                    excitatoryPanel.fillFieldValues()
-                }
+        }
+        when (synTypeSelector.selectedItem as SynapseView) {
+            SynapseView.ALL, SynapseView.OVERLAY -> {
+                chooseRandomizerPanel.removeAll()
+                chooseRandomizerPanel.add(allPanel)
+            }
+            SynapseView.INHIBITORY -> {
+                chooseRandomizerPanel.removeAll()
+                chooseRandomizerPanel.add(inhibitoryPanel)
+            }
+            SynapseView.EXCITATORY -> {
+                chooseRandomizerPanel.removeAll()
+                chooseRandomizerPanel.add(excitatoryPanel)
             }
         }
     }
@@ -292,8 +278,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         var exWeights = 0
         var inWeights = 0
 
-        // TODO: Get rid of this... replace with separate arraylists that
-        // are preallocated. It should actually be more efficient.
 
         // Inefficient but necessary due to lack of support for collections of
         // primitive types.

@@ -117,6 +117,10 @@ public class NumericWidget extends JPanel {
         return spinner.getValue();
     }
 
+    public boolean isNull() {
+        return spinner.getValue() == null;
+    }
+
     public void setValue(Object value) {
         spinner.setValue(value);
     }

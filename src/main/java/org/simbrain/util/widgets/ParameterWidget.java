@@ -342,7 +342,7 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         } else if (parameter.isString()) {
             return ((TextWithNull) component).isNull() ? null : ((TextWithNull) component).getText();
         } else if (parameter.isNumeric()) {
-            return ((NumericWidget) component).getValue();
+            return ((NumericWidget) component).isNull() ? null : ((NumericWidget) component).getValue();
         } else if (parameter.isBoolean()) {
             return ((YesNoNull) component).isNull() ? null : ((YesNoNull) component).isSelected();
         } else if (parameter.isColor()) {

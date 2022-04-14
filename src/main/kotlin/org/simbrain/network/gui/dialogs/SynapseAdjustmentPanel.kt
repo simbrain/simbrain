@@ -19,10 +19,14 @@
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.connections.RadialProbabilistic
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.useInhibitoryParams
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.LabelledItemPanel
+import org.simbrain.util.complement
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -38,16 +42,12 @@ import java.util.*
 import javax.swing.*
 
 /**
- * Panel for editing collections of synapses.
- *
- * TODO: In need of some optimizations eventually... possibly after 3.0. Suggestions for this: Don't allow polarity
- * shifts and keep separate lists of excitatory/inhibitory synapses, also allow to preview and keep values in
- * numerical array and THEN change synapse strengths.
+ * Panel for editing collections of synapses. Randomizing, perturbing, scaling, and pruning.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
+class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
 
     /**
      * A collection of the selected synaptic weights, such that the first row
@@ -68,8 +68,8 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
     private var chooseRandomizerPanel = JPanel()
     private val randomizeButton = JButton("Apply")
 
-    private val perturber: ProbabilityDistribution = UniformRealDistribution()
-    private val perturberRandomizer = Randomizer()
+    private val perturber: ProbabilityDistribution = UniformRealDistribution(0.0,.01)
+    private val perturberRandomizer = Randomizer(perturber)
     private val perturberPanel = AnnotatedPropertyEditor(perturberRandomizer)
     private val perturbButton = JButton("Apply")
 
@@ -110,7 +110,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         // Extract weight values in usable form by internal methods
         extractWeightValues(synapses)
 
-        perturberRandomizer.probabilityDistribution = perturber
         histogramPanel.setxAxisName("Synapse Strength")
         histogramPanel.setyAxisName("# of Synapses")
 
@@ -177,6 +176,7 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             anchor = GridBagConstraints.CENTER
         }
         randTab.add(chooseRandomizerPanel, c)
+        // TODO: Use ObjecTypeEditor.createEditor to set label to "perturber"
         perturbTab.add(perturberPanel, c)
         scalerTab.add(SynapseScalerPanel(), c)
         prunerTab.add(PrunerPanel(), c)
@@ -212,28 +212,18 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
      * combo box.
      */
     fun addActionListeners() {
-        perturbButton.addActionListener {
-//            chooseRandomizerPanel.commitChanges(
-            val view = synTypeSelector.selectedItem as SynapseView
-            for (synapse in synapses) {
-                if (view.synapseIsAdjustable(synapse)) {
-                    synapse.forceSetStrength(synapse.strength + perturber.sampleDouble())
-                }
-            }
-            fullUpdate()
-        }
         randomizeButton.addActionListener {
-//            chooseRandomizerPanel.commitChanges()
             val view = synTypeSelector.selectedItem as SynapseView
             when (view) {
-                SynapseView.ALL, SynapseView.OVERLAY -> { allPanel.commitChanges() }
+                SynapseView.ALL, SynapseView.OVERLAY -> {
+                    allPanel.commitChanges()
+                }
                 SynapseView.INHIBITORY -> inhibitoryPanel.commitChanges()
                 SynapseView.EXCITATORY -> excitatoryPanel.commitChanges()
             }
-            // Randomize synapses appropriately
             synapses.filter { s -> view.synapseIsAdjustable(s) }.forEach { s ->
                 when (view) {
-                    SynapseView.ALL, SynapseView.OVERLAY  -> s.forceSetStrength(allRandomizer.sampleDouble())
+                    SynapseView.ALL, SynapseView.OVERLAY -> s.forceSetStrength(allRandomizer.sampleDouble())
                     SynapseView.EXCITATORY -> s.forceSetStrength(excitatoryRandomizer.sampleDouble())
                     SynapseView.INHIBITORY -> s.forceSetStrength(inhibitoryRandomizer.sampleDouble())
                 }
@@ -245,12 +235,22 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         synTypeSelector.addActionListener {
             initRandomizerPanel()
         }
+        perturbButton.addActionListener {
+            perturberPanel.commitChanges()
+            val view = synTypeSelector.selectedItem as SynapseView
+            for (synapse in synapses) {
+                if (view.synapseIsAdjustable(synapse)) {
+                    synapse.forceSetStrength(synapse.strength + perturber.sampleDouble())
+                }
+            }
+            fullUpdate()
+        }
     }
 
     private fun initRandomizerPanel() {
         updateHistogram()
         updateStats()
-        if(parent!= null) {
+        if (parent != null) {
             parent.revalidate()
             parent.repaint()
         }
@@ -278,7 +278,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         var exWeights = 0
         var inWeights = 0
 
-
         // Inefficient but necessary due to lack of support for collections of
         // primitive types.
         for (s in synapses) {
@@ -294,9 +293,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
         exWeights = 0
         inWeights = 0
         if (weights[0]!!.isNotEmpty()) {
-            // Inefficient but necessary due to lack of support for collections
-            // of
-            // primitive types.
             for (s in synapses) {
                 val w = s.strength
                 if (w > 0) {
@@ -327,66 +323,52 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
      * Histogram must be initialized prior to invocation. Red is used to
      * represent excitatory values, blue is used for inhibitory.
      */
-    fun updateHistogram() {
+    private fun updateHistogram() {
         val data: MutableList<DoubleArray?> = ArrayList()
         val names: MutableList<String> = ArrayList()
         when (synTypeSelector.selectedItem as SynapseView) {
             SynapseView.ALL -> {
-                run {
-
-                    // Send the histogram the excitatory and absolute inhibitory
-                    // synapse values as separate data series.
-                    val hist1 = weights[0]
-                    val hist2 = weights[1]
-                    // The names of both series
-                    names.add(SynapseView.EXCITATORY.toString())
-                    names.add(SynapseView.INHIBITORY.toString())
-                    data.add(hist1)
-                    data.add(hist2)
-                }
+                // Send the histogram the excitatory and absolute inhibitory
+                // synapse values as separate data series.
+                val hist1 = weights[0]
+                val hist2 = weights[1]
+                // The names of both series
+                names.add(SynapseView.EXCITATORY.toString())
+                names.add(SynapseView.INHIBITORY.toString())
+                data.add(hist1)
+                data.add(hist2)
             }
             SynapseView.OVERLAY -> {
-                run {
 
-                    // Send the histogram the excitatory and absolute inhibitory
-                    // synapse values as separate data series.
-                    val hist1 = weights[0]
-                    val hist2 = DoubleArray(weights[1]!!.size)
-                    var i = 0
-                    val n = hist2.size
-                    while (i < n) {
-                        hist2[i] = Math.abs(weights[1]!![i])
-                        i++
-                    }
-                    // The names of both series
-                    names.add(SynapseView.EXCITATORY.toString())
-                    names.add(SynapseView.INHIBITORY.toString())
-                    data.add(hist1)
-                    data.add(hist2)
+                // Send the histogram the excitatory and absolute inhibitory
+                // synapse values as separate data series.
+                val hist1 = weights[0]
+                val hist2 = DoubleArray(weights[1]!!.size)
+                var i = 0
+                val n = hist2.size
+                while (i < n) {
+                    hist2[i] = Math.abs(weights[1]!![i])
+                    i++
                 }
+                // The names of both series
+                names.add(SynapseView.EXCITATORY.toString())
+                names.add(SynapseView.INHIBITORY.toString())
+                data.add(hist1)
+                data.add(hist2)
             }
             SynapseView.EXCITATORY -> {
-                run {
-
-                    // Send the histogram only excitatory weights as a single series
-                    val hist = weights[0]
-                    // Name the series
-                    names.add(SynapseView.EXCITATORY.toString())
-                    data.add(hist)
-                }
+                // Send the histogram only excitatory weights as a single series
+                val hist = weights[0]
+                // Name the series
+                names.add(SynapseView.EXCITATORY.toString())
+                data.add(hist)
             }
             SynapseView.INHIBITORY -> {
-                run {
-
-                    // Send the histogram only inhibitory weights as a single series
-                    val hist = weights[1]
-                    // Name the series
-                    names.add(SynapseView.INHIBITORY.toString())
-                    data.add(hist)
-                }
-            }
-            else -> {
-                throw IllegalArgumentException("Invalid Synapse" + " Selection.")
+                // Send the histogram only inhibitory weights as a single series
+                val hist = weights[1]
+                // Name the series
+                names.add(SynapseView.INHIBITORY.toString())
+                data.add(hist)
             }
         }
 
@@ -549,13 +531,11 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
     }
 
     /**
-     * Panel for pruning synapses.
+     * Panel for pruning synapses. If synapse strength above absolute value of the threshold,
+     * prune the synapse when the prune button is pressed.
      */
     inner class PrunerPanel() : LabelledItemPanel() {
-        /**
-         * Threshold. If synapse strength above absolute value of this value
-         * prune the synapse when the prune button is pressed.
-         */
+
         private val tfThreshold = JTextField(".1")
 
         init {
@@ -565,14 +545,16 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             pruneButton.addActionListener {
                 val threshold = tfThreshold.text.toDouble()
                 val view = synTypeSelector.selectedItem as SynapseView
-                for (synapse in synapses) {
-                    if (view.synapseIsAdjustable(synapse)) {
-                        if (Math.abs(synapse.strength) < threshold) {
-                            synapse.delete()
-                        }
-                    }
-                }
+                val toDelete = synapses.filter { view.synapseIsAdjustable(it) }
+                    .filter {Math.abs(it.strength) < threshold}
+
+                // Update the internal panel and data
+                synapses = (toDelete complement synapses).rightComp.toList()
+                extractWeightValues(synapses)
                 fullUpdate()
+
+                // Delete from the network itself
+                toDelete.forEach { it.delete() }
             }
         }
     }
@@ -582,7 +564,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             override fun toString(): String {
                 return "All"
             }
-
             override fun synapseIsAdjustable(s: Synapse): Boolean {
                 return true
             }
@@ -591,7 +572,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             override fun toString(): String {
                 return "Overlay"
             }
-
             override fun synapseIsAdjustable(s: Synapse): Boolean {
                 return true
             }
@@ -600,7 +580,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             override fun toString(): String {
                 return "Excitatory"
             }
-
             override fun synapseIsAdjustable(s: Synapse): Boolean {
                 return s.strength >= 0
             }
@@ -609,7 +588,6 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
             override fun toString(): String {
                 return "Inhibitory"
             }
-
             override fun synapseIsAdjustable(s: Synapse): Boolean {
                 return s.strength < 0
             }
@@ -622,8 +600,10 @@ class SynapseAdjustmentPanel(val synapses: List<Synapse>) : JPanel() {
 fun createSynapseAdjustmentPanel(synapses: List<Synapse>): SynapseAdjustmentPanel? {
     val sap = SynapseAdjustmentPanel(synapses)
     if (synapses.isEmpty()) {
-        JOptionPane.showMessageDialog(null, "No synapses to display", "Warning",
-            JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(
+            null, "No synapses to display", "Warning",
+            JOptionPane.WARNING_MESSAGE
+        );
         return null
     }
     return sap

@@ -15,6 +15,7 @@ import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.MatrixConverter
 import org.simbrain.util.SimbrainPreferences
 import org.simbrain.util.Utils
+import org.simbrain.util.math.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
@@ -223,4 +224,12 @@ fun ProbabilityDistribution.useInhibitoryParams() {
             floor = -1
         }
     }
+}
+
+fun List<Synapse>.decayStrengthBasedOnLength(decay: DecayFunction) {
+    forEach{ it.decayStrengthBasedOnLength(decay) }
+}
+
+fun Synapse.decayStrengthBasedOnLength(decay: DecayFunction) {
+    strength *= decay.getScalingFactor(length)
 }

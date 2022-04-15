@@ -49,6 +49,9 @@ import javax.swing.*
  */
 class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
 
+    // TODO: Some of the logical operations here could be moved to utility classes or Network.kt
+    // and called from here
+
     /**
      * A collection of the selected synaptic weights, such that the first row
      * represents excitatory weights and the 2nd row represents inhibitory
@@ -68,7 +71,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
     private var chooseRandomizerPanel = JPanel()
     private val randomizeButton = JButton("Apply")
 
-    private val perturber: ProbabilityDistribution = UniformRealDistribution(0.0,.01)
+    private val perturber: ProbabilityDistribution = UniformRealDistribution(-0.1,.01)
     private val perturberRandomizer = Randomizer(perturber)
     private val perturberPanel = AnnotatedPropertyEditor(perturberRandomizer)
     private val perturbButton = JButton("Apply")

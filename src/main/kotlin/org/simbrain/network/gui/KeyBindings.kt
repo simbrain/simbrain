@@ -1,11 +1,14 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.LocatableModel
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.decayStrengthBasedOnLength
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.util.*
+import org.simbrain.util.math.DecayFunctions.LinearDecayFunction
 import java.awt.event.KeyEvent.*
 
 /**
@@ -38,6 +41,11 @@ fun NetworkPanel.addKeyBindings() {
         selectionManager.filterSelectedModels<WeightMatrix>().forEach {
             it.diagonalize()
         }
+    }
+    // Temporary for testing until a proper GUI is made
+    bind(Ctrl + 'L') {
+        selectionManager.filterSelectedModels<Synapse>().decayStrengthBasedOnLength(
+        LinearDecayFunction().also { it.dispersion = 240.0 })
     }
     bind(Ctrl + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }

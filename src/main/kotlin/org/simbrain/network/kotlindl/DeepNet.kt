@@ -58,7 +58,7 @@ class DeepNet(
      * Float representation of [doubleInputs].
      */
     val floatInputs: FloatArray
-        get() = toFloatArray(doubleInputs)
+        get() = doubleInputs.toFloatArray()
 
     /**
      * Outputs as double array for use with couplings.
@@ -163,7 +163,7 @@ class DeepNet(
             if (outputProbabilities) {
                 // Softmax case
                 val predictions = deepNetLayers.predictSoftly(floatInputs)
-                outputs = Matrix(toDoubleArray(predictions))
+                outputs = Matrix(predictions.toDoubleArray())
                 // TODO: Below _should_ use predictSoftlyAndGetActivations, but that is not currently exposed in
                 //  kotlindl
                 val test = deepNetLayers.predictAndGetActivations(floatInputs)

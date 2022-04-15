@@ -40,7 +40,7 @@ public final class PropertyTabAction extends AbstractAction {
      */
     public PropertyTabAction(SimbrainDesktop desktop) {
         super("Property Tabs");
-        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Properties.png"));
+        putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/systemMonitor.png"));
         this.desktop = desktop;
     }
 

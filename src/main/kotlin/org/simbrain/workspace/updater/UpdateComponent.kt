@@ -10,7 +10,7 @@ import org.simbrain.workspace.WorkspaceComponent
 class UpdateComponent(
     val component: WorkspaceComponent
 ) : UpdateAction("Update ${component.name}") {
-    override suspend operator fun invoke() {
+    override suspend fun run() {
         component.update()
     }
 }

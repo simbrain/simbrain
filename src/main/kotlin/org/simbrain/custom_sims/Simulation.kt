@@ -130,7 +130,7 @@ fun SimbrainDesktop.createControlPanel(name: String, x: Int, y: Int, config: Con
 
 fun updateAction(description: String, longDescription: String = description, action: () -> Unit)
         = object : UpdateAction(description, longDescription) {
-    override suspend fun invoke() {
+    override suspend fun run() {
         action()
     }
 }

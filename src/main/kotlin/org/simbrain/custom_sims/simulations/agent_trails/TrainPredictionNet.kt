@@ -17,7 +17,7 @@ class TrainPredictionNet(var sim: AgentTrails) : UpdateAction("Custom Learning R
         lastPrediction = sim.predictionNet.activations
     }
 
-    override suspend operator fun invoke() {
+    override suspend fun run() {
         mainUpdateMethod()
     }
 

@@ -175,7 +175,7 @@ val isopodSim = newSim {
                 var iteration = 0
                 trialData.clear()
                 while (++iteration < 1000 && !fishCollision) {
-                    workspace.iterate()
+                    workspace.simpleIterate()
                 }
                 fishCollision = false
                 // println("TrialData: ${trialData}")

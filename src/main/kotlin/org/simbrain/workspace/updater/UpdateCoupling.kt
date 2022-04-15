@@ -8,7 +8,7 @@ import org.simbrain.workspace.couplings.Coupling
  * @author jyoshimi
  */
 class UpdateCoupling(@field:Transient val coupling: Coupling) : UpdateAction("Update coupling (${coupling.producer}>${coupling.consumer})") {
-    override suspend operator fun invoke() {
+    override suspend fun run() {
         coupling.update()
     }
 }

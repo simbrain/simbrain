@@ -1,16 +1,21 @@
 package org.simbrain.workspace
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
 import org.simbrain.util.SimbrainPreferences
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceEvents
 import org.simbrain.workspace.serialization.WorkspaceSerializer
+import org.simbrain.workspace.updater.PerformanceMonitor
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.workspace.updater.WorkspaceUpdater
+import org.simbrain.workspace.updater.updateAction
 import java.io.*
 import java.util.*
 
@@ -108,6 +113,12 @@ class Workspace @JvmOverloads constructor(@Transient val coroutineScope: Corouti
     @Transient
     val updater = WorkspaceUpdater(this)
 
+    init {
+        coroutineScope.launch(Dispatchers.Swing) {
+            PerformanceMonitor.flow.collectLatest {  }
+        }
+    }
+
     /**
      * Adds a workspace component to the workspace.
      *
@@ -199,7 +210,9 @@ class Workspace @JvmOverloads constructor(@Transient val coroutineScope: Corouti
         for (wc in componentList) {
             wc.start()
         }
-        updater.runOnce()
+        coroutineScope.launch {
+            updater.runOnce()
+        }
         stop()
     }
 
@@ -218,7 +231,9 @@ class Workspace @JvmOverloads constructor(@Transient val coroutineScope: Corouti
         for (wc in componentList) {
             wc.start()
         }
-        updater.iterate(numIterations)
+        coroutineScope.launch {
+            updater.iterate(numIterations)
+        }
         stop()
     }
 
@@ -227,7 +242,7 @@ class Workspace @JvmOverloads constructor(@Transient val coroutineScope: Corouti
      * in a single thread.
      */
     fun simpleIterate() {
-        updater.runOnce()
+        updater.runBlocking()
     }
 
     /**
@@ -456,6 +471,14 @@ class Workspace @JvmOverloads constructor(@Transient val coroutineScope: Corouti
      */
     fun addUpdateAction(action: UpdateAction?) {
         updater.updateManager.addAction(action)
+    }
+
+    fun addUpdateAction(description: String, longDescription: String = description, action: suspend () -> Unit) {
+        updater.updateManager.addAction(updateAction(description, longDescription, action))
+    }
+
+    fun addNonRemovalAction(description: String, longDescription: String = description, action: suspend () -> Unit) {
+        updater.updateManager.addNonRemovalAction(updateAction(description, longDescription, action))
     }
 
     /**

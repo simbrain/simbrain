@@ -34,7 +34,7 @@ class RL_Update(var sim: ActorCritic) : UpdateAction("Custom TD Rule") {
     /**
      * Custom update of the network, including application of TD Rules.
      */
-    override suspend operator fun invoke() {
+    override suspend fun run() {
 
         // Update neurons and networks
         sim.sensorNeurons.update()

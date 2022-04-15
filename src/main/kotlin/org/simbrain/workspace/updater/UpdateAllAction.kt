@@ -13,10 +13,16 @@ import org.pmw.tinylog.Logger
  */
 class UpdateAllAction(val updater: WorkspaceUpdater) : UpdateAction(description = "Update All Components and Couplings") {
 
-    override suspend operator fun invoke(): Unit = coroutineScope {
+    override suspend fun run(): Unit = coroutineScope {
         val components = updater.components
         updateCouplings()
-        components.map { async { it.update() } }.awaitAll()
+        components.map {
+            async {
+               PerformanceMonitor.record("Updating Component ${it.name}") {
+                   it.update()
+               }
+            }
+        }.awaitAll()
     }
 
     /**

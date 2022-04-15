@@ -21,7 +21,7 @@ class TrainPredictionNet(
     init {
         lastPrediction = sim.predictionRes.activations
     }
-    override suspend operator fun invoke() {
+    override suspend fun run() {
         mainUpdateMethod()
     }
 

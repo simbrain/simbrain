@@ -86,7 +86,7 @@ class RL_Update(
     /**
      * Custom update of the network, including application of TD Rules.
      */
-    override suspend operator fun invoke() {
+    override suspend fun run() {
 
         // Update input nodes
         sim.leftInputs.update()

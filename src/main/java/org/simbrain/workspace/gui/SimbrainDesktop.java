@@ -39,6 +39,7 @@ import org.simbrain.util.widgets.ToggleButton;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
+import org.simbrain.workspace.updater.PerformanceMonitor;
 import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 import javax.swing.*;
@@ -1188,9 +1189,11 @@ public class SimbrainDesktop {
         if (dockVisible) {
             dockVisible = false;
             horizontalSplitter.getBottomComponent().setVisible(false);
+            PerformanceMonitor.INSTANCE.setEnabled(false);
         } else {
             dockVisible = true;
             horizontalSplitter.getBottomComponent().setVisible(true);
+            PerformanceMonitor.INSTANCE.setEnabled(true);
             horizontalSplitter.setDividerLocation(getDividerLocation());
         }
 
@@ -1210,11 +1213,7 @@ public class SimbrainDesktop {
 
         String text = String.format("Timestep: %s (%sHz)", timestep, updateRate);
         timeLabel.setText(text);
-        if (workspace.getUpdater().isRunning()) {
-            runningLabel.setVisible(true);
-        } else {
-            runningLabel.setVisible(false);
-        }
+        runningLabel.setVisible(workspace.getUpdater().isRunning());
     }
 
     /**

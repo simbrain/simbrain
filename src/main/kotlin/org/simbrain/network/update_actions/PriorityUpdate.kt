@@ -11,7 +11,7 @@ import org.simbrain.workspace.updater.UpdateAction
  * @author jyoshimi
  */
 class PriorityUpdate(private val network: Network): UpdateAction("Loose neurons (priority) and synapses", "Priority update of loose items") {
-    override suspend fun invoke() {
+    override suspend fun run() {
         network.updateNeuronsByPriority()
         network.updateAllButNeurons()
     }

@@ -12,7 +12,7 @@ class UpdateNetworkModel(private val networkModel: NetworkModel) : UpdateAction(
     networkModel.label,
     "Update ${networkModel.label}"
 ) {
-    override suspend operator fun invoke() {
+    override suspend fun run() {
         networkModel.update()
     }
 }

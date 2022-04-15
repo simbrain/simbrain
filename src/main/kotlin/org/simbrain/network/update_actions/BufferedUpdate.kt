@@ -10,7 +10,7 @@ import org.simbrain.workspace.updater.UpdateAction
  * @author jyoshimi
  */
 class BufferedUpdate(private val network: Network) : UpdateAction("Loose neurons (buffered) and synapses", "Buffered update of loose items") {
-    override suspend operator fun invoke() {
+    override suspend fun run() {
         network.asyncBufferedUpdate()
     }
 }

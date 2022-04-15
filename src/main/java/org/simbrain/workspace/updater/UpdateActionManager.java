@@ -65,6 +65,8 @@ public class UpdateActionManager {
         public void actionOrderChanged();
     }
 
+    private final ArrayList<UpdateAction> nonRemovableActions = new ArrayList<>();
+
     /**
      * The list of update actions, in a specific order. One run through these
      * actions constitutes a single iteration of the workspace.
@@ -164,6 +166,10 @@ public class UpdateActionManager {
         return actionList;
     }
 
+    public List<UpdateAction> getNonRemovableActions() {
+        return nonRemovableActions;
+    }
+
     /**
      * Swap elements at the specified location.
      *
@@ -184,6 +190,13 @@ public class UpdateActionManager {
      */
     public void addAction(UpdateAction action) {
         actionList.add(action);
+        for (UpdateManagerListener listener : listeners) {
+            listener.actionAdded(action);
+        }
+    }
+
+    public void addNonRemovalAction(UpdateAction action) {
+        nonRemovableActions.add(action);
         for (UpdateManagerListener listener : listeners) {
             listener.actionAdded(action);
         }

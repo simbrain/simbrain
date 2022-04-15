@@ -20,6 +20,7 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.workspace.updater.PerformanceMonitor
 import org.simbrain.workspace.updater.UpdateAction
 import java.awt.geom.Point2D
 import java.util.concurrent.atomic.AtomicBoolean
@@ -145,7 +146,7 @@ class Network {
     /**
      * An optional name for the network that defaults to "Network[current_id]".
      */
-    val name: String = "Network$current_id"
+    var name: String = "Network$current_id"
 
     /**
      * A counter for the total number of iterations run by this network.
@@ -199,7 +200,9 @@ class Network {
         // Main update
         updateManager.actionList.forEach {
             runBlocking {
-                it()
+                PerformanceMonitor.record(it, "${this@Network.name}:${it.description}") {
+                    it.run()
+                }
             }
         }
 

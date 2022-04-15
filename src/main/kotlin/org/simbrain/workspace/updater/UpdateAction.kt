@@ -22,12 +22,12 @@ abstract class UpdateAction(
     open val longDescription: String? = description
 
 ) {
-    abstract suspend operator fun invoke()
+    abstract suspend fun run()
 }
 
-inline fun updateAction(description: String? = null, longDescription: String? = description, crossinline action: () -> Unit): UpdateAction {
+inline fun updateAction(description: String? = null, longDescription: String? = description, crossinline action: suspend () -> Unit): UpdateAction {
     return object : UpdateAction(description, longDescription) {
-        override suspend fun invoke() {
+        override suspend fun run() {
             action()
         }
     }
@@ -36,8 +36,12 @@ inline fun updateAction(description: String? = null, longDescription: String? = 
 @JvmOverloads
 fun create(description: String? = null, longDescription: String? = description, action: Runnable): UpdateAction {
     return object : UpdateAction(description, longDescription) {
-        override suspend fun invoke() {
+        override suspend fun run() {
             action.run()
         }
     }
+}
+
+suspend operator fun UpdateAction.invoke() {
+    run()
 }

@@ -29,31 +29,10 @@ import java.util.function.Consumer
  */
 class WorkspaceUpdater(val workspace: Workspace) {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    var numThreads: Int = Runtime.getRuntime().availableProcessors()
-        set(value) {
-            if (isRunning) {
-                stop()
-            }
-            field = value
-            dispatcher = Dispatchers.Default.limitedParallelism(value)
-            for (listener in updaterListeners) {
-                listener.changeNumThreads()
-            }
-        }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    var dispatcher = Dispatchers.Default.limitedParallelism(numThreads)
-
     /**
      * The executor service for notifying listeners.
      */
     private val notificationEvents = Executors.newSingleThreadExecutor()
-
-    /**
-     * Component listeners.
-     */
-    private val componentListeners: MutableList<UpdateEventListener> = CopyOnWriteArrayList()
 
     /**
      * Updater listeners.
@@ -118,7 +97,23 @@ class WorkspaceUpdater(val workspace: Workspace) {
     /**
      * Submits a single task to the queue.
      */
-    fun runOnce() {
+    suspend fun runOnce() {
+        isRunning = true
+        for (wc in workspace.componentList) {
+            wc.isRunning = true
+        }
+        notifyWorkspaceUpdateStarted()
+        withContext(Dispatchers.Swing) {
+            doUpdate()
+        }
+        notifyWorkspaceUpdateCompleted()
+        isRunning = false
+        for (component in workspace.componentList) {
+            component.isRunning = false
+        }
+    }
+
+    fun runBlocking() {
         isRunning = true
         for (wc in workspace.componentList) {
             wc.isRunning = true
@@ -126,11 +121,11 @@ class WorkspaceUpdater(val workspace: Workspace) {
         notifyWorkspaceUpdateStarted()
         runBlocking {
             doUpdate()
-            notifyWorkspaceUpdateCompleted()
-            isRunning = false
-            for (component in workspace.componentList) {
-                component.isRunning = false
-            }
+        }
+        notifyWorkspaceUpdateCompleted()
+        isRunning = false
+        for (component in workspace.componentList) {
+            component.isRunning = false
         }
     }
 
@@ -142,22 +137,22 @@ class WorkspaceUpdater(val workspace: Workspace) {
      *
      * @param numIterations the number of iterations to update
      */
-    fun iterate(numIterations: Int) {
+    suspend fun iterate(numIterations: Int) {
         isRunning = true
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        GlobalScope.launch {
-            notifyWorkspaceUpdateStarted()
+        notifyWorkspaceUpdateStarted()
+        withContext(Dispatchers.Swing) {
             repeat(numIterations) {
                 doUpdate()
             }
-            isRunning = false
-            for (component in workspace.componentList) {
-                component.isRunning = false
-            }
-            notifyWorkspaceUpdateCompleted()
         }
+        isRunning = false
+        for (component in workspace.componentList) {
+            component.isRunning = false
+        }
+        notifyWorkspaceUpdateCompleted()
     }
 
     /**
@@ -166,33 +161,15 @@ class WorkspaceUpdater(val workspace: Workspace) {
     private suspend fun doUpdate() {
         time++
         Logger.trace("starting: $time")
-        for (action in updateManager.actionList) {
-            notifyBeforeUpdateAction(action)
+        for (action in updateManager.actionList + updateManager.nonRemovableActions) {
             withContext(Dispatchers.Default) {
-                action()
+                with(PerformanceMonitor) {
+                    action()
+                }
             }
-            notifyAfterUpdateAction(action)
         }
         notifyWorkspaceUpdated()
         Logger.trace("done: $time")
-    }
-
-    /**
-     * Adds a component listener to this instance.
-     *
-     * @param listener The component listener to add.
-     */
-    fun addComponentListener(listener: UpdateEventListener) {
-        componentListeners.add(listener)
-    }
-
-    /**
-     * Removes a component listener from this instance.
-     *
-     * @param listener The listener to add.
-     */
-    fun removeComponentListener(listener: UpdateEventListener) {
-        componentListeners.remove(listener)
     }
 
     /**
@@ -211,78 +188,6 @@ class WorkspaceUpdater(val workspace: Workspace) {
      */
     fun removeUpdaterListener(listener: WorkspaceUpdaterListener) {
         updaterListeners.remove(listener)
-    }
-
-    /**
-     * Called when an update action is about to be invoked.
-     *
-     * @param action The action to be invoked.
-     */
-    fun notifyBeforeUpdateAction(action: UpdateAction?) {
-        val nanoTime = System.nanoTime()
-        componentListeners.forEach { l ->
-            l.beforeUpdateAction(
-                action,
-                nanoTime
-            )
-        }
-    }
-
-    /**
-     * Called after an update action has been invoked.
-     *
-     * @param action The action that was invoked.
-     */
-    fun notifyAfterUpdateAction(action: UpdateAction?) {
-        val nanoTime = System.nanoTime()
-        componentListeners.forEach { l: UpdateEventListener ->
-            l.afterUpdateAction(
-                action,
-                nanoTime
-            )
-        }
-    }
-
-    /**
-     * Called when a new component is starting to update.
-     *
-     * @param component The component to update.
-     * @param thread    The number of the thread doing the update.
-     */
-    fun notifyComponentUpdateStarted(component: WorkspaceComponent?, thread: Int) {
-        val simTime = time
-        val nanoTime = System.nanoTime()
-        notificationEvents.submit {
-            componentListeners.forEach(Consumer { l: UpdateEventListener ->
-                l.beforeComponentUpdate(
-                    component,
-                    simTime,
-                    thread,
-                    nanoTime
-                )
-            })
-        }
-    }
-
-    /**
-     * Called when a new component is finished updating.
-     *
-     * @param component The component to update.
-     * @param thread    The number of the thread doing the update.
-     */
-    fun notifyComponentUpdateFinished(component: WorkspaceComponent?, thread: Int) {
-        val simTime = time
-        val nanoTime = System.nanoTime()
-        notificationEvents.submit {
-            componentListeners.forEach(Consumer { l: UpdateEventListener ->
-                l.afterComponentUpdate(
-                    component,
-                    simTime,
-                    thread,
-                    nanoTime
-                )
-            })
-        }
     }
 
     /**

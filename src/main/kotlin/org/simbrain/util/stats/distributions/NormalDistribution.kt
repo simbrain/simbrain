@@ -1,5 +1,6 @@
 package org.simbrain.util.stats.distributions
 
+import org.apache.commons.math3.distribution.AbstractRealDistribution
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toIntArray
@@ -28,7 +29,7 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
         }
 
     @Transient
-    ProbabilityDistribution() =
+    var dist: AbstractRealDistribution =
         org.apache.commons.math3.distribution.NormalDistribution(randomGenerator, mean, standardDeviation)
 
     override fun sampleDouble(): Double = dist.sample()

@@ -21,6 +21,7 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
             dist = org.apache.commons.math3.distribution.UniformIntegerDistribution(randomGenerator, value, ceil)
         }
 
+    @Transient
     var dist: AbstractIntegerDistribution = org.apache.commons.math3.distribution.UniformIntegerDistribution(randomGenerator, floor, ceil)
 
     override fun sampleDouble(): Double = dist.sample().toDouble()

@@ -23,7 +23,7 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5): Probabi
     private var scale = 0.5
     // TODO
 
-    // TODO: Params don't match
+    @Transient
     var dist: AbstractRealDistribution =
         org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, scale, location)
 

@@ -25,6 +25,7 @@ class ParetoDistribution(slope: Double = 2.0, min: Double = 1.0): ProbabilityDis
             dist = org.apache.commons.math3.distribution.ParetoDistribution(randomGenerator, slope, value)
         }
 
+    @Transient
     var dist: AbstractRealDistribution =
         org.apache.commons.math3.distribution.ParetoDistribution(randomGenerator, slope, min)
 

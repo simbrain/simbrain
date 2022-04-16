@@ -1,6 +1,5 @@
 package org.simbrain.util.stats.distributions
 
-import org.apache.commons.math3.distribution.AbstractRealDistribution
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toIntArray
@@ -22,8 +21,8 @@ class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0) : ProbabilityD
         }
 
 
-    // TODO: Test
-    var dist: AbstractRealDistribution =
+    @Transient
+    ProbabilityDistribution() =
         org.apache.commons.math3.distribution.GammaDistribution(randomGenerator, shape, scale)
 
     override fun sampleDouble(): Double = dist.sample()

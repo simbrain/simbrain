@@ -18,6 +18,7 @@ class ExponentialDistribution(lambda: Double = 1.0): ProbabilityDistribution() {
             dist = org.apache.commons.math3.distribution.ExponentialDistribution(randomGenerator, 1/value)
         }
 
+    @Transient
     var dist: AbstractRealDistribution = org.apache.commons.math3.distribution.ExponentialDistribution(
         randomGenerator, 1/lambda)
 

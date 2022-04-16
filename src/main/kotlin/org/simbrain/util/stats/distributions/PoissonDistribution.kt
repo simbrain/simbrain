@@ -30,6 +30,7 @@ class PoissonDistribution(p: Double = 1.0, epsilon:Double = 1e-12, maxIterations
             dist = org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, p, epsilon, value)
         }
 
+    @Transient
     var dist: AbstractIntegerDistribution = org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, p, epsilon, maxIterations)
 
     override fun sampleDouble(): Double = dist.sample().toDouble()

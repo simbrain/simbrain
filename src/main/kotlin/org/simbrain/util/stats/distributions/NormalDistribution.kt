@@ -51,13 +51,6 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
         return cpy
     }
 
-    override fun readResolve(): Any {
-        super.readResolve()
-        dist = org.apache.commons.math3.distribution.NormalDistribution(this.randomGenerator, this.mean, this
-            .standardDeviation)
-        return this
-    }
-
     // Kotlin hack to support "static method in superclass"
     companion object {
         @JvmStatic

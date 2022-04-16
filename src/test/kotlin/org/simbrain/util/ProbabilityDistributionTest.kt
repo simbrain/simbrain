@@ -41,21 +41,21 @@ class ProbabilityDistributionTest {
     }
 
     fun tscoreNormalMean(alpha: Double, sampleSize: Int, sampleStdev: Double): Double {
-        val tdist = TDistribution((sampleSize-1).toDouble())
-        val stderr = sampleStdev/Math.sqrt(sampleSize.toDouble())
+        val tdist = TDistribution((sampleSize - 1).toDouble())
+        val stderr = sampleStdev / Math.sqrt(sampleSize.toDouble())
         // This works but there is un unexplained negative
-        return -tdist.inverseCumulativeProbability(alpha/2) * stderr
+        return -tdist.inverseCumulativeProbability(alpha / 2) * stderr
     }
 
     // Rename lower/upper after reversal issue figured out
     fun tscoreNormalVarianceLeft(alpha: Double, sampleSize: Int, sampleStdev: Double): Double {
-        val tdist = ChiSquaredDistribution((sampleSize-1).toDouble())
-        return ((sampleSize-1)/tdist.inverseCumulativeProbability(alpha/2)) * sampleStdev.pow(2)
+        val tdist = ChiSquaredDistribution((sampleSize - 1).toDouble())
+        return ((sampleSize - 1) / tdist.inverseCumulativeProbability(alpha / 2)) * sampleStdev.pow(2)
     }
 
     fun tscoreNormalVarianceRight(alpha: Double, sampleSize: Int, sampleStdev: Double): Double {
-        val tdist = ChiSquaredDistribution((sampleSize-1).toDouble())
-        return ((sampleSize-1)/tdist.inverseCumulativeProbability(1-alpha/2)) * sampleStdev.pow(2)
+        val tdist = ChiSquaredDistribution((sampleSize - 1).toDouble())
+        return ((sampleSize - 1) / tdist.inverseCumulativeProbability(1 - alpha / 2)) * sampleStdev.pow(2)
     }
 
 
@@ -70,7 +70,7 @@ class ProbabilityDistributionTest {
         assertTrue(sampleMean in ((1.0 - tscoreMean)..(1.0 + tscoreMean)))
         val tLeft = tscoreNormalVarianceLeft(alpha, N, sampleStdev)
         val tRight = tscoreNormalVarianceRight(alpha, N, sampleStdev)
-        println("" + sampleStdev.pow(2)  + " in " + tLeft + ".." + tRight)
+        println("" + sampleStdev.pow(2) + " in " + tLeft + ".." + tRight)
         assertTrue(sampleStdev.pow(2) in tRight..tLeft)
 
         // assertTrue(nums.stdev() in ((0.5 - alpha)..(0.5 + alpha)))
@@ -120,11 +120,25 @@ class ProbabilityDistributionTest {
     @Test
     fun `test serialization using xstream`() {
         val dist = UniformRealDistribution(-2.2, 1.2)
-        val xml = ProbabilityDistribution.getXStream().toXML(dist)
-        val deserialized = ProbabilityDistribution.getXStream().fromXML(xml) as UniformRealDistribution
-        assertNotNull(deserialized.dist)
-        assertNotNull(deserialized.randomGenerator)
-        assertTrue(deserialized.ceil == 1.2)
-        assertTrue(deserialized.floor == -2.2)
+        with(dist) {
+            val xml = ProbabilityDistribution.getXStream().toXML(this)
+            val deserialized = ProbabilityDistribution.getXStream().fromXML(xml) as UniformRealDistribution
+            assertNotNull(deserialized.dist)
+            assertNotNull(deserialized.randomGenerator)
+            assertTrue(deserialized.ceil == 1.2)
+            assertTrue(deserialized.floor == -2.2)
+        }
+
+        val randomizer = ProbabilityDistribution.Randomizer(NormalDistribution(1.0, 0.25))
+        with(randomizer) {
+            val xml = ProbabilityDistribution.getXStream().toXML(this)
+            val deserialized = ProbabilityDistribution.getXStream().fromXML(xml) as ProbabilityDistribution.Randomizer
+            with(deserialized.probabilityDistribution as NormalDistribution) {
+                assertNotNull(randomGenerator)
+                assertTrue(mean == 1.0)
+                assertTrue(standardDeviation == 0.25)
+            }
+        }
+
     }
 }

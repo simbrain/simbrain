@@ -37,12 +37,6 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
         return "Uniform (Real)"
     }
 
-    override fun readResolve(): Any {
-        super.readResolve()
-        dist = UniformRealDistribution(this.randomGenerator, this.floor, this.ceil)
-        return this
-    }
-
     override fun deepCopy(): org.simbrain.util.stats.distributions.UniformRealDistribution {
         val cpy = org.simbrain.util.stats.distributions.UniformRealDistribution()
         cpy.ceil = ceil

@@ -38,10 +38,11 @@ class ParetoDistribution(slope: Double = 2.0, min: Double = 1.0): ProbabilityDis
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray()
 
     override fun deepCopy(): ParetoDistribution {
-        val cpy = ParetoDistribution()
-        cpy.slope = slope
-        cpy.min = min
-        return cpy
+        val copy = ParetoDistribution()
+        copy.randomSeed = randomSeed
+        copy.slope = slope
+        copy.min = min
+        return copy
     }
 
     override fun getName(): String {

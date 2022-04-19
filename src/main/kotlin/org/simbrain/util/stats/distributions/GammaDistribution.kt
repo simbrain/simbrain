@@ -35,10 +35,11 @@ class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0) : ProbabilityD
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray()
 
     override fun deepCopy(): GammaDistribution {
-        val cpy = GammaDistribution()
-        cpy.shape = shape
-        cpy.scale = scale
-        return cpy
+        val copy = GammaDistribution()
+        copy.randomSeed = randomSeed
+        copy.shape = shape
+        copy.scale = scale
+        return copy
     }
 
     override fun getName(): String {

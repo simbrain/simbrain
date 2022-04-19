@@ -1,10 +1,12 @@
 package org.simbrain.util.propertyeditor;
 
 /**
- * Indicates that an object can be used by the {@link ObjectTypeEditor}.
- * A more apt but uglier name might have been "UsableByObjectTypeEditor".
- * Being used by the object type editor requires that a prototype object is created
- * and then copies of that object are made and applied to all the edited objects.
+ * Indicates that an object can be copied.
+ *
+ * Used by the {@link ObjectTypeEditor}, which creates and edits a prototype object and then makes copies of
+ * that object. For example, if editing a bunch of neurons that have different update rules, setting one of them to a
+ * certain udpate rule  will require that they all now have that rule. A single prototype rule is copied and written
+ * to all the neurons.
  *
  * @author Jeff Yoshimi
  */

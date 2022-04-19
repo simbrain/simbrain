@@ -28,7 +28,7 @@ val binaryReservoir = newSim {
     val responseIterations = 300
 
     var normalDist = NormalDistribution(0.0, 1.0)
-    normalDist.setSeed(1)
+    normalDist.randomSeed = 1
     // TODO: Use this in building the network itself
 
     // Stored activations

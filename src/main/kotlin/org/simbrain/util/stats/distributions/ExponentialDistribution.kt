@@ -31,9 +31,10 @@ class ExponentialDistribution(lambda: Double = 1.0): ProbabilityDistribution() {
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray()
 
     override fun deepCopy(): ProbabilityDistribution {
-        val cpy = ExponentialDistribution()
-        cpy.lambda = lambda
-        return cpy
+        val copy = ExponentialDistribution()
+        copy.randomSeed = randomSeed
+        copy.lambda = lambda
+        return copy
     }
 
     override fun getName(): String {

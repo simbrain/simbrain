@@ -36,10 +36,11 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5): Probabi
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray()
 
     override fun deepCopy(): LogNormalDistribution {
-        val cpy = LogNormalDistribution()
-        cpy.location = location
-        cpy.scale = scale
-        return cpy
+        val copy = LogNormalDistribution()
+        copy.randomSeed = randomSeed
+        copy.location = location
+        copy.scale = scale
+        return copy
     }
 
     override fun getName(): String {

@@ -5,10 +5,7 @@ import org.apache.commons.math3.distribution.TDistribution
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.ExponentialDistribution
-import org.simbrain.util.stats.distributions.NormalDistribution
-import org.simbrain.util.stats.distributions.UniformIntegerDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.util.stats.distributions.*
 import kotlin.math.pow
 
 /**
@@ -22,7 +19,7 @@ class ProbabilityDistributionTest {
     // TODO: Finish for all probability distributions
 
     val alpha = .05 // For 1 - alpha confidence level
-    val N = 10_000
+    val N = 1000
 
     @Test
     fun `test uniform`() {
@@ -57,7 +54,6 @@ class ProbabilityDistributionTest {
         val tdist = ChiSquaredDistribution((sampleSize - 1).toDouble())
         return ((sampleSize - 1) / tdist.inverseCumulativeProbability(1 - alpha / 2)) * sampleStdev.pow(2)
     }
-
 
     @Test
     fun `test normal`() {
@@ -94,18 +90,36 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test same results from same seed`() {
-        val dist1 = NormalDistribution(1.0, .5)
-        dist1.setSeed(1)
-        val dist2 = NormalDistribution(1.0, .5)
-        dist2.setSeed(1)
+        var dist1: ProbabilityDistribution = NormalDistribution(1.0, .5)
+        dist1.randomSeed = 1
+        var dist2: ProbabilityDistribution = NormalDistribution(1.0, .5)
+        dist2.randomSeed = 1
         assertEquals(dist1.sampleDouble(), dist2.sampleDouble())
+
+        dist1 = TwoValued()
+        dist1.randomSeed = 1
+        dist2 = TwoValued()
+        dist2.randomSeed = 1
+        assertEquals(dist1.sampleDouble(), dist2.sampleDouble())
+
+        dist1 = UniformRealDistribution()
+        dist1.randomSeed = 1
+        dist2 = UniformRealDistribution()
+        dist2.randomSeed = 1
+        assertEquals(dist1.sampleDouble(), dist2.sampleDouble())
+
     }
 
     @Test
     fun `test different results if no seed set`() {
-        val dist1 = NormalDistribution(1.0, .5)
-        val dist2 = NormalDistribution(1.0, .5)
+        var dist1: ProbabilityDistribution = NormalDistribution(1.0, .5)
+        var dist2: ProbabilityDistribution = NormalDistribution(1.0, .5)
         assertNotEquals(dist1.sampleDouble(), dist2.sampleDouble())
+
+        dist1 = UniformRealDistribution()
+        dist2 = UniformRealDistribution()
+        assertNotEquals(dist1.sampleDouble(), dist2.sampleDouble())
+
     }
 
     @Test
@@ -118,8 +132,41 @@ class ProbabilityDistributionTest {
     }
 
     @Test
+    fun `test two valued`() {
+        val dist = TwoValued(-3.0, 3.0)
+        var nums = dist.sampleDouble(N)
+        assertTrue(nums.all{ it == -3.0 || it == 3.0 })
+        assertTrue{nums.average() in (-.5 .. .5) } // TODO
+        dist.p = 1.0
+        nums = dist.sampleDouble(N)
+        assertTrue(nums.all{ it == 3.0 })
+        dist.p = 0.0
+        nums = dist.sampleDouble(N)
+        assertTrue(nums.all{ it == -3.0 })
+    }
+
+    @Test
+    fun `test deep copy`() {
+        run {
+            val dist1 = NormalDistribution(1.0, .5)
+            val dist2 = dist1.deepCopy()
+            assertTrue((dist1.randomSeed == dist2.randomSeed))
+            assertTrue((dist1.mean == dist2.mean))
+            assertTrue((dist1.standardDeviation == dist2.standardDeviation))
+        }
+        run {
+            val dist1 = TwoValued()
+            val dist2 = dist1.deepCopy()
+            assertTrue((dist1.randomSeed == dist2.randomSeed))
+            assertTrue((dist1.upperValue == dist2.upperValue))
+            assertTrue((dist1.lowerValue == dist2.lowerValue))
+        }
+    }
+
+
+    @Test
     fun `test serialization using xstream`() {
-        val dist = UniformRealDistribution(-2.2, 1.2)
+        var dist: ProbabilityDistribution = UniformRealDistribution(-2.2, 1.2)
         with(dist) {
             val xml = ProbabilityDistribution.getXStream().toXML(this)
             val deserialized = ProbabilityDistribution.getXStream().fromXML(xml) as UniformRealDistribution
@@ -129,6 +176,16 @@ class ProbabilityDistributionTest {
             assertTrue(deserialized.floor == -2.2)
         }
 
+        dist = TwoValued(-2.0, 2.0, .7)
+        with(dist) {
+            val xml = ProbabilityDistribution.getXStream().toXML(this)
+            val deserialized = ProbabilityDistribution.getXStream().fromXML(xml) as TwoValued
+            assertTrue(deserialized.lowerValue == -2.0)
+            assertTrue(deserialized.upperValue == 2.0)
+            assertTrue(deserialized.p == .7)
+        }
+
+        // Test randomizer serializes properly
         val randomizer = ProbabilityDistribution.Randomizer(NormalDistribution(1.0, 0.25))
         with(randomizer) {
             val xml = ProbabilityDistribution.getXStream().toXML(this)

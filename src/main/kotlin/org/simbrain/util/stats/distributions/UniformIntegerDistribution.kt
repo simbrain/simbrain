@@ -37,10 +37,11 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
     }
 
     override fun deepCopy(): UniformIntegerDistribution {
-        val cpy = UniformIntegerDistribution()
-        cpy.ceil = ceil
-        cpy.floor = floor
-        return cpy
+        val copy = UniformIntegerDistribution()
+        copy.randomSeed = randomSeed
+        copy.ceil = ceil
+        copy.floor = floor
+        return copy
     }
 
     // Kotlin hack to support "static method in superclass"

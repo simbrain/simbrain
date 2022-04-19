@@ -45,10 +45,11 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
     }
 
     override fun deepCopy(): NormalDistribution {
-        val cpy = NormalDistribution()
-        cpy.mean = mean
-        cpy.standardDeviation = standardDeviation
-        return cpy
+        val copy = NormalDistribution()
+        copy.randomSeed = randomSeed
+        copy.mean = mean
+        copy.standardDeviation = standardDeviation
+        return copy
     }
 
     // Kotlin hack to support "static method in superclass"

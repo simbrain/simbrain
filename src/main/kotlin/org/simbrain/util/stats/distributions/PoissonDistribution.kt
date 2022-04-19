@@ -46,9 +46,10 @@ class PoissonDistribution(p: Double = 1.0, epsilon:Double = 1e-12, maxIterations
     }
 
     override fun deepCopy(): PoissonDistribution {
-        val cpy = PoissonDistribution()
+        val copy = PoissonDistribution()
+        copy.randomSeed = randomSeed
         // TODO
-        return cpy
+        return copy
     }
 
     // Kotlin hack to support "static method in superclass"

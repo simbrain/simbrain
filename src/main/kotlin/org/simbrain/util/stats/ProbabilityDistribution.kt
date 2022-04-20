@@ -12,7 +12,6 @@ import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.*
-import kotlin.random.Random
 import kotlin.reflect.KParameter
 import kotlin.reflect.jvm.javaType
 
@@ -34,12 +33,17 @@ abstract class ProbabilityDistribution() : CopyableObject {
 
     /**
      * Use this to ensure two probability distributions return the same pseudo-random sequence of numbers.
-     * See ProbabilityDistributionTest.kt for exmamples
+     * See ProbabilityDistributionTest.kt for exmamples.
+     *
+     * If null, then seed is random and so copies of this object produce different samples.
+     *
      */
-    var randomSeed: Int = Random.nextInt()
+    var randomSeed: Int? = null
         set(value) {
             field = value
-            randomGenerator.setSeed(value)
+            if (value != null) {
+                randomGenerator.setSeed(value)
+            }
         }
 
     abstract fun sampleDouble(): Double
@@ -142,6 +146,10 @@ class ProbabilityDistributionConverter(mapper: Mapper, reflectionProvider: Refle
         }
 
         val paramMap = paramValueMapping.associate { (param, value) -> param to typeMapping(value, param) }
-        return constructor.callBy(paramMap)
+        val probDist = constructor.callBy(paramMap) as ProbabilityDistribution
+        vars["randomSeed"]?.toInt()?.let{
+            probDist.randomSeed = it
+        }
+        return probDist
     }
 }

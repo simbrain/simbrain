@@ -1,6 +1,10 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.connections.*
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.decayStrengthBasedOnLength
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction
 import org.simbrain.network.gui.actions.ShowDebugAction
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
@@ -24,11 +28,10 @@ import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
-import org.simbrain.util.CmdOrCtrl
-import org.simbrain.util.Shift
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Utils
-import org.simbrain.util.createAction
+import org.simbrain.network.layouts.GridLayout
+import org.simbrain.util.*
+import org.simbrain.util.math.DecayFunction
+import org.simbrain.util.stats.ProbabilityDistribution
 import javax.swing.AbstractAction
 import javax.swing.JOptionPane
 
@@ -162,5 +165,61 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     private fun applyConnectionAction(name: String, connectionStrategy: ConnectionStrategy) =
         ApplyConnectionAction(networkPanel, connectionStrategy, name)
+
+    /**
+     * Decay selected weights using a [DecayFunction] selected by the user.
+     */
+    val decayWeightsAction = networkPanel.createConditionallyEnabledAction(
+        name = "Decay selected weights based on axon length",
+        enablingCondition = ConditionallyEnabledAction.EnablingCondition.SYNAPSES
+    ) {
+        DecayFunction.DecayFunctionSelector().showDialog {
+            selectionManager.filterSelectedModels<Synapse>()
+                .decayStrengthBasedOnLength(it.decayFunction)
+        }
+    }
+
+    /**
+     * Prune selected weights. Weights whose absolute value is less then the threshold are removed.
+     */
+    val pruneWeightsAction = networkPanel.createConditionallyEnabledAction(
+        name = "Prune selected weights",
+        enablingCondition = ConditionallyEnabledAction.EnablingCondition.SYNAPSES
+    ) {
+        val threshold: String = JOptionPane.showInputDialog(
+            null,
+            "Pruning threshold:",
+            ".5"
+        )
+        selectionManager.filterSelectedModels<Synapse>()
+            .filter {Math.abs(it.strength) < threshold.toDouble()}
+            .forEach { it.delete() }
+    }
+
+    /**
+     * Randomize the polarity of selected nodes. Note that this will change the polarity of outgoing synapses.
+     */
+    val randomizePolarityAction = networkPanel.createConditionallyEnabledAction(
+        name = "Randomize polarity of selected neurons",
+        enablingCondition = ConditionallyEnabledAction.EnablingCondition.NEURONS
+    ) {
+        // TODO: Indicate the threshold somehow in a prompt
+        ProbabilityDistribution.Randomizer().showDialog { dist ->
+            selectionManager.filterSelectedModels<Neuron>().forEach {  n ->
+                if (dist.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
+                else n.polarity = SimbrainConstants.Polarity.INHIBITORY
+            }
+        }
+    }
+
+    /**
+     * Quick action to apply a grid layout to selected nodes
+     */
+    val fastGridAction = networkPanel.createConditionallyEnabledAction(
+        name = "Apply grid layout to selected nodes",
+        enablingCondition = ConditionallyEnabledAction.EnablingCondition.NEURONS
+    ) {
+        GridLayout().layoutNeurons(selectionManager.filterSelectedModels<Neuron>())
+    }
 
 }

@@ -37,6 +37,14 @@ class ProbabilityDistributionTest {
         assertTrue(nums.minOrNull()!! >= -2.0)
     }
 
+    @Test
+    fun `test uniform bounds`() {
+        val dist = UniformRealDistribution(1.0, 3.0)
+        var nums = dist.sampleDouble(10)
+        assertTrue(nums.maxOrNull()!! <= 3.0)
+        assertTrue(nums.minOrNull()!! >= 1.0)
+    }
+
     fun tscoreNormalMean(alpha: Double, sampleSize: Int, sampleStdev: Double): Double {
         val tdist = TDistribution((sampleSize - 1).toDouble())
         val stderr = sampleStdev / Math.sqrt(sampleSize.toDouble())

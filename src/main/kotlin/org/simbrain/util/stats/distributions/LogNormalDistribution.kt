@@ -9,6 +9,7 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5): Probabi
 
     @UserParameter(
         label = "Location (\u03BC)",
+        useSetter = true,
         description = "The mean of the logarithm of this distribution.",
         order = 1
     )
@@ -17,6 +18,7 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5): Probabi
 
     @UserParameter(
         label = "Scale (\u03C3)",
+        useSetter = true,
         description = "The standard deviation of the logarithm of this distribution.",
         order = 2
     )

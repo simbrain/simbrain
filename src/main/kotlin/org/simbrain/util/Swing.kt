@@ -1,5 +1,9 @@
 package org.simbrain.util
 
+import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.Component
 import java.awt.event.*
 import java.io.File
@@ -119,6 +123,33 @@ fun <T: JComponent> T.createAction(
     }
 }
 
+fun NetworkPanel.createConditionallyEnabledAction(
+    iconPath: String? = null,
+    name: String,
+    enablingCondition: ConditionallyEnabledAction.EnablingCondition,
+    description: String = name,
+    keyCombo: KeyCombination? = null,
+    block: NetworkPanel.() -> Unit
+): AbstractAction {
+    return object : ConditionallyEnabledAction(this, name, enablingCondition) {
+        init {
+            if (iconPath != null) {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+            }
+
+            putValue(NAME, name)
+            putValue(SHORT_DESCRIPTION, description)
+            if (keyCombo != null) {
+                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY,it)}
+                this@createConditionallyEnabledAction.bindTo(keyCombo, this)
+            }
+        }
+        override fun actionPerformed(e: ActionEvent) {
+            block()
+        }
+    }
+}
+
 /**
  * Create an action with a char rather than a key combinaation
  */
@@ -130,4 +161,18 @@ fun <T: JComponent> T.createAction(
     block: T.() -> Unit
 ): AbstractAction {
     return createAction(iconPath, name, description, KeyCombination(keyPress), block)
+}
+
+/**
+ * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor] and
+ * then applying a lambda to that object.
+ */
+fun <E: EditableObject> E.showDialog(block: (E) -> Unit) {
+    val editor = AnnotatedPropertyEditor(this)
+    StandardDialog(editor).apply{
+        addClosingTask{
+            editor.commitChanges()
+            block(editor.editedObject as E)
+        }
+    }.display()
 }

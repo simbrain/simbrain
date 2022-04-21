@@ -37,15 +37,11 @@ import javax.swing.JOptionPane
  * Network desktop component. An extension of the Gui component for this class
  * which is used in the Simbrain desktop.
  */
-class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent) : DesktopComponent<NetworkComponent?>(frame, component) {
+class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent) :
+    DesktopComponent<NetworkComponent?>(frame, component) {
 
     val networkPanel = NetworkPanel(component)
 
-    /**
-     * Create and return a new File menu for this Network panel.
-     *
-     * @return a new File menu for this Network panel
-     */
     fun createFileMenu(): JMenu {
         val fileMenu = JMenu("File")
         fileMenu.add(OpenAction(this))
@@ -84,7 +80,12 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
             // it.allSynapses.size > saveWarningThreshold && !it.isUseFullRepOnSave w
         }
         if (showPanel) {
-            val n = JOptionPane.showConfirmDialog(null, "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. " + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that " + "their weight matrices are compressed.   Otherwise the save will take a " + "long time and the saved file will be large. Click Cancel to go ahead with the save, " + "and OK to return to the network and change settings.</body></html>", "Save Warning", JOptionPane.OK_CANCEL_OPTION)
+            val n = JOptionPane.showConfirmDialog(
+                null,
+                "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. " + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that " + "their weight matrices are compressed.   Otherwise the save will take a " + "long time and the saved file will be large. Click Cancel to go ahead with the save, " + "and OK to return to the network and change settings.</body></html>",
+                "Save Warning",
+                JOptionPane.OK_CANCEL_OPTION
+            )
             if (n == JOptionPane.OK_OPTION) {
                 return false
             }
@@ -128,24 +129,20 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
         // Put it all together
         add("Center", networkPanel)
 
-        with(networkPanel) {
-            JMenuBar().apply {
-                add(createFileMenu())
-                add(createEditMenu())
-                add(insertMenu)
-                add(createViewMenu())
-                // TODO: todo copied from old code
-                // TODO
-                //menuBar.add(NetworkScriptMenu.getNetworkScriptMenu(this.getNetworkPanel()));
-                // menuBar.add(createAttributeMenu());
-                add(this@with.helpMenu)
-                parentFrame.jMenuBar = this
-            }
+        JMenuBar().apply {
+            parentFrame.jMenuBar = this
+            add(createFileMenu())
+            add(networkPanel.editMenu)
+            add(networkPanel.insertMenu)
+            add(networkPanel.actionMenu)
+            add(networkPanel.viewMenu)
+            add(networkPanel.helpMenu)
         }
 
         // Toggle the network panel's visiblity if the workspace component is
         // set to "gui off"
-        component.events.onGUIToggled(Runnable { networkPanel.guiOn = workspaceComponent!!.isGuiOn })
+        component.events.onGUIToggled(Runnable
+        { networkPanel.guiOn = workspaceComponent!!.isGuiOn })
     }
 
 }

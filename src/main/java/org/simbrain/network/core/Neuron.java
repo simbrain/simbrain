@@ -121,7 +121,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public static final int PRE_ALLOCATED_NUM_SYNAPSES = (int) Math.ceil(500 / 0.75);
 
     /**
-     * List of synapses this neuron attaches to.
+     * Fan-out in the form of a map from target neurons to synapses.
      */
     private transient Map<Neuron, Synapse> fanOut = new HashMap<>(PRE_ALLOCATED_NUM_SYNAPSES);
 
@@ -161,7 +161,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * The polarity of this neuron (excitatory, inhibitory, or none, which is
      * null). Used in synapse randomization, and in adding synapses.
      */
-    // TODO: See notes at setter. May or may not make sense to have this be settable.
     @UserParameter(label = "Polarity", order = 10)
     private Polarity polarity = Polarity.BOTH;
 
@@ -1010,13 +1009,14 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         return polarity;
     }
 
-    // TODO: Unsafe discuss design of this feature.
-    // Should check.  For example, setting a neuron to inhibitory when
-    // all of its fan-out is excitatory, or before anything has been changed
-    // Could make Polarity final and disallow changes.  May be useful to have
-    // in "sandbox" mode.  Need to discuss further.
+    /**
+     * Note that setting polarity updates fan-out synapses, e.g. inbhitory nodes ensures all fan-out
+     * synapses are negative. See {@link Polarity}
+     */
     public void setPolarity(Polarity polarity) {
         this.polarity = polarity;
+        fanOut.values().forEach(s -> s.setStrength(polarity.value(s.getStrength())));
+        events.fireColorChange();
     }
 
     public boolean isSpike() {

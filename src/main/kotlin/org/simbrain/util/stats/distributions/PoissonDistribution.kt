@@ -8,7 +8,7 @@ import org.simbrain.util.toDoubleArray
 class PoissonDistribution(p: Double = 1.0, epsilon:Double = 1e-12, maxIterations: Int = 10000000) : ProbabilityDistribution
 () {
 
-    @UserParameter(label = "Pouisson mean", description = "Todo.", order = 2)
+    @UserParameter(label = "Pouisson mean", useSetter = true, description = "Todo.", order = 2)
     var p = p
         set(value) {
             field = value
@@ -16,7 +16,7 @@ class PoissonDistribution(p: Double = 1.0, epsilon:Double = 1e-12, maxIterations
                 maxIterations)
         }
 
-    @UserParameter(label = "Epsilon", description = "Todo.", order = 2)
+    @UserParameter(label = "Epsilon", useSetter = true, description = "Todo.", order = 2)
     var epsilon = epsilon
         set(value) {
             field = value

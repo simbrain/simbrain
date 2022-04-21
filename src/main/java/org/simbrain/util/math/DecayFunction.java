@@ -6,6 +6,7 @@ import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
 import org.simbrain.util.math.DecayFunctions.QuadraticDecayFunction;
 import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
 import org.simbrain.util.propertyeditor.CopyableObject;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
@@ -16,9 +17,8 @@ import java.util.List;
 public abstract class DecayFunction implements CopyableObject {
 
     /**
-     * Decay functions for drop-down list used by
-     * {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
-     * to set a type of probability distribution.
+     * Decay functions for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor} to set a
+     * type of probability distribution.
      */
     public static List<Class> DECAY_FUNCTIONS_LIST = Arrays.asList(
             StepDecayFunction.class,
@@ -111,7 +111,7 @@ public abstract class DecayFunction implements CopyableObject {
      * Apply the scaling factor on a double array based on the given distance.
      *
      * @param distance the distance to compute the decay scaling factor
-     * @param vector the vector to be multiplied with the decay scaling factor
+     * @param vector   the vector to be multiplied with the decay scaling factor
      * @return the multiplied vector
      */
     public double[] apply(double distance, double[] vector) {
@@ -126,7 +126,7 @@ public abstract class DecayFunction implements CopyableObject {
      * Apply the scaling factor on a Double List based on the given distance.
      *
      * @param distance the distance to compute the decay scaling factor
-     * @param vector the vector to be multiplied with the decay scaling factor
+     * @param vector   the vector to be multiplied with the decay scaling factor
      * @return the multiplied vector
      */
     public List<Double> apply(double distance, List<Double> vector) {
@@ -137,20 +137,43 @@ public abstract class DecayFunction implements CopyableObject {
         return ret;
     }
 
+    public static class DecayFunctionSelector implements EditableObject {
+        /**
+         * The layout for the neurons in this group.
+         */
+        @UserParameter(label = "Decay Function", isObjectType = true, tab = "Layout", order = 50)
+        public DecayFunction decayFunction = new LinearDecayFunction();
+
+        public DecayFunctionSelector() {
+        }
+
+        public DecayFunctionSelector(DecayFunction decayFunction) {
+            this.decayFunction = decayFunction;
+        }
+
+        @Override
+        public String getName() {
+            return "Decay Function";
+        }
+    }
+
+
     public abstract static class DecayFunctionBuilder<
             B extends DecayFunctionBuilder,
             T extends DecayFunction
             > {
 
         /**
-         * Uniform access to the product being build. Only used in this abstract class
-         * where the product cannot be instantiate yet.
+         * Uniform access to the product being build. Only used in this abstract class where the product cannot be
+         * instantiate yet.
+         *
          * @return the product being build
          */
         protected abstract T product();
 
         /**
          * Builds a instance of specific {@link DecayFunction} of given states.
+         *
          * @return the final product
          */
         public abstract T build();

@@ -7,14 +7,22 @@ import org.simbrain.util.toIntArray
 
 class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : ProbabilityDistribution() {
 
-    @UserParameter(label = "Ceiling", description = "Max of the uniform distribution.", order = 1)
+    @UserParameter(
+        label = "Ceiling",
+        useSetter = true,
+        description = "Max of the uniform distribution.",
+        order = 1)
     var ceil = ceil
         set(value) {
             field = value
             dist = org.apache.commons.math3.distribution.UniformRealDistribution(randomGenerator, floor, value)
         }
 
-    @UserParameter(label = "Floor", description = "Min of the uniform distribution.", order = 2)
+    @UserParameter(
+        label = "Floor",
+        useSetter = true,
+        description = "Min of the uniform distribution.",
+        order = 2)
     var floor = floor
         set(value) {
             field = value

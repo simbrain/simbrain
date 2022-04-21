@@ -7,14 +7,14 @@ import org.simbrain.util.toIntArray
 
 class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0) : ProbabilityDistribution() {
 
-    @UserParameter(label = "Shape (k)", description = "Shape (k).", order = 1)
+    @UserParameter(label = "Shape (k)", useSetter = true, description = "Shape (k).", order = 1)
     private var shape = shape
         set(value) {
             field = value
             dist = org.apache.commons.math3.distribution.GammaDistribution(randomGenerator, value, scale)
         }
 
-    @UserParameter(label = "Scale (\u03B8)", description = "Scale (\u03B8).", order = 2)
+    @UserParameter(label = "Scale (\u03B8)", useSetter = true, description = "Scale (\u03B8).", order = 2)
     private var scale = scale
         set(value) {
             field = value

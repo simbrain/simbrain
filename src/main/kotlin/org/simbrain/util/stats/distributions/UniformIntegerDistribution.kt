@@ -7,14 +7,21 @@ import org.simbrain.util.toDoubleArray
 
 class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDistribution() {
 
-    @UserParameter(label = "Ceiling", description = "Highest integer possible.", order = 1)
+    @UserParameter(
+        label = "Ceiling",
+        useSetter = true,
+        description = "Highest integer possible.",
+        order = 1)
     var ceil = ceil
         set(value) {
             field = value
             dist = org.apache.commons.math3.distribution.UniformIntegerDistribution(randomGenerator, floor, value)
         }
 
-    @UserParameter(label = "Floor", description = "Smallest integer possible.", order = 2)
+    @UserParameter(label = "Floor",
+        useSetter = true,
+        description = "Smallest integer possible.",
+        order = 2)
     var floor = floor
         set(value) {
             field = value

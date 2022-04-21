@@ -115,6 +115,15 @@ public class StandardDialog extends GenericJDialog {
     }
 
     /**
+     * Constructo a dialog around the provided panel.
+     */
+    public StandardDialog(JPanel panel) {
+        super();
+        init();
+        setContentPane(panel);
+    }
+
+    /**
      * This method creates a StandardDialog with the given parent frame and
      * title.
      *

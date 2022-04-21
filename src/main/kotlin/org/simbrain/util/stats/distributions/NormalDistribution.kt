@@ -9,6 +9,7 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
 
     @UserParameter(
         label = "Mean (\u03BC)",
+        useSetter = true,
         description = "The expected value or center of the distribution.",
         increment = .1, order = 1
     )
@@ -20,6 +21,7 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
 
     @UserParameter(
         label = "Std. Dev. (\u03C3)",
+        useSetter = true,
         description = "The average squared distance from the mean.",
         increment = .1, order = 2)
     var standardDeviation: Double = standardDeviation

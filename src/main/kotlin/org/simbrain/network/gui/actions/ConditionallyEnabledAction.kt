@@ -2,6 +2,7 @@ package org.simbrain.network.gui.actions
 
 
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.NetworkSelectionManager
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
 import javax.swing.AbstractAction
@@ -33,16 +34,17 @@ abstract class ConditionallyEnabledAction(
     }
 
     private fun updateAction() {
-        isEnabled = with(networkPanel.selectionManager) {
-            when (updateType) {
-                EnablingCondition.NEURONS -> selection.any { it is NeuronNode }
-                EnablingCondition.SYNAPSES -> selection.any { it is SynapseNode }
-                EnablingCondition.ALLITEMS -> selection.isNotEmpty()
-                EnablingCondition.SOURCE_NEURONS -> sourceSelection.any { it is NeuronNode }
-                EnablingCondition.SOURCE_AND_TARGET_NEURONS ->
-                    sourceSelection.any { it is NeuronNode } && selection.any { it is NeuronNode }
-            }
-        }
+        isEnabled = networkPanel.selectionManager.checkEnablingFunction(updateType)
     }
+}
 
+fun NetworkSelectionManager.checkEnablingFunction(condition: ConditionallyEnabledAction.EnablingCondition): Boolean {
+    return when (condition) {
+        ConditionallyEnabledAction.EnablingCondition.NEURONS -> selection.any { it is NeuronNode }
+        ConditionallyEnabledAction.EnablingCondition.SYNAPSES -> selection.any { it is SynapseNode }
+        ConditionallyEnabledAction.EnablingCondition.ALLITEMS -> selection.isNotEmpty()
+        ConditionallyEnabledAction.EnablingCondition.SOURCE_NEURONS -> sourceSelection.any { it is NeuronNode }
+        ConditionallyEnabledAction.EnablingCondition.SOURCE_AND_TARGET_NEURONS ->
+            sourceSelection.any { it is NeuronNode } && selection.any { it is NeuronNode }
+    }
 }

@@ -10,34 +10,35 @@ import javax.swing.JCheckBoxMenuItem
 import javax.swing.JMenu
 import javax.swing.JPopupMenu
 
-fun NetworkPanel.createEditMenu() = JMenu("Edit").apply {
-    with(networkActions) {
-        add(cutAction)
-        add(copyAction)
-        add(pasteAction)
-        add(deleteAction)
-        addSeparator()
-        add(clearSourceNeurons)
-        add(setSourceNeurons)
-        add(connectionMenu)
-        add(addSynapseGroupAction)
-        addSeparator()
-        add(randomizeObjectsAction)
-        add(showAdjustSynapsesDialog)
-        addSeparator()
-        add(showLayoutDialogAction)
-        addSeparator()
-        add(neuronCollectionAction)
-        addSeparator()
-        add(alignMenu)
-        add(spaceMenu)
-        addSeparator()
-        add(setNeuronPropertiesAction)
-        add(setSynapsePropertiesAction)
-        addSeparator()
-        add(selectionMenu)
+val NetworkPanel.editMenu
+    get() = JMenu("Edit").apply {
+        with(networkActions) {
+            add(cutAction)
+            add(copyAction)
+            add(pasteAction)
+            add(deleteAction)
+            addSeparator()
+            add(clearSourceNeurons)
+            add(setSourceNeurons)
+            add(connectionMenu)
+            add(addSynapseGroupAction)
+            addSeparator()
+            add(randomizeObjectsAction)
+            add(showAdjustSynapsesDialog)
+            addSeparator()
+            add(showLayoutDialogAction)
+            addSeparator()
+            add(neuronCollectionAction)
+            addSeparator()
+            add(alignMenu)
+            add(spaceMenu)
+            addSeparator()
+            add(setNeuronPropertiesAction)
+            add(setSynapsePropertiesAction)
+            addSeparator()
+            add(selectionMenu)
+        }
     }
-}
 
 /**
  * Create and return a new Insert menu for this Network panel.
@@ -58,6 +59,20 @@ val NetworkPanel.insertMenu
             add(newNetworkMenu)
             add(testInputAction)
             add(showWeightMatrixAction)
+        }
+    }
+
+/**
+ * Special one-off actions.
+ */
+val NetworkPanel.actionMenu
+    get() = JMenu("Actions").apply {
+        with(networkActions) {
+            // Alphabetical by action name
+            add(fastGridAction)
+            add(decayWeightsAction)
+            add(pruneWeightsAction)
+            add(randomizePolarityAction)
         }
     }
 
@@ -124,18 +139,19 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
     }
 }
 
-fun NetworkPanel.createViewMenu() = JMenu("View").apply {
-    with(networkActions) {
-        add(JMenu("Toolbars").apply {
-            add(showRunToolBarAction.toMenuItem().apply { isSelected = runToolBar.isVisible })
-            add(showMainToolBarAction.toMenuItem().apply { isSelected = mainToolBar.isVisible })
-            add(showEditToolBarAction.toMenuItem().apply { isSelected = editToolBar.isVisible })
-        })
-        addSeparator()
-        add(JCheckBoxMenuItem(showPrioritiesAction).apply { this.state = networkPanel.prioritiesVisible })
-        add(JCheckBoxMenuItem(showWeightsAction).apply { this.state = networkPanel.looseWeightsVisible })
+val NetworkPanel.viewMenu
+    get() = JMenu("View").apply {
+        with(networkActions) {
+            add(JMenu("Toolbars").apply {
+                add(showRunToolBarAction.toMenuItem().apply { isSelected = runToolBar.isVisible })
+                add(showMainToolBarAction.toMenuItem().apply { isSelected = mainToolBar.isVisible })
+                add(showEditToolBarAction.toMenuItem().apply { isSelected = editToolBar.isVisible })
+            })
+            addSeparator()
+            add(JCheckBoxMenuItem(showPrioritiesAction).apply { this.state = networkPanel.prioritiesVisible })
+            add(JCheckBoxMenuItem(showWeightsAction).apply { this.state = networkPanel.looseWeightsVisible })
+        }
     }
-}
 
 val NetworkPanel.connectionMenu
     get() = JMenu("Connect Neurons").apply {
@@ -144,54 +160,56 @@ val NetworkPanel.connectionMenu
         }
     }
 
-val NetworkPanel.neuronContextMenu get() = with(networkActions) {
-    JPopupMenu().apply {
-        add(cutAction)
-        add(copyAction)
-        add(pasteAction)
-        add(deleteAction)
-        addSeparator()
-        add(clearSourceNeurons)
-        add(setSourceNeurons)
-        add(connectionMenu)
-        addSeparator()
-        add(showLayoutDialogAction)
-        addSeparator()
-        add(showNetworkPreferencesAction)
-        addSeparator()
-        if (selectionManager.filterSelectedNodes<NeuronNode>().size > 1) {
-            add(alignMenu)
-            add(spaceMenu)
+val NetworkPanel.neuronContextMenu
+    get() = with(networkActions) {
+        JPopupMenu().apply {
+            add(cutAction)
+            add(copyAction)
+            add(pasteAction)
+            add(deleteAction)
             addSeparator()
-        }
-        add(setNeuronPropertiesAction)
-        addSeparator()
-        add(JMenu("Select").apply {
-            add(selectIncomingWeightsAction)
-            add(selectOutgoingWeightsAction)
-        })
-        addSeparator()
-        add(testInputAction)
-        add(showWeightMatrixAction)
-        if (selectionManager.filterSelectedNodes<NeuronNode>().size == 1) {
-            val node = selectionManager.filterSelectedNodes<NeuronNode>()[0]
+            add(clearSourceNeurons)
+            add(setSourceNeurons)
+            add(connectionMenu)
             addSeparator()
-            add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
+            add(showLayoutDialogAction)
+            addSeparator()
+            add(showNetworkPreferencesAction)
+            addSeparator()
+            if (selectionManager.filterSelectedNodes<NeuronNode>().size > 1) {
+                add(alignMenu)
+                add(spaceMenu)
+                addSeparator()
+            }
+            add(setNeuronPropertiesAction)
+            addSeparator()
+            add(JMenu("Select").apply {
+                add(selectIncomingWeightsAction)
+                add(selectOutgoingWeightsAction)
+            })
+            addSeparator()
+            add(testInputAction)
+            add(showWeightMatrixAction)
+            if (selectionManager.filterSelectedNodes<NeuronNode>().size == 1) {
+                val node = selectionManager.filterSelectedNodes<NeuronNode>()[0]
+                addSeparator()
+                add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
+            }
         }
     }
-}
 
-val NetworkPanel.synapseContextMenu get() = with(networkActions) {
-    JPopupMenu().apply {
-        add(cutAction)
-        add(copyAction)
-        add(pasteAction)
-        addSeparator()
-        add(deleteAction)
-        addSeparator()
-        add(setSynapsePropertiesAction)
+val NetworkPanel.synapseContextMenu
+    get() = with(networkActions) {
+        JPopupMenu().apply {
+            add(cutAction)
+            add(copyAction)
+            add(pasteAction)
+            addSeparator()
+            add(deleteAction)
+            addSeparator()
+            add(setSynapsePropertiesAction)
+        }
     }
-}
 
 fun NetworkComponent.createCouplingMenu(container: AttributeContainer) = CouplingMenu(this, container)
 

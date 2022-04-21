@@ -9,6 +9,7 @@ class ExponentialDistribution(lambda: Double = 1.0): ProbabilityDistribution() {
 
     @UserParameter(
         label = "Rate (\u03BB)",
+        useSetter = true,
         description = "The rate of exponential decay; higher rate parameters will produce more small values.",
         order = 1
     )

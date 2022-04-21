@@ -7,17 +7,23 @@ import org.simbrain.util.toIntArray
 
 class ParetoDistribution(slope: Double = 2.0, min: Double = 1.0): ProbabilityDistribution() {
 
-    @UserParameter(label = "Slope (\u03B1)", description = "The power of the distribution.", order = 1)
+    @UserParameter(
+        label = "Slope (\u03B1)",
+        useSetter = true,
+        description = "The power of the distribution.",
+        order = 1)
     var slope = slope
         set(value) {
             field = value
             dist = org.apache.commons.math3.distribution.ParetoDistribution(randomGenerator, value, min)
         }
 
-
     @UserParameter(
-        label = "Minimum", description = "The minimum value the distribution will produce. "
-                + "Note that floor should never be lower than minimum.", order = 2
+        label = "Minimum",
+        useSetter = true,
+        description = "The minimum value the distribution will produce. "
+                + "Note that floor should never be lower than minimum.",
+        order = 2
     )
     var min = min
         set(value) {

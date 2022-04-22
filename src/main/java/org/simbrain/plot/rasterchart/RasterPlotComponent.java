@@ -62,11 +62,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
         return model;
     }
 
-    @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        return model;
-    }
-
     /**
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */

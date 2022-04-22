@@ -111,20 +111,6 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-
-        //System.out.println("-->" + objectKey);
-        if (objectKey.startsWith("Entity")) {
-            return getWorld().getEntity(objectKey);
-        } else if (objectKey.startsWith("Sensor")) {
-            return getWorld().getSensor(objectKey);
-        } else if (objectKey.startsWith("Effector")) {
-            return getWorld().getEffector(objectKey);
-        }
-        return null;
-    }
-
-    @Override
     public void update() {
         world.update();
     }

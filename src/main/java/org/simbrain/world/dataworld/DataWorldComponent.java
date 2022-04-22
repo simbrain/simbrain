@@ -158,15 +158,6 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     }
 
     @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        if (objectKey.equals("DataTable")) {
-            return this;
-        } else {
-            return null;
-        }
-    }
-
-    @Override
     public void update() {
         dataTable.updateCurrentRow();
         this.getEvents().fireComponentUpdated();

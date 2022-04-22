@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * ThreeDWorldComponent is a workspace component to extract some serialization and attribute
@@ -119,32 +118,6 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
         world.getEngine().queueState(ThreeDEngine.State.SystemPause, true);
         getXStream().toXML(world, output);
         world.getEngine().queueState(previousState, false);
-    }
-
-    @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        if (objectKey == null || objectKey.isEmpty()) {
-            return null;
-        }
-        String[] parsedKey = objectKey.split(":");
-
-        Optional<Entity> entity = getWorld().getEntity(parsedKey[0]);
-        if (entity.isPresent()) {
-            if (parsedKey.length == 1) {
-                return entity.get();
-            } else {
-                String objectType = parsedKey[1];
-                Agent agent = (Agent) entity.get();
-                if (objectType.toLowerCase().contains("sensor")) {
-                    return agent.getSensor(objectType).get(); // TODO: Added the get() in a refactor may cause problems
-                } else if (objectType.toLowerCase().contains("effector")) {
-                    return agent.getEffector(objectType).get();
-                }
-                return null;
-            }
-        } else {
-            return null;
-        }
     }
 
     @Override

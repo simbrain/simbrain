@@ -57,12 +57,6 @@ public class PixelPlotComponent extends WorkspaceComponent {
         return containers;
     }
 
-    @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        // TODO
-        return null;
-    }
-
     /**
      * Create an xstream from this class.
      */

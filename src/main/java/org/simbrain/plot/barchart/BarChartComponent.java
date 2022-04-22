@@ -74,11 +74,6 @@ public class BarChartComponent extends WorkspaceComponent {
         });
     }
 
-    @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        return model;
-    }
-
     public BarChartModel getModel() {
         return model;
     }

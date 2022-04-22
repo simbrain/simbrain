@@ -49,9 +49,7 @@ import java.util.*
  * @author Tim Shea
  */
 class Workspace @JvmOverloads constructor(@Transient val coroutineScope: CoroutineScope = MainScope()) {
-    /**
-     * List of workspace components.
-     */
+
     @Transient
     private val _componentList = ArrayList<WorkspaceComponent>()
 
@@ -381,7 +379,7 @@ class Workspace @JvmOverloads constructor(@Transient val coroutineScope: Corouti
          * back of the list, so they are serialized last, and hence deserialized
          * last.
          */
-        Collections.sort(componentList) { c1, c2 -> Integer.compare(c1.serializePriority, c2.serializePriority) }
+        Collections.sort(_componentList) { c1, c2 -> Integer.compare(c1.serializePriority, c2.serializePriority) }
         savedTime = time
     }
 

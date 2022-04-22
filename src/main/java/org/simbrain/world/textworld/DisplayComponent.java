@@ -162,11 +162,6 @@ public class DisplayComponent extends WorkspaceComponent {
     }
 
     @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        return world;
-    }
-
-    @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> retList = new ArrayList<>();
         retList.add(world);

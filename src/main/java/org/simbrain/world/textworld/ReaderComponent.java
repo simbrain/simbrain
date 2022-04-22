@@ -90,11 +90,6 @@ public class ReaderComponent extends WorkspaceComponent {
     }
 
     @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        return world;
-    }
-
-    @Override
     public List<AttributeContainer> getAttributeContainers() {
         return Arrays.asList(world);
     }

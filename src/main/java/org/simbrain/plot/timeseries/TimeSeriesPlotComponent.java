@@ -106,21 +106,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         return model;
     }
 
-    @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-
-        //todo
-//        if (objectKey.equals(model.getName())) {
-//            return model;
-//        } else {
-//            Optional<TimeSeriesModel.TimeSeries> timeSeries = model.getTimeSeries(objectKey);
-//            if (timeSeries.isPresent()) {
-//                return timeSeries.get();
-//            }
-//        }
-        return null;
-    }
-
     /**
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */

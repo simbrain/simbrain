@@ -80,11 +80,6 @@ public class PieChartComponent extends WorkspaceComponent {
         return container;
     }
 
-    @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        return model;
-    }
-
     /**
      * Streams file data for opening saved charts.
      *

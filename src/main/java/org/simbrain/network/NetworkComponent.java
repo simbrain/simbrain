@@ -100,17 +100,6 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     }
 
-    // TODO: Implement new stuff
-    @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        if (objectKey.startsWith("Neuron_")) {
-            return this.getNetwork().getLooseNeuron(objectKey);
-        } else if (objectKey.startsWith("Synapse_")) {
-            return this.getNetwork().getLooseSynapse(objectKey);
-        }
-        return null;
-    }
-
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         return network.getAllModels().stream()

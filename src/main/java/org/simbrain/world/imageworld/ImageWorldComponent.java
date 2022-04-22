@@ -4,7 +4,6 @@ import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.world.imageworld.filters.Filter;
 import org.simbrain.world.imageworld.serialization.BufferedImageConverter;
 import org.simbrain.world.imageworld.serialization.CouplingArrayConverter;
 
@@ -45,16 +44,6 @@ public class ImageWorldComponent extends WorkspaceComponent {
         List<AttributeContainer> containers = new ArrayList<>();
         containers.addAll(world.getFilterCollection().getFilters());
         return containers;
-    }
-
-    @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        for (Filter filter : world.getFilterCollection().getFilters()) {
-            if (objectKey.equals(filter.getName())) {
-                return filter;
-            }
-        }
-        return null;
     }
 
     /**

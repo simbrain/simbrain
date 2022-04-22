@@ -185,11 +185,6 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     }
 
     @Override
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        return this;
-    }
-
-    @Override
     public String getId() {
         return super.getName();
     }

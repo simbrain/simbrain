@@ -143,19 +143,6 @@ public abstract class WorkspaceComponent {
     }
 
     /**
-     * Override to return objects based on a key. Used in deserializing {@link Attribute}s.
-     * Any class that produces attributes should override this for
-     * serialization.  Each attribute container in a component must be given a
-     * unique id (relative to that component) for deserializing to work.
-     *
-     * @param objectKey String key
-     * @return the corresponding AttributeContainer
-     */
-    public AttributeContainer getAttributeContainer(String objectKey) {
-        return null;
-    }
-
-    /**
      * Override to return a collection of all {@link AttributeContainer}'s currently managed by this
      * component.
      */

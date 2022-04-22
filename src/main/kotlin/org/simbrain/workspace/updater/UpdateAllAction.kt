@@ -11,7 +11,7 @@ import org.pmw.tinylog.Logger
  *
  * @author jyoshimi
  */
-class UpdateAllAction(val updater: WorkspaceUpdater) : UpdateAction(description = "Update All Components and Couplings") {
+class UpdateAllAction(@Transient val updater: WorkspaceUpdater) : UpdateAction(description = "Update All Components and Couplings") {
 
     override suspend fun run(): Unit = coroutineScope {
         val components = updater.components

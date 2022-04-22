@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent.*
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings not found here are in the action
- * classes.
+ * classes. See [NetworkActions.kt]
  */
 fun NetworkPanel.addKeyBindings() {
 

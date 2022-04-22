@@ -217,9 +217,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val fastGridAction = networkPanel.createConditionallyEnabledAction(
         name = "Apply grid layout to selected nodes",
+        keyCombo = CmdOrCtrl + 'L',
         enablingCondition = ConditionallyEnabledAction.EnablingCondition.NEURONS
     ) {
         GridLayout().layoutNeurons(selectionManager.filterSelectedModels<Neuron>())
+        zoomToFitPage()
     }
 
 }

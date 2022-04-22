@@ -99,9 +99,6 @@ public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
     private void update() {
     }
 
-    /**
-     * @return {@inheritDoc}
-     */
     public boolean clearWorkspace() {
         update();
         return true;
@@ -122,30 +119,18 @@ public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
          */
         private ArrayList<WorkspaceComponent> data = new ArrayList<WorkspaceComponent>();
 
-        /**
-         * {@inheritDoc}
-         */
         public int getColumnCount() {
             return columnNames.length;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public String getColumnName(int col) {
             return columnNames[col];
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public int getRowCount() {
             return data.size();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public Object getValueAt(int row, int col) {
             switch (col) {
                 case 0:
@@ -161,9 +146,6 @@ public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
             }
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public void setValueAt(Object value, int row, int col) {
             switch (col) {
                 case 0:
@@ -182,9 +164,6 @@ public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
             this.fireTableDataChanged();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public boolean isCellEditable(int row, int col) {
             switch (col) {
                 case 0:
@@ -228,9 +207,6 @@ public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
             fireTableStructureChanged();
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public Class getColumnClass(int col) {
             switch (col) {
                 case 0:

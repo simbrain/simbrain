@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -152,17 +151,6 @@ public abstract class WorkspaceComponent {
 
     public CouplingManager getCouplingManager() {
         return workspace.getCouplingManager();
-    }
-
-    /**
-     * Returns the locks for the update parts. There should be one lock per
-     * part. These locks need to be the same ones used to lock the update of
-     * each part.
-     *
-     * @return The locks for the update parts.
-     */
-    public Collection<? extends Object> getLocks() {
-        return Collections.singleton(this);
     }
 
     /**

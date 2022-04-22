@@ -7,7 +7,7 @@ import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.workspace.gui.SimbrainDesktop
 
-class UpdaterTest {
+class SimbrainDesktopTest {
 
     @Test
     fun `ensure gui components are ready for placement after component creation`() {

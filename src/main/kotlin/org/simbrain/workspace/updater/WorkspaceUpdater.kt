@@ -252,22 +252,4 @@ class WorkspaceUpdater(val workspace: Workspace) {
             return components
         }
 
-    companion object {
-        /**
-         * A synch-manager where the methods do nothing.
-         */
-        private val NO_ACTION_SYNC_MANAGER: TaskSynchronizationManager = object : TaskSynchronizationManager {
-            override fun queueTasks() {
-                /* no implementation */
-            }
-
-            override fun releaseTasks() {
-                /* no implementation */
-            }
-
-            override fun runTasks() {
-                /* no implementation */
-            }
-        }
-    }
 }

@@ -5,33 +5,27 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toDoubleArray
 
-class PoissonDistribution(p: Double = 1.0, epsilon:Double = 1e-12, maxIterations: Int = 10000000) : ProbabilityDistribution
-() {
+/**
+ * https://en.wikipedia.org/wiki/Poisson_distribution
+ */
+class PoissonDistribution(p: Double = 1.0) : ProbabilityDistribution() {
 
-    @UserParameter(label = "Pouisson mean", useSetter = true, description = "Todo.", order = 2)
+    @UserParameter(
+        label = "Mean value",
+        useSetter = true,
+        description = "The discrete value you should expect to see most often.",
+        minimumValue = 0.00001,
+        increment = 1.0,
+        order = 2)
     var p = p
         set(value) {
             field = value
-            dist = org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, value, epsilon,
-                maxIterations)
-        }
-
-    @UserParameter(label = "Epsilon", useSetter = true, description = "Todo.", order = 2)
-    var epsilon = epsilon
-        set(value) {
-            field = value
-            dist = org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, p, value, maxIterations)
-        }
-
-    @UserParameter(label = "Max iterations", description = "Todo.", order = 3)
-    var maxIterations = maxIterations
-        set(value) {
-            field = value
-            dist = org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, p, epsilon, value)
+            dist = org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, value, 1e-12, 10000000 )
         }
 
     @Transient
-    var dist: AbstractIntegerDistribution = org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, p, epsilon, maxIterations)
+    var dist: AbstractIntegerDistribution =
+        org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, p,  1e-12, 10000000)
 
     override fun sampleDouble(): Double = dist.sample().toDouble()
 
@@ -48,7 +42,7 @@ class PoissonDistribution(p: Double = 1.0, epsilon:Double = 1e-12, maxIterations
     override fun deepCopy(): PoissonDistribution {
         val copy = PoissonDistribution()
         copy.randomSeed = randomSeed
-        // TODO
+        copy.p = p
         return copy
     }
 

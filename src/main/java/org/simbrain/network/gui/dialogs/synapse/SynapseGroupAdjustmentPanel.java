@@ -39,6 +39,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+// TODO: This re-creates most of SynapseAdjustmentPanel.kt. Re-use is needed!
+
 /**
  * A panel for adjusting the polarity and weights of a synapse group as well as
  * its weight randomizers, and displaying the results in a histogram.

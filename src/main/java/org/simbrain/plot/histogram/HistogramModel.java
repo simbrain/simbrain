@@ -187,11 +187,9 @@ public class HistogramModel implements AttributeContainer {
 
     /**
      * Reset the data in the model.
-     *
-     * @param data  the data to set
-     * @param names
      */
     public void resetData(List<double[]> data, List<String> names) {
+        resetData();
         this.data = data;
         this.dataNames = names;
         redraw();

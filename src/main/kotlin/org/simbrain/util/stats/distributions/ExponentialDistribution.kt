@@ -5,12 +5,17 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toIntArray
 
+/**
+ * See https://en.wikipedia.org/wiki/Exponential_distribution
+ */
 class ExponentialDistribution(lambda: Double = 1.0): ProbabilityDistribution() {
 
     @UserParameter(
         label = "Rate (\u03BB)",
         useSetter = true,
-        description = "The rate of exponential decay; higher rate parameters will produce more small values.",
+        description = "The rate of exponential decay. The mean is 1/λ. For higher λ the mean is closer to 0 " +
+                "For lower λ the mean is farther from 0 and the tail is longer.",
+        minimumValue = 0.00001,
         order = 1
     )
     var lambda = lambda

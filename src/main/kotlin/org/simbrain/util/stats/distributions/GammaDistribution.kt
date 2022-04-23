@@ -5,22 +5,33 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toIntArray
 
+/**
+ * https://en.wikipedia.org/wiki/Gamma_distribution
+ */
 class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0) : ProbabilityDistribution() {
 
-    @UserParameter(label = "Shape (k)", useSetter = true, description = "Shape (k).", order = 1)
-    private var shape = shape
+    @UserParameter(
+        label = "Shape (k)",
+        useSetter = true,
+        description = "Shape (k).",
+        minimumValue = 0.0001,
+        order = 1)
+    var shape = shape
         set(value) {
             field = value
             dist = org.apache.commons.math3.distribution.GammaDistribution(randomGenerator, value, scale)
         }
 
-    @UserParameter(label = "Scale (\u03B8)", useSetter = true, description = "Scale (\u03B8).", order = 2)
-    private var scale = scale
+    @UserParameter(label = "Scale (\u03B8)",
+        useSetter = true,
+        description = "Scale (\u03B8).",
+        minimumValue = 0.0001,
+        order = 2)
+    var scale = scale
         set(value) {
             field = value
             dist = org.apache.commons.math3.distribution.GammaDistribution(randomGenerator, shape, value)
         }
-
 
     @Transient
     var dist: AbstractRealDistribution =

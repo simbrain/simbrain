@@ -111,7 +111,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
     init {
 
         // Extract weight values in usable form by internal methods
-        extractWeightValues(synapses)
+        updateWeightArrays(synapses)
 
         histogramPanel.setxAxisName("Synapse Strength")
         histogramPanel.setyAxisName("# of Synapses")
@@ -203,8 +203,6 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
         }
         this.add(bottomPanel, gbc)
 
-        updateStats()
-        updateHistogram()
         addActionListeners()
         initRandomizerPanel()
     }
@@ -251,12 +249,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
     }
 
     private fun initRandomizerPanel() {
-        updateHistogram()
-        updateStats()
-        if (parent != null) {
-            parent.revalidate()
-            parent.repaint()
-        }
+        fullUpdate()
         when (synTypeSelector.selectedItem as SynapseView) {
             SynapseView.ALL, SynapseView.OVERLAY -> {
                 chooseRandomizerPanel.removeAll()
@@ -277,7 +270,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
      * Extracts weight values and organizes them by synapse type (inhibitory or
      * excitatory). Inhibitory values are represented by their absolute value.
      */
-    private fun extractWeightValues(synapses: List<Synapse>) {
+    private fun updateWeightArrays(synapses: List<Synapse>) {
         var exWeights = 0
         var inWeights = 0
 
@@ -312,11 +305,13 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
      * question.
      */
     private fun fullUpdate() {
-        extractWeightValues(synapses)
+        updateWeightArrays(synapses)
         updateHistogram()
         updateStats()
-        parent.revalidate()
-        parent.repaint()
+        if (parent != null) {
+            parent.revalidate()
+            parent.repaint()
+        }
     }
 
     /**
@@ -342,7 +337,6 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
                 data.add(hist2)
             }
             SynapseView.OVERLAY -> {
-
                 // Send the histogram the excitatory and absolute inhibitory
                 // synapse values as separate data series.
                 val hist1 = weights[0]
@@ -553,7 +547,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
 
                 // Update the internal panel and data
                 synapses = (toDelete complement synapses).rightComp.toList()
-                extractWeightValues(synapses)
+                updateWeightArrays(synapses)
                 fullUpdate()
 
                 // Delete from the network itself

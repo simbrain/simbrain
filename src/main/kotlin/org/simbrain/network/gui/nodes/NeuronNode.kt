@@ -330,23 +330,18 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
      * Update the text label.
      */
     fun updateTextLabel() {
-        if (!currentTextVisibility) {
-            return
-        }
-        if (neuron.label == null) {
-            return
-        }
-
-        // Set label text
-        if (!neuron.label.equals("", ignoreCase = true) || !neuron.label.equals(
-                SimbrainConstants.NULL_STRING,
-                ignoreCase = true
-            )
-        ) {
-            labelText.font = NEURON_FONT
-            labelText.text = "" + neuron.label
-            labelText.setOffset(mainShape.x - labelText.width / 2 + DIAMETER / 2, mainShape.y - DIAMETER / 2 - 1)
-            labelBackground.setBounds(labelText.fullBounds)
+        if (currentTextVisibility && neuron.label != null) {
+            // Set label text
+            if (!neuron.label.equals("", ignoreCase = true) || !neuron.label.equals(
+                    SimbrainConstants.NULL_STRING,
+                    ignoreCase = true
+                )
+            ) {
+                labelText.font = NEURON_FONT
+                labelText.text = "" + neuron.label
+                labelText.setOffset(mainShape.x - labelText.width / 2 + DIAMETER / 2, mainShape.y - DIAMETER / 2 - 1)
+                labelBackground.setBounds(labelText.fullBounds)
+            }
 
             // update bounds to include text
             val bounds = mainShape.bounds
@@ -524,12 +519,12 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
     }
 
     //@Override
-    //public void setGrouped(final boolean isGrouped) {
-    //    super.setGrouped(isGrouped);
-    //    for (SynapseNode synapseNode : connectedSynapses) {
-    //        synapseNode.setGrouped(isGrouped);
-    //    }
-    //}
+//public void setGrouped(final boolean isGrouped) {
+//    super.setGrouped(isGrouped);
+//    for (SynapseNode synapseNode : connectedSynapses) {
+//        synapseNode.setGrouped(isGrouped);
+//    }
+//}
     override fun getModel(): Neuron {
         return neuron
     }

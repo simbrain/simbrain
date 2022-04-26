@@ -92,7 +92,6 @@ public class ParameterWidget implements Comparable<ParameterWidget> {
         }
     }
 
-
     /**
      * Check if this component should be enabled or not, based on
      * {@link UserParameter#conditionalEnablingMethod()} ()}.

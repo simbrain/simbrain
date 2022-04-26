@@ -25,7 +25,6 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries;
 
 import javax.swing.*;
 import java.awt.*;
@@ -195,12 +194,7 @@ public class HistogramPanel extends JPanel {
 
         JPanel buttonPanel = new JPanel();
         JButton clearButton = new JButton("Clear");
-        clearButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.resetData();
-            }
-        });
+        clearButton.addActionListener(e -> model.resetData());
         buttonPanel.add(clearButton);
         buttonPanel.add(binButton);
         buttonPanel.add(numBinLabel);
@@ -214,7 +208,7 @@ public class HistogramPanel extends JPanel {
                 HistogramModel model = HistogramPanel.this.getModel();
                 try {
                     model.setBins(Integer.parseInt(numBins.getText()));
-                    model.redraw();
+                    model.applyCurrentData();
                 } catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
                     JOptionPane.showMessageDialog(getParent(), "Non-Integer number of bins.", "Error", JOptionPane.ERROR);
@@ -246,10 +240,10 @@ public class HistogramPanel extends JPanel {
                 renderer.setDrawBarOutline(false);
                 renderer.setShadowVisible(false);
 
-                Iterator<ColoredDataSeries> series = model.getSeriesData().iterator();
+                Iterator<OverwritableHistogramDataset.ColoredDataSeries> series = model.getSeriesData().iterator();
                 for (int i = 0; i < model.getData().size(); i++) {
                     if (i < colorPallet.length) {
-                        ColoredDataSeries s = series.next();
+                        OverwritableHistogramDataset.ColoredDataSeries s = series.next();
                         Color c = s.color;
                         if (c == null) {
                             c = assignColor();
@@ -300,11 +294,11 @@ public class HistogramPanel extends JPanel {
     public void reRender() {
         XYPlot plot = (XYPlot) mainChart.getPlot();
         XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
-        Iterator<ColoredDataSeries> series = model.getSeriesData().iterator();
+        Iterator<OverwritableHistogramDataset.ColoredDataSeries> series = model.getSeriesData().iterator();
         int i = 0;
         while (series.hasNext()) {
             if (i < colorPallet.length) {
-                ColoredDataSeries s = series.next();
+                OverwritableHistogramDataset.ColoredDataSeries s = series.next();
                 Color c = s.color;
                 if (c == null) {
                     c = assignColor();

@@ -45,7 +45,7 @@ public class HistogramComponent extends WorkspaceComponent {
      */
     public HistogramComponent(final String name) {
         super(name);
-        model = new HistogramModel(HistogramModel.INITIAL_DATA_SOURCES);
+        model = new HistogramModel();
     }
 
     /**

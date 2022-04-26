@@ -97,6 +97,18 @@ class ProbabilityDistributionTest {
     }
 
     @Test
+    fun `test exponential negation`() {
+        val dist = ExponentialDistribution()
+        dist.negate = true
+        assertTrue(dist.sampleDouble() <= 0)
+        assertTrue(dist.sampleInt() <= 0)
+        var nums = dist.sampleDouble(5)
+        assertTrue(nums.minOrNull()!! <= 0)
+        var intNums = dist.sampleInt(5)
+        assertTrue(intNums.minOrNull()!! <= 0)
+    }
+
+    @Test
     fun `test same results from same seed`() {
         var dist1: ProbabilityDistribution = NormalDistribution(1.0, .5)
         dist1.randomSeed = 1

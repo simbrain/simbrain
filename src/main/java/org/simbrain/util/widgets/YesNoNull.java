@@ -72,11 +72,7 @@ public class YesNoNull extends ChoicesWithNull {
      * @return True or false value
      */
     public boolean isSelected() {
-        if (this.getSelectedIndex() == TRUE) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.getSelectedIndex() == TRUE;
     }
 
     /**

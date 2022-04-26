@@ -59,7 +59,8 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
      * that this array is only used internally, to display stats and the
      * histogram.
      */
-    private val weights = arrayOfNulls<DoubleArray>(2)
+    // TODO: Simplify by replacing with excitatoryArray and inhibitoryArray.
+    private val weights = arrayOf(doubleArrayOf(), doubleArrayOf())
 
     private val allRandomizer = Randomizer(UniformRealDistribution(-1.0, 1.0))
     private val allPanel = AnnotatedPropertyEditor(allRandomizer)
@@ -71,7 +72,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
     private var chooseRandomizerPanel = JPanel()
     private val randomizeButton = JButton("Apply")
 
-    private val perturber: ProbabilityDistribution = UniformRealDistribution(-0.1,.01)
+    private val perturber: ProbabilityDistribution = UniformRealDistribution(-0.1, .01)
     private val perturberRandomizer = Randomizer(perturber)
     private val perturberPanel = AnnotatedPropertyEditor(perturberRandomizer)
     private val perturbButton = JButton("Apply")
@@ -91,7 +92,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
      * A histogram plotting the strength of synapses over given intervals (bins)
      * against their frequency.
      */
-    private val histogramPanel = HistogramPanel(HistogramModel(2))
+    private val histogramPanel = HistogramPanel(HistogramModel())
 
     /**
      * A panel displaying basic statistics about the synapses, including: number
@@ -222,6 +223,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
                 SynapseView.INHIBITORY -> inhibitoryPanel.commitChanges()
                 SynapseView.EXCITATORY -> excitatoryPanel.commitChanges()
             }
+
             synapses.filter { s -> view.synapseIsAdjustable(s) }.forEach { s ->
                 when (view) {
                     SynapseView.ALL, SynapseView.OVERLAY -> s.forceSetStrength(allRandomizer.sampleDouble())
@@ -288,16 +290,15 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
         weights[1] = DoubleArray(inWeights)
         exWeights = 0
         inWeights = 0
-        if (weights[0]!!.isNotEmpty()) {
-            for (s in synapses) {
-                val w = s.strength
-                if (w > 0) {
-                    weights[0]!![exWeights++] = w
-                } else {
-                    weights[1]!![inWeights++] = w
-                }
+        for (s in synapses) {
+            val w = s.strength
+            if (w > 0) {
+                weights[0][exWeights++] = w
+            } else {
+                weights[1][inWeights++] = w
             }
         }
+
     }
 
     /**
@@ -322,7 +323,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
      * represent excitatory values, blue is used for inhibitory.
      */
     private fun updateHistogram() {
-        val data: MutableList<DoubleArray?> = ArrayList()
+        val data: MutableList<DoubleArray> = ArrayList()
         val names: MutableList<String> = ArrayList()
         when (synTypeSelector.selectedItem as SynapseView) {
             SynapseView.ALL -> {
@@ -340,11 +341,11 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
                 // Send the histogram the excitatory and absolute inhibitory
                 // synapse values as separate data series.
                 val hist1 = weights[0]
-                val hist2 = DoubleArray(weights[1]!!.size)
+                val hist2 = DoubleArray(weights[1].size)
                 var i = 0
                 val n = hist2.size
                 while (i < n) {
-                    hist2[i] = Math.abs(weights[1]!![i])
+                    hist2[i] = Math.abs(weights[1][i])
                     i++
                 }
                 // The names of both series
@@ -387,10 +388,10 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
         meanLabel.text = "Mean: " + SimbrainMath.roundDouble(statCalculator.mean, 5)
         medianLabel.text = "Median: " + SimbrainMath.roundDouble(statCalculator.median, 5)
         sdLabel.text = "Std. Dev: " + SimbrainMath.roundDouble(statCalculator.stdDev, 5)
-        val tot = weights[0]!!.size + weights[1]!!.size
+        val tot = weights[0].size + weights[1].size
         numSynsLabel.text = "Synapses: " + Integer.toString(tot)
-        numExSynsLabel.text = "Excitatory : " + Integer.toString(weights[0]!!.size)
-        numInSynsLabel.text = "Inhibitory: " + Integer.toString(weights[1]!!.size)
+        numExSynsLabel.text = "Excitatory : " + Integer.toString(weights[0].size)
+        numInSynsLabel.text = "Inhibitory: " + Integer.toString(weights[1].size)
         statsPanel.revalidate()
         statsPanel.repaint()
     }
@@ -419,20 +420,20 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
             var tot = 0
             val type = synTypeSelector.selectedItem as SynapseView
             var runningVal = 0.0
-            if (weights[0]!!.size == 0 && weights[1]!!.size == 0) {
+            if (weights[0].size == 0 && weights[1].size == 0) {
                 return
             }
 
             // Determine selected type(s) and collect data accordingly...
             if (type == SynapseView.ALL) {
-                tot = weights[0]!!.size + weights[1]!!.size
+                tot = weights[0].size + weights[1].size
                 data = DoubleArray(tot)
                 var c = 0
                 for (i in 0..1) {
                     var j = 0
-                    val m = weights[i]!!.size
+                    val m = weights[i].size
                     while (j < m) {
-                        val `val` = weights[i]!![j]
+                        val `val` = weights[i][j]
                         runningVal += `val`
                         data[c] = `val`
                         c++
@@ -440,33 +441,33 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
                     }
                 }
             } else if (type == SynapseView.OVERLAY) {
-                tot = weights[0]!!.size + weights[1]!!.size
+                tot = weights[0].size + weights[1].size
                 data = DoubleArray(tot)
                 var c = 0
                 for (i in 0..1) {
                     var j = 0
-                    val m = weights[i]!!.size
+                    val m = weights[i].size
                     while (j < m) {
-                        val `val` = Math.abs(weights[i]!![j])
+                        val `val` = Math.abs(weights[i][j])
                         runningVal += `val`
                         data[c] = `val`
                         c++
                         j++
                     }
                 }
-            } else if (type == SynapseView.EXCITATORY && weights[0]!!.size != 0) {
-                tot = weights[0]!!.size
+            } else if (type == SynapseView.EXCITATORY && weights[0].size != 0) {
+                tot = weights[0].size
                 data = DoubleArray(tot)
                 for (j in 0 until tot) {
-                    val `val` = Math.abs(weights[0]!![j])
+                    val `val` = Math.abs(weights[0][j])
                     runningVal += `val`
                     data[j] = `val`
                 }
-            } else if (type == SynapseView.INHIBITORY && weights[1]!!.size != 0) {
-                tot = weights[1]!!.size
+            } else if (type == SynapseView.INHIBITORY && weights[1].size != 0) {
+                tot = weights[1].size
                 data = DoubleArray(tot)
                 for (j in 0 until tot) {
-                    val `val` = weights[1]!![j]
+                    val `val` = weights[1][j]
                     runningVal += `val`
                     data[j] = `val`
                 }
@@ -543,7 +544,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
                 val threshold = tfThreshold.text.toDouble()
                 val view = synTypeSelector.selectedItem as SynapseView
                 val toDelete = synapses.filter { view.synapseIsAdjustable(it) }
-                    .filter {Math.abs(it.strength) < threshold}
+                    .filter { Math.abs(it.strength) < threshold }
 
                 // Update the internal panel and data
                 synapses = (toDelete complement synapses).rightComp.toList()
@@ -561,6 +562,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
             override fun toString(): String {
                 return "All"
             }
+
             override fun synapseIsAdjustable(s: Synapse): Boolean {
                 return true
             }
@@ -569,6 +571,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
             override fun toString(): String {
                 return "Overlay"
             }
+
             override fun synapseIsAdjustable(s: Synapse): Boolean {
                 return true
             }
@@ -577,6 +580,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
             override fun toString(): String {
                 return "Excitatory"
             }
+
             override fun synapseIsAdjustable(s: Synapse): Boolean {
                 return s.strength >= 0
             }
@@ -585,6 +589,7 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
             override fun toString(): String {
                 return "Inhibitory"
             }
+
             override fun synapseIsAdjustable(s: Synapse): Boolean {
                 return s.strength < 0
             }

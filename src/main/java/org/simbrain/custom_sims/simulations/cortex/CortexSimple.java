@@ -197,8 +197,8 @@ public class CortexSimple extends Simulation {
     private SynapseGroup connectLayers(NeuronGroup src, NeuronGroup tar,
                                        double sparsity) {
 
-        ProbabilityDistribution exRand = new LogNormalDistribution(exlocation, exscale);
-        ProbabilityDistribution inRand = new LogNormalDistribution(-exlocation, exscale);
+        ProbabilityDistribution exRand = new LogNormalDistribution(exlocation, exscale, false);
+        ProbabilityDistribution inRand = new LogNormalDistribution(exlocation, exscale, true);
 
         Sparse con = new Sparse(sparsity, false, false);
 

@@ -35,15 +35,16 @@ import java.util.stream.Collectors;
  * represented by an appropriate java JComponent (often a text field but also
  * special drop downs for booleans, etc), via the {@link ParameterWidget} class.
  * When all the objects in the edited collection have the same value, it is
- * shown in the widget.  When they have different values it a null value "..."
+ * shown in the widget.  When they have different values a null value "..."
  * is shown.  Null values are ignored when the panel is closed, and any values
  * in the panel are written to it.
  * <p>
  * To use simply initialize with a single object or list of objects to edit. These
  * objects must instantiate {@link EditableObject}. The fields that should be editable
- * are annotated with the {@link UserParameter} annotation.  Object types must instantiate
- * {@link CopyableObject}, because the way it works is that (e.g.) when changing the update
- * rule of a neuron, a copy of a prototype rule is made of the relevant type.
+ * are annotated with the {@link UserParameter} annotation.
+ * <p>
+ * Object types are created by updating a prototype object, then copying it. Thus objects using the object type
+ * editor must instantiate {@link CopyableObject}.
  * <p>
  * You can also use the editor to build a more customized panel but using the
  * property editor as a holder that can then return JComponents for specific
@@ -293,7 +294,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
             return;
         }
 
-        // Commit each widgets value to all objects in list
+        // Commit each widget's value to all objects in list
         for (ParameterWidget pw : widgets) {
 
             if (!pw.getParameter().isEditable()) {

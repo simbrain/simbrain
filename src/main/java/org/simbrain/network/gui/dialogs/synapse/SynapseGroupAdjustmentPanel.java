@@ -79,7 +79,8 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
      * A histogram plotting the strength of synapses over given intervals (bins)
      * against their frequency.
      */
-    private HistogramPanel histogramPanel = new HistogramPanel(new HistogramModel(2));
+    // private HistogramPanel histogramPanel = new HistogramPanel(new HistogramModel(2));
+    private HistogramPanel histogramPanel = new HistogramPanel(new HistogramModel());
 
     /**
      * The panel governing the percent excitatory connections and the randomizer
@@ -126,7 +127,10 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
             if (bins < 10) {
                 bins = 10;
             }
-            histogramPanel = new HistogramPanel(new HistogramModel(2, bins));
+            var model = new HistogramModel();
+            model.setBins(bins);
+            model.addDataSources(2);
+            histogramPanel = new HistogramPanel(new HistogramModel());
         }
         histogramPanel.setVisible(!creationPanel);
         revalidateButton.setVisible(!creationPanel);

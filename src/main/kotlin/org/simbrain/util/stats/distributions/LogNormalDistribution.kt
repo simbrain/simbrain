@@ -2,13 +2,15 @@ package org.simbrain.util.stats.distributions
 
 import org.apache.commons.math3.distribution.AbstractRealDistribution
 import org.simbrain.util.UserParameter
+import org.simbrain.util.stats.NegatableDistribution
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toIntArray
 
 /**
  * https://en.wikipedia.org/wiki/Log-normal_distribution
  */
-class LogNormalDistribution(location: Double = 1.0, scale: Double = .5): ProbabilityDistribution() {
+class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: Boolean = false)
+    : NegatableDistribution, ProbabilityDistribution() {
 
     // TODO: Should this be min 0? The apache requires it but wiki suggests not.
     @UserParameter(
@@ -38,23 +40,27 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5): Probabi
             dist = org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, value, location)
         }
 
+    override var negate: Boolean = negate
+
     @Transient
     var dist: AbstractRealDistribution =
         org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, scale, location)
 
-    override fun sampleDouble(): Double = dist.sample()
+    override fun sampleDouble(): Double = dist.sample().conditionalNegate()
 
-    override fun sampleDouble(n: Int): DoubleArray = dist.sample(n)
+    override fun sampleDouble(n: Int): DoubleArray = dist.sample(n).conditionalNegate()
 
-    override fun sampleInt(): Int = dist.sample().toInt()
+    override fun sampleInt(): Int = dist.sample().toInt().conditionalNegate()
 
-    override fun sampleInt(n: Int) = dist.sample(n).toIntArray()
+    override fun sampleInt(n: Int) = dist.sample(n).toIntArray().conditionalNegate()
+
 
     override fun deepCopy(): LogNormalDistribution {
         val copy = LogNormalDistribution()
         copy.randomSeed = randomSeed
         copy.location = location
         copy.scale = scale
+        copy.negate = negate
         return copy
     }
 

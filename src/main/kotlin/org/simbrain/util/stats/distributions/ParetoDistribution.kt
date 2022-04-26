@@ -2,13 +2,15 @@ package org.simbrain.util.stats.distributions
 
 import org.apache.commons.math3.distribution.AbstractRealDistribution
 import org.simbrain.util.UserParameter
+import org.simbrain.util.stats.NegatableDistribution
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toIntArray
 
 /**
  * https://en.wikipedia.org/wiki/Pareto_distribution
  */
-class ParetoDistribution(shape: Double = 3.0, scale: Double = 1.0): ProbabilityDistribution() {
+class ParetoDistribution(shape: Double = 3.0, scale: Double = 1.0, negate: Boolean = false)
+    : NegatableDistribution, ProbabilityDistribution() {
 
     @UserParameter(
         label = "Shape (α)",
@@ -35,23 +37,26 @@ class ParetoDistribution(shape: Double = 3.0, scale: Double = 1.0): ProbabilityD
             dist = org.apache.commons.math3.distribution.ParetoDistribution(randomGenerator, value, shape)
         }
 
+    override var negate: Boolean = negate
+
     @Transient
     var dist: AbstractRealDistribution =
         org.apache.commons.math3.distribution.ParetoDistribution(randomGenerator, scale, shape)
 
-    override fun sampleDouble(): Double = dist.sample()
+    override fun sampleDouble(): Double = dist.sample().conditionalNegate()
 
-    override fun sampleDouble(n: Int): DoubleArray = dist.sample(n)
+    override fun sampleDouble(n: Int): DoubleArray = dist.sample(n).conditionalNegate()
 
-    override fun sampleInt(): Int = dist.sample().toInt()
+    override fun sampleInt(): Int = dist.sample().toInt().conditionalNegate()
 
-    override fun sampleInt(n: Int) = dist.sample(n).toIntArray()
+    override fun sampleInt(n: Int) = dist.sample(n).toIntArray().conditionalNegate()
 
     override fun deepCopy(): ParetoDistribution {
         val copy = ParetoDistribution()
         copy.randomSeed = randomSeed
         copy.shape = shape
         copy.scale = scale
+        copy.negate = negate
         return copy
     }
 

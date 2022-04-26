@@ -2,13 +2,15 @@ package org.simbrain.util.stats.distributions
 
 import org.apache.commons.math3.distribution.AbstractIntegerDistribution
 import org.simbrain.util.UserParameter
+import org.simbrain.util.stats.NegatableDistribution
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toDoubleArray
 
 /**
  * https://en.wikipedia.org/wiki/Poisson_distribution
  */
-class PoissonDistribution(p: Double = 1.0) : ProbabilityDistribution() {
+class PoissonDistribution(p: Double = 1.0, negate: Boolean = false)
+    : NegatableDistribution, ProbabilityDistribution() {
 
     @UserParameter(
         label = "Mean value",
@@ -23,17 +25,19 @@ class PoissonDistribution(p: Double = 1.0) : ProbabilityDistribution() {
             dist = org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, value, 1e-12, 10000000 )
         }
 
+    override var negate: Boolean = negate
+
     @Transient
     var dist: AbstractIntegerDistribution =
         org.apache.commons.math3.distribution.PoissonDistribution(randomGenerator, p,  1e-12, 10000000)
 
-    override fun sampleDouble(): Double = dist.sample().toDouble()
+    override fun sampleDouble(): Double = dist.sample().toDouble().conditionalNegate()
 
-    override fun sampleDouble(n: Int): DoubleArray = dist.sample(n).toDoubleArray()
+    override fun sampleDouble(n: Int): DoubleArray = dist.sample(n).toDoubleArray().conditionalNegate()
 
-    override fun sampleInt(): Int = dist.sample()
+    override fun sampleInt(): Int = dist.sample().conditionalNegate()
 
-    override fun sampleInt(n: Int) = dist.sample(n)
+    override fun sampleInt(n: Int) = dist.sample(n).conditionalNegate()
 
     override fun getName(): String {
         return "Poisson"
@@ -43,6 +47,7 @@ class PoissonDistribution(p: Double = 1.0) : ProbabilityDistribution() {
         val copy = PoissonDistribution()
         copy.randomSeed = randomSeed
         copy.p = p
+        copy.negate = negate
         return copy
     }
 

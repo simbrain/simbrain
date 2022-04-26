@@ -48,7 +48,7 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
     /**
      * A mapping from the names of data series to the data themselves.
      */
-    private LinkedHashMap<String, ColoredDataSeries> dataMap = new LinkedHashMap<String, ColoredDataSeries>();
+    private final LinkedHashMap<String, ColoredDataSeries> dataMap = new LinkedHashMap<String, ColoredDataSeries>();
 
     /**
      * The histogram type.
@@ -102,6 +102,8 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
     public void overwriteSeries(String key, double[] values, int bins) {
         addSeries(key, values, bins);
     }
+
+    // NOTE: This is where the bins and ths mins and maxes are computed. It happens with calls to getRange.
 
     /**
      * Adds a series to the dataset. Any data value less than minimum will be
@@ -220,14 +222,12 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
         }
         Iterator<double[]> dataIterator = data.iterator();
         for (String str : names) {
+            dataMap.remove(str); // NOTE: Added to code to ensure old bin counts are erased
             addSeries(str, dataIterator.next(), bins);
         }
         dataMap.keySet().retainAll(names);
     }
 
-    /**
-     * {@inheritDoc} A bit expensive...
-     */
     @Override
     public Comparable<String> getSeriesKey(int arg0) {
         int i = 0;
@@ -383,37 +383,22 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
         return getY(series, item);
     }
 
-    /**
-     * Tests this dataset for equality with an arbitrary object.
-     *
-     * @param obj the object to test against (<code>null</code> permitted).
-     * @return A boolean.
-     */
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj.getClass().equals(this.getClass()))) {
-            return false;
-        }
-        // TODO: Commented out after updating JFreechart. Impact not yet known!
-        // OverwritableHistogramDataset that = (OverwritableHistogramDataset) obj;
-        // if (!ObjectUtilities.equal(this.type, that.type)) {
-        //     return false;
-        // }
-        // if (!ObjectUtilities.equal(this.dataMap, that.dataMap)) {
-        //     return false;
-        // }
-        return true;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OverwritableHistogramDataset that = (OverwritableHistogramDataset) o;
+
+        if (dataMap != null ? !dataMap.equals(that.dataMap) : that.dataMap != null) return false;
+        return type != null ? type.equals(that.type) : that.type == null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public int hashCode() {
-        final int p1 = 13;
-        final int p2 = 89;
-        return p1 * this.type.hashCode() + p2 * this.dataMap.hashCode();
+        int result = dataMap != null ? dataMap.hashCode() : 0;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
     }
 
     /**

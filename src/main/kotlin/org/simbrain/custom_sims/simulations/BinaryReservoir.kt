@@ -9,12 +9,22 @@ import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.util.*
 import org.simbrain.util.Utils.FS
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.util.stats.distributions.TwoValued
 import java.io.File
 import java.lang.Math.sqrt
 import javax.swing.JTextField
 
 /**
- * Create a reservoir simulation...
+ * Create a reservoir simulation.
+ *
+ * Based on Bertschinger, Nils, and Thomas Natschläger.
+ * "Real-time computation at the edge of chaos in recurrent neural networks."
+ * Neural computation 16.7 (2004): 1413-1436.
+ *
+ * Also see [EdgeOfChaos] and [EdgeOfChaosBitsream]
+ *
+ * @author Jeff Yoshimi
+ * @author Sergio Ponce de Leon
  */
 val binaryReservoir = newSim {
 
@@ -22,14 +32,15 @@ val binaryReservoir = newSim {
     // U_bar
     // Measure of chaos, etc.
 
-    val k = 2
+    val k = 4
     var variance = .1
     val baseIterations = 400
     val responseIterations = 300
+    val inputNoise = TwoValued(-1.0,1.0, .5)
+    val numNeurons = 250
 
     var normalDist = NormalDistribution(0.0, 1.0)
-    normalDist.randomSeed = 1
-    // TODO: Use this in building the network itself
+    // normalDist.randomSeed = 1 // Not sufficient to randomize
 
     // Stored activations
     // Each row is an activation vector at a time.
@@ -42,7 +53,7 @@ val binaryReservoir = newSim {
     val network = networkComponent.network
 
     // Add a self-connected neuron array to the network
-    val resNeurons = List(100) {
+    val resNeurons = List(numNeurons) {
         val rule = BinaryRule()
         rule.threshold = .5
         val neuron = Neuron(network, rule)
@@ -96,6 +107,8 @@ val binaryReservoir = newSim {
     }
 
     network.addUpdateAction(updateAction("Record activations") {
+        val u = inputNoise.sampleDouble()
+        resNeurons.map{n -> n.addInputValue(u)}
         activations.add(resNeurons.map { n -> n.activation })
     })
 

@@ -28,19 +28,30 @@ import javax.swing.JTextField
  */
 val binaryReservoir = newSim {
 
-    // TODO: Button for variance and implement.
-    // U_bar
-    // Measure of chaos, etc.
+    // Neurons in the reservoir
+    val numNeurons = 100
 
+    // Fan-in to each neuron
     val k = 4
-    var variance = .1
-    val baseIterations = 400
-    val responseIterations = 300
-    val inputNoise = TwoValued(-1.0,1.0, .5)
-    val numNeurons = 250
 
+    // Weight variance
+    var variance = .1
+
+    // Times to iterate before perturbation
+    val baseIterations = 5
+
+    // What percent of neurons to perturb
+    val percentToPerturb = 1
+    val numNodesToPerturb = (percentToPerturb * numNeurons).toInt()
+
+    // Times to iterate after perturbation
+    val responseIterations = 5
+
+    // Noise used to generate u-bar
+    val inputNoise = TwoValued(-1.0,1.0, .5)
+
+    // Distribution used to generate synapses
     var normalDist = NormalDistribution(0.0, 1.0)
-    // normalDist.randomSeed = 1 // Not sufficient to randomize
 
     // Stored activations
     // Each row is an activation vector at a time.
@@ -73,10 +84,6 @@ val binaryReservoir = newSim {
      * Resets the variance by rescaling synapses. Assumes valid variance to begin with.
      */
     fun setVariance(newVariance: Double) {
-        // if (newVariance !in (0.0..1.0)) {
-        //     JOptionPane.showMessageDialog(null, "Variance must be between 0 and 1")
-        //     return
-        // }
         normalDist.standardDeviation = sqrt(newVariance)
         network.flatSynapseList.forEach { synapse ->
             synapse.strength = normalDist.sampleDouble()
@@ -87,6 +94,7 @@ val binaryReservoir = newSim {
         println("Variance set to ${variance}; Actual variance: ${av}")
 
     }
+    setVariance(variance)
 
     fun perturbAndRunNetwork() {
 
@@ -99,8 +107,8 @@ val binaryReservoir = newSim {
         // Baseline window
         repeat(baseIterations) { network.update() }
 
-        // Perturb 10 nodes
-        resNeurons.take(10).forEach { n -> n.activation = 1.0 }
+        // Perturb nodes
+        resNeurons.take(numNodesToPerturb).forEach { n -> n.addInputValue(1.0)  }
 
         // Response window
         repeat(responseIterations) { network.update() }
@@ -110,6 +118,7 @@ val binaryReservoir = newSim {
         val u = inputNoise.sampleDouble()
         resNeurons.map{n -> n.addInputValue(u)}
         activations.add(resNeurons.map { n -> n.activation })
+        // println("" + activations.last() + ",")
     })
 
     withGui {
@@ -133,14 +142,31 @@ val binaryReservoir = newSim {
                 }
             }
 
+            /**
+             * https://en.wikipedia.org/wiki/Geometric_progression
+             */
+            fun createGeometricProgression(commonRatio: Double): Sequence<Double> {
+                return sequence{
+                    var current = .1
+                    while (current < 10) {
+                        yield(current)
+                        current *= commonRatio
+                    }
+                }
+            }
+
+            // addButton("Test Geometric Progression") {
+            //     createGeometricProgression(1.25).forEach{println(it)}
+            // }
+
             addButton("Run one trial per parameter") {
                     val path = showDirectorySelectionDialog()
                     if (path != null) {
-                        (5..95 step 5).forEach {
-                            setVariance(it/100.0)
+                        createGeometricProgression(1.25).forEach {
+                            setVariance(it)
                             perturbAndRunNetwork()
                             // println("${variance}: ${activations}")
-                            File(path + FS + "activations${variance}.csv").writeText(activations.toCsvString())
+                            File(path + FS + "activations${it}.csv").writeText(activations.toCsvString())
                         }
                     }
 

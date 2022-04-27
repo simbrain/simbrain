@@ -29,7 +29,7 @@ import javax.swing.JTextField
 val binaryReservoir = newSim {
 
     // Neurons in the reservoir
-    val numNeurons = 100
+    val numNeurons = 250
 
     // Fan-in to each neuron
     val k = 4
@@ -38,14 +38,14 @@ val binaryReservoir = newSim {
     var variance = .1
 
     // Times to iterate before perturbation
-    val baseIterations = 5
+    val baseIterations = 400
 
     // What percent of neurons to perturb
-    val percentToPerturb = 1
+    val percentToPerturb = .1
     val numNodesToPerturb = (percentToPerturb * numNeurons).toInt()
 
     // Times to iterate after perturbation
-    val responseIterations = 5
+    val responseIterations = 300
 
     // Noise used to generate u-bar
     val inputNoise = TwoValued(-1.0,1.0, .5)

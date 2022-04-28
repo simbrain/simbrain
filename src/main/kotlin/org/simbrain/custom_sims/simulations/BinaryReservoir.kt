@@ -142,31 +142,17 @@ val binaryReservoir = newSim {
                 }
             }
 
-            /**
-             * https://en.wikipedia.org/wiki/Geometric_progression
-             */
-            fun createGeometricProgression(commonRatio: Double): Sequence<Double> {
-                return sequence{
-                    var current = .1
-                    while (current < 10) {
-                        yield(current)
-                        current *= commonRatio
-                    }
-                }
-            }
-
-            // addButton("Test Geometric Progression") {
-            //     createGeometricProgression(1.25).forEach{println(it)}
-            // }
 
             addButton("Run one trial per parameter") {
                     val path = showDirectorySelectionDialog()
                     if (path != null) {
-                        createGeometricProgression(1.25).forEach {
-                            setVariance(it)
-                            perturbAndRunNetwork()
-                            // println("${variance}: ${activations}")
-                            File(path + FS + "activations${it}.csv").writeText(activations.toCsvString())
+                        createGeometricProgression(.1, 1.25)
+                            .takeWhile{it < 10}
+                            .forEach {
+                                setVariance(it)
+                                perturbAndRunNetwork()
+                                // println("${variance}: ${activations}")
+                                File(path + FS + "activations${it}.csv").writeText(activations.toCsvString())
                         }
                     }
 

@@ -90,3 +90,17 @@ fun DoubleArray.variance(): Double {
 }
 
 fun DoubleArray.stdev(): Double = kotlin.math.sqrt(variance())
+
+/**
+ * https://en.wikipedia.org/wiki/Geometric_progression
+ *  a, ar, ar^2, ...
+ */
+fun createGeometricProgression(initialValue: Double, ratio: Double): Sequence<Double> {
+    return sequence{
+        var current = initialValue
+        while (true) {
+            yield(current)
+            current *= ratio
+        }
+    }
+}

@@ -26,5 +26,15 @@ class MathKtTest {
         oneHot = getOneHotArray(2, 10, 2.0)
         assertEquals(2.0, oneHot[2])
     }
+
+    @Test
+    fun `test geometric progression`() {
+        val seq = createGeometricProgression(1.0, 2.0).takeWhile { it < 2000 }.toList()
+        assertEquals(1.0, seq[0])
+        assertEquals(2.0, seq[1])
+        assertEquals(4.0, seq[2])
+        assertEquals(8.0, seq[3])
+        assertEquals(11, seq.size)
+    }
 }
 

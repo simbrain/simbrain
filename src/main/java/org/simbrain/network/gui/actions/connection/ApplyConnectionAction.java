@@ -13,13 +13,11 @@
  */
 package org.simbrain.network.gui.actions.connection;
 
-import org.simbrain.network.connections.*;
+import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 import org.simbrain.network.gui.dialogs.connect.ConnectionDialog;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -33,11 +31,6 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
     private ConnectionStrategy connection;
 
     /**
-     * Connection panel for dialog.
-     */
-    private AnnotatedPropertyEditor connectionPanel = null;
-
-    /**
      * Construct the action.
      *
      * @param networkPanel networkPanel, must not be null
@@ -45,32 +38,16 @@ public final class ApplyConnectionAction extends ConditionallyEnabledAction {
      * @param name         the name of this action
      */
     public ApplyConnectionAction(final NetworkPanel networkPanel, ConnectionStrategy connection, String name) {
-
         super(networkPanel, name, EnablingCondition.SOURCE_AND_TARGET_NEURONS);
         putValue(SHORT_DESCRIPTION, "Use " + name + " method to connect source to target neurons");
         this.connection = connection;
 
     }
 
-    /**
-     * @param event
-     * @see AbstractAction
-     */
+    @Override
     public void actionPerformed(final ActionEvent event) {
 
         String title = "Connect " + connection.toString();
-
-        if (connection instanceof RadialGaussian) {
-            connectionPanel = new AnnotatedPropertyEditor((RadialGaussian) connection);
-        } else if (connection instanceof AllToAll) {
-            connectionPanel = new AnnotatedPropertyEditor((AllToAll) connection);
-        } else if (connection instanceof OneToOne) {
-            connectionPanel = new AnnotatedPropertyEditor((OneToOne) connection);
-        }  else if (connection instanceof Sparse) {
-            connectionPanel = new AnnotatedPropertyEditor((Sparse) connection);
-        }  else if (connection instanceof RadialProbabilistic) {
-            connectionPanel = new AnnotatedPropertyEditor((RadialProbabilistic) connection);
-        }
 
         ConnectionDialog dialog = new ConnectionDialog(getNetworkPanel(), connection);
         dialog.setTitle(title);

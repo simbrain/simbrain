@@ -122,7 +122,12 @@ class RadialGaussian(
      * A regulating constant governing overall connection density. Higher values create denser connections. Lambda can
      * be thought of as the average connection distance in pixels.
      */
-    @UserParameter(label = "Distance Drop-off", increment = 5.0, minimumValue = 0.01, order = 1)
+    @UserParameter(
+        label = "Distance Drop-off",
+        description = "Roughly the average connection distance in pixels.",
+        increment = 5.0,
+        minimumValue = 0.01,
+        order = 1)
     var lambda: Double = DEFAULT_LAMBDA
 
 ) : ConnectionStrategy(), EditableObject {

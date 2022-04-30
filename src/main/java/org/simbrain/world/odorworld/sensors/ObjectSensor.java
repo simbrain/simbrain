@@ -1,8 +1,8 @@
 package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.DecayFunction;
-import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
+import org.simbrain.util.decayfunctions.DecayFunction;
+import org.simbrain.util.decayfunctions.LinearDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -36,7 +36,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
      */
     @UserParameter(label = "Decay Function", isObjectType = true,
         showDetails = false, order = 15)
-    DecayFunction decayFunction = LinearDecayFunction.create();
+    DecayFunction decayFunction = new LinearDecayFunction(70);
 
     /**
      * The type of the object represented, e.g. Swiss.gif.

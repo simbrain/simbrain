@@ -30,7 +30,7 @@ import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.*
-import org.simbrain.util.math.DecayFunction
+import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
 import javax.swing.AbstractAction
 import javax.swing.JOptionPane
@@ -152,6 +152,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val connectionActions
         get() = listOf(
             applyConnectionAction("All to all", AllToAll()),
+            applyConnectionAction("Distance Based", DistanceBased()),
             applyConnectionAction("One-to-one", OneToOne()),
             applyConnectionAction("Radial (Gaussian)", RadialGaussian()),
             applyConnectionAction("Radial (Probalistic)", RadialProbabilistic()),

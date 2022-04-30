@@ -11,8 +11,8 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
-import org.simbrain.util.math.DecayFunction;
-import org.simbrain.util.math.DecayFunctions.StepDecayFunction;
+import org.simbrain.util.decayfunctions.DecayFunction;
+import org.simbrain.util.decayfunctions.StepDecayFunction;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -231,10 +231,7 @@ public class ActorCritic extends Simulation {
         ObjectSensor cheeseSensor = new ObjectSensor(mouse);
         cheeseSensor.setLabel("Cheese sensor");
         double dispersion = rewardDispersionFactor * (tileSize / 2);
-        DecayFunction decayFunction =
-                StepDecayFunction.builder()
-                        .dispersion(dispersion)
-                        .build();
+        DecayFunction decayFunction = new StepDecayFunction();
         cheeseSensor.setDecayFunction(decayFunction);
         mouse.addSensor(cheeseSensor);
 

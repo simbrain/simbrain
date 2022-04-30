@@ -19,14 +19,12 @@
 package org.simbrain.world.odorworld.effectors;
 
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.DecayFunction;
-import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
+import org.simbrain.util.decayfunctions.DecayFunction;
+import org.simbrain.util.decayfunctions.LinearDecayFunction;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.List;
 
 /**
@@ -77,10 +75,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     private double threshold = DEFAULT_THRESHOLD;
 
     @UserParameter(label = "Decay Function", isObjectType = true, order = 10, tab = "Dispersion")
-    private DecayFunction decayFunction =
-            LinearDecayFunction.builder()
-            .dispersion(128)
-            .build();
+    private DecayFunction decayFunction = new LinearDecayFunction(128);
 
     /**
      * Whether this is activated. If so, display the phrase and notify all

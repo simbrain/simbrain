@@ -19,9 +19,11 @@
 package org.simbrain.util.environment;
 
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.DecayFunction;
-import org.simbrain.util.math.DecayFunctions.LinearDecayFunction;
+import org.simbrain.util.decayfunctions.DecayFunction;
+import org.simbrain.util.decayfunctions.LinearDecayFunction;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
+
+import java.util.Arrays;
 
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
@@ -50,7 +52,7 @@ public class SmellSource {
      * Method for calculating decay of stimulus as a function of distance from
      * object.
      */
-    private DecayFunction decayFunction = LinearDecayFunction.create();
+    private DecayFunction decayFunction = new LinearDecayFunction(70);
 
     /**
      * Construct smell source from specified parameters.
@@ -120,13 +122,10 @@ public class SmellSource {
      * @return proximal stimulus to creature caused by this object
      */
     public double[] getStimulus(final double distance) {
-        double[] ret;
-        if (returnVector == null) {
-            returnVector = stimulusVector;
-        }
-        ret = decayFunction.apply(distance, returnVector);
-
-        return ret;
+        var scalingFactor = decayFunction.getScalingFactor(distance);
+        return Arrays.stream(stimulusVector)
+                .map(s -> s * scalingFactor + decayFunction.getNoise())
+                .toArray();
     }
 
     /**

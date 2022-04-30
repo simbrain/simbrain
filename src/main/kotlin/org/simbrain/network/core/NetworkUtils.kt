@@ -3,7 +3,6 @@ package org.simbrain.network.core
 import com.thoughtworks.xstream.XStream
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.core.*
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
@@ -15,7 +14,7 @@ import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.MatrixConverter
 import org.simbrain.util.SimbrainPreferences
 import org.simbrain.util.Utils
-import org.simbrain.util.math.DecayFunction
+import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution

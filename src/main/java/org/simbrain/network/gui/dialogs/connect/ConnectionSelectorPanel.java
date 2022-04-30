@@ -38,7 +38,7 @@ public class ConnectionSelectorPanel extends EditablePanel {
     /**
      * Temporary list of connection panels managed by combo box.
      */
-    private final ConnectionStrategy[] CONNECTORS = {new AllToAll(), new OneToOne(),
+    private final ConnectionStrategy[] CONNECTORS = {new AllToAll(), new DistanceBased(), new OneToOne(),
             new RadialProbabilistic(), new FixedDegree(), new RadialGaussian(), new Sparse()};
 
     /**

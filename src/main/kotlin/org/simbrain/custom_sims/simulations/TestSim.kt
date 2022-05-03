@@ -21,6 +21,7 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
+import javax.swing.JInternalFrame
 
 /**
  * Sample simulation showing how to do basic stuff.
@@ -48,8 +49,7 @@ val testSim = newSim {
     val radial = RadialProbabilistic().apply {
         excitatoryRatio = .2
     }
-    val sparse = Sparse().apply {
-        connectionDensity = .3
+    val sparse = Sparse(connectionDensity = 0.3).apply {
         excitatoryRatio = .1
     }
 
@@ -204,24 +204,37 @@ val testSim = newSim {
 
 
 val linkedNeuronList = newSim {
-    val networkComponent = addNetworkComponent("Neuron List")
+    repeat(1) {
+        val networkComponent = addNetworkComponent("Neuron List $it")
 
-    val network = networkComponent.network
+        val network = networkComponent.network
 
-    workspace.coroutineScope.launch(Dispatchers.Main) {
-        val neurons = (1..10000).map {
-            async(Dispatchers.Default) { Neuron(network) }
-        }.awaitAll()
+        workspace.coroutineScope.launch(Dispatchers.Main) {
+            val neurons = (1..10000).map {
+                async(Dispatchers.Default) { Neuron(network) }
+            }.awaitAll()
 
-        neurons.forEach { network.addNetworkModel(it) }
+            neurons.forEach { network.addNetworkModel(it) }
+            val (first) = neurons
+            first.activation = 1.0
 
-        val synapses = with(network) {
-            neurons.windowed(2) { (n1, n2) ->
-                addSynapse(n1, n2) {
-                    strength = 1.0
+            val synapses = with(network) {
+                neurons.windowed(2) { (n1, n2) ->
+                    addSynapse(n1, n2) {
+                        strength = 1.0
+                    }
+                }
+            }
+            HexagonalGridLayout.layoutNeurons(neurons, 40, 40)
+        }
+        withGui {
+            getDesktopComponent(networkComponent).apply {
+                parentFrame.let { frame ->
+                    if (frame is JInternalFrame) {
+                        frame.setIcon(true)
+                    }
                 }
             }
         }
-        HexagonalGridLayout.layoutNeurons(neurons, 40, 40)
     }
 }

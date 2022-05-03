@@ -154,13 +154,13 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         // Connectivity panel
         if (isCreationDialog) {
-            connectionPanel = new ConnectionSelectorPanel(sourceNeuronGroup.equals(targetNeuronGroup), this, isCreationDialog);
+            connectionPanel = new ConnectionSelectorPanel(this, synapseGroup, null, null, null, networkPanel.getNetwork());
             JScrollPane connectWrapper = new JScrollPane(connectionPanel);
             connectWrapper.setBorder(null);
             setContentPane(connectWrapper);
 
         } else {
-            connectionPanel = new ConnectionSelectorPanel(synapseGroup.getConnectionManager(), this, isCreationDialog);
+            connectionPanel = new ConnectionSelectorPanel(this, synapseGroup, null, null, null, networkPanel.getNetwork());
             var connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
                     (ActionEvent e) -> {
                 connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);

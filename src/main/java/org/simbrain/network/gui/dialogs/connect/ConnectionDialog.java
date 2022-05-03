@@ -26,8 +26,6 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
 
-import static org.simbrain.network.connections.ConnectionUtilitiesKt.testRecurrence;
-
 /**
  * Dialog for using connection objects to create connections between free nodes.
  *
@@ -54,10 +52,12 @@ public class ConnectionDialog extends StandardDialog {
      */
     public ConnectionDialog(final NetworkPanel networkPanel, final ConnectionStrategy connection) {
         this.networkPanel = networkPanel;
-        this.connectionPanel = new ConnectionPanel(this, connection,
-                networkPanel.getSelectionManager().filterSelectedModels(Neuron.class).size(),
-                testRecurrence(networkPanel.getSelectionManager().filterSelectedModels(Neuron.class),
-                        networkPanel.getSelectionManager().filterSelectedSourceModels(Neuron.class)), true);
+        this.connectionPanel = new ConnectionPanel(
+                this,
+                connection,
+                networkPanel.getSelectionManager().filterSelectedSourceModels(Neuron.class),
+                networkPanel.getSelectionManager().filterSelectedModels(Neuron.class)
+        );
         setContentPane(connectionPanel);
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/connections.html");
         addButton(new JButton(helpAction));

@@ -176,9 +176,9 @@ public class ModularOscillatoryNetwork extends Simulation {
     }
 
     private SynapseGroup connectModules(NeuronGroup sourceNg, NeuronGroup targetNg, double density, double exRatio) {
-        Sparse sparse = new Sparse();
-        sparse.setConnectionDensity(density);
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(sourceNg, targetNg, sparse, exRatio, null, null);
+        Sparse sparse = new Sparse(density);
+        SynapseGroup sg = SynapseGroup.createSynapseGroup(sourceNg, targetNg, exRatio);
+        sparse.connectNeurons(sg);
         net.addNetworkModel(sg);
         sg.setDisplaySynapses(false);
         return sg;

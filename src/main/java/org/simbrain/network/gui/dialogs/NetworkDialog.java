@@ -28,8 +28,6 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * <b>NetworkDialog</b> is a dialog box for setting the properties of the
@@ -88,7 +86,7 @@ public class NetworkDialog extends StandardDialog {
 
         // Quick-connect properties
         ConnectionStrategy currentConnector = networkPanel.getQuickConnector().getCurrentConnector();
-        quickConnectPanel = new ConnectionSelectorPanel(currentConnector, this, true);
+//        quickConnectPanel = new ConnectionSelectorPanel(this, null, currentConnector, networkPanel.getNetwork());
         JScrollPane wrapper = new JScrollPane(quickConnectPanel);
         tabbedPane.addTab("Connections", wrapper);
 

@@ -65,6 +65,9 @@ public final class ConnectionPanel extends JPanel {
      */
     private ConnectionStrategy connectionStrategy;
 
+    private List<Neuron> sourceNeurons;
+    private List<Neuron> targetNeurons;
+
     /**
      * Whether or not the the connections would be recurrent.
      */
@@ -85,24 +88,22 @@ public final class ConnectionPanel extends JPanel {
      *
      * @param connectionStrategy   the underlying connection object
      */
-    public ConnectionPanel(final Window parent, final ConnectionStrategy connectionStrategy, int numTar, boolean rec,
-                           boolean isCreation) {
+    public ConnectionPanel(
+            final Window parent,
+            final ConnectionStrategy connectionStrategy,
+            List<Neuron> sourceNeurons,
+            List<Neuron> targetNeurons) {
         this.parentFrame = parent;
         this.connectionStrategy = connectionStrategy;
-        this.rec = rec;
-        this.isCreation = isCreation;
+        this.sourceNeurons = sourceNeurons;
+        this.targetNeurons = targetNeurons;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JPanel connectionContainer = new JPanel(new GridBagLayout());
         connectionContainer.setBorder(BorderFactory.createTitledBorder("Connection Properties"));
         if (connectionStrategy.getClass() != Sparse.class) {
             connectionStrategyProperties = new AnnotatedPropertyEditor(connectionStrategy);
         } else {
-            if (((Sparse) connectionStrategy).getSynapseGroup() != null) {
-                connectionStrategyProperties = SparseConnectionPanel.createSparsityAdjustmentEditor((Sparse) connectionStrategy);
-            } else {
-                connectionStrategyProperties = SparseConnectionPanel.createSparsityAdjustmentPanel(
-                        (Sparse) connectionStrategy, numTar, rec);
-            }
+            connectionStrategyProperties = new SparseConnectionPanel((Sparse) connectionStrategy);
         }
 
         // Set up detail triangle and connection strategy

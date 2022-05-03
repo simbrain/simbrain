@@ -35,8 +35,7 @@ val cortexPCI = newSim {
     }
 
     // Sparse connectivity
-    val sparse = Sparse().apply {
-        connectionDensity = .3
+    val sparse = Sparse(connectionDensity = 0.3).apply {
         excitatoryRatio = .2
     }
 

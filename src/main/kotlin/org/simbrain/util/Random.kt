@@ -23,3 +23,17 @@ fun Matrix.randomize(dist: ProbabilityDistribution) {
         }
     }
 }
+
+fun <T> List<T>.sampleWithoutReplacement(
+    random: Random = Random(Random.nextLong()),
+    restartIfExhausted: Boolean = false
+) = this.asSequence().sampleWithoutReplacement(random, restartIfExhausted)
+
+fun <T> Sequence<T>.sampleWithoutReplacement(
+    random: Random = Random(Random.nextLong()),
+    restartIfExhausted: Boolean = false
+) = sequence {
+    do {
+        shuffled(random).forEach { yield(it) }
+    } while (restartIfExhausted)
+}

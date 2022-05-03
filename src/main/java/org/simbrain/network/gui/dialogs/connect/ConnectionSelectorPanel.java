@@ -14,6 +14,9 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.*;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
@@ -34,6 +37,10 @@ public class ConnectionSelectorPanel extends EditablePanel {
      * So that it can be resized on updates with pack().
      */
     private final Window parentFrame;
+    private SynapseGroup synapseGroup;
+    private NeuronGroup sourceNeuronGroup;
+    private NeuronGroup targetNeuronGroup;
+    private Network network;
 
     /**
      * Temporary list of connection panels managed by combo box.
@@ -70,24 +77,14 @@ public class ConnectionSelectorPanel extends EditablePanel {
     /**
      * Connection dialog default constructor.
      */
-    public ConnectionSelectorPanel(boolean recurrent, Window parentFrame, boolean isCreation) {
+    public ConnectionSelectorPanel(Window parentFrame, SynapseGroup synapseGroup, NeuronGroup sourceNeuronGroup, NeuronGroup targetNeuronGroup, ConnectionStrategy initConnection, Network network) {
         this.parentFrame = parentFrame;
-        cbConnectionType = new JComboBox(CONNECTORS);
-        this.recurrent = recurrent;
-        this.isCreation = isCreation;
-        init();
-    }
-
-    /**
-     * Construct the panel using a specific starting connector.
-     *
-     * @param initConnection initial connection manager
-     */
-    public ConnectionSelectorPanel(ConnectionStrategy initConnection, Window parentFrame, boolean isCreation) {
-        this.parentFrame = parentFrame;
-        cbConnectionType = new JComboBox(CONNECTORS);
+        this.synapseGroup = synapseGroup;
+        this.sourceNeuronGroup = sourceNeuronGroup;
+        this.targetNeuronGroup = targetNeuronGroup;
+        this.network = network;
+        cbConnectionType = new JComboBox<>(CONNECTORS);
         cbConnectionType.setPreferredSize(new Dimension(200, 20));
-        this.isCreation = isCreation;
         setComboBox(initConnection);
         init();
     }
@@ -146,16 +143,16 @@ public class ConnectionSelectorPanel extends EditablePanel {
             remove(currentConnectionPanel);
         }
         int noTar = 0;
-        if (cbConnectionType.getSelectedItem().getClass() == Sparse.class) {
-            if (((Sparse) cbConnectionType.getSelectedItem()).getSynapseGroup() != null) {
-                noTar = ((Sparse) cbConnectionType.getSelectedItem())
-                        .getSynapseGroup().getTargetNeuronGroup()
-                        .size();
-            }
-        }
+//        if (cbConnectionType.getSelectedItem().getClass() == Sparse.class) {
+//            if (((Sparse) cbConnectionType.getSelectedItem()).getSynapseGroup() != null) {
+//                noTar = ((Sparse) cbConnectionType.getSelectedItem())
+//                        .getSynapseGroup().getTargetNeuronGroup()
+//                        .size();
+//            }
+//        }
         currentConnectionPanel = new ConnectionPanel(parentFrame,
                 (ConnectionStrategy) cbConnectionType.getSelectedItem(),
-                noTar, recurrent, isCreation);
+                synapseGroup.getSourceNeurons(), synapseGroup.getTargetNeurons());
 
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.gridx = 0;

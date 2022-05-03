@@ -198,13 +198,14 @@ public class ConnectivityAdjustmentPanel extends JPanel {
      */
     public void commitChanges() {
         double density = Utils.doubleParsable(sparsity.getText());
-        if (!Double.isNaN(density)) {
-            if (density > connection.getConnectionDensity()) {
-                connection.addToSparsity(density);
-            } else if (density < connection.getConnectionDensity()) {
-                connection.removeToSparsity(density);
-            }
-        }
+//        if (!Double.isNaN(density)) {
+//            connection.adjustToSparsity(density);
+//            if (density > connection.getConnectionDensity()) {
+//                connection.addToSparsity(density);
+//            } else if (density < connection.getConnectionDensity()) {
+//                connection.removeToSparsity(density);
+//            }
+//        }
     }
 
     /**

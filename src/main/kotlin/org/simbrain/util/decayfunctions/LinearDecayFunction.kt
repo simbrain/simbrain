@@ -1,6 +1,6 @@
 package org.simbrain.util.decayfunctions
 
-class LinearDecayFunction(dispersion: Double) : DecayFunction(dispersion) {
+class LinearDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0) : DecayFunction(dispersion) {
 
     override fun getScalingFactor(distance: Double): Double {
         val dist = distanceFromPeak(distance)
@@ -11,8 +11,6 @@ class LinearDecayFunction(dispersion: Double) : DecayFunction(dispersion) {
         return LinearDecayFunction(dispersion)
             .also {
                 it.peakDistance = dispersion
-                it.addNoise = addNoise
-                it.randomizer = randomizer.deepCopy()
             }
     }
 

@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import org.simbrain.util.math.SimbrainMath
 import smile.math.matrix.Matrix
 import kotlin.math.pow
 
@@ -103,4 +104,11 @@ fun createGeometricProgression(initialValue: Double, ratio: Double): Sequence<Do
             current *= ratio
         }
     }
+}
+
+/**
+ * Returns the vector sum of a list of arrays.
+ */
+fun List<DoubleArray>.sum(): DoubleArray {
+    return reduce(SimbrainMath::addVector)
 }

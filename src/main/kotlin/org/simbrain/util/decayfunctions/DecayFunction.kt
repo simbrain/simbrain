@@ -3,8 +3,7 @@ package org.simbrain.util.decayfunctions
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
+import kotlin.math.abs
 
 abstract class DecayFunction(
 
@@ -21,24 +20,9 @@ abstract class DecayFunction(
     @UserParameter(label = "Peak Distance", description = "Peak value", order = 2)
     var peakDistance: Double = 0.0,
 
-    /**
-     * If true, add noise to object's stimulus vector.
-     */
-    @UserParameter(
-        label = "Add noise",
-        description = "If true, add noise to object's stimulus vector.",
-        order = 99,
-        tab = "Noise"
-    )
-    var addNoise: Boolean = false
 
 ) : CopyableObject {
 
-    /**
-     * Noise generator for this decay function if [DecayFunction.addNoise] is true.
-     */
-    @UserParameter(label = "Randomizer", isObjectType = true, order = 1000, tab = "Noise")
-    var randomizer: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * Get the decay amount for the given distance.
@@ -53,17 +37,12 @@ abstract class DecayFunction(
      * Note that when peak = 0, this is just distance
      */
     fun distanceFromPeak(distance: Double): Double {
-        return Math.abs(distance - peakDistance)
-    }
-
-    fun getNoise(): Double {
-        return if (addNoise) return randomizer.sampleDouble() else 0.0
+        return abs(distance - peakDistance)
     }
 
     fun copy(copy: DecayFunction): DecayFunction {
         copy.dispersion = dispersion
         copy.peakDistance = peakDistance
-        copy.randomizer = randomizer.deepCopy()
         return copy
     }
 

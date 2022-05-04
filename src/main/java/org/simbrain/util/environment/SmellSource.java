@@ -18,9 +18,11 @@
  */
 package org.simbrain.util.environment;
 
-import org.simbrain.util.Utils;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.decayfunctions.DecayFunction;
 import org.simbrain.util.decayfunctions.LinearDecayFunction;
+import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 import java.util.Arrays;
@@ -31,85 +33,64 @@ import java.util.Arrays;
  * <p>
  * Standardly these objects represent "distal stimuli" relative to an organism.
  */
-public class SmellSource {
-
-    // TODO: Consider using lists instead of arrays to make it easier to
-    // dynamically resize
-    //TOOD: Possibly give this a location.  Then can make a method getStimulus(sensorLocation)
-    // but currently no use cases where a smell location is used.
+public class SmellSource implements EditableObject {
 
     /**
      * Vector of base stimulus values associated to object.
      */
+    @UserParameter(
+            label = "Stimulus vector",
+            description = "Values associated with this smell",
+            order = 1)
     private double[] stimulusVector;
-
-    /**
-     * The vector returned. Base stimulus vector + noise, if any.
-     */
-    private double[] returnVector;
 
     /**
      * Method for calculating decay of stimulus as a function of distance from
      * object.
      */
+    @UserParameter(
+            label = "Decay function",
+            description = "Way of decaying the stimulus",
+            showDetails = false,
+            isObjectType = true,
+            order= 5
+    )
     private DecayFunction decayFunction = new LinearDecayFunction(70);
 
     /**
-     * Construct smell source from specified parameters.
-     *
-     * @param distalstim stimulus vector
-     * @param decay      decay function
-     * @param dispersion level of dispersion
-     * Decay Functions.
+     * If true, add noise to object's stimulus vector.
      */
-    public SmellSource(double[] distalstim, DecayFunction decay, double dispersion) {
-        this(distalstim, decay);
-        decayFunction.setDispersion(dispersion);
-    }
+    @UserParameter(
+            label = "Add noise",
+            description = "If true, add noise to object's stimulus vector.",
+            order = 10
+    )
+    private boolean addNoise = false;
 
     /**
-     * Construct smell source from specified parameters.
-     *
-     * @param distalstim stimulus vector
-     * @param decay      decay function
+     * Noise generator for this decay function if [DecayFunction.addNoise] is true.
      */
-    public SmellSource(final double[] distalstim, final DecayFunction decay) {
-        this(distalstim);
-        this.decayFunction = decay;
-    }
+    @UserParameter(
+            label = "Randomizer",
+            isObjectType = true,
+            showDetails = false,
+            condtionalEnablingWidget = "Add Noise",
+            order = 15)
+    private ProbabilityDistribution randomizer  = new UniformRealDistribution();
 
-    /**
-     * Construct a smell source from a specified stimulus vector, using defaults
-     * otherwise.
-     *
-     * @param distalstim the stimulus vector
-     */
     public SmellSource(final double[] distalstim) {
         this.stimulusVector = distalstim;
     }
 
-    /**
-     * Construct a smell source with a specified number of dimensions, randomly
-     * initialized.
-     *
-     * @param numDimensions number of dimensions of the stimulus vector.
-     */
     public SmellSource(final int numDimensions) {
-        UniformRealDistribution randomizer = new UniformRealDistribution();
         this.stimulusVector = new double[numDimensions];
         for (int i = 0; i < numDimensions; i++) {
-            stimulusVector[i] = randomizer.sampleDouble();
+            stimulusVector[i] = Math.random();
         }
     }
 
     public static SmellSource createScalarSource(final int val) {
         return new SmellSource(new double[] {val});
-    }
-
-    /**
-     * Default constructor.
-     */
-    public SmellSource() {
     }
 
     /**
@@ -124,23 +105,22 @@ public class SmellSource {
     public double[] getStimulus(final double distance) {
         var scalingFactor = decayFunction.getScalingFactor(distance);
         return Arrays.stream(stimulusVector)
-                .map(s -> s * scalingFactor + decayFunction.getNoise())
+                .map(s -> s * scalingFactor + getNoise())
                 .toArray();
     }
 
-    /**
-     * Update the source.
-     */
-    public void update() {
-        returnVector = stimulusVector;
+    private Double getNoise() {
+        if (addNoise) {
+            return randomizer.sampleDouble();
+        } else {
+            return 0.0;
+        }
     }
 
     /**
      * Randomize values.
      */
     public void randomize() {
-        UniformRealDistribution randomizer = new UniformRealDistribution(0, 10);
-
         for (int i = 0; i < getStimulusDimension(); i++) {
             stimulusVector[i] = randomizer.sampleDouble();
         }
@@ -155,124 +135,26 @@ public class SmellSource {
         if (stimulusVector == null) {
             return 0;
         }
-
         return stimulusVector.length;
     }
 
-    /**
-     * Sets the stimulus vector.
-     *
-     * @param newStim New stimulus
-     */
-    public void setStimulusVector(final double[] newStim) {
-        stimulusVector = newStim;
-    }
-
-    /**
-     * Return the stimulus vector.
-     *
-     * @return the stimulus vector
-     */
-    public double[] getStimulusVector() {
-        return stimulusVector;
-    }
-
-    /**
-     * Return add noise.
-     *
-     * @return add noise
-     */
-    public boolean isAddNoise() {
-        return decayFunction.getAddNoise();
-    }
-
-    /**
-     * Return the stimulus string.
-     *
-     * @return the stimulus string
-     */
-    public String getStimulusString() {
-        return Utils.getVectorString(stimulusVector, ",");
-    }
-
-    /**
-     * Sets the stimulus string.
-     *
-     * @param vectorString Stimulus string
-     */
-    public void setStimulusS(final String vectorString) {
-        stimulusVector = Utils.getVectorString(vectorString, ",");
-    }
-
-    /**
-     * Sets the add noise.
-     *
-     * @param addNoise the add noise
-     */
-    public void setAddNoise(final boolean addNoise) {
-        decayFunction.setAddNoise(addNoise);
-    }
-
-    /**
-     * Sets the dispersion.
-     *
-     * @param d Dispersion
-     */
     public void setDispersion(final double d) {
         decayFunction.setDispersion(d);
     }
 
-    /**
-     * Return the dispersion.
-     *
-     * @return the dispersion
-     */
     public double getDispersion() {
         return decayFunction.getDispersion();
     }
 
-    /**
-     * @return Returns the peak.
-     */
-    public double getPeak() {
-        return decayFunction.getPeakDistance();
-    }
-
-    /**
-     * @param peak The peak to set.
-     */
-    public void setPeak(final double peak) {
-        decayFunction.setPeakDistance(peak);
-    }
-
-    /**
-     * @return the decayFunction
-     */
     public DecayFunction getDecayFunction() {
         return decayFunction;
     }
 
-    /**
-     * @param decayFunction the decayFunction to set
-     */
     public void setDecayFunction(DecayFunction decayFunction) {
         this.decayFunction = decayFunction;
     }
 
-    // /**
-    //  * @return the imageBox
-    //  */
-    // public ComboBoxWrapper getTheDecayFunction() {
-    //     return new ComboBoxWrapper() {
-    //         public Object getCurrentObject() {
-    //             return getDecayFunction();
-    //         }
-    //
-    //         public Object[] getObjects() {
-    //             return DecayFunction.values();
-    //         }
-    //     };
-    // }
-
-
+    public double[] getStimulusVector() {
+        return stimulusVector;
+    }
 }

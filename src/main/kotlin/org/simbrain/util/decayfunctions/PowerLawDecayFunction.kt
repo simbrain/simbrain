@@ -2,7 +2,7 @@ package org.simbrain.util.decayfunctions
 
 // TODO: Finish implementation.
 //  Add parameters (constant, exponent). Relation to quadratic
-class PowerLawDecayFunction(): DecayFunction(){
+class PowerLawDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0): DecayFunction(){
 
     override fun getScalingFactor(distance: Double): Double {
         val dist = distanceFromPeak(distance)
@@ -14,11 +14,8 @@ class PowerLawDecayFunction(): DecayFunction(){
     }
 
     override fun copy(): PowerLawDecayFunction {
-        return PowerLawDecayFunction().also {
-            it.dispersion = dispersion
+        return PowerLawDecayFunction(dispersion).also {
             it.peakDistance = peakDistance
-            it.addNoise = addNoise
-            it.randomizer = randomizer.deepCopy()
         }
     }
 

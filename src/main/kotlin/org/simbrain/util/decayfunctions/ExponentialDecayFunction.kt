@@ -3,7 +3,7 @@ package org.simbrain.util.decayfunctions
 import org.simbrain.util.UserParameter
 import kotlin.math.exp
 
-class ExponentialDecayFunction (): DecayFunction() {
+class ExponentialDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0): DecayFunction() {
 
     @UserParameter(
         label = "Rate (\u03BB)",
@@ -27,13 +27,10 @@ class ExponentialDecayFunction (): DecayFunction() {
 
 
     override fun copy(): ExponentialDecayFunction {
-        return ExponentialDecayFunction()
+        return ExponentialDecayFunction(dispersion)
             .also {
-                it.dispersion = dispersion
                 it.peakDistance = dispersion
-                it.addNoise = addNoise
                 it.lambda = lambda
-                it.randomizer = randomizer.deepCopy()
             }
     }
 

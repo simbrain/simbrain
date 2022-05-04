@@ -45,7 +45,7 @@ class SmellSensorGene(override val chromosome: Chromosome<SmellSensor, SmellSens
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): SmellSensor {
-        return SmellSensor(template).apply { parent = odorWorldEntity }.also { product.complete(it) }
+        return template.copy().apply { parent = odorWorldEntity }.also { product.complete(it) }
     }
 
 }

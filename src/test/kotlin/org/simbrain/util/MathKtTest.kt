@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -35,6 +36,12 @@ class MathKtTest {
         assertEquals(4.0, seq[2])
         assertEquals(8.0, seq[3])
         assertEquals(11, seq.size)
+    }
+
+    @Test
+    fun `test vector sum`() {
+        val array = listOf(doubleArrayOf(1.0,2.0), doubleArrayOf(-1.0,1.0))
+        assertArrayEquals(doubleArrayOf(0.0, 3.0),array.sum())
     }
 }
 

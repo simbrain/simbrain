@@ -19,7 +19,6 @@
 package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.environment.SmellSourcePanel;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -51,7 +50,7 @@ public class EntityDialog extends StandardDialog {
     /**
      * Editor panel for smell source.
      */
-    private SmellSourcePanel smellPanel;
+    private AnnotatedPropertyEditor smellPanel;
 
     /**
      * Create and show the world entity dialog box.
@@ -77,9 +76,8 @@ public class EntityDialog extends StandardDialog {
 
         // Smell tabs
         if (entityRef.getSmellSource() != null) {
-            smellPanel = new SmellSourcePanel(entityRef.getSmellSource());
-            tabbedPane.addTab("Smell", smellPanel.getValuesPanel());
-            tabbedPane.addTab("Dispersion", smellPanel.getDispersionPanel());
+            smellPanel = new AnnotatedPropertyEditor(entityRef.getSmellSource());
+            tabbedPane.addTab("Smell", smellPanel);
         }
 
         // Sensor / effector display

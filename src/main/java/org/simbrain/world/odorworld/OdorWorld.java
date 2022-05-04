@@ -33,7 +33,6 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -125,10 +124,7 @@ public class OdorWorld implements EditableObject {
      * Update world.
      */
     public void update() {
-        for (OdorWorldEntity entity : entityList) {
-            entity.updateSmellSource();
-            entity.update();
-        }
+        entityList.forEach(OdorWorldEntity::update);
         events.fireUpdated();
     }
 
@@ -498,27 +494,6 @@ public class OdorWorld implements EditableObject {
 
     public double getMaxVectorNorm() {
         return maxVectorNorm;
-    }
-
-    /**
-     * Use the provided set of vectors (stored as a 2-d array of doubles, one
-     * vector per row) to set the stimulus vectors on all odor world entities,
-     * in the order in which they are stored in the internal list (which should
-     * match the order in which they were added to the world).
-     *
-     * @param stimulusVecs the 2d matrix of stimulus vectors
-     */
-    public void loadStimulusVectors(double[][] stimulusVecs) {
-        Iterator<OdorWorldEntity> entityIterator = getEntityList().iterator();
-        for (int i = 0; i < stimulusVecs.length; i++) {
-            if (entityIterator.hasNext()) {
-                OdorWorldEntity entity = entityIterator.next();
-                if (entity.getSmellSource() != null) {
-                    //System.out.println(entity);
-                    entity.getSmellSource().setStimulusVector(stimulusVecs[i]);
-                }
-            }
-        }
     }
 
     public SimpleIdManager.SimpleId getSensorIDGenerator() {

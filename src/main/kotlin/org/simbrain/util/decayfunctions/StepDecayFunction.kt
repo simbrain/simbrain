@@ -1,6 +1,6 @@
 package org.simbrain.util.decayfunctions
 
-class StepDecayFunction () : DecayFunction() {
+class StepDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0) : DecayFunction() {
 
     override fun getScalingFactor(distance: Double): Double {
         return if (distanceFromPeak(distance) > dispersion) {
@@ -11,11 +11,8 @@ class StepDecayFunction () : DecayFunction() {
     }
 
     override fun copy(): StepDecayFunction {
-        return StepDecayFunction().also {
-            it.dispersion = dispersion
+        return StepDecayFunction(dispersion).also {
             it.peakDistance = dispersion
-            it.addNoise = addNoise
-            it.randomizer = randomizer.deepCopy()
         }
     }
 

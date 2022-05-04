@@ -16,143 +16,79 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld.sensors;
+package org.simbrain.world.odorworld.sensors
 
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.workspace.Producible;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.sum
+import org.simbrain.workspace.Producible
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
 /**
- * A sensor which is updated based on the presence of SmellSources near it.
- *
- * @see org.simbrain.util.environment.SmellSource
+ * A sensor which is updated based on the presence of [SmellSource]s near it.
  */
-public class SmellSensor extends Sensor implements VisualizableEntityAttribute {
+class SmellSensor @JvmOverloads constructor(
+    parent: OdorWorldEntity? = null,
+    label: String = "Smell Sensor",
+    theta: Double = 0.0,
+    radius: Double = 0.0,
+) : Sensor(parent, label), VisualizableEntityAttribute {
 
     /**
-     * Default label.
+     * The current vale of the smell sensors. A vector of smells obtained
+     * by summing over scaled "distal" stimuli.
      */
-    public static final String DEFAULT_LABEL = "SmellSensor";
+    @get:Producible(customDescriptionMethod = "getAttributeDescription")
+    @Transient
+    var smellVector = DoubleArray(0)
 
     /**
-     * Current value of this sensor, as an array of doubles.
+     * Update the smell vector by iterating over entities and adding up their distance-scaled smell vectors.
      */
-    private double[] currentValue = new double[0];
-
-    /**
-     * Construct a smell sensor.
-     *
-     * @param parent parent
-     * @param label  label for this sensor (entity name will be added)
-     * @param theta  offset from straight in degrees radians
-     * @param radius length of "whisker"
-     */
-    public SmellSensor(final OdorWorldEntity parent, final String label, double theta, double radius) {
-        super(parent, label);
-        this.parent = parent;
-        this.theta = theta;
-        this.radius = radius;
-    }
-
-    /**
-     * Construct a smell sensor.
-     *
-     * @param parent parent
-     */
-    public SmellSensor(final OdorWorldEntity parent) {
-        super(parent, DEFAULT_LABEL);
-        this.parent = parent;
-    }
-
-    /**
-     * Construct a copy of a smell sensor.
-     *
-     * @param smellSensor The smell sensor to copy
-     */
-    public SmellSensor(SmellSensor smellSensor) {
-        super(smellSensor);
-    }
-
-    /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * When used, {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
-     * If possible call {@link SmellSensor#SmellSensor(OdorWorldEntity)} instead.
-     */
-    public SmellSensor() {
-        super();
-    }
-
-    /**
-     * Update the smell array ({@link #currentValue}) by iterating over entities
-     * and adding up their distance-scaled smell vectors.
-     */
-    @Override
-    public void update() {
-
-        // Start with an empty array. It will grow in size as smell vectors are
-        // added.
-        currentValue = new double[0];
-        for (OdorWorldEntity entity : parent.getParentWorld().getEntityList()) {
-            // Don't smell yourself
-            if (entity != parent) {
-                double[] smell = entity.getSmellVector(getLocation());
-                if (smell != null) {
-                    currentValue = SimbrainMath.addVector(currentValue, smell);
-                }
-            }
-        }
-    }
-
-    @Producible(customDescriptionMethod = "getAttributeDescription")
-    public double[] getCurrentValues() {
-        return currentValue;
+    override fun update() {
+        smellVector = parent.parentWorld.entityList
+            .filter { it != parent } // Don't smell yourself
+            .map{Pair(it.smellSource, SimbrainMath.distance(it.centerLocation, this.location)) }
+            .filter{(smellSource, _) -> smellSource != null}
+            .map{(smellSource, distance) -> smellSource.getStimulus(distance)}
+            .sum()
     }
 
     /**
      * Returns a scalar value associated to the current smell vector.
      */
-    @Producible(description = "Scalar smell")
-    public double getCurrentScalarValue() {
-        if (currentValue.length == 1) {
-            return currentValue[0];
+    @get:Producible(description = "Scalar smell")
+    val currentScalarValue: Double
+        get() = if (smellVector.size == 1) {
+            smellVector[0]
         } else {
             // TODO: Provide other options for producing a scalar smell value from a vector, e.g. mean value or norm.
-            return SimbrainMath.sum(currentValue);
+            smellVector.sum()
         }
-    }
 
-    @Override
-    public void setParent(OdorWorldEntity parent) {
-        this.parent = parent;
+    override fun setParent(parent: OdorWorldEntity) {
+        this.parent = parent
     }
 
     /**
      * Called by reflection to return a custom description for couplings.
      */
-    public String getSmellSensorDescription() {
-        return "Smell sensor (" +
-            SimbrainMath.roundDouble(theta, 2) + "," +
-            SimbrainMath.roundDouble(radius, 2) + ")";
-    }
+    val smellSensorDescription: String
+        get() = "Smell sensor (" +
+                SimbrainMath.roundDouble(theta, 2) + "," +
+                SimbrainMath.roundDouble(radius, 2) + ")"
 
-    @Override
-    public String getLabel() {
+    override fun getLabel(): String {
         // TODO: Add labbel.ismpety check. Removed it because label is set by AddSensorDialog.
         //  So for now custom labels not possible on this sensor
-        return getDirectionString() + getSmellSensorDescription();
+        return directionString + smellSensorDescription
     }
 
-    @Override
-    public SmellSensor copy() {
-        return new SmellSensor(this);
+    override fun copy(): SmellSensor {
+        return SmellSensor(parent, label, theta, radius)
     }
 
-    @Override
-    public String getName() {
-        return "Smell Sensor";
+    override fun getName(): String {
+        return "Smell Sensor"
     }
 
 }

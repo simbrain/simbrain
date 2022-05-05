@@ -15,7 +15,10 @@ package org.simbrain.network.groups;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.*;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -217,9 +220,9 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      */
     public void makeConnections() {
         clear();
-        sourceNeuronGroup.addOutgoingSg(this);
-        targetNeuronGroup.addIncomingSg(this);
-        connectionManager.connectNeurons(this);
+        // sourceNeuronGroup.addOutgoingSg(this);
+        // targetNeuronGroup.addIncomingSg(this);
+        // connectionManager.connectNeurons(this);
         if (size() == 0) {
             String errMessage = "Synapse group creation failed because there are no synapses;";
             errMessage += "source neuron group = " + this.getSourceNeuronGroup().getLabel();
@@ -365,8 +368,8 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         clear();
         exSynapseSet.forEach(Synapse::delete);
         inSynapseSet.forEach(Synapse::delete);
-        targetNeuronGroup.removeIncomingSg(this);
-        sourceNeuronGroup.removeOutgoingSg(this);
+        // targetNeuronGroup.removeIncomingSg(this);
+        // sourceNeuronGroup.removeOutgoingSg(this);
         events.fireDeleted();
     }
 

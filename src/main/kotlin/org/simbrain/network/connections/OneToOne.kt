@@ -15,7 +15,6 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.util.OrientationComparator
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -42,17 +41,6 @@ class OneToOne(
     var connectOrientation: OrientationComparator = OrientationComparator.X_ORDER
 
 ) : ConnectionStrategy(), EditableObject {
-
-    /**
-     * Source and target neuron groups must have the same number of neurons.
-     * A synapse is created such that every source neuron is connected to
-     * exactly one target neuron (and vice versa if connections are
-     * bidirectional).
-     */
-    override fun connectNeurons(synGroup: SynapseGroup) {
-        val syns = connectOneToOne(synGroup.sourceNeurons, synGroup.targetNeurons, useBidirectionalConnections)
-        syns.forEach{s -> synGroup.addNewSynapse(s)}
-    }
 
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
         val syns = connectOneToOne(source, target, useBidirectionalConnections)

@@ -20,13 +20,11 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.UniformRealDistribution
-import java.util.concurrent.*
-import kotlin.math.floor
+import java.util.concurrent.Callable
 
 const val DEFAULT_DIST_CONST: Double = 0.25
 
@@ -139,95 +137,6 @@ class RadialGaussian(
         val syns: List<Synapse> = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
         network.addNetworkModels(syns)
         return syns
-    }
-
-    /**
-     * Specifically: Connects neurons based on a probability function related to their distance from one another, which
-     * exponentially decays with distance.
-     */
-    override fun connectNeurons(synGroup: SynapseGroup) {
-        synGroup.connectionManager = this
-        var source: List<Neuron> = synGroup.sourceNeurons
-        var target: List<Neuron> = synGroup.targetNeurons
-        var synapses: List<Synapse>
-        if (source.size < 500) {
-            synapses = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
-            synapses.forEach { s -> synGroup.addNewSynapse(s) }
-        } else {
-            val workers: MutableList<Callable<Collection<Synapse>>> = ArrayList()
-            val threads: Int = Runtime.getRuntime().availableProcessors()
-            val idealShare: Int = floor((source.size / threads).toDouble()).toInt()
-            var remaining: Int = source.size
-            val srcIter: Iterator<Neuron> = source.iterator()
-            var srcChunk: MutableList<Neuron>
-            var runningPercentEx: Double = 0.0
-            for (i in 0 until threads) {
-                srcChunk = ArrayList(Math.ceil((idealShare * 2) / 0.75).toInt())
-                var share: Int
-                if (remaining < idealShare * 2) {
-                    share = remaining
-                } else {
-                    share = idealShare
-                }
-                var j: Int = 0
-                while (j < share) {
-                    val n: Neuron = srcIter.next()
-                    srcChunk.add(n)
-                    if (n.isPolarized()) {
-                        if (Polarity.EXCITATORY === n.getPolarity()) {
-                            runningPercentEx++
-                        }
-                    }
-                    j++
-                }
-                remaining -= j
-                workers.add(ConnectorService(srcChunk, target, false))
-            }
-            runningPercentEx /= source.size.toDouble()
-            synGroup.setExcitatoryRatio(runningPercentEx)
-            val ex: ExecutorService = Executors.newFixedThreadPool(threads)
-            val generatedSyns: List<Future<Collection<Synapse>>>
-            try {
-                generatedSyns = ex.invokeAll(workers)
-                ex.shutdown()
-                ex.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS)
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
-                return
-            }
-            var numSyns = 0
-            for (future: Future<Collection<Synapse>> in generatedSyns) {
-                try {
-                    numSyns += future.get().size
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                } catch (e: ExecutionException) {
-                    e.printStackTrace()
-                }
-            }
-            synGroup.preAllocateSynapses(numSyns)
-            for (future: Future<Collection<Synapse>> in generatedSyns) {
-                try {
-                    for (s: Synapse? in future.get()) {
-                        synGroup.addNewSynapse(s)
-                    }
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                } catch (e: ExecutionException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        //        if (synGroup.isRecurrent()) {
-        //            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * (synGroup.getSourceNeuronGroup().size() - 1));
-        //        } else {
-        //            connectionDensity = (double) synGroup.size() / (synGroup.getSourceNeuronGroup().size() * synGroup.getTargetNeuronGroup().size());
-        //        }
-        // source = null
-        // target = null
-        // synapses = null
-        Runtime.getRuntime().gc()
     }
 
     public override fun toString(): String {

@@ -20,7 +20,6 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.util.SimnetUtils.getEuclideanDist
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
@@ -41,11 +40,6 @@ class DistanceBased (
     var decayFunction: DecayFunction = ExponentialDecayFunction()
 
 ) : ConnectionStrategy(), EditableObject {
-
-    override fun connectNeurons(sg: SynapseGroup) {
-        val syns = connectRadial(sg.sourceNeurons, sg.targetNeurons, decayFunction)
-        syns.forEach{s -> sg.addNewSynapse(s)}
-    }
 
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
         val syns = connectRadial(source, target, decayFunction)

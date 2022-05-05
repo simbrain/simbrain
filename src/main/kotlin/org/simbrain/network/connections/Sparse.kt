@@ -20,11 +20,9 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.sampleWithoutReplacement
-import java.util.*
 import kotlin.math.roundToInt
 
 /**
@@ -78,20 +76,6 @@ class Sparse @JvmOverloads constructor(
         )
     }
 
-    /**
-     * Should only be called for initialization.
-     *
-     * @param synGroup The synapse group that the connections this class
-     * will generate will be added to.
-     */
-    override fun connectNeurons(synGroup: SynapseGroup) {
-        if (equalizeEfferents) {
-            synGroup.connectEqualized()
-        } else {
-            synGroup.adjustToSparsity()
-        }
-    }
-
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
         val result = connectSparse(source, target, connectionDensity, allowSelfConnection, equalizeEfferents)
         return when(result) {
@@ -107,31 +91,6 @@ class Sparse @JvmOverloads constructor(
                 result.connectionsToRemove.forEach { it.delete() }
                 listOf()
             }
-        }
-    }
-
-    /**
-     * Populates the synapse group with synapses by making individual synaptic
-     * connections between the neurons in the synapse group's source and target
-     * groups. These synapses are initialized with default attributes and zero
-     * strength. Each source neuron will have exactly the same number of
-     * efferent synapses. This number being whichever satisfies the constraints
-     * given by the sparsity and whether or not the synapse group is recurrent
-     * and self connections are allowed.
-     *
-     * @param synapseGroup
-     */
-    private fun SynapseGroup.connectEqualized() {
-        clear()
-        connectEqualized(sourceNeurons, targetNeurons, connectionDensity).resultConnections.forEach {
-            addNewSynapse(it)
-        }
-    }
-
-    private fun SynapseGroup.adjustToSparsity(connectionDensity: Double? = null) {
-        when (val result = connectSparse(sourceNeurons, targetNeurons, connectionDensity ?: this@Sparse.connectionDensity, isRecurrent)) {
-            is ConnectionsResult.Add -> result.connectionsToAdd.forEach { addNewSynapse(it) }
-            is ConnectionsResult.Remove -> result.connectionsToRemove.forEach { removeSynapse(it) }
         }
     }
 

@@ -15,7 +15,6 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.propertyeditor.EditableObject
@@ -48,26 +47,6 @@ class AllToAll(
 
     override fun toString(): String {
         return name
-    }
-
-    /**
-     * Connects neurons such that every source neuron is connected to every
-     * target neuron. The only exception to this case is if the source neuron
-     * group is the target neuron group and self-connections are not allowed.
-     *
-     * @param synGroup the synapse group to which the synapses created by this
-     * connection class will be added.
-     */
-    override fun connectNeurons(synGroup: SynapseGroup) {
-        val syns = connectAllToAll(
-            synGroup.sourceNeurons,
-            synGroup.targetNeurons,
-            allowSelfConnection
-        )
-        // Set the capacity of the synapse group's list to accommodate the
-        // synapses this group will add.
-        synGroup.preAllocateSynapses(synGroup.sourceNeuronGroup.size() * synGroup.targetNeuronGroup.size())
-        syns.forEach { s -> synGroup.addNewSynapse(s) }
     }
 
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {

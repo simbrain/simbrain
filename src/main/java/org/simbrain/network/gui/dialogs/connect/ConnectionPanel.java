@@ -22,7 +22,6 @@ import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.DropDownTriangle;
@@ -199,37 +198,6 @@ public final class ConnectionPanel extends JPanel {
                 randomizeInhibitorySynapses(synapses, polarityPanel.getInRandomizer());
             }
         }
-    }
-
-    /**
-     * Commit changes made to a synapse group's connectivity.
-     *
-     * @param synapseGroup the group to change
-     */
-    public void commitChanges(SynapseGroup synapseGroup) {
-        synapseGroup.clear();
-        connectionStrategyProperties.commitChanges();
-        connectionStrategy.connectNeurons(synapseGroup);
-        if (isCreation && !connectionStrategy.getOverridesPolarity()) {
-            // Calls SynapseGroup.setExcitatoryRatio
-            polarityPanel.commitChanges();
-            if (polarityPanel.exRandomizerEnabled()) {
-                randomizeExcitatorySynapses(
-                        synapseGroup.getExcitatorySynapses(),
-                        polarityPanel.getExRandomizer());
-                synapseGroup.setExcitatoryRandomizer(polarityPanel
-                        .getExRandomizer());
-            }
-            if (polarityPanel.inRandomizerEnabled()) {
-                randomizeInhibitorySynapses(
-                        synapseGroup.getInhibitorySynapses(),
-                        polarityPanel.getInRandomizer());
-                synapseGroup.setInhibitoryRandomizer(polarityPanel
-                        .getInRandomizer());
-            }
-            synapseGroup.setExcitatoryRatio(polarityPanel.getPercentExcitatory());
-        }
-        synapseGroup.setConnectionManager(connectionStrategy);
     }
 
     public ConnectionStrategy getConnectionStrategy() {

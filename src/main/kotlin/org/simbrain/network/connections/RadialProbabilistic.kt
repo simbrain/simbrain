@@ -20,7 +20,6 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -119,18 +118,6 @@ class RadialProbabilistic(
         val syns = exc + inh
         network.addNetworkModels(syns)
         return syns
-    }
-
-    override fun connectNeurons(synGroup: SynapseGroup) {
-        val exc = connectProbabilistically(synGroup.sourceNeurons, synGroup.targetNeurons, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1)
-        )
-        exc.forEach{s -> synGroup.addExcitatorySynapse(s)}
-        val inh = connectProbabilistically(synGroup.sourceNeurons, synGroup.targetNeurons, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1)
-        )
-        inh.forEach{s -> synGroup.addInhibitorySynapse(s)}
-        synGroup.revalidateSynapseSets()
     }
 
     override fun getName(): String {

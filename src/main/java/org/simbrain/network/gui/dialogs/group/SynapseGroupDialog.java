@@ -163,7 +163,7 @@ public final class SynapseGroupDialog extends StandardDialog {
             connectionPanel = new ConnectionSelectorPanel(this, synapseGroup, null, null, null, networkPanel.getNetwork());
             var connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
                     (ActionEvent e) -> {
-                connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
+                // connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
                 //sumPanel.fillFieldValues(synapseGroup); // TODO
                 adjustmentPanel.fullUpdate();
                 // TODO: Update weight matrix when this is pressed

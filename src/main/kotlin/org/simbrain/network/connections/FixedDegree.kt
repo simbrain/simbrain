@@ -20,7 +20,6 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -86,17 +85,6 @@ class FixedDegree(
         }
         network.addNetworkModels(syns)
         return syns
-    }
-
-    override fun connectNeurons(synGroup: SynapseGroup) {
-        val syns = if (useRadius) {
-            connectFixedDegreeInRadius(synGroup.sourceNeurons, synGroup.targetNeurons,
-                degree, radius, direction, allowSelfConnections)
-        } else {
-            connectFixedDegree(synGroup.sourceNeurons, synGroup.targetNeurons,
-                degree, direction, allowSelfConnections)
-        }
-        syns.forEach { s -> synGroup.addNewSynapse(s) }
     }
 
     override fun getName(): String {

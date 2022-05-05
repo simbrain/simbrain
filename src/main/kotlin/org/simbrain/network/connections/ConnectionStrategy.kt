@@ -75,13 +75,6 @@ abstract class ConnectionStrategy : EditableObject {
     open val overridesPolarity = false
 
     /**
-     * Apply connection to a synapse group using specified parameters.
-     *
-     * @param synGroup synapse group
-     */
-    abstract fun connectNeurons(synGroup: SynapseGroup)
-
-    /**
      * Apply connection to a set of loose neurons.
      *
      * @param network parent network loose neuron

@@ -38,7 +38,6 @@ import org.simbrain.workspace.Producible;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,16 +70,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     @UserParameter(label = "Layout", isObjectType = true, tab = "Layout", order = 150)
     private Layout layout = DEFAULT_LAYOUT;
-
-    /**
-     * Set of incoming synapse groups.
-     */
-    private final HashSet<SynapseGroup> incomingSgs = new HashSet<SynapseGroup>();
-
-    /**
-     * Set of outgoing synapse groups.
-     */
-    private final HashSet<SynapseGroup> outgoingSgs = new HashSet<SynapseGroup>();
 
     /**
      * In method setLayoutBasedOnSize, this is used as the threshold number of neurons in the group, above which to use
@@ -173,8 +162,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void delete() {
         events.fireDeleted();
         neuronList.forEach(Neuron::delete);
-        outgoingSgs.forEach(SynapseGroup::delete);
-        incomingSgs.forEach(SynapseGroup::delete);
         activationRecorder.stopRecording();
     }
 
@@ -333,38 +320,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
     public void applyLayout(Layout newLayout) {
         layout = newLayout;
         applyLayout(getLocation());
-    }
-
-    public HashSet<SynapseGroup> getIncomingSgs() {
-        return new HashSet<SynapseGroup>(incomingSgs);
-    }
-
-    public HashSet<SynapseGroup> getOutgoingSg() {
-        return new HashSet<SynapseGroup>(outgoingSgs);
-    }
-
-    public boolean containsAsIncoming(SynapseGroup sg) {
-        return incomingSgs.contains(sg);
-    }
-
-    public boolean containsAsOutgoing(SynapseGroup sg) {
-        return outgoingSgs.contains(sg);
-    }
-
-    public void addIncomingSg(SynapseGroup sg) {
-        incomingSgs.add(sg);
-    }
-
-    public void addOutgoingSg(SynapseGroup sg) {
-        outgoingSgs.add(sg);
-    }
-
-    public boolean removeIncomingSg(SynapseGroup sg) {
-        return incomingSgs.remove(sg);
-    }
-
-    public boolean removeOutgoingSg(SynapseGroup sg) {
-        return outgoingSgs.remove(sg);
     }
 
     /**

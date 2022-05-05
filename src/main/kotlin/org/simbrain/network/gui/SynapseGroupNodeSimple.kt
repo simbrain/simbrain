@@ -20,7 +20,8 @@ class SynapseGroupNodeSimple(private val synapseGroupNode: SynapseGroupNode) : P
 
     private val source = synapseGroupNode.synapseGroup.sourceNeuronGroup
     private val target = synapseGroupNode.synapseGroup.targetNeuronGroup
-    private fun isBidirectional() = target.outgoingSg.any { it.targetNeuronGroup == source }
+    // private fun isBidirectional() = target.outgoingSg.any { it.targetNeuronGroup == source }
+    private fun isBidirectional() = false // Temp
 
     private val arrow = bezierArrow {
 

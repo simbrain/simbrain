@@ -90,7 +90,7 @@ public class WinnerTakeAll extends NeuronGroup {
         super(root);
         for (int i = 0; i < numNeurons; i++) {
             // TODO: Prevent invalid states like this?
-            this.addNeuron(new Neuron(root, new LinearRule()));
+            addNeuron(new Neuron(root, new LinearRule()));
         }
         setLabel("Winner take all network");
     }

@@ -160,6 +160,14 @@ public class NeuronGroup extends AbstractNeuronCollection {
     }
 
     /**
+     * Add a neuron to the neuron group and designate parent group properly.
+     */
+    protected void addNeuron(Neuron neuron) {
+        super.addNeuron(neuron);
+        neuron.setParentGroup(this);
+    }
+
+    /**
      * Delete this neuron group.
      */
     public void delete() {

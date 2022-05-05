@@ -96,20 +96,29 @@ class TileSet(
      * and later when the tiles are access, they will be store into the [.idTileMap].
      */
     @XStreamImplicit
-    private val tiles: MutableList<Tile>? = null
+    private val tiles: MutableList<Tile> = mutableListOf(Tile(2).apply { label = "Water1"})
 
     /**
-     * A map of tile id to tile for fast lookup.
+     * A map from tile ids to tiles for fast lookup.
      */
     @Transient
-    private lateinit var idTileMap: MutableMap<Int, Tile?>
+    private lateinit var idTileMap: MutableMap<Int, Tile>
+
+    /**
+     * A map from tile string labels to tiles.
+     */
+    // TODO: Directly editing labels on tiles in APE does not update this map
+    @Transient
+    private lateinit var labelTileMap: MutableMap<String, Tile>
 
     init {
-        init()
+        initTileMaps()
     }
 
-    fun init() {
-        idTileMap = tiles?.associate { it.id to it }?.toMutableMap()?:HashMap()
+    fun initTileMaps() {
+        idTileMap = tiles.associate { it.id to it }.toMutableMap()
+        labelTileMap = tiles.filter { it.label != null }
+            .associate { it.label!! to it }.toMutableMap()
     }
 
     /**
@@ -143,10 +152,17 @@ class TileSet(
     }
 
     /**
+     * Get tile associated with a string label.
+     */
+    operator fun get(label: String): Tile? {
+        return labelTileMap[label]
+    }
+
+    /**
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private fun readResolve(): Any {
-        init()
+        initTileMaps()
         return this
     }
 }

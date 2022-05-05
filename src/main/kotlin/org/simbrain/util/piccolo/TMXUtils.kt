@@ -29,6 +29,13 @@ val XStream
 
 val missingTexture by lazy { OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png") }
 
+/**
+ * Return id corresponding to a label or 0 (empty tile) if nothing is found
+ */
+fun Collection<TileSet>.getIdFromLabel(label: String): Int {
+    return firstNotNullOf{tileSet -> tileSet[label]}.id ?:0
+}
+
 fun transparentTexture(width: Int, height: Int) = transparentImage(width, height)
 
 /**

@@ -151,6 +151,10 @@ class TileMap(width: Int, height: Int) {
         }
     }
 
+    fun fill(tileLabel: String) {
+        fill(tileSets.getIdFromLabel(tileLabel))
+    }
+
     // TODO: should not be able to edit tile map layers that don't belong to this map
     fun TileMapLayer.editTile(x: Int, y: Int, tileID: Int) {
         this[x, y] = tileID

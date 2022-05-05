@@ -511,9 +511,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
         with(selectionManager) {
 
-            if (connectNeuronGroups()) {
-                return
-            }
+            // Re-enable when new synapse groups are done
+            // if (connectNeuronGroups()) {
+            //     return
+            // }
 
             if (connectLayers()) {
                 return

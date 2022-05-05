@@ -32,8 +32,6 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.Hashtable;
 
-import static org.simbrain.network.connections.SparseKt.DEFAULT_CONNECTION_DENSITY;
-
 /**
  * Panel for adjusting the connectivity between a source and target set of
  * neurons.
@@ -193,9 +191,6 @@ public class ConnectivityAdjustmentPanel extends JPanel {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void commitChanges() {
         double density = Utils.doubleParsable(sparsity.getText());
 //        if (!Double.isNaN(density)) {
@@ -208,12 +203,9 @@ public class ConnectivityAdjustmentPanel extends JPanel {
 //        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void fillFieldValues() {
         if (connection == null || !(connection instanceof Sparse)) {
-            sparsity.setValue(DEFAULT_CONNECTION_DENSITY);
+            sparsity.setValue(.01);
 
         } else {
             sparsity.setValue(((Sparse) connection).getConnectionDensity());

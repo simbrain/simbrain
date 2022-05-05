@@ -474,7 +474,7 @@ public class SparseConnectionPanel extends EditablePanel {
             connection.setEqualizeEfferents(equalizeEfferentsChkBx.isSelected());
         }
         if (allowSelfConnectChkBx.isEnabled()) {
-             connection.setSelfConnectionAllowed(allowSelfConnectChkBx.isSelected());
+             connection.setAllowSelfConnection(allowSelfConnectChkBx.isSelected());
         }
         double connectivity = Utils.doubleParsable(densityTf);
         if (!Double.isNaN(connectivity)) {

@@ -28,35 +28,36 @@ import java.util.*
 import kotlin.math.roundToInt
 
 /**
- * A superclass for all connectors whose primary parameter is related to base
- * connection density, taking no other major factors into account insofar as
- * selecting which neurons should be connected goes.
+ * Connect some percent of possible source-target links. Sparsity or density is between 0 (no connections) and 1 (all
+ * to all). Featuers to allow changing existing sparsity and to hold number of outgoing connections constant are
+ * provided.
  *
  * @author Zoë Tosi
- * @param equalizeEfferents Whether or not each source neuron is given an equal number of efferent
- *        synapses. If true, every source neuron will have exactly the same number
- *        of synapses emanating from them, that is, each source will connect to the
- *        same number of targets. If you have 10 source neurons and 10 target
- *        neurons, and 50% sparsity, then each source neuron will connect to
- *        exactly 5 targets. If equalizeEfferents is false, then the number of
- *        target neurons each source neuron connects to will be drawn from a
- *        binomial distribution with a %success chance of 50%, so on average each
- *        source neuron will connect to 5 targets, and the sparsity will be roughly
- *        50% (more exact the more neurons/synapses there are). However the number
- *        of targets any given source neuron connects to is by no means guaranteed.
- * @param selfConnectionAllowed  Whether or not connections where the source and target are the same
- *        neuron are allowed. Only applicable if the source and target neuron sets
- *        are the same.
+ * @author Yulin Li
+ * @author Jeff Yoshimi
  */
 class Sparse @JvmOverloads constructor(
+
     /**
-     * Generally speaking the connectionDensity parameter represents a
-     * probability reflecting how many possible connections between a given
-     * source neuron and all available target neurons will actually be made.
+     * What percent (as a probability) of possible connectios to make.
      */
     var connectionDensity: Double = 0.8,
-    @get:JvmName("isEqualizeEfferents") var equalizeEfferents: Boolean = DEFAULT_EE_PREF,
-    @get:JvmName("isSelfConnectionAllowed") var selfConnectionAllowed: Boolean = false
+
+    /**
+     * Whether or not each source neuron is given an equal number of efferent synapses. If true, every source neuron
+     * will have exactly the same number of synapses emanating from them, that is, each source will connect to the same
+     * number of targets. If you have 10 source neurons and 10 target neurons, and 50% sparsity, then each source neuron
+     * will connect to exactly 5 targets.
+     */
+    @get:JvmName("isEqualizeEfferents")
+    var equalizeEfferents: Boolean = false,
+
+    /**
+     *  Whether or not connections where the source and target are the same neuron are allowed.
+     *  Only applicable if the source and target neuron sets are the same.
+     */
+    @get:JvmName("isSelfConnectionAllowed")
+    var allowSelfConnection: Boolean = false
 ) : ConnectionStrategy(), EditableObject {
 
     /**
@@ -72,7 +73,7 @@ class Sparse @JvmOverloads constructor(
             sourceNeurons,
             targetNeurons,
             connectionDensity,
-            selfConnectionAllowed,
+            allowSelfConnection,
             equalizeEfferents
         )
     }
@@ -92,7 +93,7 @@ class Sparse @JvmOverloads constructor(
     }
 
     override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
-        val result = connectSparse(source, target, connectionDensity, selfConnectionAllowed, equalizeEfferents)
+        val result = connectSparse(source, target, connectionDensity, allowSelfConnection, equalizeEfferents)
         return when(result) {
             is ConnectionsResult.Add -> {
                 network.addNetworkModels(result.connectionsToAdd)
@@ -139,22 +140,6 @@ class Sparse @JvmOverloads constructor(
     override fun toString() = name
 
 }
-
-/**
- * The default preference as to whether or not self connections are allowed.
- */
-const val DEFAULT_SELF_CONNECT_PREF = false
-
-/**
- * Sets the default behavior concerning whether or not the number of
- * efferents of each source neurons should be equalized.
- */
-val DEFAULT_EE_PREF = false
-
-/**
- * The default sparsity (between 0 and 1).
- */
-const val DEFAULT_CONNECTION_DENSITY = 0.1
 
 fun connectEqualized(
     sourceNeurons: List<Neuron>,
@@ -219,9 +204,9 @@ fun connectSparse(
 fun connectSparse(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
-    sparsity: Double = DEFAULT_CONNECTION_DENSITY,
-    selfConnectionAllowed: Boolean = DEFAULT_SELF_CONNECT_PREF,
-    equalizeEfferents: Boolean = DEFAULT_EE_PREF
+    sparsity: Double = .01,
+    selfConnectionAllowed: Boolean = false,
+    equalizeEfferents: Boolean = false
 ): ConnectionsResult = if (equalizeEfferents) {
     connectEqualized(sourceNeurons, targetNeurons, sparsity, selfConnectionAllowed)
 } else {

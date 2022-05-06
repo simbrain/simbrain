@@ -1,28 +1,27 @@
 package org.simbrain.util.decayfunctions
 
-import org.simbrain.util.UserParameter
 import kotlin.math.exp
 
 class ExponentialDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0): DecayFunction() {
 
-    @UserParameter(
-        label = "Rate (\u03BB)",
-        useSetter = true,
-        description = "The rate of exponential decay. The mean is 1/λ. For higher λ the mean is closer to 0 " +
-                "For lower λ the mean is farther from 0 and the tail is longer.",
-        minimumValue = 0.00001,
-        increment = .1,
-        order = 1
-    )
-    var lambda = 1.0
+    // @UserParameter(
+    //     label = "Rate (\u03BB)",
+    //     useSetter = true,
+    //     description = "The rate of exponential decay. The mean is 1/λ. For higher λ the mean is closer to 0 " +
+    //             "For lower λ the mean is farther from 0 and the tail is longer.",
+    //     minimumValue = 0.00001,
+    //     increment = .1,
+    //     order = 1
+    // )
+    // var lambda = 1.0
 
     override fun getScalingFactor(distance: Double): Double {
-        val dist = distanceFromPeak(distance)
-        return if (dist > dispersion) {
-            0.0
-        } else {
-            return exp(-dist / (lambda * lambda))
-        }
+        // lambda = 1/dispersion
+        // So max value we can get is 1/dispersion, at the peak
+        // this is a reflected version of the exponential distribution
+        // it is not a true pdf except when limited to non-negative values
+        val x = distanceFromPeak(distance)
+        return (1/dispersion) * exp((-1/dispersion) * x)
     }
 
 
@@ -30,7 +29,6 @@ class ExponentialDecayFunction @JvmOverloads constructor(dispersion: Double = 70
         return ExponentialDecayFunction(dispersion)
             .also {
                 it.peakDistance = dispersion
-                it.lambda = lambda
             }
     }
 

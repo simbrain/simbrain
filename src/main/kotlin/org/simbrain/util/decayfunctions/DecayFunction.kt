@@ -13,10 +13,14 @@ abstract class DecayFunction(
     @UserParameter(
         label = "Dispersion",
         description = "If outside of this radius the object has no affect on the network.",
+        minimumValue = 0.0,
         order = 1
     )
     var dispersion: Double = 70.0,
 
+    /**
+     * The "center" of the decay function where it takes its maximal value.
+     */
     @UserParameter(label = "Peak Distance", description = "Peak value", order = 2)
     var peakDistance: Double = 0.0,
 
@@ -29,6 +33,7 @@ abstract class DecayFunction(
      *
      * Returns a number between 0 and 1 that can also be treated as a probability.
      */
+    // TODO: But note these are not normalized to be probability density functions
     abstract fun getScalingFactor(distance: Double): Double
 
     /**
@@ -70,7 +75,6 @@ abstract class DecayFunction(
                 StepDecayFunction::class.java,
                 LinearDecayFunction::class.java,
                 ExponentialDecayFunction::class.java,
-                PowerLawDecayFunction::class.java
             )
         }
     }

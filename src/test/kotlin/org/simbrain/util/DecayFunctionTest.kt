@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.util.decayfunctions.ExponentialDecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
-import org.simbrain.util.decayfunctions.PowerLawDecayFunction
 import org.simbrain.util.decayfunctions.StepDecayFunction
 
 /**
@@ -49,32 +48,26 @@ class DecayFunctionTest {
         assertEquals(1.0, decay.getScalingFactor(3.1))
         assertEquals(1.0, decay.getScalingFactor(5.0))
         assertEquals(0.0, decay.getScalingFactor(8.0))
-        // (0..10).forEach {
-        //     println("" + it + ":" + decay.getScalingFactor(it.toDouble())) }
+        // println(makeStringArray(0.0, 10.0, decay::getScalingFactor))
     }
 
     @Test
     fun `test exponential`() {
         val decay = ExponentialDecayFunction()
-        decay.dispersion = 5.0
-        (0..10).forEach {
-            println("" + it + ":" + decay.getScalingFactor(it.toDouble())) }
+        decay.dispersion = 1.0
+        assertEquals(1.0, decay.getScalingFactor(0.0))
+        assertEquals(1/Math.E, decay.getScalingFactor(1.0))
+        // println(makeStringArray(0.0, 10.0, decay::getScalingFactor))
     }
 
+    //TODO
     @Test
     fun `test exponential with peak`() {
         val decay = ExponentialDecayFunction()
-        decay.dispersion = 5.0
+        decay.dispersion = 2.0
         decay.peakDistance = 10.0
-        println("[" + (0..20).joinToString(",") { "" + decay.getScalingFactor(it.toDouble()) }  + "]")
-    }
-
-    @Test
-    fun `test power law with peak`() {
-        val decay = PowerLawDecayFunction()
-        decay.dispersion = 5.0
-        decay.peakDistance = 10.0
-        println("[" + (0..20).joinToString(",") { "" + decay.getScalingFactor(it.toDouble()) }  + "]")
+        assertEquals(1/decay.dispersion, decay.getScalingFactor(10.0))
+        // println(makeStringArray(0.0,20.0, decay::getScalingFactor))
     }
 
 }

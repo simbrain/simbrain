@@ -112,3 +112,25 @@ fun createGeometricProgression(initialValue: Double, ratio: Double): Sequence<Do
 fun List<DoubleArray>.sum(): DoubleArray {
     return reduce(SimbrainMath::addVector)
 }
+
+/**
+ * Create a sequence of double starting at start, incremented by step, and stopping at stop.
+ */
+fun makeDoubleSequence(start: Double, stop: Double, step: Double): Sequence<Double> {
+    return sequence {
+        var current = start
+        while (current <= stop) {
+            yield(current)
+            current += step
+        }
+    }
+}
+
+/**
+ * Apply a function to a sequence of doubles and return the result as [f(start),....f(stop)].
+ * Useful to create display strings or strings that can be pasted into numpy arrays for example.
+ */
+fun makeStringArray(start: Double, stop: Double, f: (Double) -> Double, step: Double = 1.0): String {
+    return "[${makeDoubleSequence(start, stop, step).map(f).joinToString(",")}]"
+
+}

@@ -1,7 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.Simulation;
-import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.RadialGaussian;
@@ -9,8 +8,8 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
@@ -80,14 +79,12 @@ public class ModularOscillatoryNetwork extends Simulation {
 
         // Sensory network
         sensory = addModule(-115, 10, 49, "Sensory", new DecayRule());
-        //SynapseGroup recSensory = connectRadialGaussian(sensory,sensory);
-        SynapseGroup recSensory = EdgeOfChaos.connectReservoir(net, sensory, 1.9, 4);
+        SynapseGroup2 recSensory = connectRadialGaussian(sensory,sensory);
         recSensory.setLabel("Recurrent Sensory");
 
         // Motor Network
         motor = addModule(322, 10, 16, "Motor", new KuramotoRule());
-        //SynapseGroup recMotor = connectRadialGaussian(motor, motor);
-        SynapseGroup recMotor = EdgeOfChaos.connectReservoir(net, motor, 1.9, 4);
+        SynapseGroup2 recMotor = connectRadialGaussian(motor, motor);
         recMotor.setLabel("Recurrent Motor");
 
         // Sensori-Motor Connection
@@ -110,7 +107,7 @@ public class ModularOscillatoryNetwork extends Simulation {
             Neuron neuron = ng.getNeuron(i++);
             neuron.setLabel(sensor.getLabel());
             neuron.setClamped(true);
-            sim.couple((ObjectSensor) sensor, neuron);
+            sim.couple(sensor, neuron);
         }
 
         // Hard coded for two input neurons
@@ -130,10 +127,6 @@ public class ModularOscillatoryNetwork extends Simulation {
         }
 
         return ng;
-
-    }
-
-    private void connectSpatial(Neuron srcNeuron) {
 
     }
 
@@ -166,19 +159,21 @@ public class ModularOscillatoryNetwork extends Simulation {
         return ng;
     }
 
-    private SynapseGroup connectRadialGaussian(NeuronGroup sourceNg, NeuronGroup targetNg) {
+    private SynapseGroup2 connectRadialGaussian(NeuronGroup sourceNg, NeuronGroup targetNg) {
         ConnectionStrategy radialConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 2,
             DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50.0);
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(sourceNg, targetNg, radialConnection);
+        SynapseGroup2 sg = new SynapseGroup2(sourceNg, targetNg, radialConnection);
         net.addNetworkModel(sg);
         sg.setDisplaySynapses(false);
         return sg;
     }
 
-    private SynapseGroup connectModules(NeuronGroup sourceNg, NeuronGroup targetNg, double density, double exRatio) {
+    private SynapseGroup2 connectModules(NeuronGroup sourceNg, NeuronGroup targetNg, double density, double exRatio) {
         Sparse sparse = new Sparse(density);
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(sourceNg, targetNg, exRatio);
-        sparse.connectNeurons(sg);
+        SynapseGroup2 sg = new SynapseGroup2(sourceNg, targetNg);
+        // TODO!
+        // , exRatio)
+        // sparse.connectNeurons(sg);
         net.addNetworkModel(sg);
         sg.setDisplaySynapses(false);
         return sg;

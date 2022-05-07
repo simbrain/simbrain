@@ -184,6 +184,11 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         // Connect neuron groups
         menu.addSeparator();
+        menu.add(getNetworkPanel().getNetworkActions().getConnectWithWeightMatrix());
+        menu.add(getNetworkPanel().getNetworkActions().getConnectWithSynapseGroup());
+
+        // Set as source and clear source
+        menu.addSeparator();
         Action setSource = new AbstractAction("Set Group as Source") {
             @Override
             public void actionPerformed(final ActionEvent event) {
@@ -201,11 +206,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             }
         };
         menu.add(clearSource);
-
-        Action makeConnection = getNetworkPanel().getNetworkActions().getConnectSelectedModels();
-        menu.add(makeConnection);
-
-        // TODO: Add Synapse group choice with proper action when synapse group is back
 
         // Add any custom menus for this type
         if (customMenuItems.size() > 0) {

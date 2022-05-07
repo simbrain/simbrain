@@ -112,10 +112,23 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
     val connectSelectedModels = networkPanel.createAction(
-        name = "Connected selected objects...",
+        name = "Connect selected objects...",
         description = "Creates synapse, weight matrix, etc. between selected source and target entities",
     ) {
         connectSelectedModels()
+    }
+
+    val connectWithWeightMatrix = networkPanel.createAction(
+        name = "Connect selected objects with weight matrix",
+    ) {
+        // This will automatically connect arrays (which is all this action should be called for) with weight matrices
+        connectSelectedModels()
+    }
+
+    val connectWithSynapseGroup = networkPanel.createAction(
+        name = "Connect selected objects with synapse group",
+    ) {
+        selectionManager.connectNeuronGroups()
     }
 
     val neuronGroupAction = addGroupAction("Add Neuron Group...") {

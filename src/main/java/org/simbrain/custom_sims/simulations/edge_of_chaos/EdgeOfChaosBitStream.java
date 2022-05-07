@@ -6,8 +6,8 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
@@ -39,7 +39,7 @@ public class EdgeOfChaosBitStream extends Simulation {
 
     // References
     Network net;
-    SynapseGroup sgRes1, sgRes2;
+    SynapseGroup2 sgRes1, sgRes2;
     NeuronGroup res1, res2, bitStream1, bitStream2;
 
     @Override

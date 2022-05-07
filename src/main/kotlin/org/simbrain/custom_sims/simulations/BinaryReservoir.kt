@@ -90,7 +90,7 @@ val binaryReservoir = newSim {
         }
         variance = newVariance
 
-        val av = network.flatSynapseList.map { it.strength }.toDoubleArray().variance()
+        val av = network.flatSynapseList.map { it.strength }.toDoubleArray().variance
         println("Variance set to ${variance}; Actual variance: ${av}")
 
     }

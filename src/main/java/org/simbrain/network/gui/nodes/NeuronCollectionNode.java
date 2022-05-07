@@ -130,6 +130,11 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         };
         menu.add(selectOutgoingNodes);
 
+        // Connect neuron connections
+        menu.addSeparator();
+        menu.add(getNetworkPanel().getNetworkActions().getConnectWithWeightMatrix());
+        menu.add(getNetworkPanel().getNetworkActions().getConnectWithSynapseGroup());
+
         // Test Input Panel
         menu.addSeparator();
         Action testInputs = new AbstractAction("Input Data...") {

@@ -15,10 +15,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.QuickConnectionManager
 import org.simbrain.network.core.*
-import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.groups.Subnetwork
-import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.groups.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.actions.edit.ToggleAutoZoom
 import org.simbrain.network.gui.dialogs.group.ConnectorDialog
@@ -257,6 +254,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
             is SynapseGroup -> createNode(model)
+            is SynapseGroup2 -> createNode(model)
             is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
@@ -324,6 +322,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
         SynapseGroupNode(this, synapseGroup)
+    }.also { it.lowerToBottom() }
+
+    fun createNode(synapseGroup: SynapseGroup2) = addScreenElement {
+        SynapseGroup2Node(this, synapseGroup)
     }.also { it.lowerToBottom() }
 
     fun createNode(weightMatrix: Connector) = addScreenElement {
@@ -576,11 +578,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      *
      * @retrun false if there source and target neurons did not have a neuron group.
      */
-    private fun NetworkSelectionManager.connectNeuronGroups(): Boolean {
-        val src = filterSelectedSourceModels(NeuronGroup::class.java)
-        val tar = filterSelectedModels(NeuronGroup::class.java)
+    fun NetworkSelectionManager.connectNeuronGroups(): Boolean {
+        val src = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
+        val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
         if (src.isNotEmpty() && tar.isNotEmpty()) {
-            displaySynapseGroupDialog(this.networkPanel, src.get(0), tar.get(0))
+            network.addNetworkModel(SynapseGroup2(src.first(), tar.first()))
             return true;
         }
         return false

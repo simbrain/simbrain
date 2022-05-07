@@ -39,6 +39,10 @@ class PoissonDistribution(p: Double = 1.0, negate: Boolean = false)
 
     override fun sampleInt(n: Int) = dist.sample(n).conditionalNegate()
 
+    val mean get() =  p
+
+    val variance get() = p
+
     override fun getName(): String {
         return "Poisson"
     }

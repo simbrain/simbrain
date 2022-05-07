@@ -42,6 +42,10 @@ class ExponentialDistribution(lambda: Double = 1.0, negate: Boolean = false)
 
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray().conditionalNegate()
 
+    val mean get() = 1/lambda
+
+    val variance get() = 1/(lambda*lambda)
+
     override fun deepCopy(): ProbabilityDistribution {
         val copy = ExponentialDistribution()
         copy.randomSeed = randomSeed

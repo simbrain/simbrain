@@ -42,6 +42,8 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
 
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray()
 
+    val variance get() = standardDeviation * standardDeviation
+
     override fun getName(): String {
         return "Normal"
     }

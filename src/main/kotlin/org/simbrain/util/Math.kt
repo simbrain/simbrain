@@ -2,7 +2,6 @@ package org.simbrain.util
 
 import org.simbrain.util.math.SimbrainMath
 import smile.math.matrix.Matrix
-import kotlin.math.pow
 
 /**
  * Numeric utilities in Kotlin. Comparable to [SimbrainMath].
@@ -63,7 +62,6 @@ fun DoubleArray.toIntArray(): IntArray {
     return map { it.toInt() }.toIntArray()
 }
 
-
 fun Any?.isRealValued(): Boolean {
         return this is Double || this is Float
 }
@@ -84,13 +82,6 @@ fun List<List<Double>>.toCsvString(): String {
 fun List<DoubleArray>.toCsvString(): String {
     return joinToString("\n") { it.joinToString(",") }
 }
-
-fun DoubleArray.variance(): Double {
-    val avg = average()
-    return sumOf { n -> (n - avg).pow(2.0)  } / size
-}
-
-fun DoubleArray.stdev(): Double = kotlin.math.sqrt(variance())
 
 /**
  * https://en.wikipedia.org/wiki/Geometric_progression

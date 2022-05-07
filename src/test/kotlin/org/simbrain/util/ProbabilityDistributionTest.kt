@@ -1,12 +1,9 @@
 package org.simbrain.util
 
-import org.apache.commons.math3.distribution.ChiSquaredDistribution
-import org.apache.commons.math3.distribution.TDistribution
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.*
-import kotlin.math.sqrt
 
 /**
  * Tests of probability distributions.
@@ -18,75 +15,66 @@ class ProbabilityDistributionTest {
 
     // TODO: Finish for all probability distributions
 
-    val alpha = .001 // For 1 - alpha confidence level
+    /**
+     * Confidence level = 1-alpha
+     *
+     * Lower alpha means tests will pass more often
+     */
+    val alpha = .001
+
+    /**
+     * Sample size.
+     */
     val N = 1000
 
     @Test
     fun `test uniform`() {
-        val sample = UniformRealDistribution(0.0, 1.0)
-        var nums = sample.sampleDouble(N)
-        // TODO:  Properly implememnt this
-        // assertTrue(nums.average() in ((.5 - alpha)..(.5 + alpha)))
-        assertTrue(nums.maxOrNull()!! <= 1.0)
-        assertTrue(nums.minOrNull()!! >= 0.0)
-        sample.floor = -2.0
-        sample.ceil = -1.0
-        nums = sample.sampleDouble(N)
-        println(nums.average())
-        // assertTrue(nums.average() in ((-1.5 - alpha)..(-1.5 + alpha)))
-        assertTrue(nums.maxOrNull()!! <= -1.0)
-        assertTrue(nums.minOrNull()!! >= -2.0)
+        val dist = UniformRealDistribution(0.0, 1.0)
+
+        var sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
+        assertTrue(sample.maxOrNull()!! <= 1.0)
+        assertTrue(sample.minOrNull()!! >= 0.0)
+
+        dist.floor = -2.0
+        dist.ceil = -1.0
+        sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
     }
 
     @Test
-    fun `test uniform bounds`() {
-        val dist = UniformRealDistribution(1.0, 3.0)
-        var nums = dist.sampleDouble(10)
-        assertTrue(nums.maxOrNull()!! <= 3.0)
-        assertTrue(nums.minOrNull()!! >= 1.0)
-    }
+    fun `test normal distribution`() {
+        val dist = NormalDistribution(1.0,.5)
+        var sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalForVarianceOfNormalDist(sample.variance, alpha, N))
 
-
-    @Test
-    fun `test normal distribution mean 1 and stdev point-5`() {
-        val mean = 1.0
-        val stdev = .5
-        val stats = NormalDistribution(mean,stdev).sampleStats()
-        assertTrue(mean in stats.confidenceIntervalForMeanOfNormalDist())
-        assertTrue(stdev*stdev in stats.confidenceIntervalForVarianceOfNormalDist())
-    }
-
-    @Test
-    fun `test normal distribution mean -1 and stdev point-25`() {
-        val mean = -1.0
-        val stdev = .25
-        val stats = NormalDistribution(mean,stdev).sampleStats()
-        assertTrue(mean in stats.confidenceIntervalForMeanOfNormalDist())
-        assertTrue(stdev*stdev in stats.confidenceIntervalForVarianceOfNormalDist())
+        dist.mean =-1.0
+        dist.standardDeviation = .25
+        sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalForVarianceOfNormalDist(sample.variance, alpha, N))
     }
 
     @Test
     fun `test poisson`() {
-        val poisson = PoissonDistribution()
-        poisson.p = 1.0
-        val poissonSample = poisson.sampleStats()
-        val poissonApproximatedByNormal = NormalDistribution(poisson.p * N,poisson.p * N)
-        val testStats = poissonApproximatedByNormal.sampleStats()
-        // println(poissonSample)
-        // println(testStats)
-        assertTrue(poissonSample.sum in testStats.confidenceIntervalForMeanOfNormalDist())
-        // TOOD: Think about variance case
+        val dist = PoissonDistribution(1.0)
+        val sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalForVarianceOfNormalDist(sample.variance, alpha, N))
     }
 
     @Test
     fun `test exponential`() {
-        val dist = ExponentialDistribution(1.0)
-        var nums = dist.sampleDouble(N)
-        assertTrue(nums.minOrNull()!! > 0)
-        assertTrue(nums.average() in ((1.0 - .25)..(1.0 + .25)))
-        dist.lambda = .5
-        nums = dist.sampleDouble(N)
-        assertTrue(nums.average() in ((2.0 - .25)..(2.0 + .25)))
+        val dist = ExponentialDistribution(2.0)
+        var sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalForMeanOfNormalDist(sample.variance, sample.stdev, alpha, N))
+
+        dist.lambda = 2.0
+        sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalForMeanOfNormalDist(sample.variance, sample.stdev, alpha, N))
     }
 
     @Test
@@ -243,41 +231,4 @@ class ProbabilityDistributionTest {
             assertNotEquals(deserialized1.sampleDouble(), deserialized2.sampleDouble())
         }
     }
-
-    ///////// Utilities /////////////
-
-    data class Stats(val mean:Double, val stdev: Double, val variance: Double, val sum: Double)
-
-    fun ProbabilityDistribution.sampleStats(): Stats {
-        var sample = sampleDouble(N)
-        val sampleMean = sample.average()
-        val sampleStdev = sample.stdev()
-        val sampleVar = sampleStdev * sampleStdev
-        val sum = sample.sum()
-        return Stats(sampleMean, sampleStdev, sampleVar, sum)
-    }
-
-    fun stderr(sampleStdev: Double, sampleSize: Int): Double {
-        return sampleStdev / sqrt(sampleSize.toDouble())
-    }
-
-    fun tscore(alpha: Double, df: Int): Double {
-        val tdist = TDistribution(df.toDouble())
-        // Absolute because t-values from t-tables are the absolute value of inverse cumulative probabilities
-        return Math.abs(tdist.inverseCumulativeProbability(alpha))
-    }
-
-    fun chiSquareScore(alpha: Double, df: Int): Double {
-        val dist = ChiSquaredDistribution(df.toDouble())
-        return dist.inverseCumulativeProbability(alpha)
-    }
-
-    fun Stats.confidenceIntervalForMeanOfNormalDist(): ClosedFloatingPointRange<Double> {
-        val halfInterval = tscore(alpha / 2, N - 1) * stderr(stdev, N)
-        return (mean - halfInterval)..(mean + halfInterval)
-    }
-    fun Stats.confidenceIntervalForVarianceOfNormalDist() = (
-                    (N - 1) / chiSquareScore(1 - alpha / 2, N - 1) * variance ..
-                    (N - 1) / chiSquareScore(alpha / 2, N - 1) * variance)
-
 }

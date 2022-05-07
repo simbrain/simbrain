@@ -4,6 +4,7 @@ import org.apache.commons.math3.distribution.AbstractRealDistribution
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toIntArray
+import java.lang.Math.sqrt
 
 class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : ProbabilityDistribution() {
 
@@ -40,6 +41,12 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
 
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray()
 
+    val mean get() =  (ceil + floor)/2
+
+    val stdev get() = (ceil - floor)/sqrt(12.0)
+
+    val variance get() = Math.pow(stdev, 2.0)
+
     override fun getName(): String {
         return "Uniform (Real)"
     }
@@ -59,4 +66,5 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
             return ProbabilityDistribution.getTypes()
         }
     }
+
 }

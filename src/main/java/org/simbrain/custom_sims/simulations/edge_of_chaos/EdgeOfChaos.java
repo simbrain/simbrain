@@ -204,7 +204,7 @@ public class EdgeOfChaos extends Simulation {
                         if (Math.random() < sparsity) {
                             Synapse syn = new Synapse(src.getNeuronList().get(srcNodeIndices[j]), tarNList.get(ii));
                             syn.setStrength(1);
-                            src2Res.addNewSynapse(syn);
+                            src2Res.addSynapse(syn);
                         }
                     }
                 }

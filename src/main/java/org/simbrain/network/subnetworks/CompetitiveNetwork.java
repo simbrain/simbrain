@@ -22,6 +22,7 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -31,6 +32,7 @@ import org.simbrain.network.util.Direction;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
@@ -81,9 +83,9 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         inputLayer.setClamped(true);
 
         // Connect layers
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(inputLayer, competitive, new AllToAll());
+        SynapseGroup2 sg = SynapseGroup.createSynapseGroup(inputLayer, competitive, new AllToAll());
         addModel(sg);
-        sg.getAllSynapses().forEach(s -> s.setLowerBound(0));
+        Arrays.stream(sg.getAllSynapses()).forEach(s -> s.setLowerBound(0));
 
         // Lay out network
         inputLayer.setLayoutBasedOnSize();

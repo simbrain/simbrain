@@ -7,6 +7,7 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
@@ -134,7 +135,7 @@ public class CortexSimple extends Simulation {
         layer_56.setLocation(500, 1850);
 
         // Connect layers
-        Map<String, SynapseGroup> synGroups = new HashMap<>();
+        Map<String, SynapseGroup2> synGroups = new HashMap<>();
 
         synGroups.put("L2/3 Rec.", connectLayers(layer_23, layer_23, .12));
         synGroups.put("L4 Rec.", connectLayers(layer_4, layer_4, .24));
@@ -147,7 +148,7 @@ public class CortexSimple extends Simulation {
         synGroups.put("L5/6 \u2192 L2/3", connectLayers(layer_56, layer_23, .03));
 
         for (String sgn : synGroups.keySet()) {
-            SynapseGroup sg = synGroups.get(sgn);
+            SynapseGroup2 sg = synGroups.get(sgn);
             for (Synapse s : sg.getAllSynapses()) {
                 s.setDelay(this.getDelay(s.getSource().getPosition3D(), s.getTarget().getPosition3D(),
                     Math.sqrt(2 * (600 * 600) + (2000 * 2000)), 20));
@@ -194,7 +195,7 @@ public class CortexSimple extends Simulation {
         return ng;
     }
 
-    private SynapseGroup connectLayers(NeuronGroup src, NeuronGroup tar,
+    private SynapseGroup2 connectLayers(NeuronGroup src, NeuronGroup tar,
                                        double sparsity) {
 
         ProbabilityDistribution exRand = new LogNormalDistribution(exlocation, exscale, false);
@@ -202,8 +203,8 @@ public class CortexSimple extends Simulation {
 
         Sparse con = new Sparse(sparsity, false, false);
 
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.65);
-        sg.setRandomizers(exRand, inRand);
+        SynapseGroup2 sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.65);
+        // sg.setRandomizers(exRand, inRand);
         sg.setLabel("Synapses");
 
         // TODO

@@ -2,9 +2,9 @@ package org.simbrain.custom_sims.simulations.rl_sim
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.core.updateNeurons
 import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.workspace.updater.UpdateAction
 
 /**
@@ -174,7 +174,7 @@ class RL_Update(
     /**
      * Train the synapses in a synapse group
      */
-    fun trainDeltaRule(group: SynapseGroup) {
+    fun trainDeltaRule(group: SynapseGroup2) {
         for (synapse in group.allSynapses) {
             val newStrength = synapse.strength + learningRate * synapse.source.activation * synapse.target.auxValue
             synapse.strength = newStrength

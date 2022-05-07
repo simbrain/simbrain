@@ -9,6 +9,7 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -146,7 +147,8 @@ public class RL_Sim_Main extends Simulation implements AttributeContainer {
     double[] combinedInputs;
     double[] combinedPredicted;
     NeuronGroup predictionLeft, predictionRight;
-    SynapseGroup rightInputToRightPrediction, outputToRightPrediction, leftInputToLeftPrediction, outputToLeftPrediction;
+    SynapseGroup2 rightInputToRightPrediction, outputToRightPrediction, leftInputToLeftPrediction,
+            outputToLeftPrediction;
     List<Synapse> rightToWta;
     List<Synapse> leftToWta;
 

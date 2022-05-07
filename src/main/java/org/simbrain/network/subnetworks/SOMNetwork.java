@@ -22,6 +22,7 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -87,7 +88,7 @@ public class SOMNetwork extends Subnetwork implements Trainable {
         inputLayer.setClamped(true);
         
         // Connect layers
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(inputLayer, som, new AllToAll());
+        SynapseGroup2 sg = SynapseGroup.createSynapseGroup(inputLayer, som, new AllToAll());
         addModel(sg);
 
         layoutNetwork();

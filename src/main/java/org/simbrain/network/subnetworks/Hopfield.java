@@ -22,6 +22,7 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -53,7 +54,7 @@ public class Hopfield extends Subnetwork implements Trainable {
     /**
      * The weights.
      */
-    private SynapseGroup weights;
+    private SynapseGroup2 weights;
 
     /**
      * Default number of neurons.
@@ -127,7 +128,7 @@ public class Hopfield extends Subnetwork implements Trainable {
         return neuronGroup;
     }
 
-    public SynapseGroup getSynapseGroup() {
+    public SynapseGroup2 getSynapseGroup() {
         return weights;
     }
 

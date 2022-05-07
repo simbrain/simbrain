@@ -15,10 +15,7 @@ package org.simbrain.network.groups;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.core.*;
 import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -154,6 +151,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      */
     private boolean recurrent;
 
+    // TODO: Temporay rewrite to make t
     /**
      * Creates a synapse group with the desired parameters. Last argument is variable argument.
      *
@@ -164,31 +162,32 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      *               used to determine the weights of inhibitory synapses.
      * @return a synapse group with the above parameters.
      */
-    public static SynapseGroup createSynapseGroup(
+    public static SynapseGroup2 createSynapseGroup(
             final NeuronGroup source,
             final NeuronGroup target,
             Object... args
     ) {
-        SynapseGroup synGroup;
+        SynapseGroup2 synGroup;
         if (args.length == 0) {
-            synGroup = new SynapseGroup(source, target, DEFAULT_CONNECTION_MANAGER);
+            synGroup = new SynapseGroup2(source, target, DEFAULT_CONNECTION_MANAGER);
         } else {
-            synGroup = new SynapseGroup(source, target, (ConnectionStrategy) args[0]);
+            synGroup = new SynapseGroup2(source, target, (ConnectionStrategy) args[0]);
         }
 
         if (args.length >= 2) {
-            synGroup.setExcitatoryRatio((Double) args[1]);
+            System.out.println("TODO: retrofit these parameters for use in synapse group 2");
+            // synGroup.setExcitatoryRatio((Double) args[1]);
         }
         if (args.length >= 3) {
-            synGroup.setExcitatoryRandomizer((ProbabilityDistribution) args[2]);
+            // synGroup.setExcitatoryRandomizer((ProbabilityDistribution) args[2]);
         }
         if (args.length >= 4) {
-            synGroup.setRandomizers((ProbabilityDistribution) args[3], (ProbabilityDistribution) args[3]);
+            // synGroup.setRandomizers((ProbabilityDistribution) args[3], (ProbabilityDistribution) args[3]);
         }
-        synGroup.makeConnections();
+        // synGroup.makeConnections();
         // Ensure that displayed ratio is consistent with actual ratio.
         // Process of determining synapse polarity is stochastic.
-        synGroup.excitatoryRatio = synGroup.getExcitatoryRatioPrecise();
+        // synGroup.excitatoryRatio = synGroup.getExcitatoryRatioPrecise();
         return synGroup;
     }
 
@@ -473,7 +472,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      *
      * @param synapse the blank synapse to be added and assigned new values based on the parameters of this group.
      */
-    public void addNewSynapse(final Synapse synapse) {
+    public void addSynapse(final Synapse synapse) {
         if (synapse.getSource().isPolarized()) {
             if (Polarity.EXCITATORY.equals(synapse.getSource().getPolarity())) {
                 addNewExcitatorySynapse(synapse);

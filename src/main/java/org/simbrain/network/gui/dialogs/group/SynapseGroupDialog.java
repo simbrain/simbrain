@@ -139,7 +139,8 @@ public final class SynapseGroupDialog extends StandardDialog {
         // Make the synapse group
         if (isCreationDialog) {
             setTitle("Create Synapse Group");
-            synapseGroup = SynapseGroup.createSynapseGroup(sourceNeuronGroup, targetNeuronGroup);
+            // TODO
+            // synapseGroup = SynapseGroup.createSynapseGroup(sourceNeuronGroup, targetNeuronGroup);
             tfSynapseGroupLabel.setText("Synapse group");
         } else {
             setTitle("Edit " + synapseGroup.getLabel());

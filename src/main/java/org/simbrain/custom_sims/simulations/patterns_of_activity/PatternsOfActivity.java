@@ -2,12 +2,12 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity;
 
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
@@ -195,12 +195,12 @@ public class PatternsOfActivity extends Simulation {
         sensoryNetR.setLocation(recurrentNetwork.getMaxX() + 300, recurrentNetwork.getMinY() + 100);
 
         // Set up recurrent synapses
-        SynapseGroup recSyns = SynapseGroup.createSynapseGroup(recurrentNetwork, recurrentNetwork,
+        SynapseGroup2 recSyns = SynapseGroup.createSynapseGroup(recurrentNetwork, recurrentNetwork,
         new RadialGaussian(DEFAULT_EE_CONST * 3, DEFAULT_EI_CONST * 3,
             DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 3, .25, 200));
         //new Sparse(0.10, false, false)
         //        .connectNeurons(recSyns);
-        initializeSynParameters(recSyns);
+        // initializeSynParameters(recSyns);
         // TODO
         // recSyns.setLearningRule(ruleExRec, Polarity.EXCITATORY);
         for (Neuron n : neuronList) {
@@ -208,7 +208,7 @@ public class PatternsOfActivity extends Simulation {
                 if (Math.random() < 0.002 && n != m) {
                     Synapse s = new Synapse(n, m);
                     s.setStrength(n.getPolarity().value(20));
-                    recSyns.addNewSynapse(s);
+                    recSyns.addSynapse(s);
                     // Delays based on distance
                 }
             }
@@ -219,9 +219,9 @@ public class PatternsOfActivity extends Simulation {
         }
 
         // Set up input synapses (connections from sensory group to the recurrent group)
-        SynapseGroup inpSynGL = SynapseGroup.createSynapseGroup(sensoryNetL, recurrentNetwork,
+        SynapseGroup2 inpSynGL = SynapseGroup.createSynapseGroup(sensoryNetL, recurrentNetwork,
             new Sparse(0.25, true, false));
-        initializeSynParameters(inpSynGL);
+        // initializeSynParameters(inpSynGL);
         // TODO
         // inpSynGL.setStrength(50, Polarity.EXCITATORY);
         //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
@@ -231,9 +231,9 @@ public class PatternsOfActivity extends Simulation {
                 inpSynGL.removeSynapse(s);
             }
         }
-        SynapseGroup inpSynGR = SynapseGroup.createSynapseGroup(sensoryNetR, recurrentNetwork,
+        SynapseGroup2 inpSynGR = SynapseGroup.createSynapseGroup(sensoryNetR, recurrentNetwork,
                 new Sparse(0.25, true, false));
-        initializeSynParameters(inpSynGR);
+        // initializeSynParameters(inpSynGR);
         // TODO
         // inpSynGR.setStrength(50, Polarity.EXCITATORY);
         //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
@@ -267,8 +267,8 @@ public class PatternsOfActivity extends Simulation {
 
         // Set up the synapses between the recurrent network and the output
         // Each neuron recieves from one quadrant of the recurrent neurons in terms of location
-        SynapseGroup rec2out = SynapseGroup.createSynapseGroup(recurrentNetwork, outGroup);
-        initializeSynParameters(rec2out);
+        SynapseGroup2 rec2out = SynapseGroup.createSynapseGroup(recurrentNetwork, outGroup);
+        // initializeSynParameters(rec2out);
         double xEdge = recurrentNetwork.getCenterX();
         double yEdge = recurrentNetwork.getCenterY();
         for (int ii = 0; ii < netSize; ++ii) {
@@ -282,7 +282,7 @@ public class PatternsOfActivity extends Simulation {
                 if (x < xEdge && Math.random() < quadrantDensity) {
                     Synapse s = new Synapse(n, outGroup.getNeuron(2));
                     s.setDelay(ThreadLocalRandom.current().nextInt(5, 10));
-                    rec2out.addNewSynapse(s);
+                    rec2out.addSynapse(s);
                     dwQuad.add(n);
                     continue;
                 }
@@ -290,7 +290,7 @@ public class PatternsOfActivity extends Simulation {
                     Synapse s = new Synapse(n, outGroup.getNeuron(3));
                     s.setDelay(ThreadLocalRandom.current().nextInt(5, 10));
                     upQuad.add(n);
-                    rec2out.addNewSynapse(s);
+                    rec2out.addSynapse(s);
                     continue;
                 }
             } else {
@@ -298,20 +298,20 @@ public class PatternsOfActivity extends Simulation {
                     rtQuad.add(n);
                     Synapse s = new Synapse(n, outGroup.getNeuron(0));
                     s.setDelay(ThreadLocalRandom.current().nextInt(5, 10));
-                    rec2out.addNewSynapse(s);
+                    rec2out.addSynapse(s);
                     continue;
                 }
                 if (x > xEdge && Math.random() < quadrantDensity) {
                     lfQuad.add(n);
                     Synapse s = new Synapse(n, outGroup.getNeuron(1));
                     s.setDelay(ThreadLocalRandom.current().nextInt(5, 10));
-                    rec2out.addNewSynapse(s);
+                    rec2out.addSynapse(s);
                     continue;
                 }
             }
 
         }
-        rec2out.setConnectionManager(new AllToAll());
+        // rec2out.setConnectionManager(new AllToAll());
 
         // Set up the neurons that read from the spiking outputs (converting it to a continuous value) which
         // are coupled to the X and Y velocities of the mouse
@@ -328,13 +328,13 @@ public class PatternsOfActivity extends Simulation {
         }
 
         // Set up the connections to the read out neurons
-        SynapseGroup out2read = SynapseGroup.createSynapseGroup(outGroup, outputNeurons);
+        SynapseGroup2 out2read = SynapseGroup.createSynapseGroup(outGroup, outputNeurons);
         // TODO
         // out2read.setSpikeResponder(new ConvolvedJumpAndDecay(20), Polarity.BOTH);
-        // out2read.addNewSynapse(new Synapse(outGroup.getNeuron(0), outputNeurons.getNeuron(0)));
-        // out2read.addNewSynapse(new Synapse(outGroup.getNeuron(1), outputNeurons.getNeuron(0)));
-        // out2read.addNewSynapse(new Synapse(outGroup.getNeuron(2), outputNeurons.getNeuron(1)));
-        // out2read.addNewSynapse(new Synapse(outGroup.getNeuron(3), outputNeurons.getNeuron(1)));
+        // out2read.addSynapse(new Synapse(outGroup.getNeuron(0), outputNeurons.getNeuron(0)));
+        // out2read.addSynapse(new Synapse(outGroup.getNeuron(1), outputNeurons.getNeuron(0)));
+        // out2read.addSynapse(new Synapse(outGroup.getNeuron(2), outputNeurons.getNeuron(1)));
+        // out2read.addSynapse(new Synapse(outGroup.getNeuron(3), outputNeurons.getNeuron(1)));
         // out2read.setDisplaySynapses(false);
         // out2read.setConnectionManager(new AllToAll());
         // out2read.setUpperBound(1000000000, Polarity.BOTH);

@@ -531,10 +531,10 @@ public class SynapseGroupAdjustmentPanel extends JPanel {
     public static void main(String[] args) {
         Network net = new Network();
         NeuronGroup ng = new NeuronGroup(net, 25);
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng);
+        // SynapseGroup sg = SynapseGroup.createSynapseGroup(ng, ng);
         JFrame disp = new JFrame();
-        SynapseGroupAdjustmentPanel sgap = SynapseGroupAdjustmentPanel.createSynapseGroupAdjustmentPanel(disp, sg, false);
-        disp.setContentPane(sgap);
+        // SynapseGroupAdjustmentPanel sgap = SynapseGroupAdjustmentPanel.createSynapseGroupAdjustmentPanel(disp, sg, false);
+        // disp.setContentPane(sgap);
         disp.pack();
         disp.setLocationRelativeTo(null);
         disp.setVisible(true);

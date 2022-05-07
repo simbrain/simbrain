@@ -56,8 +56,12 @@ public class SynapseGroup2 @JvmOverloads constructor(
         events.fireDeleted()
     }
 
-    fun addNewSynapse(syn: Synapse) {
+    fun addSynapse(syn: Synapse) {
         synapses.add(syn)
+    }
+
+    fun removeSynapse(syn: Synapse) {
+        synapses.remove(syn)
     }
 
     fun isRecurrent(): Boolean {

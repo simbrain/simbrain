@@ -5,16 +5,12 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
-import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.layouts.LineLayout.LineOrientation
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
@@ -24,7 +20,6 @@ import org.simbrain.workspace.updater.PerformanceMonitor
 import org.simbrain.workspace.updater.UpdateAction
 import java.awt.geom.Point2D
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.function.Consumer
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.ln
@@ -642,7 +637,7 @@ class Network {
      *
      * @return the new synapse group
      */
-    fun addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup {
+    fun addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup2 {
         val sg = SynapseGroup.createSynapseGroup(source, target)
         addNetworkModel(sg)
         return sg

@@ -8,6 +8,7 @@ import org.simbrain.network.connections.RadialGaussian;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
@@ -40,7 +41,7 @@ public class KuramotoOscillators extends Simulation {
     Network net;
     ProjectionComponent plot;
     NeuronGroup reservoirNet, predictionRes, inputNetwork;
-    SynapseGroup predictionSg;
+    SynapseGroup2 predictionSg;
     Neuron errorNeuron;
 
     OdorWorldEntity mouse;
@@ -105,7 +106,7 @@ public class KuramotoOscillators extends Simulation {
 
         ConnectionStrategy recConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 3,
             DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50);
-        SynapseGroup recSyns = SynapseGroup.createSynapseGroup(reservoirNet, reservoirNet, recConnection);
+        SynapseGroup2 recSyns = SynapseGroup.createSynapseGroup(reservoirNet, reservoirNet, recConnection);
         net.addNetworkModel(recSyns);
         recSyns.setLabel("Recurrent");
 
@@ -118,7 +119,7 @@ public class KuramotoOscillators extends Simulation {
         inputNetwork.setLabel("Sensory Neurons");
 
         // Inputs to reservoir
-        SynapseGroup inpSynG = SynapseGroup.createSynapseGroup(inputNetwork, reservoirNet,
+        SynapseGroup2 inpSynG = SynapseGroup.createSynapseGroup(inputNetwork, reservoirNet,
             new Sparse(0.7, true, false));
         // TODO
         // inpSynG.setStrength(40, Polarity.EXCITATORY);

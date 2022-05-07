@@ -7,6 +7,7 @@ import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
@@ -81,10 +82,10 @@ public class CorticalBranching extends Simulation {
         con.setUseRadius(true);
         con.setRadius(RADIUS);
 
-        SynapseGroup sg = SynapseGroup.createSynapseGroup(ng1, ng1, con);
-        sg.setRandomizers(exRand, inRand);
-        sg.setConnectionManager(con);
-        sg.makeConnections();
+        SynapseGroup2 sg = SynapseGroup.createSynapseGroup(ng1, ng1, con);
+            // sg.setRandomizers(exRand, inRand);
+            // sg.setConnectionManager(con);
+            // sg.makeConnections();
 
         // TODO: Band-aid... issue with synapse bounds needs addressing
         for(Synapse s : sg.getAllSynapses()) {

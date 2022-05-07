@@ -23,6 +23,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
@@ -154,9 +155,9 @@ public final class SimpleRecurrentNetwork extends Subnetwork implements Trainabl
         offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH, betweenLayerInterval);
 
         // Connect the layers
-        SynapseGroup inToHid = SynapseGroup.createSynapseGroup(inputLayer, hiddenLayer, new AllToAll(false), 0.5);
-        SynapseGroup contToHid = SynapseGroup.createSynapseGroup(contextLayer, hiddenLayer, new AllToAll(false), 0.5);
-        SynapseGroup hidToOut = SynapseGroup.createSynapseGroup(hiddenLayer, outputLayer, new AllToAll(false), 0.5);
+        SynapseGroup2 inToHid = SynapseGroup.createSynapseGroup(inputLayer, hiddenLayer, new AllToAll(false), 0.5);
+        SynapseGroup2 contToHid = SynapseGroup.createSynapseGroup(contextLayer, hiddenLayer, new AllToAll(false), 0.5);
+        SynapseGroup2 hidToOut = SynapseGroup.createSynapseGroup(hiddenLayer, outputLayer, new AllToAll(false), 0.5);
 
         // TODO
         // addAndLabelSynapseGroup(inToHid);

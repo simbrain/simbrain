@@ -7,6 +7,7 @@ import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
@@ -106,7 +107,7 @@ public class SORN extends Simulation {
         int x_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 300);
         ngIn.applyLayout(new Point(1810, 141));
 
-        SynapseGroup sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
+        SynapseGroup2 sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
                 "Exc. \u2192 Exc.");
         connectGroups(net, ngIn, ng, ieKIn, new UniformRealDistribution(-1,0),
                 Polarity.INHIBITORY,
@@ -146,7 +147,7 @@ public class SORN extends Simulation {
         input.applyLayout(new Point(x_loc, y_loc));
 
         Sparse input_ee_con = new Sparse(0.05, false, false);
-        SynapseGroup input_ee = SynapseGroup.createSynapseGroup(input, ng, input_ee_con,
+        SynapseGroup2 input_ee = SynapseGroup.createSynapseGroup(input, ng, input_ee_con,
                 1.0, defWtPD, defWtPD);
         input_ee.setLabel("Input -> Excitatory");
         // TODO
@@ -162,7 +163,7 @@ public class SORN extends Simulation {
 //        network.addGroup(ee_input);
 
         Sparse input_ie_con = new Sparse(0.05, true, false);
-        SynapseGroup input_ie = SynapseGroup.createSynapseGroup(input, ngIn,
+        SynapseGroup2 input_ie = SynapseGroup.createSynapseGroup(input, ngIn,
                 input_ie_con, 1.0, defWtPD, defWtPD);
         input_ie.setLabel("Input -> Inhibitory");
         // TODO
@@ -198,7 +199,7 @@ public class SORN extends Simulation {
         net.updateTimeType();
     }
 
-    private static SynapseGroup connectGroups(Network network, NeuronGroup src, NeuronGroup tar, int kIn,
+    private static SynapseGroup2 connectGroups(Network network, NeuronGroup src, NeuronGroup tar, int kIn,
                                               ProbabilityDistribution random, Polarity polarity, String label) {
         double excRat = polarity != Polarity.INHIBITORY ? 1.0 : 0.0;
         FixedDegree connector = new FixedDegree();
@@ -209,7 +210,7 @@ public class SORN extends Simulation {
         // src.setPolarity(polarity);
         // connector.setExcCons(kIn);
         // connector.setInhCons(kIn);
-        SynapseGroup sg = SynapseGroup
+        SynapseGroup2 sg = SynapseGroup
                 .createSynapseGroup(src, tar, connector, excRat, random, random);
         sg.setLabel(label);
         // TODO

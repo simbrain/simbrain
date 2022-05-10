@@ -48,7 +48,7 @@ public class NetworkTest {
         ng2.setLabel("ng2");
         net.addNetworkModel(ng2);
 
-        SynapseGroup sg1 = SynapseGroup.createSynapseGroup(ng1, ng2);
+        SynapseGroup2 sg1 = SynapseGroup.createSynapseGroup(ng1, ng2);
         net.addNetworkModel(sg1);
 
         na1 = new NeuronArray(net, 10);

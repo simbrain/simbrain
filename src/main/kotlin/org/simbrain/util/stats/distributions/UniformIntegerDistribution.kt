@@ -39,6 +39,12 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
 
     override fun sampleInt(n: Int) = dist.sample(n)
 
+    val mean get() =  (ceil + floor)/2
+
+    val stdev get() = (ceil - floor)/ Math.sqrt(12.0)
+
+    val variance get() = Math.pow(stdev, 2.0)
+
     override fun getName(): String {
         return "Uniform (Integer)"
     }

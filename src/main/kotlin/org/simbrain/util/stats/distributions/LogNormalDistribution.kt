@@ -5,6 +5,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.NegatableDistribution
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toIntArray
+import kotlin.math.exp
 
 /**
  * https://en.wikipedia.org/wiki/Log-normal_distribution
@@ -54,6 +55,9 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: 
 
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray().conditionalNegate()
 
+    val mean get() = exp(location + scale * scale / 2)
+
+    val variance get() = (exp(scale * scale) - 1) * exp(2 * location + scale * scale)
 
     override fun deepCopy(): LogNormalDistribution {
         val copy = LogNormalDistribution()

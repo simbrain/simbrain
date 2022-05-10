@@ -26,12 +26,12 @@ fun chiSquareScore(alpha: Double, df: Int): Double {
     return dist.inverseCumulativeProbability(alpha)
 }
 
-fun confidenceIntervalForMeanOfNormalDist(mean: Double, stdev: Double, alpha: Double, N: Int):
+fun confidenceIntervalMean(mean: Double, stdev: Double, alpha: Double, N: Int):
         ClosedFloatingPointRange<Double> {
     val halfInterval = tscore(alpha / 2, N - 1) * stderr(stdev, N)
     return (mean - halfInterval)..(mean + halfInterval)
 }
 
-fun confidenceIntervalForVarianceOfNormalDist(variance: Double, alpha: Double, N: Int) = (
+fun confidenceIntervalVariance(variance: Double, alpha: Double, N: Int) = (
         (N - 1) / chiSquareScore(1 - alpha / 2, N - 1) * variance ..
                 (N - 1) / chiSquareScore(alpha / 2, N - 1) * variance)

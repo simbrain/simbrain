@@ -28,53 +28,95 @@ class ProbabilityDistributionTest {
     val N = 1000
 
     @Test
-    fun `test uniform`() {
+    fun `test continuous uniform`() {
         val dist = UniformRealDistribution(0.0, 1.0)
 
         var sample = dist.sampleDouble(N)
-        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
         assertTrue(sample.maxOrNull()!! <= 1.0)
         assertTrue(sample.minOrNull()!! >= 0.0)
 
         dist.floor = -2.0
         dist.ceil = -1.0
         sample = dist.sampleDouble(N)
-        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+    }
+
+    @Test
+    fun `test uniform integer`() {
+        val dist = UniformIntegerDistribution(0, 1)
+        var sample = dist.sampleDouble(N)
+        var ones = sample.count { it == 0.0 }
+        assertTrue((ones/N.toDouble()) in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+
+        // dist.ceil = 4
+        // sample = dist.sampleDouble(N)
+        // ones = sample.count { it == 0.0 }
+        // assertTrue((ones/N.toDouble()) in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+
+        dist.floor = 1
+        dist.ceil = 10
+        sample = dist.sampleDouble(N)
+        assertTrue(sample.minOrNull()!! >= 1)
+        assertTrue(sample.maxOrNull()!! <= 10)
+    }
+
+    @Test
+    fun `test two valued`() {
+        val dist = TwoValued(-1.0, 2.0)
+        var sample = dist.sampleDouble(N)
+        assertTrue(sample.all { it == -1.0 || it == 2.0 })
+        var ones = sample.count { it == -1.0 }
+        assertTrue((ones/N.toDouble()) in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+
+        dist.lowerValue = -3.0
+        dist.upperValue = 3.0
+        sample = dist.sampleDouble(N)
+        assertTrue(sample.all { it == -3.0 || it == 3.0 })
+        ones = sample.count { it == -3.0 }
+        // assertTrue((ones/N.toDouble()) in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+
+        dist.p = 1.0
+        sample = dist.sampleDouble(N)
+        assertTrue(sample.all { it == 3.0 })
+        dist.p = 0.0
+        sample = dist.sampleDouble(N)
+        assertTrue(sample.all { it == -3.0 })
     }
 
     @Test
     fun `test normal distribution`() {
         val dist = NormalDistribution(1.0,.5)
         var sample = dist.sampleDouble(N)
-        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalForVarianceOfNormalDist(sample.variance, alpha, N))
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
 
         dist.mean =-1.0
         dist.standardDeviation = .25
         sample = dist.sampleDouble(N)
-        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalForVarianceOfNormalDist(sample.variance, alpha, N))
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
     }
 
     @Test
     fun `test poisson`() {
         val dist = PoissonDistribution(1.0)
         val sample = dist.sampleDouble(N)
-        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalForVarianceOfNormalDist(sample.variance, alpha, N))
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
     }
 
     @Test
     fun `test exponential`() {
         val dist = ExponentialDistribution(2.0)
         var sample = dist.sampleDouble(N)
-        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalForMeanOfNormalDist(sample.variance, sample.stdev, alpha, N))
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
 
         dist.lambda = 2.0
         sample = dist.sampleDouble(N)
-        assertTrue(dist.mean in confidenceIntervalForMeanOfNormalDist(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalForMeanOfNormalDist(sample.variance, sample.stdev, alpha, N))
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
     }
 
     @Test
@@ -87,6 +129,34 @@ class ProbabilityDistributionTest {
         assertTrue(sample.minOrNull()!! <= 0)
         var intNums = dist.sampleInt(5)
         assertTrue(intNums.minOrNull()!! <= 0)
+    }
+
+    @Test
+    fun `test log normal`() {
+        val dist = LogNormalDistribution(2.0)
+        var sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        // assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+
+        // dist.location = 1.0
+        // dist.scale = 2.0
+        // sample = dist.sampleDouble(N)
+        // assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        // assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+    }
+
+    @Test
+    fun `test gamma`() {
+        val dist = GammaDistribution()
+        var sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+
+        dist.shape = 9.0
+        dist.shape = .5
+        sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
     }
 
     @Test
@@ -127,29 +197,6 @@ class ProbabilityDistributionTest {
         var dist: ProbabilityDistribution = NormalDistribution(1.0, .5)
         var dist2 = dist.copy()
         assertNotEquals(dist.sampleDouble(), dist2.sampleDouble());
-    }
-
-    @Test
-    fun `test uniform int`() {
-        val dist = UniformIntegerDistribution(1, 10)
-        var nums = dist.sampleInt(N)
-        print(nums.contentToString())
-        assertTrue(nums.minOrNull()!! >= 1)
-        assertTrue(nums.maxOrNull()!! <= 10)
-    }
-
-    @Test
-    fun `test two valued`() {
-        val dist = TwoValued(-3.0, 3.0)
-        var nums = dist.sampleDouble(N)
-        assertTrue(nums.all { it == -3.0 || it == 3.0 })
-        assertTrue { nums.average() in (-.5.. .5) } // TODO
-        dist.p = 1.0
-        nums = dist.sampleDouble(N)
-        assertTrue(nums.all { it == 3.0 })
-        dist.p = 0.0
-        nums = dist.sampleDouble(N)
-        assertTrue(nums.all { it == -3.0 })
     }
 
     @Test

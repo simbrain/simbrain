@@ -49,6 +49,10 @@ class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0, negate: Boolea
 
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray().conditionalNegate()
 
+    val mean get() = shape * scale
+
+    val variance get() = shape * scale * scale
+
     override fun deepCopy(): GammaDistribution {
         val copy = GammaDistribution()
         copy.randomSeed = randomSeed

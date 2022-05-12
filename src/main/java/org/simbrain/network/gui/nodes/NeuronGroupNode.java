@@ -43,10 +43,6 @@ import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 @SuppressWarnings("serial")
 public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
-    private static final int DEFAULT_BUFFER = 10;
-
-    private final int buffer = DEFAULT_BUFFER;
-
     /**
      * Reference to represented group node.
      */
@@ -86,19 +82,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      */
     public void addCustomMenuItem(final JMenuItem item) {
         customMenuItems.add(item);
-    }
-
-    /**
-     * Call update synapse node positions on all constituent neuron nodes.
-     * Ensures synapse nodes are updated properly when this is moved.
-     */
-    public void updateSynapseNodePositions() {
-        if (getNetworkPanel().isRunning()) {
-            return;
-        }
-        for (NeuronNode neuronNode : getNeuronNodes()) {
-            neuronNode.updateSynapseNodePositions();
-        }
     }
 
     @Override

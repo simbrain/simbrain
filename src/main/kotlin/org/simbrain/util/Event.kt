@@ -22,11 +22,11 @@ import java.util.function.Consumer
  * Also, since the fireX and onX methods are (by convention) next to each other, it's easy
  * to get from the code where an event is fired in the code to where it is handled, and conversely.
  *
- * A live template that makes event creation easier is in `etc\event_shortcuts.zip`
+ * A live template that makes event creation easier is in `etc\event_shortcuts.zip` ("Import settings...")
  * Import this into intellij and then you can create these pairs of functions using these abbreviations, which
  * stand for "Simbrain event":
  *
- *  - `sevt0` (event with no argument),
+ *  - `sevt0` (event with no argument)
  *  - `sevtn` (event to create something)
  *  - `sevto` (event to remove something)
  *  - `sevtc` (event to change something). Events are only fired when old and new are different.

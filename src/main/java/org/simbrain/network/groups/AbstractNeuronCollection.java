@@ -42,6 +42,16 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     private final Network parentNetwork;
 
     /**
+     * Set of incoming synapse groups.
+     */
+    private final HashSet<SynapseGroup2> incomingSgs = new HashSet<>();
+
+    /**
+     * Set of outgoing synapse groups.
+     */
+    private final HashSet<SynapseGroup2> outgoingSgs = new HashSet<>();
+
+    /**
      * Optional information about the current state of the group. For display in
      * GUI.
      */
@@ -412,6 +422,38 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         for (Neuron neuron : this.getNeuronList()) {
             neuron.randomizeFanOut();
         }
+    }
+
+    public HashSet<SynapseGroup2> getIncomingSgs() {
+        return new HashSet<SynapseGroup2>(incomingSgs);
+    }
+
+    public HashSet<SynapseGroup2> getOutgoingSg() {
+        return new HashSet<SynapseGroup2>(outgoingSgs);
+    }
+
+    public void addIncomingSg(SynapseGroup2 sg) {
+        incomingSgs.add(sg);
+    }
+
+    public void addOutgoingSg(SynapseGroup2 sg) {
+        outgoingSgs.add(sg);
+    }
+
+    public boolean removeIncomingSg(SynapseGroup2 sg) {
+        return incomingSgs.remove(sg);
+    }
+
+    public boolean removeOutgoingSg(SynapseGroup2 sg) {
+        return outgoingSgs.remove(sg);
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        outgoingSgs.forEach(SynapseGroup2::delete);
+        incomingSgs.forEach(SynapseGroup2::delete);
+
     }
 
     @Override

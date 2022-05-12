@@ -13,6 +13,8 @@ import org.simbrain.network.groups.Subnetwork
 /**
  * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
  * Backed by a linked hash set.  Hash set deals with duplication; linked provides an iterator.
+ *
+ * Used both by [Network] and by [Subnetwork].
  */
 class NetworkModelList {
 
@@ -108,7 +110,7 @@ class NetworkModelList {
         get() = networkModels.values.flatMap { it?.map { item -> item } ?: listOf() }
 
     /**
-     * Returns a list of network models in the order required for proper deserilization.
+     * Returns a list of network models in the order required for proper deserialization.
      */
     val allInDeserializationOrder: List<NetworkModel>
         get() {

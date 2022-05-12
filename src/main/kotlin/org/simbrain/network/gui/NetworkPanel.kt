@@ -149,15 +149,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     private val updateComplete = AtomicInteger(0)
 
     /**
-     * Whether loose synapses are visible or not.
-     */
-    var looseWeightsVisible = true
-        set(value) {
-            field = value
-            filterScreenElements<SynapseNode>().forEach { it.visible = value }
-        }
-
-    /**
      * Whether to display update priorities.
      */
     var prioritiesVisible = false
@@ -294,8 +285,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             else -> NeuronGroupNode(this, neuronGroup)
         }
 
-        neuronGroup.applyLayout()
         val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron) }
+        neuronGroup.applyLayout()
         createNeuronGroupNode().apply { addNeuronNodes(neuronNodes) }
     }
 
@@ -326,7 +317,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun createNode(synapseGroup: SynapseGroup2) = addScreenElement {
         SynapseGroup2Node(this, synapseGroup)
-    }.also { it.lowerToBottom() }
+    }
 
     fun createNode(weightMatrix: Connector) = addScreenElement {
         WeightMatrixNode(this, weightMatrix).also { it.lower() }

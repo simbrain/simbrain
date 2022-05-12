@@ -8,19 +8,18 @@ import org.simbrain.util.p
 import org.simbrain.util.widgets.bezierArrow
 
 /**
- * PNode representation of a "green arrow" (representing a group of synapses) from one
- * NeuronGroup to another.
+ * PNode representation of a directed "green arrow" (representing a group of synapses) from one
+ * [AbstractNeuronCollectionNode] to another.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  * @author Leo Yulin Li
  */
-class SynapseGroup2NodeSimple(private val synapseGroupNode: SynapseGroup2Node) : PNode(), SynapseGroup2Node.Arrow {
+class SynapseGroup2NodeDirected(private val synapseGroupNode: SynapseGroup2Node) : PNode(), SynapseGroup2Node.Arrow {
 
     private val source = synapseGroupNode.synapseGroup.source
     private val target = synapseGroupNode.synapseGroup.target
-    // private fun isBidirectional() = target.outgoingSg.any { it.targetNeuronGroup == source }
-    private fun isBidirectional() = false // Temp
+    private fun isBidirectional() = target.outgoingSg.any { it.target == source }
 
     private val arrow = bezierArrow {
 

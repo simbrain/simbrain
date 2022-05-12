@@ -22,20 +22,12 @@ import org.piccolo2d.PNode
 import org.simbrain.network.gui.NetworkPanel
 
 
-class SynapseGroup2NodeVisible(networkPanel: NetworkPanel, val parent: SynapseGroup2Node):
+/**
+ * "Expanded" representation of a synapse group in the sense that individual synapses are visible.
+ * The synapse group itself is only visible via the interaction box.
+ */
+class SynapseGroup2NodeExpanded(networkPanel: NetworkPanel, val parent: SynapseGroup2Node):
     PNode(), SynapseGroup2Node.Arrow  {
-
-    // init{
-    //     parent.synapseGroup.allSynapses.forEach { s ->
-    //         val sourceNode = networkPanel.neuronNodeMapping[s.source]
-    //         val targetNode = networkPanel.neuronNodeMapping[s.target]
-    //         if (sourceNode != null && targetNode != null) {
-    //             val synapseNode = SynapseNode(networkPanel, sourceNode, targetNode, s)
-    //             addChild(synapseNode)
-    //         }
-    //     }
-    //     lowerToBottom()
-    // }
 
     /**
      * Override PNode layoutChildren method in order to properly set the

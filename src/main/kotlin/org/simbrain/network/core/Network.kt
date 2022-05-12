@@ -38,6 +38,11 @@ private val LOG_10 = ln(10.0)
  * <b>Network</b> provides core neural network functionality and is the main neural network model object. The core
  * data structure is a [NetworkModelList] that associates classes of [NetworkModel] with linked hash sets of
  * instances of those types.
+ *
+ * To add models, use [Network.addNetworkModel] and friends.
+ *
+ * To remove models use [Network.getModels] and call .delete() on the resulting models. Get models can be called with
+ * an argument to filter by model type, e.g getModels(Neuron.class)
  */
 class Network {
 
@@ -577,6 +582,8 @@ class Network {
     val isRedrawTime: Boolean = oneOffRun || (iterCount % updateFreq == 0)
 
     val looseNeurons get() = networkModels.get<Neuron>()
+
+    val looseWeights get() = networkModels.get<Synapse>()
 
     fun addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
         .apply(this::addNetworkModel)

@@ -24,11 +24,10 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Polygon
 import java.awt.geom.Arc2D
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Creates a simple synapse group node that represents a recurrent synapse
- * group, using a "green arrow".
+ * PNode representation of a recurrent "green arrow" (representing a group of synapses) from a
+ * [AbstractNeuronCollectionNode] to itself.
  *
  * @author Zoë
  */
@@ -39,7 +38,6 @@ class SynapseGroup2NodeRecurrent(group: SynapseGroup2Node) : PNode(), SynapseGro
     private val arrowHead: PPath
     private var arcCurve: PPath
     private var strokeWidth: Float
-    private val halt = AtomicBoolean(false)
 
     init {
         require(group.synapseGroup.isRecurrent()) { "Using a recurrent synapse node" + " for a non-recurrent synapse " +
@@ -64,7 +62,6 @@ class SynapseGroup2NodeRecurrent(group: SynapseGroup2Node) : PNode(), SynapseGro
 
     @Synchronized
     override fun layoutChildren() {
-        if (halt.get()) return
         val ng = parent.synapseGroup.source
         val quarterSizeX = Math.abs(ng.maxX - ng.minX).toFloat() / 4
         val quarterSizeY = Math.abs(ng.maxY - ng.minY).toFloat() / 4
@@ -102,9 +99,6 @@ class SynapseGroup2NodeRecurrent(group: SynapseGroup2Node) : PNode(), SynapseGro
             ), false
         )
         parent.interactionBox.centerFullBoundsOnPoint(recArc.centerX, recArc.centerY)
-        parent.interactionBox.raiseToTop()
-        arrowHead.lowerToBottom()
-        arcCurve.lowerToBottom()
     }
 
     private fun traceArrowHead(theta: Double, tarX: Double, tarY: Double): Polygon {
@@ -123,9 +117,6 @@ class SynapseGroup2NodeRecurrent(group: SynapseGroup2Node) : PNode(), SynapseGro
 
     @Synchronized
     override fun removeFromParent() {
-        halt.getAndSet(true)
-        // TODO
-        // arcCurve = null
         super.removeFromParent()
     }
 }

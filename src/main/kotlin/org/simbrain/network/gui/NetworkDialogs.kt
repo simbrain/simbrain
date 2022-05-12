@@ -5,12 +5,14 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel
 import org.simbrain.network.gui.dialogs.TestInputPanel
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
+import org.simbrain.network.gui.nodes.SynapseGroup2Node
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.smile.SmileClassifier
@@ -176,6 +178,34 @@ fun NetworkPanel.showLMSDialog(lms: LMSIterative) {
 //    }
 }
 
+fun SynapseGroup2Node.getDialog(): StandardDialog {
+
+    val dialog = StandardDialog()
+    val tabbedPane = JTabbedPane()
+
+    // val ape: AnnotatedPropertyEditor
+    val synapseAdjustment = SynapseAdjustmentPanel(synapseGroup.allSynapses.toList())
+    // val connectionEditor = ConnectorDialog(synapseGroup.allSynapses.toList())
+
+
+
+    dialog.contentPane = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
+        // ape = AnnotatedPropertyEditor(synapseGroup)
+        add(tabbedPane)
+        tabbedPane.addTab("Weights", synapseAdjustment)
+        if (synapseGroup.size() < 10000) {
+            tabbedPane.add("Weight Matrix", weightMatrixViewer())
+        }
+    }
+
+    dialog.addClosingTask {
+        // ape.commitChanges()
+    }
+
+    return dialog
+}
+
 /**
  * Show dialog for Smile classifier creation
  */
@@ -194,8 +224,6 @@ fun NetworkPanel.showClassifierCreationDialog() {
         ape.commitChanges()
         network.addNetworkModel(creator.create(network))
     }
-    dialog.pack()
-    dialog.setLocationRelativeTo(null)
     dialog.title = "Create Smile Classifier"
-    dialog.isVisible = true
+    dialog.makeVisible()
 }

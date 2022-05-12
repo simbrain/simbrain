@@ -101,6 +101,11 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     private double output;
 
     /**
+     * Whether this should be visible in the GUI.
+     */
+    private boolean isVisible = true;
+
+    /**
      * The update method of this synapse, which corresponds to what kind of synapse it is.
      */
     @UserParameter(label = "Learning Rule", useSetter = true,
@@ -932,4 +937,14 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     public double getOutput() {
         return output;
     }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean newVisibility) {
+        events.fireVisibilityChanged(isVisible, newVisibility);
+        isVisible = newVisibility;
+    }
+
 }

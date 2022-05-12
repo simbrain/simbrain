@@ -14,7 +14,7 @@ public class SynapseGroup2 @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
     var connection: ConnectionStrategy = AllToAll(),
-    private val synapses: MutableList<Synapse> = connection
+    val synapses: MutableList<Synapse> = connection
         .connectNeurons(source.network, source.neuronList, target.neuronList).toMutableList()
 ) : NetworkModel(), AttributeContainer {
 
@@ -30,12 +30,15 @@ public class SynapseGroup2 @JvmOverloads constructor(
     var displaySynapses = false
         set(value) {
             field = value
+            synapses.forEach { it.isVisible = value }
             events.fireVisibilityChange()
         }
 
     init {
         initializeSynapseVisibility()
         label = source.network.idManager.getProposedId(this.javaClass)
+        source.outgoingSg.add(this)
+        target.incomingSgs.add(this)
     }
 
     // TODO: Remove later. Here for conversion
@@ -53,6 +56,8 @@ public class SynapseGroup2 @JvmOverloads constructor(
 
     override fun delete() {
         synapses.forEach { it.delete() }
+        target.removeIncomingSg(this)
+        source.removeOutgoingSg(this)
         events.fireDeleted()
     }
 
@@ -72,6 +77,14 @@ public class SynapseGroup2 @JvmOverloads constructor(
 
     override fun getEvents(): SynapseGroup2Events {
         return events
+    }
+
+    override fun randomize() {
+        synapses.forEach { it.randomize() }
+    }
+
+    override fun toggleClamping() {
+        synapses.forEach { it.toggleClamping() }
     }
 
     // TODO: Why needed?
@@ -97,5 +110,4 @@ public class SynapseGroup2 @JvmOverloads constructor(
 
         return SynapseGroup2(src, tar, connection, syns)
     }
-
 }

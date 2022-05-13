@@ -4,7 +4,8 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 
 /**
- * Returns one of two values based on a probability.
+ * Returns one of two values based on a probability. A Bernoulli distribution where the sample space can be any two
+ * numbers.
  */
 class TwoValued(
     @UserParameter(label = "Lower value", useSetter = true, order = 1)
@@ -35,6 +36,10 @@ class TwoValued(
     override fun sampleInt(n: Int): IntArray {
         return IntArray(n) {sampleInt()}
     }
+
+    val mean get() = p * upperValue + (1-p) * lowerValue
+
+    val variance get() = .5 * (p * p + ((1-p) * (1-p))) * ((upperValue - lowerValue) * (upperValue - lowerValue))
 
     override fun deepCopy(): TwoValued {
         val copy = TwoValued()

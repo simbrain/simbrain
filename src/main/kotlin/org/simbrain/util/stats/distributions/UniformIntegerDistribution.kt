@@ -4,6 +4,7 @@ import org.apache.commons.math3.distribution.AbstractIntegerDistribution
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toDoubleArray
+import java.lang.Math.sqrt
 
 class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDistribution() {
 
@@ -39,11 +40,11 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
 
     override fun sampleInt(n: Int) = dist.sample(n)
 
-    val mean get() =  (ceil + floor)/2
+    val mean get() =  (ceil + floor)/2.0
 
-    val stdev get() = (ceil - floor)/ Math.sqrt(12.0)
+    val stdev get() = sqrt(variance)
 
-    val variance get() = Math.pow(stdev, 2.0)
+    val variance get() = 0.0833 * ((ceil - floor) * (ceil - floor)).toDouble()
 
     override fun getName(): String {
         return "Uniform (Integer)"

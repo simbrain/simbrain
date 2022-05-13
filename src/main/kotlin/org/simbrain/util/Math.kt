@@ -123,5 +123,4 @@ fun makeDoubleSequence(start: Double, stop: Double, step: Double): Sequence<Doub
  */
 fun makeStringArray(start: Double, stop: Double, f: (Double) -> Double, step: Double = 1.0): String {
     return "[${makeDoubleSequence(start, stop, step).map(f).joinToString(",")}]"
-
 }

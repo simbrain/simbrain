@@ -13,12 +13,10 @@ import org.simbrain.util.stats.distributions.*
  */
 class ProbabilityDistributionTest {
 
-    // TODO: Finish for all probability distributions
-
     /**
      * Confidence level = 1-alpha
      *
-     * Lower alpha means tests will pass more often
+     * Lower alpha means tests will pass more often, because the confidence intervals get larger
      */
     val alpha = .001
 
@@ -46,13 +44,15 @@ class ProbabilityDistributionTest {
     fun `test uniform integer`() {
         val dist = UniformIntegerDistribution(0, 1)
         var sample = dist.sampleDouble(N)
-        var ones = sample.count { it == 0.0 }
-        assertTrue((ones/N.toDouble()) in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        // println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        // println("${dist.variance} in ${confidenceIntervalVariance(sample.variance, alpha, N)}")
+        // assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
 
-        // dist.ceil = 4
-        // sample = dist.sampleDouble(N)
-        // ones = sample.count { it == 0.0 }
-        // assertTrue((ones/N.toDouble()) in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        dist.ceil = 5
+        dist.floor = 2
+        sample = dist.sampleDouble(N)
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
 
         dist.floor = 1
         dist.ceil = 10
@@ -66,15 +66,18 @@ class ProbabilityDistributionTest {
         val dist = TwoValued(-1.0, 2.0)
         var sample = dist.sampleDouble(N)
         assertTrue(sample.all { it == -1.0 || it == 2.0 })
-        var ones = sample.count { it == -1.0 }
-        assertTrue((ones/N.toDouble()) in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        // println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        // println("${dist.variance} in ${confidenceIntervalVariance(sample.variance, alpha, N)}")
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
 
         dist.lowerValue = -3.0
         dist.upperValue = 3.0
         sample = dist.sampleDouble(N)
-        assertTrue(sample.all { it == -3.0 || it == 3.0 })
-        ones = sample.count { it == -3.0 }
-        // assertTrue((ones/N.toDouble()) in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
+        assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
+        println("${dist.variance} in ${confidenceIntervalVariance(sample.variance, alpha, N)}")
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
 
         dist.p = 1.0
         sample = dist.sampleDouble(N)
@@ -110,13 +113,14 @@ class ProbabilityDistributionTest {
     fun `test exponential`() {
         val dist = ExponentialDistribution(2.0)
         var sample = dist.sampleDouble(N)
+        // println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
 
-        dist.lambda = 2.0
+        dist.lambda = 1.5
         sample = dist.sampleDouble(N)
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
     }
 
     @Test
@@ -133,16 +137,19 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test log normal`() {
-        val dist = LogNormalDistribution(2.0)
+        val dist = LogNormalDistribution(0.0, .25)
         var sample = dist.sampleDouble(N)
+        // println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
-        // assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+        // println("${dist.variance} in ${confidenceIntervalVariance(sample.variance, alpha, N)}")
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
 
-        // dist.location = 1.0
-        // dist.scale = 2.0
+        // dist.location = 0.2
+        // dist.scale = 1.25
         // sample = dist.sampleDouble(N)
         // assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
-        // assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+        // println("${dist.variance} in ${confidenceIntervalVariance(sample.variance, alpha, N)}")
+        // assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
     }
 
     @Test
@@ -150,13 +157,13 @@ class ProbabilityDistributionTest {
         val dist = GammaDistribution()
         var sample = dist.sampleDouble(N)
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
 
         dist.shape = 9.0
         dist.shape = .5
         sample = dist.sampleDouble(N)
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
-        assertTrue(dist.variance in confidenceIntervalMean(sample.variance, sample.stdev, alpha, N))
+        assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
     }
 
     @Test

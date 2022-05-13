@@ -24,13 +24,13 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: 
     var location = location
         set(value) {
             field = value
-            dist = org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, scale, value)
+            dist = org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, value, scale)
         }
 
     @UserParameter(
         label = "Scale (σ)",
         useSetter = true,
-        description = "The standard deviation σ of the logarithm of this distribution.",
+        description = "The standard deviation or shape σ of the logarithm of this distribution.",
         minimumValue = 0.0,
         increment = .1,
         order = 2
@@ -38,14 +38,14 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: 
     var scale = scale
         set(value) {
             field = value
-            dist = org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, value, location)
+            dist = org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, location, value)
         }
 
     override var negate: Boolean = negate
 
     @Transient
     var dist: AbstractRealDistribution =
-        org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, scale, location)
+        org.apache.commons.math3.distribution.LogNormalDistribution(randomGenerator, location, scale)
 
     override fun sampleDouble(): Double = dist.sample().conditionalNegate()
 

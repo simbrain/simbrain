@@ -54,6 +54,11 @@ class AllToAll(
         network.addNetworkModels(syns)
         return syns
     }
+
+    // TODO: Temporary
+    override fun connectNeurons2(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+        return connectAllToAll(source, target, allowSelfConnection)
+    }
 }
 
 /**

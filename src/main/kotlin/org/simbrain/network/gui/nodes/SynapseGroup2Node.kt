@@ -130,12 +130,6 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         currentNode!!.layoutChildren()
     }
 
-    // fun propertyChange(evt: PropertyChangeEvent?) {
-    //     // This is needed for synapse groups within subnetworks
-    //     // to be updated properly when neuron groups are moved.
-    //     layoutChildren()
-    // }
-
     /**
      * Update the text in the interaction box.
      */

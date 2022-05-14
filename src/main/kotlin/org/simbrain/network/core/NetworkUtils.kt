@@ -10,6 +10,9 @@ import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.subnetworks.CompetitiveGroup
+import org.simbrain.network.subnetworks.SOMGroup
+import org.simbrain.network.subnetworks.WinnerTakeAll
 import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.MatrixConverter
 import org.simbrain.util.SimbrainPreferences
@@ -28,17 +31,21 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 var synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold")
 
 /**
- * Items must be ordered for deserializing. For example neurons but serialized before synapses.
+ * Items must be ordered for proper reconstruction. For example neurons but serialized before synapses.
  */
-val deserializationOrder: List<Class<out NetworkModel>> = listOf(
+val reconstructionOrder: List<Class<out NetworkModel>> = listOf(
     Neuron::class.java,
     NeuronGroup::class.java,
+    CompetitiveGroup::class.java,
+    SOMGroup::class.java,
+    WinnerTakeAll::class.java,
     NeuronCollection::class.java,
     NeuronArray::class.java,
     Connector::class.java,
     SynapseGroup::class.java,
+    SynapseGroup2::class.java,
     Subnetwork::class.java,
-    Synapse::class.java
+    Synapse::class.java,
 )
 
 /**

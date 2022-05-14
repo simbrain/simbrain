@@ -189,7 +189,7 @@ class Network {
      * Returns a list of network models in the order needed to reconstruct a network properly. Example: nodes must be
      * added before synapses which refer to them.
      */
-    val allModelsInDeserializationOrder get() = networkModels.allInDeserializationOrder
+    val modelsInReconstructionOrder get() = networkModels.allInReconstructionOrder
 
     /**
      * The core update function of the neural network. Calls the current update function on each neuron, decays all the
@@ -439,7 +439,7 @@ class Network {
 
         // Initialize update manager
         updateManager.postOpenInit()
-        networkModels.allInDeserializationOrder.forEach { it.postOpenInit() }
+        networkModels.allInReconstructionOrder.forEach { it.postOpenInit() }
         return this
     }
 

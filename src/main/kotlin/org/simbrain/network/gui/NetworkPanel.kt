@@ -316,6 +316,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }.also { it.lowerToBottom() }
 
     fun createNode(synapseGroup: SynapseGroup2) = addScreenElement {
+        synapseGroup.synapses.map { s -> createNode(s) }
         SynapseGroup2Node(this, synapseGroup)
     }
 
@@ -332,6 +333,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun createNode(subnetwork: Subnetwork) = addScreenElement {
+
         fun createSubNetwork() = when (subnetwork) {
             is Hopfield -> HopfieldNode(this, subnetwork)
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
@@ -343,9 +345,12 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        val modelNodes = subnetwork.modelList.all.map { createNode(it) }
+        val subnetworkNodes = subnetwork.modelList.allInReconstructionOrder.map {
+            createNode(it)
+        }
         createSubNetwork().apply {
-            modelNodes.forEach { addNode(it) }
+            // Add "sub-nodes" to subnetwork node
+            subnetworkNodes.forEach { addNode(it) }
         }
 
     }
@@ -756,7 +761,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         })
 
         // Add all network elements (important for de-serializing)
-        network.allModelsInDeserializationOrder.forEach{ createNode(it) }
+        network.modelsInReconstructionOrder.forEach{ createNode(it) }
 
     }
 

@@ -425,19 +425,11 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     }
 
     public HashSet<SynapseGroup2> getIncomingSgs() {
-        return new HashSet<SynapseGroup2>(incomingSgs);
+        return incomingSgs;
     }
 
     public HashSet<SynapseGroup2> getOutgoingSg() {
-        return new HashSet<SynapseGroup2>(outgoingSgs);
-    }
-
-    public void addIncomingSg(SynapseGroup2 sg) {
-        incomingSgs.add(sg);
-    }
-
-    public void addOutgoingSg(SynapseGroup2 sg) {
-        outgoingSgs.add(sg);
+        return outgoingSgs;
     }
 
     public boolean removeIncomingSg(SynapseGroup2 sg) {
@@ -453,7 +445,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         super.delete();
         outgoingSgs.forEach(SynapseGroup2::delete);
         incomingSgs.forEach(SynapseGroup2::delete);
-
     }
 
     @Override

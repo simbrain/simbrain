@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.core.decayStrengthBasedOnLength
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction
 import org.simbrain.network.gui.actions.ShowDebugAction
@@ -179,6 +180,16 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     private fun applyConnectionAction(name: String, connectionStrategy: ConnectionStrategy) =
         ApplyConnectionAction(networkPanel, connectionStrategy, name)
+
+    val synapseGroupVisibilityAction = networkPanel.createAction(
+        name = "Toggle visibility of selected synapse groups",
+        keyCombo = CmdOrCtrl + 'T'
+    ) {
+        val sgs = selectionManager.filterSelectedModels<SynapseGroup2>()
+        sgs.forEach {
+            it.displaySynapses = !it.displaySynapses
+        }
+    }
 
     /**
      * Decay selected weights using a [DecayFunction] selected by the user.

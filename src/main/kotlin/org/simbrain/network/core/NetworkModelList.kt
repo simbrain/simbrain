@@ -110,13 +110,14 @@ class NetworkModelList {
         get() = networkModels.values.flatMap { it?.map { item -> item } ?: listOf() }
 
     /**
-     * Returns a list of network models in the order required for proper deserialization.
+     * Returns a list of network models in the order required for proper reconstruction of all network models.
+     * For example, neurons must be recreated before synapses since the synapses refer to neurons.
      */
-    val allInDeserializationOrder: List<NetworkModel>
+    val allInReconstructionOrder: List<NetworkModel>
         get() {
             val keys = networkModels.keys.toMutableSet()
             return sequence {
-                for (cls in deserializationOrder) {
+                for (cls in reconstructionOrder) {
                     networkModels[cls]?.let { yieldAll(it) }
                     keys.remove(cls)
                 }
@@ -154,7 +155,7 @@ class NetworkModelListConverter : Converter {
 
     override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {
         val modelList = source as NetworkModelList
-        modelList.allInDeserializationOrder.forEach { model ->
+        modelList.allInReconstructionOrder.forEach { model ->
             writer.startNode(model::class.java.name)
             context.convertAnother(model)
             writer.endNode()

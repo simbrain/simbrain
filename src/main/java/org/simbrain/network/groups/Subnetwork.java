@@ -36,8 +36,8 @@ import static org.simbrain.util.GeomKt.plus;
  * A collection of {@link org.simbrain.network.NetworkModel} objects which functions as a subnetwork within the main
  * root network, which (1) is shown in the GUI with an outline around it and a custom interaction box and (2) has
  * a potentially custom update rule.
- * <p></p>
- * Subclasses simply use {@link #addModel(NetworkModel)} to add whatever models they want, and subclass
+ * <br>
+ * Subclasses use {@link #addModel(NetworkModel)} to add models, and subclass
  * {@link org.simbrain.network.gui.nodes.SubnetworkNode} to customize the presentation, and override NetworkModel
  * methods as needed for custom behavior.
  */
@@ -90,10 +90,12 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
      * Delete this subnetwork and its children.
      */
     public void delete() {
-        modelList.getAll().forEach(m -> modelList.remove(m));
+        modelList.getAll().forEach(m -> {
+            modelList.remove(m);
+            m.delete();
+        });
         events.fireDeleted();
     }
-
 
     public NetworkModelList getModelList() {
         return modelList;
@@ -134,7 +136,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
      * override this.
      */
     public void update() {
-        modelList.getAllInDeserializationOrder().forEach(NetworkModel::update);
+        modelList.getAllInReconstructionOrder().forEach(NetworkModel::update);
     }
 
     public Network getParentNetwork() {
@@ -146,7 +148,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
         if (events == null) {
             events = new LocationEvents(this);
         }
-        modelList.getAllInDeserializationOrder().forEach(NetworkModel::postOpenInit);
+        modelList.getAllInReconstructionOrder().forEach(NetworkModel::postOpenInit);
     }
 
     @Override

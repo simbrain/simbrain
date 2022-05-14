@@ -156,6 +156,7 @@ public final class SynapseNode extends ScreenElement {
             updateDiameter();
         });
         events.onVisibilityChanged((oldVisibility, newVisibility) -> setVisible(newVisibility));
+        setVisible(synapse.isVisible());
         events.onClampChanged(this::updateClampStatus);
 
         // Respond to spiking events

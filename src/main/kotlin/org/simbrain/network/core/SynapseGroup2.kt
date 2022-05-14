@@ -15,7 +15,7 @@ public class SynapseGroup2 @JvmOverloads constructor(
     val target: AbstractNeuronCollection,
     var connection: ConnectionStrategy = AllToAll(),
     val synapses: MutableList<Synapse> = connection
-        .connectNeurons(source.network, source.neuronList, target.neuronList).toMutableList()
+        .connectNeurons2(source.network, source.neuronList, target.neuronList).toMutableList()
 ) : NetworkModel(), AttributeContainer {
 
     // TODO: When passing in synapses check all source are in source and all target are in target
@@ -73,6 +73,10 @@ public class SynapseGroup2 @JvmOverloads constructor(
         return source == target
     }
 
+    override fun update() {
+        synapses.forEach { it.update() }
+    }
+
     fun size(): Int = synapses.size
 
     override fun getEvents(): SynapseGroup2Events {
@@ -90,6 +94,10 @@ public class SynapseGroup2 @JvmOverloads constructor(
     // TODO: Why needed?
     override fun getId(): String {
         return super<NetworkModel>.getId()
+    }
+
+    override fun toString(): String {
+        return ("$id  with ${size()} synapse(s) from $source.id to $target.id")
     }
 
     /**

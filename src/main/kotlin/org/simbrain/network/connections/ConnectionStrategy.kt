@@ -85,6 +85,11 @@ abstract class ConnectionStrategy : EditableObject {
      */
     abstract fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse>
 
+    // TODO: Temporary
+    open fun connectNeurons2(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+        return listOf()
+    }
+
     val stringDescription: String
         get() = "" + this.javaClass.simpleName
 

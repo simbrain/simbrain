@@ -91,14 +91,6 @@ public class SOMNetwork extends Subnetwork implements Trainable {
         SynapseGroup2 sg = SynapseGroup.createSynapseGroup(inputLayer, som, new AllToAll());
         addModel(sg);
 
-        layoutNetwork();
-    }
-
-    /**
-     * Set the layout of the network.
-     */
-    public void layoutNetwork() {
-        // TODO: Would be easy to set the layout and redo it...
         offsetNeuronGroup(inputLayer, som, Direction.NORTH, 250);
     }
 

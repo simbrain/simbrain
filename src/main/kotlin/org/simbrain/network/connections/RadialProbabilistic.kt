@@ -89,7 +89,6 @@ class RadialProbabilistic(
     )
     var inhibitoryRadius: Double = 80.0,
 
-
     @UserParameter(
         label = "Allow self connections",
         description = "Allow synapses from neurons to themselves",

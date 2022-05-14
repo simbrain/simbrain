@@ -22,7 +22,6 @@ import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.getDialog
-import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.createAction
 import org.simbrain.util.display
 import javax.swing.*
@@ -122,15 +121,7 @@ class SynapseGroup2InteractionBox(
 
         // Synapse Visibility
         menu.addSeparator()
-        menu.add(JCheckBoxMenuItem().also {
-            it.action = networkPanel.createAction(
-                name = "Toggle visibility",
-                keyCombo = CmdOrCtrl + 'T'
-            ) {
-                synapseGroup.displaySynapses = !synapseGroup.displaySynapses
-                it.isSelected = synapseGroup.displaySynapses
-            }
-        })
+        menu.add(networkPanel.networkActions.synapseGroupVisibilityAction)
 
         // Coupling menu
         val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(synapseGroup)

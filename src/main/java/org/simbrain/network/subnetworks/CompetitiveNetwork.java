@@ -19,23 +19,17 @@
 package org.simbrain.network.subnetworks;
 
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
-import org.simbrain.network.util.Direction;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
-import java.util.Arrays;
 import java.util.List;
-
-import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
 
 /**
  * <b>CompetitiveNetwork</b> is a small network encompassing a Competitive
@@ -72,25 +66,24 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
     public CompetitiveNetwork(Network net, int numInputNeurons, int numCompetitiveNeurons) {
         super(net);
         this.setLabel("Competitive Network");
+
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
-        inputLayer = new NeuronGroup(net, numInputNeurons);
         this.addModel(competitive);
+        competitive.setLayoutBasedOnSize();
+
+        inputLayer = new NeuronGroup(net, numInputNeurons);
         this.addModel(inputLayer);
-        for (Neuron neuron : inputLayer.getNeuronList()) {
-            neuron.setLowerBound(0);
-        }
         inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
-
-        // Connect layers
-        SynapseGroup2 sg = SynapseGroup.createSynapseGroup(inputLayer, competitive, new AllToAll());
-        addModel(sg);
-        Arrays.stream(sg.getAllSynapses()).forEach(s -> s.setLowerBound(0));
-
-        // Lay out network
         inputLayer.setLayoutBasedOnSize();
-        competitive.setLayoutBasedOnSize();
-        offsetNeuronGroup(inputLayer, competitive, Direction.NORTH, 200);
+        inputLayer.getNeuronList().forEach(n -> n.setLowerBound(0));
+
+        SynapseGroup2 sg = new SynapseGroup2(inputLayer, competitive);
+        this.addModel(sg);
+        sg.getSynapses().forEach(s -> s.setLowerBound(0));
+
+        inputLayer.offset(0, 300);
+
     }
 
     @Override

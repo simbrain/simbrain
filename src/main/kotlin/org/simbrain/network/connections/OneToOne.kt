@@ -42,9 +42,16 @@ class OneToOne(
 
 ) : ConnectionStrategy(), EditableObject {
 
-    override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+    override fun connectNeurons(
+        network: Network,
+        source: List<Neuron>,
+        target: List<Neuron>,
+        addToNetwork: Boolean
+    ): List<Synapse> {
         val syns = connectOneToOne(source, target, useBidirectionalConnections)
-        network.addNetworkModels(syns)
+        if (addToNetwork) {
+            network.addNetworkModels(syns)
+        }
         return syns
     }
 

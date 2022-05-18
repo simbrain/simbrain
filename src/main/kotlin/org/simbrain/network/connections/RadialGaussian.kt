@@ -133,9 +133,16 @@ class RadialGaussian(
     // TODO: Add a sparsity constraint, such that connections are still chosen stochastically
     // based on distance, but a specific number of connections are guaranteed to be made.
 
-    override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+    override fun connectNeurons(
+        network: Network,
+        source: List<Neuron>,
+        target: List<Neuron>,
+        addToNetwork: Boolean
+    ): List<Synapse> {
         val syns: List<Synapse> = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
-        network.addNetworkModels(syns)
+        if (addToNetwork) {
+            network.addNetworkModels(syns)
+        }
         return syns
     }
 

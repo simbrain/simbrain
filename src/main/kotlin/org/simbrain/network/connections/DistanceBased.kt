@@ -41,9 +41,16 @@ class DistanceBased (
 
 ) : ConnectionStrategy(), EditableObject {
 
-    override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+    override fun connectNeurons(
+        network: Network,
+        source: List<Neuron>,
+        target: List<Neuron>,
+        addToNetwork: Boolean
+    ): List<Synapse> {
         val syns = connectRadial(source, target, decayFunction)
-        network.addNetworkModels(syns)
+        if (addToNetwork) {
+            network.addNetworkModels(syns)
+        }
         return syns
     }
 

@@ -113,8 +113,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         bitStream2 = buildBitStream(res2);
         bitStream2.setLabel("Bit stream 2");
         AllToAll connector = new AllToAll();
-        connector.connectNeurons(net, bitStream1.getNeuronList(), res1.getNeuronList());
-        connector.connectNeurons(net, bitStream2.getNeuronList(), res2.getNeuronList());
+        connector.connectNeurons(net, bitStream1.getNeuronList(), res1.getNeuronList(), true);
+        connector.connectNeurons(net, bitStream2.getNeuronList(), res2.getNeuronList(), true);
 
     }
 

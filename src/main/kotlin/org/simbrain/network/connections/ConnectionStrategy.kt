@@ -80,15 +80,16 @@ abstract class ConnectionStrategy : EditableObject {
      * @param network parent network loose neuron
      * @param source  source neurons
      * @param target  target neurons
+     * @param addToNetwork if true, add the synapses to the network
      * @return the resulting list of synapses, which are sometimes needed for
      * other operations
      */
-    abstract fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse>
-
-    // TODO: Temporary
-    open fun connectNeurons2(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
-        return listOf()
-    }
+    abstract fun connectNeurons(
+        network: Network,
+        source: List<Neuron>,
+        target: List<Neuron>,
+        addToNetwork: Boolean = true
+    ): List<Synapse>
 
     val stringDescription: String
         get() = "" + this.javaClass.simpleName

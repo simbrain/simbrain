@@ -15,7 +15,7 @@ public class SynapseGroup2 @JvmOverloads constructor(
     val target: AbstractNeuronCollection,
     var connection: ConnectionStrategy = AllToAll(),
     val synapses: MutableList<Synapse> = connection
-        .connectNeurons2(source.network, source.neuronList, target.neuronList).toMutableList()
+        .connectNeurons(source.network, source.neuronList, target.neuronList, false).toMutableList()
 ) : NetworkModel(), AttributeContainer {
 
     // TODO: When passing in synapses check all source are in source and all target are in target

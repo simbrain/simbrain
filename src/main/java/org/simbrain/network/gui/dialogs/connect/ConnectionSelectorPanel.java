@@ -14,9 +14,6 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.*;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.util.widgets.EditablePanel;
 
 import javax.swing.*;
@@ -37,10 +34,6 @@ public class ConnectionSelectorPanel extends EditablePanel {
      * So that it can be resized on updates with pack().
      */
     private final Window parentFrame;
-    private SynapseGroup synapseGroup;
-    private NeuronGroup sourceNeuronGroup;
-    private NeuronGroup targetNeuronGroup;
-    private Network network;
 
     /**
      * Temporary list of connection panels managed by combo box.
@@ -77,12 +70,8 @@ public class ConnectionSelectorPanel extends EditablePanel {
     /**
      * Connection dialog default constructor.
      */
-    public ConnectionSelectorPanel(Window parentFrame, SynapseGroup synapseGroup, NeuronGroup sourceNeuronGroup, NeuronGroup targetNeuronGroup, ConnectionStrategy initConnection, Network network) {
+    public ConnectionSelectorPanel(Window parentFrame, ConnectionStrategy initConnection) {
         this.parentFrame = parentFrame;
-        this.synapseGroup = synapseGroup;
-        this.sourceNeuronGroup = sourceNeuronGroup;
-        this.targetNeuronGroup = targetNeuronGroup;
-        this.network = network;
         cbConnectionType = new JComboBox<>(CONNECTORS);
         cbConnectionType.setPreferredSize(new Dimension(200, 20));
         setComboBox(initConnection);
@@ -151,8 +140,7 @@ public class ConnectionSelectorPanel extends EditablePanel {
 //            }
 //        }
         currentConnectionPanel = new ConnectionPanel(parentFrame,
-                (ConnectionStrategy) cbConnectionType.getSelectedItem(),
-                synapseGroup.getSourceNeurons(), synapseGroup.getTargetNeurons());
+                (ConnectionStrategy) cbConnectionType.getSelectedItem());
 
         gbc.anchor = GridBagConstraints.NORTH;
         gbc.gridx = 0;
@@ -164,8 +152,6 @@ public class ConnectionSelectorPanel extends EditablePanel {
         //currentConnectionPanel.setBorder(new LineBorder(Color.red));
         add(currentConnectionPanel, gbc);
         repaint();
-        parentFrame.pack();
-        parentFrame.setLocationRelativeTo(null);
     }
 
     /**

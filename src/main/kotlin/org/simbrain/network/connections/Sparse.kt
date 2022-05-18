@@ -76,15 +76,24 @@ class Sparse @JvmOverloads constructor(
         )
     }
 
-    override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+    override fun connectNeurons(
+        network: Network,
+        source: List<Neuron>,
+        target: List<Neuron>,
+        addToNetwork: Boolean
+    ): List<Synapse> {
         val result = connectSparse(source, target, connectionDensity, allowSelfConnection, equalizeEfferents)
         return when(result) {
             is ConnectionsResult.Add -> {
-                network.addNetworkModels(result.connectionsToAdd)
+                if (addToNetwork) {
+                    network.addNetworkModels(result.connectionsToAdd)
+                }
                 result.connectionsToAdd
             }
             is ConnectionsResult.Reset -> {
-                network.addNetworkModels(result.resultConnections)
+                if (addToNetwork) {
+                    network.addNetworkModels(result.resultConnections)
+                }
                 result.resultConnections
             }
             is ConnectionsResult.Remove -> {

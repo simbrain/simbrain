@@ -107,7 +107,12 @@ class RadialProbabilistic(
     /**
      * Connect neurons.
      */
-    override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+    override fun connectNeurons(
+        network: Network,
+        source: List<Neuron>,
+        target: List<Neuron>,
+        addToNetwork: Boolean
+    ): List<Synapse> {
         val exc = connectProbabilistically(source, target, excitatoryProbability,
             excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1)
         )
@@ -115,7 +120,9 @@ class RadialProbabilistic(
             excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1)
         )
         val syns = exc + inh
-        network.addNetworkModels(syns)
+        if (addToNetwork) {
+            network.addNetworkModels(syns)
+        }
         return syns
     }
 

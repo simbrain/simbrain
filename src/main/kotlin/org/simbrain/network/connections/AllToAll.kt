@@ -49,16 +49,19 @@ class AllToAll(
         return name
     }
 
-    override fun connectNeurons(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
+    override fun connectNeurons(
+        network: Network,
+        source: List<Neuron>,
+        target: List<Neuron>,
+        addToNetwork: Boolean
+    ): List<Synapse> {
         val syns = connectAllToAll(source, target, allowSelfConnection)
-        network.addNetworkModels(syns)
+        if (addToNetwork) {
+            network.addNetworkModels(syns)
+        }
         return syns
     }
 
-    // TODO: Temporary
-    override fun connectNeurons2(network: Network, source: List<Neuron>, target: List<Neuron>): List<Synapse> {
-        return connectAllToAll(source, target, allowSelfConnection)
-    }
 }
 
 /**

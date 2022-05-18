@@ -168,7 +168,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             applyConnectionAction("All to all", AllToAll()),
             applyConnectionAction("Distance Based", DistanceBased()),
             applyConnectionAction("One-to-one", OneToOne()),
-            applyConnectionAction("Radial (Gaussian)", RadialGaussian()),
             applyConnectionAction("Radial (Probalistic)", RadialProbabilistic()),
             applyConnectionAction("Fixed degree", FixedDegree()),
             applyConnectionAction("Sparse", Sparse())

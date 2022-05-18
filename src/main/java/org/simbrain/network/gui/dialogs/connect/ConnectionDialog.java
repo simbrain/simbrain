@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.dialogs.connect;
 
 import org.simbrain.network.connections.ConnectionStrategy;
-import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -52,12 +51,7 @@ public class ConnectionDialog extends StandardDialog {
      */
     public ConnectionDialog(final NetworkPanel networkPanel, final ConnectionStrategy connection) {
         this.networkPanel = networkPanel;
-        this.connectionPanel = new ConnectionPanel(
-                this,
-                connection,
-                networkPanel.getSelectionManager().filterSelectedSourceModels(Neuron.class),
-                networkPanel.getSelectionManager().filterSelectedModels(Neuron.class)
-        );
+        this.connectionPanel = new ConnectionPanel(this, connection);
         setContentPane(connectionPanel);
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/connections.html");
         addButton(new JButton(helpAction));

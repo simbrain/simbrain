@@ -26,14 +26,12 @@ import org.simbrain.network.gui.dialogs.connect.ConnectionSelectorPanel;
 import org.simbrain.network.gui.dialogs.synapse.SynapseGroupAdjustmentPanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.widgets.ApplyPanel;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 /**
@@ -155,24 +153,24 @@ public final class SynapseGroupDialog extends StandardDialog {
 
         // Connectivity panel
         if (isCreationDialog) {
-            connectionPanel = new ConnectionSelectorPanel(this, synapseGroup, null, null, null, networkPanel.getNetwork());
-            JScrollPane connectWrapper = new JScrollPane(connectionPanel);
-            connectWrapper.setBorder(null);
-            setContentPane(connectWrapper);
+            // connectionPanel = new ConnectionSelectorPanel(this, synapseGroup, null, null, null, networkPanel.getNetwork());
+            // JScrollPane connectWrapper = new JScrollPane(connectionPanel);
+            // connectWrapper.setBorder(null);
+            // setContentPane(connectWrapper);
 
         } else {
-            connectionPanel = new ConnectionSelectorPanel(this, synapseGroup, null, null, null, networkPanel.getNetwork());
-            var connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
-                    (ActionEvent e) -> {
-                // connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
-                //sumPanel.fillFieldValues(synapseGroup); // TODO
-                adjustmentPanel.fullUpdate();
-                // TODO: Update weight matrix when this is pressed
-            });
-            JScrollPane connectWrapper = new JScrollPane(connectionApplyPanel);
-            connectWrapper.setBorder(null);
-            storedComponents.add(connectWrapper);
-            tabbedPane.addTab("Connection Manager", connectWrapper);
+            // connectionPanel = new ConnectionSelectorPanel(this, synapseGroup, null, null, null, networkPanel.getNetwork());
+            // var connectionApplyPanel  =  ApplyPanel.createCustomApplyPanel(connectionPanel,
+            //         (ActionEvent e) -> {
+            //     // connectionPanel.getCurrentConnectionPanel().commitChanges(synapseGroup);
+            //     //sumPanel.fillFieldValues(synapseGroup); // TODO
+            //     adjustmentPanel.fullUpdate();
+            //     // TODO: Update weight matrix when this is pressed
+            // });
+            // JScrollPane connectWrapper = new JScrollPane(connectionApplyPanel);
+            // connectWrapper.setBorder(null);
+            // storedComponents.add(connectWrapper);
+            // tabbedPane.addTab("Connection Manager", connectWrapper);
         }
 
         // Weight matrix

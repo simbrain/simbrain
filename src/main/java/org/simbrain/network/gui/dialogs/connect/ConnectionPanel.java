@@ -64,9 +64,6 @@ public final class ConnectionPanel extends JPanel {
      */
     private ConnectionStrategy connectionStrategy;
 
-    private List<Neuron> sourceNeurons;
-    private List<Neuron> targetNeurons;
-
     /**
      * Whether or not the the connections would be recurrent.
      */
@@ -87,15 +84,10 @@ public final class ConnectionPanel extends JPanel {
      *
      * @param connectionStrategy   the underlying connection object
      */
-    public ConnectionPanel(
-            final Window parent,
-            final ConnectionStrategy connectionStrategy,
-            List<Neuron> sourceNeurons,
-            List<Neuron> targetNeurons) {
-        this.parentFrame = parent;
+    public ConnectionPanel(final Window parent,
+                           final ConnectionStrategy connectionStrategy) {
         this.connectionStrategy = connectionStrategy;
-        this.sourceNeurons = sourceNeurons;
-        this.targetNeurons = targetNeurons;
+        this.parentFrame = parent;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JPanel connectionContainer = new JPanel(new GridBagLayout());
         connectionContainer.setBorder(BorderFactory.createTitledBorder("Connection Properties"));
@@ -107,7 +99,7 @@ public final class ConnectionPanel extends JPanel {
 
         // Set up detail triangle and connection strategy
         detailTriangle = new DropDownTriangle(DropDownTriangle.UpDirection.LEFT,
-            true, "Show", "Hide", parentFrame);
+            true, "Show", "Hide", parent);
         detailTriangle.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -141,7 +133,7 @@ public final class ConnectionPanel extends JPanel {
      */
     private void syncPanelToTriangle() {
         connectionStrategyProperties.setVisible(detailTriangle.isDown());
-        parentFrame.pack();
+        // parentFrame.pack();
         //parentFrame.setLocationRelativeTo(null);
     }
 
@@ -176,7 +168,7 @@ public final class ConnectionPanel extends JPanel {
         // Make the connections
         List<Synapse> synapses = connectionStrategy.connectNeurons(networkPanel.getNetwork(),
                 networkPanel.getSelectionManager().filterSelectedSourceModels(Neuron.class),
-                networkPanel.getSelectionManager().filterSelectedModels(Neuron.class));
+                networkPanel.getSelectionManager().filterSelectedModels(Neuron.class), true);
         if (synapses.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Chosen connection" +
                             " parameters resulted in no synapses being created." +

@@ -82,7 +82,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         this.addModel(sg);
         sg.getSynapses().forEach(s -> s.setLowerBound(0));
 
-        inputLayer.offset(0, 300);
+        inputLayer.offset(0, 400);
 
     }
 
@@ -127,7 +127,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
     public static class CompetitiveCreator implements EditableObject {
 
         @UserParameter(label = "Number of inputs")
-        int numIn = 10;
+        int numIn = 20;
 
         @UserParameter(label = "Number of competitive neurons")
         int numComp = 20;

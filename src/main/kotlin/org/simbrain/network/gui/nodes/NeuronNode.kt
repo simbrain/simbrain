@@ -482,12 +482,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             synapseNode.updatePosition()
         }
     }
-    /**
-     * @return Returns the xpos.
-     */
-    /**
-     * @param xpos The xpos to set.
-     */
+
     var xpos: kotlin.Double
         get() = this.globalBounds.getX()
         set(xpos) {
@@ -495,12 +490,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             globalToLocal(p)
             this.setBounds(p.x, p.y, this.width, this.height)
         }
-    /**
-     * @return Returns the ypos.
-     */
-    /**
-     * @param ypos The ypos to set.
-     */
+
     var ypos: kotlin.Double
         get() = this.globalBounds.getY()
         set(ypos) {

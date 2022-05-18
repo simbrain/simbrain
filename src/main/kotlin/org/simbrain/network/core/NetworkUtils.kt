@@ -10,9 +10,6 @@ import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.subnetworks.CompetitiveGroup
-import org.simbrain.network.subnetworks.SOMGroup
-import org.simbrain.network.subnetworks.WinnerTakeAll
 import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.MatrixConverter
 import org.simbrain.util.SimbrainPreferences
@@ -31,22 +28,21 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 var synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold")
 
 /**
- * Items must be ordered for proper reconstruction. For example neurons but serialized before synapses.
+ * Provides an ordering on [NetworkModels] so that the networks are rebuilt in a proper order, for example with
+ * neurons created before synapses (which refer to neurons).
  */
-val reconstructionOrder: List<Class<out NetworkModel>> = listOf(
-    Neuron::class.java,
-    NeuronGroup::class.java,
-    CompetitiveGroup::class.java,
-    SOMGroup::class.java,
-    WinnerTakeAll::class.java,
-    NeuronCollection::class.java,
-    NeuronArray::class.java,
-    Connector::class.java,
-    SynapseGroup::class.java,
-    SynapseGroup2::class.java,
-    Subnetwork::class.java,
-    Synapse::class.java,
-)
+fun reconstructionOrder(obj: NetworkModel): Int = when (obj) {
+    is Neuron -> 10
+    is NeuronGroup -> 20
+    is NeuronCollection -> 30
+    is NeuronArray -> 40
+    is Connector -> 50
+    is SynapseGroup -> 60
+    is SynapseGroup2 -> 65
+    is Subnetwork -> 70
+    is Synapse -> 80
+    else -> 55
+}
 
 /**
  * Convenience method for asynchronously updating a set of neurons, by calling each neuron's update function (which

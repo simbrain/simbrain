@@ -114,18 +114,7 @@ class NetworkModelList {
      * For example, neurons must be recreated before synapses since the synapses refer to neurons.
      */
     val allInReconstructionOrder: List<NetworkModel>
-        get() {
-            val keys = networkModels.keys.toMutableSet()
-            return sequence {
-                for (cls in reconstructionOrder) {
-                    networkModels[cls]?.let { yieldAll(it) }
-                    keys.remove(cls)
-                }
-                for (cls in keys) {
-                    networkModels[cls]?.let { yieldAll(it) }
-                }
-            }.toList()
-        }
+        get() = all.sortedBy { reconstructionOrder(it) }
 
     fun remove(model: NetworkModel) {
         if (model is Subnetwork) {

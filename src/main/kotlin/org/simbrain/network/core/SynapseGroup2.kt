@@ -22,7 +22,7 @@ public class SynapseGroup2 @JvmOverloads constructor(
     // reuse this in addsynapse
 
     @Transient
-    private val events = SynapseGroup2Events(this)
+    private var events = SynapseGroup2Events(this)
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
@@ -91,7 +91,13 @@ public class SynapseGroup2 @JvmOverloads constructor(
         synapses.forEach { it.toggleClamping() }
     }
 
-    // TODO: Why needed?
+    override fun postOpenInit() {
+        if (events == null) {
+            events = SynapseGroup2Events(this)
+        }
+        synapses.forEach { it.postOpenInit() }
+    }
+
     override fun getId(): String {
         return super<NetworkModel>.getId()
     }

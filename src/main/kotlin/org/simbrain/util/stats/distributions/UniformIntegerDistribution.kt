@@ -44,7 +44,7 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
 
     val stdev get() = sqrt(variance)
 
-    val variance get() = 0.0833 * ((ceil - floor) * (ceil - floor)).toDouble()
+    val variance get() = ((ceil - floor) * (ceil - floor))/12.0 + (ceil-floor)/6.0
 
     override fun getName(): String {
         return "Uniform (Integer)"

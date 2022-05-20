@@ -30,7 +30,7 @@ public class SynapseGroup2 @JvmOverloads constructor(
     var displaySynapses = false
         set(value) {
             field = value
-            synapses.forEach { it.isVisible = value }
+            this.synapses.forEach { it.isVisible = value }
             events.fireVisibilityChange()
         }
 
@@ -40,9 +40,6 @@ public class SynapseGroup2 @JvmOverloads constructor(
         source.outgoingSg.add(this)
         target.incomingSgs.add(this)
     }
-
-    // TODO: Remove later. Here for conversion
-    val allSynapses: Array<Synapse> = synapses.toTypedArray()
 
     /**
      * Determine whether this synpase group should initially have its synapses displayed. For isolated synapse groups
@@ -55,18 +52,18 @@ public class SynapseGroup2 @JvmOverloads constructor(
     }
 
     override fun delete() {
-        synapses.forEach { it.delete() }
+        this.synapses.forEach { it.delete() }
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
         events.fireDeleted()
     }
 
     fun addSynapse(syn: Synapse) {
-        synapses.add(syn)
+        this.synapses.add(syn)
     }
 
     fun removeSynapse(syn: Synapse) {
-        synapses.remove(syn)
+        this.synapses.remove(syn)
     }
 
     fun isRecurrent(): Boolean {
@@ -74,28 +71,28 @@ public class SynapseGroup2 @JvmOverloads constructor(
     }
 
     override fun update() {
-        synapses.forEach { it.update() }
+        this.synapses.forEach { it.update() }
     }
 
-    fun size(): Int = synapses.size
+    fun size(): Int = this.synapses.size
 
     override fun getEvents(): SynapseGroup2Events {
         return events
     }
 
     override fun randomize() {
-        synapses.forEach { it.randomize() }
+        this.synapses.forEach { it.randomize() }
     }
 
     override fun toggleClamping() {
-        synapses.forEach { it.toggleClamping() }
+        this.synapses.forEach { it.toggleClamping() }
     }
 
     override fun postOpenInit() {
         if (events == null) {
             events = SynapseGroup2Events(this)
         }
-        synapses.forEach { it.postOpenInit() }
+        this.synapses.forEach { it.postOpenInit() }
     }
 
     override fun getId(): String {
@@ -118,7 +115,7 @@ public class SynapseGroup2 @JvmOverloads constructor(
             .zip(src.neuronList + tar.neuronList)
             .toMap()
 
-        val syns = synapses.map{
+        val syns = this.synapses.map{
                 Synapse(it.parentNetwork, mapping[it.source], mapping[it.target], it )
             }.toMutableList()
 

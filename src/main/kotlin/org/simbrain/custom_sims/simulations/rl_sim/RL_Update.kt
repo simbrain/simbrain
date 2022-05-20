@@ -175,7 +175,7 @@ class RL_Update(
      * Train the synapses in a synapse group
      */
     fun trainDeltaRule(group: SynapseGroup2) {
-        for (synapse in group.allSynapses) {
+        for (synapse in group.synapses) {
             val newStrength = synapse.strength + learningRate * synapse.source.activation * synapse.target.auxValue
             synapse.strength = newStrength
         }

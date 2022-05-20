@@ -68,10 +68,10 @@ public class EdgeOfChaosBitStream extends Simulation {
 
             // Update variance of weight strengths
             double new_variance = Double.parseDouble(tf_stdev.getText());
-            for (Synapse synapse : sgRes1.getAllSynapses()) {
+            for (Synapse synapse : sgRes1.getSynapses()) {
                 synapse.setStrength(synapse.getStrength() * (new_variance / variance));
             }
-            for (Synapse synapse : sgRes2.getAllSynapses()) {
+            for (Synapse synapse : sgRes2.getSynapses()) {
                 synapse.setStrength(synapse.getStrength() * (new_variance / variance));
             }
             variance = new_variance;

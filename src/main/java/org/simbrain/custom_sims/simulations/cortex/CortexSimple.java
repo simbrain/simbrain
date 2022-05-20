@@ -149,7 +149,7 @@ public class CortexSimple extends Simulation {
 
         for (String sgn : synGroups.keySet()) {
             SynapseGroup2 sg = synGroups.get(sgn);
-            for (Synapse s : sg.getAllSynapses()) {
+            for (Synapse s : sg.getSynapses()) {
                 s.setDelay(this.getDelay(s.getSource().getPosition3D(), s.getTarget().getPosition3D(),
                     Math.sqrt(2 * (600 * 600) + (2000 * 2000)), 20));
             }

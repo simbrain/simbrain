@@ -46,7 +46,7 @@ class TrainPredictionNet(
         sim.errorNeuron.forceSetActivation(Math.sqrt(sumError))
 
         // Update all synapses
-        for (synapse in sim.predictionSg.allSynapses) {
+        for (synapse in sim.predictionSg.synapses) {
             val newStrength = synapse.strength + learningRate * synapse.source.activation * synapse.target.auxValue
             synapse.strength = newStrength
             // System.out.println(newStrength);

@@ -157,7 +157,7 @@ public class Hopfield extends Subnetwork implements Trainable {
      * main training algorithm, which directly makes use of the input data.
      */
     public void trainOnCurrentPattern() {
-        for (Synapse w : this.getSynapseGroup().getAllSynapses()) {
+        for (Synapse w : this.getSynapseGroup().getSynapses()) {
             Neuron src = w.getSource();
             Neuron tar = w.getTarget();
             // TODO

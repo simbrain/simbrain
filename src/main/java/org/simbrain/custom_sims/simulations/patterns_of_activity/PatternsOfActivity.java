@@ -214,7 +214,7 @@ public class PatternsOfActivity extends Simulation {
                 }
             }
         }
-        for(Synapse s : recSyns.getAllSynapses()) {
+        for(Synapse s : recSyns.getSynapses()) {
             double d = SimbrainMath.distance(s.getSource().getPosition3D(), s.getTarget().getPosition3D());
             s.setDelay((int) (maxDly * d / maxDist));
         }
@@ -226,7 +226,7 @@ public class PatternsOfActivity extends Simulation {
         // TODO
         // inpSynGL.setStrength(50, Polarity.EXCITATORY);
         //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
-        for (Synapse s : inpSynGL.getAllSynapses()) {
+        for (Synapse s : inpSynGL.getSynapses()) {
             s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
             if(s.getTarget().getPolarity() == Polarity.INHIBITORY) {
                 inpSynGL.removeSynapse(s);
@@ -238,7 +238,7 @@ public class PatternsOfActivity extends Simulation {
         // TODO
         // inpSynGR.setStrength(50, Polarity.EXCITATORY);
         //inpSynGL.setStrength(-10, Polarity.INHIBITORY);
-        for (Synapse s : inpSynGR.getAllSynapses()) {
+        for (Synapse s : inpSynGR.getSynapses()) {
             s.setDelay(ThreadLocalRandom.current().nextInt(2, maxDly/2));
             if(s.getTarget().getPolarity() == Polarity.INHIBITORY) {
                 inpSynGR.removeSynapse(s);

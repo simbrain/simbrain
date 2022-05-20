@@ -80,7 +80,7 @@ public class EdgeOfChaos extends Simulation {
 
             // Update variance of weight strengths
             double new_variance = Double.parseDouble(tf_stdev.getText());
-            for (Synapse synapse : sgReservoir.getAllSynapses()) {
+            for (Synapse synapse : sgReservoir.getSynapses()) {
                 synapse.setStrength(synapse.getStrength() * (new_variance / variance));
             }
             variance = new_variance;

@@ -88,7 +88,7 @@ public class CorticalBranching extends Simulation {
             // sg.makeConnections();
 
         // TODO: Band-aid... issue with synapse bounds needs addressing
-        for(Synapse s : sg.getAllSynapses()) {
+        for(Synapse s : sg.getSynapses()) {
             s.setUpperBound(10000);
             s.forceSetStrength(exRand.sampleDouble());
         }

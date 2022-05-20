@@ -184,7 +184,7 @@ fun SynapseGroup2Node.getDialog(): StandardDialog {
     val tabbedPane = JTabbedPane()
 
     // val ape: AnnotatedPropertyEditor
-    val synapseAdjustment = SynapseAdjustmentPanel(synapseGroup.allSynapses.toList())
+    val synapseAdjustment = SynapseAdjustmentPanel(synapseGroup.synapses.toList())
     // val connectionEditor = ConnectorDialog(synapseGroup.allSynapses.toList())
 
 

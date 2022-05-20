@@ -64,6 +64,12 @@ class NakaScalarData(@UserParameter(label = "a") var a: Double = 0.0) : ScalarDa
     }
 }
 
+class IntFireScalarData(var membranePotential: Double = 0.0) : ScalarDataHolder {
+    override fun copy(): IntFireScalarData {
+        return IntFireScalarData(membranePotential)
+    }
+}
+
 class IzhikData(
     @UserParameter(label = "a") var a: Double = 0.0,
     @UserParameter(label = "b") var b: Double = 0.0,

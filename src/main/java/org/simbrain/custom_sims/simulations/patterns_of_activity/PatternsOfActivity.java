@@ -111,13 +111,14 @@ public class PatternsOfActivity extends Simulation {
 
         // Set up sensory group and odor world
         NeuronGroup sensoryNetL =  net.addNeuronGroup(-9.25, 95.93, 5);
-        sensoryNetL.setNeuronType(new IntegrateAndFireRule(0.005));
+        // TODO: Removed random spike chance for now
+        sensoryNetL.setNeuronType(new IntegrateAndFireRule());
         sensoryNetL.setPolarity(Polarity.EXCITATORY);
         sensoryNetL.setLabel("Sensory Left");
 
         // Set up sensory group and odor world
         NeuronGroup sensoryNetR =  net.addNeuronGroup(-9.25, 155.93, 5);
-        sensoryNetR.setNeuronType(new IntegrateAndFireRule(0.005));
+        sensoryNetR.setNeuronType(new IntegrateAndFireRule());
         sensoryNetR.setPolarity(Polarity.EXCITATORY);
         sensoryNetR.setLabel("Sensory Right");
 

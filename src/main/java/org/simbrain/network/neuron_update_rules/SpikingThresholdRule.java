@@ -35,6 +35,7 @@ import java.util.Random;
 
 /**
  * A simple spiking neuron that fires when weighted inputs exceed a threshold.
+ * When spiking activation is 1, else it is 0.
  * TODO: Has no documentation.
  */
 public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements NoisyUpdateRule {

@@ -21,12 +21,12 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.IntFireScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.Utils;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Linear <b>IntegrateAndFireNeuron</b> implements an integrate and fire neuron.
@@ -60,7 +60,8 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
     @UserParameter(
             label = "Time-Constant (ms)",
             description = "How quickly/slowly the neuron responds to external change and returns to its "
-                    + "resting potential.",
+                    + "resting potential. Roughly: how long to decay to resting state. Smaller time constant > faster" +
+                    " decay to 0",
             increment = .1,
             order = 6,
             minimumValue = 1,
@@ -129,20 +130,8 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
      */
     private boolean addNoise;
 
-    /**
-     * Membrane potential for the neuron.
-     */
-    private double memPotential = 0;
-
-    private double randSpkChance = 0;
-
     public IntegrateAndFireRule() {
         super();
-    }
-
-    public IntegrateAndFireRule(double randSpkChance) {
-        this();
-        this.randSpkChance = randSpkChance;
     }
 
     @Override
@@ -156,7 +145,6 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
         ifn.setResistance(getResistance());
         ifn.setAddNoise(getAddNoise());
         ifn.noiseGenerator = noiseGenerator.deepCopy();
-        ifn.randSpkChance = randSpkChance;
         return ifn;
     }
 
@@ -173,7 +161,7 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
 
         double timeStep = neuron.getNetwork().getTimeStep();
 
-        memPotential = neuron.getActivation();
+        var memPotential = ((IntFireScalarData)data).getMembranePotential();
 
         /*
          * Formula:
@@ -188,22 +176,30 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
          */
         double dVm = timeStep * (-(memPotential - restingPotential) + resistance * synCurrent) / timeConstant;
 
-        memPotential += dVm;
+        ((IntFireScalarData)data).setMembranePotential(memPotential + dVm);
 
-        if(ThreadLocalRandom.current().nextDouble() < randSpkChance*neuron.getNetwork().getTimeStep()) {
-            memPotential = threshold+1;
-        }
+        // if(ThreadLocalRandom.current().nextDouble() < randSpkChance*neuron.getNetwork().getTimeStep()) {
+        //     ((IntFireScalarData)data).setMembranePotential(threshold + 1);
+        // }
 
         if ((memPotential >= threshold) && (neuron.getNetwork().getTime() > (getLastSpikeTime() + refractoryPeriod))) {
             neuron.setSpike(true);
             setHasSpiked(true, neuron);
-            memPotential = resetPotential;
+            ((IntFireScalarData)data).setMembranePotential(resetPotential);
         } else {
             neuron.setSpike(false);
             setHasSpiked(false, neuron);
         }
 
         neuron.setActivation(memPotential);
+    }
+
+    @Override
+    public String getToolTipText(Neuron neuron) {
+        return neuron.getId() + ".  Location: (" + (int) neuron.getX() + "," + (int) neuron.getY() + "). Activation: "
+                + Utils.round(neuron.getActivation(), 3)
+                + ", Membrane Potential: "
+                + Utils.round(((IntFireScalarData)neuron.getNeuronDataHolder()).getMembranePotential(), 3);
     }
 
     @Override
@@ -235,6 +231,11 @@ public class IntegrateAndFireRule extends SpikingNeuronUpdateRule implements Noi
 
     public void setAddNoise(final boolean addNoise) {
         this.addNoise = addNoise;
+    }
+
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new IntFireScalarData();
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
+import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.lang.reflect.Method
 
 /**
@@ -136,7 +137,6 @@ class CouplingManager(val workspace: Workspace) {
      */
     val Consumer.preference: Int
         get() = when {
-
             baseObject is StraightMovement && method.name == "setAmount" -> 10
             baseObject is Turning && method.name == "setAmount" -> 10
             with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
@@ -149,6 +149,7 @@ class CouplingManager(val workspace: Workspace) {
      */
     val Producer.preference: Int
         get() = when {
+            baseObject is SmellSensor && method.name == "getSmellVector" -> 10
             else -> 0
         }
 

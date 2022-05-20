@@ -114,5 +114,4 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
     public void setAppliedInput(double appliedInput) {
         this.appliedInput = appliedInput;
     }
-
 }

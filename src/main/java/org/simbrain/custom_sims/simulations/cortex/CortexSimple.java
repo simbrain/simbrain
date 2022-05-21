@@ -10,7 +10,7 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.neuron_update_rules.IntegrateAndFireRule;
+import org.simbrain.network.updaterules.IntegrateAndFireRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.stats.ProbabilityDistribution;

@@ -27,8 +27,11 @@ import kotlin.math.roundToInt
 
 /**
  * Connect some percent of possible source-target links. Sparsity or density is between 0 (no connections) and 1 (all
- * to all). Featuers to allow changing existing sparsity and to hold number of outgoing connections constant are
+ * to all). Features to allow changing existing sparsity and to hold number of outgoing connections constant are
  * provided.
+ *
+ * When returning synapse lists methods in this file only return newly added synapses. When sparsity changes
+ * from 10 to 20% in a 10 node network, for example, only the 100 new synapses are returned, not all 200 synapses.
  *
  * @author Zoë Tosi
  * @author Yulin Li
@@ -142,7 +145,7 @@ fun connectSparse(
     sparsity: Double,
     selfConnectionAllowed: Boolean = false
 ): ConnectionsResult {
-    val existingSynapses = sourceNeurons.flatMap { it.fanOut.values }
+    val existingSynapses = sourceNeurons.flatMap { it.fanOut.values.filter{it.target in targetNeurons} }
     val possibleConnections = (sourceNeurons.asSequence() cartesianProduct targetNeurons.asSequence()).toSet().let {
         if (!selfConnectionAllowed) {
             it.filter { (source, target) -> source != target }
@@ -180,7 +183,6 @@ fun connectSparse(
 } else {
     connectSparse(sourceNeurons, targetNeurons, sparsity, selfConnectionAllowed)
 }
-
 
 sealed interface ConnectionsResult {
     data class Add(val connectionsToAdd: List<Synapse>) : ConnectionsResult

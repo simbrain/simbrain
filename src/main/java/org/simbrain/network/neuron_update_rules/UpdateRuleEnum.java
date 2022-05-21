@@ -5,11 +5,7 @@ import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.simbrain.network.updaterules.IntegrateAndFireRule;
 
 /**
  * Enum of {@link NeuronUpdateRule}'s that is used for several GUI purposes.

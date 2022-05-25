@@ -23,13 +23,14 @@ Some things you can do to get a quick sense of how Simbrain works.
 The GNU License is in the ./etc directory.
 
 ## Release Notes for Simbrain 3.05 
-(Fall 2021, pending)
-- Simbrain is no longer launched via the jar, but is packaged as a modern desktop application.
-- Some security issues with xstream have been addressed
+(Summer 2022)
+- Simbrain is now packaged as a modern desktop application.
+- Security issues with xstream using newer releases of java were addressed. Note that earlier versions of Simbrain will no longer run with the latest java (java 8 is recommended if running Simbrain 3.04) 
 - Component open and save commands have been renamed to import / export, to avoid confusion between those functions and
   the preferred workspace open / save.
-- Save dialog opens by default to system-specific "my documents" folder
+- Save dialog opens by default to local application directory.
 - config.properties file removed
+- Should be compatible with Simbrain 3.04
 
 ## Release Notes for Simbrain 3.04 
 (Spring 2020)

@@ -97,7 +97,8 @@
 				<exclude name="**/archives/**"/>
 			</fileset>
 		</copy>
-		<copy todir="${build.main}" file="/${etc}/Readme.md" />
+		<copy todir="${build.main}" file="/${etc}/License.txt" />
+		<copy todir="${build.main}" file="Readme.md" />
 		<zip destfile="${version}.zip" basedir="${build.main}" />
 		<mkdir dir="${dist}"/>
 		<move todir="${dist}" file="${version}.zip" />

@@ -1,14 +1,5 @@
 ## Simbrain 3.05
 
-To run either:
-1. Click Simbrain.jar 
-2. From terminal run `java -jar Simbrain.jar` 
+Simbrain is now packaged as a self-contained desktop application and should be straightforward to run.
 
-## Requirement
-
-java 1.8 or later
-
-## More info
-
-- https://github.com/simbrain/simbrain#readme
-- http://www.simbrain.net 
+For release notes see the Readme.md file for `Simbrain4` branch.

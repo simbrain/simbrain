@@ -98,7 +98,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
      * Whether text should be visible (when zoomed out, it should be
      * invisible).
      */
-    private var currentTextVisibility = false
+    private var isTextVisible = false
 
     /**
      * If true then a custom color is being used for stroke.
@@ -120,11 +120,12 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         labelBackground.addChild(labelText)
         addChild(labelBackground)
 
-        // Set graphics of node based on neuron propertiess
+        // Set graphics of node based on neuron properties
         updateShape()
         updateColor()
         updateText()
         updateTextLabel()
+        updateBounds()
         updateClampStatus()
         centerFullBoundsOnPoint(neuron.x, neuron.y)
         pickable = true
@@ -181,7 +182,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
      * TODO: Redo by scaling the text object.
      */
     private fun updateText() {
-        if (!currentTextVisibility) {
+        if (!isTextVisible) {
             return
         }
         // Todo: a bit of a performance drain.
@@ -236,16 +237,16 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
     fun updateTextVisibility() {
         val scale = networkPanel.canvas.camera.viewScale
         if (scale > TEXT_VISIBILITY_THRESHOLD) {
-            if (!currentTextVisibility) {
+            if (!isTextVisible) {
                 setDisplayText(true)
-                currentTextVisibility = true
+                isTextVisible = true
             }
             updateText()
             updateTextLabel()
         } else {
-            if (currentTextVisibility) {
+            if (isTextVisible) {
                 setDisplayText(false)
-                currentTextVisibility = false
+                isTextVisible = false
             }
         }
     }
@@ -329,7 +330,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
      * Update the text label.
      */
     fun updateTextLabel() {
-        if (currentTextVisibility && neuron.label != null) {
+        if (isTextVisible && neuron.label != null) {
             // Set label text
             if (!neuron.label.equals("", ignoreCase = true) || !neuron.label.equals(
                     SimbrainConstants.NULL_STRING,
@@ -341,12 +342,17 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
                 labelText.setOffset(mainShape.x - labelText.width / 2 + DIAMETER / 2, mainShape.y - DIAMETER / 2 - 1)
                 labelBackground.setBounds(labelText.fullBounds)
             }
-
-            // update bounds to include text
-            val bounds = mainShape.bounds
-            bounds.add(labelText.localToParent(labelText.bounds))
-            setBounds(bounds)
+            updateBounds()
         }
+    }
+
+    private fun updateBounds() {
+        // update bounds to include text
+        val bounds = mainShape.bounds
+        if (neuron.label != null) {
+            bounds.add(labelText.localToParent(labelText.bounds))
+        }
+        setBounds(bounds)
     }
 
     /**
@@ -379,7 +385,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
      * Set position of priority label.
      */
     private fun setPriorityTextPosition() {
-        if (priorityText == null || !currentTextVisibility) {
+        if (priorityText == null || !isTextVisible) {
             return
         }
         priorityText.setOffset(mainShape.bounds.centerX, mainShape.bounds.centerY + DIAMETER - 10)

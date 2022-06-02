@@ -100,9 +100,6 @@ public class SubnetworkNode extends ScreenElement {
         events.onLocationChange(this::layoutChildren);
     }
 
-    /**
-     * Override pnode layoutChildren to get objects placed in correct spots.
-     */
     @Override
     public void layoutChildren() {
         outline.resetOutlinedNodes(outlinedObjects);

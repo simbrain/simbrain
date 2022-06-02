@@ -55,7 +55,7 @@ public class Outline extends PNode {
         if (outlinedNodes != null) {
             PBounds bounds = new PBounds();
             for (ScreenElement node : outlinedNodes) {
-                bounds.add(node.getFullBoundsReference());
+                bounds.add(node.getFullBounds());
             }
             updateBound(bounds.x, bounds.y, bounds.width, bounds.height);
             outlinedNodes = null;

@@ -72,8 +72,8 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        pushViewPositionToModel()
         super.offset(dx, dy)
+        pushViewPositionToModel()
     }
 
     private fun createBorder(): PPath {

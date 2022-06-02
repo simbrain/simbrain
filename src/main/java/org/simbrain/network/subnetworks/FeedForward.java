@@ -100,7 +100,7 @@ public class FeedForward extends Subnetwork {
      * @param nodesPerLayer       an array of integers which determines the number of layers and
      *                            neurons in each layer. Integers 1...n in the array correspond
      *                            to the number of nodes in layers 1...n.
-     * @param initialPosition     bottom corner where network will be placed.
+     * @param initialPosition     center where the network is placed
      * @param inputNeuronTemplate the type of Neuron to use for the input layer
      */
     private void buildNetwork(final Network network, int[] nodesPerLayer, Point2D initialPosition,
@@ -130,8 +130,8 @@ public class FeedForward extends Subnetwork {
             // Reset last layer
             lastLayer = hiddenLayer;
         }
+        setLocation(initialPosition);
         outputLayer = lastLayer;
-
     }
 
     public int getBetweenLayerInterval() {

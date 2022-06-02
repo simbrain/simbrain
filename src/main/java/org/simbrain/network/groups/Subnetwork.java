@@ -78,6 +78,12 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     public void addModel(NetworkModel model) {
         modelList.add(model);
         model.setId(getParentNetwork().getIdManager().getAndIncrementId(model.getClass()));
+        if (model instanceof LocatableModel) {
+            ((LocatableModel) model).getEvents().onLocationChange(() -> {
+                getEvents().fireLocationChange();
+            });
+        }
+        getEvents().fireLocationChange();
         model.getEvents().onDeleted(m -> {
             modelList.remove(m);
             if (modelList.getSize() == 0) {

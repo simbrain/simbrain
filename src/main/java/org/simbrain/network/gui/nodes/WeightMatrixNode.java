@@ -24,6 +24,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
@@ -31,7 +33,7 @@ import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 /**
  * A visual representation of a weight matrix
  */
-public class WeightMatrixNode extends ScreenElement {
+public class WeightMatrixNode extends ScreenElement implements PropertyChangeListener {
 
     // TODO: Make this cover other subclasses of Connector besides WeightMatrix.
     // But for now we are only using WeightMatrix
@@ -81,6 +83,7 @@ public class WeightMatrixNode extends ScreenElement {
         addChild(imageBox);
         renderMatrixToImage();
         setBounds(imageBox.getBounds());
+        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
         setPickable(true);
 
@@ -244,6 +247,16 @@ public class WeightMatrixNode extends ScreenElement {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         return dialog;
+    }
+
+
+    /**
+     * Without this the node can't be selected.
+     */
+    @Override
+    public void propertyChange(PropertyChangeEvent arg0) {
+        setBounds(imageBox.getFullBounds());
+        invalidateFullBounds();
     }
 
     @Override

@@ -21,7 +21,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.simbrain.network.LocatableModelKt.getCenterLocation;
 import static org.simbrain.util.GeomKt.minus;
@@ -277,7 +276,8 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * Add listener to indicated neuron.
      */
     protected void addListener(Neuron n) {
-        n.getEvents().onLocationChange(fireLocationChange);
+        n.getEvents().onLocationChange(() -> events.fireLocationChange());
+        // n.getEvents().onLocationChange(fireLocationChange); // TODO Reimplement when debounce is working
         n.getEvents().onDeleted(neuronList::remove);
         n.getEvents().onActivationChange((aold,anew) -> {
             invalidateCachedActivations();
@@ -289,27 +289,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
             }
         });
     }
-
-    private Runnable createFireLocationChange() {
-        AtomicReference<Timer> timer = new AtomicReference<>();
-        timer.set(null); // debouncing
-        return () -> {
-            var thisTimer = timer.get();
-            if (thisTimer != null) {
-                thisTimer.cancel();
-            }
-            thisTimer = new Timer();
-            thisTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    events.fireLocationChange();
-                }
-            }, 5);
-            timer.set(thisTimer);
-        };
-    }
-
-    private Runnable fireLocationChange = createFireLocationChange();
 
     /**
      * Remove a neuron
@@ -761,10 +740,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     public void postOpenInit() {
         if (events == null) {
             events = new NeuronCollectionEvents(this);
-        }
-
-        if (fireLocationChange == null) {
-            fireLocationChange = createFireLocationChange();
         }
 
         // TODO: Resave and remove

@@ -7,7 +7,6 @@
 # Then repackage it into a dmg by placing it in a folder and using Disk Utility, File > New Image
 # Title is Simbrain-3.05.dmg
 
-# Long jvm arg, mostly to deal with xstream issues
 # See https://github.com/x-stream/xstream/issues/262
 JVM_ARGS="-Duser.dir=\$APPDIR "
 JVM_ARGS+="--add-opens=java.base/java.util=ALL-UNNAMED "

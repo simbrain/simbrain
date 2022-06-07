@@ -11,6 +11,9 @@ plugins {
 }
 
 def versionName = "Simbrain4Beta"
+def simbrainJvmArgs = [ '--add-opens','java.base/java.util=ALL-UNNAMED',
+                        '--add-opens','java.desktop/java.awt=ALL-UNNAMED',
+                        '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED']
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 compileJava.options.encoding = 'UTF-8'
 
@@ -104,19 +107,18 @@ dependencies {
 
 }
 
-run {
-    jvmArgs '--illegal-access=permit'
+application {
+    applicationDefaultJvmArgs = simbrainJvmArgs
 }
 
 test {
-    jvmArgs '--illegal-access=permit'
     useJUnitPlatform()
 }
 
 // Sample invocation:
 // gradle runSim -PsimName="Test Sim"
 task runSim(type: JavaExec) {
-    jvmArgs '--illegal-access=permit'
+    jvmArgs simbrainJvmArgs
     classpath = sourceSets.main.runtimeClasspath
     main = "org.simbrain.custom_sims.RegisteredSimulationsKt"
     if(project.hasProperty('simName')){

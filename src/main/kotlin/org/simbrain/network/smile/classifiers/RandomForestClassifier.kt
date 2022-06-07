@@ -47,9 +47,7 @@ class RandomForestClassifier() : ClassifierWrapper() {
         }
     }
 
-    override fun getName(): String {
-        return "Random Forest"
-    }
+    override val name = "Random Forest"
 
     companion object {
         @JvmStatic

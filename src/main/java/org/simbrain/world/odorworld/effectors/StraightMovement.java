@@ -89,7 +89,7 @@ public class StraightMovement extends Effector {
 
     @Override
     public void update() {
-        parent.goStraight(amount * scalingFactor);
+        parent.setSpeed(amount * scalingFactor);
         this.amount = 0;
     }
 

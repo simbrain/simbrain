@@ -16,29 +16,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.util.propertyeditor;
+package org.simbrain.util.propertyeditor
 
 /**
- * Indicates that objects that can be edited in an {@link AnnotatedPropertyEditor}. Returns a name that is used in the
+ * Indicates that objects that can be edited in an [AnnotatedPropertyEditor]. Returns a name that is used in the
  * GUI and has a commit method that can be overridden if special actions are needed when committing.
  *
  * @author Jeff Yoshimi
  */
-public interface EditableObject {
-
+interface EditableObject {
     /**
      * Returns the name of this object.
      */
-    default String getName() {
-        return "No-name (be sure getName() is overridden)";
-    }
+    @JvmDefault val name: String
+        get() = "No-name (be sure getName() is overridden)"
     // See ParameterWidget#getTypeMap
-
     /**
-     * A method to be invoked at the end of {@link AnnotatedPropertyEditor#commitChanges()}
+     * A method to be invoked at the end of [AnnotatedPropertyEditor.commitChanges]
      */
-    default void onCommit() {
-
-    }
-
+    @JvmDefault fun onCommit() {}
 }

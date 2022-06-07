@@ -173,7 +173,7 @@ public class ModularOscillatoryNetwork extends Simulation {
         SynapseGroup2 sg = new SynapseGroup2(sourceNg, targetNg);
         // TODO!
         // , exRatio)
-        // sparse.connectNeurons(sg);
+//        sparse.connectNeurons(sg);
         net.addNetworkModel(sg);
         sg.setDisplaySynapses(false);
         return sg;

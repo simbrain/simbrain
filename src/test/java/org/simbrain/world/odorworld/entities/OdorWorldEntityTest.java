@@ -45,10 +45,10 @@ public class OdorWorldEntityTest {
         OdorWorldEntity mouse = world.addAgent();
         for (int i = 0; i < 100; i++) {
             mouse.randomizeLocation();
-            assert mouse.getLocation()[0] > 0;
-            assert mouse.getLocation()[1] > 0;
-            assert mouse.getLocation()[0] < world.getWidth();
-            assert mouse.getLocation()[1] < world.getHeight();
+            assert mouse.getLocation().getX() > 0;
+            assert mouse.getLocation().getY() > 0;
+            assert mouse.getLocation().getX() < world.getWidth();
+            assert mouse.getLocation().getY() < world.getHeight();
         }
     }
 }

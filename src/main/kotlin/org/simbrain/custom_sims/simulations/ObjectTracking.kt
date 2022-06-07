@@ -136,7 +136,7 @@ val objectTrackingSim = newSim {
 
     // Agent
     val agent = odorWorld.addEntity(EntityType.CIRCLE).apply {
-        setCenterLocation(odorWorld.width / 2.0, odorWorld.height / 2.0)
+        location = point(odorWorld.width / 2.0, odorWorld.height / 2.0)
         heading = 90.0
         addDefaultEffectors()
     }
@@ -181,7 +181,7 @@ val objectTrackingSim = newSim {
 
     fun updateCheeseLocation() {
         //TODO: Update when Yulin's refactor is done
-        cheese.setCenterLocation(agent.centerX + 100 * cos(network.time), agent.centerY - 100 * sin(network.time))
+        cheese.location = point(agent.x + 100 * cos(network.time), agent.y - 100 * sin(network.time))
     }
     updateCheeseLocation()
     workspace.addUpdateAction(updateAction("Move cheese") {
@@ -241,9 +241,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
         return AllostaticUpdateRule()
     }
 
-    override fun getName(): String {
-        return "Allostatic Update Rule"
-    }
+    override val name = "Allostatic Update Rule"
 
 
 }

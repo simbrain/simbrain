@@ -71,8 +71,7 @@ public class KeyBindings {
                 worldPanel.setManualMovementState("w", true);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
-                    entity.setManualMode(true);
-                    entity.goStraight();
+                    entity.getManualMovement().setSpeed(1.0);
                 }
             }
         });
@@ -85,9 +84,9 @@ public class KeyBindings {
                 if (entity != null) {
                     // case where w and s are both being pressed
                     if (worldPanel.getManualMovementState("s")) {
-                        entity.goBackwards();
+                        entity.getManualMovement().setSpeed(-1);
                     } else {
-                        worldPanel.releaseManualMovement(entity);
+                        entity.getManualMovement().setSpeed(0);
                     }
                 }
             }
@@ -103,8 +102,7 @@ public class KeyBindings {
                 worldPanel.setManualMovementState("s", true);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
-                    entity.setManualMode(true);
-                    entity.goBackwards();
+                    entity.getManualMovement().setSpeed(-1.0);
                 }
             }
         });
@@ -117,9 +115,9 @@ public class KeyBindings {
                 if (entity != null) {
                     // case where w and s are both being pressed
                     if (worldPanel.getManualMovementState("w")) {
-                        entity.goStraight();
+                        entity.getManualMovement().setSpeed(1.0);
                     } else {
-                        worldPanel.releaseManualMovement(entity);
+                        entity.getManualMovement().setSpeed(0.0);
                     }
                 }
             }
@@ -136,8 +134,7 @@ public class KeyBindings {
                 worldPanel.setManualMovementState("a", true);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
-                    entity.setManualMode(true);
-                    entity.turnLeft();
+                    entity.getManualMovement().turnLeft();
                 }
             }
         });
@@ -150,10 +147,9 @@ public class KeyBindings {
                 if (entity != null) {
                     // case where a and d are both being pressed
                     if (worldPanel.getManualMovementState("d")) {
-                        entity.turnRight();
+                        entity.getManualMovement().turnRight();
                     } else {
-                        entity.stopTurning();
-                        worldPanel.releaseManualMovement(entity);
+                        entity.getManualMovement().stopTurning();
                     }
                 }
             }
@@ -169,8 +165,7 @@ public class KeyBindings {
                 worldPanel.setManualMovementState("d", true);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
-                    entity.setManualMode(true);
-                    entity.turnRight();
+                    entity.getManualMovement().turnRight();
                 }
             }
         });
@@ -183,10 +178,9 @@ public class KeyBindings {
                 if (entity != null) {
                     // case where a and d are both being pressed
                     if (worldPanel.getManualMovementState("a")) {
-                        entity.turnLeft();
+                        entity.getManualMovement().turnLeft();
                     } else {
-                        entity.stopTurning();
-                        worldPanel.releaseManualMovement(entity);
+                        entity.getManualMovement().stopTurning();
                     }
                 }
             }

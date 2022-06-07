@@ -32,9 +32,7 @@ class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
         }
     }
 
-    override fun getName(): String {
-        return "Dense layer"
-    }
+    override val name = "Dense layer"
 
     companion object {
         @JvmStatic

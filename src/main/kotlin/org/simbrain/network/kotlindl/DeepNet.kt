@@ -233,10 +233,6 @@ class DeepNet(
         return network
     }
 
-    override fun getId(): String {
-        return super<ArrayLayer>.getId()
-    }
-
     override fun toString(): String {
         return "${label}: : ${inputSize()} -> ${outputSize()}\n" +
                 deepNetLayers.layers.joinToString("\n") { it.name }
@@ -264,9 +260,7 @@ class DeepNet(
         @UserParameter(label = "Label", order = 10)
         private val label = proposedLabel
 
-        override fun getName(): String {
-            return "Deep Network"
-        }
+        override val name = "Deep Network"
 
         fun create(net: Network, layers: ArrayList<TFLayer<*>>): DeepNet {
             return DeepNet(net, layers)
@@ -281,9 +275,8 @@ class TrainingParameters (
     var epochs: Int = 100,
 
 ): EditableObject {
-    override fun getName(): String {
-        return "Trainer parameters"
-    }
+
+    override val name: String = "Trainer parameters"
 }
 
 class OptimizerParameters (
@@ -298,7 +291,5 @@ class OptimizerParameters (
     var metric: Metrics = Metrics.MSE,
 
     ): EditableObject {
-    override fun getName(): String {
-        return "Optimizer parameters"
-    }
+    override val name: String = "Optimizer parameters"
 }

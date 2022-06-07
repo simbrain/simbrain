@@ -47,9 +47,7 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
 
     val variance get() = Math.pow(stdev, 2.0)
 
-    override fun getName(): String {
-        return "Uniform (Real)"
-    }
+    override val name = "Uniform (Real)"
 
     override fun deepCopy(): UniformRealDistribution {
         val copy = UniformRealDistribution()

@@ -76,7 +76,7 @@ public class TileSensor extends Sensor {
 
         TileMap tileMap = parent.getParentWorld().getTileMap();
 
-        if (tileMap.hasTileIdAtPixel(tileIdToSense, parent.getCenterX(), parent.getCenterY())) {
+        if (tileMap.hasTileIdAtPixel(tileIdToSense, parent.getLocation().getX(), parent.getLocation().getY())) {
             value = outputAmount;
         }
     }

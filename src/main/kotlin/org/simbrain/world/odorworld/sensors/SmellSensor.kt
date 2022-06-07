@@ -45,11 +45,11 @@ class SmellSensor @JvmOverloads constructor(
      * Update the smell vector by iterating over entities and adding up their distance-scaled smell vectors.
      */
     override fun update() {
-        smellVector = parent.parentWorld.entityList
+        smellVector = parent.world.entityList
             .filter { it != parent } // Don't smell yourself
-            .map{Pair(it.smellSource, SimbrainMath.distance(it.centerLocation, this.location)) }
-            .filter{(smellSource, _) -> smellSource != null}
-            .map{(smellSource, distance) -> smellSource.getStimulus(distance)}
+            .map { Pair(it.smellSource, SimbrainMath.distance(it.location, this.location)) }
+            .filter { (smellSource, _) -> smellSource != null }
+            .map { (smellSource, distance) -> smellSource.getStimulus(distance) }
             .sum()
     }
 
@@ -87,8 +87,5 @@ class SmellSensor @JvmOverloads constructor(
         return SmellSensor(parent, label, theta, radius)
     }
 
-    override fun getName(): String {
-        return "Smell Sensor"
-    }
-
+    override val name: String = "Smell Sensor"
 }

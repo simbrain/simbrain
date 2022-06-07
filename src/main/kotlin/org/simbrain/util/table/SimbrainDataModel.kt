@@ -182,9 +182,8 @@ class Column(
         return 0
     }
 
-    override fun getName(): String {
-        return columName
-    }
+    override val name: String
+        get() = columName
 
     enum class DataType {
         DoubleType {

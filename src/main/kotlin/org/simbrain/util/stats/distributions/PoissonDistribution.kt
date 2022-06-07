@@ -43,9 +43,7 @@ class PoissonDistribution(p: Double = 1.0, negate: Boolean = false)
 
     val variance get() = p
 
-    override fun getName(): String {
-        return "Poisson"
-    }
+    override val name = "Poisson"
 
     override fun deepCopy(): PoissonDistribution {
         val copy = PoissonDistribution()

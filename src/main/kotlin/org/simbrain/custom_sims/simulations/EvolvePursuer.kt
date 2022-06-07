@@ -15,6 +15,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
+import org.simbrain.util.distanceTo
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
@@ -91,17 +92,18 @@ val evolvePursuer = newSim {
             }
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
-                setCenterLocation(50.0, 200.0)
+                location = point(50.0, 200.0)
             }
 
             fun OdorWorldEntity.reset() {
-                setCenterLocation(random.nextDouble()*300,random.nextDouble()*300)
+                location = point(random.nextDouble() * 300, random.nextDouble() * 300)
             }
 
             fun createCheese() = odorworld.addEntity(EntityType.SWISS).apply {
-                setCenterLocation(random.nextDouble()*300,random.nextDouble()*300)
-                velocityX = random.nextDouble(-1.0,1.0)
-                velocityY = random.nextDouble(-1.0,1.0)
+                location = point(random.nextDouble() * 300, random.nextDouble() * 300)
+                // TODO: use polar
+                // dx = random.nextDouble(-1.0, 1.0)
+                // dy = random.nextDouble(-1.0, 1.0)
                 onCollide {
                     if (it === mouse) reset()
                 }
@@ -157,7 +159,7 @@ val evolvePursuer = newSim {
 
                 cheeses.forEach { cheese ->
                     cheese.onCollide {
-                        cheese.setCenterLocation(
+                        cheese.location = point(
                             random.nextDouble(100.0, 300.0),
                             random.nextDouble(0.0, 300.0)
                         )
@@ -212,7 +214,7 @@ val evolvePursuer = newSim {
                     }
                 }
 
-                val partial = cheeses.map { cheese -> 100 - mouse.getRadiusTo(cheese) }
+                val partial = cheeses.map { cheese -> 100 - mouse.location.distanceTo(cheese.location) }
                     .maxOf { it }
                     .let { if (it < 0) 0.0 else it } / 100
 

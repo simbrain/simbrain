@@ -9,10 +9,15 @@ import java.awt.geom.CubicCurve2D
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
+import java.lang.Double.isNaN
 import kotlin.math.*
 
 fun Int.toRadian() = Math.toRadians(this.toDouble())
 fun Double.toRadian() = Math.toRadians(this)
+
+fun Int.toDegrees() = Math.toDegrees(this.toDouble())
+fun Double.toDegrees() = Math.toDegrees(this)
+
 
 // Points / Vectors
 fun point(x: Double, y: Double): Point2D = Point2D.Double(x, y)
@@ -68,6 +73,12 @@ operator fun Point.component2() = y
 // Lines
 fun line(p1: Point2D, p2: Point2D) = Line2D.Double(p1, p2)
 
+val Line2D.vector: Point2D
+    get() {
+        val vector = p2 - p1
+        return point(vector.x, vector.y)
+    }
+
 val Line2D.normal : Point2D
     get() {
         val vector = p2 - p1
@@ -94,6 +105,8 @@ val Line2D.midPoint
  */
 fun Line2D.p(t: Double) = point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t)
 
+fun Line2D.scale(t: Double) = p(t)
+
 // Rectangles
 fun rectangle(p1: Point2D, p2: Point2D): Rectangle2D {
     val x = min(p1.x, p2.x)
@@ -112,12 +125,21 @@ val Rectangle2D.vertices get() = RectangleVertices(
 
 val Rectangle2D.outlines get() = vertices.outlines
 
+fun Rectangle2D.expandBy(vector: Point2D): Rectangle2D {
+    val (width, height) = width + vector.x to height + vector.y
+    val x = if (vector.x < 0) x - vector.x else x
+    val y = if (vector.y < 0) y - vector.y else y
+    return Rectangle2D.Double(x, y, width, height)
+}
+
 data class RectangleVertices(
         val topLeft: Point2D,
         val topRight: Point2D,
         val bottomLeft: Point2D,
         val bottomRight: Point2D
 )
+
+fun RectangleVertices.toList() = listOf(topLeft, topRight, bottomRight, bottomLeft)
 
 data class RectangleOutlines(val top: Line2D, val right: Line2D, val bottom: Line2D, val left: Line2D) {
     fun toList() = listOf(top, right, bottom, left)
@@ -176,5 +198,65 @@ operator fun Rectangle2D.component1() = x
 operator fun Rectangle2D.component2() = y
 operator fun Rectangle2D.component3() = width
 operator fun Rectangle2D.component4() = height
+
+val Rectangle2D.center get() = point(centerX, centerY)
+val Rectangle2D.topLeft get() = point(x, y)
+
+fun Rectangle2D.centerOn(point: Point2D) {
+    val (px, py) = point
+    setRect(px - width / 2, py - height / 2, width, height)
+}
+
+fun Rectangle2D.setTopLeftLocation(point: Point2D) {
+    val (x, y) = point
+    setRect(x, y, width, height)
+}
+
+fun Rectangle2D.setTopLeftLocation(x: Double, y: Double) {
+    setRect(x, y, width, height)
+}
+
+fun Rectangle2D.setSize(width: Double, height: Double) {
+    setRect(x, y, width, height)
+}
+
+operator fun Rectangle2D.plus(point: Point2D): Rectangle2D.Double {
+    return Rectangle2D.Double(x + point.x, y + point.y, width, height)
+}
+
+fun Point2D.withVector(vector: Point2D): Line2D = Line2D.Double(x, y, x + vector.x, y + vector.y)
+fun Point2D.withVector(u: Double, v: Double): Line2D = Line2D.Double(x, y, x + u, y + v)
+fun Point2D.withVector(u: Int, v: Int): Line2D = Line2D.Double(x, y, x + u, y + v)
+
+infix fun Point2D.cross(other: Point2D) = this.x * other.y - other.x * this.y
+
+sealed interface Intersection {
+    data class Time(val time: Double): Intersection
+    data class Point(val point: Point2D): Intersection
+    object Overlap : Intersection
+    object Empty: Intersection
+}
+
+
+fun Line2D.intersectionTime(other: Line2D): Intersection {
+    if (!this.intersectsLine(other)) {
+        return Intersection.Empty
+    }
+    val result = ((other.p1 - this.p1) cross other.vector) / (this.vector cross other.vector)
+    return when {
+        isNaN(result) -> Intersection.Overlap
+        else -> Intersection.Time(result)
+    }
+}
+
+fun Line2D.intersectionPoint(other: Line2D): Intersection {
+    return when (val t = intersectionTime(other)) {
+        is Intersection.Time -> Intersection.Point(scale(t.time))
+        else -> t
+    }
+}
+
+typealias Degree = Double
+typealias Radian = Double
 
 val sin60deg = sin(Math.toRadians(60.0))

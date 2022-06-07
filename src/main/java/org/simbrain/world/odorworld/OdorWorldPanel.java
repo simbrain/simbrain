@@ -370,7 +370,7 @@ public class OdorWorldPanel extends JPanel {
         EntityNode entityNode = getFirstSelectedEntityNode();
         if (entityNode != null) {
             OdorWorldEntity entity = entityNode.getEntity();
-            entity.manualMovementUpdate();
+            entity.applyMovement();
             entityNode.advance();
             centerCameraToSelectedEntity();
         }
@@ -634,16 +634,5 @@ public class OdorWorldPanel extends JPanel {
     private boolean getManualMovementState() {
         return manualMovementState > 0;
     }
-
-
-    void releaseManualMovement(OdorWorldEntity entity) {
-        if (!getManualMovementState()) {
-            entity.setManualMode(false);
-        }
-        if (!getManualMovementState("w") && !getManualMovementState("s")) {
-            entity.resetManualVelocity();
-        }
-    }
-
 
 }

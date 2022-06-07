@@ -98,36 +98,33 @@ val kAgentTrails = newSim {
     }
 
     val mouse = odorWorld.addEntity(EntityType.MOUSE).apply {
-        setLocation(204.0, 343.0)
+        location = point(204.0, 343.0)
         heading = 90.0
         addDefaultEffectors()
         addSensor(SmellSensor(this))
-        manualStraightMovementIncrement = 2.0
-        manualMotionTurnIncrement = 2.0
+        manualMovement.manualStraightMovementIncrement = 2.0
+        manualMovement.manualMotionTurnIncrement = 2.0
     }
 
     val (straightMovement, turnLeft, turnRight) = mouse.effectors
     val (smellSensors) = mouse.sensors
 
     val cheese = odorWorld.addEntity(EntityType.SWISS).apply {
-        val (x, y) = cheeseLocation
-        setLocation(x, y)
+        location = cheeseLocation
         smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0)).apply {
             this.dispersion = dispersion
         }
     }
 
     val flower = odorWorld.addEntity(EntityType.FLOWER).apply {
-        val (x, y) = flowerLocation
-        setLocation(x, y)
+        location = flowerLocation
         smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0)).apply {
             this.dispersion = dispersion
         }
     }
 
     val fish = odorWorld.addEntity(EntityType.FISH).apply {
-        val (x, y) = fishLocation
-        setLocation(x, y)
+        location = fishLocation
         smellSource = SmellSource(doubleArrayOf(0.0, 0.0, 1.0)).apply {
             this.dispersion = dispersion
         }
@@ -159,7 +156,7 @@ val kAgentTrails = newSim {
             fun positionMouse(location: Point2D) {
                 network.clearActivations()
                 val (x, y) = location
-                mouse.setLocation(x, y + dispersion)
+                mouse.location = point(x, y + dispersion)
                 mouse.heading = 90.0
                 straightNeuron.forceSetActivation(1.0)
                 // TODO: move to a location by iterating while not at location
@@ -179,7 +176,7 @@ val kAgentTrails = newSim {
             addButton("Cheese > Flower") {
                 network.clearActivations()
                 val (x, y) = cheeseLocation
-                mouse.setLocation(x, y + dispersion)
+                mouse.location = point(x, y + dispersion)
                 mouse.heading = 90.0
                 straightNeuron.forceSetActivation(1.0)
                 workspace.iterate(50)
@@ -192,7 +189,7 @@ val kAgentTrails = newSim {
             addButton("Cheese > Fish") {
                 network.clearActivations()
                 val (x, y) = cheeseLocation
-                mouse.setLocation(x, y + dispersion)
+                mouse.location = point(x, y + dispersion)
                 mouse.heading = 90.0
                 straightNeuron.forceSetActivation(1.0)
                 workspace.iterate(50)
@@ -204,23 +201,24 @@ val kAgentTrails = newSim {
             }
             addButton("Solar System") {
                 network.clearActivations()
-                cheese.velocityX = 2.05
-                cheese.velocityY = 2.05
-                flower.velocityX = 2.5
-                flower.velocityY = 2.1
-                fish.velocityX = -2.5
-                fish.velocityY = 1.05
+                // TODO: use polar
+                // cheese.dx = 2.05
+                // cheese.dy = 2.05
+                // flower.dx = 2.5
+                // flower.dy = 2.1
+                // fish.dx = -2.5
+                // fish.dy = 1.05
                 val (x, y) = cheeseLocation
-                mouse.setLocation(x, y + dispersion)
+                mouse.location = point(x, y + dispersion)
                 mouse.heading = 90.0
                 straightNeuron.forceSetActivation(0.0)
                 workspace.iterate(200)
-                cheese.velocityX = 0.0
-                cheese.velocityY = 0.0
-                flower.velocityX = 0.0
-                flower.velocityY = 0.0
-                fish.velocityX = 0.0
-                fish.velocityY = 0.0
+                // cheese.dx = 0.0
+                // cheese.dy = 0.0
+                // flower.dx = 0.0
+                // flower.dy = 0.0
+                // fish.dx = 0.0
+                // fish.dy = 0.0
             }
         }
 

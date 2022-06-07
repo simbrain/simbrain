@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.odorworld.sensors;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -27,6 +28,8 @@ import org.simbrain.world.odorworld.events.AttributeEvents;
 import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.simbrain.util.GeomKt.toRadian;
 
 /**
  * Interface for 2d world sensors.  Sensors have a position given in polar
@@ -222,21 +225,18 @@ public abstract class Sensor implements PeripheralAttribute {
      *
      * @return the sensor location
      */
-    public double[] getLocation() {
+    public Point2D getLocation() {
         updateRelativeLocation();
-        double[] ret = {relativeLocation.x, relativeLocation.y};
-        ret[0] += parent.getX();
-        ret[1] += parent.getY();
-        return ret;
+        return new Point2D.Double(relativeLocation.x, relativeLocation.y);
     }
 
     /**
      * Update the sensor {@link #relativeLocation} base on the heading of the entity.
      */
     public void updateRelativeLocation() {
-        double x =  (radius * Math.cos(parent.getHeadingRadians() + theta))
+        double x =  (radius * Math.cos(toRadian(parent.getHeading()) + theta))
             + parent.getEntityType().getImageWidth() / 2;
-        double y = -(radius * Math.sin(parent.getHeadingRadians() + theta))
+        double y = -(radius * Math.sin(toRadian(parent.getHeading()) + theta))
             + parent.getEntityType().getImageWidth() / 2;
         relativeLocation.setLocation(x, y);
     }
@@ -280,6 +280,17 @@ public abstract class Sensor implements PeripheralAttribute {
 
         public void setSensor(Sensor sensor) {
             this.sensor = sensor;
+        }
+
+        @Nullable
+        @Override
+        public String getName() {
+            return EditableObject.super.getName();
+        }
+
+        @Override
+        public void onCommit() {
+            EditableObject.super.onCommit();
         }
     }
 }

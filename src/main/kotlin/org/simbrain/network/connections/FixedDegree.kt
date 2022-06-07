@@ -94,9 +94,7 @@ class FixedDegree(
         return syns
     }
 
-    override fun getName(): String {
-        return "Fixed degree"
-    }
+    override val name = "Fixed degree"
 
     override fun toString(): String {
         return name

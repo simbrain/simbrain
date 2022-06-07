@@ -514,10 +514,10 @@ public class Creature {
         }
 
         // Calculate the target heading for the agent
-        double delta_x = agent.getCenterX() - targetObject.getCenterX();
-        double delta_y = agent.getCenterY() - targetObject.getCenterY();
-        double targetHeading = Math.toDegrees(Math.atan2(delta_y, delta_x));
-        targetHeading = ((targetHeading < 0) ? targetHeading + 360 : targetHeading);
+//        double delta_x = agent.getCenterX() - targetObject.getCenterX();
+//        double delta_y = agent.getCenterY() - targetObject.getCenterY();
+//        double targetHeading = Math.toDegrees(Math.atan2(delta_y, delta_x));
+//        targetHeading = ((targetHeading < 0) ? targetHeading + 360 : targetHeading);
 
         // System.out.println(targetHeading + "," + agent.getHeading());
 
@@ -525,11 +525,11 @@ public class Creature {
         // TODO :Heading update feels unnatural. Maybe use braitenberg method instead,
         // or else improve this
         double stepSize = baseMovementStepSize * motionAmount;
-        double newX = agent.getCenterX() + stepSize * (targetObject.getX() - agent.getCenterX());
-        double newY = agent.getCenterY() + stepSize * (targetObject.getY() - agent.getCenterY());
-        double newHeading = agent.getHeading() + .1 * (targetHeading - agent.getHeading());
-        agent.setCenterLocation((float) newX, (float) newY);
-        agent.setHeading(newHeading);
+//        double newX = agent.getCenterX() + stepSize * (targetObject.getX() - agent.getCenterX());
+//        double newY = agent.getCenterY() + stepSize * (targetObject.getY() - agent.getCenterY());
+//        double newHeading = agent.getHeading() + .1 * (targetHeading - agent.getHeading());
+//        agent.setCenterLocation((float) newX, (float) newY);
+//        agent.setHeading(newHeading);
 
     }
 
@@ -647,7 +647,7 @@ public class Creature {
 
     // Was not here before last pull
     public void setAgentLocation(float x, float y) {
-        agent.setCenterLocation(x, y);
+//        agent.setCenterLocation(x, y);
     }
 
     // Was not here before last pull

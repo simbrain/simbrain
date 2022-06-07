@@ -110,17 +110,18 @@ val evolveAvoider = newSim {
             }
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
-                setCenterLocation(200.0, 200.0)
+                location = point(200.0, 200.0)
             }
 
             fun OdorWorldEntity.reset() {
-                setCenterLocation(random.nextDouble()*300,random.nextDouble()*300)
+                location = point(random.nextDouble()*300,random.nextDouble()*300)
             }
 
             fun addPoison() = odorworld.addEntity(EntityType.POISON).apply {
-                setCenterLocation(random.nextDouble()*300,random.nextDouble()*300)
-                velocityX = random.nextDouble(-5.0,5.0)
-                velocityY = random.nextDouble(-5.0,5.0)
+                location = point(random.nextDouble()*300,random.nextDouble()*300)
+                // TODO: use polar
+                // dx = random.nextDouble(-5.0,5.0)
+                // dy = random.nextDouble(-5.0,5.0)
                 onCollide {
                     if (it === mouse) reset()
                 }

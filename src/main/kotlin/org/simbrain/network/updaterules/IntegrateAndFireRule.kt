@@ -200,6 +200,8 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
                 "Activation (Membrane Potential): ${round(neuron.activation, 3)}"
     }
 
+    override val name = "Integrate and Fire"
+
     override fun getRandomValue(): Double {
         // Equal chance of spiking or not spiking, taking on any value between
         // the resting potential and the threshold if not.
@@ -220,10 +222,6 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
     override fun setNoiseGenerator(noise: ProbabilityDistribution) {
         noiseGenerator = noise
-    }
-
-    override fun getName(): String {
-        return "Integrate and Fire"
     }
 
     // An alternative here would be to have reset potential be the zero point

@@ -244,9 +244,7 @@ class RadialGaussian(
     //     }
     // }
 
-    override fun getName(): String {
-        return "Radial (Gaussian)"
-    }
+    override val name = "Radial (Gaussian)"
 }
 
 fun connectRadialPolarized(

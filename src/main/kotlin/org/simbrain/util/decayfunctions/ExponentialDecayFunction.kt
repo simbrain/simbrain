@@ -32,9 +32,7 @@ class ExponentialDecayFunction @JvmOverloads constructor(dispersion: Double = 70
             }
     }
 
-    override fun getName(): String {
-        return "Gaussian"
-    }
+    override val name = "Gaussian"
 
     // Kotlin hack to support "static method in superclass"
     companion object {

@@ -49,9 +49,7 @@ class AdaDeltaWrapper() : OptimizerWrapper() {
         return AdaDeltaWrapper()
     }
 
-    override fun getName(): String {
-        return "AdaDelta"
-    }
+    override val name = "AdaDelta"
 
 }
 
@@ -70,9 +68,7 @@ class AdaGradWrapper() : OptimizerWrapper() {
         return AdaGradWrapper()
     }
 
-    override fun getName(): String {
-        return "AdaGrad"
-    }
+    override val name = "AdaGrad"
 }
 
 
@@ -98,9 +94,7 @@ class AdaGradaWrapper() : OptimizerWrapper() {
         return AdaGradaWrapper()
     }
 
-    override fun getName(): String {
-        return "AdaGradDA"
-    }
+    override val name = "AdaGradDA"
 }
 
 
@@ -134,9 +128,7 @@ class AdamWrapper() : OptimizerWrapper() {
         return AdamWrapper()
     }
 
-    override fun getName(): String {
-        return "Adam"
-    }
+    override val name = "Adam"
 
     // Kotlin hack to support "static method in superclass"
     companion object {
@@ -171,9 +163,7 @@ class AdamaxWrapper() : OptimizerWrapper() {
         return AdamaxWrapper()
     }
 
-    override fun getName(): String {
-        return "Adamax"
-    }
+    override val name = "Adamax"
 }
 
 
@@ -202,9 +192,7 @@ class FtrlWrapper() : OptimizerWrapper() {
         return FtrlWrapper()
     }
 
-    override fun getName(): String {
-        return "Ftrl"
-    }
+    override val name = "Ftrl"
 }
 
 class MomentumWrapper() : OptimizerWrapper() {
@@ -226,9 +214,7 @@ class MomentumWrapper() : OptimizerWrapper() {
         return MomentumWrapper()
     }
 
-    override fun getName(): String {
-        return "Momentum"
-    }
+    override val name = "Momentum"
 }
 
 class RMSPropWrapper() : OptimizerWrapper() {
@@ -250,9 +236,7 @@ class RMSPropWrapper() : OptimizerWrapper() {
         return RMSPropWrapper()
     }
 
-    override fun getName(): String {
-        return "RMSProp"
-    }
+    override val name = "RMSProp"
 }
 
 class SGDWrapper() : OptimizerWrapper() {
@@ -268,9 +252,7 @@ class SGDWrapper() : OptimizerWrapper() {
         return SGDWrapper()
     }
 
-    override fun getName(): String {
-        return "SGD"
-    }
+    override val name = "SGD"
 
 
     // Kotlin hack to support "static method in superclass"

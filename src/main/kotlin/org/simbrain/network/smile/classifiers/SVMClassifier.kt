@@ -37,9 +37,7 @@ class SVMClassifier(): ClassifierWrapper() {
         }
     }
 
-    override fun getName(): String {
-        return "Support Vector Machine"
-    }
+    override val name = "Support Vector Machine"
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         model = SVM.fit(inputs, targets, PolynomialKernel(kernelDegree), C, tolerance)

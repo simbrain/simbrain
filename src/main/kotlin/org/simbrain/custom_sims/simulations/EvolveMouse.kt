@@ -77,11 +77,11 @@ val evolveMouse = newSim {
             }
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
-                setCenterLocation(50.0, 200.0)
+                location = point(50.0, 200.0)
             }
 
             fun createCheese() = odorworld.addEntity(EntityType.SWISS).apply {
-                setCenterLocation(
+                location = point(
                     random.nextDouble(100.0, 300.0),
                     random.nextDouble(0.0, 300.0)
                 )
@@ -128,7 +128,7 @@ val evolveMouse = newSim {
 
                 cheeses.forEach { cheese ->
                     cheese.onCollide {
-                        cheese.setCenterLocation(
+                        cheese.location = point(
                             random.nextDouble(100.0, 300.0),
                             random.nextDouble(0.0, 300.0)
                         )

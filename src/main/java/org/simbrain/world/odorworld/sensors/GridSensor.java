@@ -176,8 +176,8 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @Override
     public void update() {
         values = new double[columns * rows];
-        int gridX = (int) (getLocation()[0] / width - x);
-        int gridY = (int) (getLocation()[1] / height - y);
+        int gridX = (int) (getLocation().getX() / width - x);
+        int gridY = (int) (getLocation().getY() / height - y);
         if (gridX < columns && gridY < rows && gridX >= 0 && gridY >= 0) {
             values[gridX + gridY * rows] = DEFAULT_ACTIVATION;
         }

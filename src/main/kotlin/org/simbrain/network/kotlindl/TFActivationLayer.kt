@@ -2,7 +2,6 @@ package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.layer.core.ActivationLayer
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.simbrain.util.UserParameter
 
 /**
@@ -23,9 +22,7 @@ class TFActivationLayer(val size: Int = 5) : TFLayer<ActivationLayer>() {
         }
     }
 
-    override fun getName(): String {
-        return "Activation layer"
-    }
+    override val name = "Activation layer"
 
     companion object {
         @JvmStatic

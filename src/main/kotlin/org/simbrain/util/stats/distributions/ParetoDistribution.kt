@@ -60,9 +60,7 @@ class ParetoDistribution(shape: Double = 3.0, scale: Double = 1.0, negate: Boole
         return copy
     }
 
-    override fun getName(): String {
-        return "Pareto"
-    }
+    override val name = "Pareto"
 
     // Kotlin hack to support "static method in superclass"
     companion object {

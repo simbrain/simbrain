@@ -75,7 +75,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     public BumpSensor(OdorWorldEntity parent, double baseValue) {
         super(parent, "Bump Sensor" + baseValue);
         this.baseValue = baseValue;
-        this.world = parent.getParentWorld();
+        this.world = parent.getWorld();
     }
 
     /**
@@ -126,11 +126,11 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
         if (world == null) {
             world = parent.getParentWorld();
         }
-        for (OdorWorldEntity e : world.getEntityList()) {
-            if (e != parent && e.getCollisionBound().collide(this.collisionBound)) {
-                return true;
-            }
-        }
+//        for (OdorWorldEntity e : world.getEntityList()) {
+//            if (e != parent && e.getCollisionBound().collide(this.collisionBound).stream().anyMatch(it -> it)) {
+//                return true;
+//            }
+//        }
         return false;
     }
 
@@ -138,11 +138,11 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
      * Update the {@link #collisionBound} base on the updated location of this sensor.
      */
     public void updateCollisionBound() {
-        collisionBound.setVelocity(parent.getVelocityX(), parent.getVelocityY());
-        collisionBound.setLocation(
-                getRelativeLocation().getX() + parent.getX(),
-                getRelativeLocation().getY() + parent.getY()
-        );
+//        collisionBound.setVelocity(parent.getVelocityX(), parent.getVelocityY());
+//        collisionBound.setLocation(
+//                getRelativeLocation().getX() + parent.getX(),
+//                getRelativeLocation().getY() + parent.getY()
+//        );
     }
 
     @Override

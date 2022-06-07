@@ -56,7 +56,7 @@ abstract class ProbabilityDistribution() : CopyableObject {
 
     abstract fun deepCopy(): ProbabilityDistribution
 
-    abstract override fun getName(): String
+    abstract override val name: String
 
     override fun toString() = name
 
@@ -104,9 +104,7 @@ abstract class ProbabilityDistribution() : CopyableObject {
         fun sampleDouble(): Double = probabilityDistribution.sampleDouble()
         fun sampleInt(): Int = probabilityDistribution.sampleInt()
 
-        override fun getName(): String {
-            return "Randomizer"
-        }
+        override val name = "Randomizer"
     }
 
 }

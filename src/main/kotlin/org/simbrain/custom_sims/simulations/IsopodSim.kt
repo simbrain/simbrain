@@ -124,8 +124,8 @@ val isopodSim = newSim {
                 theta = -Math.PI / 4
                 addSensor(this)
             }
-            manualStraightMovementIncrement = 2.0
-            manualMotionTurnIncrement = 2.0
+            manualMovement.manualStraightMovementIncrement = 2.0
+            manualMovement.manualMotionTurnIncrement = 2.0
         }
 
         fun addFish(x: Int, y: Int) {
@@ -147,7 +147,7 @@ val isopodSim = newSim {
         addFish(590, 10)
 
         workspace.addUpdateAction(updateAction("Track location") {
-            trialData.add(isopod.location);
+//            trialData.add(isopod.location);
         })
 
     }

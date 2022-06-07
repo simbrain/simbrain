@@ -65,6 +65,13 @@ open class Event(private val changeSupport: PropertyChangeSupport) {
     }
 
     /**
+     * No-argument event handler.
+     */
+    protected fun String.event(handler: () -> Unit) {
+        event(Runnable { handler() })
+    }
+
+    /**
      * Handle a "new object" event, e.g. adding a neuron.
      */
     @Suppress("UNCHECKED_CAST")

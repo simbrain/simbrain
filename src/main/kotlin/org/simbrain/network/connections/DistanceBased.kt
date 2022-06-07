@@ -55,13 +55,10 @@ class DistanceBased (
     }
 
     override fun toString(): String {
-        return getName()
+        return name
     }
 
-
-    override fun getName(): String {
-        return "Distance Based"
-    }
+    override val name = "Distance Based"
 }
 
 fun connectRadial (

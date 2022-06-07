@@ -50,8 +50,6 @@ class TwoValued(
         return copy
     }
 
-    override fun getName(): String {
-        return "Two valued"
-    }
+    override val name = "Two valued"
 
 }

@@ -62,9 +62,7 @@ class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0, negate: Boolea
         return copy
     }
 
-    override fun getName(): String {
-        return "Gamma"
-    }
+    override val name = "Gamma"
 
     // Kotlin hack to support "static method in superclass"
     companion object {

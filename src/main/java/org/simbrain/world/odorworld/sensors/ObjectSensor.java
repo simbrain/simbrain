@@ -121,7 +121,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
                 double scaleFactor = decayFunction.getScalingFactor(
                     SimbrainMath.distance(
                         getLocation(),
-                        new double[]{entity.getCenterX(), entity.getCenterY()}
+                        entity.getLocation()
                     ));
                 value += baseValue * scaleFactor;
             }

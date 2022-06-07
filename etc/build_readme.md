@@ -4,13 +4,18 @@ Simbrain apps are bundled with a JVM (the one used to build the distribution). U
 
 Note that all simulations are now stored inside the local application directory (the directory that contains the application itself). 
 
+Certificates were obtained from UC Merced IT.
+
+To activate console run jpackage with the -win-console command
+
 Additional information about the builds are in comments to the build files referenced below.
 ## Mac build process
 - `ant build` 
 - `etc/make_app.sh`
 - dmg produced in `dist`
 
-## PC build process
+<!-- UPDTAE BELOW BASED ON NEW SCRIPT -->
+## PC build process 
 - `ant build`
 - `etc/make_app.bat`
 - .exe installer produced in `dist`

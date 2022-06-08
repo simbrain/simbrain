@@ -132,12 +132,13 @@ class WorkspaceUpdater(val workspace: Workspace) {
     /**
      * Iterate a set number of iterations.
      *
+     * Optional finishing task is run after main iteration finishes.
      *
      * See [Workspace.iterate]
      *
      * @param numIterations the number of iterations to update
      */
-    suspend fun iterate(numIterations: Int) {
+    suspend fun iterate(numIterations: Int, finishingTask: () -> Unit = {}) {
         isRunning = true
         for (wc in workspace.componentList) {
             wc.isRunning = true
@@ -149,6 +150,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             }
         }
         isRunning = false
+        finishingTask()
         for (component in workspace.componentList) {
             component.isRunning = false
         }

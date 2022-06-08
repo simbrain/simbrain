@@ -163,8 +163,9 @@ val kAgentTrails = newSim {
                 mouse.heading = 90.0
                 straightNeuron.forceSetActivation(1.0)
                 // TODO: move to a location by iterating while not at location
-                workspace.iterate((4 * dispersion).toInt())
-                straightNeuron.forceSetActivation(0.0)
+                workspace.iterate((4 * dispersion).toInt()) {
+                    straightNeuron.forceSetActivation(0.0)
+                }
             }
 
             addButton("Cheese") {
@@ -182,12 +183,16 @@ val kAgentTrails = newSim {
                 mouse.setLocation(x, y + dispersion)
                 mouse.heading = 90.0
                 straightNeuron.forceSetActivation(1.0)
-                workspace.iterate(50)
-                rightNeuron.forceSetActivation(1.5)
-                workspace.iterate(25)
-                rightNeuron.forceSetActivation(0.0)
-                workspace.iterate(220)
-                straightNeuron.forceSetActivation(0.0)
+                // TODO: This is temporary until workspace.iterate is fixed
+                workspace.iterate(50) {
+                    rightNeuron.forceSetActivation(1.5)
+                    workspace.iterate(25) {
+                        rightNeuron.forceSetActivation(0.0)
+                        workspace.iterate(220) {
+                            straightNeuron.forceSetActivation(0.0)
+                        }
+                    }
+                }
             }
             addButton("Cheese > Fish") {
                 network.clearActivations()
@@ -195,12 +200,15 @@ val kAgentTrails = newSim {
                 mouse.setLocation(x, y + dispersion)
                 mouse.heading = 90.0
                 straightNeuron.forceSetActivation(1.0)
-                workspace.iterate(50)
-                leftNeuron.forceSetActivation(1.5)
-                workspace.iterate(25)
-                leftNeuron.forceSetActivation(0.0)
-                workspace.iterate(220)
-                straightNeuron.forceSetActivation(0.0)
+                workspace.iterate(50) {
+                    leftNeuron.forceSetActivation(1.5)
+                    workspace.iterate(25) {
+                        leftNeuron.forceSetActivation(0.0)
+                        workspace.iterate(220) {
+                            straightNeuron.forceSetActivation(0.0)
+                        }
+                    }
+                }
             }
             addButton("Solar System") {
                 network.clearActivations()

@@ -215,22 +215,18 @@ class Workspace @JvmOverloads constructor(@Transient val coroutineScope: Corouti
     }
 
     /**
-     * Iterated for a specified number of iterations using a latch. Used in
-     * scripts when making a series of events occur, e.g. set some neurons, run
-     * for 50 iterations, set some other neurons, run 20 iterations, etc.
+     * Iterate for a specified number of iterations. Block until all iterations are complete then
+     * run an optional finishing task.
      *
-     * Forces desktop to render between iterations. For headless simulations suggest
-     * using [.simpleIterate].
-     *
-     * @param numIterations the number of iteration to run while waiting on the
-     * latch.
+     * TODO: This is a temporary solution until suspend functions are used here
      */
-    fun iterate(numIterations: Int) {
+    @JvmOverloads
+    fun iterate(numIterations: Int, finishingTask: () -> Unit = {}) {
         for (wc in componentList) {
             wc.start()
         }
         coroutineScope.launch {
-            updater.iterate(numIterations)
+            updater.iterate(numIterations, finishingTask)
         }
         stop()
     }

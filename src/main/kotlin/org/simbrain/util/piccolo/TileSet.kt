@@ -96,7 +96,7 @@ class TileSet(
      * and later when the tiles are access, they will be store into the [.idTileMap].
      */
     @XStreamImplicit
-    private val tiles: MutableList<Tile> = mutableListOf(Tile(2).apply { label = "Water1"})
+    private var tiles: MutableList<Tile> = mutableListOf()
 
     /**
      * A map from tile ids to tiles for fast lookup.
@@ -162,6 +162,9 @@ class TileSet(
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private fun readResolve(): Any {
+        if (tiles == null) {
+            tiles = mutableListOf()
+        }
         initTileMaps()
         return this
     }

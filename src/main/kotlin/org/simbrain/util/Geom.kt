@@ -237,15 +237,18 @@ sealed interface Intersection {
     object Empty: Intersection
 }
 
-
-fun Line2D.intersectionTime(other: Line2D): Intersection {
+fun Line2D.intersectionTime(other: Line2D, inclusive: Boolean = true): Intersection {
     if (!this.intersectsLine(other)) {
         return Intersection.Empty
     }
     val result = ((other.p1 - this.p1) cross other.vector) / (this.vector cross other.vector)
     return when {
         isNaN(result) -> Intersection.Overlap
-        else -> Intersection.Time(result)
+        else -> if (inclusive || (result != 0.0 && result != 1.0)) {
+            Intersection.Time(result)
+        } else {
+            Intersection.Empty
+        }
     }
 }
 

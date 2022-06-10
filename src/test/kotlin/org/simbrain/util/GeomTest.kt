@@ -64,4 +64,12 @@ class GeomTest {
         val intersection = line1.intersectionTime(line2)
         assertEquals(Intersection.Empty, intersection)
     }
+
+    @Test
+    internal fun `p(0, 0)v(1, 0) and p(0, 0)v(0, 1) should not be considered intersecting`() {
+        val line1 = point(0, 0).withVector(1, 0)
+        val line2 = point(1, 0).withVector(0, -1)
+        val intersection = line1.intersectionTime(line2, inclusive = false)
+        assertEquals(Intersection.Empty, intersection)
+    }
 }

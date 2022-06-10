@@ -31,9 +31,7 @@ import org.simbrain.world.odorworld.events.EntityLocationEvent
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.Sensor
-import java.awt.geom.Line2D
 import java.awt.geom.Point2D
-import java.awt.geom.Rectangle2D
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -92,10 +90,6 @@ interface WithSize {
     var width: Double
     var height: Double
     var size: Point2D
-}
-
-class Size(override var width: Double, override var height: Double) : WithSize {
-    override var size: Point2D
         get() = point(width, height)
         set(value) {
             val (w, h) = value
@@ -104,7 +98,25 @@ class Size(override var width: Double, override var height: Double) : WithSize {
         }
 }
 
-interface Bound : Locatable, WithSize
+class Size(override var width: Double, override var height: Double) : WithSize
+
+interface Bounded: WithSize {
+    val x: Double
+    val y: Double
+    val location: Point2D
+    val inverted: Boolean get() = false
+}
+
+class Bound(
+    override val x: Double,
+    override val y: Double,
+    override var width: Double,
+    override var height: Double,
+    override val inverted: Boolean = false
+) : Bounded {
+    override val location: Point2D
+        get() = point(x, y)
+}
 
 interface Movable {
     var speed: Double
@@ -182,7 +194,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     AttributeContainer,
     Locatable by Location(events),
     Movable,
-    WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bound {
+    WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bounded {
 
     @Deprecated("Use location")
     val centerLocation: Point2D get() = location
@@ -243,56 +255,51 @@ class OdorWorldEntity @JvmOverloads constructor(
             heading += dtheta
         }
 
-        val box = Rectangle2D.Double(x, y, width, height)
-
         val dx = cos(heading.toRadian()) * speed
         val dy = -sin(heading.toRadian()) * speed
 
-        val bounds = (world.entityList + listOf(object : Bound {
-            override var x: Double = 0.0
-            override var y: Double = 0.0
-            override var heading = 0.0
-            override var location = point(x, y)
-            override var width = world.width.toDouble()
-            override var height = world.height.toDouble()
-            override var size = point(width, height)
+        val worldBound = Bound(0.0, 0.0, world.width.toDouble(), world.height.toDouble(), inverted = true)
 
-        }))
-            .filter { it !== this }
-            .map { with(it) { Rectangle2D.Double(x, y, width, height) } }
+        val bounds = (world.entityList + worldBound).filter { it !== this }
 
-        val boundLines = bounds.flatMap { it.outlines.toList() }
-        val boundVertices = bounds.flatMap { it.vertices.toList() }
+        val moveInX = Bound(x + dx, y, width, height)
 
-        fun List<Pair<Line2D, Line2D>>.maximumTime() = map { (a, b) -> a.intersectionTime(b) }
-            .filterIsInstance<Intersection.Time>()
-            .map { it.time }
-            .minByOrNull { it } ?: 1.0
+        fun Bounded.intersect(other: Bounded): Pair<Double, Double> {
+            val a = this
+            val b = other
 
-        val moveInX = Rectangle2D.Double(x, y, width, height)
-            .vertices
-            .toList()
-            .map { point(it.x, it.y).withVector(point(dx, 0.0)) }
-        val xt = (boundLines cartesianProduct moveInX).maximumTime()
+            val xCollision = min((a.x + a.width) - b.x, (b.x + b.width) - a.x)
+            val yCollision = min((a.y + a.height) - b.y, (b.y + b.height) - a.y)
 
-        val boundsWithDx = boundVertices.map { it.withVector(point(-dx, 0.0)) }
-        val xt2 = (boundsWithDx cartesianProduct box.outlines.toList()).maximumTime()
+            return xCollision to yCollision
+        }
 
-        val landingSpotX = location + point(dx * min(xt, xt2), 0.0)
-        val (xdx, ydx) = landingSpotX
+        val directionX = if (dx > 0) 1 else -1
+        val directionY = if (dy > 0) 1 else -1
 
-        val moveInY = Rectangle2D.Double(xdx, ydx, width, height)
-            .vertices
-            .toList()
-            .map { point(it.x, it.y).withVector(point(0.0, dy)) }
-        val yt = (boundLines cartesianProduct moveInY).maximumTime()
+        val distanceXShortenBy = bounds.filter {
+            !it.inverted
+        }.map {
+            moveInX.intersect(it)
+        }.filter { (x, y) ->
+            x > 0 && y > 0
+        }.minOfOrNull { (x) ->
+            x
+        } ?: 0.0
 
-        val boundsWithDy = boundVertices.map { it.withVector(point(0.0, -dy)) }
-        val yt2 = (boundsWithDy cartesianProduct box.outlines.toList()).maximumTime()
+        val moveInY = Bound(x + (dx - distanceXShortenBy * directionX), y + dy, width, height)
 
-        val landingSpotXY = landingSpotX + point(0.0, dy * min(yt, yt2))
+        val distanceYShortenBy = bounds.filter {
+            !it.inverted
+        }.map {
+            moveInY.intersect(it)
+        }.onEach { println(it) }.filter { (x, y) ->
+            x > 0 && y > 0
+        }.minOfOrNull { (_, y) ->
+            y
+        } ?: 0.0
 
-        location = landingSpotXY
+        location = point(x + (dx - distanceXShortenBy * directionX), y + (dy - distanceYShortenBy * directionY))
 
     }
 
@@ -354,7 +361,7 @@ class OdorWorldEntity @JvmOverloads constructor(
         addEffector(Turning(this, Turning.RIGHT))
     }
 
-    fun onCollide(block: (other: Bound) -> Unit) {
+    fun onCollide(block: (other: Bounded) -> Unit) {
 
     }
 

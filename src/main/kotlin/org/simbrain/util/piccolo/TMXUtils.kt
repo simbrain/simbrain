@@ -8,6 +8,7 @@ import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldResourceManager
 import java.awt.*
 import java.awt.event.MouseEvent
@@ -19,13 +20,6 @@ import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
 
 val zeroTile by lazy { Tile(0) }
-
-val XStream
-    get() = Utils.getSimbrainXStream()!!.apply {
-        processAnnotations(TileMap::class.java)
-        registerConverter(
-            TiledDataConverter(mapper, reflectionProvider))
-    }
 
 val missingTexture by lazy { OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png") }
 
@@ -46,7 +40,7 @@ fun transparentTexture(width: Int, height: Int) = transparentImage(width, height
  * @return the tilemap object from the given file
  */
 fun loadTileMap(file: File?): TileMap {
-    return XStream.fromXML(file) as TileMap
+    return OdorWorldComponent.getOdorWorldXStream().fromXML(file) as TileMap
 }
 
 /**
@@ -57,7 +51,7 @@ fun loadTileMap(file: File?): TileMap {
  * @return the tilemap object from the given file
  */
 fun loadTileMap(filename: String): TileMap {
-    return XStream.fromXML(
+    return OdorWorldComponent.getOdorWorldXStream().fromXML(
         OdorWorldResourceManager.getFileURL("tilemap" + File.separator + filename)
     ) as TileMap
 }

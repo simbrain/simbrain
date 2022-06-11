@@ -19,10 +19,13 @@
 package org.simbrain.world.odorworld;
 
 import com.thoughtworks.xstream.XStream;
-import org.simbrain.util.piccolo.TMXUtils;
+import org.simbrain.util.Utils;
+import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.util.piccolo.TiledDataConverter;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.OdorWorldEntityConverter;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -84,28 +87,29 @@ public class OdorWorldComponent extends WorkspaceComponent {
 
     }
 
+    public static XStream getOdorWorldXStream() {
+        XStream xstream = Utils.getSimbrainXStream();
+        xstream.processAnnotations(TileMap.class);
+        xstream.registerConverter(new TiledDataConverter(xstream.getMapper(), xstream.getReflectionProvider()));
+        xstream.registerConverter(new OdorWorldEntityConverter(xstream.getMapper(), xstream.getReflectionProvider()));
+        return xstream;
+    }
+
     @Override
     public String getXML() {
-        XStream xstream = TMXUtils.getXStream();
-        return xstream.toXML(world);
+        return getOdorWorldXStream().toXML(world);
     }
 
     @Override
     public void save(OutputStream output, String format) {
-        XStream xstream = TMXUtils.getXStream();
-        xstream.toXML(world, output);
+        getOdorWorldXStream().toXML(world, output);
     }
 
     /**
      * Recreates an instance of this class from a saved component.
-     *
-     * @param input
-     * @param name
-     * @param format
-     * @return
      */
     public static OdorWorldComponent open(InputStream input, String name, String format) {
-        XStream xstream = TMXUtils.getXStream();
+        XStream xstream = getOdorWorldXStream();
         OdorWorld newWorld = (OdorWorld) xstream.fromXML(input);
         return new OdorWorldComponent(name, newWorld);
     }

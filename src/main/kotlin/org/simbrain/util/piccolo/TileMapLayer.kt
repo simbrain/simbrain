@@ -13,8 +13,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import com.thoughtworks.xstream.mapper.Mapper
 import org.piccolo2d.nodes.PImage
-import org.simbrain.network.NetworkModel
-import org.simbrain.network.core.Network
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -164,7 +162,7 @@ class TileMapLayerData(val gidMatrix: MutableList<MutableList<Int>>) {
 }
 
 /**
- * Custom serializer that stores [Network.networkModels], which is a map, as a flat list of [NetworkModel]s.
+ * Custom serializer using reflection converter, which allows constructor calls.
  */
 class TiledDataConverter(mapper: Mapper, reflectionProvider: ReflectionProvider) :
     ReflectionConverter(mapper, reflectionProvider, TileMapLayerData::class.java) {

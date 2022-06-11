@@ -18,6 +18,11 @@
  */
 package org.simbrain.world.odorworld.entities
 
+import com.thoughtworks.xstream.converters.UnmarshallingContext
+import com.thoughtworks.xstream.converters.reflection.ReflectionConverter
+import com.thoughtworks.xstream.converters.reflection.ReflectionProvider
+import com.thoughtworks.xstream.io.HierarchicalStreamReader
+import com.thoughtworks.xstream.mapper.Mapper
 import org.simbrain.util.*
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.propertyeditor.EditableObject
@@ -35,6 +40,8 @@ import java.awt.geom.Point2D
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.javaType
 
 interface Locatable {
     var x: Double
@@ -43,7 +50,7 @@ interface Locatable {
     var location: Point2D
 }
 
-class Location(private val event: EntityLocationEvent) : Locatable {
+class Location(@Transient private val event: EntityLocationEvent) : Locatable {
     private var dirty = false
 
     @UserParameter(label = "X", description = "X Position", useSetter = true, order = 3)
@@ -188,7 +195,8 @@ class OdorWorldEntity @JvmOverloads constructor(
     val world: OdorWorld,
     @UserParameter(label = "Type", order = 2)
     var entityType: EntityType = EntityType.SWISS,
-    val events: EntityEvents = EntityEvents(),
+    @Transient
+    var events: EntityEvents = EntityEvents(),
 ) :
     EditableObject,
     AttributeContainer,
@@ -197,7 +205,8 @@ class OdorWorldEntity @JvmOverloads constructor(
     WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bounded {
 
     @Deprecated("Use location")
-    val centerLocation: Point2D get() = location
+    val centerLocation: Point2D
+        get() = location
 
     @get:JvmName("isSensorsEnabled")
     var sensorsEnabled: Boolean = true
@@ -447,6 +456,21 @@ class OdorWorldEntity @JvmOverloads constructor(
         set(value) {
             movement.dtheta = value
         }
+
+    /**
+     * Perform initialization of objects after de-serializing.
+     */
+    fun readResolve(): Any {
+        events = EntityEvents()
+
+        // motionEventListeners = ArrayList()
+        // collisionEventHandlers = ArrayList()
+        // currentlyHeardPhrases = ArrayList()
+        sensors.forEach { it.postSerializationInit() }
+        effectors.forEach { it.postSerializationInit() }
+        return this
+    }
+
 }
 
 ///**
@@ -1357,3 +1381,53 @@ class OdorWorldEntity @JvmOverloads constructor(
 //        private const val WHISKER_ANGLE = Math.PI / 4
 //    }
 //}
+
+
+// TODO: Temporary initial work on a converter
+class OdorWorldEntityConverter(mapper: Mapper, reflectionProvider: ReflectionProvider) :
+    ReflectionConverter(mapper, reflectionProvider, OdorWorldEntity::class.java) {
+
+    @OptIn(ExperimentalStdlibApi::class)
+    override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
+        //TODO: Guarantee order
+        reader.moveDown()
+        val world = context.convertAnother(reader, OdorWorld::class.java) as OdorWorld
+        reader.moveUp()
+        reader.moveDown()
+        val type = context.convertAnother(reader, EntityType::class.java) as EntityType
+        reader.moveUp()
+        val entity = OdorWorldEntity(world, type, EntityEvents())
+        // Set the rest of the fields by reflection
+
+        // TODO: XStreamUtils
+        val fieldMap = entity::class.declaredMemberProperties.associateBy { it.name }
+        while (reader.hasMoreChildren()) {
+            reader.moveDown()
+            if (reader.nodeName.startsWith("_-_-delegate")) {
+                while (reader.hasMoreChildren()) {
+                    reader.moveDown()
+                    val currentField = if (fieldMap[reader.nodeName] == null) {
+                        reader.moveUp()
+                        continue
+                    } else {
+                        fieldMap[reader.nodeName]
+                    }
+                    val fieldValue = context.convertAnother(reader.value, null)
+                    // currentField?.set(entity, fieldValue)
+                    reader.moveUp()
+                }
+                continue
+            }
+            val currentField = if (fieldMap[reader.nodeName] == null) {
+                reader.moveUp()
+                continue
+            } else {
+                fieldMap[reader.nodeName]
+            }
+            val fieldValue = context.convertAnother(reader.value, currentField?.returnType?.javaType as Class<*>?)
+            // currentField?.(entity, fieldValue)
+            reader.moveUp()
+        }
+        return entity
+    }
+}

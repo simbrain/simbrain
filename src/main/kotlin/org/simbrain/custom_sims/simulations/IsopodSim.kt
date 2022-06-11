@@ -133,7 +133,7 @@ val isopodSim = newSim {
                 smellSource = SmellSource.createScalarSource(1).apply {
                     dispersion = 300.0
                 }
-                onCollide {
+                events.onCollided {
                     fishCollision = true
                     // TODO: Magic numbers for fish collision
                     trialData.add(doubleArrayOf(-1.0, 1.0))

@@ -301,24 +301,29 @@ class OdorWorldEntity @JvmOverloads constructor(
         val moveInX = Bound(x + dx, y, width, height)
 
         val distanceXShortenBy = bounds
-            .map { moveInX.intersect(it) }
-            .filter { it.intersect }
-            .minOfOrNull { it.dx } ?: 0.0
+                .associateWith { moveInX.intersect(it) }
+                .filter { it.value.intersect }
+                .minByOrNull { it.value.dx }
+                ?.apply { events.fireCollided(key) }?.value?.dx ?: 0.0
 
         val moveInY = Bound(x + (dx - distanceXShortenBy * directionX), y + dy, width, height)
 
         val distanceYShortenBy = bounds
-            .map { moveInY.intersect(it) }
-            .filter { it.intersect }
-            .minOfOrNull { it.dy } ?: 0.0
+            .associateWith { moveInY.intersect(it) }
+            .filter { it.value.intersect }
+            .minByOrNull { it.value.dy }
+            ?.apply { events.fireCollided(key) }?.value?.dy ?: 0.0
 
         val newX = x + (dx - distanceXShortenBy * directionX)
         val newY = y + (dy - distanceYShortenBy * directionY)
 
-        val maxXLocation = (worldBound.width - width)
-        val maxYLocation = (worldBound.height - height)
-
-        location = point((newX + maxXLocation) % maxXLocation, (newY + maxYLocation) % maxYLocation)
+        location = if (world.wrapAround) {
+            val maxXLocation = (worldBound.width - width)
+            val maxYLocation = (worldBound.height - height)
+            point((newX + maxXLocation) % maxXLocation, (newY + maxYLocation) % maxYLocation)
+        } else {
+            point(newX, newY)
+        }
 
     }
 

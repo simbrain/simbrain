@@ -68,7 +68,7 @@ public class KeyBindings {
         canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed UP"), "start moving forward");
         canvas.getActionMap().put("start moving forward", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                worldPanel.setManualMovementState("w", true);
+                worldPanel.setManualMovementKeyState("w", true);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     entity.getManualMovement().setSpeed(1.0);
@@ -79,7 +79,7 @@ public class KeyBindings {
         canvas.getInputMap().put(KeyStroke.getKeyStroke("released UP"), "stop moving forward");
         canvas.getActionMap().put("stop moving forward", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                worldPanel.setManualMovementState("w", false);
+                worldPanel.setManualMovementKeyState("w", false);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     // case where w and s are both being pressed
@@ -99,7 +99,7 @@ public class KeyBindings {
         canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed DOWN"), "start moving backward");
         canvas.getActionMap().put("start moving backward", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                worldPanel.setManualMovementState("s", true);
+                worldPanel.setManualMovementKeyState("s", true);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     entity.getManualMovement().setSpeed(-1.0);
@@ -110,7 +110,7 @@ public class KeyBindings {
         canvas.getInputMap().put(KeyStroke.getKeyStroke("released DOWN"), "stop moving backward");
         canvas.getActionMap().put("stop moving backward", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                worldPanel.setManualMovementState("s", false);
+                worldPanel.setManualMovementKeyState("s", false);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     // case where w and s are both being pressed
@@ -131,7 +131,7 @@ public class KeyBindings {
         canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed LEFT"), "start turning left");
         canvas.getActionMap().put("start turning left", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                worldPanel.setManualMovementState("a", true);
+                worldPanel.setManualMovementKeyState("a", true);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     entity.getManualMovement().turnLeft();
@@ -142,7 +142,7 @@ public class KeyBindings {
         canvas.getInputMap().put(KeyStroke.getKeyStroke("released LEFT"), "stopTurningLeft");
         canvas.getActionMap().put("stopTurningLeft", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                worldPanel.setManualMovementState("a", false);
+                worldPanel.setManualMovementKeyState("a", false);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     // case where a and d are both being pressed
@@ -162,7 +162,7 @@ public class KeyBindings {
         canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed RIGHT"), "start turning right");
         canvas.getActionMap().put("start turning right", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                worldPanel.setManualMovementState("d", true);
+                worldPanel.setManualMovementKeyState("d", true);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     entity.getManualMovement().turnRight();
@@ -173,7 +173,7 @@ public class KeyBindings {
         canvas.getInputMap().put(KeyStroke.getKeyStroke("released RIGHT"), "stopTurningRight");
         canvas.getActionMap().put("stopTurningRight", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                worldPanel.setManualMovementState("d", false);
+                worldPanel.setManualMovementKeyState("d", false);
                 OdorWorldEntity entity = worldPanel.getFirstSelectedRotatingEntity();
                 if (entity != null) {
                     // case where a and d are both being pressed

@@ -105,7 +105,7 @@ public class OdorWorldPanel extends JPanel {
      * Used for a mask that allows multiple movements to be applied at once.
      * Lower four bits are used for U,D,L,R.
      */
-    private byte manualMovementState;
+    private byte manualMovementKeyState;
 
     /**
      * List corresponding to the layers of a tmx file.
@@ -368,7 +368,7 @@ public class OdorWorldPanel extends JPanel {
 
     public void manualMovementUpdate() {
         EntityNode entityNode = getFirstSelectedEntityNode();
-        if (entityNode != null) {
+        if (entityNode != null && isManualMovementMode()) {
             OdorWorldEntity entity = entityNode.getEntity();
             entity.applyMovement();
             entityNode.advance();
@@ -617,22 +617,22 @@ public class OdorWorldPanel extends JPanel {
         return mask;
     }
 
-    void setManualMovementState(String key, boolean state) {
+    void setManualMovementKeyState(String key, boolean state) {
         byte mask = getManualMovementStateMask(key);
         if (state) {
-            manualMovementState |= mask;
+            manualMovementKeyState |= mask;
         } else {
-            manualMovementState &= ~mask;
+            manualMovementKeyState &= ~mask;
         }
     }
 
     boolean getManualMovementState(String key) {
         byte mask = getManualMovementStateMask(key);
-        return (manualMovementState & mask) > 0;
+        return (manualMovementKeyState & mask) > 0;
     }
 
-    private boolean getManualMovementState() {
-        return manualMovementState > 0;
+    private boolean isManualMovementMode() {
+        return manualMovementKeyState > 0;
     }
 
 }

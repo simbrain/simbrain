@@ -292,12 +292,13 @@ class OdorWorldEntity @JvmOverloads constructor(
 
         val worldBound = Bound(0.0, 0.0, world.width.toDouble(), world.height.toDouble(), worldBound = true)
 
-        val bounds = (world.entityList + worldBound).filter { it !== this }
-
-        val moveInX = Bound(x + dx, y, width, height)
-
         val directionX = if (dx > 0) 1 else -1
         val directionY = if (dy > 0) 1 else -1
+
+        val bounds = (if (world.wrapAround) world.entityList else world.entityList + worldBound)
+            .filter { it !== this }
+
+        val moveInX = Bound(x + dx, y, width, height)
 
         val distanceXShortenBy = bounds
             .map { moveInX.intersect(it) }
@@ -311,7 +312,13 @@ class OdorWorldEntity @JvmOverloads constructor(
             .filter { it.intersect }
             .minOfOrNull { it.dy } ?: 0.0
 
-        location = point(x + (dx - distanceXShortenBy * directionX), y + (dy - distanceYShortenBy * directionY))
+        val newX = x + (dx - distanceXShortenBy * directionX)
+        val newY = y + (dy - distanceYShortenBy * directionY)
+
+        val maxXLocation = (worldBound.width - width)
+        val maxYLocation = (worldBound.height - height)
+
+        location = point((newX + maxXLocation) % maxXLocation, (newY + maxYLocation) % maxYLocation)
 
     }
 

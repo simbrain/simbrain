@@ -111,7 +111,7 @@ interface Bounded: WithSize {
     val x: Double
     val y: Double
     val location: Point2D
-    val inverted: Boolean get() = false
+    val worldBound: Boolean get() = false
 }
 
 class Bound(
@@ -119,11 +119,34 @@ class Bound(
     override val y: Double,
     override var width: Double,
     override var height: Double,
-    override val inverted: Boolean = false
+    override val worldBound: Boolean = false
 ) : Bounded {
     override val location: Point2D
         get() = point(x, y)
 }
+
+fun Bounded.intersect(other: Bounded): BoundIntersection {
+    val a = this
+    val b = other
+
+    return if (b.worldBound) {
+        val left = a.x - b.x
+        val right = (b.x + b.width) - (a.x + a.width)
+        val top = a.y - b.y
+        val bottom = (b.y + b.height) - (a.y + a.height)
+        val xCollision = -min(left, right)
+        val yCollision = -min(top, bottom)
+        BoundIntersection(xCollision > 0 || yCollision > 0, xCollision, yCollision)
+    } else {
+        val xCollision = min((a.x + a.width) - b.x, (b.x + b.width) - a.x)
+        val yCollision = min((a.y + a.height) - b.y, (b.y + b.height) - a.y)
+
+        BoundIntersection(xCollision > 0 && yCollision > 0, xCollision, yCollision)
+    }
+
+}
+
+data class BoundIntersection(val intersect: Boolean, val dx: Double, val dy: Double)
 
 interface Movable {
     var speed: Double
@@ -267,46 +290,26 @@ class OdorWorldEntity @JvmOverloads constructor(
         val dx = cos(heading.toRadian()) * speed
         val dy = -sin(heading.toRadian()) * speed
 
-        val worldBound = Bound(0.0, 0.0, world.width.toDouble(), world.height.toDouble(), inverted = true)
+        val worldBound = Bound(0.0, 0.0, world.width.toDouble(), world.height.toDouble(), worldBound = true)
 
         val bounds = (world.entityList + worldBound).filter { it !== this }
 
         val moveInX = Bound(x + dx, y, width, height)
 
-        fun Bounded.intersect(other: Bounded): Pair<Double, Double> {
-            val a = this
-            val b = other
-
-            val xCollision = min((a.x + a.width) - b.x, (b.x + b.width) - a.x)
-            val yCollision = min((a.y + a.height) - b.y, (b.y + b.height) - a.y)
-
-            return xCollision to yCollision
-        }
-
         val directionX = if (dx > 0) 1 else -1
         val directionY = if (dy > 0) 1 else -1
 
-        val distanceXShortenBy = bounds.filter {
-            !it.inverted
-        }.map {
-            moveInX.intersect(it)
-        }.filter { (x, y) ->
-            x > 0 && y > 0
-        }.minOfOrNull { (x) ->
-            x
-        } ?: 0.0
+        val distanceXShortenBy = bounds
+            .map { moveInX.intersect(it) }
+            .filter { it.intersect }
+            .minOfOrNull { it.dx } ?: 0.0
 
         val moveInY = Bound(x + (dx - distanceXShortenBy * directionX), y + dy, width, height)
 
-        val distanceYShortenBy = bounds.filter {
-            !it.inverted
-        }.map {
-            moveInY.intersect(it)
-        }.onEach { println(it) }.filter { (x, y) ->
-            x > 0 && y > 0
-        }.minOfOrNull { (_, y) ->
-            y
-        } ?: 0.0
+        val distanceYShortenBy = bounds
+            .map { moveInY.intersect(it) }
+            .filter { it.intersect }
+            .minOfOrNull { it.dy } ?: 0.0
 
         location = point(x + (dx - distanceXShortenBy * directionX), y + (dy - distanceYShortenBy * directionY))
 

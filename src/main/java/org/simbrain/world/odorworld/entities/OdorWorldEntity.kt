@@ -24,6 +24,7 @@ import com.thoughtworks.xstream.converters.reflection.ReflectionProvider
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.mapper.Mapper
 import org.simbrain.util.*
+import org.simbrain.util.Utils.round
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
@@ -166,6 +167,10 @@ class OdorWorldEntity @JvmOverloads constructor(
         applyMovement()
         sensors.forEach { it.update() }
         effectors.forEach { it.update() }
+    }
+
+    override fun toString(): String {
+        return "name = $name type = $entityType location = (${round(x, 2)}, ${round(y, 2)})"
     }
 
     fun addEffector(effector: Effector) {
@@ -410,10 +415,6 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
             x = value.x
             y = value.y
         }
-
-    override fun toString(): String {
-        return "($x,$y)"
-    }
 }
 
 /**

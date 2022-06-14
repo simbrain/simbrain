@@ -55,14 +55,14 @@ public class OdorWorldPanel extends JPanel {
     private final OdorWorldCanvas canvas;
 
     /**
-     * Reference to WorkspaceComponent. // TODO: Needed?
+     * Reference to WorkspaceComponent.
      */
-    private OdorWorldComponent component;
+    private final OdorWorldComponent component;
 
     /**
      * Reference to model world.
      */
-    private OdorWorld world;
+    private final OdorWorld world;
 
     /**
      * Selection model.
@@ -74,21 +74,6 @@ public class OdorWorldPanel extends JPanel {
      */
     private PNode tileSelectionBox = null;
     private Rectangle tileSelectionModel = null;
-
-    /**
-     * Color of the world background.
-     */
-    private Color backgroundColor = Color.white;
-
-    /**
-     * Default panel width
-     */
-    private int defaultWidth = 450;
-
-    /**
-     * Default panel height
-     */
-    private int defaultHeight = 450;
 
     /**
      * Timer to update entity animations.
@@ -179,7 +164,6 @@ public class OdorWorldPanel extends JPanel {
         setLayout(new BorderLayout());
         this.add("Center", canvas);
 
-        canvas.setBackground(backgroundColor);
         canvas.setFocusable(true);
 
         // Add tile map
@@ -387,7 +371,6 @@ public class OdorWorldPanel extends JPanel {
         }
     }
 
-
     /**
      * Show the PNode debugging tool.
      */
@@ -489,37 +472,8 @@ public class OdorWorldPanel extends JPanel {
         return contextMenu;
     }
 
-    /**
-     * @return Background color of world.
-     */
-    public int getBackgroundColor() {
-        return backgroundColor.getRGB();
-    }
-
-    /**
-     * Sets the background color of the world.
-     *
-     * @param backgroundColor Color
-     */
-    public void setBackgroundColor(final int backgroundColor) {
-        this.backgroundColor = new Color(backgroundColor);
-    }
-
-    /**
-     * @return the world
-     */
     public OdorWorld getWorld() {
         return world;
-    }
-
-    /**
-     * @param world the world to set
-     */
-    public void setWorld(final OdorWorld world) {
-        this.world = world;
-    }
-
-    public void setBeginPosition(Point2D position) {
     }
 
     public void clearSelection() {
@@ -572,21 +526,6 @@ public class OdorWorldPanel extends JPanel {
         return selectionModel.isSelected(element);
     }
 
-
-    public int getDefaultWidth() {
-        return defaultWidth;
-    }
-
-    public int getDefaultHeight() {
-        return defaultHeight;
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(
-                Math.min(defaultWidth, getWorld().getWidth()),
-                Math.min(defaultHeight, getWorld().getHeight()));
-    }
 
     /**
      * Toggle the selected state of the specified element; if it is selected,

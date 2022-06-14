@@ -10,7 +10,7 @@ import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.showSaveDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
-import org.simbrain.util.toCsvString
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
@@ -24,9 +24,12 @@ val isopodSim = newSim {
 
     workspace.clearWorkspace()
 
-    // x coordinate, y coordinate
-    // TODO success v failure (0/1), time of success vs. failure
-    val trialData = mutableListOf<DoubleArray>()
+    // Adjustible parameters for sim
+    var numTrials = 5
+    var trialNum = 1
+    val maxIterationsPerTrial = 5000
+
+    var log = ""
 
     // ----- Network construction ------
 
@@ -66,7 +69,7 @@ val isopodSim = newSim {
         location = point(50, 0)
         upperBound = 10.0
         label = "Straight"
-        (neuronDataHolder as BiasedScalarData).bias = 2.0
+        (neuronDataHolder as BiasedScalarData).bias = 10.0
     }
 
     connect(neuronLeftSensor, neuronLeftTurning, 4.0)
@@ -75,7 +78,7 @@ val isopodSim = newSim {
     // Location of the network in the desktop
     withGui {
         place(networkComponent) {
-            location = point(145, 10)
+            location = point(180, 10)
             width = 400
             height = 400
         }
@@ -94,7 +97,7 @@ val isopodSim = newSim {
     var rightSensor: SmellSensor
     val isopod: OdorWorldEntity
 
-    var fishCollision = false
+    var collision = false
 
     odorWorld.apply {
 
@@ -106,6 +109,7 @@ val isopodSim = newSim {
 
         // Body could be represented by a triangle or rhombus
         isopod = addEntity(300, 300, EntityType.MOUSE).apply {
+            name = "isopod"
             heading = 90.0
             addDefaultEffectors()
             straightMovement = effectors[0]
@@ -124,19 +128,23 @@ val isopodSim = newSim {
                 theta = -Math.PI / 4
                 addSensor(this)
             }
+            events.onCollided {
+                if (it is OdorWorldEntity) {
+                    log += "Collided with ${it.name}\n"
+                } else {
+                    log += "Collided with wall\n"
+                }
+                collision = true
+            }
             manualMovement.manualStraightMovementIncrement = 2.0
             manualMovement.manualMotionTurnIncrement = 2.0
         }
 
         fun addFish(x: Int, y: Int) {
             odorWorld.addEntity(x, y, EntityType.FISH).apply {
+                name = "Fish"
                 smellSource = SmellSource.createScalarSource(1).apply {
                     dispersion = 300.0
-                }
-                events.onCollided {
-                    fishCollision = true
-                    // TODO: Magic numbers for fish collision
-                    trialData.add(doubleArrayOf(-1.0, 1.0))
                 }
             }
         }
@@ -147,14 +155,14 @@ val isopodSim = newSim {
         addFish(590, 10)
 
         workspace.addUpdateAction(updateAction("Track location") {
-//            trialData.add(isopod.location);
+            log += "${isopod}\n"
         })
 
     }
 
     withGui {
         place(odorWorldComponent) {
-            location = point(530, 10)
+            location = point(590, 10)
             (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).setGuiSizeToWorldSize()
         }
     }
@@ -169,18 +177,32 @@ val isopodSim = newSim {
         rightSensor couple neuronRightSensor
     }
 
+    fun resetIsopod() {
+        isopod.location = point(300,300)
+        isopod.heading = UniformRealDistribution(0.0,360.0).sampleDouble()
+    }
+
     withGui {
         createControlPanel("Control Panel", 5, 10) {
-            addButton("Run one trial") {
+
+            val numTrialsTF = addTextField("Number of trials", "" + numTrials)
+
+            addButton("Run all trials") {
                 var iteration = 0
-                trialData.clear()
-                while (++iteration < 1000 && !fishCollision) {
-                    workspace.simpleIterate()
+                numTrials = Integer.parseInt(numTrialsTF.text)
+                log = "Trial: $trialNum\n"
+                resetIsopod()
+                log += "Heading: ${isopod.heading}\n"
+                while(trialNum < numTrials) {
+                    while (++iteration < maxIterationsPerTrial && !collision) {
+                        workspace.simpleIterate()
+                    }
+                    trialNum++
+                    collision = false
                 }
-                fishCollision = false
-                // println("TrialData: ${trialData}")
-                showSaveDialog("", "trialData.csv") {
-                    writeText(trialData.toCsvString())
+                trialNum = 0
+                showSaveDialog("", "trialData.txt") {
+                    writeText(log)
                 }
             }
         }

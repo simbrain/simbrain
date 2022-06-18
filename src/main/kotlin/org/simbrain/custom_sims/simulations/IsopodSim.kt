@@ -118,12 +118,12 @@ val isopodSim = newSim {
 
             // Can add more smell sensors here
             // Options: new sensor in back; triangular array
-            leftSensor = SmellSensor(this).apply {
+            leftSensor = SmellSensor().apply {
                 radius = 40.0
                 theta = Math.PI / 4
                 addSensor(this)
             }
-            rightSensor = SmellSensor(this).apply {
+            rightSensor = SmellSensor().apply {
                 radius = 40.0
                 theta = -Math.PI / 4
                 addSensor(this)

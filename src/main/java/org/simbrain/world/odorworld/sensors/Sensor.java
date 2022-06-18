@@ -29,8 +29,6 @@ import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.simbrain.util.GeomKt.toRadian;
-
 /**
  * Interface for 2d world sensors.  Sensors have a position given in polar
  * coordinates.
@@ -64,34 +62,32 @@ public abstract class Sensor implements PeripheralAttribute {
     /**
      * Relative location of the sensor in polar coordinates.
      */
-    @UserParameter(label = "Sensor angle", description = "The angle at which the smell sensor will be added. "
-        + "A sensor angle of 0 a smell sensor that is directly in front of the agent. "
-        + "A positive sensor angle locates the sensor at a position to the left of the agent's heading. "
-        + "A negative sensor angle locates the sensor at a position to the right of the agent's heading.",
-        order = 3)
+    @UserParameter(label = "Sensor angle", description = "The angle theta (in polar coordinates, with radius) at " +
+            "which the sensor will be added.", order = 3)
     protected double theta = DEFAULT_THETA;
 
     /**
      * Relative location of the sensor in polar coordinates.
      */
     @UserParameter(label = "Sensor length",
-        description = "The distance from the center of the entity to which the smell sensor is to be added."
-            + "A sensor length of 0 makes sensor angle irrelevant since located at the center of the agent."
+        description = "The distance in pixels from the center of the entity to which the sensor is to be added."
         , order = 4)
     protected double radius = DEFAULT_RADIUS;
 
     /**
-     * The relative location of this sensor to the top left of the entity
+     * Returns the sensor location in the local coordinate frame of the entity.
      */
-    private Point2D.Double relativeLocation = new Point2D.Double();
+    public Point2D.Double computeLocationFrom(OdorWorldEntity entity) {
+        Point2D.Double sensorLocation = new Point2D.Double(0,0);
+        sensorLocation.x = radius * Math.cos(Math.toRadians(entity.getHeading() + theta));
+        sensorLocation.x += entity.getWidth()/2;
+        sensorLocation.y = -radius * Math.sin(Math.toRadians(entity.getHeading() + theta));
+        sensorLocation.y += entity.getHeight()/2;
+        return sensorLocation;
+    }
 
     /**
-     * Reference to parent entity.
-     */
-    protected OdorWorldEntity parent;
-
-    /**
-     * The id of this smell sensor..
+     * The id of this smell sensor.
      */
     @UserParameter(label = "Sensor ID", description = "A unique id for this sensor",
             order = 0, editable = false)
@@ -112,24 +108,13 @@ public abstract class Sensor implements PeripheralAttribute {
     /**
      * Construct a sensor.
      *
-     * @param parent the parent entity
      * @param label  a label for this sensor
      */
-    public Sensor(OdorWorldEntity parent, String label) {
+    public Sensor(String label) {
         super();
-        this.parent = parent;
         this.label = label;
     }
 
-    /**
-     * Construct a sensor.
-     *
-     * @param parent the parent entity
-     */
-    public Sensor(OdorWorldEntity parent) {
-        super();
-        this.parent = parent;
-    }
 
     /**
      * Construct a copy of a sensor.
@@ -143,24 +128,10 @@ public abstract class Sensor implements PeripheralAttribute {
     }
 
     /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
+     * Default no-arg constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */
     public Sensor() {
         super();
-    }
-
-    /**
-     * Update the sensor.
-     */
-    public abstract void update();
-
-    @Override
-    public OdorWorldEntity getParent() {
-        return parent;
     }
 
     public void setId(String name) {
@@ -218,36 +189,6 @@ public abstract class Sensor implements PeripheralAttribute {
 
     public void setRadius(double radius) {
         this.radius = radius;
-    }
-
-    /**
-     * Location of sensor in "non-relative" world coordinates.
-     *
-     * @return the sensor location
-     */
-    public Point2D getLocation() {
-        updateRelativeLocation();
-        return new Point2D.Double(relativeLocation.x, relativeLocation.y);
-    }
-
-    /**
-     * Update the sensor {@link #relativeLocation} base on the heading of the entity.
-     */
-    public void updateRelativeLocation() {
-        double x =  (radius * Math.cos(toRadian(parent.getHeading()) + theta))
-            + parent.getEntityType().getImageWidth() / 2;
-        double y = -(radius * Math.sin(toRadian(parent.getHeading()) + theta))
-            + parent.getEntityType().getImageWidth() / 2;
-        relativeLocation.setLocation(x, y);
-    }
-
-    /**
-     * Update and get the {@link #relativeLocation} of this sensor.
-     * @return the updated {@link #relativeLocation}
-     */
-    public Point2D.Double getRelativeLocation() {
-        updateRelativeLocation();
-        return relativeLocation;
     }
 
     @Override

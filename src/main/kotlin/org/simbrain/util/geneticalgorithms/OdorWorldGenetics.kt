@@ -45,7 +45,7 @@ class SmellSensorGene(override val chromosome: Chromosome<SmellSensor, SmellSens
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): SmellSensor {
-        return template.copy().apply { parent = odorWorldEntity }.also { product.complete(it) }
+        return template.copy().also { product.complete(it) }
     }
 
 }
@@ -60,7 +60,7 @@ class ObjectSensorGene(override val chromosome: Chromosome<ObjectSensor, ObjectS
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): ObjectSensor {
-        return ObjectSensor(template).apply { parent = odorWorldEntity }.also { product.complete(it) }
+        return ObjectSensor(template).also { product.complete(it) }
     }
 
 }
@@ -75,7 +75,7 @@ class StraightMovementGene(override val chromosome: Chromosome<StraightMovement,
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): StraightMovement {
-        return StraightMovement(template).apply { parent = odorWorldEntity }.also { product.complete(it) }
+        return StraightMovement(template).also { product.complete(it) }
     }
 
 }
@@ -90,7 +90,7 @@ class TurningGene(override val chromosome: Chromosome<Turning, TurningGene>, pri
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): Turning {
-        return Turning(template).apply { parent = odorWorldEntity }.also { product.complete(it) }
+        return Turning(template).also { product.complete(it) }
     }
 
 }

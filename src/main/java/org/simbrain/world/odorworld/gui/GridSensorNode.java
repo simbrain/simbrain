@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.GridSensor;
 
 import java.awt.*;
@@ -70,7 +71,6 @@ public class GridSensorNode extends EntityAttributeNode {
         addChild(shape);
 
         updateGrid();
-        shape.setOffset(sensor.getRelativeLocation());
     }
 
     /**
@@ -118,8 +118,10 @@ public class GridSensorNode extends EntityAttributeNode {
 
     private void updateGrid() {
         if (sensor.getGridVisibility()) {
-            double dx = sensor.getX() - sensor.getParent().getX();
-            double dy = sensor.getY() - sensor.getParent().getY();
+            double dx = sensor.getX();
+            double dy = sensor.getY();
+            // double dx = sensor.getX() - sensor.getParent().getX();
+            // double dy = sensor.getY() - sensor.getParent().getY();
 
             for (int i = 0; i < sensor.getColumns() * sensor.getRows(); i++) {
                 PPath highlightedGrid = highlightedGrids.get(i);
@@ -138,15 +140,12 @@ public class GridSensorNode extends EntityAttributeNode {
     }
 
     @Override
-    public void update() {
-
+    public void update(OdorWorldEntity entity) {
         if (!isGridSizeConsistent()) {
             redrawGrid();
         }
         updateGridSizeInfo();
-
-        shape.setOffset(sensor.getRelativeLocation());
-
+        shape.setOffset(sensor.computeLocationFrom(entity));
         updateGrid();
     }
 }

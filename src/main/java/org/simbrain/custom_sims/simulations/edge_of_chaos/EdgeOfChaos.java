@@ -245,7 +245,7 @@ public class EdgeOfChaos extends Simulation {
         flower3.getSmellSource().setDecayFunction(new StepDecayFunction());
 
         // Couple agent to cheese and flower nodes
-        SmellSensor smellSensor = new SmellSensor(mouse);
+        SmellSensor smellSensor = new SmellSensor();
         mouse.addSensor(smellSensor);
         sim.couple(smellSensor, sensorNodes);
     }

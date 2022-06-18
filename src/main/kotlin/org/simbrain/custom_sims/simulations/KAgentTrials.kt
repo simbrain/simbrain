@@ -101,7 +101,7 @@ val kAgentTrails = newSim {
         location = point(204.0, 343.0)
         heading = 90.0
         addDefaultEffectors()
-        addSensor(SmellSensor(this))
+        addSensor(SmellSensor())
         manualMovement.manualStraightMovementIncrement = 2.0
         manualMovement.manualMotionTurnIncrement = 2.0
     }

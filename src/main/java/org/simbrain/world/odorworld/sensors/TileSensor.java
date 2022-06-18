@@ -29,23 +29,16 @@ public class TileSensor extends Sensor {
     private int tileIdToSense = 0;
 
     /**
-     * Construct a tile sensor.
-     *
-     * @param parent the parent entity
-     */
-    public TileSensor(OdorWorldEntity parent) {
-        super(parent, "Tile Sensor");
-    }
-
-    /**
      * Construct a tile sensor to sense a specific tile of the given ID.
      *
-     * @param parent the parent entity
      * @param tileId the tile id of the tile to sense
      */
-    public TileSensor(OdorWorldEntity parent, int tileId) {
-        this(parent);
+    public TileSensor(int tileId) {
         this.tileIdToSense = tileId;
+    }
+
+    public TileSensor() {
+        super("Tile Sensor");
     }
 
     /**
@@ -59,22 +52,11 @@ public class TileSensor extends Sensor {
         this.tileIdToSense = tileSensor.tileIdToSense;
     }
 
-    /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
-     */
-    public TileSensor() {
-        super();
-    }
-
     @Override
-    public void update() {
+    public void update(OdorWorldEntity parent) {
         value = 0;
 
-        TileMap tileMap = parent.getParentWorld().getTileMap();
+        TileMap tileMap = parent.getWorld().getTileMap();
 
         if (tileMap.hasTileIdAtPixel(tileIdToSense, parent.getLocation().getX(), parent.getLocation().getY())) {
             value = outputAmount;
@@ -84,11 +66,6 @@ public class TileSensor extends Sensor {
     @Producible(customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
-    }
-
-    @Override
-    public void setParent(OdorWorldEntity parent) {
-        this.parent = parent;
     }
 
     @Override

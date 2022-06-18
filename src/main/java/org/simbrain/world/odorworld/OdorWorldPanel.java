@@ -205,7 +205,14 @@ public class OdorWorldPanel extends JPanel {
             repaint();
         });
         world.getEvents().onEntityRemoved(e -> {
-            repaint();
+            var entityNode = canvas.getLayer().getAllNodes()
+                    .stream().filter(n -> n instanceof EntityNode)
+                    .filter(n -> ((EntityNode)n).getEntity() == e)
+                    .findFirst();
+            if (entityNode.isPresent()) {
+                canvas.getLayer().removeChild((PNode) entityNode.get());
+                repaint();
+            }
         });
         world.getEvents().onUpdated(this::centerCameraToSelectedEntity);
         world.getEvents().onFrameAdvance(() -> {

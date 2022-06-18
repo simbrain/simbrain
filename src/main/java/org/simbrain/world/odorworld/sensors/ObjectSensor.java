@@ -57,21 +57,10 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     /**
      * Instantiate an object sensor.
      *
-     * @param parent     parent entity
      * @param objectType the type (e.g. Swiss.gif)
      */
-    public ObjectSensor(OdorWorldEntity parent, EntityType objectType) {
-        super(parent);
+    public ObjectSensor(EntityType objectType) {
         this.objectType = objectType;
-    }
-
-    /**
-     * Instantiate an object sensor.
-     *
-     * @param parent parent entity
-     */
-    public ObjectSensor(OdorWorldEntity parent) {
-        super(parent);
     }
 
     /**
@@ -90,10 +79,6 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
 
     /**
      * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
      */
     public ObjectSensor() {
         super();
@@ -107,22 +92,19 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         this.decayFunction = decayFunction;
     }
 
-    public ObjectSensor(OdorWorldEntity parent, EntityType type, double angle, double radius) {
-        this(parent, type);
-        setTheta(angle);
-        setRadius(radius);
+    public ObjectSensor(EntityType type, double radius, double angle) {
+        objectType = type;
+        this.radius = radius;
+        this.theta = angle;
     }
 
     @Override
-    public void update() {
+    public void update(OdorWorldEntity parent) {
         value = 0;
-        for (OdorWorldEntity entity : parent.getEntitiesInRadius(decayFunction.getDispersion())) {
-            if (entity.getEntityType() == objectType) {
+        for (OdorWorldEntity otherEntity : parent.getEntitiesInRadius(decayFunction.getDispersion())) {
+            if (otherEntity.getEntityType() == objectType) {
                 double scaleFactor = decayFunction.getScalingFactor(
-                    SimbrainMath.distance(
-                        getLocation(),
-                        entity.getLocation()
-                    ));
+                    SimbrainMath.distance(computeLocationFrom(parent), otherEntity.getLocation()));
                 value += baseValue * scaleFactor;
             }
         }
@@ -131,11 +113,6 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     @Producible(customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
-    }
-
-    @Override
-    public void setParent(OdorWorldEntity parent) {
-        this.parent = parent;
     }
 
     @Override

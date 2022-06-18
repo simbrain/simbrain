@@ -51,9 +51,7 @@ public class Braitenberg extends Simulation {
         OdorWorldEntity agent1 = oc.getWorld().addEntity(120, 245, EntityType.CIRCLE);
         OdorWorldEntity agent2 = oc.getWorld().addEntity(320, 245, EntityType.CIRCLE);
         agent1.addLeftRightSensors(EntityType.CIRCLE, 270);
-        agent1.addDefaultEffectors();
         agent2.addLeftRightSensors(EntityType.CIRCLE, 270);
-        agent2.addDefaultEffectors();
 
         NetworkComponent vehicle1 = sim.addNetwork(251,1,359,327, "Vehicle 1");
         Vehicle vb1 = new Vehicle(sim, vehicle1.getNetwork());

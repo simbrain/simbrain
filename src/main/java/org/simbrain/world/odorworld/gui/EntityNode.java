@@ -147,7 +147,7 @@ public class EntityNode extends PNode {
         EntityAttributeNode node = EntityAttributeNode.getNode(attribute);
         visualizableAttributeMap.put(attribute, node);
         addChild(visualizableAttributeMap.get(attribute));
-        node.update();
+        node.update(entity);
     }
 
     /**
@@ -196,7 +196,7 @@ public class EntityNode extends PNode {
             } else {
                 currentEntityAttributeNode = visualizableAttributeMap.get(vp);
             }
-            currentEntityAttributeNode.update();
+            currentEntityAttributeNode.update(entity);
         }
     }
 
@@ -204,7 +204,7 @@ public class EntityNode extends PNode {
      * Update all visualizable attribute nodes.
      */
     private void updateAttributesNodes() {
-        visualizableAttributeMap.values().forEach(EntityAttributeNode::update);
+        visualizableAttributeMap.values().forEach(entityAttributeNode -> entityAttributeNode.update(entity));
     }
 
     /**

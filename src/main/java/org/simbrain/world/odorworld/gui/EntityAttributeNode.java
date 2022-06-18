@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.PNode;
 import org.simbrain.world.odorworld.effectors.Speech;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.*;
 
 import java.awt.*;
@@ -18,8 +19,9 @@ public abstract class EntityAttributeNode extends PNode {
 
     /**
      * Update the visual representation base on the attribute status.
+     * @param entity
      */
-    public abstract void update();
+    public abstract void update(OdorWorldEntity entity);
 
     /**
      * Get the visual representation of a attribute.

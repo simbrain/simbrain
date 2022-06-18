@@ -228,7 +228,7 @@ public class ActorCritic extends Simulation {
         world.addEntity(cheese);
 
         // Set up cheese sensor
-        ObjectSensor cheeseSensor = new ObjectSensor(mouse);
+        ObjectSensor cheeseSensor = new ObjectSensor();
         cheeseSensor.setLabel("Cheese sensor");
         double dispersion = rewardDispersionFactor * (tileSize / 2);
         DecayFunction decayFunction = new StepDecayFunction();
@@ -239,10 +239,9 @@ public class ActorCritic extends Simulation {
         sensorCouplings = new ArrayList<>();
 
         // Create grid sensor
-        GridSensor sensor = new GridSensor(
-                mouse,
-                0, 0,
-                oc.getWorld().getWidth() / numTiles, oc.getWorld().getHeight() / numTiles
+        GridSensor sensor = new GridSensor(0, 0,
+                oc.getWorld().getWidth() / numTiles,
+                oc.getWorld().getHeight() / numTiles
         );
         mouse.addSensor(sensor);
 

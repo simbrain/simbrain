@@ -23,9 +23,6 @@ import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-
 /**
  * Implement a simple hearing sensor. When the phrase is heard, the sensor is
  * activated and and outputValue is sent out.
@@ -74,7 +71,6 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
             order = 5)
     private double outputAmount = DEFAULT_OUTPUT_AMOUNT;
 
-
     //TODO: Clean up / Make this settable
     private int time = 0;
     private int lingerTime = 10;
@@ -82,23 +78,20 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     /**
      * Construct the hearing sensor.
      *
-     * @param parent       parent entity
      * @param phrase       the phrase associated with this sensor
      * @param outputAmount the amount to output when this sensor is activated
      */
-    public Hearing(OdorWorldEntity parent, String phrase, double outputAmount) {
-        super(parent, "Hear: \"" + phrase + "\"");
+    public Hearing(String phrase, double outputAmount) {
+        super("Hear: \"" + phrase + "\"");
         this.phrase = phrase;
         this.outputAmount = outputAmount;
     }
 
     /**
      * Construct the hearing sensor.
-     *
-     * @param parent parent entity
      */
-    public Hearing(OdorWorldEntity parent) {
-        super(parent, "Hear: \"" + DEFAULT_PHRASE + "\"");
+    public Hearing() {
+        super("Hear: \"" + DEFAULT_PHRASE + "\"");
     }
 
     public Hearing(Hearing hearing) {
@@ -107,23 +100,12 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         this.charactersPerRow = hearing.charactersPerRow;
     }
 
-    /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
-     */
-    public Hearing() {
-        super();
-    }
-
     @Override
-    public void update() {
+    public void update(OdorWorldEntity parent) {
 
         // TODO: Only hear if in range of speaker.  Will need some new range variable.
 
-        for (String heardPhrase : this.getParent().getCurrentlyHeardPhrases()) {
+        for (String heardPhrase : parent.getCurrentlyHeardPhrases()) {
             if (phrase.equalsIgnoreCase(heardPhrase)) {
                 if (!activated) {
                     activated = true;
@@ -177,11 +159,6 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     @Override
     public String getName() {
         return "Hearing Sensor";
-    }
-
-    @Override
-    public void setParent(OdorWorldEntity parent) {
-        this.parent = parent;
     }
 
     @Override

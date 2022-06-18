@@ -20,7 +20,6 @@ package org.simbrain.world.odorworld.effectors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.events.AttributeEvents;
 
@@ -50,11 +49,6 @@ public abstract class Effector implements PeripheralAttribute {
     }
 
     /**
-     * Reference to parent entity.
-     */
-    protected OdorWorldEntity parent;
-
-    /**
      * The id of this smell effector.
      */
     @UserParameter(label = "Effector ID", description = "A unique id for this effector",
@@ -76,23 +70,10 @@ public abstract class Effector implements PeripheralAttribute {
     /**
      * Construct an effector.
      *
-     * @param parent the parent entity
      * @param label  a label for this effector
      */
-    public Effector(OdorWorldEntity parent, String label) {
+    public Effector(String label) {
         super();
-        this.parent = parent;
-        this.label = label;
-    }
-
-    /**
-     * Construct an effector.
-     *
-     * @param parent the parent entity
-     */
-    public Effector(OdorWorldEntity parent) {
-        super();
-        this.parent = parent;
         this.label = label;
     }
 
@@ -103,41 +84,14 @@ public abstract class Effector implements PeripheralAttribute {
      */
     public Effector(Effector effector) {
         super();
-        this.parent = effector.parent;
         this.label = effector.label;
     }
 
     /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddEffectorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
+     * Default no-arg constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */
     public Effector() {
-        super();
     }
-
-    /**
-     * Move the agent in a manner appropriate to the effector type.
-     */
-    public abstract void update();
-
-    /**
-     * Return a list of entity types which can use this type of sensor.
-     *
-     * @return list of applicable types.
-     */
-    public List<Class<?>> getApplicableTypes() {
-        return null;
-    }
-
-    @Override
-    public OdorWorldEntity getParent() {
-        return parent;
-    }
-
-    public abstract void setParent(OdorWorldEntity parent);
 
     public void setId(String name) {
         this.id = name;

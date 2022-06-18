@@ -130,7 +130,7 @@ public class AgentTrails extends Simulation {
         mouse = oc.getWorld().addEntity(204, 343, EntityType.MOUSE);
         mouse.setHeading(90);
         mouse.addDefaultSensorsEffectors();
-        SmellSensor smellSensor = new SmellSensor(mouse);
+        SmellSensor smellSensor = new SmellSensor();
         mouse.addSensor(smellSensor);
         mouse.getManualMovement().setManualStraightMovementIncrement(2);
         mouse.getManualMovement().setManualMotionTurnIncrement(2);

@@ -195,7 +195,7 @@ public class ModularOscillatoryNetwork extends Simulation {
 
         // Add sensors
         for (OdorWorldEntity entity : worldEntities) {
-            ObjectSensor sensor = new ObjectSensor(mouse, entity.getEntityType());
+            ObjectSensor sensor = new ObjectSensor(entity.getEntityType());
             sensor.getDecayFunction().setDispersion(dispersion);
             mouse.addSensor(sensor);
         }

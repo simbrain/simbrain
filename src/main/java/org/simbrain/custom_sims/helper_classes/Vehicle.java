@@ -3,6 +3,8 @@ package org.simbrain.custom_sims.helper_classes;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
+import org.simbrain.world.odorworld.effectors.Turning;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
@@ -127,13 +129,21 @@ public class Vehicle {
             connect(rightInput, straight, forwardWeights);
         }
 
+        // Update entity effectors
+        agent.removeAllEffectors();
+        var eStraight = new StraightMovement();
+        var eLeft = new Turning(Turning.LEFT);
+        var eRight = new Turning(Turning.RIGHT);
+        agent.addEffector(eStraight);
+        agent.addEffector(eLeft);
+        agent.addEffector(eRight);
+
         // Couple network to agent.
         sim.couple(leftSensor, leftInput);
         sim.couple(rightSensor, rightInput);
-        // TODO: Labelling has changed; fix below
-        sim.couple(straight, agent.getEffector("Move straight"));
-        sim.couple(leftTurn, agent.getEffector("Turn left"));
-        sim.couple(rightTurn, agent.getEffector("Turn right"));
+        sim.couple(straight, eStraight);
+        sim.couple(leftTurn, eLeft);
+        sim.couple(rightTurn, eRight);
 
         return vehicle;
     }

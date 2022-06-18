@@ -146,7 +146,7 @@ val objectTrackingSim = newSim {
 
     // Left sensors
     (30 - sensoryNeurons / 2..30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
-        val cheeseSensorLeft = ObjectSensor(agent, EntityType.SWISS)
+        val cheeseSensorLeft = ObjectSensor(EntityType.SWISS)
         cheeseSensorLeft.theta = Math.toRadians(position.toDouble())
         cheeseSensorLeft.radius = EntityType.CIRCLE.imageHeight / 2.0
         cheeseSensorLeft.decayFunction.dispersion = 100.0
@@ -160,7 +160,7 @@ val objectTrackingSim = newSim {
     }
 
     (-30 - sensoryNeurons / 2..-30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
-        val cheeseSensorRight = ObjectSensor(agent, EntityType.SWISS)
+        val cheeseSensorRight = ObjectSensor(EntityType.SWISS)
         cheeseSensorRight.theta = Math.toRadians(position.toDouble())
         cheeseSensorRight.radius = EntityType.CIRCLE.imageHeight / 2.0
         cheeseSensorRight.decayFunction.dispersion = 100.0

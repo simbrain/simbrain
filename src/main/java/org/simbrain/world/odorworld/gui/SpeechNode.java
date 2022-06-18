@@ -79,7 +79,6 @@ public class SpeechNode extends EntityAttributeNode {
      */
     public SpeechNode(Speech effector) {
         this.effector = effector;
-        this.entity = effector.getParent();
         GeneralPath trianglePath = new GeneralPath();
         trianglePath.moveTo(18, 0);
         trianglePath.lineTo(3, speechBubbleBottomLeftLocation.getY() - 4);
@@ -111,7 +110,7 @@ public class SpeechNode extends EntityAttributeNode {
     }
 
     @Override
-    public void update() {
+    public void update(OdorWorldEntity entity) {
 
     }
 

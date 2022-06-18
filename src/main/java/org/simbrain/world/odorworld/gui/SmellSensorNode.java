@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.nodes.PPath;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import java.awt.*;
@@ -47,17 +48,16 @@ public class SmellSensorNode extends EntityAttributeNode {
         );
         setPickable(false);
         shape.setPickable(false);
-        this.world = sensor.getParent().getParentWorld();
         addChild(shape);
     }
 
     @Override
-    public void update() {
-        shape.setOffset(sensor.getRelativeLocation());
+    public void update(OdorWorldEntity entity) {
+        shape.setOffset(sensor.computeLocationFrom(entity));
         double val = SimbrainMath.getVectorNorm(sensor.getSmellVector());
         float saturation = 0;
-        if (world.getMaxVectorNorm() > 0) {
-            saturation = (float) SimbrainMath.rescale(val, 0, world.getMaxVectorNorm(),
+        if (entity.getWorld().getMaxVectorNorm() > 0) {
+            saturation = (float) SimbrainMath.rescale(val, 0, entity.getWorld().getMaxVectorNorm(),
                     0,1);
         }
         shape.setPaint(Color.getHSBColor(maxColor, saturation, 1));

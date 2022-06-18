@@ -15,11 +15,9 @@ public interface PeripheralAttribute extends AttributeContainer, CopyableObject 
 
     String getLabel();
 
-    OdorWorldEntity getParent();
-
-    void setParent(OdorWorldEntity parent);
-
     void setLabel(String label);
+
+    void update(OdorWorldEntity parent);
 
     AttributeEvents getEvents();
 
@@ -29,6 +27,6 @@ public interface PeripheralAttribute extends AttributeContainer, CopyableObject 
      * corresponding to object sensors and effectors.
      */
     default String getAttributeDescription() {
-        return getParent().getName() + ":" + getId() + ":" + getLabel();
+        return getId() + ":" + getLabel();
     }
 }

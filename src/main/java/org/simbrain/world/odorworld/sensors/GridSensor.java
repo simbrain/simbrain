@@ -129,14 +129,13 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     /**
      * Construct a tile sensor.
      *
-     * @param parent parent entity
      * @param x      upper left
      * @param y      upper right
      * @param width  width in pixels
      * @param height height
      */
-    public GridSensor(OdorWorldEntity parent, int x, int y, int width, int height) {
-        super(parent, "Grid (" + x + "," + y + "):" + width + "x" + height);
+    public GridSensor(int x, int y, int width, int height) {
+        super("Grid (" + x + "," + y + "):" + width + "x" + height);
         this.x = x;
         this.y = y;
         this.width = width;
@@ -144,6 +143,10 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         this.values = new double[columns * rows];
         super.setTheta(0);
         super.setRadius(25);
+    }
+
+    public GridSensor() {
+        super("Grid sensor");
     }
 
     /**
@@ -162,22 +165,11 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         this.columns = gridSensor.columns;
     }
 
-    /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
-     */
-    public GridSensor() {
-        super();
-    }
-
     @Override
-    public void update() {
+    public void update(OdorWorldEntity parent) {
         values = new double[columns * rows];
-        int gridX = (int) (getLocation().getX() / width - x);
-        int gridY = (int) (getLocation().getY() / height - y);
+        int gridX = (int) (computeLocationFrom(parent).getX() / width - x);
+        int gridY = (int) (computeLocationFrom(parent).getY() / height - y);
         if (gridX < columns && gridY < rows && gridX >= 0 && gridY >= 0) {
             values[gridX + gridY * rows] = DEFAULT_ACTIVATION;
         }
@@ -245,11 +237,6 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
 
     public void setActivationAmount(double amount) {
         activationAmount = amount;
-    }
-
-    @Override
-    public void setParent(OdorWorldEntity parent) {
-        this.parent = parent;
     }
 
     @Override

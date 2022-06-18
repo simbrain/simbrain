@@ -158,8 +158,8 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     fun update() {
         applyMovement()
-        sensors.forEach { it.update() }
-        effectors.forEach { it.update() }
+        sensors.forEach { it.update(this) }
+        effectors.forEach { it.update(this) }
     }
 
     override fun toString(): String {
@@ -167,38 +167,36 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun addEffector(effector: Effector) {
-        _effectors.add(effector.apply {
-            setId(world.effectorIDGenerator.andIncrement)
-        })
+        _effectors.add(effector)
+        if (effector.id == null) {
+            effector.setId(world.effectorIDGenerator.andIncrement)
+        }
+        events.fireEffectorAdded(effector)
+    }
+
+    fun removeAllEffectors() {
+        _effectors.forEach { events.fireEffectorRemoved(it) }
+        _effectors.clear()
     }
 
     fun removeEffector(effector: Effector) {
         _effectors.remove(effector)
+        events.fireEffectorRemoved(effector)
     }
 
     fun addSensor(sensor: Sensor) {
-        _sensors.add(sensor.also {
-            it.parent = this
-            if (it.id == null) {
-                it.setId(world.sensorIDGenerator.andIncrement)
-            }
-        })
+        _sensors.add(sensor)
+        if (sensor.id == null) {
+            sensor.setId(world.sensorIDGenerator.andIncrement)
+        }
+        events.fireSensorAdded(sensor)
     }
 
     fun addDefaultSensorsEffectors() {
         addDefaultEffectors()
-        addSensor(
-            ObjectSensor(
-                this, EntityType.SWISS, Math.PI / 8,
-                50.0
-            )
-        )
-        addSensor(ObjectSensor(this, EntityType.SWISS, 0.0, 0.0))
-        addSensor(
-            ObjectSensor(
-                this, EntityType.SWISS, -Math.PI / 8,
-                50.0
-            )
+        addSensor(ObjectSensor(EntityType.SWISS, 50.0, 45.0))
+        addSensor(ObjectSensor(EntityType.SWISS, 0.0, 0.0))
+        addSensor(ObjectSensor(EntityType.SWISS, 50.0, -45.0)
         )
         //TODO: Add more defaults
     }
@@ -207,16 +205,22 @@ class OdorWorldEntity @JvmOverloads constructor(
      * Add straight, left, and right effectors, in that order.
      */
     fun addDefaultEffectors() {
-        addEffector(StraightMovement(this))
-        addEffector(Turning(this, Turning.LEFT))
-        addEffector(Turning(this, Turning.RIGHT))
+        addEffector(StraightMovement())
+        addEffector(Turning(Turning.LEFT))
+        addEffector(Turning(Turning.RIGHT))
     }
 
     fun onCollide(block: (other: Bounded) -> Unit) {
     }
 
+    fun removeAllSensors() {
+        _sensors.forEach { events.fireSensorRemoved(it) }
+        _sensors.clear()
+    }
+
     fun removeSensor(sensor: Sensor) {
         _sensors.remove(sensor)
+        events.fireSensorRemoved(sensor)
     }
 
     fun delete() {
@@ -234,7 +238,9 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun getEntitiesInRadius(radius: Double): List<OdorWorldEntity> {
-        return world.entityList.filter { it.location.distance(location) <= radius }
+        return world.entityList
+            .filter{it !== this}
+            .filter{ it.location.distance(location) <= radius }
     }
 
     fun speakToEntity(phrase: String) {
@@ -253,7 +259,7 @@ class OdorWorldEntity @JvmOverloads constructor(
         val tileHeight = world.height / numTilesY
         for (i in 0 until numTilesX) {
             for (j in 0 until numTilesY) {
-                addSensor(GridSensor(this, i * tileWidth + offset, j * tileHeight + offset, tileWidth, tileHeight))
+                addSensor(GridSensor(i * tileWidth + offset, j * tileHeight + offset, tileWidth, tileHeight))
             }
         }
     }
@@ -262,9 +268,16 @@ class OdorWorldEntity @JvmOverloads constructor(
         TODO()
     }
 
-    fun addLeftRightSensors(entityType: EntityType, angle: Int) {
-        TODO()
-    }
+   /**
+    * Add left and right sensors of a given type.
+    *
+    * @param type type of sensor to add
+    * @param range the range of the object sensors
+    */
+   fun addLeftRightSensors(type: EntityType?, range: Double) {
+       addObjectSensor(type, 50.0, 45.0, range) // Left sensor
+       addObjectSensor(type, 50.0, -45.0, range) // Right sensor
+   }
 
     @Deprecated("Use location=")
     fun setCenterLocation(x: Int, y: Int) {
@@ -280,9 +293,15 @@ class OdorWorldEntity @JvmOverloads constructor(
         TODO()
     }
 
-    fun addObjectSensor(entityType: EntityType, radius: Double, angle: Double, range: Double): ObjectSensor {
-        TODO("Not yet implemented")
-    }
+    /**
+     * Add an object sensor to this entity.
+     */
+    fun addObjectSensor(type: EntityType?, radius: Double, angle: Double, range: Double): ObjectSensor {
+       val sensor = ObjectSensor(type, radius, angle)
+       sensor.setRange(range)
+       addSensor(sensor)
+       return sensor
+   }
 
     @get:UserParameter(label = "Linear Speed", order = 9, useSetter = true)
     override var speed: Double
@@ -300,6 +319,9 @@ class OdorWorldEntity @JvmOverloads constructor(
 
 }
 
+/**
+ * Heading is in degrees
+ */
 interface Locatable {
     var x: Double
     var y: Double

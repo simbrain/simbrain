@@ -91,23 +91,19 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
     /**
      * Construct the speech effector.
      *
-     * @param parent    parent entity
      * @param phrase    the phrase associated with this effector
-     * @param threshold
      */
-    public Speech(OdorWorldEntity parent, String phrase, double threshold) {
-        super(parent, "Say: \"" + phrase + "\"");
+    public Speech( String phrase, double threshold) {
+        super("Say: \"" + phrase + "\"");
         this.phrase = phrase;
         this.threshold = threshold;
     }
 
     /**
      * Construct the speech effector with default values.
-     *
-     * @param parent    parent entity
      */
-    public Speech(OdorWorldEntity parent) {
-        super(parent, "Say: \"" + DEFAULT_PHRASE + "\"");
+    public Speech() {
+        super("Say: \"" + DEFAULT_PHRASE + "\"");
     }
 
     public Speech(Speech speech) {
@@ -118,19 +114,9 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         this.decayFunction = (DecayFunction) speech.decayFunction.copy();
     }
 
-    /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddEffectorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
-     */
-    public Speech() {
-        super();
-    }
 
     @Override
-    public void update() {
+    public void update(OdorWorldEntity parent) {
         if (amount > threshold) {
             if (!activated) {
                 activated = true;
@@ -154,11 +140,6 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
                 }
             }
         }
-    }
-
-    @Override
-    public void setParent(OdorWorldEntity parent) {
-        this.parent = parent;
     }
 
     public String getPhrase() {

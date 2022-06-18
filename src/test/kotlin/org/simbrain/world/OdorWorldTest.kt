@@ -43,13 +43,14 @@ class OdorWorldTest {
         val oc = OdorWorldComponent("Test")
         val swiss = OdorWorldEntity(oc.world, EntityType.SWISS)
         swiss.location = point(5,6)
+        oc.world.addEntity(swiss)
         val mouse = OdorWorldEntity(oc.world, EntityType.MOUSE)
         mouse.location = point(10,11)
-        oc.world.addEntity(swiss)
+        oc.world.addEntity(mouse)
 
         // Create xstream for world
         val xstream = oc.xml
-        println(xstream)
+        // println(xstream)
         val stream: InputStream = ByteArrayInputStream(xstream.toByteArray(StandardCharsets.UTF_8))
 
         // Unmarshall from xstream

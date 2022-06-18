@@ -18,11 +18,6 @@
  */
 package org.simbrain.world.odorworld.entities
 
-import com.thoughtworks.xstream.converters.UnmarshallingContext
-import com.thoughtworks.xstream.converters.reflection.ReflectionConverter
-import com.thoughtworks.xstream.converters.reflection.ReflectionProvider
-import com.thoughtworks.xstream.io.HierarchicalStreamReader
-import com.thoughtworks.xstream.mapper.Mapper
 import org.simbrain.util.*
 import org.simbrain.util.Utils.round
 import org.simbrain.util.environment.SmellSource
@@ -41,8 +36,6 @@ import java.awt.geom.Point2D
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.javaType
 
 class OdorWorldEntity @JvmOverloads constructor(
     val world: OdorWorld,
@@ -71,7 +64,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     override var id: String? = null
 
     @Deprecated("Use world", ReplaceWith("world"))
-    val parentWorld = world
+    val parentWorld get() = world
 
     val isRotating get() = entityType.isRotating
 
@@ -98,13 +91,13 @@ class OdorWorldEntity @JvmOverloads constructor(
      * Sensors.
      */
     private val _sensors: MutableList<Sensor> = ArrayList()
-    val sensors: List<Sensor> by this::_sensors
+    val sensors: List<Sensor> get() = _sensors
 
     /**
      * Effectors.
      */
     private val _effectors: MutableList<Effector> = ArrayList()
-    val effectors: List<Effector> by this::_effectors
+    val effectors: List<Effector> get() = _effectors
 
     /**
      * Smell Source (if any). Initialize to random smell source with 10
@@ -305,65 +298,6 @@ class OdorWorldEntity @JvmOverloads constructor(
             movement.dtheta = value
         }
 
-    /**
-     * Perform initialization of objects after de-serializing.
-     */
-    fun readResolve(): Any {
-        events = EntityEvents()
-        sensors.forEach { it.postSerializationInit() }
-        effectors.forEach { it.postSerializationInit() }
-        return this
-    }
-
-}
-
-// TODO: Temporary initial work on a converter
-class OdorWorldEntityConverter(mapper: Mapper, reflectionProvider: ReflectionProvider) :
-    ReflectionConverter(mapper, reflectionProvider, OdorWorldEntity::class.java) {
-
-    @OptIn(ExperimentalStdlibApi::class)
-    override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
-        //TODO: Guarantee order
-        reader.moveDown()
-        val world = context.convertAnother(reader, OdorWorld::class.java) as OdorWorld
-        reader.moveUp()
-        reader.moveDown()
-        val type = context.convertAnother(reader, EntityType::class.java) as EntityType
-        reader.moveUp()
-        val entity = OdorWorldEntity(world, type, EntityEvents())
-        // Set the rest of the fields by reflection
-
-        // TODO: XStreamUtils
-        val fieldMap = entity::class.declaredMemberProperties.associateBy { it.name }
-        while (reader.hasMoreChildren()) {
-            reader.moveDown()
-            if (reader.nodeName.startsWith("_-_-delegate")) {
-                while (reader.hasMoreChildren()) {
-                    reader.moveDown()
-                    val currentField = if (fieldMap[reader.nodeName] == null) {
-                        reader.moveUp()
-                        continue
-                    } else {
-                        fieldMap[reader.nodeName]
-                    }
-                    val fieldValue = context.convertAnother(reader.value, null)
-                    // currentField?.set(entity, fieldValue)
-                    reader.moveUp()
-                }
-                continue
-            }
-            val currentField = if (fieldMap[reader.nodeName] == null) {
-                reader.moveUp()
-                continue
-            } else {
-                fieldMap[reader.nodeName]
-            }
-            val fieldValue = context.convertAnother(reader.value, currentField?.returnType?.javaType as Class<*>?)
-            // currentField?.(entity, fieldValue)
-            reader.moveUp()
-        }
-        return entity
-    }
 }
 
 interface Locatable {
@@ -377,7 +311,7 @@ interface Locatable {
  * Top-left x, y position of the entity.
  */
 class Location(@Transient private val event: EntityLocationEvent) : Locatable {
-    private var dirty = false
+    @Transient  private var dirty = true
 
     @UserParameter(label = "X", description = "X Position", useSetter = true, order = 3)
     override var x = 0.0
@@ -402,7 +336,7 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
             field = ((value % 360.0) + 360.0) % 360.0
         }
 
-    override var location: Point2D = point(x, y)
+    @Transient override var location: Point2D = point(x, y)
         get() {
             if (dirty) {
                 field = point(x, y)

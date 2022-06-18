@@ -250,14 +250,6 @@ public abstract class Sensor implements PeripheralAttribute {
         return relativeLocation;
     }
 
-    /**
-     * Perform initialization of objects after de-serializing.
-     */
-    public void postSerializationInit() {
-        relativeLocation = new Point2D.Double();
-        events = new AttributeEvents(this);
-    }
-
     @Override
     public abstract Sensor copy();
 

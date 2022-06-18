@@ -161,15 +161,6 @@ public abstract class Effector implements PeripheralAttribute {
     @Override
     public abstract Effector copy();
 
-    /**
-     * Perform initialization of objects after de-serializing.
-     * Called when odor world is de-serialized.  Effectors should override
-     * if needed.
-     */
-    public void postSerializationInit() {
-        events = new AttributeEvents(this);
-    }
-
     @Override
     public AttributeEvents getEvents() {
         return events;

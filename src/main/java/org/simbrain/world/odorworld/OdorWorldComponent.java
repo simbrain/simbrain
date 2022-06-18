@@ -20,12 +20,12 @@ package org.simbrain.world.odorworld;
 
 import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.piccolo.TiledDataConverter;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.entities.OdorWorldEntityConverter;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -91,7 +91,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
         XStream xstream = Utils.getSimbrainXStream();
         xstream.processAnnotations(TileMap.class);
         xstream.registerConverter(new TiledDataConverter(xstream.getMapper(), xstream.getReflectionProvider()));
-        xstream.registerConverter(new OdorWorldEntityConverter(xstream.getMapper(), xstream.getReflectionProvider()));
+        xstream.registerConverter(XStreamUtils.createConstructorCallingConverter(OdorWorldEntity.class, xstream.getMapper(), xstream.getReflectionProvider()));
         return xstream;
     }
 

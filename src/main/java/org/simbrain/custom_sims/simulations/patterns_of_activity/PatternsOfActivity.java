@@ -142,8 +142,8 @@ public class PatternsOfActivity extends Simulation {
         oc.getWorld().setUseCameraCentering(false);
         oc.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
         OdorWorldEntity mouse = oc.getWorld().addEntity(120, 245, EntityType.MOUSE);
-        mouse.addSensor(new SmellSensor("Smell-Right", Math.PI/5, 40));
-        mouse.addSensor(new SmellSensor("Smell-Left", -Math.PI/5, 40));
+        mouse.addSensor(new SmellSensor("Smell-Right", 36.0, 40));
+        mouse.addSensor(new SmellSensor("Smell-Left", -36.0, 40));
         mouse.setHeading(90);
         OdorWorldEntity cheese = oc.getWorld().addEntity(72, 220, EntityType.SWISS,
             new double[] {18, 0, 5, 10, 5});

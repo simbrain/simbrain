@@ -240,9 +240,9 @@ public class RL_Sim_Main extends Simulation implements AttributeContainer {
         mouse.addEffector(new Turning(Turning.LEFT));
         mouse.addEffector(new Turning(Turning.RIGHT));
 
-        leftSmell = new SmellSensor("Smell-Left", -Math.PI / 8,
+        leftSmell = new SmellSensor("Smell-Left", -22.5,
             50);
-        rightSmell = new SmellSensor("Smell-Right", Math.PI / 8,
+        rightSmell = new SmellSensor("Smell-Right", 22.5,
             50);
         mouse.addSensor(leftSmell);
         mouse.addSensor(rightSmell);
@@ -257,22 +257,22 @@ public class RL_Sim_Main extends Simulation implements AttributeContainer {
 
         // Used in Vehicle class
         double dispersion = 300;
-        cheeseLeft = new ObjectSensor(EntityType.SWISS, 50, Math.PI/8);
+        cheeseLeft = new ObjectSensor(EntityType.SWISS, 50, 22.5);
         cheeseLeft.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(cheeseLeft);
-        cheeseRight = new ObjectSensor(EntityType.SWISS, 50, -Math.PI/8);
+        cheeseRight = new ObjectSensor(EntityType.SWISS, 50, -22.5);
         cheeseRight.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(cheeseRight);
-        flowerLeft = new ObjectSensor(EntityType.FLOWER, 50, Math.PI/8);
+        flowerLeft = new ObjectSensor(EntityType.FLOWER, 50, 22.5);
         flowerLeft.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(flowerLeft);
-        flowerRight = new ObjectSensor(EntityType.FLOWER, 50, -Math.PI/8);
+        flowerRight = new ObjectSensor(EntityType.FLOWER, 50, -22.5);
         flowerRight.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(flowerRight);
-        candleLeft = new ObjectSensor(EntityType.CANDLE, 50, Math.PI/8);
+        candleLeft = new ObjectSensor(EntityType.CANDLE, 50, 22.5);
         candleLeft.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(candleLeft);
-        candleRight = new ObjectSensor(EntityType.CANDLE, 50, -Math.PI/8);
+        candleRight = new ObjectSensor(EntityType.CANDLE, 50, -22.5);
         candleRight.getDecayFunction().setDispersion(dispersion);
         mouse.addSensor(candleRight);
 

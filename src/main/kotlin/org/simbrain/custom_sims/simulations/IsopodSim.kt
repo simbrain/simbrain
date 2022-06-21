@@ -120,12 +120,12 @@ val isopodSim = newSim {
             // Options: new sensor in back; triangular array
             leftSensor = SmellSensor().apply {
                 radius = 40.0
-                theta = Math.PI / 4
+                theta = 45.0
                 addSensor(this)
             }
             rightSensor = SmellSensor().apply {
                 radius = 40.0
-                theta = -Math.PI / 4
+                theta = -45.0
                 addSensor(this)
             }
             events.onCollided {

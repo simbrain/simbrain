@@ -147,9 +147,9 @@ public abstract class Sensor implements PeripheralAttribute {
      * Return String direction (left / right) based on angle of the sensor
      */
     public String getDirectionString() {
-        if (getTheta() < 0 && getTheta() > - Math.PI /2  ) {
+        if (getTheta() < 0 && getTheta() > -45  ) {
             return "Right ";
-        } else if (getTheta() > 0 && getTheta() < Math.PI/2 ) {
+        } else if (getTheta() > 0 && getTheta() < 45 ) {
             return "Left ";
         } else {
             return "";

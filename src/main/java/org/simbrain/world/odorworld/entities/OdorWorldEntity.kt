@@ -124,8 +124,15 @@ class OdorWorldEntity @JvmOverloads constructor(
         val directionX = if (dx > 0) 1 else -1
         val directionY = if (dy > 0) 1 else -1
 
-        val bounds = (if (world.wrapAround) world.entityList else world.entityList + worldBound)
-            .filter { it !== this }
+        val bounds = ArrayList<Bounded>()
+
+        if (world.isObjectsBlockMovement) {
+            bounds.addAll(world.entityList.filter { it !== this@OdorWorldEntity })
+        }
+
+        if (!world.wrapAround) {
+            bounds.add(worldBound)
+        }
 
         val moveInX = Bound(x + dx, y, width, height)
 

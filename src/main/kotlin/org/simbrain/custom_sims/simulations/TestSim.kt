@@ -116,11 +116,11 @@ val testSim = newSim {
         cow = addEntity(50, 50, EntityType.COW).apply {
             heading = 90.0
             addDefaultEffectors()
-            addSensor(SmellSensor(this))
-            addSensor(SmellSensor(this).apply { theta = Math.PI / 8  })
-            addSensor(SmellSensor(this).apply { theta = -Math.PI / 8  })
-            manualStraightMovementIncrement = 2.0
-            manualMotionTurnIncrement = 2.0
+            addSensor(SmellSensor())
+            addSensor(SmellSensor().apply { theta = Math.PI / 8  })
+            addSensor(SmellSensor().apply { theta = -Math.PI / 8  })
+            manualMovement.manualStraightMovementIncrement = 2.0
+            manualMovement.manualMotionTurnIncrement = 2.0
         }
 
         odorWorld.addEntity(200, 260, EntityType.FLAX).apply {

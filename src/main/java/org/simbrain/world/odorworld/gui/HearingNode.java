@@ -77,7 +77,6 @@ public class HearingNode extends EntityAttributeNode {
      */
     public HearingNode(Hearing sensor) {
         this.sensor = sensor;
-        this.entity = sensor.getParent();
         this.hearingBubbleTrailLarge = PPath.createEllipse(10, -20, 10, 10);
         this.hearingBubbleTrailSmall = PPath.createEllipse(10, -8, 5, 5);
         this.hearingText = new PText();
@@ -101,7 +100,7 @@ public class HearingNode extends EntityAttributeNode {
     }
 
     @Override
-    public void update() {
+    public void update(OdorWorldEntity entity) {
 
     }
 

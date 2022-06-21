@@ -68,14 +68,16 @@ val evolveResourcePursuer = newSim {
 
             // Pre-populate with a few connections
             val connections = chromosome() {
-                listOf(connectionGene(inputs[0],hiddens[0]),
-                connectionGene(inputs[1],hiddens[1]),
-                connectionGene(inputs[1],hiddens[0]),
-                connectionGene(inputs[1],hiddens[1]),
-                connectionGene(hiddens[1],outputs[0]),
-                connectionGene(hiddens[1],outputs[1]),
-                connectionGene(hiddens[2],outputs[0]),
-                connectionGene(hiddens[2],outputs[1]))
+                listOf(
+                    connectionGene(inputs[0], hiddens[0]),
+                    connectionGene(inputs[1], hiddens[1]),
+                    connectionGene(inputs[1], hiddens[0]),
+                    connectionGene(inputs[1], hiddens[1]),
+                    connectionGene(hiddens[1], outputs[0]),
+                    connectionGene(hiddens[1], outputs[1]),
+                    connectionGene(hiddens[2], outputs[0]),
+                    connectionGene(hiddens[2], outputs[1])
+                )
             }
 
             val evolutionWorkspace = Workspace()
@@ -127,17 +129,18 @@ val evolveResourcePursuer = newSim {
             }
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
-                setCenterLocation(200.0, 200.0)
+                location = point(200.0, 200.0)
             }
 
             fun OdorWorldEntity.reset() {
-                setCenterLocation(random.nextDouble()*300,random.nextDouble()*300)
+                location = point(random.nextDouble() * 300, random.nextDouble() * 300)
             }
 
             fun addPoison() = odorworld.addEntity(EntityType.POISON).apply {
-                setCenterLocation(random.nextDouble()*300,random.nextDouble()*300)
-                velocityX = random.nextDouble(-5.0,5.0)
-                velocityY = random.nextDouble(-5.0,5.0)
+                location = point(random.nextDouble() * 300, random.nextDouble() * 300)
+                // TODO: use polar
+                // dx = random.nextDouble(-5.0, 5.0)
+                // dy = random.nextDouble(-5.0, 5.0)
                 onCollide {
                     if (it === mouse) reset()
                 }
@@ -267,17 +270,17 @@ val evolveResourcePursuer = newSim {
                 poison2.handleCollision();
                 poison3.handleCollision();
 
-               evolutionWorkspace.apply {
-                   repeat(iterationsPerRun) {simpleIterate()}
-                   // score += (0..1000).map {
-                   //     simpleIterate()
-                   //     minOf(
-                   //         poison1.getRadiusTo(mouse),
-                   //         poison2.getRadiusTo(mouse),
-                   //         poison3.getRadiusTo(mouse)
-                   //     ) / 100
-                   // }.minOf { it }
-               }
+                evolutionWorkspace.apply {
+                    repeat(iterationsPerRun) { simpleIterate() }
+                    // score += (0..1000).map {
+                    //     simpleIterate()
+                    //     minOf(
+                    //         poison1.getRadiusTo(mouse),
+                    //         poison2.getRadiusTo(mouse),
+                    //         poison3.getRadiusTo(mouse)
+                    //     ) / 100
+                    // }.minOf { it }
+                }
 
                 score
             }

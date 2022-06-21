@@ -44,9 +44,7 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
 
     val variance get() = standardDeviation * standardDeviation
 
-    override fun getName(): String {
-        return "Normal"
-    }
+    override val name = "Normal"
 
     override fun deepCopy(): NormalDistribution {
         val copy = NormalDistribution()

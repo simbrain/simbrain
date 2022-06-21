@@ -54,9 +54,7 @@ class ExponentialDistribution(lambda: Double = 1.0, negate: Boolean = false)
         return copy
     }
 
-    override fun getName(): String {
-        return "Exponential"
-    }
+    override val name = "Exponential"
 
     // Kotlin hack to support "static method in superclass"
     companion object {

@@ -162,18 +162,18 @@ public class Creature {
         agent.setId("Mouse");
         agent.setSmellSource(new SmellSource(new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0})); // TODO: Still used?
 
-        agent.addEffector(new StraightMovement(agent));
-        agent.addEffector(new Turning(agent, Turning.LEFT));
-        agent.addEffector(new Turning(agent, Turning.RIGHT));
+        agent.addEffector(new StraightMovement());
+        agent.addEffector(new Turning(Turning.LEFT));
+        agent.addEffector(new Turning(Turning.RIGHT));
 
         // Add object sensors (Todo)
-        cheeseSensor = new ObjectSensor(agent, EntityType.SWISS);
-        poisonSensor = new ObjectSensor(agent, EntityType.POISON);
-        toySensor = new ObjectSensor(agent, EntityType.BELL);
-        fishSensor = new ObjectSensor(agent, EntityType.FISH);
-        //hazardSensor = new ObjectSensor(agent, EntityType.???);
-        flowerSensor = new ObjectSensor(agent, EntityType.PANSY);
-        mouseSensor = new ObjectSensor(agent, EntityType.MOUSE);
+        cheeseSensor = new ObjectSensor(EntityType.SWISS);
+        poisonSensor = new ObjectSensor(EntityType.POISON);
+        toySensor = new ObjectSensor(EntityType.BELL);
+        fishSensor = new ObjectSensor(EntityType.FISH);
+        //hazardSensor = new ObjectSensor(EntityType.???);
+        flowerSensor = new ObjectSensor(EntityType.PANSY);
+        mouseSensor = new ObjectSensor(EntityType.MOUSE);
         agent.addSensor(cheeseSensor);
         agent.addSensor(poisonSensor);
         agent.addSensor(toySensor);
@@ -183,26 +183,26 @@ public class Creature {
         agent.addSensor(mouseSensor);
 
         // Add hearing sensors
-        hearCheese = new Hearing(agent, "Cheese", 10);
-        hearPoison = new Hearing(agent, "Poison", 10);
-        hearToy = new Hearing(agent, "Toy", 10);
-        hearFish = new Hearing(agent, "Fish", 10);
-        hearHazard = new Hearing(agent, "Hazard", 10);
-        hearFlower = new Hearing(agent, "Flower", 10);
-        hearMouse = new Hearing(agent, "Mouse", 10);
-        hearWait = new Hearing(agent, "Wait", 10);
-        hearLeft = new Hearing(agent, "Left", 10);
-        hearRight = new Hearing(agent, "Right", 10);
-        hearForward = new Hearing(agent, "Forward", 10);
-        hearBackward = new Hearing(agent, "Backward", 10);
-        hearSleep = new Hearing(agent, "Sleep", 10);
-        hearApproach = new Hearing(agent, "Approach", 10);
-        hearIngest = new Hearing(agent, "Ingest", 10);
-        hearLook = new Hearing(agent, "Look", 10);
-        hearSmell = new Hearing(agent, "Smell", 10);
-        hearAttack = new Hearing(agent, "Attack", 10);
-        hearPlay = new Hearing(agent, "Play", 10);
-        hearMate = new Hearing(agent, "Mate", 10);
+        hearCheese = new Hearing("Cheese", 10);
+        hearPoison = new Hearing("Poison", 10);
+        hearToy = new Hearing("Toy", 10);
+        hearFish = new Hearing("Fish", 10);
+        hearHazard = new Hearing("Hazard", 10);
+        hearFlower = new Hearing("Flower", 10);
+        hearMouse = new Hearing("Mouse", 10);
+        hearWait = new Hearing("Wait", 10);
+        hearLeft = new Hearing("Left", 10);
+        hearRight = new Hearing("Right", 10);
+        hearForward = new Hearing("Forward", 10);
+        hearBackward = new Hearing("Backward", 10);
+        hearSleep = new Hearing("Sleep", 10);
+        hearApproach = new Hearing("Approach", 10);
+        hearIngest = new Hearing("Ingest", 10);
+        hearLook = new Hearing("Look", 10);
+        hearSmell = new Hearing("Smell", 10);
+        hearAttack = new Hearing("Attack", 10);
+        hearPlay = new Hearing("Play", 10);
+        hearMate = new Hearing("Mate", 10);
         agent.addSensor(hearCheese);
         agent.addSensor(hearPoison);
         agent.addSensor(hearToy);
@@ -225,13 +225,13 @@ public class Creature {
         agent.addSensor(hearMate);
 
         // Add speech effectors
-        agent.addEffector(new Speech(agent, "Toy", 1));
-        agent.addEffector(new Speech(agent, "Fish", 1));
-        agent.addEffector(new Speech(agent, "Cheese", 1));
-        agent.addEffector(new Speech(agent, "Poison", 1));
-        agent.addEffector(new Speech(agent, "Hazard", 1));
-        agent.addEffector(new Speech(agent, "Flower", 1));
-        agent.addEffector(new Speech(agent, "Mouse", 1));
+        agent.addEffector(new Speech("Toy", 1));
+        agent.addEffector(new Speech("Fish", 1));
+        agent.addEffector(new Speech("Cheese", 1));
+        agent.addEffector(new Speech("Poison", 1));
+        agent.addEffector(new Speech("Hazard", 1));
+        agent.addEffector(new Speech("Flower", 1));
+        agent.addEffector(new Speech("Mouse", 1));
     }
 
     /**
@@ -514,10 +514,10 @@ public class Creature {
         }
 
         // Calculate the target heading for the agent
-        double delta_x = agent.getCenterX() - targetObject.getCenterX();
-        double delta_y = agent.getCenterY() - targetObject.getCenterY();
-        double targetHeading = Math.toDegrees(Math.atan2(delta_y, delta_x));
-        targetHeading = ((targetHeading < 0) ? targetHeading + 360 : targetHeading);
+//        double delta_x = agent.getCenterX() - targetObject.getCenterX();
+//        double delta_y = agent.getCenterY() - targetObject.getCenterY();
+//        double targetHeading = Math.toDegrees(Math.atan2(delta_y, delta_x));
+//        targetHeading = ((targetHeading < 0) ? targetHeading + 360 : targetHeading);
 
         // System.out.println(targetHeading + "," + agent.getHeading());
 
@@ -525,11 +525,11 @@ public class Creature {
         // TODO :Heading update feels unnatural. Maybe use braitenberg method instead,
         // or else improve this
         double stepSize = baseMovementStepSize * motionAmount;
-        double newX = agent.getCenterX() + stepSize * (targetObject.getX() - agent.getCenterX());
-        double newY = agent.getCenterY() + stepSize * (targetObject.getY() - agent.getCenterY());
-        double newHeading = agent.getHeading() + .1 * (targetHeading - agent.getHeading());
-        agent.setCenterLocation((float) newX, (float) newY);
-        agent.setHeading(newHeading);
+//        double newX = agent.getCenterX() + stepSize * (targetObject.getX() - agent.getCenterX());
+//        double newY = agent.getCenterY() + stepSize * (targetObject.getY() - agent.getCenterY());
+//        double newHeading = agent.getHeading() + .1 * (targetHeading - agent.getHeading());
+//        agent.setCenterLocation((float) newX, (float) newY);
+//        agent.setHeading(newHeading);
 
     }
 
@@ -647,7 +647,7 @@ public class Creature {
 
     // Was not here before last pull
     public void setAgentLocation(float x, float y) {
-        agent.setCenterLocation(x, y);
+//        agent.setCenterLocation(x, y);
     }
 
     // Was not here before last pull

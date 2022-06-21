@@ -21,9 +21,7 @@ class KNNClassifier(): ClassifierWrapper() {
      */
     override var model: Classifier<DoubleArray>? = null
 
-    override fun getName(): String {
-        return "K Nearest Neighbors"
-    }
+    override val name: String = "K Nearest Neighbors"
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         model = KNN.fit(inputs, targets, k)

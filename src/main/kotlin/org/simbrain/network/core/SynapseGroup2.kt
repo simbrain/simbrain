@@ -10,7 +10,7 @@ import org.simbrain.workspace.AttributeContainer
 /**
  * Lightweight collection of synapses
  */
-public class SynapseGroup2 @JvmOverloads constructor(
+class SynapseGroup2 @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
     var connection: ConnectionStrategy = AllToAll(),
@@ -22,7 +22,7 @@ public class SynapseGroup2 @JvmOverloads constructor(
     // reuse this in addsynapse
 
     @Transient
-    private var events = SynapseGroup2Events(this)
+    override var events: SynapseGroup2Events = SynapseGroup2Events(this)
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
@@ -76,10 +76,6 @@ public class SynapseGroup2 @JvmOverloads constructor(
 
     fun size(): Int = this.synapses.size
 
-    override fun getEvents(): SynapseGroup2Events {
-        return events
-    }
-
     override fun randomize() {
         this.synapses.forEach { it.randomize() }
     }
@@ -95,9 +91,7 @@ public class SynapseGroup2 @JvmOverloads constructor(
         this.synapses.forEach { it.postOpenInit() }
     }
 
-    override fun getId(): String {
-        return super<NetworkModel>.getId()
-    }
+    override var id: String? = super<NetworkModel>.id
 
     override fun toString(): String {
         return ("$id  with ${size()} synapse(s) from $source.id to $target.id")

@@ -69,23 +69,15 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     /**
      * Construct bump sensor.
      *
-     * @param parent  parent entity
      * @param baseValue value
      */
-    public BumpSensor(OdorWorldEntity parent, double baseValue) {
-        super(parent, "Bump Sensor" + baseValue);
+    public BumpSensor(double baseValue) {
+        super("Bump Sensor " + baseValue);
         this.baseValue = baseValue;
-        this.world = parent.getParentWorld();
     }
 
-    /**
-     * Construct bump sensor with default values.
-     *
-     * @param parent  parent entity
-     */
-    public BumpSensor(OdorWorldEntity parent) {
-        super(parent, "Bump Sensor");
-        this.world = parent.getParentWorld();
+    public BumpSensor() {
+        super("Bump sensor");
     }
 
     /**
@@ -98,19 +90,8 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
         this.baseValue = bumpSensor.baseValue;
     }
 
-    /**
-     * Default constructor for {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
-     *
-     * NOTE:
-     * {@link org.simbrain.world.odorworld.dialogs.AddSensorDialog} handles the set up of {@link #parent}.
-     * When calling this directly, remember to set up the required field {@link #parent} accordingly.
-     */
-    public BumpSensor() {
-        super();
-    }
-
     @Override
-    public void update() {
+    public void update(OdorWorldEntity parent) {
         value = 0;
         updateCollisionBound();
         if (collided()) {
@@ -123,14 +104,14 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
      * @return true if collided with an entity, false otherwise
      */
     public boolean collided() {
-        if (world == null) {
-            world = parent.getParentWorld();
-        }
-        for (OdorWorldEntity e : world.getEntityList()) {
-            if (e != parent && e.getCollisionBound().collide(this.collisionBound)) {
-                return true;
-            }
-        }
+        // if (world == null) {
+        //     world = parent.getParentWorld();
+        // }
+//        for (OdorWorldEntity e : world.getEntityList()) {
+//            if (e != parent && e.getCollisionBound().collide(this.collisionBound).stream().anyMatch(it -> it)) {
+//                return true;
+//            }
+//        }
         return false;
     }
 
@@ -138,16 +119,11 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
      * Update the {@link #collisionBound} base on the updated location of this sensor.
      */
     public void updateCollisionBound() {
-        collisionBound.setVelocity(parent.getVelocityX(), parent.getVelocityY());
-        collisionBound.setLocation(
-                getRelativeLocation().getX() + parent.getX(),
-                getRelativeLocation().getY() + parent.getY()
-        );
-    }
-
-    @Override
-    public void setParent(OdorWorldEntity parent) {
-        this.parent = parent;
+//        collisionBound.setVelocity(parent.getVelocityX(), parent.getVelocityY());
+//        collisionBound.setLocation(
+//                getRelativeLocation().getX() + parent.getX(),
+//                getRelativeLocation().getY() + parent.getY()
+//        );
     }
 
     @Override

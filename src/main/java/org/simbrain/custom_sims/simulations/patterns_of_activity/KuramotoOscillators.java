@@ -168,7 +168,7 @@ public class KuramotoOscillators extends Simulation {
 
         // Mouse
         mouse = oc.getWorld().addEntity(202, 176, EntityType.MOUSE);
-        smellSensor = new SmellSensor(mouse, "Smell-Center", 0, 0);
+        smellSensor = new SmellSensor("Smell-Center", 0, 0);
         mouse.addSensor(smellSensor);
         mouse.setHeading(90);
 

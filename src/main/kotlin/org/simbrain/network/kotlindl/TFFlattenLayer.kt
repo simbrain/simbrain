@@ -25,9 +25,7 @@ class TFFlattenLayer : TFLayer<Flatten>() {
         }
     }
 
-    override fun getName(): String {
-        return "Flatten layer"
-    }
+    override val name = "Flatten layer"
 
     companion object {
         @JvmStatic

@@ -150,8 +150,5 @@ class HistogramModel(
         return dataSet
     }
 
-    override fun getId(): String {
-        return "Histogram"
-    }
-
+    override val id: String = "Histogram"
 }

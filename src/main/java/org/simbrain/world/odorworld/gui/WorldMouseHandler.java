@@ -119,13 +119,6 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
         // objects in the last clicked position on screen.
         world.setLastClickedPosition(mouseEvent.getCanvasPosition());
 
-        // Set picked node
-        PNode pickedNode = mouseEvent.getPath().getPickedNode();
-
-        // Set pressed position for use in double clicking
-        if (pickedNode instanceof PCamera) {
-            odorWorldPanel.setBeginPosition(mouseEvent.getPosition());
-        }
     }
 
     @Override

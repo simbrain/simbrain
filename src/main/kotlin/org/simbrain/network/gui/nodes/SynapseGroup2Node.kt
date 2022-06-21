@@ -61,7 +61,7 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         // Note the children pnodes to outlined objects are created in
         // networkpanel and added externally to outlined objects
         interactionBox = SynapseGroup2InteractionBox(networkPanel, synapseGroup, this)
-        interactionBox.setText(synapseGroup.getLabel())
+        interactionBox.setText(synapseGroup.label)
         addChild(interactionBox)
         synapseGroup.source.events.onLocationChange { layoutChildren() }
         synapseGroup.target.events.onLocationChange { layoutChildren() }
@@ -134,7 +134,7 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
      * Update the text in the interaction box.
      */
     fun updateText() {
-        interactionBox.setText(synapseGroup.getLabel())
+        interactionBox.setText(synapseGroup.label)
     }
 
     override fun isSelectable(): Boolean {

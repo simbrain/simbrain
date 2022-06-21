@@ -55,7 +55,5 @@ class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, editable 
         return this
     }
 
-    override fun getName(): String {
-        return "$id"
-    }
+    override val name = "$id"
 }

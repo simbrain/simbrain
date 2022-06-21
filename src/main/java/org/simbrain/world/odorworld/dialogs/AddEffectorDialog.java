@@ -85,7 +85,6 @@ public class AddEffectorDialog extends StandardDialog {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        effectorCreator.getEffector().setParent(entity);
         entity.addEffector(effectorCreator.getEffector());
     }
 }

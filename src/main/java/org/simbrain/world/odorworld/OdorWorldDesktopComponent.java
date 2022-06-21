@@ -91,10 +91,13 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         worldPanel.setPreferredSize(worldPanel.getPreferredSize());
         int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
         int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
-        getParentFrame().setMaximumSize(
-                new Dimension(worldPanel.getWorld().getWidth() + widthOffset,
-                        worldPanel.getWorld().getHeight() + heightOffset));
-        getParentFrame().pack();
+        var maxWidth = worldPanel.getWorld().getWidth() + widthOffset;
+        var maxHeight = worldPanel.getWorld().getHeight() + heightOffset;
+        getParentFrame().setMaximumSize(new Dimension(maxWidth, maxHeight));
+        var bound = getParentFrame().getBounds();
+        bound.width = maxWidth;
+        bound.height = maxHeight;
+        getParentFrame().setBounds(bound);
     }
 
     /**

@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkKt;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
@@ -173,7 +172,7 @@ public class OperantWithEnvironment extends Simulation {
             if (Math.random() < .2) {
                 mouse.setHeading(mouse.getHeading() + Math.random()*20-10);
             }
-            mouse.goStraight(2.5);
+            mouse.setSpeed(2.5);
         }
         // Node 2: Spin
         else {

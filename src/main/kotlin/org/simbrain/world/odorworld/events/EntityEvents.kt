@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld.events
 
 import org.simbrain.util.Event
 import org.simbrain.world.odorworld.effectors.Effector
+import org.simbrain.world.odorworld.entities.Bounded
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.entities.PeripheralAttribute
@@ -10,19 +11,25 @@ import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
+
+interface EntityLocationEvent {
+    fun onMoved(handler: Runnable)
+    fun fireMoved()
+}
+
 /**
  * See [Event].
  */
-class EntityEvents(val entity: OdorWorldEntity):Event(PropertyChangeSupport(entity)) {
+class EntityEvents: Event(PropertyChangeSupport(Any())), EntityLocationEvent {
 
     fun onDeleted(handler: Consumer<OdorWorldEntity>) = "Deleted".itemRemovedEvent(handler)
-    fun fireDeleted() = "Deleted"(old = entity)
+    fun fireDeleted(old: OdorWorldEntity) = "Deleted"(old)
 
     fun onUpdated(handler: Runnable) = "Update".event(handler)
     fun fireUpdated() = "Update"()
 
-    fun onMoved(handler: Runnable) = "Moved".event(handler)
-    fun fireMoved() = "Moved"()
+    override fun onMoved(handler: Runnable) = "Moved".event(handler)
+    override fun fireMoved() = "Moved"()
 
     fun onTypeChanged(handler: BiConsumer<EntityType, EntityType>) = "TypeChanged".itemChangedEvent(handler)
     fun fireTypeChanged(old: EntityType, new: EntityType) = "TypeChanged"(old = old, new = new)
@@ -42,6 +49,8 @@ class EntityEvents(val entity: OdorWorldEntity):Event(PropertyChangeSupport(enti
     fun onEffectorRemoved(handler: Consumer<Effector>) = "EffectorRemoved".itemRemovedEvent(handler)
     fun fireEffectorRemoved(effector: Effector) = "EffectorRemoved"(old = effector)
 
+    fun onCollided(handler: Consumer<Bounded>) = "Collided".itemAddedEvent(handler)
+    fun fireCollided(bound: Bounded) = "Collided"(new = bound)
 }
 
 /**

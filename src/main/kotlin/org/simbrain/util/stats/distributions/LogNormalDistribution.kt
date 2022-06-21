@@ -68,9 +68,7 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: 
         return copy
     }
 
-    override fun getName(): String {
-        return "Log-Normal"
-    }
+    override val name = "Log-Normal"
 
     // Kotlin hack to support "static method in superclass"
     companion object {

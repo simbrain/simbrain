@@ -30,9 +30,7 @@ class TFInputLayer(
         }
     }
 
-    override fun getName(): String {
-        return "Input layer"
-    }
+    override val name = "Input layer"
 
     val numElements
         get() = rows * cols * channels

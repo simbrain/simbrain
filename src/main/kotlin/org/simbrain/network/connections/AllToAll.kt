@@ -41,9 +41,7 @@ class AllToAll(
 
 ) : ConnectionStrategy(), EditableObject {
 
-    override fun getName(): String {
-        return "All to All"
-    }
+    override val name: String = "All to All"
 
     override fun toString(): String {
         return name

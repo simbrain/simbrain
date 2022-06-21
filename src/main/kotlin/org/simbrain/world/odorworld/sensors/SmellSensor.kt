@@ -27,11 +27,10 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  * A sensor which is updated based on the presence of [SmellSource]s near it.
  */
 class SmellSensor @JvmOverloads constructor(
-    parent: OdorWorldEntity? = null,
     label: String = "Smell Sensor",
     theta: Double = 0.0,
     radius: Double = 0.0,
-) : Sensor(parent, label), VisualizableEntityAttribute {
+) : Sensor(label), VisualizableEntityAttribute {
 
     /**
      * The current vale of the smell sensors. A vector of smells obtained
@@ -44,12 +43,12 @@ class SmellSensor @JvmOverloads constructor(
     /**
      * Update the smell vector by iterating over entities and adding up their distance-scaled smell vectors.
      */
-    override fun update() {
-        smellVector = parent.parentWorld.entityList
+    override fun update(parent: OdorWorldEntity) {
+        smellVector = parent.world.entityList
             .filter { it != parent } // Don't smell yourself
-            .map{Pair(it.smellSource, SimbrainMath.distance(it.centerLocation, this.location)) }
-            .filter{(smellSource, _) -> smellSource != null}
-            .map{(smellSource, distance) -> smellSource.getStimulus(distance)}
+            .map { Pair(it.smellSource, SimbrainMath.distance(it.location, parent.location)) }
+            .filter { (smellSource, _) -> smellSource != null }
+            .map { (smellSource, distance) -> smellSource.getStimulus(distance) }
             .sum()
     }
 
@@ -64,10 +63,6 @@ class SmellSensor @JvmOverloads constructor(
             // TODO: Provide other options for producing a scalar smell value from a vector, e.g. mean value or norm.
             smellVector.sum()
         }
-
-    override fun setParent(parent: OdorWorldEntity) {
-        this.parent = parent
-    }
 
     /**
      * Called by reflection to return a custom description for couplings.
@@ -84,11 +79,8 @@ class SmellSensor @JvmOverloads constructor(
     }
 
     override fun copy(): SmellSensor {
-        return SmellSensor(parent, label, theta, radius)
+        return SmellSensor(label, theta, radius)
     }
 
-    override fun getName(): String {
-        return "Smell Sensor"
-    }
-
+    override val name: String = "Smell Sensor"
 }

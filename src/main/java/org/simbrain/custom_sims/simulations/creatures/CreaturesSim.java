@@ -85,20 +85,20 @@ public class CreaturesSim extends Simulation {
         npc.setSmellSource(new SmellSource(new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0}));
 
         // Give npc speech effectors
-        npc.addEffector(new Speech(npc, "Wait", 1));
-        npc.addEffector(new Speech(npc, "Left", 1));
-        npc.addEffector(new Speech(npc, "Right", 1));
-        npc.addEffector(new Speech(npc, "Forward", 1));
-        npc.addEffector(new Speech(npc, "Backward", 1));
-        npc.addEffector(new Speech(npc, "Sleep", 1));
-        npc.addEffector(new Speech(npc, "Approach", 1));
-        npc.addEffector(new Speech(npc, "Ingest", 1));
-        npc.addEffector(new Speech(npc, "Look", 1));
-        npc.addEffector(new Speech(npc, "Smell", 1));
-        npc.addEffector(new Speech(npc, "Attack", 1));
-        npc.addEffector(new Speech(npc, "Play", 1));
-        npc.addEffector(new Speech(npc, "Mate", 1));
-        npc.addEffector(new Speech(npc, "Speak", 1));
+        npc.addEffector(new Speech("Wait", 1));
+        npc.addEffector(new Speech("Left", 1));
+        npc.addEffector(new Speech("Right", 1));
+        npc.addEffector(new Speech("Forward", 1));
+        npc.addEffector(new Speech("Backward", 1));
+        npc.addEffector(new Speech("Sleep", 1));
+        npc.addEffector(new Speech("Approach", 1));
+        npc.addEffector(new Speech("Ingest", 1));
+        npc.addEffector(new Speech("Look", 1));
+        npc.addEffector(new Speech("Smell", 1));
+        npc.addEffector(new Speech("Attack", 1));
+        npc.addEffector(new Speech("Play", 1));
+        npc.addEffector(new Speech("Mate", 1));
+        npc.addEffector(new Speech("Speak", 1));
     }
 
     private void setUpWorld() {

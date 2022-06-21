@@ -152,10 +152,7 @@ public class OdorWorld implements EditableObject {
         entity.setName(entity.getId());
 
         // Add entity to the map
-        // map.addSprite(entity);
         entityList.add(entity);
-
-        entity.setParentWorld(this);
 
         events.fireEntityAdded(entity);
 
@@ -168,7 +165,7 @@ public class OdorWorld implements EditableObject {
      */
     public OdorWorldEntity addEntity() {
         OdorWorldEntity entity = new OdorWorldEntity(this);
-        entity.setLocation(lastClickedPosition.getX(), lastClickedPosition.getY());
+        entity.setLocation(new Point2D.Double(lastClickedPosition.getX(), lastClickedPosition.getY()));
         addEntity(entity);
         return entity;
     }
@@ -345,10 +342,10 @@ public class OdorWorld implements EditableObject {
             entityList.remove(entity);
             entity.delete();
             for (Sensor sensor : entity.getSensors()) {
-                //fireSensorRemoved(sensor);
+                entity.getEvents().fireSensorRemoved(sensor);
             }
             for (Effector effector : entity.getEffectors()) {
-                //fireEffectorRemoved(effector);
+                entity.getEvents().fireEffectorRemoved(effector);
             }
             recomputeMaxVectorNorm();
             events.fireEntityRemoved(entity);
@@ -388,7 +385,7 @@ public class OdorWorld implements EditableObject {
         ));
 
         for (OdorWorldEntity entity : entityList) {
-            entity.postSerializationInit();
+//            entity.postSerializationInit();
         }
         recomputeMaxVectorNorm();
         return this;

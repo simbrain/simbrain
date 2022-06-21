@@ -106,7 +106,7 @@ class Sparse @JvmOverloads constructor(
         }
     }
 
-    override fun getName() = "Sparse"
+    override val name = "Sparse"
 
     override fun toString() = name
 

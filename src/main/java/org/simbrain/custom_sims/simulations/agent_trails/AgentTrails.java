@@ -130,10 +130,10 @@ public class AgentTrails extends Simulation {
         mouse = oc.getWorld().addEntity(204, 343, EntityType.MOUSE);
         mouse.setHeading(90);
         mouse.addDefaultSensorsEffectors();
-        SmellSensor smellSensor = new SmellSensor(mouse);
+        SmellSensor smellSensor = new SmellSensor();
         mouse.addSensor(smellSensor);
-        mouse.setManualStraightMovementIncrement(2);
-        mouse.setManualMotionTurnIncrement(2);
+        mouse.getManualMovement().setManualStraightMovementIncrement(2);
+        mouse.getManualMovement().setManualMotionTurnIncrement(2);
 
         cheese = oc.getWorld().addEntity(cheeseX, cheeseY, EntityType.SWISS, new double[]{1, 0, 0});
         cheese.getSmellSource().setDispersion(dispersion);
@@ -242,22 +242,23 @@ public class AgentTrails extends Simulation {
 
         panel.addButton("Solar System", () -> {
             nc.getNetwork().clearActivations();
-            cheese.setVelocityX(2.05f);
-            cheese.setVelocityY(2.05f);
-            flower.setVelocityX(2.5f);
-            flower.setVelocityY(2.1f);
-            fish.setVelocityX(-2.5f);
-            fish.setVelocityY(1.05f);
+            // TODO: use polar
+            // cheese.setVelocityX(2.05f);
+            // cheese.setVelocityY(2.05f);
+            // flower.setVelocityX(2.5f);
+            // flower.setVelocityY(2.1f);
+            // fish.setVelocityX(-2.5f);
+            // fish.setVelocityY(1.05f);
             mouse.setLocation(cheeseX, cheeseY + dispersion);
             mouse.setHeading(90);
             straightNeuron.forceSetActivation(0);
             sim.iterate(200);
-            cheese.setVelocityX(0);
-            cheese.setVelocityY(0);
-            flower.setVelocityX(0);
-            flower.setVelocityY(0);
-            fish.setVelocityX(0);
-            fish.setVelocityY(0);
+            // cheese.setVelocityX(0);
+            // cheese.setVelocityY(0);
+            // flower.setVelocityX(0);
+            // flower.setVelocityY(0);
+            // fish.setVelocityX(0);
+            // fish.setVelocityY(0);
 //            networkWrapper.getNetwork().fireNeuronsUpdated(); // TODO: [event]
         });
 

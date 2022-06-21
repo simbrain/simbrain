@@ -14,9 +14,7 @@ class LinearDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0) :
             }
     }
 
-    override fun getName(): String {
-        return "Linear"
-    }
+    override val name = "Linear"
 
     // Kotlin hack to support "static method in superclass"
     companion object {

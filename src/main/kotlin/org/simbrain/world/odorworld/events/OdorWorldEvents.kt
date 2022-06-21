@@ -2,9 +2,7 @@ package org.simbrain.world.odorworld.events
 
 import org.simbrain.util.Event
 import org.simbrain.world.odorworld.OdorWorld
-import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.sensors.Sensor
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 

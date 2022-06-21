@@ -126,9 +126,8 @@ class RadialProbabilistic(
         return syns
     }
 
-    override fun getName(): String {
-        return "Radial (Probabilistic)"
-    }
+
+    override val name = "Radial (Probabilistic)"
 
     override fun toString(): String {
         return name

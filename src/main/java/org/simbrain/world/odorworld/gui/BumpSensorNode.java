@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld.gui;
 
 import org.piccolo2d.nodes.PPath;
+import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.BumpSensor;
 
 import java.awt.*;
@@ -30,15 +31,13 @@ public class BumpSensorNode extends EntityAttributeNode {
                 sensor.getSensorSize(),
                 sensor.getSensorSize()
         );
-        update();
         setPickable(false);
         shape.setPickable(false);
         addChild(this.shape);
     }
 
     @Override
-    public void update() {
-        shape.setOffset(sensor.getRelativeLocation().getX(), sensor.getRelativeLocation().getY());
+    public void update(OdorWorldEntity entity) {
         shape.setPaint(Color.getHSBColor(maxColor, (float) sensor.getCurrentValue(), 1));
     }
 }

@@ -144,9 +144,7 @@ class SmileClassifier(
         40)
         var classifierType: ClassifierWrapper = SVMClassifier()
 
-        override fun getName(): String {
-            return "Classifier"
-        }
+        override val name = "Classifier"
 
         fun create(net: Network): SmileClassifier {
             return SmileClassifier(net, classifierType, nin)

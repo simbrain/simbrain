@@ -55,9 +55,7 @@ class OneToOne(
         return syns
     }
 
-    override fun getName(): String {
-        return "One to one"
-    }
+    override val name = "One to one"
 
     override fun toString(): String {
         return name

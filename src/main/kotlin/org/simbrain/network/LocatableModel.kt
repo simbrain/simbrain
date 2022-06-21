@@ -29,7 +29,7 @@ abstract class LocatableModel() : NetworkModel() {
     /**
      * Implementing classes must fire and handle location events.
      */
-    abstract override fun getEvents(): LocationEvents
+    abstract override val events: LocationEvents
 
     /**
      * Must call this _after_ adding a network model, because adding the model places the model using the layout

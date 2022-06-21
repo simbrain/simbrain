@@ -74,11 +74,9 @@ public class Turning extends Effector {
     /**
      * Construct a turning effector.
      *
-     * @param parent    parent entity.
      * @param direction amount turn in radians.
      */
-    public Turning(OdorWorldEntity parent, double direction) {
-        super(parent);
+    public Turning(double direction) {
         this.direction = direction;
     }
 
@@ -105,14 +103,9 @@ public class Turning extends Effector {
     }
 
     @Override
-    public void update() {
-        parent.turn(direction * amount);
+    public void update(OdorWorldEntity parent) {
+        parent.setDtheta(direction * amount);
         this.amount = 0;
-    }
-
-    @Override
-    public void setParent(OdorWorldEntity parent) {
-        this.parent = parent;
     }
 
     public double getAmount() {

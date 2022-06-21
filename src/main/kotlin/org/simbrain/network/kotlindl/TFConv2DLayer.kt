@@ -56,9 +56,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
         }
     }
 
-    override fun getName(): String {
-        return "Convolutional 2d"
-    }
+    override val name = "Convolutional 2d"
 
     companion object {
         @JvmStatic

@@ -58,9 +58,7 @@ abstract class DecayFunction(
         @UserParameter(label = "Decay Function", isObjectType = true, tab = "Layout", order = 50)
         var decayFunction: DecayFunction = decayFunction
 
-        override fun getName(): String {
-            return "Decay Function"
-        }
+        override val name = "Decay Function"
     }
 
     companion object {

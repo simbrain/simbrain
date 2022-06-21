@@ -47,9 +47,7 @@ class LogisticRegClassifier() : ClassifierWrapper() {
         }
     }
 
-    override fun getName(): String {
-        return "Logistic Regression"
-    }
+    override val name = "Logistic Regression"
 
     companion object {
         @JvmStatic

@@ -23,9 +23,9 @@ import org.simbrain.util.piccolo.Animations;
 import org.simbrain.util.piccolo.RotatingSprite;
 import org.simbrain.util.piccolo.Sprite;
 import org.simbrain.world.odorworld.OdorWorld;
+import org.simbrain.world.odorworld.OdorWorldResourceManager;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.RotatingEntityManager;
-import org.simbrain.world.odorworld.OdorWorldResourceManager;
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute;
 
 import java.awt.geom.Point2D;
@@ -147,7 +147,7 @@ public class EntityNode extends PNode {
         EntityAttributeNode node = EntityAttributeNode.getNode(attribute);
         visualizableAttributeMap.put(attribute, node);
         addChild(visualizableAttributeMap.get(attribute));
-        node.update();
+        node.update(entity);
     }
 
     /**
@@ -196,7 +196,7 @@ public class EntityNode extends PNode {
             } else {
                 currentEntityAttributeNode = visualizableAttributeMap.get(vp);
             }
-            currentEntityAttributeNode.update();
+            currentEntityAttributeNode.update(entity);
         }
     }
 
@@ -204,7 +204,7 @@ public class EntityNode extends PNode {
      * Update all visualizable attribute nodes.
      */
     private void updateAttributesNodes() {
-        visualizableAttributeMap.values().forEach(EntityAttributeNode::update);
+        visualizableAttributeMap.values().forEach(entityAttributeNode -> entityAttributeNode.update(entity));
     }
 
     /**
@@ -274,7 +274,6 @@ public class EntityNode extends PNode {
             }
             setOffset(entity.getX(), entity.getY());
             updateAttributesNodes();
-            // repaint(); // TODO: Not clear why this is needed. setOffset fires an event.
             updateFlag = false;
         }
     }
@@ -283,16 +282,7 @@ public class EntityNode extends PNode {
      * Advancing animation frame based on the velocity of the entity.
      */
     public void advance() {
-        double dx;
-        double dy;
-        if (entity.isManualMode()) {
-            dx = entity.getManualMovementVelocity().getX();
-            dy = entity.getManualMovementVelocity().getY();
-        } else {
-            dx = entity.getVelocityX();
-            dy = entity.getVelocityY();
-        }
-        frameCounter += Math.sqrt(dx * dx + dy * dy) / 5;
+        frameCounter += entity.getSpeed() / 5;
         int i = 0;
         for (; i < frameCounter; i++) {
             sprite.advance();

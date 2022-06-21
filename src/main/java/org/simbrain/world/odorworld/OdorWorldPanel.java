@@ -55,14 +55,14 @@ public class OdorWorldPanel extends JPanel {
     private final OdorWorldCanvas canvas;
 
     /**
-     * Reference to WorkspaceComponent. // TODO: Needed?
+     * Reference to WorkspaceComponent.
      */
-    private OdorWorldComponent component;
+    private final OdorWorldComponent component;
 
     /**
      * Reference to model world.
      */
-    private OdorWorld world;
+    private final OdorWorld world;
 
     /**
      * Selection model.
@@ -74,21 +74,6 @@ public class OdorWorldPanel extends JPanel {
      */
     private PNode tileSelectionBox = null;
     private Rectangle tileSelectionModel = null;
-
-    /**
-     * Color of the world background.
-     */
-    private Color backgroundColor = Color.white;
-
-    /**
-     * Default panel width
-     */
-    private int defaultWidth = 450;
-
-    /**
-     * Default panel height
-     */
-    private int defaultHeight = 450;
 
     /**
      * Timer to update entity animations.
@@ -105,7 +90,7 @@ public class OdorWorldPanel extends JPanel {
      * Used for a mask that allows multiple movements to be applied at once.
      * Lower four bits are used for U,D,L,R.
      */
-    private byte manualMovementState;
+    private byte manualMovementKeyState;
 
     /**
      * List corresponding to the layers of a tmx file.
@@ -179,7 +164,6 @@ public class OdorWorldPanel extends JPanel {
         setLayout(new BorderLayout());
         this.add("Center", canvas);
 
-        canvas.setBackground(backgroundColor);
         canvas.setFocusable(true);
 
         // Add tile map
@@ -221,7 +205,14 @@ public class OdorWorldPanel extends JPanel {
             repaint();
         });
         world.getEvents().onEntityRemoved(e -> {
-            repaint();
+            var entityNode = canvas.getLayer().getAllNodes()
+                    .stream().filter(n -> n instanceof EntityNode)
+                    .filter(n -> ((EntityNode)n).getEntity() == e)
+                    .findFirst();
+            if (entityNode.isPresent()) {
+                canvas.getLayer().removeChild((PNode) entityNode.get());
+                repaint();
+            }
         });
         world.getEvents().onUpdated(this::centerCameraToSelectedEntity);
         world.getEvents().onFrameAdvance(() -> {
@@ -368,9 +359,9 @@ public class OdorWorldPanel extends JPanel {
 
     public void manualMovementUpdate() {
         EntityNode entityNode = getFirstSelectedEntityNode();
-        if (entityNode != null) {
+        if (entityNode != null && isManualMovementMode()) {
             OdorWorldEntity entity = entityNode.getEntity();
-            entity.manualMovementUpdate();
+            entity.applyMovement();
             entityNode.advance();
             centerCameraToSelectedEntity();
         }
@@ -386,7 +377,6 @@ public class OdorWorldPanel extends JPanel {
             canvas.getLayer().addChild(node);
         }
     }
-
 
     /**
      * Show the PNode debugging tool.
@@ -489,37 +479,8 @@ public class OdorWorldPanel extends JPanel {
         return contextMenu;
     }
 
-    /**
-     * @return Background color of world.
-     */
-    public int getBackgroundColor() {
-        return backgroundColor.getRGB();
-    }
-
-    /**
-     * Sets the background color of the world.
-     *
-     * @param backgroundColor Color
-     */
-    public void setBackgroundColor(final int backgroundColor) {
-        this.backgroundColor = new Color(backgroundColor);
-    }
-
-    /**
-     * @return the world
-     */
     public OdorWorld getWorld() {
         return world;
-    }
-
-    /**
-     * @param world the world to set
-     */
-    public void setWorld(final OdorWorld world) {
-        this.world = world;
-    }
-
-    public void setBeginPosition(Point2D position) {
     }
 
     public void clearSelection() {
@@ -573,21 +534,6 @@ public class OdorWorldPanel extends JPanel {
     }
 
 
-    public int getDefaultWidth() {
-        return defaultWidth;
-    }
-
-    public int getDefaultHeight() {
-        return defaultHeight;
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(
-                Math.min(defaultWidth, getWorld().getWidth()),
-                Math.min(defaultHeight, getWorld().getHeight()));
-    }
-
     /**
      * Toggle the selected state of the specified element; if it is selected,
      * remove it from the selection, if it is not selected, add it to the
@@ -617,33 +563,22 @@ public class OdorWorldPanel extends JPanel {
         return mask;
     }
 
-    void setManualMovementState(String key, boolean state) {
+    void setManualMovementKeyState(String key, boolean state) {
         byte mask = getManualMovementStateMask(key);
         if (state) {
-            manualMovementState |= mask;
+            manualMovementKeyState |= mask;
         } else {
-            manualMovementState &= ~mask;
+            manualMovementKeyState &= ~mask;
         }
     }
 
     boolean getManualMovementState(String key) {
         byte mask = getManualMovementStateMask(key);
-        return (manualMovementState & mask) > 0;
+        return (manualMovementKeyState & mask) > 0;
     }
 
-    private boolean getManualMovementState() {
-        return manualMovementState > 0;
+    private boolean isManualMovementMode() {
+        return manualMovementKeyState > 0;
     }
-
-
-    void releaseManualMovement(OdorWorldEntity entity) {
-        if (!getManualMovementState()) {
-            entity.setManualMode(false);
-        }
-        if (!getManualMovementState("w") && !getManualMovementState("s")) {
-            entity.resetManualVelocity();
-        }
-    }
-
 
 }

@@ -59,14 +59,15 @@ public class CheeseFlower extends RL_Sim {
         sim.net.clearActivations();
 
         // Get mouse in position
-        sim.mouse.setCenterLocation((float) (objectToPass.getCenterX() - 100), (float) objectToPass.getCenterY());
+        sim.mouse.setCenterLocation((float) (objectToPass.getX() - 100), (float) objectToPass.getY());
 
         // Run past the object
-        sim.mouse.setVelocityX(5);
-        sim.mouse.setVelocityY(0);
+        // TODO: use polar
+        // sim.mouse.setVelocityX(5);
+        // sim.mouse.setVelocityY(0);
         sim.mouse.setHeading(0);
         sim.getSimulation().iterate(40);
-        sim.mouse.setVelocityX(0);
+        // sim.mouse.setVelocityX(0);
 
     }
 

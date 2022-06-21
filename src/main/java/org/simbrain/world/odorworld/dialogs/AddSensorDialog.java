@@ -84,7 +84,6 @@ public class AddSensorDialog extends StandardDialog {
      * Called externally when the dialog is closed, to commit any changes made.
      */
     public void commitChanges() {
-        sensorCreator.getSensor().setParent(entity);
         entity.addSensor(sensorCreator.getSensor());
     }
 }

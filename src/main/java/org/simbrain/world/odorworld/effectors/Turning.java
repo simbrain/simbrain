@@ -104,7 +104,7 @@ public class Turning extends Effector {
 
     @Override
     public void update(OdorWorldEntity parent) {
-        parent.setDtheta(direction * amount);
+        parent.setHeading(parent.getHeading() + direction * amount);
         this.amount = 0;
     }
 

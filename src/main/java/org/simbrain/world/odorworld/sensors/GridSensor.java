@@ -106,7 +106,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @UserParameter(label = "Cell Width",
         description = "Determines the size of the tile. Width specifies the horizontal length of the tile sensor.",
         order = 11)
-    private int width = DEFAULT_WIDTH;
+    private double width = DEFAULT_WIDTH;
 
     /**
      * Height of the sensor.
@@ -114,7 +114,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @UserParameter(label = "Cell Height",
         description = "Determines the size of the tile. Height specifies the vertical length.",
         order = 12)
-    private int height = DEFAULT_HEIGHT;
+    private double height = DEFAULT_HEIGHT;
 
     /**
      * Whether to draw the sensor grid in GridSensorNode.
@@ -203,19 +203,19 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         this.y = y;
     }
 
-    public int getWidth() {
+    public double getWidth() {
         return width;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(double width) {
         this.width = width;
     }
 
-    public int getHeight() {
+    public double getHeight() {
         return height;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(double height) {
         this.height = height;
     }
 

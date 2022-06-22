@@ -24,12 +24,12 @@ public class GridSensorNode extends EntityAttributeNode {
     /**
      * A cached grid width for comparision to see if the graphics need to be updated.
      */
-    private int gridWidth;
+    private double gridWidth;
 
     /**
      * A cached grid height for comparision to see if the graphics need to be updated.
      */
-    private int gridHeight;
+    private double gridHeight;
 
     /**
      * A cached grid column count for comparision to see if the graphics need to be updated.
@@ -105,8 +105,8 @@ public class GridSensorNode extends EntityAttributeNode {
         if (sensor.getGridVisibility()) {
             highlightedGrids = new ArrayList<>();
             for (int i = 0; i < sensor.getColumns() * sensor.getRows(); i++) {
-                int x = (i % sensor.getColumns()) * sensor.getWidth();
-                int y = (i / sensor.getRows()) * sensor.getHeight();
+                double x = (i % sensor.getColumns()) * sensor.getWidth();
+                double y = (i / sensor.getRows()) * sensor.getHeight();
                 PPath newGrid = PPath.createRectangle(x, y, sensor.getWidth(), sensor.getHeight());
                 highlightedGrids.add(newGrid);
                 addChild(newGrid);

@@ -9,7 +9,7 @@ fun Bounded.intersect(other: Bounded): BoundIntersection {
     val a = this
     val b = other
 
-    return if (b.worldBound) {
+    return if (b is OdorWorld) { // world bound is inverted
         val left = a.x - b.x
         val right = (b.x + b.width) - (a.x + a.width)
         val top = a.y - b.y

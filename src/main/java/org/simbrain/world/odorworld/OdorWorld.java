@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.odorworld;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.util.SimpleIdManager;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.environment.SmellSource;
@@ -26,7 +27,6 @@ import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.entities.Bound;
 import org.simbrain.world.odorworld.entities.Bounded;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -47,7 +47,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Contains a {@link TileMap} which is a grid of tiles. This tilemap determines the size of the world.
  * The world's size cannot be set directly.
  */
-public class OdorWorld implements EditableObject {
+public class OdorWorld implements EditableObject, Bounded {
 
     /**
      * List of odor world entities.
@@ -462,7 +462,7 @@ public class OdorWorld implements EditableObject {
      *
      * @return width in pixels.
      */
-    public int getWidth() {
+    public double getWidth() {
         return tileMap.getMapWidth();
     }
 
@@ -471,7 +471,7 @@ public class OdorWorld implements EditableObject {
      *
      * @return height of world
      */
-    public int getHeight() {
+    public double getHeight() {
         return tileMap.getMapHeight();
     }
 
@@ -490,10 +490,8 @@ public class OdorWorld implements EditableObject {
             bounds.addAll(entityList);
         }
 
-        var worldBound = new Bound(0.0, 0.0, getWidth(), getHeight(), true);
-
         if (!wrapAround) {
-            bounds.add(worldBound);
+            bounds.add(this);
         }
 
         return bounds;
@@ -547,6 +545,23 @@ public class OdorWorld implements EditableObject {
 
     public boolean isUseCameraCentering() {
         return useCameraCentering;
+    }
+
+    @Override
+    public double getX() {
+        return 0;
+    }
+
+
+    @Override
+    public double getY() {
+        return 0;
+    }
+
+    @NotNull
+    @Override
+    public Point2D getLocation() {
+        return new Point2D.Double(getX(), getY());
     }
 
 }

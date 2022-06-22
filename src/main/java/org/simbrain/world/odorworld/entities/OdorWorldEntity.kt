@@ -18,10 +18,12 @@
  */
 package org.simbrain.world.odorworld.entities
 
-import org.simbrain.util.*
+import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils.round
 import org.simbrain.util.environment.SmellSource
+import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.toRadian
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
@@ -47,6 +49,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     EditableObject,
     AttributeContainer,
     Locatable by Location(events),
+    Rotatable by Rotation(events),
     Movable,
     WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bounded {
 
@@ -119,8 +122,6 @@ class OdorWorldEntity @JvmOverloads constructor(
         val dx = cos(heading.toRadian()) * speed
         val dy = -sin(heading.toRadian()) * speed
 
-        val worldBound = Bound(0.0, 0.0, world.width.toDouble(), world.height.toDouble(), worldBound = true)
-
         val bounds = world.collidableObjects.filter { it !== this }
 
         val directionX = if (dx > 0) 1 else -1
@@ -146,8 +147,8 @@ class OdorWorldEntity @JvmOverloads constructor(
         val newY = y + (dy - distanceYShortenBy * directionY)
 
         location = if (world.wrapAround) {
-            val maxXLocation = (worldBound.width - width)
-            val maxYLocation = (worldBound.height - height)
+            val maxXLocation = (world.width - width)
+            val maxYLocation = (world.height - height)
             point((newX + maxXLocation) % maxXLocation, (newY + maxYLocation) % maxYLocation)
         } else {
             point(newX, newY)
@@ -195,9 +196,10 @@ class OdorWorldEntity @JvmOverloads constructor(
         addDefaultEffectors()
         addSensor(ObjectSensor(EntityType.SWISS, 50.0, 45.0))
         addSensor(ObjectSensor(EntityType.SWISS, 0.0, 0.0))
-        addSensor(ObjectSensor(EntityType.SWISS, 50.0, -45.0)
+        addSensor(
+            ObjectSensor(EntityType.SWISS, 50.0, -45.0)
         )
-        //TODO: Add more defaults
+        // TODO: Add more defaults
     }
 
     /**
@@ -232,14 +234,15 @@ class OdorWorldEntity @JvmOverloads constructor(
     fun setLocation(x: Int, y: Int) {
         location = point(x, y)
     }
+
     fun setLocation(x: Double, y: Double) {
         location = point(x, y)
     }
 
     fun getEntitiesInRadius(radius: Double): List<OdorWorldEntity> {
         return world.entityList
-            .filter{it !== this}
-            .filter{ it.location.distance(location) <= radius }
+            .filter { it !== this }
+            .filter { it.location.distance(location) <= radius }
     }
 
     fun speakToEntity(phrase: String) {
@@ -258,7 +261,14 @@ class OdorWorldEntity @JvmOverloads constructor(
         val tileHeight = world.height / numTilesY
         for (i in 0 until numTilesX) {
             for (j in 0 until numTilesY) {
-                addSensor(GridSensor(i * tileWidth + offset, j * tileHeight + offset, tileWidth, tileHeight))
+                addSensor(
+                    GridSensor(
+                        (i * tileWidth + offset).toInt(),
+                        (j * tileHeight + offset).toInt(),
+                        tileWidth.toInt(),
+                        tileHeight.toInt()
+                    )
+                )
             }
         }
     }
@@ -267,16 +277,16 @@ class OdorWorldEntity @JvmOverloads constructor(
         TODO()
     }
 
-   /**
-    * Add left and right sensors of a given type.
-    *
-    * @param type type of sensor to add
-    * @param range the range of the object sensors
-    */
-   fun addLeftRightSensors(type: EntityType?, range: Double) {
-       addObjectSensor(type, 50.0, 45.0, range) // Left sensor
-       addObjectSensor(type, 50.0, -45.0, range) // Right sensor
-   }
+    /**
+     * Add left and right sensors of a given type.
+     *
+     * @param type type of sensor to add
+     * @param range the range of the object sensors
+     */
+    fun addLeftRightSensors(type: EntityType?, range: Double) {
+        addObjectSensor(type, 50.0, 45.0, range) // Left sensor
+        addObjectSensor(type, 50.0, -45.0, range) // Right sensor
+    }
 
     @Deprecated("Use location=")
     fun setCenterLocation(x: Int, y: Int) {
@@ -296,11 +306,11 @@ class OdorWorldEntity @JvmOverloads constructor(
      * Add an object sensor to this entity.
      */
     fun addObjectSensor(type: EntityType?, radius: Double, angle: Double, range: Double): ObjectSensor {
-       val sensor = ObjectSensor(type, radius, angle)
-       sensor.setRange(range)
-       addSensor(sensor)
-       return sensor
-   }
+        val sensor = ObjectSensor(type, radius, angle)
+        sensor.setRange(range)
+        addSensor(sensor)
+        return sensor
+    }
 
     @get:UserParameter(label = "Linear Speed", order = 9, useSetter = true)
     override var speed: Double
@@ -318,21 +328,24 @@ class OdorWorldEntity @JvmOverloads constructor(
 
 }
 
-/**
- * Heading is in degrees
- */
-interface Locatable {
-    var x: Double
-    var y: Double
-    var heading: Double
-    var location: Point2D
+interface StaticallyLocatable {
+    val x: Double
+    val y: Double
+    val location: Point2D
+}
+
+interface Locatable : StaticallyLocatable {
+    override var x: Double
+    override var y: Double
+    override var location: Point2D
 }
 
 /**
  * Top-left x, y position of the entity.
  */
 class Location(@Transient private val event: EntityLocationEvent) : Locatable {
-    @Transient  private var dirty = true
+    @Transient
+    private var dirty = true
 
     @UserParameter(label = "X", description = "X Position", useSetter = true, order = 3)
     override var x = 0.0
@@ -350,14 +363,8 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
             dirty = true
         }
 
-    @UserParameter(label = "heading", description = "heading", order = 2)
-    override var heading = 0.0
-        set(value) {
-            event.fireMoved()
-            field = ((value % 360.0) + 360.0) % 360.0
-        }
-
-    @Transient override var location: Point2D = point(x, y)
+    @Transient
+    override var location: Point2D = point(x, y)
         get() {
             if (dirty) {
                 field = point(x, y)
@@ -372,39 +379,40 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
         }
 }
 
+interface Rotatable {
+    var heading: Double
+}
+
+class Rotation(@Transient private val event: EntityLocationEvent) : Rotatable {
+    @UserParameter(label = "heading", description = "heading", order = 2)
+    override var heading = 0.0
+        set(value) {
+            event.fireMoved()
+            field = ((value % 360.0) + 360.0) % 360.0
+        }
+}
+
 /**
  * Common interface for [Size] and [Bounded].
  */
 interface WithSize {
-    var width: Double
-    var height: Double
-    var size: Point2D
+    val width: Double
+    val height: Double
+    val size: Point2D
         get() = point(width, height)
-        set(value) {
-            val (w, h) = value
-            width = w
-            height = h
-        }
 }
 
-class Size(override var width: Double, override var height: Double) : WithSize
+class Size(override val width: Double, override val height: Double) : WithSize
 
-interface Bounded: WithSize {
-    val x: Double
-    val y: Double
-    val location: Point2D
-    val worldBound: Boolean get() = false
-}
+interface Bounded : StaticallyLocatable, WithSize
 
-class Bound @JvmOverloads constructor(
+class Bound(
     override val x: Double,
     override val y: Double,
-    override var width: Double,
-    override var height: Double,
-    override val worldBound: Boolean = false
+    override val width: Double,
+    override val height: Double
 ) : Bounded {
-    override val location: Point2D
-        get() = point(x, y)
+    override val location: Point2D = point(x, y)
 }
 
 data class BoundIntersection(val intersect: Boolean, val dx: Double, val dy: Double)

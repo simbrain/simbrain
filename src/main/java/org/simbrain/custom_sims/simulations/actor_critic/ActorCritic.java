@@ -240,8 +240,8 @@ public class ActorCritic extends Simulation {
 
         // Create grid sensor
         GridSensor sensor = new GridSensor(0, 0,
-                oc.getWorld().getWidth() / numTiles,
-                oc.getWorld().getHeight() / numTiles
+                (int) (oc.getWorld().getWidth() / numTiles),
+                (int) (oc.getWorld().getHeight() / numTiles)
         );
         mouse.addSensor(sensor);
 

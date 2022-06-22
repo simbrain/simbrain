@@ -75,11 +75,11 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
     public void setGuiSizeToWorldSize() {
         int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
         int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
-        getParentFrame().setPreferredSize(new Dimension(worldPanel.getWorld().getWidth() + widthOffset,
-                worldPanel.getWorld().getHeight() + heightOffset));
+        getParentFrame().setPreferredSize(new Dimension((int) (worldPanel.getWorld().getWidth() + widthOffset),
+                (int) (worldPanel.getWorld().getHeight() + heightOffset)));
         getParentFrame().setMaximumSize(
-                new Dimension(worldPanel.getWorld().getWidth() + widthOffset,
-                worldPanel.getWorld().getHeight() + heightOffset));
+                new Dimension((int) (worldPanel.getWorld().getWidth() + widthOffset),
+                        (int) (worldPanel.getWorld().getHeight() + heightOffset)));
         getParentFrame().pack();
     }
 
@@ -91,12 +91,12 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         worldPanel.setPreferredSize(worldPanel.getPreferredSize());
         int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
         int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
-        var maxWidth = worldPanel.getWorld().getWidth() + widthOffset;
-        var maxHeight = worldPanel.getWorld().getHeight() + heightOffset;
-        getParentFrame().setMaximumSize(new Dimension(maxWidth, maxHeight));
+        double maxWidth = worldPanel.getWorld().getWidth() + widthOffset;
+        double maxHeight = worldPanel.getWorld().getHeight() + heightOffset;
+        getParentFrame().setMaximumSize(new Dimension((int) maxWidth, (int) maxHeight));
         var bound = getParentFrame().getBounds();
-        bound.width = maxWidth;
-        bound.height = maxHeight;
+        bound.width = (int) maxWidth;
+        bound.height = (int) maxHeight;
         getParentFrame().setBounds(bound);
     }
 

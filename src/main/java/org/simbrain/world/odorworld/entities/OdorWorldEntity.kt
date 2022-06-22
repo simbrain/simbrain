@@ -29,12 +29,12 @@ import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.events.EntityEvents
 import org.simbrain.world.odorworld.events.EntityLocationEvent
+import org.simbrain.world.odorworld.intersect
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.Sensor
 import java.awt.geom.Point2D
 import kotlin.math.cos
-import kotlin.math.min
 import kotlin.math.sin
 
 class OdorWorldEntity @JvmOverloads constructor(
@@ -121,18 +121,10 @@ class OdorWorldEntity @JvmOverloads constructor(
 
         val worldBound = Bound(0.0, 0.0, world.width.toDouble(), world.height.toDouble(), worldBound = true)
 
+        val bounds = world.collidableObjects.filter { it !== this }
+
         val directionX = if (dx > 0) 1 else -1
         val directionY = if (dy > 0) 1 else -1
-
-        val bounds = ArrayList<Bounded>()
-
-        if (world.isObjectsBlockMovement) {
-            bounds.addAll(world.entityList.filter { it !== this@OdorWorldEntity })
-        }
-
-        if (!world.wrapAround) {
-            bounds.add(worldBound)
-        }
 
         val moveInX = Bound(x + dx, y, width, height)
 
@@ -404,7 +396,7 @@ interface Bounded: WithSize {
     val worldBound: Boolean get() = false
 }
 
-class Bound(
+class Bound @JvmOverloads constructor(
     override val x: Double,
     override val y: Double,
     override var width: Double,
@@ -413,27 +405,6 @@ class Bound(
 ) : Bounded {
     override val location: Point2D
         get() = point(x, y)
-}
-
-fun Bounded.intersect(other: Bounded): BoundIntersection {
-    val a = this
-    val b = other
-
-    return if (b.worldBound) {
-        val left = a.x - b.x
-        val right = (b.x + b.width) - (a.x + a.width)
-        val top = a.y - b.y
-        val bottom = (b.y + b.height) - (a.y + a.height)
-        val xCollision = -min(left, right)
-        val yCollision = -min(top, bottom)
-        BoundIntersection(xCollision > 0 || yCollision > 0, xCollision, yCollision)
-    } else {
-        val xCollision = min((a.x + a.width) - b.x, (b.x + b.width) - a.x)
-        val yCollision = min((a.y + a.height) - b.y, (b.y + b.height) - a.y)
-
-        BoundIntersection(xCollision > 0 && yCollision > 0, xCollision, yCollision)
-    }
-
 }
 
 data class BoundIntersection(val intersect: Boolean, val dx: Double, val dy: Double)

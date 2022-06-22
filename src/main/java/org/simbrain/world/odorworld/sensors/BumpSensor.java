@@ -20,11 +20,9 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Producible;
-import org.simbrain.world.odorworld.OdorWorld;
-import org.simbrain.world.odorworld.RectangleCollisionBound;
+import org.simbrain.world.odorworld.OdorWorldUtilsKt;
+import org.simbrain.world.odorworld.entities.Bound;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-
-import java.awt.geom.Rectangle2D;
 
 /**
  * Very simple bump sensor. Holding off on more sophisticated "touch" sensors in
@@ -55,18 +53,6 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     private int sensorSize = 5;
 
     /**
-     * Reference to the world this sensor is in
-     */
-    private OdorWorld world;
-
-    /**
-     * The collision bound of this sensor
-     */
-    private RectangleCollisionBound collisionBound = new RectangleCollisionBound(
-            new Rectangle2D.Double(0, 0, sensorSize, sensorSize)
-    );
-
-    /**
      * Construct bump sensor.
      *
      * @param baseValue value
@@ -93,37 +79,19 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
     @Override
     public void update(OdorWorldEntity parent) {
         value = 0;
-        updateCollisionBound();
-        if (collided()) {
+        var bound = new Bound(
+                parent.getX() - sensorSize / 2.0,
+                parent.getY() - sensorSize / 2.0,
+                parent.getWidth() + sensorSize,
+                parent.getHeight() + sensorSize
+        );
+        var collided = parent.getWorld().getCollidableObjects()
+                .stream()
+                .filter(it -> it != parent)
+                .anyMatch(it -> OdorWorldUtilsKt.intersect(bound, it).getIntersect());
+        if (collided) {
             value = baseValue;
         }
-    }
-
-    /**
-     * Check if this sensor is collided with any entity.
-     * @return true if collided with an entity, false otherwise
-     */
-    public boolean collided() {
-        // if (world == null) {
-        //     world = parent.getParentWorld();
-        // }
-//        for (OdorWorldEntity e : world.getEntityList()) {
-//            if (e != parent && e.getCollisionBound().collide(this.collisionBound).stream().anyMatch(it -> it)) {
-//                return true;
-//            }
-//        }
-        return false;
-    }
-
-    /**
-     * Update the {@link #collisionBound} base on the updated location of this sensor.
-     */
-    public void updateCollisionBound() {
-//        collisionBound.setVelocity(parent.getVelocityX(), parent.getVelocityY());
-//        collisionBound.setLocation(
-//                getRelativeLocation().getX() + parent.getX(),
-//                getRelativeLocation().getY() + parent.getY()
-//        );
     }
 
     @Override
@@ -136,7 +104,7 @@ public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
         return "Bump Sensor";
     }
 
-    @Producible( customDescriptionMethod = "getAttributeDescription")
+    @Producible(customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
         return value;
     }

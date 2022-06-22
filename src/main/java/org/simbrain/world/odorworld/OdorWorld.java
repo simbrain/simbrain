@@ -26,13 +26,15 @@ import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.entities.Bound;
+import org.simbrain.world.odorworld.entities.Bounded;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.events.OdorWorldEvents;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -109,10 +111,6 @@ public class OdorWorld implements EditableObject {
      * Last clicked position.
      */
     private Point2D lastClickedPosition = new Point2D.Double(50,50);
-
-    private transient RectangleCollisionBound worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
-            0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
-    ));
 
     /**
      * Default constructor.
@@ -380,10 +378,6 @@ public class OdorWorld implements EditableObject {
 
         events = new OdorWorldEvents(this);
 
-        worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
-                0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
-        ));
-
         for (OdorWorldEntity entity : entityList) {
 //            entity.postSerializationInit();
         }
@@ -489,6 +483,22 @@ public class OdorWorld implements EditableObject {
         this.objectsBlockMovement = objectsBlockMovement;
     }
 
+    public List<Bounded> getCollidableObjects() {
+        var bounds = new ArrayList<Bounded>();
+
+        if (isObjectsBlockMovement()) {
+            bounds.addAll(entityList);
+        }
+
+        var worldBound = new Bound(0.0, 0.0, getWidth(), getHeight(), true);
+
+        if (!wrapAround) {
+            bounds.add(worldBound);
+        }
+
+        return bounds;
+    }
+
     public double getMaxVectorNorm() {
         return maxVectorNorm;
     }
@@ -507,9 +517,6 @@ public class OdorWorld implements EditableObject {
 
     public void setTileMap(TileMap tileMap) {
         this.tileMap = tileMap;
-        worldBoundary = new RectangleCollisionBound(new Rectangle2D.Double(
-                0, 0, tileMap.getMapWidth(), tileMap.getMapHeight()
-        ));
         events.fireTileMapChanged();
     }
 
@@ -523,10 +530,6 @@ public class OdorWorld implements EditableObject {
 
     public void setLastClickedPosition(Point2D position) {
         lastClickedPosition = position;
-    }
-
-    public RectangleCollisionBound getWorldBoundary() {
-        return worldBoundary;
     }
 
     @Override

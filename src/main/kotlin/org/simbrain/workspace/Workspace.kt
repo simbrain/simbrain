@@ -231,6 +231,14 @@ class Workspace @JvmOverloads constructor(@Transient val coroutineScope: Corouti
         stop()
     }
 
+    suspend fun iterateSuspend(numIterations: Int) {
+        for (wc in componentList) {
+            wc.start()
+        }
+        updater.iterate(numIterations)
+        stop()
+    }
+
     /**
      * Simple non-synchronized updater for non-GUI applications running
      * in a single thread.

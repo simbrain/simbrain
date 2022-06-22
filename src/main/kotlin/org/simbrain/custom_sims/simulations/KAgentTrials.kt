@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 
 import org.simbrain.network.core.activations
@@ -196,15 +197,14 @@ val kAgentTrails = newSim {
                 val (x, y) = cheeseLocation
                 mouse.location = point(x, y + dispersion)
                 mouse.heading = 90.0
-                straightNeuron.forceSetActivation(1.0)
-                workspace.iterate(50) {
+                workspace.coroutineScope.launch {
+                    straightNeuron.forceSetActivation(1.0)
+                    workspace.iterateSuspend(50)
                     leftNeuron.forceSetActivation(1.5)
-                    workspace.iterate(25) {
-                        leftNeuron.forceSetActivation(0.0)
-                        workspace.iterate(220) {
-                            straightNeuron.forceSetActivation(0.0)
-                        }
-                    }
+                    workspace.iterateSuspend(25)
+                    leftNeuron.forceSetActivation(0.0)
+                    workspace.iterateSuspend(220)
+                    straightNeuron.forceSetActivation(0.0)
                 }
             }
             addButton("Solar System") {

@@ -1,5 +1,6 @@
 package org.simbrain.workspace
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -23,15 +24,18 @@ class WorkspaceTestKt {
     }
 
     @Test
-    fun `iterate(n) should call a custom action each iteration`() {
+    fun `iterateSuspend(n) should call a custom action each iteration`() {
         var counter = 0
         workspace.addUpdateAction("increment counter"){
             println("Update action: $counter")
             counter++
         }
-        workspace.iterate(10)
-        assertEquals(10, counter)
+        runBlocking {
+            workspace.iterateSuspend(10)
+            assertEquals(10, counter)
+        }
     }
+
 
     @Test
     fun `iterate(n)'s finishing task should be called after n iterations'`() {
@@ -43,6 +47,7 @@ class WorkspaceTestKt {
         workspace.iterate(10) {
             counter++
         }
+        Thread.sleep(100)
         assertEquals(11, counter)
     }
 

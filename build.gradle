@@ -12,13 +12,15 @@ plugins {
 
 def versionName = "Simbrain4Beta"
 def simbrainJvmArgs = [ '--add-opens','java.base/java.util=ALL-UNNAMED',
-                        '--add-opens','java.desktop/java.awt=ALL-UNNAMED',
-                        '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED']
+                        '--add-opens','java.desktop/java.awt.geom=ALL-UNNAMED',
+                        '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED',
+                        '--add-opens', 'java.base/java.util.concurrent.atomic=ALL-UNNAMED',
+                        '--add-opens', 'java.base/java.lang=ALL-UNNAMED']
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 compileJava.options.encoding = 'UTF-8'
 
 // When updating also search for "jvmTarget" and update those
-sourceCompatibility = 1.11
+sourceCompatibility = 1.17
 
 repositories {
     mavenCentral()
@@ -112,6 +114,7 @@ application {
 }
 
 test {
+    jvmArgs simbrainJvmArgs
     useJUnitPlatform()
 }
 
@@ -127,14 +130,14 @@ task runSim(type: JavaExec) {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "16"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.experimental.ExperimentalTypeInference"
     kotlinOptions.freeCompilerArgs += "-Xjvm-default=all"
     kotlinOptions.useIR = true
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "16"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.experimental.ExperimentalTypeInference"
     kotlinOptions.freeCompilerArgs += "-Xjvm-default=all"
     kotlinOptions.useIR = true

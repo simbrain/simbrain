@@ -120,6 +120,11 @@ public abstract class Effector implements PeripheralAttribute {
         return events;
     }
 
+    private Object readResolve() {
+        events = new AttributeEvents(this);
+        return this;
+    }
+
     public static class EffectorCreator implements EditableObject {
 
         @UserParameter(label="Effector", isObjectType = true)

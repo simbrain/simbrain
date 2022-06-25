@@ -198,6 +198,11 @@ public abstract class Sensor implements PeripheralAttribute {
         return events;
     }
 
+    public Object readResolve() {
+        events = new AttributeEvents(this);
+        return this;
+    }
+
     public static class SensorCreator implements EditableObject {
 
         @UserParameter(label="Sensor", isObjectType = true)

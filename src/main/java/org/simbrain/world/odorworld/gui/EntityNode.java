@@ -103,7 +103,7 @@ public class EntityNode extends PNode {
         entity.getEvents().onTypeChanged((o, n) -> updateImage());
 
         entity.getEvents().onUpdateSensorVisiblity(() -> {
-            if (this.entity.isShowSensors()) {
+            if (this.entity.isShowSensorsAndEffectors()) {
                 visualizableAttributeMap.values().forEach(n -> n.setVisible(true));
             } else {
                 visualizableAttributeMap.values().forEach(n -> n.setVisible(false));

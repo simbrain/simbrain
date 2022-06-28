@@ -53,60 +53,51 @@ class OdorWorldEntity @JvmOverloads constructor(
     Movable,
     WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bounded {
 
-    @Deprecated("Use location")
-    val centerLocation: Point2D
-        get() = location
-
-    @get:JvmName("isSensorsEnabled")
-    var sensorsEnabled: Boolean = true
-    val currentlyHeardPhrases: MutableList<String> = arrayListOf()
-
     @UserParameter(label = "Name", order = 1)
     override var name: String = "null"
 
     override var id: String? = null
 
-    @Deprecated("Use world", ReplaceWith("world"))
-    val parentWorld get() = world
+    @UserParameter(label = "Enable Sensors", order = 6)
+    var isSensorsEnabled: Boolean = true
 
-    val isRotating get() = entityType.isRotating
-
-    val movement = Movement()
-    val manualMovement = ManualMovement()
-
-    /**
-     * Enable effectors. If not the agent is "paralyzed.
-     */
     @UserParameter(label = "Enable Effectors", order = 6)
-    var isEffectorsEnabled = false
+    var isEffectorsEnabled = true
 
-    /**
-     * If true, show peripheral attributes.
-     */
     @UserParameter(
         label = "Show Sensors / Effectors",
         description = "Show Attributes (Sensors and Effectors)",
         order = 30
     )
-    var isShowSensors = true
-
-    /**
-     * Sensors.
-     */
-    private val _sensors: MutableList<Sensor> = ArrayList()
-    val sensors: List<Sensor> get() = _sensors
-
-    /**
-     * Effectors.
-     */
-    private val _effectors: MutableList<Effector> = ArrayList()
-    val effectors: List<Effector> get() = _effectors
+    var isShowSensorsAndEffectors = true
 
     /**
      * Smell Source (if any). Initialize to random smell source with 10
      * components.
      */
     var smellSource = SmellSource(10)
+
+    private val _sensors: MutableList<Sensor> = ArrayList()
+    val sensors: List<Sensor> get() = _sensors
+
+    private val _effectors: MutableList<Effector> = ArrayList()
+    val effectors: List<Effector> get() = _effectors
+
+    val currentlyHeardPhrases: MutableList<String> = arrayListOf()
+
+    val isRotating get() = entityType.isRotating
+
+    val movement = Movement()
+
+    val manualMovement = ManualMovement()
+
+
+    @Deprecated("Use world", ReplaceWith("world"))
+    val parentWorld get() = world
+
+    @Deprecated("Use location")
+    val centerLocation: Point2D
+        get() = location
 
     /**
      * Before moving, see if there are any collisions. If there are, change the landing spot of the movement to a
@@ -158,8 +149,12 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     fun update() {
         applyMovement()
+        if (isSensorsEnabled) {
         sensors.forEach { it.update(this) }
-        effectors.forEach { it.update(this) }
+        }
+        if (isEffectorsEnabled) {
+            effectors.forEach { it.update(this) }
+        }
     }
 
     override fun toString(): String {

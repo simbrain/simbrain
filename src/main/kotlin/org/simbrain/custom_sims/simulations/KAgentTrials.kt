@@ -22,7 +22,7 @@ import kotlin.math.sqrt
 val kAgentTrails = newSim {
 
     val dispersion = 100.0
-
+    val mouseLocation = point(204.0, 343.0)
     val cheeseLocation = point(200.0, 250.0)
     val flowerLocation = point(330.0, 100.0)
     val fishLocation = point(50.0, 100.0)
@@ -33,7 +33,7 @@ val kAgentTrails = newSim {
 
     withGui {
         place(networkComponent) {
-            location = point(153,10)
+            location = point(190,10)
             width = 439
             height = 296
         }
@@ -70,7 +70,7 @@ val kAgentTrails = newSim {
 
     var lastPredicted = predictionNet.neuronList.activations
 
-    network.addUpdateAction(updateAction("K Custom Learning Rule") {
+    network.addUpdateAction(updateAction("Train prediction network") {
         val learningRate = 0.1
 
         val errors = (sensoryNet.neuronList.activations zip lastPredicted).map { (a, b) -> a - b }
@@ -99,7 +99,7 @@ val kAgentTrails = newSim {
     }
 
     val mouse = odorWorld.addEntity(EntityType.MOUSE).apply {
-        location = point(204.0, 343.0)
+        location = mouseLocation
         heading = 90.0
         addDefaultEffectors()
         addSensor(SmellSensor())
@@ -145,7 +145,7 @@ val kAgentTrails = newSim {
             projector.tolerance = .001
         }
         place(plot) {
-            location = point(152,306)
+            location = point(190,306)
             width = 441
             height = 308
         }
@@ -154,83 +154,95 @@ val kAgentTrails = newSim {
 
         createControlPanel("Control Panel", 5, 10) {
 
-            fun positionMouse(location: Point2D) {
-                network.clearActivations()
-                val (x, y) = location
-                mouse.location = point(x, y + dispersion)
+
+            fun resetObjects() {
+                cheese.location = cheeseLocation
+                fish.location = fishLocation
+                flower.location = flowerLocation
+                mouse.location = mouseLocation
+                cheese.heading = 90.0
+                fish.heading = 90.0
+                flower.heading = 90.0
                 mouse.heading = 90.0
-                straightNeuron.forceSetActivation(1.0)
-                // TODO: move to a location by iterating while not at location
-                workspace.iterate((4 * dispersion).toInt()) {
+            }
+
+            fun moveMouseVerticallyThroughLocation(location: Point2D) {
+                workspace.coroutineScope.launch {
+                    resetObjects()
+                    network.clearActivations()
+                    val (x, y) = location
+                    mouse.location = point(x, y + dispersion)
+                    mouse.heading = 90.0
+                    straightNeuron.forceSetActivation(1.0)
+                    workspace.iterateSuspend((2 * dispersion).toInt())
                     straightNeuron.forceSetActivation(0.0)
                 }
             }
 
             addButton("Cheese") {
-                positionMouse(cheeseLocation)
+                moveMouseVerticallyThroughLocation(cheeseLocation)
             }
             addButton("Fish") {
-                positionMouse(fishLocation)
+                moveMouseVerticallyThroughLocation(fishLocation)
             }
             addButton("Flower") {
-                positionMouse(flowerLocation)
+                moveMouseVerticallyThroughLocation(flowerLocation)
             }
             addButton("Cheese > Flower") {
-                network.clearActivations()
-                val (x, y) = cheeseLocation
-                mouse.location = point(x, y + dispersion)
-                mouse.heading = 90.0
-                straightNeuron.forceSetActivation(1.0)
-                // TODO: This is temporary until workspace.iterate is fixed
-                workspace.iterate(50) {
-                    rightNeuron.forceSetActivation(1.5)
-                    workspace.iterate(25) {
-                        rightNeuron.forceSetActivation(0.0)
-                        workspace.iterate(220) {
-                            straightNeuron.forceSetActivation(0.0)
-                        }
-                    }
-                }
-            }
-            addButton("Cheese > Fish") {
-                network.clearActivations()
-                val (x, y) = cheeseLocation
-                mouse.location = point(x, y + dispersion)
-                mouse.heading = 90.0
                 workspace.coroutineScope.launch {
+                    resetObjects()
+                    network.clearActivations()
+                    val (x, y) = cheeseLocation
+                    mouse.location = point(x, y + dispersion)
+                    mouse.heading = 90.0
                     straightNeuron.forceSetActivation(1.0)
-                    workspace.iterateSuspend(50)
-                    leftNeuron.forceSetActivation(1.5)
+                    workspace.iterateSuspend((dispersion * .80).toInt())
+                    rightNeuron.forceSetActivation(1.5)
                     workspace.iterateSuspend(25)
-                    leftNeuron.forceSetActivation(0.0)
-                    workspace.iterateSuspend(220)
+                    rightNeuron.forceSetActivation(0.0)
+                    workspace.iterateSuspend((dispersion * 1.5).toInt())
                     straightNeuron.forceSetActivation(0.0)
                 }
             }
-            addButton("Solar System") {
-                network.clearActivations()
-                // TODO: use polar
-                // cheese.dx = 2.05
-                // cheese.dy = 2.05
-                // flower.dx = 2.5
-                // flower.dy = 2.1
-                // fish.dx = -2.5
-                // fish.dy = 1.05
-                val (x, y) = cheeseLocation
-                mouse.location = point(x, y + dispersion)
-                mouse.heading = 90.0
-                straightNeuron.forceSetActivation(0.0)
-                workspace.iterate(200)
-                // cheese.dx = 0.0
-                // cheese.dy = 0.0
-                // flower.dx = 0.0
-                // flower.dy = 0.0
-                // fish.dx = 0.0
-                // fish.dy = 0.0
+            addButton("Cheese > Fish") {
+                workspace.coroutineScope.launch {
+                    resetObjects()
+                    network.clearActivations()
+                    val (x, y) = cheeseLocation
+                    mouse.location = point(x, y + dispersion)
+                    mouse.heading = 90.0
+                    straightNeuron.forceSetActivation(1.0)
+                    workspace.iterateSuspend((dispersion * .80).toInt())
+                    leftNeuron.forceSetActivation(1.5)
+                    workspace.iterateSuspend(25)
+                    leftNeuron.forceSetActivation(0.0)
+                    workspace.iterateSuspend((dispersion * 1.5).toInt())
+                    straightNeuron.forceSetActivation(0.0)
+                }
+            }
+            addButton("Random motion") {
+                workspace.coroutineScope.launch {
+                    resetObjects()
+                    network.clearActivations()
+                    cheese.randomizeLocationAndHeading()
+                    flower.randomizeLocationAndHeading()
+                    fish.randomizeLocationAndHeading()
+                    cheese.speed = 2.0
+                    flower.speed = 2.0
+                    fish.speed = 2.0
+                    val (x, y) = cheeseLocation
+                    mouse.location = point(odorWorld.width/2, odorWorld.height/2)
+                    mouse.heading = 90.0
+                    straightNeuron.forceSetActivation(0.0)
+                    workspace.iterateSuspend(200)
+                    cheese.speed = 0.0
+                    flower.speed = 0.0
+                    fish.speed = 0.0
+                }
             }
         }
 
-        // Uncomment for prediction halo
+        // Prediction halo
         plot.projector.isUseColorManager = false
         workspace.addUpdateAction(updateAction("Color projection points") {
             val predictedState: DoubleArray = predictionNet.activations

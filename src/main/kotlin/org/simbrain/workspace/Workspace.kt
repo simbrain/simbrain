@@ -48,7 +48,15 @@ import java.util.*
  * @author Matt Watson
  * @author Tim Shea
  */
-class Workspace @JvmOverloads constructor(@Transient val coroutineScope: CoroutineScope = MainScope()) {
+class Workspace @JvmOverloads constructor(
+    /**
+     * Effectively the main event queue for a Simbrain workspace. It uses the Swing Event queue and thus includes all
+     * those events, but you can use it with co-routine syntax (rather than InvokeLater, for example). Get the
+     * benefit of a single-threaded event queue but without the drawbacks, because things can be suspended.
+     */
+    @Transient
+    val coroutineScope: CoroutineScope = MainScope())
+{
 
     @Transient
     private val _componentList = ArrayList<WorkspaceComponent>()

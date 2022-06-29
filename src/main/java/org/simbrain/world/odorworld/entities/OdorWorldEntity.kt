@@ -23,6 +23,7 @@ import org.simbrain.util.Utils.round
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.util.toRadian
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.world.odorworld.OdorWorld
@@ -301,8 +302,11 @@ class OdorWorldEntity @JvmOverloads constructor(
         location = point(x.toDouble(), y.toDouble())
     }
 
-    fun randomizeLocation() {
-        TODO()
+    fun randomizeLocationAndHeading() {
+        location = point(
+                UniformRealDistribution(0.0, world.width).sampleDouble(),
+                UniformRealDistribution(0.0, world.height).sampleDouble())
+        heading = UniformRealDistribution(0.0, 360.0).sampleDouble()
     }
 
     /**

@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations.agent_trails;
+package org.simbrain.custom_sims.simulations.braitenberg;
 
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
@@ -150,7 +150,7 @@ public class RandomizedPursuer extends Simulation {
 
         panel.addButton("Run", () -> {
             for (int trial = 0; trial  < numTrials; trial ++) {
-                mouse.randomizeLocation();
+                mouse.randomizeLocationAndHeading();
                 sim.iterate(300);
             }
         });

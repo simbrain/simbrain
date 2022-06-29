@@ -2,12 +2,12 @@ package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic
-import org.simbrain.custom_sims.simulations.agent_trails.RandomizedPursuer
 import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
 import org.simbrain.custom_sims.simulations.braitenberg.Braitenberg
+import org.simbrain.custom_sims.simulations.braitenberg.RandomizedPursuer
 import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum
 import org.simbrain.custom_sims.simulations.cortex.CortexSimple
 import org.simbrain.custom_sims.simulations.cortex.CorticalBranching
@@ -57,7 +57,7 @@ val simulations = dir<Any>("Simulations") {
         item("Cortical Branching") {CorticalBranching()}
         item("Cortex Simple") {CortexSimple()}
         item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
-        item("RandomizedPursuer") {RandomizedPursuer()}
+        item("RandomizedPursuer") { RandomizedPursuer() }
         item("PatternsOfActivity") {PatternsOfActivity()}
         item("KuramotoOscillators") {KuramotoOscillators()}
         item("SORN") { SORN() }

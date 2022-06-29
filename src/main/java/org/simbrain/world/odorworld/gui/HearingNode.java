@@ -86,28 +86,16 @@ public class HearingNode extends EntityAttributeNode {
         shape.addChild(hearingText);
         hearingBubble.setStroke(new BasicStroke(1));
         addChild(shape);
-        updateLocation();
         hearingBubble.setPickable(false);
         hearingBubbleTrailLarge.setPickable(false);
         hearingBubbleTrailSmall.setPickable(false);
         hearingText.setPickable(false);
         shape.setVisible(false);
-
-        sensor.getEvents().onUpdate(() -> {
-            updateSensor();
-            updateLocation();
-        });
+        sensor.getEvents().onUpdate(this::updateSensor);
     }
 
     @Override
     public void update(OdorWorldEntity entity) {
-
-    }
-
-    /**
-     * Update the location of this node to the center top of the entity.
-     */
-    public void updateLocation() {
         setOffset(entity.getEntityType().getImageWidth() / 2 - 10, 0);
     }
 

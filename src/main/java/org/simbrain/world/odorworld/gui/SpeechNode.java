@@ -95,29 +95,18 @@ public class SpeechNode extends EntityAttributeNode {
         shape.addChild(speechText);
         speechBubble.setStroke(new BasicStroke(1));
         addChild(shape);
-        updateLocation();
         speechBubble.setPickable(false);
         speechBubbleTriangle.setPickable(false);
         speechBubblePatch.setPickable(false);
         speechText.setPickable(false);
         shape.setVisible(false);
 
-        effector.getEvents().onUpdate(() -> {
-            updateEffector();
-            updateLocation();
-        });
+        effector.getEvents().onUpdate(this::updateEffector);
 
     }
 
     @Override
     public void update(OdorWorldEntity entity) {
-
-    }
-
-    /**
-     * Update the location of this node to the center top of the entity.
-     */
-    public void updateLocation() {
         setOffset(entity.getEntityType().getImageWidth() / 2 - 18, 0);
     }
 

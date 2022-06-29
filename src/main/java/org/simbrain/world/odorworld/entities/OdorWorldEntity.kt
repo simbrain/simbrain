@@ -53,10 +53,10 @@ class OdorWorldEntity @JvmOverloads constructor(
     Movable,
     WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bounded {
 
+    override var id: String? = null
+
     @UserParameter(label = "Name", order = 1)
     override var name: String = "null"
-
-    override var id: String? = null
 
     @UserParameter(label = "Enable Sensors", order = 6)
     var isSensorsEnabled: Boolean = true
@@ -83,14 +83,22 @@ class OdorWorldEntity @JvmOverloads constructor(
     private val _effectors: MutableList<Effector> = ArrayList()
     val effectors: List<Effector> get() = _effectors
 
+    /**
+     * Whatever phrases the entity can currently "hear".
+     */
     val currentlyHeardPhrases: MutableList<String> = arrayListOf()
 
     val isRotating get() = entityType.isRotating
 
+    /**
+     * Manages programatic movement (based on couplings to neurons, etc.)
+     */
     val movement = Movement()
 
+    /**
+     * Manages movement of the entity using the control keys.
+     */
     val manualMovement = ManualMovement()
-
 
     @Deprecated("Use world", ReplaceWith("world"))
     val parentWorld get() = world

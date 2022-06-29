@@ -19,16 +19,16 @@ import java.util.function.Consumer
 /**
  * Subclasses are genes that express products that can be added to a [Network].
  */
-sealed class NetworkGene<P: NetworkModel, G: NetworkGene<P, G>>: Gene<P, G>() {
+sealed class NetworkGene<P: NetworkModel>: Gene<P>() {
     abstract fun buildWithContext(context: NetworkGeneticsContext): P
 }
 
 /**
  * Create a node gene in a chromosome using a template.
  */
-class NodeGene private constructor(override val chromosome: Chromosome<Neuron, NodeGene>, val template: Neuron = Neuron(null)): NetworkGene<Neuron, NodeGene>() {
+class NodeGene private constructor(val template: Neuron = Neuron(null)): NetworkGene<Neuron>() {
 
-    constructor(chromosome: Chromosome<Neuron, NodeGene>, config: Neuron.() -> Unit): this(chromosome, Neuron(null)) {
+    constructor(config: Neuron.() -> Unit): this(Neuron(null)) {
         template.apply(config)
     }
 
@@ -43,14 +43,8 @@ class NodeGene private constructor(override val chromosome: Chromosome<Neuron, N
         template.apply(config)
     }
 
-    override fun delete() {
-        super.delete()
-        val toDelete = fanIn + fanOut
-        toDelete.forEach { it.delete() }
-    }
-
-    override fun copy(chromosome: Chromosome<Neuron, NodeGene>): NodeGene {
-        val newGene = NodeGene(chromosome, template.deepCopy())
+    override fun copy(): NodeGene {
+        val newGene = NodeGene(template.deepCopy())
         events.fireCopied(newGene)
         return newGene
     }
@@ -67,7 +61,7 @@ class NodeGeneEvents(nodeGene: NodeGene) : Event(PropertyChangeSupport(nodeGene)
 }
 
 
-class ConnectionGene(override val chromosome: Chromosome<Synapse, ConnectionGene>, private val template: Synapse, val source: NodeGene, val target: NodeGene) : NetworkGene<Synapse, ConnectionGene>() {
+class ConnectionGene(private val template: Synapse, val source: NodeGene, val target: NodeGene) : NetworkGene<Synapse>() {
 
     override val product = CompletableFuture<Synapse>()
 
@@ -85,14 +79,8 @@ class ConnectionGene(override val chromosome: Chromosome<Synapse, ConnectionGene
         template.apply(block)
     }
 
-    override fun delete() {
-        super.delete()
-        source.fanOut.remove(this)
-        target.fanOut.remove(this)
-    }
-
-    override fun copy(chromosome: Chromosome<Synapse, ConnectionGene>): ConnectionGene {
-        return ConnectionGene(chromosome, Synapse(template), sourceCopy, targetCopy)
+    override fun copy(): ConnectionGene {
+        return ConnectionGene(Synapse(template), sourceCopy, targetCopy)
     }
 
     override fun buildWithContext(context: NetworkGeneticsContext): Synapse {
@@ -112,14 +100,14 @@ class LayoutWrapper(var layout: Layout, var hSpacing: Double, var vSpacing: Doub
     override fun copy() = LayoutWrapper(layout.copy(), hSpacing, vSpacing)
 }
 
-class LayoutGene(override val chromosome: Chromosome<Layout, LayoutGene>, private val template: LayoutWrapper) : Gene<Layout, LayoutGene>(), TopLevelGene<Layout> {
+class LayoutGene(private val template: LayoutWrapper) : Gene<Layout>(), TopLevelGene<Layout> {
 
     override val product = CompletableFuture<Layout>()
 
     // Todo: handle types of layout
 
-    override fun copy(chromosome: Chromosome<Layout, LayoutGene>): LayoutGene {
-        return LayoutGene(chromosome, template.copy())
+    override fun copy(): LayoutGene {
+        return LayoutGene(template.copy())
     }
 
     fun mutate(config: LayoutWrapper.() -> Unit) {
@@ -154,23 +142,23 @@ class LayoutGene(override val chromosome: Chromosome<Layout, LayoutGene>, privat
  */
 class NetworkGeneticsContext(val network: Network) {
 
-    fun <P, G: NetworkGene<P, G>> express(chromosome: Chromosome<P, G>): List<P> = chromosome.genes.map {
+    fun <P, G: NetworkGene<P>> express(chromosome: Chromosome<P, G>): List<P> = chromosome.map {
         it.buildWithContext(this).also { product ->
             if (product is Neuron) network.addNetworkModel(product)
         }
     }
 
-    operator fun <P, G: NetworkGene<P, G>> Chromosome<P, G>.unaryPlus(): List<P> = express(this)
+    operator fun <P, G: NetworkGene<P>> Chromosome<P, G>.unaryPlus(): List<P> = express(this)
 
     fun Chromosome<Neuron, NodeGene>.asGroup(block: NeuronGroup.() -> Unit = { }) = fun(network: Network): NeuronGroup {
-        return genes.map { it.buildWithContext(this@NetworkGeneticsContext) }
+        return map { it.buildWithContext(this@NetworkGeneticsContext) }
             .let { NeuronGroup(network, it).apply(block) }
             .also { network.addNetworkModel(it) }
     }
 
     fun Chromosome<Neuron, NodeGene>.asNeuronCollection(block: NeuronCollection.() -> Unit = { }) = fun(network: Network):
             NeuronCollection {
-        return genes.map { it.buildWithContext(this@NetworkGeneticsContext) }
+        return map { it.buildWithContext(this@NetworkGeneticsContext) }
             .let {
                 it.forEach(network::addNetworkModel)
                 NeuronCollection(network, it).apply(block) }
@@ -189,13 +177,13 @@ operator fun Network.invoke(block: NetworkGeneticsContext.() -> Unit) {
 /**
  * Helper functions to create genes
  */
-fun Chromosome<Neuron, NodeGene>.nodeGene(options: Neuron.() -> Unit = { }): NodeGene {
-    return NodeGene(this, options)
+fun nodeGene(options: Neuron.() -> Unit = { }): NodeGene {
+    return NodeGene(options)
 }
-inline fun Chromosome<Synapse, ConnectionGene>.connectionGene(source: NodeGene, target: NodeGene, options: Synapse.() -> Unit = { }): ConnectionGene {
-    return ConnectionGene(this, Synapse(null, null as Neuron?).apply(options), source, target)
+inline fun connectionGene(source: NodeGene, target: NodeGene, options: Synapse.() -> Unit = { }): ConnectionGene {
+    return ConnectionGene(Synapse(null, null as Neuron?).apply(options), source, target)
 }
-inline fun Chromosome<Layout, LayoutGene>.layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
+inline fun layoutGene(options: GridLayout.() -> Unit = { }): LayoutGene {
     val layout = GridLayout().apply(options)
-    return LayoutGene(this, LayoutWrapper(layout, layout.hSpacing, layout.vSpacing))
+    return LayoutGene(LayoutWrapper(layout, layout.hSpacing, layout.vSpacing))
 }

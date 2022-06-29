@@ -72,23 +72,23 @@ val evolveAutoAssociator = newSim {
             // Create synapses
             val (source, target) = if (Random().nextBoolean()) {
                 // Input to hidden
-                val source = inputs.genes.shuffled().first()
-                val target = hiddenNodes.genes.shuffled().first()
+                val source = inputs.selectRandom()
+                val target = hiddenNodes.selectRandom()
                 Pair(source, target)
             } else {
                 // Hidden to output
-                val source = hiddenNodes.genes.shuffled().first()
-                val target = outputs.genes.shuffled().first()
+                val source = hiddenNodes.selectRandom()
+                val target = outputs.selectRandom()
                 Pair(source, target)
             }
             // Can add conditions for recurrent connections
             // e.g. source = node.genes, target = node.genes.
 
-            connections.add {
+            connections.add(
                 connectionGene(source, target) {
                     strength = (Random().nextDouble() - 0.5) * 0.2
                 }
-            }
+            )
         }
 
         onEval {

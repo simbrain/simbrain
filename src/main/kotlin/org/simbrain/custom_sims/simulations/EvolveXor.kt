@@ -70,16 +70,12 @@ val evolveXor = newSim {
                 val target = (outputChromosome + hiddenNodeChromosome).selectRandom()
                 Pair(source, target)
             }
-            connectionChromosome.add {
-                connectionGene(source, target) {
-                    strength = (Random().nextDouble() - 0.5) * 0.2
-                }
+            connectionChromosome += connectionGene(source, target) {
+                strength = (Random().nextDouble() - 0.5) * 0.2
             }
             when (Random().nextDouble()) {
-                in 0.9..0.95 -> hiddenNodeChromosome.add {
-                    nodeGene()
-                }
-                // in 0.95..1.0 ->  hiddenNodeChromosome.genes.removeLast() // Does not work
+                in 0.9..0.95 -> hiddenNodeChromosome.add(nodeGene())
+                in 0.95..1.0 ->  hiddenNodeChromosome.last().disable()
             }
         }
 

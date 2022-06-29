@@ -82,7 +82,7 @@ val evolveModularity = newSim {
         }
 
         // Utility to create connections
-        fun Chromosome<Synapse, ConnectionGene>.createInitialConnection(
+        fun createInitialConnection(
             sourceLayer: Chromosome<Neuron, NodeGene>,
             targetLayer: Chromosome<Neuron, NodeGene>,
         ): ConnectionGene {
@@ -93,14 +93,21 @@ val evolveModularity = newSim {
             }
         }
 
-        val connectionChromosome = chromosome<Synapse, ConnectionGene>() {
-            repeat(4) { add { createInitialConnection(leftRetina, layer1Chromosome) } }
-            repeat(4) { add { createInitialConnection(rightRetina, layer1Chromosome) } }
-            repeat(4) { add { createInitialConnection(layer1Chromosome, layer2Chromosome) } }
-            repeat(3) { add { createInitialConnection(layer2Chromosome, layer3Chromosome) } }
-            repeat(2) { add { createInitialConnection(layer3Chromosome, outputChromosome) } }
-            listOf()
+        val list = buildList {
+            add(createInitialConnection(leftRetina, layer1Chromosome))
+            add(createInitialConnection(leftRetina, layer1Chromosome))
+        }
+
+        val connectionChromosome = chromosome {
+            add(createInitialConnection(leftRetina, layer1Chromosome))
+            // repeat(4) { add(createInitialConnection(leftRetina, layer1Chromosome)) }
+            // repeat(4) { add { createInitialConnection(rightRetina, layer1Chromosome) } }
+            // repeat(4) { add { createInitialConnection(layer1Chromosome, layer2Chromosome) } }
+            // repeat(3) { add { createInitialConnection(layer2Chromosome, layer3Chromosome) } }
+            // repeat(2) { add { createInitialConnection(layer3Chromosome, outputChromosome) } }
        }
+
+        val thing = connectionChromosome[0]
 
         val thresholds = listOf(-2.0,-1.0,0.0,1.0,2.0)
         val weightStrengths = listOf(-2.0,-1.0,1.0,2.0)
@@ -136,9 +143,9 @@ val evolveModularity = newSim {
                 sourceLayer: Chromosome<Neuron, NodeGene>,
                 targetLayer: Chromosome<Neuron, NodeGene>
             ) {
-                val source = sourceLayer.genes.shuffled().first()
-                val target = targetLayer.genes.shuffled().first()
-                genes.add(connectionGene(source, target) {
+                val source = sourceLayer.selectRandom()
+                val target = targetLayer.selectRandom()
+                add(connectionGene(source, target) {
                     strength = (Random().nextDouble() - 0.5) * 0.2
                 })
             }

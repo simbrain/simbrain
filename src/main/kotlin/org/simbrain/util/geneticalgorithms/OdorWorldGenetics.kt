@@ -11,37 +11,37 @@ import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.util.concurrent.CompletableFuture
 
-inline fun Chromosome<SmellSensor, SmellSensorGene>.smellSensorGene(options: SmellSensor.() -> Unit = { }): SmellSensorGene {
-    return SmellSensorGene(this, SmellSensor().apply(options))
+inline fun smellSensorGene(options: SmellSensor.() -> Unit = { }): SmellSensorGene {
+    return SmellSensorGene(SmellSensor().apply(options))
 }
 
-inline fun Chromosome<ObjectSensor, ObjectSensorGene>.objectSensorGene(options: ObjectSensor.() -> Unit = { }): ObjectSensorGene {
-    return ObjectSensorGene(this, ObjectSensor().apply(options))
+inline fun objectSensorGene(options: ObjectSensor.() -> Unit = { }): ObjectSensorGene {
+    return ObjectSensorGene(ObjectSensor().apply(options))
 }
 
-inline fun Chromosome<StraightMovement, StraightMovementGene>.straightMovementGene(options: StraightMovement.() -> Unit = { }): StraightMovementGene {
-    return StraightMovementGene(this, StraightMovement().apply(options))
+inline fun straightMovementGene(options: StraightMovement.() -> Unit = { }): StraightMovementGene {
+    return StraightMovementGene(StraightMovement().apply(options))
 }
 
-inline fun Chromosome<Turning, TurningGene>.turningGene(options: Turning.() -> Unit = { }): TurningGene {
-    return TurningGene(this, Turning().apply(options))
+inline fun turningGene(options: Turning.() -> Unit = { }): TurningGene {
+    return TurningGene(Turning().apply(options))
 }
 
 inline fun entity(type: EntityType, crossinline template: OdorWorldEntity.() -> Unit = { }): (OdorWorld) -> OdorWorldEntity {
     return { world -> OdorWorldEntity(world, type).apply(template) }
 }
 
-abstract class OdorWorldEntityGene<P, G: OdorWorldEntityGene<P, G>>: Gene<P, G>() {
+abstract class OdorWorldEntityGene<P>: Gene<P>() {
     abstract fun build(odorWorldEntity: OdorWorldEntity): P
 }
 
-class SmellSensorGene(override val chromosome: Chromosome<SmellSensor, SmellSensorGene>, private val template: SmellSensor):
-        OdorWorldEntityGene<SmellSensor, SmellSensorGene>() {
+class SmellSensorGene(private val template: SmellSensor):
+        OdorWorldEntityGene<SmellSensor>() {
 
     override val product = CompletableFuture<SmellSensor>()
 
-    override fun copy(chromosome: Chromosome<SmellSensor, SmellSensorGene>): SmellSensorGene {
-        return SmellSensorGene(chromosome, template.copy())
+    override fun copy(): SmellSensorGene {
+        return SmellSensorGene(template.copy())
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): SmellSensor {
@@ -50,13 +50,13 @@ class SmellSensorGene(override val chromosome: Chromosome<SmellSensor, SmellSens
 
 }
 
-class ObjectSensorGene(override val chromosome: Chromosome<ObjectSensor, ObjectSensorGene>, private val template: ObjectSensor):
-        OdorWorldEntityGene<ObjectSensor, ObjectSensorGene>() {
+class ObjectSensorGene(private val template: ObjectSensor):
+        OdorWorldEntityGene<ObjectSensor>() {
 
     override val product = CompletableFuture<ObjectSensor>()
 
-    override fun copy(chromosome: Chromosome<ObjectSensor, ObjectSensorGene>): ObjectSensorGene {
-        return ObjectSensorGene(chromosome, template.copy())
+    override fun copy(): ObjectSensorGene {
+        return ObjectSensorGene(template.copy())
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): ObjectSensor {
@@ -65,13 +65,13 @@ class ObjectSensorGene(override val chromosome: Chromosome<ObjectSensor, ObjectS
 
 }
 
-class StraightMovementGene(override val chromosome: Chromosome<StraightMovement, StraightMovementGene>, private val template: StraightMovement):
-        OdorWorldEntityGene<StraightMovement, StraightMovementGene>() {
+class StraightMovementGene(private val template: StraightMovement):
+        OdorWorldEntityGene<StraightMovement>() {
 
     override val product = CompletableFuture<StraightMovement>()
 
-    override fun copy(chromosome: Chromosome<StraightMovement, StraightMovementGene>): StraightMovementGene {
-        return StraightMovementGene(chromosome, template.copy())
+    override fun copy(): StraightMovementGene {
+        return StraightMovementGene(template.copy())
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): StraightMovement {
@@ -80,13 +80,13 @@ class StraightMovementGene(override val chromosome: Chromosome<StraightMovement,
 
 }
 
-class TurningGene(override val chromosome: Chromosome<Turning, TurningGene>, private val template: Turning):
-        OdorWorldEntityGene<Turning, TurningGene>() {
+class TurningGene(private val template: Turning):
+        OdorWorldEntityGene<Turning>() {
 
     override val product = CompletableFuture<Turning>()
 
-    override fun copy(chromosome: Chromosome<Turning, TurningGene>): TurningGene {
-        return TurningGene(chromosome, template.copy())
+    override fun copy(): TurningGene {
+        return TurningGene(template.copy())
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): Turning {
@@ -97,8 +97,8 @@ class TurningGene(override val chromosome: Chromosome<Turning, TurningGene>, pri
 
 class OdorWorldEntityGeneticsContext(val entity: OdorWorldEntity) {
 
-    fun <P, G: OdorWorldEntityGene<P, G>> express(chromosome: Chromosome<P, G>): List<P> =
-        chromosome.genes.map {
+    fun <P, G: OdorWorldEntityGene<P>> express(chromosome: Chromosome<P, G>): List<P> =
+        chromosome.map {
             it.build(entity).also { peripheralAttribute ->
                 when (peripheralAttribute) {
                     is Sensor -> entity.addSensor(peripheralAttribute)
@@ -107,7 +107,7 @@ class OdorWorldEntityGeneticsContext(val entity: OdorWorldEntity) {
             } 
         }
 
-    operator fun <P, G: OdorWorldEntityGene<P, G>> Chromosome<P, G>.unaryPlus(): List<P> = express(this)
+    operator fun <P, G: OdorWorldEntityGene<P>> Chromosome<P, G>.unaryPlus(): List<P> = express(this)
 
 }
 

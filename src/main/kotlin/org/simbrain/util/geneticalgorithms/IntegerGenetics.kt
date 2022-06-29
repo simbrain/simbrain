@@ -22,8 +22,8 @@ class IntWrapper(var value: Int = 0) : CopyableObject {
 /**
  * Builder function for [IntGene].
  */
-inline fun Chromosome<Int, IntGene>.intGene(initVal: IntWrapper.() -> Unit = { }): IntGene {
-    return IntGene(this, IntWrapper().apply(initVal))
+inline fun intGene(initVal: IntWrapper.() -> Unit = { }): IntGene {
+    return IntGene(IntWrapper().apply(initVal))
 }
 
 /**
@@ -31,12 +31,12 @@ inline fun Chromosome<Int, IntGene>.intGene(initVal: IntWrapper.() -> Unit = { }
  * [Gene] and implements [TopLevelGene], which allows you to add this gene directly into an onBuild context.
  * function.
  */
-class IntGene(override val chromosome: Chromosome<Int, IntGene>, private val template: IntWrapper) : Gene<Int, IntGene>(), TopLevelGene<Int> {
+class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<Int> {
 
     override val product = CompletableFuture<Int>()
 
-    override fun copy(chromosome: Chromosome<Int, IntGene>): IntGene {
-        return IntGene(chromosome, template.copy())
+    override fun copy(): IntGene {
+        return IntGene(template.copy())
     }
 
     override fun TopLevelBuilderContext.build(): Int {
@@ -60,7 +60,6 @@ fun main() {
          * Set number of integers per chromosome here
          */
         val intChromosome = chromosome(5) {
-            // Default value for integers
             intGene { value = 1 }
         }
 
@@ -77,14 +76,14 @@ fun main() {
         }
 
         onEval {
-            val total = intChromosome.genes.map { it.product.get() }.sumByDouble { it.toDouble() }
+            val total = intChromosome.map { it.product.get() }.sumByDouble { it.toDouble() }
             val targetSum = 10
             abs(total - targetSum)
         }
 
         onPeek {
             print("Integer genes:")
-            println(intChromosome.genes.map { it.product.get() }.joinToString(", "))
+            println(intChromosome.map { it.product.get() }.joinToString(", "))
         }
 
     }

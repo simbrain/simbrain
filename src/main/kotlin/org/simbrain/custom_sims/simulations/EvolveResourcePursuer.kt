@@ -67,18 +67,16 @@ val evolveResourcePursuer = newSim {
             }
 
             // Pre-populate with a few connections
-            val connections = chromosome() {
-                listOf(
-                    connectionGene(inputs[0], hiddens[0]),
-                    connectionGene(inputs[1], hiddens[1]),
-                    connectionGene(inputs[1], hiddens[0]),
-                    connectionGene(inputs[1], hiddens[1]),
-                    connectionGene(hiddens[1], outputs[0]),
-                    connectionGene(hiddens[1], outputs[1]),
-                    connectionGene(hiddens[2], outputs[0]),
-                    connectionGene(hiddens[2], outputs[1])
-                )
-            }
+            val connections = chromosome(
+                connectionGene(inputs[0], hiddens[0]),
+                connectionGene(inputs[1], hiddens[1]),
+                connectionGene(inputs[1], hiddens[0]),
+                connectionGene(inputs[1], hiddens[1]),
+                connectionGene(hiddens[1], outputs[0]),
+                connectionGene(hiddens[1], outputs[1]),
+                connectionGene(hiddens[2], outputs[0]),
+                connectionGene(hiddens[2], outputs[1])
+            )
 
             val evolutionWorkspace = Workspace()
 
@@ -121,12 +119,10 @@ val evolveResourcePursuer = newSim {
                 straightMovementGene()
             }
 
-            val turning = chromosome {
-                listOf(
-                    turningGene { direction = -1.0 },
-                    turningGene { direction = 1.0 }
-                )
-            }
+            val turning = chromosome(
+                turningGene { direction = -1.0 },
+                turningGene { direction = 1.0 }
+            )
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
                 location = point(200.0, 200.0)
@@ -141,7 +137,7 @@ val evolveResourcePursuer = newSim {
                 // TODO: use polar
                 // dx = random.nextDouble(-5.0, 5.0)
                 // dy = random.nextDouble(-5.0, 5.0)
-                onCollide {
+                events.onCollided {
                     if (it === mouse) reset()
                 }
             }
@@ -204,7 +200,7 @@ val evolveResourcePursuer = newSim {
             // Mutate the chromosomes. Specify what things are mutated at each generation.
             //
             onMutate {
-                hiddens.genes.forEach {
+                hiddens.forEach {
                     it.mutate {
                         updateRule.let {
                             if (it is BiasedUpdateRule) it.bias += random.nextDouble(-0.2, 0.2)
@@ -212,9 +208,7 @@ val evolveResourcePursuer = newSim {
                     }
                 }
                 if (Random.nextDouble() > 0.95) {
-                    hiddens.add {
-                        nodeGene()
-                    }
+                    hiddens.add(nodeGene())
                 }
                 // Mutation that changes the activation function for the output nodes
                 // Could try on hidden nodes and also try more rule types...
@@ -228,27 +222,19 @@ val evolveResourcePursuer = newSim {
                 //         }
                 //     }
                 // }
-                connections.genes.forEach {
+                connections.forEach {
                     it.mutate {
                         strength += random.nextDouble(-0.5, 0.5)
                     }
                 }
 
                 // Random source neuron
-                val source = (inputs + hiddens).let {
-                    val index = random.nextInt(0, it.size)
-                    it[index]
-                }
+                val source = (inputs + hiddens).selectRandom()
                 // Random target neuron
-                val target = (outputs + hiddens).let {
-                    val index = random.nextInt(0, it.size)
-                    it[index]
-                }
+                val target = (outputs + hiddens).selectRandom()
                 // Add the connection
-                connections.add {
-                    connectionGene(source, target) {
-                        strength = random.nextDouble(-10.0, 10.0)
-                    }
+                connections += connectionGene(source, target) {
+                    strength = random.nextDouble(-10.0, 10.0)
                 }
             }
 
@@ -259,7 +245,7 @@ val evolveResourcePursuer = newSim {
                 var score = 0.0
 
                 fun OdorWorldEntity.handleCollision() {
-                    onCollide { other ->
+                    events.onCollided { other ->
                         if (other === mouse) {
                             score -= 1
                         }

@@ -19,6 +19,7 @@ import org.simbrain.util.distanceTo
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.EntityType
@@ -35,7 +36,7 @@ val evolvePursuer = newSim {
     /**
      * Max generation to run before giving up
      */
-    val maxGenerations = 100
+    val maxGenerations = 10
 
     fun createEvolution(): Evaluator {
         val evolutionarySimulation = evolutionarySimulation(1) {
@@ -68,13 +69,14 @@ val evolvePursuer = newSim {
 
             val odorworldComponent = evolutionWorkspace { addOdorWorldComponent("Odor World") }
             val odorworld = odorworldComponent.world.apply {
-                isObjectsBlockMovement = false
+                isObjectsBlockMovement = true
+                wrapAround = true
             }
 
             val sensors = chromosome(3) {
                 objectSensorGene {
                     setObjectType(EntityType.SWISS)
-                    theta = it * 2 * Math.PI / 3
+                    theta = (it - 1) * 60.0
                     radius = 32.0
                     decayFunction.dispersion = 200.0
                 }
@@ -84,12 +86,10 @@ val evolvePursuer = newSim {
                 straightMovementGene()
             }
 
-            val turning = chromosome {
-                listOf(
-                    turningGene { direction = -1.0 },
-                    turningGene { direction = 1.0 }
-                )
-            }
+            val turning = chromosome(
+                turningGene { direction = -1.0 },
+                turningGene { direction = 1.0 }
+            )
 
             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
                 location = point(50.0, 200.0)
@@ -101,10 +101,9 @@ val evolvePursuer = newSim {
 
             fun createCheese() = odorworld.addEntity(EntityType.SWISS).apply {
                 location = point(random.nextDouble() * 300, random.nextDouble() * 300)
-                // TODO: use polar
-                // dx = random.nextDouble(-1.0, 1.0)
-                // dy = random.nextDouble(-1.0, 1.0)
-                onCollide {
+                heading = UniformRealDistribution(0.0, 360.0).sampleDouble()
+                speed = 3.0
+                events.onCollided {
                     if (it === mouse) reset()
                 }
             }
@@ -158,7 +157,7 @@ val evolvePursuer = newSim {
                 }
 
                 cheeses.forEach { cheese ->
-                    cheese.onCollide {
+                    cheese.events.onCollided {
                         cheese.location = point(
                             random.nextDouble(100.0, 300.0),
                             random.nextDouble(0.0, 300.0)
@@ -180,18 +179,10 @@ val evolvePursuer = newSim {
                         strength += random.nextDouble(-0.2, 0.2)
                     }
                 }
-                val source = (inputs + hiddens).let {
-                    val index = random.nextInt(0, it.size)
-                    it[index]
-                }
-                val target = (outputs + hiddens).let {
-                    val index = random.nextInt(0, it.size)
-                    it[index]
-                }
-                connections.add {
-                    connectionGene(source, target) {
-                        strength = random.nextDouble(-0.2, 0.2)
-                    }
+                val source = (inputs + hiddens).selectRandom()
+                val target = (outputs + hiddens).selectRandom()
+                connections += connectionGene(source, target) {
+                    strength = random.nextDouble(-0.2, 0.2)
                 }
             }
 
@@ -199,7 +190,7 @@ val evolvePursuer = newSim {
                 var score = 0.0
 
                 cheeses.forEach {
-                    it.onCollide { other ->
+                    it.events.onCollided { other ->
                         if (other === mouse) {
                             score += 1
                         }
@@ -230,7 +221,7 @@ val evolvePursuer = newSim {
         return evaluator(evolutionarySimulation) {
             populationSize = 100
             eliminationRatio = 0.5
-            runUntil { generation == maxGenerations || fitness > 5 }
+            runUntil { generation == maxGenerations || fitness > 20 }
         }
     }
 
@@ -244,7 +235,7 @@ val evolvePursuer = newSim {
 
             val generations = createEvolution().start().onEachGenerationBest { agent, gen ->
                 progressWindow.value = gen
-                progressWindow.text = "Error: ${agent.fitness.format(2)}"
+                progressWindow.text = "Fitness: ${agent.fitness.format(2)}"
             }
             val (best, _) = generations.best
 

@@ -215,9 +215,6 @@ class OdorWorldEntity @JvmOverloads constructor(
         addEffector(Turning(Turning.RIGHT))
     }
 
-    fun onCollide(block: (other: Bounded) -> Unit) {
-    }
-
     fun removeAllSensors() {
         _sensors.forEach { events.fireSensorRemoved(it) }
         _sensors.clear()

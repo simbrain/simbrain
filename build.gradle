@@ -4,7 +4,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.0'
     // id 'checkstyle'
     // Fixes problem with long filenames
     id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
@@ -29,15 +29,15 @@ repositories {
 dependencies {
 
     // Kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.6.10'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-jvm-host:1.6.10'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-jsr223:1.6.10'
-    implementation 'org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.10'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.6.10'
-    implementation 'org.jetbrains.kotlin:kotlin-script-util:1.6.10'
-    implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.6.10'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.0-native-mt'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.7.0'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-jvm-host:1.7.0'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-jsr223:1.7.0'
+    implementation 'org.jetbrains.kotlin:kotlin-compiler-embeddable:1.7.0'
+    implementation 'org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.7.0'
+    implementation 'org.jetbrains.kotlin:kotlin-script-util:1.7.0'
+    implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.7.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.1-native-mt'
 
     // Kotlin DL
     implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:0.3.0'
@@ -130,16 +130,14 @@ task runSim(type: JavaExec) {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "16"
+    kotlinOptions.jvmTarget = "17"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.experimental.ExperimentalTypeInference"
     kotlinOptions.freeCompilerArgs += "-Xjvm-default=all"
-    kotlinOptions.useIR = true
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "16"
+    kotlinOptions.jvmTarget = "17"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.experimental.ExperimentalTypeInference"
     kotlinOptions.freeCompilerArgs += "-Xjvm-default=all"
-    kotlinOptions.useIR = true
 }
 

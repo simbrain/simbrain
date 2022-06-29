@@ -82,35 +82,33 @@ val evolveNetwork = newSim {
 
             // Add nodes
             if (Random().nextDouble() > .95) {
-                nodeChromosome.add { nodeGene() }
+                nodeChromosome.add(nodeGene())
             }
 
             // Remove node mutation
             if (Random().nextDouble() > .95) {
-                nodeChromosome.selectRandom().delete()
+                nodeChromosome.selectRandom().disabled = true
             }
 
-            motivations.genes.forEach {
+            motivations.forEach {
                 it.mutateBias()
             }
 
-            nodeChromosome.genes.forEach {
+            nodeChromosome.forEach {
                 it.mutateBias()
             }
 
             // Modify the layout
-            layoutChromosome.genes.forEach {
+            layoutChromosome.forEach {
                 it.mutateParam()
                 it.mutateType()
             }
 
             // New connections
-            val source = nodeChromosome.genes.shuffled().first()
-            val target = nodeChromosome.genes.shuffled().first()
-            val newConnectionGene = connectionChromosome.add {
-                connectionGene(source, target) {
-                    strength = (Random().nextDouble() - 0.5) * 0.2
-                }
+            val source = nodeChromosome.selectRandom()
+            val target = nodeChromosome.selectRandom()
+            connectionChromosome += connectionGene(source, target) {
+                strength = (Random().nextDouble() - 0.5) * 0.2
             }
 
             // Weight mutations

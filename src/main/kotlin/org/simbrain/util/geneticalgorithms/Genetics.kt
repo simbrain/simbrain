@@ -2,8 +2,11 @@ package org.simbrain.util.geneticalgorithms
 
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+import kotlin.experimental.ExperimentalTypeInference
 import kotlin.random.Random
-import kotlin.streams.toList
 
 /**
  * Describes how to make a gene product, or "express a phenotype". Extend this class with your own gene type, and
@@ -18,17 +21,14 @@ import kotlin.streams.toList
  * @param P the phenotype of the gene product. For example, the phenotype of [NodeGene] is [Neuron]
  * @param G the gene type. A bit strange that it must be declared but required in the generic for the Chromosome field
  */
-abstract class Gene<P, G: Gene<P, G>> {
-
-    /**
-     * Reference to parent chromosome, to facilitate deletion.
-     */
-    protected abstract val chromosome: Chromosome<P, G>
+abstract class Gene<P> {
 
     /**
      * The phenotype expressed by the gene. Not expressed until onBuild is called.
      */
     abstract val product: CompletableFuture<P>
+
+    var disabled = false
 
     /**
      * Helper to make it easy to complete the build.
@@ -37,10 +37,10 @@ abstract class Gene<P, G: Gene<P, G>> {
         return block().also { product.complete(it) }
     }
 
-    abstract fun copy(chromosome: Chromosome<P, G>): G
+    abstract fun copy(): Gene<P>
 
-    open fun delete() {
-        chromosome.genes.remove(this)
+    fun disable() {
+        disabled = true
     }
 
 }
@@ -64,22 +64,13 @@ interface TopLevelGene<T> {
  *
  * Do not instantiate chromosomes directly but create using creation methods in [AgentBuilder].
  */
-class Chromosome<P, G : Gene<P, G>> (val genes: LinkedHashSet<G> = LinkedHashSet()) {
-
-    /**
-     * Add a new gene.
-     */
-    fun add(block: Chromosome<P, G>.() -> G): G {
-        val gene = block()
-        genes.add(gene)
-        return gene
-    }
+class Chromosome<P, G: Gene<P>> (genes: LinkedHashSet<G> = LinkedHashSet()): MutableSet<G> by genes {
 
     /**
      * Index operator support. Provides indexed access to the LinkedHashSet (which provides fast lookup).
      * The access provided here is not optimal, but it's better than using an ArrayList.
      */
-    operator fun get(index: Int) = genes.asSequence().drop(index).first()
+    operator fun get(index: Int) = asSequence().drop(index).first()
 
     /**
      * Returns a random gene from this chromosome.
@@ -89,32 +80,25 @@ class Chromosome<P, G : Gene<P, G>> (val genes: LinkedHashSet<G> = LinkedHashSet
     }
 
     /**
-     * Number of genes on the chromosome.
-     */
-    val size get() = genes.size
-
-    /**
      * Expresses the genes and returns a list of products.
      */
-    val products get() = genes.map { it.product.get() }
+    val products get() = map { it.product.get() }
 
     fun copy(): Chromosome<P, G> {
-        val chromosome = Chromosome<P, G>(LinkedHashSet())
-        genes.forEach { chromosome.genes.add(it.copy(chromosome)) }
-        return chromosome
+        return Chromosome(LinkedHashSet(map { it.copy() as G }))
     }
 
     /**
      * Creates a chromosome that is union with another.
      */
     operator fun plus(other: Chromosome<P, G>): Chromosome<P, G> {
-        val myGenesCopy = genes.toMutableList()
-        myGenesCopy.addAll(other.genes)
-        return Chromosome(LinkedHashSet(myGenesCopy))
+        val combinedGenes = this.toMutableSet().apply { addAll(other) }
+        return Chromosome(LinkedHashSet(combinedGenes))
     }
 
-    fun forEach(block: (G) -> Unit) = genes.forEach(block)
-
+    operator fun plus(other: G): Chromosome<P, G> {
+        return this.apply { add(other) }
+    }
 
 }
 
@@ -164,9 +148,9 @@ class TopLevelBuilderContext {
      */
     operator fun <P, G, C> C.unaryPlus(): List<P>
             where
-            G : Gene<P, G>,
+            G : Gene<P>,
             G : TopLevelGene<P>,
-            C : Chromosome<P, G> = genes.map { with(it) { build() } }
+            C : Chromosome<P, G> = map { with(it) { build() } }
 }
 
 /**
@@ -281,7 +265,8 @@ class AgentBuilder private constructor(
         peekFunction = peek
     }
 
-    private inline fun <P, G : Gene<P, G>> createChromosome(crossinline initializeValue: () -> Chromosome<P, G>): Chromosome<P, G> {
+
+    private inline fun <P, G : Gene<P>> createChromosome(crossinline initializeValue: () -> Chromosome<P, G>): Chromosome<P, G> {
         return if (isInitial) {
             initializeValue().also { chromosomeList.add(it) }
         } else {
@@ -293,33 +278,39 @@ class AgentBuilder private constructor(
     /**
      * Use this to create a chromosome using a builder block, which returns a list of genes.
      */
-    fun <P, G : Gene<P, G>> chromosome(@BuilderInference block: Chromosome<P, G>.() -> List<G>): Chromosome<P, G> {
+    @OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
+    fun <P, G: Gene<P>> chromosome(@BuilderInference block: Chromosome<P, G>.() -> Unit): Chromosome<P, G> {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
         return createChromosome {
-            val newChromosome = Chromosome<P,G>()
+            val newChromosome = Chromosome<P, G>()
             with (newChromosome) {
-                block().forEach{
-                    add{it}
-                }
+                block()
             }
             newChromosome
         }
     }
 
+    fun <P, G: Gene<P>> chromosome(vararg genes: G): Chromosome<P, G> {
+        return Chromosome(LinkedHashSet(genes.toSet()))
+    }
+
+
+
     /**
      * Use this to create an empty chromosome.
      */
-    fun <P, G : Gene<P, G>> chromosome(): Chromosome<P, G> {
+    fun <P, G : Gene<P>> chromosome(): Chromosome<P, G> {
         return createChromosome { Chromosome() }
     }
 
     /**
      * Use this to create a chromosome with a set number of genes, using a gene-building lambda.
      */
-    fun <P, G : Gene<P, G>> chromosome(initialCount: Int, @BuilderInference geneBuilder: Chromosome<P, G>.(index: Int) -> G): Chromosome<P, G> {
+    fun <P, G : Gene<P>> chromosome(initialCount: Int, geneBuilder: (index: Int) -> G): Chromosome<P, G> {
         return createChromosome {
             val chromosome = Chromosome<P, G>()
             repeat(initialCount) {
-                chromosome.genes.add(chromosome.geneBuilder(it))
+                chromosome.add(geneBuilder(it))
             }
             chromosome
         }

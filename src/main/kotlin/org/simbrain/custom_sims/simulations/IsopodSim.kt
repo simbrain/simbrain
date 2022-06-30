@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
@@ -130,9 +131,9 @@ val isopodSim = newSim {
             }
             events.onCollided {
                 if (it is OdorWorldEntity) {
-                    log += "Collided with ${it.name}\n"
+                    log += "# Collided with ${it.name}\n"
                 } else {
-                    log += "Collided with wall\n"
+                    log += "# Collided with wall\n"
                 }
                 collision = true
             }
@@ -153,10 +154,6 @@ val isopodSim = newSim {
         addFish(10, 590)
         addFish(10, 10)
         addFish(590, 10)
-
-        workspace.addUpdateAction(updateAction("Track location") {
-            log += "${isopod}\n"
-        })
 
     }
 
@@ -185,24 +182,53 @@ val isopodSim = newSim {
     withGui {
         createControlPanel("Control Panel", 5, 10) {
 
+            addButton("Run one trial") {
+                resetIsopod()
+                log = ""
+                var iteration = 0
+                workspace.coroutineScope.launch {
+                    log += "# Heading: ${isopod.heading}\n"
+                    while (++iteration < maxIterationsPerTrial) {
+                        workspace.iterateSuspend(1)
+                        if (collision) {
+                            break
+                        } else {
+                            log +=  "${isopod.x}, ${isopod.y}\n"
+                        }
+                    }
+                    collision = false
+                    showSaveDialog("", "singleTrial.csv") {
+                        writeText(log)
+                    }
+                }
+            }
+
             val numTrialsTF = addTextField("Number of trials", "" + numTrials)
 
-            addButton("Run all trials") {
-                var iteration = 0
-                numTrials = Integer.parseInt(numTrialsTF.text)
-                log = "Trial: $trialNum\n"
-                resetIsopod()
-                log += "Heading: ${isopod.heading}\n"
-                while(trialNum < numTrials) {
-                    while (++iteration < maxIterationsPerTrial && !collision) {
-                        workspace.simpleIterate()
+            addButton("Run trials") {
+                workspace.coroutineScope.launch {
+                    log = ""
+                    var iteration = 0
+                    numTrials = Integer.parseInt(numTrialsTF.text)
+                    while(trialNum < numTrials) {
+                        log += "# Trial: $trialNum\n"
+                        resetIsopod()
+                        log += "# Heading: ${isopod.heading}\n"
+                        while (++iteration < maxIterationsPerTrial) {
+                            workspace.iterateSuspend(1)
+                            if (collision) {
+                                break
+                            } else {
+                                log +=  "${isopod.x}, ${isopod.y}\n"
+                            }
+                        }
+                        trialNum++
+                        collision = false
                     }
-                    trialNum++
-                    collision = false
-                }
-                trialNum = 0
-                showSaveDialog("", "trialData.txt") {
-                    writeText(log)
+                    trialNum = 0
+                    showSaveDialog("", "multipleTrials.csv") {
+                        writeText(log)
+                    }
                 }
             }
         }

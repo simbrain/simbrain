@@ -20,7 +20,7 @@ package org.simbrain.plot.projection;
 
 import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.DoubleArrayConverter;
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.util.projection.DataPointColored;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.AttributeContainer;
@@ -65,7 +65,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     }
 
     private static XStream getProjectorXStream() {
-        var xstream = Utils.getSimbrainXStream();
+        var xstream = XStreamUtils.getSimbrainXStream();
         xstream.registerConverter(new DoubleArrayConverter());
         return xstream;
     }

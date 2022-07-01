@@ -19,7 +19,7 @@
 package org.simbrain.util.table;
 
 import com.thoughtworks.xstream.XStream;
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
@@ -304,7 +304,7 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
+        XStream xstream = XStreamUtils.getSimbrainXStream();
         xstream.omitField(AbstractTableModel.class, "listenerList");
         return xstream;
     }

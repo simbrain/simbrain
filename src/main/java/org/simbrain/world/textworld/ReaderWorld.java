@@ -21,6 +21,7 @@ package org.simbrain.world.textworld;
 import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.Producible;
 import org.simbrain.world.textworld.TextListener.TextAdapter;
 
@@ -379,7 +380,7 @@ public final class ReaderWorld extends TextWorld {
      * @return the XStream object
      */
     static XStream getXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
+        XStream xstream = XStreamUtils.getSimbrainXStream();
         return xstream;
     }
 

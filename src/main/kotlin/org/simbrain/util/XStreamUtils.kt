@@ -1,9 +1,13 @@
 @file:JvmName("XStreamUtils")
+
 package org.simbrain.util
+
+import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.converters.reflection.ReflectionConverter
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
+import com.thoughtworks.xstream.io.xml.DomDriver
 import com.thoughtworks.xstream.mapper.Mapper
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -13,12 +17,34 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.javaType
 
 /**
+ * Returns an XStream instance with default Simbrain settings, including backwards compatibility with earlier xml,
+ * and turning off security warning, and formatting xml as utf-8.
+ *
+ * @return the properly initialized XStream object
+ */
+fun getSimbrainXStream(): XStream {
+    return XStream(DomDriver("UTF-8")).apply {
+        ignoreUnknownElements()
+        allowTypesByWildcard(
+            arrayOf(
+                "org.simbrain.**", "java.awt.**", "org.jfree.**", "javax.swing.event.**", "java.beans.**",
+                "smile.math.**", "java.util.concurrent.**"
+            )
+        )
+    }
+}
+
+/**
  * XStream support for classes that require a primary constructor call.
  *
  * Limitation: Field names must match primary constructor param names.
  * Untested on Java classes.
  */
-fun <T: Any> createConstructorCallingConverter(clazz: Class<T>, mapper: Mapper, reflectionProvider: ReflectionProvider): ReflectionConverter {
+fun <T : Any> createConstructorCallingConverter(
+    clazz: Class<T>,
+    mapper: Mapper,
+    reflectionProvider: ReflectionProvider
+): ReflectionConverter {
     return object : ReflectionConverter(mapper, reflectionProvider, clazz) {
 
         @OptIn(ExperimentalStdlibApi::class)
@@ -46,7 +72,8 @@ fun <T: Any> createConstructorCallingConverter(clazz: Class<T>, mapper: Mapper, 
             val fieldValueMap = HashMap<String, Any?>()
 
             // Kotlin Properties, mainly used for delegations
-            val propertyMap = cls.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>().associateBy { it.name }
+            val propertyMap =
+                cls.declaredMemberProperties.filterIsInstance<KMutableProperty<*>>().associateBy { it.name }
             val propertyValueMap = HashMap<String, Any?>()
 
             fun read() {

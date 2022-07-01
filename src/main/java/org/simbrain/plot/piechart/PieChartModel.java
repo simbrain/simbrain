@@ -20,7 +20,7 @@ package org.simbrain.plot.piechart;
 
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.general.DefaultPieDataset;
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -68,7 +68,7 @@ public class PieChartModel implements AttributeContainer, EditableObject {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
+        XStream xstream = XStreamUtils.getSimbrainXStream();
         return xstream;
     }
 

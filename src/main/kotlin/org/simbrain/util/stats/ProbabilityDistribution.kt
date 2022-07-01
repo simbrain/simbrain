@@ -8,8 +8,8 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.mapper.Mapper
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.simbrain.util.UserParameter
-import org.simbrain.util.Utils
 import org.simbrain.util.createConstructorCallingConverter
+import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.*
@@ -68,7 +68,7 @@ abstract class ProbabilityDistribution() : CopyableObject {
     companion object {
 
         fun getXStream(): XStream {
-            val xstream = Utils.getSimbrainXStream()
+            val xstream = getSimbrainXStream()
             xstream.registerConverter(createConstructorCallingConverter(ProbabilityDistribution::class.java, xstream.mapper, xstream.reflectionProvider))
             return xstream
         }

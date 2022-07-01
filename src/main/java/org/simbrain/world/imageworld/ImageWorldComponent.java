@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld;
 
 import com.thoughtworks.xstream.XStream;
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.imageworld.serialization.BufferedImageConverter;
@@ -68,7 +68,7 @@ public class ImageWorldComponent extends WorkspaceComponent {
      * Create an xstream from this class.
      */
     public static XStream getXStream() {
-        XStream stream = Utils.getSimbrainXStream();
+        XStream stream = XStreamUtils.getSimbrainXStream();
         stream.registerConverter(new BufferedImageConverter());
         stream.registerConverter(new CouplingArrayConverter());
         return stream;

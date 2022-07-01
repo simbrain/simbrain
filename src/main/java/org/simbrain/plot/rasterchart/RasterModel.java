@@ -22,7 +22,7 @@ import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -153,7 +153,7 @@ public class RasterModel implements AttributeContainer, EditableObject {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = Utils.getSimbrainXStream();
+        XStream xstream = XStreamUtils.getSimbrainXStream();
         return xstream;
     }
 

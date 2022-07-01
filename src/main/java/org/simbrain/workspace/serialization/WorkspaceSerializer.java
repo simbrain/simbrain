@@ -20,7 +20,7 @@ package org.simbrain.workspace.serialization;
 
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.gui.DesktopComponent;
@@ -302,7 +302,7 @@ public class WorkspaceSerializer {
                     workspace.addWorkspaceComponent(wc);
                     if (archivedComponent.getDesktopComponent() != null) {
                         Rectangle bounds =
-                                (Rectangle) Utils.getSimbrainXStream().fromXML(new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
+                                (Rectangle) XStreamUtils.getSimbrainXStream().fromXML(new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
                         DesktopComponent<?> desktopComponent = desktop.getDesktopComponent(wc);
                         desktopComponent.getParentFrame().setBounds(bounds);
                     }

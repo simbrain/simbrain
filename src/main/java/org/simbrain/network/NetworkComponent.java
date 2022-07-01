@@ -20,7 +20,7 @@ package org.simbrain.network;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 
@@ -151,7 +151,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return Utils.getSimbrainXStream().toXML(network);
+        return XStreamUtils.getSimbrainXStream().toXML(network);
     }
 
     @Override

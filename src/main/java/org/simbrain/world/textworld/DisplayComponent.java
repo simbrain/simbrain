@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.textworld;
 
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.world.textworld.TextWorld.TextItem;
@@ -139,14 +139,14 @@ public class DisplayComponent extends WorkspaceComponent {
      * {@inheritDoc}.
      */
     public static DisplayComponent open(InputStream input, String name, String format) {
-        DisplayWorld newWorld = (DisplayWorld) Utils.getSimbrainXStream().fromXML(input);
+        DisplayWorld newWorld = (DisplayWorld) XStreamUtils.getSimbrainXStream().fromXML(input);
         return new DisplayComponent(name, newWorld);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
         world.preSaveInit();
-        Utils.getSimbrainXStream().toXML(world, output);
+        XStreamUtils.getSimbrainXStream().toXML(world, output);
     }
 
     @Override

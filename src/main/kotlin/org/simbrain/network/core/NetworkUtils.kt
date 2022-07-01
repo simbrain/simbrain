@@ -13,8 +13,8 @@ import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.MatrixConverter
 import org.simbrain.util.SimbrainPreferences
-import org.simbrain.util.Utils
 import org.simbrain.util.decayfunctions.DecayFunction
+import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
@@ -99,7 +99,7 @@ val List<Synapse>.lengths: List<Double>
     get() = map { it.length }
 
 fun getNetworkXStream(): XStream {
-    val xstream = Utils.getSimbrainXStream()
+    val xstream = getSimbrainXStream()
     xstream.registerConverter(NetworkModelListConverter())
     xstream.registerConverter(DoubleArrayConverter())
     xstream.registerConverter(MatrixConverter())

@@ -1,11 +1,10 @@
 package org.simbrain.world.deviceinteraction;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
-import org.simbrain.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,7 +92,7 @@ public class KeyboardWorld implements AttributeContainer {
      * @return the XStream object
      */
     static XStream getXStream() {
-        return Utils.getSimbrainXStream();
+        return XStreamUtils.getSimbrainXStream();
     }
 
 

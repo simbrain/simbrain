@@ -18,7 +18,7 @@
  */
 package org.simbrain.plot.piechart;
 
-import org.simbrain.util.Utils;
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -109,7 +109,7 @@ public class PieChartComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return Utils.getSimbrainXStream().toXML(model);
+        return XStreamUtils.getSimbrainXStream().toXML(model);
     }
 
 }

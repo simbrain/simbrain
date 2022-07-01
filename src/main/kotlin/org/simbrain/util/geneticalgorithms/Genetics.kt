@@ -19,7 +19,6 @@ import kotlin.random.Random
  *  For usage examples see [IntGene] and [NodeGene].
  *
  * @param P the phenotype of the gene product. For example, the phenotype of [NodeGene] is [Neuron]
- * @param G the gene type. A bit strange that it must be declared but required in the generic for the Chromosome field
  */
 abstract class Gene<P> {
 
@@ -28,19 +27,22 @@ abstract class Gene<P> {
      */
     abstract val product: CompletableFuture<P>
 
+    /**
+     * If set to true, this gene won't be expressed. Makes life easier than using deletion mutations.
+     */
     var disabled = false
+
+    abstract fun copy(): Gene<P>
+
+    fun disable() {
+        disabled = true
+    }
 
     /**
      * Helper to make it easy to complete the build.
      */
     protected inline fun completeWith(block: () -> P): P {
         return block().also { product.complete(it) }
-    }
-
-    abstract fun copy(): Gene<P>
-
-    fun disable() {
-        disabled = true
     }
 
 }
@@ -64,7 +66,7 @@ interface TopLevelGene<T> {
  *
  * Do not instantiate chromosomes directly but create using creation methods in [AgentBuilder].
  */
-class Chromosome<P, G: Gene<P>> (genes: LinkedHashSet<G> = LinkedHashSet()): MutableSet<G> by genes {
+class Chromosome<P, G : Gene<P>>(genes: LinkedHashSet<G> = LinkedHashSet()) : MutableSet<G> by genes {
 
     /**
      * Index operator support. Provides indexed access to the LinkedHashSet (which provides fast lookup).
@@ -89,7 +91,7 @@ class Chromosome<P, G: Gene<P>> (genes: LinkedHashSet<G> = LinkedHashSet()): Mut
     }
 
     /**
-     * Creates a chromosome that is union with another.
+     * Creates a chromosome that is unioned with another.
      */
     operator fun plus(other: Chromosome<P, G>): Chromosome<P, G> {
         val combinedGenes = this.toMutableSet().apply { addAll(other) }
@@ -98,6 +100,13 @@ class Chromosome<P, G: Gene<P>> (genes: LinkedHashSet<G> = LinkedHashSet()): Mut
 
     operator fun plus(other: G): Chromosome<P, G> {
         return this.apply { add(other) }
+    }
+
+    // TODO: Make an adapter for this class to avoid the clash with superclass add
+
+    fun addAndReturnGene(gene: G): G {
+        add(gene)
+        return gene
     }
 
 }
@@ -279,21 +288,20 @@ class AgentBuilder private constructor(
      * Use this to create a chromosome using a builder block, which returns a list of genes.
      */
     @OptIn(ExperimentalTypeInference::class, ExperimentalContracts::class)
-    fun <P, G: Gene<P>> chromosome(@BuilderInference block: Chromosome<P, G>.() -> Unit): Chromosome<P, G> {
+    fun <P, G : Gene<P>> chromosome(@BuilderInference block: Chromosome<P, G>.() -> Unit): Chromosome<P, G> {
         contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
         return createChromosome {
             val newChromosome = Chromosome<P, G>()
-            with (newChromosome) {
+            with(newChromosome) {
                 block()
             }
             newChromosome
         }
     }
 
-    fun <P, G: Gene<P>> chromosome(vararg genes: G): Chromosome<P, G> {
+    fun <P, G : Gene<P>> chromosome(vararg genes: G): Chromosome<P, G> {
         return Chromosome(LinkedHashSet(genes.toSet()))
     }
-
 
 
     /**

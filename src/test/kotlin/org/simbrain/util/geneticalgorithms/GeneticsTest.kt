@@ -15,38 +15,38 @@ class GeneticsTest {
 
     @Test
     fun `node copy copies neuron properties correctly`() {
-        val node = chromosome.add { nodeGene() {
+        val node = nodeGene() {
             activation = .5
             lowerBound = -1.2
             upperBound = 1.5
-        } }
-        val copy = node.copy(chromosome)
+        }
+        val copy = node.copy()
         assertEquals(.5, copy.template.activation)
         assertEquals(-1.2, copy.template.lowerBound)
         assertEquals(1.5, copy.template.upperBound)
     }
 
-     @Test
-     fun `node gene creates product specified in template`() {
-         val node = chromosome.add { nodeGene { activation = 0.7 } }
-         val neuron = node.buildWithContext(NetworkGeneticsContext(Network()))
-         assertEquals(0.7, neuron.activation, 0.01)
-     }
+    @Test
+    fun `node gene creates product specified in template`() {
+        val node = nodeGene { activation = 0.7 }
+        val neuron = node.buildWithContext(NetworkGeneticsContext(Network()))
+        assertEquals(0.7, neuron.activation, 0.01)
+    }
 
-     @Test
-     fun `node gene creates specified product after copied`() {
-         val node = chromosome.add { nodeGene { activation = 0.7 } }
-         val copy = node.copy(chromosome)
-         val neuron = copy.buildWithContext(NetworkGeneticsContext(Network()))
-         assertEquals(0.7, neuron.activation, 0.01)
-     }
+    @Test
+    fun `node gene creates specified product after copied`() {
+        val node = nodeGene { activation = 0.7 }
+        val copy = node.copy()
+        val neuron = copy.buildWithContext(NetworkGeneticsContext(Network()))
+        assertEquals(0.7, neuron.activation, 0.01)
+    }
 
     @Test
     fun `node events are working properly`() {
-        val node = chromosome.add { nodeGene() }
+        val node = nodeGene()
         var counter = 0
-        node.events.onCopy{counter++}
-        node.copy(chromosome)
+        node.events.onCopy { counter++ }
+        node.copy()
         assertEquals(counter, 1)
     }
 
@@ -84,10 +84,8 @@ class GeneticsTest {
 
             val network = Network()
 
-            val nodes = defaultActivations.map {
-                chromosome.add {
-                    nodeGene { activation = it }
-                }
+            defaultActivations.map {
+                chromosome += nodeGene { activation = it }
             }
 
             onBuild {
@@ -129,7 +127,7 @@ class GeneticsTest {
 
             onEval {
                 inputs.products.activations.forEach { assertEquals(0.75, it, 0.01) }
-                refs.add(inputs.genes.toMutableList())
+                refs.add(inputs.toMutableList())
                 0.0
             }
         }
@@ -154,12 +152,10 @@ class GeneticsTest {
                 nodeGene()
             }
 
-            val synapses = chromosome() {
-                listOf(
-                    connectionGene(inputs[0], outputs[1]),
-                    connectionGene(inputs[1], outputs[0])
-                )
-            }
+            val synapses = chromosome(
+                connectionGene(inputs[0], outputs[1]),
+                connectionGene(inputs[1], outputs[0])
+            )
 
             onBuild {
                 network {
@@ -199,12 +195,10 @@ class GeneticsTest {
                 nodeGene()
             }
 
-            val synapses = chromosome() {
-                listOf(
-                    connectionGene(inputs[0], outputs[1]),
-                    connectionGene(inputs[1], outputs[0])
-                )
-            }
+            val synapses = chromosome(
+                connectionGene(inputs[0], outputs[1]),
+                connectionGene(inputs[1], outputs[0])
+            )
 
             onBuild {
                 network {
@@ -215,14 +209,14 @@ class GeneticsTest {
             }
 
             onMutate {
-                val source = inputs.add { nodeGene() }
-                val target = outputs.add { nodeGene() }
-                synapses.add { connectionGene(source, target) }
+                val source = inputs.addAndReturnGene(nodeGene())
+                val target = outputs.addAndReturnGene(nodeGene())
+                synapses += connectionGene(source, target)
             }
 
             onEval {
-                val condition = synapses.genes.all {
-                    val result = it.source in inputs.genes && it.target in outputs.genes
+                val condition = synapses.all {
+                    val result = it.source in inputs && it.target in outputs
                     result
                 }
                 assertTrue(condition)
@@ -260,15 +254,15 @@ class GeneticsTest {
             }
 
             onBuild {
-                    network {
-                        +inputs
-                        +outputs
-                    }
-
-                    with(workspace.couplingManager) {
-                        inputs.products couple outputs.products
-                    }
+                network {
+                    +inputs
+                    +outputs
                 }
+
+                with(workspace.couplingManager) {
+                    inputs.products couple outputs.products
+                }
+            }
 
 
             onEval {
@@ -277,7 +271,10 @@ class GeneticsTest {
 
                 workspace.simpleIterate()
 
-                assertArrayEquals(inputs.products.activations.toTypedArray(), outputs.products.activations.toTypedArray())
+                assertArrayEquals(
+                    inputs.products.activations.toTypedArray(),
+                    outputs.products.activations.toTypedArray()
+                )
 
                 0.0
             }

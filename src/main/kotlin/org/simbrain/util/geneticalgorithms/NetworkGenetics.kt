@@ -1,5 +1,8 @@
 package org.simbrain.util.geneticalgorithms
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withTimeout
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -13,14 +16,13 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.util.Event
 import org.simbrain.util.propertyeditor.CopyableObject
 import java.beans.PropertyChangeSupport
-import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
 /**
  * Subclasses are genes that express products that can be added to a [Network].
  */
 sealed class NetworkGene<P: NetworkModel>: Gene<P>() {
-    abstract fun buildWithContext(context: NetworkGeneticsContext): P
+    abstract suspend fun buildWithContext(context: NetworkGeneticsContext): P
 }
 
 /**
@@ -35,7 +37,7 @@ class NodeGene private constructor(val template: Neuron = Neuron(null)): Network
     val fanOut = LinkedHashSet<ConnectionGene>()
     val fanIn = LinkedHashSet<ConnectionGene>()
 
-    override val product = CompletableFuture<Neuron>()
+    override val product = CompletableDeferred<Neuron>()
 
     val events = NodeGeneEvents(this)
 
@@ -49,7 +51,7 @@ class NodeGene private constructor(val template: Neuron = Neuron(null)): Network
         return newGene
     }
 
-    override fun buildWithContext(context: NetworkGeneticsContext): Neuron = completeWith {
+    override suspend fun buildWithContext(context: NetworkGeneticsContext): Neuron = completeWith {
       Neuron(context.network, template)
     }
 
@@ -63,7 +65,7 @@ class NodeGeneEvents(nodeGene: NodeGene) : Event(PropertyChangeSupport(nodeGene)
 
 class ConnectionGene(private val template: Synapse, val source: NodeGene, val target: NodeGene) : NetworkGene<Synapse>() {
 
-    override val product = CompletableFuture<Synapse>()
+    override val product: CompletableDeferred<Synapse> = CompletableDeferred()
 
     private lateinit var sourceCopy: NodeGene
     private lateinit var targetCopy: NodeGene
@@ -83,11 +85,13 @@ class ConnectionGene(private val template: Synapse, val source: NodeGene, val ta
         return ConnectionGene(Synapse(template), sourceCopy, targetCopy)
     }
 
-    override fun buildWithContext(context: NetworkGeneticsContext): Synapse {
-        return Synapse(context.network, source.product.get(), target.product.get(), template.learningRule, template)
-            .also {
-            context.network.addNetworkModel(it)
-            product.complete(it)
+    override suspend fun buildWithContext(context: NetworkGeneticsContext): Synapse {
+        return withTimeout(1000) {
+            Synapse(context.network, source.product.await(), target.product.await(), template.learningRule, template)
+                .also {
+                    context.network.addNetworkModel(it)
+                    product.complete(it)
+                }
         }
     }
 
@@ -102,7 +106,7 @@ class LayoutWrapper(var layout: Layout, var hSpacing: Double, var vSpacing: Doub
 
 class LayoutGene(private val template: LayoutWrapper) : Gene<Layout>(), TopLevelGene<Layout> {
 
-    override val product = CompletableFuture<Layout>()
+    override val product = CompletableDeferred<Layout>()
 
     // Todo: handle types of layout
 
@@ -114,7 +118,7 @@ class LayoutGene(private val template: LayoutWrapper) : Gene<Layout>(), TopLevel
         template.apply(config)
     }
 
-    override fun TopLevelBuilderContext.build(): Layout = completeWith {
+    override suspend fun TopLevelBuilderContext.build(): Layout = completeWith {
         template.layout.apply {
             when(this) {
                 is GridLayout -> {
@@ -142,35 +146,38 @@ class LayoutGene(private val template: LayoutWrapper) : Gene<Layout>(), TopLevel
  */
 class NetworkGeneticsContext(val network: Network) {
 
-    fun <P, G: NetworkGene<P>> express(chromosome: Chromosome<P, G>): List<P> = chromosome.map {
+    suspend fun <P, G: NetworkGene<P>> express(chromosome: Chromosome<P, G>): List<P> = chromosome.map {
         it.buildWithContext(this).also { product ->
             if (product is Neuron) network.addNetworkModel(product)
         }
     }
 
-    operator fun <P, G: NetworkGene<P>> Chromosome<P, G>.unaryPlus(): List<P> = express(this)
+    suspend operator fun <P, G: NetworkGene<P>> Chromosome<P, G>.unaryPlus(): List<P> = express(this)
 
-    fun Chromosome<Neuron, NodeGene>.asGroup(block: NeuronGroup.() -> Unit = { }) = fun(network: Network): NeuronGroup {
-        return map { it.buildWithContext(this@NetworkGeneticsContext) }
-            .let { NeuronGroup(network, it).apply(block) }
-            .also { network.addNetworkModel(it) }
+    suspend fun Chromosome<Neuron, NodeGene>.asGroup(block: NeuronGroup.() -> Unit = { }): (suspend (network: Network) -> NeuronGroup) {
+        return { network ->
+            map { it.buildWithContext(this@NetworkGeneticsContext) }
+                .let { NeuronGroup(network, it).apply(block) }
+                .also { network.addNetworkModel(it) }
+        }
     }
 
-    fun Chromosome<Neuron, NodeGene>.asNeuronCollection(block: NeuronCollection.() -> Unit = { }) = fun(network: Network):
-            NeuronCollection {
-        return map { it.buildWithContext(this@NetworkGeneticsContext) }
-            .let {
-                it.forEach(network::addNetworkModel)
-                NeuronCollection(network, it).apply(block) }
-            .also { network.addNetworkModel(it) }
+    fun Chromosome<Neuron, NodeGene>.asNeuronCollection(block: NeuronCollection.() -> Unit = { }): (suspend (network: Network) -> NeuronCollection) {
+        return { network ->
+            map { it.buildWithContext(this@NetworkGeneticsContext) }
+                .let {
+                    it.forEach(network::addNetworkModel)
+                    NeuronCollection(network, it).apply(block) }
+                .also { network.addNetworkModel(it) }
+        }
     }
 
-    operator fun <T> ((Network) -> T).unaryPlus(): T = this(network)
+    suspend operator fun <T> (suspend (Network) -> T).unaryPlus(): T = this(network)
 
 }
 
-operator fun Network.invoke(block: NetworkGeneticsContext.() -> Unit) {
-    NetworkGeneticsContext(this).apply(block)
+suspend operator fun Network.invoke(block: suspend NetworkGeneticsContext.() -> Unit) = coroutineScope {
+    NetworkGeneticsContext(this@invoke).apply { block() }
 }
 
 

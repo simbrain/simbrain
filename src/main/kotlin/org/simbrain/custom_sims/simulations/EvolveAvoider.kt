@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addOdorWorldComponent
 import org.simbrain.custom_sims.couplingManager
@@ -11,7 +11,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule
 import org.simbrain.util.format
@@ -31,25 +30,28 @@ val evolveAvoider = newSim {
     /**
      * Max generation to run before giving up
      */
-    val maxGenerations = 150
+    val maxGenerations = 100
 
     /**
      * Iterations to run for each simulation. If < 3000 success is usually by luck.
      */
-    val iterationsPerRun = 7500
+    val iterationsPerRun = 5000
 
     fun createEvolution(): Evaluator {
         val evolutionarySimulation = evolutionarySimulation(1) {
 
             val inputs = chromosome(3) {
-                nodeGene()
+                nodeGene {
+                    upperBound = 5.0
+                }
             }
 
             val hiddens = chromosome(8) {
                 nodeGene {
-                    updateRule = DecayRule().apply {
-                        decayFraction = .01
-                    }
+                    upperBound = 10.0
+                    // updateRule = DecayRule().apply {
+                    //     decayFraction = .01
+                    // }
                 }
             }
 
@@ -167,15 +169,17 @@ val evolveAvoider = newSim {
                 }
 
                 evolutionWorkspace {
-                    couplingManager.apply {
-                        val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
-                        val (straightConsumer) = straightMovement.products
-                        val (left, right) = turning.products
+                    runBlocking {
+                        couplingManager.apply {
+                            val (straightNeuron, leftNeuron, rightNeuron) = outputs.getProducts()
+                            val (straightConsumer) = straightMovement.getProducts()
+                            val (left, right) = turning.getProducts()
 
-                        sensors.products couple inputs.products
-                        straightNeuron couple straightConsumer
-                        leftNeuron couple left
-                        rightNeuron couple right
+                            sensors.getProducts() couple inputs.getProducts()
+                            straightNeuron couple straightConsumer
+                            leftNeuron couple left
+                            rightNeuron couple right
+                        }
                     }
                 }
             }
@@ -241,7 +245,7 @@ val evolveAvoider = newSim {
                 poison3.handleCollision();
 
                 evolutionWorkspace.apply {
-                    repeat(iterationsPerRun) { simpleIterate() }
+                    iterateSuspend(iterationsPerRun)
                     // score += (0..1000).map {
                     //     simpleIterate()
                     //     minOf(

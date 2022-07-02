@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addOdorWorldComponent
 import org.simbrain.custom_sims.couplingManager
@@ -10,7 +11,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.core.labels
-
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
@@ -36,17 +36,21 @@ val evolvePursuer = newSim {
     /**
      * Max generation to run before giving up
      */
-    val maxGenerations = 10
+    val maxGenerations = 100
 
     fun createEvolution(): Evaluator {
         val evolutionarySimulation = evolutionarySimulation(1) {
 
             val inputs = chromosome(3) {
-                nodeGene()
+                nodeGene {
+                    upperBound = 5.0
+                }
             }
 
             val hiddens = chromosome(8) {
-                nodeGene()
+                nodeGene {
+                    upperBound = 10.0
+                }
             }
 
             val outputs = chromosome(3) {
@@ -144,15 +148,17 @@ val evolvePursuer = newSim {
                     +turning
                 }
                 evolutionWorkspace {
-                    couplingManager.apply {
-                        val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
-                        val (straightConsumer) = straightMovement.products
-                        val (left, right) = turning.products
+                    runBlocking {
+                        couplingManager.apply {
+                            val (straightNeuron, leftNeuron, rightNeuron) = outputs.getProducts()
+                            val (straightConsumer) = straightMovement.getProducts()
+                            val (left, right) = turning.getProducts()
 
-                        sensors.products couple inputs.products
-                        straightNeuron couple straightConsumer
-                        leftNeuron couple left
-                        rightNeuron couple right
+                            sensors.getProducts() couple inputs.getProducts()
+                            straightNeuron couple straightConsumer
+                            leftNeuron couple left
+                            rightNeuron couple right
+                        }
                     }
                 }
 
@@ -182,7 +188,7 @@ val evolvePursuer = newSim {
                 val source = (inputs + hiddens).selectRandom()
                 val target = (outputs + hiddens).selectRandom()
                 connections += connectionGene(source, target) {
-                    strength = random.nextDouble(-0.2, 0.2)
+                    strength = random.nextDouble(-10.0, 10.0)
                 }
             }
 
@@ -197,12 +203,13 @@ val evolvePursuer = newSim {
                     }
                 }
 
+                evolutionWorkspace.addUpdateAction("compute energy") {
+                    val energy = abs(outputs.getProducts().activations.sum()) + 5
+                    score -= energy / 1000
+                }
+
                 evolutionWorkspace.apply {
-                    repeat(1000) {
-                        simpleIterate()
-                        val energy = abs(outputs.products.activations.sum()) + 5
-                        score -= energy / 1000
-                    }
+                    iterateSuspend(1000)
                 }
 
                 val partial = cheeses.map { cheese -> 100 - mouse.location.distanceTo(cheese.location) }
@@ -221,7 +228,7 @@ val evolvePursuer = newSim {
         return evaluator(evolutionarySimulation) {
             populationSize = 100
             eliminationRatio = 0.5
-            runUntil { generation == maxGenerations || fitness > 20 }
+            runUntil { generation == maxGenerations || fitness > 16 }
         }
     }
 

@@ -8,7 +8,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
-
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.format
@@ -84,11 +83,11 @@ val evolveXor = newSim {
             val inputData = listOf(listOf(0.0, 0.0), listOf(1.0, 0.0), listOf(0.0, 1.0), listOf(1.0, 1.0))
             val tarData = listOf(listOf(0.0), listOf(1.0), listOf(1.0), listOf(0.0))
             inputData.zip(tarData).map { (i, t) ->
-                inputChromosome.products.activations = i
+                inputChromosome.getProducts().activations = i
                 network.apply {
                     repeat(20) { bufferedUpdate() }
                 }
-                t sse outputChromosome.products.activations
+                t sse outputChromosome.getProducts().activations
             }.sum()
         }
 

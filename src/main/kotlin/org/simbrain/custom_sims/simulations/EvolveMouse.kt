@@ -4,13 +4,13 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addOdorWorldComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
-
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.util.format
@@ -112,15 +112,17 @@ val evolveMouse = newSim {
                     +turning
                 }
                 evolutionWorkspace {
-                    couplingManager.apply {
-                        val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
-                        val (straightConsumer) = straightMovement.products
-                        val (left, right) = turning.products
+                    runBlocking {
+                        couplingManager.apply {
+                            val (straightNeuron, leftNeuron, rightNeuron) = outputs.getProducts()
+                            val (straightConsumer) = straightMovement.getProducts()
+                            val (left, right) = turning.getProducts()
 
-                        sensors.products couple inputs.products
-                        straightNeuron couple straightConsumer
-                        leftNeuron couple left
-                        rightNeuron couple right
+                            sensors.getProducts() couple inputs.getProducts()
+                            straightNeuron couple straightConsumer
+                            leftNeuron couple left
+                            rightNeuron couple right
+                        }
                     }
                 }
 
@@ -168,7 +170,7 @@ val evolveMouse = newSim {
                 evolutionWorkspace.apply {
                     repeat(100) {
                         simpleIterate()
-                        val energy = abs(outputs.products.activations.sum()) + 5
+                        val energy = abs(outputs.getProducts().activations.sum()) + 5
                         fitness += energy / 1000
                     }
                 }

@@ -1,18 +1,14 @@
 package org.simbrain.workspace
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
 import org.simbrain.util.SimbrainPreferences
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceEvents
 import org.simbrain.workspace.serialization.WorkspaceSerializer
-import org.simbrain.workspace.updater.PerformanceMonitor
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.workspace.updater.WorkspaceUpdater
 import org.simbrain.workspace.updater.updateAction
@@ -118,12 +114,6 @@ class Workspace @JvmOverloads constructor(
      */
     @Transient
     val updater = WorkspaceUpdater(this)
-
-    init {
-        coroutineScope.launch(Dispatchers.Swing) {
-            PerformanceMonitor.flow.collectLatest {  }
-        }
-    }
 
     /**
      * Adds a workspace component to the workspace.

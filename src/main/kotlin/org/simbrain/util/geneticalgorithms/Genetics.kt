@@ -1,7 +1,8 @@
 package org.simbrain.util.geneticalgorithms
 
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -25,7 +26,7 @@ abstract class Gene<P> {
     /**
      * The phenotype expressed by the gene. Not expressed until onBuild is called.
      */
-    abstract val product: CompletableFuture<P>
+    abstract val product: CompletableDeferred<P>
 
     /**
      * If set to true, this gene won't be expressed. Makes life easier than using deletion mutations.
@@ -57,7 +58,7 @@ abstract class Gene<P> {
  */
 interface TopLevelGene<T> {
 
-    fun TopLevelBuilderContext.build(): T
+    suspend fun TopLevelBuilderContext.build(): T
 
 }
 
@@ -82,9 +83,9 @@ class Chromosome<P, G : Gene<P>>(genes: LinkedHashSet<G> = LinkedHashSet()) : Mu
     }
 
     /**
-     * Expresses the genes and returns a list of products.
+     * Return a list of expressed genes
      */
-    val products get() = map { it.product.get() }
+    suspend fun getProducts() = map { it.product }.awaitAll()
 
     fun copy(): Chromosome<P, G> {
         return Chromosome(LinkedHashSet(map { it.copy() as G }))
@@ -128,19 +129,19 @@ object MutationContext
  */
 class Agent(
     private val evaluationContext: EvaluationContext,
-    private val evalFunction: EvaluationContext.() -> Double,
-    private val peekFunction: (EvaluationContext.() -> Unit)?
+    private val evalFunction: suspend EvaluationContext.() -> Double,
+    private val peekFunction: (suspend EvaluationContext.() -> Unit)?
 ) {
 
     /**
      * A function that returns a double indicating fitness. Used by the [Evaluator] during evolution.
      */
-    fun eval() = evaluationContext.evalFunction()
+    suspend fun eval() = evaluationContext.evalFunction()
 
     /**
      * A function that can be called after an environment has been built. Useful for getting the "winning" genotype.
      */
-    fun peek() = peekFunction?.let { evaluationContext.it() }
+    suspend fun peek() = peekFunction?.let { evaluationContext.it() }
 
 }
 
@@ -155,7 +156,7 @@ class TopLevelBuilderContext {
      * @param G the gene type, e.g. [LayoutGene]
      * @param C the inferred chromosome type, e.g. <Layout, LayoutGene>
      */
-    operator fun <P, G, C> C.unaryPlus(): List<P>
+    suspend operator fun <P, G, C> C.unaryPlus(): List<P>
             where
             G : Gene<P>,
             G : TopLevelGene<P>,
@@ -197,11 +198,11 @@ class AgentBuilder private constructor(
     /**
      * A fitness function.
      */
-    private lateinit var evalFunction: EvaluationContext.() -> Double
+    private lateinit var evalFunction: suspend EvaluationContext.() -> Double
 
-    private var peekFunction: (EvaluationContext.() -> Unit)? = null
+    private var peekFunction: (suspend EvaluationContext.() -> Unit)? = null
 
-    private lateinit var builderBlock: TopLevelBuilderContext.(pretty: Boolean) -> Unit
+    private lateinit var builderBlock: suspend TopLevelBuilderContext.(pretty: Boolean) -> Unit
 
     /**
      * Indicates we are on the first generation of the evolutionary algorithm.  Important to distinguish
@@ -238,7 +239,7 @@ class AgentBuilder private constructor(
      * The build operation is called once for each genome at each generation, via
      * [build]
      */
-    fun onBuild(block: TopLevelBuilderContext.(visible: Boolean) -> Unit) {
+    fun onBuild(block: suspend TopLevelBuilderContext.(visible: Boolean) -> Unit) {
         builderBlock = block
     }
 
@@ -250,7 +251,7 @@ class AgentBuilder private constructor(
     /**
      * Build an agent by running the builderBlock defined in [onBuild].
      */
-    fun build(): Agent {
+    suspend fun build(): Agent {
         TopLevelBuilderContext().builderBlock(false)
         return createAgent()
     }
@@ -258,7 +259,7 @@ class AgentBuilder private constructor(
     /**
      * [build] for the case where the agent should be visible in the desktop/
      */
-    fun visibleBuild(): Agent {
+    suspend fun visibleBuild(): Agent {
         TopLevelBuilderContext().builderBlock(true)
         return createAgent()
     }
@@ -266,11 +267,11 @@ class AgentBuilder private constructor(
     /**
      * Use this to define your evaluation / fitness function.
      */
-    fun onEval(eval: EvaluationContext.() -> Double) {
+    fun onEval(eval: suspend EvaluationContext.() -> Double) {
         evalFunction = eval
     }
 
-    fun onPeek(peek: EvaluationContext.() -> Unit) {
+    fun onPeek(peek: suspend EvaluationContext.() -> Unit) {
         peekFunction = peek
     }
 
@@ -300,7 +301,7 @@ class AgentBuilder private constructor(
     }
 
     fun <P, G : Gene<P>> chromosome(vararg genes: G): Chromosome<P, G> {
-        return Chromosome(LinkedHashSet(genes.toSet()))
+        return createChromosome { Chromosome(LinkedHashSet(genes.toSet())) }
     }
 
 
@@ -408,12 +409,16 @@ class Evaluator(agentBuilder: AgentBuilder) {
         private var generations = sequence {
             var population = initialPopulation
             do {
-                val builderFitnessPairs = population.parallelStream().map {
-                    val build = it.build()
-                    val score = build.eval()
-                    BuilderFitnessPair(it.copy(), score)
-                }.toList()
-                    .sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
+                val builderFitnessPairs = runBlocking {
+                    population.asFlow().map {
+                        async {
+                            val build = it.build()
+                            val score = build.eval()
+                            BuilderFitnessPair(it.copy(), score)
+                        }
+                    }.toList().awaitAll()
+                        .sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
+                }
 
                 val currentFitness = builderFitnessPairs[0].fitness
 

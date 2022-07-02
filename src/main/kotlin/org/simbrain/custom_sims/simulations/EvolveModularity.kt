@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
 
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
@@ -205,18 +207,18 @@ val evolveModularity = newSim {
             var error = 0.0
             for (i in 0 until 256) {
                 // Randomize patterns
-                rightRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
-                leftRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
+                rightRetina.getProducts().activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
+                leftRetina.getProducts().activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
 
                 workspace.iterate(5)
 
-                val left = leftRetina.products.activations in leftInputs
-                val right = rightRetina.products.activations in rightInputs
+                val left = leftRetina.getProducts().activations in leftInputs
+                val right = rightRetina.getProducts().activations in rightInputs
                 var target = 0.0
                 if (left and right) {
                     target = 1.0
                 }
-                error += abs((outputChromosome.products[0].activation - target))
+                error += abs((outputChromosome.getProducts()[0].activation - target))
 
             }
             error
@@ -229,20 +231,26 @@ val evolveModularity = newSim {
                 val wspace = this@newSim.workspace
                 createControlPanel("Control Panel", 5, 10) {
                     addButton("Random pattern") {
-                        rightRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
-                        leftRetina.products.activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
-                        wspace.iterate()
-                    }
-                    for (i in 0..7) {
-                        addButton("Left Pattern ${i+1}") {
-                            leftRetina.products.activations = leftInputs[i]
+                        wspace.coroutineScope.launch {
+                            rightRetina.getProducts().activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
+                            leftRetina.getProducts().activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                             wspace.iterate()
                         }
                     }
                     for (i in 0..7) {
+                        addButton("Left Pattern ${i+1}") {
+                            wspace.coroutineScope.launch {
+                                leftRetina.getProducts().activations = leftInputs[i]
+                                wspace.iterate()
+                            }
+                        }
+                    }
+                    for (i in 0..7) {
                         addButton("Right Pattern ${i+1}") {
-                            rightRetina.products.activations = rightInputs[i]
-                            wspace.iterate()
+                            wspace.coroutineScope.launch {
+                                rightRetina.getProducts().activations = rightInputs[i]
+                                wspace.iterate()
+                            }
                         }
                     }
                 }
@@ -270,7 +278,9 @@ val evolveModularity = newSim {
 
     val (winner, fitness) = generations.best
     // println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
-    winner.visibleBuild().peek()
+    runBlocking {
+        winner.visibleBuild().peek()
+    }
 
 }
 

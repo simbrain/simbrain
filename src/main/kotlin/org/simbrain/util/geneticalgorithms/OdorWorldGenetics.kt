@@ -1,5 +1,6 @@
 package org.simbrain.util.geneticalgorithms
 
+import kotlinx.coroutines.CompletableDeferred
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
@@ -9,7 +10,6 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
-import java.util.concurrent.CompletableFuture
 
 inline fun smellSensorGene(options: SmellSensor.() -> Unit = { }): SmellSensorGene {
     return SmellSensorGene(SmellSensor().apply(options))
@@ -38,7 +38,7 @@ abstract class OdorWorldEntityGene<P>: Gene<P>() {
 class SmellSensorGene(private val template: SmellSensor):
         OdorWorldEntityGene<SmellSensor>() {
 
-    override val product = CompletableFuture<SmellSensor>()
+    override val product = CompletableDeferred<SmellSensor>()
 
     override fun copy(): SmellSensorGene {
         return SmellSensorGene(template.copy())
@@ -53,7 +53,7 @@ class SmellSensorGene(private val template: SmellSensor):
 class ObjectSensorGene(private val template: ObjectSensor):
         OdorWorldEntityGene<ObjectSensor>() {
 
-    override val product = CompletableFuture<ObjectSensor>()
+    override val product = CompletableDeferred<ObjectSensor>()
 
     override fun copy(): ObjectSensorGene {
         return ObjectSensorGene(template.copy())
@@ -68,7 +68,7 @@ class ObjectSensorGene(private val template: ObjectSensor):
 class StraightMovementGene(private val template: StraightMovement):
         OdorWorldEntityGene<StraightMovement>() {
 
-    override val product = CompletableFuture<StraightMovement>()
+    override val product = CompletableDeferred<StraightMovement>()
 
     override fun copy(): StraightMovementGene {
         return StraightMovementGene(template.copy())
@@ -83,7 +83,7 @@ class StraightMovementGene(private val template: StraightMovement):
 class TurningGene(private val template: Turning):
         OdorWorldEntityGene<Turning>() {
 
-    override val product = CompletableFuture<Turning>()
+    override val product = CompletableDeferred<Turning>()
 
     override fun copy(): TurningGene {
         return TurningGene(template.copy())

@@ -106,7 +106,7 @@ val evolveAutoAssociator = newSim {
                 // }
 
                 // Randomize inputs
-                inputs.products.activations = inputs.products.mapIndexed { index, _ ->
+                inputs.getProducts().activations = inputs.getProducts().mapIndexed { index, _ ->
                     (Random().nextDouble() - 0.5) * 2
                 }
 
@@ -114,8 +114,8 @@ val evolveAutoAssociator = newSim {
                     repeat(2) { bufferedUpdate() }
                 }
 
-                val source = inputs.products.activations
-                val target = outputs.products.activations
+                val source = inputs.getProducts().activations
+                val target = outputs.getProducts().activations
                 source sse target
             }.sum()
         }

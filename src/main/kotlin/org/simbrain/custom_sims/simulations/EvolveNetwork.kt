@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.placeComponent
@@ -8,7 +9,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.core.lengths
-
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.util.BiasedScalarData
@@ -133,22 +133,22 @@ val evolveNetwork = newSim {
             repeat(50) { network.bufferedUpdate() }
 
             // Comment / Uncomment different choices of fitness function here
-            fun fitness() : Double {
+            suspend fun fitness() : Double {
 
-                var avgLength = connectionChromosome.products.lengths.average()
+                var avgLength = connectionChromosome.getProducts().lengths.average()
 
-                val numWeights = connectionChromosome.products.size
+                val numWeights = connectionChromosome.getProducts().size
 
-                val avgActivation = nodeChromosome.products.activations.average()
-                val totalActivation = nodeChromosome.products.activations.sum()
+                val avgActivation = nodeChromosome.getProducts().activations.average()
+                val totalActivation = nodeChromosome.getProducts().activations.sum()
 
                 // Evolve fixed nodes to have specific activations 2.5 and -3
-                val (m1, m2) =  motivations.products
+                val (m1, m2) =  motivations.getProducts()
                 val m1error = abs(m1.activation - 2.5)
                 val m2error = abs(m2.activation + 3)
 
                 // TODO: Normalize errors and provide for weightings
-                val numNodesError = abs(nodeChromosome.products.size - 20).toDouble()
+                val numNodesError = abs(nodeChromosome.getProducts().size - 20).toDouble()
                 val numWeightsError = abs(numWeights - 40)
                 val axonLengthError = abs(avgLength - 250)
                 val avgActivationError = abs(avgActivation - 5)
@@ -199,7 +199,9 @@ val evolveNetwork = newSim {
 
     val (winner, fitness) = generations.best
     // println("Winning fitness $fitness after generation ${generations.finalGenerationNumber}")
-    winner.visibleBuild().peek()
+    runBlocking {
+        winner.visibleBuild().peek()
+    }
 
 }
 

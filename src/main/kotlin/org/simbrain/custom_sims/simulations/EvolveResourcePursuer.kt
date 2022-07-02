@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addOdorWorldComponent
 import org.simbrain.custom_sims.couplingManager
@@ -183,15 +183,17 @@ val evolveResourcePursuer = newSim {
                 }
 
                 evolutionWorkspace {
-                    couplingManager.apply {
-                        val (straightNeuron, leftNeuron, rightNeuron) = outputs.products
-                        val (straightConsumer) = straightMovement.products
-                        val (left, right) = turning.products
+                    runBlocking {
+                        couplingManager.apply {
+                            val (straightNeuron, leftNeuron, rightNeuron) = outputs.getProducts()
+                            val (straightConsumer) = straightMovement.getProducts()
+                            val (left, right) = turning.getProducts()
 
-                        sensors.products couple inputs.products
-                        straightNeuron couple straightConsumer
-                        leftNeuron couple left
-                        rightNeuron couple right
+                            sensors.getProducts() couple inputs.getProducts()
+                            straightNeuron couple straightConsumer
+                            leftNeuron couple left
+                            rightNeuron couple right
+                        }
                     }
                 }
             }

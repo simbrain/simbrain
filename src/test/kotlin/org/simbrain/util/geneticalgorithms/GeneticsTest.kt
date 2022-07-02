@@ -1,5 +1,9 @@
 package org.simbrain.util.geneticalgorithms
 
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -29,7 +33,7 @@ class GeneticsTest {
     @Test
     fun `node gene creates product specified in template`() {
         val node = nodeGene { activation = 0.7 }
-        val neuron = node.buildWithContext(NetworkGeneticsContext(Network()))
+        val neuron = runBlocking { node.buildWithContext(NetworkGeneticsContext(Network())) }
         assertEquals(0.7, neuron.activation, 0.01)
     }
 
@@ -37,7 +41,7 @@ class GeneticsTest {
     fun `node gene creates specified product after copied`() {
         val node = nodeGene { activation = 0.7 }
         val copy = node.copy()
-        val neuron = copy.buildWithContext(NetworkGeneticsContext(Network()))
+        val neuron = runBlocking { copy.buildWithContext(NetworkGeneticsContext(Network())) }
         assertEquals(0.7, neuron.activation, 0.01)
     }
 
@@ -67,14 +71,14 @@ class GeneticsTest {
             }
 
             onEval {
-                nodes.products.forEach { neuron ->
+                nodes.getProducts().forEach { neuron ->
                     assertEquals(0.7, neuron.activation, 0.01)
                 }
                 0.0
             }
         }
 
-        environment.build().eval()
+        runBlocking { environment.build().eval() }
     }
 
     @Test
@@ -95,14 +99,14 @@ class GeneticsTest {
             }
 
             onEval {
-                (chromosome.products.activations zip defaultActivations).forEach { (actual, expected) ->
+                (chromosome.getProducts().activations zip defaultActivations).forEach { (actual, expected) ->
                     assertEquals(expected, actual, 0.01)
                 }
                 0.0
             }
         }
 
-        environment.build().eval()
+        runBlocking { environment.build().eval() }
     }
 
     @Test
@@ -126,15 +130,15 @@ class GeneticsTest {
             }
 
             onEval {
-                inputs.products.activations.forEach { assertEquals(0.75, it, 0.01) }
+                inputs.getProducts().activations.forEach { assertEquals(0.75, it, 0.01) }
                 refs.add(inputs.toMutableList())
                 0.0
             }
         }
         val e1 = environment.copy()
-        e1.build().eval()
+        runBlocking { e1.build().eval() }
         val e2 = e1.copy()
-        e2.build().eval()
+        runBlocking { e2.build().eval() }
         assertTrue(refs[0].zip(refs[1]).none { (first, second) -> first !== second })
     }
 
@@ -178,7 +182,7 @@ class GeneticsTest {
             }
         }
 
-        environment.copy().copy().copy().build().eval()
+        runBlocking { environment.copy().copy().copy().build().eval() }
     }
 
     @Test
@@ -224,13 +228,15 @@ class GeneticsTest {
             }
         }
 
-        sequence {
-            var newEnv = environment.copy()
-            while (true) {
-                yield(newEnv.build().eval())
-                newEnv = newEnv.copy().apply { mutate() }
-            }
-        }.take(5).last()
+        runBlocking {
+            flow {
+                var newEnv = environment.copy()
+                while (true) {
+                    emit(newEnv.build().eval())
+                    newEnv = newEnv.copy().apply { mutate() }
+                }
+            }.take(5).last()
+        }
     }
 
     @Test
@@ -260,20 +266,20 @@ class GeneticsTest {
                 }
 
                 with(workspace.couplingManager) {
-                    inputs.products couple outputs.products
+                    inputs.getProducts() couple outputs.getProducts()
                 }
             }
 
 
             onEval {
 
-                inputs.products.activations = listOf(1.0, 1.0, 1.0)
+                inputs.getProducts().activations = listOf(1.0, 1.0, 1.0)
 
                 workspace.simpleIterate()
 
                 assertArrayEquals(
-                    inputs.products.activations.toTypedArray(),
-                    outputs.products.activations.toTypedArray()
+                    inputs.getProducts().activations.toTypedArray(),
+                    outputs.getProducts().activations.toTypedArray()
                 )
 
                 0.0
@@ -281,8 +287,8 @@ class GeneticsTest {
 
         }
 
-        val build = evolutionarySimulation.build()
+        val build = runBlocking { evolutionarySimulation.build() }
 
-        build.eval()
+        runBlocking { build.eval() }
     }
 }

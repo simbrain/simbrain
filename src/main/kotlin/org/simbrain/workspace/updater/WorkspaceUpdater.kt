@@ -6,7 +6,6 @@ import org.pmw.tinylog.Logger
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.Executors
 import java.util.function.Consumer
 
 /**
@@ -28,11 +27,6 @@ import java.util.function.Consumer
  * @author Jeff Yoshimi
  */
 class WorkspaceUpdater(val workspace: Workspace) {
-
-    /**
-     * The executor service for notifying listeners.
-     */
-    private val notificationEvents = Executors.newSingleThreadExecutor()
 
     /**
      * Updater listeners.
@@ -118,11 +112,11 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        notifyWorkspaceUpdateStarted()
         runBlocking {
+            notifyWorkspaceUpdateStarted()
             doUpdate()
+            notifyWorkspaceUpdateCompleted()
         }
-        notifyWorkspaceUpdateCompleted()
         isRunning = false
         for (component in workspace.componentList) {
             component.isRunning = false
@@ -195,24 +189,30 @@ class WorkspaceUpdater(val workspace: Workspace) {
     /**
      * Called when the couplings are updated.
      */
-    fun notifyCouplingsUpdated() {
-        val time = time
-        val notifier = Consumer { l: WorkspaceUpdaterListener -> l.updatedCouplings(time) }
-        notificationEvents.submit { updaterListeners.forEach(notifier) }
+    suspend fun notifyCouplingsUpdated() = coroutineScope {
+        launch(Dispatchers.Default) {
+            val time = time
+            val notifier = Consumer { l: WorkspaceUpdaterListener -> l.updatedCouplings(time) }
+            updaterListeners.forEach(notifier)
+        }
     }
 
     /**
      * Called when the workspace update begins.
      */
-    private fun notifyWorkspaceUpdateStarted() {
-        notificationEvents.submit { updaterListeners.forEach(Consumer { obj: WorkspaceUpdaterListener -> obj.updatingStarted() }) }
+    private suspend fun notifyWorkspaceUpdateStarted() = coroutineScope {
+        launch(Dispatchers.Default) {
+            updaterListeners.forEach(Consumer { obj: WorkspaceUpdaterListener -> obj.updatingStarted() })
+        }
     }
 
     /**
      * Called when workspace update finishes.
      */
-    private fun notifyWorkspaceUpdateCompleted() {
-        notificationEvents.submit { updaterListeners.forEach(Consumer { obj: WorkspaceUpdaterListener -> obj.updatingFinished() }) }
+    private suspend fun notifyWorkspaceUpdateCompleted() = coroutineScope {
+        launch(Dispatchers.Default) {
+            updaterListeners.forEach(Consumer { obj: WorkspaceUpdaterListener -> obj.updatingFinished() })
+        }
     }
 
     /**

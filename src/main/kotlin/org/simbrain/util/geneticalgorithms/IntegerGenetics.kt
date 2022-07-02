@@ -1,7 +1,8 @@
 package org.simbrain.util.geneticalgorithms
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.runBlocking
 import org.simbrain.util.propertyeditor.CopyableObject
-import java.util.concurrent.CompletableFuture
 import kotlin.math.abs
 import kotlin.system.measureTimeMillis
 
@@ -33,15 +34,15 @@ inline fun intGene(initVal: IntWrapper.() -> Unit = { }): IntGene {
  */
 class IntGene(private val template: IntWrapper) : Gene<Int>(), TopLevelGene<Int> {
 
-    override val product = CompletableFuture<Int>()
+    override val product = CompletableDeferred<Int>()
 
     override fun copy(): IntGene {
         return IntGene(template.copy())
     }
 
-    override fun TopLevelBuilderContext.build(): Int {
+    override suspend fun TopLevelBuilderContext.build(): Int {
         template.copy().also { product.complete(it.value) }
-        return product.get()
+        return product.await()
     }
 
     fun mutate(block: IntWrapper.() -> Unit) {
@@ -76,14 +77,14 @@ fun main() {
         }
 
         onEval {
-            val total = intChromosome.map { it.product.get() }.sumByDouble { it.toDouble() }
+            val total = intChromosome.map { it.product.await() }.sumByDouble { it.toDouble() }
             val targetSum = 10
             abs(total - targetSum)
         }
 
         onPeek {
             print("Integer genes:")
-            println(intChromosome.map { it.product.get() }.joinToString(", "))
+            println(intChromosome.map { it.product.await() }.joinToString(", "))
         }
 
     }
@@ -97,7 +98,7 @@ fun main() {
 
     val time = measureTimeMillis {
         val (builder, fitness) = evolution.start().best
-        builder.build().peek()
+        runBlocking { builder.build().peek() }
         println("Fitness: $fitness")
     }
 

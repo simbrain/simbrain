@@ -23,14 +23,16 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
  */
 val isopodSim = newSim {
 
-    workspace.clearWorkspace()
-
-    // Adjustible parameters for sim
-    var numTrials = 5
-    var trialNum = 1
+    // Adjustable parameters for sim
+    var defaultNumTrials = 5
     val maxIterationsPerTrial = 5000
 
+    // Other variables
     var log = ""
+    var trialNum = 1
+
+    // Clear the workspace
+    workspace.clearWorkspace()
 
     // ----- Network construction ------
 
@@ -40,7 +42,7 @@ val isopodSim = newSim {
 
     val neuronLeftSensor = network.addNeuron {
         location = point(0, 100)
-        upperBound = 10.0
+        upperBound = 100.0
         label = "Left"
         with (updateRule as LinearRule) {
             noiseGenerator = noiseSource
@@ -49,7 +51,7 @@ val isopodSim = newSim {
     }
     val neuronRightSensor = network.addNeuron {
         location = point(100, 100)
-        upperBound = 10.0
+        upperBound = 100.0
         label = "Right"
         with (updateRule as LinearRule) {
             noiseGenerator = noiseSource
@@ -58,23 +60,24 @@ val isopodSim = newSim {
     }
     val neuronLeftTurning = network.addNeuron {
         location = point(0, 0)
-        upperBound = 10.0
+        upperBound = 150.0
         label = "Turn Left"
     }
     val neuronRightTurning = network.addNeuron {
         location = point(100, 0)
-        upperBound = 10.0
+        upperBound = 150.0
         label = "Turn Right"
     }
     val neuronStraight = network.addNeuron {
         location = point(50, 0)
         upperBound = 10.0
         label = "Straight"
-        (neuronDataHolder as BiasedScalarData).bias = 10.0
+        (neuronDataHolder as BiasedScalarData).bias = 5.0
     }
 
-    connect(neuronLeftSensor, neuronLeftTurning, 4.0)
-    connect(neuronRightSensor, neuronRightTurning, 4.0)
+    // Create the weights
+    connect(neuronLeftSensor, neuronLeftTurning, 10.0, 0.0, 50.0)
+    connect(neuronRightSensor, neuronRightTurning, 10.0, 0.0, 50.0)
 
     // Location of the network in the desktop
     withGui {
@@ -103,7 +106,7 @@ val isopodSim = newSim {
     odorWorld.apply {
 
         wrapAround = false
-        isObjectsBlockMovement = false
+        isObjectsBlockMovement = true
 
         tileMap = TileMap(20, 20)
         tileMap.fill(2)
@@ -145,7 +148,7 @@ val isopodSim = newSim {
             odorWorld.addEntity(x, y, EntityType.FISH).apply {
                 name = "Fish"
                 smellSource = SmellSource.createScalarSource(1).apply {
-                    dispersion = 300.0
+                    dispersion = 350.0
                 }
             }
         }
@@ -203,14 +206,14 @@ val isopodSim = newSim {
                 }
             }
 
-            val numTrialsTF = addTextField("Number of trials", "" + numTrials)
+            val numTrialsTF = addTextField("Number of trials", "" + defaultNumTrials)
 
             addButton("Run trials") {
                 workspace.coroutineScope.launch {
                     log = ""
                     var iteration = 0
-                    numTrials = Integer.parseInt(numTrialsTF.text)
-                    while(trialNum < numTrials) {
+                    defaultNumTrials = Integer.parseInt(numTrialsTF.text)
+                    while(trialNum < defaultNumTrials) {
                         log += "# Trial: $trialNum\n"
                         resetIsopod()
                         log += "# Heading: ${isopod.heading}\n"

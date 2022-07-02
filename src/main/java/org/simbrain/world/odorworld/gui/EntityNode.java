@@ -55,11 +55,6 @@ public class EntityNode extends PNode {
     private static final String DEFAULT_IMAGE = "Swiss.gif";
 
     /**
-     * Flag to indicate this node's location has changed and should be updated at the next update
-     */
-    private boolean updateFlag;
-
-    /**
      * Sprite representing this entity.
      */
     public Sprite sprite;
@@ -92,11 +87,6 @@ public class EntityNode extends PNode {
         entity.getEvents().onDeleted(e -> removeFromParent());
 
         entity.getEvents().onMoved(() -> {
-            updateFlag = true;
-            // TODO: The call below makes the updateFlag redundant.
-            // leave it here for now until there is time for a good
-            // performance tuning.  If the call below is removed some
-            // simulations like agent trails fail to update properly
             update();
         });
 
@@ -238,7 +228,6 @@ public class EntityNode extends PNode {
             case CIRCLE:
                 sprite = new RotatingSprite(Animations.createAnimation(
                         OdorWorldResourceManager.getBufferedImage("circle.png")));
-
                 break;
             case AMY:
             case ARNO:
@@ -265,17 +254,11 @@ public class EntityNode extends PNode {
     }
 
     private void update() {
-
-        //TODO: Make sure this is only called once per workspace update
-
-        if (updateFlag) {
-            if (entity.isRotating()) {
-                ((RotatingSprite) sprite).updateHeading(entity.getHeading());
-            }
-            setOffset(entity.getX(), entity.getY());
-            updateAttributesNodes();
-            updateFlag = false;
+        if (entity.isRotating()) {
+            ((RotatingSprite) sprite).updateHeading(entity.getHeading());
         }
+        setOffset(entity.getX(), entity.getY());
+        updateAttributesNodes();
     }
 
     /**
@@ -300,6 +283,5 @@ public class EntityNode extends PNode {
     public OdorWorldEntity getEntity() {
         return entity;
     }
-
 
 }

@@ -102,7 +102,8 @@ class OdorWorldEntity @JvmOverloads constructor(
     val manualMovement = ManualMovement()
 
     @Deprecated("Use world", ReplaceWith("world"))
-    val parentWorld get() = world
+    val parentWorld
+        get() = world
 
     @Deprecated("Use location")
     val centerLocation: Point2D
@@ -159,7 +160,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     fun update() {
         applyMovement()
         if (isSensorsEnabled) {
-        sensors.forEach { it.update(this) }
+            sensors.forEach { it.update(this) }
         }
         if (isEffectorsEnabled) {
             effectors.forEach { it.update(this) }
@@ -301,8 +302,9 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     fun randomizeLocationAndHeading() {
         location = point(
-                UniformRealDistribution(0.0, world.width).sampleDouble(),
-                UniformRealDistribution(0.0, world.height).sampleDouble())
+            UniformRealDistribution(0.0, world.width).sampleDouble(),
+            UniformRealDistribution(0.0, world.height).sampleDouble()
+        )
         heading = UniformRealDistribution(0.0, 360.0).sampleDouble()
     }
 
@@ -391,8 +393,8 @@ class Rotation(@Transient private val event: EntityLocationEvent) : Rotatable {
     @UserParameter(label = "heading", description = "heading", order = 2)
     override var heading = 0.0
         set(value) {
-            event.fireMoved()
             field = ((value % 360.0) + 360.0) % 360.0
+            event.fireMoved()
         }
 }
 

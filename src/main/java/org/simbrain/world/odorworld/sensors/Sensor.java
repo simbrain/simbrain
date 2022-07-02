@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.jetbrains.annotations.Nullable;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
@@ -76,14 +77,22 @@ public abstract class Sensor implements PeripheralAttribute {
 
     /**
      * Returns the sensor location in the local coordinate frame of the entity.
+     * The entity containing the sensor should be passed in.
      */
-    public Point2D.Double computeLocationFrom(OdorWorldEntity entity) {
+    public Point2D.Double computeRelativeLocation(OdorWorldEntity entity) {
         Point2D.Double sensorLocation = new Point2D.Double(0,0);
         sensorLocation.x = radius * Math.cos(Math.toRadians(entity.getHeading() + theta));
         sensorLocation.x += entity.getWidth()/2;
         sensorLocation.y = -radius * Math.sin(Math.toRadians(entity.getHeading() + theta));
         sensorLocation.y += entity.getHeight()/2;
         return sensorLocation;
+    }
+
+    /**
+     * Returns the sensor location in the world's coordinate frame.
+     */
+    public Point2D.Double computeAbsoluteLocation(OdorWorldEntity entity) {
+        return SimbrainMath.add(entity.getLocation(), computeRelativeLocation(entity));
     }
 
     /**

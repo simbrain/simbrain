@@ -46,8 +46,8 @@ class SmellSensor @JvmOverloads constructor(
     override fun update(parent: OdorWorldEntity) {
         smellVector = parent.world.entityList
             .filter { it != parent } // Don't smell yourself
-            .map { Pair(it.smellSource, SimbrainMath.distance(it.location, parent.location)) }
-            .filter { (smellSource, _) -> smellSource != null }
+            .map { Pair(it.smellSource, SimbrainMath.distance(it.location, computeAbsoluteLocation(parent))) }
+            .filter { (_, _) -> true }
             .map { (smellSource, distance) -> smellSource.getStimulus(distance) }
             .sum()
     }

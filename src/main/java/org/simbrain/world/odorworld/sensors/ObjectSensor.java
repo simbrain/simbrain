@@ -104,7 +104,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         for (OdorWorldEntity otherEntity : parent.getEntitiesInRadius(decayFunction.getDispersion())) {
             if (otherEntity.getEntityType() == objectType) {
                 double scaleFactor = decayFunction.getScalingFactor(
-                    SimbrainMath.distance(computeLocationFrom(parent), otherEntity.getLocation()));
+                    SimbrainMath.distance(computeAbsoluteLocation(parent), otherEntity.getLocation()));
                 value += baseValue * scaleFactor;
             }
         }

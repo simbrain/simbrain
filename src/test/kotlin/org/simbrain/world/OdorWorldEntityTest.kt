@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.sensors.SmellSensor
 
 class OdorWorldEntityTest {
 
@@ -112,5 +113,16 @@ class OdorWorldEntityTest {
 
     }
 
+    @Test
+    fun `smell sensor location is correct `() {
+        val agent = OdorWorldEntity(world)
+        agent.location = point(10.0, 0.0)
+        val sensor = SmellSensor()
+        sensor.radius = 10.0
+        sensor.theta = 0.0
+        agent.addSensor(sensor)
+        assertEquals(agent.width / 2.0 + sensor.radius, sensor.computeRelativeLocation(agent).x)
+        assertEquals(agent.x + agent.width / 2.0 + sensor.radius, sensor.computeAbsoluteLocation(agent).x)
+    }
     
 }

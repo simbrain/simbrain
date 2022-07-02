@@ -62,7 +62,7 @@ public class ObjectSensorNode extends EntityAttributeNode {
 
     @Override
     public void update(OdorWorldEntity entity) {
-        shape.setOffset(sensor.computeLocationFrom(entity));
+        shape.setOffset(sensor.computeRelativeLocation(entity));
         float saturation = (float) SimbrainMath.rescale(sensor.getCurrentValue(), 0, sensor.getBaseValue(),
                 0,1);
         shape.setPaint(Color.getHSBColor(maxColor, saturation, 1));

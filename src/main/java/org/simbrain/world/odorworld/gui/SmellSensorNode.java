@@ -53,7 +53,7 @@ public class SmellSensorNode extends EntityAttributeNode {
 
     @Override
     public void update(OdorWorldEntity entity) {
-        shape.setOffset(sensor.computeLocationFrom(entity));
+        shape.setOffset(sensor.computeRelativeLocation(entity));
         double val = SimbrainMath.getVectorNorm(sensor.getSmellVector());
         float saturation = 0;
         if (entity.getWorld().getMaxVectorNorm() > 0) {

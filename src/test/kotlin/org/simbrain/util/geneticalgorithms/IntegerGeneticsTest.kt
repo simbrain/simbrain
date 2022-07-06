@@ -1,5 +1,6 @@
 package org.simbrain.util.geneticalgorithms
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.math.abs
@@ -28,25 +29,27 @@ class IntegerGeneticsTest {
             }
 
             onEval {
-                val total = intChromosome.map { it.product.get() }.sumOf { it.toDouble() }
+                val total = intChromosome.getProducts().sumOf { it.toDouble() }
                 abs(total - targetSum)
             }
 
             onPeek {
                 // print("Integer genes:")
                 // println(intChromosome.map { it.product.get() }.joinToString(", "))
-                val total = intChromosome.map { it.product.get() }.sumOf { it.toDouble() }
+                val total = intChromosome.getProducts().sumOf { it.toDouble() }
                 val error = abs(total - targetSum)
                 assertEquals(0.0, error, .001)
             }
         }
 
-        evaluator(evolutionarySimulation) {
-            populationSize = 100
-            eliminationRatio = 0.5
-            optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-            runUntil { generation == 10000 || fitness < .2 }
-        }.start().best.agentBuilder.build().peek()
+        runBlocking {
+            evaluator(evolutionarySimulation) {
+                populationSize = 100
+                eliminationRatio = 0.5
+                optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
+                runUntil { generation == 10000 || fitness < .2 }
+            }.start().best.agentBuilder.build().peek()
+        }
 
     }
 

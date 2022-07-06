@@ -21,7 +21,6 @@ class GeneticsTest {
     fun `chromosome creation functions are stable across generations`() {
         val sim = evolutionarySimulation {
 
-            // TODO:  chromosome<Int, IntGene>().apply{addNeuron()} produces an unexpected count
             val c0 = chromosome<Int, IntGene>()
             val c2 = chromosome(intGene(), intGene())
             val c3 = chromosome(3) { intGene() }
@@ -33,16 +32,19 @@ class GeneticsTest {
             }
             onEval {
                 // Size of chromosome should stay the same through the generations
-                assertEquals(0, c0.products.count())
-                assertEquals(2, c2.products.count())
-                assertEquals(3, c3.products.count())
+                assertEquals(0, c0.getProducts().count())
+                assertEquals(2, c2.getProducts().count())
+                assertEquals(3, c3.getProducts().count())
                 0.0
             }
         }
-        evaluator(sim) {
-            populationSize = 51
-            runUntil { generation == 10 }
-        }.start().best.agentBuilder.build()
+        runBlocking {
+            evaluator(sim) {
+                // TODO: Fails for population size = 2
+                populationSize = 50
+                runUntil { generation == 2 }
+            }.start().best.agentBuilder.build()
+        }
 
     }
 

@@ -306,9 +306,8 @@ class AgentBuilder private constructor(
     }
 
     fun <P, G : Gene<P>> chromosome(vararg genes: G): Chromosome<P, G> {
-        return createChromosome {
-            Chromosome(LinkedHashSet(genes.toSet()))
-        }
+        return Chromosome(LinkedHashSet(genes.toSet()))
+
     }
 
     /**

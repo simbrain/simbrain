@@ -18,6 +18,35 @@ class GeneticsTest {
     private val chromosome = Chromosome<Neuron, NodeGene>()
 
     @Test
+    fun `chromosome creation functions are stable across generations`() {
+        val sim = evolutionarySimulation {
+
+            // TODO:  chromosome<Int, IntGene>().apply{addNeuron()} produces an unexpected count
+            val c0 = chromosome<Int, IntGene>()
+            val c2 = chromosome(intGene(), intGene())
+            val c3 = chromosome(3) { intGene() }
+
+            onBuild {
+                +c0
+                +c2
+                +c3
+            }
+            onEval {
+                // Size of chromosome should stay the same through the generations
+                assertEquals(0, c0.products.count())
+                assertEquals(2, c2.products.count())
+                assertEquals(3, c3.products.count())
+                0.0
+            }
+        }
+        evaluator(sim) {
+            populationSize = 51
+            runUntil { generation == 10 }
+        }.start().best.agentBuilder.build()
+
+    }
+
+    @Test
     fun `node copy copies neuron properties correctly`() {
         val node = nodeGene() {
             activation = .5

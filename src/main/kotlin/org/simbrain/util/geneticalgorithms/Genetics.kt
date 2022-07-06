@@ -167,6 +167,8 @@ class TopLevelBuilderContext {
  * The main provider for the genetic algorithm DSL. Builds agents for a simulation during the evolution process.
  * By default does not store anything (except for a memoized set of genes).
  *
+ * This should not be called directly; [evolutionarySimulation] is the point of entry.
+ *
  * @param chromosomeList set of genes describing an agent, e.g. input, hidden, and output node genes.
  * @param block the block opened up in the DSL, where you build the agent, by creating chromosomes and setting
  *                  up DSL functions like onMutate.
@@ -200,6 +202,9 @@ class AgentBuilder private constructor(
      */
     private lateinit var evalFunction: suspend EvaluationContext.() -> Double
 
+    /**
+     * @see Agent.peek()
+     */
     private var peekFunction: (suspend EvaluationContext.() -> Unit)? = null
 
     private lateinit var builderBlock: suspend TopLevelBuilderContext.(pretty: Boolean) -> Unit
@@ -301,9 +306,10 @@ class AgentBuilder private constructor(
     }
 
     fun <P, G : Gene<P>> chromosome(vararg genes: G): Chromosome<P, G> {
-        return createChromosome { Chromosome(LinkedHashSet(genes.toSet())) }
+        return createChromosome {
+            Chromosome(LinkedHashSet(genes.toSet()))
+        }
     }
-
 
     /**
      * Use this to create an empty chromosome.

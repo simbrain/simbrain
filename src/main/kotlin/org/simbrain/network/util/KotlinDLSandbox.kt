@@ -35,9 +35,9 @@ public val lenet5Classic = Sequential.of(
     ),
     Conv2D(
         filters = 6,
-        kernelSize = longArrayOf(5, 5),
+        kernelSize = intArrayOf(5, 5),
         //  batch, height, width, channels
-        strides = longArrayOf(1, 1, 1, 1),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),
@@ -50,8 +50,8 @@ public val lenet5Classic = Sequential.of(
     ),
     Conv2D(
         filters = 16,
-        kernelSize = longArrayOf(5, 5),
-        strides = longArrayOf(1, 1, 1, 1),
+        kernelSize = intArrayOf(5, 5),
+        strides = intArrayOf(1, 1, 1, 1),
         activation = Activations.Tanh,
         kernelInitializer = GlorotNormal(SEED),
         biasInitializer = Zeros(),

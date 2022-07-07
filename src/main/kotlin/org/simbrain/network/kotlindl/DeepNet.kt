@@ -124,19 +124,7 @@ class DeepNet(
             it.compile(
                 optimizer = optimizerParams.optimizerWrapper.optimizer,
                 loss = optimizerParams.lossFunction,
-                metric = optimizerParams.metric,
-                callback = object: Callback() {
-                    override fun onTrainBegin() {
-                        println("Training begin")
-                        trainerEvents.fireBeginTraining()
-                    }
-
-                    override fun onTrainEnd(logs: TrainingHistory) {
-                        println("Training end:")
-                        lossValue = logs.lastBatchEvent().lossValue
-                        trainerEvents.fireEndTraining()
-                    }
-                }
+                metric = optimizerParams.metric
             )
             deepNetLayers.numberOfClasses = outputSize().toLong()
         }
@@ -155,7 +143,21 @@ class DeepNet(
         // Fixing batch size to 1 to make things simpler
         // TODO: Think about this...
         deepNetLayers.fit(trainingDataset, testingDataset,
-            trainingParams.epochs, trainBatchSize, validationBatchSize)
+            trainingParams.epochs, trainBatchSize, validationBatchSize,
+            callback = object: Callback() {
+                override fun onTrainBegin() {
+                    println("Training begin")
+                    trainerEvents.fireBeginTraining()
+                }
+
+                override fun onTrainEnd(logs: TrainingHistory) {
+                    println("Training end:")
+                    lossValue = logs.lastBatchEvent().lossValue
+                    trainerEvents.fireEndTraining()
+                }
+            }
+
+        )
     }
 
     override fun update() {
@@ -166,7 +168,7 @@ class DeepNet(
                 outputs = Matrix(predictions.toDoubleArray())
                 // TODO: Below _should_ use predictSoftlyAndGetActivations, but that is not currently exposed in
                 //  kotlindl
-                val test = deepNetLayers.predictAndGetActivations(floatInputs)
+                val test = deepNetLayers.predictSoftly(floatInputs)
                 // println("Output (probabilities):" + predictions.joinToString())
             } else {
                 // One-hot case

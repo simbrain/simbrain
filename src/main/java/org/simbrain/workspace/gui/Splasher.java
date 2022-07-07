@@ -26,7 +26,6 @@ import org.simbrain.util.Utils;
 import smile.math.blas.BLAS;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,7 +65,7 @@ public class Splasher {
 
         // Same hack as above, for deep net engine
         if (!Utils.isM1Mac()) {
-            var dummyDeepNet = Sequential.of(List.of(new Input(new long[]{1L},""), new Dense()));
+            var dummyDeepNet = Sequential.of(List.of(new Input(new long[]{1L},""), new Dense()),false);
         }
 
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));

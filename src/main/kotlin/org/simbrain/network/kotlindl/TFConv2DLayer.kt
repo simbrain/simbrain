@@ -7,7 +7,6 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.simbrain.util.UserParameter
-import org.simbrain.util.toLongArray
 
 /**
  * Wrapper for kotlin dl convolutional 2d layer
@@ -42,10 +41,11 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
     override var layer: Conv2D? = null
 
     override fun create() : Conv2D {
-        return Conv2D(nfilters.toLong(),
-            kernelSize = kernelSize.toLongArray(),
-            strides = strides.toLongArray(),
-            dilations = dilations.toLongArray(),
+        return Conv2D(
+            filters = nfilters,
+            kernelSize = kernelSize,
+            strides = strides,
+            dilations = dilations,
             activation = activations,
             kernelInitializer = kernelInitializer,
             biasInitializer = biasInitializer,

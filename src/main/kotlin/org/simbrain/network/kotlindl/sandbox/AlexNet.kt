@@ -9,15 +9,12 @@ import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.jetbrains.kotlinx.dl.api.core.layer.normalization.BatchNorm
-import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.MaxPool2D
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
-import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.handler.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.mnist
 
@@ -40,8 +37,8 @@ public val alexNet = Sequential.of(
         // What about local response normalization for the CONV2D layers?
         Conv2D(
                 filters = 6,
-                kernelSize = longArrayOf(5, 5),
-                strides = longArrayOf(1, 1, 1, 1),
+                kernelSize = intArrayOf(5, 5),
+                strides = intArrayOf(1, 1, 1, 1),
                 activation = Activations.Relu,
                 kernelInitializer = GlorotNormal(SEED),       // not sure about this
                 biasInitializer = Zeros(),
@@ -50,8 +47,8 @@ public val alexNet = Sequential.of(
         //BatchNorm(),
         Conv2D(
                 filters = 16,
-                kernelSize = longArrayOf(3, 3),
-                strides = longArrayOf(1, 1, 1, 1),
+                kernelSize = intArrayOf(3, 3),
+                strides = intArrayOf(1, 1, 1, 1),
                 activation = Activations.Relu,
                 kernelInitializer = GlorotNormal(SEED),       // not sure about this
                 biasInitializer = Zeros(),              // nor this
@@ -64,8 +61,8 @@ public val alexNet = Sequential.of(
         ),
         Conv2D(
                 filters = 24,
-                kernelSize = longArrayOf(3, 3),
-                strides = longArrayOf(1, 1, 1, 1),
+                kernelSize = intArrayOf(3, 3),
+                strides = intArrayOf(1, 1, 1, 1),
                 activation = Activations.Relu,
                 kernelInitializer = GlorotNormal(SEED),       // not sure about this
                 biasInitializer = Zeros(),              // nor this
@@ -73,8 +70,8 @@ public val alexNet = Sequential.of(
         ),
         Conv2D(
                 filters = 24,
-                kernelSize = longArrayOf(3, 3),
-                strides = longArrayOf(1, 1, 1, 1),
+                kernelSize = intArrayOf(3, 3),
+                strides = intArrayOf(1, 1, 1, 1),
                 activation = Activations.Relu,
                 kernelInitializer = GlorotNormal(SEED),       // not sure about this
                 biasInitializer = Zeros(),              // nor this

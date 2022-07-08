@@ -17,6 +17,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.entities.EntityType
@@ -25,6 +26,8 @@ import kotlin.random.Random
 
 /**
  * Cangelosi et. al.
+ *
+ * TODO: Right now this is just avoiding, but this should do the Cangelosi stuff
  */
 val evolveResourcePursuer = newSim {
 
@@ -38,7 +41,7 @@ val evolveResourcePursuer = newSim {
     /**
      * Iterations to run for each simulation. If < 3000 success is usually by luck.
      */
-    val iterationsPerRun = 10
+    val iterationsPerRun = 1000
 
     fun createEvolution(): Evaluator {
         val evolutionarySimulation = evolutionarySimulation(1) {
@@ -100,7 +103,8 @@ val evolveResourcePursuer = newSim {
             // }
 
             val odorworld = odorworldComponent.world.apply {
-                isObjectsBlockMovement = false
+                isObjectsBlockMovement = true
+                wrapAround = true
                 // tileMap.updateMapSize(40, 40);
                 // Grass = 5+1, Water = 0+1, Berries = 537+1
                 // tileMap.editTile(10, 10, 6)
@@ -133,10 +137,9 @@ val evolveResourcePursuer = newSim {
             }
 
             fun addPoison() = odorworld.addEntity(EntityType.POISON).apply {
-                location = point(random.nextDouble() * 300, random.nextDouble() * 300)
-                // TODO: use polar
-                // dx = random.nextDouble(-5.0, 5.0)
-                // dy = random.nextDouble(-5.0, 5.0)
+                location = point(random.nextDouble()*300,random.nextDouble()*300)
+                heading = UniformRealDistribution(0.0,360.0).sampleDouble()
+                speed = 3.0
                 events.onCollided {
                     if (it === mouse) reset()
                 }
@@ -244,12 +247,12 @@ val evolveResourcePursuer = newSim {
             // Evaluate the current generation.
             //
             onEval {
-                var score = 0.0
+                var fitness = 0.0
 
                 fun OdorWorldEntity.handleCollision() {
                     events.onCollided { other ->
                         if (other === mouse) {
-                            score -= 1
+                            fitness -= 1
                         }
                     }
                 }
@@ -259,8 +262,8 @@ val evolveResourcePursuer = newSim {
                 poison3.handleCollision();
 
                 evolutionWorkspace.apply {
-                    repeat(iterationsPerRun) { simpleIterate() }
-                    // score += (0..1000).map {
+                    iterateSuspend(iterationsPerRun)
+                    // fitness += (0..1000).map {
                     //     simpleIterate()
                     //     minOf(
                     //         poison1.getRadiusTo(mouse),
@@ -270,7 +273,7 @@ val evolveResourcePursuer = newSim {
                     // }.minOf { it }
                 }
 
-                score
+                fitness
             }
 
             // Called when evolution finishes. evolutionWorkspace is the "winning" sim.

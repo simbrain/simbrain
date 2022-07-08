@@ -49,6 +49,9 @@ class EntityEvents: Event(PropertyChangeSupport(Any())), EntityLocationEvent {
     fun onEffectorRemoved(handler: Consumer<Effector>) = "EffectorRemoved".itemRemovedEvent(handler)
     fun fireEffectorRemoved(effector: Effector) = "EffectorRemoved"(old = effector)
 
+    /**
+     * If using collisions isObjectBlocking must be true in OdorWorld.
+     */
     fun onCollided(handler: Consumer<Bounded>) = "Collided".itemAddedEvent(handler)
     fun fireCollided(bound: Bounded) = "Collided"(new = bound)
 }

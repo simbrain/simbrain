@@ -44,7 +44,6 @@ val objectTrackingSim = newSim {
     val sparse = Sparse()
     sparse.connectionDensity = .1
 
-
     // Add a self-connected neuron array to the network
     val resNeurons = (0..numResNeurons).map {
         val rule = AllostaticUpdateRule()
@@ -147,7 +146,7 @@ val objectTrackingSim = newSim {
     // Left sensors
     (30 - sensoryNeurons / 2..30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
         val cheeseSensorLeft = ObjectSensor(EntityType.SWISS)
-        cheeseSensorLeft.theta = Math.toRadians(position.toDouble())
+        cheeseSensorLeft.theta = position.toDouble()
         cheeseSensorLeft.radius = EntityType.CIRCLE.imageHeight / 2.0
         cheeseSensorLeft.decayFunction.dispersion = 100.0
         with(couplingManager) {
@@ -161,7 +160,7 @@ val objectTrackingSim = newSim {
 
     (-30 - sensoryNeurons / 2..-30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
         val cheeseSensorRight = ObjectSensor(EntityType.SWISS)
-        cheeseSensorRight.theta = Math.toRadians(position.toDouble())
+        cheeseSensorRight.theta = position.toDouble()
         cheeseSensorRight.radius = EntityType.CIRCLE.imageHeight / 2.0
         cheeseSensorRight.decayFunction.dispersion = 100.0
         with(couplingManager) {
@@ -242,6 +241,5 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
     }
 
     override val name = "Allostatic Update Rule"
-
 
 }

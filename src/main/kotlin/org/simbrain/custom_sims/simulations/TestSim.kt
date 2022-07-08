@@ -117,8 +117,8 @@ val testSim = newSim {
             heading = 90.0
             addDefaultEffectors()
             addSensor(SmellSensor())
-            addSensor(SmellSensor().apply { theta = Math.PI / 8  })
-            addSensor(SmellSensor().apply { theta = -Math.PI / 8  })
+            addSensor(SmellSensor().apply { theta = 22.5  })
+            addSensor(SmellSensor().apply { theta = -22.5 })
             manualMovement.manualStraightMovementIncrement = 2.0
             manualMovement.manualMotionTurnIncrement = 2.0
         }

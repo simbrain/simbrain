@@ -179,14 +179,14 @@ public abstract class Sensor implements PeripheralAttribute {
     }
 
     /**
-     * Returns angle in radians
+     * Returns angle in degrees
      */
     public double getTheta() {
         return theta;
     }
 
     /**
-     * Sets angle in radians
+     * Sets angle in degrees
      */
     public void setTheta(double theta) {
         this.theta = theta;

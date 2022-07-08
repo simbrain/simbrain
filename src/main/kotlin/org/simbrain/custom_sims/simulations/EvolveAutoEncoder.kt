@@ -19,12 +19,16 @@ import org.simbrain.util.sse
 import org.simbrain.util.widgets.ProgressWindow
 import java.util.*
 
+
+
 /**
  * Evolve a network which associates input vectors with the same output vectors through a smaller hidden layer.
  */
 val evolveAutoAssociator = newSim {
 
     val mainScope = MainScope()
+
+    val maxGenerations = 1000
 
     val evolutionarySimulation = evolutionarySimulation {
 
@@ -161,14 +165,14 @@ val evolveAutoAssociator = newSim {
         populationSize = 100
         eliminationRatio = 0.5
         optimizationMethod = Evaluator.OptimizationMethod.MINIMIZE_FITNESS
-        runUntil { generation == 500 || fitness < .1 }
+        runUntil { generation == maxGenerations || fitness < .1 }
     }
 
     mainScope.launch {
 
         workspace.clearWorkspace()
 
-        val progressWindow = ProgressWindow(1000, "Error")
+        val progressWindow = ProgressWindow(maxGenerations, "Error")
 
         launch(Dispatchers.Default) {
 

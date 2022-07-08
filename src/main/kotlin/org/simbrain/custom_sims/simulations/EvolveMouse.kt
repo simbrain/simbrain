@@ -59,7 +59,7 @@ val evolveMouse = newSim {
             val sensors = chromosome(3) {
                 objectSensorGene {
                     setObjectType(EntityType.SWISS)
-                    theta = it * 2 * Math.PI / 3
+                    theta = it * 2 * 60.0
                     radius = 32.0
                     decayFunction.dispersion = 200.0
                 }

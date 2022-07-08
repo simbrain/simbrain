@@ -109,7 +109,7 @@ val evolveResourcePursuer = newSim {
             val sensors = chromosome(3) {
                 objectSensorGene {
                     setObjectType(EntityType.POISON)
-                    theta = it * 2 * Math.PI / 3
+                    theta = it * 2 * 60.0
                     radius = 32.0
                     decayFunction.dispersion = 200.0
                 }
@@ -283,7 +283,7 @@ val evolveResourcePursuer = newSim {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-            runUntil { generation == 1 || fitness > -2 }
+            runUntil { generation == maxGenerations || fitness > -2 }
         }
     }
 

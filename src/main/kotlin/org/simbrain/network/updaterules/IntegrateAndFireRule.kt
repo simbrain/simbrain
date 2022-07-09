@@ -28,7 +28,8 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 /**
- * Linear **IntegrateAndFireNeuron** implements an integrate and fire neuron.
+ * A linear integrate and fire rule.
+ *
  * Parameters taken from recordings of rat cortex from: Maass (2002) Real Time
  * Computing Without Stable States: A new framework for neural computations
  * based on perturbations.
@@ -44,15 +45,12 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     @UserParameter(
         label = "Resistance (MΩ)",
         description = "The resistance across the cell's membrane determines how much of an effect "
-                + "currents have of the membrane potential.",
+                + "currents have of the membrane potential. A bit like a constant weight value.",
         increment = .1,
         order = 4
     )
     var resistance = 1.0
 
-    /**
-     * Time constant (ms)
-     */
     @UserParameter(
         label = "Time-Constant (ms)",
         description = "How quickly/slowly the neuron responds to external change and returns to its "
@@ -67,9 +65,6 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     )
     var timeConstant = 30.0
 
-    /**
-     * Threshold (mV)
-     */
     @UserParameter(
         label = "Threshold (mV)",
         description = "The value of the membrane potential that if met or exceeded triggers an "
@@ -79,20 +74,6 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     )
     var threshold = -50.0
 
-    /**
-     * Reset potential (mV)
-     */
-    @UserParameter(
-        label = "Reset Potential (mV)",
-        description = "The value of the membrane potential to which it is set and held at immediately "
-                + "after firing an action potential.",
-        order = 2
-    )
-    var resetPotential = -55.0
-
-    /**
-     * Resting potential (mV) Default: 0.0
-     */
     @UserParameter(
         label = "Resting potential (mV)",
         description = "In the absence of further perturbation, the voltage will exponentially return "
@@ -102,9 +83,14 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     )
     var restingPotential = -70.0
 
-    /**
-     * Background Current (nA) .
-     */
+    @UserParameter(
+        label = "Reset Potential (mV)",
+        description = "The value of the membrane potential to which it is set immediately "
+                + "after firing an action potential.",
+        order = 2
+    )
+    var resetPotential = -55.0
+
     @UserParameter(
         label = "Background Current (nA)",
         description = "A constant background current to the neuron.",

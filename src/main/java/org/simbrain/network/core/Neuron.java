@@ -325,7 +325,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void setUpdateRule(final NeuronUpdateRule updateRule) {
 
         NeuronUpdateRule oldRule = this.updateRule;
-        this.updateRule = updateRule.deepCopy();
+        this.updateRule = updateRule;
         neuronDataHolder = updateRule.createScalarData();
 
         if (getNetwork() != null) {

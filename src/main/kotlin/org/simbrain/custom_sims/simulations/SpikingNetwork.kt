@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.addTimeSeries
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
+import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay
 import org.simbrain.util.place
 import org.simbrain.util.point
 
@@ -13,8 +14,8 @@ import org.simbrain.util.point
  */
 val spikingNetwork = newSim {
 
-    val networkComponent = addNetworkComponent("Just a Neuron")
-
+    workspace.clearWorkspace()
+    val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
     val input = network.addNeuron {
@@ -27,8 +28,15 @@ val spikingNetwork = newSim {
         label = "Spiking"
         location = point(200, 100)
     }
+    val postSpiking = network.addNeuron {
+        label = "Post-Synaptic Response"
+        location = point(200, 200)
+    }
 
-    val synapse = network.addSynapse(input, spiking)
+    network.addSynapse(input, spiking)
+    network.addSynapse(spiking, postSpiking).apply {
+        spikeResponder = JumpAndDecay()
+    }
 
     withGui {
         place(networkComponent) {
@@ -50,6 +58,7 @@ val spikingNetwork = newSim {
 
     with(couplingManager) {
         spiking couple timeSeriesComponent.model.timeSeriesList[0]
+        postSpiking couple timeSeriesComponent.model.timeSeriesList[1]
     }
 
 }

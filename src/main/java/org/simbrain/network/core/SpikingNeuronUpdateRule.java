@@ -32,9 +32,9 @@ import org.simbrain.network.core.Network.TimeType;
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
     /**
-     * Time of last spike.
+     * Time of last spike. Default assumes no spikes have occurred when simulation begins.
      */
-    private double lastSpikeTime;
+    private double lastSpikeTime = Double.NEGATIVE_INFINITY;
 
     /**
      * An aux value for applied inputs to the neuron (eg injected current)

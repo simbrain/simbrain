@@ -8,6 +8,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.MorrisLecarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -128,11 +129,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     private double v_w2 = 17.4;
 
     /**
-     * Fraction of open potassium channels.
-     */
-    private double w_K;
-
-    /**
      * Potassium channel time constant/decay rate (s^-1).
      */
     @UserParameter(
@@ -173,19 +169,22 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
     private ProbabilityDistribution noiseGenerator = new NormalDistribution(0.0,1.0);
 
     @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
+    public void apply(Neuron neuron, ScalarDataHolder dat) {
+
+        MorrisLecarData data = ((MorrisLecarData)dat);
+
         double dt = neuron.getNetwork().getTimeStep();
         double i_syn = neuron.getInput();
         // Under normal circumstances this will cause no change.
         double vMembrane = neuron.getActivation();
 
-        double dVdt = dVdt(vMembrane, i_syn);
-        double dWdt = dWdt(vMembrane, w_K);
+        double dVdt = dVdt(vMembrane, i_syn, data.getW_K() );
+        double dWdt = dWdt(vMembrane, data.getW_K());
 
         double vmFut = vMembrane + dt * dVdt;
-        double wKFut = w_K + dt * dWdt;
-        vMembrane = vMembrane + (dt / 2) * ((dVdt) + dVdt(vmFut, i_syn));
-        w_K = w_K + (dt / 2) * ((dWdt) + dWdt(vMembrane, wKFut));
+        double wKFut = data.getW_K() + dt * dWdt;
+        vMembrane = vMembrane + (dt / 2) * ((dVdt) + dVdt(vmFut, i_syn, data.getW_K()));
+        data.setW_K(data.getW_K() + (dt / 2) * ((dWdt) + dWdt(vMembrane, wKFut)));
 
         neuron.setSpike(vMembrane > threshold);
         setHasSpiked(vMembrane > threshold, neuron);
@@ -194,7 +193,7 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
 
     }
 
-    private double dVdt(double vMembrane, double i_syn) {
+    private double dVdt(double vMembrane, double i_syn, double w_K) {
         double i_Ca = g_Ca * membraneFunction(vMembrane) * (vMembrane - vRest_Ca);
         double i_K = g_K * w_K * (vMembrane - vRest_k);
         double i_L = g_L * (vMembrane - vRest_L);
@@ -208,6 +207,11 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
 
     private double dWdt(double vMembrane, double w_K) {
         return phi * lambdaFunction(vMembrane) * (k_fractionFunction(vMembrane) - w_K);
+    }
+
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new MorrisLecarData();
     }
 
     private double membraneFunction(double vMembrane) {
@@ -240,7 +244,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
         cpy.vRest_Ca = this.vRest_Ca;
         cpy.vRest_k = this.vRest_k;
         cpy.vRest_L = this.vRest_L;
-        cpy.w_K = this.w_K;
         cpy.noiseGenerator = noiseGenerator.deepCopy();
 
         return cpy;

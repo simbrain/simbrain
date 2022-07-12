@@ -64,12 +64,6 @@ class NakaScalarData(@UserParameter(label = "a") var a: Double = 0.0) : ScalarDa
     }
 }
 
-class IntFireScalarData(var membranePotential: Double = 0.0) : ScalarDataHolder {
-    override fun copy(): IntFireScalarData {
-        return IntFireScalarData(membranePotential)
-    }
-}
-
 class IzhikData(
     @UserParameter(label = "a") var a: Double = 0.0,
     @UserParameter(label = "b") var b: Double = 0.0,
@@ -78,5 +72,29 @@ class IzhikData(
 ) : ScalarDataHolder {
     override fun copy(): IzhikData {
         return IzhikData(a, b, c, d)
+    }
+}
+
+
+class MorrisLecarData(
+    @UserParameter(label = "w_K", description = "Fraction of open potassium channels")
+    var w_K: Double = 0.0,
+) : ScalarDataHolder {
+    override fun copy(): MorrisLecarData {
+        return MorrisLecarData(w_K)
+    }
+}
+
+class AdexData(
+    @UserParameter(label = "w", description = "Adaptation variable: Roughly speaking amount of metabolite currently " +
+            "in the cell. Expelled during spiking and then replenished.")
+    var w: Double = 200.0,
+    @UserParameter(label = "Inhibitory Conductance")
+    var inhibConductance: Double = 0.0,
+    @UserParameter(label = "Excitatory Conductance")
+    var exConductance: Double = 0.0,
+) : ScalarDataHolder {
+    override fun copy(): AdexData {
+        return AdexData(w, inhibConductance, exConductance)
     }
 }

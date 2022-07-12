@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.AdexData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
@@ -33,6 +34,8 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  * differential equation as well as an adaptation term which lowers the
  * membrane potential in response to successive spikes.
  * See Toboul &#38; Brette 2005.
+ *
+ * @see <a href="http://www.scholarpedia.org/article/Adaptive_exponential_integrate-and-fire_model">...</a>
  *
  * @author Zoë Tosi
  */
@@ -144,11 +147,6 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
     private double v_mem = leakReversal;
 
     /**
-     * Adaptation variable.
-     */
-    private double w = 200;
-
-    /**
      * Adaptation reset parameter (nA).
      */
     @UserParameter(
@@ -224,10 +222,16 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
      */
     private double refractoryPeriod = 1.0;
 
-    private double[] ei = new double[2];
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new AdexData();
+    }
 
     @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
+    public void apply(Neuron neuron, ScalarDataHolder dat) {
+
+        AdexData data = ((AdexData)dat);
+
         if (v_mem >= v_Peak) {
             v_mem = v_Reset;
             neuron.forceSetActivation(v_Reset);
@@ -239,34 +243,31 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         //                        : refractoryPeriod;
         final boolean refractory = getLastSpikeTime() + refractoryPeriod >= neuron.getNetwork().getTime();
 
-
         // Retrieve membrane potential from host neuron's activation
         // in case some outside entity has explicitly changed the membrane
         // potential between updates.
         v_mem = neuron.getActivation();
 
-
         // Retrieve incoming ex/in currents or proportion of open channels
-        ei[0] = 0;
-        ei[1] = 0;
+        data.setExConductance(0);
+        data.setInhibConductance(0);
         for(int ii=0; ii<neuron.getFanIn().size(); ++ii) {
             neuron.getFanIn().get(ii).updateOutput();
             double val = neuron.getFanIn().get(ii).getPsr();
             if(neuron.getPolarity() == SimbrainConstants.Polarity.INHIBITORY) {
-                ei[1] += val;
+                data.setInhibConductance(data.getInhibConductance() + val);
             } else {
-                ei[0] += val;
+                data.setExConductance(data.getExConductance() + val);
             }
         }
 
         // Calculate incoming excitatory and inhibitory voltage changes
-        double iSyn_ex = g_e_bar * ei[0] * (exReversal - v_mem);
-        double iSyn_in = -g_i_bar * ei[1] * (inReversal - v_mem);
+        double iSyn_ex = g_e_bar * data.getExConductance() * (exReversal - v_mem);
+        double iSyn_in = -g_i_bar * data.getInhibConductance() * (inReversal - v_mem);
 
         // Calculate voltage changes due to leak
         double i_leak = g_L * (leakReversal - v_mem);
         double ibg = i_bg;
-
 
         // Add noise if there is any to be added
         if (addNoise) {
@@ -274,24 +275,25 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         }
 
         // Calc dV/dt for membrane potential
-        double dVdt = (g_L * slopeFactor * Math.exp((v_mem - v_Th) / slopeFactor)) + i_leak + iSyn_ex + iSyn_in + ibg - w;
+        double dVdt =
+                (g_L * slopeFactor * Math.exp((v_mem - v_Th) / slopeFactor)) + i_leak + iSyn_ex + iSyn_in + ibg - data.getW();
 
 
-        // Factor in membane capacitance...
+        // Factor in membrane capacitance...
         dVdt /= memCapacitance;
 
         // Calculate adaptation change
-        double dwdt = (a * (v_mem - leakReversal) - w) / tauW;
+        double dwdt = (a * (v_mem - leakReversal) - data.getW()) / tauW;
 
         // Integrate membrane potential and adaptation parameter using
         // Euler integration
         v_mem += (dVdt * dt);
-        w += (dwdt * dt);
+        data.setW(data.getW() + (dwdt * dt));
 
         // Spike?
         if (v_mem >= v_Peak) {
             v_mem = v_Peak;
-            w = w + (b * CURRENT_CONVERTER);
+            data.setW(data.getW() + (b * CURRENT_CONVERTER));
             if (!refractory) {
                 neuron.setSpike(true);
                 setHasSpiked(true, neuron);
@@ -324,7 +326,6 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         cpy.v_mem = this.v_mem;
         cpy.v_Reset = this.v_Reset;
         cpy.v_Th = this.v_Th;
-        cpy.w = this.w;
         return cpy;
     }
 
@@ -401,14 +402,6 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
 
     public void setV_mem(double v_mem) {
         this.v_mem = v_mem;
-    }
-
-    public double getW() {
-        return w;
-    }
-
-    public void setW(double w) {
-        this.w = w;
     }
 
     public double getB() {

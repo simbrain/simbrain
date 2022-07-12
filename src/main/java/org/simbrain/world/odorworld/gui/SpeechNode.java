@@ -102,6 +102,7 @@ public class SpeechNode extends EntityAttributeNode {
         shape.setVisible(false);
 
         effector.getEvents().onUpdate(this::updateEffector);
+        effector.getEvents().onPropertyChange(this::updateEffector);
 
     }
 

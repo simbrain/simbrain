@@ -18,12 +18,9 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
-import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
@@ -35,7 +32,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -255,7 +255,7 @@ public class SensorEffectorPanel extends JPanel {
             dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
         });
         dialog.addClosingTask(() -> {
-            attribute.getEvents().fireUpdate();
+            attribute.getEvents().firePropertyChanged();
         });
         dialog.pack();
         dialog.setVisible(true);

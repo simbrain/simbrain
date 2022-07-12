@@ -24,7 +24,7 @@ import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
-import org.simbrain.world.odorworld.events.AttributeEvents;
+import org.simbrain.world.odorworld.events.SensorEffectorEvents;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;
@@ -112,7 +112,7 @@ public abstract class Sensor implements PeripheralAttribute {
     /**
      * Handle events.
      */
-    private transient AttributeEvents events = new AttributeEvents(this);
+    private transient SensorEffectorEvents events = new SensorEffectorEvents(this);
 
     /**
      * Construct a sensor.
@@ -175,7 +175,7 @@ public abstract class Sensor implements PeripheralAttribute {
     @Override
     public void setLabel(String label) {
         this.label = label;
-        getEvents().fireUpdate();
+        getEvents().firePropertyChanged();
     }
 
     /**
@@ -203,12 +203,12 @@ public abstract class Sensor implements PeripheralAttribute {
     @Override
     public abstract Sensor copy();
 
-    public AttributeEvents getEvents() {
+    public SensorEffectorEvents getEvents() {
         return events;
     }
 
     public Object readResolve() {
-        events = new AttributeEvents(this);
+        events = new SensorEffectorEvents(this);
         return this;
     }
 

@@ -31,9 +31,6 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
             order = 10)
     private double baseValue = 1;
 
-    /**
-     * Decay function
-     */
     @UserParameter(label = "Decay Function", isObjectType = true,
         showDetails = false, order = 15)
     DecayFunction decayFunction = new LinearDecayFunction(70);
@@ -46,12 +43,16 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         order = 3)
     private EntityType objectType = EntityType.SWISS;
 
-    /**
-     * Should the sensor node show a label on top.
-     */
+    @UserParameter(label = "Show dispersion",
+            description = "Show dispersion of the sensor",
+            useSetter = true,
+            order = 4)
+    private boolean showDispersion = false;
+
     @UserParameter(label = "Show Label",
             description = "Show label on top of the sensor node",
-            order = 4)
+            useSetter = true,
+            order = 5)
     private boolean showLabel = false;
 
     /**
@@ -101,7 +102,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
     @Override
     public void update(OdorWorldEntity parent) {
         value = 0;
-        for (OdorWorldEntity otherEntity : parent.getEntitiesInRadius(decayFunction.getDispersion())) {
+        for (OdorWorldEntity otherEntity : parent.getWorld().getEntityList()) {
             if (otherEntity.getEntityType() == objectType) {
                 double scaleFactor = decayFunction.getScalingFactor(
                     SimbrainMath.distance(computeAbsoluteLocation(parent), otherEntity.getLocation()));
@@ -109,6 +110,7 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
             }
         }
     }
+
 
     @Producible(customDescriptionMethod = "getAttributeDescription")
     public double getCurrentValue() {
@@ -133,8 +135,14 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         return showLabel;
     }
 
+    public void setShowLabel(boolean showLabel) {
+        this.showLabel = showLabel;
+        getEvents().firePropertyChanged();
+    }
+
     public void setRange(double value) {
         decayFunction.setDispersion(value);
+        getEvents().firePropertyChanged();
     }
 
     public void setObjectType(EntityType objectType) {
@@ -148,5 +156,14 @@ public class ObjectSensor extends Sensor implements VisualizableEntityAttribute 
         } else {
             return super.getLabel();
         }
+    }
+
+    public boolean isShowDispersion() {
+        return showDispersion;
+    }
+
+    public void setShowDispersion(boolean showDispersion) {
+        this.showDispersion = showDispersion;
+        getEvents().firePropertyChanged();
     }
 }

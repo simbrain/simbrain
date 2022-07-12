@@ -120,13 +120,13 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
         if (amount > threshold) {
             if (!activated) {
                 activated = true;
-                getEvents().fireUpdate();
+                getEvents().fireUpdated();
             }
             amount = 0; // reset
         } else {
             if (activated) {
                 activated = false;
-                getEvents().fireUpdate();
+                getEvents().fireUpdated();
             }
         }
         if (activated) {

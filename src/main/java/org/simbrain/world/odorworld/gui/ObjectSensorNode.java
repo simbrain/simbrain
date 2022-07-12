@@ -13,30 +13,29 @@ import java.awt.geom.Point2D;
 
 public class ObjectSensorNode extends EntityAttributeNode {
 
-    /**
-     * Sensor diameter
-     */
     private static final int SENSOR_RADIUS = 4;
 
-    /**
-     * Reference to the sensor this node is representing
-     */
-    private ObjectSensor sensor;
+    private final ObjectSensor sensor;
 
     /**
      * The shape of this node
      */
-    private PPath shape;
+    private final PPath shape;
+
+    /**
+     * Dotted circle around sensor
+     */
+    private final PPath dispersionCircle;
 
     /**
      * The text graphical object
      */
-    private PText labelText;
+    private final PText labelText;
 
     /**
      * The text label location
      */
-    private Point2D.Float labelBottomCenterLocation = new Point2D.Float(0, -5);
+    private final Point2D.Float labelBottomCenterLocation = new Point2D.Float(0, -5);
 
     public ObjectSensorNode(ObjectSensor sensor) {
         this.sensor = sensor;
@@ -56,7 +55,25 @@ public class ObjectSensorNode extends EntityAttributeNode {
         updateLabel();
         shape.addChild(labelText);
 
-        sensor.getEvents().onUpdate(this::updateLabel);
+        var dispersion = sensor.getDecayFunction().getDispersion();
+        dispersionCircle = PPath.createEllipse(
+                -dispersion / 2,
+                -dispersion / 2,
+                dispersion,
+                dispersion
+        );
+        dispersionCircle.setPaint(null);
+        Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+                0, new float[]{3}, 0);
+        dispersionCircle.setStroke(dashed);
+        dispersionCircle.setStrokePaint(Color.gray);
+        updateDispersionCircle();
+
+        sensor.getEvents().onPropertyChange(() -> {
+            updateLabel();
+            updateDispersionCircle();
+        });
+
 
     }
 
@@ -64,13 +81,10 @@ public class ObjectSensorNode extends EntityAttributeNode {
     public void update(OdorWorldEntity entity) {
         shape.setOffset(sensor.computeRelativeLocation(entity));
         float saturation = (float) SimbrainMath.rescale(sensor.getCurrentValue(), 0, sensor.getBaseValue(),
-                0,1);
+                0, 1);
         shape.setPaint(Color.getHSBColor(maxColor, saturation, 1));
     }
 
-    /**
-     * Update the label for this node
-     */
     public void updateLabel() {
         // TODO: If there is more than one sensor in one spot, labels are on top of each others
         if (sensor.isShowLabel()) {
@@ -81,5 +95,13 @@ public class ObjectSensorNode extends EntityAttributeNode {
             );
         }
         labelText.setVisible(sensor.isShowLabel());
+    }
+
+    public void updateDispersionCircle() {
+        if (sensor.isShowDispersion()) {
+            shape.addChild(dispersionCircle);
+        } else {
+            shape.removeChild(dispersionCircle);
+        }
     }
 }

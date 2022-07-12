@@ -5,15 +5,13 @@ import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.updateAction
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronUpdateRule
-import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.core.SynapseGroup2
+import org.simbrain.network.core.*
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.*
+import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.world.odorworld.OdorWorldComponent
@@ -32,7 +30,9 @@ import kotlin.math.sin
  */
 val objectTrackingSim = newSim {
 
+    // Number of reservoir neurons
     val numResNeurons = 200
+    // Number of left and right sensory neurons. Totaly sensory neurons is twice this.
     val sensoryNeurons = 25
 
     // Basic setup
@@ -47,7 +47,7 @@ val objectTrackingSim = newSim {
     // Add a self-connected neuron array to the network
     val resNeurons = (0..numResNeurons).map {
         val rule = AllostaticUpdateRule()
-        val neuron = Neuron(network, rule)
+        val neuron = AllostaticNeuron(network, rule)
         neuron
     }
     network.addNetworkModels(resNeurons)
@@ -95,24 +95,24 @@ val objectTrackingSim = newSim {
     val rightInputsToRes = SynapseGroup2(rightInputs, reservoir, sparse)
     network.addNetworkModel(rightInputsToRes)
 
-    // Effectors
+    // Output neurons
     val leftTurnNeuron = Neuron(network)
     val rightTurnNeuron = Neuron(network)
     network.addNetworkModel(leftTurnNeuron)
     network.addNetworkModel(rightTurnNeuron)
     leftTurnNeuron.upperBound = 100.0
     rightTurnNeuron.upperBound = 100.0
-    val leftTurn = NeuronCollection(network, listOf(leftTurnNeuron))
-    leftTurn.label = "Left Turn"
-    network.addNetworkModel(leftTurn)
-    val rightTurn = NeuronCollection(network, listOf(rightTurnNeuron))
-    rightTurn.label = "Right Turn"
-    network.addNetworkModel(rightTurn)
+    val leftTurnCollection = NeuronCollection(network, listOf(leftTurnNeuron))
+    leftTurnCollection.label = "Left Turn"
+    network.addNetworkModel(leftTurnCollection)
+    val rightTurnCollection = NeuronCollection(network, listOf(rightTurnNeuron))
+    rightTurnCollection.label = "Right Turn"
+    network.addNetworkModel(rightTurnCollection)
     leftTurnNeuron.location = point(546, -203)
     rightTurnNeuron.location = point(573, 323)
-    val resToLeftTurn = SynapseGroup2(reservoir, leftTurn, sparse)
+    val resToLeftTurn = SynapseGroup2(reservoir, leftTurnCollection, sparse)
     network.addNetworkModel(resToLeftTurn)
-    val resToRightTurn = SynapseGroup2(reservoir, rightTurn, sparse)
+    val resToRightTurn = SynapseGroup2(reservoir, rightTurnCollection, sparse)
     network.addNetworkModel(resToRightTurn)
 
     // Location of the network in the desktop
@@ -141,28 +141,27 @@ val objectTrackingSim = newSim {
     }
 
     // Effectors
-    val (_, turnLeft, turnRight) = agent.effectors
+    val (_, turnLeftEffector, turnRightEffector) = agent.effectors
 
     // Left sensors
-    (30 - sensoryNeurons / 2..30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
+    (30 - sensoryNeurons / 2 until 30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
         val cheeseSensorLeft = ObjectSensor(EntityType.SWISS)
         cheeseSensorLeft.theta = position.toDouble()
         cheeseSensorLeft.radius = EntityType.CIRCLE.imageHeight / 2.0
-        cheeseSensorLeft.decayFunction.dispersion = 100.0
+        cheeseSensorLeft.decayFunction = StepDecayFunction()
         with(couplingManager) {
+            cheeseSensorLeft.decayFunction.dispersion = 100.5
             cheeseSensorLeft couple leftInputNeurons[counter]
         }
-        // cheeseSensorLeft.decayFunction = StepDecayFunction().also {
-        //     dispersion = 200.0
-        // }
         agent.addSensor(cheeseSensorLeft)
     }
 
-    (-30 - sensoryNeurons / 2..-30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
+    (-30 - sensoryNeurons / 2 until -30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
         val cheeseSensorRight = ObjectSensor(EntityType.SWISS)
         cheeseSensorRight.theta = position.toDouble()
         cheeseSensorRight.radius = EntityType.CIRCLE.imageHeight / 2.0
-        cheeseSensorRight.decayFunction.dispersion = 100.0
+        cheeseSensorRight.decayFunction = StepDecayFunction()
+        cheeseSensorRight.decayFunction.dispersion = 100.5
         with(couplingManager) {
             cheeseSensorRight couple rightInputNeurons[counter]
         }
@@ -182,6 +181,7 @@ val objectTrackingSim = newSim {
         //TODO: Update when Yulin's refactor is done
         cheese.location = point(agent.x + 100 * cos(network.time), agent.y - 100 * sin(network.time))
     }
+
     updateCheeseLocation()
     workspace.addUpdateAction(updateAction("Move cheese") {
         updateCheeseLocation()
@@ -196,44 +196,60 @@ val objectTrackingSim = newSim {
         }
     }
 
+    // Couple output neurons to effectors
     with(couplingManager) {
-        leftTurnNeuron couple turnLeft
-        rightTurnNeuron couple turnRight
+        leftTurnNeuron couple turnLeftEffector
+        rightTurnNeuron couple turnRightEffector
     }
 
 }
 
+class AllostaticNeuron(parent: Network, rule: NeuronUpdateRule) : Neuron(parent, rule) {
+    var target = 1.0
+    var threshold = 2.0
+    var applyLearning = false
+}
+
 class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
 
-    var target = 1.0
-    var threshold = 1.0
     val leakRate = .25
     val learningRate = .01
 
     override fun apply(n: Neuron, data: ScalarDataHolder) {
+
+        n as AllostaticNeuron
+
         // TODO.  Min below is a bandaid, those values are blowing up
         val newActivation = n.activation * (1-leakRate) + min(n.weightedInputs, 100.0)
         n.activation = max(0.0, newActivation )
 
-        if (n.activation > threshold) {
+        // Only apply learning if neuron has just spiked
+        n.applyLearning = n.isSpike
+        n.isSpike = false
+
+        if (n.activation > n.threshold) {
             n.isSpike = true
-            println("Spike!")
+            // println("Spike!")
             setHasSpiked(true, n)
+            n.activation -= n.threshold
         }
 
-        val error = n.activation - target
+        val error = n.activation - n.target
 
         // Weights
-        val toTrain= n.fanIn.filter{it.source.isSpike}
+        val toTrain= n.fanIn
+            .filter { it.source is AllostaticNeuron}
+            .filter { (it.source as AllostaticNeuron).applyLearning }
+
         toTrain.forEach {  s ->
             s.strength -= error/toTrain.size
         }
 
-        target += error * learningRate
-        target = max(target, 1.0)
-        threshold = 2*target
+        n.target += error * learningRate
+        n.target = max(n.target, 1.0)
+        n.threshold = 2*n.target
 
-        println("$target, $threshold, ${n.activation}")
+        // println("target = $n.target, threshold = $n.threshold, activation = ${n.activation}")
     }
 
     override fun deepCopy(): NeuronUpdateRule {

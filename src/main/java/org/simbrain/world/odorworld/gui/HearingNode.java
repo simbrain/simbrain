@@ -92,6 +92,7 @@ public class HearingNode extends EntityAttributeNode {
         hearingText.setPickable(false);
         shape.setVisible(false);
         sensor.getEvents().onUpdate(this::updateSensor);
+        sensor.getEvents().onPropertyChange(this::updateSensor);
     }
 
     @Override

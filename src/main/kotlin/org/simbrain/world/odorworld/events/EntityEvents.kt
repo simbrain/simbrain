@@ -20,7 +20,7 @@ interface EntityLocationEvent {
 /**
  * See [Event].
  */
-class EntityEvents: Event(PropertyChangeSupport(Any())), EntityLocationEvent {
+class EntityEvents : Event(PropertyChangeSupport(Any())), EntityLocationEvent {
 
     fun onDeleted(handler: Consumer<OdorWorldEntity>) = "Deleted".itemRemovedEvent(handler)
     fun fireDeleted(old: OdorWorldEntity) = "Deleted"(old)
@@ -44,7 +44,7 @@ class EntityEvents: Event(PropertyChangeSupport(Any())), EntityLocationEvent {
     fun fireUpdateSensorVisiblity() = "UpdateSensorVisiblity"()
 
     fun onEffectorAdded(handler: Consumer<Effector>) = "EffectorAdded".itemAddedEvent(handler)
-    fun fireEffectorAdded(effector: Effector) = "EffectorAdded"(new =effector)
+    fun fireEffectorAdded(effector: Effector) = "EffectorAdded"(new = effector)
 
     fun onEffectorRemoved(handler: Consumer<Effector>) = "EffectorRemoved".itemRemovedEvent(handler)
     fun fireEffectorRemoved(effector: Effector) = "EffectorRemoved"(old = effector)
@@ -59,9 +59,12 @@ class EntityEvents: Event(PropertyChangeSupport(Any())), EntityLocationEvent {
 /**
  * [Sensor] and [Effector] events.
  */
-class AttributeEvents(val attribute: PeripheralAttribute):Event(PropertyChangeSupport(attribute)) {
+class SensorEffectorEvents(val attribute: PeripheralAttribute) : Event(PropertyChangeSupport(attribute)) {
 
     fun onUpdate(handler: Runnable) = "Update".event(handler)
-    fun fireUpdate() = "Update"()
+    fun fireUpdated() = "Update"()
+
+    fun onPropertyChange(handler: Runnable) = "PropertyChanged".event(handler)
+    fun firePropertyChanged() = "PropertyChanged"()
 
 }

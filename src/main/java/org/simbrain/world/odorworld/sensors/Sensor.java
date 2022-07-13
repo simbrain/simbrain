@@ -92,7 +92,7 @@ public abstract class Sensor implements PeripheralAttribute {
      * Returns the sensor location in the world's coordinate frame.
      */
     public Point2D.Double computeAbsoluteLocation(OdorWorldEntity entity) {
-        return SimbrainMath.add(entity.getLocation(), computeRelativeLocation(entity));
+        return SimbrainMath.add(entity.getCenterLocation(), computeRelativeLocation(entity));
     }
 
     /**

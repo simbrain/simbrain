@@ -108,7 +108,7 @@ class ObjectSensor : Sensor, VisualizableEntityAttribute {
         for (otherEntity in parent.world.entityList) {
             if (otherEntity.entityType == objectType) {
                 val scaleFactor = decayFunction.getScalingFactor(
-                    SimbrainMath.distance(computeAbsoluteLocation(parent), otherEntity.location)
+                    SimbrainMath.distance(computeAbsoluteLocation(parent), otherEntity.centerLocation)
                 )
                 currentValue += baseValue * scaleFactor
             }

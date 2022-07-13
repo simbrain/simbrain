@@ -18,13 +18,11 @@
  */
 package org.simbrain.world.odorworld.entities
 
-import org.simbrain.util.UserParameter
+import org.simbrain.util.*
 import org.simbrain.util.Utils.round
 import org.simbrain.util.environment.SmellSource
-import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.UniformRealDistribution
-import org.simbrain.util.toRadian
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
@@ -105,9 +103,13 @@ class OdorWorldEntity @JvmOverloads constructor(
     val parentWorld
         get() = world
 
+    // TODO: Make location be center location and at that point get rid of this or replace with topLeft
     @Deprecated("Use location")
-    val centerLocation: Point2D
-        get() = location
+    var centerLocation: Point2D
+        get() = location + point(width/2, height/2)
+        set(value) {
+            location = value - point(width/2, height/2)
+        }
 
     /**
      * Before moving, see if there are any collisions. If there are, change the landing spot of the movement to a

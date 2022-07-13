@@ -34,6 +34,8 @@ val objectTrackingSim = newSim {
     val numResNeurons = 200
     // Number of left and right sensory neurons. Totaly sensory neurons is twice this.
     val sensoryNeurons = 25
+    // Radius in pixels of the cheese's revolution around the agent.
+    val radiusOfRevolution = 100.0
 
     // Basic setup
     workspace.clearWorkspace()
@@ -132,6 +134,7 @@ val objectTrackingSim = newSim {
 
     val odorWorldComponent = OdorWorldComponent("World")
     val odorWorld = odorWorldComponent.world
+    odorWorld.isObjectsBlockMovement = false
 
     // Agent
     val agent = odorWorld.addEntity(EntityType.CIRCLE).apply {
@@ -149,8 +152,8 @@ val objectTrackingSim = newSim {
         cheeseSensorLeft.theta = position.toDouble()
         cheeseSensorLeft.radius = EntityType.CIRCLE.imageHeight / 2.0
         cheeseSensorLeft.decayFunction = StepDecayFunction()
+        cheeseSensorLeft.decayFunction.dispersion = radiusOfRevolution / 2
         with(couplingManager) {
-            cheeseSensorLeft.decayFunction.dispersion = 100.5
             cheeseSensorLeft couple leftInputNeurons[counter]
         }
         agent.addSensor(cheeseSensorLeft)
@@ -161,7 +164,7 @@ val objectTrackingSim = newSim {
         cheeseSensorRight.theta = position.toDouble()
         cheeseSensorRight.radius = EntityType.CIRCLE.imageHeight / 2.0
         cheeseSensorRight.decayFunction = StepDecayFunction()
-        cheeseSensorRight.decayFunction.dispersion = 100.5
+        cheeseSensorRight.decayFunction.dispersion = radiusOfRevolution / 2
         with(couplingManager) {
             cheeseSensorRight couple rightInputNeurons[counter]
         }
@@ -178,8 +181,10 @@ val objectTrackingSim = newSim {
     }
 
     fun updateCheeseLocation() {
-        //TODO: Update when Yulin's refactor is done
-        cheese.location = point(agent.x + 100 * cos(network.time), agent.y - 100 * sin(network.time))
+        val (x,y) = agent.centerLocation
+        cheese.centerLocation = point(
+            x + radiusOfRevolution * cos(network.time),
+            y - radiusOfRevolution * sin(network.time))
     }
 
     updateCheeseLocation()

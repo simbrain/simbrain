@@ -10,6 +10,7 @@ import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldResourceManager
+import org.simbrain.world.odorworld.entities.Locatable
 import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
@@ -18,6 +19,8 @@ import java.util.function.Consumer
 import javax.swing.*
 import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
+import kotlin.math.floor
+
 
 val zeroTile by lazy { Tile(0) }
 
@@ -27,7 +30,7 @@ val missingTexture by lazy { OdorWorldResourceManager.getBufferedImage("tilemap/
  * Return id corresponding to a label or 0 (empty tile) if nothing is found
  */
 fun Collection<TileSet>.getIdFromLabel(label: String): Int {
-    return firstNotNullOf{tileSet -> tileSet[label]}.id ?:0
+    return firstNotNullOf { tileSet -> tileSet[label] }.id ?: 0
 }
 
 fun transparentTexture(width: Int, height: Int) = transparentImage(width, height)
@@ -119,7 +122,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
                 // Select the tile that was initially clicked on
                 this.layer.allNodes.filterIsInstance<PTiledImage>().find { it.gid == pickedTile }?.let {
                     it.select()
-                    //camera.centerBoundsOnPoint(it.bounds.centerX, it.bounds.centerY)
+                    // camera.centerBoundsOnPoint(it.bounds.centerX, it.bounds.centerY)
                     // TODO: Figure out what to center on what.
                 }
 
@@ -217,3 +220,50 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
     pack()
     setLocationRelativeTo(null)
 }
+
+sealed class Coordinate(x: kotlin.Double, y: kotlin.Double): Point2D.Double(x, y)
+
+class GridCoordinate(x: kotlin.Double, y: kotlin.Double): Coordinate(x, y) {
+    fun copy() = GridCoordinate(x, y)
+}
+fun Point2D.asGridCoordinate() = GridCoordinate(x, y)
+
+class PixelCoordinate(x: kotlin.Double, y: kotlin.Double): Coordinate(x, y) {
+    fun copy() = PixelCoordinate(x, y)
+}
+fun Point2D.asPixelCoordinate() = PixelCoordinate(x, y)
+
+context(TileMap)
+fun PixelCoordinate.toGridCoordinate() = point(floor(x / tileWidth), floor(y / tileHeight))
+
+context(TileMap)
+fun GridCoordinate.toPixelCoordinate() = point(floor(x / tileWidth), floor(y / tileHeight))
+
+fun TileMap.getGridLocationsInRadius(staringLocation: PixelCoordinate, radiusInPixel: Double) = sequence {
+
+    fun Point2D.isInRadius() = distanceSqTo(staringLocation) < radiusInPixel * radiusInPixel
+
+    fun step(dx: Int, dy: Int) = sequence {
+        val currentPoint = staringLocation.copy()
+        currentPoint.setLocation(currentPoint.x + dx * tileWidth, currentPoint.y)
+        while (currentPoint.isInRadius()) {
+            while (currentPoint.isInRadius()) {
+                val (x, y) = currentPoint
+                yield(currentPoint.toGridCoordinate())
+                currentPoint.setLocation(x + dx * tileWidth, y)
+            }
+            currentPoint.setLocation(staringLocation.x, currentPoint.y + dy * tileHeight)
+        }
+    }
+
+    yield(staringLocation.asPixelCoordinate().toGridCoordinate())
+    yieldAll(step(1, 1))
+    yieldAll(step(-1, 1))
+    yieldAll(step(-1, -1))
+    yieldAll(step(1, -1))
+}
+
+fun TileMap.getTilesNear(location: Locatable, radius: Double = 10.0) =
+    getGridLocationsInRadius(location.location.asPixelCoordinate(), radius).flatMap { (x, y) ->
+        getTileStackAt(x.toInt(), y.toInt()).map { GridCoordinate(x, y) to it }
+    }

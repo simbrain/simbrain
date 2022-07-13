@@ -293,5 +293,6 @@ class TileMap(width: Int, height: Int) {
         changeSupport = PropertyChangeSupport(this)
         return this
     }
+
 }
 

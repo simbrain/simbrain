@@ -285,7 +285,7 @@ class OdorWorldEntity @JvmOverloads constructor(
      * @param type type of sensor to add
      * @param range the range of the object sensors
      */
-    fun addLeftRightSensors(type: EntityType?, range: Double) {
+    fun addLeftRightSensors(type: EntityType, range: Double) {
         addObjectSensor(type, 50.0, 45.0, range) // Left sensor
         addObjectSensor(type, 50.0, -45.0, range) // Right sensor
     }
@@ -311,7 +311,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     /**
      * Add an object sensor to this entity.
      */
-    fun addObjectSensor(type: EntityType?, radius: Double, angle: Double, range: Double): ObjectSensor {
+    fun addObjectSensor(type: EntityType, radius: Double, angle: Double, range: Double): ObjectSensor {
         val sensor = ObjectSensor(type, radius, angle)
         sensor.setRange(range)
         addSensor(sensor)

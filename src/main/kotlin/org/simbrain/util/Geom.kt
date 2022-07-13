@@ -70,6 +70,8 @@ operator fun Point2D.component2() = y
 operator fun Point.component1() = x
 operator fun Point.component2() = y
 
+fun Point2D.copy() = point(x, y)
+
 // Lines
 fun line(p1: Point2D, p2: Point2D) = Line2D.Double(p1, p2)
 

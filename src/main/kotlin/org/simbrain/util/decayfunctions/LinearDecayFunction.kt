@@ -10,7 +10,7 @@ class LinearDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0) :
     override fun copy(): LinearDecayFunction {
         return LinearDecayFunction(dispersion)
             .also {
-                it.peakDistance = dispersion
+                it.peakDistance = peakDistance
             }
     }
 

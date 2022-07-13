@@ -24,11 +24,10 @@ class ExponentialDecayFunction @JvmOverloads constructor(dispersion: Double = 70
         return (1/dispersion) * exp((-1/dispersion) * x)
     }
 
-
     override fun copy(): ExponentialDecayFunction {
         return ExponentialDecayFunction(dispersion)
             .also {
-                it.peakDistance = dispersion
+                it.peakDistance = peakDistance
             }
     }
 

@@ -12,7 +12,7 @@ class StepDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0) : D
 
     override fun copy(): StepDecayFunction {
         return StepDecayFunction(dispersion).also {
-            it.peakDistance = dispersion
+            it.peakDistance = peakDistance
         }
     }
 

@@ -313,7 +313,7 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     fun addObjectSensor(type: EntityType, radius: Double, angle: Double, range: Double): ObjectSensor {
         val sensor = ObjectSensor(type, radius, angle)
-        sensor.setRange(range)
+        sensor.decayFunction.dispersion = range
         addSensor(sensor)
         return sensor
     }

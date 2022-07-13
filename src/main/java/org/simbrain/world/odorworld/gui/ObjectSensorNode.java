@@ -25,7 +25,7 @@ public class ObjectSensorNode extends EntityAttributeNode {
     /**
      * Dotted circle around sensor
      */
-    private final PPath dispersionCircle;
+    private PPath dispersionCircle;
 
     /**
      * The text graphical object
@@ -55,25 +55,12 @@ public class ObjectSensorNode extends EntityAttributeNode {
         updateLabel();
         shape.addChild(labelText);
 
-        var dispersion = sensor.getDecayFunction().getDispersion();
-        dispersionCircle = PPath.createEllipse(
-                -dispersion / 2,
-                -dispersion / 2,
-                dispersion,
-                dispersion
-        );
-        dispersionCircle.setPaint(null);
-        Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
-                0, new float[]{3}, 0);
-        dispersionCircle.setStroke(dashed);
-        dispersionCircle.setStrokePaint(Color.gray);
         updateDispersionCircle();
 
         sensor.getEvents().onPropertyChange(() -> {
             updateLabel();
             updateDispersionCircle();
         });
-
 
     }
 
@@ -98,10 +85,21 @@ public class ObjectSensorNode extends EntityAttributeNode {
     }
 
     public void updateDispersionCircle() {
+        shape.removeChild(dispersionCircle);
         if (sensor.isShowDispersion()) {
+            var dispersion = sensor.getDecayFunction().getDispersion();
+            dispersionCircle = PPath.createEllipse(
+                    -dispersion / 2,
+                    -dispersion / 2,
+                    dispersion,
+                    dispersion
+            );
+            dispersionCircle.setPaint(null);
+            Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+                    0, new float[]{3}, 0);
+            dispersionCircle.setStroke(dashed);
+            dispersionCircle.setStrokePaint(Color.gray);
             shape.addChild(dispersionCircle);
-        } else {
-            shape.removeChild(dispersionCircle);
         }
     }
 }

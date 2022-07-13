@@ -53,7 +53,8 @@ class ObjectSensor : Sensor, VisualizableEntityAttribute {
         useSetter = true,
         order = 4
     )
-    private val showDispersion = false
+    @get:JvmName("isShowDispersion")
+    var showDispersion = false
 
     /**
      * Should the sensor node show a label on top.
@@ -120,11 +121,6 @@ class ObjectSensor : Sensor, VisualizableEntityAttribute {
 
     override val name: String
         get() = "Object Sensor"
-
-    fun setRange(value: Double) {
-        decayFunction.dispersion = value
-        events.firePropertyChanged()
-    }
 
     fun setObjectType(objectType: EntityType) {
         this.objectType = objectType

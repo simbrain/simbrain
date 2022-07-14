@@ -96,11 +96,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     private Neuron target;
 
     /**
-     * The output of the synapse. For details see {@link #updateOutput()}
-     */
-    private double output;
-
-    /**
      * Whether this should be visible in the GUI.
      */
     private boolean isVisible = true;
@@ -372,7 +367,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     }
 
     /**
-     * Update output of this synapse. If there is no spike responder then output is just weighted input
+     * Update output of this synapse. If there is no spike responder then "psr" is just weighted input
      * ("connectionist style"). If there is a {@link SpikeResponder} it is applied to update the post-synaptic response
      * (psr) and psr is used as the output.
      */
@@ -385,18 +380,17 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         // Update the output of this synapse
         if (spikeResponder instanceof NonResponder) {
             // For "connectionist" case
-            output = source.getActivation() * strength;
+            psr = source.getActivation() * strength;
         } else {
             // Updates psr for spiking source neurons
             spikeResponder.apply(this);
-            output = psr;
         }
 
         // Handle delays
         if (delay != 0) {
             dlyVal = dequeu();
-            enqueu(output);
-            output = dlyVal;
+            enqueu(psr);
+            psr = dlyVal;
         }
     }
 
@@ -845,9 +839,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         }
     }
 
-    /**
-     * @return the post-synaptic response
-     */
     public double getPsr() {
         return psr;
     }
@@ -932,10 +923,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     public ScalarDataHolder getDataHolder() {
         return dataHolder;
-    }
-
-    public double getOutput() {
-        return output;
     }
 
     public boolean isVisible() {

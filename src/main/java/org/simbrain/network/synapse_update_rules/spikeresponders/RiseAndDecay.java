@@ -61,9 +61,10 @@ public class RiseAndDecay extends SpikeResponder {
         }
 
         recovery += ((timeStep / timeConstant) * (-recovery));
-        value += ((timeStep / timeConstant) * ((Math.E * maximumResponse * recovery * (1 - value)) - value));
+        s.setPsr(s.getPsr() + ((timeStep / timeConstant)
+                * ((Math.E * maximumResponse * recovery * (1 - s.getPsr())) - s.getPsr())));
 
-        s.setPsr(value * s.getStrength());
+        s.setPsr(s.getPsr() * s.getStrength());
 
     }
 

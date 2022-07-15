@@ -65,16 +65,10 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
         }
     }
 
-    /**
-     * @return the lastSpikeTime
-     */
     public double getLastSpikeTime() {
         return lastSpikeTime;
     }
 
-    /**
-     * @param lastSpikeTime the lastSpikeTime to set
-     */
     public void setLastSpikeTime(double lastSpikeTime) {
         this.lastSpikeTime = lastSpikeTime;
     }

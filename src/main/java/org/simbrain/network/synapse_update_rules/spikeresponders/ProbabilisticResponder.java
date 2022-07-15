@@ -59,14 +59,13 @@ public class ProbabilisticResponder extends SpikeResponder {
     public void apply(Synapse s) {
         if (s.getSource().isSpike()) {
             if (Math.random() > (1 - activationProbability)) {
-                value = responseValue * s.getStrength();
+                s.setPsr(responseValue * s.getStrength());
             } else {
-                value = 0;
+                s.setPsr(0);
             }
         } else {
-            value = 0; // In case it did not spike at all;
+            s.setPsr(0); // In case it did not spike at all;
         }
-        s.setPsr(value);
     }
 
     @Override

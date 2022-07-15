@@ -52,11 +52,6 @@ public abstract class SpikeResponder implements CopyableObject {
     }
 
     /**
-     * Value.
-     */
-    protected double value;
-
-    /**
      * Defines a spike responder for scalar data.
      *
      * NOTE: No spike responders currently maintain state. If that changes, we can add a data holder as argument to
@@ -106,14 +101,6 @@ public abstract class SpikeResponder implements CopyableObject {
             }
         }
         return srList;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public void setValue(final double value) {
-        this.value = value;
     }
 
     @Override

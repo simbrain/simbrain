@@ -5,17 +5,17 @@ import org.piccolo2d.nodes.PText;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.ObjectSensor;
+import org.simbrain.world.odorworld.sensors.TileSensor;
 
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
-public class ObjectSensorNode extends EntityAttributeNode {
+public class TileSensorNode extends EntityAttributeNode {
 
-    private static final int SENSOR_RADIUS = 4;
+    private static final int SENSOR_RADIUS = 3;
 
-    private final ObjectSensor sensor;
+    private final TileSensor sensor;
 
     /**
      * The shape of this node
@@ -37,15 +37,15 @@ public class ObjectSensorNode extends EntityAttributeNode {
      */
     private final Point2D.Float labelBottomCenterLocation = new Point2D.Float(0, -5);
 
-    public ObjectSensorNode(ObjectSensor sensor) {
+    public TileSensorNode(TileSensor sensor) {
         this.sensor = sensor;
-        GeneralPath diamondPath = new GeneralPath();
-        diamondPath.moveTo(-SENSOR_RADIUS, 0);
-        diamondPath.lineTo(0, -SENSOR_RADIUS);
-        diamondPath.lineTo(SENSOR_RADIUS, 0);
-        diamondPath.lineTo(0, SENSOR_RADIUS);
-        diamondPath.closePath();
-        this.shape = new PPath.Float(diamondPath);
+        GeneralPath squarePath = new GeneralPath();
+        squarePath.moveTo(-SENSOR_RADIUS, -SENSOR_RADIUS);
+        squarePath.lineTo(-SENSOR_RADIUS, SENSOR_RADIUS);
+        squarePath.lineTo(SENSOR_RADIUS, SENSOR_RADIUS);
+        squarePath.lineTo(SENSOR_RADIUS, -SENSOR_RADIUS);
+        squarePath.closePath();
+        this.shape = new PPath.Float(squarePath);
         setPickable(false);
         shape.setPickable(false);
         addChild(shape);

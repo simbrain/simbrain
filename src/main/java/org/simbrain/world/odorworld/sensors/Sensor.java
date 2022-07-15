@@ -82,9 +82,7 @@ public abstract class Sensor implements PeripheralAttribute {
     public Point2D.Double computeRelativeLocation(OdorWorldEntity entity) {
         Point2D.Double sensorLocation = new Point2D.Double(0,0);
         sensorLocation.x = radius * Math.cos(Math.toRadians(entity.getHeading() + theta));
-        sensorLocation.x += entity.getWidth()/2;
         sensorLocation.y = -radius * Math.sin(Math.toRadians(entity.getHeading() + theta));
-        sensorLocation.y += entity.getHeight()/2;
         return sensorLocation;
     }
 
@@ -141,6 +139,12 @@ public abstract class Sensor implements PeripheralAttribute {
      */
     public Sensor() {
         super();
+    }
+
+    public Sensor(double radius, double angle) {
+        super();
+        setRadius(radius);
+        setTheta(angle);
     }
 
     public void setId(String name) {

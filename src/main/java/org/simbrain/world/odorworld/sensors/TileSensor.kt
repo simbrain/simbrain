@@ -3,10 +3,9 @@ package org.simbrain.world.odorworld.sensors
 import org.simbrain.util.UserParameter
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
-import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.piccolo.getTileStackNear
+import org.simbrain.util.piccolo.toPixelCoordinate
 import org.simbrain.workspace.Producible
-import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
 /**
@@ -19,9 +18,9 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  * The sensor itself is currently fixed at the center of the agent. We may
  * make the location editable at some point, if use-cases emerge.
  */
-class ObjectSensor @JvmOverloads constructor(
+class TileSensor @JvmOverloads constructor(
     @UserParameter(label = "Object Type", description = "What type of object this sensor responds to", order = 3)
-    private var objectType: EntityType = EntityType.SWISS,
+    private var tileType: String = "water",
     radius: Double = DEFAULT_RADIUS,
     angle: Double = DEFAULT_THETA
 ) : Sensor(radius, angle), VisualizableEntityAttribute {
@@ -68,41 +67,30 @@ class ObjectSensor @JvmOverloads constructor(
     override fun update(parent: OdorWorldEntity) {
         currentValue = 0.0
         val sensorLocation = computeAbsoluteLocation(parent)
-        val thing = with(parent.world.tileMap) {
+        currentValue = with(parent.world.tileMap) {
             getTileStackNear(sensorLocation, decayFunction.dispersion)
-                .filter { (_, tiles) -> tiles.any { it.type == "water" } }
-        }.toList()
-
-        for (otherEntity in parent.world.entityList) {
-            if (otherEntity.entityType == objectType) {
-                val scaleFactor = decayFunction.getScalingFactor(
-                    SimbrainMath.distance(computeAbsoluteLocation(parent), otherEntity.centerLocation)
-                )
-                currentValue += baseValue * scaleFactor
-            }
+                .filter { (_, tiles) -> tiles.any { it.type == tileType } }
+                .map { (pos) -> pos.toPixelCoordinate().distance(sensorLocation) }
+                .sumOf { decayFunction.getScalingFactor(it) * baseValue }
         }
     }
 
-    override fun copy(): ObjectSensor {
-        return ObjectSensor().apply {
-            setId(this@ObjectSensor.id)
-            baseValue = this@ObjectSensor.baseValue
-            decayFunction = this@ObjectSensor.decayFunction.copy() as DecayFunction
-            objectType = this@ObjectSensor.objectType
-            isShowLabel = this@ObjectSensor.isShowLabel
+    override fun copy(): TileSensor {
+        return TileSensor().apply {
+            setId(this@TileSensor.id)
+            baseValue = this@TileSensor.baseValue
+            decayFunction = this@TileSensor.decayFunction.copy() as DecayFunction
+            tileType = this@TileSensor.tileType
+            isShowLabel = this@TileSensor.isShowLabel
         }
     }
 
     override val name: String
-        get() = "Object Sensor"
-
-    fun setObjectType(objectType: EntityType) {
-        this.objectType = objectType
-    }
+        get() = "Tile Sensor"
 
     override fun getLabel(): String {
         return if (super.getLabel().isEmpty()) {
-            directionString + objectType.description + " Detector"
+            "$directionString$tileType Detector"
         } else {
             super.getLabel()
         }

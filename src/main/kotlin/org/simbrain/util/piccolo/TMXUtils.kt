@@ -10,7 +10,6 @@ import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldResourceManager
-import org.simbrain.world.odorworld.entities.Locatable
 import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
@@ -234,10 +233,10 @@ class PixelCoordinate(x: kotlin.Double, y: kotlin.Double): Coordinate(x, y) {
 fun Point2D.asPixelCoordinate() = PixelCoordinate(x, y)
 
 context(TileMap)
-fun PixelCoordinate.toGridCoordinate() = point(floor(x / tileWidth), floor(y / tileHeight))
+fun PixelCoordinate.toGridCoordinate() = point(floor(x / tileWidth), floor(y / tileHeight)).asGridCoordinate()
 
 context(TileMap)
-fun GridCoordinate.toPixelCoordinate() = point(floor(x / tileWidth), floor(y / tileHeight))
+fun GridCoordinate.toPixelCoordinate() = point((x + 0.5) * tileWidth, (y + 0.5) * tileHeight).asPixelCoordinate()
 
 fun TileMap.getGridLocationsInRadius(staringLocation: PixelCoordinate, radiusInPixel: Double) = sequence {
 
@@ -261,9 +260,12 @@ fun TileMap.getGridLocationsInRadius(staringLocation: PixelCoordinate, radiusInP
     yieldAll(step(-1, 1))
     yieldAll(step(-1, -1))
     yieldAll(step(1, -1))
-}
+}.toSet()
 
-fun TileMap.getTilesNear(location: Locatable, radius: Double = 10.0) =
-    getGridLocationsInRadius(location.location.asPixelCoordinate(), radius).flatMap { (x, y) ->
-        getTileStackAt(x.toInt(), y.toInt()).map { GridCoordinate(x, y) to it }
+fun TileMap.getTileStackNear(location: Point2D, radius: Double = 10.0): List<Pair<GridCoordinate, List<Tile>>> {
+    val a = getGridLocationsInRadius(location.asPixelCoordinate(), radius)
+    val b = a.map { (x, y) ->
+        GridCoordinate(x, y) to getTileStackAt(x.toInt(), y.toInt())
     }
+    return b
+}

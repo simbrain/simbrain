@@ -60,7 +60,7 @@ class ObjectSensorGene(private val template: ObjectSensor):
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): ObjectSensor {
-        return ObjectSensor(template).also { product.complete(it) }
+        return template.copy().also { product.complete(it) }
     }
 
 }

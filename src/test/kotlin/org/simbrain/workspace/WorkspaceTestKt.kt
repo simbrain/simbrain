@@ -47,7 +47,7 @@ class WorkspaceTestKt {
         workspace.iterate(10) {
             counter++
         }
-        Thread.sleep(200)
+        Thread.sleep(500)
         assertEquals(11, counter)
     }
 

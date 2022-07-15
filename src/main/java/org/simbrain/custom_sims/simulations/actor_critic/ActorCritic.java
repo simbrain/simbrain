@@ -224,7 +224,7 @@ public class ActorCritic extends Simulation {
 
         // Set up cheese
         cheese = new OdorWorldEntity(world, EntityType.SWISS);
-        cheese.setCenterLocation(tileSize / 2, tileSize / 2);
+        cheese.setLocation(tileSize / 2, tileSize / 2);
         world.addEntity(cheese);
 
         // Set up cheese sensor
@@ -399,7 +399,7 @@ public class ActorCritic extends Simulation {
                     // Keep iterating until the mouse achieves its goal
                     // Goal is currently to get near the cheese
                     while (!goalAchieved) {
-                        int distance = (int) SimbrainMath.distance(mouse.getCenterLocation(), cheese.getCenterLocation());
+                        int distance = (int) SimbrainMath.distance(mouse.getLocation(), cheese.getLocation());
                         if (distance < hitRadius) {
                             goalAchieved = true;
                         }
@@ -417,7 +417,7 @@ public class ActorCritic extends Simulation {
      * Init mouse position.
      */
     private void resetMouse() {
-        mouse.setCenterLocation(mouseHomeLocation, mouseHomeLocation);
+        mouse.setLocation(mouseHomeLocation, mouseHomeLocation);
         mouse.setHeading(90);
     }
 

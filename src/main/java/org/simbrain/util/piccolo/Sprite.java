@@ -23,17 +23,13 @@
 */
 package org.simbrain.util.piccolo;
 
-import java.awt.Image;
-import java.awt.Graphics2D;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Collections;
-
 import org.piccolo2d.PNode;
-
 import org.piccolo2d.util.PBounds;
 import org.piccolo2d.util.PPaintContext;
+
+import java.awt.*;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Piccolo2D sprite node.
@@ -134,7 +130,9 @@ public class Sprite
         this.frameSkip = frameSkip;
         setCurrentAnimation(currentAnimation);
         Image currentFrame = currentAnimation.getCurrentFrame();
-        setBounds(0, 0, currentFrame.getWidth(null), currentFrame.getHeight(null));
+        double width = currentFrame.getWidth(null);
+        double height = currentFrame.getHeight(null);
+        setBounds(-width/2, -height/2, width, height);
     }
 
 

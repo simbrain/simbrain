@@ -82,7 +82,7 @@ class OdorWorldEntityTest {
         entity.heading  = 180.0 // pointing towards the wall
         entity.movement.speed = 10.0
         entity.applyMovement()
-        assertEquals(world.width - 10 - entity.width, entity.x)
+        assertEquals(world.width - 10, entity.x)
     }
 
     @Test
@@ -93,7 +93,7 @@ class OdorWorldEntityTest {
         entity.heading  = 180.0 // pointing towards the wall
         entity.movement.speed = 10.0
         entity.applyMovement()
-        assertEquals(0.0, entity.x)
+        assertEquals(0.0, entity.topLeftLocation.x)
     }
 
     @Test
@@ -121,8 +121,8 @@ class OdorWorldEntityTest {
         sensor.radius = 10.0
         sensor.theta = 0.0
         agent.addSensor(sensor)
-        assertEquals(agent.width / 2.0 + sensor.radius, sensor.computeRelativeLocation(agent).x)
-        assertEquals(agent.x + agent.width / 2.0 + sensor.radius, sensor.computeAbsoluteLocation(agent).x)
+        assertEquals(sensor.radius, sensor.computeRelativeLocation(agent).x)
+        assertEquals(agent.x + sensor.radius, sensor.computeAbsoluteLocation(agent).x)
     }
     
 }

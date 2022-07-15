@@ -181,10 +181,11 @@ val objectTrackingSim = newSim {
     }
 
     fun updateCheeseLocation() {
-        val (x,y) = agent.centerLocation
-        cheese.centerLocation = point(
+        val (x,y) = agent.location
+        cheese.location = point(
             x + radiusOfRevolution * cos(network.time),
-            y - radiusOfRevolution * sin(network.time))
+            y - radiusOfRevolution * sin(network.time)
+        )
     }
 
     updateCheeseLocation()

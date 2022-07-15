@@ -482,7 +482,7 @@ public class RL_Sim_Main extends Simulation implements AttributeContainer {
      */
     void updateGoalState() {
         for (OdorWorldEntity entity : getCurrentSim().goalEntities) {
-            int distance = (int) SimbrainMath.distance(mouse.getCenterLocation(), entity.getCenterLocation());
+            int distance = (int) SimbrainMath.distance(mouse.getLocation(), entity.getLocation());
             if (distance < hitRadius) {
                 goalAchieved = true;
             }

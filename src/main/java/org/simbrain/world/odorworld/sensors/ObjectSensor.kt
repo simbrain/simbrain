@@ -76,7 +76,7 @@ class ObjectSensor @JvmOverloads constructor(
         for (otherEntity in parent.world.entityList) {
             if (otherEntity.entityType == objectType) {
                 val scaleFactor = decayFunction.getScalingFactor(
-                    SimbrainMath.distance(computeAbsoluteLocation(parent), otherEntity.centerLocation)
+                    SimbrainMath.distance(computeAbsoluteLocation(parent), otherEntity.location)
                 )
                 currentValue += baseValue * scaleFactor
             }

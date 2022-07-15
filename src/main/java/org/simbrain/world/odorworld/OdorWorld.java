@@ -549,13 +549,13 @@ public class OdorWorld implements EditableObject, Bounded {
 
     @Override
     public double getX() {
-        return 0;
+        return getWidth() / 2;
     }
 
 
     @Override
     public double getY() {
-        return 0;
+        return getHeight() / 2;
     }
 
     @NotNull

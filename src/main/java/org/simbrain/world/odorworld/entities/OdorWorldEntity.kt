@@ -18,23 +18,23 @@
  */
 package org.simbrain.world.odorworld.entities
 
-import org.simbrain.util.*
+import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils.round
 import org.simbrain.util.environment.SmellSource
+import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.util.toRadian
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.events.EntityEvents
-import org.simbrain.world.odorworld.events.EntityLocationEvent
 import org.simbrain.world.odorworld.intersect
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.Sensor
-import java.awt.geom.Point2D
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -103,14 +103,6 @@ class OdorWorldEntity @JvmOverloads constructor(
     val parentWorld
         get() = world
 
-    // TODO: Make location be center location and at that point get rid of this or replace with topLeft
-    @Deprecated("Use location")
-    var centerLocation: Point2D
-        get() = location + point(width/2, height/2)
-        set(value) {
-            location = value - point(width/2, height/2)
-        }
-
     /**
      * Before moving, see if there are any collisions. If there are, change the landing spot of the movement to a
      * point before the collision occurs.
@@ -150,8 +142,8 @@ class OdorWorldEntity @JvmOverloads constructor(
         val newY = y + (dy - distanceYShortenBy * directionY)
 
         location = if (world.wrapAround) {
-            val maxXLocation = (world.width - width)
-            val maxYLocation = (world.height - height)
+            val maxXLocation = world.width
+            val maxYLocation = world.height
             point((newX + maxXLocation) % maxXLocation, (newY + maxYLocation) % maxYLocation)
         } else {
             point(newX, newY)
@@ -292,16 +284,6 @@ class OdorWorldEntity @JvmOverloads constructor(
         addObjectSensor(type, 50.0, -45.0, range) // Right sensor
     }
 
-    @Deprecated("Use location=")
-    fun setCenterLocation(x: Int, y: Int) {
-        location = point(x, y)
-    }
-
-    @Deprecated("Use location=")
-    fun setCenterLocation(x: Float, y: Float) {
-        location = point(x.toDouble(), y.toDouble())
-    }
-
     fun randomizeLocationAndHeading() {
         location = point(
             UniformRealDistribution(0.0, world.width).sampleDouble(),
@@ -336,157 +318,3 @@ class OdorWorldEntity @JvmOverloads constructor(
 
 }
 
-interface StaticallyLocatable {
-    val x: Double
-    val y: Double
-    val location: Point2D
-}
-
-interface Locatable : StaticallyLocatable {
-    override var x: Double
-    override var y: Double
-    override var location: Point2D
-}
-
-/**
- * Top-left x, y position of the entity.
- */
-class Location(@Transient private val event: EntityLocationEvent) : Locatable {
-    @Transient
-    private var dirty = true
-
-    @UserParameter(label = "X", description = "X Position", useSetter = true, order = 3)
-    override var x = 0.0
-        set(value) {
-            field = value
-            event.fireMoved()
-            dirty = true
-        }
-
-    @UserParameter(label = "Y", description = "Y Position", useSetter = true, order = 3)
-    override var y = 0.0
-        set(value) {
-            field = value
-            event.fireMoved()
-            dirty = true
-        }
-
-    @Transient
-    override var location: Point2D = point(x, y)
-        get() {
-            if (dirty) {
-                field = point(x, y)
-            }
-            dirty = false
-            return field
-        }
-        set(value) {
-            field = value
-            x = value.x
-            y = value.y
-        }
-}
-
-interface Rotatable {
-    var heading: Double
-}
-
-class Rotation(@Transient private val event: EntityLocationEvent) : Rotatable {
-    @UserParameter(label = "heading", description = "heading", order = 2)
-    override var heading = 0.0
-        set(value) {
-            field = ((value % 360.0) + 360.0) % 360.0
-            event.fireMoved()
-        }
-}
-
-/**
- * Common interface for [Size] and [Bounded].
- */
-interface WithSize {
-    val width: Double
-    val height: Double
-    val size: Point2D
-        get() = point(width, height)
-}
-
-class Size(override val width: Double, override val height: Double) : WithSize
-
-interface Bounded : StaticallyLocatable, WithSize
-
-class Bound(
-    override val x: Double,
-    override val y: Double,
-    override val width: Double,
-    override val height: Double
-) : Bounded {
-    override val location: Point2D = point(x, y)
-}
-
-data class BoundIntersection(val intersect: Boolean, val dx: Double, val dy: Double)
-
-interface Movable {
-    var speed: Double
-    var dtheta: Double
-}
-
-class Movement : Movable {
-    override var speed: Double = 0.0
-
-    override var dtheta: Double = 0.0
-
-    override fun toString(): String {
-        return "Movement(speed=$speed, dtheta=$dtheta)"
-    }
-
-}
-
-interface ManuallyMovable : Movable {
-    /**
-     * Amount to manually move forward or in cardinal directions.
-     */
-    @get:UserParameter(label = "Straight movement", order = 10, useSetter = true)
-    var manualStraightMovementIncrement: Double
-
-    /**
-     * Amount to manually rotate.
-     */
-    @get:UserParameter(label = "Turn amount", order = 10)
-    var manualMotionTurnIncrement: Double
-
-    fun increaseSpeed()
-    fun decreaseSpeed()
-    fun turnLeft()
-    fun turnRight()
-    fun stopTurning()
-}
-
-class ManualMovement(
-    override var manualStraightMovementIncrement: Double = 1.0,
-    override var manualMotionTurnIncrement: Double = 1.0
-) : ManuallyMovable, Movable by Movement() {
-
-    override fun increaseSpeed() {
-        speed += manualStraightMovementIncrement
-    }
-
-    override fun decreaseSpeed() {
-        speed -= manualStraightMovementIncrement
-    }
-
-    override fun turnLeft() {
-        dtheta = manualMotionTurnIncrement
-    }
-
-    override fun turnRight() {
-        dtheta = -manualMotionTurnIncrement
-    }
-
-    override fun stopTurning() {
-        dtheta = 0.0
-    }
-
-    override fun toString(): String {
-        return "Movement(speed=$speed, dtheta=$dtheta)"
-    }
-}

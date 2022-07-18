@@ -24,8 +24,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -75,7 +73,7 @@ public class DisplayPanel extends JPanel {
         dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
         topToolbarPanel.add(dictionaryToolBar);
         add(topToolbarPanel, BorderLayout.NORTH);
-        dictionaryToolBar.add(TextWorldActions.getExtractDictionaryFromTextAction(world));
+        dictionaryToolBar.add(TextWorldActions.getExtractDictionaryAction(world));
 
         // Force a bit of room at bottom
         add(new JLabel("  "), BorderLayout.SOUTH);

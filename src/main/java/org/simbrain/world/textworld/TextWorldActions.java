@@ -67,6 +67,7 @@ public class TextWorldActions {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 for (String word : extractTextItems()) {
+                    System.out.println(word);
                     world.addWordToTokenDictionary(word);
                 }
                 world.fireDictionaryChangedEvent();
@@ -74,30 +75,32 @@ public class TextWorldActions {
         };
     }
 
-    public static Action getExtractDictionaryFromTextAction(final TextWorld world) {
-        return new AbstractAction() {
 
-            // Initialize
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Import.png"));
-                putValue(NAME, "Extract dictionary...");
-                putValue(SHORT_DESCRIPTION, "Extract dictionary from text file...");
-                //KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
-                //        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-                //putValue(ACCELERATOR_KEY, keyStroke);
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                Scanner scanner = new Scanner(world.getText());
-                List<String> words = parseText(scanner);
-                for (String word : words) {
-                    world.addWordToTokenDictionary(word);
-                }
-                world.fireDictionaryChangedEvent();
-            }
-        };
-    }
+    // TODO: This extracts a dictiomary directly from the text in the panel. Not currently used. Consider deletion.
+    // public static Action getExtractDictionaryFromTextAction(final TextWorld world) {
+    //     return new AbstractAction() {
+    //
+    //         // Initialize
+    //         {
+    //             putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Import.png"));
+    //             putValue(NAME, "Extract dictionary...");
+    //             putValue(SHORT_DESCRIPTION, "Extract dictionary from text file...");
+    //             //KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L,
+    //             //        Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    //             //putValue(ACCELERATOR_KEY, keyStroke);
+    //         }
+    //
+    //         @Override
+    //         public void actionPerformed(ActionEvent arg0) {
+    //             Scanner scanner = new Scanner(world.getText());
+    //             List<String> words = parseText(scanner);
+    //             for (String word : words) {
+    //                 world.addWordToTokenDictionary(word);
+    //             }
+    //             world.fireDictionaryChangedEvent();
+    //         }
+    //     };
+    // }
 
     /**
      * Extract all the text items from a file.
@@ -107,8 +110,7 @@ public class TextWorldActions {
     private static List<String> extractTextItems() {
         List<String> retList = new ArrayList<String>();
         SFileChooser chooser = new SFileChooser(getDictionaryDirectory(), "text file", "txt");
-        chooser.addExtension("rtf"); // (Must do other stuff to support
-        // rich text)
+        chooser.addExtension("rtf"); // Must do other stuff to suppo rich tex
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
             try {

@@ -32,7 +32,7 @@ val objectTrackingSim = newSim {
 
     // Number of reservoir neurons
     val numResNeurons = 200
-    // Number of left and right sensory neurons. Totaly sensory neurons is twice this.
+    // Number of left and right sensory neurons. Total sensory neurons is twice this.
     val sensoryNeurons = 25
     // Radius in pixels of the cheese's revolution around the agent.
     val radiusOfRevolution = 100.0
@@ -98,8 +98,8 @@ val objectTrackingSim = newSim {
     network.addNetworkModel(rightInputsToRes)
 
     // Output neurons
-    val leftTurnNeuron = Neuron(network)
-    val rightTurnNeuron = Neuron(network)
+    val leftTurnNeuron = Neuron(network, PercentIncomingNeuronRule())
+    val rightTurnNeuron = Neuron(network, PercentIncomingNeuronRule())
     network.addNetworkModel(leftTurnNeuron)
     network.addNetworkModel(rightTurnNeuron)
     leftTurnNeuron.upperBound = 100.0
@@ -146,13 +146,15 @@ val objectTrackingSim = newSim {
     // Effectors
     val (_, turnLeftEffector, turnRightEffector) = agent.effectors
 
+    val fudge = 35.0 // to get the sensor range right
+
     // Left sensors
     (30 - sensoryNeurons / 2 until 30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
         val cheeseSensorLeft = ObjectSensor(EntityType.SWISS)
         cheeseSensorLeft.theta = position.toDouble()
         cheeseSensorLeft.radius = EntityType.CIRCLE.imageHeight / 2.0
         cheeseSensorLeft.decayFunction = StepDecayFunction()
-        cheeseSensorLeft.decayFunction.dispersion = radiusOfRevolution / 2
+        cheeseSensorLeft.decayFunction.dispersion = radiusOfRevolution - fudge
         with(couplingManager) {
             cheeseSensorLeft couple leftInputNeurons[counter]
         }
@@ -164,7 +166,7 @@ val objectTrackingSim = newSim {
         cheeseSensorRight.theta = position.toDouble()
         cheeseSensorRight.radius = EntityType.CIRCLE.imageHeight / 2.0
         cheeseSensorRight.decayFunction = StepDecayFunction()
-        cheeseSensorRight.decayFunction.dispersion = radiusOfRevolution / 2
+        cheeseSensorRight.decayFunction.dispersion = radiusOfRevolution - fudge
         with(couplingManager) {
             cheeseSensorRight couple rightInputNeurons[counter]
         }
@@ -210,6 +212,19 @@ val objectTrackingSim = newSim {
 
 }
 
+/**
+ * Activation set = to number of positive inputs / total number of inputs.
+ */
+class PercentIncomingNeuronRule: LinearRule() {
+    val maxVal = 10.0
+    override fun apply(n: Neuron, data: ScalarDataHolder) {
+        n.activation = maxVal * n.fanIn
+            .filter { it.source.activation > 0 }
+            .count()
+            .toDouble() / n.fanIn.size
+    }
+}
+
 class AllostaticNeuron(parent: Network, rule: NeuronUpdateRule) : Neuron(parent, rule) {
     var target = 1.0
     var threshold = 2.0
@@ -225,9 +240,8 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
 
         n as AllostaticNeuron
 
-        // TODO.  Min below is a bandaid, those values are blowing up
         val newActivation = n.activation * (1-leakRate) + min(n.weightedInputs, 100.0)
-        n.activation = max(0.0, newActivation )
+        n.activation = max(0.0, newActivation ) // Prevent from going below 0
 
         // Only apply learning if neuron has just spiked
         n.applyLearning = n.isSpike
@@ -236,7 +250,6 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
         if (n.activation > n.threshold) {
             n.isSpike = true
             // println("Spike!")
-            setHasSpiked(true, n)
             n.activation -= n.threshold
         }
 
@@ -248,14 +261,16 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
             .filter { (it.source as AllostaticNeuron).applyLearning }
 
         toTrain.forEach {  s ->
-            s.strength -= error/toTrain.size
+            if (toTrain.size > 0) {
+                s.strength -= error/toTrain.size
+            }
         }
 
         n.target += error * learningRate
         n.target = max(n.target, 1.0)
         n.threshold = 2*n.target
 
-        // println("target = $n.target, threshold = $n.threshold, activation = ${n.activation}")
+        println("target = ${n.target}, threshold = ${n.threshold}, activation = ${n.activation}")
     }
 
     override fun deepCopy(): NeuronUpdateRule {

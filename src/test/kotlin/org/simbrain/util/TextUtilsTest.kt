@@ -11,10 +11,10 @@ class TextUtilsTest {
 
     @Test
     fun `test sentence parsing`() {
-        val sentences =  tokenizeWordsFromSentence(simpleText)
+        val sentences =  tokenizeSentencesFromDoc(simpleText)
         // println(sentences.contentToString())
         assertEquals(2, sentences.size)
-        assertEquals(4, tokenizeWordsFromSentence(harderText).size)
+        assertEquals(4, tokenizeSentencesFromDoc(harderText).size)
     }
 
     @Test

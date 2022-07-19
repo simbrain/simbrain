@@ -18,10 +18,14 @@
  */
 package org.simbrain.network.updaterules
 
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
+import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils.round
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -133,6 +137,27 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         return ifn
     }
 
+    override fun apply(na: Layer, data: MatrixDataHolder) {
+        if (na is NeuronArray && data is SpikingMatrixData) {
+            for (i in 0 until na.size()) {
+                val(spiked, V) = intFireRule(
+                    na.network.time,
+                    data.lastSpikeTimes[i],
+                    na.network.timeStep,
+                    na.inputs.get(i, 0),
+                    na.activations.get(i, 0))
+                data.setHasSpiked(i, spiked, na.network.time)
+                na.activations.set(i, 0, V)
+            }
+        }
+    }
+
+    override fun apply(n: Neuron, data: ScalarDataHolder) {
+        val(spiked, V) = intFireRule(n.network.time, n.lastSpikeTime, n.network.timeStep, n.input, n.activation)
+        n.isSpike = spiked
+        n.activation = V
+    }
+
     /*
     * dV/dt = ( -(Vm - Vr) + Rm * (Isyn + Ibg) ) / tau
     * Vm > theta ? Vm <- Vreset ; spike
@@ -141,43 +166,36 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     * Isyn: synaptic input current Ibg: background input current tau: time
     * constant Vreset: reset potential theta: threshold
     */
-    override fun apply(neuron: Neuron, data: ScalarDataHolder) {
+    fun intFireRule(t: Double,
+                    lastSpikeTime: Double,
+                    timeStep: Double,
+                    input: Double,
+                    memPotential: Double): Pair<Boolean, Double> {
 
         // Incoming current is 0 during the refractory period, otherwise it's
         // equal to input and background current
         var synCurrent: Double =
-            if (neuron.network.time < lastSpikeTime + refractoryPeriod) {
+            if (t < lastSpikeTime + refractoryPeriod) {
                 // println("Refractory")
                 0.0
             } else {
                 // println("syncurrent = ${neuron.input + backgroundCurrent}")
-                neuron.input + backgroundCurrent
+                input + backgroundCurrent
             }
 
         if (addNoise) {
             synCurrent += noiseGenerator.sampleDouble()
         }
 
-        var memPotential = neuron.activation
         val dVm =
-            neuron.network.timeStep * (-(memPotential - restingPotential) + resistance * synCurrent) / timeConstant
-        memPotential += dVm
+            timeStep * (-(memPotential - restingPotential) + resistance * synCurrent) / timeConstant
 
-        // if(ThreadLocalRandom.current().nextDouble() < randSpkChance*neuron.getNetwork().getTimeStep()) {
-        //     ((IntFireScalarData)data).setMembranePotential(threshold + 1);
-        // }
-
-        if (memPotential >= threshold && neuron.network.time > lastSpikeTime + refractoryPeriod) {
-            neuron.isSpike = true
+        return if (memPotential >= threshold && t > lastSpikeTime + refractoryPeriod) {
             // println("Spike!")
-            setHasSpiked(true, neuron)
-            memPotential = resetPotential
+            Pair(true, resetPotential)
         } else {
-            neuron.isSpike = false
-            setHasSpiked(false, neuron)
+            Pair(false, memPotential + dVm)
         }
-
-        neuron.activation = memPotential
 
     }
 

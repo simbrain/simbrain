@@ -72,7 +72,7 @@ val isopodSim = newSim {
         location = point(50, 0)
         upperBound = 10.0
         label = "Straight"
-        (neuronDataHolder as BiasedScalarData).bias = 5.0
+        (dataHolder as BiasedScalarData).bias = 5.0
     }
 
     // Create the weights

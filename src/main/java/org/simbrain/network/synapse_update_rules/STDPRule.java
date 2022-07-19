@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.synapse_update_rules;
 
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
@@ -116,15 +115,14 @@ public class STDPRule extends SynapseUpdateRule {
     private double delta_w = 0;
 
     @Override
-    public void apply(Synapse synapse, ScalarDataHolder data) {
+    public void apply(Synapse s, ScalarDataHolder data) {
 
-        final double str = synapse.getStrength();
-        if (synapse.getSource().isSpike() || synapse.getTarget().isSpike()) {
+        final double str = s.getStrength();
+        if (s.getSource().isSpike() || s.getTarget().isSpike()) {
             try {
 
-                final double delta_t = ((((SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule())
-                        .getLastSpikeTime())
-                        - ((SpikingNeuronUpdateRule) synapse.getTarget().getUpdateRule()).getLastSpikeTime())
+                final double delta_t = (s.getSource().getLastSpikeTime()
+                        - s.getTarget().getLastSpikeTime())
                         * (hebbian ? 1 : -1);
                 if (delta_t < 0) {
                     delta_w = W_plus * Math.exp(delta_t / tau_plus) * learningRate;
@@ -137,16 +135,16 @@ public class STDPRule extends SynapseUpdateRule {
                 System.out.println("Don't use non-spiking neurons with STDP!");
             }
             if ( !continuous && Math.signum(str) == -1 ) {
-                synapse.setStrength(str - delta_w * synapse.getSource().getNetwork().getTimeStep());
+                s.setStrength(str - delta_w * s.getSource().getNetwork().getTimeStep());
             } else {
-                synapse.setStrength(str + delta_w * synapse.getSource().getNetwork().getTimeStep());
+                s.setStrength(str + delta_w * s.getSource().getNetwork().getTimeStep());
             }
         }
 
         if ( continuous && Math.signum(str) == -1 ) {
-            synapse.setStrength(str - delta_w * synapse.getSource().getNetwork().getTimeStep());
+            s.setStrength(str - delta_w * s.getSource().getNetwork().getTimeStep());
         } else {
-            synapse.setStrength(str + delta_w * synapse.getSource().getNetwork().getTimeStep());
+            s.setStrength(str + delta_w * s.getSource().getNetwork().getTimeStep());
         }
     }
 

@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
-import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -63,17 +63,11 @@ public class JumpAndDecay extends SpikeResponder {
     }
 
     @Override
-    public void apply(Connector connector) {
-        // TODO
-    }
-
-    @Override
-    public void apply(Synapse s) {
+    public void apply(Synapse s, ScalarDataHolder data) {
         s.setPsr(jumpAndDecay(s.getSource().isSpike()
                 , s.getPsr(), s.getStrength(), s.getNetwork().getTimeStep()));
     }
 
-    // TODO: Ugly
     public double jumpAndDecay(boolean isSpike, double psr, double wt, double timeStep) {
         if (isSpike) {
             return jumpHeight * wt;

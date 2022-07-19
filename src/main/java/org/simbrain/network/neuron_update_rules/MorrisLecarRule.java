@@ -187,7 +187,6 @@ public class MorrisLecarRule extends SpikingNeuronUpdateRule implements NoisyUpd
         data.setW_K(data.getW_K() + (dt / 2) * ((dWdt) + dWdt(vMembrane, wKFut)));
 
         neuron.setSpike(vMembrane > threshold);
-        setHasSpiked(vMembrane > threshold, neuron);
 
         neuron.setActivation(vMembrane);
 

@@ -20,6 +20,11 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.spikeresponders.StepResponder;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.EmptyScalarData;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 
@@ -42,7 +47,7 @@ public abstract class SpikeResponder implements CopyableObject {
     public static List<Class> RESPONDER_LIST = Arrays.asList(
         NonResponder.class, JumpAndDecay.class,
         ConvolvedJumpAndDecay.class, ProbabilisticResponder.class,
-        RiseAndDecay.class, Step.class, UDF.class);
+        RiseAndDecay.class, StepResponder.class, UDF.class);
 
     /**
      * Called via reflection using {@link UserParameter#typeListMethod()}.
@@ -54,18 +59,31 @@ public abstract class SpikeResponder implements CopyableObject {
     /**
      * Defines a spike responder for scalar data.
      *
-     * NOTE: No spike responders currently maintain state. If that changes, we can add a data holder as argument to
-     *     the apply functions.
-     *
-     * @param synapse a reference to a parent synapse whose spikes we respond to. Contains reference to source and
-     *                target neuron, weight, strength, spike time, etc which can be used to defined the response rule.
+     * @param synapse           a reference to a parent synapse whose spikes we respond to. Contains reference to source
+     *                          and target neuron, weight, strength, spike time, etc which can be used to defined the
+     *                          response rule.
+     * @param responderData data holder for spike responder
      */
-    public abstract void apply(Synapse synapse);
+    public abstract void apply(Synapse synapse, ScalarDataHolder responderData);
 
     /**
      * Override to define a spike responder for matrix data. NOTE: None have yet been defined.
      */
-    public void apply(Connector connector) {}
+    public void apply(Connector connector, MatrixDataHolder responderData) {}
+
+    /**
+     * Override to return an appropriate data holder for a given responder.
+     */
+    public ScalarDataHolder createResponderData() {
+        return new EmptyScalarData();
+    }
+
+    /**
+     * Override to return an appropriate data holder for a given responder.
+     */
+    public MatrixDataHolder createMatrixData(int rows, int cols) {
+        return new EmptyMatrixData();
+    }
 
     /**
      * @return Spike responder to duplicate.

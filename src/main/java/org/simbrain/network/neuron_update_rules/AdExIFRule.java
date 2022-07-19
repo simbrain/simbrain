@@ -241,7 +241,7 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
         //        final double ref = neuron.getNetwork().getTimeType()
         //                == TimeType.DISCRETE ? refractoryPeriod / dt
         //                        : refractoryPeriod;
-        final boolean refractory = getLastSpikeTime() + refractoryPeriod >= neuron.getNetwork().getTime();
+        final boolean refractory = neuron.getLastSpikeTime() + refractoryPeriod >= neuron.getNetwork().getTime();
 
         // Retrieve membrane potential from host neuron's activation
         // in case some outside entity has explicitly changed the membrane
@@ -296,14 +296,11 @@ public class AdExIFRule extends SpikingNeuronUpdateRule implements NoisyUpdateRu
             data.setW(data.getW() + (b * CURRENT_CONVERTER));
             if (!refractory) {
                 neuron.setSpike(true);
-                setHasSpiked(true, neuron);
             } else {
                 neuron.setSpike(false);
-                setHasSpiked(false, neuron);
             }
         } else {
             neuron.setSpike(false);
-            setHasSpiked(false, neuron);
         }
 
         // Set the buffer to the membrane potential

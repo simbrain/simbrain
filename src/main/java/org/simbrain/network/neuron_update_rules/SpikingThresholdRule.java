@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.neuron_update_rules;
 
+import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
-import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.network.util.SpikingMatrixData;
@@ -68,16 +68,16 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     @Override
-    public void apply(NeuronArray array, MatrixDataHolder data) {
+    public void apply(Layer arr, MatrixDataHolder data) {
+        var array = (NeuronArray) arr;
         // TODO: Implement using matrix operations
         double[] vals = new double[array.size()];
         for (int i = 0; i < vals.length; i++) {
             if (spikingThresholdRule(array.getInputs().col(0)[i])) {
-                ((SpikingMatrixData) data).getSpikes()[0] = true;
-                // dataspk.lastSpikeTimes[0] = getTime; // TODO
+                ((SpikingMatrixData) data).setHasSpiked(i, true, array.getNetwork().getTime());
                 vals[i] = 1;
             } else {
-                ((SpikingMatrixData) data).getSpikes()[0] = false;
+                ((SpikingMatrixData) data).setHasSpiked(i, false, array.getNetwork().getTime());
                 vals[i] = 0;
             }
         }
@@ -88,11 +88,9 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     public void apply(Neuron neuron, ScalarDataHolder data) {
         if (spikingThresholdRule(neuron.getInput())) {
             neuron.setSpike(true);
-            setHasSpiked(true, neuron);
             neuron.setActivation(1);
         } else {
             neuron.setSpike(false);
-            setHasSpiked(false, neuron);
             neuron.setActivation(0); // Make this a separate variable?
         }
     }
@@ -104,16 +102,6 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
         } else {
             return false;
         }
-    }
-
-    @Override
-    public MatrixDataHolder createMatrixData(int size) {
-        return new SpikingMatrixData(size);
-    }
-
-    @Override
-    public ScalarDataHolder createScalarData() {
-        return new EmptyScalarData();
     }
 
     @Override

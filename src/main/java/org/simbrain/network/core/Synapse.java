@@ -111,7 +111,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      * Only used if source neuron is a spiking neuron.
      */
     @UserParameter(label = "Spike Responder", isObjectType = true,
-            showDetails = false, order = 200)
+            useSetter = true, showDetails = false, order = 200)
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
     // TODO: Conditionally enable based on type of source neuron?
 
@@ -199,6 +199,11 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      * Data holder for synapse
      */
     private ScalarDataHolder dataHolder = new EmptyScalarData();
+
+    /**
+     * Data holder for spiker responder.
+     */
+    private ScalarDataHolder spikeResponderData = new EmptyScalarData();
 
     /**
      * Support for property change events.
@@ -383,7 +388,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
             psr = source.getActivation() * strength;
         } else {
             // Updates psr for spiking source neurons
-            spikeResponder.apply(this);
+            spikeResponder.apply(this, spikeResponderData);
         }
 
         // Handle delays
@@ -615,8 +620,8 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     }
 
     public void setSpikeResponder(final SpikeResponder sr) {
-        // Note that a copy of the spike responder is set. Impacts of this not known yet
         this.spikeResponder = sr.deepCopy();
+        spikeResponderData = sr.createResponderData();
     }
 
     /**

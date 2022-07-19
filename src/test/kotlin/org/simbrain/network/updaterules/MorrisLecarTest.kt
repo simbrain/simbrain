@@ -19,7 +19,7 @@ class MorrisLecarTest {
     fun `todo`() {
         repeat(10) {
             net.update()
-            println("t = ${net.time}: act=${n.activation} w_K=${(n.neuronDataHolder as MorrisLecarData).w_K}")
+            println("t = ${net.time}: act=${n.activation} w_K=${(n.dataHolder as MorrisLecarData).w_K}")
         }
     }
 

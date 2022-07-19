@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.distributions.NormalDistribution;
@@ -108,7 +109,7 @@ public class UDF extends SpikeResponder {
     }
 
     @Override
-    public void apply(Synapse s) {
+    public void apply(Synapse s, ScalarDataHolder responderData) {
         if (firstTime) {
             init(s);
             spikeDecay.setTimeConstant(tau);
@@ -123,7 +124,7 @@ public class UDF extends SpikeResponder {
             lastSpikeTime = s.getNetwork().getTime();
             spikeDecay.update(s, A);
         } else {
-            spikeDecay.apply(s);
+            spikeDecay.apply(s, responderData);
         }
     }
 

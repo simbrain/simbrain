@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -56,7 +57,7 @@ public class ProbabilisticResponder extends SpikeResponder {
     }
 
     @Override
-    public void apply(Synapse s) {
+    public void apply(Synapse s, ScalarDataHolder responderData) {
         if (s.getSource().isSpike()) {
             if (Math.random() > (1 - activationProbability)) {
                 s.setPsr(responseValue * s.getStrength());

@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.util.ScalarDataHolder;
 
 /**
  * A "null" spike responder for the case where non-spiking neurons are connected.
@@ -28,7 +29,7 @@ import org.simbrain.network.core.Synapse;
 public class NonResponder extends SpikeResponder {
 
     @Override
-    public void apply(Synapse s) {
+    public void apply(Synapse s, ScalarDataHolder responderData) {
         s.setPsr(s.getSource().getActivation() * s.getStrength());
     }
 

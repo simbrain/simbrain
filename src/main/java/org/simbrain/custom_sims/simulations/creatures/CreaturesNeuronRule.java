@@ -111,7 +111,7 @@ public class CreaturesNeuronRule extends DecayRule {
         //        }
 
 
-        super.apply(neuron, neuron.getNeuronDataHolder());
+        super.apply(neuron, neuron.getDataHolder());
 
     }
 

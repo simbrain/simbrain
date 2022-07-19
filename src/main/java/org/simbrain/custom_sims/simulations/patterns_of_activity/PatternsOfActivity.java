@@ -493,7 +493,7 @@ public class PatternsOfActivity extends Simulation {
                         sgn * Math.abs(((STDPRule) s.getLearningRule()).getDelta_w()));
                 }
             }
-            super.apply(n, n.getNeuronDataHolder());
+            super.apply(n, n.getDataHolder());
 
         }
 

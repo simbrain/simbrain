@@ -30,7 +30,7 @@ public class NeuronArrayTest {
         neuronArray.update(); // Should clear to 0
         assertEquals(0, neuronArray.getActivations().sum(), 0.0);
     }
-
+    
     @Test
     public void testSetLocation() {
         Point2D location = neuronArray.getLocation();

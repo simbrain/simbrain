@@ -1,10 +1,9 @@
 package org.simbrain.network.matrix;
 
-import org.simbrain.network.core.Connector;
-import org.simbrain.network.core.Layer;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.core.*;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
+import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
@@ -36,6 +35,19 @@ public class WeightMatrix extends Connector {
     SynapseUpdateRule prototypeRule = new StaticSynapseRule();
 
     /**
+     * Only used if source connector's rule is spiking.
+     */
+    @UserParameter(label = "Spike Responder", isObjectType = true,
+            useSetter = true, showDetails = false, order = 200)
+    private SpikeResponder spikeResponder = new NonResponder();
+    // TODO: Conditionally enable based on type of source array rule?
+
+    public void setSpikeResponder(SpikeResponder spikeResponder) {
+        this.spikeResponder = spikeResponder;
+        spikeResponseData = spikeResponder.createMatrixData(weightMatrix.nrows(), weightMatrix.ncols());
+    }
+
+    /**
      * Holds data for prototype rule.
      */
     private MatrixDataHolder dataHolder = new EmptyMatrixData();
@@ -43,12 +55,18 @@ public class WeightMatrix extends Connector {
     /**
      * Holds data for spike responder.
      */
-    private MatrixDataHolder spikeResponseHolder = new EmptyMatrixData();
+    public MatrixDataHolder spikeResponseData = new EmptyMatrixData();
 
     /**
      * The weight matrix object.
      */
     private Matrix weightMatrix;
+
+    /**
+     * Data for post synaptic responses. Allows matrix to respond to connectionist or spiking pre-synaptic neuron
+     * arrays.
+     */
+    private Matrix psrMatrix;
 
     /**
      * Construct the matrix.
@@ -65,6 +83,9 @@ public class WeightMatrix extends Connector {
 
         weightMatrix = new Matrix(target.inputSize(), source.outputSize());
         diagonalize();
+
+        psrMatrix = new Matrix(target.inputSize(), source.outputSize());
+
     }
 
     public Matrix getWeightMatrix() {
@@ -89,6 +110,10 @@ public class WeightMatrix extends Connector {
         }
     }
 
+    public void setPsrMatrix(Matrix psrMat) {
+        psrMatrix = psrMat;
+    }
+
     @Consumable
     public void setWeights(double[] newWeights) {
         int len = Math.min((int) weightMatrix.size(), newWeights.length);
@@ -107,21 +132,35 @@ public class WeightMatrix extends Connector {
         getEvents().fireUpdated();
     }
 
-    /**
-     * Returns the product of the this matrix its source activations
-     */
-    @Override
-    public Matrix getOutput() {
-        return weightMatrix.mm(source.getOutputs());
-    }
-
     @Override
     public void update() {
-        // TODO: Check for clamping or "freezing"
+
+        // TODO: Check for clamping and enabling
+
         if (!(prototypeRule instanceof StaticSynapseRule)){
             prototypeRule.apply(this, dataHolder);
             getEvents().fireUpdated();
         }
+    }
+
+    /**
+     * Returns the product of this matrix its source activations, or psr if source array's rule is spiking.
+     *
+     * @see Synapse#updateOutput()
+     */
+    @Override
+    public Matrix getOutput() {
+
+        // TODO: Do frozen, clamping, or enabling make sense here
+
+        if (spikeResponder instanceof NonResponder) {
+            // For "connectionist" case.
+            psrMatrix = weightMatrix.mm(source.getOutputs());
+        } else {
+            // Updates psr for spiking source neurons
+            spikeResponder.apply(this, spikeResponseData);
+        }
+        return new Matrix(psrMatrix.rowSums());
     }
 
     public SynapseUpdateRule getPrototypeRule() {
@@ -165,5 +204,9 @@ public class WeightMatrix extends Connector {
         return getId()
                 + " (" + weightMatrix.nrows() + "x" + weightMatrix.ncols() + ") "
                 + "connecting " + source.getId() + " to " + target.getId();
+    }
+
+    public Matrix getPsrMatrix() {
+        return psrMatrix;
     }
 }

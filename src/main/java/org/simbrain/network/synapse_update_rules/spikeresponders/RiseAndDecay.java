@@ -19,6 +19,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -54,7 +55,7 @@ public class RiseAndDecay extends SpikeResponder {
     }
 
     @Override
-    public void apply(Synapse s) {
+    public void apply(Synapse s, ScalarDataHolder responderData) {
         double timeStep = s.getParentNetwork().getTimeStep();
         if (s.getSource().isSpike()) {
             recovery = 1;

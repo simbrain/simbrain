@@ -18,12 +18,11 @@ import smile.stat.distribution.GaussianDistribution;
 import java.awt.geom.Rectangle2D;
 
 /**
- * A "neuron array" backed by a Smile Matrix.
+ * A "neuron array" backed by a Smile Matrix. Stored as a column vector.
  */
 public class NeuronArray extends ArrayLayer implements EditableObject, AttributeContainer {
-
     @UserParameter(label = "Update Rule", useSetter = true, isObjectType = true, order = 100)
-    NeuronUpdateRule prototypeRule = new LinearRule();
+    NeuronUpdateRule updateRule = new LinearRule();
 
     /**
      * Holds data for prototype rule.
@@ -53,7 +52,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         activations = new Matrix(size, 1);
         randomize();
         setLabel(net.getIdManager().getProposedId(this.getClass()));
-        setPrototypeRule(prototypeRule);
+        setUpdateRule(updateRule);
     }
 
     /**
@@ -67,7 +66,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         NeuronArray copy = new NeuronArray(newParent, orig.outputSize());
         copy.setLocation(orig.getLocation());
         copy.setActivations(orig.getActivations());
-        copy.setPrototypeRule(orig.getPrototypeRule());
+        copy.setUpdateRule(orig.getUpdateRule());
         copy.setDataHolder(orig.getDataHolder().copy());
         return copy;
     }
@@ -181,7 +180,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         if (isClamped()) {
             return;
         }
-        prototypeRule.apply(this, dataHolder);
+        updateRule.apply(this, dataHolder);
         getInputs().mul(0); // clear inputs
         getEvents().fireUpdated();
     }
@@ -237,13 +236,13 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         getEvents().fireUpdated();
     }
 
-    public void setPrototypeRule(NeuronUpdateRule prototypeRule) {
-        this.prototypeRule = prototypeRule;
-        dataHolder = prototypeRule.createMatrixData(size());
+    public void setUpdateRule(NeuronUpdateRule updateRule) {
+        this.updateRule = updateRule;
+        dataHolder = updateRule.createMatrixData(size());
     }
 
-    public NeuronUpdateRule getPrototypeRule() {
-        return prototypeRule;
+    public NeuronUpdateRule getUpdateRule() {
+        return updateRule;
     }
 
     public MatrixDataHolder getDataHolder() {
@@ -253,4 +252,5 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public void setDataHolder(MatrixDataHolder dataHolder) {
         this.dataHolder = dataHolder;
     }
+
 }

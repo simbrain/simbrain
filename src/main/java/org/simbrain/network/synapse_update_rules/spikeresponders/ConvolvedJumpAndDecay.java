@@ -1,6 +1,7 @@
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -52,7 +53,7 @@ public class ConvolvedJumpAndDecay extends SpikeResponder {
     }
 
     @Override
-    public void apply(final Synapse s) {
+    public void apply(final Synapse s, ScalarDataHolder responderData) {
         if (s.getSource().isSpike()) {
             s.setPsr(jumpHeight * s.getStrength());
         } else {

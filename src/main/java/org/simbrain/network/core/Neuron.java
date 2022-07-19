@@ -29,6 +29,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.SpikingScalarData;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
@@ -200,7 +201,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Local data holder for neuron update rule.
      */
     @UserParameter(label = "State variables", useSetter = true, isEmbeddedObject = true, order = 100)
-    private ScalarDataHolder neuronDataHolder = new EmptyScalarData();
+    private ScalarDataHolder dataHolder = new EmptyScalarData();
 
     /**
      * Construct a specific type of neuron.
@@ -242,15 +243,15 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         y = n.y;
         setUpdatePriority(n.getUpdatePriority());
         setLabel(n.getLabel());
-        setNeuronDataHolder(n.getNeuronDataHolder().copy());
+        setDataHolder(n.getDataHolder().copy());
     }
 
-    public ScalarDataHolder getNeuronDataHolder() {
-        return neuronDataHolder;
+    public ScalarDataHolder getDataHolder() {
+        return dataHolder;
     }
 
-    public void setNeuronDataHolder(ScalarDataHolder neuronDataHolder) {
-        this.neuronDataHolder = neuronDataHolder;
+    public void setDataHolder(ScalarDataHolder dataHolder) {
+        this.dataHolder = dataHolder;
     }
 
     /**
@@ -326,7 +327,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule;
-        neuronDataHolder = updateRule.createScalarData();
+        dataHolder = updateRule.createScalarData();
 
         if (getNetwork() != null) {
             getNetwork().updateTimeType();
@@ -339,7 +340,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public void changeUpdateRule(final NeuronUpdateRule updateRule, final ScalarDataHolder data) {
         this.updateRule = updateRule;
-        this.neuronDataHolder = data;
+        this.dataHolder = data;
     }
 
     @Override
@@ -356,7 +357,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         if (isClamped()) {
             return;
         }
-        updateRule.apply(this, neuronDataHolder);
+        updateRule.apply(this, dataHolder);
         inputValue = 0.0;
     }
 
@@ -1019,13 +1020,22 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         events.fireColorChange();
     }
 
+    // TODO: Move these methods to SpikingScalarData?
+
     public boolean isSpike() {
         return spike;
     }
 
     public void setSpike(boolean spike) {
         this.spike = spike;
+        if (dataHolder instanceof SpikingScalarData) {
+            ((SpikingScalarData) dataHolder).setHasSpiked(spike, parent.getTime());
+        }
         events.fireSpiked(spike);
+    }
+
+    public Double getLastSpikeTime() {
+        return ((SpikingScalarData) dataHolder).getLastSpikeTime();
     }
 
     public double getLastActivation() {

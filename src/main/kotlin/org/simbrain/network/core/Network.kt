@@ -90,16 +90,6 @@ class Network {
      */
     var time = 0.0
         private set(i) {
-            if (i < time) {
-                for (n in flatNeuronList) {
-                    val nur = n.updateRule
-                    if (nur.isSpikingNeuron) {
-                        val snur = nur as SpikingNeuronUpdateRule
-                        val diff: Double = i - (time - snur.lastSpikeTime)
-                        snur.setLastSpikeTime(if (diff < 0) 0.0 else diff)
-                    }
-                }
-            }
             field = i
         }
 
@@ -480,8 +470,24 @@ class Network {
         time += timeStep
     }
 
+    /**
+     * Reset time. Note that last spike time computations for spiking networks will be incorrect.
+     */
     fun resetTime() {
         time = 0.0
+        // TODO: Earlier code from Zoë used to adjust last spike times on spiking neurons.
+        // Not a common use case so commented out for now. If put in a unit test needed.
+        // if (i < time) {
+        //     for (n in flatNeuronList) {
+        //         val nur = n.updateRule
+        //         if (nur.isSpikingNeuron) {
+        //             val snur = nur as SpikingNeuronUpdateRule
+        //             val diff: Double = i - (time - snur.lastSpikeTime)
+        //             snur.setLastSpikeTime(if (diff < 0) 0.0 else diff)
+        //         }
+        //     }
+        // }
+
     }
 
     /**
@@ -547,6 +553,15 @@ class Network {
      * @param toAdd list of objects to add.
      */
     fun addNetworkModels(toAdd: List<NetworkModel>) {
+        toAdd.forEach { addNetworkModel(it) }
+    }
+
+    /**
+     * Var arg version of addNetworkModels.
+     *
+     * Ex: addNetworkModels(synapse1, synapse2, neuron1, neuron2, ...)
+     */
+    fun addNetworkModels(vararg toAdd: NetworkModel) {
         toAdd.forEach { addNetworkModel(it) }
     }
 

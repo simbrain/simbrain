@@ -82,7 +82,7 @@ public class ActivationInputManager {
     public void testAndSetIfSpiking() {
         boolean spiking = true;
         for (Neuron n : pc.getNeuronList()) {
-            if (!n.getUpdateRule().isSpikingNeuron()) {
+            if (!n.getUpdateRule().isSpikingRule()) {
                 spiking = false;
                 break;
             }

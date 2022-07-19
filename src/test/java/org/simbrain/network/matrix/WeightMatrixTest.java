@@ -64,16 +64,31 @@ public class WeightMatrixTest {
         assertArrayEquals(new double[]{5,11}, wm.getOutput().col(0), 0.0);
     }
 
+
     @Test
     public void testArrayToArray() {
         na1.setActivations(new Matrix(new double[]{.5, -.5}));
         wm.diagonalize();
-        net.bufferedUpdate(); // input should be cleared and second array updated
+        net.update(); // input should be cleared and second array updated. This is buffered update.
         assertArrayEquals(new double[]{0,0}, na1.getActivations().col(0), 0.0);
         assertArrayEquals(new double[]{.5,-.5}, na2.getActivations().col(0), 0.0);
-        net.bufferedUpdate(); // All should be cleared on second update
+        net.update(); // All should be cleared on second update
         assertArrayEquals(new double[]{0,0}, na1.getActivations().col(0), 0.0);
         assertArrayEquals(new double[]{0,0}, na2.getActivations().col(0), 0.0);
+    }
+
+
+    @Test
+    public void testInputPropagation() {
+        na1.clear();
+        na1.addInputs(new double[]{.5, -.5});
+        wm.diagonalize();
+        net.update(); // First update puts inputs to activation
+        assertArrayEquals(new double[]{.5,-.5}, na1.getActivations().col(0), 0.0);
+        assertArrayEquals(new double[]{0,0}, na2.getActivations().col(0), 0.0);
+        net.update(); // Second update propagates
+        assertArrayEquals(new double[]{0,0}, na1.getActivations().col(0), 0.0);
+        assertArrayEquals(new double[]{.5,-.5}, na2.getActivations().col(0), 0.0);
     }
 
     @Test

@@ -348,10 +348,10 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     @Override
     public void updateInputs() {
         if (!(exSpikeResponder instanceof NonResponder)) {
-            exSynapseSet.forEach(exSpikeResponder::apply);
+            exSynapseSet.forEach(s -> exSpikeResponder.apply(s, s.getSource().getDataHolder()));
         }
         if (!(inSpikeResponder instanceof NonResponder)) {
-            inSynapseSet.forEach(inSpikeResponder::apply);
+            inSynapseSet.forEach(s -> inSpikeResponder.apply(s, s.getSource().getDataHolder()));
         }
     }
 

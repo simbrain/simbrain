@@ -27,6 +27,7 @@ import org.simbrain.network.gui.actions.edit.DeleteAction
 import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -79,6 +80,10 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
         mainNode.addChild(this)
     }
 
+    private val spikeImage = PImage().apply {
+        mainNode.addChild(this)
+    }
+
     /**
      * Create a new neuron array node.
      *
@@ -91,8 +96,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
             updateActivationImage()
             updateInfoText()
         }
+        events.onGridModeChange {
+            gridMode = neuronArray.isGridMode
+        }
+        gridMode = neuronArray.isGridMode
         updateActivationImage()
         activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
+        spikeImage.offset(0.0, infoText.offset.y + infoText.height + 5)
         activationImage.addBorder()
         updateBorder()
     }
@@ -109,6 +119,14 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
                 0.0, 0.0,
                 infoText.width, infoText.width
             )
+            if (neuronArray.updateRule.isSpikingRule) {
+                val spikes = (neuronArray.dataHolder as SpikingMatrixData).spikes
+                spikeImage.image = spikes.toOverlay(len, len, NeuronNode.spikingColor)
+                spikeImage.setBounds(
+                    0.0, 0.0,
+                    infoText.width,  infoText.width
+                )
+            }
         } else {
             // "Flat" case
             val img = activations.toSimbrainColorImage(activations.size, 1)
@@ -117,8 +135,17 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
                 0.0, 0.0,
                 infoText.width, flatPixelArrayHeight.toDouble()
             )
+            activationImage.addBorder()
+            if (neuronArray.updateRule.isSpikingRule) {
+                val spikes = (neuronArray.dataHolder as SpikingMatrixData).spikes
+                spikeImage.image = spikes.toOverlay(activations.size, 1, NeuronNode.spikingColor)
+                spikeImage.setBounds(
+                    0.0, 0.0,
+                    infoText.width, flatPixelArrayHeight.toDouble()
+                )
+            }
         }
-        activationImage.addBorder()
+
     }
 
     private fun computeInfoText() = """
@@ -161,24 +188,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
         contextMenu.add(networkPanel.networkActions.connectSelectedModels)
         contextMenu.addSeparator()
 
-
-        // Layout style
-        // TODO: Add a third "LooseNeuron" mode.  It can also be grid or line.  Only allow it for < 1K or some number
-        val switchStyle: Action = networkPanel.createAction(
-            name = "Switch style",
-            iconPath = "menu_icons/grid.png",
-            description = "Change to grid style"
-        ) {
-            gridMode = !gridMode
-        }
-        contextMenu.add(switchStyle)
-
-
         // Randomize Action
         val randomizeAction: Action = object : AbstractAction("Randomize") {
             init {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"))
-                putValue(SHORT_DESCRIPTION, "Randomize neuro naarray")
+                putValue(SHORT_DESCRIPTION, "Randomize neuron array")
             }
 
             override fun actionPerformed(event: ActionEvent) {

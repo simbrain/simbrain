@@ -1,10 +1,12 @@
 package org.simbrain.network.matrix;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.core.ArrayLayer;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.events.NeuronArrayEvents;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
@@ -40,6 +42,13 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
      */
     @UserParameter(label = "Show activations", description = "Whether to show activations as a pixel image", order = 4)
     private boolean renderActivations = true;
+
+    @UserParameter(label = "Grid Mode", useSetter = true, description = "If true, show activations as a grid, " +
+            "otherwise show them as a line",
+            order = 10)
+    private boolean gridMode = false;
+
+    private transient NeuronArrayEvents events = new NeuronArrayEvents(this);
 
     /**
      * Construct a neuron array.
@@ -102,6 +111,12 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     public void setRenderActivations(boolean renderActivations) {
         this.renderActivations = renderActivations;
+    }
+
+    @NotNull
+    @Override
+    public NeuronArrayEvents getEvents() {
+        return events;
     }
 
     @Override
@@ -253,4 +268,20 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         this.dataHolder = dataHolder;
     }
 
+    public void setGridMode(boolean gridMode) {
+        this.gridMode = gridMode;
+        getEvents().fireGridModeChange();
+    }
+
+    public boolean isGridMode() {
+        return gridMode;
+    }
+
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
+    public Object readResolve() {
+        events = new NeuronArrayEvents(this);
+        return this;
+    }
 }

@@ -16,109 +16,57 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld.sensors;
+package org.simbrain.world.odorworld.sensors
 
-import org.simbrain.util.UserParameter;
-import org.simbrain.workspace.Producible;
-import org.simbrain.world.odorworld.OdorWorldUtilsKt;
-import org.simbrain.world.odorworld.entities.Bound;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
+import org.simbrain.world.odorworld.entities.Bound
+import org.simbrain.world.odorworld.entities.Bounded
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.intersect
 
 /**
  * Very simple bump sensor. Holding off on more sophisticated "touch" sensors in
  * case an existing library can provide it.
- * <p>
+ *
+ *
  * TODO: Implement once collisions are implemented. At that point can rename to
  * collision sensor? Can also give the sensor a location and make it visible.
  */
-public class BumpSensor extends Sensor implements VisualizableEntityAttribute {
-
-    /**
-     * Current value of the sensor.
-     */
-    private double value = 0;
-
-    /**
-     * The value to output when the sensor is bumped.
-     */
-    @UserParameter(
-            label = "Base Value",
-            description = "The value to output when the sensor is bumped",
-            order = 4)
-    private double baseValue = 1;
+class BumpSensor(theta: Double = DEFAULT_THETA, radius: Double = DEFAULT_RADIUS) : SensorWithRelativeLocation(theta, radius), VisualizableEntityAttribute {
 
     /**
      * The length of the sides of the square sensor shape
      */
-    private int sensorSize = 5;
+    val sensorSize = 5
 
-    /**
-     * Construct bump sensor.
-     *
-     * @param baseValue value
-     */
-    public BumpSensor(double baseValue) {
-        super("Bump Sensor " + baseValue);
-        this.baseValue = baseValue;
-    }
-
-    public BumpSensor() {
-        super("Bump sensor");
-    }
-
-    /**
-     * Construct a copy of a bump sensor.
-     *
-     * @param bumpSensor the bump sensor to copy
-     */
-    public BumpSensor(BumpSensor bumpSensor) {
-        super(bumpSensor);
-        this.baseValue = bumpSensor.baseValue;
-    }
-
-    @Override
-    public void update(OdorWorldEntity parent) {
-        value = 0;
-        var bound = new Bound(
-                parent.getX() - sensorSize / 2.0,
-                parent.getY() - sensorSize / 2.0,
-                parent.getWidth() + sensorSize,
-                parent.getHeight() + sensorSize
-        );
-        var collided = parent.getWorld().getCollidableObjects()
-                .stream()
-                .filter(it -> it != parent)
-                .anyMatch(it -> OdorWorldUtilsKt.intersect(bound, it).getIntersect());
+    override fun update(parent: OdorWorldEntity) {
+        currentValue = 0.0
+        val bound = Bound(
+            parent.x - sensorSize / 2.0,
+            parent.y - sensorSize / 2.0,
+            parent.width + sensorSize,
+            parent.height + sensorSize
+        )
+        val collided = parent.world.collidableObjects
+            .stream()
+            .filter { it: Bounded -> it !== parent }
+            .anyMatch { it: Bounded? -> bound.intersect(it!!).intersect }
         if (collided) {
-            value = baseValue;
+            currentValue = baseValue
         }
     }
 
-    @Override
-    public BumpSensor copy() {
-        return new BumpSensor(this);
+    override fun copy(): BumpSensor {
+        return BumpSensor(theta, radius).applyCommonCopy()
     }
 
-    @Override
-    public String getName() {
-        return "Bump Sensor";
-    }
+    override val name: String
+        get() = "Bump Sensor"
 
-    @Producible(customDescriptionMethod = "getAttributeDescription")
-    public double getCurrentValue() {
-        return value;
-    }
-
-    public int getSensorSize() {
-        return sensorSize;
-    }
-
-    @Override
-    public String getLabel() {
-        if (super.getLabel().isEmpty()) {
-            return getDirectionString() + "Bump Sensor";
+    override fun getLabel(): String {
+        return if (super.getLabel().isEmpty()) {
+            "$directionString Bump Sensor"
         } else {
-            return super.getLabel();
+            super.getLabel()
         }
     }
 }

@@ -5,21 +5,16 @@ import org.piccolo2d.nodes.PText
 import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.sensors.TileSensor
+import org.simbrain.world.odorworld.sensors.SensorWithRelativeLocation
 import java.awt.Color
-import java.awt.geom.GeneralPath
 import java.awt.geom.Point2D
 
-class TileSensorNode(override val sensor: TileSensor) : EntityAttributeNode(), NodeWithDispersion by DispersionNode(sensor) {
-    /**
-     * The shape of this node
-     */
-    private val shape: PPath
+abstract class SensorNodeWithRelativeLocation(val sensor: SensorWithRelativeLocation, private val shape: PPath): EntityAttributeNode() {
 
     /**
      * The text graphical object
      */
-    private val labelText: PText
+    private var labelText: PText = PText()
 
     /**
      * The text label location
@@ -27,25 +22,15 @@ class TileSensorNode(override val sensor: TileSensor) : EntityAttributeNode(), N
     private val labelBottomCenterLocation = Point2D.Float(0f, -5f)
 
     init {
-        val squarePath = GeneralPath()
-        squarePath.moveTo(-SENSOR_RADIUS.toFloat(), -SENSOR_RADIUS.toFloat())
-        squarePath.lineTo(-SENSOR_RADIUS.toFloat(), SENSOR_RADIUS.toFloat())
-        squarePath.lineTo(SENSOR_RADIUS.toFloat(), SENSOR_RADIUS.toFloat())
-        squarePath.lineTo(SENSOR_RADIUS.toFloat(), -SENSOR_RADIUS.toFloat())
-        squarePath.closePath()
-        shape = PPath.Float(squarePath)
         pickable = false
-        shape.setPickable(false)
+        shape.pickable = false
         addChild(shape)
-        labelText = PText()
         labelText.pickable = false
         labelText.font = labelText.font.deriveFont(9.0f)
         updateLabel()
         shape.addChild(labelText)
-        drawDispersionCircleAround(shape)
         sensor.events.onPropertyChange {
             updateLabel()
-            drawDispersionCircleAround(shape)
         }
     }
 
@@ -68,9 +53,5 @@ class TileSensorNode(override val sensor: TileSensor) : EntityAttributeNode(), N
             )
         }
         labelText.visible = sensor.isShowLabel
-    }
-
-    companion object {
-        private const val SENSOR_RADIUS = 3
     }
 }

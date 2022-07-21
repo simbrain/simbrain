@@ -1,105 +1,76 @@
-package org.simbrain.world.odorworld.gui;
+package org.simbrain.world.odorworld.gui
 
-import org.piccolo2d.nodes.PPath;
-import org.piccolo2d.nodes.PText;
-import org.simbrain.util.Utils;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.sensors.ObjectSensor;
+import org.piccolo2d.nodes.PPath
+import org.piccolo2d.nodes.PText
+import org.simbrain.util.Utils
+import org.simbrain.util.math.SimbrainMath
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.sensors.ObjectSensor
+import java.awt.Color
+import java.awt.geom.GeneralPath
+import java.awt.geom.Point2D
 
-import java.awt.*;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
-
-public class ObjectSensorNode extends EntityAttributeNode {
-
-    private static final int SENSOR_RADIUS = 4;
-
-    private final ObjectSensor sensor;
-
+class ObjectSensorNode(override val sensor: ObjectSensor) : EntityAttributeNode(), NodeWithDispersion by DispersionNode(sensor) {
     /**
      * The shape of this node
      */
-    private final PPath shape;
-
-    /**
-     * Dotted circle around sensor
-     */
-    private PPath dispersionCircle;
+    private val shape: PPath
 
     /**
      * The text graphical object
      */
-    private final PText labelText;
+    private val labelText: PText
 
     /**
      * The text label location
      */
-    private final Point2D.Float labelBottomCenterLocation = new Point2D.Float(0, -5);
+    private val labelBottomCenterLocation = Point2D.Float(0f, -5f)
 
-    public ObjectSensorNode(ObjectSensor sensor) {
-        this.sensor = sensor;
-        GeneralPath diamondPath = new GeneralPath();
-        diamondPath.moveTo(-SENSOR_RADIUS, 0);
-        diamondPath.lineTo(0, -SENSOR_RADIUS);
-        diamondPath.lineTo(SENSOR_RADIUS, 0);
-        diamondPath.lineTo(0, SENSOR_RADIUS);
-        diamondPath.closePath();
-        this.shape = new PPath.Float(diamondPath);
-        setPickable(false);
-        shape.setPickable(false);
-        addChild(shape);
-        labelText = new PText();
-        labelText.setPickable(false);
-        labelText.setFont(labelText.getFont().deriveFont(9.0f));
-        updateLabel();
-        shape.addChild(labelText);
-
-        updateDispersionCircle();
-
-        sensor.getEvents().onPropertyChange(() -> {
-            updateLabel();
-            updateDispersionCircle();
-        });
-
+    init {
+        val diamondPath = GeneralPath()
+        diamondPath.moveTo(-SENSOR_RADIUS.toFloat(), 0f)
+        diamondPath.lineTo(0f, -SENSOR_RADIUS.toFloat())
+        diamondPath.lineTo(SENSOR_RADIUS.toFloat(), 0f)
+        diamondPath.lineTo(0f, SENSOR_RADIUS.toFloat())
+        diamondPath.closePath()
+        shape = PPath.Float(diamondPath)
+        pickable = false
+        shape.setPickable(false)
+        addChild(shape)
+        labelText = PText()
+        labelText.pickable = false
+        labelText.font = labelText.font.deriveFont(9.0f)
+        updateLabel()
+        shape.addChild(labelText)
+        drawDispersionCircleAround(shape)
+        sensor.events.onPropertyChange {
+            updateLabel()
+            drawDispersionCircleAround(shape)
+        }
     }
 
-    @Override
-    public void update(OdorWorldEntity entity) {
-        shape.setOffset(sensor.computeRelativeLocation(entity));
-        float saturation = (float) SimbrainMath.rescale(sensor.getCurrentValue(), 0, sensor.getBaseValue(),
-                0, 1);
-        shape.setPaint(Color.getHSBColor(maxColor, saturation, 1));
+    override fun update(entity: OdorWorldEntity) {
+        shape.offset = sensor.computeRelativeLocation(entity)
+        val saturation = SimbrainMath.rescale(
+            sensor.currentValue, 0.0, sensor.baseValue,
+            0.0, 1.0
+        ).toFloat()
+        shape.paint = Color.getHSBColor(maxColor, saturation, 1f)
     }
 
-    public void updateLabel() {
+    fun updateLabel() {
         // TODO: If there is more than one sensor in one spot, labels are on top of each others
-        if (sensor.isShowLabel()) {
-            labelText.setText(Utils.getWrapAroundString(sensor.getLabel(), 10));
+        if (sensor.isShowLabel) {
+            labelText.text = Utils.getWrapAroundString(sensor.label, 10)
             labelText.setOffset(
-                    labelBottomCenterLocation.getX() - labelText.getWidth() / 2,
-                    labelBottomCenterLocation.getY() - labelText.getHeight()
-            );
+                labelBottomCenterLocation.getX() - labelText.width / 2,
+                labelBottomCenterLocation.getY() - labelText.height
+            )
         }
-        labelText.setVisible(sensor.isShowLabel());
+        labelText.visible = sensor.isShowLabel
     }
 
-    public void updateDispersionCircle() {
-        shape.removeChild(dispersionCircle);
-        if (sensor.isShowDispersion()) {
-            var dispersion = sensor.getDecayFunction().getDispersion();
-            dispersionCircle = PPath.createEllipse(
-                    -dispersion / 2,
-                    -dispersion / 2,
-                    dispersion,
-                    dispersion
-            );
-            dispersionCircle.setPaint(null);
-            Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
-                    0, new float[]{3}, 0);
-            dispersionCircle.setStroke(dashed);
-            dispersionCircle.setStrokePaint(Color.gray);
-            shape.addChild(dispersionCircle);
-        }
+    companion object {
+        private const val SENSOR_RADIUS = 4
     }
 }

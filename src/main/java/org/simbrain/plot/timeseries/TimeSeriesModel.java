@@ -18,11 +18,9 @@
  */
 package org.simbrain.plot.timeseries;
 
-import com.thoughtworks.xstream.XStream;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.XStreamUtils;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -44,7 +42,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     /**
      * Time Series Data.
      */
-    private XYSeriesCollection dataset = new XYSeriesCollection();
+    private transient XYSeriesCollection dataset = new XYSeriesCollection();
 
     /**
      * Lambda to supply time to the time series model.
@@ -348,16 +346,6 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     }
 
     /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
-     */
-    public static XStream getXStream() {
-        XStream xstream = XStreamUtils.getSimbrainXStream();
-        return xstream;
-    }
-
-    /**
      * The name to used in coupling descriptions.
      */
     public String getName() {
@@ -368,6 +356,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private Object readResolve() {
+        dataset = new XYSeriesCollection();
         changeSupport = new PropertyChangeSupport(this);
         return this;
     }
@@ -388,7 +377,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         /**
          * The represented time series
          */
-        XYSeries series;
+        transient XYSeries series;
 
         /**
          * Construct the time series.

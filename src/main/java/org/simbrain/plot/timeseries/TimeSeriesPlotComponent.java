@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.timeseries;
 
+import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -107,13 +108,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     }
 
     /**
-     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
-     */
-    private Object readResolve() {
-        return this;
-    }
-
-    /**
      * Opens a saved time series plot.
      *
      * @param input  stream
@@ -122,13 +116,13 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @return bar chart component to be opened
      */
     public static TimeSeriesPlotComponent open(final InputStream input, final String name, final String format) {
-        TimeSeriesModel dataModel = (TimeSeriesModel) TimeSeriesModel.getXStream().fromXML(input);
+        TimeSeriesModel dataModel = (TimeSeriesModel) XStreamUtils.getSimbrainXStream().fromXML(input);
         return new TimeSeriesPlotComponent(name, dataModel);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
-        TimeSeriesModel.getXStream().toXML(model, output);
+        XStreamUtils.getSimbrainXStream().toXML(model, output);
     }
 
     @Override
@@ -138,7 +132,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return TimeSeriesModel.getXStream().toXML(model);
+        return XStreamUtils.getSimbrainXStream().toXML(model);
     }
 
 

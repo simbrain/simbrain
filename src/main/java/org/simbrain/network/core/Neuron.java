@@ -236,6 +236,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public Neuron(final Network parent, final Neuron n) {
         this.parent = parent;
         setUpdateRule(n.getUpdateRule().deepCopy());
+        setDataHolder(n.getDataHolder().copy());
         setClamped(n.isClamped());
         setIncrement(n.getIncrement());
         forceSetActivation(n.getActivation());
@@ -243,7 +244,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         y = n.y;
         setUpdatePriority(n.getUpdatePriority());
         setLabel(n.getLabel());
-        setDataHolder(n.getDataHolder().copy());
     }
 
     public ScalarDataHolder getDataHolder() {

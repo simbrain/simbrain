@@ -74,6 +74,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
         NeuronArray copy = new NeuronArray(newParent, orig.outputSize());
         copy.setLocation(orig.getLocation());
+        copy.setGridMode(orig.gridMode);
         copy.setActivations(orig.getActivations());
         copy.setUpdateRule(orig.getUpdateRule());
         copy.setDataHolder(orig.getDataHolder().copy());

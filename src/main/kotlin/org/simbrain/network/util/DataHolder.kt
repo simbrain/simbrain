@@ -23,13 +23,18 @@ class BiasedMatrixData(var size: Int) : MatrixDataHolder {
     }
 }
 
-class SpikingMatrixData(var size: Int) : MatrixDataHolder {
+open class SpikingMatrixData(var size: Int) : MatrixDataHolder {
     var spikes = BooleanArray(size) // TODO: Possibly use int Smile array of binary ints for perf
         private set
     var lastSpikeTimes = DoubleArray(size)
     override fun copy() = SpikingMatrixData(size).also {
         it.spikes = spikes.copyOf()
         it.lastSpikeTimes = lastSpikeTimes.copyOf()
+    }
+
+    fun commonCopy(toCopy: SpikingMatrixData) {
+        toCopy.spikes = spikes.copyOf()
+        toCopy.lastSpikeTimes = lastSpikeTimes.copyOf()
     }
 
     fun setHasSpiked(i: Int, hasSpiked: Boolean, networkTime: Double) {

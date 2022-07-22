@@ -5,6 +5,7 @@ import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule;
+import org.simbrain.network.updaterules.FitzhughNagumo;
 import org.simbrain.network.updaterules.IntegrateAndFireRule;
 
 /**

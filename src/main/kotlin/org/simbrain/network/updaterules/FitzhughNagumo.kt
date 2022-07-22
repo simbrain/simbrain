@@ -16,214 +16,205 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.neuron_update_rules;
+package org.simbrain.network.updaterules
 
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule;
-import org.simbrain.network.util.ScalarDataHolder;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.stats.ProbabilityDistribution;
-import org.simbrain.util.stats.distributions.UniformRealDistribution;
+import org.simbrain.network.core.Layer
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.SpikingNeuronUpdateRule
+import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
+import org.simbrain.network.util.MatrixDataHolder
+import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.network.util.SpikingScalarData
+import org.simbrain.util.UserParameter
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 
-
-public class FitzhughNagumo extends SpikingNeuronUpdateRule implements NoisyUpdateRule {
-
-    /**
-     * W. - recovery variable
-     */
-    private double w;
-
-    /**
-     * V. - membrane potential
-     */
-    private double v;
+class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
     /**
      * Constant background current. KEEP
      */
     @UserParameter(
-            label = "Background Current (nA)",
-            description = "Background current to the cell.",
-            increment = .1,
-            order = 4)
-    private double iBg = 1;
+        label = "Background Current (nA)",
+        description = "Background current to the cell.",
+        increment = .1,
+        order = 4
+    )
+    private var iBg = 0.0
 
     /**
      * Threshold value to signal a spike. KEEP
      */
     @UserParameter(
-            label = "Spike threshold",
-            description = "Threshold value to signal a spike.",
-            increment = .1,
-            order = 5)
-    private double threshold = 1.9;
+        label = "Spike threshold",
+        description = "Threshold value to signal a spike.",
+        increment = .1,
+        order = 5
+    )
+    var threshold = 1.9
 
     /**
      * Noise generator.
      */
-    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
+    private var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * Add noise to the neuron.
      */
-    private  boolean addNoise = false;
+    private var addNoise = false
 
     /**
      * Recovery rate
      */
     @UserParameter(
-            label = "A (Recovery Rate)",
-            description = "Abstract measure of how much \"resource\" a cell is depleting in response to large changes in voltage.",
-            increment = .1,
-            order = 1)
-    private double a = 0.08;
+        label = "A (Recovery Rate)",
+        description = "Abstract measure of how much \"resource\" a cell is depleting in response to large changes in voltage.",
+        increment = .1,
+        order = 1
+    )
+    var a = 0.08
 
     /**
      * Recovery dependence on voltage.
      */
     @UserParameter(
-            label = "B (Rec. Voltage Dependence)",
-            description = "How much the recovery variable w depends on voltage.",
-            increment = .1,
-            order = 2)
-    private double b = 1;
+        label = "B (Rec. Voltage Dependence)",
+        description = "How much the recovery variable w depends on voltage.",
+        increment = .1,
+        order = 2
+    )
+    var b = 1.0
 
     /**
      * Recovery self-dependence.
      */
     @UserParameter(
-            label = "C (Rec. Self Dependence)",
-            description = "How quickly the recovery variable recovers to its baseline value.",
-            increment = .1,
-            order = 3)
-    private double c = 0.8;
-
-    @Override
-    public FitzhughNagumo deepCopy() {
-        FitzhughNagumo in = new FitzhughNagumo();
-        in.setW(getW());
-        in.setV(getV());
-        in.setA(getA());
-        in.setB(getB());
-        in.setC(getC());
-        in.setThreshold(getThreshold());
-        in.setAddNoise(getAddNoise());
-        in.setNoiseGenerator(noiseGenerator.deepCopy());
-        return in;
+        label = "C (Rec. Self Dependence)",
+        description = "How quickly the recovery variable recovers to its baseline value.",
+        increment = .1,
+        order = 3
+    )
+    var c = 0.8
+    override fun deepCopy(): FitzhughNagumo {
+        val copy = FitzhughNagumo()
+        copy.a = a
+        copy.b = b
+        copy.c = c
+        copy.threshold = threshold
+        copy.setAddNoise(getAddNoise())
+        copy.setNoiseGenerator(noiseGenerator.deepCopy())
+        return copy
     }
 
-    @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
-        double timeStep = neuron.getNetwork().getTimeStep();
-        //        final boolean refractory = getLastSpikeTime() + refractoryPeriod
-        //                >= neuron.getNetwork().getTime();
-        // final double activation = neuron.getActivation();
-        double inputs = 0;
-        inputs = neuron.getInput();
+    override fun apply(n: Neuron, data: ScalarDataHolder) {
+        if (data !is FitzHughData) {
+            return
+        }
+        val (spiked, v, w) = fitzhughNagumoRule(n.activation, data.w, n.input, n.network.timeStep)
+        n.isSpike = spiked
+        n.activation = v
+        data.w = w
+    }
+
+    override fun apply(na: Layer, data: MatrixDataHolder) {
+        if (na is NeuronArray && data is FitzHughMatrixData) {
+            for (i in 0 until na.size()) {
+                val (spiked, v, w) = fitzhughNagumoRule(
+                    na.activations.get(i, 0),
+                    data.w.get(i),
+                    na.inputs.get(i, 0),
+                    na.network.timeStep
+                )
+                data.setHasSpiked(i, spiked, na.network.time)
+                na.activations.set(i, 0, v)
+                data.w.set(i, w)
+            }
+        }
+    }
+
+    private fun fitzhughNagumoRule(
+        extV: Double,
+        extW: Double,
+        externalInput: Double,
+        timeStep: Double
+    ): Triple<Boolean, Double, Double> {
+        var inputs = externalInput
+        var v = extV
+        var w = extW
         if (addNoise) {
-            inputs += noiseGenerator.sampleDouble();
+            inputs += noiseGenerator.sampleDouble()
         }
-        inputs += iBg;
-        v = neuron.getActivation();
-        w += (timeStep * (a * (b * v + 0.7 - (c * w))));
+        inputs += iBg
+        w += timeStep * (a * (b * v + 0.7 - c * w))
+        v += timeStep * (v - v * v * v / 3 - w + inputs)
 
-        v += timeStep * (v - (v * v * v) / 3 - w + inputs);
-
-        // v = activation + (timeStep * (activation - (Math.pow(activation, 3)/3) - w + inputs) );
-        // You want this
         if (v >= threshold) {
-            neuron.setSpike(true);
+            return Triple(true, v, w)
         } else {
-            neuron.setSpike(false);
+            return Triple(false, v, w)
         }
-        //till here
-        neuron.setActivation(v);
     }
 
-    @Override
-    public double getRandomValue() {
+    override fun createScalarData(): ScalarDataHolder {
+        return FitzHughData()
+    }
+
+    override fun createMatrixData(size: Int): MatrixDataHolder {
+        return FitzHughMatrixData(size)
+    }
+
+    override fun getRandomValue(): Double {
         // Equal chance of spiking or not spiking, taking on any value between
         // the resting potential and the threshold if not.
-        return 2 * (threshold - c) * Math.random() + c;
+        return 2 * (threshold - c) * Math.random() + c
     }
 
-    public double getW() {
-        return w;
+    fun getiBg(): Double {
+        return iBg
     }
 
-    public void setW(final double w) {
-        this.w = w;
+    fun setiBg(iBg: Double) {
+        this.iBg = iBg
     }
 
-    public double getV() {
-        return v;
+    override fun getAddNoise(): Boolean {
+        return addNoise
     }
 
-    public void setV(final double v) {
-        this.v = v;
+    override fun setAddNoise(addNoise: Boolean) {
+        this.addNoise = addNoise
     }
 
-    public double getiBg() {
-        return iBg;
+    override fun getNoiseGenerator(): ProbabilityDistribution {
+        return noiseGenerator
     }
 
-    public void setiBg(double iBg) {
-        this.iBg = iBg;
+    override fun setNoiseGenerator(noise: ProbabilityDistribution) {
+        noiseGenerator = noise
     }
 
-    public boolean getAddNoise() {
-        return addNoise;
-    }
+    override val name: String
+        get() = "FitzhughNagumo"
+}
 
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
 
-    @Override
-    public ProbabilityDistribution getNoiseGenerator() {
-        return noiseGenerator;
+class FitzHughData(
+    @UserParameter(
+        label = "w", description = "Recovery variables."
+    )
+    var w: Double = 0.0,
+) : SpikingScalarData() {
+    override fun copy(): FitzHughData {
+        return FitzHughData(w)
     }
+}
 
-    @Override
-    public void setNoiseGenerator(final ProbabilityDistribution noise) {
-        this.noiseGenerator = noise;
-    }
-
-    @Override
-    public String getName() {
-        return "FitzhughNagumo";
-    }
-
-    public double getThreshold() {
-        return threshold;
-    }
-
-    public void setThreshold(double threshold) {
-        this.threshold = threshold;
-    }
-
-    public double getA() {
-        return a;
-    }
-
-    public double getB() {
-        return b;
-    }
-
-    public double getC() {
-        return c;
-    }
-
-    public void setA(double a) {
-        this.a = a;
-    }
-
-    public void setB(double b) {
-        this.b = b;
-    }
-
-    public void setC(double c) {
-        this.c = c;
+class FitzHughMatrixData(size: Int) : SpikingMatrixData(size) {
+    var w = DoubleArray(size)
+    override fun copy() = FitzHughMatrixData(size).also {
+        commonCopy(it)
+        it.w = w.copyOf()
     }
 }

@@ -1,8 +1,8 @@
 package org.simbrain.network.matrix;
 
 import org.simbrain.network.core.*;
+import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.MatrixDataHolder;

@@ -11,4 +11,7 @@ open class NeuronArrayEvents(na: NeuronArray) : LocationEvents(na) {
     fun onGridModeChange(handler: Runnable) = "GridModeChange".event(handler)
     fun fireGridModeChange() = "GridModeChange"()
 
+    fun onUpdateRuleChange(handler: Runnable) = "UpdateRuleChange".event(handler)
+    fun fireUpdateRuleChange() = "UpdateRuleChange"()
+
 }

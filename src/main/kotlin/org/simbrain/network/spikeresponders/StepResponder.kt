@@ -23,8 +23,11 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder
-import org.simbrain.network.util.*
+import org.simbrain.network.util.MatrixDataHolder
+import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
+import smile.math.matrix.Matrix
 
 /**
  * Responds to a spike with a step response for a set number of iterations.
@@ -117,4 +120,23 @@ class StepResponder(
 
     override val name: String
         get() = "Step"
+}
+
+class StepResponderData(
+    @UserParameter(
+        label = "Counter", description = "Used to count down the step function. Each iteration is as long as whatever" +
+                "the network time step"
+    )
+    var counter: Int = 0,
+) : ScalarDataHolder {
+    override fun copy(): StepResponderData {
+        return StepResponderData(counter)
+    }
+}
+
+class StepMatrixData(val rows: Int, val cols: Int) : MatrixDataHolder {
+    var counterMatrix = Matrix(rows, cols)
+    override fun copy() = StepMatrixData(rows, cols).also {
+        it.counterMatrix = counterMatrix.clone()
+    }
 }

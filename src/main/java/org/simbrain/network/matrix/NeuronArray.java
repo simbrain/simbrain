@@ -254,6 +254,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public void setUpdateRule(NeuronUpdateRule updateRule) {
         this.updateRule = updateRule;
         dataHolder = updateRule.createMatrixData(size());
+        getEvents().fireUpdateRuleChange();
     }
 
     public NeuronUpdateRule getUpdateRule() {

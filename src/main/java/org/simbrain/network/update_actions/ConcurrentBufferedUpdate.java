@@ -28,7 +28,7 @@
 // import org.simbrain.network.groups.SynapseGroup;
 // import org.simbrain.network.layouts.GridLayout;
 // import org.simbrain.network.neuron_update_rules.IzhikevichRule;
-// import org.simbrain.network.synapse_update_rules.spikeresponders.ConvolvedJumpAndDecay;
+// import org.simbrain.network.spikeresponders.ConvolvedJumpAndDecay;
 // import org.simbrain.network.update_actions.concurrency_tools.BufferedUpdateTask;
 // import org.simbrain.network.update_actions.concurrency_tools.Task;
 // import org.simbrain.util.SimbrainConstants.Polarity;

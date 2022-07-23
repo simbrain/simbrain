@@ -100,6 +100,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
             gridMode = neuronArray.isGridMode
         }
         gridMode = neuronArray.isGridMode
+        events.onUpdateRuleChange {
+            if (!neuronArray.updateRule.isSpikingRule) {
+                mainNode.removeChild(spikeImage)
+            }
+        }
         updateActivationImage()
         activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
         spikeImage.offset(0.0, infoText.offset.y + infoText.height + 5)

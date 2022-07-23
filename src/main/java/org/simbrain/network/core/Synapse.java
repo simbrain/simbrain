@@ -21,8 +21,8 @@ package org.simbrain.network.core;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.SynapseEvents;
 import org.simbrain.network.groups.SynapseGroup;
+import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
@@ -620,7 +620,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     }
 
     public void setSpikeResponder(final SpikeResponder sr) {
-        this.spikeResponder = sr.deepCopy();
+        this.spikeResponder = sr;
         spikeResponderData = sr.createResponderData();
     }
 

@@ -1163,7 +1163,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay">
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay">
                       <value>0.0</value>
                       <jumpHeight>1.0</jumpHeight>
                       <baseLine>0.0</baseLine>
@@ -1187,7 +1187,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_227</id>
                     <strength>5.039449529461139</strength>
                     <psr>0.0</psr>
@@ -1206,7 +1206,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_235</id>
                     <strength>1.3199428561241562</strength>
                     <psr>0.0</psr>
@@ -1225,7 +1225,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_225</id>
                     <strength>6.578308193094778</strength>
                     <psr>0.0</psr>
@@ -1244,7 +1244,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_236</id>
                     <strength>0.313715198420708</strength>
                     <psr>0.0</psr>
@@ -1263,7 +1263,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_230</id>
                     <strength>3.3561691323075284</strength>
                     <psr>0.0</psr>
@@ -1282,7 +1282,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_226</id>
                     <strength>5.846405350927635</strength>
                     <psr>0.0</psr>
@@ -1301,7 +1301,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_233</id>
                     <strength>1.6367161117674593</strength>
                     <psr>0.0</psr>
@@ -1320,7 +1320,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_231</id>
                     <strength>5.399536762996885</strength>
                     <psr>0.0</psr>
@@ -1339,7 +1339,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_228</id>
                     <strength>2.9763329415427173</strength>
                     <psr>0.0</psr>
@@ -1358,7 +1358,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_234</id>
                     <strength>1.926663585399381</strength>
                     <psr>0.0</psr>
@@ -1377,7 +1377,7 @@
                     <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                       <clipped>false</clipped>
                     </learningRule>
-                    <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
+                    <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../org.simbrain.network.core.Synapse/spikeResponder"/>
                     <id>Synapse_232</id>
                     <strength>4.179189770173217</strength>
                     <psr>0.0</psr>
@@ -1401,7 +1401,7 @@
                   <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                     <clipped>false</clipped>
                   </learningRule>
-                  <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../exSynapseSet/org.simbrain.network.core.Synapse/spikeResponder"/>
+                  <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../exSynapseSet/org.simbrain.network.core.Synapse/spikeResponder"/>
                   <id></id>
                   <strength>0.0</strength>
                   <psr>0.0</psr>
@@ -1416,7 +1416,7 @@
                   <learningRule class="org.simbrain.network.synapse_update_rules.StaticSynapseRule">
                     <clipped>false</clipped>
                   </learningRule>
-                  <spikeResponder class="org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay" reference="../../exSynapseSet/org.simbrain.network.core.Synapse/spikeResponder"/>
+                  <spikeResponder class="org.simbrain.network.spikeresponders.JumpAndDecay" reference="../../exSynapseSet/org.simbrain.network.core.Synapse/spikeResponder"/>
                   <id></id>
                   <strength>0.0</strength>
                   <psr>0.0</psr>

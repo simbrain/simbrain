@@ -2,7 +2,6 @@ package org.simbrain.network.util
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
-import smile.math.matrix.Matrix
 import java.util.*
 
 /**
@@ -144,25 +143,6 @@ class AdexData(
 ): SpikingScalarData() {
     override fun copy(): AdexData {
         return AdexData(w, inhibConductance, exConductance)
-    }
-}
-
-class StepResponderData(
-    @UserParameter(
-        label = "Counter", description = "Used to count down the step function. Each iteration is as long as whatever" +
-                "the network time step"
-    )
-    var counter: Int = 0,
-) : ScalarDataHolder {
-    override fun copy(): StepResponderData {
-        return StepResponderData(counter)
-    }
-}
-
-class StepMatrixData(val rows: Int, val cols: Int) : MatrixDataHolder {
-    var counterMatrix = Matrix(rows, cols)
-    override fun copy() = StepMatrixData(rows, cols).also {
-        it.counterMatrix = counterMatrix.clone()
     }
 }
 

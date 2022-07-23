@@ -5,10 +5,12 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
+import org.simbrain.network.spikeresponders.NonResponder
+import org.simbrain.network.spikeresponders.ProbabilisticResponder
+import org.simbrain.network.spikeresponders.StepMatrixData
 import org.simbrain.network.spikeresponders.StepResponder
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.util.SpikingMatrixData
-import org.simbrain.network.util.StepMatrixData
 import smile.math.matrix.Matrix
 
 /**
@@ -50,6 +52,36 @@ class SpikeResponderMatrixTest {
         assertEquals(4, arr2.size())
         assertTrue(arr2.updateRule is IntegrateAndFireRule)
     }
+
+    @Test
+    fun `non-responder results in weight matrix times input vector`() {
+
+        val nr = NonResponder()
+        wm2.setSpikeResponder(nr)
+
+        n2.activations = Matrix(doubleArrayOf(1.0, 1.0))
+        net.update()
+        assertArrayEquals(doubleArrayOf(1.0, -1.0, 1.0), n3.activationArray)
+    }
+
+    @Test
+    fun `test probabilistic responder`() {
+
+        val pr = ProbabilisticResponder()
+        pr.activationProbability = 1.0
+        wm2.setSpikeResponder(pr)
+        n1.activations = Matrix(doubleArrayOf(1.0, 1.0))
+        net.update()
+        net.update() // extra update to propagate from layer 1 to 2
+        assertArrayEquals(doubleArrayOf(1.0, -1.0, 1.0), n3.activationArray)
+
+        pr.activationProbability = 0.0
+        n1.activations = Matrix(doubleArrayOf(1.0, 1.0))
+        net.update()
+        net.update()
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), n3.activationArray)
+    }
+
 
     @Test
     fun `test step responder values before during and after its duration `() {

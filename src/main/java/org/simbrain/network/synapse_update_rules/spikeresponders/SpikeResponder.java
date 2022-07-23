@@ -20,7 +20,7 @@ package org.simbrain.network.synapse_update_rules.spikeresponders;
 
 import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.spikeresponders.StepResponder;
+import org.simbrain.network.spikeresponders.*;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
@@ -67,7 +67,7 @@ public abstract class SpikeResponder implements CopyableObject {
     public abstract void apply(Synapse synapse, ScalarDataHolder responderData);
 
     /**
-     * Override to define a spike responder for matrix data. NOTE: None have yet been defined.
+     * Override to define a spike responder for matrix data.
      */
     public void apply(Connector connector, MatrixDataHolder responderData) {}
 

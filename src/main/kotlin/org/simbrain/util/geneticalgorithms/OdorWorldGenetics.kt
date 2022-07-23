@@ -10,6 +10,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
+import org.simbrain.world.odorworld.sensors.TileSensor
 
 inline fun smellSensorGene(options: SmellSensor.() -> Unit = { }): SmellSensorGene {
     return SmellSensorGene(SmellSensor().apply(options))
@@ -17,6 +18,10 @@ inline fun smellSensorGene(options: SmellSensor.() -> Unit = { }): SmellSensorGe
 
 inline fun objectSensorGene(options: ObjectSensor.() -> Unit = { }): ObjectSensorGene {
     return ObjectSensorGene(ObjectSensor().apply(options))
+}
+
+inline fun tileSensorGene(options: TileSensor.() -> Unit = { }): TileSensorGene {
+    return TileSensorGene(TileSensor().apply(options))
 }
 
 inline fun straightMovementGene(options: StraightMovement.() -> Unit = { }): StraightMovementGene {
@@ -60,6 +65,21 @@ class ObjectSensorGene(private val template: ObjectSensor):
     }
 
     override fun build(odorWorldEntity: OdorWorldEntity): ObjectSensor {
+        return template.copy().also { product.complete(it) }
+    }
+
+}
+
+class TileSensorGene(private val template: TileSensor):
+    OdorWorldEntityGene<TileSensor>() {
+
+    override val product = CompletableDeferred<TileSensor>()
+
+    override fun copy(): TileSensorGene {
+        return TileSensorGene(template.copy())
+    }
+
+    override fun build(odorWorldEntity: OdorWorldEntity): TileSensor {
         return template.copy().also { product.complete(it) }
     }
 

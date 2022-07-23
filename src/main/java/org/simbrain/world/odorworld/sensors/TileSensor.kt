@@ -19,7 +19,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  */
 class TileSensor @JvmOverloads constructor(
     @UserParameter(label = "Tile Type", description = "What type of tile this sensor responds to", order = 3)
-    private var tileType: String = "water",
+    var tileType: String = "water",
     radius: Double = DEFAULT_RADIUS,
     angle: Double = DEFAULT_THETA
 ) : SensorWithRelativeLocation(radius, angle), VisualizableEntityAttribute, WithDispersion {

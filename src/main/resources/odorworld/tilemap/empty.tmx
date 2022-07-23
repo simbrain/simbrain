@@ -4,7 +4,7 @@
   <image source="tileset_kenney.png" width="1936" height="1052"/>
   <tile id="2">
    <properties>
-    <property name="type" value="Water"/>
+    <property name="type" value="water"/>
     <property name="label" value="Water1"/>
    </properties>
   </tile>

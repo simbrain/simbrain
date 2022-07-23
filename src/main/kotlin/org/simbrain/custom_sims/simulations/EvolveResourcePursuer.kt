@@ -14,21 +14,17 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule
-import org.simbrain.util.format
+import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithms.*
-import org.simbrain.util.point
-import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.util.piccolo.GridCoordinate
+import org.simbrain.util.piccolo.toPixelCoordinate
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
+import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import kotlin.random.Random
 
-/**
- * Cangelosi et. al.
- *
- * TODO: Right now this is just avoiding, but this should do the Cangelosi stuff
- */
 val evolveResourcePursuer = newSim {
 
     val scope = MainScope()
@@ -36,7 +32,7 @@ val evolveResourcePursuer = newSim {
     /**
      * Max generation to run before giving up
      */
-    val maxGenerations = 150
+    val maxGenerations = 25
 
     /**
      * Iterations to run for each simulation. If < 3000 success is usually by luck.
@@ -58,12 +54,15 @@ val evolveResourcePursuer = newSim {
                 }
             }
 
-            val outputs = chromosome(3) {
+            val outputs = chromosome(3) { index ->
                 nodeGene {
                     updateRule.let {
                         if (it is BoundedUpdateRule) {
                             it.lowerBound = -10.0
                             it.upperBound = 10.0
+                        }
+                        if (it is BiasedUpdateRule) {
+                            it.bias = 1.0
                         }
                     }
                 }
@@ -111,8 +110,8 @@ val evolveResourcePursuer = newSim {
             }
 
             val sensors = chromosome(3) {
-                objectSensorGene {
-                    setObjectType(EntityType.POISON)
+                tileSensorGene {
+                    tileType = "water"
                     theta = it * 2 * 60.0
                     radius = 32.0
                     decayFunction.dispersion = 200.0
@@ -135,17 +134,6 @@ val evolveResourcePursuer = newSim {
             fun OdorWorldEntity.reset() {
                 location = point(random.nextDouble() * 300, random.nextDouble() * 300)
             }
-
-            fun addPoison() = odorworld.addEntity(EntityType.POISON).apply {
-                location = point(random.nextDouble()*300,random.nextDouble()*300)
-                heading = UniformRealDistribution(0.0,360.0).sampleDouble()
-                speed = 3.0
-                events.onCollided {
-                    if (it === mouse) reset()
-                }
-            }
-
-            val (poison1, poison2, poison3) = List(3) { addPoison() }
 
             // Take the current chromosomes,and express them via an agent in a world.
             // Everything needed to build one generation
@@ -249,28 +237,34 @@ val evolveResourcePursuer = newSim {
             onEval {
                 var fitness = 0.0
 
-                fun OdorWorldEntity.handleCollision() {
-                    events.onCollided { other ->
-                        if (other === mouse) {
-                            fitness -= 1
+                fun randomTileCoordinate() = GridCoordinate(
+                    random.nextInt(odorworld.tileMap.width).toDouble(),
+                    random.nextInt(odorworld.tileMap.height).toDouble()
+                )
+
+                var currentWaterLocation = randomTileCoordinate()
+
+                fun setTile(coordinate: GridCoordinate, tileId: Int) {
+                    val (x, y) = coordinate
+                    odorworld.tileMap.editTile(x.toInt(), y.toInt(), tileId)
+                }
+
+                setTile(currentWaterLocation, 3)
+
+                evolutionWorkspace.addUpdateAction("location check") {
+                    with(odorworld.tileMap) {
+                        val distance = currentWaterLocation.toPixelCoordinate().distanceTo(mouse.location)
+                        if (distance < mouse.width / 2) {
+                            fitness += 1.0
+                            setTile(currentWaterLocation, 0)
+                            currentWaterLocation = randomTileCoordinate()
+                            setTile(currentWaterLocation, 3)
                         }
                     }
                 }
 
-                poison1.handleCollision();
-                poison2.handleCollision();
-                poison3.handleCollision();
-
                 evolutionWorkspace.apply {
                     iterateSuspend(iterationsPerRun)
-                    // fitness += (0..1000).map {
-                    //     simpleIterate()
-                    //     minOf(
-                    //         poison1.getRadiusTo(mouse),
-                    //         poison2.getRadiusTo(mouse),
-                    //         poison3.getRadiusTo(mouse)
-                    //     ) / 100
-                    // }.minOf { it }
                 }
 
                 fitness
@@ -279,6 +273,33 @@ val evolveResourcePursuer = newSim {
             // Called when evolution finishes. evolutionWorkspace is the "winning" sim.
             onPeek {
                 workspace.openFromZipData(evolutionWorkspace.zipData)
+                val worldComponent = workspace.componentList.filterIsInstance<OdorWorldComponent>().first()
+                val world = worldComponent.world
+                val newMouse = world.entityList.first()
+                fun randomTileCoordinate() = GridCoordinate(
+                    random.nextInt(world.tileMap.width).toDouble(),
+                    random.nextInt(world.tileMap.height).toDouble()
+                )
+
+                var currentWaterLocation = randomTileCoordinate()
+
+                fun setTile(coordinate: GridCoordinate, tileId: Int) {
+                    val (x, y) = coordinate
+                    world.tileMap.editTile(x.toInt(), y.toInt(), tileId)
+                }
+
+                setTile(currentWaterLocation, 3)
+
+                workspace.addUpdateAction("location check") {
+                    with(world.tileMap) {
+                        val distance = currentWaterLocation.toPixelCoordinate().distanceTo(newMouse.location)
+                        if (distance < mouse.width / 2) {
+                            setTile(currentWaterLocation, 0)
+                            currentWaterLocation = randomTileCoordinate()
+                            setTile(currentWaterLocation, 3)
+                        }
+                    }
+                }
             }
         }
 
@@ -286,7 +307,7 @@ val evolveResourcePursuer = newSim {
             populationSize = 100
             eliminationRatio = 0.5
             optimizationMethod = Evaluator.OptimizationMethod.MAXIMIZE_FITNESS
-            runUntil { generation == maxGenerations || fitness > -2 }
+            runUntil { generation == maxGenerations || fitness > 5 }
         }
     }
 
@@ -326,5 +347,5 @@ val evolveResourcePursuer = newSim {
 }
 
 fun main() {
-    evolveAvoider.run()
+    evolveResourcePursuer.run()
 }

@@ -15,7 +15,10 @@ package org.simbrain.network.util;
 
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.core.*;
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.NetworkTextObject;
+import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.util.math.SimbrainMath;
@@ -244,7 +247,7 @@ public class SimnetUtils {
             } else if (item instanceof NeuronGroup) {
                 ret.add(((NeuronGroup) item).deepCopy(newParent));
             } else if (item instanceof NeuronArray) {
-                LocatableModel copy = ((NeuronArray) item).deepCopy(newParent, (NeuronArray) item);
+                LocatableModel copy = ((NeuronArray) item).deepCopy(newParent);
                 ret.add(copy);
             }
         }

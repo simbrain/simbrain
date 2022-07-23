@@ -1,15 +1,19 @@
 package org.simbrain.network.core
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
 import org.simbrain.network.spikeresponders.StepResponder
+import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.StepMatrixData
 import smile.math.matrix.Matrix
 
+/**
+ * This will hold all matrix based spike responder tests since they all require the same setup.
+ */
 class SpikeResponderMatrixTest {
 
     val net = Network()
@@ -18,7 +22,6 @@ class SpikeResponderMatrixTest {
     val n3 = NeuronArray(net, 3) // receives spike response
     val wm1 = WeightMatrix(net, n1, n2)
     val wm2 = WeightMatrix(net, n2, n3) // This one has the spike responder
-    val step = StepResponder()
 
     init {
         wm2.setWeights(
@@ -30,19 +33,36 @@ class SpikeResponderMatrixTest {
         listOf(n1, n2, n3).forEach {
             it.clear()
         }
-        wm2.setSpikeResponder(step)
         net.addNetworkModels(n1, n2, n3, wm1, wm2)
     }
 
     @Test
+    fun `neuron arrays and copies`() {
+        // Change type of neuron array, copy, and create a spike responder
+        val net2 = Network()
+        val arr1 = NeuronArray(net, 4) // Input
+        arr1.updateRule = IntegrateAndFireRule()
+        val arr2 = arr1.deepCopy(net2)
+        val wmArr1Arr2 = WeightMatrix(net2, arr1, arr2)
+        wmArr1Arr2.setSpikeResponder(StepResponder())
+        net2.addNetworkModels(arr1, arr2, wmArr1Arr2)
+        net2.update() // Caused exceptions in earlier iterations.
+        assertEquals(4, arr2.size())
+        assertTrue(arr2.updateRule is IntegrateAndFireRule)
+    }
+
+    @Test
     fun `test step responder values before during and after its duration `() {
+
+        val step = StepResponder()
+        wm2.setSpikeResponder(step)
 
         step.responseHeight = .5
         step.responseDuration = 3
 
         n1.activations = Matrix(doubleArrayOf(1.0, 0.0))
         net.update()
-        assertArrayEquals(doubleArrayOf(1.0, 0.0), wm1.psrMatrix.rowSums())
+        assertArrayEquals(doubleArrayOf(0.0, 0.0), wm1.psrMatrix.rowSums())
         assertArrayEquals(doubleArrayOf(1.0, 0.0), n2.activationArray, .001)
         assertArrayEquals(booleanArrayOf(true, false), (n2.dataHolder as SpikingMatrixData).spikes)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), wm2.psrMatrix.rowSums())
@@ -78,6 +98,9 @@ class SpikeResponderMatrixTest {
 
     @Test
     fun `test step responder values with both nodes spiking`() {
+
+        val step = StepResponder()
+        wm2.setSpikeResponder(step)
 
         step.responseHeight = 1.0
         step.responseDuration = 2

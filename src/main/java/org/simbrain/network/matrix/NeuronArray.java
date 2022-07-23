@@ -68,16 +68,15 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
      * Make a deep copy of this array.
      *
      * @param newParent the new parent network
-     * @param orig      the array to copy
      * @return the deep copy
      */
-    public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
-        NeuronArray copy = new NeuronArray(newParent, orig.outputSize());
-        copy.setLocation(orig.getLocation());
-        copy.setGridMode(orig.gridMode);
-        copy.setActivations(orig.getActivations());
-        copy.setUpdateRule(orig.getUpdateRule());
-        copy.setDataHolder(orig.getDataHolder().copy());
+    public NeuronArray deepCopy(Network newParent) {
+        NeuronArray copy = new NeuronArray(newParent, this.outputSize());
+        copy.setLocation(this.getLocation());
+        copy.setGridMode(this.gridMode);
+        copy.setActivations(this.getActivations());
+        copy.setUpdateRule(this.getUpdateRule());
+        copy.setDataHolder(this.getDataHolder().copy());
         return copy;
     }
 

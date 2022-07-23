@@ -18,6 +18,14 @@ class SpikeResponderScalarTest {
         net.addNetworkModels(n1, n2, n3, s1, s2)
     }
 
+    @Test
+    fun `responder data is copied correctly`() {
+        val step = StepResponder()
+        val newResponder: StepResponder = step.copy() as StepResponder
+        assertEquals(step.responseDuration, newResponder.responseDuration)
+        assertEquals(step.responseHeight, newResponder.responseHeight)
+    }
+
     /**
      * Should "fire" at responseHeight (2.0) for responseDuration (3)
      */

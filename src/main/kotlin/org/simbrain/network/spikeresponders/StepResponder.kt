@@ -70,10 +70,11 @@ class StepResponder(
                     }
                 }
                 for (i in 0 until stepResponseData.counterMatrix.nrows())
-                    for (j in 0 until stepResponseData.counterMatrix.ncols())
+                    for (j in 0 until stepResponseData.counterMatrix.ncols()) {
                         if (stepResponseData.counterMatrix.get(i, j) <= 0) {
                             wm.psrMatrix.set(i, j, 0.0)
                         }
+                    }
             }
         }
 

@@ -63,8 +63,8 @@ public class WeightMatrix extends Connector {
     private Matrix weightMatrix;
 
     /**
-     * Data for post synaptic responses. Allows matrix to respond to connectionist or spiking pre-synaptic neuron
-     * arrays.
+     * A matrix with the same size as the weight matrix. Holds values from post synaptic responses.
+     * Only used with spike responders.
      */
     private Matrix psrMatrix;
 
@@ -154,13 +154,13 @@ public class WeightMatrix extends Connector {
         // TODO: Do frozen, clamping, or enabling make sense here
 
         if (spikeResponder instanceof NonResponder) {
-            // For "connectionist" case.
-            psrMatrix = weightMatrix.mm(source.getOutputs());
+            // For "connectionist" case. PSR Matrix not neededin this case
+            return weightMatrix.mm(source.getOutputs());
         } else {
             // Updates psr for spiking source neurons
             spikeResponder.apply(this, spikeResponseData);
+            return new Matrix(psrMatrix.rowSums());
         }
-        return new Matrix(psrMatrix.rowSums());
     }
 
     public SynapseUpdateRule getPrototypeRule() {

@@ -125,6 +125,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         updateColor()
         updateText()
         updateTextLabel()
+        updateBounds()
         updateClampStatus()
         centerFullBoundsOnPoint(neuron.x, neuron.y)
         pickable = true
@@ -600,5 +601,14 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
          */
         @JvmStatic
         var spikingColor = Color.yellow
+    }
+
+    private fun updateBounds() {
+        // update bounds to include text
+        val bounds = mainShape.bounds
+        if (neuron.label != null) {
+            bounds.add(labelText.localToParent(labelText.bounds))
+        }
+        setBounds(bounds)
     }
 }

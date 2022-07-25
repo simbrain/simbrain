@@ -67,7 +67,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
      */
     private fun pushViewPositionToModel() {
         // Networkmodels use the center location
-        val centerLocation = globalFullBounds.center2D
+        val centerLocation = borderBox.globalFullBounds.center2D
         layer.location = centerLocation
     }
 

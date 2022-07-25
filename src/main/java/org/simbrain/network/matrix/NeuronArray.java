@@ -60,7 +60,6 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         super(net, size);
         activations = new Matrix(size, 1);
         randomize();
-        setLabel(net.getIdManager().getProposedId(this.getClass()));
         setUpdateRule(updateRule);
     }
 
@@ -146,23 +145,11 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public static class CreationTemplate implements EditableObject {
 
         /**
-         * Number of columns in the under laying ND4J Array.
+         * Size of the neuron array.
          */
         @UserParameter(label = "Nodes", description = "Number of nodes", order = 1)
         private int numNodes = 100;
 
-        /**
-         * A label for this Neuron Array for display purpose.
-         */
-        @UserParameter(label = "Label", description = "If left blank, a default label will be created.", initialValueMethod = "getLabel")
-        private String label;
-
-        /**
-         * Create the template with a proposed label
-         */
-        public CreationTemplate(String proposedLabel) {
-            this.label = proposedLabel;
-        }
 
         /**
          * Add a neuron array to network created from field values which should be setup by an Annotated Property
@@ -172,16 +159,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
          * @return the created neuron array
          */
         public NeuronArray create(Network network) {
-            NeuronArray na = new NeuronArray(network, numNodes);
-            na.setLabel(label);
-            return na;
-        }
-
-        /**
-         * Getter called by reflection by {@link UserParameter#initialValueMethod}
-         */
-        public String getLabel() {
-            return label;
+            return new NeuronArray(network, numNodes);
         }
 
         @Override
@@ -285,4 +263,5 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         events = new NeuronArrayEvents(this);
         return this;
     }
+
 }

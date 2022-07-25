@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes
 
+import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.NetworkPanel
@@ -35,6 +36,7 @@ import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
 import org.simbrain.util.table.SimbrainJTableScrollPanel
 import smile.math.matrix.Matrix
+import java.awt.Color
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.*
@@ -44,18 +46,43 @@ import kotlin.math.sqrt
  * The current pnode representation for all [Layer] objects. May be broken out into subtypes for different
  * subclasses of Layer.
  */
-class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
+class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) :
     ArrayLayerNode(networkPanel, neuronArray) {
+
+    /**
+     * Main pixel image for activations.
+     */
+    protected val activationImage = PImage().apply {
+        mainNode.addChild(this)
+    }
+
+    /**
+     * Image with spikes and transparent background overlaid on the activation image for spiking neuron arrays.
+     */
+    private val spikeImage = PImage().apply {
+        mainNode.addChild(this)
+    }
+
+
+    /**
+     * Text corresponding to neuron's (optional) label.
+     */
+    private val labelText = PText()
+
+    /**
+     * Background for label text, so that background objects don't show up.
+     */
+    private val labelBackground = PNode()
 
     /**
      * If true, show the image array as a grid; if false show it as a horizontal line.
      */
     private var gridMode = false
-    set(value) {
-        field = value
-        updateActivationImage()
-        updateBorder()
-    }
+        set(value) {
+            field = value
+            updateActivationImage()
+            updateBorder()
+        }
 
     override val margin = 10.0
 
@@ -74,32 +101,32 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
     }
 
     /**
-     * Image to show activationImage.
-     */
-    private val activationImage = PImage().apply {
-        mainNode.addChild(this)
-    }
-
-    private val spikeImage = PImage().apply {
-        mainNode.addChild(this)
-    }
-
-    /**
      * Create a new neuron array node.
      *
      * @param np Reference to NetworkPanel
      * @param na reference to model neuron array
      */
     init {
+
         val events = neuronArray.events
-        events.onUpdated {
-            updateActivationImage()
-            updateInfoText()
-        }
+
         events.onGridModeChange {
             gridMode = neuronArray.isGridMode
         }
         gridMode = neuronArray.isGridMode
+
+        // TODO: Link to network preferences
+        labelBackground.paint = Color.white
+        labelBackground.setBounds(labelText.bounds)
+        labelBackground.addChild(labelText)
+        addChild(labelBackground)
+        events.onLabelChange { o, n -> updateTextLabel() }
+        updateTextLabel()
+
+        events.onUpdated {
+            updateActivationImage()
+            updateInfoText()
+        }
         events.onUpdateRuleChange {
             if (!neuronArray.updateRule.isSpikingRule) {
                 mainNode.removeChild(spikeImage)
@@ -110,6 +137,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
         spikeImage.offset(0.0, infoText.offset.y + infoText.height + 5)
         activationImage.addBorder()
         updateBorder()
+
     }
 
     private fun updateActivationImage() {
@@ -129,7 +157,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
                 spikeImage.image = spikes.toOverlay(len, len, NeuronNode.spikingColor)
                 spikeImage.setBounds(
                     0.0, 0.0,
-                    infoText.width,  infoText.width
+                    infoText.width, infoText.width
                 )
             }
         } else {
@@ -150,19 +178,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
                 )
             }
         }
-
+        updateTextLabel()
     }
 
     private fun computeInfoText() = """
-            ${neuronArray.label}    nodes: ${neuronArray.size()}
+            ${neuronArray.id}    nodes: ${neuronArray.size()}
             mean activation: ${neuronArray.activations.col(0).average().format(4)}
             """.trimIndent()
-            // if (neuronArray.getPrototypeRule() instanceof SpikingNeuronUpdateRule) {
-            //     // TODO: Use this to place a yellow grid over pixels for spiking components
-            //     System.out.println(
-            //             Arrays.toString(((DataHolder.SpikingDataHolder)
-            //                     neuronArray.getDataHolder()).spikes));
-            // }
 
     /**
      * Update status text.
@@ -236,6 +258,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
      */
     private val arrayDialog: StandardDialog
         get() {
+            // TODO: Use  show dialog
             val dialog: StandardDialog = AnnotatedPropertyEditor(neuronArray).dialog
             dialog.pack()
             dialog.setLocationRelativeTo(null)
@@ -249,5 +272,20 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray):
 
     override fun getModel(): NeuronArray {
         return neuronArray
+    }
+
+    /**
+     * Update the text label.
+     */
+    fun updateTextLabel() {
+        if (!neuronArray.label.isNullOrEmpty()) {
+            labelText.font = NeuronNode.NEURON_FONT
+            labelText.text = "" + neuronArray.label
+            labelText.setOffset(
+                activationImage.x - labelText.width / 2 + activationImage.width / 2,
+                activationImage.y - labelText.height - 17
+            )
+            labelBackground.setBounds(labelText.fullBounds)
+        }
     }
 }

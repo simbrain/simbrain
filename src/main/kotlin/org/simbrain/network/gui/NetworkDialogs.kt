@@ -54,7 +54,7 @@ fun NetworkPanel.showSelectedSynapseProperties() {
 
 
 fun NetworkPanel.showNeuronArrayCreationDialog() {
-    val template = NeuronArray.CreationTemplate(network.idManager.getProposedId(NeuronArray::class.java))
+    val template = NeuronArray.CreationTemplate()
     AnnotatedPropertyEditor(template).dialog.apply {
         addClosingTask {
             val neuronArray = template.create(network)

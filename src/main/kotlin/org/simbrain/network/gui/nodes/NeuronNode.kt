@@ -115,7 +115,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
         // Set up label text
         //priorityText.setFont(PRIORITY_FONT);
-        labelBackground.paint = networkPanel.background
+        labelBackground.paint = networkPanel.backgroundColor
         labelBackground.setBounds(labelText.bounds)
         labelBackground.addChild(labelText)
         addChild(labelBackground)
@@ -125,7 +125,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         updateColor()
         updateText()
         updateTextLabel()
-        updateBounds()
         updateClampStatus()
         centerFullBoundsOnPoint(neuron.x, neuron.y)
         pickable = true
@@ -342,17 +341,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
                 labelText.setOffset(mainShape.x - labelText.width / 2 + DIAMETER / 2, mainShape.y - DIAMETER / 2 - 1)
                 labelBackground.setBounds(labelText.fullBounds)
             }
-            updateBounds()
         }
-    }
-
-    private fun updateBounds() {
-        // update bounds to include text
-        val bounds = mainShape.bounds
-        if (neuron.label != null) {
-            bounds.add(labelText.localToParent(labelText.bounds))
-        }
-        setBounds(bounds)
     }
 
     /**

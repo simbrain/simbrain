@@ -197,10 +197,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Decay selected weights based on axon length",
         enablingCondition = ConditionallyEnabledAction.EnablingCondition.SYNAPSES
     ) {
-        DecayFunction.DecayFunctionSelector().showDialog {
+        DecayFunction.DecayFunctionSelector().createDialog {
             selectionManager.filterSelectedModels<Synapse>()
                 .decayStrengthBasedOnLength(it.decayFunction)
-        }
+        }.display()
     }
 
     /**
@@ -228,12 +228,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         enablingCondition = ConditionallyEnabledAction.EnablingCondition.NEURONS
     ) {
         // TODO: Indicate the threshold somehow in a prompt
-        ProbabilityDistribution.Randomizer().showDialog { dist ->
+        ProbabilityDistribution.Randomizer().createDialog { dist ->
             selectionManager.filterSelectedModels<Neuron>().forEach {  n ->
                 if (dist.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
                 else n.polarity = SimbrainConstants.Polarity.INHIBITORY
             }
-        }
+        }.display()
     }
 
     /**

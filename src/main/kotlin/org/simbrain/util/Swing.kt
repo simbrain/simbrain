@@ -164,15 +164,15 @@ fun <T: JComponent> T.createAction(
 }
 
 /**
- * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor] and
- * then applying a lambda to that object.
+ * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor]. The provided block is executed when
+ * closing the dialog.
  */
-fun <E: EditableObject> E.showDialog(block: (E) -> Unit) {
+fun <E: EditableObject> E.createDialog(block: (E) -> Unit): StandardDialog {
     val editor = AnnotatedPropertyEditor(this)
-    StandardDialog(editor).apply{
+    return StandardDialog(editor).apply{
         addClosingTask{
             editor.commitChanges()
             block(editor.editedObject as E)
         }
-    }.display()
+    }
 }

@@ -31,7 +31,6 @@ import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
 import org.simbrain.util.table.SimbrainJTableScrollPanel
@@ -205,8 +204,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         contextMenu.addSeparator()
         val editArray: Action = object : AbstractAction("Edit...") {
             override fun actionPerformed(event: ActionEvent) {
-                val dialog = arrayDialog
-                dialog.isVisible = true
+                propertyDialog.display()
             }
         }
         contextMenu.add(editArray)
@@ -253,21 +251,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         return contextMenu
     }
 
-    /**
-     * Returns the dialog for editing this neuron array.
-     */
-    private val arrayDialog: StandardDialog
-        get() {
-            // TODO: Use  show dialog
-            val dialog: StandardDialog = AnnotatedPropertyEditor(neuronArray).dialog
-            dialog.pack()
-            dialog.setLocationRelativeTo(null)
-            dialog.addClosingTask { updateInfoText() }
-            return dialog
-        }
-
     override fun getPropertyDialog(): JDialog {
-        return arrayDialog
+        return neuronArray.createDialog { updateInfoText()}
     }
 
     override fun getModel(): NeuronArray {

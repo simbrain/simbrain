@@ -18,6 +18,8 @@ import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.createDialog
+import org.simbrain.util.display
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import java.awt.Dialog
@@ -54,16 +56,12 @@ fun NetworkPanel.showSelectedSynapseProperties() {
 
 
 fun NetworkPanel.showNeuronArrayCreationDialog() {
-    val template = NeuronArray.CreationTemplate()
-    AnnotatedPropertyEditor(template).dialog.apply {
-        addClosingTask {
-            val neuronArray = template.create(network)
-            network.addNetworkModel(neuronArray)
-        }
-        pack()
-        setLocationRelativeTo(this@showNeuronArrayCreationDialog)
-        isVisible = true
-    }
+    NeuronArray.CreationTemplate().createDialog {
+        val neuronArray = it.create(network)
+        network.addNetworkModel(neuronArray)
+    }.also {
+        it.title = "Create Neuron Array"
+    }.display()
 }
 
 val NetworkPanel.neuronDialog

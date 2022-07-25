@@ -131,7 +131,9 @@ class Network {
     /**
      * Manage ids for all network elements.
      */
-    val idManager = SimpleIdManager { cls -> networkModels.getRawModelSet(cls).size + 1 }
+    @Transient
+    var idManager = SimpleIdManager { cls -> networkModels.getRawModelSet(cls).size + 1 }
+        private set
 
     /**
      * An optional name for the network that defaults to "Network[current_id]".
@@ -430,6 +432,7 @@ class Network {
         // Initialize update manager
         updateManager.postOpenInit()
         networkModels.allInReconstructionOrder.forEach { it.postOpenInit() }
+        idManager = SimpleIdManager { cls -> networkModels.getRawModelSet(cls).size + 1 }
         return this
     }
 

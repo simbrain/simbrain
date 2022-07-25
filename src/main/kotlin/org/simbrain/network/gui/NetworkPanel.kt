@@ -10,9 +10,7 @@ import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
-import org.simbrain.network.LocatableModel
-import org.simbrain.network.NetworkComponent
-import org.simbrain.network.NetworkModel
+import org.simbrain.network.*
 import org.simbrain.network.connections.QuickConnectionManager
 import org.simbrain.network.core.*
 import org.simbrain.network.groups.*
@@ -29,7 +27,6 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
-import org.simbrain.network.topLeftLocation
 import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.network.trainers.TrainingSet
 import org.simbrain.util.complement
@@ -113,7 +110,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     val editToolBar = createEditToolBar()
 
-    var backgroundColor = Color.white!!
+    // TODO: Use preference default
+    var backgroundColor = Color.white
 
     val isRunning
         get() = network.isRunning
@@ -465,8 +463,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun nudge(dx: Int, dy: Int) {
-        selectionManager.filterSelectedModels<Neuron>()
-                .forEach { it.offset(dx * nudgeAmount, dy * nudgeAmount) }
+        selectionManager.filterSelectedModels<LocatableModel>()
+            .translate(dx * nudgeAmount, dy * nudgeAmount)
     }
 
     fun toggleClamping() {

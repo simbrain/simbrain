@@ -238,8 +238,10 @@ public class EntityNode extends PNode {
             case LION:
             case STEVE:
             case SUSI:
-                sprite = new RotatingSprite(RotatingEntityManager.getRotatingTileset(entity.getEntityType().name()));
+                sprite = new RotatingSprite(RotatingEntityManager.getRotatingTileset(entity.getEntityType().name(), 8));
                 break;
+            case ISOPOD:
+                sprite = new RotatingSprite(RotatingEntityManager.getRotatingTileset("isopod", 2));
             default:
                 break;
         }

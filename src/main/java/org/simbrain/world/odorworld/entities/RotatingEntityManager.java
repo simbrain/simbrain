@@ -69,7 +69,7 @@ public class RotatingEntityManager {
         if (animationName.equals("mouse")) {
             animation = getMouse();
         } else {
-            animation = getRotatingTileset(animationName);
+            animation = getRotatingTileset(animationName, 8);
         }
 
         return getAnimationByHeading(animation, degree);
@@ -89,9 +89,10 @@ public class RotatingEntityManager {
      *
      * @param tileBaseName base name used to access the relevant set of image,
      *                     which are named in a standard way
+     * @param numFrames how many frames there are per direction
      * @return horse tree map
      */
-    public static ArrayList<Animation> getRotatingTileset(String tileBaseName) {
+    public static ArrayList<Animation> getRotatingTileset(String tileBaseName, int numFrames) {
 
         // The folders are lower cased
         tileBaseName = tileBaseName.toLowerCase();
@@ -101,7 +102,7 @@ public class RotatingEntityManager {
         String[] fileNameInitials = {"e000", "ne000", "n000", "nw000", "w000", "sw000", "s000", "se000"};
         for (String fni : fileNameInitials) {
             ArrayList<Image> frames = new ArrayList<>();
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < numFrames; i++) {
                 frames.add(OdorWorldResourceManager.getRotatingImage(tileBaseName + "/" + fni + i + ".png"));
             }
             rotatingTileset.add(Animations.createLoopedAnimation(frames));

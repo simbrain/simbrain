@@ -69,6 +69,7 @@ val NetworkPanel.actionMenu
     get() = JMenu("Actions").apply {
         with(networkActions) {
             // Alphabetical by action name
+            add(fast100)
             add(fastGridAction)
             add(decayWeightsAction)
             add(pruneWeightsAction)

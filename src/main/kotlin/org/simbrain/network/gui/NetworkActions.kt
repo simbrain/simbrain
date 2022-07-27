@@ -92,7 +92,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             description = "Deep Network is not currently supported on M1 Macs",
             keyCombo = CmdOrCtrl + Shift + 'D'
         ) {
-            JOptionPane.showConfirmDialog(null, "Deep Network / TensorFlow for Java is not currently supported on M1 Macs.")
+            JOptionPane.showConfirmDialog(
+                null,
+                "Deep Network / TensorFlow for Java is not currently supported on M1 Macs."
+            )
         }.also { it.isEnabled = false }
     } else {
         networkPanel.createAction(
@@ -216,7 +219,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             ".5"
         )
         selectionManager.filterSelectedModels<Synapse>()
-            .filter {Math.abs(it.strength) < threshold.toDouble()}
+            .filter { Math.abs(it.strength) < threshold.toDouble() }
             .forEach { it.delete() }
     }
 
@@ -229,7 +232,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         // TODO: Indicate the threshold somehow in a prompt
         ProbabilityDistribution.Randomizer().createDialog { dist ->
-            selectionManager.filterSelectedModels<Neuron>().forEach {  n ->
+            selectionManager.filterSelectedModels<Neuron>().forEach { n ->
                 if (dist.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
                 else n.polarity = SimbrainConstants.Polarity.INHIBITORY
             }
@@ -248,4 +251,18 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         zoomToFitPage()
     }
 
+    /**
+     * Quick create 100 nodes
+     */
+    val fast100 = networkPanel.createAction(
+        name = "Add 100 nodes",
+    ) {
+        List(100) { Neuron(network) }.apply {
+            network.addNetworkModels(this)
+            GridLayout().layoutNeurons(this)
+        }.onEach {
+            it.events.fireSelected()
+        }
+        zoomToFitPage()
+    }
 }

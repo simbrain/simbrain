@@ -276,6 +276,9 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
      * Sets the color of this neuron based on its activation level.
      */
     private fun updateColor() {
+        if (neuron.isSpike) {
+            return
+        }
         val activation = neuron.updateRule.getGraphicalValue(neuron)
         // Force to blank if 0 (or close to it)
         val gLow = neuron.updateRule.graphicalLowerBound
@@ -298,7 +301,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             val saturation = SimbrainMath.rescale(activation, 0.0, gLow, 0.0, 1.0)
             mainShape.paint = Color.getHSBColor(coolColor, saturation.toFloat(), 1f)
         }
-        if (!customStrokeColor && !neuron.isSpike) {
+        if (!customStrokeColor) {
             // Color stroke paint based on Polarity
             if (neuron.polarity === SimbrainConstants.Polarity.EXCITATORY) {
                 circle.strokePaint = Color.red

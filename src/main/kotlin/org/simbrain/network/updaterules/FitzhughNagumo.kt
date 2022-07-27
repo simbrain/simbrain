@@ -28,9 +28,17 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.math.SimbrainMath.clip
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.workspace.Producible
 
+/**
+ * An early 2d spiking model that models the action potential. At rest with no inputs, goes to the values shown in
+ * the phase-portrait on the scholarpedia page.
+ *
+ * @see http://www.scholarpedia.org/article/FitzHugh-Nagumo_model
+ */
 class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
     /**
@@ -150,6 +158,8 @@ class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         w += timeStep * (a * (b * v + 0.7 - c * w))
         v += timeStep * (v - v * v * v / 3 - w + inputs)
 
+        v = clip(v, -1000.0, 1000.0)
+
         if (v >= threshold) {
             return Triple(true, v, w)
         } else {
@@ -204,6 +214,7 @@ class FitzHughData(
     @UserParameter(
         label = "w", description = "Recovery variables."
     )
+    @get:Producible
     var w: Double = 0.0,
 ) : SpikingScalarData() {
     override fun copy(): FitzHughData {
@@ -212,6 +223,7 @@ class FitzHughData(
 }
 
 class FitzHughMatrixData(size: Int) : SpikingMatrixData(size) {
+    @get:Producible
     var w = DoubleArray(size)
     override fun copy() = FitzHughMatrixData(size).also {
         commonCopy(it)

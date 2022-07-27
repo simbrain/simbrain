@@ -198,11 +198,13 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Data holder for synapse
      */
+    @UserParameter(label = "Learning data", isEmbeddedObject = true, order = 100)
     private ScalarDataHolder dataHolder = new EmptyScalarData();
 
     /**
      * Data holder for spiker responder.
      */
+    @UserParameter(label = "Spike data", isEmbeddedObject = true, order = 110)
     private ScalarDataHolder spikeResponderData = new EmptyScalarData();
 
     /**

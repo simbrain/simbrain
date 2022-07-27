@@ -54,7 +54,7 @@ class JumpAndDecay : SpikeResponder() {
         increment = .1,
         order = 2
     )
-    var baseLine = .0001
+    var baseLine = 0.0
 
     @UserParameter(
         label = "Time Constant",

@@ -50,7 +50,7 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
     @Override
     public void apply(Neuron neuron, ScalarDataHolder data) {
         // Synaptic Normalization
-        neuron.normalizeExcitatoryFanIn();
+        SORN.normalizeExcitatoryFanIn(neuron);
         // Sum inputs including noise and applied (external) inputs
         double input = neuron.getInput()
                 + (addNoise ? noiseGenerator.sampleDouble() : 0);
@@ -74,10 +74,6 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
 //        if (getThreshold() > maxThreshold) {
 //            setThreshold(maxThreshold);
 //        }
-    }
-    
-    public void init(Neuron n) {
-        n.normalizeInhibitoryFanIn();
     }
 
     @Override

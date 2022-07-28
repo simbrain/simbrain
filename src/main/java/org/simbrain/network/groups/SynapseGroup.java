@@ -414,6 +414,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         inSynapseSet.remove(toDelete);
         if (toDelete != null) {
             // TODO: Discuss np check with Zoë
+            // TODO: Replace with toDelete.delete();?
             toDelete.getSource().removeEfferent(toDelete);
             toDelete.getTarget().removeAfferent(toDelete);
         }

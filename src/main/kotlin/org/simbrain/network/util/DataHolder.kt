@@ -130,19 +130,3 @@ class MorrisLecarData(
     }
 }
 
-class AdexData(
-    @UserParameter(
-        label = "w", description = "Adaptation variable: Roughly speaking amount of metabolite currently " +
-                "in the cell. Expelled during spiking and then replenished."
-    )
-    var w: Double = 200.0,
-    @UserParameter(label = "Inhibitory Conductance")
-    var inhibConductance: Double = 0.0,
-    @UserParameter(label = "Excitatory Conductance")
-    var exConductance: Double = 0.0,
-): SpikingScalarData() {
-    override fun copy(): AdexData {
-        return AdexData(w, inhibConductance, exConductance)
-    }
-}
-

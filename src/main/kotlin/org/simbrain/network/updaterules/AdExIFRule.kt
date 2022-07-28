@@ -21,8 +21,8 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.AdexData
 import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -40,6 +40,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  * @author Zoë Tosi
  */
 open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
+
     /**
      * Reset voltage (mV). Defaults to 3-spike bursting behavior at .8 nA
      * current. See Touboul & Brette 2005 -48.5: 2 spike burst -47.2: 4 spike
@@ -99,7 +100,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         order = 6,
         tab = "Input Currents"
     )
-    private var g_L = 30.0
+    var g_L = 30.0
 
     /**
      * Maximal excitatory conductance. (nS)
@@ -182,7 +183,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         probParam1 = 0.01,
         probParam2 = .3
     )
-    private var b = 0.0805
+    var b = 0.0805
 
     /**
      * Adaptation time constant (ms).
@@ -272,11 +273,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
             v_mem = v_Reset
             neuron.forceSetActivation(v_Reset)
         }
-        // Retrieve integration time constant in case it has changed...
         val dt = neuron.network.timeStep
-        //        final double ref = neuron.getNetwork().getTimeType()
-        //                == TimeType.DISCRETE ? refractoryPeriod / dt
-        //                        : refractoryPeriod;
         val refractory = neuron.lastSpikeTime + refractoryPeriod >= neuron.network.time
 
         // Retrieve membrane potential from host neuron's activation
@@ -284,23 +281,9 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         // potential between updates.
         v_mem = neuron.activation
 
-        // Retrieve incoming ex/in currents or proportion of open channels
-        data.exConductance = 0.0
-        data.inhibConductance = 0.0
-        // TODO
-//        for (ii in neuron.fanIn.indices) {
-//            neuron.fanIn[ii].updateOutput()
-//            val `val` = neuron.fanIn[ii].psr
-//            if (neuron.polarity === SimbrainConstants.Polarity.INHIBITORY) {
-//                data.inhibConductance = data.inhibConductance + `val`
-//            } else {
-//                data.exConductance = data.exConductance + `val`
-//            }
-//        }
-
         // Calculate incoming excitatory and inhibitory voltage changes
-        val iSyn_ex = g_e_bar * data.exConductance * (exReversal - v_mem)
-        val iSyn_in = -g_i_bar * data.inhibConductance * (inReversal - v_mem)
+        val iSyn_ex = g_e_bar * neuron.excitatoryInputs * (exReversal - v_mem)
+        val iSyn_in = -g_i_bar * neuron.inhibitoryInputs * (inReversal - v_mem)
 
         // Calculate voltage changes due to leak
         val i_leak = g_L * (leakReversal - v_mem)
@@ -331,11 +314,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         if (v_mem >= v_Peak) {
             v_mem = v_Peak
             data.w = data.w + b * CURRENT_CONVERTER
-            if (!refractory) {
-                neuron.isSpike = true
-            } else {
-                neuron.isSpike = false
-            }
+            neuron.isSpike = !refractory
         } else {
             neuron.isSpike = false
         }
@@ -388,6 +367,12 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         return v_Th + 10
     }
 
+    /**
+     * A converter from pA to nA, since most other sims in Simbrain use
+     * nano Amps.
+     */
+    val CURRENT_CONVERTER = 1000.0
+
     fun getI_bg(): Double {
         return i_bg / CURRENT_CONVERTER
     }
@@ -399,11 +384,17 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         this.i_bg = CURRENT_CONVERTER * i_bg
     }
 
-    companion object {
-        /**
-         * A converter from pA to nA, since most other sims in Simbrain use
-         * nano Amps.
-         */
-        const val CURRENT_CONVERTER = 1000.0
+}
+
+
+class AdexData(
+    @UserParameter(
+        label = "w", description = "Adaptation variable: Roughly speaking amount of metabolite currently " +
+                "in the cell. Expelled during spiking and then replenished."
+    )
+    var w: Double = 200.0,
+): SpikingScalarData() {
+    override fun copy(): AdexData {
+        return AdexData(w)
     }
 }

@@ -18,6 +18,7 @@ import java.util.function.Consumer
 import javax.swing.*
 import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
+import kotlin.math.ceil
 import kotlin.math.floor
 
 
@@ -220,16 +221,18 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
     setLocationRelativeTo(null)
 }
 
-sealed class Coordinate(x: kotlin.Double, y: kotlin.Double): Point2D.Double(x, y)
+sealed class Coordinate(x: kotlin.Double, y: kotlin.Double) : Point2D.Double(x, y)
 
-class GridCoordinate(x: kotlin.Double, y: kotlin.Double): Coordinate(x, y) {
+class GridCoordinate(x: kotlin.Double, y: kotlin.Double) : Coordinate(x, y) {
     fun copy() = GridCoordinate(x, y)
 }
+
 fun Point2D.asGridCoordinate() = GridCoordinate(x, y)
 
-class PixelCoordinate(x: kotlin.Double, y: kotlin.Double): Coordinate(x, y) {
+class PixelCoordinate(x: kotlin.Double, y: kotlin.Double) : Coordinate(x, y) {
     fun copy() = PixelCoordinate(x, y)
 }
+
 fun Point2D.asPixelCoordinate() = PixelCoordinate(x, y)
 
 context(TileMap)
@@ -237,6 +240,24 @@ fun PixelCoordinate.toGridCoordinate() = point(floor(x / tileWidth), floor(y / t
 
 context(TileMap)
 fun GridCoordinate.toPixelCoordinate() = point((x + 0.5) * tileWidth, (y + 0.5) * tileHeight).asPixelCoordinate()
+
+fun TileMap.getRelativeGridLocationsInRadius(radiusInPixel: Double) = sequence {
+
+    fun Point2D.isInRadius() = magnitudeSq < radiusInPixel * radiusInPixel
+
+    val maxX = ceil(radiusInPixel / tileWidth / 2).toInt()
+    val maxY = ceil(radiusInPixel / tileHeight / 2).toInt()
+
+    for (j in -maxY until maxY) {
+        for (i in -maxX until maxX) {
+            val gridCoordinate = point(i, j).asGridCoordinate()
+            if (gridCoordinate.toPixelCoordinate().isInRadius()) {
+                yield(gridCoordinate)
+            }
+        }
+    }
+
+}
 
 fun TileMap.getGridLocationsInRadius(staringLocation: PixelCoordinate, radiusInPixel: Double) = sequence {
 

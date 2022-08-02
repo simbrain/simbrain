@@ -3,8 +3,8 @@ package org.simbrain.world.odorworld.sensors
 import org.simbrain.util.UserParameter
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
-import org.simbrain.util.piccolo.getTileStackNear
-import org.simbrain.util.piccolo.toPixelCoordinate
+import org.simbrain.util.piccolo.*
+import org.simbrain.util.plus
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
 /**
@@ -36,7 +36,9 @@ class TileSensor @JvmOverloads constructor(
         currentValue = 0.0
         val sensorLocation = computeAbsoluteLocation(parent)
         currentValue = with(parent.world.tileMap) {
-            getTileStackNear(sensorLocation, decayFunction.dispersion)
+            getRelativeGridLocationsInRadius(decayFunction.dispersion)
+                .map { it + sensorLocation.asPixelCoordinate().toGridCoordinate() }
+                .map { it.asGridCoordinate() to getTileStackAt(it.x.toInt(), it.y.toInt()) }
                 .filter { (_, tiles) -> tiles.any { it.type == tileType } }
                 .map { (pos) -> pos.toPixelCoordinate().distance(sensorLocation) }
                 .sumOf { decayFunction.getScalingFactor(it) * baseValue }

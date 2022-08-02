@@ -143,14 +143,14 @@ class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     }
 
     private fun fitzhughNagumoRule(
-        extV: Double,
-        extW: Double,
+        initV: Double,
+        initW: Double,
         externalInput: Double,
         timeStep: Double
     ): Triple<Boolean, Double, Double> {
         var inputs = externalInput
-        var v = extV
-        var w = extW
+        var v = initV
+        var w = initW
         if (addNoise) {
             inputs += noiseGenerator.sampleDouble()
         }

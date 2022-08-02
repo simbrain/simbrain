@@ -18,14 +18,17 @@
  */
 package org.simbrain.network.updaterules
 
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.ScalarDataHolder
-import org.simbrain.network.util.SpikingScalarData
+import org.simbrain.network.util.*
 import org.simbrain.util.UserParameter
+import org.simbrain.util.math.SimbrainMath.clip
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.workspace.Producible
 
 /**
  * An implementation of adaptive exponential integrate and fire. This version
@@ -34,7 +37,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  * membrane potential in response to successive spikes.
  * See Toboul &#38; Brette 2005.
  *
- * @see [...](http://www.scholarpedia.org/article/Adaptive_exponential_integrate-and-fire_model)
+ * @see http://www.scholarpedia.org/article/Adaptive_exponential_integrate-and-fire_model
  *
  *
  * @author Zoë Tosi
@@ -174,8 +177,8 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
      * Adaptation reset parameter (nA).
      */
     @UserParameter(
-        label = "Reset (nA)",
-        description = "Adaptation reset parameter (nA)",
+        label = "Adaptation step size",
+        description = "Adaptation step size",
         increment = .1,
         order = 12,
         tab = "Adaptation",
@@ -224,7 +227,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
      */
     @UserParameter(
         label = "Capacitance (μF)",
-        description = "A paramter designating the overall ability of the neuron's membrane to retain a charge.",
+        description = "A parameter designating the overall ability of the neuron's membrane to retain a charge.",
         increment = .1,
         order = 4,
         tab = "Membrane Voltage",
@@ -263,27 +266,63 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
      * optionally be used to promote network stability.
      */
     var refractoryPeriod = 1.0
-    override fun createScalarData(): ScalarDataHolder {
-        return AdexData()
+
+    override fun apply(na: Layer, data: MatrixDataHolder) {
+        if (na is NeuronArray && data is AdexMatrixData) {
+            for (i in 0 until na.size()) {
+                val excitInputs = na.excitatoryInputs
+                val inhibInputs = na.inhibitoryInputs
+                val (spiked, v, w) = adExRule(
+                    na.activations.get(i, 0),
+                    data.w.get(i),
+                    excitInputs[i],
+                    inhibInputs[i],
+                    data.lastSpikeTimes[i],
+                    na.network.time,
+                    na.network.timeStep
+                )
+                data.setHasSpiked(i, spiked, na.network.time)
+                na.activations.set(i, 0, v)
+                data.w.set(i, w)
+            }
+        }
     }
 
-    override fun apply(neuron: Neuron, dat: ScalarDataHolder) {
-        val data = dat as AdexData
-        if (v_mem >= v_Peak) {
-            v_mem = v_Reset
-            neuron.forceSetActivation(v_Reset)
-        }
-        val dt = neuron.network.timeStep
-        val refractory = neuron.lastSpikeTime + refractoryPeriod >= neuron.network.time
+    override fun createMatrixData(size: Int): MatrixDataHolder {
+        return AdexMatrixData(size)
+    }
 
-        // Retrieve membrane potential from host neuron's activation
-        // in case some outside entity has explicitly changed the membrane
-        // potential between updates.
-        v_mem = neuron.activation
+    override fun apply(n: Neuron, data: ScalarDataHolder) {
+        if (data is AdexData) {
+            val (spiked, v, w) = adExRule(
+                n.activation, data.w, n.excitatoryInputs, n.inhibitoryInputs,
+                n.lastSpikeTime, n.network.time, n.network.timeStep
+            )
+            n.isSpike = spiked
+            n.activation = v
+            data.w = w
+        }
+
+    }
+
+    private fun adExRule(
+        initV: Double,
+        initW: Double,
+        excIn: Double,
+        inhIn: Double,
+        lastSpikeTime: Double,
+        t: Double,
+        dt: Double
+    ): Triple<Boolean, Double, Double> {
+
+        var v_mem = initV
+        var w = initW
+
+        val refractory = lastSpikeTime + refractoryPeriod >= t
 
         // Calculate incoming excitatory and inhibitory voltage changes
-        val iSyn_ex = g_e_bar * neuron.excitatoryInputs * (exReversal - v_mem)
-        val iSyn_in = -g_i_bar * neuron.inhibitoryInputs * (inReversal - v_mem)
+        val iSyn_ex = g_e_bar * excIn * (exReversal - v_mem)
+        val iSyn_in = -g_i_bar * inhIn * (inReversal - v_mem)
 
         // Calculate voltage changes due to leak
         val i_leak = g_L * (leakReversal - v_mem)
@@ -296,31 +335,39 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
         // Calc dV/dt for membrane potential
         var dVdt =
-            g_L * slopeFactor * Math.exp((v_mem - v_Th) / slopeFactor) + i_leak + iSyn_ex + iSyn_in + ibg - data.w
-
+            g_L * slopeFactor * Math.exp((v_mem - v_Th) / slopeFactor) + i_leak + iSyn_ex + iSyn_in + ibg - w
 
         // Factor in membrane capacitance...
         dVdt /= memCapacitance
 
         // Calculate adaptation change
-        val dwdt = (a * (v_mem - leakReversal) - data.w) / tauW
+        val dwdt = (a * (v_mem - leakReversal) - w) / tauW
 
         // Integrate membrane potential and adaptation parameter using
         // Euler integration
         v_mem += dVdt * dt
-        data.w = data.w + dwdt * dt
+        w += dwdt * dt
 
-        // Spike?
+        var isSpike: Boolean
         if (v_mem >= v_Peak) {
-            v_mem = v_Peak
-            data.w = data.w + b * CURRENT_CONVERTER
-            neuron.isSpike = !refractory
+            v_mem = v_Reset
+            w += b * CURRENT_CONVERTER
+            if (!refractory) {
+                isSpike = true
+            } else {
+                isSpike = false
+            }
         } else {
-            neuron.isSpike = false
+            isSpike = false
         }
+        v_mem = clip(v_mem, -1000.0,1000.0)
 
-        // Set the buffer to the membrane potential
-        neuron.activation = v_mem
+        return Triple(isSpike, v_mem, w)
+
+    }
+
+    override fun createScalarData(): ScalarDataHolder {
+        return AdexData()
     }
 
     override fun deepCopy(): AdExIFRule {
@@ -386,6 +433,14 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
 }
 
+class AdexMatrixData(size: Int) : SpikingMatrixData(size) {
+    @get:Producible
+    var w = DoubleArray(size)
+    override fun copy() = AdexMatrixData(size).also {
+        commonCopy(it)
+        it.w = w.copyOf()
+    }
+}
 
 class AdexData(
     @UserParameter(
@@ -393,7 +448,7 @@ class AdexData(
                 "in the cell. Expelled during spiking and then replenished."
     )
     var w: Double = 200.0,
-): SpikingScalarData() {
+) : SpikingScalarData() {
     override fun copy(): AdexData {
         return AdexData(w)
     }

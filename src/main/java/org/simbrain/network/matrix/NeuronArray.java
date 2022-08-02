@@ -11,6 +11,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
@@ -184,6 +185,10 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         getEvents().fireUpdated();
     }
 
+    public void setActivations(double[] newActivations) {
+        setActivations(new Matrix(newActivations));
+    }
+
     public void fireLocationChange() {
         getEvents().fireLocationChange();
     }
@@ -262,6 +267,21 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public Object readResolve() {
         events = new NeuronArrayEvents(this);
         return this;
+    }
+
+    public double[] getExcitatoryInputs() {
+        return getIncomingConnectors().stream()
+                .filter(wm -> wm instanceof WeightMatrix)
+                .map(wm -> ((WeightMatrix) wm).getExcitatoryOutputs())
+                .reduce(SimbrainMath::addVector)
+                .orElse(new double[inputSize()]);
+    }
+    public double[] getInhibitoryInputs() {
+        return getIncomingConnectors().stream()
+                .filter(wm -> wm instanceof WeightMatrix)
+                .map(wm -> ((WeightMatrix) wm).getInhibitoryOutputs())
+                .reduce(SimbrainMath::addVector)
+                .orElse(new double[inputSize()]);
     }
 
 }

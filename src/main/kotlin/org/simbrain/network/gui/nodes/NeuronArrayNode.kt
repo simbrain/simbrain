@@ -213,6 +213,17 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         contextMenu.add(networkPanel.networkActions.connectSelectedModels)
         contextMenu.addSeparator()
 
+        // Choose style
+        val switchStyle: Action = networkPanel.createAction(
+            name = "Toggle line / grid",
+            iconPath = "menu_icons/grid.png",
+            description = "Toggle line / grid style"
+        ) {
+            neuronArray.isGridMode = !neuronArray.isGridMode
+        }
+        contextMenu.add(switchStyle)
+        contextMenu.addSeparator()
+
         // Randomize Action
         val randomizeAction: Action = object : AbstractAction("Randomize") {
             init {

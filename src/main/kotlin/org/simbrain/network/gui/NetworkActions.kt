@@ -34,6 +34,7 @@ import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
 import javax.swing.AbstractAction
+import javax.swing.JCheckBoxMenuItem
 import javax.swing.JOptionPane
 
 class NetworkActions(val networkPanel: NetworkPanel) {
@@ -77,7 +78,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val showPrioritiesAction = ShowPrioritiesAction(networkPanel)
     val showRunToolBarAction = ShowRunToolBarAction(networkPanel)
     val showWeightMatrixAction = ShowWeightMatrixAction(networkPanel)
-    val showWeightsAction = ShowWeightsAction(networkPanel)
     val spaceHorizontalAction = SpaceHorizontalAction(networkPanel)
     val spaceVerticalAction = SpaceVerticalAction(networkPanel)
     val stopNetworkAction = StopNetworkAction(networkPanel)
@@ -104,6 +104,23 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             keyCombo = CmdOrCtrl + Shift + 'D'
         ) {
             showDeepNetCreationDialog()
+        }
+    }
+
+    /**
+     * Should be called from a combo box menu item
+     */
+    val toggleFreeWeightVisibility = networkPanel.createAction(
+        name = "Toggle Weight Visibility",
+        description = "Toggle visibilty of free weights",
+        keyCombo = KeyCombination('5')
+    ) { event ->
+        event.source.let {
+            if (it is JCheckBoxMenuItem) {
+                freeWeightsVisible = it.state
+            } else {
+                freeWeightsVisible = !freeWeightsVisible
+            }
         }
     }
 

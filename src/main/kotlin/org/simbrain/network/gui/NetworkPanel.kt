@@ -156,6 +156,15 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
 
     /**
+     * Whether to display free weights (those not in a synapse group) or not.
+     */
+    var freeWeightsVisible = true
+        set(value) {
+            field = value
+            network.looseWeights.forEach{it.isVisible = value}
+        }
+
+    /**
      * Turn GUI on or off.
      */
     var guiOn = true

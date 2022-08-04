@@ -150,8 +150,7 @@ val NetworkPanel.viewMenu
             })
             addSeparator()
             add(JCheckBoxMenuItem(showPrioritiesAction).apply { this.state = networkPanel.prioritiesVisible })
-            // TODO
-            // add(JCheckBoxMenuItem(showWeightsAction).apply { this.state = networkPanel.looseWeightsVisible })
+            add(JCheckBoxMenuItem(toggleFreeWeightVisibility).apply { this.state = networkPanel.freeWeightsVisible })
         }
     }
 

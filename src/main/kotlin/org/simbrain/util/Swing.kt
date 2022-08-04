@@ -102,11 +102,11 @@ fun <T: JComponent> T.createAction(
     name: String,
     description: String = name,
     keyCombo: KeyCombination? = null,
-    block: T.() -> Unit
+    block: T.(e:ActionEvent) -> Unit
 ): AbstractAction {
     return object : AbstractAction() {
         init {
-            if (iconPath != null) {
+             if (iconPath != null) {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
             }
 
@@ -118,7 +118,7 @@ fun <T: JComponent> T.createAction(
             }
         }
         override fun actionPerformed(e: ActionEvent) {
-            block()
+            block(e)
         }
     }
 }
@@ -157,10 +157,10 @@ fun <T: JComponent> T.createAction(
     iconPath: String = "",
     name: String = "",
     description: String = name,
-    keyPress: Char,
-    block: T.() -> Unit
+    keyCombo: Char,
+    block: T.(e: ActionEvent) -> Unit
 ): AbstractAction {
-    return createAction(iconPath, name, description, KeyCombination(keyPress), block)
+    return createAction(iconPath, name, description, KeyCombination(keyCombo), block)
 }
 
 /**

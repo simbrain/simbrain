@@ -53,8 +53,6 @@ fun NetworkPanel.addKeyBindings() {
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModels() }
     bindTo("3", networkActions.connectWithSynapseGroup)
-    bind("5") { network.flatSynapseList.forEach { it.isVisible = false }}
-    bind(CmdOrCtrl + '5') {network.flatSynapseList.forEach { it.isVisible = true }}
     bindTo("6", networkActions.selectIncomingWeightsAction)
     bindTo("7", networkActions.selectOutgoingWeightsAction)
     bind("8") {

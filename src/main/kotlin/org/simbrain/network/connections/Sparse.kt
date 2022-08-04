@@ -120,6 +120,10 @@ fun connectEqualized(
     random: kotlin.random.Random = kotlin.random.Random(kotlin.random.Random.nextLong())
 ): ConnectionsResult.Reset {
 
+    if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
+        return ConnectionsResult.Reset(listOf())
+    }
+
     val connectionCount = sourceNeurons.size * targetNeurons.size * connectionDensity
 
     val sources = sourceNeurons.sampleWithoutReplacement(random = random, restartIfExhausted = true)
@@ -145,6 +149,9 @@ fun connectSparse(
     sparsity: Double,
     selfConnectionAllowed: Boolean = false
 ): ConnectionsResult {
+    if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
+        return ConnectionsResult.Add(listOf())
+    }
     val existingSynapses = sourceNeurons.flatMap { it.fanOut.values.filter{it.target in targetNeurons} }
     val possibleConnections = (sourceNeurons.asSequence() cartesianProduct targetNeurons.asSequence()).toSet().let {
         if (!selfConnectionAllowed) {

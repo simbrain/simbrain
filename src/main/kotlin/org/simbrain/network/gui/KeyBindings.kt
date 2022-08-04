@@ -51,8 +51,8 @@ fun NetworkPanel.addKeyBindings() {
     bind(CmdOrCtrl + Shift + 'Z') { redo() }
 
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
-    bind("2") { connectSelectedModels() }
-    bindTo("3", networkActions.connectWithSynapseGroup)
+    bind("2") { connectSelectedModelsDefault() }
+    bind("3") { connectSelectedModelsCustom()}
     bindTo("6", networkActions.selectIncomingWeightsAction)
     bindTo("7", networkActions.selectOutgoingWeightsAction)
     bind("8") {

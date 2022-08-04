@@ -11,6 +11,7 @@ import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.*
+import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.QuickConnectionManager
 import org.simbrain.network.core.*
 import org.simbrain.network.groups.*
@@ -106,7 +107,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     val mainToolBar = createMainToolBar()
 
-    val runToolBar = createRunToolBar().apply{isVisible = false}
+    val runToolBar = createRunToolBar().apply { isVisible = false }
 
     val editToolBar = createEditToolBar()
 
@@ -161,7 +162,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     var freeWeightsVisible = true
         set(value) {
             field = value
-            network.looseWeights.forEach{it.isVisible = value}
+            network.looseWeights.forEach { it.isVisible = value }
         }
 
     /**
@@ -185,9 +186,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         this.updateComplete.set(if (updateComplete) 0 else 3)
     }
 
-    val zoomToFitPage = fun (): (Boolean) -> Unit {
+    val zoomToFitPage = fun(): (Boolean) -> Unit {
         var timer: Timer? = null
-        return fun (forceZoom: Boolean) {
+        return fun(forceZoom: Boolean) {
 
             // Implements debounce. If many requests are made they will all be cancelled, until the last one.
             timer?.cancel()
@@ -196,8 +197,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 schedule(timerTask {
                     if (autoZoom && editMode.isSelection || forceZoom) {
                         val filtered = canvas.layer.getUnionOfChildrenBounds(null)
-                        val adjustedFiltered = PBounds(filtered.getX() - 10, filtered.getY() - 10,
-                            filtered.getWidth() + 20, filtered.getHeight() + 20)
+                        val adjustedFiltered = PBounds(
+                            filtered.getX() - 10, filtered.getY() - 10,
+                            filtered.getWidth() + 20, filtered.getHeight() + 20
+                        )
                         canvas.camera.setViewBounds(adjustedFiltered)
                     }
                 }, 5)
@@ -226,7 +229,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      */
     inline fun <reified T : ScreenElement> filterScreenElements() = canvas.layer.allNodes.filterIsInstance<T>()
     fun <T : ScreenElement> filterScreenElements(clazz: Class<T>) =
-            canvas.layer.allNodes.filterIsInstance(clazz)
+        canvas.layer.allNodes.filterIsInstance(clazz)
 
     /**
      * Add a screen element to the network panel and rezoom the page.
@@ -243,8 +246,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         zoomToFitPage()
     }
 
-    private fun createNode(model: NetworkModel) : ScreenElement {
-        return when(model) {
+    private fun createNode(model: NetworkModel): ScreenElement {
+        return when (model) {
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
             is SmileClassifier -> createNode(model)
@@ -267,6 +270,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             override fun undo() {
                 neuron.delete()
             }
+
             override fun redo() {
                 network.addNetworkModel(neuron)
             }
@@ -299,15 +303,15 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
-    fun createNode(classifier : SmileClassifier) = addScreenElement {
+    fun createNode(classifier: SmileClassifier) = addScreenElement {
         SmileClassifierNode(this, classifier)
     }
 
-    fun createNode(layer : ZoeLayer) = addScreenElement {
+    fun createNode(layer: ZoeLayer) = addScreenElement {
         ZoeLayerNode(this, layer)
     }
 
-    fun createNode(dn : DeepNet) = addScreenElement {
+    fun createNode(dn: DeepNet) = addScreenElement {
         DeepNetNode(this, dn)
     }
 
@@ -333,7 +337,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun createNode(text: NetworkTextObject) = addScreenElement {
         TextNode(this, text).apply {
-            if(text.inputEvent != null) {
+            if (text.inputEvent != null) {
                 textHandle.startEditing(text.inputEvent, this.pStyledText);
             }
         }
@@ -382,6 +386,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                             override fun undo() {
                                 network.addNetworkModel(screenElement.model)
                             }
+
                             override fun redo() {
                                 screenElement.model.delete()
                             }
@@ -477,26 +482,26 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun toggleClamping() {
-        selectionManager.filterSelectedModels<NetworkModel>().forEach {  it.toggleClamping() }
+        selectionManager.filterSelectedModels<NetworkModel>().forEach { it.toggleClamping() }
     }
 
     fun incrementSelectedObjects() {
-        selectionManager.filterSelectedModels<NetworkModel>().forEach {  it.increment() }
+        selectionManager.filterSelectedModels<NetworkModel>().forEach { it.increment() }
     }
 
     fun decrementSelectedObjects() {
-        selectionManager.filterSelectedModels<NetworkModel>().forEach {  it.decrement() }
+        selectionManager.filterSelectedModels<NetworkModel>().forEach { it.decrement() }
     }
 
     fun clearSelectedObjects() {
-        selectionManager.filterSelectedModels<NetworkModel>().forEach {  it.clear() }
+        selectionManager.filterSelectedModels<NetworkModel>().forEach { it.clear() }
     }
 
     fun hardClearSelectedObjects() {
         clearSelectedObjects();
-        selectionManager.filterSelectedModels<Synapse>().forEach {  it.hardClear()}
-        selectionManager.filterSelectedModels<WeightMatrix>().forEach {  it.hardClear() }
-        selectionManager.filterSelectedModels<SynapseGroup>().forEach {  it.hardClear() }
+        selectionManager.filterSelectedModels<Synapse>().forEach { it.hardClear() }
+        selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.hardClear() }
+        selectionManager.filterSelectedModels<SynapseGroup>().forEach { it.hardClear() }
     }
 
     fun selectNeuronsInNeuronGroups() {
@@ -504,15 +509,13 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     /**
-     * Connect source and target model items.
-     * <br></br>
-     * If a pair of source and target items are neuron groups, connect with a synapse group
-     * <br></br>
-     * If either member of a pair is a neuron collection or a set of loose neurons, then connect using neurons on both
-     * sides, using quick connect (e.g. if connecting neuron collection to neuron group, connect to the neurons "inside"
-     * of neuron group).
+     * Connect source and target model items using a default action.
+     *
+     * For free weights, use "all to all"
+     *
+     * For neuron groups or arrays, use a weight matrix.
      */
-    fun connectSelectedModels() {
+    fun connectSelectedModelsDefault() {
 
         with(selectionManager) {
 
@@ -525,7 +528,36 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 return
             }
 
-            // Connect loose neurons with loose synapses using quick connector
+            connectFreeWeights()
+        }
+    }
+
+    /**
+     * Connect source and target model items using a more custom action.
+     *
+     * For free weights, use the quick connector.
+     *
+     * For neuron groups use a synapse group
+     *
+     * For neuron arrays, open a dialog allowing selection (later when we have choices)
+     */
+    fun connectSelectedModelsCustom() {
+
+        // For neuron groups
+        selectionManager.connectNeuronGroups()
+
+        // TODO: Neuron Array case
+
+        // For free weights
+        connectUsingQuickConnector()
+    }
+
+    /**
+     * Connect free weights using [QuickConnectionManager] settings.
+     */
+    fun connectUsingQuickConnector() {
+        // Connect all selected neurons with loose synapses using quick connector default
+        with(selectionManager) {
             val sourceNeurons = filterSelectedSourceModels<Neuron>() +
                     filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedSourceModels<NeuronGroup>().flatMap { it.neuronList }
@@ -534,6 +566,25 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
             quickConnector.applyCurrentConnection(network, sourceNeurons, targetNeurons)
         }
+    }
+
+    /**
+     * Connect free weights using all to all. An important default case.
+     */
+    fun connectFreeWeights() {
+        // TODO: For large numbers of connections maybe pop up a warning and depending on button pressed make the
+        // weights automatically be invisible
+        with(selectionManager) {
+            val sourceNeurons = filterSelectedSourceModels<Neuron>() +
+                    filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
+                    filterSelectedSourceModels<NeuronGroup>().flatMap { it.neuronList }
+            val targetNeurons = filterSelectedModels<Neuron>() +
+                    filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
+                    filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
+            AllToAll().connectNeurons(network, sourceNeurons, targetNeurons)
+        }
+
+
     }
 
     /**
@@ -552,7 +603,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 dialog.isVisible = true
             } else {
                 // TODO: Ability to set defaults for weight matrix that is added
-                sources.zip(targets) { s,t ->
+                sources.zip(targets) { s, t ->
                     network.addNetworkModel(WeightMatrix(network, s, t))
                 }
             }
@@ -768,7 +819,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         })
 
         // Add all network elements (important for de-serializing)
-        network.modelsInReconstructionOrder.forEach{ createNode(it) }
+        network.modelsInReconstructionOrder.forEach { createNode(it) }
 
     }
 

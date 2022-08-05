@@ -163,6 +163,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         set(value) {
             field = value
             network.looseWeights.forEach { it.isVisible = value }
+            network.events.fireFreeWeightVisibilityChanged(value)
         }
 
     /**

@@ -29,6 +29,15 @@ class TileSensor @JvmOverloads constructor(
      */
     @UserParameter(label = "Decay Function", isObjectType = true, showDetails = false, order = 15)
     override var decayFunction: DecayFunction = LinearDecayFunction(70.0)
+        set(value) {
+            field = value
+            relativeGridCoordinates = null // invalidate pre-computed grid coordinates
+        }
+
+    /**
+     * Cached relative grid coordinates this sensor should check
+     */
+    private var relativeGridCoordinates: List<GridCoordinate>? = null
 
     override var showDispersion = false
 
@@ -36,7 +45,7 @@ class TileSensor @JvmOverloads constructor(
         currentValue = 0.0
         val sensorLocation = computeAbsoluteLocation(parent)
         currentValue = with(parent.world.tileMap) {
-            getRelativeGridLocationsInRadius(decayFunction.dispersion)
+            (relativeGridCoordinates ?: getRelativeGridLocationsInRadius(decayFunction.dispersion).toList().also { relativeGridCoordinates = it })
                 .map { it + sensorLocation.asPixelCoordinate().toGridCoordinate() }
                 .map { it.asGridCoordinate() to getTileStackAt(it.x.toInt(), it.y.toInt()) }
                 .filter { (_, tiles) -> tiles.any { it.type == tileType } }

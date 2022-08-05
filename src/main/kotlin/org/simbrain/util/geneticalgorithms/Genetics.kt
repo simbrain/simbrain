@@ -2,6 +2,7 @@ package org.simbrain.util.geneticalgorithms
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.simbrain.workspace.Workspace
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -414,13 +415,13 @@ class Evaluator(agentBuilder: AgentBuilder) {
             var population = initialPopulation
             do {
                 val builderFitnessPairs = runBlocking {
-                    population.asFlow().map {
+                    population.map {
                         async {
                             val build = it.build()
                             val score = build.eval()
                             BuilderFitnessPair(it.copy(), score)
                         }
-                    }.toList().awaitAll()
+                    }.awaitAll()
                         .sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
                 }
 
@@ -498,3 +499,5 @@ fun List<BuilderFitnessPair>.uniformSample() = sequence {
         yield(this@uniformSample[index])
     }
 }
+
+fun EvolutionWorkspace() = Workspace(MainScope() + Dispatchers.Default)

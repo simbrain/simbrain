@@ -138,7 +138,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         notifyWorkspaceUpdateStarted()
-        withContext(Dispatchers.Swing) {
+        withContext(workspace.coroutineScope.coroutineContext) {
             repeat(numIterations) {
                 doUpdate()
             }
@@ -157,8 +157,8 @@ class WorkspaceUpdater(val workspace: Workspace) {
     private suspend fun doUpdate() {
         time++
         Logger.trace("starting: $time")
-        for (action in updateManager.actionList + updateManager.nonRemovableActions) {
-            withContext(Dispatchers.Default) {
+        withContext(workspace.coroutineScope.coroutineContext) {
+            for (action in updateManager.actionList + updateManager.nonRemovableActions) {
                 with(PerformanceMonitor) {
                     action()
                 }

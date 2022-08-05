@@ -196,15 +196,17 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
             timer = Timer().apply {
                 schedule(timerTask {
-                    if (autoZoom && editMode.isSelection || forceZoom) {
-                        val filtered = canvas.layer.getUnionOfChildrenBounds(null)
-                        val adjustedFiltered = PBounds(
-                            filtered.getX() - 10, filtered.getY() - 10,
-                            filtered.getWidth() + 20, filtered.getHeight() + 20
-                        )
-                        canvas.camera.setViewBounds(adjustedFiltered)
+                    SwingUtilities.invokeLater {
+                        if (autoZoom && editMode.isSelection || forceZoom) {
+                            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
+                            val adjustedFiltered = PBounds(
+                                filtered.getX() - 10, filtered.getY() - 10,
+                                filtered.getWidth() + 20, filtered.getHeight() + 20
+                            )
+                            canvas.camera.setViewBounds(adjustedFiltered)
+                        }
                     }
-                }, 5)
+                }, 10)
             }
         }
     }()

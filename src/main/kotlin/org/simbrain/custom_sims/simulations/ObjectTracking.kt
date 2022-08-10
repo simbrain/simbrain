@@ -33,9 +33,13 @@ val objectTrackingSim = newSim {
     // Number of reservoir neurons
     val numResNeurons = 200
     // Number of left and right sensory neurons. Total sensory neurons is twice this.
-    val sensoryNeurons = 25
+    val sensoryNeurons = 31
     // Radius in pixels of the cheese's revolution around the agent.
     val radiusOfRevolution = 100.0
+    // Varoables to make cheese change direction once in a while
+    var counter = 0
+    var direction = 1 // 1 for counterclockwise -1 for clockwise
+
 
     // Basic setup
     workspace.clearWorkspace()
@@ -60,7 +64,7 @@ val objectTrackingSim = newSim {
     reservoir.location = point(0, 0)
     val reservoirSynapseGroup = SynapseGroup2(reservoir, reservoir, sparse)
     network.addNetworkModel(reservoirSynapseGroup)
-    val dist = NormalDistribution(0.0, 2.0)
+    val dist = NormalDistribution(0.0, .1)
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
     }
@@ -94,8 +98,14 @@ val objectTrackingSim = newSim {
     // Connect input nodes to reservoir
     val leftInputsToRes = SynapseGroup2(leftInputs, reservoir, sparse)
     network.addNetworkModel(leftInputsToRes)
+    leftInputsToRes.synapses.forEach { s ->
+        s.strength = 0.75
+    }
     val rightInputsToRes = SynapseGroup2(rightInputs, reservoir, sparse)
     network.addNetworkModel(rightInputsToRes)
+    rightInputsToRes.synapses.forEach { s ->
+        s.strength = 0.75
+    }
 
     // Output neurons
     val leftTurnNeuron = Neuron(network, PercentIncomingNeuronRule())
@@ -146,10 +156,11 @@ val objectTrackingSim = newSim {
     // Effectors
     val (_, turnLeftEffector, turnRightEffector) = agent.effectors
 
-    val fudge = 35.0 // to get the sensor range right
+    val fudge = 36.0 // to get the sensor range right
 
-    // Left sensors
-    (30 - sensoryNeurons / 2 until 30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
+    val leftSensors = linspace(-31, 89, 31)
+    // Left sensors (30 - sensoryNeurons / 2 until 30 + sensoryNeurons / 2).forEachIndexed { counter, position ->//
+    leftSensors.forEachIndexed { counter, position ->
         val cheeseSensorLeft = ObjectSensor(EntityType.SWISS)
         cheeseSensorLeft.theta = position.toDouble()
         cheeseSensorLeft.radius = EntityType.CIRCLE.imageHeight / 2.0
@@ -161,7 +172,9 @@ val objectTrackingSim = newSim {
         agent.addSensor(cheeseSensorLeft)
     }
 
-    (-30 - sensoryNeurons / 2 until -30 + sensoryNeurons / 2).forEachIndexed { counter, position ->
+    // Right sensors (-30 - sensoryNeurons / 2 until -30 + sensoryNeurons / 2).forEachIndexed { counter, position ->//
+    val rightSensors = linspace(-90, 30, 31)
+    rightSensors.forEachIndexed { counter, position ->
         val cheeseSensorRight = ObjectSensor(EntityType.SWISS)
         cheeseSensorRight.theta = position.toDouble()
         cheeseSensorRight.radius = EntityType.CIRCLE.imageHeight / 2.0
@@ -183,15 +196,23 @@ val objectTrackingSim = newSim {
     }
 
     fun updateCheeseLocation() {
-        val (x,y) = agent.location
+        val (agentx,agenty) = agent.location
+
+        // Change direction every 2 rotations
+        counter += 1
+        if (counter % 720 == 0) {
+            direction *= -1
+        }
+
         cheese.location = point(
-            x + radiusOfRevolution * cos(network.time),
-            y - radiusOfRevolution * sin(network.time)
+            agentx + radiusOfRevolution * cos((direction * counter).toRadian()),
+            agenty + radiusOfRevolution * sin((direction * counter).toRadian())
         )
     }
 
     updateCheeseLocation()
     workspace.addUpdateAction(updateAction("Move cheese") {
+        println(reservoir.activations.mean)
         updateCheeseLocation()
     })
 
@@ -261,7 +282,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
             .filter { (it.source as AllostaticNeuron).applyLearning }
 
         toTrain.forEach {  s ->
-            if (toTrain.size > 0) {
+            if (toTrain.isNotEmpty()) {
                 s.strength -= error/toTrain.size
             }
         }
@@ -270,7 +291,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
         n.target = max(n.target, 1.0)
         n.threshold = 2*n.target
 
-        println("target = ${n.target}, threshold = ${n.threshold}, activation = ${n.activation}")
+        // println("target = ${n.target}, threshold = ${n.threshold}, activation = ${n.activation}")
     }
 
     override fun deepCopy(): NeuronUpdateRule {

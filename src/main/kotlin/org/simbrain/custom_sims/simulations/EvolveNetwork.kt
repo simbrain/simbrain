@@ -69,7 +69,7 @@ val evolveNetwork = newSim {
             }
 
             fun NodeGene.mutateBias() = mutate {
-                neuronDataHolder.let {
+                dataHolder.let {
                     if (it is BiasedScalarData) it.bias += (Random().nextDouble() - 0.5) * 0.2
                 }
             }

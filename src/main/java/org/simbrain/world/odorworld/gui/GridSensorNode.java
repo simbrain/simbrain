@@ -145,7 +145,7 @@ public class GridSensorNode extends EntityAttributeNode {
             redrawGrid();
         }
         updateGridSizeInfo();
-        shape.setOffset(sensor.computeRelativeLocation(entity));
+        // shape.setOffset(sensor.computeRelativeLocation(entity)); // TODO
         updateGrid();
     }
 }

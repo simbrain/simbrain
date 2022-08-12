@@ -8,6 +8,7 @@ import org.simbrain.network.core.Synapse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SpikeThresholdTest {
+
     @Test
     public void testUpdate1InputToOutput() {
         Network net = new Network();

@@ -3,9 +3,9 @@ package org.simbrain.network.updaterules
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.neuron_update_rules.FitzhughNagumo
+import org.simbrain.util.Utils.round
 
-class FitzHughNagumoTest {
+class FitzhughNagumoTest {
 
     val net = Network()
     val fhRule = FitzhughNagumo()
@@ -13,12 +13,12 @@ class FitzHughNagumoTest {
     init {
         net.addNetworkModel(n)
     }
-    
+
     @Test
     fun `todo`() {
         repeat(10) {
             net.update()
-            println("t = ${net.time}: act=${n.activation}")
+            println("act=${round(n.activation, 3)}, w=${round((n.dataHolder as FitzHughData).w, 3)}")
         }
     }
 

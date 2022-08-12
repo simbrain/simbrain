@@ -22,10 +22,26 @@ class BiasedMatrixData(var size: Int) : MatrixDataHolder {
     }
 }
 
-class SpikingMatrixData(var size: Int) : MatrixDataHolder {
-    var spikes = BooleanArray(size)
+open class SpikingMatrixData(var size: Int) : MatrixDataHolder {
+    var spikes = BooleanArray(size) // TODO: Possibly use int Smile array of binary ints for perf
+        private set
+    var lastSpikeTimes = DoubleArray(size)
     override fun copy() = SpikingMatrixData(size).also {
         it.spikes = spikes.copyOf()
+        it.lastSpikeTimes = lastSpikeTimes.copyOf()
+    }
+
+    fun commonCopy(toCopy: SpikingMatrixData) {
+        toCopy.spikes = spikes.copyOf()
+        toCopy.lastSpikeTimes = lastSpikeTimes.copyOf()
+    }
+
+    fun setHasSpiked(i: Int, hasSpiked: Boolean, networkTime: Double) {
+        spikes[i] = hasSpiked
+        if (hasSpiked) {
+            lastSpikeTimes[i] = networkTime
+        }
+
     }
 }
 
@@ -58,6 +74,35 @@ class BiasedScalarData(
     }
 }
 
+open class SpikingScalarData(
+    /**
+     * Set to true at end of iteration when spike occurs, then set to false.
+     */
+    spiked: Boolean = false,
+    /**
+     * Time of last spike. Default assumes no spikes have occurred when simulation begins.
+     */
+    var lastSpikeTime: Double = Double.NEGATIVE_INFINITY
+) : ScalarDataHolder {
+
+    var spiked: Boolean = spiked
+        private set
+
+    /**
+     * Indicate a spike occurred, and if it has, set the last spike time.
+     */
+    fun setHasSpiked(hasSpiked: Boolean, networkTime: Double) {
+        spiked = hasSpiked
+        if (spiked) {
+            lastSpikeTime = networkTime
+        }
+    }
+
+    override fun copy(): SpikingScalarData {
+        return SpikingScalarData(spiked, lastSpikeTime)
+    }
+}
+
 class NakaScalarData(@UserParameter(label = "a") var a: Double = 0.0) : ScalarDataHolder {
     override fun copy(): NakaScalarData {
         return NakaScalarData(a)
@@ -85,16 +130,3 @@ class MorrisLecarData(
     }
 }
 
-class AdexData(
-    @UserParameter(label = "w", description = "Adaptation variable: Roughly speaking amount of metabolite currently " +
-            "in the cell. Expelled during spiking and then replenished.")
-    var w: Double = 200.0,
-    @UserParameter(label = "Inhibitory Conductance")
-    var inhibConductance: Double = 0.0,
-    @UserParameter(label = "Excitatory Conductance")
-    var exConductance: Double = 0.0,
-) : ScalarDataHolder {
-    override fun copy(): AdexData {
-        return AdexData(w, inhibConductance, exConductance)
-    }
-}

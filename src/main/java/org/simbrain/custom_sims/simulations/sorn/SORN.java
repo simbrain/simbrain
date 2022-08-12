@@ -7,6 +7,7 @@ import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
@@ -117,7 +118,7 @@ public class SORN extends Simulation {
 
         // Normalize newly created inhibitory connections
         for (Neuron n : neurons) {
-            ((SORNNeuronRule) n.getUpdateRule()).init(n);
+            SORN.normalizeInhibitoryFanIn(n);
         }
         // Set up plasticity between exc and exc neurons
         AddSTDPRule stdp = new AddSTDPRule();
@@ -183,10 +184,10 @@ public class SORN extends Simulation {
         ngIn.applyLayout(new Point(x_loc, 10));
 
         for (Neuron n : neurons) {
-            n.normalizeInhibitoryFanIn();
+            normalizeInhibitoryFanIn(n);
         }
         for (Neuron n : inhibitoryNeurons) {
-            n.normalizeExcitatoryFanIn();
+            normalizeExcitatoryFanIn(n);
         }
 
 //        for (Neuron n : input.getNeuronList()) {
@@ -197,6 +198,51 @@ public class SORN extends Simulation {
         // net.getUpdateManager().clear();
         // net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
         net.updateTimeType();
+    }
+
+    // TODO: Possibly move to NetworkUtils.kt as extension functions
+    /**
+     * Normalizes the excitatory synaptic strengths impinging on this neuron,
+     * that is finds the sum of the exctiatory weights and divides each weight
+     * value by that sum.
+     */
+    public static void normalizeExcitatoryFanIn(Neuron neuron) {
+        double sum = 0;
+        double str = 0;
+        for (int i = 0, n = neuron.getFanIn().size(); i < n; i++) {
+            str = neuron.getFanIn().get(i).getStrength();
+            if (str > 0) {
+                sum += str;
+            }
+        }
+        Synapse s = null;
+        for (int i = 0, n = neuron.getFanIn().size(); i < n; i++) {
+            s = neuron.getFanIn().get(i);
+            str = s.getStrength();
+            if (str > 0) {
+                s.setStrength(s.getStrength() / sum);
+            }
+        }
+    }
+
+    // TODO: Possibly move to NetworkUtils.kt as extension functions
+    public static void normalizeInhibitoryFanIn(Neuron neuron) {
+        double sum = 0;
+        double str = 0;
+        for (int i = 0, n = neuron.getFanIn().size(); i < n; i++) {
+            str = neuron.getFanIn().get(i).getStrength();
+            if (str < 0) {
+                sum -= str;
+            }
+        }
+        Synapse s = null;
+        for (int i = 0, n =  neuron.getFanIn().size(); i < n; i++) {
+            s =  neuron.getFanIn().get(i);
+            str = s.getStrength();
+            if (str < 0) {
+                s.setStrength(s.getStrength() / sum);
+            }
+        }
     }
 
     private static SynapseGroup2 connectGroups(Network network, NeuronGroup src, NeuronGroup tar, int kIn,

@@ -18,8 +18,8 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.*;
 import org.simbrain.network.events.SynapseGroupEvents;
 import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
-import org.simbrain.network.synapse_update_rules.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.SynapseSet;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -348,10 +348,10 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     @Override
     public void updateInputs() {
         if (!(exSpikeResponder instanceof NonResponder)) {
-            exSynapseSet.forEach(exSpikeResponder::apply);
+            exSynapseSet.forEach(s -> exSpikeResponder.apply(s, s.getSource().getDataHolder()));
         }
         if (!(inSpikeResponder instanceof NonResponder)) {
-            inSynapseSet.forEach(inSpikeResponder::apply);
+            inSynapseSet.forEach(s -> inSpikeResponder.apply(s, s.getSource().getDataHolder()));
         }
     }
 
@@ -414,6 +414,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         inSynapseSet.remove(toDelete);
         if (toDelete != null) {
             // TODO: Discuss np check with Zoë
+            // TODO: Replace with toDelete.delete();?
             toDelete.getSource().removeEfferent(toDelete);
             toDelete.getTarget().removeAfferent(toDelete);
         }

@@ -20,13 +20,10 @@ package org.simbrain.world.odorworld.sensors;
 
 import org.jetbrains.annotations.Nullable;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.events.SensorEffectorEvents;
 
-import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,49 +45,6 @@ public abstract class Sensor implements PeripheralAttribute {
 
     public static List<Class> getTypes() {
         return SENSOR_LIST;
-    }
-
-    /**
-     * Angle of sensor in radians.
-     */
-    public static double DEFAULT_THETA = 0;
-
-    /**
-     * Initial length of mouse whisker.
-     */
-    public static final double DEFAULT_RADIUS = 0;
-
-    /**
-     * Relative location of the sensor in polar coordinates.
-     */
-    @UserParameter(label = "Sensor angle", description = "The angle theta (in polar coordinates, with radius) at " +
-            "which the sensor will be added.", order = 3)
-    protected double theta = DEFAULT_THETA;
-
-    /**
-     * Relative location of the sensor in polar coordinates.
-     */
-    @UserParameter(label = "Sensor length",
-        description = "The distance in pixels from the center of the entity to which the sensor is to be added."
-        , order = 4)
-    protected double radius = DEFAULT_RADIUS;
-
-    /**
-     * Returns the sensor location in the local coordinate frame of the entity.
-     * The entity containing the sensor should be passed in.
-     */
-    public Point2D.Double computeRelativeLocation(OdorWorldEntity entity) {
-        Point2D.Double sensorLocation = new Point2D.Double(0,0);
-        sensorLocation.x = radius * Math.cos(Math.toRadians(entity.getHeading() + theta));
-        sensorLocation.y = -radius * Math.sin(Math.toRadians(entity.getHeading() + theta));
-        return sensorLocation;
-    }
-
-    /**
-     * Returns the sensor location in the world's coordinate frame.
-     */
-    public Point2D.Double computeAbsoluteLocation(OdorWorldEntity entity) {
-        return SimbrainMath.add(entity.getLocation(), computeRelativeLocation(entity));
     }
 
     /**
@@ -129,8 +83,6 @@ public abstract class Sensor implements PeripheralAttribute {
      * @param sensor the sensor to copy
      */
     public Sensor(Sensor sensor) {
-        this.radius = sensor.radius;
-        this.theta = sensor.theta;
         this.label = sensor.label;
     }
 
@@ -139,12 +91,6 @@ public abstract class Sensor implements PeripheralAttribute {
      */
     public Sensor() {
         super();
-    }
-
-    public Sensor(double radius, double angle) {
-        super();
-        setRadius(radius);
-        setTheta(angle);
     }
 
     public void setId(String name) {
@@ -156,21 +102,6 @@ public abstract class Sensor implements PeripheralAttribute {
         return id;
     }
 
-    /**
-     * Return String direction (left / right) based on angle of the sensor
-     */
-    public String getDirectionString() {
-        if (getTheta() < 0 && getTheta() > -45  ) {
-            return "Right ";
-        } else if (getTheta() > 0 && getTheta() < 45 ) {
-            return "Left ";
-        } else {
-            return "";
-        }
-        // TODO: Maybe add front, back, left-back and right-back
-        // With length = 0 can also have center
-    }
-
     @Override
     public String getLabel() {
         return label;
@@ -180,28 +111,6 @@ public abstract class Sensor implements PeripheralAttribute {
     public void setLabel(String label) {
         this.label = label;
         getEvents().firePropertyChanged();
-    }
-
-    /**
-     * Returns angle in degrees
-     */
-    public double getTheta() {
-        return theta;
-    }
-
-    /**
-     * Sets angle in degrees
-     */
-    public void setTheta(double theta) {
-        this.theta = theta;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
     }
 
     @Override

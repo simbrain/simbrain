@@ -12,9 +12,9 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+import org.simbrain.network.spikeresponders.UDF;
 import org.simbrain.network.synapse_update_rules.STDPRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
-import org.simbrain.network.synapse_update_rules.spikeresponders.UDF;
 import org.simbrain.network.updaterules.IntegrateAndFireRule;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.plot.projection.ProjectionComponent;
@@ -493,7 +493,7 @@ public class PatternsOfActivity extends Simulation {
                         sgn * Math.abs(((STDPRule) s.getLearningRule()).getDelta_w()));
                 }
             }
-            super.apply(n, n.getNeuronDataHolder());
+            super.apply(n, n.getDataHolder());
 
         }
 

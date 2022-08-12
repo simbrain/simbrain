@@ -5,7 +5,7 @@ import org.simbrain.custom_sims.addTimeSeries
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
-import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay
+import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.util.place
 import org.simbrain.util.point
 

@@ -19,6 +19,10 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.SpikingMatrixData;
+import org.simbrain.network.util.SpikingScalarData;
 
 /**
  * <b>SpikingNeuron</b> is the superclass for spiking neuron types (e.g.
@@ -31,46 +35,15 @@ import org.simbrain.network.core.Network.TimeType;
  */
 public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
 
-    /**
-     * Time of last spike. Default assumes no spikes have occurred when simulation begins.
-     */
-    private double lastSpikeTime = Double.NEGATIVE_INFINITY;
-
-    /**
-     * An aux value for applied inputs to the neuron (eg injected current)
-     * usable across all spiking neuron update rules.
-     */
-    private double appliedInput = 0.0;
-
     @Override
     public void clear(Neuron neuron) {
         super.clear(neuron);
-        for(Synapse s :neuron.getFanIn()) {
-            s.clear();
-        }
+        neuron.getFanIn().forEach(Synapse::clear);
     }
 
     @Override
     public TimeType getTimeType() {
         return TimeType.CONTINUOUS;
-    }
-
-    /**
-     * @param hasSpiked the hasSpiked to set
-     * @param neuron    the neuron which has (or has not) spiked.
-     */
-    public void setHasSpiked(final boolean hasSpiked, final Neuron neuron) {
-        if (hasSpiked) {
-            lastSpikeTime = neuron.getNetwork().getTime();
-        }
-    }
-
-    public double getLastSpikeTime() {
-        return lastSpikeTime;
-    }
-
-    public void setLastSpikeTime(double lastSpikeTime) {
-        this.lastSpikeTime = lastSpikeTime;
     }
 
     /**
@@ -84,28 +57,23 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
      * definition be a spiking neuron.
      */
     @Override
-    public final boolean isSpikingNeuron() {
+    public final boolean isSpikingRule() {
         return true;
     }
 
     /**
-     * @return the input being injected into this neuron update rule, if any.
+     * Override to provide subclasses of SpikingMatrixData if needed.
      */
-    public double getAppliedInput() {
-        return appliedInput;
+    @Override
+    public MatrixDataHolder createMatrixData(int size) {
+        return new SpikingMatrixData(size);
     }
 
     /**
-     * Allows external objects to set the background applied input to this
-     * neuron. This allows inputs to be passed through the rule's update without
-     * directly setting the activation. It is much more practical for spiking
-     * neurons for which it makes much more sense to inject current as input
-     * since the update rule is in charge of whether or not the neuron spikes.
-     *
-     * @param appliedInput the background stimulation being applied or
-     *                     "injected" into this neuron.
+     * Override to provide subclasses of SpikingScalarData if needed.
      */
-    public void setAppliedInput(double appliedInput) {
-        this.appliedInput = appliedInput;
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new SpikingScalarData();
     }
 }

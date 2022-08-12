@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.odorworld.entities;
 
+import org.simbrain.world.odorworld.gui.EntityNode;
+
 /**
  * The type of an odor world entity (swiss, candle, etc).
  *
@@ -46,7 +48,8 @@ public enum EntityType {
     LION("Lion", true, true, true, 96, 96),
     STEVE("Steve", true, true, true, 96, 96),
     SUSI("Susi", true, true, true, 96, 96),
-    CIRCLE("Circle", true, true, true, 73, 73);
+    CIRCLE("Circle", true, true, true, 73, 73),
+    ISOPOD("Isopod", true, true, true, 18, 18);
 
     /**
      * String description that shows up in dialog boxes.

@@ -12,7 +12,6 @@
  */
 package org.simbrain.network.synapse_update_rules;
 
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.stats.distributions.NormalDistribution;
@@ -85,31 +84,29 @@ public class LogSTDPRule extends STDPRule {
      * Updates the synapse's strength using Log-STDP.
      */
     @Override
-    public void apply(Synapse synapse, ScalarDataHolder data) {
-        boolean sourceSpiking = synapse.getSource().getUpdateRule().isSpikingNeuron();
-        boolean targetSpiking = synapse.getTarget().getUpdateRule().isSpikingNeuron();
+    public void apply(Synapse s, ScalarDataHolder data) {
+        boolean sourceSpiking = s.getSource().getUpdateRule().isSpikingRule();
+        boolean targetSpiking = s.getTarget().getUpdateRule().isSpikingRule();
         if (!sourceSpiking || !targetSpiking) {
             return; // STDP is non-sensical if one of the units doesn't spike...
         }
-        SpikingNeuronUpdateRule src = (SpikingNeuronUpdateRule) synapse.getSource().getUpdateRule();
-        SpikingNeuronUpdateRule tar = (SpikingNeuronUpdateRule) synapse.getTarget().getUpdateRule();
         double delta_t;
-        final double timeStep = synapse.getNetwork().getTimeStep();
+        final double timeStep = s.getNetwork().getTimeStep();
         //        final double delay = synapse.getDelay() * timeStep;
         //        if (synapse.getStrength() >= 0) {
-        delta_t = (src.getLastSpikeTime()) - (tar.getLastSpikeTime());
+        delta_t = (s.getSource().getLastSpikeTime()) - (s.getTarget().getLastSpikeTime());
         //        } else {
         //        	delta_t = tar.getLastSpikeTime()
         //        			- (src.getLastSpikeTime());
         //        }
 
-        if (synapse.getStrength() >= 0) {
+        if (s.getStrength() >= 0) {
             double noise = 1 + dist.sampleDouble();
             if (delta_t < 0) {
-                calcW_plusTerm(synapse);
+                calcW_plusTerm(s);
                 delta_w = timeStep * learningRate * (W_plus * Math.exp(delta_t / tau_plus)) * (1 + noise);
             } else if (delta_t > 0) {
-                calcW_minusTerm(synapse);
+                calcW_minusTerm(s);
                 delta_w = timeStep * learningRate * (-W_minus * Math.exp(-delta_t / tau_minus)) * (1 + noise);
             } else {
                 delta_w = 0;
@@ -126,7 +123,7 @@ public class LogSTDPRule extends STDPRule {
 //            if (synapse.getSource().isSpike()) {
 //                synapse.setStrength(synapse.clip(synapse.getStrength() + (learningRate * delta_w)));
 //            }
-         else if (synapse.getStrength() <= 0) {
+         else if (s.getStrength() <= 0) {
             if (delta_t > 0) {
                 delta_w = learningRate * 1.5 * Math.exp(-delta_t / tau_plus);
             } else if (delta_t < 0) {
@@ -135,7 +132,7 @@ public class LogSTDPRule extends STDPRule {
                 delta_w = 0;
             }
         }
-        synapse.setStrength(synapse.clip(synapse.getStrength() - delta_w));
+        s.setStrength(s.clip(s.getStrength() - delta_w));
     }
 
 

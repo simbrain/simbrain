@@ -185,7 +185,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * @param base the neuron update rule to set.
      */
     public void setNeuronType(NeuronUpdateRule base) {
-        inputManager.setInputSpikes(base.isSpikingNeuron());
+        inputManager.setInputSpikes(base.isSpikingRule());
         prototypeRule = base;
         dataHolder = prototypeRule.createScalarData();
         // Have to also set node rules to support randomization, increment, etc.

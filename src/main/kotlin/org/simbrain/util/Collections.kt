@@ -136,3 +136,10 @@ fun randShuffleK(inds: ArrayList<Int?>, k: Int, rand: Random) {
         Collections.swap(inds, i, rand.nextInt(inds.size))
     }
 }
+
+/**
+ * A numpy-style linspace command. Returns an array of [numPoints] integers between [start] and [stop].
+ *
+ * @see https://stackoverflow.com/questions/55786239/how-to-autogenerate-array-in-kotlin-similar-to-numpy
+ */
+fun linspace(start: Int, stop: Int, numPoints: Int) = Array(numPoints) { start + it * ((stop - start) / (numPoints - 1)) }

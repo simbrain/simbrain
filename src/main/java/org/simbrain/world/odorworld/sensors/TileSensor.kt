@@ -3,9 +3,8 @@ package org.simbrain.world.odorworld.sensors
 import org.simbrain.util.UserParameter
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
-import org.simbrain.util.piccolo.getTileStackNear
-import org.simbrain.util.piccolo.toPixelCoordinate
-import org.simbrain.workspace.Producible
+import org.simbrain.util.piccolo.*
+import org.simbrain.util.plus
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
 /**
@@ -19,56 +18,36 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  * make the location editable at some point, if use-cases emerge.
  */
 class TileSensor @JvmOverloads constructor(
-    @UserParameter(label = "Object Type", description = "What type of object this sensor responds to", order = 3)
-    private var tileType: String = "water",
+    @UserParameter(label = "Tile Type", description = "What type of tile this sensor responds to", order = 3)
+    var tileType: String = "water",
     radius: Double = DEFAULT_RADIUS,
     angle: Double = DEFAULT_THETA
-) : Sensor(radius, angle), VisualizableEntityAttribute {
-    /**
-     * Current value of the sensor.
-     */
-    @get:Producible(customDescriptionMethod = "getAttributeDescription")
-    var currentValue = 0.0
-        private set
-
-    @UserParameter(
-        description = "Maximum value of the sensor when agent is right on top of the associated object type",
-        label = "Max Value",
-        order = 10
-    )
-    var baseValue = 1.0
-        private set
+) : SensorWithRelativeLocation(radius, angle), VisualizableEntityAttribute, WithDispersion {
 
     /**
      * Decay function
      */
     @UserParameter(label = "Decay Function", isObjectType = true, showDetails = false, order = 15)
-    var decayFunction: DecayFunction = LinearDecayFunction(70.0)
-
-    @UserParameter(
-        label = "Show dispersion",
-        description = "Show dispersion of the sensor",
-        useSetter = true,
-        order = 4
-    )
-    @get:JvmName("isShowDispersion")
-    var showDispersion = false
+    override var decayFunction: DecayFunction = LinearDecayFunction(70.0)
+        set(value) {
+            field = value
+            relativeGridCoordinates = null // invalidate pre-computed grid coordinates
+        }
 
     /**
-     * Should the sensor node show a label on top.
+     * Cached relative grid coordinates this sensor should check
      */
-    @UserParameter(label = "Show Label", description = "Show label on top of the sensor node", order = 5)
-    var isShowLabel = false
-        private set(value) {
-            field = value
-            events.firePropertyChanged()
-        }
+    private var relativeGridCoordinates: List<GridCoordinate>? = null
+
+    override var showDispersion = false
 
     override fun update(parent: OdorWorldEntity) {
         currentValue = 0.0
         val sensorLocation = computeAbsoluteLocation(parent)
         currentValue = with(parent.world.tileMap) {
-            getTileStackNear(sensorLocation, decayFunction.dispersion)
+            (relativeGridCoordinates ?: getRelativeGridLocationsInRadius(decayFunction.dispersion).toList().also { relativeGridCoordinates = it })
+                .map { it + sensorLocation.asPixelCoordinate().toGridCoordinate() }
+                .map { it.asGridCoordinate() to getTileStackAt(it.x.toInt(), it.y.toInt()) }
                 .filter { (_, tiles) -> tiles.any { it.type == tileType } }
                 .map { (pos) -> pos.toPixelCoordinate().distance(sensorLocation) }
                 .sumOf { decayFunction.getScalingFactor(it) * baseValue }
@@ -76,12 +55,9 @@ class TileSensor @JvmOverloads constructor(
     }
 
     override fun copy(): TileSensor {
-        return TileSensor().apply {
-            setId(this@TileSensor.id)
-            baseValue = this@TileSensor.baseValue
-            decayFunction = this@TileSensor.decayFunction.copy() as DecayFunction
+        return TileSensor().applyCommonCopy().apply {
             tileType = this@TileSensor.tileType
-            isShowLabel = this@TileSensor.isShowLabel
+            decayFunction = this@TileSensor.decayFunction.copy() as DecayFunction
         }
     }
 

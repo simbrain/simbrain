@@ -29,4 +29,9 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 
     fun onUpdateActionsChanged(handler: Runnable) = "UpdateActionsChanged".event(handler)
     fun fireUpdateActionsChanged() = "UpdateActionsChanged"()
+
+    fun onFreeWeightVisibilityChanged(handler: Consumer<Boolean>) =
+        "FreeWeightVisibilityChanged".itemAddedEvent(handler)
+    fun fireFreeWeightVisibilityChanged(state: Boolean) = "FreeWeightVisibilityChanged"(new =state)
+
 }

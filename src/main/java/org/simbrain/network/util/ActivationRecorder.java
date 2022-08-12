@@ -2,7 +2,6 @@ package org.simbrain.network.util;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.AbstractNeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -71,7 +70,7 @@ public class ActivationRecorder {
     public void startRecording(final File outputFile) {
         boolean spikeRecord = true;
         for (Neuron n : nc.getNeuronList()) {
-            if (!n.getUpdateRule().isSpikingNeuron()) {
+            if (!n.getUpdateRule().isSpikingRule()) {
                 spikeRecord = false;
                 break;
             }

@@ -72,7 +72,7 @@ val isopodSim = newSim {
         location = point(50, 0)
         upperBound = 10.0
         label = "Straight"
-        (neuronDataHolder as BiasedScalarData).bias = 5.0
+        (dataHolder as BiasedScalarData).bias = 5.0
     }
 
     // Create the weights
@@ -112,13 +112,14 @@ val isopodSim = newSim {
         tileMap.fill(2)
 
         // Body could be represented by a triangle or rhombus
-        isopod = addEntity(300, 300, EntityType.MOUSE).apply {
+        isopod = addEntity(300, 300, EntityType.ISOPOD).apply {
             name = "isopod"
             heading = 90.0
             addDefaultEffectors()
             straightMovement = effectors[0]
             turnLeft = effectors[1]
             turnRight = effectors[2]
+            isShowSensorsAndEffectors = false
 
             // Can add more smell sensors here
             // Options: new sensor in back; triangular array

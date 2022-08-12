@@ -94,7 +94,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
      * Register a callback function to run when the location of this object is updated.
      */
     public void onLocationChange(Runnable task) {
-        events.onLocationChange(task);
+        getEvents().onLocationChange(task);
     }
 
     public abstract Network getNetwork();
@@ -164,7 +164,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
     public void setLocation(Point2D location) {
         this.x = location.getX();
         this.y = location.getY();
-        events.fireLocationChange();
+        getEvents().fireLocationChange();
     }
 
     public double getX() {
@@ -181,7 +181,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
 
     public void setWidth(double width) {
         this.width = width;
-        events.fireLocationChange();
+        getEvents().fireLocationChange();
     }
 
     public double getHeight() {
@@ -190,7 +190,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
 
     public void setHeight(double height) {
         this.height = height;
-        events.fireLocationChange();
+        getEvents().fireLocationChange();
     }
 
 }

@@ -15,7 +15,6 @@ class SimbrainDesktopTest {
             val component = NetworkComponent("net1")
             workspace.addWorkspaceComponent(component)
             withGui {
-                println("bleh")
                 place(component) {
                     location = point(20, 20)
                     width = 300

@@ -51,10 +51,8 @@ fun NetworkPanel.addKeyBindings() {
     bind(CmdOrCtrl + Shift + 'Z') { redo() }
 
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
-    bind("2") { connectSelectedModels() }
-    bindTo("3", networkActions.connectWithSynapseGroup)
-    bind("5") { network.flatSynapseList.forEach { it.isVisible = false }}
-    bind(CmdOrCtrl + '5') {network.flatSynapseList.forEach { it.isVisible = true }}
+    bind("2") { connectSelectedModelsDefault() }
+    bind("3") { connectSelectedModelsCustom()}
     bindTo("6", networkActions.selectIncomingWeightsAction)
     bindTo("7", networkActions.selectOutgoingWeightsAction)
     bind("8") {

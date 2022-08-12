@@ -47,7 +47,7 @@ val evolveXor = newSim {
             // Mutate bias
             hiddenNodeChromosome.forEach {
                 it.mutate {
-                    neuronDataHolder.let {
+                    dataHolder.let {
                         if (it is BiasedScalarData) it.bias += (Random().nextDouble() - 0.5) * 0.2
                     }
                 }

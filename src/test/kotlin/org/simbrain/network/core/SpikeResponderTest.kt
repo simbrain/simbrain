@@ -1,76 +1,204 @@
 package org.simbrain.network.core
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
-import org.simbrain.network.synapse_update_rules.spikeresponders.JumpAndDecay
-import org.simbrain.network.synapse_update_rules.spikeresponders.Step
+import org.simbrain.network.spikeresponders.*
 
 class SpikeResponderTest {
 
     val net = Network()
-    val rule = SpikingThresholdRule()
-    val n1 = Neuron(net, rule)
-    val n2 = Neuron(net)
-    val s = Synapse(n1, n2)
+    val n1 = Neuron(net) // Input
+    val n2 = Neuron(net, SpikingThresholdRule()) // Spiking neuron
+    val n3 = Neuron(net).also { it.upperBound = 10.0 } // receive spike response
+    val s1 = Synapse(n1, n2)
+    val s2 = Synapse(n2, n3) // This one has the spike responder
 
-    @BeforeEach
-    fun setup() {
-        net.timeStep = 1.0 // For simpler computations
-        net.addNetworkModels(listOf(n1, n2, s))
+    init {
+        net.addNetworkModels(n1, n2, n3, s1, s2)
     }
 
     @Test
-    fun `test step responder`() {
-        rule.threshold = .7
-        n2.upperBound = 10.0
+    fun `responder data is copied correctly`() {
+        val step = StepResponder()
+        val newResponder: StepResponder = step.copy() as StepResponder
+        assertEquals(step.responseDuration, newResponder.responseDuration)
+        assertEquals(step.responseHeight, newResponder.responseHeight)
+    }
 
-        val step = Step()
-        step.responseHeight = 2.0
-        step.responseDuration = 3.0
-        s.spikeResponder = step
-        net.timeStep = 1.0 // For simpler computations
-        net.addNetworkModels(listOf(n1, n2, s))
-        println(s.spikeResponder)
+    @Test
+    fun `test NonResponder`() {
+        val nr = NonResponder()
+        s2.spikeResponder = nr
+        s2.strength = .7
+        n1.activation = 1.0
+        net.update()
+        net.update()
+        // Just passes the weight through
+        assertEquals(.7, n3.activation)
+    }
 
-        // Sub-threshold.
-        n1.addInputValue(.6)
-        net.update()
-        assertEquals(0.0, n2.activation)
+    /**
+     * Should "fire" at responseHeight (2.0) for responseDuration (3)
+     */
+    @Test
+    fun `step responder produces correct height and duration `() {
 
-        // Above-threshold. Should "fire" at responseHeight (2.0) for responseDuration (3)
-        n1.addInputValue(.8)
-        net.update()
-        net.update()  // TODO: Why does it take an extra step?
-        assertEquals(2.0, n2.activation)
-        net.update()
-        assertEquals(2.0, n2.activation)
-        net.update()
-        assertEquals(2.0, n2.activation)
-        net.update()
-        assertEquals(0.0, n2.activation)
+        val step = StepResponder()
+        step.responseHeight = .75
+        step.responseDuration = 3
+        s2.spikeResponder = step
 
-        // repeat(10) {
-        //     if (it == 3) n1.addInputValue(1.0)
-        //     net.update()
-        //     println("$it:${n1.activation} -> ${n2.activation}")
-        // }
+        n1.activation = 1.0
+        net.update() // First update propagates from n1 to n2, no spike response yet
+        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, n3.activation)
+        net.update()
+        assertEquals(step.responseHeight, s2.psr)
+        assertEquals(step.responseHeight, n3.activation)
+        net.update()
+        assertEquals(step.responseHeight, s2.psr)
+        assertEquals(step.responseHeight, n3.activation)
+        net.update()
+        assertEquals(step.responseHeight, s2.psr)
+        assertEquals(step.responseHeight, n3.activation)
+        net.update()
+        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, n3.activation)
     }
 
     @Test
     fun `test jump and decay`() {
-        rule.threshold = .7
-        n2.upperBound = 10.0
-
-        val sr = JumpAndDecay()
-        s.spikeResponder = sr
-
+        val jd = JumpAndDecay()
+        jd.jumpHeight = 4.0
+        jd.baseLine = 2.0
+        jd.timeConstant = .15
+        s2.spikeResponder = jd
+        n1.activation = 1.0
+        net.update()
+        net.update()
+        assertEquals(4.0, n3.activation)
         repeat(10) {
-            if (it == 3) n1.addInputValue(1.0)
             net.update()
-            println("$it:${n1.activation} -> ${n2.activation}")
         }
+        assertEquals(2.0, n3.activation, .1)
+    }
+
+    @Test
+    fun `test jump and decay with negative weight`() {
+        val jd = JumpAndDecay()
+        s2.strength = -.5
+        s2.spikeResponder = jd
+        n1.activation = 1.0
+        net.update()
+        net.update()
+        assertEquals(-.5, n3.activation)
+        jd.timeConstant = .15
+        repeat(10) {
+            net.update()
+        }
+        assertEquals(0.0, n3.activation, .1)
+    }
+
+    @Test
+    fun `test probabalistic responder`() {
+        val pr = ProbabilisticResponder()
+        pr.activationProbability = 1.0
+        s2.spikeResponder = pr
+        s2.strength = .5
+        n1.activation = 1.0
+        net.update()
+        net.update()
+        assertEquals(.5, n3.activation)
+        pr.activationProbability = 0.0
+        n1.activation = 1.0
+        net.update()
+        net.update()
+        assertEquals(0.0, n3.activation)
+    }
+
+    @Test
+    fun `test probabalistic responder with negative weight`() {
+        val pr = ProbabilisticResponder()
+        pr.activationProbability = 1.0
+        s2.spikeResponder = pr
+        s2.strength = -.5
+        n1.activation = 1.0
+        net.update()
+        net.update()
+        assertEquals(-.5, n3.activation)
+    }
+
+    @Test
+    fun `test rise and decay`() {
+        val rad = RiseAndDecay()
+        s2.spikeResponder = rad
+        n1.activation = 1.0
+        net.update()
+        net.update()
+        println(s2)
+        println(n3)
+        net.update()
+        println(s2)
+        println(n3)
+        net.update()
+        println(s2)
+        println(n3)
+        net.update()
+        println(s2)
+        println(n3)
+        net.update()
+        println(s2)
+        println(n3)
+    }
+
+    @Test
+    fun `test convolved jump and decay`() {
+        val cjd = ConvolvedJumpAndDecay()
+        s2.spikeResponder = cjd
+        s2.strength = .5
+        n1.activation = 1.0
+        n1.isClamped = true
+        net.update()
+        net.update()
+        assertEquals(.5, n3.activation)
+        net.update()
+        assertEquals(1.0, n3.activation)
+        net.update()
+        assertEquals(1.5, n3.activation)
+        net.update()
+        assertEquals(2.0, n3.activation)
+        n1.isClamped = false
+        cjd.baseLine = 0.2
+        cjd.timeConstant = .1 // decay quick
+        repeat(10) {
+            net.update()
+        }
+        assertEquals(0.2, n3.activation)
+    }
+
+
+    @Test
+    fun `test UDF`() {
+        val udf = UDF()
+        s2.spikeResponder = udf
+        n1.activation = 1.0
+        net.update()
+        net.update()
+        println(s2)
+        println(n3)
+        net.update()
+        println(s2)
+        println(n3)
+        net.update()
+        println(s2)
+        println(n3)
+        net.update()
+        println(s2)
+        println(n3)
+        net.update()
+        println(s2)
+        println(n3)
     }
 
 }

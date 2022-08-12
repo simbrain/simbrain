@@ -18,9 +18,12 @@
  */
 package org.simbrain.world.odorworld.dialogs;
 
+import org.simbrain.util.CmdOrCtrl;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.SwingKt;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
@@ -59,11 +62,12 @@ public class SensorEffectorPanel extends JPanel {
     /**
      * Whether this is a sensor or effector panel.
      */
-    public enum PanelType {Sensor, Effector};
+    public enum PanelType {Sensor, Effector}
+
+    ;
 
     /**
-     * Initial sensor or effector to edit, if any.  Also used to determine the type
-     * for this panel.
+     * Initial sensor or effector to edit, if any.  Also used to determine the type for this panel.
      */
     private PanelType type;
 
@@ -169,16 +173,28 @@ public class SensorEffectorPanel extends JPanel {
         buttonBar.add(deleteAttribute);
         DeleteItems deleteAction = new DeleteItems();
         deleteAttribute.setAction(deleteAction);
-        // Add a key command to the delete action   
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
-        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), this);
-        getActionMap().put(this,  deleteAction);
+
+        // Add a key command to the delete action
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "delete");
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "delete");
+        getActionMap().put("delete", deleteAction);
 
         // Edit attribute
         JButton editAttribute = new JButton("Edit", ResourceManager.getImageIcon("menu_icons/Properties.png"));
         editAttribute.setToolTipText("Edit...");
         buttonBar.add(editAttribute);
         editAttribute.addActionListener(e -> editAttribute(selectedAttribute));
+
+        // Cmd-Ctrl A to select all items
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                (KeyStroke.getKeyStroke('A', CmdOrCtrl.INSTANCE.getKeyCode())), "selectAll");
+        getActionMap().put("selectAll", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.selectAll();
+            }
+        });
+
 
         // Final GUI setup
         setLayout(new BorderLayout());
@@ -191,7 +207,7 @@ public class SensorEffectorPanel extends JPanel {
                 model.addAttribute(sensor);
             }
         } else {
-            for (Effector effector: parentEntity.getEffectors()) {
+            for (Effector effector : parentEntity.getEffectors()) {
                 model.addAttribute(effector);
             }
         }
@@ -323,58 +339,63 @@ public class SensorEffectorPanel extends JPanel {
         @Override
         public Object getValueAt(int row, int col) {
             switch (col) {
-            case 0:
-                return data.get(row).getId();
-            case 1:
-                return data.get(row).getLabel();
-            case 2:
-                return data.get(row).getName();
-            default:
-                return null;
+                case 0:
+                    return data.get(row).getId();
+                case 1:
+                    return data.get(row).getLabel();
+                case 2:
+                    return data.get(row).getName();
+                default:
+                    return null;
             }
         }
 
         @Override
         public void setValueAt(Object value, int row, int col) {
             switch (col) {
-            case 0:
-                return;
-            case 1:
-                data.get(row).setLabel((String) value);
-                return;
-            case 2:
-                return;
+                case 0:
+                    return;
+                case 1:
+                    data.get(row).setLabel((String) value);
+                    return;
+                case 2:
+                    return;
             }
             this.fireTableDataChanged();
         }
 
-//        @Override
-//        public boolean isCellEditable(int row, int col) {
-//            switch (col) {
-//                case 0:
-//                    return false;
-//                case 1:
-//                    return true;
-//                case 2:
-//                    return false;
-//                default:
-//                    return false;
-//            }
-//        }
+        //        @Override
+        //        public boolean isCellEditable(int row, int col) {
+        //            switch (col) {
+        //                case 0:
+        //                    return false;
+        //                case 1:
+        //                    return true;
+        //                case 2:
+        //                    return false;
+        //                default:
+        //                    return false;
+        //            }
+        //        }
 
         @Override
         public Class getColumnClass(int col) {
             switch (col) {
-            case 0:
-                return String.class;
-            case 1:
-                return String.class;
-            case 2:
-                return String.class;
-            default:
-                return null;
+                case 0:
+                    return String.class;
+                case 1:
+                    return String.class;
+                case 2:
+                    return String.class;
+                default:
+                    return null;
             }
         }
 
+    }
+
+    public static void main(String[] args) {
+        var entity = new OdorWorld().addAgent();
+        SwingKt.displayInDialog(new SensorEffectorPanel(entity, PanelType.Sensor, null));
     }
 }

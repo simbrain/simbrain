@@ -2,6 +2,7 @@ package org.simbrain.util.geneticalgorithms
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.simbrain.workspace.Workspace
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -305,9 +306,8 @@ class AgentBuilder private constructor(
         }
     }
 
-    fun <P, G : Gene<P>> chromosome(vararg genes: G): Chromosome<P, G> {
-        return Chromosome(LinkedHashSet(genes.toSet()))
-
+    fun <P, G : Gene<P>> chromosome(vararg genes: G): Chromosome<P, G> = createChromosome {
+        Chromosome(LinkedHashSet(genes.toSet()))
     }
 
     /**
@@ -415,13 +415,13 @@ class Evaluator(agentBuilder: AgentBuilder) {
             var population = initialPopulation
             do {
                 val builderFitnessPairs = runBlocking {
-                    population.asFlow().map {
+                    population.map {
                         async {
                             val build = it.build()
                             val score = build.eval()
                             BuilderFitnessPair(it.copy(), score)
                         }
-                    }.toList().awaitAll()
+                    }.awaitAll()
                         .sortedBy { if (optimizationMethod == OptimizationMethod.MAXIMIZE_FITNESS) -it.fitness else it.fitness }
                 }
 
@@ -499,3 +499,5 @@ fun List<BuilderFitnessPair>.uniformSample() = sequence {
         yield(this@uniformSample[index])
     }
 }
+
+fun EvolutionWorkspace() = Workspace(MainScope() + Dispatchers.Default)

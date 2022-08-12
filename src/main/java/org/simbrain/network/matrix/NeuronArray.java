@@ -1,14 +1,17 @@
 package org.simbrain.network.matrix;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.core.ArrayLayer;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
+import org.simbrain.network.events.NeuronArrayEvents;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
@@ -18,12 +21,11 @@ import smile.stat.distribution.GaussianDistribution;
 import java.awt.geom.Rectangle2D;
 
 /**
- * A "neuron array" backed by a Smile Matrix.
+ * A "neuron array" backed by a Smile Matrix. Stored as a column vector.
  */
 public class NeuronArray extends ArrayLayer implements EditableObject, AttributeContainer {
-
     @UserParameter(label = "Update Rule", useSetter = true, isObjectType = true, order = 100)
-    NeuronUpdateRule prototypeRule = new LinearRule();
+    NeuronUpdateRule updateRule = new LinearRule();
 
     /**
      * Holds data for prototype rule.
@@ -42,6 +44,13 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     @UserParameter(label = "Show activations", description = "Whether to show activations as a pixel image", order = 4)
     private boolean renderActivations = true;
 
+    @UserParameter(label = "Grid Mode", useSetter = true, description = "If true, show activations as a grid, " +
+            "otherwise show them as a line",
+            order = 10)
+    private boolean gridMode = false;
+
+    private transient NeuronArrayEvents events = new NeuronArrayEvents(this);
+
     /**
      * Construct a neuron array.
      *
@@ -52,23 +61,22 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         super(net, size);
         activations = new Matrix(size, 1);
         randomize();
-        setLabel(net.getIdManager().getProposedId(this.getClass()));
-        setPrototypeRule(prototypeRule);
+        setUpdateRule(updateRule);
     }
 
     /**
      * Make a deep copy of this array.
      *
      * @param newParent the new parent network
-     * @param orig      the array to copy
      * @return the deep copy
      */
-    public NeuronArray deepCopy(Network newParent, NeuronArray orig) {
-        NeuronArray copy = new NeuronArray(newParent, orig.outputSize());
-        copy.setLocation(orig.getLocation());
-        copy.setActivations(orig.getActivations());
-        copy.setPrototypeRule(orig.getPrototypeRule());
-        copy.setDataHolder(orig.getDataHolder().copy());
+    public NeuronArray deepCopy(Network newParent) {
+        NeuronArray copy = new NeuronArray(newParent, this.outputSize());
+        copy.setLocation(this.getLocation());
+        copy.setGridMode(this.gridMode);
+        copy.setActivations(this.getActivations());
+        copy.setUpdateRule(this.getUpdateRule());
+        copy.setDataHolder(this.getDataHolder().copy());
         return copy;
     }
 
@@ -105,6 +113,12 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         this.renderActivations = renderActivations;
     }
 
+    @NotNull
+    @Override
+    public NeuronArrayEvents getEvents() {
+        return events;
+    }
+
     @Override
     public void onCommit() {
         getEvents().fireLabelChange("", getLabel());
@@ -132,23 +146,11 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public static class CreationTemplate implements EditableObject {
 
         /**
-         * Number of columns in the under laying ND4J Array.
+         * Size of the neuron array.
          */
         @UserParameter(label = "Nodes", description = "Number of nodes", order = 1)
         private int numNodes = 100;
 
-        /**
-         * A label for this Neuron Array for display purpose.
-         */
-        @UserParameter(label = "Label", description = "If left blank, a default label will be created.", initialValueMethod = "getLabel")
-        private String label;
-
-        /**
-         * Create the template with a proposed label
-         */
-        public CreationTemplate(String proposedLabel) {
-            this.label = proposedLabel;
-        }
 
         /**
          * Add a neuron array to network created from field values which should be setup by an Annotated Property
@@ -158,16 +160,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
          * @return the created neuron array
          */
         public NeuronArray create(Network network) {
-            NeuronArray na = new NeuronArray(network, numNodes);
-            na.setLabel(label);
-            return na;
-        }
-
-        /**
-         * Getter called by reflection by {@link UserParameter#initialValueMethod}
-         */
-        public String getLabel() {
-            return label;
+            return new NeuronArray(network, numNodes);
         }
 
         @Override
@@ -181,7 +174,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         if (isClamped()) {
             return;
         }
-        prototypeRule.apply(this, dataHolder);
+        updateRule.apply(this, dataHolder);
         getInputs().mul(0); // clear inputs
         getEvents().fireUpdated();
     }
@@ -190,6 +183,10 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public void setActivations(Matrix newActivations) {
         activations = newActivations;
         getEvents().fireUpdated();
+    }
+
+    public void setActivations(double[] newActivations) {
+        setActivations(new Matrix(newActivations));
     }
 
     public void fireLocationChange() {
@@ -237,13 +234,14 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         getEvents().fireUpdated();
     }
 
-    public void setPrototypeRule(NeuronUpdateRule prototypeRule) {
-        this.prototypeRule = prototypeRule;
-        dataHolder = prototypeRule.createMatrixData(size());
+    public void setUpdateRule(NeuronUpdateRule updateRule) {
+        this.updateRule = updateRule;
+        dataHolder = updateRule.createMatrixData(size());
+        getEvents().fireUpdateRuleChange();
     }
 
-    public NeuronUpdateRule getPrototypeRule() {
-        return prototypeRule;
+    public NeuronUpdateRule getUpdateRule() {
+        return updateRule;
     }
 
     public MatrixDataHolder getDataHolder() {
@@ -253,4 +251,37 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public void setDataHolder(MatrixDataHolder dataHolder) {
         this.dataHolder = dataHolder;
     }
+
+    public void setGridMode(boolean gridMode) {
+        this.gridMode = gridMode;
+        getEvents().fireGridModeChange();
+    }
+
+    public boolean isGridMode() {
+        return gridMode;
+    }
+
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
+    public Object readResolve() {
+        events = new NeuronArrayEvents(this);
+        return this;
+    }
+
+    public double[] getExcitatoryInputs() {
+        return getIncomingConnectors().stream()
+                .filter(wm -> wm instanceof WeightMatrix)
+                .map(wm -> ((WeightMatrix) wm).getExcitatoryOutputs())
+                .reduce(SimbrainMath::addVector)
+                .orElse(new double[inputSize()]);
+    }
+    public double[] getInhibitoryInputs() {
+        return getIncomingConnectors().stream()
+                .filter(wm -> wm instanceof WeightMatrix)
+                .map(wm -> ((WeightMatrix) wm).getInhibitoryOutputs())
+                .reduce(SimbrainMath::addVector)
+                .orElse(new double[inputSize()]);
+    }
+
 }

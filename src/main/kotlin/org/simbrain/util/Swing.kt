@@ -102,11 +102,11 @@ fun <T: JComponent> T.createAction(
     name: String,
     description: String = name,
     keyCombo: KeyCombination? = null,
-    block: T.() -> Unit
+    block: T.(e:ActionEvent) -> Unit
 ): AbstractAction {
     return object : AbstractAction() {
         init {
-            if (iconPath != null) {
+             if (iconPath != null) {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
             }
 
@@ -118,7 +118,7 @@ fun <T: JComponent> T.createAction(
             }
         }
         override fun actionPerformed(e: ActionEvent) {
-            block()
+            block(e)
         }
     }
 }
@@ -157,22 +157,22 @@ fun <T: JComponent> T.createAction(
     iconPath: String = "",
     name: String = "",
     description: String = name,
-    keyPress: Char,
-    block: T.() -> Unit
+    keyCombo: Char,
+    block: T.(e: ActionEvent) -> Unit
 ): AbstractAction {
-    return createAction(iconPath, name, description, KeyCombination(keyPress), block)
+    return createAction(iconPath, name, description, KeyCombination(keyCombo), block)
 }
 
 /**
- * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor] and
- * then applying a lambda to that object.
+ * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor]. The provided block is executed when
+ * closing the dialog.
  */
-fun <E: EditableObject> E.showDialog(block: (E) -> Unit) {
+fun <E: EditableObject> E.createDialog(block: (E) -> Unit): StandardDialog {
     val editor = AnnotatedPropertyEditor(this)
-    StandardDialog(editor).apply{
+    return StandardDialog(editor).apply{
         addClosingTask{
             editor.commitChanges()
             block(editor.editedObject as E)
         }
-    }.display()
+    }
 }

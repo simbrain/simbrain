@@ -52,7 +52,7 @@ public final class AddSynapseGroupAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        networkPanel.connectSelectedModels();
+        networkPanel.connectSelectedModelsDefault();
     }
 
 }

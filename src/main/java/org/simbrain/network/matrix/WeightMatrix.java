@@ -1,10 +1,9 @@
 package org.simbrain.network.matrix;
 
-import org.simbrain.network.core.Connector;
-import org.simbrain.network.core.Layer;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.core.*;
+import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
@@ -36,6 +35,14 @@ public class WeightMatrix extends Connector {
     SynapseUpdateRule prototypeRule = new StaticSynapseRule();
 
     /**
+     * Only used if source connector's rule is spiking.
+     */
+    @UserParameter(label = "Spike Responder", isObjectType = true,
+            useSetter = true, showDetails = false, order = 200)
+    private SpikeResponder spikeResponder = new NonResponder();
+    // TODO: Conditionally enable based on type of source array rule?
+
+    /**
      * Holds data for prototype rule.
      */
     private MatrixDataHolder dataHolder = new EmptyMatrixData();
@@ -43,12 +50,30 @@ public class WeightMatrix extends Connector {
     /**
      * Holds data for spike responder.
      */
-    private MatrixDataHolder spikeResponseHolder = new EmptyMatrixData();
+    public MatrixDataHolder spikeResponseData = new EmptyMatrixData();
 
     /**
      * The weight matrix object.
      */
     private Matrix weightMatrix;
+
+    /**
+     * A matrix with the same size as the weight matrix. Holds values from post synaptic responses.
+     * Only used with spike responders.
+     */
+    private Matrix psrMatrix;
+
+    /**
+     * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
+     * excitatory, and 0s otherwise. Used by {@link #getExcitatoryOutputs()}
+     */
+    private transient Matrix excitatoryMask;
+
+    /**
+     * A binary matrix with 1s corresponding to entries of the weight matrix that are less than 1 and thus
+     * inhibitory, and 0s otherwise. Used by {@link #getInhibitoryOutputs()} }
+     */
+    private transient Matrix inhibitoryMask;
 
     /**
      * Construct the matrix.
@@ -65,6 +90,15 @@ public class WeightMatrix extends Connector {
 
         weightMatrix = new Matrix(target.inputSize(), source.outputSize());
         diagonalize();
+
+        psrMatrix = new Matrix(target.inputSize(), source.outputSize());
+
+        getEvents().onUpdated(() -> {
+           updateExcitatoryMask();
+           updateInhibitoryMask();
+        });
+        updateExcitatoryMask();
+        updateInhibitoryMask();
     }
 
     public Matrix getWeightMatrix() {
@@ -107,22 +141,98 @@ public class WeightMatrix extends Connector {
         getEvents().fireUpdated();
     }
 
-    /**
-     * Returns the product of the this matrix its source activations
-     */
-    @Override
-    public Matrix getOutput() {
-        return weightMatrix.mm(source.getOutputs());
-    }
-
     @Override
     public void update() {
-        // TODO: Check for clamping or "freezing"
+
+        // TODO: Check for clamping and enabling
+
         if (!(prototypeRule instanceof StaticSynapseRule)){
             prototypeRule.apply(this, dataHolder);
             getEvents().fireUpdated();
         }
     }
+
+    /**
+     * Returns the product of this matrix its source activations, or psr if source array's rule is spiking.
+     *
+     * @see Synapse#updateOutput()
+     */
+    @Override
+    public Matrix getOutput() {
+
+        // TODO: Do frozen, clamping, or enabling make sense here
+
+        if (spikeResponder instanceof NonResponder) {
+            // For "connectionist" case. PSR Matrix not needed in this case
+            return weightMatrix.mm(source.getOutputs());
+        } else {
+            // Updates the psrMatrix in the spiking case
+            spikeResponder.apply(this, spikeResponseData);
+            return new Matrix(psrMatrix.rowSums());
+        }
+    }
+
+    /**
+     * Update the psr matrix in the connectionist case.
+     */
+    public void updateConnectionistPSR() {
+        if (spikeResponder instanceof NonResponder) {
+            // For "connectionist" case. Unusual to need this, but could happen with excitatory inputs and no spike
+            // responder, for example.
+            // Populate each row of the psrMatrix with the element-wise product of the pre-synaptic output vector and
+            // that row of the matrix
+            var output = source.getOutputs();
+            for (int i = 0; i <  weightMatrix.nrows(); i++) {
+                for (int j = 0; j < weightMatrix.ncols(); j++) {
+                    var newVal = weightMatrix.get(i,j) * output.get(j, 0);
+                    psrMatrix.set(i,j, newVal);
+                }
+            }
+        }
+    }
+
+    private void updateExcitatoryMask() {
+        excitatoryMask = weightMatrix.clone();
+        for (int i = 0; i <  excitatoryMask.nrows(); i++) {
+            for (int j = 0; j < excitatoryMask.ncols(); j++) {
+                var newVal = (excitatoryMask.get(i,j) > 0) ? 1 : 0;
+                excitatoryMask.set(i,j, newVal);
+            }
+        }
+    }
+
+    private void updateInhibitoryMask() {
+        inhibitoryMask = weightMatrix.clone();
+        for (int i = 0; i <  inhibitoryMask.nrows(); i++) {
+            for (int j = 0; j < inhibitoryMask.ncols(); j++) {
+                var newVal = (inhibitoryMask.get(i,j) < 0) ? 1 : 0;
+                inhibitoryMask.set(i,j, newVal);
+            }
+        }
+    }
+
+    /**
+     * Returns an array representing the sum of the psr's for all excitatory (> 0) pre-synaptic weights
+     */
+    public double[] getExcitatoryOutputs() {
+        updateConnectionistPSR();
+        if (excitatoryMask == null) {
+            updateExcitatoryMask();
+        }
+        return excitatoryMask.clone().mul(psrMatrix).rowSums();
+    }
+
+    /**
+     * Returns an array representing the sum of the psr's for all inhibitory (< 0) pre-synaptic weights
+     */
+    public double[] getInhibitoryOutputs() {
+        updateConnectionistPSR();
+        if (inhibitoryMask == null) {
+            updateInhibitoryMask();
+        }
+        return inhibitoryMask.clone().mul(psrMatrix).rowSums();
+    }
+
 
     public SynapseUpdateRule getPrototypeRule() {
         return prototypeRule;
@@ -166,4 +276,14 @@ public class WeightMatrix extends Connector {
                 + " (" + weightMatrix.nrows() + "x" + weightMatrix.ncols() + ") "
                 + "connecting " + source.getId() + " to " + target.getId();
     }
+
+    public Matrix getPsrMatrix() {
+        return psrMatrix;
+    }
+
+    public void setSpikeResponder(SpikeResponder spikeResponder) {
+        this.spikeResponder = spikeResponder;
+        spikeResponseData = spikeResponder.createMatrixData(weightMatrix.nrows(), weightMatrix.ncols());
+    }
+
 }

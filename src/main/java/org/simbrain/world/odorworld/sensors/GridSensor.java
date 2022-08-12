@@ -141,8 +141,8 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         this.width = width;
         this.height = height;
         this.values = new double[columns * rows];
-        super.setTheta(0);
-        super.setRadius(25);
+        // super.setTheta(0);
+        // super.setRadius(25);
     }
 
     public GridSensor() {
@@ -168,11 +168,11 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @Override
     public void update(OdorWorldEntity parent) {
         values = new double[columns * rows];
-        int gridX = (int) (computeAbsoluteLocation(parent).getX() / width - x);
-        int gridY = (int) (computeAbsoluteLocation(parent).getY() / height - y);
-        if (gridX < columns && gridY < rows && gridX >= 0 && gridY >= 0) {
-            values[gridX + gridY * rows] = DEFAULT_ACTIVATION;
-        }
+        // int gridX = (int) (computeAbsoluteLocation(parent).getX() / width - x);
+        // int gridY = (int) (computeAbsoluteLocation(parent).getY() / height - y);
+        // if (gridX < columns && gridY < rows && gridX >= 0 && gridY >= 0) {
+        //     values[gridX + gridY * rows] = DEFAULT_ACTIVATION;
+        // }
     }
 
     /**
@@ -247,7 +247,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @Override
     public String getLabel() {
         if (super.getLabel().isEmpty()) {
-            return getDirectionString() + "Grid Sensor";
+            return "Grid Sensor";
         } else {
             return super.getLabel();
         }

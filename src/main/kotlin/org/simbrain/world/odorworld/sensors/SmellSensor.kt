@@ -19,7 +19,6 @@
 package org.simbrain.world.odorworld.sensors
 
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.util.sum
 import org.simbrain.workspace.Producible
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
@@ -27,10 +26,10 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  * A sensor which is updated based on the presence of [SmellSource]s near it.
  */
 class SmellSensor @JvmOverloads constructor(
-    label: String = "Smell Sensor",
+    override val name: String = "Smell Sensor",
     theta: Double = 0.0,
     radius: Double = 0.0,
-) : Sensor(label), VisualizableEntityAttribute {
+) : SensorWithRelativeLocation(theta, radius), VisualizableEntityAttribute {
 
     /**
      * The current vale of the smell sensors. A vector of smells obtained
@@ -49,7 +48,8 @@ class SmellSensor @JvmOverloads constructor(
             .map { Pair(it.smellSource, SimbrainMath.distance(it.location, computeAbsoluteLocation(parent))) }
             .filter { (_, _) -> true }
             .map { (smellSource, distance) -> smellSource.getStimulus(distance) }
-            .sum()
+            .map { it.sum() }
+            .toDoubleArray()
     }
 
     /**
@@ -79,8 +79,8 @@ class SmellSensor @JvmOverloads constructor(
     }
 
     override fun copy(): SmellSensor {
-        return SmellSensor(label, theta, radius)
+        return SmellSensor(name, theta, radius).applyCommonCopy().apply {
+            this@SmellSensor.smellVector = smellVector
+        }
     }
-
-    override val name: String = "Smell Sensor"
 }

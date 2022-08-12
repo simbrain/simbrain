@@ -32,14 +32,14 @@ public class AddSTDPRule extends STDPRule {
     }
 
     @Override
-    public void apply(Synapse synapse, ScalarDataHolder data) {
-        boolean ss = synapse.getSource().isSpike();
-        boolean st = synapse.getTarget().isSpike();
+    public void apply(Synapse s, ScalarDataHolder data) {
+        boolean ss = s.getSource().isSpike();
+        boolean st = s.getTarget().isSpike();
 
-        double str = synapse.getStrength();
+        double str = s.getStrength();
 
         str += learningRate * ((srcSpk && st ? 1 : 0) - (tarSpk && ss ? 1 : 0));
-        synapse.setStrength(synapse.clip(str));
+        s.setStrength(s.clip(str));
         srcSpk = ss;
         tarSpk = st;
 

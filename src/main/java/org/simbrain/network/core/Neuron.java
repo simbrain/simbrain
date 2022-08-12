@@ -29,6 +29,7 @@ import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.SpikingScalarData;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
@@ -200,7 +201,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Local data holder for neuron update rule.
      */
     @UserParameter(label = "State variables", useSetter = true, isEmbeddedObject = true, order = 100)
-    private ScalarDataHolder neuronDataHolder = new EmptyScalarData();
+    private ScalarDataHolder dataHolder = new EmptyScalarData();
 
     /**
      * Construct a specific type of neuron.
@@ -235,6 +236,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public Neuron(final Network parent, final Neuron n) {
         this.parent = parent;
         setUpdateRule(n.getUpdateRule().deepCopy());
+        setDataHolder(n.getDataHolder().copy());
         setClamped(n.isClamped());
         setIncrement(n.getIncrement());
         forceSetActivation(n.getActivation());
@@ -242,15 +244,14 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         y = n.y;
         setUpdatePriority(n.getUpdatePriority());
         setLabel(n.getLabel());
-        setNeuronDataHolder(n.getNeuronDataHolder().copy());
     }
 
-    public ScalarDataHolder getNeuronDataHolder() {
-        return neuronDataHolder;
+    public ScalarDataHolder getDataHolder() {
+        return dataHolder;
     }
 
-    public void setNeuronDataHolder(ScalarDataHolder neuronDataHolder) {
-        this.neuronDataHolder = neuronDataHolder;
+    public void setDataHolder(ScalarDataHolder dataHolder) {
+        this.dataHolder = dataHolder;
     }
 
     /**
@@ -326,7 +327,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule;
-        neuronDataHolder = updateRule.createScalarData();
+        dataHolder = updateRule.createScalarData();
 
         if (getNetwork() != null) {
             getNetwork().updateTimeType();
@@ -339,7 +340,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public void changeUpdateRule(final NeuronUpdateRule updateRule, final ScalarDataHolder data) {
         this.updateRule = updateRule;
-        this.neuronDataHolder = data;
+        this.dataHolder = data;
     }
 
     @Override
@@ -356,7 +357,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         if (isClamped()) {
             return;
         }
-        updateRule.apply(this, neuronDataHolder);
+        updateRule.apply(this, dataHolder);
         inputValue = 0.0;
     }
 
@@ -434,8 +435,10 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Adds an efferent synapse to this neuron, i.e. adds a synapse to
-     * {@link #fanOut}. Does <b>NOT</b> add this synapse to the network or any
+     * Adds an efferent (outgoing) synapse to this neuron, i.e. adds a synapse to
+     * {@link #fanOut}. Used when constructing synapses. Should not be called directly
+     *
+     * Does <b>NOT</b> add this synapse to the network or any
      * intermediate bodies. If the connection is a duplicate connection the
      * original synapse connecting this neuron to a target neuron will be
      * removed and replaced by <i>Synapse s</i>.
@@ -460,9 +463,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Remove this neuron from target neuron via a weight.
-     *
-     * @param synapse the connection between this neuron and a target neuron
+     * Remove an efferent (outgoing) weight from this neuron. Used by synapse but should not generally be called
+     * directly.
      */
     public void removeEfferent(final Synapse synapse) {
         if (fanOut != null) {
@@ -471,12 +473,10 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Adds an afferent synapse to this neuron, i.e. adds a synapse to
-     * {@link #fanIn}. Does <b>NOT</b> add this synapse to the network or any
-     * intermediate bodies.
+     * Adds an afferent (incoming) synapse to this neuron, i.e. adds a synapse to
+     * {@link #fanIn}. Used when constructing synapses. Should not be called directly
      *
-     * @param source adds source as a synapse for which this neuron is the
-     *               target.
+     * Does <b>NOT</b> add this synapse to the network or any intermediate bodies.
      */
     public void addAfferent(final Synapse source) {
         if (fanIn != null) {
@@ -485,9 +485,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Remove this neuron from source neuron via a weight.
-     *
-     * @param synapse the connection between this neuron and a source neuron
+     * Remove an afferent (incoming) weight from this neuron. Used by synapse but should not generally be called
+     * directly.
      */
     public void removeAfferent(final Synapse synapse) {
         if (fanIn != null) {
@@ -508,97 +507,34 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Returns the weighted input to this neuron, i.e. for each incoming neuron
-     * n, n's activation times the intervening weights. If n is a spiking
-     * neuron its {@link org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder}
-     * is used, so that this returns the sum of the post-synaptic responses (synapse values in
-     * response to spikes and mediated by spike responders) impinging on this
-     * neuron.
-     *
-     * @return total input to this neuron from other neurons
+     * Returns the sum of post-synaptic responses of all incoming neurons connected to this one by negative weights.
+     * This automatically includes neurons whose polarity is excitatory, since they only produce positive outgoing
+     * weights.
+     */
+    public double getExcitatoryInputs() {
+         return fanIn.stream()
+                    .filter(s -> s.getStrength() > 0.0)
+                    .map(Synapse::getPsr)
+                    .reduce(Double::sum).orElse(0.0);
+    }
+
+    /**
+     * Returns the sum of post-synaptic responses of all incoming neurons connected to this one by negative weights.
+     * This automatically includes neurons whose polarity is inhibitory, since they only produce negative outgoing
+     * weights.
+     */
+    public double getInhibitoryInputs() {
+        return fanIn.stream()
+                    .filter(s -> s.getStrength() < 0.0)
+                    .map(Synapse::getPsr)
+                    .reduce(Double::sum).orElse(0.0);
+    }
+
+    /**
+     * Returns "external input" to neuron, separate from any input from connected neurons.
      */
     public double getInput() {
         return inputValue;
-    }
-
-    /**
-     * A helper method which iterates over each afferent synapse to this neuron
-     * and calls their update functions.
-     */
-    public void updateFanIn() {
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            fanIn.get(i).update();
-        }
-    }
-
-    /**
-     * Normalizes the excitatory synaptic strengths impinging on this neuron,
-     * that is finds the sum of the exctiatory weights and divides each weight
-     * value by that sum.
-     */
-    public void normalizeExcitatoryFanIn() {
-        double sum = 0;
-        double str = 0;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            str = fanIn.get(i).getStrength();
-            if (str > 0) {
-                sum += str;
-            }
-        }
-        Synapse s = null;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            s = fanIn.get(i);
-            str = s.getStrength();
-            if (str > 0) {
-                s.setStrength(s.getStrength() / sum);
-            }
-        }
-    }
-
-    public void normalizeInhibitoryFanIn() {
-        double sum = 0;
-        double str = 0;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            str = fanIn.get(i).getStrength();
-            if (str < 0) {
-                sum -= str;
-            }
-        }
-        Synapse s = null;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            s = fanIn.get(i);
-            str = s.getStrength();
-            if (str < 0) {
-                s.setStrength(s.getStrength() / sum);
-            }
-        }
-    }
-
-    public void normalizeFanIn() {
-        double eSum = 0;
-        double iSum = 0;
-        double str;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            str = fanIn.get(i).getStrength();
-            if (str > 0) {
-                eSum += str;
-            } else {
-                // subtract negative wts so that iSum stays +. Otherwise a
-                // sign change will occur when the weights are divided by this
-                // value.
-                iSum -= str;
-            }
-        }
-        Synapse s = null;
-        for (int i = 0, n = fanIn.size(); i < n; i++) {
-            s = fanIn.get(i);
-            str = s.getStrength();
-            if (str > 0) {
-                s.setStrength(s.getStrength() / eSum);
-            } else {
-                s.setStrength(s.getStrength() / iSum);
-            }
-        }
     }
 
     @Override
@@ -672,23 +608,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         return ret;
     }
 
-    /**
-     * Returns the number of neurons attaching to this one which have activity
-     * above a specified threshold.
-     *
-     * @param threshold value above which neurons are considered "active."
-     * @return number of "active" neurons
-     */
-    public int getNumberOfActiveInputs(final int threshold) {
-        int numActiveLines = 0;
-        // Determine number of active (greater than 0) input lines
-        for (Synapse incoming : fanIn) {
-            if (incoming.getSource().getActivation() > threshold) {
-                numActiveLines++;
-            }
-        }
-        return numActiveLines;
-    }
+
 
     /**
      * @return the average activation of neurons connecting to this neuron
@@ -731,13 +651,13 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     /**
      * Used for deletion to avoid a ConcurrentModificationException as well as
-     * conform to the other processes inovlved in removing synapses from a
+     * conform to the other processes involved in removing synapses from a
      * network.
      *
      * @return an element by element shallow copy of the synapses in this
      * neuron's fanIn map.
      */
-    public List<Synapse> getFanInList() {
+    private List<Synapse> getFanInList() {
         // Pre-allocating for speed
         List<Synapse> syns = new ArrayList<Synapse>((int) (fanIn.size() / 0.75));
         for (Synapse s : fanIn) {
@@ -754,7 +674,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @return an element by element shallow copy of the synapses in this
      * neuron's fanOut map.
      */
-    public List<Synapse> getFanOutList() {
+    private List<Synapse> getFanOutList() {
         // Pre-allocating for speed
         List<Synapse> syns = new ArrayList<Synapse>((int) (fanOut.size() / 0.75));
         for (Synapse s : fanOut.values()) {
@@ -767,7 +687,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Removes all synapses from fanOut and from the network or any intermediate
      * structures.
      */
-    public void deleteFanOut() {
+    private void deleteFanOut() {
         List<Synapse> fanOutList = getFanOutList();
         fanOut.clear();
         for (Synapse s : fanOutList) {
@@ -779,7 +699,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Removes all synapses from fanIn and from the network or any intermediate
      * structures.
      */
-    public void deleteFanIn() {
+    private void deleteFanIn() {
         List<Synapse> fanInList = getFanInList();
         fanIn.clear();
         for (Synapse synapse : fanInList) {
@@ -1019,13 +939,22 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         events.fireColorChange();
     }
 
+    // TODO: Move these methods to SpikingScalarData?
+
     public boolean isSpike() {
         return spike;
     }
 
     public void setSpike(boolean spike) {
         this.spike = spike;
+        if (dataHolder instanceof SpikingScalarData) {
+            ((SpikingScalarData) dataHolder).setHasSpiked(spike, parent.getTime());
+        }
         events.fireSpiked(spike);
+    }
+
+    public Double getLastSpikeTime() {
+        return ((SpikingScalarData) dataHolder).getLastSpikeTime();
     }
 
     public double getLastActivation() {

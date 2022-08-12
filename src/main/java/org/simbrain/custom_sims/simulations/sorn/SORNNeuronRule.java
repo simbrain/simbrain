@@ -50,18 +50,17 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
     @Override
     public void apply(Neuron neuron, ScalarDataHolder data) {
         // Synaptic Normalization
-        neuron.normalizeExcitatoryFanIn();
+        SORN.normalizeExcitatoryFanIn(neuron);
         // Sum inputs including noise and applied (external) inputs
         double input = neuron.getInput()
-                + (addNoise ? noiseGenerator.sampleDouble() : 0)
-                + getAppliedInput();
+                + (addNoise ? noiseGenerator.sampleDouble() : 0);
+        // TODO: There used to be "applied input here" but it is no longer used
         // Check that we're not still in the refractory period
         boolean outOfRef = neuron.getNetwork().getTime()
-            > getLastSpikeTime()+refractoryPeriod;
+            > neuron.getLastSpikeTime()+refractoryPeriod;
         // We fire a spike if input exceeds threshold and we're
         // not in the refractory period
         boolean spk = outOfRef && (input >= getThreshold());
-        setHasSpiked(spk, neuron);
         neuron.setSpike(spk);
         neuron.setActivation(2*(input-getThreshold()));
         plasticUpdate(neuron);
@@ -75,10 +74,6 @@ public class SORNNeuronRule extends SpikingThresholdRule implements
 //        if (getThreshold() > maxThreshold) {
 //            setThreshold(maxThreshold);
 //        }
-    }
-    
-    public void init(Neuron n) {
-        n.normalizeInhibitoryFanIn();
     }
 
     @Override

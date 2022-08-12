@@ -115,7 +115,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
         // Set up label text
         //priorityText.setFont(PRIORITY_FONT);
-        labelBackground.paint = networkPanel.background
+        labelBackground.paint = networkPanel.backgroundColor
         labelBackground.setBounds(labelText.bounds)
         labelBackground.addChild(labelText)
         addChild(labelBackground)
@@ -276,6 +276,9 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
      * Sets the color of this neuron based on its activation level.
      */
     private fun updateColor() {
+        if (neuron.isSpike) {
+            return
+        }
         val activation = neuron.updateRule.getGraphicalValue(neuron)
         // Force to blank if 0 (or close to it)
         val gLow = neuron.updateRule.graphicalLowerBound
@@ -298,7 +301,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             val saturation = SimbrainMath.rescale(activation, 0.0, gLow, 0.0, 1.0)
             mainShape.paint = Color.getHSBColor(coolColor, saturation.toFloat(), 1f)
         }
-        if (!customStrokeColor && !neuron.isSpike) {
+        if (!customStrokeColor) {
             // Color stroke paint based on Polarity
             if (neuron.polarity === SimbrainConstants.Polarity.EXCITATORY) {
                 circle.strokePaint = Color.red
@@ -342,17 +345,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
                 labelText.setOffset(mainShape.x - labelText.width / 2 + DIAMETER / 2, mainShape.y - DIAMETER / 2 - 1)
                 labelBackground.setBounds(labelText.fullBounds)
             }
-            updateBounds()
         }
-    }
-
-    private fun updateBounds() {
-        // update bounds to include text
-        val bounds = mainShape.bounds
-        if (neuron.label != null) {
-            bounds.add(labelText.localToParent(labelText.bounds))
-        }
-        setBounds(bounds)
     }
 
     /**
@@ -611,5 +604,14 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
          */
         @JvmStatic
         var spikingColor = Color.yellow
+    }
+
+    private fun updateBounds() {
+        // update bounds to include text
+        val bounds = mainShape.bounds
+        if (neuron.label != null) {
+            bounds.add(labelText.localToParent(labelText.bounds))
+        }
+        setBounds(bounds)
     }
 }

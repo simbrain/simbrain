@@ -3,6 +3,7 @@ package org.simbrain.workspace
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.pmw.tinylog.Logger
 import org.simbrain.util.SimbrainPreferences
 import org.simbrain.workspace.couplings.Coupling
@@ -230,11 +231,13 @@ class Workspace @JvmOverloads constructor(
     }
 
     suspend fun iterateSuspend(numIterations: Int) {
-        for (wc in componentList) {
-            wc.start()
+        withContext(coroutineScope.coroutineContext) {
+            for (wc in componentList) {
+                wc.start()
+            }
+            updater.iterate(numIterations)
+            stop()
         }
-        updater.iterate(numIterations)
-        stop()
     }
 
     /**

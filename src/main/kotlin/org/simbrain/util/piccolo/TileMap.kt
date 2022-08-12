@@ -94,6 +94,18 @@ class TileMap(width: Int, height: Int) {
     val tileSets: List<TileSet> = listOf(createDefaultTileSet())
 
     /**
+     * Cache id ranges for each TileSet in [tileSets]
+     */
+    @Transient
+    private var tileSetRanges = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
+
+    /**
+     * Cache [Tile] objects by their ids
+     */
+    @Transient
+    private var idTileMapping = HashMap<Int, Tile>()
+
+    /**
      * The layers of this map.
      */
     @XStreamImplicit
@@ -177,11 +189,14 @@ class TileMap(width: Int, height: Int) {
     fun hasTileIdAtPixel(id: Int, x: Double, y: Double) =
             getTileStackAtPixel(x, y).any { t: Tile -> t.id == id }
 
-    fun getTile(gid: Int) = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
+    fun getTile(gid: Int) = idTileMapping.getOrPut(gid) {
+
+        tileSetRanges
             .firstOrNull { (range, _) -> gid in range }
             ?.let { (_, tileSet) -> tileSet[gid] } ?: zeroTile
+    }
 
-    fun tileImage(gid: Int) = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
+    fun tileImage(gid: Int) = tileSetRanges
             .firstOrNull { (range, _) -> gid in range }
             ?.let { (_, tileSet) -> tileSet.getTileImage(gid) } ?: transparentTexture(tileWidth, tileHeight)
 
@@ -291,6 +306,8 @@ class TileMap(width: Int, height: Int) {
      */
     private fun readResolve(): Any {
         changeSupport = PropertyChangeSupport(this)
+        tileSetRanges = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
+        idTileMapping = HashMap()
         return this
     }
 

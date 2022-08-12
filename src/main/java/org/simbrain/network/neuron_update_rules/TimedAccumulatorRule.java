@@ -107,14 +107,12 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
             }
             neuron.setActivation(currentState);
             neuron.setSpike(false);
-            setHasSpiked(false, neuron);
             return;
         }
         if (ThreadLocalRandom.current().nextDouble() < baseProb) {
             currentState++;
             neuron.setActivation(1);
             neuron.setSpike(true);
-            setHasSpiked(true, neuron);
             return;
         }
         expSum = 0;
@@ -132,14 +130,12 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
                     currentState++;
                     neuron.setActivation(1);
                     neuron.setSpike(true);
-                    setHasSpiked(true, neuron);
                     return;
                 }
             }
         }
         neuron.setActivation(0);
         neuron.setSpike(false);
-        setHasSpiked(false, neuron);
     }
 
 //    public void init(Neuron neuron) {
@@ -159,7 +155,6 @@ public class TimedAccumulatorRule extends SpikingThresholdRule {
         tar.setCurrentState(currentState);
         tar.setMaxState(maxState);
         tar.setKappa(kappa);
-        tar.setLastSpikeTime(getLastSpikeTime());
         return tar;
     }
 

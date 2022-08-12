@@ -69,6 +69,7 @@ val NetworkPanel.actionMenu
     get() = JMenu("Actions").apply {
         with(networkActions) {
             // Alphabetical by action name
+            add(fast100)
             add(fastGridAction)
             add(decayWeightsAction)
             add(pruneWeightsAction)
@@ -149,8 +150,12 @@ val NetworkPanel.viewMenu
             })
             addSeparator()
             add(JCheckBoxMenuItem(showPrioritiesAction).apply { this.state = networkPanel.prioritiesVisible })
-            // TODO
-            // add(JCheckBoxMenuItem(showWeightsAction).apply { this.state = networkPanel.looseWeightsVisible })
+            add(JCheckBoxMenuItem(toggleFreeWeightVisibility).apply {
+                this.state = networkPanel.freeWeightsVisible
+                networkPanel.network.events.onFreeWeightVisibilityChanged{
+                    this.state = it
+                }
+            })
         }
     }
 

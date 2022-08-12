@@ -57,7 +57,17 @@ public class BufferedUpdateTask implements Task {
                 break;
             }
             hosts[i].update();
-            hosts[i].updateFanIn();
+            updateFanIn(hosts[i]);
+        }
+    }
+
+    /**
+     * A helper method which iterates over each afferent synapse to this neuron
+     * and calls their update functions.
+     */
+    public void updateFanIn(Neuron neuron) {
+        for (int i = 0, n = neuron.getFanIn().size(); i < n; i++) {
+            neuron.getFanIn().get(i).update();
         }
     }
 

@@ -19,9 +19,8 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.neuron_update_rules.AdExIFRule;
-import org.simbrain.network.neuron_update_rules.IzhikevichRule;
+import org.simbrain.network.updaterules.AdExIFRule;
+import org.simbrain.network.updaterules.IzhikevichRule;
 import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
 import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.IntegrateAndFireRule;
@@ -113,10 +112,10 @@ public abstract class NeuronUpdateRule implements CopyableObject {
      *
      * NOTE: Only a few of these have been done.
      *
-     * @param array reference to a layer and its matrix-valued data (inputs, activations).
+     * @param layer reference to a layer and its matrix-valued data (inputs, activations).
      * @param dataHolder a holder for mutable data used in matrix versions of an update rule
      */
-    public void apply(NeuronArray array, MatrixDataHolder dataHolder) {}
+    public void apply(Layer layer, MatrixDataHolder dataHolder) {}
 
     /**
      * Override to return an appropriate data holder for a given rule.
@@ -251,7 +250,7 @@ public abstract class NeuronUpdateRule implements CopyableObject {
         return neuron.getId() + ".  Location: (" + (int) neuron.getX() + "," + (int) neuron.getY() + "). Activation: " + Utils.round(neuron.getActivation(), MAX_DIGITS);
     }
 
-    public boolean isSpikingNeuron() {
+    public boolean isSpikingRule() {
         return false;
     }
 

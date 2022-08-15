@@ -1,9 +1,8 @@
 package org.simbrain.util
 
 import smile.math.MathEx.cos
-import smile.nlp.dictionary.EnglishStopWords
-import smile.nlp.tokenizer.SimpleSentenceSplitter
 import smile.math.matrix.Matrix
+import smile.nlp.tokenizer.SimpleSentenceSplitter
 
 /**
  * Sentence tokenizer: parse document into sentences and return as a list of sentences.
@@ -11,7 +10,7 @@ import smile.math.matrix.Matrix
  * Forward to Smile's sentence splitter.
  */
 fun tokenizeSentencesFromDoc(docString: String) : List<String> {
-    return  SimpleSentenceSplitter.getInstance().split(docString.lowercase()).toList()
+    return SimpleSentenceSplitter.getInstance().split(docString).toList()
 }
 
 /**
@@ -36,7 +35,6 @@ fun uniqueTokensFromArray(words: List<String>) : List<String> {
     return words.distinctBy { it.lowercase() }
 }
 
-
 /**
  * Unique tokens: content words only / remove stop words (targets) -- not working at the moment
  */
@@ -52,93 +50,99 @@ fun uniqueTokensFromArray(words: List<String>) : List<String> {
 //    return filteredTargets
 //}
 
-
-
 /**
- * Generates co-occ matrix w/ window size n
+ * Generates co-occurrence matrix from a provided [docString]. [windowSize] specifies how many words should be
+ * included in a context.
+ *
+ * Example: if [windowSize] 2, then the context for "dog" in "the quick dog ran fastly" is ["the", "dog", "ran",
+ * "fastly'].
+ *
+ * Returns a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
+ *
  */
 fun generateCooccurrenceMatrix(docString: String, windowSize: Int): Matrix  {
+
+    if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
+
     // get tokens from whole document
-    var tokenizedSentence = tokenizeWordsFromSentence(docString)
-    var tokens = uniqueTokensFromArray(tokenizedSentence)
-    println("Tokens:")
-    println(tokens)
+    val tokenizedSentence = tokenizeWordsFromSentence(docString)
+    val tokens = uniqueTokensFromArray(tokenizedSentence)
+    // println("Tokens:")
+    // println(tokens)
 
     // Split document into sentences
-    var sentences = tokenizeSentencesFromDoc(docString)
+    val sentences = tokenizeSentencesFromDoc(docString)
 
     // Set up matrix
-    var matrixSize = tokens.size
-    var cooccurrenceSmileMatrix = Matrix(matrixSize, matrixSize)
+    val matrixSize = tokens.size
+    val cooccurrenceSmileMatrix = Matrix(matrixSize, matrixSize)
 
-//    cooccurrenceMatrix[0][1] = 2 // cooccurrenceMatrix[target][context]
+   // cooccurrenceMatrix[0][1] = 2 // cooccurrenceMatrix[target][context]
 
     // Loop through sentences, through words
     for (sentence in sentences) {
-        println(sentence)
-        var tokenizedSentence = tokenizeWordsFromSentence(sentence)
+        // println(sentence)
+        val tokenizedSentence = tokenizeWordsFromSentence(sentence)
         for (sentenceIndex in tokenizedSentence.indices) {
-            var maxIndex = tokenizedSentence.size -1  // used for window range check
+            val maxIndex = tokenizedSentence.size -1  // used for window range check
 
-            var currentToken = tokenizedSentence[sentenceIndex] // Current iterated token
+            val currentToken = tokenizedSentence[sentenceIndex] // Current iterated token
 
-            var contextLowerLimit = sentenceIndex - windowSize
-            var contextUpperLimit = sentenceIndex + windowSize
+            val contextLowerLimit = sentenceIndex - windowSize
+            val contextUpperLimit = sentenceIndex + windowSize
 
             for (contextIndex in contextLowerLimit..contextUpperLimit){
                 if (contextIndex in 0..maxIndex && contextIndex != sentenceIndex){
-                    var currentContext = tokenizedSentence[contextIndex]
+                    val currentContext = tokenizedSentence[contextIndex]
 
 
-                    var tokenCoordinate = tokens.indexOf(currentToken)
-                    var contextCoordinate = tokens.indexOf(currentContext)
-//                    print(listOf("Current Token:", currentToken, tokenCoordinate))
-//                    println(listOf("Current Context",currentContext, contextCoordinate))
+                    val tokenCoordinate = tokens.indexOf(currentToken)
+                    val contextCoordinate = tokens.indexOf(currentContext)
+                    // print(listOf("Current Token:", currentToken, tokenCoordinate))
+                    // println(listOf("Current Context",currentContext, contextCoordinate))
                     cooccurrenceSmileMatrix[tokenCoordinate, contextCoordinate] = cooccurrenceSmileMatrix[tokenCoordinate, contextCoordinate] + 1
                 }
             }
         }
     }
-    print(cooccurrenceSmileMatrix)
+    // print(cooccurrenceSmileMatrix)
     return cooccurrenceSmileMatrix
 }
 
 /**
  * Get an embedding from a matrix given matrix, index, and word
  */
-//fun generateCooccurrenceMatrix(docString: String, windowSize: Int): Matrix  {
 fun wordEmbeddingQuery(targetWord: String, tokens: List<String>, cooccurrenceMatrix: Matrix): DoubleArray {
-    var targetWordIndex = tokens.indexOf(targetWord)
+    val targetWordIndex = tokens.indexOf(targetWord)
     return cooccurrenceMatrix.col(targetWordIndex)
-
 }
 
 
-/**
- * PPMI weighting
- * Adjusted from:  https://stackoverflow.com/questions/58701337/how-to-construct-ppmi-matrix-from-a-text-corpus
- * https://haifengl.github.io/api/java/smile/math/matrix/Matrix.html#colSums--
- */
-//fun manualPPMI(cooccurrenceMatrix: Matrix, positive: Boolean): Matrix {
+// /**
+//  * PPMI weighting
+//  * Adjusted from:  https://stackoverflow.com/questions/58701337/how-to-construct-ppmi-matrix-from-a-text-corpus
+//  * https://haifengl.github.io/api/java/smile/math/matrix/Matrix.html#colSums--
+//  */
+// fun manualPPMI(cooccurrenceMatrix: Matrix, positive: Boolean): Matrix {
 //    // Get vector of column totals
-//    var columnTotals = colSums(cooccurrenceMatrix)
+//    var columnTotals = cooccurrenceMatrix.colSums()
 //    // Get total sum of cooccurrences
-//    var totalSum = sum(columnTotals)
+//    var totalSum = columnTotals.sum()
 //    // Get vector of row totals
-//    var rowTotals = rowSums(cooccurrenceMatrix)
+//    var rowTotals = cooccurrenceMatrix.rowSums()
 //    // "expected values" as the outer product of (row totals, col totals) / total
 //
 //    // Divide cooccurrence matrix by the expected values
 //
 //    // If positive, then fill in negatives with zero
-//}
+// }
 
 /**
- * Calculate cosine similarity of two vectors (higher values are more similar)
+ * Calculate cosine similarity of two vectors (higher values are more similar).
+ * All this does is forward to Math.cos but leaving it named this way is slightly more legible
  */
-fun embeddingCosineSimilarity(vectorA: DoubleArray, vectorB: DoubleArray): Double {
+fun cosineSimilarity(vectorA: DoubleArray, vectorB: DoubleArray): Double {
     return cos(vectorA, vectorB)
-
 }
 
 

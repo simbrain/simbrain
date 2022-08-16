@@ -105,7 +105,7 @@ class TileMapLayer(
      * @return the tile id
      */
     operator fun get(x: Int, y: Int): Int {
-        infix fun Int.wrap(other: Int) = (this + other) % other
+        infix fun Int.wrap(other: Int) = (this % other).let { if (it < 0) it + other else it }
         return data[x wrap width, y wrap height]
     }
 

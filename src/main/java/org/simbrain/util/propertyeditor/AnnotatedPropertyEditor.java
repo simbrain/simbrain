@@ -71,14 +71,11 @@ public class AnnotatedPropertyEditor extends EditablePanel {
     private List<? extends EditableObject> editedObjects = Collections.EMPTY_LIST;
 
     /**
-     * Main panel.
+     * The main panel, which is either a labelled item panel, or, if there are tabs, a JTabbedPane.
      */
-    private JComponent mainPanel = new JTabbedPane();
+    private JComponent mainPanel;
 
-    /**
-     * All tab panels.
-     */
-    private Map<String, LabelledItemPanel> tabPanels = new TreeMap<>();
+    private Map<String, LabelledItemPanel> contentPanels = new TreeMap<>();
 
     /**
      * Construct with one object.
@@ -97,12 +94,10 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
     /**
      * Construct with a list of objects.
-     *
-     * @param objects
      */
     public AnnotatedPropertyEditor(List<? extends EditableObject> objects) {
 
-        if (objects.isEmpty() || objects == null) {
+        if (objects.isEmpty()) {
             return;
         }
         this.editedObjects = objects;
@@ -110,7 +105,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         initPanel();
         add(mainPanel, BorderLayout.CENTER);
         fillFieldValues(editedObjects);
-
     }
 
     /**
@@ -136,6 +130,13 @@ public class AnnotatedPropertyEditor extends EditablePanel {
             widgets.add(new ParameterWidget(this, p));
         });
 
+        // If there is only one tab panel, do not create tab bar and use that one panel as main panel
+        if (contentPanels.size() == 1) {
+            mainPanel = contentPanels.values().iterator().next();
+        } else {
+            mainPanel = new JTabbedPane();
+        }
+
         // Add parameter widgets after collecting list of params so they're in
         // the right order.
         for (ParameterWidget pw : widgets) {
@@ -146,11 +147,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 label.setToolTipText(pw.getToolTipText());
                 addItemToTabPanel(label, pw);
             }
-        }
-
-        // If there is only one tab panel, do not create tab bar and use that one panel as main panel
-        if (tabPanels.size() == 1) {
-            mainPanel = tabPanels.values().iterator().next();
         }
 
         // Update conditional enabling based on widgets
@@ -470,8 +466,8 @@ public class AnnotatedPropertyEditor extends EditablePanel {
      */
     private void addItemToTabPanel(ParameterWidget pw) {
         String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
-        addTabPanel(parameterWidgetTabName);
-        tabPanels.get(parameterWidgetTabName).addItem(pw.getComponent());
+        addContentPanel(parameterWidgetTabName);
+        contentPanels.get(parameterWidgetTabName).addItem(pw.getComponent());
     }
 
     /**
@@ -481,20 +477,42 @@ public class AnnotatedPropertyEditor extends EditablePanel {
      */
     private void addItemToTabPanel(JLabel label, ParameterWidget pw) {
         String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
-        addTabPanel(parameterWidgetTabName);
-        tabPanels.get(parameterWidgetTabName).addItemLabel(label, pw.getComponent());
+        addContentPanel(parameterWidgetTabName);
+        contentPanels.get(parameterWidgetTabName).addItemLabel(label, pw.getComponent());
     }
 
     /**
-     * Creates if not exists a tab panel with a specified name.
-     *
-     * @param tabName the name for the tab
+     * Creates content panel with a specified name.
      */
-    private void addTabPanel(String tabName) {
-        if (!tabPanels.containsKey(tabName)) {
+    private void addContentPanel(String tabName) {
+        if (!contentPanels.containsKey(tabName)) {
             LabelledItemPanel newLabelledItemPanel = new LabelledItemPanel();
-            tabPanels.put(tabName, newLabelledItemPanel);
+            contentPanels.put(tabName, newLabelledItemPanel);
             ((JTabbedPane) mainPanel).addTab(tabName, newLabelledItemPanel);
+        }
+    }
+
+    /**
+     * Add an item to the main panel or, if tabs, the first tab.
+     */
+    public void addItem(JComponent item) {
+        if (item == null) {
+            return;
+        }
+        if (mainPanel instanceof LabelledItemPanel) {
+            ((LabelledItemPanel) mainPanel).addItem(item);
+        } else {
+            contentPanels.values().iterator().next().addItem(item);
+        }
+    }
+
+    public void removeItem(JComponent item) {
+        if (item != null) {
+            if (mainPanel instanceof LabelledItemPanel) {
+                mainPanel.remove(item);
+            } else {
+                contentPanels.values().iterator().next().remove(item);
+            }
         }
     }
 
@@ -504,7 +522,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
      *
      * @return the tabbed pane
      */
-    public JTabbedPane getTabbedPane() {
+    public JTabbedPane getMainPanel() {
         if (mainPanel instanceof JTabbedPane) {
             return (JTabbedPane) mainPanel;
         }
@@ -531,5 +549,6 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(object);
         return ape.getDialog();
     }
+
 
 }

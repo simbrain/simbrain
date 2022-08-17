@@ -15,15 +15,11 @@ package org.simbrain.util.widgets;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * A widget that contains an apply button, for cases when it should be possible
- * to immediately apply changes in an editing panel (as opposed to waiting to
- * press ok in the parent dialog). Implements {@link EditablePanel}, since the
- * apply can fail.
+ * Use to wrap editable panels, and in particular {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}s,
+ * in a panel with an apply button that commits changes.
  *
  * @author Zoë Tosi
  */
@@ -56,29 +52,12 @@ public class ApplyPanel extends JPanel {
         setLayout(layoutManager);
     }
 
-    private AtomicBoolean applyPressed = new AtomicBoolean(false);
-
     /**
-     * A factory method to create an apply panel.
-     *
-     * @param mainPanel the panel to wrap
-     * @return the wrapped apply panel
+     * Wrap an editor in a apply panel.
      */
     public static ApplyPanel createApplyPanel(EditablePanel mainPanel) {
         final ApplyPanel ap = new ApplyPanel(mainPanel);
         ap.applyButton.addActionListener(arg0 -> mainPanel.commitChanges());
-        return ap;
-    }
-
-    /**
-     * A factory method to create an apply panel attached to an artbitrary panel
-     * with a custom action associated with pressing apply.
-     * @param mainPanel the panel to wrap
-     * @param al a listener that is triggered and performs an action when apply is pressed
-     */
-    public static ApplyPanel createCustomApplyPanel(JPanel mainPanel, ActionListener al) {
-        final ApplyPanel ap = new ApplyPanel(mainPanel);
-        ap.applyButton.addActionListener(al);
         return ap;
     }
 
@@ -89,9 +68,6 @@ public class ApplyPanel extends JPanel {
      */
     private ApplyPanel(JPanel mainPanel) {
         this.mainPanel = mainPanel;
-        applyButton.addActionListener((ActionEvent e) -> {
-            applyPressed.set(true);
-        });
         masterLayout();
     }
 
@@ -137,14 +113,10 @@ public class ApplyPanel extends JPanel {
     }
 
     /**
-     * Allows outside parties to add other listeners to the apply panel's apply
-     * button.
-     *
-     * @param l
+     * Use this to determine what panel does.
      */
     public void addActionListener(ActionListener l) {
         applyButton.addActionListener(l);
-
     }
 
     public void setEnabled(boolean enabled) {

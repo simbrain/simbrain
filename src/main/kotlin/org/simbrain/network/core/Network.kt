@@ -5,7 +5,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.connections.Sparse
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -84,6 +86,11 @@ class Network {
      * The update manager for this network.
      */
     val updateManager = NetworkUpdateManager(this)
+
+    /**
+     * Connection strategy for connecting free neurons.
+     */
+    val neuronConnector = ConnectionSelector(Sparse())
 
     /**
      * In iterations or msec.

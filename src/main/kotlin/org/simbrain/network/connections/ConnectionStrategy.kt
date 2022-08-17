@@ -22,6 +22,10 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.gui.ConnectionStrategyPanel
+import org.simbrain.util.UserParameter
+import org.simbrain.util.displayInDialog
+import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
@@ -40,7 +44,7 @@ import org.simbrain.util.stats.distributions.NormalDistribution
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-abstract class ConnectionStrategy : EditableObject {
+abstract class ConnectionStrategy : CopyableObject {
 
     /**
      * Whether excitatory connection should be randomized.
@@ -69,10 +73,25 @@ abstract class ConnectionStrategy : EditableObject {
     var inRandomizer: ProbabilityDistribution = NormalDistribution();
 
     /**
-     * Subclasses should set to true if the strategy itself produces inhibitory and excitatory weights and thus
-     * overrides the need to explicitly set weight polarity (excitatory/inhibitory ratio).
+     * If true, then separately store [percentExcitatory]. If false, the connection strategy itself determines how
+     * many excitatory vs. inhibitory weights there are.
      */
-    open val overridesPolarity = false
+    open val usesPolarity = true
+
+    /**
+     * If uses polarity, store the percent excitatory. Otherwise ignore.
+     */
+    var percentExcitatory: Double = 0.0
+
+    fun commonCopy(toCopy: ConnectionStrategy) {
+        toCopy.exRandomizer = exRandomizer.copy()
+        toCopy.inRandomizer = inRandomizer.copy()
+        toCopy.excitatoryRatio = excitatoryRatio
+        toCopy.isUseExcitatoryRandomization = isUseExcitatoryRandomization
+        toCopy.isUseInhibitoryRandomization = isUseInhibitoryRandomization
+    }
+
+    abstract override fun copy(): ConnectionStrategy
 
     /**
      * Apply connection to a set of loose neurons.
@@ -94,4 +113,39 @@ abstract class ConnectionStrategy : EditableObject {
     val stringDescription: String
         get() = "" + this.javaClass.simpleName
 
+    companion object {
+        /**
+         * Called via reflection using [UserParameter.typeListMethod].
+         */
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return listOf(
+                AllToAll::class.java,
+                DistanceBased::class.java,
+                OneToOne::class.java,
+                RadialProbabilistic::class.java,
+                FixedDegree::class.java,
+                RadialGaussian::class.java,
+                Sparse::class.java
+            )
+        }
+    }
+
+}
+
+/**
+ * TODO. See comments at Randomizer.
+ */
+class ConnectionSelector(cs: ConnectionStrategy = AllToAll()) : EditableObject {
+
+    @UserParameter(label = "Connection Strategy", isObjectType = true)
+    var cs: ConnectionStrategy = cs
+
+    override val name = "Connection Strategy"
+
+}
+
+
+fun main() {
+    ConnectionStrategyPanel(ConnectionSelector(Sparse())).displayInDialog()
 }

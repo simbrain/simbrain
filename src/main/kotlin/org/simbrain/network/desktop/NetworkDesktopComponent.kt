@@ -48,6 +48,9 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
         fileMenu.add(SaveAction(this))
         fileMenu.add(SaveAsAction(this))
         fileMenu.addSeparator()
+        // Edit randomizers
+        fileMenu.add(networkPanel.networkActions.editConnectionStrategy);
+        fileMenu.addSeparator()
         fileMenu.add(networkPanel.networkActions.showNetworkUpdaterDialog);
         fileMenu.add(networkPanel.networkActions.showNetworkPreferencesAction);
         fileMenu.addSeparator()

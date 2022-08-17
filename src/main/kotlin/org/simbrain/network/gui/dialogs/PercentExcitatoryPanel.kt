@@ -18,16 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs
 
-import org.simbrain.network.connections.RadialProbabilistic
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
 import org.simbrain.util.SwitchableChangeListener
 import org.simbrain.util.SwitchablePropertyChangeListener
 import org.simbrain.util.Utils
 import org.simbrain.util.displayInDialog
 import java.awt.*
-import java.awt.event.ActionListener
 import java.beans.PropertyChangeEvent
 import java.util.*
 import javax.swing.*
@@ -40,7 +35,7 @@ import javax.swing.event.ChangeEvent
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class PercentExcitatoryPanel(var synapses: List<Synapse>) : JPanel() {
+class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
 
     /**
      * Max ratio of excitatory/inhibitory connections.
@@ -53,26 +48,21 @@ class PercentExcitatoryPanel(var synapses: List<Synapse>) : JPanel() {
     private val RATIO_MIN = 0
 
     /**
-     * Default starting ratio of excitatory/inhibitory.
-     */
-    private val RATIO_INIT = 50
-
-    /**
      * A slider for setting the ratio of inhibitory to excitatory connections.
      */
-    private val ratioSlider = JSlider(JSlider.HORIZONTAL, RATIO_MIN, RATIO_MAX, RATIO_INIT)
+    private val ratioSlider = JSlider(JSlider.HORIZONTAL, RATIO_MIN, RATIO_MAX, percentExcitatory.toInt())
 
     /**
      * A text field for setting the ratio of excitatory to inhibitory
      * connections.
      */
-    private val eRatio = JFormattedTextField(RATIO_INIT)
+    private val eRatio = JFormattedTextField(percentExcitatory)
 
     /**
      * A text field for setting the ratio of inhibitory to excitatory
      * connections.
      */
-    private val iRatio = JFormattedTextField(1 - RATIO_INIT)
+    private val iRatio = JFormattedTextField(100 - percentExcitatory)
 
     /**
      * A switchable listener.
@@ -104,9 +94,9 @@ class PercentExcitatoryPanel(var synapses: List<Synapse>) : JPanel() {
     private val sliderApply = JButton("Apply")
 
     init {
-        ratioSlider.setMajorTickSpacing(10)
-        ratioSlider.setMinorTickSpacing(2)
-        ratioSlider.setPaintTicks(true)
+        ratioSlider.majorTickSpacing = 10
+        ratioSlider.minorTickSpacing = 2
+        ratioSlider.paintTicks = true
 
         val labelTable = Hashtable<Int, JLabel>()
         labelTable[0] = JLabel("0/100")
@@ -114,8 +104,8 @@ class PercentExcitatoryPanel(var synapses: List<Synapse>) : JPanel() {
         labelTable[50] = JLabel("50/50")
         labelTable[75] = JLabel("75/25")
         labelTable[100] = JLabel("100/0")
-        ratioSlider.setLabelTable(labelTable)
-        ratioSlider.setPaintLabels(true)
+        ratioSlider.labelTable = labelTable
+        ratioSlider.paintLabels = true
 
         val sliderPanel = JPanel(GridBagLayout())
 
@@ -239,23 +229,12 @@ class PercentExcitatoryPanel(var synapses: List<Synapse>) : JPanel() {
             }
         }
 
-        sliderApply.addActionListener(ActionListener {
+        sliderApply.addActionListener {
             val percentExcitatory = Utils.doubleParsable(eRatio) / 100
             if (!java.lang.Double.isNaN(percentExcitatory)) {
-                // synapseGroup.setExcitatoryRatio(percentExcitatory)
-                // if (Math.abs(percentExcitatory - synapseGroup.getExcitatoryRatioPrecise()) > SynapsePolarityAndRandomizerPanel.ERROR_TOLERANCE) {
-                //     warning.setVisible(true)
-                // } else {
-                //     warning.setVisible(false)
-                // }
-                // In case some or all source neurons have polarity, reset
-                // the slider and other field values to represent the result
-                // of synapseGroup's attempt to match the desired excitatory
-                // ratio.
-                ratioSlider.value = (100 * getPercentExcitatory()).toInt() // TODO
-                // ratioSlider.value = (100 * synapseGroup.getExcitatoryRatioPrecise()).toInt()
+                ratioSlider.value = (100 * getPercentAsProbability()).toInt() // TODO
             }
-        })
+        }
 
         ratioSlider.addChangeListener(sliderListener)
 
@@ -265,31 +244,15 @@ class PercentExcitatoryPanel(var synapses: List<Synapse>) : JPanel() {
 
     }
 
-
-    fun getPercentExcitatory(): Double {
-        val percentExcitatory: Double = Utils.doubleParsable(eRatio)
-        return percentExcitatory / 100
+    /**
+     * Returns the percent excitatory as a double between 0 and 1.
+     */
+    fun getPercentAsProbability(): Double {
+        return Utils.doubleParsable(eRatio) / 100
     }
 
-}
-
-fun createPercentExcitatoryPanel(synapses: List<Synapse>): PercentExcitatoryPanel? {
-    val pep = PercentExcitatoryPanel(synapses)
-    if (synapses.isEmpty()) {
-        JOptionPane.showMessageDialog(
-            null, "No synapses to display", "Warning",
-            JOptionPane.WARNING_MESSAGE
-        );
-        return null
-    }
-    return pep
 }
 
 fun main() {
-    val net = Network()
-    val neurons = List(20) { Neuron(net) }
-    // val neurons = mutableListOf<Neuron>() // To test empty list case
-    val conn = RadialProbabilistic()
-    val syns = conn.connectNeurons(net, neurons, neurons)
-    createPercentExcitatoryPanel(syns)?.displayInDialog()
+    PercentExcitatoryPanel().displayInDialog()
 }

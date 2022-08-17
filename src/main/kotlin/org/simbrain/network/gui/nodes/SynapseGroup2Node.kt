@@ -78,7 +78,11 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
             refreshVisible()
         }
         events.onSynapseRemoved { s ->
-            this@SynapseGroup2Node.networkPanel.createNode(s)
+            s.delete()
+            refreshVisible()
+        }
+        events.onSynapseListChanged() {
+            setVisibility()
             refreshVisible()
         }
         setVisibility()
@@ -157,10 +161,10 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
     }
 
     fun weightMatrixViewer() : JScrollPane {
-        val weightMatrix = JPanel()
-        val matrixScrollPane = JScrollPane(weightMatrix)
+        val weightMatrixPanel = JPanel()
+        val matrixScrollPane = JScrollPane(weightMatrixPanel)
         matrixScrollPane.border = null
-        weightMatrix.add(
+        weightMatrixPanel.add(
             WeightMatrixViewer.getWeightMatrixPanel(
                 WeightMatrixViewer(
                     synapseGroup.source.neuronList,

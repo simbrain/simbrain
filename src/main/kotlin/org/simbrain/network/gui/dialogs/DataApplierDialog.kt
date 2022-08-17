@@ -29,7 +29,6 @@ class DataApplierDialog(val dataConsumer: (data: DoubleArray) -> Unit): JPanel()
 
 }
 
-
 fun main() {
     StandardDialog().apply {
         contentPane = DataApplierDialog { println(it.joinToString(", ")) }

@@ -21,6 +21,9 @@ class SynapseGroup2Events(val sg: SynapseGroup2) : NetworkModelEvents(sg) {
     fun onSynapseRemoved(handler: Consumer<Synapse>) = "SynapseRemoved".itemRemovedEvent(handler)
     fun fireSynapseRemoved(syn: Synapse) = "SynapseRemoved"(old = syn)
 
+    fun onSynapseListChanged(handler: Runnable) = "SynapseListChanged".event(handler)
+    fun fireSynapseListChanged() = "SynapseListChanged"()
+
     fun onVisibilityChange(handler: Runnable) = "VisibilityChange".event(handler)
     fun fireVisibilityChange() = "VisibilityChange"()
 

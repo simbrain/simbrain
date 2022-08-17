@@ -140,6 +140,7 @@ class RadialGaussian(
         addToNetwork: Boolean
     ): List<Synapse> {
         val syns: List<Synapse> = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
+        polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModels(syns)
         }
@@ -148,6 +149,12 @@ class RadialGaussian(
 
     public override fun toString(): String {
         return "Radial (Gaussian)"
+    }
+
+    override fun copy(): RadialGaussian {
+        return RadialGaussian(eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda).also {
+            commonCopy(it)
+        }
     }
 
     private inner class ConnectorService constructor(
@@ -245,6 +252,13 @@ class RadialGaussian(
     // }
 
     override val name = "Radial (Gaussian)"
+
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ConnectionStrategy.getTypes()
+        }
+    }
 }
 
 fun connectRadialPolarized(

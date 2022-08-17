@@ -48,6 +48,7 @@ class DistanceBased (
         addToNetwork: Boolean
     ): List<Synapse> {
         val syns = connectRadial(source, target, decayFunction)
+        polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModels(syns)
         }
@@ -58,7 +59,20 @@ class DistanceBased (
         return name
     }
 
+    override fun copy(): DistanceBased {
+        return DistanceBased(decayFunction).also {
+            commonCopy(it)
+        }
+    }
+
     override val name = "Distance Based"
+
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ConnectionStrategy.getTypes()
+        }
+    }
 }
 
 fun connectRadial (

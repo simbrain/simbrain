@@ -12,7 +12,6 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.*
 import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.connections.QuickConnectionManager
 import org.simbrain.network.core.*
 import org.simbrain.network.groups.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
@@ -126,11 +125,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      * Text object event handler.
      */
     val textHandle: TextEventHandler = TextEventHandler(this)
-
-    /**
-     * Manages keyboard-based connections.
-     */
-    val quickConnector = QuickConnectionManager()
 
     /**
      * Manages placement of new nodes, groups, etc.
@@ -257,7 +251,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is NeuronArray -> createNode(model)
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
-            is SynapseGroup -> createNode(model)
             is SynapseGroup2 -> createNode(model)
             is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
@@ -324,10 +317,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
         NeuronCollectionNode(this, neuronCollection).apply { addNeuronNodes(neuronNodes) }
     }
-
-    fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
-        SynapseGroupNode(this, synapseGroup)
-    }.also { it.lowerToBottom() }
 
     fun createNode(synapseGroup: SynapseGroup2) = addScreenElement {
         synapseGroup.synapses.map { s -> createNode(s) }
@@ -538,7 +527,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     /**
      * Connect source and target model items using a more custom action.
      *
-     * For free weights, use the quick connector.
+     * For free weights, use the current connection manager
      *
      * For neuron groups use a synapse group
      *
@@ -551,15 +540,14 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
         // TODO: Neuron Array case
 
-        // For free weights
-        connectUsingQuickConnector()
+        // Apply network connection manager to free weights
+        applyConnectionStrategy()
     }
 
     /**
-     * Connect free weights using [QuickConnectionManager] settings.
+     * Connect free neurons using a potentially customized [ConnectionStrategy]
      */
-    fun connectUsingQuickConnector() {
-        // Connect all selected neurons with loose synapses using quick connector default
+    fun applyConnectionStrategy() {
         with(selectionManager) {
             val sourceNeurons = filterSelectedSourceModels<Neuron>() +
                     filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
@@ -567,7 +555,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            quickConnector.applyCurrentConnection(network, sourceNeurons, targetNeurons)
+            network.neuronConnector.cs.connectNeurons(network, sourceNeurons, targetNeurons)
         }
     }
 
@@ -586,7 +574,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
             AllToAll().connectNeurons(network, sourceNeurons, targetNeurons)
         }
-
 
     }
 

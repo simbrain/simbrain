@@ -42,7 +42,6 @@ import javax.swing.*
  */
 class InhibExcRandomizerPanel(var synapses: List<Synapse>) : JPanel() {
 
-
     enum class RandBehavior {
         FORCE_ON, DEFAULT, FORCE_OFF
     }
@@ -71,7 +70,6 @@ class InhibExcRandomizerPanel(var synapses: List<Synapse>) : JPanel() {
         excitatoryRandomizerPanel?.initListeners()
         inhibitoryRandomizerPanel?.initListeners()
 
-
         // if (SynapsePolarityAndRandomizerPanel.RandBehavior.FORCE_OFF != randomizerState) {
         // buffer
         this.add(Box.createVerticalStrut(10), BorderLayout.CENTER)
@@ -94,7 +92,6 @@ class InhibExcRandomizerPanel(var synapses: List<Synapse>) : JPanel() {
     }
 
 }
-
 
 /**
  * @author Zoë Tosi

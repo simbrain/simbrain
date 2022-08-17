@@ -2,10 +2,15 @@ package org.simbrain.network.core
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.SynapseGroup2Events
 import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.util.SimnetUtils
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer
+import smile.math.matrix.Matrix
 
 /**
  * Lightweight collection of synapses
@@ -13,13 +18,30 @@ import org.simbrain.workspace.AttributeContainer
 class SynapseGroup2 @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
-    var connection: ConnectionStrategy = AllToAll(),
-    val synapses: MutableList<Synapse> = connection
-        .connectNeurons(source.network, source.neuronList, target.neuronList, false).toMutableList()
+    connection: ConnectionStrategy = AllToAll(),
+    val synapses: MutableList<Synapse> = connection.connectNeurons(source.network, source.neuronList, target
+        .neuronList, false).toMutableList()
 ) : NetworkModel(), AttributeContainer {
+
+    var connectionSelector: ConnectionSelector = ConnectionSelector(connection)
 
     // TODO: When passing in synapses check all source are in source and all target are in target
     // reuse this in addsynapse
+
+    /**
+     * Randomizer for all weights, regardless of polarity. Applying it can change the polarity of a weight.
+     */
+    val weightRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 1.0))
+
+    /**
+     * Randomizer for excitatory weights.
+     */
+    val excitatoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(0.0, 1.0))
+
+    /**
+     * Randomizer for inhibitory weights.
+     */
+    val inhibitoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 0.0))
 
     @Transient
     override var events: SynapseGroup2Events = SynapseGroup2Events(this)
@@ -60,10 +82,12 @@ class SynapseGroup2 @JvmOverloads constructor(
 
     fun addSynapse(syn: Synapse) {
         this.synapses.add(syn)
+        events.fireSynapseAdded(syn)
     }
 
     fun removeSynapse(syn: Synapse) {
         this.synapses.remove(syn)
+        events.fireSynapseRemoved(syn)
     }
 
     fun isRecurrent(): Boolean {
@@ -113,6 +137,27 @@ class SynapseGroup2 @JvmOverloads constructor(
                 Synapse(it.parentNetwork, mapping[it.source], mapping[it.target], it )
             }.toMutableList()
 
-        return SynapseGroup2(src, tar, connection, syns)
+        return SynapseGroup2(src, tar, connectionSelector.cs.copy(), syns)
+    }
+
+    fun applyConnectionStrategy() {
+        val syns = connectionSelector.cs.connectNeurons(
+            source.network,
+            source.neuronList,
+            target.neuronList,
+            false
+        )
+        synapses.toList().forEach { removeSynapse(it) }
+        syns.forEach { addSynapse(it) }
+
+        events.fireSynapseListChanged()
+    }
+
+    fun getWeightMatrixArray(): Array<DoubleArray> {
+        return SimnetUtils.getWeights(source.neuronList, target.neuronList);
+    }
+
+    fun getWeightMatrix(): Matrix {
+        return Matrix(SimnetUtils.getWeights(source.neuronList, target.neuronList));
     }
 }

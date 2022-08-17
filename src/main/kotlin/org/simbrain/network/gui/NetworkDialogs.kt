@@ -1,14 +1,17 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.connections.ConnectionSelector
+import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.gui.dialogs.PercentExcitatoryPanel
+import org.simbrain.network.gui.dialogs.SparsePanel
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel
 import org.simbrain.network.gui.dialogs.TestInputPanel
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
-import org.simbrain.network.gui.dialogs.group.SynapseGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
@@ -22,6 +25,11 @@ import org.simbrain.util.createDialog
 import org.simbrain.util.display
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.ObjectTypeEditor
+import org.simbrain.util.table.*
+import org.simbrain.util.widgets.ApplyPanel.createApplyPanel
+import org.simbrain.util.widgets.EditablePanel
+import org.simbrain.util.widgets.ParameterWidget
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
@@ -84,11 +92,6 @@ fun NetworkPanel.createNeuronGroupDialog(neuronGroup: NeuronGroup) =
         modalityType = Dialog.ModalityType.MODELESS
     }
 
-fun NetworkPanel.createSynapseGroupDialog(synapseGroup: SynapseGroup) =
-    SynapseGroupDialog(this, synapseGroup).apply {
-        modalityType = Dialog.ModalityType.MODELESS
-    }
-
 /**
  * Display the provided network in a dialog
  *
@@ -121,20 +124,6 @@ fun NetworkPanel.showPiccoloDebugger() {
         setLocationRelativeTo(null)
         isVisible = true
     }
-}
-
-/**
- * Display the add synapse group dialog. Assumes the enabling condition (at
- * least one source and target neuron group designated) is in effect.
- *
- * @param networkPanel the network panel in which to add the group.
- */
-fun displaySynapseGroupDialog(networkPanel: NetworkPanel?, src: NeuronGroup?, tar: NeuronGroup?): Boolean {
-    val dialog: JDialog = SynapseGroupDialog(networkPanel, src, tar)
-    dialog.setLocationRelativeTo(null)
-    dialog.pack()
-    dialog.isVisible = true
-    return true
 }
 
 /**
@@ -180,25 +169,41 @@ fun SynapseGroup2Node.getDialog(): StandardDialog {
 
     val dialog = StandardDialog()
     val tabbedPane = JTabbedPane()
+    var matrixViewerPanel = JPanel()
 
-    // val ape: AnnotatedPropertyEditor
-    val synapseAdjustment = SynapseAdjustmentPanel(synapseGroup.synapses.toList())
-    // val connectionEditor = ConnectorDialog(synapseGroup.allSynapses.toList())
+    val sap = SynapseAdjustmentPanel(
+        synapseGroup.synapses,
+        synapseGroup.weightRandomizer,
+        synapseGroup.excitatoryRandomizer,
+        synapseGroup.inhibitoryRandomizer
+    )
 
-
-
-    dialog.contentPane = JPanel().apply {
-        layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
-        // ape = AnnotatedPropertyEditor(synapseGroup)
-        add(tabbedPane)
-        tabbedPane.addTab("Weights", synapseAdjustment)
-        if (synapseGroup.size() < 10000) {
-            tabbedPane.add("Weight Matrix", weightMatrixViewer())
+    val connPanel = ConnectionStrategyPanel(synapseGroup.connectionSelector)
+    val connectionStrategyPanel = createApplyPanel(connPanel).apply {
+        addActionListener{
+            synapseGroup.applyConnectionStrategy()
         }
     }
 
-    dialog.addClosingTask {
-        // ape.commitChanges()
+    fun initWeightMatrixViewer() {
+        // if (synapseGroup.size() < 10000) {
+        val matrixViewer = weightMatrixViewer()
+        matrixViewerPanel.removeAll()
+        matrixViewerPanel.add(matrixViewer)
+    }
+
+    synapseGroup.events.onSynapseListChanged(){
+        sap.fullUpdate()
+        initWeightMatrixViewer()
+    }
+    initWeightMatrixViewer()
+
+    dialog.contentPane = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
+        add(tabbedPane)
+        tabbedPane.addTab("Weights", sap)
+        tabbedPane.addTab("Connection Strategy", connectionStrategyPanel)
+        tabbedPane.add("Weight Matrix", matrixViewerPanel)
     }
 
     return dialog
@@ -224,4 +229,60 @@ fun NetworkPanel.showClassifierCreationDialog() {
     }
     dialog.title = "Create Smile Classifier"
     dialog.makeVisible()
+}
+
+class ConnectionStrategyPanel(connectionSelector: ConnectionSelector): EditablePanel() {
+
+    val editor: AnnotatedPropertyEditor
+    var ote: ParameterWidget
+    var selectedStrategy: ConnectionStrategy = connectionSelector.cs
+    val percentExcitatoryPanel = PercentExcitatoryPanel(selectedStrategy.percentExcitatory)
+    var sparsePanel: SparsePanel? = null
+
+    init {
+            editor = AnnotatedPropertyEditor(connectionSelector)
+            add(editor)
+            ote = editor.getWidget("Connection Strategy") as ParameterWidget
+            val comp = editor.getWidget("Connection Strategy").component
+
+            fun updatePanel() {
+                if (ote.widgetValue is ConnectionStrategy) {
+                    selectedStrategy = ote.widgetValue as ConnectionStrategy
+                    // Add percent excitatory panel if the connection strategy requires it
+                    if (selectedStrategy.usesPolarity) {
+                        editor.addItem(percentExcitatoryPanel)
+                    } else {
+                        editor.removeItem(percentExcitatoryPanel)
+                    }
+                    // Custom Sparse Panel
+                    if (selectedStrategy is Sparse) {
+                        editor.removeItem(sparsePanel)
+                        sparsePanel = SparsePanel(selectedStrategy as Sparse)
+                        editor.addItem(sparsePanel)
+                        // TODO: Put it in the panel itself?
+                        // comp.editorPanel.addItem(sparsePanel)
+                    } else {
+                        editor.removeItem(sparsePanel)
+                        // comp.editorPanel.removeItem(sparsePanel)
+                    }
+                }
+            }
+            (comp as ObjectTypeEditor).setObjectChangedTask {
+                updatePanel()
+            }
+            updatePanel()
+        }
+
+        override fun fillFieldValues() {
+        }
+
+        override fun commitChanges(): Boolean {
+            editor.commitChanges()
+            selectedStrategy.percentExcitatory = percentExcitatoryPanel.getPercentAsProbability() * 100
+            if (selectedStrategy is Sparse) {
+                sparsePanel!!.commitChanges()
+            }
+            return true
+        }
+
 }

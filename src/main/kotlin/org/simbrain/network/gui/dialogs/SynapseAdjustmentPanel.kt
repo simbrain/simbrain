@@ -47,7 +47,13 @@ import javax.swing.*
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
+class
+SynapseAdjustmentPanel(
+    var synapses: List<Synapse>,
+    var allRandomizer: Randomizer = Randomizer(UniformRealDistribution(-1.0, 1.0)),
+    var excitatoryRandomizer: Randomizer = Randomizer(UniformRealDistribution(0.0, 1.0)),
+    var inhibitoryRandomizer: Randomizer = Randomizer(UniformRealDistribution(-1.0, 0.0))
+) : JPanel() {
 
     // TODO: Some of the logical operations here could be moved to utility classes or Network.kt
     // and called from here
@@ -62,11 +68,8 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
     // TODO: Simplify by replacing with excitatoryArray and inhibitoryArray.
     private val weights = arrayOf(doubleArrayOf(), doubleArrayOf())
 
-    private val allRandomizer = Randomizer(UniformRealDistribution(-1.0, 1.0))
     private val allPanel = AnnotatedPropertyEditor(allRandomizer)
-    private val excitatoryRandomizer = Randomizer(UniformRealDistribution(0.0, 1.0))
     private val excitatoryPanel = AnnotatedPropertyEditor(excitatoryRandomizer)
-    private val inhibitoryRandomizer = Randomizer(UniformRealDistribution(-1.0, 0.0))
     private val inhibitoryPanel = AnnotatedPropertyEditor(inhibitoryRandomizer)
 
     private var chooseRandomizerPanel = JPanel()
@@ -302,10 +305,9 @@ class SynapseAdjustmentPanel(var synapses: List<Synapse>) : JPanel() {
     }
 
     /**
-     * Fully updates the histogram based on the status of the synapses in
-     * question.
+     * Updates weight arrays and then updates all graphics.
      */
-    private fun fullUpdate() {
+    fun fullUpdate() {
         updateWeightArrays(synapses)
         updateHistogram()
         updateStats()
@@ -612,7 +614,6 @@ fun createSynapseAdjustmentPanel(synapses: List<Synapse>): SynapseAdjustmentPane
 }
 
 fun main() {
-
     val net = Network()
     val neurons = List(20) { Neuron(net) }
     // val neurons = mutableListOf<Neuron>() // To test empty list case

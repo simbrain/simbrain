@@ -1,6 +1,5 @@
 package org.simbrain.network.gui
 
-import org.simbrain.network.connections.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup2
@@ -9,7 +8,6 @@ import org.simbrain.network.gui.actions.ConditionallyEnabledAction
 import org.simbrain.network.gui.actions.ShowDebugAction
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
-import org.simbrain.network.gui.actions.connection.ApplyConnectionAction
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons
 import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction
@@ -22,7 +20,10 @@ import org.simbrain.network.gui.actions.neuron.NewNeuronAction
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction
 import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction
 import org.simbrain.network.gui.actions.selection.*
-import org.simbrain.network.gui.actions.synapse.*
+import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction
+import org.simbrain.network.gui.actions.synapse.ShowAdjustConnectivityDialog
+import org.simbrain.network.gui.actions.synapse.ShowAdjustSynapsesDialog
+import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction
@@ -42,7 +43,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     // TODO: Convert these to inline actions as below.
     val addNeuronArrayAction = AddNeuronArrayAction(networkPanel)
     val addNeuronsAction = AddNeuronsAction(networkPanel)
-    val addSynapseGroupAction = AddSynapseGroupAction(networkPanel)
     val alignHorizontalAction = AlignHorizontalAction(networkPanel)
     val alignVerticalAction = AlignVerticalAction(networkPanel)
     val clearNodeActivationsAction = ClearSelectedObjects(networkPanel)
@@ -172,33 +172,38 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             wandEditModeAction
         )
 
+    // TODO: Note: the lambda parameter `NetworkPanel` is not used
+    private fun addGroupAction(name: String, createDialog: AddGroupAction.(NetworkPanel) -> StandardDialog) =
+        AddGroupAction(networkPanel, name, createDialog)
+
     val newNetworkActions
         get() = listOf(
             addGroupAction("Backprop") { BackpropCreationDialog(networkPanel) },
             addGroupAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addGroupAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addGroupAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
-//            addGroupAction("LMS (Least Mean Squares)") { LMSCreationDialog(networkPanel) },
+           // addGroupAction("LMS (Least Mean Squares)") { LMSCreationDialog(networkPanel) },
             addGroupAction("SOM Network") { SOMCreationDialog(networkPanel) },
-//            addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
+           // addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
         )
 
-    val connectionActions
-        get() = listOf(
-            applyConnectionAction("All to all", AllToAll()),
-            applyConnectionAction("Distance Based", DistanceBased()),
-            applyConnectionAction("One-to-one", OneToOne()),
-            applyConnectionAction("Radial (Probalistic)", RadialProbabilistic()),
-            applyConnectionAction("Fixed degree", FixedDegree()),
-            applyConnectionAction("Sparse", Sparse())
-        )
+    // val connectionActions
+    //     get() = listOf(
+    //         applyConnectionAction("All to all", AllToAll()),
+    //         applyConnectionAction("Distance Based", DistanceBased()),
+    //         applyConnectionAction("One-to-one", OneToOne()),
+    //         applyConnectionAction("Radial (Probalistic)", RadialProbabilistic()),
+    //         applyConnectionAction("Fixed degree", FixedDegree()),
+    //         applyConnectionAction("Sparse", Sparse())
+    //     )
 
-    // TODO: Note: the lambda parameter `NetworkPanel` is not used
-    private fun addGroupAction(name: String, createDialog: AddGroupAction.(NetworkPanel) -> StandardDialog) =
-        AddGroupAction(networkPanel, name, createDialog)
-
-    private fun applyConnectionAction(name: String, connectionStrategy: ConnectionStrategy) =
-        ApplyConnectionAction(networkPanel, connectionStrategy, name)
+    val editConnectionStrategy = networkPanel.createAction(
+        name = "Edit connection strategy...",
+    ) {
+        ConnectionStrategyPanel(network.neuronConnector).displayInDialog {
+            commitChanges()
+        }
+    }
 
     val synapseGroupVisibilityAction = networkPanel.createAction(
         name = "Toggle visibility of selected synapse groups",

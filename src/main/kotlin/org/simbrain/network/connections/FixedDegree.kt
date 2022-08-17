@@ -82,12 +82,12 @@ class FixedDegree(
         target: List<Neuron>,
         addToNetwork: Boolean
     ): List<Synapse> {
-
         val syns = if (useRadius) {
             connectFixedDegreeInRadius(source, target, degree, radius, direction, allowSelfConnections)
         } else {
             connectFixedDegree(source, target, degree, direction, allowSelfConnections)
         }
+        polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModels(syns)
         }
@@ -98,6 +98,20 @@ class FixedDegree(
 
     override fun toString(): String {
         return name
+    }
+
+    override fun copy(): FixedDegree {
+        return FixedDegree(degree, direction, useRadius, radius, allowSelfConnections).also {
+            commonCopy(it)
+        }
+
+    }
+
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ConnectionStrategy.getTypes()
+        }
     }
 }
 

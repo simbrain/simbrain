@@ -88,12 +88,14 @@ class Sparse @JvmOverloads constructor(
         val result = connectSparse(source, target, connectionDensity, allowSelfConnection, equalizeEfferents)
         return when(result) {
             is ConnectionsResult.Add -> {
+                polarizeSynapses(result.connectionsToAdd, percentExcitatory)
                 if (addToNetwork) {
                     network.addNetworkModels(result.connectionsToAdd)
                 }
                 result.connectionsToAdd
             }
             is ConnectionsResult.Reset -> {
+                polarizeSynapses(result.resultConnections, percentExcitatory)
                 if (addToNetwork) {
                     network.addNetworkModels(result.resultConnections)
                 }
@@ -109,6 +111,19 @@ class Sparse @JvmOverloads constructor(
     override val name = "Sparse"
 
     override fun toString() = name
+
+    override fun copy(): Sparse {
+        return Sparse(connectionDensity, equalizeEfferents, allowSelfConnection).also {
+            commonCopy(it)
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ConnectionStrategy.getTypes()
+        }
+    }
 
 }
 

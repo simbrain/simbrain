@@ -49,6 +49,7 @@ class OneToOne(
         addToNetwork: Boolean
     ): List<Synapse> {
         val syns = connectOneToOne(source, target, useBidirectionalConnections)
+        polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModels(syns)
         }
@@ -59,6 +60,19 @@ class OneToOne(
 
     override fun toString(): String {
         return name
+    }
+
+    override fun copy(): OneToOne {
+        return OneToOne(useBidirectionalConnections, connectOrientation).also {
+            commonCopy(it)
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ConnectionStrategy.getTypes()
+        }
     }
 }
 

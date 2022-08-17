@@ -41,7 +41,7 @@ class PlacementManager() {
         operator fun get(model: LocatableModel?) = when (model) {
             is Neuron -> point(45, 0)
             is NeuronArray -> point(300, 0)
-            is NeuronGroup -> point(270, 0)
+            is NeuronGroup -> point(400, 0)
             is Hopfield -> point(300, 0)
             is CompetitiveNetwork -> point(300, 0)
             is Subnetwork -> point(220, 0)

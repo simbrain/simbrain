@@ -21,7 +21,8 @@ val NetworkPanel.editMenu
             add(clearSourceNeurons)
             add(setSourceNeurons)
             add(connectionMenu)
-            add(addSynapseGroupAction)
+            add(connectWithWeightMatrix)
+            add(connectWithSynapseGroup)
             addSeparator()
             add(randomizeObjectsAction)
             add(showAdjustSynapsesDialog)
@@ -162,7 +163,7 @@ val NetworkPanel.viewMenu
 val NetworkPanel.connectionMenu
     get() = JMenu("Connect Neurons").apply {
         with(networkActions) {
-            connectionActions.forEach { add(it.toMenuItem()) }
+            // connectionActions.forEach { add(it.toMenuItem()) }
         }
     }
 

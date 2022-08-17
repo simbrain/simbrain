@@ -17,7 +17,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
-import org.simbrain.util.propertyeditor.EditableObject
 
 /**
  * Connect every source neuron to every target neuron.
@@ -39,12 +38,18 @@ class AllToAll(
     )
     var allowSelfConnection: Boolean = false
 
-) : ConnectionStrategy(), EditableObject {
+) : ConnectionStrategy() {
 
     override val name: String = "All to All"
 
     override fun toString(): String {
         return name
+    }
+
+    override fun copy(): AllToAll {
+        return AllToAll(allowSelfConnection).also {
+            commonCopy(it)
+        }
     }
 
     override fun connectNeurons(
@@ -54,10 +59,18 @@ class AllToAll(
         addToNetwork: Boolean
     ): List<Synapse> {
         val syns = connectAllToAll(source, target, allowSelfConnection)
+        polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModels(syns)
         }
         return syns
+    }
+
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ConnectionStrategy.getTypes()
+        }
     }
 
 }

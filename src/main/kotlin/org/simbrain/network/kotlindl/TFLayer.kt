@@ -55,9 +55,6 @@ abstract class TFLayer<T : Layer> : CopyableObject {
         }
     }
 
-    /**
-     * To get a static method
-     */
     companion object {
         /**
          * Called via reflection using [UserParameter.typeListMethod].

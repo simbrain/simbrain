@@ -125,7 +125,7 @@ public final class NeuronGroupDialog extends StandardDialog {
                 }
             };
             JPanel inputDataPanel = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList(), matrix);
-            mainPanel.getTabbedPane().addTab("Input Data", inputDataPanel);
+            mainPanel.getMainPanel().addTab("Input Data", inputDataPanel);
         }
 
         // Set up help button

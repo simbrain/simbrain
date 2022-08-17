@@ -18,16 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs;
 
-import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.connect.ConnectionSelectorPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * <b>NetworkDialog</b> is a dialog box for setting the properties of the
@@ -43,24 +38,9 @@ public class NetworkDialog extends StandardDialog {
     protected NetworkPanel networkPanel;
 
     /**
-     * Tabbed pane.
-     */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /**
      * Main properties panel.
      */
     protected NetworkPropertiesPanel networkPropertiesPanel;
-
-    /**
-     * Connection preferences panel.
-     */
-    protected ConnectionSelectorPanel quickConnectPanel;
-
-    /**
-     * Random panel.
-     */
-    private NetworkRandomizerPanel randomPanel;
 
     /**
      * This method is the default constructor.
@@ -82,24 +62,7 @@ public class NetworkDialog extends StandardDialog {
 
         // Main properties tab
         networkPropertiesPanel = new NetworkPropertiesPanel(networkPanel);
-        tabbedPane.addTab("Main", networkPropertiesPanel);
-
-        // Quick-connect properties
-        ConnectionStrategy currentConnector = networkPanel.getQuickConnector().getCurrentConnector();
-        quickConnectPanel = new ConnectionSelectorPanel(this, currentConnector);
-        JScrollPane wrapper = new JScrollPane(quickConnectPanel);
-        tabbedPane.addTab("Connections", wrapper);
-
-        // Randomizer properties. Not currently used but being left in case
-        //   it is reinstated.
-        //randomPanel = new NetworkRandomizerPanel();
-        // randomPanel.fillFieldValues(networkPanel.getNetwork()
-        // .getWeightRandomizer());
-        //tabbedPane.addTab("Randomizer", randomPanel);
-
-        // Set main panel
-        setContentPane(tabbedPane);
-
+        setContentPane(networkPropertiesPanel);
         // Add help button
         JButton helpButton = new JButton("Help");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Network/network_prefs.html");
@@ -112,8 +75,6 @@ public class NetworkDialog extends StandardDialog {
      */
     private void commitChanges() {
         networkPropertiesPanel.commitChanges();
-        quickConnectPanel.commitChanges();
-        networkPanel.getQuickConnector().setCurrentConnector(quickConnectPanel.getSelectedConnector());
     }
 
     @Override
@@ -122,76 +83,4 @@ public class NetworkDialog extends StandardDialog {
         commitChanges();
     }
 
-    /**
-     * Panel for selecting which network randomizer to edit.
-     */
-    private class NetworkRandomizerPanel extends JPanel {
-
-        /**
-         * Selects which randomizer to edit.
-         */
-        private JComboBox comboBox;
-
-        /**
-         * Panel which holds the randomizer panel.
-         */
-        private JPanel randomizerHolder = new JPanel();
-
-        /**
-         * The activation randomizer panel.
-         */
-        private AnnotatedPropertyEditor activationRandomizer;
-
-        /**
-         * The weight randomizer panel.
-         */
-        private AnnotatedPropertyEditor weightRandomizer;
-
-        /**
-         * Construct the panel.
-         */
-        public NetworkRandomizerPanel() {
-            Box mainPanel = Box.createVerticalBox();
-            mainPanel.add(Box.createVerticalStrut(10));
-            comboBox = new JComboBox(new String[]{"Activation Randomizer", "Weight Randomizer"});
-            comboBox.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    initPanel();
-                }
-            });
-
-            //activationRandomizer = new RandomizerPanel();
-            //activationRandomizer.fillFieldValues(networkPanel.getNetwork()
-            //        .getActivationRandomizer());
-            //weightRandomizer = new RandomizerPanel();
-            //weightRandomizer.fillFieldValues(networkPanel.getNetwork()
-            //        .getWeightRandomizer());
-            initPanel();
-
-            mainPanel.add(comboBox);
-            mainPanel.add(Box.createVerticalStrut(10));
-            mainPanel.add(new JSeparator(JSeparator.HORIZONTAL));
-            mainPanel.add(Box.createVerticalStrut(10));
-            mainPanel.add(randomizerHolder);
-
-            add(mainPanel);
-
-        }
-
-        /**
-         * Re-initialize the panel every time the combo box is changed.
-         */
-        private void initPanel() {
-            randomizerHolder.removeAll();
-            if (comboBox.getSelectedIndex() == 0) {
-                randomizerHolder.add(activationRandomizer);
-            } else {
-                randomizerHolder.add(weightRandomizer);
-            }
-            repaint();
-            pack();
-        }
-
-    }
 }

@@ -101,8 +101,8 @@ class RadialProbabilistic(
     /**
      * Radial simple sets the polarity implicitly.
      */
-    override val overridesPolarity: Boolean
-        get() = true
+    override val usesPolarity: Boolean
+        get() = false
 
     /**
      * Connect neurons.
@@ -131,6 +131,21 @@ class RadialProbabilistic(
 
     override fun toString(): String {
         return name
+    }
+
+    override fun copy(): RadialProbabilistic {
+        return RadialProbabilistic(
+            excitatoryProbability, inhibitoryProbability, excitatoryRadius, inhibitoryRadius, allowSelfConnections
+        ).also {
+            commonCopy(it)
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ConnectionStrategy.getTypes()
+        }
     }
 
 }

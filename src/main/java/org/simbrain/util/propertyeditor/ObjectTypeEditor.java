@@ -68,8 +68,6 @@ import java.util.List;
  * true.</li>
  * <li> Embed the object itself in a higher level AnnotatedPropertyEditor.</li>
  * </ul>
- *
- * <p>
  */
 public class ObjectTypeEditor extends JPanel {
 
@@ -103,6 +101,11 @@ public class ObjectTypeEditor extends JPanel {
      * For showing/hiding the property editor.
      */
     private DropDownTriangle detailTriangle;
+
+    /**
+     * A task that is run after the object type is changed using the combo box.
+     */
+    private Runnable objectChangedTask = () -> {};
 
     /**
      * A reference to the parent window containing this panel for the purpose of
@@ -305,6 +308,7 @@ public class ObjectTypeEditor extends JPanel {
                 editorPanelContainer.add(editorPanel);
                 updateEditorPanel();
                 syncPanelToTriangle();
+                objectChangedTask.run();
 
             } catch (Exception exception) {
                 exception.printStackTrace();
@@ -321,8 +325,14 @@ public class ObjectTypeEditor extends JPanel {
             if (parent != null) {
                 parent.pack();
             }
-
         });
+    }
+
+    /**
+     * Set a callback that is called only after when the combo box is changed.
+     */
+    public void setObjectChangedTask(Runnable callback) {
+        objectChangedTask = callback;
     }
 
     /**

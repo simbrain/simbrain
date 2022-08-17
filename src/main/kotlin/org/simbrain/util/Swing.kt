@@ -17,9 +17,11 @@ inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = 
     })
 }
 
-fun showSaveDialog(initialDirectory: String = "",
-                   initialFileName: String? = null,
-                   block: File.()  -> Unit) {
+fun showSaveDialog(
+    initialDirectory: String = "",
+    initialFileName: String? = null,
+    block: File.() -> Unit
+) {
     val chooser = SFileChooser(initialDirectory, "")
     val theFile = if (initialFileName != null) {
         chooser.showSaveDialog(initialFileName)
@@ -31,9 +33,11 @@ fun showSaveDialog(initialDirectory: String = "",
     }
 }
 
-fun showOpenDialog(initialDirectory: String = "",
-                   extension: String? = null,
-                   block: File.() -> Unit) {
+fun showOpenDialog(
+    initialDirectory: String = "",
+    extension: String? = null,
+    block: File.() -> Unit
+) {
     val chooser = SFileChooser(initialDirectory, "")
     if (extension != null) {
         chooser.addExtension(extension)
@@ -74,10 +78,12 @@ fun showDirectorySelectionDialog(): String? {
 /**
  * Place the panel in a [StandardDialog] and show the dialog.
  */
-fun JPanel.displayInDialog() {
+@JvmOverloads
+fun <T : JPanel> T.displayInDialog(block: T.() -> Unit = {}) {
     val dialog = StandardDialog()
     dialog.contentPane = this
     dialog.makeVisible()
+    dialog.addClosingTask { block() }
 }
 
 fun JDialog.display() {
@@ -97,26 +103,27 @@ inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {
 /**
  * Similar to Utils.createAction but using Kotlin context. Can be used with any JComponent.
  */
-fun <T: JComponent> T.createAction(
+fun <T : JComponent> T.createAction(
     iconPath: String? = null,
     name: String,
     description: String = name,
     keyCombo: KeyCombination? = null,
-    block: T.(e:ActionEvent) -> Unit
+    block: T.(e: ActionEvent) -> Unit
 ): AbstractAction {
     return object : AbstractAction() {
         init {
-             if (iconPath != null) {
+            if (iconPath != null) {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
             }
 
             putValue(NAME, name)
             putValue(SHORT_DESCRIPTION, description)
             if (keyCombo != null) {
-                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY,it)}
+                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
                 this@createAction.bindTo(keyCombo, this)
             }
         }
+
         override fun actionPerformed(e: ActionEvent) {
             block(e)
         }
@@ -140,10 +147,11 @@ fun NetworkPanel.createConditionallyEnabledAction(
             putValue(NAME, name)
             putValue(SHORT_DESCRIPTION, description)
             if (keyCombo != null) {
-                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY,it)}
+                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
                 this@createConditionallyEnabledAction.bindTo(keyCombo, this)
             }
         }
+
         override fun actionPerformed(e: ActionEvent) {
             block()
         }
@@ -153,7 +161,7 @@ fun NetworkPanel.createConditionallyEnabledAction(
 /**
  * Create an action with a char rather than a key combinaation
  */
-fun <T: JComponent> T.createAction(
+fun <T : JComponent> T.createAction(
     iconPath: String = "",
     name: String = "",
     description: String = name,
@@ -167,10 +175,10 @@ fun <T: JComponent> T.createAction(
  * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor]. The provided block is executed when
  * closing the dialog.
  */
-fun <E: EditableObject> E.createDialog(block: (E) -> Unit): StandardDialog {
+fun <E : EditableObject> E.createDialog(block: (E) -> Unit): StandardDialog {
     val editor = AnnotatedPropertyEditor(this)
-    return StandardDialog(editor).apply{
-        addClosingTask{
+    return StandardDialog(editor).apply {
+        addClosingTask {
             editor.commitChanges()
             block(editor.editedObject as E)
         }

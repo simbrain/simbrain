@@ -50,6 +50,46 @@ fun uniqueTokensFromArray(words: List<String>) : List<String> {
 //    return filteredTargets
 //}
 
+
+// After writing, found out that SimBrain already has an outerProduct function.
+fun outerProduct(vectorU: DoubleArray, vectorV: DoubleArray): Matrix {
+    // u (*) v = [u1 ... ui].vertical * [v1 ... vj].horizontal
+    val rows = vectorU.size
+    val cols = vectorV.size
+    val outerProductMatrix = Matrix(rows, cols)
+    for (indexU in vectorU.indices) for (indexV in vectorV.indices) outerProductMatrix[indexU, indexV] = vectorU[indexU] * vectorV[indexV]
+    return outerProductMatrix
+}
+
+/**
+ * Positive Pointwise Mutual Information weighting
+ * Adjusted from:  https://stackoverflow.com/questions/58701337/how-to-construct-ppmi-matrix-from-a-text-corpus
+ *
+ * Weights the co-occurrence values to avoid word-frequency-bias in embeddings.
+ *
+ * "PPMI measures how much the probability of a target–context pair estimated in the training corpus is higher than the probability
+ * we should expect if the target and the context occurred independently of one another." (Lenci, 2018)
+ */
+fun manualPPMI(cooccurrenceMatrix: Matrix, positive: Boolean): Matrix {
+    val columnTotals = cooccurrenceMatrix.colSums()
+    val totalSum = columnTotals.sum()
+    val rowTotals = cooccurrenceMatrix.rowSums()
+
+    val expectedValues = outerProduct(rowTotals, columnTotals)/totalSum
+    val adjustedMatrix = cooccurrenceMatrix.div(expectedValues)
+
+    if (positive) {
+        for (indexRow in 0..(adjustedMatrix.nrows()-1)) {
+            for (indexCol in 0..(adjustedMatrix.ncols()-1)) {
+                if (adjustedMatrix[indexRow, indexCol] < 0) {
+                    adjustedMatrix[indexRow, indexCol] = 0.0
+                }
+            }
+        }
+    }
+    return adjustedMatrix
+}
+
 /**
  * Generates co-occurrence matrix from a provided [docString]. [windowSize] specifies how many words should be
  * included in a context.
@@ -60,7 +100,7 @@ fun uniqueTokensFromArray(words: List<String>) : List<String> {
  * Returns a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
  *
  */
-fun generateCooccurrenceMatrix(docString: String, windowSize: Int): Matrix  {
+fun generateCooccurrenceMatrix(docString: String, windowSize: Int, usePPMI: Boolean = true): Matrix  {
 
     if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
 
@@ -105,38 +145,20 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int): Matrix  {
             }
         }
     }
-    // print(cooccurrenceSmileMatrix)
+    if (usePPMI){
+        return manualPPMI(cooccurrenceSmileMatrix, true)
+    }
     return cooccurrenceSmileMatrix
+
 }
 
 /**
  * Get an embedding from a matrix given matrix, index, and word
  */
 fun wordEmbeddingQuery(targetWord: String, tokens: List<String>, cooccurrenceMatrix: Matrix): DoubleArray {
-    val targetWordIndex = tokens.indexOf(targetWord)
+    val targetWordIndex = tokens.indexOf(targetWord.lowercase())
     return cooccurrenceMatrix.col(targetWordIndex)
 }
-
-
-// /**
-//  * PPMI weighting
-//  * Adjusted from:  https://stackoverflow.com/questions/58701337/how-to-construct-ppmi-matrix-from-a-text-corpus
-//  * https://haifengl.github.io/api/java/smile/math/matrix/Matrix.html#colSums--
-//  */
-// fun manualPPMI(cooccurrenceMatrix: Matrix, positive: Boolean): Matrix {
-//    // Get vector of column totals
-//    var columnTotals = cooccurrenceMatrix.colSums()
-//    // Get total sum of cooccurrences
-//    var totalSum = columnTotals.sum()
-//    // Get vector of row totals
-//    var rowTotals = cooccurrenceMatrix.rowSums()
-//    // "expected values" as the outer product of (row totals, col totals) / total
-//
-//    // Divide cooccurrence matrix by the expected values
-//
-//    // If positive, then fill in negatives with zero
-// }
-
 /**
  * Calculate cosine similarity of two vectors (higher values are more similar).
  * All this does is forward to Math.cos but leaving it named this way is slightly more legible

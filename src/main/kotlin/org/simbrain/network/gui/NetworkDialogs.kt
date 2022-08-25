@@ -180,7 +180,7 @@ fun SynapseGroup2Node.getDialog(): StandardDialog {
 
     val connPanel = ConnectionStrategyPanel(synapseGroup.connectionSelector)
     val connectionStrategyPanel = createApplyPanel(connPanel).apply {
-        addActionListener{
+        addActionListener {
             synapseGroup.applyConnectionStrategy()
         }
     }
@@ -231,11 +231,11 @@ fun NetworkPanel.showClassifierCreationDialog() {
     dialog.makeVisible()
 }
 
-class ConnectionStrategyPanel(connectionSelector: ConnectionSelector): EditablePanel() {
+class ConnectionStrategyPanel(val connectionSelector: ConnectionSelector): EditablePanel() {
 
     val editor: AnnotatedPropertyEditor
     var ote: ParameterWidget
-    var selectedStrategy: ConnectionStrategy = connectionSelector.cs
+    val selectedStrategy: ConnectionStrategy get() = connectionSelector.cs
     val percentExcitatoryPanel = PercentExcitatoryPanel(selectedStrategy.percentExcitatory)
     var sparsePanel: SparsePanel? = null
 
@@ -247,7 +247,7 @@ class ConnectionStrategyPanel(connectionSelector: ConnectionSelector): EditableP
 
             fun updatePanel() {
                 if (ote.widgetValue is ConnectionStrategy) {
-                    selectedStrategy = ote.widgetValue as ConnectionStrategy
+                    connectionSelector.cs = ote.widgetValue as ConnectionStrategy
                     // Add percent excitatory panel if the connection strategy requires it
                     if (selectedStrategy.usesPolarity) {
                         editor.addItem(percentExcitatoryPanel)
@@ -279,8 +279,10 @@ class ConnectionStrategyPanel(connectionSelector: ConnectionSelector): EditableP
         override fun commitChanges(): Boolean {
             editor.commitChanges()
             selectedStrategy.percentExcitatory = percentExcitatoryPanel.getPercentAsProbability() * 100
-            if (selectedStrategy is Sparse) {
-                sparsePanel!!.commitChanges()
+            selectedStrategy.let {
+                if (it is Sparse) {
+                    sparsePanel?.applyChanges(it)
+                }
             }
             return true
         }

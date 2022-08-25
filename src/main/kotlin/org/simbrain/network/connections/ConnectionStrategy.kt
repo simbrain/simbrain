@@ -57,12 +57,6 @@ abstract class ConnectionStrategy : CopyableObject {
     var isUseInhibitoryRandomization = true
 
     /**
-     * The normalized ratio of excitatory to inhibitory neurons.
-     * A value between 0 (all inhibitory) and 1 (all excitatory).
-     */
-    var excitatoryRatio = .5
-
-    /**
      * The randomizer for excitatory synapses.
      */
     var exRandomizer: ProbabilityDistribution = NormalDistribution();
@@ -81,14 +75,14 @@ abstract class ConnectionStrategy : CopyableObject {
     /**
      * If uses polarity, store the percent excitatory. Otherwise ignore.
      */
-    var percentExcitatory: Double = 0.0
+    var percentExcitatory: Double = 50.0
 
     fun commonCopy(toCopy: ConnectionStrategy) {
         toCopy.exRandomizer = exRandomizer.copy()
         toCopy.inRandomizer = inRandomizer.copy()
-        toCopy.excitatoryRatio = excitatoryRatio
         toCopy.isUseExcitatoryRandomization = isUseExcitatoryRandomization
         toCopy.isUseInhibitoryRandomization = isUseInhibitoryRandomization
+        toCopy.percentExcitatory = percentExcitatory
     }
 
     abstract override fun copy(): ConnectionStrategy

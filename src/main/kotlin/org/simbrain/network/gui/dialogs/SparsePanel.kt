@@ -8,7 +8,6 @@ import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.SwitchableChangeListener
 import org.simbrain.util.SwitchablePropertyChangeListener
 import org.simbrain.util.Utils
-import org.simbrain.util.widgets.EditablePanel
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
@@ -30,8 +29,8 @@ import javax.swing.event.ChangeEvent
  * @author Zoë Tosi
  */
 class SparsePanel(
-    private val connection: Sparse
-) : EditablePanel() {
+    private val connection: Sparse // should only be used in initialization
+) : JPanel() {
 
     /**
      * A slider for setting the sparsity of the connections.
@@ -111,46 +110,11 @@ class SparsePanel(
      * @param connection the connection object this panel will act on
      */
     init {
-        fillFieldValues()
+        initPanelValues()
         initializeSparseSlider()
         addChangeListeners()
         addActionListeners()
         initializeLayout()
-
-        // Assumes only one source and one target group are selected if any
-        // are
-//            try {
-////                // TODO: Temp.  For loose neuron case
-////                if(networkPanel == null) {
-////                    return;
-////                }
-//
-//                if (noSrc > 0 || noTar > 0) {
-//                    NeuronGroup source = networkPanel.getSourceModelGroups().get(0);
-//                    NeuronGroup target = networkPanel.getSelectedModelNeuronGroups().get(0);
-//                    numTargs = target.size();
-//                    setRecurrent(source.equals(target));
-//
-//                } else {
-//                    // Called when Quick Properties (see QuickConnectDialog) is used
-//                    Set<Neuron> sources = new HashSet<Neuron>(networkPanel.getSourceModels(Neuron.class));
-//                    List<Neuron> targets = networkPanel.getSelectedModels(Neuron.class);
-//                    numTargs = targets.size();
-//                    int sourcesSize = sources.size();
-//                    sources.retainAll(targets);
-//                    int newSize = sources.size();
-//                    // Counts as recurrent iff all the source neurons are the
-//                    // same
-//                    // as all the target neurons.
-//                    setRecurrent(sourcesSize == newSize);
-//                }
-//                synsPerSource.setVisible(numTargs != 0);
-//            } catch (IndexOutOfBoundsException e) {
-//                setRecurrent(true);
-//                numTargs = (int) 1E4;
-//                synsPerSource.setVisible(false);
-//            }
-//        }
     }
 
     /**
@@ -291,7 +255,6 @@ class SparsePanel(
         })
         connectionDensitySlider.addChangeListener(sliderListener)
 
-        // *********************************************************************
         // Equalized efferent number (Synapses per source)
         synsPerSourceListener = object : SwitchablePropertyChangeListener() {
             override fun propertyChange(evt: PropertyChangeEvent) {
@@ -327,7 +290,6 @@ class SparsePanel(
         })
         synsPerSource.addPropertyChangeListener(synsPerSourceListener)
 
-        // *********************************************************************
         // Overall density
         densityTfListener = object : SwitchablePropertyChangeListener() {
             override fun propertyChange(evt: PropertyChangeEvent) {
@@ -392,7 +354,7 @@ class SparsePanel(
         })
     }
 
-    override fun fillFieldValues() {
+    fun initPanelValues() {
         val connectivity = connection.connectionDensity
         equalizeEfferentsChkBx.isSelected = connection.equalizeEfferents
         allowSelfConnectChkBx.isSelected = connection.allowSelfConnection
@@ -404,17 +366,17 @@ class SparsePanel(
 //        allowSelfConnectChkBx.setEnabled(!editing);
     }
 
-    override fun commitChanges(): Boolean {
+    fun applyChanges(sparse: Sparse): Boolean {
         if (equalizeEfferentsChkBx.isEnabled) {
             // Should always be disabled if the connection is AllToAll
-            connection.equalizeEfferents = equalizeEfferentsChkBx.isSelected
+            sparse.equalizeEfferents = equalizeEfferentsChkBx.isSelected
         }
         if (allowSelfConnectChkBx.isEnabled) {
-            connection.allowSelfConnection = allowSelfConnectChkBx.isSelected
+            sparse.allowSelfConnection = allowSelfConnectChkBx.isSelected
         }
         val connectivity = Utils.doubleParsable(densityTf)
         if (!java.lang.Double.isNaN(connectivity)) {
-            connection.connectionDensity = connectivity
+            sparse.connectionDensity = connectivity
         }
         return true
     }
@@ -494,7 +456,4 @@ class SparsePanel(
         this.repaint()
     }
 
-    fun getConnection(): ConnectionStrategy {
-        return connection
-    }
 }

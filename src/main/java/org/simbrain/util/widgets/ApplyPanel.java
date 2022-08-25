@@ -16,6 +16,7 @@ package org.simbrain.util.widgets;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.LinkedList;
 
 /**
  * Use to wrap editable panels, and in particular {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}s,
@@ -47,6 +48,11 @@ public class ApplyPanel extends JPanel {
      */
     private final GridBagConstraints gbc = new GridBagConstraints();
 
+    /**
+     * A list to make sure commitChanges is called before other actions.
+     */
+    private final LinkedList<ActionListener> applyButtonListeners = new LinkedList<>();
+
 
     {
         setLayout(layoutManager);
@@ -57,7 +63,8 @@ public class ApplyPanel extends JPanel {
      */
     public static ApplyPanel createApplyPanel(EditablePanel mainPanel) {
         final ApplyPanel ap = new ApplyPanel(mainPanel);
-        ap.applyButton.addActionListener(arg0 -> mainPanel.commitChanges());
+        ap.applyButtonListeners.add(e -> mainPanel.commitChanges());
+        ap.applyButton.addActionListener(e -> ap.applyButtonListeners.forEach(a -> a.actionPerformed(e)));
         return ap;
     }
 
@@ -116,7 +123,7 @@ public class ApplyPanel extends JPanel {
      * Use this to determine what panel does.
      */
     public void addActionListener(ActionListener l) {
-        applyButton.addActionListener(l);
+        applyButtonListeners.add(l);
     }
 
     public void setEnabled(boolean enabled) {

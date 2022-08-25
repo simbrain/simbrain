@@ -47,10 +47,10 @@ val testSim = newSim {
 
     // Connection strategies to use below
     val radial = RadialProbabilistic().apply {
-        excitatoryRatio = .2
+        percentExcitatory = 20.0
     }
     val sparse = Sparse(connectionDensity = 0.3).apply {
-        excitatoryRatio = .1
+        percentExcitatory = 10.0
     }
 
     val syns = sparse.connectNeurons(network, neuronList1, neuronList1)

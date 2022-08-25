@@ -81,6 +81,7 @@ class SynapseGroup2 @JvmOverloads constructor(
     }
 
     fun addSynapse(syn: Synapse) {
+        syn.isVisible = displaySynapses
         this.synapses.add(syn)
         events.fireSynapseAdded(syn)
     }
@@ -141,15 +142,14 @@ class SynapseGroup2 @JvmOverloads constructor(
     }
 
     fun applyConnectionStrategy() {
+        synapses.toList().forEach { removeSynapse(it) }
         val syns = connectionSelector.cs.connectNeurons(
             source.network,
             source.neuronList,
             target.neuronList,
             false
         )
-        synapses.toList().forEach { removeSynapse(it) }
         syns.forEach { addSynapse(it) }
-
         events.fireSynapseListChanged()
     }
 

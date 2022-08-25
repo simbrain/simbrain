@@ -85,7 +85,7 @@ fun connectAllToAll(
 ): List<Synapse> {
     return (sourceNeurons cartesianProduct targetNeurons)
         .filter { (src, tar) ->
-            allowSelfConnection || src != tar
+            allowSelfConnection || src !== tar
         }.map { (src, tar) ->
             Synapse(src, tar).apply { strength = 1.0 }
         }

@@ -174,19 +174,6 @@ class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
         layout = BorderLayout()
         add(sliderPanel, BorderLayout.NORTH)
 
-        val percentExcitatory: Double = Utils.doubleParsable(eRatio) / 100
-        // if (!java.lang.Double.isNaN(percentExcitatory)) {
-        //     synapseGroup.setExcitatoryRatio(percentExcitatory)
-        //     if (Math.abs(percentExcitatory - synapseGroup.getExcitatoryRatioPrecise()) > SynapsePolarityAndRandomizerPanel.ERROR_TOLERANCE) {
-        //         warning.setVisible(true)
-        //     } else {
-        //         warning.setVisible(false)
-        //     }
-        //     // In case some or all source neurons have polarity, reset
-        //     // the slider and other field values to represent the result
-        //     // of synapseGroup's attempt to match the desired excitatory
-        //     // ratio.
-        //     ratioSlider.setValue((100 * synapseGroup.getExcitatoryRatioPrecise()).toInt())
         ratioSlider.setValue(percentExcitatory.toInt())
 
         sliderListener = object : SwitchableChangeListener() {

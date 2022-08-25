@@ -255,11 +255,11 @@ fun getInhibitorySynapses(synapses: Collection<Synapse>): ArrayList<Synapse> {
  * excitatoryRatio in this case, this method will get as close as possible.
  *
  * @param synapses        the synapses to polarize
- * @param excitatoryRatio the ration of excitatory synapses (1 for all
+ * @param percentExcitatory the ration of excitatory synapses (1 for all
  * exctitatory)
  */
-fun polarizeSynapses(synapses: Collection<Synapse>, excitatoryRatio: Double) {
-    var excitatoryRatio = excitatoryRatio
+fun polarizeSynapses(synapses: Collection<Synapse>, percentExcitatory: Double) {
+    var excitatoryRatio = percentExcitatory / 100
     if (excitatoryRatio > 1 || excitatoryRatio < 0) {
         throw IllegalArgumentException("Randomization had failed." + " The ratio of excitatory synapses " + " cannot be greater than 1 or less than 0.")
     } else {

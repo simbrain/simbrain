@@ -549,12 +549,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      */
     fun applyConnectionStrategy() {
         with(selectionManager) {
-            val sourceNeurons = filterSelectedSourceModels<Neuron>() +
-                    filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
-                    filterSelectedSourceModels<NeuronGroup>().flatMap { it.neuronList }
-            val targetNeurons = filterSelectedModels<Neuron>() +
-                    filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
-                    filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
+            val sourceNeurons = filterSelectedSourceModels<Neuron>()
+            val targetNeurons = filterSelectedModels<Neuron>()
             network.neuronConnector.cs.connectNeurons(network, sourceNeurons, targetNeurons)
         }
     }

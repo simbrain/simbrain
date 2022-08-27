@@ -562,12 +562,18 @@ public class OdorWorld implements EditableObject, Bounded {
         return getHeight() / 2;
     }
 
+    /**
+     * Center location by default.
+     */
     @NotNull
     @Override
     public Point2D getLocation() {
         return new Point2D.Double(getX(), getY());
     }
 
+    /**
+     * Forwards to [getLocation] but makes clear that location is centerlocation.
+     */
     @NotNull
     public Point2D getCenterLocation() {
         return getLocation();

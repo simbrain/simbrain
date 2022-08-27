@@ -96,7 +96,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     private Neuron target;
 
     /**
-     * Whether this should be visible in the GUI.
+     * Whether this synapse should be visible in the GUI.
      */
     private boolean isVisible = true;
 

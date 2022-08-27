@@ -6,6 +6,7 @@ import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.SynapseGroup2Events
 import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -48,6 +49,9 @@ class SynapseGroup2 @JvmOverloads constructor(
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
+     *
+     * Individual synapse visibility is handled via the isVisible field. Changes to visibility
+     * fire an event which is received by [SynapseNode].
      */
     var displaySynapses = false
         set(value) {

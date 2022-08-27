@@ -127,11 +127,11 @@ public @interface UserParameter {
     int order() default 0;
 
     /**
-     * The name of the tab this parameter associated with.
-     *
-     * @return the label of the tab
+     * The name of the tab this parameter associated with. If a single tab annotation is set then the
+     * AnnotatedPropertyEditor will be a JTabbedPane. In that case, any field in the EditableObject where the tab
+     * annotation is empty will be put in a "Main" tab.
      */
-    String tab() default "Main";
+    String tab() default "";
 
     /**
      * Whether the parameter represents an object to be edited by

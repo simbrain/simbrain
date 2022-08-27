@@ -18,6 +18,8 @@
  */
 package org.simbrain.util.propertyeditor;
 
+import org.simbrain.network.core.Network;
+import org.simbrain.network.core.Neuron;
 import org.simbrain.util.*;
 import org.simbrain.util.widgets.EditablePanel;
 import org.simbrain.util.widgets.ParameterWidget;
@@ -71,11 +73,11 @@ public class AnnotatedPropertyEditor extends EditablePanel {
     private List<? extends EditableObject> editedObjects = Collections.EMPTY_LIST;
 
     /**
-     * The main panel, which is either a labelled item panel, or, if there are tabs, a JTabbedPane.
+     * The main panel, which is a tabbedPane if tabs are used, and a LabelledItemPanel otherwise.
      */
     private JComponent mainPanel;
 
-    private Map<String, LabelledItemPanel> contentPanels = new TreeMap<>();
+    private final Map<String, LabelledItemPanel> tabPanels = new TreeMap<>();
 
     /**
      * Construct with one object.
@@ -126,13 +128,15 @@ public class AnnotatedPropertyEditor extends EditablePanel {
 
         // Create a list of widgets
         widgets = new TreeSet<>();
-        Parameter.getParameters(editedObjects.get(0).getClass()).forEach(p -> {
+        var parameters = Parameter.getParameters(editedObjects.get(0).getClass());
+        parameters.forEach(p -> {
             widgets.add(new ParameterWidget(this, p));
         });
 
-        // If there is only one tab panel, do not create tab bar and use that one panel as main panel
-        if (contentPanels.size() == 1) {
-            mainPanel = contentPanels.values().iterator().next();
+        // If there are no tab annotations, do not create tab bar
+        var numTabAnnotations = parameters.stream().filter(p -> !p.getAnnotation().tab().isEmpty()).count();
+        if (numTabAnnotations == 0) {
+            mainPanel = new LabelledItemPanel();
         } else {
             mainPanel = new JTabbedPane();
         }
@@ -141,11 +145,20 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         // the right order.
         for (ParameterWidget pw : widgets) {
             if (pw.getParameter().isObjectType()) {
-                addItemToTabPanel(pw);
+                if (isTabbedPane()) {
+                    addItemToTabPanel(pw);
+                } else {
+                    // Label is redundant for object types because it gets added in a border box
+                    ((LabelledItemPanel) mainPanel).addItem(pw.getComponent());
+                }
             } else {
-                JLabel label = new JLabel(pw.getParameter().getAnnotation().label());
-                label.setToolTipText(pw.getToolTipText());
-                addItemToTabPanel(label, pw);
+                if (isTabbedPane()) {
+                    JLabel label = new JLabel(pw.getParameter().getAnnotation().label());
+                    label.setToolTipText(pw.getToolTipText());
+                    addItemToTabPanel(label, pw);
+                } else {
+                    ((LabelledItemPanel) mainPanel).addItem(pw.getLabel(), pw.getComponent());
+                }
             }
         }
 
@@ -158,6 +171,10 @@ public class AnnotatedPropertyEditor extends EditablePanel {
                 });
             }
         });
+    }
+
+    private boolean isTabbedPane() {
+        return mainPanel instanceof JTabbedPane;
     }
 
     /**
@@ -466,8 +483,8 @@ public class AnnotatedPropertyEditor extends EditablePanel {
      */
     private void addItemToTabPanel(ParameterWidget pw) {
         String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
-        addContentPanel(parameterWidgetTabName);
-        contentPanels.get(parameterWidgetTabName).addItem(pw.getComponent());
+        addTabPanel(parameterWidgetTabName);
+        tabPanels.get(parameterWidgetTabName).addItem(pw.getComponent());
     }
 
     /**
@@ -477,20 +494,26 @@ public class AnnotatedPropertyEditor extends EditablePanel {
      */
     private void addItemToTabPanel(JLabel label, ParameterWidget pw) {
         String parameterWidgetTabName = pw.getParameter().getAnnotation().tab();
-        addContentPanel(parameterWidgetTabName);
-        contentPanels.get(parameterWidgetTabName).addItemLabel(label, pw.getComponent());
+        if (parameterWidgetTabName.isEmpty()) {
+            // Default name when the tab annotation is left blank.
+            parameterWidgetTabName = "Main";
+        }
+        addTabPanel(parameterWidgetTabName);
+        tabPanels.get(parameterWidgetTabName).addItemLabel(label, pw.getComponent());
     }
 
     /**
      * Creates content panel with a specified name.
      */
-    private void addContentPanel(String tabName) {
-        if (!contentPanels.containsKey(tabName)) {
+    private void addTabPanel(String tabName) {
+        if (!tabPanels.containsKey(tabName)) {
             LabelledItemPanel newLabelledItemPanel = new LabelledItemPanel();
-            contentPanels.put(tabName, newLabelledItemPanel);
+            tabPanels.put(tabName, newLabelledItemPanel);
             ((JTabbedPane) mainPanel).addTab(tabName, newLabelledItemPanel);
         }
     }
+
+    // TODO: Review and rename
 
     /**
      * Add an item to the main panel or, if tabs, the first tab.
@@ -502,7 +525,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         if (mainPanel instanceof LabelledItemPanel) {
             ((LabelledItemPanel) mainPanel).addItem(item);
         } else {
-            contentPanels.values().iterator().next().addItem(item);
+            tabPanels.values().iterator().next().addItem(item);
         }
     }
 
@@ -511,11 +534,10 @@ public class AnnotatedPropertyEditor extends EditablePanel {
             if (mainPanel instanceof LabelledItemPanel) {
                 mainPanel.remove(item);
             } else {
-                contentPanels.values().iterator().next().remove(item);
+                tabPanels.values().iterator().next().remove(item);
             }
         }
     }
-
 
     /**
      * Returns the tabbed pain or null if there is none.
@@ -528,6 +550,8 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         }
         return null;
     }
+
+    // End review and rename
 
     /**
      * Open or close all the detail triangles in any {@link ObjectTypeEditor} widgets this editor contains.
@@ -549,6 +573,11 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(object);
         return ape.getDialog();
     }
-
+    public static void main(String[] args) {
+        var net = new Network();
+        var neurons = Arrays.asList(new Neuron(net), new Neuron(net));
+        AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(neurons);
+        SwingKt.displayInDialog(ape);
+    }
 
 }

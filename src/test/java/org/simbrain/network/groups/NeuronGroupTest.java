@@ -3,7 +3,9 @@ package org.simbrain.network.groups;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.neurongroups.SoftmaxGroup;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,7 +14,6 @@ public class NeuronGroupTest {
 
     Network net = new Network();
     NeuronGroup ng = new NeuronGroup(net, 2);
-
     {
         ng.setLabel("test");
         net.addNetworkModel(ng);
@@ -59,5 +60,16 @@ public class NeuronGroupTest {
         net.addNetworkModels(List.of(ng2, wm));
         net.update();
         assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
+    }
+
+    @Test
+    void testSoftmax() {
+        ng.randomize();
+        SoftmaxGroup ng2 = new SoftmaxGroup(net, 5);
+        WeightMatrix wm = new WeightMatrix(net, ng, ng2);
+        net.addNetworkModels(List.of(ng2, wm));
+        net.update();
+        // System.out.println(Arrays.toString(ng2.getActivations()));
+        assertEquals(1.0, Arrays.stream(ng2.getActivations()).sum(), .01);
     }
 }

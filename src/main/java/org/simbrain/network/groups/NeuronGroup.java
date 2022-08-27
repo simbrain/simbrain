@@ -28,6 +28,7 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.neurongroups.SoftmaxGroup;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
@@ -428,6 +429,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
                 ng = new CompetitiveGroup(network, numNeurons);
             } else if (groupType == GroupEnum.SOM) {
                 ng = new SOMGroup(network, numNeurons);
+            } else if (groupType == GroupEnum.SOFTMAX){
+                ng = new SoftmaxGroup(network, numNeurons);
             }
             ng.setLayout(layout);
             ng.applyLayout();
@@ -473,6 +476,12 @@ public class NeuronGroup extends AbstractNeuronCollection {
             @Override
             public String toString() {
                 return "Self organizing map";
+            }
+        },
+        SOFTMAX {
+            @Override
+            public String toString() {
+                return "Softmax";
             }
         };
     }

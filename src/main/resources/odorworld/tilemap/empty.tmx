@@ -2,10 +2,34 @@
 <map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="14" height="14" tilewidth="32" tileheight="32" infinite="0" nextobjectid="1">
  <tileset firstgid="1" name="RoguelikeTileSet" tilewidth="32" tileheight="32" spacing="2" tilecount="1767" columns="57">
   <image source="tileset_kenney.png" width="1936" height="1052"/>
+  <tile id="0">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_0"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_1"/>
+   </properties>
+  </tile>
   <tile id="2">
    <properties>
     <property name="type" value="water"/>
-    <property name="label" value="Water1"/>
+    <property name="label" value="water_tl"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_t"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_tr"/>
    </properties>
   </tile>
   <tile id="5">
@@ -13,9 +37,75 @@
     <property name="type" value="Grass"/>
    </properties>
   </tile>
+  <tile id="57">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_inner_br"/>
+   </properties>
+  </tile>
+  <tile id="58">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_inner_bl"/>
+   </properties>
+  </tile>
+  <tile id="59">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_l"/>
+   </properties>
+  </tile>
+  <tile id="60">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_c"/>
+   </properties>
+  </tile>
+  <tile id="61">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_r"/>
+   </properties>
+  </tile>
   <tile id="62">
    <properties>
     <property name="type" value="Grass"/>
+   </properties>
+  </tile>
+  <tile id="114">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_inner_tr"/>
+   </properties>
+  </tile>
+  <tile id="115">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_inner_tl"/>
+   </properties>
+  </tile>
+  <tile id="116">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_bl"/>
+   </properties>
+  </tile>
+  <tile id="116">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_bl"/>
+   </properties>
+  </tile>
+  <tile id="117">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_b"/>
+   </properties>
+  </tile>
+  <tile id="118">
+   <properties>
+    <property name="type" value="water"/>
+    <property name="label" value="water_br"/>
    </properties>
   </tile>
   <tile id="293">

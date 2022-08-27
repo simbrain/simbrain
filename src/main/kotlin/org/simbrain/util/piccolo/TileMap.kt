@@ -141,15 +141,20 @@ class TileMap(width: Int, height: Int) {
     /**
      * Edit tiles in first layer. Use with care; assumes just one layer.
      */
-    fun editTile(x: Int, y: Int, tileID: Int) {
-        layers.first().editTile(x, y, tileID)
+    fun setTile(x: Int, y: Int, tileID: Int) {
+        layers.first().setTile(x, y, tileID)
+    }
+
+    fun setTile(x: Int, y: Int, tileStringID: String) {
+        val tileID = tileSets.asSequence().map { it[tileStringID] }.first()?.id
+        tileID?.let { layers.first().setTile(x, y, it + 1) } ?: println("warn: no tile string id [$tileStringID] found")
     }
 
     /**
      * Edit tile in a named layer
      */
-    fun editTile(layerName: String, x: Int, y: Int, tileID: Int) {
-        getLayer(layerName).editTile(x, y, tileID)
+    fun setTile(layerName: String, x: Int, y: Int, tileID: Int) {
+        getLayer(layerName).setTile(x, y, tileID)
     }
 
     /**
@@ -158,7 +163,7 @@ class TileMap(width: Int, height: Int) {
     fun fill(tileId: Int) {
         (0 until width).forEach { i ->
             (0 until height).forEach { j ->
-                editTile(i, j, tileId)
+                setTile(i, j, tileId)
             }
         }
     }
@@ -168,7 +173,7 @@ class TileMap(width: Int, height: Int) {
     }
 
     // TODO: should not be able to edit tile map layers that don't belong to this map
-    fun TileMapLayer.editTile(x: Int, y: Int, tileID: Int) {
+    fun TileMapLayer.setTile(x: Int, y: Int, tileID: Int) {
         this[x, y] = tileID
         if (guiEnabled) {
             val oldRenderedImage = layerImage
@@ -208,6 +213,9 @@ class TileMap(width: Int, height: Int) {
      * @return a list of tiles at that location in the same order as in the xml file
      */
     fun getTileStackAt(x: Int, y: Int) = layers.map { getTile(it[x, y]) }
+
+    fun getTileStackAt(gridCoordinate: GridCoordinate) =
+        getTileStackAt(gridCoordinate.x.toInt(), gridCoordinate.y.toInt())
 
     /**
      * Check if a given tile location contains any tiles or layers that with the collision property.

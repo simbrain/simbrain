@@ -16,7 +16,10 @@ def simbrainJvmArgs = [ '--add-opens','java.base/java.util=ALL-UNNAMED',
                         '--add-opens','java.desktop/java.awt.geom=ALL-UNNAMED',
                         '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED',
                         '--add-opens', 'java.base/java.util.concurrent.atomic=ALL-UNNAMED',
-                        '--add-opens', 'java.base/java.lang=ALL-UNNAMED']
+                        '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+//                        '-Djava.library.path', '/opt/homebrew/opt/openblas/lib/',
+//                        '-Dorg.bytedeco.openblas.load', 'blas'
+]
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 compileJava.options.encoding = 'UTF-8'
 
@@ -24,6 +27,7 @@ compileJava.options.encoding = 'UTF-8'
 sourceCompatibility = 1.17
 
 repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
 }
 
@@ -46,10 +50,11 @@ dependencies {
     // Smile
     implementation 'com.github.haifengl:smile-kotlin:2.6.0'
     if (isFamily(FAMILY_MAC) && isArch('aarch64')) {
-        implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
-        implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.19-1.5.7'
-        implementation group: 'org.bytedeco', name: 'openblas-platform', version: '0.3.19-1.5.7'
-        implementation group: 'org.bytedeco', name: 'arpack-ng', version: '3.8.0-1.5.7'
+        implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.8-SNAPSHOT'
+        implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.21-1.5.8-SNAPSHOT'
+        implementation group: 'org.bytedeco', name: 'openblas-platform', version: '0.3.21-1.5.8-SNAPSHOT'
+        implementation group: 'org.bytedeco', name: 'arpack-ng', version: '3.8.0-1.5.8-SNAPSHOT'
+        implementation group: 'org.bytedeco', name: 'arpack-ng-platform', version: '3.8.0-1.5.8-SNAPSHOT'
     } else {
         implementation 'com.github.haifengl:smile-mkl:2.6.0'
     }

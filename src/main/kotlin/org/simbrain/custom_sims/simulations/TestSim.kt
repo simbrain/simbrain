@@ -14,6 +14,8 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.util.environment.SmellSource
+import org.simbrain.util.piccolo.asGridCoordinate
+import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.effectors.Effector
@@ -112,6 +114,9 @@ val testSim = newSim {
         // tileMap = loadTileMap("yulins_world.tmx")
         // tileMap.editTile(1,1,1)
         // tileMap.editTile(5,5,12)
+
+        tileMap.makeLake(point(1, 1).asGridCoordinate(), 5, 2)
+        tileMap.makeLake(point(4, 2).asGridCoordinate(), 2, 5)
 
         cow = addEntity(50, 50, EntityType.COW).apply {
             heading = 90.0

@@ -19,7 +19,7 @@ class OdorWorldTest {
 
     @Test
     fun testEditingExistingTile() {
-        world.tileMap.editTile("Tile Layer 1", 4, 4, 25)
+        world.tileMap.setTile("Tile Layer 1", 4, 4, 25)
         assertEquals(25, world.tileMap.layers[0][4, 4])
     }
 

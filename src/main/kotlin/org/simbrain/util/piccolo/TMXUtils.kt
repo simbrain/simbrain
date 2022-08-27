@@ -210,7 +210,7 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
     }
 
     val panels = (layers zip getTileStackAt(x, y)).reversed()
-        .map { (layer, tile) -> tilePanel(layer.name, tile) { layer.editTile(x, y, it) } }
+        .map { (layer, tile) -> tilePanel(layer.name, tile) { layer.setTile(x, y, it) } }
         .onEach { mainPanel.add(it, gbc) }
 
     addClosingTask { panels.forEach { it.onCommit() } }
@@ -289,4 +289,70 @@ fun TileMap.getTileStackNear(location: Point2D, radius: Double = 10.0): List<Pai
         GridCoordinate(x, y) to getTileStackAt(x.toInt(), y.toInt())
     }
     return b
+}
+
+
+/**
+ * Make a lake of the indicated size (in # of tiles) starting at the top left grid location.
+ * If two lakes are put together, they are merged into one with shared edges removed.
+ */
+fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int) {
+
+    /**
+     * Compute edge type string based on surround
+     */
+    fun computeShape(surroundingLandBits: Int): String {
+        val tl = 1 shl 0
+        val tc = 1 shl 1
+        val tr = 1 shl 2
+        val cl = 1 shl 3
+        val cc = 1 shl 4
+        val cr = 1 shl 5
+        val bl = 1 shl 6
+        val bc = 1 shl 7
+        val br = 1 shl 8
+
+        if (surroundingLandBits and cc > 0) return "land"
+
+        if (surroundingLandBits and (tc or cl or cr or bc) == 0) {
+            if (surroundingLandBits and tl > 0) return "inner_br"
+            if (surroundingLandBits and tr > 0) return "inner_bl"
+            if (surroundingLandBits and bl > 0) return "inner_tr"
+            if (surroundingLandBits and br > 0) return "inner_tl"
+        }
+        var dir = ""
+        if (surroundingLandBits and bc > 0) dir += "t"
+        if (surroundingLandBits and tc > 0) dir += "b"
+        if (surroundingLandBits and cr > 0) dir += "l"
+        if (surroundingLandBits and cl > 0) dir += "r"
+
+        return if (dir.length > 2) return "" else dir
+    }
+
+    // make a basic lake
+    repeat(height) { y ->
+        repeat(width) { x ->
+            val p = topLeftLocation + point(x, y)
+            setTile(p.x.toInt(), p.y.toInt(),2)
+        }
+    }
+
+    // replace edges and corners
+    repeat(height) { y ->
+        repeat(width) { x ->
+            val p = topLeftLocation + point(x, y)
+            val isLandList = (-1..1).flatMap { ly ->
+                (-1..1).map { lx ->
+                    val lp = (p + point(lx, ly)).asGridCoordinate()
+                    val tileStack = getTileStackAt(lp)
+                    if (tileStack.any { it.type != "water" }) 1 else 0
+                }
+            }
+            val surroundingLandBits = isLandList.reduce { acc, i -> (acc shl 1) + i }
+            val shape = computeShape(surroundingLandBits)
+            setTile(p.x.toInt(), p.y.toInt(), listOf("water", shape).filter { it.isNotEmpty() }.joinToString("_"))
+        }
+    }
+
+
 }

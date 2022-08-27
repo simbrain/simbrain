@@ -251,7 +251,7 @@ val evolveResourcePursuer = newSim {
 
                 fun setTile(coordinate: GridCoordinate, tileId: Int) {
                     val (x, y) = coordinate
-                    world.tileMap.editTile(x.toInt(), y.toInt(), tileId)
+                    world.tileMap.setTile(x.toInt(), y.toInt(), tileId)
                 }
 
                 val currentWaterLocations = List(3) { randomTileCoordinate() }.toMutableSet().onEach {

@@ -12,7 +12,6 @@ import org.simbrain.util.point
 import org.simbrain.util.showSaveDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
-import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -26,10 +25,11 @@ val isopodSim = newSim {
     // Adjustable parameters for sim
     var defaultNumTrials = 5
     val maxIterationsPerTrial = 5000
+    val hitRadius = 80
 
     // Other variables
     var log = ""
-    var trialNum = 1
+    var trialNum = 0
 
     // Clear the workspace
     workspace.clearWorkspace()
@@ -108,11 +108,11 @@ val isopodSim = newSim {
         wrapAround = false
         isObjectsBlockMovement = true
 
-        tileMap = TileMap(20, 20)
+        tileMap = TileMap(25, 25)
         tileMap.fill(2)
 
         // Body could be represented by a triangle or rhombus
-        isopod = addEntity(300, 300, EntityType.ISOPOD).apply {
+        isopod = addEntity(centerLocation.x, centerLocation.y, EntityType.ISOPOD).apply {
             name = "isopod"
             heading = 90.0
             addDefaultEffectors()
@@ -145,7 +145,7 @@ val isopodSim = newSim {
             manualMovement.manualMotionTurnIncrement = 2.0
         }
 
-        fun addFish(x: Int, y: Int) {
+        fun addFish(x: Double, y: Double) {
             odorWorld.addEntity(x, y, EntityType.FISH).apply {
                 name = "Fish"
                 smellSource = SmellSource.createScalarSource(1).apply {
@@ -154,17 +154,22 @@ val isopodSim = newSim {
             }
         }
 
-        addFish(590, 590)
-        addFish(10, 590)
-        addFish(10, 10)
-        addFish(590, 10)
+        // adding fish to four corners of the world
+        val fishHalfWidth = EntityType.FISH.imageWidth / 2
+        val fishHalfHeight = EntityType.FISH.imageHeight / 2
+
+        addFish(odorWorld.width - fishHalfWidth, odorWorld.height - fishHalfHeight)
+        addFish(fishHalfWidth, odorWorld.height - fishHalfHeight)
+        addFish(fishHalfWidth, fishHalfHeight)
+        addFish(odorWorld.width - fishHalfWidth, fishHalfHeight)
 
     }
 
     withGui {
         place(odorWorldComponent) {
             location = point(590, 10)
-            (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).setGuiSizeToWorldSize()
+            width = 600
+            height = 600
         }
     }
 
@@ -179,9 +184,18 @@ val isopodSim = newSim {
     }
 
     fun resetIsopod() {
-        isopod.location = point(300,300)
+        isopod.location = odorWorld.centerLocation
         isopod.heading = UniformRealDistribution(0.0,360.0).sampleDouble()
     }
+
+    workspace.addUpdateAction(updateAction("Found fish") {
+        val foundFish = odorWorld.entityList
+            .filter { it.entityType == EntityType.FISH }
+            .any { fish -> fish.location.distance(isopod.location) < hitRadius }
+        if (foundFish) {
+            collision = true
+        }
+    })
 
     withGui {
         createControlPanel("Control Panel", 5, 10) {
@@ -215,7 +229,7 @@ val isopodSim = newSim {
                     var iteration = 0
                     defaultNumTrials = Integer.parseInt(numTrialsTF.text)
                     while(trialNum < defaultNumTrials) {
-                        log += "# Trial: $trialNum\n"
+                        log += "# Trial: ${trialNum + 1}\n"
                         resetIsopod()
                         log += "# Heading: ${isopod.heading}\n"
                         while (++iteration < maxIterationsPerTrial) {

@@ -196,6 +196,10 @@ public class OdorWorld implements EditableObject, Bounded {
         return entity;
     }
 
+    public OdorWorldEntity addEntity(double x, double y, EntityType type) {
+        return addEntity((int) x, (int) y, type);
+    }
+
     /**
      * Add new "agent" (rotating with some default) sensors and effectors at last clicked position.
      */
@@ -562,6 +566,11 @@ public class OdorWorld implements EditableObject, Bounded {
     @Override
     public Point2D getLocation() {
         return new Point2D.Double(getX(), getY());
+    }
+
+    @NotNull
+    public Point2D getCenterLocation() {
+        return getLocation();
     }
 
 }

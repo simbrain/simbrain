@@ -20,12 +20,16 @@ val NetworkPanel.editMenu
             addSeparator()
             add(clearSourceNeurons)
             add(setSourceNeurons)
+            addSeparator()
             add(connectionMenu)
-            add(connectWithWeightMatrix)
-            add(connectWithSynapseGroup)
+            add(editConnectionStrategy)
             addSeparator()
             add(randomizeObjectsAction)
-            add(showAdjustSynapsesDialog)
+            add(showSynapseAdjustmentPanel)
+            addSeparator()
+            // TODO: Sync this with "2" and "3" ways of connecting both neuron groups and free neurons
+            add(connectWithWeightMatrix)
+            add(connectWithSynapseGroup)
             addSeparator()
             add(showLayoutDialogAction)
             addSeparator()
@@ -163,7 +167,7 @@ val NetworkPanel.viewMenu
 val NetworkPanel.connectionMenu
     get() = JMenu("Connect Neurons").apply {
         with(networkActions) {
-            // connectionActions.forEach { add(it.toMenuItem()) }
+            connectionActions.forEach { add(it.toMenuItem()) }
         }
     }
 
@@ -220,4 +224,4 @@ val NetworkPanel.synapseContextMenu
 
 fun NetworkComponent.createCouplingMenu(container: AttributeContainer) = CouplingMenu(this, container)
 
-private fun AbstractAction.toMenuItem() = JCheckBoxMenuItem(this)
+fun AbstractAction.toMenuItem() = JCheckBoxMenuItem(this)

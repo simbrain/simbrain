@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.plot.barchart.BarChartComponent;
@@ -16,7 +15,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import java.awt.*;
 import java.util.List;
 
-import static org.simbrain.network.connections.ConnectionUtilitiesKt.randomizeAndPolarizeSynapses;
+import static org.simbrain.network.connections.ConnectionUtilitiesKt.polarizeSynapses;
 import static org.simbrain.network.connections.SparseKt.connectSparse;
 
 /**
@@ -74,7 +73,7 @@ public class TestSim extends Simulation {
         // CREATE SYNAPSES
         connectSparse(network.getFlatNeuronList(),
                 network.getFlatNeuronList(), sparsity, false, false);
-        randomizeAndPolarizeSynapses(network.getModels(Synapse.class), excitatoryRatio);
+        polarizeSynapses(network.getFlatSynapseList(), excitatoryRatio);
 
         //MAKE BARCHART
         BarChartComponent barChart = new BarChartComponent("Bar Chart of Recurrent Network");

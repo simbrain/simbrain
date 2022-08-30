@@ -601,8 +601,13 @@ SynapseAdjustmentPanel(
     }
 }
 
-fun createSynapseAdjustmentPanel(synapses: List<Synapse>): SynapseAdjustmentPanel? {
-    val sap = SynapseAdjustmentPanel(synapses)
+fun createSynapseAdjustmentPanel(
+    synapses: List<Synapse>,
+    all: Randomizer = Randomizer(UniformRealDistribution(-1.0, 1.0)),
+    excitatoryRandomizer: Randomizer = Randomizer(UniformRealDistribution(0.0, 1.0)),
+    inhibitoryRandomizer: Randomizer = Randomizer(UniformRealDistribution(-1.0, 0.0))
+): SynapseAdjustmentPanel? {
+    val sap = SynapseAdjustmentPanel(synapses, all, excitatoryRandomizer, inhibitoryRandomizer)
     if (synapses.isEmpty()) {
         JOptionPane.showMessageDialog(
             null, "No synapses to display", "Warning",
@@ -611,6 +616,10 @@ fun createSynapseAdjustmentPanel(synapses: List<Synapse>): SynapseAdjustmentPane
         return null
     }
     return sap
+}
+
+fun createSynapseAdjustmentPanel(synapses: List<Synapse>): SynapseAdjustmentPanel? {
+    return createSynapseAdjustmentPanel(synapses)
 }
 
 fun main() {

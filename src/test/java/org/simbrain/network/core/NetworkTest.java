@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class NetworkTest {
-
     Network net;
     Neuron n1, n2;
     Synapse s1;
@@ -102,6 +101,24 @@ public class NetworkTest {
         assertNotNull(fromXml.getNeuronByLabel("neuron2") );
         assertNotNull(fromXml.getNeuronGroupByLabel("neuron_group_1") );
         assertNotNull(fromXml.getNeuronGroupByLabel("ng2") );
+    }
 
+    @Test
+    public void testSynapseCounts() {
+
+        // 1 loose synapse
+        System.out.println(net.getLooseWeights().size());
+
+        // 1 loose synapse + 90 in the synapseGroup = 91
+        SynapseGroup2 sg2 = new SynapseGroup2(ng1, ng1);
+        net.addNetworkModel(sg2);
+        System.out.println(net.getFlatSynapseList().size());
+    }
+
+    @Test
+    public void testNeuronCounts() {
+        // 2 loose neurons, 20 in 2 neuron groups, 2 in neuron collection which are the same
+        // Should be 22, but we're getting 24
+        System.out.println(net.getFlatNeuronList().size());
     }
 }

@@ -31,8 +31,6 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  * synapse group should be done through the synapse group, but there are
  * counter-examples.
  *
- * TODO: Make synapse group use more of these functions.
- *
  * @author Zoë Tosi
  */
 
@@ -49,10 +47,8 @@ const val DEFAULT_INHIBITORY_STRENGTH = -1.0
  * this method will get as close as possible to the desired ratio. This,
  * however is not recommended.
  *
- *
  * If the source neurons to these synapses are themselves, by and large,
  * polarized, this method can be, but should **NOT** be used.
- *
  *
  * Null values for either PolarizedRandomizer is permitted. Synapses are
  * assigned default strengths based on their polarity depending on which
@@ -73,30 +69,30 @@ fun randomizeAndPolarizeSynapses(
     inhibRand: ProbabilityDistribution?,
     excitatoryRatio: Double
 ) {
-    var excitatoryRatio = excitatoryRatio
+    var excRatio = excitatoryRatio
     if (exciteRand == inhibRand) {
         throw IllegalArgumentException("Randomization has failed." + " The excitatory and inhibitory randomizers cannot be" + " the same object.")
-    } else // Change the excitatoryRatio to maintain balance.// Change the excitatoryRatio to maintain balance// Set the strength based on the polarity.
-        require(!(excitatoryRatio > 1 || excitatoryRatio < 0)) { "Randomization had failed." + " The ratio of excitatory synapses " + " cannot be greater than 1 or less than 0." }
+    } else
+        require(!(excRatio > 1 || excRatio < 0)) { "Randomization had failed." + " The ratio of excitatory synapses " + " cannot be greater than 1 or less than 0." }
     checkPolarityMatches(exciteRand, Polarity.EXCITATORY)
     checkPolarityMatches(inhibRand, Polarity.INHIBITORY)
-    var exciteCount = (excitatoryRatio * synapses.size).toInt()
+    var exciteCount = (excRatio * synapses.size).toInt()
     var inhibCount = synapses.size - exciteCount
     var remaining = synapses.size
     var excitatory = false
     for (s in synapses) {
-        excitatory = shouldBeExcitatory(excitatoryRatio, exciteCount, inhibCount, s)
+        excitatory = shouldBeExcitatory(excRatio, exciteCount, inhibCount, s)
         // Set the strength based on the polarity.
         if (excitatory) {
             s.strength = if (exciteRand != null) exciteRand.sampleDouble() else DEFAULT_EXCITATORY_STRENGTH
             exciteCount--
             // Change the excitatoryRatio to maintain balance
-            excitatoryRatio = exciteCount / remaining.toDouble()
+            excRatio = exciteCount / remaining.toDouble()
         } else {
             s.strength = if (inhibRand != null) inhibRand.sampleDouble() else DEFAULT_INHIBITORY_STRENGTH
             inhibCount--
             // Change the excitatoryRatio to maintain balance.
-            excitatoryRatio = (remaining - inhibCount) / remaining.toDouble()
+            excRatio = (remaining - inhibCount) / remaining.toDouble()
         }
         remaining--
     }
@@ -163,23 +159,6 @@ fun randomizeExcitatorySynapses(synapses: Collection<Synapse>, exciteRand: Proba
 }
 
 /**
- * Randomizes the given synapses using the given excitatory randomizer
- * without checking first to make sure that the given synapses or their
- * source neurons are not inhibitory. Used for speed when the polarity of
- * the synapses in the list is known ahead of time.
- *
- * @param synapses   the synapses to modify
- * @param exciteRand the randomizer to be used to determine the weights of
- * excitatory synapses.
- */
-fun randomizeExcitatorySynapsesUnsafe(synapses: Collection<Synapse>, exciteRand: ProbabilityDistribution?) {
-    checkPolarityMatches(exciteRand, Polarity.EXCITATORY)
-    for (s in synapses) {
-        s.strength = if (exciteRand != null) exciteRand.sampleDouble() else DEFAULT_EXCITATORY_STRENGTH
-    }
-}
-
-/**
  * Randomizes the inhibitory synapses in the given list of synapses using
  * the given inhibitory randomizer.
  *
@@ -193,23 +172,6 @@ fun randomizeInhibitorySynapses(synapses: Collection<Synapse>, inhibRand: Probab
         if (Polarity.INHIBITORY == s.source.polarity || s.strength < 0) {
             s.strength = if (inhibRand != null) inhibRand.sampleDouble() else DEFAULT_INHIBITORY_STRENGTH
         }
-    }
-}
-
-/**
- * Randomizes the given synapses using the given inhibitory randomizer
- * without checking first to make sure that the given synapses or their
- * source neurons are not excitatory. Used for speed when the polarity of
- * the synapses in the list is known ahead of time.
- *
- * @param synapses  the synapses to modify
- * @param inhibRand the randomizer to be used to determine the weights of
- * inhibitory synapses.
- */
-fun randomizeInhibitorySynapsesUnsafe(synapses: Collection<Synapse>, inhibRand: ProbabilityDistribution?) {
-    checkPolarityMatches(inhibRand, Polarity.INHIBITORY)
-    for (s in synapses) {
-        s.strength = if (inhibRand != null) inhibRand.sampleDouble() else DEFAULT_INHIBITORY_STRENGTH
     }
 }
 

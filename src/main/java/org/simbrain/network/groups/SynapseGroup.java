@@ -33,7 +33,8 @@ import org.simbrain.workspace.Producible;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.simbrain.network.connections.ConnectionUtilitiesKt.*;
+import static org.simbrain.network.connections.ConnectionUtilitiesKt.DEFAULT_EXCITATORY_STRENGTH;
+import static org.simbrain.network.connections.ConnectionUtilitiesKt.DEFAULT_INHIBITORY_STRENGTH;
 import static org.simbrain.network.core.NetworkUtilsKt.getSynapseVisibilityThreshold;
 
 /**
@@ -708,7 +709,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * synapses may have corrupted that assumption call {@link #revalidateSynapseSets()} first.
      */
     public void randomizeExcitatoryConnections() {
-        randomizeExcitatorySynapsesUnsafe(exSynapseSet, exciteRand);
+        // randomizeExcitatorySynapsesUnsafe(exSynapseSet, exciteRand);
     }
 
     /**
@@ -717,7 +718,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * have corrupted that assumption call {@link #revalidateSynapseSets()} first.
      */
     public void randomizeInhibitoryConnections() {
-        randomizeInhibitorySynapsesUnsafe(inSynapseSet, inhibRand);
+        // randomizeInhibitorySynapsesUnsafe(inSynapseSet, inhibRand);
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import org.simbrain.network.connections.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup2
@@ -21,12 +22,11 @@ import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction
 import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction
 import org.simbrain.network.gui.actions.selection.*
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction
-import org.simbrain.network.gui.actions.synapse.ShowAdjustConnectivityDialog
-import org.simbrain.network.gui.actions.synapse.ShowAdjustSynapsesDialog
 import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction
+import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
@@ -66,9 +66,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setSourceNeurons = SetSourceNeurons(networkPanel)
     val setSynapsePropertiesAction = SetSynapsePropertiesAction(networkPanel)
 
-    // val setTextPropertiesAction = SetTextPropertiesAction(networkPanel) TODO
-    val showAdjustConnectivityDialog = ShowAdjustConnectivityDialog(networkPanel)
-    val showAdjustSynapsesDialog = ShowAdjustSynapsesDialog(networkPanel)
     val showDebugAction = ShowDebugAction(networkPanel)
     val showEditToolBarAction = ShowEditToolBarAction(networkPanel)
     val showLayoutDialogAction = ShowLayoutDialogAction(networkPanel)
@@ -172,6 +169,20 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             wandEditModeAction
         )
 
+    val showSynapseAdjustmentPanel = networkPanel.createConditionallyEnabledAction(
+        iconPath = "menu_icons/Rand.png",
+        name = "Weight randomization dialog...",
+        keyCombo = CmdOrCtrl + 'R',
+        enablingCondition = ConditionallyEnabledAction.EnablingCondition.SYNAPSES
+    ) {
+        createSynapseAdjustmentPanel(
+            network.getModels<Synapse>().toList(),
+            network.weightRandomizer,
+            network.excitatoryRandomizer,
+            network.inhibitoryRandomizer
+        )?.displayInDialog()
+    }
+
     // TODO: Note: the lambda parameter `NetworkPanel` is not used
     private fun addGroupAction(name: String, createDialog: AddGroupAction.(NetworkPanel) -> StandardDialog) =
         AddGroupAction(networkPanel, name, createDialog)
@@ -182,20 +193,38 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addGroupAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addGroupAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addGroupAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
-           // addGroupAction("LMS (Least Mean Squares)") { LMSCreationDialog(networkPanel) },
+            // addGroupAction("LMS (Least Mean Squares)") { LMSCreationDialog(networkPanel) },
             addGroupAction("SOM Network") { SOMCreationDialog(networkPanel) },
-           // addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
+            // addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
         )
 
-    // val connectionActions
-    //     get() = listOf(
-    //         applyConnectionAction("All to all", AllToAll()),
-    //         applyConnectionAction("Distance Based", DistanceBased()),
-    //         applyConnectionAction("One-to-one", OneToOne()),
-    //         applyConnectionAction("Radial (Probalistic)", RadialProbabilistic()),
-    //         applyConnectionAction("Fixed degree", FixedDegree()),
-    //         applyConnectionAction("Sparse", Sparse())
-    //     )
+    fun applyConnectionAction(strategy: ConnectionStrategy): AbstractAction {
+        return networkPanel.createConditionallyEnabledAction(
+            name = "Connect ${strategy.name}...",
+            enablingCondition = ConditionallyEnabledAction.EnablingCondition.SOURCE_AND_TARGET_NEURONS
+        ) {
+            val connectionSelector = ConnectionSelector(strategy)
+            ConnectionStrategyPanel(connectionSelector).displayInDialog {
+                commitChanges()
+                connectionSelector.cs.connectNeurons(
+                    network,
+                    selectionManager.filterSelectedSourceModels<Neuron>(),
+                    selectionManager.filterSelectedModels<Neuron>()
+                )
+            }
+        }
+    }
+
+    val connectionActions
+        get() = listOf(
+            applyConnectionAction(AllToAll()),
+            applyConnectionAction(DistanceBased()),
+            applyConnectionAction(OneToOne()),
+            applyConnectionAction(FixedDegree()),
+            applyConnectionAction(RadialGaussian()),
+            applyConnectionAction(RadialProbabilistic()),
+            applyConnectionAction(Sparse())
+        )
 
     val editConnectionStrategy = networkPanel.createAction(
         name = "Edit connection strategy...",

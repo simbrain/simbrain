@@ -117,9 +117,9 @@ abstract class ConnectionStrategy : CopyableObject {
                 AllToAll::class.java,
                 DistanceBased::class.java,
                 OneToOne::class.java,
-                RadialProbabilistic::class.java,
                 FixedDegree::class.java,
                 RadialGaussian::class.java,
+                RadialProbabilistic::class.java,
                 Sparse::class.java
             )
         }

@@ -18,6 +18,8 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.updater.PerformanceMonitor
 import org.simbrain.workspace.updater.UpdateAction
 import java.awt.geom.Point2D
@@ -91,6 +93,21 @@ class Network {
      * Connection strategy for connecting free neurons.
      */
     val neuronConnector = ConnectionSelector(Sparse())
+
+    /**
+     * Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a weight.
+     */
+    val weightRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 1.0))
+
+    /**
+     * Randomizer for free excitatory weights.
+     */
+    val excitatoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(0.0, 1.0))
+
+    /**
+     * Randomizer for free inhibitory weights.
+     */
+    val inhibitoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 0.0))
 
     /**
      * In iterations or msec.
@@ -639,7 +656,6 @@ class Network {
             }
         }
     }
-
 
     fun createNeuronGroupTemplate(template: NeuronGroup.() -> Unit) = fun Network.(
         count: Int,

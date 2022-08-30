@@ -40,8 +40,8 @@ class EntityEvents : Event(PropertyChangeSupport(Any())), EntityLocationEvent {
     fun onSensorRemoved(handler: Consumer<Sensor>) = "SensorRemoved".itemRemovedEvent(handler)
     fun fireSensorRemoved(sensor: Sensor) = "SensorRemoved"(old = sensor)
 
-    fun onUpdateSensorVisiblity(handler: Runnable) = "UpdateSensorVisiblity".event(handler)
-    fun fireUpdateSensorVisiblity() = "UpdateSensorVisiblity"()
+    fun onPropertyChanged(handler: Runnable) = "PropertyChanged".event(handler)
+    fun firePropertyChanged() = "PropertyChanged"()
 
     fun onEffectorAdded(handler: Consumer<Effector>) = "EffectorAdded".itemAddedEvent(handler)
     fun fireEffectorAdded(effector: Effector) = "EffectorAdded"(new = effector)

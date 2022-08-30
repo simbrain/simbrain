@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld.gui
 
+import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.simbrain.world.odorworld.sensors.WithDispersion
 import java.awt.BasicStroke
@@ -9,7 +10,7 @@ interface NodeWithDispersion {
     val sensor: WithDispersion
     var dispersionCircle: PPath
 
-    fun drawDispersionCircleAround(shape: PPath)
+    fun drawDispersionCircleAround(shape: PNode)
 }
 
 class DispersionNode(override val sensor: WithDispersion): NodeWithDispersion {
@@ -31,7 +32,7 @@ class DispersionNode(override val sensor: WithDispersion): NodeWithDispersion {
         }
     }
 
-    override fun drawDispersionCircleAround(shape: PPath) {
+    override fun drawDispersionCircleAround(shape: PNode) {
         shape.removeChild(dispersionCircle)
         if (sensor.showDispersion) {
             dispersionCircle = makeDispersionCircle()

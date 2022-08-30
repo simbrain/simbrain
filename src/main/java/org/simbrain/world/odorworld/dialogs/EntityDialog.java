@@ -100,10 +100,10 @@ public class EntityDialog extends StandardDialog {
         EntityType oldType = entityRef.getEntityType();
         mainEditor.commitChanges();
         entityRef.getEvents().fireTypeChanged(oldType, entityRef.getEntityType());
-        entityRef.getEvents().fireUpdateSensorVisiblity();
         if (smellPanel != null) {
             smellPanel.commitChanges();
         }
+        entityRef.getEvents().firePropertyChanged();
     }
 
     @Override

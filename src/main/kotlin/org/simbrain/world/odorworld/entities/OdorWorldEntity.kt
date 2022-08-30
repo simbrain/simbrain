@@ -1,25 +1,8 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.world.odorworld.entities
 
 import org.simbrain.util.UserParameter
-import org.simbrain.util.Utils.round
+import org.simbrain.util.Utils
+import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
@@ -35,6 +18,7 @@ import org.simbrain.world.odorworld.intersect
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.Sensor
+import org.simbrain.world.odorworld.sensors.WithDispersion
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -50,7 +34,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     Locatable by Location(events),
     Rotatable by Rotation(events),
     Movable,
-    WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bounded {
+    WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bounded, WithDispersion {
 
     override var id: String? = null
 
@@ -161,8 +145,12 @@ class OdorWorldEntity @JvmOverloads constructor(
         }
     }
 
+    override var showDispersion: Boolean = false
+
+    override val decayFunction: DecayFunction get() = smellSource.decayFunction
+
     override fun toString(): String {
-        return "name = $name type = $entityType location = (${round(x, 2)}, ${round(y, 2)})"
+        return "name = $name type = $entityType location = (${Utils.round(x, 2)}, ${Utils.round(y, 2)})"
     }
 
     fun addEffector(effector: Effector) {
@@ -317,4 +305,3 @@ class OdorWorldEntity @JvmOverloads constructor(
         }
 
 }
-

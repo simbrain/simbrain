@@ -334,9 +334,6 @@ class Network {
             for (neuronGroup in networkModels.get<NeuronGroup>()) {
                 yieldAll(neuronGroup.neuronList)
             }
-            for (neuronCollection in networkModels.get<NeuronCollection>()) {
-                yieldAll(neuronCollection.neuronList)
-            }
             for (subnetwork in networkModels.get<Subnetwork>()) {
                 yieldAll(subnetwork.modelList.get<NeuronGroup>().flatMap { it.neuronList })
             }
@@ -350,6 +347,7 @@ class Network {
     val flatSynapseList: List<Synapse>
         get() = sequence {
             yieldAll(networkModels.get<Synapse>())
+            yieldAll(networkModels.get<SynapseGroup2>().flatMap { sg -> sg.synapses })
             yieldAll(networkModels.get<Subnetwork>().flatMap { subnetwork ->
                 subnetwork.modelList.get<SynapseGroup>().flatMap { it.allSynapses }
             })

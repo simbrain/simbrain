@@ -23,6 +23,8 @@ public class NetworkTest {
     NeuronCollection nc1;
     WeightMatrix wm1;
 
+    SynapseGroup2 sg1;
+
     @BeforeEach
     public void setUpNetwork() {
         net = new Network();
@@ -47,7 +49,7 @@ public class NetworkTest {
         ng2.setLabel("ng2");
         net.addNetworkModel(ng2);
 
-        SynapseGroup2 sg1 = SynapseGroup.createSynapseGroup(ng1, ng2);
+        sg1 = new SynapseGroup2(ng1, ng2);
         net.addNetworkModel(sg1);
 
         na1 = new NeuronArray(net, 10);
@@ -106,19 +108,21 @@ public class NetworkTest {
     @Test
     public void testSynapseCounts() {
 
-        // 1 loose synapse
-        System.out.println(net.getLooseWeights().size());
+        // 1 free synapse
+        assertEquals(1, net.getFreeSynapses().size());
 
-        // 1 loose synapse + 90 in the synapseGroup = 91
-        SynapseGroup2 sg2 = new SynapseGroup2(ng1, ng1);
-        net.addNetworkModel(sg2);
-        System.out.println(net.getFlatSynapseList().size());
+        // 1 free synapse + 100 in the synapseGroup = 101
+        assertEquals(101, net.getFlatSynapseList().size());
     }
 
     @Test
     public void testNeuronCounts() {
-        // 2 loose neurons, 20 in 2 neuron groups, 2 in neuron collection which are the same
-        // Should be 22, but we're getting 24
-        System.out.println(net.getFlatNeuronList().size());
+
+        // 2 free neurons
+        assertEquals(2, net.getFreeNeurons().size());
+
+        // 2 free neurons, 2 x 10 in each of two neuron groups = 22
+        // (2 in neuron collection are free neurons)
+        assertEquals(22, net.getFlatNeuronList().size());
     }
 }

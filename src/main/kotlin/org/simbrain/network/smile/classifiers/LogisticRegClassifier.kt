@@ -12,6 +12,8 @@ import smile.validation.metric.Accuracy
  */
 class LogisticRegClassifier() : ClassifierWrapper() {
 
+    // TODO: Should this be a classifier?
+
     override var model: Classifier<DoubleArray>? = null
 
     /**

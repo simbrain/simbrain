@@ -158,6 +158,7 @@ public class SmileTest {
     }
 
     //@Test
+    // Model SVR / regression
     public void modelXOR() throws IOException, URISyntaxException {
 
         var train_data = Read.csv(getClass().getClassLoader().getResource("iris_train.csv").getPath());
@@ -197,7 +198,6 @@ public class SmileTest {
 
         //var model = SVR.fit(x,y,0.01, 1000,1E-3);
         System.out.println(model);
-
     }
 
 }

@@ -126,10 +126,10 @@ class SmileClassifierTest {
     fun `test decision tree`() {
         val iris = Read.arff("simulations/tables/iris.arff")
         val decisionTree = cart(Formula.of("class", "."), iris)
-        (0 until iris.nrows()).forEach { i ->
-            // println("${iris[i]} -> ${decisionTree.predict(iris.get(i))}")
-            // println("${decisionTree.predict(iris.get(i))}")
-        }
+        // (0 until iris.nrows()).forEach { i ->
+        //     println("${iris[i]} -> ${decisionTree.predict(iris.get(i))}")
+        //     println("${decisionTree.predict(iris.get(i))}")
+        // }
         val schema = StructType(
             StructField("sepallength", DataType.of(Int.javaClass)),
             StructField("sepalwidth", DataType.of(Int.javaClass)),

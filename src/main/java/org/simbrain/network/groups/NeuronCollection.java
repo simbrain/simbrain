@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A collection of loose neurons (neurons in a {@link NeuronGroup} can be added to a collection). Allows them to be
+ * A collection of free neurons (neurons in a {@link NeuronGroup} can be added to a collection). Allows them to be
  * labelled, moved around as a unit, coupled to, etc. However no special processing occurs in neuron collections. They
  * are a convenience. NeuronCollections can overlap each other in the sense of having neurons in common.
  */

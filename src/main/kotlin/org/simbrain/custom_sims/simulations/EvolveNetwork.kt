@@ -155,7 +155,7 @@ val evolveNetwork = newSim {
                 val totalActivationError = abs(totalActivation - 10)
 
                 // Area in thousands of pixels
-                val bounds  = network.looseNeurons.bound
+                val bounds  = network.freeNeurons.bound
                 val size = (bounds.height * bounds.width) / 10_000
                 val areaError = abs(size - 10)
 

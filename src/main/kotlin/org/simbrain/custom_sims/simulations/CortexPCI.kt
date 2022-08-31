@@ -102,7 +102,7 @@ val cortexPCI = newSim {
     val activations = mutableListOf<List<Double>>()
     region1.randomize()
     val recordActivations = updateAction("Record activations") {
-        val acts = network.looseNeurons.map { n -> n.activation }
+        val acts = network.freeNeurons.map { n -> n.activation }
         activations.add(acts)
     }
     network.addUpdateAction(recordActivations)

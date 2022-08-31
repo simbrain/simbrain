@@ -309,7 +309,7 @@ class Network {
      * @param id id to search for.
      * @return neuron with that id, null otherwise
      */
-    fun getLooseNeuron(id: String?): Neuron? = networkModels.get<Neuron>().firstOrNull {
+    fun getFreeNeuron(id: String?): Neuron? = networkModels.get<Neuron>().firstOrNull {
         it.id.equals(id, ignoreCase = true)
     }
 
@@ -319,7 +319,7 @@ class Network {
      * @param id id to search for.
      * @return synapse with that id, null otherwise
      */
-    fun getLooseSynapse(id: String?): Synapse? = networkModels.get<Synapse>().firstOrNull {
+    fun getFreeSynapse(id: String?): Synapse? = networkModels.get<Synapse>().firstOrNull {
         it.id.equals(id, ignoreCase = true)
     }
 
@@ -403,15 +403,15 @@ class Network {
      */
     fun createNeuronCollection(neuronList: List<Neuron>): NeuronCollection? {
 
-        // Filter out loose neurons (a neuron is loose if its parent group is null)
-        val loose: List<Neuron> = neuronList
+        // Filter out free neurons (a neuron is free if its parent group is null)
+        val freeNeurons: List<Neuron> = neuronList
             // .filter(n -> n.getParentGroup() == null)  // TODO
             .toList()
 
         // Only make the neuron collection if some neurons have been selected
-        if (loose.isNotEmpty()) {
+        if (freeNeurons.isNotEmpty()) {
             // Make the collection
-            val nc = NeuronCollection(this, loose)
+            val nc = NeuronCollection(this, freeNeurons)
 
             if (nc.shouldAdd()) {
                 nc.label = idManager.getProposedId(nc.javaClass)
@@ -615,7 +615,7 @@ class Network {
             // TODO
             // group.setFrozen(freeze, Polarity.BOTH)
         }
-        // Freeze loose synapses
+        // Freeze free synapses
         for (synapse in networkModels.get<Synapse>()) {
             synapse.isFrozen = freeze
         }
@@ -623,9 +623,9 @@ class Network {
 
     val isRedrawTime: Boolean = oneOffRun || (iterCount % updateFreq == 0)
 
-    val looseNeurons get() = networkModels.get<Neuron>()
+    val freeNeurons get() = networkModels.get<Neuron>()
 
-    val looseWeights get() = networkModels.get<Synapse>()
+    val freeSynapses get() = networkModels.get<Synapse>()
 
     fun addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
         .apply(this::addNetworkModel)

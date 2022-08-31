@@ -16,10 +16,10 @@ class SOMTest {
     fun `test som`() {
         val som = SOMNetwork(net, 1, 2)
         net.addNetworkModel(som)
-        assertEquals(0, net.looseNeurons.size)
+        assertEquals(0, net.freeNeurons.size)
         assertEquals(1, som.som.size())
         assertEquals(2, som.inputLayer.size())
-        assertEquals(0, net.looseWeights.size)
+        assertEquals(0, net.freeSynapses.size)
         assertEquals(0, som.modelList.get<Synapse>().size)
         assertEquals(2, som.modelList.get<SynapseGroup2>().first().size())
     }

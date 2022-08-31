@@ -489,7 +489,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     @Override
     public void postOpenInit() {
         super.postOpenInit();
-        // NeuronGroup neurons are not loose neurons so they are not deserialized
+        // NeuronGroup neurons are not free neurons so they are not deserialized
         // when Network.readResolve is called
         getNeuronList().forEach(Neuron::postOpenInit);
         getNeuronList().forEach(this::addListener);

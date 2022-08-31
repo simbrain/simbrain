@@ -156,7 +156,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     var freeWeightsVisible = true
         set(value) {
             field = value
-            network.looseWeights.forEach { it.isVisible = value }
+            network.freeSynapses.forEach { it.isVisible = value }
             network.events.fireFreeWeightVisibilityChanged(value)
         }
 

@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkKt;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.simbrain.network.core.NetworkUtilsKt.connectAllToAll;
-import static org.simbrain.network.core.NetworkUtilsKt.getLooseSynapse;
+import static org.simbrain.network.core.NetworkUtilsKt.getFreeSynapse;
 
 /**
  * Simulation to demonstrate classical and operant conditioning.
@@ -200,7 +199,7 @@ public class OperantConditioning extends Simulation {
                 // Update weight on active node
                 for (Neuron src : stimulusNet.getNeuronList()) {
                     if (src.getActivation() > 0) {
-                        Synapse s = getLooseSynapse(src, tar);
+                        Synapse s = getFreeSynapse(src, tar);
                         s.setStrength(Math.max(s.getStrength() + valence, 0));
                     }
                 }

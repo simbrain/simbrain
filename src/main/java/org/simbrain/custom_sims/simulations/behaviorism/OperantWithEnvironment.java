@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.simbrain.network.core.NetworkUtilsKt.connectAllToAll;
-import static org.simbrain.network.core.NetworkUtilsKt.getLooseSynapse;
+import static org.simbrain.network.core.NetworkUtilsKt.getFreeSynapse;
 
 
 /**
@@ -264,7 +264,7 @@ public class OperantWithEnvironment extends Simulation {
         // If there are inputs, update weights
         if(totalActivation > .1) {
             Neuron src = WinnerTakeAll.getWinner(stimulusNet.getNeuronList(), true);
-            Synapse s_r = getLooseSynapse(src,winner);
+            Synapse s_r = getFreeSynapse(src,winner);
             // Strengthen or weaken active S-R Pair
             s_r.setStrength(s_r.getStrength() + valence);
 

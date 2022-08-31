@@ -25,7 +25,7 @@ import org.simbrain.util.math.SimbrainMath;
 
 import java.util.*;
 
-import static org.simbrain.network.core.NetworkUtilsKt.getLooseSynapse;
+import static org.simbrain.network.core.NetworkUtilsKt.getFreeSynapse;
 
 /**
  * <b>SimnetUtils</b> provides utility classes relating to Simbrain networks.
@@ -50,7 +50,7 @@ public class SimnetUtils {
 
         for (int i = 0; i < srcLayer.size(); i++) {
             for (int j = 0; j < targetLayer.size(); j++) {
-                Synapse s = getLooseSynapse(srcLayer.get(i), targetLayer.get(j));
+                Synapse s = getFreeSynapse(srcLayer.get(i), targetLayer.get(j));
 
                 if (s != null) {
                     ret[i][j] = s.getStrength();
@@ -75,7 +75,7 @@ public class SimnetUtils {
     public static void setWeights(final List<Neuron> src, final List<Neuron> tar, final double[][] w) {
         for (int i = 0; i < src.size(); i++) {
             for (int j = 0; j < tar.size(); j++) {
-                Synapse s = getLooseSynapse(src.get(i), tar.get(j));
+                Synapse s = getFreeSynapse(src.get(i), tar.get(j));
                 if (s != null) {
                     s.forceSetStrength(w[i][j]);
                 } else {
@@ -101,7 +101,7 @@ public class SimnetUtils {
 
         for (int i = 0; i < srcLayer.size(); i++) {
             for (int j = 0; j < targetLayer.size(); j++) {
-                Synapse s = getLooseSynapse(srcLayer.get(i), targetLayer.get(j));
+                Synapse s = getFreeSynapse(srcLayer.get(i), targetLayer.get(j));
 
                 if (s != null) {
                     ret[i][j] = s;
@@ -125,9 +125,9 @@ public class SimnetUtils {
     public static void scaleWeights(List<Neuron> src, List<Neuron> tar, double scalar) {
         for (Neuron source : src) {
             for (Neuron target : tar) {
-                Synapse weight = getLooseSynapse(source, target);
+                Synapse weight = getFreeSynapse(source, target);
                 if (weight != null) {
-                    getLooseSynapse(source, target).forceSetStrength(weight.getStrength() * scalar);
+                    getFreeSynapse(source, target).forceSetStrength(weight.getStrength() * scalar);
                 }
             }
         }

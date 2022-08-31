@@ -35,7 +35,7 @@ val mnistSim = newSim {
     }
     pixelNet.applyLayout(-5, -85)
 
-    println("Total Number of neurons: ${network.looseNeurons.size}")
+    println("Total Number of neurons: ${network.freeNeurons.size}")
 
     withGui {
         place(networkComponent) {

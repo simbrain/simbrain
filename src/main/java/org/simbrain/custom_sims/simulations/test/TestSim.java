@@ -68,7 +68,7 @@ public class TestSim extends Simulation {
 
         // LAYOUT NEURONS
         LineLayout layout = new LineLayout(10,10,50, LineLayout.LineOrientation.HORIZONTAL);
-        layout.layoutNeurons((List<Neuron>) network.getLooseNeurons());
+        layout.layoutNeurons((List<Neuron>) network.getFreeNeurons());
 
         // CREATE SYNAPSES
         connectSparse(network.getFlatNeuronList(),

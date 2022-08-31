@@ -63,7 +63,7 @@ fun updateNeurons(neuronList: List<Neuron>) {
  * @param tar target neuron
  * @return synapse from source to target
  */
-fun getLooseSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
+fun getFreeSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
 
 /**
  * Convenient access to a list of activations

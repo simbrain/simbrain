@@ -21,10 +21,14 @@ class BasicDataWrapper(
     /**
      * Insert column to left, unless the index is -1 (no selection) in which case it is added as the right-most column.
      */
-    override fun insertColumn(colIndex: Int) {
+    fun insertColumn(
+        colIndex: Int,
+        name: String = "New Column",
+        type: Column.DataType = Column.DataType.DoubleType
+    ) {
         val newColIndex = if (colIndex == -1) columnCount else colIndex
         if (colIndex in -1 until columnCount) {
-            columns.add(newColIndex, Column("New Column"))
+            columns.add(newColIndex, Column(name, type))
             data.forEach { row -> row.add(newColIndex, null) }
             fireTableStructureChanged()
         }

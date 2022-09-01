@@ -70,10 +70,10 @@ public class DisplayPanel extends JPanel {
             topToolbarPanel.add(openCloseToolBar);
         }
         JToolBar dictionaryToolBar = new JToolBar();
-        dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
+        // dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
         topToolbarPanel.add(dictionaryToolBar);
         add(topToolbarPanel, BorderLayout.NORTH);
-        dictionaryToolBar.add(TextWorldActions.getExtractDictionaryAction(world));
+        // dictionaryToolBar.add(TextWorldActions.getExtractDictionaryAction(world));
 
         // Force a bit of room at bottom
         add(new JLabel("  "), BorderLayout.SOUTH);

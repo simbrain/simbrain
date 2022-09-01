@@ -120,11 +120,11 @@ public class ReaderPanel extends JPanel {
         // Add toolbars
         JPanel topToolbarPanel = new JPanel();
         topToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        if (openCloseToolBar != null) {
-            topToolbarPanel.add(openCloseToolBar);
-        }
+        // if (openCloseToolBar != null) {
+        //     topToolbarPanel.add(openCloseToolBar);
+        // }
         JToolBar dictionaryToolBar = new JToolBar();
-        // dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
+        dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
         dictionaryToolBar.add(TextWorldActions.getExtractDictionaryAction(world));
         topToolbarPanel.add(dictionaryToolBar);
 

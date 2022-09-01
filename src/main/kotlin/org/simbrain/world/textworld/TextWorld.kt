@@ -16,167 +16,137 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.textworld;
+package org.simbrain.world.textworld
 
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumable
+import smile.math.matrix.Matrix
+import java.awt.Color
+import javax.swing.SwingUtilities
 
 /**
- * <b>TextWorld</b> is an environment for modeling speech and reading and other
+ * TextWorld is an environment for modeling speech and reading and other
  * linguistic phenomena. It is the superclass for readerworld, where text is
  * converted or "read" and used to produce activation in neural nets (reader
  * world), and display world, where activations from neural nets can be used to
  * display text (e.g. modeled speech).
  */
-public abstract class TextWorld implements AttributeContainer, EditableObject {
+abstract class TextWorld: AttributeContainer, EditableObject {
 
     /**
-     * The main text in the text world.
+     * A "dictionary" which associates string tokens with arrays of doubles and vice-versa
      */
-    private String text = "";
+    var tokenToVectorDict = TokenVectorDictionary(
+        // TODO: This is temporary
+        tokens = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
+        tokenVectorMatrix = Matrix.eye(6)
+    )
+        set(value) {
+            field = value
+            fireDictionaryChangedEvent()
+        }
+
+    /**
+     * The main displayed text to be parsed.
+     */
+    var text = ""
+        set(value) {
+            field = value
+            // fireTextChangedEvent()
+        }
 
     /**
      * The current item of text (letter, word, etc.)
      */
-    private TextItem currentItem;
+     protected var currentItem: TextItem? = null
+        set(value) {
+            field = value
+            fireCurrentItemChanged(value)
+        }
 
     /**
      * What the current position in the text is.
      */
-    private int position = 0;
+    protected var position = 0
+        set(value) {
+            field = value
+        }
 
     /**
      * Last position in the text.
      */
-    private int lastPosition = 0;
+    protected var lastPosition = 0
 
     /**
      * List of listeners on this world.
      */
-    private transient List<TextListener> listenerList = new ArrayList<TextListener>();
+    @Transient
+    private var listenerList: MutableList<TextListener> = ArrayList()
 
     /**
      * Highlight color.
      */
-    private Color highlightColor = Color.GRAY;
-
-    /**
-     * Set of a strings that can be coupled to via scalar couplings. In
-     * ReaderWorld when the token is parsed a 1 is sent to consumers In
-     * DisplayWorld when a value above a threshold is consumed the token is
-     * displayed in the text area.
-     */
-    protected Set<String> tokenDictionary = new TreeSet<String>();
-
-    // Populate token dictionary with sample items
-    {
-        tokenDictionary.add("mouse");
-        tokenDictionary.add("cheese");
-        tokenDictionary.add("flower");
-        tokenDictionary.add("poison");
-        tokenDictionary.add("yum!");
-        tokenDictionary.add("yuck!");
-    }
-
-    /**
-     * Constructs an instance of TextWorld.
-     */
-    public TextWorld() {
-    }
+    var highlightColor = Color.GRAY
 
     /**
      * Advance the position in the text, and update the current item.
      */
-    public abstract void update();
+    abstract fun update()
 
     /**
      * Add a text to the end of the underling text object.
-     *
-     * @param newText the text to add
      */
     @Consumable
-    public void addText(String newText) {
-        if (getText() != null) {
-            setPosition(getText().length());
-            setText(getText().concat(newText));
-        } else {
-            setText(newText);
-        }
-        fireTextChangedEvent();
+    fun addText(newText: String) {
+        position = text.length
+        text += newText
+        fireTextChangedEvent()
     }
 
-    /**
-     * Add a listener.
-     *
-     * @param listener the listener to add
-     */
-    public void addListener(TextListener listener) {
-        listenerList.add(listener);
+    fun addListener(listener: TextListener) {
+        listenerList.add(listener)
     }
 
-    /**
-     * Remove a listener.
-     *
-     * @param listener the listener to remove
-     */
-    public void removeListener(TextListener listener) {
-        listenerList.remove(listener);
-    }
-
-    /**
-     * @return the highlightColor
-     */
-    public Color getHighlightColor() {
-        return highlightColor;
-    }
-
-    /**
-     * @param highlightColor the highlightColor to set
-     */
-    public void setHighlightColor(Color highlightColor) {
-        this.highlightColor = highlightColor;
+    fun removeListener(listener: TextListener) {
+        listenerList.remove(listener)
     }
 
     /**
      * Notify listeners that the text has changed.
      */
-    public void fireTextChangedEvent() {
-        for (TextListener listener : listenerList) {
-            listener.textChanged();
+    fun fireTextChangedEvent() {
+        SwingUtilities.invokeLater{
+            for (listener in listenerList) {
+                listener.textChanged()
+            }
         }
     }
 
     /**
      * Notify listeners that the dictionary has changed.
      */
-    public void fireDictionaryChangedEvent() {
-        for (TextListener listener : listenerList) {
-            listener.dictionaryChanged();
+    fun fireDictionaryChangedEvent() {
+        for (listener in listenerList) {
+            listener.dictionaryChanged()
         }
     }
 
     /**
      * Notify listeners that preferences have changed.
      */
-    public void firePrefsChangedEvent() {
-        for (TextListener listener : listenerList) {
-            listener.preferencesChanged();
+    fun firePrefsChangedEvent() {
+        for (listener in listenerList) {
+            listener.preferencesChanged()
         }
     }
 
     /**
      * Notify listeners that the caret position has changed.
      */
-    public void firePositionChangedEvent() {
-        for (TextListener listener : listenerList) {
-            listener.positionChanged();
+    fun firePositionChangedEvent() {
+        for (listener in listenerList) {
+            listener.positionChanged()
         }
     }
 
@@ -185,90 +155,30 @@ public abstract class TextWorld implements AttributeContainer, EditableObject {
      *
      * @param newItem
      */
-    public void fireCurrentItemChanged(TextItem newItem) {
-        for (TextListener listener : listenerList) {
-            listener.currentItemChanged(newItem);
+    fun fireCurrentItemChanged(newItem: TextItem?) {
+        for (listener in listenerList) {
+            listener.currentItemChanged(newItem)
         }
     }
 
-    /**
-     * @return the text
-     */
-    public String getText() {
-        return text;
+    // TODO: Remove
+    fun setText(text: String, fireEvent: Boolean) {
+        this.text = text
+        // if (fireEvent) {
+        //     fireTextChangedEvent()
+        // }
     }
 
-    /**
-     * @param text the text to set
-     */
-    public void setText(String text) {
-        setText(text, true);
-    }
-
-    /**
-     * Set text, and fire an event if the fireEvent flag is set.
-     *
-     * @param text      the text to set
-     * @param fireEvent whether or not to fire an event
-     */
-    public void setText(final String text, final boolean fireEvent) {
-        this.text = text;
-        if (fireEvent) {
-            fireTextChangedEvent();
-        }
-    }
-
-    /**
-     * @return the position
-     */
-    public int getPosition() {
-        return position;
-    }
-
-    /**
-     * @param newPosition the position to set
-     */
-    public void setPosition(int newPosition) {
-        setPosition(newPosition, true);
-    }
-
-    /**
-     * Set position. Fire event only if specified.
-     *
-     * @param newPosition new position to set
-     * @param fireEvent   whether to fire event
-     */
-    public void setPosition(final int newPosition, final boolean fireEvent) {
-        if (newPosition <= text.length()) {
-            lastPosition = position;
-            this.position = newPosition;
+    // TODO
+    fun setPosition(newPosition: Int, fireEvent: Boolean) {
+        if (newPosition <= text.length) {
+            lastPosition = position
+            position = newPosition
             if (fireEvent) {
-                firePositionChangedEvent();
+                firePositionChangedEvent()
             }
         } else {
-            System.err.println("Invalid position:" + newPosition);
-        }
-    }
-
-    public TextItem getCurrentItem() {
-        return currentItem;
-    }
-
-    public void setCurrentItem(TextItem currentItem) {
-        this.currentItem = currentItem;
-        fireCurrentItemChanged(currentItem);
-    }
-
-    /**
-     * Returns the text of the current item.
-     *
-     * @return text of current item, or null if current item is null.
-     */
-    public String getCurrentText() {
-        if (currentItem == null) {
-            return "";
-        } else {
-            return currentItem.getText();
+            System.err.println("Invalid position:$newPosition")
         }
     }
 
@@ -278,111 +188,45 @@ public abstract class TextWorld implements AttributeContainer, EditableObject {
      *
      * @return the next character.
      */
-    public String previewNextChar() {
-        if (position < text.length()) {
-            return text.substring(position, position + 1);
-        } else if (position == text.length()) {
-            return text.substring(0, 1);
+    fun previewNextChar(): String {
+        if (position < text.length) {
+            return text.substring(position, position + 1)
+        } else if (position == text.length) {
+            return text.substring(0, 1)
         }
-        return "";
+        return ""
     }
 
     /**
-     * Reset the dictionary (e.g. after it's been edited.)
-     *
-     * @param newDict the new dictionary entries
+     * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
-    public void loadTokenDictionary(String[][] newDict) {
-        tokenDictionary.clear();
-        for (int i = 0; i < newDict.length; i++) {
-            tokenDictionary.add(newDict[i][0]);
-        }
-        fireDictionaryChangedEvent();
-    }
-
-    /**
-     * @return the wordList
-     */
-    public Set<String> getTokenDictionary() {
-        return tokenDictionary;
-    }
-
-    /**
-     * Add a word to the dictionary.
-     *
-     * @param word the word to add
-     */
-    public void addWordToTokenDictionary(String word) {
-        tokenDictionary.add(word);
-    }
-
-    /**
-     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
-     */
-    protected Object readResolve() {
-        listenerList = new ArrayList<TextListener>();
-        return this;
+    protected open fun readResolve(): Any? {
+        listenerList = ArrayList()
+        return this
     }
 
     /**
      * Represents the "current item" as String, and includes a representation of
      * the beginning and ending of the item in the main text.
      */
-    public class TextItem {
+    inner class TextItem (
 
         /**
          * Initial position in main text.
          */
-        private final int beginPosition;
-
+        val beginPosition: Int,
         /**
          * Final position in main text.
          */
-        private final int endPosition;
-
+        val endPosition: Int,
         /**
          * The item text.
          */
-        private final String text;
+        val text: String
+    ) {
 
-        /**
-         * Construct this text item.
-         *
-         * @param beginPosition
-         * @param endPosition
-         * @param text
-         */
-        public TextItem(int beginPosition, int endPosition, String text) {
-            this.beginPosition = beginPosition;
-            this.endPosition = endPosition;
-            this.text = text;
+        override fun toString(): String {
+            return "($beginPosition,$endPosition) $text"
         }
-
-        /**
-         * @return the beginPosition
-         */
-        public int getBeginPosition() {
-            return beginPosition;
-        }
-
-        /**
-         * @return the endPosition
-         */
-        public int getEndPosition() {
-            return endPosition;
-        }
-
-        /**
-         * @return the text
-         */
-        public String getText() {
-            return text;
-        }
-
-        @Override
-        public String toString() {
-            return "(" + beginPosition + "," + endPosition + ") " + text;
-        }
-
     }
 }

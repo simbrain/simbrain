@@ -98,9 +98,6 @@ public class DisplayDesktopComponent extends DesktopComponent<DisplayComponent> 
 
     /**
      * Creates a new frame of type TextWorld.
-     *
-     * @param frame
-     * @param component
      */
     public DisplayDesktopComponent(GenericFrame frame, DisplayComponent component) {
         super(frame, component);
@@ -143,8 +140,8 @@ public class DisplayDesktopComponent extends DesktopComponent<DisplayComponent> 
         file.add(new CloseAction(this.getWorkspaceComponent()));
 
         // Edit Menu
-        loadDictionary.setAction(TextWorldActions.getExtractDictionaryAction(world));
-        showDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
+        // loadDictionary.setAction(TextWorldActions.getExtractDictionaryAction(world));
+        // showDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
         preferences.setAction(TextWorldActions.getShowPreferencesDialogAction(world));
         edit.add(loadDictionary);
         edit.add(showDictionary);

@@ -2,8 +2,8 @@ package org.simbrain.util.table
 
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTableHeader
-import org.simbrain.util.StandardDialog
 import org.simbrain.util.cartesianProduct
+import org.simbrain.util.displayInDialog
 import org.simbrain.util.widgets.RowNumberTable
 import smile.math.matrix.Matrix
 import java.awt.BorderLayout
@@ -277,12 +277,6 @@ fun main() {
     // val model = DataFrameWrapper(read.csv("simulations/tables/toy-test.txt", delimiter='\t', header=false))
     // val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
     val model = createFromDoubleArray(Matrix.randn(10, 4).toArray())
+    SimbrainDataViewer(model).displayInDialog()
 
-    StandardDialog().apply {
-        val table = SimbrainDataViewer(model)
-        contentPane = table
-        isVisible = true
-        pack()
-        setLocationRelativeTo(null)
-    }
 }

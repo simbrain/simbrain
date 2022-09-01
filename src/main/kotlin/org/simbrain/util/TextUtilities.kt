@@ -9,21 +9,21 @@ import smile.nlp.tokenizer.SimpleSentenceSplitter
  *
  * Forward to Smile's sentence splitter.
  */
-fun tokenizeSentencesFromDoc(docString: String) : List<String> {
+fun tokenizeSentencesFromDoc(docString: String): List<String> {
     return SimpleSentenceSplitter.getInstance().split(docString).toList()
 }
 
 /**
  * https://www.techiedelight.com/remove-punctuation-from-a-string-in-kotlin/
  */
-fun removePunctuation(str: String) : String {
+fun removePunctuation(str: String): String {
     return str.replace("\\p{Punct}".toRegex(), "");
 }
 
 /**
  * Word tokenizer: parse sentence into words.
  */
-fun tokenizeWordsFromSentence(sentence: String) : List<String> {
+fun tokenizeWordsFromSentence(sentence: String): List<String> {
     return removePunctuation(sentence.lowercase()).split(" ")
 }
 
@@ -31,7 +31,7 @@ fun tokenizeWordsFromSentence(sentence: String) : List<String> {
  * Unique tokens: all unique tokens (contexts)
  * Converts to lowercase
  */
-fun uniqueTokensFromArray(words: List<String>) : List<String> {
+fun uniqueTokensFromArray(words: List<String>): List<String> {
     return words.distinctBy { it.lowercase() }
 }
 
@@ -57,30 +57,37 @@ fun outerProduct(vectorU: DoubleArray, vectorV: DoubleArray): Matrix {
     val rows = vectorU.size
     val cols = vectorV.size
     val outerProductMatrix = Matrix(rows, cols)
-    for (indexU in vectorU.indices) for (indexV in vectorV.indices) outerProductMatrix[indexU, indexV] = vectorU[indexU] * vectorV[indexV]
+    for (indexU in vectorU.indices) for (indexV in vectorV.indices) outerProductMatrix[indexU, indexV] =
+        vectorU[indexU] * vectorV[indexV]
     return outerProductMatrix
 }
 
 /**
  * Positive Pointwise Mutual Information weighting
- * Adjusted from:  https://stackoverflow.com/questions/58701337/how-to-construct-ppmi-matrix-from-a-text-corpus
+ * Adapted from: https://stackoverflow.com/questions/58701337/how-to-construct-ppmi-matrix-from-a-text-corpus
  *
- * Weights the co-occurrence values to avoid word-frequency-bias in embeddings.
+ * Weights the co-occurrence values to avoid word-frequency-bias in embeddings. Words like "the" and "a" that should
+ * not be considered meaningful in terms of co-occurrence are down-weighted. Less frequent words on the other, like
+ * "platitude" or "espresso", that are more meaningful in terms of co-occurrences, are up-weighted.
  *
- * "PPMI measures how much the probability of a target–context pair estimated in the training corpus is higher than the probability
- * we should expect if the target and the context occurred independently of one another." (Lenci, 2018)
+ * Generally considered better for word embeddings.
+ *
+ * "PPMI measures how much the probability of a target–context pair estimated in the training corpus is higher than
+ * the probability we should expect if the target and the context occurred independently of one another." (Lenci, 2018)
+ *
+ * @param positive if true, changes negative adjusted co-occurrence values to 0
  */
-fun manualPPMI(cooccurrenceMatrix: Matrix, positive: Boolean): Matrix {
-    val columnTotals = cooccurrenceMatrix.colSums()
+fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
+    val columnTotals = cocMatrix.colSums()
     val totalSum = columnTotals.sum()
-    val rowTotals = cooccurrenceMatrix.rowSums()
+    val rowTotals = cocMatrix.rowSums()
 
-    val expectedValues = outerProduct(rowTotals, columnTotals)/totalSum
-    val adjustedMatrix = cooccurrenceMatrix.div(expectedValues)
+    val expectedValues = outerProduct(rowTotals, columnTotals) / totalSum
+    val adjustedMatrix = cocMatrix.clone().div(expectedValues)
 
     if (positive) {
-        for (indexRow in 0..(adjustedMatrix.nrows()-1)) {
-            for (indexCol in 0..(adjustedMatrix.ncols()-1)) {
+        for (indexRow in 0..(adjustedMatrix.nrows() - 1)) {
+            for (indexCol in 0..(adjustedMatrix.ncols() - 1)) {
                 if (adjustedMatrix[indexRow, indexCol] < 0) {
                     adjustedMatrix[indexRow, indexCol] = 0.0
                 }
@@ -89,6 +96,8 @@ fun manualPPMI(cooccurrenceMatrix: Matrix, positive: Boolean): Matrix {
     }
     return adjustedMatrix
 }
+
+// TODO: Return a TokenVectorDictionary
 
 /**
  * Generates co-occurrence matrix from a provided [docString]. [windowSize] specifies how many words should be
@@ -100,7 +109,7 @@ fun manualPPMI(cooccurrenceMatrix: Matrix, positive: Boolean): Matrix {
  * Returns a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
  *
  */
-fun generateCooccurrenceMatrix(docString: String, windowSize: Int, usePPMI: Boolean = true): Matrix  {
+fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: Boolean = true): Matrix {
 
     if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
 
@@ -117,35 +126,34 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int, usePPMI: Bool
     val matrixSize = tokens.size
     val cooccurrenceSmileMatrix = Matrix(matrixSize, matrixSize)
 
-   // cooccurrenceMatrix[0][1] = 2 // cooccurrenceMatrix[target][context]
+    // cooccurrenceMatrix[0][1] = 2 // cooccurrenceMatrix[target][context]
 
     // Loop through sentences, through words
     for (sentence in sentences) {
         // println(sentence)
         val tokenizedSentence = tokenizeWordsFromSentence(sentence)
         for (sentenceIndex in tokenizedSentence.indices) {
-            val maxIndex = tokenizedSentence.size -1  // used for window range check
+            val maxIndex = tokenizedSentence.size - 1  // used for window range check
 
             val currentToken = tokenizedSentence[sentenceIndex] // Current iterated token
 
             val contextLowerLimit = sentenceIndex - windowSize
             val contextUpperLimit = sentenceIndex + windowSize
 
-            for (contextIndex in contextLowerLimit..contextUpperLimit){
-                if (contextIndex in 0..maxIndex && contextIndex != sentenceIndex){
+            for (contextIndex in contextLowerLimit..contextUpperLimit) {
+                if (contextIndex in 0..maxIndex && contextIndex != sentenceIndex) {
                     val currentContext = tokenizedSentence[contextIndex]
-
-
                     val tokenCoordinate = tokens.indexOf(currentToken)
                     val contextCoordinate = tokens.indexOf(currentContext)
                     // print(listOf("Current Token:", currentToken, tokenCoordinate))
                     // println(listOf("Current Context",currentContext, contextCoordinate))
-                    cooccurrenceSmileMatrix[tokenCoordinate, contextCoordinate] = cooccurrenceSmileMatrix[tokenCoordinate, contextCoordinate] + 1
+                    cooccurrenceSmileMatrix[tokenCoordinate, contextCoordinate] =
+                        cooccurrenceSmileMatrix[tokenCoordinate, contextCoordinate] + 1
                 }
             }
         }
     }
-    if (usePPMI){
+    if (usePPMI) {
         return manualPPMI(cooccurrenceSmileMatrix, true)
     }
     return cooccurrenceSmileMatrix
@@ -159,6 +167,7 @@ fun wordEmbeddingQuery(targetWord: String, tokens: List<String>, cooccurrenceMat
     val targetWordIndex = tokens.indexOf(targetWord.lowercase())
     return cooccurrenceMatrix.col(targetWordIndex)
 }
+
 /**
  * Calculate cosine similarity of two vectors (higher values are more similar).
  * All this does is forward to Math.cos but leaving it named this way is slightly more legible

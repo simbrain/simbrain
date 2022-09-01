@@ -139,7 +139,7 @@ public class ReaderDesktopComponent extends DesktopComponent<ReaderComponent> {
         file.add(new CloseAction(this.getWorkspaceComponent()));
 
         // Edit menu
-        loadDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
+        // loadDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
         preferences.setAction(TextWorldActions.getShowPreferencesDialogAction(world));
         // edit.add(loadDictionary);
         edit.addSeparator();

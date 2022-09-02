@@ -67,7 +67,6 @@ object TextWorldActions {
                     // TODO: Temp, but can use this as a 'one-hot' style for loading
                     world.tokenVectorMap = TokenVectorMap(wordList, Matrix.eye(wordList.size))
                 }
-                world.fireDictionaryChangedEvent()
             }
         }
     }

@@ -27,7 +27,6 @@ import smile.math.matrix.Matrix
 import java.awt.Color
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import javax.swing.SwingUtilities
 
 /**
  * TextWorld is an environment for modeling speech and reading and other linguistic phenomena and their interactions
@@ -59,7 +58,7 @@ class TextWorld : AttributeContainer, EditableObject {
     )
         set(value) {
             field = value
-            fireDictionaryChangedEvent()
+            events.fireTokenVectorMapChanged()
         }
 
     /**
@@ -68,7 +67,6 @@ class TextWorld : AttributeContainer, EditableObject {
     var text = ""
         set(value) {
             field = value
-            // fireTextChangedEvent()
         }
 
     /**
@@ -77,7 +75,7 @@ class TextWorld : AttributeContainer, EditableObject {
     var currentItem: TextItem? = null
         set(value) {
             field = value
-            fireCurrentItemChanged(value)
+            events.fireCurrentTokenChanged(value)
         }
 
     /**
@@ -92,12 +90,6 @@ class TextWorld : AttributeContainer, EditableObject {
      * Last position in the text.
      */
     protected var lastPosition = 0
-
-    /**
-     * List of listeners on this world.
-     */
-    @Transient
-    private var listenerList: MutableList<TextListener> = ArrayList()
 
     /**
      * Highlight color.
@@ -145,6 +137,9 @@ class TextWorld : AttributeContainer, EditableObject {
      * Pattern matcher.
      */
     private var matcher: Matcher = pattern.matcher(text)
+
+    @Transient
+    var events = TextWorldEvents(this)
 
     /**
      * Returns the double array associated with the currently selected token
@@ -219,11 +214,11 @@ class TextWorld : AttributeContainer, EditableObject {
      * @return true if some token is found, false otherwise.
      */
     private fun findNextToken(): Boolean {
-        val foundToken = matcher!!.find()
+        val foundToken = matcher.find()
         currentTextItem = if (foundToken) {
-            val begin = matcher!!.start()
-            val end = matcher!!.end()
-            val text = matcher!!.group()
+            val begin = matcher.start()
+            val end = matcher.end()
+            val text = matcher.group()
             // System.out.println("[" + text + "](" + begin + "," + end + ")");
             TextItem(begin, end, text)
         } else {
@@ -266,12 +261,11 @@ class TextWorld : AttributeContainer, EditableObject {
      * @return the next token in the text area.
      */
     fun previewNextToken(): String {
-        matcher!!.find()
-        val nextOne = matcher!!.group()
+        matcher.find()
+        val nextOne = matcher.group()
         updateMatcher() // Return matcher to its previous state
         return nextOne
     }
-
 
     /**
      * Add a text to the end of the underling text object.
@@ -280,7 +274,7 @@ class TextWorld : AttributeContainer, EditableObject {
     fun addText(newText: String) {
         position = text.length
         text += newText
-        fireTextChangedEvent()
+        events.fireTextChanged()
     }
 
     /**
@@ -293,70 +287,12 @@ class TextWorld : AttributeContainer, EditableObject {
     val currentToken: String
         get() = currentItem.let { it?.text ?: "" }
 
-
-    fun addListener(listener: TextListener) {
-        listenerList.add(listener)
-    }
-
-    fun removeListener(listener: TextListener) {
-        listenerList.remove(listener)
-    }
-
-    /**
-     * Notify listeners that the text has changed.
-     */
-    fun fireTextChangedEvent() {
-        SwingUtilities.invokeLater {
-            for (listener in listenerList) {
-                listener.textChanged()
-            }
-        }
-    }
-
-    /**
-     * Notify listeners that the dictionary has changed.
-     */
-    fun fireDictionaryChangedEvent() {
-        for (listener in listenerList) {
-            listener.dictionaryChanged()
-        }
-    }
-
-    /**
-     * Notify listeners that preferences have changed.
-     */
-    fun firePrefsChangedEvent() {
-        for (listener in listenerList) {
-            listener.preferencesChanged()
-        }
-    }
-
-    /**
-     * Notify listeners that the caret position has changed.
-     */
-    fun firePositionChangedEvent() {
-        for (listener in listenerList) {
-            listener.positionChanged()
-        }
-    }
-
-    /**
-     * Notify listeners that the caret position has changed.
-     *
-     * @param newItem
-     */
-    fun fireCurrentItemChanged(newItem: TextItem?) {
-        for (listener in listenerList) {
-            listener.currentItemChanged(newItem)
-        }
-    }
-
     // TODO: Remove
     fun setText(text: String, fireEvent: Boolean) {
         this.text = text
-        // if (fireEvent) {
-        //     fireTextChangedEvent()
-        // }
+        if (fireEvent) {
+            events.fireTextChanged()
+        }
     }
 
     // TODO
@@ -365,7 +301,7 @@ class TextWorld : AttributeContainer, EditableObject {
             lastPosition = position
             position = newPosition
             if (fireEvent) {
-                firePositionChangedEvent()
+                events.fireCursorPositionChanged()
             }
         } else {
             System.err.println("Invalid position:$newPosition")
@@ -390,8 +326,8 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
-    protected open fun readResolve(): Any? {
-        listenerList = ArrayList()
+    fun readResolve(): TextWorld {
+        events = TextWorldEvents(this)
         return this
     }
 

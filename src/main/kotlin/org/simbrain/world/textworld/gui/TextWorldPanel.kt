@@ -18,9 +18,7 @@
  */
 package org.simbrain.world.textworld.gui
 
-import org.simbrain.world.textworld.TextListener
 import org.simbrain.world.textworld.TextWorld
-import org.simbrain.world.textworld.TextWorld.TextItem
 import org.simbrain.world.textworld.TextWorldActions.getExtractDictionaryAction
 import org.simbrain.world.textworld.TextWorldActions.showDictionaryEditor
 import java.awt.BorderLayout
@@ -150,39 +148,40 @@ class TextWorldPanel private constructor(
             override fun componentResized(e: ComponentEvent) {
                 // textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
                 inputScrollPane.preferredSize =
-                    Dimension(this@TextWorldPanel.preferredSize.width - 25, this@TextWorldPanel.preferredSize.height - 25)
+                    Dimension(
+                        this@TextWorldPanel.preferredSize.width - 25,
+                        this@TextWorldPanel.preferredSize.height - 25
+                    )
                 // inputScrollPane.revalidate();
             }
         })
-        world.addListener(object : TextListener {
-            override fun textChanged() {
-                textArea.text = world.text
-                if (world.position < textArea.document.length) {
-                    textArea.caretPosition = world.position
-                }
-            }
-
-            override fun dictionaryChanged() {}
-            override fun positionChanged() {
+        world.events.onTextChanged {
+            textArea.text = world.text
+            if (world.position < textArea.document.length) {
                 textArea.caretPosition = world.position
             }
+        }
 
-            override fun currentItemChanged(newItem: TextItem?) {
-                if (world.currentItem!!.text.equals("", ignoreCase = true)) {
-                    removeHighlights(textArea)
-                } else {
-                    highlight(world.currentItem!!.beginPosition, world.currentItem!!.endPosition)
-                }
-            }
+        world.events.onCursorPositionChanged {
+            textArea.caretPosition = world.position
+        }
 
-            override fun preferencesChanged() {
-                if (world.parseStyle === TextWorld.ParseStyle.CHARACTER) {
-                    charButton.isSelected = true
-                } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
-                    wordButton.isSelected = true
-                }
+        world.events.onCurrentTokenChanged {
+            if (it!!.text.equals("", ignoreCase = true)) {
+                removeHighlights(textArea)
+            } else {
+                highlight(it!!.beginPosition, it!!.endPosition)
             }
-        })
+        }
+
+        //     override fun preferencesChanged() {
+        //         if (world.parseStyle === TextWorld.ParseStyle.CHARACTER) {
+        //             charButton.isSelected = true
+        //         } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
+        //             wordButton.isSelected = true
+        //         }
+        //     }
+        // })
     }
 
     /**

@@ -23,7 +23,6 @@ import java.util.*
  * corresponds to a single simulation, that can be run with or without a
  * graphical view of it. The main visualization of a workspace is [ ].
  *
- *
  * To create a new type of workspace component, extend [ ], and [DesktopComponent]. The
  * latter is a gui representation of the former. Follow the pattern in [ ] to register this mapping.  The workspace component
  * holds all the model objects, and manages couplings. Usually there is some

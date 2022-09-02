@@ -202,9 +202,7 @@ public class WorkspaceActionManager {
                 createComponentFactoryAction(workspace, "Odor World", "menu_icons/SwissIcon.png"),
                 createComponentFactoryAction(workspace, "3D World", "menu_icons/World.png"),
                 createComponentFactoryAction(workspace, "Image World", "menu_icons/photo.png"),
-                // createComponentFactoryAction(workspace, "Pixel Consumer", "menu_icons/PaintView.png"),
-                createComponentFactoryAction(workspace, "Text Display", "menu_icons/Text.png"),
-                createComponentFactoryAction(workspace, "Text Reader", "menu_icons/Text.png"));
+                createComponentFactoryAction(workspace, "Text World", "menu_icons/Text.png"));
                 //createComponentFactoryAction(workspace, "Device Interaction", "Text.png"));
 
         quitWorkspaceAction = new QuitWorkspaceAction(desktop);

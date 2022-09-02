@@ -16,36 +16,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.textworld;
+package org.simbrain.world.textworld
 
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.WorkspaceComponent;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.List;
+import org.simbrain.util.getSimbrainXStream
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.WorkspaceComponent
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.*
 
 /**
- * <b>ReaderComponent</b> is the container for the readerworld, which adds
+ * ReaderComponent is the container for the readerworld, which adds
  * producers.
  */
-public class ReaderComponent extends WorkspaceComponent {
+class TextWorldComponent : WorkspaceComponent {
 
-    /**
-     * Instance of world of type TextWorld.
-     */
-    private ReaderWorld world;
+    var world: TextWorld
+        private set
 
     /**
      * Creates a new frame of type TextWorld.
      *
      * @param name name of this component
      */
-    public ReaderComponent(String name) {
-        super(name);
-        world = ReaderWorld.createReaderWorld();
-        init();
+    constructor(name: String?) : super(name) {
+        world = TextWorld()
+        init()
     }
 
     /**
@@ -54,43 +50,34 @@ public class ReaderComponent extends WorkspaceComponent {
      * @param name     name of component
      * @param newWorld provided world
      */
-    public ReaderComponent(String name, ReaderWorld newWorld) {
-        super(name);
-        world = newWorld;
-        init();
+    constructor(name: String?, newWorld: TextWorld) : super(name) {
+        world = newWorld
+        init()
     }
 
     /**
      * Initialize attribute types.
      */
-    private void init() {
-        this.world = world;
+    private fun init() {
+        world = world
     }
 
-    public static ReaderComponent open(InputStream input, String name, String format) {
-        ReaderWorld newWorld = (ReaderWorld) ReaderWorld.getXStream().fromXML(input);
-        return new ReaderComponent(name, newWorld);
+    override fun save(output: OutputStream, format: String) {
+        getSimbrainXStream().toXML(world, output)
     }
 
-    @Override
-    public void save(final OutputStream output, final String format) {
-        ReaderWorld.getXStream().toXML(world, output);
+    override fun update() {
+        world.update()
     }
 
-    @Override
-    public void update() {
-        world.update();
+    override fun getAttributeContainers(): List<AttributeContainer> {
+        return Arrays.asList<AttributeContainer>(world)
     }
 
-    /**
-     * @return the world
-     */
-    public ReaderWorld getWorld() {
-        return world;
-    }
-
-    @Override
-    public List<AttributeContainer> getAttributeContainers() {
-        return Arrays.asList(world);
+    companion object {
+        fun open(input: InputStream?, name: String?, format: String?): TextWorldComponent {
+            val newWorld = getSimbrainXStream().fromXML(input) as TextWorld
+            return TextWorldComponent(name, newWorld)
+        }
     }
 }

@@ -18,10 +18,7 @@
  */
 package org.simbrain.util.projection;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * <b>Datapoint</b> represents a single datapoint.
@@ -46,6 +43,12 @@ public class DataPoint {
     public DataPoint(double[] data) {
         this.data = new double[data.length];
         System.arraycopy(data, 0, this.data, 0, data.length);
+    }
+
+    public DataPoint(double[] data, String label) {
+        this.data = new double[data.length];
+        System.arraycopy(data, 0, this.data, 0, data.length);
+        this.label = label;
     }
 
     /**

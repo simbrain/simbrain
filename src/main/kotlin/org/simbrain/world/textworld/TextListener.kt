@@ -16,68 +16,50 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.textworld;
+package org.simbrain.world.textworld
 
-import org.simbrain.world.textworld.TextWorld.TextItem;
+import org.simbrain.world.textworld.TextWorld.TextItem
 
 /**
  * Listen for changes in the text world.
  */
-public interface TextListener {
-
+interface TextListener {
     /**
      * The text has changed.
      */
-    void textChanged();
+    fun textChanged()
 
     /**
      * The dictionary has changed.
      */
-    void dictionaryChanged();
+    fun dictionaryChanged()
 
     /**
      * The position of the caret has changed.
      */
-    void positionChanged();
+    fun positionChanged()
 
     /**
      * The current item has changed.
      *
      * @param newItem the new current text item.
      */
-    void currentItemChanged(TextItem newItem);
+    fun currentItemChanged(newItem: TextItem?)
 
     /**
      * The current preferences have changed.
      */
-    void preferencesChanged();
+    fun preferencesChanged()
 
     /**
      * Adapter class so users of the interface don't have to implement every
      * method.
      */
-    public class TextAdapter implements TextListener {
-
-        @Override
-        public void textChanged() {
-        }
-
-        @Override
-        public void dictionaryChanged() {
-        }
-
-        @Override
-        public void positionChanged() {
-        }
-
-        @Override
-        public void currentItemChanged(TextItem newItem) {
-        }
-
-        @Override
-        public void preferencesChanged() {
-        }
-
+    class TextAdapter : TextListener {
+        override fun textChanged() {}
+        override fun dictionaryChanged() {}
+        override fun positionChanged() {}
+        override fun currentItemChanged(newItem: TextItem?) {}
+        override fun preferencesChanged() {}
     }
-
 }

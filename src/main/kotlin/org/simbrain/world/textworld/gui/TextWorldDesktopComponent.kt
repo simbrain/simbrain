@@ -16,80 +16,76 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.textworld;
+package org.simbrain.world.textworld.gui
 
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
-import org.simbrain.workspace.gui.DesktopComponent;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.util.widgets.ShowHelpAction
+import org.simbrain.workspace.component_actions.CloseAction
+import org.simbrain.workspace.component_actions.OpenAction
+import org.simbrain.workspace.component_actions.SaveAction
+import org.simbrain.workspace.component_actions.SaveAsAction
+import org.simbrain.workspace.gui.DesktopComponent
+import org.simbrain.world.textworld.TextWorld
+import org.simbrain.world.textworld.TextWorldActions.getShowPreferencesDialogAction
+import org.simbrain.world.textworld.TextWorldActions.getTextAction
+import org.simbrain.world.textworld.TextWorldComponent
+import java.awt.Dimension
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.JToolBar
 
 /**
- * <b>ReaderComponentDesktopGui</b> is the gui view for the reader world.
+ * **ReaderComponentDesktopGui** is the gui view for the reader world.
  */
-public class ReaderDesktopComponent extends DesktopComponent<ReaderComponent> {
-
-    /**
-     * Default height.
-     */
-    private static final int DEFAULT_HEIGHT = 250;
-
-    /**
-     * Default width.
-     */
-    private static final int DEFAULT_WIDTH = 400;
-
+class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldComponent) :
+    DesktopComponent<TextWorldComponent?>(frame, component) {
     /**
      * Menu Bar.
      */
-    private JMenuBar menuBar = new JMenuBar();
+    private val menuBar = JMenuBar()
 
     /**
      * File menu for saving and opening world files.
      */
-    private JMenu file = new JMenu("File");
+    private val file = JMenu("File")
 
     /**
      * Edit menu Item.
      */
-    private JMenu edit = new JMenu("Edit");
+    private val edit = JMenu("Edit")
 
     /**
      * Opens the dialog to define TextWorld Dictionary.
      */
-    private JMenuItem loadDictionary = new JMenuItem("Edit dictionary...");
+    private val loadDictionary = JMenuItem("Edit dictionary...")
 
     /**
      * Opens user preferences dialog.
      */
-    private JMenuItem preferences = new JMenuItem("Preferences");
+    private val preferences = JMenuItem("Preferences")
 
     /**
      * Opens the help dialog for TextWorld.
      */
-    private JMenu help = new JMenu("Help");
+    private val help = JMenu("Help")
 
     /**
      * Help menu item.
      */
-    private JMenuItem helpItem = new JMenuItem("Reader Help");
+    private val helpItem = JMenuItem("Reader Help")
 
     /**
      * The pane representing the text world.
      */
-    private ReaderPanel panel;
+    private val panel: TextWorldPanel
 
     /**
      * The text world.
      */
-    private ReaderWorld world;
+    private val world: TextWorld
 
     /**
      * Creates a new frame of type TextWorld.
@@ -97,63 +93,70 @@ public class ReaderDesktopComponent extends DesktopComponent<ReaderComponent> {
      * @param frame
      * @param component
      */
-    public ReaderDesktopComponent(GenericFrame frame, ReaderComponent component) {
-        super(frame, component);
-
-        world = component.getWorld();
-        JToolBar openSaveToolBar = new JToolBar();
-        openSaveToolBar.add(new OpenAction(this));
-        openSaveToolBar.add(new SaveAction(this));
-        panel = ReaderPanel.createReaderPanel(world, openSaveToolBar);
-        this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
-        addMenuBar();
-        add(panel);
-        frame.pack();
+    init {
+        world = component.world
+        val openSaveToolBar = JToolBar()
+        openSaveToolBar.add(OpenAction(this))
+        openSaveToolBar.add(SaveAction(this))
+        panel = TextWorldPanel.createReaderPanel(world, openSaveToolBar)
+        this.preferredSize = Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)
+        addMenuBar()
+        add(panel)
+        frame.pack()
 
         // Force component to fill up parent panel
-        this.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                Component component = e.getComponent();
-                panel.setPreferredSize(new Dimension(component.getWidth(), component.getHeight()));
-                panel.revalidate();
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
+                val component = e.component
+                panel.preferredSize = Dimension(component.width, component.height)
+                panel.revalidate()
             }
-        });
-
-        this.getParentFrame().pack();
+        })
+        parentFrame.pack()
     }
 
     /**
      * Adds menu bar to the top of TextWorldComponent.
      */
-    private void addMenuBar() {
+    private fun addMenuBar() {
 
         // File Menu
-        menuBar.add(file);
-        file.add(new OpenAction(this));
-        file.add(new SaveAction(this));
-        file.add(new SaveAsAction(this));
-        file.addSeparator();
-        file.add(TextWorldActions.getTextAction(world));
-        file.addSeparator();
-        file.add(new CloseAction(this.getWorkspaceComponent()));
+        menuBar.add(file)
+        file.add(OpenAction(this))
+        file.add(SaveAction(this))
+        file.add(SaveAsAction(this))
+        file.addSeparator()
+        file.add(getTextAction(world))
+        file.addSeparator()
+        file.add(CloseAction(workspaceComponent))
 
         // Edit menu
         // loadDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
-        preferences.setAction(TextWorldActions.getShowPreferencesDialogAction(world));
+        preferences.action = getShowPreferencesDialogAction(world)
         // edit.add(loadDictionary);
-        edit.addSeparator();
-        edit.add(preferences);
-        menuBar.add(edit);
+        edit.addSeparator()
+        edit.add(preferences)
+        menuBar.add(edit)
 
         // Help Menu
-        menuBar.add(help);
-        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/TextWorld/TextWorld.html");
-        helpItem.setAction(helpAction);
-        help.add(helpItem);
+        menuBar.add(help)
+        val helpAction = ShowHelpAction("Pages/Worlds/TextWorld/TextWorld.html")
+        helpItem.action = helpAction
+        help.add(helpItem)
 
         // Add menu
-        getParentFrame().setJMenuBar(menuBar);
+        parentFrame.jMenuBar = menuBar
     }
 
+    companion object {
+        /**
+         * Default height.
+         */
+        private const val DEFAULT_HEIGHT = 250
+
+        /**
+         * Default width.
+         */
+        private const val DEFAULT_WIDTH = 400
+    }
 }

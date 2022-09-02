@@ -16,90 +16,68 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.textworld;
+package org.simbrain.world.textworld.gui
 
-import org.simbrain.world.textworld.ReaderWorld.ParseStyle;
-import org.simbrain.world.textworld.TextWorld.TextItem;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
-import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.awt.event.*;
+import org.simbrain.world.textworld.TextListener
+import org.simbrain.world.textworld.TextWorld
+import org.simbrain.world.textworld.TextWorld.TextItem
+import org.simbrain.world.textworld.TextWorldActions.getExtractDictionaryAction
+import org.simbrain.world.textworld.TextWorldActions.showDictionaryEditor
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Dimension
+import java.awt.FlowLayout
+import java.awt.event.*
+import javax.swing.*
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
+import javax.swing.text.BadLocationException
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter
+import javax.swing.text.Highlighter
+import javax.swing.text.JTextComponent
 
 /**
  * Display panel for reading data from user and showing text world's state.
  *
  * @author jyoshimi
  */
-public class ReaderPanel extends JPanel {
-
+class TextWorldPanel private constructor(
     /**
      * Underlying model text world.
      */
-    private final ReaderWorld world;
+    val world: TextWorld, toolbar: JToolBar?
+) : JPanel() {
 
     /**
      * Text area for inputting text into networks.
      */
-    private JTextArea textArea = new JTextArea();
+    private val textArea = JTextArea()
 
     /**
      * The main scroll panel.
      */
-    final JScrollPane inputScrollPane;
+    val inputScrollPane: JScrollPane
 
     /**
      * Displays the current parse style and allows it to be set.
      */
-    private final ButtonGroup parseStyle = new ButtonGroup();
+    private val parseStyle = ButtonGroup()
 
     /**
      * Parse style is word-based.
      */
-    private final JRadioButton wordButton = new JRadioButton("Word");
+    private val wordButton = JRadioButton("Word")
 
     /**
      * Parse style is character based.
      */
-    private final JRadioButton charButton = new JRadioButton("Character");
+    private val charButton = JRadioButton("Character")
 
     /**
      * Toolbar for opening and closing the world. Must be defined at component
      * level.
      */
-    private JToolBar openCloseToolBar = null;
-
-    /**
-     * Factory method for panel (so that listeners are not created in
-     * constructor).
-     *
-     * @param theWorld the world
-     * @param toolbar  pass in open / close toolbar
-     * @return the constructed panel
-     */
-    public static ReaderPanel createReaderPanel(ReaderWorld theWorld, JToolBar toolbar) {
-        ReaderPanel panel = new ReaderPanel(theWorld, toolbar);
-        panel.initListeners();
-        return panel;
-    }
-
-    /**
-     * Factory method for panel (so that listeners are not created in
-     * constructor).
-     *
-     * @param theWorld the world
-     * @return the constructed panel
-     */
-    public static ReaderPanel createReaderPanel(ReaderWorld theWorld) {
-        ReaderPanel panel = new ReaderPanel(theWorld, null);
-        panel.initListeners();
-        return panel;
-    }
+    private var openCloseToolBar: JToolBar? = null
 
     /**
      * Initialize the panel with an open / close toolbar.
@@ -107,145 +85,133 @@ public class ReaderPanel extends JPanel {
      * @param theWorld the reader world to display
      * @param toolbar  the openClose toolbar.
      */
-    private ReaderPanel(ReaderWorld theWorld, JToolBar toolbar) {
-        this.world = theWorld;
-        openCloseToolBar = toolbar;
-        this.setLayout(new BorderLayout());
-        this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
-        textArea.setLineWrap(true);
-        textArea.setText(world.getText());
-        inputScrollPane = new JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        add(inputScrollPane);
+    init {
+        openCloseToolBar = toolbar
+        this.layout = BorderLayout()
+        border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
+        textArea.lineWrap = true
+        textArea.text = world.text
+        inputScrollPane =
+            JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
+        add(inputScrollPane)
 
         // Add toolbars
-        JPanel topToolbarPanel = new JPanel();
-        topToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        val topToolbarPanel = JPanel()
+        topToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
         // if (openCloseToolBar != null) {
         //     topToolbarPanel.add(openCloseToolBar);
         // }
-        JToolBar dictionaryToolBar = new JToolBar();
-        dictionaryToolBar.add(TextWorldActions.showDictionaryEditor(world));
-        dictionaryToolBar.add(TextWorldActions.getExtractDictionaryAction(world));
-        topToolbarPanel.add(dictionaryToolBar);
-
-        add(topToolbarPanel, BorderLayout.NORTH);
-        JPanel bottomToolbarPanel = new JPanel();
-        bottomToolbarPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        bottomToolbarPanel.add(getToolbarModeSelect());
-        add(bottomToolbarPanel, BorderLayout.SOUTH);
-
-        syncParseStyleButtons();
+        val dictionaryToolBar = JToolBar()
+        dictionaryToolBar.add(showDictionaryEditor(world))
+        dictionaryToolBar.add(getExtractDictionaryAction(world))
+        topToolbarPanel.add(dictionaryToolBar)
+        add(topToolbarPanel, BorderLayout.NORTH)
+        val bottomToolbarPanel = JPanel()
+        bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
+        bottomToolbarPanel.add(toolbarModeSelect)
+        add(bottomToolbarPanel, BorderLayout.SOUTH)
+        syncParseStyleButtons()
     }
 
     /**
      * Init the listeners, called by factor method, outside the constructor.
      */
-    private void initListeners() {
+    private fun initListeners() {
 
         // Reset text position when user clicks in text area
-        textArea.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                world.setPosition(textArea.getCaretPosition(), false);
-                world.updateMatcher();
+        textArea.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent) {
+                world.setPosition(textArea.caretPosition, false)
+                world.updateMatcher()
             }
-
-        });
+        })
 
         // Listener for changes in the textarea (i.e. adding or removing text
         // directly in the area).
-        textArea.getDocument().addDocumentListener(new DocumentListener() {
-
-            public void changedUpdate(DocumentEvent arg0) {
+        textArea.document.addDocumentListener(object : DocumentListener {
+            override fun changedUpdate(arg0: DocumentEvent) {
                 //System.out.println("readerworld: changedUpdate");
-                world.setText(textArea.getText(), false);
+                world.setText(textArea.text, false)
             }
 
-            public void insertUpdate(DocumentEvent arg0) {
+            override fun insertUpdate(arg0: DocumentEvent) {
                 //System.out.println("readerworld: insertUpdate");
-                world.setText(textArea.getText(), false);
+                world.setText(textArea.text, false)
             }
 
-            public void removeUpdate(DocumentEvent arg0) {
+            override fun removeUpdate(arg0: DocumentEvent) {
                 //System.out.println("readerworld: removeUpdate");
-                world.setText(textArea.getText(), false);
+                world.setText(textArea.text, false)
             }
-
-        });
+        })
 
         // Force component to fill up parent panel
-        this.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent) {
                 // textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
-                inputScrollPane.setPreferredSize(new Dimension(ReaderPanel.this.getPreferredSize().width - 25, ReaderPanel.this.getPreferredSize().height - 25));
+                inputScrollPane.preferredSize =
+                    Dimension(this@TextWorldPanel.preferredSize.width - 25, this@TextWorldPanel.preferredSize.height - 25)
                 // inputScrollPane.revalidate();
             }
-        });
-
-        world.addListener(new TextListener() {
-            public void textChanged() {
-                textArea.setText(world.getText());
-                if (world.getPosition() < textArea.getDocument().getLength()) {
-                    textArea.setCaretPosition(world.getPosition());
+        })
+        world.addListener(object : TextListener {
+            override fun textChanged() {
+                textArea.text = world.text
+                if (world.position < textArea.document.length) {
+                    textArea.caretPosition = world.position
                 }
             }
 
-            public void dictionaryChanged() {
+            override fun dictionaryChanged() {}
+            override fun positionChanged() {
+                textArea.caretPosition = world.position
             }
 
-            public void positionChanged() {
-                textArea.setCaretPosition(world.getPosition());
-            }
-
-            public void currentItemChanged(TextItem newItem) {
-                if (world.getCurrentItem().getText().equalsIgnoreCase("")) {
-                    removeHighlights(textArea);
+            override fun currentItemChanged(newItem: TextItem?) {
+                if (world.currentItem!!.text.equals("", ignoreCase = true)) {
+                    removeHighlights(textArea)
                 } else {
-                    highlight(world.getCurrentItem().getBeginPosition(), world.getCurrentItem().getEndPosition());
+                    highlight(world.currentItem!!.beginPosition, world.currentItem!!.endPosition)
                 }
             }
 
-            public void preferencesChanged() {
-                if (world.getTheParseStyle() == ParseStyle.CHARACTER) {
-                    charButton.setSelected(true);
-                } else if (world.getTheParseStyle() == ParseStyle.WORD) {
-                    wordButton.setSelected(true);
+            override fun preferencesChanged() {
+                if (world.parseStyle === TextWorld.ParseStyle.CHARACTER) {
+                    charButton.isSelected = true
+                } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
+                    wordButton.isSelected = true
                 }
             }
-
-        });
-
+        })
     }
 
     /**
      * Syncs the parse style buttons to the underlying model state.
      */
-    public void syncParseStyleButtons() {
-        if (world.getTheParseStyle() == ParseStyle.CHARACTER) {
-            charButton.setSelected(true);
-        } else if (world.getTheParseStyle() == ParseStyle.WORD) {
-            wordButton.setSelected(true);
+    fun syncParseStyleButtons() {
+        if (world.parseStyle === TextWorld.ParseStyle.CHARACTER) {
+            charButton.isSelected = true
+        } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
+            wordButton.isSelected = true
         }
     }
 
     /**
-     * Highlight word beginning at <code>begin</code> nd ending at
-     * <code>end</code>.
+     * Highlight word beginning at `begin` nd ending at
+     * `end`.
      *
      * @param begin offset of beginning of highlight
      * @param end   offset of end of highlight
      */
-    public void highlight(final int begin, final int end) {
+    fun highlight(begin: Int, end: Int) {
         // An instance of the private subclass of the default highlight painter
-        Highlighter.HighlightPainter myHighlightPainter = new MyHighlightPainter(world.getHighlightColor());
-        removeHighlights(textArea);
+        val myHighlightPainter: Highlighter.HighlightPainter = MyHighlightPainter(world.highlightColor)
+        removeHighlights(textArea)
         try {
-            Highlighter hilite = textArea.getHighlighter();
-            hilite.addHighlight(begin, end, myHighlightPainter);
-        } catch (BadLocationException e) {
-            System.err.checkError();
+            val hilite = textArea.highlighter
+            hilite.addHighlight(begin, end, myHighlightPainter)
+        } catch (e: BadLocationException) {
+            System.err.checkError()
         }
     }
 
@@ -254,12 +220,12 @@ public class ReaderPanel extends JPanel {
      *
      * @param textComp text component to remove highlights from.
      */
-    public void removeHighlights(final JTextComponent textComp) {
-        Highlighter hilite = textComp.getHighlighter();
-        Highlighter.Highlight[] hilites = hilite.getHighlights();
-        for (int i = 0; i < hilites.length; i++) {
-            if (hilites[i].getPainter() instanceof MyHighlightPainter) {
-                hilite.removeHighlight(hilites[i]);
+    fun removeHighlights(textComp: JTextComponent) {
+        val hilite = textComp.highlighter
+        val hilites = hilite.highlights
+        for (i in hilites.indices) {
+            if (hilites[i].painter is MyHighlightPainter) {
+                hilite.removeHighlight(hilites[i])
             }
         }
     }
@@ -267,56 +233,63 @@ public class ReaderPanel extends JPanel {
     /**
      * A private subclass of the default highlight painter.
      */
-    class MyHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
-
-        /**
-         * Sets the color of highlighter.
-         *
-         * @param color Color of highlight
-         */
-        public MyHighlightPainter(final Color color) {
-            super(color);
-        }
-    }
-
+    internal inner class MyHighlightPainter
     /**
-     * @return the world
+     * Sets the color of highlighter.
+     *
+     * @param color Color of highlight
      */
-    public ReaderWorld getWorld() {
-        return world;
-    }
-
+        (color: Color?) :
+        DefaultHighlightPainter(color)// add action listener for switching between char and word buttons:
+    // wordButton.addActionListener(a);
     /**
      * Return a toolbar with buttons for switching between word and character
      * mode.
      *
      * @return the mode selection toolbar
      */
-    public JToolBar getToolbarModeSelect() {
-        JToolBar toolbar = new JToolBar();
-        parseStyle.add(wordButton);
-        parseStyle.add(charButton);
-        wordButton.setSelected(true);
-        toolbar.add(wordButton);
-        toolbar.add(charButton);
+    val toolbarModeSelect: JToolBar
+        get() {
+            val toolbar = JToolBar()
+            parseStyle.add(wordButton)
+            parseStyle.add(charButton)
+            wordButton.isSelected = true
+            toolbar.add(wordButton)
+            toolbar.add(charButton)
+            wordButton.addActionListener { world.parseStyle = TextWorld.ParseStyle.WORD }
+            charButton.addActionListener { world.parseStyle = TextWorld.ParseStyle.CHARACTER }
 
-        wordButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                world.setParseStyle(ParseStyle.WORD);
-            }
+            // add action listener for switching between char and word buttons:
+            // wordButton.addActionListener(a);
+            return toolbar
+        }
 
-        });
-        charButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                world.setParseStyle(ParseStyle.CHARACTER);
-            }
-        });
+    companion object {
+        /**
+         * Factory method for panel (so that listeners are not created in
+         * constructor).
+         *
+         * @param theWorld the world
+         * @param toolbar  pass in open / close toolbar
+         * @return the constructed panel
+         */
+        fun createReaderPanel(theWorld: TextWorld, toolbar: JToolBar?): TextWorldPanel {
+            val panel = TextWorldPanel(theWorld, toolbar)
+            panel.initListeners()
+            return panel
+        }
 
-        // add action listener for switching between char and word buttons:
-        // wordButton.addActionListener(a);
-        return toolbar;
+        /**
+         * Factory method for panel (so that listeners are not created in
+         * constructor).
+         *
+         * @param theWorld the world
+         * @return the constructed panel
+         */
+        fun createReaderPanel(theWorld: TextWorld): TextWorldPanel {
+            val panel = TextWorldPanel(theWorld, null)
+            panel.initListeners()
+            return panel
+        }
     }
-
 }

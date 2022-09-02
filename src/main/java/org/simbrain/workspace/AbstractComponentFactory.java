@@ -18,8 +18,8 @@ import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.projection.ProjectionDesktopComponent;
 import org.simbrain.plot.rasterchart.RasterPlotComponent;
 import org.simbrain.plot.rasterchart.RasterPlotDesktopComponent;
-import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.plot.timeseries.TimeSeriesDesktopComponent;
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.workspace.gui.DesktopComponent;
@@ -29,14 +29,12 @@ import org.simbrain.world.deviceinteraction.DeviceInteractionComponent;
 import org.simbrain.world.deviceinteraction.DeviceInteractionDesktopComponent;
 import org.simbrain.world.game.GameComponent;
 import org.simbrain.world.game.GameDesktopComponent;
-import org.simbrain.world.imageworld.*;
+import org.simbrain.world.imageworld.ImageWorldComponent;
 import org.simbrain.world.imageworld.gui.ImageWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
-import org.simbrain.world.textworld.DisplayComponent;
-import org.simbrain.world.textworld.DisplayDesktopComponent;
-import org.simbrain.world.textworld.ReaderComponent;
-import org.simbrain.world.textworld.ReaderDesktopComponent;
+import org.simbrain.world.textworld.TextWorldComponent;
+import org.simbrain.world.textworld.gui.TextWorldDesktopComponent;
 import org.simbrain.world.threedworld.ThreeDDesktopComponent;
 import org.simbrain.world.threedworld.ThreeDWorldComponent;
 
@@ -72,11 +70,8 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Data Table", () -> DataWorldComponent.createDataWorld(new NumericTable(), ""));
         putGuiComponentFactory(DataWorldComponent.class, DataWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Text Display", () -> new DisplayComponent(""));
-        putGuiComponentFactory(DisplayComponent.class, DisplayDesktopComponent::new);
-
-        putWorkspaceComponentFactory("Text Reader", () -> new ReaderComponent(""));
-        putGuiComponentFactory(ReaderComponent.class, ReaderDesktopComponent::new);
+        putWorkspaceComponentFactory("Text World", () -> new TextWorldComponent(""));
+        putGuiComponentFactory(TextWorldComponent.class, TextWorldDesktopComponent::new);
 
         putWorkspaceComponentFactory("Image World", ImageWorldComponent::new);
         putGuiComponentFactory(ImageWorldComponent.class, ImageWorldDesktopComponent::new);

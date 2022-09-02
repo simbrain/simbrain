@@ -64,8 +64,8 @@ object TextWorldActions {
                 if (theFile != null) {
                     val docString = Utils.readFileContents(theFile)
                     val wordList = uniqueTokensFromArray(tokenizeWordsFromSentence(docString))
-                    // TODO: Temp
-                    world.tokenToVectorDict = TokenVectorDictionary(wordList, Matrix.eye(wordList.size))
+                    // TODO: Temp, but can use this as a 'one-hot' style for loading
+                    world.tokenVectorMap = TokenVectorMap(wordList, Matrix.eye(wordList.size))
                 }
                 world.fireDictionaryChangedEvent()
             }
@@ -93,9 +93,9 @@ object TextWorldActions {
             override fun actionPerformed(arg0: ActionEvent) {
                 // TODO: Find a way to show the tokens as rowHeaders
                 // Find a way to make it immutable
-                val model = createFromDoubleArray(world!!.tokenToVectorDict.tokenVectorMatrix.toArray())
+                val model = createFromDoubleArray(world!!.tokenVectorMap.tokenVectorMatrix.toArray())
                 model.insertColumn(0, "Token", Column.DataType.StringType)
-                world.tokenToVectorDict.tokensMap.keys.forEachIndexed {
+                world.tokenVectorMap.tokensMap.keys.forEachIndexed {
                     rowIndex, token -> model.setValueAt(token, rowIndex, 0 )
                 }
                 SimbrainDataViewer(model).displayInDialog()

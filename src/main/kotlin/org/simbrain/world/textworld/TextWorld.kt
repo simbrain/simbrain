@@ -18,27 +18,42 @@
  */
 package org.simbrain.world.textworld
 
+import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
+import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.awt.Color
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import javax.swing.SwingUtilities
 
 /**
- * TextWorld is an environment for modeling speech and reading and other
- * linguistic phenomena. It is the superclass for readerworld, where text is
- * converted or "read" and used to produce activation in neural nets (reader
- * world), and display world, where activations from neural nets can be used to
- * display text (e.g. modeled speech).
+ * TextWorld is an environment for modeling speech and reading and other linguistic phenomena and their interactions
+ * with a neural network.
+ *
+ * A dictionary object associates words or other tokens with vectors and vice versa, using [Coupling]s.
+ *
+ * Text in the main window is parsed and highlighted, and if a corresponding entry is found in the dictionary, a
+ * vector is sent to any coupled objects, for example the input layer of a neural network.
+ *
+ * Output from a neural network can also be sent to the world. The closest matching vector in the dictionary is found
+ * and then the corresponding token in the dictionary is printed to the main window.
+ *
+ * The dictionary can be generated in several ways, which correspond to methods of word embedding.
+ *
+ * @see https://en.wikipedia.org/wiki/Word_embedding
+ * @author Jeff Yoshimi
+ * @author Yulin Li
+ *
  */
-abstract class TextWorld: AttributeContainer, EditableObject {
+class TextWorld : AttributeContainer, EditableObject {
 
     /**
-     * A "dictionary" which associates string tokens with arrays of doubles and vice-versa
+     * Associates string tokens with arrays of doubles and vice-versa
      */
-    var tokenToVectorDict = TokenVectorDictionary(
-        // TODO: This is temporary
+    var tokenVectorMap = TokenVectorMap(
         tokens = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
         tokenVectorMatrix = Matrix.eye(6)
     )
@@ -59,7 +74,7 @@ abstract class TextWorld: AttributeContainer, EditableObject {
     /**
      * The current item of text (letter, word, etc.)
      */
-     protected var currentItem: TextItem? = null
+    var currentItem: TextItem? = null
         set(value) {
             field = value
             fireCurrentItemChanged(value)
@@ -68,7 +83,7 @@ abstract class TextWorld: AttributeContainer, EditableObject {
     /**
      * What the current position in the text is.
      */
-    protected var position = 0
+    var position = 0
         set(value) {
             field = value
         }
@@ -90,9 +105,173 @@ abstract class TextWorld: AttributeContainer, EditableObject {
     var highlightColor = Color.GRAY
 
     /**
+     * The current text item.
+     */
+    private var currentTextItem: TextItem? = null
+
+    /**
+     * List of parsing style.
+     */
+    enum class ParseStyle {
+        CHARACTER, WORD
+    }
+
+    /**
+     * The current parsing style.
+     */
+    @UserParameter(label = "Parse Style", description = "The current parsing style.", order = 1)
+    var parseStyle = ParseStyle.WORD
+    // TODO: Fire an event that the radio button listens to
+
+    /**
+     * Regular expression for matcher.
+     */
+    @UserParameter(label = "Regular Expression", description = "Regular expression for matcher.", order = 2)
+    private var regularExpression = "(\\S+)"
+        set(value) {
+            field = value
+            pattern = Pattern.compile(regularExpression)
+            matcher = pattern.matcher(text)
+            updateMatcher()
+        }
+
+    /**
+     * Regular expression pattern. By default search for whole words
+     */
+    private var pattern: Pattern = Pattern.compile(regularExpression)
+    // TODO: Document other good choices in the pref dialog. e.g. (\\w+)
+
+    /**
+     * Pattern matcher.
+     */
+    private var matcher: Matcher = pattern.matcher(text)
+
+    /**
+     * Returns the double array associated with the currently selected token
+     * (character or word). The reader world can produce a vector at any moment
+     * by calling this function. Called by reflection by ReaderComponent.
+     *
+     * @return the vector corresponding to the currently parsed token.
+     */
+    @get:Producible
+    val currentVector: DoubleArray
+        get() = currentItem.let {
+            if (it == null) {
+                DoubleArray(tokenVectorMap.size)
+            } else {
+                tokenVectorMap.get(it.text)
+            }
+        }
+
+    /**
+     * Display the string associated with the closest matching vector in the
+     * dictionary.
+     */
+    @Consumable()
+    fun displayClosestWord(key: DoubleArray) {
+        addText(tokenVectorMap.getClosestWord(key))
+    }
+
+    /**
      * Advance the position in the text, and update the current item.
      */
-    abstract fun update()
+    fun update() {
+        if (parseStyle == ParseStyle.CHARACTER) {
+            wrapText()
+            val begin = position
+            val end = position + 1
+            currentItem = TextItem(begin, end, text.substring(begin, end))
+            position = end
+        } else if (parseStyle == ParseStyle.WORD) {
+            wrapText()
+            val matchFound = findNextToken()
+            if (matchFound) {
+                selectCurrentToken()
+            } else {
+                // No match found. Go back to the beginning of the text area
+                // and select the first token found
+                position = 0
+                updateMatcher()
+                // Having wrapped to the beginning select the next token, if
+                // there is one.
+                if (findNextToken()) {
+                    selectCurrentToken()
+                }
+            }
+        }
+    }
+
+    /**
+     * Reset the parser and specify the region focused on by it, to go from the
+     * current cursor position to the end of the text.
+     */
+    fun updateMatcher() {
+        val begin = position
+        val end = text.length
+        // System.out.println(begin + "," + end);
+        matcher.reset(text)
+        matcher.region(begin, end)
+    }
+
+    /**
+     * Find the next token in the text area.
+     *
+     * @return true if some token is found, false otherwise.
+     */
+    private fun findNextToken(): Boolean {
+        val foundToken = matcher!!.find()
+        currentTextItem = if (foundToken) {
+            val begin = matcher!!.start()
+            val end = matcher!!.end()
+            val text = matcher!!.group()
+            // System.out.println("[" + text + "](" + begin + "," + end + ")");
+            TextItem(begin, end, text)
+        } else {
+            null
+        }
+        return foundToken
+    }
+
+    /**
+     * Select the current token.
+     */
+    private fun selectCurrentToken() {
+        currentItem = currentTextItem
+        position = currentTextItem!!.endPosition
+    }
+
+    /**
+     * If the position is at the end of the text area, "reset" the position to
+     * 0.
+     */
+    private fun wrapText() {
+        if (atEnd()) {
+            position = 0
+            updateMatcher()
+        }
+    }
+
+    /**
+     * @return true if the current position is past the end of the text area,
+     * false otherwise.
+     */
+    private fun atEnd(): Boolean {
+        return position >= text.length
+    }
+
+    /**
+     * Utility method to "preview" the next token after the current one. Used in
+     * some scripts.
+     *
+     * @return the next token in the text area.
+     */
+    fun previewNextToken(): String {
+        matcher!!.find()
+        val nextOne = matcher!!.group()
+        updateMatcher() // Return matcher to its previous state
+        return nextOne
+    }
+
 
     /**
      * Add a text to the end of the underling text object.
@@ -103,6 +282,17 @@ abstract class TextWorld: AttributeContainer, EditableObject {
         text += newText
         fireTextChangedEvent()
     }
+
+    /**
+     * Returns a standard java string containing the character or characters
+     * selected by the reader world.
+     *
+     * @return the current string
+     */
+    @get:Producible
+    val currentToken: String
+        get() = currentItem.let { it?.text ?: "" }
+
 
     fun addListener(listener: TextListener) {
         listenerList.add(listener)
@@ -116,7 +306,7 @@ abstract class TextWorld: AttributeContainer, EditableObject {
      * Notify listeners that the text has changed.
      */
     fun fireTextChangedEvent() {
-        SwingUtilities.invokeLater{
+        SwingUtilities.invokeLater {
             for (listener in listenerList) {
                 listener.textChanged()
             }
@@ -205,11 +395,13 @@ abstract class TextWorld: AttributeContainer, EditableObject {
         return this
     }
 
+    override val id = "Text World"
+
     /**
      * Represents the "current item" as String, and includes a representation of
      * the beginning and ending of the item in the main text.
      */
-    inner class TextItem (
+    inner class TextItem(
 
         /**
          * Initial position in main text.
@@ -229,4 +421,5 @@ abstract class TextWorld: AttributeContainer, EditableObject {
             return "($beginPosition,$endPosition) $text"
         }
     }
+
 }

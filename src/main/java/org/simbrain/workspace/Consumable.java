@@ -33,5 +33,4 @@ public @interface Consumable {
      */
     boolean defaultVisibility() default true;
 
-
 }

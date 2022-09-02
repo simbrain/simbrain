@@ -522,30 +522,28 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         if (item == null) {
             return;
         }
-        if (mainPanel instanceof LabelledItemPanel) {
-            ((LabelledItemPanel) mainPanel).addItem(item);
-        } else {
+        if (isTabbedPane()) {
             tabPanels.values().iterator().next().addItem(item);
+        } else {
+            ((LabelledItemPanel) mainPanel).addItem(item);
         }
     }
 
     public void removeItem(JComponent item) {
         if (item != null) {
-            if (mainPanel instanceof LabelledItemPanel) {
-                mainPanel.remove(item);
-            } else {
+            if (isTabbedPane()) {
                 tabPanels.values().iterator().next().remove(item);
+            } else {
+                mainPanel.remove(item);
             }
         }
     }
 
     /**
      * Returns the tabbed pain or null if there is none.
-     *
-     * @return the tabbed pane
      */
-    public JTabbedPane getMainPanel() {
-        if (mainPanel instanceof JTabbedPane) {
+    public JTabbedPane getTabbedPane() {
+        if (isTabbedPane()) {
             return (JTabbedPane) mainPanel;
         }
         return null;
@@ -573,6 +571,7 @@ public class AnnotatedPropertyEditor extends EditablePanel {
         AnnotatedPropertyEditor ape = new AnnotatedPropertyEditor(object);
         return ape.getDialog();
     }
+
     public static void main(String[] args) {
         var net = new Network();
         var neurons = Arrays.asList(new Neuron(net), new Neuron(net));

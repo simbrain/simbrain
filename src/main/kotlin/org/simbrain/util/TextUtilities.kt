@@ -27,7 +27,7 @@ fun tokenizeSentencesFromDoc(docString: String): List<String> {
  * Removes troublesome chars from text file
  */
 fun removeBadChars(docString: String): String {
-    return docString.trim().replace("[\n\r]".toRegex(), "")
+    return docString.trim().replace("[\n\r\t]".toRegex(), "")
 }
 
 
@@ -130,7 +130,7 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
 fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: Boolean = true): Matrix {
     // println(docString)
     val convertedDocString = removeBadChars(docString)
-    
+
     if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
 
     // get tokens from whole document

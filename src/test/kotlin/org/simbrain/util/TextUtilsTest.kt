@@ -46,6 +46,14 @@ class TextUtilsTest {
     }
 
     @Test
+    fun `Troublesome characters removed`() {
+        val testString = "A\tb\nc"
+        assertEquals(false, removeBadChars(testString).contains("[\n\r\t]"))
+        assertEquals(3, removeBadChars(testString).length)
+    }
+
+
+    @Test
     fun `get unique tokens from sentences`() {
         val sentence = "a A a b. B c b d c c"
         val tokenizedSentence = tokenizeWordsFromSentence(sentence)

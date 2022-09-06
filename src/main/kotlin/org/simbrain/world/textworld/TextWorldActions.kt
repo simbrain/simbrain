@@ -23,7 +23,6 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.Column
 import org.simbrain.util.table.SimbrainDataViewer
 import org.simbrain.util.table.createFromDoubleArray
-import smile.math.matrix.Matrix
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.AbstractAction
@@ -62,10 +61,7 @@ object TextWorldActions {
                 val chooser = SFileChooser(dictionaryDirectory, "text file", "txt")
                 val theFile = chooser.showOpenDialog()
                 if (theFile != null) {
-                    val docString = Utils.readFileContents(theFile)
-                    val wordList = uniqueTokensFromArray(tokenizeWordsFromSentence(docString))
-                    // TODO: Temp, but can use this as a 'one-hot' style for loading
-                    world.tokenVectorMap = TokenVectorMap(wordList, Matrix.eye(wordList.size))
+                    world.loadDictionary(Utils.readFileContents(theFile))
                 }
             }
         }
@@ -97,8 +93,8 @@ object TextWorldActions {
                 world.tokenVectorMap.tokensMap.keys.forEachIndexed {
                     rowIndex, token -> model.setValueAt(token, rowIndex, 0 )
                 }
-                SimbrainDataViewer(model).displayInDialog()
-
+                val dialog = SimbrainDataViewer(model).displayInDialog()
+                dialog.title = "Dictionary with ${world.tokenVectorMap.size} unique entries"
             }
         }
     }

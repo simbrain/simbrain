@@ -19,7 +19,10 @@
 package org.simbrain.world.textworld
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.generateCooccurrenceMatrix
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.tokenizeWordsFromSentence
+import org.simbrain.util.uniqueTokensFromArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -48,6 +51,17 @@ import java.util.regex.Pattern
  *
  */
 class TextWorld : AttributeContainer, EditableObject {
+
+    enum class EmbeddingType {ONE_HOT, COC}
+
+    @UserParameter(label = "Embedding type", description = "Method for converting text to vectors", order = 1 )
+    var embeddingType = EmbeddingType.COC
+
+    @UserParameter(label = "Window size", order = 20 )
+    var windowSize = 2
+
+    @UserParameter(label = "Use PPMI", order = 30 )
+    var usePPMI = true
 
     /**
      * Associates string tokens with arrays of doubles and vice-versa
@@ -358,4 +372,15 @@ class TextWorld : AttributeContainer, EditableObject {
         }
     }
 
+    fun loadDictionary(docString: String) {
+        if (embeddingType == EmbeddingType.ONE_HOT) {
+            val tokens = uniqueTokensFromArray(tokenizeWordsFromSentence((docString)))
+            tokenVectorMap = TokenVectorMap(tokens, Matrix.eye(tokens.size))
+
+        } else {
+            val result = generateCooccurrenceMatrix(docString, windowSize, usePPMI)
+            tokenVectorMap = TokenVectorMap(result.first, result.second)
+        }
+    }
 }
+

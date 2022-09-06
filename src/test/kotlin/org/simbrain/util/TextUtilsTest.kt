@@ -20,9 +20,9 @@ class TextUtilsTest {
 
     @Test
     fun `test sentence parsing`() {
-        val sentences =  tokenizeSentencesFromDoc(simpleText)
+        val sentences =  simpleText.tokenizeSentencesFromDoc()
         assertEquals(2, sentences.size)
-        assertEquals(4, tokenizeSentencesFromDoc(harderText).size)
+        assertEquals(4, harderText.tokenizeSentencesFromDoc().size)
     }
 
     @Test
@@ -46,12 +46,12 @@ class TextUtilsTest {
     }
 
     @Test
-    fun `Troublesome characters removed`() {
+    fun `tabs and newlines removed by removeSpecialCharacters`() {
         val testString = "A\tb\nc"
-        assertEquals(false, removeBadChars(testString).contains("[\n\r\t]"))
-        assertEquals(3, removeBadChars(testString).length)
+        println(testString.removeSpecialCharacters())
+        assertEquals(false,testString.removeSpecialCharacters().contains("[\n\r\t]"))
+        assertEquals(5,testString.removeSpecialCharacters().length)
     }
-
 
     @Test
     fun `get unique tokens from sentences`() {
@@ -86,7 +86,7 @@ class TextUtilsTest {
     @Test
     fun `co-occurrence matrix is correct size`() {
         val tokens = uniqueTokensFromArray(tokenizeWordsFromSentence(simpleText))
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, 2, true)
+        val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, 2, true).second
         assertEquals(tokens.size, cooccurrenceMatrix.nrows())
         assertEquals(tokens.size, cooccurrenceMatrix.ncols())
     }
@@ -95,7 +95,7 @@ class TextUtilsTest {
     fun `word embedding have correct size`() {
         val tokenizedSentence = tokenizeWordsFromSentence(harderText)
         val tokens = uniqueTokensFromArray(tokenizedSentence)
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(harderText, 2, true)
+        val cooccurrenceMatrix = generateCooccurrenceMatrix(harderText, 2, true).second
         assertEquals(tokens.size, wordEmbeddingQuery("obstacles",tokens,cooccurrenceMatrix).size)
         assertEquals(tokens.size, wordEmbeddingQuery("Quixote",tokens,cooccurrenceMatrix).size) // issue was capital Q
     }
@@ -103,8 +103,8 @@ class TextUtilsTest {
     @Test
     fun `co-occurence matrix window size correctly affects similarity`() {
         val tokens = uniqueTokensFromArray(tokenizeWordsFromSentence(windowSizeText))
-        val cooccurrenceMatrixShort = generateCooccurrenceMatrix(windowSizeText, 1, true)
-        val cooccurrenceMatrixLong = generateCooccurrenceMatrix(windowSizeText, 4, true)
+        val cooccurrenceMatrixShort = generateCooccurrenceMatrix(windowSizeText, 1, true).second
+        val cooccurrenceMatrixLong = generateCooccurrenceMatrix(windowSizeText, 4, true).second
         val smallWindowSimilarity = cosineSimilarity(
                 wordEmbeddingQuery("Jean", tokens, cooccurrenceMatrixShort),
                 wordEmbeddingQuery("Albert", tokens, cooccurrenceMatrixShort),
@@ -121,7 +121,7 @@ class TextUtilsTest {
     fun `computes cosine similarity between two vectors`() {
         val tokenizedSentence = tokenizeWordsFromSentence(similarText)
         val tokens = uniqueTokensFromArray(tokenizedSentence)
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(similarText, 2, true)
+        val cooccurrenceMatrix = generateCooccurrenceMatrix(similarText, 2, true).second
         val vectorA = wordEmbeddingQuery("cat",tokens,cooccurrenceMatrix)
         val vectorB = wordEmbeddingQuery("dog",tokens,cooccurrenceMatrix)
         val vectorC = wordEmbeddingQuery("table",tokens,cooccurrenceMatrix)

@@ -4,32 +4,21 @@ import smile.math.MathEx.cos
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
 
-fun main() {
-    val chooser = SFileChooser(".", "Text import", "txt")
-    val theFile = chooser.showOpenDialog()
-    if (theFile != null) {
-        val text = Utils.readFileContents(theFile)
-        generateCooccurrenceMatrix(text)
-    }
-}
-
-
 /**
  * Sentence tokenizer: parse document into sentences and return as a list of sentences.
  *
  * Forward to Smile's sentence splitter.
  */
-fun tokenizeSentencesFromDoc(docString: String): List<String> {
-    return SimpleSentenceSplitter.getInstance().split(docString).toList()
+fun String.tokenizeSentencesFromDoc(): List<String> {
+    return SimpleSentenceSplitter.getInstance().split(this).toList()
 }
 
 /**
- * Removes troublesome chars from text file
+ * Trims extra whitespace and removes newlines, returns, and tabs.
  */
-fun removeBadChars(docString: String): String {
-    return docString.trim().replace("[\n\r\t]".toRegex(), "")
+fun String.removeSpecialCharacters(): String {
+    return this.trim().replace("[\n\r\t]".toRegex(), " ")
 }
-
 
 /**
  * https://www.techiedelight.com/remove-punctuation-from-a-string-in-kotlin/
@@ -127,9 +116,10 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
  * Returns a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
  *
  */
-fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: Boolean = true): Matrix {
+fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: Boolean = true):
+        Pair<List<String>, Matrix> {
     // println(docString)
-    val convertedDocString = removeBadChars(docString)
+    val convertedDocString = docString.removeSpecialCharacters()
 
     if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
 
@@ -143,7 +133,7 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: 
     // println(tokens)
 
     // Split document into sentences
-    val sentences = tokenizeSentencesFromDoc(convertedDocString)
+    val sentences = convertedDocString.tokenizeSentencesFromDoc()
     // print("Sentences: ")
     // println(sentences)
 
@@ -179,10 +169,9 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: 
         }
     }
     if (usePPMI) {
-        return manualPPMI(cooccurrenceSmileMatrix, true)
+        return Pair(tokens, manualPPMI(cooccurrenceSmileMatrix, true))
     }
-    return cooccurrenceSmileMatrix
-
+    return Pair(tokens, cooccurrenceSmileMatrix)
 }
 
 /**
@@ -201,4 +190,12 @@ fun cosineSimilarity(vectorA: DoubleArray, vectorB: DoubleArray): Double {
     return cos(vectorA, vectorB)
 }
 
-
+// Test main
+fun main() {
+    val chooser = SFileChooser(".", "Text import", "txt")
+    val theFile = chooser.showOpenDialog()
+    if (theFile != null) {
+        val text = Utils.readFileContents(theFile)
+        generateCooccurrenceMatrix(text)
+    }
+}

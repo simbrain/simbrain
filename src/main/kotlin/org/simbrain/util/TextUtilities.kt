@@ -4,6 +4,16 @@ import smile.math.MathEx.cos
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
 
+fun main() {
+    val chooser = SFileChooser(".", "Text import", "txt")
+    val theFile = chooser.showOpenDialog()
+    if (theFile != null) {
+        val text = Utils.readFileContents(theFile)
+        generateCooccurrenceMatrix(text)
+    }
+}
+
+
 /**
  * Sentence tokenizer: parse document into sentences and return as a list of sentences.
  *
@@ -12,6 +22,14 @@ import smile.nlp.tokenizer.SimpleSentenceSplitter
 fun tokenizeSentencesFromDoc(docString: String): List<String> {
     return SimpleSentenceSplitter.getInstance().split(docString).toList()
 }
+
+/**
+ * Removes troublesome chars from text file
+ */
+fun removeBadChars(docString: String): String {
+    return docString.trim().replace("[\n\r\t]".toRegex(), "")
+}
+
 
 /**
  * https://www.techiedelight.com/remove-punctuation-from-a-string-in-kotlin/
@@ -110,17 +128,24 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
  *
  */
 fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: Boolean = true): Matrix {
+    // println(docString)
+    val convertedDocString = removeBadChars(docString)
 
     if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
 
     // get tokens from whole document
-    val tokenizedSentence = tokenizeWordsFromSentence(docString)
+    val tokenizedSentence = tokenizeWordsFromSentence(convertedDocString)
+    // print("Tokenized sentence: ")
+    // println(tokenizedSentence)
+
     val tokens = uniqueTokensFromArray(tokenizedSentence)
-    // println("Tokens:")
+    // print("Tokens: ")
     // println(tokens)
 
     // Split document into sentences
-    val sentences = tokenizeSentencesFromDoc(docString)
+    val sentences = tokenizeSentencesFromDoc(convertedDocString)
+    // print("Sentences: ")
+    // println(sentences)
 
     // Set up matrix
     val matrixSize = tokens.size

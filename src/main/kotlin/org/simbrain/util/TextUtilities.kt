@@ -17,7 +17,7 @@ fun String.tokenizeSentencesFromDoc(): List<String> {
  * Trims extra whitespace and removes newlines, returns, and tabs.
  */
 fun String.removeSpecialCharacters(): String {
-    return this.trim().replace("[\n\r\t]".toRegex(), " ")
+    return this.trim().replace("[\n\r\t]".toRegex(), " ").replace("\\s+".toRegex(), " ")
 }
 
 /**

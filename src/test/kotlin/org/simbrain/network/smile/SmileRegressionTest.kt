@@ -33,7 +33,7 @@ class SmileRegressionTest {
      * Based on https://towardsdatascience.com/building-a-logistic-regression-in-python-step-by-step-becd4d56c9c8
      * Dataset Source: http://archive.ics.uci.edu/ml/index.php
      */
-    @Test
+    //@Test
     fun `test logistic regression with bank data`() {
         val data = Read.csv("simulations/tables/bank-full.csv")
 

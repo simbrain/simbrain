@@ -47,8 +47,7 @@ class TextUtilsTest {
 
     @Test
     fun `tabs and newlines removed by removeSpecialCharacters`() {
-        val testString = "A\tb\nc"
-        println(testString.removeSpecialCharacters())
+        val testString = "A\t\tb\n\nc"
         assertEquals(false,testString.removeSpecialCharacters().contains("[\n\r\t]"))
         assertEquals(5,testString.removeSpecialCharacters().length)
     }

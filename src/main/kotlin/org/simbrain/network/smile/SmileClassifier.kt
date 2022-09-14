@@ -2,6 +2,7 @@ package org.simbrain.network.smile
 
 import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
+import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
@@ -16,6 +17,15 @@ class SmileClassifier(
     val inputSize: Int,
     nsamples: Int = 4
 ) : ArrayLayer(net, inputSize), EditableObject {
+
+    /**
+     * Construct a classifier using the provided classifier and training data.
+     */
+    constructor(net: Network, classifier: LogisticRegClassifier, inputs: Array<DoubleArray>, targets: IntArray)
+            : this(net, classifier, inputs[0].size, inputs.size) {
+                this.trainingInputs = inputs
+                this.trainingTargets = targets
+            }
 
     /**
      * A 2d array. Rows correspond to possible inputs to the classifier.
@@ -53,12 +63,17 @@ class SmileClassifier(
      * Size of outputs, currently inferred from the number of unique target labels.
      */
     var outputSize: Int = 2
+        set(value) {
+            field = value
+            outputs = Matrix(outputSize, 1)
+        }
 
     /**
      * A version of the winning class label that can be used in couplings.
      */
     @get:Producible()
     val labelEncodedOutput get() = winner.toDouble()
+
     /**
      * Output matrix
      */

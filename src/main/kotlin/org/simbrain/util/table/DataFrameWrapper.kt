@@ -10,9 +10,8 @@ class DataFrameWrapper(var df : DataFrame): SimbrainDataModel() {
 
     override val isMutable = false
 
-    override var columns: MutableList<Column>
-        get() = TODO()
-        set(value) = TODO()
+    // TODO: Add setter
+    override var columns: MutableList<Column> = df.schema().fields().map { Column(it.name, it.type)  }.toMutableList()
 
     override fun getRowCount(): Int {
         return df.nrows()

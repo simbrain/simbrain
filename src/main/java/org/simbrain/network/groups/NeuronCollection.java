@@ -33,10 +33,9 @@ import java.util.List;
 public class NeuronCollection extends AbstractNeuronCollection {
 
     /**
-     * Construct a new neuron group from a list of neurons.
+     * Construct a new neuron group from a list of free neurons.
      *
-     * @param net     the network
-     * @param neurons the neurons
+     * Assumes the neurons have already been added to the root network.
      */
     public NeuronCollection(final Network net, final List<Neuron> neurons) {
         super(net);

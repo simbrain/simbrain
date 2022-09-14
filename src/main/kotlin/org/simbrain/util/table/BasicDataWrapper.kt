@@ -7,7 +7,7 @@ import smile.math.matrix.Matrix
  */
 class BasicDataWrapper(
     data: MutableList<MutableList<Any?>>,
-    override var columns: MutableList<Column> = inferColumn(data)
+    override var columns: MutableList<Column> = inferColumns(data)
 ) : SimbrainDataModel() {
 
     override val isMutable = true
@@ -15,7 +15,7 @@ class BasicDataWrapper(
     var data: MutableList<MutableList<Any?>> = data
         set(value) {
             field = value
-            columns = inferColumn(value)
+            columns = inferColumns(value)
         }
 
     /**
@@ -152,7 +152,7 @@ class BasicDataWrapper(
 /**
  * Infer a column from a 2d array of data.
  */
-private fun inferColumn(data: MutableList<MutableList<Any?>>) =
+private fun inferColumns(data: MutableList<MutableList<Any?>>) =
     data[0].mapIndexed { i, value ->
         createColumn("Column ${i + 1}", value)
     }.toMutableList()

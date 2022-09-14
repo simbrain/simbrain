@@ -6,6 +6,7 @@ import org.simbrain.util.isRealValued
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import smile.data.type.DataType
 import javax.swing.table.AbstractTableModel
 
 /**
@@ -91,15 +92,25 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
      */
     fun getColumnMajorArray(): Array<DoubleArray> {
         return (0 until columnCount)
-            .filter { columns[it].isNumeric()}
+            .filter { columns[it].isNumeric() }
             .map { getDoubleColumn(it) }
             .toTypedArray()
     }
 
-    fun columnsSameType(clazz: Class<*>): Boolean {
-        return (0 until columnCount).all {
-            columnClasses[it] == clazz
+    /**
+     * If all columns in [colIndices] are instances of one of the types in [classes], return true
+     */
+    fun columnsOfType(colIndices: List<Int>, vararg classes: Class<*>): Boolean {
+        return colIndices.all {
+            classes.contains(columnClasses[it])
         }
+    }
+
+    /**
+     * Ensure all columns have the indicated type or types.
+     */
+    fun columnsOfType(vararg classes: Class<*>): Boolean {
+        return  columnsOfType((0 until columnCount).toList(), *classes)
     }
 
     private fun getDoubleRowUnsafe(row: Int): DoubleArray {
@@ -116,8 +127,38 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
             .toFloatArray()
     }
 
-    fun getRowMajorDoubleArray(): Array<DoubleArray> {
-        if (!columnsSameType(Double::class.java)) {
+    /**
+     * Returns a 2d double array using provided column indices.
+     *
+     * Note that numeric types are cast to doubles.
+     */
+    fun get2DDoubleArray(colIndices: List<Int>): Array<DoubleArray> {
+        if (!columnsOfType(colIndices, Double::class.java, Int::class.java, Float::class.java)) {
+            throw Error("getDoubleArray called on a non-double column")
+        }
+        return (0 until rowCount)
+            .map { rowIndex ->
+                colIndices.map { colIndex ->
+                    (getValueAt(rowIndex, colIndex) as Number).toDouble()
+                }.toDoubleArray()
+            }.toTypedArray()
+    }
+
+
+    /**
+     * Returns a 2d double array using columns in the provided range.
+     */
+    fun get2DDoubleArray(indices: IntRange): Array<DoubleArray> {
+        return get2DDoubleArray(indices.toList())
+    }
+
+    /**
+     * Returns an array of double array rows for the table (comparable to "row major" order).
+     *
+     * Numeric types are cast to doubles.
+     */
+    fun get2DDoubleArray(): Array<DoubleArray> {
+        if (!columnsOfType(Double::class.java)) {
             throw Error("getDoubleArray called on a non-numeric column")
         }
         return (0 until rowCount)
@@ -125,18 +166,28 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
             .toTypedArray()
     }
 
-    fun getRowMajorFloatArray(): Array<FloatArray> {
-        if (!columnsSameType(Double::class.java)) {
-            throw Error("getFloatArray called on a non-numeric column")
+    /**
+     * Returns an array of float array rows for the table (comparable to "row major" order).
+     *
+     * Doubles and ints are cast to floats.
+     */
+    fun getFloat2DArray(): Array<FloatArray> {
+        if (!columnsOfType(Double::class.java, Int::class.java)) {
+            throw Error("getFloat2DArray called on a non-numeric column")
         }
         return (0 until rowCount)
             .map { getFloatRowUnsafe(it) }
             .toTypedArray()
     }
 
+    /**
+     * Returns an array of float array columns for the table.
+     *
+     * Doubles and ints are cast to floats.
+     */
     fun getColumnMajorIntArray(): Array<IntArray> {
         return (0 until columnCount)
-            .filter { columns[it].isNumeric()}
+            .filter { columns[it].isNumeric() }
             .map { getIntColumn(it) }
             .toTypedArray()
     }
@@ -163,6 +214,14 @@ class Column(
     @UserParameter(label = "Type", order = 2)
     var type: DataType = DataType.DoubleType
 ) : EditableObject {
+
+    /**
+     * Construct a column using a Smile data type object.
+     */
+    constructor(name: String, smileDataType: smile.data.type.DataType) : this(
+        name,
+        smileToSimbrainDataType(smileDataType)
+    )
 
     @UserParameter(label = "Enabled", order = 10)
     var enabled = true
@@ -252,5 +311,10 @@ fun getDataType(clazz: Class<*>): Column.DataType {
     }
 }
 
-
-
+fun smileToSimbrainDataType(smileDataType: DataType): Column.DataType {
+    return when (smileDataType.id()) {
+        DataType.ID.Double -> Column.DataType.DoubleType
+        DataType.ID.Integer -> Column.DataType.IntType
+        else -> Column.DataType.StringType
+    }
+}

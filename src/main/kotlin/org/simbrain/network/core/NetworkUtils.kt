@@ -211,6 +211,12 @@ fun Network.createNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): Li
     return neurons
 }
 
+fun Network.createNeuronCollection(numNeurons: Int) : NeuronCollection {
+    val nc = NeuronCollection(this, createNeurons(numNeurons))
+    addNetworkModel(nc)
+    return nc
+}
+
 /**
  * Convenience methods to set parameters for inhibitory methods in a prob. dist
  */

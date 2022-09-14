@@ -238,7 +238,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
             TableActionsKt.addSimpleDefaults(wmViewer);
             tabs.addTab("Weight Matrix", wmViewer);
             dialog.addClosingTask(() -> {
-                ((WeightMatrix) weightMatrix).setWeights(wm.getRowMajorDoubleArray());
+                ((WeightMatrix) weightMatrix).setWeights(wm.get2DDoubleArray());
                 weightMatrix.getEvents().fireUpdated();
             });
         }

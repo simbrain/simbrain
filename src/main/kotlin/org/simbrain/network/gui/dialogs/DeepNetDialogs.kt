@@ -183,7 +183,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
         // Helper to commit data from data tables
         fun commitData() {
-            deepNet.inputData = inputPanel.model.getRowMajorFloatArray()
+            deepNet.inputData = inputPanel.model.getFloat2DArray()
             deepNet.targetData = targetPanel.model.getFloatColumn(0)
             deepNet.initializeDatasets()
         }

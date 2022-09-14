@@ -3,8 +3,10 @@ package org.simbrain.network.smile
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.smile.classifiers.LogisticRegClassifier
-import smile.io.Read
-import java.math.RoundingMode
+import org.simbrain.util.Utils.round
+import org.simbrain.util.table.DataFrameWrapper
+import smile.read
+import kotlin.random.Random
 
 class SmileRegressionTest {
 
@@ -33,77 +35,32 @@ class SmileRegressionTest {
      * Based on https://towardsdatascience.com/building-a-logistic-regression-in-python-step-by-step-becd4d56c9c8
      * Dataset Source: http://archive.ics.uci.edu/ml/index.php
      */
-    //@Test
+    @Test
     fun `test logistic regression with bank data`() {
-        val data = Read.csv("simulations/tables/bank-full.csv")
+        // csv(file: String, delimiter: Char = ',', header: Boolean = true, quote: Char = '"', escape: Char =
+        // '\\', schema: StructType? = null): DataFram
+        val data = DataFrameWrapper(read.csv("simulations/tables/bank-full.csv", header = true))
 
-        // Create Type Arrays
-        var targets = IntArray(45211) { 1 }
-        val inputs = Array<DoubleArray>(targets.size) { doubleArrayOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0) }
+        val targets = data.getIntColumn(data.columnCount-1)
+        val inputs = data.get2DDoubleArray(listOf(0, 5, 11, 12, 13, 14))
 
-        // Replace input Array with data values
-        for (i in 1 until targets.size) {
-            inputs[i] = doubleArrayOf(
-                data[i][0].toString().toDouble(),
-                data[i][5].toString().toDouble(),
-                data[i][11].toString().toDouble(),
-                data[i][12].toString().toDouble(),
-                data[i][13].toString().toDouble(),
-                data[i][14].toString().toDouble()
-            )
-        }
-
-        // Replace target array with data values
-        for (i in 1 until targets.size) {
-            targets[i] = data[i][17].toString().toInt()
-        }
-
-        // Print sizes
-        println("Input Size: " + inputs.size)
-        println("Target Size: " + targets.size)
-
-        // Call Logistic Regression
+        // Fit the model
         val lr = LogisticRegClassifier()
-        // Fit Model
         lr.fit(inputs, targets)
+        println("\nModel Accuracy: ${round(lr.stats.toDouble(), 3)}\n")
 
-        //Prediction test Function
-        fun predictionTest(subjectNumber: Int): DoubleArray {
-            return doubleArrayOf(
-                data[subjectNumber][0].toString().toDouble(),
-                data[subjectNumber][5].toString().toDouble(),
-                data[subjectNumber][11].toString().toDouble(),
-                data[subjectNumber][12].toString().toDouble(),
-                data[subjectNumber][13].toString().toDouble(),
-                data[subjectNumber][14].toString().toDouble()
-            )
+        // Make some predictions
+        fun predict(rowNum: Int) {
+            val rowVector = inputs[rowNum]
+            val tar = targets[rowNum]
+            val pred = lr.predict(rowVector)
+            println("Target $tar - Prediction  $pred = Error ${tar - pred}")
+            println("Probabilities: ${lr.outputProbabilities.contentToString()}")
         }
-
-        var accuracy = lr.stats.toDouble() * 100
-        accuracy = accuracy.toBigDecimal().setScale(2, RoundingMode.UP).toDouble()
-
-        println("\nModel Accuracy: $accuracy%\n")
-
-        // Predict
-        // Subject 87
-        println("Target: 1")
-        println("Prediction: ${lr.predict(predictionTest(87))}")
-        println("Probability Array: ${lr.outputProbabilities.contentToString()}\n")
-
-        // Subject 84
-        println("Target: 1")
-        println("Prediction: ${lr.predict(predictionTest(84))}")
-        println("Probability Array: ${lr.outputProbabilities.contentToString()}\n")
-
-        // Subject 88
-        println("Target: 1")
-        println("Prediction: ${lr.predict(predictionTest(88))}")
-        println("Probability Array: ${lr.outputProbabilities.contentToString()}\n")
-
-        // Subject 169
-        println("Target: 1")
-        println("Prediction: ${lr.predict(predictionTest(169))}")
-        println("Probability Array: ${lr.outputProbabilities.contentToString()}\n")
+        repeat(10) {
+            predict(Random.nextInt(targets.size))
+        }
+        // println("Percent ones = ${targets.count { v -> v == 1 }.toDouble()/targets.size}")
     }
 
 }

@@ -8,6 +8,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.classifiers.SVMClassifier
+import smile.classification.NaiveBayes
 import smile.data.Tuple
 import smile.data.formula.Formula
 import smile.data.type.DataType
@@ -16,7 +17,11 @@ import smile.data.type.StructType
 import smile.io.Read
 import smile.math.matrix.Matrix
 import smile.regression.cart
+import smile.stat.distribution.GaussianDistribution
 
+/**
+ * Also see SmileTest.java and SmileRegressionTest.kt
+ */
 class SmileClassifierTest {
 
     var net = Network()
@@ -121,7 +126,6 @@ class SmileClassifierTest {
         // TODO: A second version of this test using neurongroups or neuron collections
     }
 
-
     @Test
     fun `test decision tree`() {
         val iris = Read.arff("simulations/tables/iris.arff")
@@ -139,5 +143,24 @@ class SmileClassifierTest {
         // TODO: Get the label
         val result = decisionTree.predict(Tuple.of(doubleArrayOf(6.0,2.2,5.0,1.5), schema))
         println("result = $result")
+    }
+
+    @Test
+    fun `test naive bayes`() {
+        val nb = NaiveBayes(
+            // Prior
+            doubleArrayOf(.5,.5),
+            // Class conditional distributions. I just made these numbers up
+            arrayOf(
+                // Men
+                arrayOf(GaussianDistribution(5.9, 1.0), GaussianDistribution(180.0,
+            1.0)),
+                // Women
+                arrayOf(GaussianDistribution(5.5, 1.0), GaussianDistribution(115.0,
+                    1.0), )))
+
+
+        // Do a prediction
+        println(nb.predict(doubleArrayOf(5.0, 175.0)))
     }
 }

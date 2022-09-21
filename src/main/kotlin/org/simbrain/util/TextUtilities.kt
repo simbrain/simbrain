@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import smile.math.MathEx.cos
+import smile.math.MathEx.dot
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
 
@@ -23,15 +24,15 @@ fun String.removeSpecialCharacters(): String {
 /**
  * https://www.techiedelight.com/remove-punctuation-from-a-string-in-kotlin/
  */
-fun removePunctuation(str: String): String {
-    return str.replace("\\p{Punct}".toRegex(), "");
+fun String.removePunctuation(): String {
+    return this.replace("\\p{Punct}".toRegex(), "");
 }
 
 /**
  * Word tokenizer: parse sentence into words.
  */
-fun tokenizeWordsFromSentence(sentence: String): List<String> {
-    return removePunctuation(sentence.lowercase()).split(" ")
+fun String.tokenizeWordsFromSentence(): List<String> {
+    return this.lowercase().removePunctuation().split(" ")
 }
 
 /**
@@ -108,15 +109,17 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
 
 /**
  * Generates co-occurrence matrix from a provided [docString]. [windowSize] specifies how many words should be
- * included in a context.
+ * included in a context. [skipGram] specifies if the window should be previous words or symmetric.
  *
- * Example: if [windowSize] 2, then the context for "dog" in "the quick dog ran fastly" is ["the", "dog", "ran",
- * "fastly'].
+ * Example: if [windowSize] 2 and [skipGram] true, then the context for "dog" in "the quick dog ran fastly"
+ * is ["the", "quick", "ran", "fastly"].  if [windowSize] 2 and [skipGram] false, then the context for "dog"
+ * is ["the", "quick"].
+ *
  *
  * Returns a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
  *
  */
-fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: Boolean = true):
+fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, skipGram: Boolean = false , usePPMI: Boolean = true):
         Pair<List<String>, Matrix> {
     // println(docString)
     val convertedDocString = docString.removeSpecialCharacters()
@@ -124,18 +127,11 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: 
     if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
 
     // get tokens from whole document
-    val tokenizedSentence = tokenizeWordsFromSentence(convertedDocString)
-    // print("Tokenized sentence: ")
-    // println(tokenizedSentence)
-
+    val tokenizedSentence = convertedDocString.tokenizeWordsFromSentence()
     val tokens = uniqueTokensFromArray(tokenizedSentence)
-    // print("Tokens: ")
-    // println(tokens)
 
     // Split document into sentences
     val sentences = convertedDocString.tokenizeSentencesFromDoc()
-    // print("Sentences: ")
-    // println(sentences)
 
     // Set up matrix
     val matrixSize = tokens.size
@@ -146,14 +142,14 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, usePPMI: 
     // Loop through sentences, through words
     for (sentence in sentences) {
         // println(sentence)
-        val tokenizedSentence = tokenizeWordsFromSentence(sentence)
+        val tokenizedSentence = sentence.tokenizeWordsFromSentence()
         for (sentenceIndex in tokenizedSentence.indices) {
             val maxIndex = tokenizedSentence.size - 1  // used for window range check
 
             val currentToken = tokenizedSentence[sentenceIndex] // Current iterated token
 
             val contextLowerLimit = sentenceIndex - windowSize
-            val contextUpperLimit = sentenceIndex + windowSize
+            val contextUpperLimit = if (skipGram) (sentenceIndex + windowSize) else (sentenceIndex)
 
             for (contextIndex in contextLowerLimit..contextUpperLimit) {
                 if (contextIndex in 0..maxIndex && contextIndex != sentenceIndex) {
@@ -183,11 +179,19 @@ fun wordEmbeddingQuery(targetWord: String, tokens: List<String>, cooccurrenceMat
 }
 
 /**
- * Calculate cosine similarity of two vectors (higher values are more similar).
+ * Generalized embedding similarity function.
+ * The parameter [useCosine] defaults to true, so it calculates cosine similarity
+ * of two vectors (higher values are more similar). If changed to false, it will
+ * calculate the dot product between the two vectors.
+ *
+ * Cosine similarity is normalized dot product.
+ *
  * All this does is forward to Math.cos but leaving it named this way is slightly more legible
  */
-fun cosineSimilarity(vectorA: DoubleArray, vectorB: DoubleArray): Double {
-    return cos(vectorA, vectorB)
+fun embeddingSimilarity(vectorA: DoubleArray, vectorB: DoubleArray, useCosine: Boolean = true): Double {
+    return if (useCosine) {
+        cos(vectorA, vectorB)
+    } else dot(vectorA, vectorB)
 }
 
 // Test main

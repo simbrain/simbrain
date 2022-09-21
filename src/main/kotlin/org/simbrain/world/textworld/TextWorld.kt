@@ -374,7 +374,7 @@ class TextWorld : AttributeContainer, EditableObject {
 
     fun loadDictionary(docString: String) {
         if (embeddingType == EmbeddingType.ONE_HOT) {
-            val tokens = uniqueTokensFromArray(tokenizeWordsFromSentence((docString)))
+            val tokens = uniqueTokensFromArray(docString.tokenizeWordsFromSentence())
             tokenVectorMap = TokenVectorMap(tokens, Matrix.eye(tokens.size))
 
         } else {

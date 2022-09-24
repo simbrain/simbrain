@@ -39,8 +39,8 @@ fun String.tokenizeWordsFromSentence(): List<String> {
  * Unique tokens: all unique tokens (contexts)
  * Converts to lowercase
  */
-fun uniqueTokensFromArray(words: List<String>): List<String> {
-    return words.distinctBy { it.lowercase() }
+fun List<String>.uniqueTokensFromArray(): List<String> {
+    return distinctBy { it.lowercase() }
 }
 
 /**
@@ -94,8 +94,8 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
     val adjustedMatrix = cocMatrix.clone().div(expectedValues)
 
     if (positive) {
-        for (indexRow in 0..(adjustedMatrix.nrows() - 1)) {
-            for (indexCol in 0..(adjustedMatrix.ncols() - 1)) {
+        for (indexRow in 0 until adjustedMatrix.nrows()) {
+            for (indexCol in 0 until adjustedMatrix.ncols()) {
                 if (adjustedMatrix[indexRow, indexCol] < 0) {
                     adjustedMatrix[indexRow, indexCol] = 0.0
                 }
@@ -108,15 +108,16 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
 // TODO: Return a TokenVectorDictionary
 
 /**
- * Generates co-occurrence matrix from a provided [docString]. [windowSize] specifies how many words should be
- * included in a context. [skipGram] specifies if the window should be previous words or symmetric.
+ * Generates co-occurrence matrix from a provided [docString].
  *
- * Example: if [windowSize] 2 and [skipGram] true, then the context for "dog" in "the quick dog ran fastly"
- * is ["the", "quick", "ran", "fastly"].  if [windowSize] 2 and [skipGram] false, then the context for "dog"
+ * Example: if [windowSize] is 2 and [skipGram] is true, then the context for "dog" in "the quick dog ran fastly"
+ * is ["the", "quick", "ran", "fastly"].  If [windowSize] 2 and [skipGram] false, then the context for "dog"
  * is ["the", "quick"].
  *
- *
- * Returns a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
+ * @param windowSize specifies how many words should be included in a context.
+ * @param skipGram  if true, window includes this many tokens before AND after; if false the window only includes
+ * previous tokens.
+ * @return a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
  *
  */
 fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, skipGram: Boolean = false , usePPMI: Boolean = true):
@@ -128,7 +129,7 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, skipGram:
 
     // get tokens from whole document
     val tokenizedSentence = convertedDocString.tokenizeWordsFromSentence()
-    val tokens = uniqueTokensFromArray(tokenizedSentence)
+    val tokens = tokenizedSentence.uniqueTokensFromArray()
 
     // Split document into sentences
     val sentences = convertedDocString.tokenizeSentencesFromDoc()

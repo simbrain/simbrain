@@ -18,6 +18,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
+import org.simbrain.world.textworld.TextWorldComponent
 
 class SimulationScope private constructor(
     val desktop: SimbrainDesktop?,
@@ -86,6 +87,12 @@ fun SimulationScope.addImageWorld(name: String?): ImageWorldComponent {
     val imageWorldComponent = ImageWorldComponent(name)
     workspace.addWorkspaceComponent(imageWorldComponent)
     return imageWorldComponent
+}
+
+fun SimulationScope.addTextWorld(name: String?): TextWorldComponent {
+    val textWorldComponent = TextWorldComponent(name)
+    workspace.addWorkspaceComponent(textWorldComponent)
+    return textWorldComponent
 }
 
 fun SimulationScope.addTimeSeries(name: String?): TimeSeriesPlotComponent {

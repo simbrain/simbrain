@@ -166,9 +166,11 @@ class TextWorld : AttributeContainer, EditableObject {
     val currentVector: DoubleArray
         get() = currentItem.let {
             if (it == null) {
+                // Zero vector if no current item
                 DoubleArray(tokenVectorMap.size)
             } else {
-                tokenVectorMap.get(it.text)
+                // TODO: Not sure if this is the best place to call lowercase()
+                tokenVectorMap.get(it.text.lowercase())
             }
         }
 
@@ -374,7 +376,7 @@ class TextWorld : AttributeContainer, EditableObject {
 
     fun loadDictionary(docString: String) {
         if (embeddingType == EmbeddingType.ONE_HOT) {
-            val tokens = uniqueTokensFromArray(docString.tokenizeWordsFromSentence())
+            val tokens = docString.tokenizeWordsFromSentence().uniqueTokensFromArray()
             tokenVectorMap = TokenVectorMap(tokens, Matrix.eye(tokens.size))
 
         } else {

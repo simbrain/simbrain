@@ -40,9 +40,6 @@ import javax.swing.text.JTextComponent
  * @author jyoshimi
  */
 class TextWorldPanel private constructor(
-    /**
-     * Underlying model text world.
-     */
     val world: TextWorld, toolbar: JToolBar?
 ) : JPanel() {
 
@@ -108,7 +105,14 @@ class TextWorldPanel private constructor(
         bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
         bottomToolbarPanel.add(toolbarModeSelect)
         add(bottomToolbarPanel, BorderLayout.SOUTH)
-        syncParseStyleButtons()
+
+        // Syncs the parse style buttons to the underlying model state.
+        if (world.parseStyle === TextWorld.ParseStyle.CHARACTER) {
+            charButton.isSelected = true
+        } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
+            wordButton.isSelected = true
+        }
+
     }
 
     /**
@@ -182,17 +186,6 @@ class TextWorldPanel private constructor(
         //         }
         //     }
         // })
-    }
-
-    /**
-     * Syncs the parse style buttons to the underlying model state.
-     */
-    fun syncParseStyleButtons() {
-        if (world.parseStyle === TextWorld.ParseStyle.CHARACTER) {
-            charButton.isSelected = true
-        } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
-            wordButton.isSelected = true
-        }
     }
 
     /**

@@ -60,8 +60,14 @@ class TextWorld : AttributeContainer, EditableObject {
     @UserParameter(label = "Window size", order = 20 )
     var windowSize = 2
 
-    @UserParameter(label = "Use PPMI", order = 30 )
+    @UserParameter(label = "SkipGram", order = 30 )
+    var skipGram = false
+
+    @UserParameter(label = "Use PPMI", order = 40 )
     var usePPMI = true
+
+    @UserParameter(label = "Use cosine sim", order = 50 )
+    var useCosine = true
 
     /**
      * Associates string tokens with arrays of doubles and vice-versa
@@ -380,7 +386,7 @@ class TextWorld : AttributeContainer, EditableObject {
             tokenVectorMap = TokenVectorMap(tokens, Matrix.eye(tokens.size))
 
         } else {
-            val result = generateCooccurrenceMatrix(docString, windowSize, usePPMI)
+            val result = generateCooccurrenceMatrix(docString, windowSize,skipGram, usePPMI)
             tokenVectorMap = TokenVectorMap(result.first, result.second)
         }
     }

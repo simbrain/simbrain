@@ -2,108 +2,47 @@ package org.simbrain.network.smile
 
 import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
-import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
 
+/**
+ * Simbrain wrapper for classifiers at https://haifengl.github.io/classification.html
+ *
+ * To work in Simbrain, all classifiers must be able to predict a label from a double array input.
+ *
+ * Outputs are class labels, which are converted into a one-hot output. A number of outputs must be specified, which
+ * thus corresponds to the number of class labels.
+ *
+ * Different classifiers are trained in different ways and thus have different properties and dialogs.
+ *
+ */
 class SmileClassifier(
     val net: Network,
-    val classifier: ClassifierWrapper,
-    val inputSize: Int,
-    nsamples: Int = 4
-) : ArrayLayer(net, inputSize), EditableObject {
+    val classifier: ClassifierWrapper
+) : ArrayLayer(net, classifier.inputSize), EditableObject {
+
+    // TODO: Re-implement when the design is further along.
+    //  Consider using String
+    // /**
+    //  * A version of the winning class label that can be used in couplings.
+    //  */
+    // @get:Producible()
+    // val labelEncodedOutput get() = winner.toDouble()
 
     /**
-     * Construct a classifier using the provided classifier and training data.
+     * Output matrix. Default to two outputs.
      */
-    constructor(net: Network, classifier: LogisticRegClassifier, inputs: Array<DoubleArray>, targets: IntArray)
-            : this(net, classifier, inputs[0].size, inputs.size) {
-                this.trainingInputs = inputs
-                this.trainingTargets = targets
-            }
-
-    /**
-     * A 2d array. Rows correspond to possible inputs to the classifier.
-     * Number of rows must = inputSize
-     *
-     * Xor example: [[0,0],[1,0],[0,1],[1,1]]
-     */
-    var trainingInputs: Array<DoubleArray>
-
-    /**
-     * Associates each row of traiingInputs with a classification into one of a set of categories. These can be
-     * represented in different ways depending on the classifier.
-     *
-     * Xor example: [-1,1,1,-1]
-     *
-     * Simbrain will convert these "outputs" of the classifier into an appropriate double array using a one-hot
-     * encoding. E.g. for a 2-category classifiers, -1 -> 1,0 and 1 -> 0,1
-     */
-    var trainingTargets: IntArray = IntArray(nsamples)
-        set(value) {
-            field = value
-            outputSize = value.toSet().count()
-        }
-
-
-    @UserParameter(label = "One hot encode outputs", order = 10)
-    var useOneHot = true
-
-    /**
-     * The current winning class label; used in output.
-     */
-    var winner = 0
-
-    /**
-     * Size of outputs, currently inferred from the number of unique target labels.
-     */
-    var outputSize: Int = 2
-        set(value) {
-            field = value
-            outputs = Matrix(outputSize, 1)
-        }
-
-    /**
-     * A version of the winning class label that can be used in couplings.
-     */
-    @get:Producible()
-    val labelEncodedOutput get() = winner.toDouble()
-
-    /**
-     * Output matrix
-     */
-    private var outputs = Matrix(outputSize, 1)
+    private var outputs = Matrix(classifier.outputSize, 1)
 
     /**
      * Construct a classifier.
      */
     init {
         label = net.idManager.getProposedId(this::class.java)
-        trainingInputs = Array(nsamples) { DoubleArray(inputSize) }
-        trainingTargets = IntArray(nsamples)
-    }
-
-    /**
-     * Train using current training data.
-     */
-    fun train() {
-        train(trainingInputs, trainingTargets)
-    }
-
-    /**
-     * Train the classifier.
-     */
-    fun train(inputs: Array<DoubleArray>, targets: IntArray) {
-        try {
-            classifier.fit(inputs, targets)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     /**
@@ -111,14 +50,10 @@ class SmileClassifier(
      */
     override fun update() {
         if (classifier.model != null) {
-            winner = classifier.predict(inputs.col(0))
+            val winner = classifier.predict(inputs.col(0))
             println("Prediction of ${this} = $winner")
             if (classifier.model != null) {
-                if (useOneHot) {
-                    outputs = getOneHotMat(winner, outputSize)
-                } else {
-                    outputs = classifier.getOutputVector(winner, outputSize)
-                }
+                    outputs = getOneHotMat(winner, outputSize())
             }
         }
         events.fireUpdated()
@@ -126,7 +61,7 @@ class SmileClassifier(
     }
 
     override fun toString(): String {
-        return "${label} (${classifier.name}): $inputSize -> $outputSize"
+        return "${label} (${classifier.name}): $classifier.inputSize -> ${outputSize()}"
     }
 
     /**
@@ -137,7 +72,7 @@ class SmileClassifier(
     }
 
     override fun outputSize(): Int {
-        return outputSize
+        return classifier.outputSize
     }
 
     override fun getBound(): Rectangle2D? {
@@ -155,14 +90,24 @@ class SmileClassifier(
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 4
 
+        @UserParameter(label = "Number of outputs (classes)", order = 10)
+        var nout = 2
+
         @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order =
         40)
-        var classifierType: ClassifierWrapper = SVMClassifier()
+        var classifierType: ClassifierWrapper = SVMClassifier(nin, nout)
 
         override val name = "Classifier"
 
         fun create(net: Network): SmileClassifier {
-            return SmileClassifier(net, classifierType, nin)
+            return SmileClassifier(net, classifierType)
+        }
+
+        companion object {
+            @JvmStatic
+            fun getTypes(): List<Class<*>> {
+                return ClassifierWrapper.getTypes()
+            }
         }
 
     }

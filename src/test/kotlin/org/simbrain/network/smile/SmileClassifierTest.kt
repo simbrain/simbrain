@@ -7,17 +7,19 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
+import org.simbrain.util.Utils
+import org.simbrain.util.table.DataFrameWrapper
+import smile.classification.DecisionTree
 import smile.classification.NaiveBayes
 import smile.data.Tuple
 import smile.data.formula.Formula
-import smile.data.type.DataType
-import smile.data.type.StructField
-import smile.data.type.StructType
 import smile.io.Read
 import smile.math.matrix.Matrix
-import smile.regression.cart
+import smile.read
 import smile.stat.distribution.GaussianDistribution
+import kotlin.random.Random
 
 /**
  * Also see SmileTest.java and SmileRegressionTest.kt
@@ -29,27 +31,28 @@ class SmileClassifierTest {
     /**
      * Create a trained SVM (on xor) for testing. Use a weirdly shaped 3x2 xor for better tests.
      */
-    var xorSVM = SmileClassifier(net, SVMClassifier(), 3, 2).apply {
-        this.trainingInputs = arrayOf(
+    val svm = SVMClassifier(3, 2).apply {
+        this.trainingData.featureVectors = arrayOf(
             doubleArrayOf(0.0, 0.0, 0.0),
             doubleArrayOf(1.0, 0.0, 0.0),
             doubleArrayOf(0.0, 1.0, 0.0),
             doubleArrayOf(1.0, 1.0, 0.0)
         )
-        this.trainingTargets = intArrayOf(-1, 1, 1, -1)
-        this.train()
+        this.trainingData.targets = intArrayOf(-1, 1, 1, -1)
     }
+    var xorSVM = SmileClassifier(net, svm)
 
     @BeforeEach
     internal fun setUp() {
         net = Network()
         xorSVM.clear()
+        svm.train()
     }
 
 
     @Test
     fun testInit() {
-        val classifier = SmileClassifier(net, SVMClassifier(), 4, 2)
+        val classifier = SmileClassifier(net, SVMClassifier(4, 2))
         net.addNetworkModel(classifier)
         classifier.addInputs(Matrix(doubleArrayOf(1.0,2.0,3.0,4.0)))
         assertEquals(10.0, classifier.inputs.sum())
@@ -126,26 +129,7 @@ class SmileClassifierTest {
         // TODO: A second version of this test using neurongroups or neuron collections
     }
 
-    @Test
-    fun `test decision tree`() {
-        val iris = Read.arff("simulations/tables/iris.arff")
-        val decisionTree = cart(Formula.of("class", "."), iris)
-        // (0 until iris.nrows()).forEach { i ->
-        //     println("${iris[i]} -> ${decisionTree.predict(iris.get(i))}")
-        //     println("${decisionTree.predict(iris.get(i))}")
-        // }
-        val schema = StructType(
-            StructField("sepallength", DataType.of(Int.javaClass)),
-            StructField("sepalwidth", DataType.of(Int.javaClass)),
-            StructField("petallength", DataType.of(Int.javaClass)),
-            StructField("petalwidth", DataType.of(Int.javaClass))
-        )
-        // TODO: Get the label
-        val result = decisionTree.predict(Tuple.of(doubleArrayOf(6.0,2.2,5.0,1.5), schema))
-        println("result = $result")
-    }
-
-    @Test
+    // @Test
     fun `test naive bayes`() {
         val nb = NaiveBayes(
             // Prior
@@ -162,5 +146,65 @@ class SmileClassifierTest {
 
         // Do a prediction
         println(nb.predict(doubleArrayOf(5.0, 175.0)))
+    }
+
+    //@Test
+    fun `test logistic regression`() {
+        val inputs = arrayOf(
+            doubleArrayOf(1.0,0.0,0.0),
+            doubleArrayOf(0.0,1.0,0.1),
+            doubleArrayOf(0.0,0.0,1.0)
+        )
+        // println(inputs.contentDeepToString())
+        val targets = intArrayOf(1, 2, 3)
+
+        val lr = LogisticRegClassifier(3, 3)
+        lr.fit(inputs, targets)
+        println(lr.predict(doubleArrayOf(1.0, 0.0, 0.0)))
+        println(lr.outputProbabilities.contentToString())
+        println(lr.predict(doubleArrayOf(0.0, 1.0, 0.0)))
+        println(lr.outputProbabilities.contentToString())
+    }
+
+    /**
+     * Predict Probability of 'Subscribing to a Term Deposit' based on 'Age, Balance, Duration, Campaign, Pay Days'
+     * Based on https://towardsdatascience.com/building-a-logistic-regression-in-python-step-by-step-becd4d56c9c8
+     * Dataset Source: http://archive.ics.uci.edu/ml/index.php
+     */
+    // @Test
+    fun `test logistic regression with bank data`() {
+        // csv(file: String, delimiter: Char = ',', header: Boolean = true, quote: Char = '"', escape: Char =
+        // '\\', schema: StructType? = null): DataFram
+        val data = DataFrameWrapper(read.csv("simulations/tables/bank-full.csv", header = true))
+
+        val targets = data.getIntColumn(data.columnCount-1)
+        val inputs = data.get2DDoubleArray(listOf(0, 5, 11, 12, 13, 14))
+
+        // Fit the model
+        val lr = LogisticRegClassifier(inputs.size, 2)
+        lr.fit(inputs, targets)
+        println("\nModel Accuracy: ${Utils.round(lr.stats.toDouble(), 3)}\n")
+
+        // Make some predictions
+        fun predict(rowNum: Int) {
+            val rowVector = inputs[rowNum]
+            val tar = targets[rowNum]
+            val pred = lr.predict(rowVector)
+            println("Target $tar - Prediction  $pred = Error ${tar - pred}")
+            println("Probabilities: ${lr.outputProbabilities.contentToString()}")
+        }
+        repeat(10) {
+            predict(Random.nextInt(targets.size))
+        }
+        // println("Percent ones = ${targets.count { v -> v == 1 }.toDouble()/targets.size}")
+    }
+
+    @Test
+    fun `test decision tree classifier`() {
+        val data = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
+        val decisionTree = DecisionTree.fit(Formula.of("class", "."), data.df)
+        println(decisionTree.predict(Tuple.of(doubleArrayOf(5.4,3.9,1.3,0.4), data.df.schema())))
+        // Use debugger to get a sense of what this has
+        // Could find a way to make the inferred tree human readable, would be cool
     }
 }

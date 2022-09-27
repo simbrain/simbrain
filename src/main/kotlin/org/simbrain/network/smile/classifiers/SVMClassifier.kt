@@ -11,8 +11,10 @@ import smile.validation.metric.Accuracy
 
 /**
  * Wrapper for Smile SVM Classifier.
+ *
  */
-class SVMClassifier(): ClassifierWrapper() {
+class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4):
+    ClassifierWrapper(inputSize, outputSize) {
 
     // TODO: Provide separate object for selecting Kernel
     @UserParameter(label = "Polynomial Kernel Degree", order = 20)
@@ -24,13 +26,10 @@ class SVMClassifier(): ClassifierWrapper() {
     @UserParameter(label = "Tolerance of convergence test", order = 40)
     var tolerance = 1E-3
 
-    /**
-     * The model.
-     */
     override var model: Classifier<DoubleArray>? = null
 
     override fun copy(): ClassifierWrapper {
-        return SVMClassifier().also {
+        return SVMClassifier(inputSize, outputSize).also {
             it.kernelDegree = kernelDegree
             it.C = C
             it.tolerance = tolerance
@@ -50,7 +49,7 @@ class SVMClassifier(): ClassifierWrapper() {
         return if (res == -1) 0 else 1
     }
 
-    override fun getOutputVector(result: Int, outputSize: Int): Matrix {
+    override fun getOutputVector(result: Int): Matrix {
         return getOneHotMat(result, outputSize)
     }
 

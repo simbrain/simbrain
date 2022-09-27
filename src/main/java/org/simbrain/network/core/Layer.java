@@ -51,7 +51,8 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
     public abstract void addInputs(Matrix inputs);
 
     /**
-     * For "single-layer" layers this is activations. For multi-layer cases it is the output layer.
+     * A column vector of output values. For "single-layer" layers this is activations. For multi-layer cases it is the
+     * output layer.
      */
     public abstract Matrix getOutputs();
 

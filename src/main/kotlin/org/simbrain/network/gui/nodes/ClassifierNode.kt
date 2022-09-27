@@ -1,24 +1,17 @@
 package org.simbrain.network.gui.nodes
 
-import net.miginfocom.swing.MigLayout
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
-import org.simbrain.network.NetworkComponent
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.getTrainingDialog
 import org.simbrain.network.smile.SmileClassifier
-import org.simbrain.network.smile.classifiers.SVMClassifier
-import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.*
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.stats.distributions.TwoValued
-import org.simbrain.util.table.*
 import org.simbrain.util.toSimbrainColorImage
-import java.awt.Dialog.ModalityType
-import java.awt.Dimension
-import javax.swing.*
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 
 class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifier: SmileClassifier):
     ArrayLayerNode(networkPanel, smileClassifier) {
@@ -83,10 +76,11 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
         infoText.text = computeInfoText()
     }
 
+    // TODO: Once the design is stabilized re-implement
     /**
      * Update status text.
      */
-    private fun computeInfoText() = "Winning class: " + smileClassifier.winner
+    private fun computeInfoText() = "Winning class: Todo" // + smileClassifier.winner
 
     override fun getModel(): NetworkModel {
         return smileClassifier
@@ -109,115 +103,9 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
         }
     }
 
-    override fun getPropertyDialog(): StandardDialog = StandardDialog().apply {
-
-        // TODO: Generalize training dialog and move
-
-        title = "Smile Classifier"
-        modalityType = ModalityType.MODELESS // Set to modeless so the dialog can be left open
-
-        val mainPanel = JPanel()
-        val statsLabel = JLabel("Score:")
-        contentPane = mainPanel
-        mainPanel.apply {
-
-            layout = MigLayout("fillx")
-            // layout = MigLayout("debug")
-
-            // Data Panels
-            val inputs = SimbrainDataViewer(createFromDoubleArray(smileClassifier.trainingInputs), false).apply {
-                addAction(table.importCsv)
-                addAction(table.randomizeAction)
-                preferredSize = Dimension(300, 300)
-                addClosingTask {
-                    smileClassifier.trainingInputs = this.model.get2DDoubleArray()
-                }
-            }
-
-            val targets = SimbrainDataViewer(createFromColumn(smileClassifier.trainingTargets), false).apply {
-                addAction(table.importCsv)
-                addAction(table.randomizeColumnAction)
-                table.model.columns[0].columnRandomizer = TwoValued(-1.0,1.0)
-                preferredSize = Dimension(200, 300)
-                addClosingTask {
-                    smileClassifier.trainingTargets = this.model.getIntColumn(0)
-                }
-            }
-
-            val addRemoveRows = JPanel().apply {
-                // Add row
-                add(JButton().apply {
-                    icon = ResourceManager.getImageIcon("menu_icons/AddTableRow.png")
-                    toolTipText = "Insert row at bottom of input and target tables"
-                    addActionListener {
-                        inputs.table.insertRow()
-                        targets.table.insertRow()
-                    }
-                })
-                add(JButton().apply {
-                    icon = ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png")
-                    toolTipText = "Delete last row of input and target tables"
-                    addActionListener {
-                        inputs.table.model.deleteRow(inputs.table.rowCount-1)
-                        targets.table.model.deleteRow(targets.table.rowCount-1)
-                    }
-                })
-            }
-
-            // Training Button
-            val trainButton = JButton("Train").apply {
-                addActionListener {
-                    // TODO: Make a separate commit action and then just call smileClassifier.train. See deepnet
-                    // TODO: Generalize to more than one column?
-                    smileClassifier.train(inputs.table.model.getColumnMajorArray()
-                        , targets.table.model.getIntColumn(0))
-                    statsLabel.text = "Stats: " + smileClassifier.classifier.stats
-                }
-            }
-
-            // Add all components
-            val classfierGeneralProps = AnnotatedPropertyEditor(smileClassifier)
-            add(classfierGeneralProps, "wrap")
-            addClosingTask(classfierGeneralProps::commitChanges)
-            add(JSeparator(), "growx, span, wrap")
-            val classfierProps = AnnotatedPropertyEditor(smileClassifier.classifier)
-            if (!classfierProps.widgets.isEmpty()) {
-                add(classfierProps, "wrap")
-                addClosingTask(classfierProps::commitChanges)
-                add(JSeparator(), "growx, span, wrap")
-            }
-            add(trainButton)
-            add(statsLabel, "wrap")
-            add(JSeparator(), "span, growx, wrap")
-            add(JLabel("Inputs"))
-            add(JLabel("Target Labels"))
-            add(JSeparator(), "span, growx, wrap")
-            add(inputs)
-            add(targets, "wrap")
-            add(JPanel().apply{
-                add(JLabel("Add / Remove rows:"))
-                add(addRemoveRows)
-            })
-        }
-
+    override fun getPropertyDialog(): StandardDialog {
+        return smileClassifier.classifier.getTrainingDialog()
     }
 
 }
 
-fun main() {
-    val networkComponent = NetworkComponent("net 1")
-    val np = NetworkPanel(networkComponent)
-    val classifier = with(networkComponent.network) {
-        val classifier = SmileClassifier(this, SVMClassifier(), 2)
-        classifier.trainingInputs = arrayOf(
-                doubleArrayOf(0.0, 0.0),
-                doubleArrayOf(1.0, 0.0),
-                doubleArrayOf(0.0, 1.0),
-                doubleArrayOf(1.0, 1.0)
-            )
-        classifier.trainingTargets = intArrayOf(-1,1,1,-1)
-        addNetworkModel(classifier)
-        classifier
-    }
-    SmileClassifierNode(np, classifier).getPropertyDialog().run { makeVisible() }
-}

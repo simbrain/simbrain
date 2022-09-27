@@ -10,10 +10,8 @@ import smile.math.matrix.Matrix
  * Array based layers (based on Smile matrices) should extend this. Maintains an input vector for summing inputs.
  */
 abstract class ArrayLayer(
-    /**
-     * Reference to network this array is part of.
-     */
-    private val parent: Network, inputSize: Int
+    private val parent: Network,
+    inputSize: Int
 ) : Layer() {
 
     @UserParameter(label = "Increment amount", increment = .1, order = 20)

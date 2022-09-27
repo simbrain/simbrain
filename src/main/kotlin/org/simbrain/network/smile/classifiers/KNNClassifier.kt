@@ -11,14 +11,12 @@ import smile.validation.metric.Accuracy
 /**
  * Wrapper for Smile KNN Classifier.
  */
-class KNNClassifier(): ClassifierWrapper() {
+class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4): ClassifierWrapper(inputSize, 
+    outputSize) {
 
     @UserParameter(label = "K", order = 10)
     var k = 5
 
-    /**
-     * The model.
-     */
     override var model: Classifier<DoubleArray>? = null
 
     override val name: String = "K Nearest Neighbors"
@@ -33,7 +31,7 @@ class KNNClassifier(): ClassifierWrapper() {
         return model?.predict(input) ?: -1
     }
 
-    override fun getOutputVector(result: Int, outputSize: Int): Matrix {
+    override fun getOutputVector(result: Int): Matrix {
         if (result > outputSize) {
             throw IllegalArgumentException("Prediction of ${result} > output size of ${outputSize}")
         }
@@ -45,7 +43,7 @@ class KNNClassifier(): ClassifierWrapper() {
     }
 
     override fun copy(): ClassifierWrapper {
-        return KNNClassifier().also {
+        return KNNClassifier(inputSize, outputSize).also {
             it.k = k
         }
     }

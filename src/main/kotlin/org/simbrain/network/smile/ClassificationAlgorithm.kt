@@ -10,9 +10,9 @@ import smile.classification.Classifier
 import smile.math.matrix.Matrix
 
 /**
- * Wrapper for Smile Classifier types
+ * Superclass for wrappers of Smile classifier objects.
  */
-abstract class ClassifierWrapper(
+abstract class ClassificationAlgorithm(
     val inputSize: Int,
     val outputSize: Int
 ): CopyableObject {
@@ -51,7 +51,7 @@ abstract class ClassifierWrapper(
     /**
      * For use with object type editor.
      */
-    abstract override fun copy(): ClassifierWrapper
+    abstract override fun copy(): ClassificationAlgorithm
 
     companion object {
         /**

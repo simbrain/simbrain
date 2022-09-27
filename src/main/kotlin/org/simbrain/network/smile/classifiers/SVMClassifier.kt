@@ -1,6 +1,6 @@
 package org.simbrain.network.smile.classifiers
 
-import org.simbrain.network.smile.ClassifierWrapper
+import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
 import smile.classification.Classifier
@@ -14,7 +14,7 @@ import smile.validation.metric.Accuracy
  *
  */
 class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4):
-    ClassifierWrapper(inputSize, outputSize) {
+    ClassificationAlgorithm(inputSize, outputSize) {
 
     // TODO: Provide separate object for selecting Kernel
     @UserParameter(label = "Polynomial Kernel Degree", order = 20)
@@ -28,7 +28,7 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
 
     override var model: Classifier<DoubleArray>? = null
 
-    override fun copy(): ClassifierWrapper {
+    override fun copy(): ClassificationAlgorithm {
         return SVMClassifier(inputSize, outputSize).also {
             it.kernelDegree = kernelDegree
             it.C = C
@@ -57,7 +57,7 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     companion object {
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return ClassifierWrapper.getTypes()
+            return ClassificationAlgorithm.getTypes()
         }
     }
 

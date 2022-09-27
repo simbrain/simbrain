@@ -22,7 +22,7 @@ import java.awt.geom.Rectangle2D
  */
 class SmileClassifier(
     val net: Network,
-    val classifier: ClassifierWrapper
+    val classifier: ClassificationAlgorithm
 ) : ArrayLayer(net, classifier.inputSize), EditableObject {
 
     // TODO: Re-implement when the design is further along.
@@ -95,7 +95,7 @@ class SmileClassifier(
 
         @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order =
         40)
-        var classifierType: ClassifierWrapper = SVMClassifier(nin, nout)
+        var classifierType: ClassificationAlgorithm = SVMClassifier(nin, nout)
 
         override val name = "Classifier"
 
@@ -106,7 +106,7 @@ class SmileClassifier(
         companion object {
             @JvmStatic
             fun getTypes(): List<Class<*>> {
-                return ClassifierWrapper.getTypes()
+                return ClassificationAlgorithm.getTypes()
             }
         }
 

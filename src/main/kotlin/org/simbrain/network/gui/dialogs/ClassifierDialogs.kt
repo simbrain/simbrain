@@ -4,7 +4,7 @@ import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SmileClassifierNode
-import org.simbrain.network.smile.ClassifierWrapper
+import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.ResourceManager
@@ -21,7 +21,7 @@ import javax.swing.JSeparator
 /**
  * SVN Training dialog.
  */
-fun ClassifierWrapper.getTrainingDialog(): StandardDialog {
+fun ClassificationAlgorithm.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
         contentPane = JPanel()

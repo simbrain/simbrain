@@ -1,6 +1,6 @@
 package org.simbrain.network.smile.classifiers
 
-import org.simbrain.network.smile.ClassifierWrapper
+import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
 import smile.classification.Classifier
@@ -11,7 +11,7 @@ import smile.validation.metric.Accuracy
 /**
  * Wrapper for Smile KNN Classifier.
  */
-class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4): ClassifierWrapper(inputSize, 
+class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4): ClassificationAlgorithm(inputSize,
     outputSize) {
 
     @UserParameter(label = "K", order = 10)
@@ -42,7 +42,7 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
         }
     }
 
-    override fun copy(): ClassifierWrapper {
+    override fun copy(): ClassificationAlgorithm {
         return KNNClassifier(inputSize, outputSize).also {
             it.k = k
         }
@@ -52,7 +52,7 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     companion object {
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return ClassifierWrapper.getTypes()
+            return ClassificationAlgorithm.getTypes()
         }
     }
 

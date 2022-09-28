@@ -49,17 +49,12 @@ val nlpSim = newSim {
 
     // Couple the text world to neuron collection
     with(couplingManager) {
-        createCoupling(
-            textWorld.getProducer("getCurrentVector"),
-            nc.getConsumer("addInputs")
-        )
+        textWorld couple nc
     }
 
 }
 
-val mlk = """
-
-And so even though we face the difficulties of today and tomorrow, I still have a dream. It is a dream deeply rooted in the American dream.
+val mlk = """And so even though we face the difficulties of today and tomorrow, I still have a dream. It is a dream deeply rooted in the American dream.
 
 I have a dream that one day this nation will rise up and live out the true meaning of its creed:
 
@@ -103,6 +98,4 @@ From every mountainside, let freedom ring.
 And when this happens, when we allow freedom ring, when we let it ring from every village and every hamlet, from every state and every city, we will be able to speed up that day when all of God s children, black men and white men, Jews and Gentiles, Protestants and Catholics, will be able to join hands and sing in the words of the old Negro spiritual:
 Free at last! Free at last!
 
-Thank God Almighty, we are free at last!
-
-"""
+Thank God Almighty, we are free at last!"""

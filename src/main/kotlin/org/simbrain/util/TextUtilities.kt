@@ -186,13 +186,13 @@ fun wordEmbeddingQuery(targetWord: String, tokens: List<String>, cooccurrenceMat
  * calculate the dot product between the two vectors.
  *
  * Cosine similarity is normalized dot product.
- *
- * All this does is forward to Math.cos but leaving it named this way is slightly more legible
  */
 fun embeddingSimilarity(vectorA: DoubleArray, vectorB: DoubleArray, useCosine: Boolean = true): Double {
     return if (useCosine) {
         cos(vectorA, vectorB)
-    } else dot(vectorA, vectorB)
+    } else {
+        dot(vectorA, vectorB)
+    }
 }
 
 // Test main

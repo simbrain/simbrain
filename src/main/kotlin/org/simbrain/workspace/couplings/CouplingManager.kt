@@ -150,6 +150,8 @@ class CouplingManager(val workspace: Workspace) {
     val Producer.preference: Int
         get() = when {
             baseObject is SmellSensor && method.name == "getSmellVector" -> 10
+            // Preference against text attributes, which are rarely used
+            method.returnType == String::class.java-> -10
             else -> 0
         }
 

@@ -30,17 +30,14 @@ val smileSim = newSim {
     inputNc.setClamped(true)
     inputNc.location = point(0, 0)
 
-    val lr = LogisticRegClassifier()
+    val lr = LogisticRegClassifier(4, 3)
     val inputs = data.get2DDoubleArray(0 until data.columnCount - 1)
     val targets = data.getIntColumn(data.columnCount - 1)
 
     inputNc.inputManager.data = inputs
 
-    // TODO: Should be able to initialize the classifier with data
-    val smileClassifier = SmileClassifier(network, lr, inputs, targets)
-    // smileClassifier.classifier.fit(inputs, targets)
-    smileClassifier.useOneHot = false
-    smileClassifier.train()
+    val smileClassifier = SmileClassifier(network, lr)
+    lr.fit(inputs, targets)
 
     val weightMatrix = WeightMatrix(network, inputNc, smileClassifier)
     network.addNetworkModels(weightMatrix, smileClassifier)

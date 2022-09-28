@@ -133,17 +133,17 @@ class TextWorldPanel private constructor(
         textArea.document.addDocumentListener(object : DocumentListener {
             override fun changedUpdate(arg0: DocumentEvent) {
                 //System.out.println("readerworld: changedUpdate");
-                world.setText(textArea.text, false)
+                world.setTextNoEvent(textArea.text)
             }
 
             override fun insertUpdate(arg0: DocumentEvent) {
                 //System.out.println("readerworld: insertUpdate");
-                world.setText(textArea.text, false)
+                world.setTextNoEvent(textArea.text)
             }
 
             override fun removeUpdate(arg0: DocumentEvent) {
                 //System.out.println("readerworld: removeUpdate");
-                world.setText(textArea.text, false)
+                world.setTextNoEvent(textArea.text)
             }
         })
 
@@ -160,9 +160,11 @@ class TextWorldPanel private constructor(
             }
         })
         world.events.onTextChanged {
-            textArea.text = world.text
-            if (world.position < textArea.document.length) {
-                textArea.caretPosition = world.position
+            SwingUtilities.invokeLater {
+                textArea.text = world.text
+                if (world.position < textArea.document.length) {
+                    textArea.caretPosition = world.position
+                }
             }
         }
 
@@ -174,7 +176,7 @@ class TextWorldPanel private constructor(
             if (it!!.text.equals("", ignoreCase = true)) {
                 removeHighlights(textArea)
             } else {
-                highlight(it!!.beginPosition, it!!.endPosition)
+                highlight(it.beginPosition, it.endPosition)
             }
         }
 
@@ -233,7 +235,8 @@ class TextWorldPanel private constructor(
      */
         (color: Color?) :
         DefaultHighlightPainter(color)// add action listener for switching between char and word buttons:
-    // wordButton.addActionListener(a);
+        // wordButton.addActionListener(a);
+
     /**
      * Return a toolbar with buttons for switching between word and character
      * mode.

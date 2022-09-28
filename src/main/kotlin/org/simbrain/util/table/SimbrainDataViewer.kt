@@ -5,7 +5,7 @@ import org.jdesktop.swingx.JXTableHeader
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.widgets.RowNumberTable
-import smile.math.matrix.Matrix
+import smile.io.Read
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.event.ActionEvent
@@ -275,8 +275,8 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
 fun main() {
 
     // val model = DataFrameWrapper(read.csv("simulations/tables/toy-test.txt", delimiter='\t', header=false))
-    // val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
-    val model = createFromDoubleArray(Matrix.randn(10, 4).toArray())
+    val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
+    // val model = createFromDoubleArray(Matrix.randn(10, 4).toArray())
     SimbrainDataViewer(model).displayInDialog()
 
 }

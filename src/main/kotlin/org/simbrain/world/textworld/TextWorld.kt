@@ -82,12 +82,26 @@ class TextWorld : AttributeContainer, EditableObject {
         }
 
     /**
-     * The main displayed text to be parsed.
+     * Private backing for [text] field.
      */
-    var text = ""
+    private var _text = ""
+
+    /**
+     * The main "world text" associated with this world (which displays in the main window).
+     */
+    var text: String
+        get() = _text
         set(value) {
-            field = value
+            _text = value
+            events.fireTextChanged()
         }
+
+    /**
+     * Set main text without firing an event.
+     */
+    fun setTextNoEvent(newText: String) {
+        _text = newText
+    }
 
     /**
      * The current item of text (letter, word, etc.)
@@ -99,12 +113,9 @@ class TextWorld : AttributeContainer, EditableObject {
         }
 
     /**
-     * What the current position in the text is.
+     * What the current "cursor" position in the text is.
      */
     var position = 0
-        set(value) {
-            field = value
-        }
 
     /**
      * Last position in the text.
@@ -186,7 +197,8 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     @Consumable()
     fun displayClosestWord(key: DoubleArray) {
-        addText(tokenVectorMap.getClosestWord(key))
+        // Using addTextAtCursor produces strange results. Must be better synced with cursor.
+        addTextAtEnd(tokenVectorMap.getClosestWord(key))
     }
 
     /**
@@ -289,13 +301,23 @@ class TextWorld : AttributeContainer, EditableObject {
         return nextOne
     }
 
+
     /**
-     * Add a text to the end of the underling text object.
+     * Add a text to the end of the world text.
      */
     @Consumable
-    fun addText(newText: String) {
+    fun addTextAtCursor(newText: String) {
+        text = StringBuilder(text).insert(position, " $newText ").toString()
+        events.fireTextChanged()
+    }
+
+    /**
+     * Add a text to the end of the world text.
+     */
+    @Consumable
+    fun addTextAtEnd(newText: String) {
         position = text.length
-        text += newText
+        text += " $newText"
         events.fireTextChanged()
     }
 
@@ -309,15 +331,6 @@ class TextWorld : AttributeContainer, EditableObject {
     val currentToken: String
         get() = currentItem.let { it?.text ?: "" }
 
-    // TODO: Remove
-    fun setText(text: String, fireEvent: Boolean) {
-        this.text = text
-        if (fireEvent) {
-            events.fireTextChanged()
-        }
-    }
-
-    // TODO
     fun setPosition(newPosition: Int, fireEvent: Boolean) {
         if (newPosition <= text.length) {
             lastPosition = position

@@ -54,7 +54,9 @@ public class NetworkUpdateManager {
     private List<UpdateManagerListener> listeners =
             new ArrayList<UpdateManagerListener>();
 
-    /** Reference to parent network. */
+    /**
+     * Reference to parent network.
+     */
     private final Network network;
 
     /**
@@ -130,8 +132,9 @@ public class NetworkUpdateManager {
         // By default these guys are always available
         availableActionList.add(new BufferedUpdate(network));
         availableActionList.add(new PriorityUpdate(network));
-        availableActionList.add(ConcurrentBufferedUpdate
-                .createConcurrentBufferedUpdate(network));
+        // Not including this by default for now. Causes problems here and only used in scripts.
+        // availableActionList.add(ConcurrentBufferedUpdate
+        //.createConcurrentBufferedUpdate(network));
 
         // Add update actions for all groups available
         for (Group group : network.getGroupList()) {
@@ -146,8 +149,7 @@ public class NetworkUpdateManager {
     /**
      * Remove action (if one exists) associated with the provided group.
      *
-     * @param group
-     *            the group being removed
+     * @param group the group being removed
      */
     private void removeGroupAction(Group group) {
         NetworkUpdateAction toDelete = null;
@@ -167,8 +169,7 @@ public class NetworkUpdateManager {
     /**
      * Listen for updates to the update manager.
      *
-     * @param listener
-     *            the listener to add
+     * @param listener the listener to add
      */
     public void addListener(UpdateManagerListener listener) {
         listeners.add(listener);
@@ -177,8 +178,7 @@ public class NetworkUpdateManager {
     /**
      * Remove listener.
      *
-     * @param listener
-     *            the listener to remove
+     * @param listener the listener to remove
      */
     public void removeListener(UpdateManagerListener listener) {
         listeners.remove(listener);
@@ -194,10 +194,8 @@ public class NetworkUpdateManager {
     /**
      * Swap elements at the specified location.
      *
-     * @param index1
-     *            index of first element
-     * @param index2
-     *            index of second element
+     * @param index1 index of first element
+     * @param index2 index of second element
      */
     public void swapElements(final int index1, final int index2) {
         Collections.swap(actionList, index1, index2);
@@ -209,8 +207,7 @@ public class NetworkUpdateManager {
     /**
      * Add an action to the list.
      *
-     * @param action
-     *            the action to add.
+     * @param action the action to add.
      */
     public void addAction(NetworkUpdateAction action) {
         actionList.add(action);
@@ -221,11 +218,12 @@ public class NetworkUpdateManager {
 
     /**
      * Add the action at a specified location in the action list
+     *
      * @param location index in the list to add the action
-     * @param action action to add
+     * @param action   action to add
      */
     public void addAction(int location, NetworkUpdateAction action) {
-        actionList.add(location,action);
+        actionList.add(location, action);
         for (UpdateManagerListener listener : listeners) {
             listener.actionAdded(action);
         }
@@ -234,8 +232,7 @@ public class NetworkUpdateManager {
     /**
      * Completely remove an action.
      *
-     * @param action
-     *            the action to completely remove
+     * @param action the action to completely remove
      */
     public void removeAction(NetworkUpdateAction action) {
         actionList.remove(action);
@@ -251,21 +248,21 @@ public class NetworkUpdateManager {
 
         /**
          * An action was added.
-         * 
-         * @param action
-         *            the action to add
+         *
+         * @param action the action to add
          */
         void actionAdded(NetworkUpdateAction action);
 
         /**
          * An action was removed.
-         * 
-         * @param action
-         *            the action to remove
+         *
+         * @param action the action to remove
          */
         void actionRemoved(NetworkUpdateAction action);
 
-        /** The action order was changed. */
+        /**
+         * The action order was changed.
+         */
         void actionOrderChanged();
     }
 

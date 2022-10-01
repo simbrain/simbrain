@@ -318,7 +318,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
          */
         public void actionPerformed(ActionEvent arg0) {
             File defaultScript = new File(System.getProperty("user.dir")
-                    + "/etc/customNetworkUpdateTemplate.bsh");
+                    + "/scripts/updateScripts/networkUpdate/customNetworkUpdateTemplate.bsh");
             ScriptEditor panel = new ScriptEditor(
                     Utils.readFileContents(defaultScript), SCRIPT_DIR);
             panel.setScriptFile(defaultScript);
@@ -375,8 +375,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
                             .getSelectedValuesList()) {
                         network.getUpdateManager().addAction(
                                 (NetworkUpdateAction) action);
-                    }
-                    ;
+                    };
                 }
             };
             addActionsDialog.setTitle("Add predefined action");
@@ -384,6 +383,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
             addActionsDialog.pack();
             addActionsDialog.setLocationRelativeTo(null);
             addActionsDialog.setVisible(true);
+            addActionsDialog.toFront();
 
         }
     };

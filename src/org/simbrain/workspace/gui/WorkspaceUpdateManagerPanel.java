@@ -104,8 +104,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         JPanel buttonPanel = new JPanel();
         JButton addActionsButton = new JButton(addPresetAction);
         buttonPanel.add(addActionsButton);
-        JButton customActionButton = new JButton(addCustomAction);
-        buttonPanel.add(customActionButton);
+        // TODO: Disabling this for now because rarely used and causes problems in Simbrain.app
+         JButton customActionButton = new JButton(addCustomAction);
+         buttonPanel.add(customActionButton);
         JButton deleteActionsButton = new JButton(deleteActionsAction);
         buttonPanel.add(deleteActionsButton);
         // TODO: Make movement actions apply to multiple selections
@@ -375,7 +376,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
          */
         public void actionPerformed(ActionEvent arg0) {
             File defaultScript = new File(System.getProperty("user.dir")
-                    + "/etc/customWorkspaceUpdateTemplate.bsh");
+                    + "/scripts/updateScripts/workspaceUpdate/customWorkspaceUpdateTemplate.bsh");
             ScriptEditor panel = new ScriptEditor(
                     Utils.readFileContents(defaultScript), SCRIPT_DIR);
             panel.setScriptFile(defaultScript);

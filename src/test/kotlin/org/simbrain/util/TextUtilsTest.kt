@@ -57,7 +57,7 @@ class TextUtilsTest {
     fun `get unique tokens from sentences`() {
         val sentence = "a A a b. B c b d c c"
         val tokenizedSentence = sentence.tokenizeWordsFromSentence()
-        val uniqueTokens = uniqueTokensFromArray(tokenizedSentence)
+        val uniqueTokens = tokenizedSentence.uniqueTokensFromArray()
         // println(uniqueTokens)
         assertEquals(listOf("a","b","c","d"), uniqueTokens)
     }
@@ -85,7 +85,7 @@ class TextUtilsTest {
 
     @Test
     fun `co-occurrence matrix is correct size`() {
-        val tokens = uniqueTokensFromArray(simpleText.tokenizeWordsFromSentence())
+        val tokens = simpleText.tokenizeWordsFromSentence().uniqueTokensFromArray()
         val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, 2, true).second
         assertEquals(tokens.size, cooccurrenceMatrix.nrows())
         assertEquals(tokens.size, cooccurrenceMatrix.ncols())
@@ -94,7 +94,7 @@ class TextUtilsTest {
     @Test
     fun `word embedding have correct size`() {
         val tokenizedSentence = harderText.tokenizeWordsFromSentence()
-        val tokens = uniqueTokensFromArray(tokenizedSentence)
+        val tokens = tokenizedSentence.uniqueTokensFromArray()
         val cooccurrenceMatrix = generateCooccurrenceMatrix(harderText, 2, true).second
         assertEquals(tokens.size, wordEmbeddingQuery("obstacles",tokens,cooccurrenceMatrix).size)
         assertEquals(tokens.size, wordEmbeddingQuery("Quixote",tokens,cooccurrenceMatrix).size) // issue was capital Q
@@ -102,7 +102,7 @@ class TextUtilsTest {
 
     @Test
     fun `co-occurence matrix window size correctly affects similarity`() {
-        val tokens = uniqueTokensFromArray(windowSizeText.tokenizeWordsFromSentence())
+        val tokens = windowSizeText.tokenizeWordsFromSentence().uniqueTokensFromArray()
         val cooccurrenceMatrixShort = generateCooccurrenceMatrix(windowSizeText, 1, true).second
         val cooccurrenceMatrixLong = generateCooccurrenceMatrix(windowSizeText, 4, true).second
         val smallWindowSimilarity = embeddingSimilarity(
@@ -120,7 +120,7 @@ class TextUtilsTest {
     @Test
     fun `computes cosine similarity between two vectors`() {
         val tokenizedSentence = similarText.tokenizeWordsFromSentence()
-        val tokens = uniqueTokensFromArray(tokenizedSentence)
+        val tokens = tokenizedSentence.uniqueTokensFromArray()
         val cooccurrenceMatrix = generateCooccurrenceMatrix(similarText, 2, true).second
         val vectorA = wordEmbeddingQuery("cat",tokens,cooccurrenceMatrix)
         val vectorB = wordEmbeddingQuery("dog",tokens,cooccurrenceMatrix)

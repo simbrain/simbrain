@@ -185,3 +185,7 @@ fun <E : EditableObject> E.createDialog(block: (E) -> Unit): StandardDialog {
         }
     }
 }
+
+fun showWarningDialog(message: String) {
+    JOptionPane.showMessageDialog(null, message, "Warning!", JOptionPane.WARNING_MESSAGE)
+}

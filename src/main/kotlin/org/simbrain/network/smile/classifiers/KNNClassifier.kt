@@ -15,7 +15,7 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     outputSize) {
 
     @UserParameter(label = "K", order = 10)
-    var k = 5
+    var k = 2
 
     override var model: Classifier<DoubleArray>? = null
 
@@ -24,7 +24,7 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         model = KNN.fit(inputs, targets, k)
         val pred = model?.predict(inputs)
-        stats = ""  + Accuracy.of(targets, pred)
+        setAccuracyLabel(Accuracy.of(targets, pred))
     }
 
     override fun predict(input: DoubleArray): Int {

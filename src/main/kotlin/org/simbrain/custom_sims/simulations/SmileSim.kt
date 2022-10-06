@@ -5,7 +5,7 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.createNeuronCollection
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.SmileClassifier
-import org.simbrain.network.smile.classifiers.LogisticRegClassifier
+import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.table.DataFrameWrapper
@@ -30,19 +30,19 @@ val smileSim = newSim {
     inputNc.setClamped(true)
     inputNc.location = point(0, 0)
 
-    val lr = LogisticRegClassifier(4, 3)
-    val inputs = data.get2DDoubleArray(0 until data.columnCount - 1)
-    val targets = data.getIntColumn(data.columnCount - 1)
-
-    inputNc.inputManager.data = inputs
-
-    val smileClassifier = SmileClassifier(network, lr)
-    lr.fit(inputs, targets)
+    // val classifier = LogisticRegClassifier(4, 3)
+    // val classifier = SVMClassifier(4, 3)
+    val classifier = KNNClassifier(4, 3)
+    classifier.trainingData.featureVectors = data.get2DDoubleArray(0 until data.columnCount - 1)
+    // TODO: Initialize with labels. DataFrame should have that
+    classifier.trainingData.setIntegerTargets(data.getIntColumn(data.columnCount - 1))
+    inputNc.inputManager.data = classifier.trainingData.featureVectors
+    val smileClassifier = SmileClassifier(network, classifier)
+    smileClassifier.train()
 
     val weightMatrix = WeightMatrix(network, inputNc, smileClassifier)
     network.addNetworkModels(weightMatrix, smileClassifier)
     smileClassifier.location = point(0, -300)
-
 
     // Location of the network in the desktop
     withGui {

@@ -6,8 +6,10 @@ import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
+import kotlin.reflect.full.primaryConstructor
 
 /**
  * Simbrain wrapper for classifiers at https://haifengl.github.io/classification.html
@@ -25,16 +27,20 @@ class SmileClassifier(
     val classifier: ClassificationAlgorithm
 ) : ArrayLayer(net, classifier.inputSize), EditableObject {
 
-    // TODO: Re-implement when the design is further along.
-    //  Consider using String
-    // /**
-    //  * A version of the winning class label that can be used in couplings.
-    //  */
-    // @get:Producible()
-    // val labelEncodedOutput get() = winner.toDouble()
+    /**
+     * Integer winner produced by the Smile classifier when predict is called.
+     */
+    var winner = Integer.MIN_VALUE
 
     /**
-     * Output matrix. Default to two outputs.
+     * Returns the label associated with the winning target integer.
+     */
+    val winningLabel: String?
+        @Producible
+        get() = classifier.trainingData.labelTargetMap.getInverse(winner)?:""
+
+    /**
+     * Output matrix.
      */
     private var outputs = Matrix(classifier.outputSize, 1)
 
@@ -46,14 +52,29 @@ class SmileClassifier(
     }
 
     /**
+     * Train the classifier using the current training data.
+     */
+    fun train() {
+        classifier.apply {
+            fit(trainingData.featureVectors, trainingData.getIntegerTargets())
+        }
+        events.fireUpdated()
+    }
+
+    /**
      * Update the classifier by apply it to inputs and caching the result as output.
      */
     override fun update() {
         if (classifier.model != null) {
-            val winner = classifier.predict(inputs.col(0))
-            println("Prediction of ${this} = $winner")
+            winner = classifier.predict(inputs.col(0))
+            // println("Prediction of ${this.id} is: $winner")
             if (classifier.model != null) {
-                    outputs = getOneHotMat(winner, outputSize())
+                outputs = try {
+                    getOneHotMat(winner, outputSize())
+                } catch(e: IllegalArgumentException) {
+                    System.err.println(e.message)
+                    Matrix(outputSize(), 1)
+                }
             }
         }
         events.fireUpdated()
@@ -93,14 +114,13 @@ class SmileClassifier(
         @UserParameter(label = "Number of outputs (classes)", order = 10)
         var nout = 2
 
-        @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order =
-        40)
-        var classifierType: ClassificationAlgorithm = SVMClassifier(nin, nout)
+        @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order = 40)
+        var classifierType: ClassificationAlgorithm = SVMClassifier()
 
         override val name = "Classifier"
 
         fun create(net: Network): SmileClassifier {
-            return SmileClassifier(net, classifierType)
+            return SmileClassifier(net, classifierType::class.primaryConstructor!!.call(nin, nout))
         }
 
         companion object {

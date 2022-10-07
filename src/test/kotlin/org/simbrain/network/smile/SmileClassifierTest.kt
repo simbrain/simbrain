@@ -38,7 +38,7 @@ class SmileClassifierTest {
             doubleArrayOf(0.0, 1.0, 0.0),
             doubleArrayOf(1.0, 1.0, 0.0)
         )
-        this.trainingData.targets = intArrayOf(-1, 1, 1, -1)
+        this.trainingData.setIntegerTargets(intArrayOf(-1, 1, 1, -1))
     }
     var xorSVM = SmileClassifier(net, svm)
 
@@ -46,7 +46,7 @@ class SmileClassifierTest {
     internal fun setUp() {
         net = Network()
         xorSVM.clear()
-        svm.train()
+        xorSVM.train()
     }
 
 

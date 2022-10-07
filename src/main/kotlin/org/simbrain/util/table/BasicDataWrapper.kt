@@ -188,3 +188,7 @@ fun createFromColumn(data: IntArray): BasicDataWrapper {
     return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
+fun createFromColumn(data: Array<String>): BasicDataWrapper {
+    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
+}
+

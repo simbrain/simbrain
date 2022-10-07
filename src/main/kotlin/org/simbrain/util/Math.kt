@@ -34,7 +34,13 @@ infix fun Iterable<Int>.sse(other: Iterable<Int>) = (this squaredError other).su
 @JvmName("mseInt")
 infix fun Iterable<Int>.mse(other: Iterable<Int>) = (this squaredError other).average()
 
+/**
+ * Creates a one-hot vector with [size] elements, and [index] set to [amount], the "hot" value, and the rest set to 0.
+ */
 fun getOneHotMat(index: Int, size: Int, amount: Double = 1.0): Matrix {
+    if (index < 0 || index >= size) {
+        throw IllegalArgumentException("Index $index of one-hot vector with $size components must be between 0 and $size")
+    }
     val ret = Matrix(size, 1)
     ret[index, 0] = amount
     return ret

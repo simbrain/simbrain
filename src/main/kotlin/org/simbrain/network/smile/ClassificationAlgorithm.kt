@@ -5,6 +5,7 @@ import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.util.UserParameter
+import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CopyableObject
 import smile.classification.Classifier
 import smile.math.matrix.Matrix
@@ -17,16 +18,16 @@ abstract class ClassificationAlgorithm(
     val outputSize: Int
 ): CopyableObject {
 
-    // TODO: If use cases where this is not needed are found, move to subclasses and create an interface for
-    //  classifiers that use this type of data
+
+    /**
+     * Main training data.
+     */
     var trainingData = ClassificationDataset(inputSize, 4)
 
-    // TODO: This should also be made non-abstract if cases that don't use it are found
+    /**
+     * Fit a model to the training data.
+     */
     abstract fun fit(get2DDoubleArray: Array<DoubleArray>, intColumn: IntArray)
-
-    fun train() {
-        fit(trainingData.featureVectors, trainingData.targets)
-    }
 
     /**
      * Statistics to display after training
@@ -47,6 +48,10 @@ abstract class ClassificationAlgorithm(
      * Convert this models integer prediction to an output vector.
      */
     abstract fun getOutputVector(result: Int): Matrix
+
+    fun setAccuracyLabel(accuracy: Double) {
+        stats = "Accuracy: ${Utils.round(accuracy, 3)}"
+    }
 
     /**
      * For use with object type editor.

@@ -41,7 +41,7 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         model = SVM.fit(inputs, targets, PolynomialKernel(kernelDegree), C, tolerance)
         val pred = model?.predict(inputs)
-        stats = ""  + Accuracy.of(targets, pred)
+        setAccuracyLabel(Accuracy.of(targets, pred))
     }
 
     override fun predict(input: DoubleArray): Int {

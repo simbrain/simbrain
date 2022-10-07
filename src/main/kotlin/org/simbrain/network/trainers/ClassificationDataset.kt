@@ -1,11 +1,14 @@
 package org.simbrain.network.trainers
 
+import org.simbrain.util.BiMap
 import org.simbrain.util.getDiagonal2DDoubleArray
 
 /**
- * Encapsulates a 2d array of feature vectors, and for each of these an integer class label.
+ * Encapsulates a 2d array of feature vectors and a set of String labels used to train a classifier.
  *
- * Used in training classifiers.
+ * String labels are used to set targets, and these are then associated with integers which can be retrieved using
+ * [getIntegerTargets].
+ *
  */
 class ClassificationDataset(numFeatures: Int, numSamples: Int) {
 
@@ -17,12 +20,42 @@ class ClassificationDataset(numFeatures: Int, numSamples: Int) {
     var featureVectors: Array<DoubleArray> = getDiagonal2DDoubleArray(numSamples, numFeatures)
 
     /**
-     * Associates each row of trainingInputs with a classification into one of a set of categories. These can be
-     * represented in different ways depending on the classifier.
+     * String labels that the user interacts with. Unique labels are automatically associated with integers by the
+     * [labelTargetMap], and those integers are what are used to train the underlying machine learning model.
      *
-     * Xor example: [-1,1,1,-1]
-     *
+     * Xor example: ["F","T","T","F"]
      */
-    var targets: IntArray = IntArray(numSamples)
+    var targetLabels: Array<String> = Array(numSamples) { "" }
+        set(value) {
+            field  = value
+            val labels = field.toSet()
+            labelTargetMap.clear()
+            if (labels.size == 2) {
+                labelTargetMap[labels.first()] = -1
+                labelTargetMap[labels.last()] = 1
+            } else {
+                labels.forEachIndexed { i, label -> labelTargetMap[label] = i }
+            }
+        }
+
+    /**
+     * Load a set of integer targets t1...tn. These will be associated with string target labels "Class t1"..."Class tn"
+     * Also the integers will themselves be used in the [labelTargetMap]
+     */
+    fun setIntegerTargets(targets: IntArray) {
+        targetLabels = targets.map{ i -> "Class $i" }.toTypedArray()
+    }
+
+    /**
+     * Associates labels with integers.
+     */
+    var labelTargetMap = BiMap<String, Int>()
+
+    /**
+     * Get the integer targets associated with the target labels.
+     */
+    fun getIntegerTargets(): IntArray {
+        return targetLabels.map { labelTargetMap[it]!!}.toIntArray()
+    }
 
 }

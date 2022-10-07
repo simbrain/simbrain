@@ -76,11 +76,10 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
         infoText.text = computeInfoText()
     }
 
-    // TODO: Once the design is stabilized re-implement
     /**
      * Update status text.
      */
-    private fun computeInfoText() = "Winning class: Todo" // + smileClassifier.winner
+    private fun computeInfoText() = "Winning class: ${smileClassifier.winningLabel}"
 
     override fun getModel(): NetworkModel {
         return smileClassifier
@@ -104,7 +103,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
     }
 
     override fun getPropertyDialog(): StandardDialog {
-        return smileClassifier.classifier.getTrainingDialog()
+        return smileClassifier.getTrainingDialog()
     }
 
 }

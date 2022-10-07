@@ -25,7 +25,7 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
         // targetSize = targets.toSet().count()
         outputProbabilities = DoubleArray(outputSize)
         val pred = model?.predict(inputs)
-        stats = ""  + Accuracy.of(targets, pred)
+        setAccuracyLabel(Accuracy.of(targets, pred))
     }
 
     override fun predict(input: DoubleArray): Int {

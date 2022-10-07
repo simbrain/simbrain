@@ -4,13 +4,13 @@ import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SmileClassifierNode
-import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.stats.distributions.TwoValued
+import org.simbrain.util.showWarningDialog
 import org.simbrain.util.table.*
 import java.awt.Dimension
 import javax.swing.JButton
@@ -19,34 +19,45 @@ import javax.swing.JPanel
 import javax.swing.JSeparator
 
 /**
- * SVN Training dialog.
+ * Classifier training dialog.
  */
-fun ClassificationAlgorithm.getTrainingDialog(): StandardDialog {
+fun SmileClassifier.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
+        title = "Train ${classifier.name} classifier with ${classifier.outputSize} labels"
         contentPane = JPanel()
-        val statsLabel = JLabel("Score:")
-        layout = MigLayout("fillx")
         // layout = MigLayout("fillx, debug")
+
+        // Manage stats label
+        val statsLabel = JLabel("---")
+        layout = MigLayout("fillx")
+        fun updateStatsLabel() {
+            statsLabel.text = "${classifier.stats}"
+        }
+        updateStatsLabel()
+        events.onUpdated {
+            updateStatsLabel()
+        }
 
         // Data Panels
         val inputs = SimbrainDataViewer(
-            createFromDoubleArray(this@getTrainingDialog.trainingData.featureVectors), false).apply {
+            createFromDoubleArray(classifier.trainingData.featureVectors), false
+        ).apply {
             addAction(table.importCsv)
             addAction(table.randomizeAction)
             preferredSize = Dimension(300, 300)
             addClosingTask {
-                this@getTrainingDialog.trainingData.featureVectors = this.model.get2DDoubleArray()
+                classifier.trainingData.featureVectors = this.model.get2DDoubleArray()
             }
         }
 
-        val targets = SimbrainDataViewer(createFromColumn(this@getTrainingDialog.trainingData.targets), false).apply {
+        val targets = SimbrainDataViewer(createFromColumn(classifier.trainingData.targetLabels), false).apply {
             addAction(table.importCsv)
-            addAction(table.randomizeColumnAction)
-            table.model.columns[0].columnRandomizer = TwoValued(-1.0,1.0)
+            // addAction(table.randomizeColumnAction)
+            // table.model.columns[0].columnRandomizer = TwoValued(-1.0,1.0)
             preferredSize = Dimension(200, 300)
             addClosingTask {
-                this@getTrainingDialog.trainingData.targets = this.model.getIntColumn(0)
+                classifier.trainingData.targetLabels = this.model.getStringColumn(0)
             }
         }
 
@@ -64,28 +75,34 @@ fun ClassificationAlgorithm.getTrainingDialog(): StandardDialog {
                 icon = ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png")
                 toolTipText = "Delete last row of input and target tables"
                 addActionListener {
-                    inputs.table.model.deleteRow(inputs.table.rowCount-1)
-                    targets.table.model.deleteRow(targets.table.rowCount-1)
+                    inputs.table.model.deleteRow(inputs.table.rowCount - 1)
+                    targets.table.model.deleteRow(targets.table.rowCount - 1)
                 }
             })
+        }
+
+        fun applyDataAndTrain() {
+            classifier.trainingData.featureVectors = inputs.model.get2DDoubleArray()
+            classifier.trainingData.targetLabels = targets.model.getStringColumn(0)
+            train()
         }
 
         // Training Button
         val trainButton = JButton("Train").apply {
             addActionListener {
-                // TODO: Make a separate commit action and then just call svm.train. See deepnet
-                // TODO: Generalize to more than one column?
-                this@getTrainingDialog.fit(inputs.table.model.get2DDoubleArray(),
-                    targets.table.model.getIntColumn(0))
-                    statsLabel.text = "Stats: " + this@getTrainingDialog.stats
+                if (classifier is KNNClassifier) {
+                    if (classifier.k >= inputs.model.rowCount) {
+                        showWarningDialog("Training aborted. k must be less than the number of rows in this dataset")
+                    } else {
+                        applyDataAndTrain()
+                    }
+                } else {
+                    applyDataAndTrain()
+                }
             }
         }
 
         // Add all components
-        val classfierGeneralProps = AnnotatedPropertyEditor(this@getTrainingDialog)
-        contentPane.add(classfierGeneralProps, "wrap")
-        addClosingTask(classfierGeneralProps::commitChanges)
-        contentPane.add(JSeparator(), "growx, span, wrap")
         val classfierProps = AnnotatedPropertyEditor(this@getTrainingDialog)
         if (!classfierProps.widgets.isEmpty()) {
             add(classfierProps, "wrap")
@@ -100,7 +117,7 @@ fun ClassificationAlgorithm.getTrainingDialog(): StandardDialog {
         contentPane.add(JSeparator(), "span, growx, wrap")
         contentPane.add(inputs)
         contentPane.add(targets, "wrap")
-        contentPane.add(JPanel().apply{
+        contentPane.add(JPanel().apply {
             add(JLabel("Add / Remove rows:"))
             add(addRemoveRows)
         })
@@ -119,7 +136,7 @@ fun main() {
             doubleArrayOf(0.0, 1.0),
             doubleArrayOf(1.0, 1.0)
         )
-        svm.trainingData.targets = intArrayOf(-1,1,1,-1)
+        svm.trainingData.targetLabels = arrayOf("F", "T", "T", "F")
         addNetworkModel(classifier)
         classifier
     }

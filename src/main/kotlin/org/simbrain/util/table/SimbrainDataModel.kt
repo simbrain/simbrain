@@ -84,7 +84,16 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
                 .map { (getValueAt(it, col) as Number).toInt() }
                 .toIntArray()
         }
-        throw Error("getIntArray called on a non-numeric column")
+        throw Error("getIntColumn called on a non-numeric column")
+    }
+
+    fun getStringColumn(col: Int): Array<String> {
+        if (columns[col].type == Column.DataType.StringType ) {
+            return (0 until rowCount)
+                .map { (getValueAt(it, col) as String) }
+                .toTypedArray()
+        }
+        throw Error("getStringColumn called on a column that is not a String")
     }
 
     /**

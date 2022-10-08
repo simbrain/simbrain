@@ -35,10 +35,10 @@ infix fun Iterable<Int>.sse(other: Iterable<Int>) = (this squaredError other).su
 infix fun Iterable<Int>.mse(other: Iterable<Int>) = (this squaredError other).average()
 
 /**
- * Creates a one-hot vector with [size] elements, and [index] set to [amount], the "hot" value, and the rest
- * set to 0. 0-indexed.
+ * Creates a one-hot vector (represented with a Smile Matrix) with [size] elements, and [index] set to [amount], the
+ * "hot" value, and the rest set to 0. Zero-indexed.
  */
-fun getOneHotMat(index: Int, size: Int, amount: Double = 1.0): Matrix {
+fun getOneHot(index: Int, size: Int, amount: Double = 1.0): Matrix {
     if (index < 0 || index >= size) {
         throw IllegalArgumentException("Index $index of one-hot vector with $size components must be between 0 and $size")
     }

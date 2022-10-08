@@ -3,7 +3,7 @@ package org.simbrain.network.smile.classifiers
 import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.util.UserParameter
-import org.simbrain.util.getOneHotMat
+import org.simbrain.util.getOneHot
 import smile.classification.Classifier
 import smile.classification.SVM
 import smile.math.kernel.PolynomialKernel
@@ -55,7 +55,7 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     }
 
     override fun getOutputVector(result: Int): Matrix {
-        return getOneHotMat(result, outputSize)
+        return getOneHot(result, outputSize)
     }
 
     // Kotlin hack to support "static method in superclass"

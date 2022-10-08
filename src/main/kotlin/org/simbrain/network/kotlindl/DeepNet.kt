@@ -173,7 +173,7 @@ class DeepNet(
             } else {
                 // One-hot case
                 val (prediction, activations) = deepNetLayers.predictAndGetActivations(floatInputs)
-                outputs = getOneHotMat(prediction,outputSize())
+                outputs = getOneHot(prediction,outputSize())
                 this.prediction = prediction
                 this.activations = activations.filterIsInstance<Array<*>>().map { layer ->
                     val shape = layer.shape

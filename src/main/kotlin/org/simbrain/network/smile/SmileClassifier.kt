@@ -69,8 +69,12 @@ class SmileClassifier(
             winner = classifier.predict(inputs.col(0))
             // println("Prediction of ${this.id} is: $winner")
             if (classifier.model != null) {
+
+                // Create output vector
                 outputs = try {
-                    getOneHotMat(winner, outputSize())
+                    // Assumes output of -1 is from a bipolar encoding, -1/1
+                    val index = if (winner == -1) 0 else winner
+                    getOneHotMat(index, outputSize())
                 } catch(e: IllegalArgumentException) {
                     System.err.println(e.message)
                     Matrix(outputSize(), 1)

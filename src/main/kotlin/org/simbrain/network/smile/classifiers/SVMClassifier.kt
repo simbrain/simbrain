@@ -1,6 +1,7 @@
 package org.simbrain.network.smile.classifiers
 
 import org.simbrain.network.smile.ClassificationAlgorithm
+import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotMat
 import smile.classification.Classifier
@@ -15,6 +16,11 @@ import smile.validation.metric.Accuracy
  */
 class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4):
     ClassificationAlgorithm(inputSize, outputSize) {
+
+    init {
+        // SVM Assumes targets are -1 or 1
+        trainingData.labelEncoding = ClassificationDataset.LabelEncoding.Bipolar
+    }
 
     // TODO: Provide separate object for selecting Kernel
     @UserParameter(label = "Polynomial Kernel Degree", order = 20)
@@ -40,13 +46,12 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         model = SVM.fit(inputs, targets, PolynomialKernel(kernelDegree), C, tolerance)
-        val pred = model?.predict(inputs)
-        setAccuracyLabel(Accuracy.of(targets, pred))
+        setAccuracyLabel(Accuracy.of(targets, model?.predict(inputs)))
     }
 
     override fun predict(input: DoubleArray): Int {
-        val res = model?.predict(input) ?: 0
-        return if (res == -1) 0 else 1
+        // Todo: null to -1 seems problematic
+        return model?.predict(input) ?: -1
     }
 
     override fun getOutputVector(result: Int): Matrix {

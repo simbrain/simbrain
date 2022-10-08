@@ -10,7 +10,16 @@ import org.simbrain.util.getDiagonal2DDoubleArray
  * [getIntegerTargets].
  *
  */
-class ClassificationDataset(numFeatures: Int, numSamples: Int) {
+class ClassificationDataset(val numFeatures: Int, val numSamples: Int) {
+
+    /**
+     * Method of associating string labels to integer indices.
+     */
+    enum class LabelEncoding(val description: String) {
+        Bipolar ("-1/1"),
+        Integer("0,1,...")}
+
+    var labelEncoding = LabelEncoding.Integer
 
     /**
      * A 2d array. Rows correspond to feature vectors
@@ -30,9 +39,16 @@ class ClassificationDataset(numFeatures: Int, numSamples: Int) {
             field  = value
             val labels = field.toSet()
             labelTargetMap.clear()
-            if (labels.size == 2) {
-                labelTargetMap[labels.first()] = -1
-                labelTargetMap[labels.last()] = 1
+            if (labelEncoding == LabelEncoding.Bipolar) {
+                if (labels.size == 1) {
+                    labelTargetMap[labels.first()] = 1
+                } else if (labels.size == 2) {
+                    labelTargetMap[labels.first()] = -1
+                    labelTargetMap[labels.last()] = 1
+                } else {
+                    throw IllegalArgumentException("Binary encodings require one or two labels, but ${labels.size} " +
+                            "were provided")
+                }
             } else {
                 labels.forEachIndexed { i, label -> labelTargetMap[label] = i }
             }

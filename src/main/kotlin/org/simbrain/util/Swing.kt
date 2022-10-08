@@ -9,6 +9,7 @@ import java.awt.event.*
 import java.io.File
 import javax.swing.*
 
+
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
     addWindowListener(object : WindowAdapter() {
         override fun windowClosed(e: WindowEvent?) {
@@ -187,5 +188,7 @@ fun <E : EditableObject> E.createDialog(block: (E) -> Unit): StandardDialog {
 }
 
 fun showWarningDialog(message: String) {
-    JOptionPane.showMessageDialog(null, message, "Warning!", JOptionPane.WARNING_MESSAGE)
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    JOptionPane.showMessageDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
 }

@@ -22,9 +22,11 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     override val name: String = "K Nearest Neighbors"
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
+        if (k > trainingData.numSamples) {
+            throw IllegalStateException("k must be less than the number of rows in the training dataset")
+        }
         model = KNN.fit(inputs, targets, k)
-        val pred = model?.predict(inputs)
-        setAccuracyLabel(Accuracy.of(targets, pred))
+        setAccuracyLabel(Accuracy.of(targets, model?.predict(inputs)))
     }
 
     override fun predict(input: DoubleArray): Int {

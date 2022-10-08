@@ -136,7 +136,7 @@ public class SmileTest {
         assertArrayEquals(expected, result, 0.0);
     }
 
-    //@Test
+    // @Test
     public void modelIris() throws IOException, URISyntaxException {
 
         var train_data = Read.csv(getClass().getClassLoader().getResource("iris_train.csv").getPath());
@@ -157,22 +157,17 @@ public class SmileTest {
 
     }
 
-    //@Test
-    // Model SVR / regression
-    public void modelXOR() throws IOException, URISyntaxException {
-
+    // @Test
+    public void sandboxSVMIris() throws IOException, URISyntaxException {
         var train_data = Read.csv(getClass().getClassLoader().getResource("iris_train.csv").getPath());
         var test_data = Read.csv(getClass().getClassLoader().getResource("iris_test.csv").getPath());
         //System.out.println(train_data);
         var x = train_data.select(0,1,2,3).toArray();
         var y = train_data.column(4).toIntArray();
-
         var test_x = test_data.select(0,1,2,3).toArray();
         var test_y = test_data.column(4).toIntArray();
-
         var kernel = new PolynomialKernel(2);
         var model = SVM.fit(x, y, kernel, 1000, 1E-3);
-
         var pred = Arrays.stream(test_x).mapToInt(model::predict).toArray();
         System.out.println("Accuracy: "+Accuracy.instance.score(test_y, pred));
     }

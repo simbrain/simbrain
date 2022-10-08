@@ -18,6 +18,9 @@
  */
 package org.simbrain.plot.timeseries;
 
+import com.thoughtworks.xstream.XStream;
+import org.simbrain.plot.XYSeriesConverter;
+import org.simbrain.util.DoubleArrayConverter;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
@@ -116,13 +119,13 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      * @return bar chart component to be opened
      */
     public static TimeSeriesPlotComponent open(final InputStream input, final String name, final String format) {
-        TimeSeriesModel dataModel = (TimeSeriesModel) XStreamUtils.getSimbrainXStream().fromXML(input);
+        TimeSeriesModel dataModel = (TimeSeriesModel) getTimeSeriesXStream().fromXML(input);
         return new TimeSeriesPlotComponent(name, dataModel);
     }
 
     @Override
     public void save(final OutputStream output, final String format) {
-        XStreamUtils.getSimbrainXStream().toXML(model, output);
+        getTimeSeriesXStream().toXML(model, output);
     }
 
     @Override
@@ -132,7 +135,14 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
     @Override
     public String getXML() {
-        return XStreamUtils.getSimbrainXStream().toXML(model);
+        return getTimeSeriesXStream().toXML(model);
+    }
+
+    public static XStream getTimeSeriesXStream() {
+        var xstream = XStreamUtils.getSimbrainXStream();
+        xstream.registerConverter(new DoubleArrayConverter());
+        xstream.registerConverter(new XYSeriesConverter());
+        return xstream;
     }
 
 

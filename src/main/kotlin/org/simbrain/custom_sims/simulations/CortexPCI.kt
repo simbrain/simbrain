@@ -1,25 +1,27 @@
 package org.simbrain.custom_sims.simulations
 
+import org.jetbrains.kotlin.backend.common.lower.rangeContainsLoweringPhase
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.updateAction
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.core.createNeurons
+import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.KuramotoRule
-import org.simbrain.util.Utils
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.toDoubleArray
-import java.io.File
+import kotlin.math.roundToInt
+import kotlin.math.abs
 
 /**
  * Create a simulation of Cortex...
  */
-val cortexPCI = newSim {
+val cortexKuramoto = newSim {
 
     // Basic setup
     workspace.clearWorkspace()
@@ -35,7 +37,7 @@ val cortexPCI = newSim {
     }
 
     // Sparse connectivity
-    val sparse = Sparse(connectionDensity = 0.3).apply {
+    val sparse = Sparse(connectionDensity = 0.1).apply {
         percentExcitatory = 20.0
     }
 
@@ -47,45 +49,115 @@ val cortexPCI = newSim {
         inhibitoryProbability = .9
     }
 
-    // Subnetwork 1
-    val region1neurons = network.createNeurons(5) { kuramotoTemplate() }
-    val region1 = NeuronCollection(network, region1neurons)
-    network.addNetworkModel(region1)
-    region1.apply {
-        label = "Region 1"
-        layout(GridLayout())
-        location = point(-100, -100)
+    // SUBNETWORKS
+    // Based on Schmidt et al., 2015: https://bmcneurosci.biomedcentral.com/articles/10.1186/s12868-015-0193-z
+    val numNetworks = 11
+    val numNodesLowerBound = 11
+    val numNodesUpperBound = 31
+    val targetNumNodes = 219
+
+    // For spacing regions apart in the GUI
+    val xPositionIncrement = 1000
+    val yPositionIncrement = 500
+    var xCoordinateFactor = 1
+    var xCoordinate = 0
+    var yCoordinate = 0
+
+    // For comparing against targetNumNodes (219)
+    var currentNumNodes = 0
+
+    // For iterating regions when connecting them
+    var neuronRegionList: MutableList<AbstractNeuronCollection> = mutableListOf()                                       // https://www.educba.com/kotlin-empty-list/, https://stackoverflow.com/questions/46850554/kotlin-unresolved-reference-add-after-converting-from-java-code
+
+    // For holding 11 random numbers of nodes (between 11 and 31 that sum to 219)
+    var numNodesList: MutableList<Int> = mutableListOf()
+
+    // For adjusting the random numbers to sum to 219
+    var numNodesListAdjusted: MutableList<Int> = mutableListOf()
+
+    // Generate 11 random numbers (of nodes) between 11 and 31 (that will eventually sum to 219)
+    for (i in 1..numNetworks) {
+        val numNodes = kotlin.random.Random.nextInt(numNodesLowerBound, numNodesUpperBound)                             // https://stackoverflow.com/questions/54340057/first-app-random-nextint-unresolved-reference
+        currentNumNodes += numNodes
+        numNodesList.add(numNodes)
     }
-    radial.connectNeurons(network, region1neurons, region1neurons)
 
-
-    // Region 2
-    val region2neurons = network.createNeurons(10) { kuramotoTemplate() }
-    val region2 = NeuronCollection(network, region2neurons)
-    network.addNetworkModel(region2)
-    region2.apply {
-       label = "Region 2"
-       layout(GridLayout())
-       location = point(100, 100)
+    // Adjust the numbers of nodes as needed to sum (close) to 219
+    // Kinda hacky?
+    for (i in numNodesList) {
+        numNodesListAdjusted.add(((i.toDouble() / currentNumNodes) * targetNumNodes).roundToInt())                      // https://stackoverflow.com/questions/2640053/getting-n-random-numbers-whose-sum-is-m
     }
-    radial.connectNeurons(network, region2neurons, region2neurons)
+    currentNumNodes = numNodesListAdjusted.sum()
+    println(numNodesListAdjusted) // debug
+    println(currentNumNodes) // debug
 
-    // Region 3
-    val region3neurons = network.createNeurons(10) { kuramotoTemplate() }
-    val region3 = NeuronCollection(network, region3neurons)
-    network.addNetworkModel(region3)
-    region3.apply {
-        label = "Region 3"
-        layout(GridLayout())
-        location = point(400, -100)
+    // Adjust the numbers of nodes as needed to sum (exactly) to 219 (because the sum from above can still be off by a few)
+    // Maybe also kinda hacky
+    while (currentNumNodes != targetNumNodes) {
+        val difference = targetNumNodes - currentNumNodes
+        var randomIndex = 0
+        var randomValue: Int
+
+        if (difference > 0) {
+            do {
+                randomIndex = kotlin.random.Random.nextInt(numNodesListAdjusted.size);                                  // https://www.baeldung.com/kotlin/list-get-random-item
+                randomValue = numNodesListAdjusted[randomIndex]
+            }
+            while (numNodesUpperBound - randomValue < difference)
+        } else if (difference < 0) {
+            do {
+                randomIndex = kotlin.random.Random.nextInt(numNodesListAdjusted.size);                                  // DRY
+                randomValue = numNodesListAdjusted[randomIndex]
+            }
+            while (randomValue - numNodesLowerBound < abs(difference))
+        }
+        numNodesListAdjusted[randomIndex] += difference
+        currentNumNodes += difference
     }
-    radial.connectNeurons(network, region3neurons, region3neurons)
+    println(numNodesListAdjusted) // debug
+    println(currentNumNodes) // debug
 
-    // Make connectNeuronsions between regions
-    sparse.connectNeurons(network, region2neurons, region1neurons)
-    sparse.connectNeurons(network, region1neurons, region2neurons)
-    sparse.connectNeurons(network, region2neurons, region3neurons)
-    sparse.connectNeurons(network, region3neurons, region2neurons)
+    // Finally create neuron regions!
+    for (i in 1..numNetworks) {
+        val regionNeurons = network.createNeurons(numNodesListAdjusted[i - 1]) { kuramotoTemplate() }
+        val region = NeuronCollection(network, regionNeurons)
+
+        network.addNetworkModel(region)
+        neuronRegionList.add(region)
+
+        // Increment GUI row after 3 neuron regions have been displayed
+        if (xCoordinateFactor % 4 == 0) {
+            yCoordinate += yPositionIncrement
+            xCoordinateFactor = 1
+        }
+
+        // Format region
+        region.apply {
+            label = "Region ${i}"
+            layout(GridLayout())
+            location = point(xCoordinate + (xCoordinateFactor * xPositionIncrement), yCoordinate + yPositionIncrement)
+        }
+
+        //  Connect neurons within region
+        radial.connectNeurons(network, regionNeurons, regionNeurons)
+
+        // Increment GUI column for next neuron region to be displayed (up to 3, per above)
+        xCoordinateFactor += 1
+    }
+
+    // Make connections between regions
+    for (i in neuronRegionList) {
+        for (j in neuronRegionList) {
+
+            // Don't connect to itself
+            if (i !== j) {
+                //val sg = SynapseGroup2(i, j, sparse)
+                //sg.displaySynapses = true
+                //network.addNetworkModel(sg)
+                sparse.connectNeurons(network, i.neuronList, j.neuronList)
+            }
+        }
+    }
 
     // Location of the network in the desktop
     withGui {
@@ -95,20 +167,4 @@ val cortexPCI = newSim {
             height = 400
         }
     }
-
-    // ----- Add pulse and record activations  ------
-    // (Note the pulse has not been actually added yet)
-
-    val activations = mutableListOf<List<Double>>()
-    region1.randomize()
-    val recordActivations = updateAction("Record activations") {
-        val acts = network.freeNeurons.map { n -> n.activation }
-        activations.add(acts)
-    }
-    network.addUpdateAction(recordActivations)
-    workspace.iterate(10)
-    network.removeUpdateAction(recordActivations)
-
-    // Save activations
-    Utils.writeMatrix(activations.toDoubleArray(), File("activations.csv"))
 }

@@ -313,9 +313,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
                     "Add a custom action to the update sequence");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             File defaultScript = new File(System.getProperty("user.dir")
                     + "/scripts/updateScripts/networkUpdate/customNetworkUpdateTemplate.bsh");
@@ -329,6 +327,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
             panel.setScriptFile(null);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
+            dialog.setAlwaysOnTop(true);
             dialog.setVisible(true);
             if (!dialog.hasUserCancelled()) {
                 CustomUpdate updateAction = new CustomUpdate(network, panel
@@ -382,9 +381,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
             addActionsDialog.setContentPane(availableListScroll);
             addActionsDialog.pack();
             addActionsDialog.setLocationRelativeTo(null);
+            addActionsDialog.setAlwaysOnTop(true);
             addActionsDialog.setVisible(true);
-            addActionsDialog.toFront();
-
         }
     };
 

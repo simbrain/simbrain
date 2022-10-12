@@ -104,9 +104,8 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         JPanel buttonPanel = new JPanel();
         JButton addActionsButton = new JButton(addPresetAction);
         buttonPanel.add(addActionsButton);
-        // TODO: Disabling this for now because rarely used and causes problems in Simbrain.app
-         JButton customActionButton = new JButton(addCustomAction);
-         buttonPanel.add(customActionButton);
+        JButton customActionButton = new JButton(addCustomAction);
+        buttonPanel.add(customActionButton);
         JButton deleteActionsButton = new JButton(deleteActionsAction);
         buttonPanel.add(deleteActionsButton);
         // TODO: Make movement actions apply to multiple selections
@@ -277,6 +276,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         StandardDialog dialog = panel.getDialog(panel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
+        dialog.setAlwaysOnTop(true);
         dialog.setVisible(true);
         if (!dialog.hasUserCancelled()) {
             ((UpdateActionCustom) action).setScriptString(panel.getTextArea()
@@ -322,9 +322,6 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
             putValue(SHORT_DESCRIPTION, "Add an action to the update sequence");
         }
 
-        /**
-         * {@inheritDoc}
-         */
         public void actionPerformed(ActionEvent arg0) {
             final JList availableActionJList = new JList();
             final DefaultListModel listModel = new DefaultListModel();
@@ -349,16 +346,15 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
                             .getSelectedValuesList()) {
                         workspace.getUpdater().getUpdateManager().addAction(
                                 (UpdateAction) action);
-                    }
-                    ;
+                    };
                 }
             };
             addActionsDialog.setTitle("Add predefined action");
             addActionsDialog.setContentPane(availableListScroll);
             addActionsDialog.pack();
             addActionsDialog.setLocationRelativeTo(null);
+            addActionsDialog.setAlwaysOnTop(true);
             addActionsDialog.setVisible(true);
-
         }
     };
 
@@ -370,10 +366,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
             putValue(NAME, "Custom action");
             putValue(SHORT_DESCRIPTION, "Add custom action");
         }
-
-        /**
-         * {@inheritDoc}
-         */
+        @Override
         public void actionPerformed(ActionEvent arg0) {
             File defaultScript = new File(System.getProperty("user.dir")
                     + "/scripts/updateScripts/workspaceUpdate/customWorkspaceUpdateTemplate.bsh");
@@ -387,6 +380,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
             panel.setScriptFile(null);
             dialog.pack();
             dialog.setLocationRelativeTo(null);
+            dialog.setAlwaysOnTop(true);
             dialog.setVisible(true);
             if (!dialog.hasUserCancelled()) {
                 UpdateActionCustom updateAction = new UpdateActionCustom(
@@ -430,6 +424,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         StandardDialog dialog = panel.getDialog(panel);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
+        dialog.setAlwaysOnTop(true);
         dialog.setVisible(true);
         if (!dialog.hasUserCancelled()) {
             ((UpdateActionCustom) action).setScriptString(panel.getTextArea()

@@ -12,8 +12,10 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm2.*
+import org.simbrain.util.point
 import org.simbrain.util.sampleWithoutReplacement
 import org.simbrain.util.sse
+import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import kotlin.random.Random
 
@@ -69,7 +71,6 @@ val evolveXor2 = newSim {
                 }
             }
 
-
             if (random.nextDouble() < 0.9) {
                 val (source, target) = if (random.nextBoolean()) {
                     val source = hiddens.toList().sampleWithoutReplacement().first()
@@ -100,7 +101,7 @@ val evolveXor2 = newSim {
 
         val network = networkComponent.network
 
-        val xor = runBlocking { xor2Genotype.build(network) }
+        val phenotype = runBlocking { xor2Genotype.build(network) }
 
         override fun mutate() {
             xor2Genotype.mutate()
@@ -120,27 +121,42 @@ val evolveXor2 = newSim {
             )
 
             return testData.sumOf { (input, output) ->
-                xor.inputs.neuronList.activations = input
+                phenotype.inputs.neuronList.activations = input
                 workspace.iterateSuspend(20)
-                -(xor.outputs.neuronList.activations sse output)
+                -(phenotype.outputs.neuronList.activations sse output)
             }
         }
 
     }
 
     workspace.coroutineScope.launch {
-        val things = evaluator2(
+        val maxGeneratioms = 200
+        val progressWindow = ProgressWindow(maxGeneratioms, "Error")
+        val lastGeneration = evaluator2(
             populatingFunction = { Xor2Sim() },
             populationSize = 100,
             eliminationRatio = 0.5,
             stoppingFunction = {
+                progressWindow.value = generation
                 listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                     "$it: ${nthPercentileFitness(it).format(3)}"
-                }.also { println("[$generation] $it") }
-                nthPercentileFitness(5) > -0.01 || generation > 200
+                }.also {
+                    println("[$generation] $it")
+                    progressWindow.text = "Error: ${nthPercentileFitness(0).format(3)}"
+                }
+                nthPercentileFitness(5) > -0.05 || generation > maxGeneratioms
             }
         )
 
-        things.take(5).forEach { it.copy(workspace) }
+        lastGeneration.take(5).forEach {
+            with(it.copy(workspace) as Xor2Sim) {
+                phenotype.inputs.neuronList.forEach { it.increment = 1.0 }
+                phenotype.inputs.location = point( 0, 150)
+                phenotype.hiddens.location = point( 0, 60)
+                phenotype.outputs.location = point(0, -25)
+            }
+        }
+
+        progressWindow.close()
     }
 }

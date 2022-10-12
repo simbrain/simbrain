@@ -102,7 +102,7 @@ public class Network {
 
         /**
          * Simulation of real time. Each updates advances time by length
-         * {@link timeStep}.
+         * {@link #timeStep}.
          */
         CONTINUOUS;
     }
@@ -133,7 +133,7 @@ public class Network {
 
     /**
      * List of neurons sorted by their update priority. Used in priority based
-     * update.
+     * update. Lower numbers updated first, as in first priority, second priority, etc.
      */
     private List<Neuron> prioritySortedNeuronList;
 
@@ -187,7 +187,7 @@ public class Network {
     	name = "Network"+current_id;
     	current_id++;
         updateManager = new NetworkUpdateManager(this);
-        prioritySortedNeuronList = new ArrayList<Neuron>();
+        prioritySortedNeuronList = new ArrayList<>();
     }
 
     /**
@@ -1064,11 +1064,13 @@ public class Network {
     	fireUpdates = true;
 
         // Initialize listener lists
-        networkListeners = new ArrayList<NetworkListener>();
-        neuronListeners = new ArrayList<NeuronListener>();
-        synapseListeners = new ArrayList<SynapseListener>();
-        textListeners = new ArrayList<TextListener>();
-        groupListeners = new ArrayList<GroupListener>();
+        networkListeners = new ArrayList<>();
+        neuronListeners = new ArrayList<>();
+        synapseListeners = new ArrayList<>();
+        textListeners = new ArrayList<>();
+        groupListeners = new ArrayList<>();
+
+        updatePriorityList();
 
         // Initialize update manager
         updateManager.postUnmarshallingInit();

@@ -417,16 +417,24 @@ public class Utils {
     }
 
     /**
-     * Utility to class to convert arrays of doubles to strings.
-     *
-     * @param data array of doubles
-     * @return string representation of that array
+     * Utility to class to convert arrays of doubles to strings with a default precision of 2.
      */
     public static String doubleArrayToString(final double[] data) {
-        String ret = new String(" ");
+        return doubleArrayToString(data, 2);
+    }
+
+    /**
+     * Convert double array to a string of doubles with specified precision.
+     *
+     * @param data array of doubles
+     * @param precision precision with which to save doubles
+     * @return string representation of that array
+     */
+    public static String doubleArrayToString(final double[] data, int precision) {
+        String ret = "";
 
         for (int i = 0; i < data.length; i++) {
-            String num = round(data[i], 2);
+            String num = round(data[i], precision);
 
             if (i == 0) {
                 ret = ret + num;

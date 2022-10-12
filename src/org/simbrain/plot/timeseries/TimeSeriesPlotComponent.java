@@ -18,15 +18,15 @@
  */
 package org.simbrain.plot.timeseries;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simbrain.plot.ChartListener;
 import org.simbrain.workspace.AttributeType;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.WorkspaceComponent;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents time series data.
@@ -114,23 +114,14 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
         model.addListener(new ChartListener() {
 
-            /**
-             * {@inheritDoc}
-             */
             public void dataSourceAdded(final int index) {
                 firePotentialAttributesChanged();
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void dataSourceRemoved(final int index) {
                 firePotentialAttributesChanged();
             }
 
-            /**
-             * {@inheritDoc}
-             */
             public void chartInitialized(int numSources) {
                 // No implementation yet (not used in this component thus far).
             }
@@ -176,9 +167,6 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         return new TimeSeriesPlotComponent(name, dataModel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void save(final OutputStream output, final String format) {
         TimeSeriesModel.getXStream().toXML(model, output);

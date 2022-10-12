@@ -23,6 +23,10 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.ChartModel;
 
 import com.thoughtworks.xstream.XStream;
+import org.simbrain.plot.XYSeriesConverter;
+import org.simbrain.util.DoubleArrayConverter;
+
+import java.beans.PropertyChangeSupport;
 
 /**
  * Data model for a time series plot.
@@ -111,8 +115,10 @@ public class TimeSeriesModel extends ChartModel {
      * Adds a data source to the chart.
      */
     public void addDataSource() {
-        Integer currentSize = dataset.getSeriesCount();
-        dataset.addSeries(new XYSeries(currentSize + 1));
+        int currentSize = dataset.getSeriesCount();
+        var newSeries = new XYSeries(currentSize + 1);
+        newSeries.setDescription("Series " + (currentSize + 1));
+        dataset.addSeries(newSeries);
         this.fireDataSourceAdded(currentSize);
     }
 
@@ -130,6 +136,8 @@ public class TimeSeriesModel extends ChartModel {
      */
     public static XStream getXStream() {
         XStream xstream = ChartModel.getXStream();
+        xstream.registerConverter(new DoubleArrayConverter());
+        xstream.registerConverter(new XYSeriesConverter());
         return xstream;
     }
 
@@ -141,6 +149,12 @@ public class TimeSeriesModel extends ChartModel {
      * @return Initialized object.
      */
     private Object readResolve() {
+        var newDataset = new XYSeriesCollection();
+        newDataset.removeAllSeries();
+        for (int i = 0; i < dataset.getSeriesCount() ; i++) {
+            newDataset.addSeries(dataset.getSeries(i));
+        }
+        dataset = newDataset;
         return this;
     }
 

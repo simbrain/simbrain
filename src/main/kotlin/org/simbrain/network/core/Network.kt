@@ -145,8 +145,7 @@ class Network {
 
     /**
      * List of neurons sorted by their update priority. Used in priority based update.
-     * TODO: Resolve priority update issue. Here as a hack to make the list available to groups that want to update via
-     * priorities WITHIN the group... To be resolved.
+     * Lower numbers updated first, as in first priority, second priority, etc.
      */
     @Transient
     var prioritySortedNeuronList: ArrayList<Neuron> = ArrayList()
@@ -233,6 +232,7 @@ class Network {
      * Update the priority list used for priority based update.
      */
     fun updatePriorityList() {
+        // TODO: Uses flat neuron list, but does this make sense? NeuronGroups should handle their own update orders.
         prioritySortedNeuronList = ArrayList(flatNeuronList)
         resortPriorities()
     }

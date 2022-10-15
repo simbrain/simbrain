@@ -50,13 +50,6 @@ private val LOG_10 = ln(10.0)
  */
 class Network {
 
-    companion object {
-        /**
-         * An internal "static" id giving networks unique numbers within the same simbrain session.
-         */
-        private var current_id = 0
-    }
-
     /**
      * Two types of time used in simulations.
      */
@@ -161,7 +154,7 @@ class Network {
     /**
      * An optional name for the network that defaults to "Network[current_id]".
      */
-    var name: String = "Network$current_id"
+    var name: String? = null
 
     /**
      * A counter for the total number of iterations run by this network.
@@ -177,13 +170,6 @@ class Network {
      * A special flag for if the network is being run for a one-time single iteration.
      */
     var oneOffRun = false
-
-    /**
-     * Initialize the network.
-     */
-    init {
-        current_id++
-    }
 
     /**
      * Returns a linked hash set of models of the specified type.

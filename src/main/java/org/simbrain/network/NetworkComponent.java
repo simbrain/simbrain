@@ -60,7 +60,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     public NetworkComponent(final String name, final Network network) {
         super(name);
         this.network = network;
-        this.network.setName(name);
         init();
     }
 
@@ -70,6 +69,7 @@ public final class NetworkComponent extends WorkspaceComponent {
     private void init() {
 
         NetworkEvents event = network.getEvents();
+        this.network.setName(getName());
 
         event.onModelAdded(m -> {
             setChangedSinceLastSave(true);

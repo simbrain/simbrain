@@ -238,15 +238,15 @@ val objectTrackingSim = newSim {
 class PercentIncomingNeuronRule: LinearRule() {
     val maxVal = 10.0
     override fun apply(n: Neuron, data: ScalarDataHolder) {
-        n.activation = maxVal * n.fanIn
-            .filter { it.source.activation > 0 }
-            .count()
+        n.activation = maxVal * n.fanIn.count { it.source.isSpike }
             .toDouble() / n.fanIn.size
     }
 }
 
 fun Neuron.getSpikingInput(): Double {
-    return fanIn.filter { s -> s.source.isSpike}.sumOf {  s -> s.strength }
+    val sensorInputs = fanIn.filter { it.source.updateRule is LinearRule}.sumOf { it.source.activation * it.strength }
+    val weightsOfSpikingNodes = fanIn.filter { it.source.isSpike}.sumOf { it.strength }
+    return sensorInputs + weightsOfSpikingNodes
 }
 
 class AllostaticNeuron(parent: Network, rule: NeuronUpdateRule) : Neuron(parent, rule) {
@@ -305,7 +305,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
     override val name = "Allostatic Update Rule"
 
 
-    // Test main
+    // Test getSpikingInput
     fun main() {
         val net = Network()
         val n1 = Neuron(net)

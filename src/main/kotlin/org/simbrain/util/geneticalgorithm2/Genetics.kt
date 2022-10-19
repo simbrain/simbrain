@@ -1,6 +1,5 @@
 package org.simbrain.util.geneticalgorithm2
 
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -13,14 +12,20 @@ interface Genotype2 {
     val random: Random
 }
 
-interface Gene2<P> {
-    val template: P
-    fun copy(): Gene2<P>
+abstract class Gene2<P> {
+    abstract val template: P
+    abstract fun copy(): Gene2<P>
+
+    fun mutate(block: P.() -> Unit) {
+        template.apply(block)
+    }
 }
 
 interface EvoSim {
     fun mutate()
-    fun copy(workspace: Workspace = Workspace(GlobalScope)): EvoSim
+    suspend fun build()
+    fun copy(workspace: Workspace): EvoSim
+    fun copy(): EvoSim
     suspend fun eval(): Double
 }
 
@@ -51,7 +56,7 @@ suspend fun evaluator2(
                 async {
                     it.copy().apply {
                         mutate()
-                    }.copy()
+                    }
                 }
             }).awaitAll()
     } while (!stoppingFunction(GenerationFitnessPair(generation, agentFitnessPair.map { it.second })))

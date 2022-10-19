@@ -1,8 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -20,6 +18,8 @@ import org.simbrain.workspace.Workspace
 import kotlin.random.Random
 
 val evolveXor2 = newSim {
+
+    val coroutineScope = workspace.coroutineScope
 
     class XorGenotype(seed: Long = Random.nextLong()) : Genotype2 {
 
@@ -94,25 +94,36 @@ val evolveXor2 = newSim {
 
     class Xor2Sim(
         val xor2Genotype: XorGenotype = XorGenotype(),
-        val workspace: Workspace = Workspace(GlobalScope)
+        val workspace: Workspace = Workspace(coroutineScope + Dispatchers.Default)
     ) : EvoSim {
 
         val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
 
         val network = networkComponent.network
 
-        val phenotype = runBlocking { xor2Genotype.build(network) }
+        private val _phenotype = CompletableDeferred<XorGenotype.Phenotype>()
+        val phenotype: Deferred<XorGenotype.Phenotype> by this::_phenotype
 
         override fun mutate() {
             xor2Genotype.mutate()
+        }
+
+        override suspend fun build() {
+            if (_phenotype.isActive) {
+                _phenotype.complete(xor2Genotype.build(network))
+            }
         }
 
         override fun copy(workspace: Workspace): Xor2Sim {
             return Xor2Sim(xor2Genotype.copy(), workspace)
         }
 
-        override suspend fun eval(): Double {
+        override fun copy(): EvoSim {
+            return Xor2Sim(xor2Genotype.copy(), Workspace(workspace.coroutineScope))
+        }
 
+        override suspend fun eval(): Double {
+            build()
             val testData = listOf(
                 listOf(0.0, 0.0) to listOf(0.0),
                 listOf(0.0, 1.0) to listOf(1.0),
@@ -121,9 +132,9 @@ val evolveXor2 = newSim {
             )
 
             return testData.sumOf { (input, output) ->
-                phenotype.inputs.neuronList.activations = input
+                phenotype.await().inputs.neuronList.activations = input
                 workspace.iterateSuspend(20)
-                -(phenotype.outputs.neuronList.activations sse output)
+                -(phenotype.await().outputs.neuronList.activations sse output)
             }
         }
 
@@ -150,6 +161,8 @@ val evolveXor2 = newSim {
 
         lastGeneration.take(5).forEach {
             with(it.copy(workspace) as Xor2Sim) {
+                build()
+                val phenotype = this.phenotype.await()
                 phenotype.inputs.neuronList.forEach { it.increment = 1.0 }
                 phenotype.inputs.location = point( 0, 150)
                 phenotype.hiddens.location = point( 0, 60)

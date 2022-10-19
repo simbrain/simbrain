@@ -7,12 +7,12 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 
-interface NetworkGene2<P : NetworkModel> : Gene2<P> {
-    suspend fun express(network: Network): P
+abstract class NetworkGene2<P : NetworkModel> : Gene2<P>() {
+    abstract suspend fun express(network: Network): P
 
 }
 
-class NodeGene2(override val template: Neuron) : NetworkGene2<Neuron> {
+class NodeGene2(override val template: Neuron) : NetworkGene2<Neuron>() {
 
     private val _expressedNeuron = CompletableDeferred<Neuron>()
 
@@ -32,13 +32,10 @@ class NodeGene2(override val template: Neuron) : NetworkGene2<Neuron> {
         return NodeGene2(template.deepCopy()).also { listeners.forEach { l -> l(it) } }
     }
 
-    fun mutate(mutation: Neuron.() -> Unit) {
-        template.apply(mutation)
-    }
 }
 
 class ConnectionGene2(override val template: Synapse, val source: NodeGene2, val target: NodeGene2) :
-    NetworkGene2<Synapse> {
+    NetworkGene2<Synapse>() {
 
     private lateinit var copiedSource: NodeGene2
     private lateinit var copiedTarget: NodeGene2
@@ -56,10 +53,6 @@ class ConnectionGene2(override val template: Synapse, val source: NodeGene2, val
 
     override fun copy(): ConnectionGene2 {
         return ConnectionGene2(Synapse(template), copiedSource, copiedTarget)
-    }
-
-    fun mutate(mutation: Synapse.() -> Unit) {
-        template.apply(mutation)
     }
 }
 

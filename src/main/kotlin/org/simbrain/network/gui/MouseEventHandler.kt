@@ -156,9 +156,13 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             val pm = networkPanel.placementManager
             pm.anchorPoint = topLeft
 
-            // Only reest the delta if alt/option key is down
+            // Only reset the delta if alt/option key is down
             if (event.pickedNode != null && event.isAltDown) {
-                pm.deltaDrag = topLeft - pm.previousAnchorPoint
+                event.pickedNode.firstScreenElement?.model.let {
+                    if (it is LocatableModel) {
+                        pm.deltaDragMap[it.javaClass.kotlin] = topLeft - pm.previousAnchorPoint
+                    }
+                }
             }
         }
         networkPanel.canvas.layer.removeChild(placementManagerDelta)

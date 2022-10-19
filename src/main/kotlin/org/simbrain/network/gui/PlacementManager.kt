@@ -1,21 +1,16 @@
 package org.simbrain.network.gui
 
-import org.simbrain.network.LocatableModel
+import org.simbrain.network.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
-import org.simbrain.network.gui.PlacementManager.DefaultOffsets
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.moveToOrigin
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.Hopfield
-import org.simbrain.network.topLeftLocation
-import org.simbrain.network.translate
-import org.simbrain.util.magnitude
 import org.simbrain.util.plus
 import org.simbrain.util.point
-import org.simbrain.util.times
 import java.awt.geom.Point2D
+import kotlin.reflect.KClass
 
 /**
  * Manage intelligent placement of new model elements in a [org.simbrain.network.gui.NetworkPanel].
@@ -35,21 +30,6 @@ import java.awt.geom.Point2D
 class PlacementManager() {
 
     /**
-     * Offsets associated with specific types of objects.
-     */
-    object DefaultOffsets {
-        operator fun get(model: LocatableModel?) = when (model) {
-            is Neuron -> point(45, 0)
-            is NeuronArray -> point(300, 0)
-            is NeuronGroup -> point(400, 0)
-            is Hopfield -> point(300, 0)
-            is CompetitiveNetwork -> point(300, 0)
-            is Subnetwork -> point(220, 0)
-            else -> point(45, 0)
-        }
-    }
-
-    /**
      * Location of the most recently placed object.
      */
     var anchorPoint = point(0.0, 0.0)
@@ -60,17 +40,16 @@ class PlacementManager() {
     var previousAnchorPoint = point(0.0, 0.0)
 
     /**
-     * Difference between last two anchor points, which is set when dragging network objects, and then used when
-     * repeatedly adding objects, which is convenient for creating "paste trails".
+     * For each object type, the offset to use between pastes, to sue when  repeatedly adding objects, which is
+     * convenient for creating "paste trails". Initialized to defaults for each object type.
      */
-    var deltaDrag: Point2D? = null
-        set(value) {
-            // println("set deltaDrag = $value")
-            // Mouse clicks are treated as drag events so need to disregard very small deltas
-            if (value != null && value.magnitude > .1) {
-                field = value
-            }
-        }
+    var deltaDragMap = mutableMapOf<KClass<out LocatableModel>, Point2D> (
+        Neuron::class to point(45, 0),
+        NeuronGroup::class to point(400, 0),
+        NeuronArray::class to point(300,0),
+        Hopfield::class to point(300,0),
+        CompetitiveNetwork::class to point(300,0),
+        Subnetwork::class to point(220,0))
 
     /**
      * Set last location clicked on screen.
@@ -105,20 +84,13 @@ class PlacementManager() {
         models.moveToOrigin()
 
         if (useLastClickedLocation) {
-            // println("Case 1: Clicked location")
             // Reset the anchor to wherever was last clicked and put objects there
             anchorPoint = lastClickedLocation
             useLastClickedLocation = false
             offsetFromAnchor(models, point(0.0,0.0))
         } else {
-            if (deltaDrag == null) {
-                // println("Case 2: Default")
-                // Place objects at a default offset from wherever they were last placed
-                offsetFromAnchor(models, DefaultOffsets[models[0]] * models.size)
-            } else {
-                // println("Case 3: Delta")
-                offsetFromAnchor(models, deltaDrag!!)
-            }
+            val offset = deltaDragMap.getOrDefault(models.first()::class, point(45,0))
+            offsetFromAnchor(models, offset)
         }
     }
 

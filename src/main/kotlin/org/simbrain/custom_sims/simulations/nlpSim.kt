@@ -1,26 +1,44 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.createNeuronCollection
-import org.simbrain.network.layouts.GridLayout
+import org.simbrain.custom_sims.*
 import org.simbrain.util.place
 import org.simbrain.util.point
 
 /**
  * Todo
+ *
  */
 val nlpSim = newSim {
+
+    // TODOS
+    // - Adjust bounds
+    // - Make a new simpler version of this for first lessons below
+    // ---
+    // - Unit tests of Ntree / Evaluate alternatives to NTree. Need a way to store the vectors for fast nearest
+    // neighbor search / vector search / kd-tree
+    //      https://cloud.google.com/blog/products/ai-machine-learning/vertex-matching-engine-blazing-fast-and-massively-scalable-nearest-neighbor-search
+    // - Sammon map fails after one click when immediate moving from PCA
+    // - Poor performance and occasional errors running sammon map while loading new items
+    // - (Hard) Better algorithm for label display in PCA. Detect crowding and show some other way.
+
+    // Possible lessons
+    // 1. Geometric thinking (what is a vector space? what is a word embedding? how can we plot words in space?)
+    //    - Start with a pre-loaded dictionary and a small set of words. See unit test example.
+    // 2. Word co-occurrences and word embeddings (what is the algorithm doing? how do the parameters affect
+    // performance?)
+    // 3. Word embeddings and neural networks
+    // 4. Shortcomings of DSM: polysemy (what happens to words with multiple meanings/senses?)
+    
+    // Something that generates text?
 
     workspace.clearWorkspace()
 
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    textWorld.loadDictionary(mlk)
-    textWorld.text = mlk
+    val text = getResource("nlp/mlk.txt")
+    textWorld.loadDictionary(text)
+    textWorld.text = text
 
     withGui {
         place(twc) {
@@ -31,16 +49,26 @@ val nlpSim = newSim {
     }
 
     // Network
-    val networkComponent = addNetworkComponent("Network")
-    val network = networkComponent.network
-    val nc = network.createNeuronCollection(textWorld.tokenVectorMap.size).apply {
-        label = "Vector Embeddings for Word Tokens"
-        location = point(0, 0)
-        layout(GridLayout())
-    }
+    // val networkComponent = addNetworkComponent("Network")
+    // val network = networkComponent.network
+    // val nc = network.createNeuronCollection(textWorld.tokenVectorMap.size).apply {
+    //     label = "Vector Embeddings for Word Tokens"
+    //     location = point(0, 0)
+    //     layout(GridLayout())
+    // }
 
+    // withGui {
+    //     place(networkComponent) {
+    //         location = point(450, 0)
+    //         width = 400
+    //         height = 400
+    //     }
+    // }
+
+    // Location of the projection in the desktop
+    val projectionPlot = addProjectionPlot("Activations")
     withGui {
-        place(networkComponent) {
+        place(projectionPlot) {
             location = point(450, 0)
             width = 400
             height = 400
@@ -49,53 +77,18 @@ val nlpSim = newSim {
 
     // Couple the text world to neuron collection
     with(couplingManager) {
-        textWorld couple nc
+        // createCoupling(
+        //     textWorld.getProducer("getCurrentVector"),
+        //     nc.getConsumer("addInputs")
+        // )
+        createCoupling(
+            textWorld.getProducer("getCurrentVector"),
+            projectionPlot.getConsumer("addPoint")
+        )
+        createCoupling(
+            textWorld.getProducer("getCurrentToken"),
+            projectionPlot.getConsumer("setLabel")
+        )
     }
 
 }
-
-val mlk = """And so even though we face the difficulties of today and tomorrow, I still have a dream. It is a dream deeply rooted in the American dream.
-
-I have a dream that one day this nation will rise up and live out the true meaning of its creed:
-
-We hold these truths to be self-evident, that all men are created equal.
-
-I have a dream that one day on the red hills of Georgia, the sons of former slaves and the sons of former slave owners will be able to sit down together at the table of brotherhood.
-
-I have a dream that one day even the state of Mississippi, a state sweltering with the heat of injustice, sweltering with the heat of oppression, will be transformed into an oasis of freedom and justice.
-
-I have a dream that my four little children will one day live in a nation where they will not be judged by the color of their skin but by the content of their character.
-
-I have a dream today!
-
-I have a dream that one day, down in Alabama, with its vicious racists, with its governor having his lips dripping with the words of interposition and nullification, one day right there in Alabama little black boys and black girls will be able to join hands with little white boys and white girls as sisters and brothers.
-
-I have a dream today!
-
-I have a dream that one day every valley shall be exalted, and every hill and mountain shall be made low, the rough places will be made plain, and the crooked places will be made straight; and the glory of the Lord shall be revealed and all flesh shall see it together.
-
-This is our hope, and this is the faith that I go back to the South with.
-
-With this faith, we will be able to hew out of the mountain of despair a stone of hope. With this faith, we will be able to transform the jangling discords of our nation into a beautiful symphony of brotherhood. With this faith, we will be able to work together, to pray together, to struggle together, to go to jail together, to stand up for freedom together, knowing that we will be free one day.
-
-And this will be the day, this will be the day when all of God s children will be able to sing with new meaning:
-
-My country  tis of thee, sweet land of liberty, of thee I sing.
-Land where my fathers died, land of the Pilgrim s pride,
-From every mountainside, let freedom ring!
-And if America is to be a great nation, this must become true.
-And so let freedom ring from the prodigious hilltops of New Hampshire.
-Let freedom ring from the mighty mountains of New York.
-Let freedom ring from the heightening Alleghenies of Pennsylvania.
-Let freedom ring from the snow-capped Rockies of Colorado.
-Let freedom ring from the curvaceous slopes of California.
-
-But not only that:
-Let freedom ring from Stone Mountain of Georgia.
-Let freedom ring from Lookout Mountain of Tennessee.
-Let freedom ring from every hill and molehill of Mississippi.
-From every mountainside, let freedom ring.
-And when this happens, when we allow freedom ring, when we let it ring from every village and every hamlet, from every state and every city, we will be able to speed up that day when all of God s children, black men and white men, Jews and Gentiles, Protestants and Catholics, will be able to join hands and sing in the words of the old Negro spiritual:
-Free at last! Free at last!
-
-Thank God Almighty, we are free at last!"""

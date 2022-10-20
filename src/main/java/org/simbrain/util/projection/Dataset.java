@@ -37,7 +37,6 @@ import java.util.List;
  */
 public class Dataset {
 
-    // TODO: Consider migrating this to ND4J and friends.
 
     /**
      * The data.

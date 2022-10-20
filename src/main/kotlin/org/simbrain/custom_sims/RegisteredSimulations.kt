@@ -50,10 +50,6 @@ val simulations = dir<Any>("Simulations") {
         item("Cerebellum") { Cerebellum() }
         item("Creatures") { CreaturesSim() }
         item("Actor Critic") { ActorCritic() }
-        item("Operant With Environment") { OperantWithEnvironment() }
-        item("Classical Conditioning") { ClassicalConditioning() }
-        item("Operant Conditioning") {OperantConditioning()}
-        item("Simple Operant") {SimpleOperant()}
         item("Cortical Branching") {CorticalBranching()}
         item("Cortex Simple") {CortexSimple()}
         item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
@@ -66,12 +62,23 @@ val simulations = dir<Any>("Simulations") {
         item("ReadSim") { ReadSim() }
     }
 
+    dir("Course Materials") {
+        dir("Behaviorism") {
+            item("Operant With Environment") { OperantWithEnvironment() }
+            item("Classical Conditioning") { ClassicalConditioning() }
+            item("Operant Conditioning") {OperantConditioning()}
+            item("Simple Operant") {SimpleOperant()}
+        }
+        dir("NLP") {
+            item("NLP") { nlpSim }
+        }
+    }
+
     dir("Demos") {
         item("Test Sim") { testSim }
         item("Linked Neuron List") { linkedNeuronList }
         item("Smile Classifier") { smileSim }
         item("Projection") { projectionSim }
-        item("NLP") { nlpSim }
         item("Deep Net") { deepNetSim }
         item("Spiking Neuron") { spikingNetwork }
         item("Mnist Images") { mnistSim }

@@ -8,12 +8,12 @@ class MathKtTest {
 
     @Test
     fun `test one hot matrix`() {
-        var oneHot = getOneHotMat(2, 10)
+        var oneHot = getOneHot(2, 10)
         assertEquals(0.0, oneHot[0,0])
         assertEquals(1.0, oneHot[2,0])
         assertEquals(10L, oneHot.size())
 
-        oneHot = getOneHotMat(2, 10, 2.0)
+        oneHot = getOneHot(2, 10, 2.0)
         assertEquals(2.0, oneHot[2,0])
     }
 

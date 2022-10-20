@@ -22,7 +22,7 @@ class TileSensor @JvmOverloads constructor(
     var tileType: String = "water",
     radius: Double = DEFAULT_RADIUS,
     angle: Double = DEFAULT_THETA
-) : SensorWithRelativeLocation(radius, angle), VisualizableEntityAttribute, WithDispersion {
+) : SensorWithRelativeLocation(angle, radius), VisualizableEntityAttribute, WithDispersion {
 
     /**
      * Decay function

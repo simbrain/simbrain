@@ -24,6 +24,14 @@ fun Matrix.randomize(dist: ProbabilityDistribution) {
     }
 }
 
+fun <T> List<T>.sampleWithReplacement(
+    random: Random = Random(Random.nextLong())
+) = sequence {
+    while (true) {
+        yield(this@sampleWithReplacement[random.nextInt(lastIndex)])
+    }
+}
+
 fun <T> List<T>.sampleWithoutReplacement(
     random: Random = Random(Random.nextLong()),
     restartIfExhausted: Boolean = false

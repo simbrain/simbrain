@@ -5,7 +5,6 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SmileClassifierNode
 import org.simbrain.network.smile.SmileClassifier
-import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
@@ -28,11 +27,14 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
         contentPane = JPanel()
         // layout = MigLayout("fillx, debug")
 
+        // Classifier properties
+        val classfierProps = AnnotatedPropertyEditor(classifier)
+
         // Manage stats label
         val statsLabel = JLabel("---")
         layout = MigLayout("fillx")
         fun updateStatsLabel() {
-            statsLabel.text = "${classifier.stats}"
+            statsLabel.text = classifier.stats
         }
         updateStatsLabel()
         events.onUpdated {
@@ -53,8 +55,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
 
         val targets = SimbrainDataViewer(createFromColumn(classifier.trainingData.targetLabels), false).apply {
             addAction(table.importCsv)
-            // addAction(table.randomizeColumnAction)
-            // table.model.columns[0].columnRandomizer = TwoValued(-1.0,1.0)
+            addAction(table.randomizeColumnAction)
             preferredSize = Dimension(200, 300)
             addClosingTask {
                 classifier.trainingData.targetLabels = this.model.getStringColumn(0)
@@ -82,28 +83,23 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
         }
 
         fun applyDataAndTrain() {
-            classifier.trainingData.featureVectors = inputs.model.get2DDoubleArray()
-            classifier.trainingData.targetLabels = targets.model.getStringColumn(0)
-            train()
+            try {
+                classfierProps.commitChanges()
+                classifier.trainingData.featureVectors = inputs.model.get2DDoubleArray()
+                classifier.trainingData.targetLabels = targets.model.getStringColumn(0)
+                train()
+            } catch(e: Exception) {
+                showWarningDialog(e.message.toString())
+            }
         }
 
         // Training Button
         val trainButton = JButton("Train").apply {
             addActionListener {
-                if (classifier is KNNClassifier) {
-                    if (classifier.k >= inputs.model.rowCount) {
-                        showWarningDialog("Training aborted. k must be less than the number of rows in this dataset")
-                    } else {
-                        applyDataAndTrain()
-                    }
-                } else {
-                    applyDataAndTrain()
-                }
+                applyDataAndTrain()
             }
         }
 
-        // Add all components
-        val classfierProps = AnnotatedPropertyEditor(this@getTrainingDialog)
         if (!classfierProps.widgets.isEmpty()) {
             add(classfierProps, "wrap")
             addClosingTask(classfierProps::commitChanges)

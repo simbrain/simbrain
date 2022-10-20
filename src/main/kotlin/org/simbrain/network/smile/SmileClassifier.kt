@@ -4,7 +4,7 @@ import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
-import org.simbrain.util.getOneHotMat
+import org.simbrain.util.getOneHot
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
@@ -69,8 +69,12 @@ class SmileClassifier(
             winner = classifier.predict(inputs.col(0))
             // println("Prediction of ${this.id} is: $winner")
             if (classifier.model != null) {
+
+                // Create output vector
                 outputs = try {
-                    getOneHotMat(winner, outputSize())
+                    // Assumes output of -1 is from a bipolar encoding, -1/1
+                    val index = if (winner == -1) 0 else winner
+                    getOneHot(index, outputSize())
                 } catch(e: IllegalArgumentException) {
                     System.err.println(e.message)
                     Matrix(outputSize(), 1)

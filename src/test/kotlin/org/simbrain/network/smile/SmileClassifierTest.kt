@@ -13,6 +13,7 @@ import org.simbrain.util.Utils
 import org.simbrain.util.table.DataFrameWrapper
 import smile.classification.DecisionTree
 import smile.classification.NaiveBayes
+import smile.classification.SVM
 import smile.data.Tuple
 import smile.data.formula.Formula
 import smile.io.Read
@@ -48,7 +49,6 @@ class SmileClassifierTest {
         xorSVM.clear()
         xorSVM.train()
     }
-
 
     @Test
     fun testInit() {
@@ -129,6 +129,7 @@ class SmileClassifierTest {
         // TODO: A second version of this test using neurongroups or neuron collections
     }
 
+
     // @Test
     fun `test naive bayes`() {
         val nb = NaiveBayes(
@@ -206,5 +207,23 @@ class SmileClassifierTest {
         println(decisionTree.predict(Tuple.of(doubleArrayOf(5.4,3.9,1.3,0.4), data.df.schema())))
         // Use debugger to get a sense of what this has
         // Could find a way to make the inferred tree human readable, would be cool
+    }
+
+    // @Test
+    fun `sandbox SVM Basic xor`() {
+        val inputs = arrayOf(
+            doubleArrayOf(0.0, 0.0),
+            doubleArrayOf(1.0, 0.0),
+            doubleArrayOf(0.0, 1.0),
+            doubleArrayOf(1.0, 1.0)
+        )
+        val targets = intArrayOf(-1,1,1,-1)
+        // val targets = intArrayOf(0,1,1,0) // Causes exception. Labels must be 1 or -1
+        val svm = SVM.fit(inputs, targets, 1000.0, .001)
+        var result = svm.predict(doubleArrayOf(1.0, 1.0))
+        println(result)
+        var result2 = svm.predict(doubleArrayOf(1.0, 0.0))
+        println(result2)
+
     }
 }

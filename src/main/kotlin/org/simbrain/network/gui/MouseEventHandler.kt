@@ -25,6 +25,7 @@ import org.piccolo2d.event.PDragSequenceEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.extras.nodes.PStyledText
+import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.LocatableModel
@@ -37,6 +38,7 @@ import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.isDoubleClick
 import org.simbrain.util.piccolo.screenElements
 import org.simbrain.util.rectangle
+import java.awt.Color
 import java.awt.event.InputEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
@@ -52,6 +54,13 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
     private lateinit var marqueeStartPosition: Point2D
 
     private lateinit var marqueeEndPosition: Point2D
+
+    /**
+     * Red line that shows what the delta for the [PlacementManager] will be.
+     */
+    private var placementManagerDelta: PPath? = null
+
+    private val PInputEvent.isPanKeyDown get() = if (Utils.isMacOSX()) isMetaDown else isControlDown
 
     private val selectionMarquee by lazy {
         with(marqueeStartPosition) { SelectionMarquee(x.toFloat(), y.toFloat()) }.also {
@@ -98,7 +107,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             }
             // Required so that clicking to drag does not de-select all other nodes
             if (pickedScreenElement !in networkPanel.selectionManager.selection) {
-                if(!event.isShiftDown) {
+                if (!event.isShiftDown) {
                     networkPanel.selectionManager.set(pickedScreenElement)
                 }
             }
@@ -133,6 +142,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         marqueeEndPosition = event.position
     }
 
+
     override fun endDrag(event: PInputEvent) {
         super.endDrag(event)
         if (mode == Mode.SELECTION) {
@@ -140,13 +150,22 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         } else {
             dragItems(event)
             priorSelection = setOf()
-            // If objects are being dragged, reset the anchor position in the placement manager
-            if (event.pickedNode != null) {
-                val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
-                networkPanel.placementManager.deltaDrag =  topLeft - networkPanel.placementManager.previousAnchorPoint
-                networkPanel.placementManager.anchorPoint = topLeft
+
+            // Reset the anchor point in the placement manager
+            val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
+            val pm = networkPanel.placementManager
+            pm.anchorPoint = topLeft
+
+            // Only reset the delta if alt/option key is down
+            if (event.pickedNode != null && event.isAltDown) {
+                event.pickedNode.firstScreenElement?.model.let {
+                    if (it is LocatableModel) {
+                        pm.deltaDragMap[it.javaClass.kotlin] = topLeft - pm.previousAnchorPoint
+                    }
+                }
             }
         }
+        networkPanel.canvas.layer.removeChild(placementManagerDelta)
         networkPanel.zoomToFitPage()
     }
 
@@ -173,7 +192,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
 
         val selectedNodes = networkPanel.canvas.layer.root.getAllNodes(
-                BoundsFilter(bound), null
+            BoundsFilter(bound), null
         ).filterIsInstance<ScreenElement>()
 
         val finalSelection = if (event.isShiftDown) {
@@ -191,10 +210,24 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
     private fun dragItems(event: PInputEvent) {
         val delta = event.position - marqueeEndPosition
         networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
-                .forEach { it?.offset(delta.x, delta.y) }
-    }
+            .forEach { it?.offset(delta.x, delta.y) }
 
-    private val PInputEvent.isPanKeyDown get() = if (Utils.isMacOSX()) isMetaDown else isControlDown
+        // Show placementManagerDelta for placement manager
+        if (event.isAltDown) {
+            val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
+            val pm = networkPanel.placementManager
+            networkPanel.canvas.layer.removeChild(placementManagerDelta)
+            placementManagerDelta = PPath.createLine(
+                topLeft.x, topLeft.y,
+                pm.previousAnchorPoint.x,
+                pm.previousAnchorPoint.y
+            ).apply {
+                this.stroke = PPath.DEFAULT_STROKE
+                this.strokePaint = Color.red
+            }
+            networkPanel.canvas.layer.addChild(placementManagerDelta)
+        }
+    }
 
     /**
      * A filter that determines whether a given pnode is selectable or not. Bounds are updated as the lasso tool is
@@ -211,6 +244,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
 
         override fun acceptChildrenOf(node: PNode) =
-                (node.childrenPickable || node is PCamera || node is PLayer) && node !is SelectionMarquee
+            (node.childrenPickable || node is PCamera || node is PLayer) && node !is SelectionMarquee
     }
 }

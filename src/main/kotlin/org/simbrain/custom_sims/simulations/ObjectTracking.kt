@@ -18,7 +18,6 @@ import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.lang.Double.max
-import java.lang.Double.min
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.component3
@@ -64,7 +63,7 @@ val objectTrackingSim = newSim {
     reservoir.location = point(0, 0)
     val reservoirSynapseGroup = SynapseGroup2(reservoir, reservoir, sparse)
     network.addNetworkModel(reservoirSynapseGroup)
-    val dist = NormalDistribution(0.0, .1)
+    val dist = NormalDistribution(1.0, .1)
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
     }
@@ -212,7 +211,7 @@ val objectTrackingSim = newSim {
 
     updateCheeseLocation()
     workspace.addUpdateAction(updateAction("Move cheese") {
-        println(reservoir.activations.mean)
+        // println(reservoir.activations.mean)
         updateCheeseLocation()
     })
 
@@ -239,11 +238,15 @@ val objectTrackingSim = newSim {
 class PercentIncomingNeuronRule: LinearRule() {
     val maxVal = 10.0
     override fun apply(n: Neuron, data: ScalarDataHolder) {
-        n.activation = maxVal * n.fanIn
-            .filter { it.source.activation > 0 }
-            .count()
+        n.activation = maxVal * n.fanIn.count { it.source.isSpike }
             .toDouble() / n.fanIn.size
     }
+}
+
+fun Neuron.getSpikingInput(): Double {
+    val sensorInputs = fanIn.filter { it.source.updateRule is LinearRule}.sumOf { it.source.activation * it.strength }
+    val weightsOfSpikingNodes = fanIn.filter { it.source.isSpike}.sumOf { it.strength }
+    return sensorInputs + weightsOfSpikingNodes
 }
 
 class AllostaticNeuron(parent: Network, rule: NeuronUpdateRule) : Neuron(parent, rule) {
@@ -251,6 +254,7 @@ class AllostaticNeuron(parent: Network, rule: NeuronUpdateRule) : Neuron(parent,
     var threshold = 2.0
     var applyLearning = false
 }
+
 
 class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
 
@@ -261,16 +265,15 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
 
         n as AllostaticNeuron
 
-        val newActivation = n.activation * (1-leakRate) + min(n.weightedInputs, 100.0)
+        val newActivation = n.activation * (1-leakRate) + n.getSpikingInput()
         n.activation = max(0.0, newActivation ) // Prevent from going below 0
 
         // Only apply learning if neuron has just spiked
-        n.applyLearning = n.isSpike
+        // n.applyLearning = n.isSpike
         n.isSpike = false
-
         if (n.activation > n.threshold) {
             n.isSpike = true
-            // println("Spike!")
+            println("Spike!")
             n.activation -= n.threshold
         }
 
@@ -279,7 +282,8 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
         // Weights
         val toTrain= n.fanIn
             .filter { it.source is AllostaticNeuron}
-            .filter { (it.source as AllostaticNeuron).applyLearning }
+            .filter { it.source.isSpike}
+            // .filter { (it.source as AllostaticNeuron).applyLearning }
 
         toTrain.forEach {  s ->
             if (toTrain.isNotEmpty()) {
@@ -299,5 +303,26 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
     }
 
     override val name = "Allostatic Update Rule"
+
+
+    // Test getSpikingInput
+    fun main() {
+        val net = Network()
+        val n1 = Neuron(net)
+        val n2 = Neuron(net)
+        net.addNetworkModels(n1, n2)
+        n1.setClamped(true)
+        n2.setClamped(true)
+        val n3 = Neuron(net)
+        net.addNetworkModel(n3)
+        val s1 = Synapse(n1, n3)
+        s1.strength = 1.0
+        val s2 = Synapse(n2, n3)
+        s2.strength = .5
+        net.addNetworkModels(s1, s2)
+        n1.isSpike = true
+        n2.isSpike = true
+        println(n3.getSpikingInput())
+    }
 
 }

@@ -14,12 +14,8 @@
 package org.simbrain.network.gui;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUpdateAction;
-import org.simbrain.network.update_actions.CustomUpdate;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
-import org.simbrain.util.scripteditor.ScriptEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.updater.UpdateAction;
 
@@ -28,9 +24,6 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
 
 /**
  * Panel for display the current network updates, and editing them (adding,
@@ -88,8 +81,6 @@ public class NetworkUpdateManagerPanel extends JPanel {
         JPanel buttonPanel = new JPanel();
         JButton addActionsButton = new JButton(addPresetAction);
         buttonPanel.add(addActionsButton);
-        JButton customActionButton = new JButton(addCustomAction);
-        buttonPanel.add(customActionButton);
         JButton deleteActionsButton = new JButton(deleteActionsAction);
         buttonPanel.add(deleteActionsButton);
         // TODO: Make movement actions apply to multiple selections
@@ -194,36 +185,6 @@ public class NetworkUpdateManagerPanel extends JPanel {
      */
     private void configureActionList() {
         currentActionJList.setCellRenderer(listRenderer);
-        currentActionJList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-
-                    // When double clicking on custom actions open an editor
-                    NetworkUpdateAction action = (NetworkUpdateAction) currentActionJList.getModel().getElementAt(currentActionJList.locationToIndex(e.getPoint()));
-                    if (action instanceof CustomUpdate) {
-                        openScriptEditorPanel((CustomUpdate) action);
-                    }
-                }
-
-            }
-        });
-    }
-
-    /**
-     * Open the script editor panel with appropriate defaults.
-     *
-     * @param action the action
-     */
-    private void openScriptEditorPanel(CustomUpdate action) {
-        ScriptEditor panel = new ScriptEditor(((CustomUpdate) action).getScriptString(), SCRIPT_DIR);
-        StandardDialog dialog = panel.getDialog(panel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-        if (!dialog.hasUserCancelled()) {
-            ((CustomUpdate) action).setScriptString(panel.getTextArea().getText());
-            ((CustomUpdate) action).init();
-        }
     }
 
     /**
@@ -247,40 +208,6 @@ public class NetworkUpdateManagerPanel extends JPanel {
             for (Object action : currentActionJList.getSelectedValuesList()) {
                 network.getUpdateManager().removeAction((UpdateAction) action);
             }
-        }
-    };
-
-    /**
-     * Action which allows for creation of custom action.
-     */
-    Action addCustomAction = new AbstractAction() {
-        // Initialize
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/plus.png"));
-            putValue(NAME, "Add custom action");
-            putValue(SHORT_DESCRIPTION, "Add a custom action to the update sequence");
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void actionPerformed(ActionEvent arg0) {
-            File defaultScript = new File(System.getProperty("user.dir") + "/etc/customNetworkUpdateTemplate.bsh");
-            ScriptEditor panel = new ScriptEditor(Utils.readFileContents(defaultScript), SCRIPT_DIR);
-            panel.setScriptFile(defaultScript);
-            StandardDialog dialog = panel.getDialog(panel);
-            // Setting script file to null prevents the template script from
-            // being saved. Forces "save as"
-            // if save button pressed.
-            panel.setScriptFile(null);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setVisible(true);
-            // if (!dialog.hasUserCancelled()) {
-            //     CustomUpdate updateAction = new CustomUpdate(network, panel.getTextArea().getText());
-            //     network.getUpdateManager().addAction(updateAction);
-            // }
-
         }
     };
 
@@ -334,17 +261,6 @@ public class NetworkUpdateManagerPanel extends JPanel {
      */
     private void configureAvailableJList(final JList availableActionJList) {
         availableActionJList.setCellRenderer(listRenderer);
-        availableActionJList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    NetworkUpdateAction action = (NetworkUpdateAction) availableActionJList.getModel().getElementAt(availableActionJList.locationToIndex(e.getPoint()));
-                    if (action instanceof CustomUpdate) {
-                        openScriptEditorPanel((CustomUpdate) action);
-                    }
-                }
-
-            }
-        });
     }
 
     /**

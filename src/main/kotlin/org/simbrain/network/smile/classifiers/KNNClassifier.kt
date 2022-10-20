@@ -2,7 +2,7 @@ package org.simbrain.network.smile.classifiers
 
 import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.util.UserParameter
-import org.simbrain.util.getOneHotMat
+import org.simbrain.util.getOneHot
 import smile.classification.Classifier
 import smile.classification.KNN
 import smile.math.matrix.Matrix
@@ -22,9 +22,11 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     override val name: String = "K Nearest Neighbors"
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
+        if (k > trainingData.numSamples) {
+            throw IllegalStateException("k must be less than the number of rows in the training dataset")
+        }
         model = KNN.fit(inputs, targets, k)
-        val pred = model?.predict(inputs)
-        setAccuracyLabel(Accuracy.of(targets, pred))
+        setAccuracyLabel(Accuracy.of(targets, model?.predict(inputs)))
     }
 
     override fun predict(input: DoubleArray): Int {
@@ -38,7 +40,7 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
         if (result == -1) {
             return Matrix(outputSize, 1)
         } else {
-            return getOneHotMat(result-1, outputSize, 1.0)
+            return getOneHot(result-1, outputSize, 1.0)
         }
     }
 

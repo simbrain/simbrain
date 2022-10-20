@@ -1,5 +1,6 @@
 package org.simbrain.util.table
 
+import org.simbrain.util.sampleWithoutReplacement
 import smile.math.matrix.Matrix
 
 /**
@@ -141,8 +142,23 @@ class BasicDataWrapper(
 
     override fun randomizeColumn(col: Int) {
         if (validateColumnIndex(col)) {
+            // String case
+            if (columns[col].type == Column.DataType.StringType) {
+                randomizeStringColum(col)
+            }
+            // Numeric case
             (0 until rowCount).forEach {
                 setValueAt(columns[col].getRandom(), it, col)
+            }
+            fireTableDataChanged()
+        }
+    }
+
+    fun randomizeStringColum(col: Int) {
+        if (validateColumnIndex(col) && columns[col].type == Column.DataType.StringType ) {
+            val options = getStringColumn(col).toSet().toList()
+            (0 until rowCount).forEach {
+                setValueAt(options.sampleWithoutReplacement().first(), it, col)
             }
             fireTableDataChanged()
         }

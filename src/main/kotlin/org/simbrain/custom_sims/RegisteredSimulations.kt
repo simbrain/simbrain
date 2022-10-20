@@ -79,7 +79,7 @@ val simulations = dir<Any>("Simulations") {
     }
 
     dir("Cognitive Science") {
-        item("Cortex (PCI)") { cortexPCI }
+        item("Cortex (Kuramoto)") { cortexKuramoto }
         item("Object Tracking") { objectTrackingSim }
         item("Binary Reservoir") {binaryReservoir }
         item("Isopod Simulation") { isopodSim }
@@ -88,13 +88,14 @@ val simulations = dir<Any>("Simulations") {
     dir("Evolution") {
         item("Evolve Avoider") { evolveAvoider }
         item("Evolve Resource Pursuer") { evolveResourcePursuer }
-        item("Multi Agent Resource Pursuer") { evolveMultiAgentResourcePursuer }
+        item("Multi Agent Resource Pursuer") { evolveCow }
         item("Evolve AutoEncoder") { evolveAutoAssociator }
         item("Evolve Modular (Clune et. al.)") { evolveModularity }
         item("Evolve Network (Sandbox)") { evolveNetwork }
         item("Evolve Pursuer") { evolvePursuer }
         item("Evolve Mouse (Sandbox)") { evolveMouse }
         item("Evolve XOR") { evolveXor }
+        item("Evolve XOR2") { evolveXor2 }
     }
 
 }

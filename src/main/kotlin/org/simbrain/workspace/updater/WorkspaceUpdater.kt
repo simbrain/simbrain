@@ -1,7 +1,6 @@
 package org.simbrain.workspace.updater
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
@@ -76,7 +75,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         notifyWorkspaceUpdateStarted()
-        withContext(Dispatchers.Swing) {
+        withContext(workspace.coroutineScope.coroutineContext) {
             while (isRunning) {
                 doUpdate()
             }
@@ -97,7 +96,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         notifyWorkspaceUpdateStarted()
-        withContext(Dispatchers.Swing) {
+        withContext(workspace.coroutineScope.coroutineContext) {
             doUpdate()
         }
         notifyWorkspaceUpdateCompleted()

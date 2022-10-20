@@ -356,8 +356,9 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private Object readResolve() {
-        dataset = new XYSeriesCollection();
         changeSupport = new PropertyChangeSupport(this);
+        dataset = new XYSeriesCollection();
+        timeSeriesList.forEach(ts -> dataset.addSeries(ts.series));
         return this;
     }
 
@@ -377,7 +378,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         /**
          * The represented time series
          */
-        transient XYSeries series;
+        XYSeries series;
 
         /**
          * Construct the time series.

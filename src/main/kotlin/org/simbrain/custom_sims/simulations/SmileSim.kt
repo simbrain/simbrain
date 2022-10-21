@@ -12,9 +12,9 @@ import org.simbrain.util.table.DataFrameWrapper
 import smile.io.Read
 
 /**
- * Simulation for evaluating and demoing the Smile ML components
+ * Train a smile classifier on Iris data.
  */
-val smileSim = newSim {
+val irisClassifier = newSim {
 
     // Basic setup
     workspace.clearWorkspace()

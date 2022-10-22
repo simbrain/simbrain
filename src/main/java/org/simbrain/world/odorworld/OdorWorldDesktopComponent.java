@@ -21,6 +21,7 @@ package org.simbrain.world.odorworld;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.gui.DesktopComponent;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -57,15 +58,14 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
 
-        worldPanel.getWorld().getEvents().onTileMapChanged(this::setGuiMaxSizeToWorldSize);
+        worldPanel.getWorld().getEvents().onTileMapChanged(this::setGuiSizeToWorldSize);
 
         // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
 
         menu = new OdorWorldFrameMenu(this, worldPanel.getWorld());
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu);
-        worldPanel.syncToModel();
-        setGuiSizeToWorldSize();
+        SwingUtilities.invokeLater(this::setGuiSizeToWorldSize);
     }
 
     /**
@@ -75,29 +75,12 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
     public void setGuiSizeToWorldSize() {
         int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
         int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
-        getParentFrame().setPreferredSize(new Dimension((int) (worldPanel.getWorld().getWidth() + widthOffset),
-                (int) (worldPanel.getWorld().getHeight() + heightOffset)));
+        getParentFrame().setPreferredSize(new Dimension(Math.min((int) (worldPanel.getWorld().getWidth() + widthOffset), 800),
+                Math.min((int) (worldPanel.getWorld().getHeight() + heightOffset), 800)));
         getParentFrame().setMaximumSize(
                 new Dimension((int) (worldPanel.getWorld().getWidth() + widthOffset),
                         (int) (worldPanel.getWorld().getHeight() + heightOffset)));
         getParentFrame().pack();
-    }
-
-    /**
-     * Sets the max size of the window based on the size of the underlying world / tilemap;
-     * set the default size base don the panel preferences.
-     */
-    private void setGuiMaxSizeToWorldSize() {
-        worldPanel.setPreferredSize(worldPanel.getPreferredSize());
-        int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
-        int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
-        double maxWidth = worldPanel.getWorld().getWidth() + widthOffset;
-        double maxHeight = worldPanel.getWorld().getHeight() + heightOffset;
-        getParentFrame().setMaximumSize(new Dimension((int) maxWidth, (int) maxHeight));
-        var bound = getParentFrame().getBounds();
-        bound.width = (int) maxWidth;
-        bound.height = (int) maxHeight;
-        getParentFrame().setBounds(bound);
     }
 
     /**

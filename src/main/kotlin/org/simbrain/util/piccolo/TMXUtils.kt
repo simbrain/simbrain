@@ -291,6 +291,8 @@ fun TileMap.getTileStackNear(location: Point2D, radius: Double = 10.0): List<Pai
     return b
 }
 
+context (TileMap)
+val GridCoordinate.isInMap get() = x.toInt() in 0 until width && y.toInt() in 0 until height
 
 /**
  * Make a lake of the indicated size (in # of tiles) starting at the top left grid location.
@@ -333,7 +335,9 @@ fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int) {
     repeat(height) { y ->
         repeat(width) { x ->
             val p = topLeftLocation + point(x, y)
-            setTile(p.x.toInt(), p.y.toInt(),2)
+            if (p.asGridCoordinate().isInMap) {
+                setTile(p.x.toInt(), p.y.toInt(),2)
+            }
         }
     }
 
@@ -344,8 +348,12 @@ fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int) {
             val isLandList = (-1..1).flatMap { ly ->
                 (-1..1).map { lx ->
                     val lp = (p + point(lx, ly)).asGridCoordinate()
-                    val tileStack = getTileStackAt(lp)
-                    if (tileStack.any { it.type != "water" }) 1 else 0
+                    if (lp.isInMap) {
+                        val tileStack = getTileStackAt(lp)
+                        if (tileStack.any { it.type != "water" }) 1 else 0
+                    } else {
+                        1
+                    }
                 }
             }
             val surroundingLandBits = isLandList.reduce { acc, i -> (acc shl 1) + i }

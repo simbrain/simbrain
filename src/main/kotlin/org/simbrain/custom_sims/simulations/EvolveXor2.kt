@@ -114,7 +114,7 @@ val evolveXor2 = newSim {
             }
         }
 
-        override fun copy(workspace: Workspace): Xor2Sim {
+        override fun visualize(workspace: Workspace): Xor2Sim {
             return Xor2Sim(xor2Genotype.copy(), workspace)
         }
 
@@ -147,7 +147,7 @@ val evolveXor2 = newSim {
             populatingFunction = { Xor2Sim() },
             populationSize = 100,
             eliminationRatio = 0.5,
-            stoppingFunction = {
+            peek = {
                 progressWindow.value = generation
                 listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                     "$it: ${nthPercentileFitness(it).format(3)}"
@@ -155,12 +155,14 @@ val evolveXor2 = newSim {
                     println("[$generation] $it")
                     progressWindow.text = "Error: ${nthPercentileFitness(0).format(3)}"
                 }
+            },
+            stoppingFunction = {
                 nthPercentileFitness(5) > -0.05 || generation > maxGeneratioms
             }
         )
 
         lastGeneration.take(5).forEach {
-            with(it.copy(workspace) as Xor2Sim) {
+            with(it.visualize(workspace) as Xor2Sim) {
                 build()
                 val phenotype = this.phenotype.await()
                 phenotype.inputs.neuronList.forEach { it.increment = 1.0 }

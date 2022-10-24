@@ -10,8 +10,7 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm2.*
-import org.simbrain.util.piccolo.GridCoordinate
-import org.simbrain.util.piccolo.toPixelCoordinate
+import org.simbrain.util.piccolo.*
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
@@ -25,12 +24,12 @@ val evolveCow = newSim {
 
     val coroutineScope = workspace.coroutineScope
 
-    class CowGenotype(seed: Long = Random.nextLong()): Genotype2 {
+    class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
         override val random: Random = Random(seed)
         var inputs = chromosome2(3) { add(nodeGene2 { isClamped = true }) }
         var hiddens = chromosome2(2) { add(nodeGene2()) }
         var outputs = chromosome2(3) { add(nodeGene2 { upperBound = 10.0; lowerBound = -10.0 }) }
-        var metrics = chromosome2(1) { add(nodeGene2 { isClamped = true }) }
+        var drives = chromosome2(1) { add(nodeGene2 { isClamped = true }) }
         var connections = chromosome2(0) { add(connectionGene2(inputs.first(), outputs.first())) }
 
 
@@ -38,16 +37,24 @@ val evolveCow = newSim {
             val inputs: NeuronCollection,
             val hiddens: NeuronCollection,
             val outputs: NeuronCollection,
-            val metrics: NeuronCollection,
+            val drives: NeuronCollection,
             val connections: List<Synapse>
         )
 
         suspend fun build(network: Network): Phenotype {
             return Phenotype(
-                NeuronCollection(network, network.express(inputs)).also { network.addNetworkModel(it); it.label = "input" },
-                NeuronCollection(network, network.express(hiddens)).also { network.addNetworkModel(it); it.label = "hidden" },
-                NeuronCollection(network, network.express(outputs)).also { network.addNetworkModel(it); it.label = "output" },
-                NeuronCollection(network, network.express(metrics)).also { network.addNetworkModel(it); it.label = "metric" },
+                NeuronCollection(network, network.express(inputs)).also {
+                    network.addNetworkModel(it); it.label = "input"
+                },
+                NeuronCollection(network, network.express(hiddens)).also {
+                    network.addNetworkModel(it); it.label = "hidden"
+                },
+                NeuronCollection(network, network.express(outputs)).also {
+                    network.addNetworkModel(it); it.label = "output"
+                },
+                NeuronCollection(network, network.express(drives)).also {
+                    network.addNetworkModel(it); it.label = "drives"
+                },
                 network.express(connections)
             )
         }
@@ -59,7 +66,7 @@ val evolveCow = newSim {
             new.inputs = current.inputs.copy()
             new.hiddens = current.hiddens.copy()
             new.outputs = current.outputs.copy()
-            new.metrics = current.metrics.copy()
+            new.drives = current.drives.copy()
             new.connections = current.connections.copy()
         }
 
@@ -80,7 +87,7 @@ val evolveCow = newSim {
 
 
             if (random.nextDouble() < 0.9) {
-                val source = (inputs + hiddens + outputs + metrics).toList().sampleWithoutReplacement().first()
+                val source = (inputs + hiddens + outputs + drives).toList().sampleWithoutReplacement().first()
                 val target = (hiddens + outputs).toList().sampleWithoutReplacement().first()
                 connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
@@ -92,12 +99,21 @@ val evolveCow = newSim {
         }
     }
 
-    class CowSim(val cowGenotypes: List<CowGenotype> = List(2) { CowGenotype() }, val workspace: Workspace = Workspace(
-        coroutineScope + Dispatchers.Default)): EvoSim {
+    class CowSim(
+        val cowGenotypes: List<CowGenotype> = List(2) { CowGenotype() }, val workspace: Workspace = Workspace(
+            coroutineScope + Dispatchers.Default
+        )
+    ) : EvoSim {
 
         val random = Random(cowGenotypes.first().random.nextInt())
 
-        val odorWorld = OdorWorldComponent("Odor World 1").also { workspace.addWorkspaceComponent(it) }.world
+        val odorWorld = OdorWorldComponent("Odor World 1").also {
+            workspace.addWorkspaceComponent(it)
+        }.world.apply {
+            loadTileMap("empty.tmx")
+            tileMap.updateMapSize(32, 32)
+            tileMap.fill(6)
+        }
 
         val networks = List(cowGenotypes.size) { index ->
             NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
@@ -140,8 +156,21 @@ val evolveCow = newSim {
         )
 
         fun setTile(coordinate: GridCoordinate, tileId: Int) {
-            val (x, y) = coordinate
-            odorWorld.tileMap.setTile(x.toInt(), y.toInt(), tileId)
+            val lakeSize = 2
+            with (odorWorld.tileMap) {
+                if (tileId == 6) {
+                    val (x, y) = coordinate
+                    (x.toInt() until (x.toInt() + lakeSize)).map { i ->
+                        (y.toInt() until (y.toInt() + lakeSize)).map { j ->
+                            if (point(i, j).asGridCoordinate().isInMap) {
+                                setTile(i, j, tileId)
+                            }
+                        }
+                    }
+                } else {
+                    makeLake(coordinate, lakeSize, lakeSize)
+                }
+            }
         }
 
         init {
@@ -158,7 +187,7 @@ val evolveCow = newSim {
 
         fun addUpdateActions(phenotype: CowGenotype.Phenotype, entity: OdorWorldEntity) {
 
-            val thirstNeuron = phenotype.metrics.neuronList.first()
+            val thirstNeuron = phenotype.drives.neuronList.first()
 
             workspace.addUpdateAction("location check") {
                 with(odorWorld.tileMap) {
@@ -168,7 +197,7 @@ val evolveCow = newSim {
                             fitness += 1.0 / iterationsPerRun
                             thirstNeuron.forceSetActivation(0.0)
 
-                            setTile(currentWaterLocation, 0)
+                            setTile(currentWaterLocation, 6)
                             waterLocations.remove(currentWaterLocation)
 
                             val newLocation = randomTileCoordinate()
@@ -190,8 +219,10 @@ val evolveCow = newSim {
 
 
             workspace.addUpdateAction("update energy") {
-                val outputsActivations = phenotype.outputs.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
-                val allActivations = (phenotype.inputs.neuronList + phenotype.outputs.neuronList).activations.sumOf { abs(it) } * 2
+                val outputsActivations =
+                    phenotype.outputs.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
+                val allActivations =
+                    (phenotype.inputs.neuronList + phenotype.outputs.neuronList).activations.sumOf { abs(it) } * 2
                 thirstNeuron.activation += (outputsActivations + allActivations) * (1 / iterationsPerRun)
             }
         }
@@ -218,7 +249,7 @@ val evolveCow = newSim {
             cowGenotypes.forEach { it.mutate() }
         }
 
-        override fun copy(workspace: Workspace) = CowSim(cowGenotypes.map { it.copy() }, workspace)
+        override fun visualize(workspace: Workspace) = CowSim(cowGenotypes.map { it.copy() }, workspace)
 
         override fun copy() = CowSim(cowGenotypes.map { it.copy() }, Workspace(workspace.coroutineScope))
 
@@ -234,21 +265,24 @@ val evolveCow = newSim {
     }
 
     workspace.coroutineScope.launch {
-        val things = evaluator2(
+        val cowSims = evaluator2(
             populatingFunction = { CowSim() },
             populationSize = 100,
             eliminationRatio = 0.5,
             stoppingFunction = {
+                nthPercentileFitness(5) > 10 || generation > 50
+            },
+            peek = {
                 listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                     "$it: ${nthPercentileFitness(it).format(3)}"
                 }.also { println("[$generation] $it") }
-                nthPercentileFitness(5) > 10 || generation > 50
             }
         )
 
-        things.take(1).forEach {
-            val new = it.copy(workspace)
-            new.build()
+        cowSims.take(1).forEach {
+            val winningSim = it.visualize(workspace)
+            winningSim.build()
+
         }
     }
 }

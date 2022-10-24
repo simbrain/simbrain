@@ -24,7 +24,7 @@ abstract class Gene2<P> {
 interface EvoSim {
     fun mutate()
     suspend fun build()
-    fun copy(workspace: Workspace): EvoSim
+    fun visualize(workspace: Workspace): EvoSim
     fun copy(): EvoSim
     suspend fun eval(): Double
 }
@@ -39,6 +39,7 @@ suspend fun evaluator2(
     populatingFunction: (index: Int) -> EvoSim,
     populationSize: Int,
     eliminationRatio: Double,
+    peek: GenerationFitnessPair.() -> Unit,
     stoppingFunction: GenerationFitnessPair.() -> Boolean,
     seed: Long = Random.nextLong(),
     random: Random = Random(seed)
@@ -59,6 +60,8 @@ suspend fun evaluator2(
                     }
                 }
             }).awaitAll()
-    } while (!stoppingFunction(GenerationFitnessPair(generation, agentFitnessPair.map { it.second })))
+        val generationFitnessPair = GenerationFitnessPair(generation, agentFitnessPair.map { it.second })
+        peek(generationFitnessPair)
+    } while (!stoppingFunction(generationFitnessPair))
     population
 }

@@ -111,6 +111,12 @@ fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int, y: Int
     }
 }
 
+fun SimulationScope.getResource(fileName: String): String {
+    return ResourceManager.getString(
+        "custom_sims" + Utils.FS + fileName
+    )
+}
+
 /**
  * Add a doc viewer component.
  *

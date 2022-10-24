@@ -273,7 +273,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
         n.isSpike = false
         if (n.activation > n.threshold) {
             n.isSpike = true
-            println("Spike!")
+            // println("Spike!")
             n.activation -= n.threshold
         }
 

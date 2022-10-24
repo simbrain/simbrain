@@ -38,51 +38,54 @@ import org.simbrain.util.dir
  */
 val simulations = dir<Any>("Simulations") {
 
-    // TODO: Finish classifying
-    dir("Imported") {
-        item("LSTM") { lstmBlock() }
-        item("MPFS") { MpfsSOM() }
-        item("Braitenberg") { Braitenberg() }
-        item("Edge Of Chaos") { EdgeOfChaos() }
-        item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
-        item("Hippocampus") { Hippocampus() }
-        item("RL_Sim_Main") { RL_Sim_Main() }
-        item("Cerebellum") { Cerebellum() }
-        item("Creatures") { CreaturesSim() }
-        item("Actor Critic") { ActorCritic() }
-        item("Operant With Environment") { OperantWithEnvironment() }
-        item("Classical Conditioning") { ClassicalConditioning() }
-        item("Operant Conditioning") {OperantConditioning()}
-        item("Simple Operant") {SimpleOperant()}
-        item("Cortical Branching") {CorticalBranching()}
-        item("Cortex Simple") {CortexSimple()}
-        item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
-        item("RandomizedPursuer") { RandomizedPursuer() }
-        item("PatternsOfActivity") {PatternsOfActivity()}
-        item("KuramotoOscillators") {KuramotoOscillators()}
-        item("SORN") { SORN() }
-        item("lstmBlock") {lstmBlock()}
-        item("ConvertSim") { ConvertSim() }
-        item("ReadSim") { ReadSim() }
+    dir("Course Materials") {
+        dir("Behaviorism") {
+            item("Operant With Environment") { OperantWithEnvironment() }
+            item("Classical Conditioning") { ClassicalConditioning() }
+            item("Operant Conditioning") {OperantConditioning()}
+            item("Simple Operant") {SimpleOperant()}
+        }
+        dir("NLP") {
+            item("NLP") { nlpSim }
+        }
     }
 
     dir("Demos") {
-        item("Test Sim") { testSim }
-        item("Linked Neuron List") { linkedNeuronList }
-        item("Smile Classifier") { smileSim }
         item("Projection") { projectionSim }
-        item("NLP") { nlpSim }
-        item("Deep Net") { deepNetSim }
+        item("Iris Classifier") { irisClassifier }
+        item("Deep Net - Mnist") { deepNetSim }
         item("Spiking Neuron") { spikingNetwork }
         item("Mnist Images") { mnistSim }
-        item("Agent Trails") { kAgentTrails }
+        item("LSTM") { lstmBlock() }
     }
 
     dir("Cognitive Science") {
-        item("Cortex (Kuramoto)") { cortexKuramoto }
+        dir("Neuroscience") {
+            item("Cortex (Kuramoto)") { cortexKuramoto }
+            item("Hippocampus") { Hippocampus() }
+            item("Cerebellum") { Cerebellum() }
+            item("Cortex Simple") {CortexSimple()}
+        }
+        dir("Cognitive Maps") {
+            item("Agent Trails") { kAgentTrails }
+            item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
+            item("KuramotoOscillators") {KuramotoOscillators()}
+        }
+        dir("RL") {
+            item("RL_Sim_Main") { RL_Sim_Main() }
+            item("Actor Critic") { ActorCritic() }
+        }
+        dir("Agents") {
+            item("RandomizedPursuer") { RandomizedPursuer() }
+            item("Isopod Simulation") { isopodSim }
+            item("Braitenberg") { Braitenberg() }
+        }
+        dir("Reservoir") {
+            item("Binary Reservoir") {binaryReservoir }
+            item("Edge Of Chaos") { EdgeOfChaos() }
+            item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
+        }
         item("Object Tracking") { objectTrackingSim }
-        item("Binary Reservoir") {binaryReservoir }
-        item("Isopod Simulation") { isopodSim }
     }
 
     dir("Evolution") {
@@ -96,6 +99,20 @@ val simulations = dir<Any>("Simulations") {
         item("Evolve Mouse (Sandbox)") { evolveMouse }
         item("Evolve XOR") { evolveXor }
         item("Evolve XOR2") { evolveXor2 }
+    }
+
+    dir("Testing") {
+        item("Test Sim") { testSim }
+        item("Linked Neuron List") { linkedNeuronList }
+        dir("Defunct?") {
+            item("ConvertSim") { ConvertSim() }
+            item("ReadSim") { ReadSim() }
+            item("Creatures") { CreaturesSim() }
+            item("MPFS") { MpfsSOM() }
+            item("PatternsOfActivity") {PatternsOfActivity()}
+            item("SORN") { SORN() }
+            item("Cortical Branching") {CorticalBranching()}
+        }
     }
 
 }

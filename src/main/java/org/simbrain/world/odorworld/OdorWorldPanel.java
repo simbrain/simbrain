@@ -230,25 +230,31 @@ public class OdorWorldPanel extends JPanel {
             repaint();
         });
 
+        // Full tile map update
         world.getEvents().onTileMapChanged(() -> {
             canvas.getLayer().removeAllChildren();
             layerImageList = world.getTileMap().createImageList();
             canvas.getLayer().addChildren(layerImageList);
-            this.world.getTileMap().addPropertyChangeListener(e -> {
-                if ("layerImageChanged".equals(e.getPropertyName())) {
-                    PImage oldImage = (PImage) e.getOldValue();
-                    PImage newImage = (PImage) e.getNewValue();
-                    int index = canvas.getLayer().indexOfChild(oldImage);
-                    canvas.getLayer().removeChild(oldImage);
-                    if (index != -1) {
-                        canvas.getLayer().addChild(index, newImage);
-                    } else {
-                        canvas.getLayer().addChild(newImage);
-                    }
-                }
-            });
-            syncToModel();
+            for (OdorWorldEntity oe : world.getEntityList()) {
+                EntityNode node = new EntityNode(world, oe);
+                canvas.getLayer().addChild(node);
+            }
             repaint();
+        });
+
+        // Single layer update
+        world.getTileMap().addPropertyChangeListener(e -> {
+            if ("layerImageChanged".equals(e.getPropertyName())) {
+                PImage oldImage = (PImage) e.getOldValue();
+                PImage newImage = (PImage) e.getNewValue();
+                int index = canvas.getLayer().indexOfChild(oldImage);
+                canvas.getLayer().removeChild(oldImage);
+                if (index != -1) {
+                    canvas.getLayer().addChild(index, newImage);
+                } else {
+                    canvas.getLayer().addChild(newImage);
+                }
+            }
         });
 
         world.getEvents().onWorldStarted(() -> {
@@ -275,15 +281,6 @@ public class OdorWorldPanel extends JPanel {
             }, 10, 10);
             if (animationTimer != null) {
                 animationTimer.cancel();
-            }
-        });
-
-        world.getTileMap().addPropertyChangeListener(e -> {
-            if ("layerImageChanged".equals(e.getPropertyName())) {
-                PImage oldImage = (PImage) e.getOldValue();
-                PImage newImage = (PImage) e.getNewValue();
-                canvas.getLayer().removeChild(oldImage);
-                canvas.getLayer().addChild(newImage);
             }
         });
 
@@ -364,17 +361,6 @@ public class OdorWorldPanel extends JPanel {
             entity.applyMovement();
             entityNode.advance();
             centerCameraToSelectedEntity();
-        }
-    }
-
-    /**
-     * Add gui reps of all model entities to the panel.  Called when
-     * de-serializing saved worlds.
-     */
-    public void syncToModel() {
-        for (OdorWorldEntity oe : world.getEntityList()) {
-            EntityNode node = new EntityNode(world, oe);
-            canvas.getLayer().addChild(node);
         }
     }
 

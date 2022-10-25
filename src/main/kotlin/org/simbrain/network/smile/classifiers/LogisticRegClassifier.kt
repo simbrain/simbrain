@@ -1,6 +1,7 @@
 package org.simbrain.network.smile.classifiers
 
 import org.simbrain.network.smile.ClassificationAlgorithm
+import org.simbrain.util.UserParameter
 import smile.classification.Classifier
 import smile.classification.LogisticRegression
 import smile.classification.SoftClassifier
@@ -15,6 +16,11 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
 
     override var model: Classifier<DoubleArray>? = null
 
+    @UserParameter(label = "Show probabilities", description = "If true, show output probabilities rather than " +
+            "a one-hot representation of the winner",
+        order = 10)
+    var showProbabilities = false
+
     /**
      * Output probabilities
      */
@@ -22,20 +28,28 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         model = LogisticRegression.fit(inputs, targets)
-        // targetSize = targets.toSet().count()
         outputProbabilities = DoubleArray(outputSize)
         val pred = model?.predict(inputs)
         setAccuracyLabel(Accuracy.of(targets, pred))
     }
 
     override fun predict(input: DoubleArray): Int {
-        val ret = (model as SoftClassifier).predict(input)
-        // println(outputProbabilities.contentToString())
+        val ret: Int
+        if (showProbabilities) {
+            ret = (model as SoftClassifier).predict(input, outputProbabilities)
+        }  else {
+            ret = (model as Classifier).predict(input)
+        }
         return ret
     }
 
-    override fun getOutputVector(result: Int): Matrix {
-        return Matrix(outputProbabilities)
+    override fun getOutputVector(winner: Int): Matrix {
+        assertValidWinnerIndex(winner)
+        if (showProbabilities) {
+            return Matrix(outputProbabilities)
+        } else {
+            return super.getOutputVector(winner)
+        }
     }
 
     override fun copy(): ClassificationAlgorithm {

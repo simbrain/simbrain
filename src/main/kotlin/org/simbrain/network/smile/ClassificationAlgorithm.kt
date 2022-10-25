@@ -6,6 +6,7 @@ import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
+import org.simbrain.util.getOneHot
 import org.simbrain.util.propertyeditor.CopyableObject
 import smile.classification.Classifier
 import smile.math.matrix.Matrix
@@ -18,11 +19,10 @@ abstract class ClassificationAlgorithm(
     val outputSize: Int
 ): CopyableObject {
 
-
     /**
      * Main training data.
      */
-    var trainingData = ClassificationDataset(inputSize, 4)
+    var trainingData = ClassificationDataset(inputSize, outputSize, 4)
 
     /**
      * Fit a model to the training data.
@@ -44,10 +44,19 @@ abstract class ClassificationAlgorithm(
      */
     abstract fun predict(input: DoubleArray): Int
 
+    fun assertValidWinnerIndex(winner: Int) {
+        if (winner > outputSize) {
+            throw IllegalArgumentException("Prediction of ${winner} > output size of ${outputSize}")
+        }
+    }
+
     /**
-     * Convert this models integer prediction to an output vector.
+     * Convert this model's integer prediction to an output vector.
      */
-    abstract fun getOutputVector(result: Int): Matrix
+    open fun getOutputVector(winner: Int): Matrix {
+        assertValidWinnerIndex(winner)
+        return getOneHot(winner, outputSize)
+    }
 
     fun setAccuracyLabel(accuracy: Double) {
         stats = "Accuracy: ${Utils.round(accuracy, 3)}"

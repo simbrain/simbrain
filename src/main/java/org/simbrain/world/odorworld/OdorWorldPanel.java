@@ -292,6 +292,7 @@ public class OdorWorldPanel extends JPanel {
             }
         }, 10, 10);
 
+        world.getEvents().fireTileMapChanged();
     }
 
     private void centerCameraToSelectedEntity() {

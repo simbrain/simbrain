@@ -32,7 +32,7 @@ class SmileClassifierTest {
     /**
      * Create a trained SVM (on xor) for testing. Use a weirdly shaped 3x2 xor for better tests.
      */
-    val svm = SVMClassifier(3, 2).apply {
+    val svm = SVMClassifier(3).apply {
         this.trainingData.featureVectors = arrayOf(
             doubleArrayOf(0.0, 0.0, 0.0),
             doubleArrayOf(1.0, 0.0, 0.0),
@@ -52,7 +52,7 @@ class SmileClassifierTest {
 
     @Test
     fun testInit() {
-        val classifier = SmileClassifier(net, SVMClassifier(4, 2))
+        val classifier = SmileClassifier(net, SVMClassifier(4))
         net.addNetworkModel(classifier)
         classifier.addInputs(Matrix(doubleArrayOf(1.0,2.0,3.0,4.0)))
         assertEquals(10.0, classifier.inputs.sum())

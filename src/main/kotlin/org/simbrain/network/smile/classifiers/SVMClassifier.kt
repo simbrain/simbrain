@@ -12,12 +12,14 @@ import smile.validation.metric.Accuracy
 
 /**
  * Wrapper for Smile SVM Classifier.
- *
  */
-class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4):
-    ClassificationAlgorithm(inputSize, outputSize) {
+class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4):
+    ClassificationAlgorithm(inputSize, 2) {
 
     init {
+        if (outputSize != 2) {
+            System.err.println("SVN can only have 2 outputs, what you entered was ignored")
+        }
         // SVM Assumes targets are -1 or 1
         trainingData.labelEncoding = ClassificationDataset.LabelEncoding.Bipolar
     }
@@ -35,7 +37,7 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     override var model: Classifier<DoubleArray>? = null
 
     override fun copy(): ClassificationAlgorithm {
-        return SVMClassifier(inputSize, outputSize).also {
+        return SVMClassifier(inputSize).also {
             it.kernelDegree = kernelDegree
             it.C = C
             it.tolerance = tolerance
@@ -54,8 +56,15 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
         return model?.predict(input) ?: -1
     }
 
-    override fun getOutputVector(result: Int): Matrix {
-        return getOneHot(result, outputSize)
+    override fun getOutputVector(winner: Int): Matrix {
+        assertValidWinnerIndex(winner)
+        // -1 is assumed to come from a bipolar -1/1 encoding, and is thus mapped to a the first entry of one-hot
+        // vector
+        if (winner == -1) {
+            return getOneHot(0, outputSize)
+        } else {
+            return getOneHot(1, outputSize)
+        }
     }
 
     // Kotlin hack to support "static method in superclass"

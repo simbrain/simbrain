@@ -124,7 +124,7 @@ fun main() {
     val networkComponent = NetworkComponent("net 1")
     val np = NetworkPanel(networkComponent)
     val classifier = with(networkComponent.network) {
-        val svm = SVMClassifier(2, 2)
+        val svm = SVMClassifier(2)
         val classifier = SmileClassifier(this, svm)
         svm.trainingData.featureVectors = arrayOf(
             doubleArrayOf(0.0, 0.0),

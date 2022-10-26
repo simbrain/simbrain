@@ -2,6 +2,7 @@ package org.simbrain.network.trainers
 
 import org.simbrain.util.BiMap
 import org.simbrain.util.getDiagonal2DDoubleArray
+import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 
 /**
  * Encapsulates a 2d array of feature vectors and a set of String labels used to train a classifier.
@@ -10,7 +11,7 @@ import org.simbrain.util.getDiagonal2DDoubleArray
  * [getIntegerTargets].
  *
  */
-class ClassificationDataset(val numFeatures: Int, val numSamples: Int) {
+class ClassificationDataset(val numFeatures: Int, val numOutputs: Int, val numSamples: Int) {
 
     /**
      * Method of associating string labels to integer indices.
@@ -34,7 +35,7 @@ class ClassificationDataset(val numFeatures: Int, val numSamples: Int) {
      *
      * Xor example: ["F","T","T","F"]
      */
-    var targetLabels: Array<String> = Array(numSamples) { "" }
+    var targetLabels: Array<String> = getRandStringLabels()
         set(value) {
             field  = value
             val labels = field.toSet()
@@ -53,6 +54,16 @@ class ClassificationDataset(val numFeatures: Int, val numSamples: Int) {
                 labels.forEachIndexed { i, label -> labelTargetMap[label] = i }
             }
         }
+
+    /**
+     * Returns a set of random labels based on number of possible outputs. "Class 1",...,"Class N". The user can of
+     * course change these.
+     */
+    fun getRandStringLabels(): Array<String> {
+        return (0 until numSamples).map { "Class " + UniformIntegerDistribution(floor = 1, ceil = numOutputs)
+            .sampleInt()}
+            .toTypedArray()
+    }
 
     /**
      * Load a set of integer targets t1...tn. These will be associated with string target labels "Class t1"..."Class tn"

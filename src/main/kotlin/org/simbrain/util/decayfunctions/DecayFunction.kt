@@ -8,7 +8,7 @@ import kotlin.math.abs
 abstract class DecayFunction(
 
     /**
-     * If outside of this radius the object has no affect on the network.
+     * If outside of this radius the object should have no effect on the network.
      */
     @UserParameter(
         label = "Dispersion",

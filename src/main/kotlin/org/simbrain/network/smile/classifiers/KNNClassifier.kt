@@ -2,10 +2,8 @@ package org.simbrain.network.smile.classifiers
 
 import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.util.UserParameter
-import org.simbrain.util.getOneHot
 import smile.classification.Classifier
 import smile.classification.KNN
-import smile.math.matrix.Matrix
 import smile.validation.metric.Accuracy
 
 /**
@@ -31,17 +29,6 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
 
     override fun predict(input: DoubleArray): Int {
         return model?.predict(input) ?: -1
-    }
-
-    override fun getOutputVector(result: Int): Matrix {
-        if (result > outputSize) {
-            throw IllegalArgumentException("Prediction of ${result} > output size of ${outputSize}")
-        }
-        if (result == -1) {
-            return Matrix(outputSize, 1)
-        } else {
-            return getOneHot(result-1, outputSize, 1.0)
-        }
     }
 
     override fun copy(): ClassificationAlgorithm {

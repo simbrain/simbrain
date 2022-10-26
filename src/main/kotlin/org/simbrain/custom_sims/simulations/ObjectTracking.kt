@@ -219,8 +219,6 @@ val objectTrackingSim = newSim {
     withGui {
         place(odorWorldComponent) {
             location = point(403, 14)
-            height = 524
-            width = 568
         }
     }
 

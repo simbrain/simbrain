@@ -23,6 +23,8 @@ import org.pmw.tinylog.Logger;
 import java.util.*;
 
 /**
+ * Related to https://en.wikipedia.org/wiki/K-d_tree
+ *
  * An n-dimensional generalization of a simple QuadTree structure. This is a
  * binary tree that splits elements based on successive dimensions, repeating as
  * necessary. There are two types of nodes in the structure, branches and
@@ -260,10 +262,6 @@ public class NTree implements Iterable<DataPoint> {
 
         /**
          * compares two points on one dimension
-         *
-         * @param o1
-         * @param o2
-         * @return
          */
         public int compare(DataPoint o1, DataPoint o2) {
             double difference = o1.get(dimension) - o2.get(dimension);
@@ -296,8 +294,6 @@ public class NTree implements Iterable<DataPoint> {
     public DataPoint isUnique(final DataPoint point, final double tolerance) {
         return isUnique(root, point, tolerance);
     }
-
-    //TODO: Confusing names.   rename or add methods that return booleans?
 
     /**
      * Checks whether the given point already exists in the tree with the
@@ -510,9 +506,6 @@ public class NTree implements Iterable<DataPoint> {
 
     /**
      * Returns the closest point in the tree to the given point.
-     *
-     * @param point
-     * @return the point closest to the given point
      */
     public DataPoint getClosestPoint(final DataPoint point) {
         return getClosestPoints(1, point).get(0);
@@ -550,8 +543,6 @@ public class NTree implements Iterable<DataPoint> {
 
     /**
      * Returns an iterator over this tree
-     *
-     * @return
      */
     public Iterator<DataPoint> iterator() {
         return list.iterator();

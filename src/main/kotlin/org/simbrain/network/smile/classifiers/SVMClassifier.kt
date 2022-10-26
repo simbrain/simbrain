@@ -13,7 +13,7 @@ import smile.validation.metric.Accuracy
 /**
  * Wrapper for Smile SVM Classifier.
  */
-class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 2):
+class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4):
     ClassificationAlgorithm(inputSize, 2) {
 
     init {
@@ -37,7 +37,7 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     override var model: Classifier<DoubleArray>? = null
 
     override fun copy(): ClassificationAlgorithm {
-        return SVMClassifier(inputSize, outputSize).also {
+        return SVMClassifier(inputSize).also {
             it.kernelDegree = kernelDegree
             it.C = C
             it.tolerance = tolerance

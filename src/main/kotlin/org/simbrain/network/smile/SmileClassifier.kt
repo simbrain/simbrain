@@ -120,7 +120,12 @@ class SmileClassifier(
         override val name = "Classifier"
 
         fun create(net: Network): SmileClassifier {
-            return SmileClassifier(net, classifierType::class.primaryConstructor!!.call(nin, nout))
+            val classifier = classifierType::class.primaryConstructor?.let { constructor ->
+                val paramMap = mapOf("inputSize" to nin, "outputSize" to nout)
+                val map = constructor.parameters.associateWith { p -> paramMap[p.name] }
+                constructor.callBy(map)
+            }!!
+            return SmileClassifier(net, classifier)
         }
 
         companion object {

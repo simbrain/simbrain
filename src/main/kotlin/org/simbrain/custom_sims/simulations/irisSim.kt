@@ -8,7 +8,6 @@ import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.table.DataFrameWrapper
 import smile.io.Read
 
 /**
@@ -22,20 +21,21 @@ val irisClassifier = newSim {
     val network = networkComponent.network
 
     // Last column is target data
-    val data = DataFrameWrapper(Read.csv("simulations/tables/iris_combined.csv"))
+    val iris = Read.arff("simulations/tables/iris.arff")
 
     // Add a neuron collection for setting inputs to the network
-    val inputNc = network.createNeuronCollection(data.columnCount - 1)
+    val inputNc = network.createNeuronCollection(4)
     inputNc.label = "Inputs"
     inputNc.setClamped(true)
     inputNc.location = point(0, 0)
 
+    // Choose a classifier here
     // val classifier = LogisticRegClassifier(4, 3)
     // val classifier = SVMClassifier(4, 3)
     val classifier = KNNClassifier(4, 3)
-    classifier.trainingData.featureVectors = data.get2DDoubleArray(0 until data.columnCount - 1)
-    // TODO: Initialize with labels. DataFrame should have that
-    classifier.trainingData.setIntegerTargets(data.getIntColumn(data.columnCount - 1))
+
+    classifier.trainingData.featureVectors = iris.select(0,1,2,3).toArray()
+    classifier.trainingData.targetLabels = iris.column(4).toStringArray()
     inputNc.inputManager.data = classifier.trainingData.featureVectors
     val smileClassifier = SmileClassifier(network, classifier)
     smileClassifier.train()

@@ -26,7 +26,9 @@ import org.simbrain.util.UserParameter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
 
 /**
  * <b>WinnerTakeAll</b>.The neuron with the highest weighted input in a
@@ -57,7 +59,7 @@ public class WinnerTakeAll extends NeuronGroup {
     /**
      * Probability of setting the winner randomly, when useRandom is true.
      */
-    @UserParameter(label = "Random prob", condtionalEnablingWidget = "Random winner", order = 80)
+    @UserParameter(label = "Random prob", conditionalEnablingMethod = "useRandomWinner", order = 80)
     private double randomProb = .1;
 
     /**
@@ -209,5 +211,12 @@ public class WinnerTakeAll extends NeuronGroup {
 
     public void setRandomProb(double randomProb) {
         this.randomProb = randomProb;
+    }
+
+    /**
+     * Called by reflection via {@link UserParameter#conditionalEnablingMethod()}
+     */
+    public Function<Map<String, Object>, Boolean> useRandomWinner() {
+        return (map) -> (Boolean) map.get("Random winner");
     }
 }

@@ -131,7 +131,7 @@ object TextWorldActions {
      * @return the action
      */
     @JvmStatic
-    fun getShowPreferencesDialogAction(world: TextWorld?): Action {
+    fun getShowPreferencesDialogAction(world: TextWorld): Action {
         return object : AbstractAction() {
             // Initialize
             init {

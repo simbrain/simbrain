@@ -26,6 +26,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.util.UserParameter;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * <b>Competitive</b> implements a simple competitive network.
@@ -48,51 +50,29 @@ public class CompetitiveGroup extends NeuronGroup {
     public static final double DEFAULT_DECAY_PERCENT  = .0008;
     public static final UpdateMethod DEFAULT_UPDATE_METHOD = UpdateMethod.RUMM_ZIPSER;
 
-    /**
-     * Current update method.
-     */
     @UserParameter(label = "Update method", order = 30)
     private UpdateMethod updateMethod = DEFAULT_UPDATE_METHOD;
 
-    /**
-     * Learning rate.
-     */
     @UserParameter(label = "Learning rate", order = 40)
     private double learningRate = DEFAULT_LEARNING_RATE;
 
-    /**
-     * Winner value.
-     */
     @UserParameter(label = "Winner Value", order = 50)
     private double winValue = DEFAULT_WIN_VALUE;
 
-    /**
-     * Loser value.
-     */
     @UserParameter(label = "Lose Value", order = 60)
     private double loseValue = DEFAULT_LOSE_VALUE;
 
-    /**
-     * Normalize inputs boolean.
-     */
     @UserParameter(label = "Normalize inputs", order = 70)
     private boolean normalizeInputs = DEFAULT_NORM_INPUTS;
 
-    /**
-     * Use leaky learning boolean.
-     */
     @UserParameter(label = "Use Leaky learning", order = 80)
     private boolean useLeakyLearning = DEFAULT_USE_LEAKY;
 
-    /**
-     * Leaky learning rate.
-     */
-    @UserParameter(label = "Leaky learning rate", condtionalEnablingWidget = "Use Leaky learning", order = 90)
+    @UserParameter(label = "Leaky learning rate", conditionalEnablingMethod = "usesLeakyLearning", order = 90)
     private double leakyLearningRate = DEFAULT_LEAKY_RATE;
 
     /**
-     * Percentage by which to decay synapses on each update for for
-     * Alvarez-Squire update.
+     * Percentage by which to decay synapses on each update for Alvarez-Squire update.
      */
     @UserParameter(label = "Decay percent", order = 100)
     private double synpaseDecayPercent = DEFAULT_DECAY_PERCENT;
@@ -452,6 +432,13 @@ public class CompetitiveGroup extends NeuronGroup {
      */
     public boolean getUseLeakyLearning() {
         return useLeakyLearning;
+    }
+
+    /**
+     * Called by reflection via {@link UserParameter#conditionalEnablingMethod()}
+     */
+    public Function<Map<String, Object>, Boolean> usesLeakyLearning() {
+        return (map) -> (Boolean) map.get("Use Leaky learning");
     }
 
     /**

@@ -111,13 +111,20 @@ class SmileClassifier(
         var nin = 4
 
         @UserParameter(label = "Number of outputs (classes)",  description = "Ignored for some classifiers (e.g. SVM)" +
-                " that can only produce 2 outputs", order = 10)
+                " that can only produce 2 outputs", conditionalEnablingMethod = "usesOutputs", order = 10)
         var nout = 2
 
         @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order = 40)
         var classifierType: ClassificationAlgorithm = SVMClassifier()
 
         override val name = "Classifier"
+
+        /**
+         * Called by reflection via [UserParameter.conditionalEnablingMethod]
+         */
+        fun usesOutputs(): (Map<String, Any?>) -> Boolean {
+            return {map -> map["Classifier Type"] !is SVMClassifier}
+        }
 
         fun create(net: Network): SmileClassifier {
             val classifier = classifierType::class.primaryConstructor?.let { constructor ->

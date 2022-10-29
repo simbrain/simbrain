@@ -26,6 +26,8 @@ import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
@@ -74,7 +76,7 @@ public class SmellSource implements EditableObject {
             label = "Randomizer",
             isObjectType = true,
             showDetails = false,
-            condtionalEnablingWidget = "Add Noise",
+            conditionalEnablingMethod = "useRandomWinner",
             order = 15)
     private ProbabilityDistribution randomizer  = new UniformRealDistribution();
 
@@ -157,4 +159,12 @@ public class SmellSource implements EditableObject {
     public double[] getStimulusVector() {
         return stimulusVector;
     }
+
+    /**
+     * Called by reflection via {@link UserParameter#conditionalEnablingMethod()}
+     */
+    public Function<Map<String, Object>, Boolean> useRandomWinner() {
+        return (map) -> (Boolean) map.get("Add noise");
+    }
+
 }

@@ -101,21 +101,21 @@ public @interface UserParameter {
 
     /**
      * The probability distribution to use when generating random values for
-     * this parameter. For options see {@link ProbabilityDistribution#getBuilder(String)}
+     * this parameter. For options see {@link ProbabilityDistribution}
      */
     String probDist() default "";
 
     /**
      * The default "first parameter" to use when when opening the randomizer panel for this field.
      * Corresponds to the mean of a normal distribution. For other cases see
-     * {@link ProbabilityDistribution#getBuilder(String, double, double)}
+     * {@link ProbabilityDistribution}
      */
     double probParam1() default 0;
 
     /**
      * The default "second parameter" to use when when opening the randomizer panel for this field.
      * Corresponds to the standard deviation of a normal distribution. For other cases see
-     * {@link ProbabilityDistribution#getBuilder(String, double, double)}
+     * {@link ProbabilityDistribution}
      */
     double probParam2() default 1.0;
 
@@ -170,16 +170,9 @@ public @interface UserParameter {
     String conditionalVisibilityMethod() default "";
 
     /**
-     * Name of a method whose value determines whether this component is enabled or not. Only called once when the editor
-     * is opened.
+     * Name of a method which returns a lambda which is used to determine whether this component is enabled or not.
      */
     String conditionalEnablingMethod() default "";
-
-    /**
-     * Name of another widget (based on its {@link #description() UserParameter} whose state determines if this widget
-     * is enabled or not. This changes dynamically.  Currently works on booleans only.
-     */
-    String condtionalEnablingWidget() default "";
 
     /**
      * Regular expression to validate (String) values against. This is only

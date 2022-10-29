@@ -35,11 +35,11 @@ abstract class TFLayer<T : Layer> : CopyableObject {
     abstract fun create(): T
 
     /**
-     * Returns true if the layer has not been initialized so that this laye is in "creation mode".
+     * Returns true if the layer has not been initialized so that this layer is in "creation mode".
      * Called by reflection from a [UserParameter]
      */
-    fun creationMode(): Boolean {
-        return layer == null
+    fun creationMode(): (Map<String, Any?>) -> Boolean {
+        return { layer == null }
     }
 
     /**

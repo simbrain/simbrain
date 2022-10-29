@@ -21,7 +21,6 @@ package org.simbrain.util.propertyeditor;
 import org.simbrain.util.BiMap;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.widgets.DropDownTriangle;
-import org.simbrain.util.widgets.ParameterWidget;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -90,7 +89,7 @@ public class ObjectTypeEditor extends JPanel {
      * Mapping from labels to types and back again, so that combo box text can be used to create prototype objects,
      * and to associate prototype objects with text for combo box.
      */
-    private BiMap<String, Class> typeMap;
+    private BiMap<String, Class<?>> typeMap;
 
     /**
      * Label for border around editor.
@@ -161,7 +160,7 @@ public class ObjectTypeEditor extends JPanel {
      * @param showDetails if true open with the detail triangle open; else open with it closed.
      * @return the editor object
      */
-    public static ObjectTypeEditor createEditor(List<CopyableObject> objects, BiMap<String, Class> tm,
+    public static ObjectTypeEditor createEditor(List<CopyableObject> objects, BiMap<String, Class<?>> tm,
                                                 String label, boolean showDetails) {
         return new ObjectTypeEditor(objects, tm, label, showDetails, null);
     }
@@ -175,7 +174,8 @@ public class ObjectTypeEditor extends JPanel {
      * @param showDetails whether the detail triangle should be down when open
      * @param parent     the parent window
      */
-    private ObjectTypeEditor(List objectList, BiMap<String, Class> typeMap, String label, boolean showDetails, Window parent) {
+    private ObjectTypeEditor(List objectList, BiMap<String, Class<?>> typeMap, String label, boolean showDetails,
+                             Window parent) {
         if (objectList.isEmpty()) {
             throw new IllegalStateException("Can't edit empty list of objects");
         }

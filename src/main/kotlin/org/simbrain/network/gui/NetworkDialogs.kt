@@ -26,10 +26,10 @@ import org.simbrain.util.display
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.ObjectTypeEditor
+import org.simbrain.util.propertyeditor.ParameterWidget
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ApplyPanel.createApplyPanel
 import org.simbrain.util.widgets.EditablePanel
-import org.simbrain.util.widgets.ParameterWidget
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
@@ -243,7 +243,7 @@ class ConnectionStrategyPanel(val connectionSelector: ConnectionSelector): Edita
             editor = AnnotatedPropertyEditor(connectionSelector)
             add(editor)
             ote = editor.getWidget("Connection Strategy") as ParameterWidget
-            val comp = editor.getWidget("Connection Strategy").component
+            val comp = editor.getWidget("Connection Strategy")?.component
 
             fun updatePanel() {
                 if (ote.widgetValue is ConnectionStrategy) {

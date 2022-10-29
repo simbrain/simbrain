@@ -80,7 +80,7 @@ public class TestObject implements EditableObject {
             + "\n" + "The Integer Object: " + theIntObject
             + "\n" + "The Double Array: " + Arrays.toString(doubleArray)
             + "\n" + "The Double Object: " + theDoubleObject + "\n"
-            + "The Float Object: " + theFloatObject + "\n" + "The Long Object: "
+            + "The Float Object: " + theFloatObject + "\n" + "The Long Object: " + "\n"
             + "The int: " + theInt + "\n" + "The double: " + theDouble + "\n"
             + "The float: " + theFloat + "\n";
 

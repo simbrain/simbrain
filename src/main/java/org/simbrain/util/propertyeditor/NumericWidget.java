@@ -1,6 +1,5 @@
 package org.simbrain.util.propertyeditor;
 
-import org.simbrain.util.Parameter;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -13,7 +12,7 @@ import java.awt.*;
 import java.util.List;
 
 /**
- * Used in the {@link org.simbrain.util.widgets.ParameterWidget} for numeric
+ * Used in the {@link ParameterWidget} for numeric
  * fields. Has an an "up / down" spinner and the option of a randomization
  * button.
  */

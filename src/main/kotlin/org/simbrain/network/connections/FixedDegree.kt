@@ -62,7 +62,7 @@ class FixedDegree(
     @UserParameter(
         label = "Radius",
         description = "Radius within which to make connections",
-        condtionalEnablingWidget = "Use radius",
+        conditionalEnablingMethod = "usesRadius",
         order = 30
     )
     var radius: Double = 200.0,
@@ -98,6 +98,13 @@ class FixedDegree(
 
     override fun toString(): String {
         return name
+    }
+
+    /**
+     * Called by reflection via [UserParameter.conditionalEnablingMethod]
+     */
+    fun usesRadius(): (Map<String, Any?>) -> Boolean {
+        return {map -> map["Use radius"] as Boolean }
     }
 
     override fun copy(): FixedDegree {

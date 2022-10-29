@@ -24,7 +24,7 @@ import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor.ObjectTypeEditor;
-import org.simbrain.util.widgets.ParameterWidget;
+import org.simbrain.util.propertyeditor.ParameterWidget;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;

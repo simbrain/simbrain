@@ -32,7 +32,7 @@ class HebbTest {
         assertEquals(1.0,s12.strength )
         net.update()
         assertEquals(2.0,s12.strength )
-        // println("Strength is ${s12.strength}")
+        println("Strength is ${s12.strength}")
     }
 
     @Test

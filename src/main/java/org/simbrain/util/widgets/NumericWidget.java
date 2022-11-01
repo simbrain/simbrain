@@ -1,11 +1,13 @@
-package org.simbrain.util.propertyeditor;
+package org.simbrain.util.widgets;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.EditableObject;
+import org.simbrain.util.propertyeditor.Parameter;
+import org.simbrain.util.propertyeditor.ParameterWidget;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.NormalDistribution;
-import org.simbrain.util.widgets.JNumberSpinnerWithNull;
-import org.simbrain.util.widgets.SpinnerNumberModelWithNull;
 
 import javax.swing.*;
 import java.awt.*;

@@ -37,15 +37,12 @@ import javax.swing.*
  * is shown.  Null values are ignored when the panel is closed, and any values
  * in the panel are written to it.
  *
- *
  * To use simply initialize with a single object or list of objects to edit. These
  * objects must instantiate [EditableObject]. The fields that should be editable
  * are annotated with the [UserParameter] annotation.
  *
- *
  * Object types are created by updating a prototype object, then copying it. Thus objects using the object type
  * editor must instantiate [CopyableObject].
- *
  *
  * You can also use the editor to build a more customized panel but using the
  * property editor as a holder that can then return JComponents for specific

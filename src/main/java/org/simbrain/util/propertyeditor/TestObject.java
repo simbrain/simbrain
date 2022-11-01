@@ -66,8 +66,6 @@ public class TestObject implements EditableObject {
         }
     }
 
-    ;
-
     public String toString() {
 
         return "(Test Object) \n" +

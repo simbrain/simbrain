@@ -173,7 +173,6 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
         }
     }
 
-
     /**
      * Returns the last number in the sequence.
      *
@@ -183,7 +182,6 @@ public class SpinnerNumberModelWithNull extends SpinnerNumberModel {
     public Comparable getMaximum() {
         return maximum;
     }
-
 
     /**
      * Changes the size of the value change computed by the

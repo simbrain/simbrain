@@ -203,7 +203,12 @@ class ParameterWidget(
                 SpinnerNumberModelWithNull(0.0, minValue, maxValue, stepSize)
             }
             val setNull = Runnable { widgetValue = null }
-            return NumericWidget(parent.editedObjects, parameter, spinnerModel, setNull)
+            return NumericWidget(
+                parent.editedObjects,
+                parameter,
+                spinnerModel,
+                setNull
+            )
         }
         if (parameter.isString) {
             return TextWithNull()

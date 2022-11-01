@@ -88,7 +88,7 @@ object TextWorldActions {
             override fun actionPerformed(arg0: ActionEvent) {
                 // TODO: Find a way to show the tokens as rowHeaders
                 // Find a way to make it immutable
-                val model = createFromDoubleArray(world!!.tokenVectorMap.tokenVectorMatrix.toArray())
+                val model = createFromDoubleArray(world!!.tokenVectorMap.tokenVectorMatrix.replaceNaN(0.0).toArray())
                 model.insertColumn(0, "Token", Column.DataType.StringType)
                 world.tokenVectorMap.tokensMap.keys.forEachIndexed {
                     rowIndex, token -> model.setValueAt(token, rowIndex, 0 )

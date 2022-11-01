@@ -168,7 +168,7 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, skipGram:
     if (usePPMI) {
         return Pair(tokens, manualPPMI(cooccurrenceSmileMatrix, true))
     }
-    return Pair(tokens, cooccurrenceSmileMatrix)
+    return Pair(tokens, cooccurrenceSmileMatrix.replaceNaN(0.0))
 }
 
 /**

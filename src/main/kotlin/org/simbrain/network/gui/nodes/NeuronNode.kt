@@ -47,7 +47,7 @@ import javax.swing.JPopupMenu
 class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), PropertyChangeListener {
 
     private val mainShape: PPath
-        get() = if (neuron is ActivityGenerator) square else circle
+        get() = if (neuron.updateRule is ActivityGenerator) square else circle
 
     /**
      * Circle shape for representing neurons.
@@ -107,9 +107,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
     /**
      * Create a new neuron node.
-     *
-     * @param net    Reference to NetworkPanel
-     * @param neuron reference to model neuron
      */
     init {
 
@@ -171,9 +168,9 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             return
         }
         if (neuron.isClamped) {
-            circle.stroke = CLAMPED_STROKE
+            mainShape.stroke = CLAMPED_STROKE
         } else {
-            circle.stroke = DEFAULT_STROKE
+            mainShape.stroke = DEFAULT_STROKE
         }
     }
 
@@ -304,11 +301,11 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         if (!customStrokeColor) {
             // Color stroke paint based on Polarity
             if (neuron.polarity === SimbrainConstants.Polarity.EXCITATORY) {
-                circle.strokePaint = Color.red
+                mainShape.strokePaint = Color.red
             } else if (neuron.polarity === SimbrainConstants.Polarity.INHIBITORY) {
-                circle.strokePaint = Color.blue
+                mainShape.strokePaint = Color.blue
             } else {
-                circle.strokePaint = DEFAULT_STROKE_PAINT
+                mainShape.strokePaint = DEFAULT_STROKE_PAINT
             }
         }
     }
@@ -403,7 +400,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
     }
 
     /**
-     * Return the center of this node (the circle) in global coordinates.
+     * Return the center of this node (the circle or square) in global coordinates.
      *
      * @return the center point of this node.
      */
@@ -528,9 +525,9 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         // This feature hasn't been used much so if it is to stay
         // in the main code it might need some refinement.
         customStrokeColor = true
-        circle.strokePaint = color
+        mainShape.strokePaint = color
         // Custom colors more visible with the clamped stroke
-        circle.stroke = CLAMPED_STROKE
+        mainShape.stroke = CLAMPED_STROKE
     }
 
     fun setUsingCustomStrokeColor(customColor: Boolean) {

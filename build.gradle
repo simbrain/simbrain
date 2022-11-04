@@ -27,7 +27,6 @@ compileJava.options.encoding = 'UTF-8'
 sourceCompatibility = 1.17
 
 repositories {
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
 }
 
@@ -50,11 +49,11 @@ dependencies {
     // Smile
     implementation 'com.github.haifengl:smile-kotlin:2.6.0'
     if (isFamily(FAMILY_MAC) && isArch('aarch64')) {
-        implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.8-SNAPSHOT'
-        implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.21-1.5.8-SNAPSHOT'
-        implementation group: 'org.bytedeco', name: 'openblas-platform', version: '0.3.21-1.5.8-SNAPSHOT'
-        implementation group: 'org.bytedeco', name: 'arpack-ng', version: '3.8.0-1.5.8-SNAPSHOT'
-        implementation group: 'org.bytedeco', name: 'arpack-ng-platform', version: '3.8.0-1.5.8-SNAPSHOT'
+        implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.8'
+        implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.21-1.5.8'
+        implementation group: 'org.bytedeco', name: 'openblas-platform', version: '0.3.21-1.5.8'
+        implementation group: 'org.bytedeco', name: 'arpack-ng', version: '3.8.0-1.5.8'
+        implementation group: 'org.bytedeco', name: 'arpack-ng-platform', version: '3.8.0-1.5.8'
     } else {
         implementation 'com.github.haifengl:smile-mkl:2.6.0'
     }

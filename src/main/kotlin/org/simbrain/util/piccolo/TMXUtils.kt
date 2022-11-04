@@ -20,6 +20,8 @@ import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.min
+import kotlin.random.Random
 
 
 val zeroTile by lazy { Tile(0) }
@@ -27,10 +29,15 @@ val zeroTile by lazy { Tile(0) }
 val missingTexture by lazy { OdorWorldResourceManager.getBufferedImage("tilemap/missing32x32.png") }
 
 /**
- * Return id corresponding to a label or 0 (empty tile) if nothing is found
+ * Return gid corresponding to a label or 0 (empty tile) if nothing is found
  */
-fun Collection<TileSet>.getIdFromLabel(label: String): Int {
-    return firstNotNullOf { tileSet -> tileSet[label] }.id ?: 0
+fun Collection<TileSet>.getGidFromLabel(label: String): Int {
+    val result = firstNotNullOfOrNull { tileSet -> tileSet to tileSet[label] }
+    if (result != null) {
+        val (tileSet, tile) = result
+        return (tile?.id ?: 0) + tileSet.firstgid
+    }
+    return 0
 }
 
 fun transparentTexture(width: Int, height: Int) = transparentImage(width, height)
@@ -221,11 +228,21 @@ fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
     setLocationRelativeTo(null)
 }
 
-sealed class Coordinate(x: kotlin.Double, y: kotlin.Double) : Point2D.Double(x, y)
+sealed class Coordinate(x: kotlin.Double, y: kotlin.Double) : Point2D.Double(x, y) {
+    data class IntCoordinate(val x: Int, val y: Int)
+
+    val int get() = IntCoordinate(x.toInt(), y.toInt())
+}
+
+val Collection<Coordinate>.int get() = map { it.int }
 
 class GridCoordinate(x: kotlin.Double, y: kotlin.Double) : Coordinate(x, y) {
+    constructor(x: Int, y: Int): this(x.toDouble(), y.toDouble())
     fun copy() = GridCoordinate(x, y)
 }
+
+context (TileMap)
+fun Random.nextGridCoordinate() = GridCoordinate(nextInt(width), nextInt(height))
 
 fun Point2D.asGridCoordinate() = GridCoordinate(x, y)
 
@@ -294,11 +311,41 @@ fun TileMap.getTileStackNear(location: Point2D, radius: Double = 10.0): List<Pai
 context (TileMap)
 val GridCoordinate.isInMap get() = x.toInt() in 0 until width && y.toInt() in 0 until height
 
+context (TileMap)
+fun createTileMapLayer(name: String, collision: Boolean = false) = TileMapLayer(name, width, height, collision)
+
+fun TileMap.getCoordinates(topLeftLocation: GridCoordinate, width: Int, height: Int): List<GridCoordinate> {
+    val (x, y) = topLeftLocation.int
+    return getCoordinates(x, y, width, height)
+}
+
+fun TileMap.getCoordinates(from: GridCoordinate, to: GridCoordinate): List<GridCoordinate> {
+    val (x, y) = listOf(from, to).reduce { acc, gridCoordinate ->
+        val (ax, ay) = acc
+        val (gx, gy) = gridCoordinate
+        GridCoordinate(min(ax, gx), min(ay, gy))
+    }.int
+    val (w, h) = (to - from).abs.int
+    return getCoordinates(x, y, w, h)
+}
+
+fun TileMap.getCoordinates(x: Int, y: Int, width: Int, height: Int): List<GridCoordinate> {
+    return (0 until height).flatMap { j ->
+        (0 until width).mapNotNull { i ->
+            GridCoordinate(x + i, y + j).let { if (it.isInMap) it else null }
+        }
+    }
+}
+
+
+context (TileMap)
+fun getTile(label: String) = tileSets.firstNotNullOfOrNull { tileSet -> tileSet[label] }
+
 /**
  * Make a lake of the indicated size (in # of tiles) starting at the top left grid location.
  * If two lakes are put together, they are merged into one with shared edges removed.
  */
-fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int) {
+fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int, layer: TileMapLayer = layers.first()) {
 
     /**
      * Compute edge type string based on surround
@@ -331,36 +378,37 @@ fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int) {
         return if (dir.length > 2) return "" else dir
     }
 
+    val lakeCoordinates = getCoordinates(topLeftLocation, width, height)
+
     // make a basic lake
-    repeat(height) { y ->
-        repeat(width) { x ->
-            val p = topLeftLocation + point(x, y)
-            if (p.asGridCoordinate().isInMap) {
-                setTile(p.x.toInt(), p.y.toInt(),2)
-            }
-        }
+    lakeCoordinates.forEach {
+        val p = it.int
+        setTile(p.x, p.y,2, layer)
     }
 
     // replace edges and corners
-    repeat(height) { y ->
-        repeat(width) { x ->
-            val p = topLeftLocation + point(x, y)
-            val isLandList = (-1..1).flatMap { ly ->
-                (-1..1).map { lx ->
-                    val lp = (p + point(lx, ly)).asGridCoordinate()
-                    if (lp.isInMap) {
-                        val tileStack = getTileStackAt(lp)
-                        if (tileStack.any { it.type != "water" }) 1 else 0
-                    } else {
-                        1
-                    }
+    lakeCoordinates.forEach { p ->
+        val isLandList = (-1..1).flatMap { ly ->
+            (-1..1).map { lx ->
+                val lp = (p + point(lx, ly)).asGridCoordinate()
+                if (lp.isInMap) {
+                    val (lpx, lpy) = lp.int
+                    val lpTileId = layer[lpx, lpy]
+                    val tileType = getTile(lpTileId).type
+                    if (tileType == "water") 0 else 1
+                } else {
+                    1
                 }
             }
-            val surroundingLandBits = isLandList.reduce { acc, i -> (acc shl 1) + i }
-            val shape = computeShape(surroundingLandBits)
-            setTile(p.x.toInt(), p.y.toInt(), listOf("water", shape).filter { it.isNotEmpty() }.joinToString("_"))
         }
+        val surroundingLandBits = isLandList.reduce { acc, i -> (acc shl 1) + i }
+        val shape = computeShape(surroundingLandBits)
+        setTile(
+            p.x.toInt(), p.y.toInt(),
+            listOf("water", shape).filter { it.isNotEmpty() }.joinToString("_"),
+            layer,
+            suppressMissingNames = listOf("water", "water_lr", "water_tb")
+        )
     }
-
 
 }

@@ -19,6 +19,12 @@ fun Int.toDegrees() = Math.toDegrees(this.toDouble())
 fun Double.toDegrees() = Math.toDegrees(this)
 
 
+data class IntPoint(val x: Int, val y: Int) {
+    fun toPoint2D() = point(x, y)
+}
+
+val Point2D.int get() = IntPoint(x.toInt(), y.toInt())
+
 // Points / Vectors
 fun point(x: Double, y: Double): Point2D = Point2D.Double(x, y)
 

@@ -34,6 +34,7 @@
   </tile>
   <tile id="5">
    <properties>
+    <property name="label" value="Grass1"/>
     <property name="type" value="Grass"/>
    </properties>
   </tile>

@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -8,9 +10,14 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.*
+import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm2.*
-import org.simbrain.util.piccolo.*
+import org.simbrain.util.piccolo.createTileMapLayer
+import org.simbrain.util.piccolo.loadTileMap
+import org.simbrain.util.piccolo.makeLake
+import org.simbrain.util.piccolo.nextGridCoordinate
+import org.simbrain.util.point
+import org.simbrain.util.sampleWithoutReplacement
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
@@ -108,8 +115,16 @@ val evolveCow = newSim {
             workspace.addWorkspaceComponent(it)
         }.world.apply {
             loadTileMap("empty.tmx")
-            tileMap.updateMapSize(32, 32)
-            tileMap.fill(6)
+            with(tileMap) {
+                updateMapSize(32, 32)
+                fill("Grass1")
+            }
+        }
+
+        val lakeLayer = with(odorWorld.tileMap) {
+            val layer = createTileMapLayer("Lake Layer")
+            layers.add(layer)
+            layer
         }
 
         val networks = List(cowGenotypes.size) { index ->
@@ -127,9 +142,14 @@ val evolveCow = newSim {
             List(3) { index ->
                 TileSensor("water", radius = 60.0, angle = (index * 120.0)).apply {
                     decayFunction.dispersion = 250.0
-                    showDispersion = true
                 }.also { entity.addSensor(it) }
             }
+        }
+
+        val centerLakeSensors = entities.map { entity ->
+            TileSensor("water", radius = 0.0).apply {
+                decayFunction.dispersion = EntityType.COW.imageWidth / 1.4
+            }.also { entity.addSensor(it) }
         }
 
         val effectors = entities.map { entity ->
@@ -145,35 +165,15 @@ val evolveCow = newSim {
 
         val iterationsPerRun = 4000
 
-        val waterLocations = HashSet<GridCoordinate>()
+        fun randomTileCoordinate() = with(odorWorld.tileMap) { random.nextGridCoordinate() }
 
-        fun randomTileCoordinate() = GridCoordinate(
-            random.nextInt(odorWorld.tileMap.width).toDouble(),
-            random.nextInt(odorWorld.tileMap.height).toDouble()
-        )
-
-        fun setTile(coordinate: GridCoordinate, tileId: Int) {
-            val lakeSize = 2
-            with (odorWorld.tileMap) {
-                if (tileId == 6) {
-                    val (x, y) = coordinate
-                    (x.toInt() until (x.toInt() + lakeSize)).map { i ->
-                        (y.toInt() until (y.toInt() + lakeSize)).map { j ->
-                            if (point(i, j).asGridCoordinate().isInMap) {
-                                setTile(i, j, tileId)
-                            }
-                        }
-                    }
-                } else {
-                    makeLake(coordinate, lakeSize, lakeSize)
-                }
-            }
-        }
+        private val lakeSize = 8
 
         init {
             List(1) { randomTileCoordinate() }.forEach {
-                waterLocations.add(it)
-                setTile(it, 3)
+                with(odorWorld.tileMap) {
+                    makeLake(it, lakeSize, lakeSize, lakeLayer)
+                }
             }
             workspace.coroutineScope.launch {
                 (phenotypes.await() zip entities).forEach { (phenotype, entity) ->
@@ -186,20 +186,17 @@ val evolveCow = newSim {
 
             val thirstNeuron = phenotype.drives.neuronList.first()
 
-            workspace.addUpdateAction("location check") {
+            workspace.addUpdateAction("water found") {
                 with(odorWorld.tileMap) {
-                    waterLocations.toList().forEach { currentWaterLocation ->
-                        val distance = currentWaterLocation.toPixelCoordinate().distanceTo(entity.location)
-                        if (distance < entity.width / 2) {
+                    centerLakeSensors.toList().forEach { sensor ->
+                        if (sensor.currentValue > 0.5) {
                             fitness += 1.0 / iterationsPerRun
                             thirstNeuron.forceSetActivation(0.0)
 
-                            setTile(currentWaterLocation, 6)
-                            waterLocations.remove(currentWaterLocation)
-
+                            // move the lake
+                            fill(0, lakeLayer)
                             val newLocation = randomTileCoordinate()
-                            waterLocations.add(newLocation)
-                            setTile(newLocation, 3)
+                            makeLake(newLocation, lakeSize, lakeSize, lakeLayer)
                         }
                     }
                 }

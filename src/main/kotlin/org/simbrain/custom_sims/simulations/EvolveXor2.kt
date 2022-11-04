@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -94,7 +96,7 @@ val evolveXor2 = newSim {
 
     class Xor2Sim(
         val xor2Genotype: XorGenotype = XorGenotype(),
-        val workspace: Workspace = Workspace(coroutineScope + Dispatchers.Default)
+        val workspace: Workspace = HeadlessWorkspace()
     ) : EvoSim {
 
         val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
@@ -119,7 +121,7 @@ val evolveXor2 = newSim {
         }
 
         override fun copy(): EvoSim {
-            return Xor2Sim(xor2Genotype.copy(), Workspace(workspace.coroutineScope))
+            return Xor2Sim(xor2Genotype.copy(), HeadlessWorkspace())
         }
 
         override suspend fun eval(): Double {

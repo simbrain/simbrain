@@ -116,9 +116,8 @@ class TileSet(
     }
 
     fun initTileMaps() {
-        idTileMap = tiles.associate { it.id to it }.toMutableMap()
-        labelTileMap = tiles.filter { it.label != null }
-            .associate { it.label!! to it }.toMutableMap()
+        idTileMap = tiles.associateBy { it.id }.toMutableMap()
+        labelTileMap = tiles.filter { it.label != null }.associateBy { it.label!! }.toMutableMap()
     }
 
     /**

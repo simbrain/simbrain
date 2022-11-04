@@ -141,13 +141,19 @@ class TileMap(width: Int, height: Int) {
     /**
      * Edit tiles in first layer. Use with care; assumes just one layer.
      */
-    fun setTile(x: Int, y: Int, tileID: Int) {
-        layers.first().setTile(x, y, tileID)
+    @JvmOverloads
+    fun setTile(x: Int, y: Int, tileID: Int, layer: TileMapLayer = layers.first()) {
+        layer.setTile(x, y, tileID)
     }
 
-    fun setTile(x: Int, y: Int, tileStringID: String) {
+    /**
+     * @param suppressMissingNames by default this function prints out a warning if a tile could not be found in the
+     *      tile sets. To disable that warning for specific tiles, provide their names in this list
+     */
+    fun setTile(x: Int, y: Int, tileStringID: String, layer: TileMapLayer = layers.first(), suppressMissingNames: List<String> = listOf()) {
         val tileID = tileSets.asSequence().map { it[tileStringID] }.first()?.id
-        tileID?.let { layers.first().setTile(x, y, it + 1) } ?: println("warn: no tile string id [$tileStringID] found")
+        tileID?.let { layer.setTile(x, y, it + 1) }
+            ?: if (tileStringID !in suppressMissingNames) println("warn: no tile string id [$tileStringID] found") else Unit
     }
 
     /**
@@ -160,21 +166,26 @@ class TileMap(width: Int, height: Int) {
     /**
      * Set all tiles on first layer to specified tile id.
      */
-    fun fill(tileId: Int) {
+    fun fill(tileId: Int, layer: TileMapLayer = layers.first()) {
         (0 until width).forEach { i ->
             (0 until height).forEach { j ->
-                setTile(i, j, tileId)
+                layer[i, j] = tileId
             }
         }
+        layer.render()
     }
 
     fun fill(tileLabel: String) {
-        fill(tileSets.getIdFromLabel(tileLabel))
+        fill(tileSets.getGidFromLabel(tileLabel))
     }
 
     // TODO: should not be able to edit tile map layers that don't belong to this map
     fun TileMapLayer.setTile(x: Int, y: Int, tileID: Int) {
         this[x, y] = tileID
+        render()
+    }
+
+    private fun TileMapLayer.render() {
         if (guiEnabled) {
             val oldRenderedImage = layerImage
             val newRenderedImage = renderImage(tileSets, true)

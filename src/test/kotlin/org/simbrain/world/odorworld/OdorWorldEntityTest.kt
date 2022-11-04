@@ -1,10 +1,9 @@
-package org.simbrain.world
+package org.simbrain.world.odorworld
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.simbrain.util.point
-import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.SmellSensor
 

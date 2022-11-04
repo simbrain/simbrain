@@ -1,4 +1,4 @@
-package org.simbrain.world
+package org.simbrain.world.odorworld
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

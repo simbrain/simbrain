@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.plus
 import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
@@ -39,6 +41,9 @@ class SimulationScope private constructor(
     fun withGui(block: SimbrainDesktop.() -> Unit) {
         desktop?.run(block)
     }
+
+    @Suppress("FunctionName")
+    fun HeadlessWorkspace() = Workspace(workspace.coroutineScope + Dispatchers.Default)
 }
 
 class NewSimulation(val task: SimulationScope.() -> Unit) {

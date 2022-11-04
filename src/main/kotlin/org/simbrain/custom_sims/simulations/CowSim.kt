@@ -22,8 +22,6 @@ import kotlin.random.Random
 
 val evolveCow = newSim {
 
-    val coroutineScope = workspace.coroutineScope
-
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
         override val random: Random = Random(seed)
         var inputs = chromosome2(3) { add(nodeGene2 { isClamped = true }) }
@@ -100,9 +98,8 @@ val evolveCow = newSim {
     }
 
     class CowSim(
-        val cowGenotypes: List<CowGenotype> = List(2) { CowGenotype() }, val workspace: Workspace = Workspace(
-            coroutineScope + Dispatchers.Default
-        )
+        val cowGenotypes: List<CowGenotype> = List(2) { CowGenotype() },
+        val workspace: Workspace = HeadlessWorkspace()
     ) : EvoSim {
 
         val random = Random(cowGenotypes.first().random.nextInt())
@@ -251,7 +248,7 @@ val evolveCow = newSim {
 
         override fun visualize(workspace: Workspace) = CowSim(cowGenotypes.map { it.copy() }, workspace)
 
-        override fun copy() = CowSim(cowGenotypes.map { it.copy() }, Workspace(workspace.coroutineScope))
+        override fun copy() = CowSim(cowGenotypes.map { it.copy() }, HeadlessWorkspace())
 
         override suspend fun eval(): Double {
             build()

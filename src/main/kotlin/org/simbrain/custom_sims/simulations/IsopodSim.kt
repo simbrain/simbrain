@@ -6,7 +6,6 @@ import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.environment.SmellSource
-import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.showSaveDialog
@@ -108,8 +107,8 @@ val isopodSim = newSim {
         wrapAround = false
         isObjectsBlockMovement = true
 
-        tileMap = TileMap(25, 25)
-        tileMap.fill(2)
+        tileMap.updateMapSize(25,25)
+        tileMap.fill("water_1")
 
         // Body could be represented by a triangle or rhombus
         isopod = addEntity(centerLocation.x, centerLocation.y, EntityType.ISOPOD).apply {

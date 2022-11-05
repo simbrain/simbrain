@@ -173,7 +173,6 @@ val evolveXor2 = newSim {
                 phenotype.outputs.location = point(0, -25)
             }
         }
-
         progressWindow.close()
     }
 }

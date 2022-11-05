@@ -164,6 +164,13 @@ class TileMap(width: Int, height: Int) {
     }
 
     /**
+     * Clear the indicated layer.
+     */
+    fun clear(layer: TileMapLayer = layers.first()) {
+        fill(0, layer)
+    }
+
+    /**
      * Set all tiles on first layer to specified tile id.
      */
     fun fill(tileId: Int, layer: TileMapLayer = layers.first()) {

@@ -22,6 +22,7 @@ import com.thoughtworks.xstream.XStream;
 import org.simbrain.util.DoubleArrayConverter;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.util.projection.DataPointColored;
+import org.simbrain.util.projection.NTreeConverter;
 import org.simbrain.util.projection.Projector;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -66,6 +67,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
 
     private static XStream getProjectorXStream() {
         var xstream = XStreamUtils.getSimbrainXStream();
+        xstream.registerConverter(new NTreeConverter());
         xstream.registerConverter(new DoubleArrayConverter());
         return xstream;
     }
@@ -90,8 +92,6 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
 
     @Override
     public void save(final OutputStream output, final String format) {
-        projector.getUpstairs().preSaveInit();
-        projector.getDownstairs().preSaveInit();
         getProjectorXStream().toXML(projector, output);
     }
 

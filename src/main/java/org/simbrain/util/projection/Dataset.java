@@ -40,7 +40,7 @@ public class Dataset {
     /**
      * The data.
      */
-    private transient NTree ntree;
+    private NTree ntree;
 
     /**
      * Number of dimensions in the dataset.
@@ -50,12 +50,8 @@ public class Dataset {
     /**
      * Matrix of interpoint distances.
      */
+    // TODO: Replace with a better data structure
     private transient double[] distances = new double[10240];
-
-    /**
-     * Persistent form of data, which is read back in to the dataset to recreate all necessary structures.
-     */
-    private List<DataPoint> persistentData = new ArrayList<DataPoint>();
 
     /**
      * The last point added to this dataset.  I.e. it was not determined to overlap an existing point, but was actually
@@ -132,7 +128,6 @@ public class Dataset {
             distances = newDistances;
         }
     }
-
 
     /**
      * Add a new datapoint to the dataset.
@@ -765,23 +760,6 @@ public class Dataset {
         return ret;
     }
 
-    /**
-     * Initializes persistent data. Initializes Dataset from persistent data.
-     */
-    public void preSaveInit() {
-        persistentData = asArrayList();
-    }
-
-    /**
-     * Initializes Dataset from persistent data.
-     */
-    public void postOpenInit() {
-        clear();
-        for (DataPoint point : persistentData) {
-            addPoint(point);
-        }
-    }
-
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -804,6 +782,16 @@ public class Dataset {
 
     public DataPoint getLastPoint() {
         return lastPoint;
+    }
+
+    /**
+     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     */
+    private Object readResolve() {
+        distances = new double[10240];
+        ensureDistances();
+        calculateDistances();
+        return this;
     }
 
     /**

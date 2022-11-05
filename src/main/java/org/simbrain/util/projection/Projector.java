@@ -107,7 +107,7 @@ public class Projector implements AttributeContainer {
     /**
      * Manages coloring the datapoints.
      */
-    private DataColoringManager colorManager;
+    private DataColoringManager colorManager = new DataColoringManager(this);
 
     /**
      * Flag which allows the user to start and stop iterative projection
@@ -154,7 +154,6 @@ public class Projector implements AttributeContainer {
 
     private void init() {
         projectionMethods = new LinkedHashMap<>();
-        colorManager = new DataColoringManager(this);
         projectionMethods.put(ProjectCoordinate.class, "Coordinate Projection");
         projectionMethods.put(ProjectNNSubspace.class, "NN Subspace");
         projectionMethods.put(ProjectPCA.class, "PCA");
@@ -168,8 +167,6 @@ public class Projector implements AttributeContainer {
     public void postOpenInit() {
         events = new ProjectorEvents(this);
         init();
-        upstairs.postOpenInit();
-        downstairs.postOpenInit();
     }
 
     /**

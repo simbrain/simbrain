@@ -8,7 +8,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import smile.math.matrix.Matrix;
 
 /**
- * Sae Smile Matrices as base 64 byte-streams from double arrays.
+ * Save Smile Matrices as base 64 byte-streams from double arrays.
  */
 public class MatrixConverter implements Converter {
 

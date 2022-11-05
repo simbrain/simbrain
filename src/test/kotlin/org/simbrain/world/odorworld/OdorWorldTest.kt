@@ -16,19 +16,6 @@ class OdorWorldTest {
     var world = OdorWorld()
 
     @Test
-    fun testEditingExistingTile() {
-        world.tileMap.setTile("Tile Layer 1", 4, 4, 25)
-        assertEquals(25, world.tileMap.layers[0][4, 4])
-    }
-
-    @Test
-    fun testUpdateMapSize() {
-        world.tileMap.updateMapSize(20, 10)
-        assert(world.tileMap.width == 20)
-        assert(world.tileMap.height == 10)
-    }
-
-    @Test
     fun testSetCollisionProperty() {
         world.tileMap.getLayer("Tile Layer 1").setProperty("collision", "true")
         Assertions.assertTrue(world.tileMap.getLayer("Tile Layer 1").collision)

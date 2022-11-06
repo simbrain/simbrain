@@ -26,7 +26,7 @@ class NeuronCollectionTest {
     }
 
     @BeforeEach
-    private void clearAll() {
+    void clearAll() {
         net.clearActivations();
     }
 

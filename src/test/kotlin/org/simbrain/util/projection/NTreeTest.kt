@@ -15,9 +15,7 @@ class NTreeTest {
         ntree.add(p1)
         ntree.add(p2)
         ntree.add(p3)
-        val p1_near = DataPoint(doubleArrayOf(1.0, 0.1))
-        ntree.add(p1_near)
-        assertEquals(p1_near, ntree.getClosestPoint(p3))
+        assertEquals(p3, ntree.getClosestPoint(DataPoint(doubleArrayOf(0.0, 0.1))))
     }
 
 }

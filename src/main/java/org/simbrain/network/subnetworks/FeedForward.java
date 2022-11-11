@@ -50,6 +50,14 @@ public class FeedForward extends Subnetwork {
      */
     private NeuronArray inputLayer;
 
+    public NeuronArray getInputLayer() {
+        return inputLayer;
+    }
+
+    public NeuronArray getOutputLayer() {
+        return outputLayer;
+    }
+
     /**
      * Reference to output layer.
      */

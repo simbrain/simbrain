@@ -20,10 +20,10 @@ package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
-import org.simbrain.network.gui.trainer.DataPanel;
-import org.simbrain.network.trainers.Trainable;
+import org.simbrain.network.trainers.Trainable2;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.table.NumericTable;
+import org.simbrain.util.table.BasicDataWrapperKt;
+import org.simbrain.util.table.SimbrainDataViewer;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -54,17 +54,17 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
     /**
      * Reference to the trainable network being edited.
      */
-    private Trainable trainable;
+    private Trainable2 trainable;
 
     /**
      * Reference to input data panel.
      */
-    private DataPanel inputPanel;
+    private SimbrainDataViewer inputPanel;
 
     /**
      * Reference to training data panel.
      */
-    private DataPanel trainingPanel;
+    private SimbrainDataViewer trainingPanel;
 
     /**
      * Reference to validate inputs panel
@@ -76,26 +76,7 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
      */
     private List<Component> tabs = new ArrayList<Component>();
 
-    /**
-     * Default constructor.
-     *
-     * @param networkPanel parent panel
-     * @param trainable    edited network
-     */
-    public SupervisedTrainingDialog(NetworkPanel networkPanel, Trainable trainable) {
-        this.networkPanel = networkPanel;
-        this.trainable = trainable;
-
-        // Stop trainer from running any time the window is closed
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                stopTrainer();
-            }
-        });
-    }
-
-    public SupervisedTrainingDialog(Frame parent, NetworkPanel networkPanel, Trainable trainable) {
+    public SupervisedTrainingDialog(Frame parent, NetworkPanel networkPanel, Trainable2 trainable) {
         super(parent, "");
         this.networkPanel = networkPanel;
         this.trainable = trainable;
@@ -122,18 +103,25 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
         setModalityType(ModalityType.MODELESS);
 
         // Input data tab
-        inputPanel = new DataPanel(trainable.getInputNeurons(), trainable.getTrainingSet().getInputDataMatrix(), 5, "Input");
-        inputPanel.setFrame(this);
+        inputPanel =
+                new SimbrainDataViewer(BasicDataWrapperKt.createFromMatrix(trainable.getTrainingSet().getInputs()), true);
+        // inputPanel = new DataPanel(trainable.getInputNeurons(), trainable.getTrainingSet().getInputDataMatrix(), 5, "Input");
+        // inputPanel.setFrame(this);
         addTab("Input data", inputPanel);
 
         // Training data tab
-        trainingPanel = new DataPanel(trainable.getOutputNeurons(), trainable.getTrainingSet().getTargetDataMatrix(), 5, "Targets");
-        trainingPanel.setFrame(this);
+        trainingPanel =
+                new SimbrainDataViewer(BasicDataWrapperKt.createFromMatrix(trainable.getTrainingSet().getTargets()), true);
+        // trainingPanel.setFrame(this);
         addTab("Target data", trainingPanel);
 
         // Testing tab
-        validateInputsPanel = TestInputPanel.createTestInputPanel(networkPanel, trainable.getInputNeurons(), trainable.getTrainingSet().getInputDataMatrix());
-        addTab("Validate Input Data", validateInputsPanel);
+        // TODO: Needs to be converted
+        // validateInputsPanel = TestInputPanel.createTestInputPanel(
+        //         networkPanel,
+        //         trainable.getInputLayer(),
+        //         trainable.getTrainingSet().getInputs());
+        // addTab("Validate Input Data", validateInputsPanel);
 
         // Finalize
         setContentPane(tabbedPane);
@@ -163,16 +151,17 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
                 }
                 tabbedPane.revalidate();
 
-                if (index == 0) {
-                    // When entering training tab, commit table changes
-                    inputPanel.commitChanges();
-                    trainingPanel.commitChanges();
-                } else if (index == 3) {
-                    // Set validation data to whatever input data currently is
-                    if (inputPanel.getTable().getData() != null) {
-                        validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).as2DDoubleArray());
-                    }
-                }
+                // TODO
+                // if (index == 0) {
+                //     // When entering training tab, commit table changes
+                //     inputPanel.commitChanges();
+                //     trainingPanel.commitChanges();
+                // } else if (index == 3) {
+                //     // Set validation data to whatever input data currently is
+                //     if (inputPanel.getTable().getData() != null) {
+                //         validateInputsPanel.setData(((NumericTable) inputPanel.getTable().getData()).as2DDoubleArray());
+                //     }
+                // }
                 pack();
                 //setLocationRelativeTo(null);
                 updateData();
@@ -219,7 +208,7 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
      */
     protected void closeDialogOk() {
         super.closeDialogOk();
-        inputPanel.commitChanges();
-        trainingPanel.commitChanges();
+        // inputPanel.commitChanges();
+        // trainingPanel.commitChanges();
     }
 }

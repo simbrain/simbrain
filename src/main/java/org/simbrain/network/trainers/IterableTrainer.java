@@ -105,13 +105,6 @@ public abstract class IterableTrainer implements EditableObject {
      */
     public abstract void randomize();
 
-    //TODO
-    public void iterate2() throws DataNotInitializedException  {
-        apply();
-        incrementIteration();
-        events.fireErrorUpdated();
-    }
-
     /**
      * Iterate the training algorithm and stop iteration based on the selected
      * stopping condition.
@@ -120,19 +113,13 @@ public abstract class IterableTrainer implements EditableObject {
      */
     public void iterate() throws DataNotInitializedException {
 
-        if (getTrainingSet().getInputData() == null) {
-            throw new DataNotInitializedException("Input data not initalized");
-        }
-        if (getTrainingSet().getTargetData() == null) {
-            throw new DataNotInitializedException("Target data not initalized");
-        }
+        getTrainingSet().getInputs();
+        getTrainingSet().getTargets();
 
         events.fireBeginTraining();
         switch (stoppingCondition) {
-            case NONE:
-                apply();
-                break;
-            case NUM_ITERATIONS:
+            case NONE -> apply();
+            case NUM_ITERATIONS -> {
                 for (int i = 0; i < iterationsBeforeStopping; i++) {
                     if (updateCompleted) {
                         break;
@@ -140,21 +127,21 @@ public abstract class IterableTrainer implements EditableObject {
                     apply();
                 }
                 setUpdateCompleted(true);
-                break;
-            case THRESHOLD_ERROR:
+            }
+            case THRESHOLD_ERROR -> {
                 do {
                     apply();
                 } while ((getError() > errorThreshold) && (!updateCompleted));
                 setUpdateCompleted(true);
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         events.fireEndTraining();
 
     }
 
-    protected abstract TrainingSet getTrainingSet();
+    protected abstract MatrixDataset getTrainingSet();
 
     public abstract void apply() throws DataNotInitializedException;
 
@@ -185,16 +172,13 @@ public abstract class IterableTrainer implements EditableObject {
      * @return least number of rows
      */
     protected int getMinimumNumRows() {
-        if ((getTrainingSet().getInputData() == null) || (getTrainingSet() == null)) {
+        getTrainingSet().getInputs();
+        if (getTrainingSet() == null) {
             return 0;
         }
-        int inputRows = getTrainingSet().getInputData().length;
-        int targetRows = getTrainingSet().getTargetData().length;
-        if (inputRows < targetRows) {
-            return inputRows;
-        } else {
-            return targetRows;
-        }
+        int inputRows = getTrainingSet().getInputs().nrows();
+        int targetRows = getTrainingSet().getTargets().nrows();
+        return Math.min(inputRows, targetRows);
     }
 
     /**

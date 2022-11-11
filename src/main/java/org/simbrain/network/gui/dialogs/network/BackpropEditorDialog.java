@@ -21,6 +21,7 @@ package org.simbrain.network.gui.dialogs.network;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.trainer.IterativeControlsPanel;
 import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.network.trainers.BackpropTrainer;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionKt;
@@ -60,13 +61,9 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
 
     /**
      * Default constructor.
-     *
-     * @param networkPanel parent panel
-     * @param backprop     edited network
      */
     public BackpropEditorDialog(NetworkPanel networkPanel, BackpropNetwork backprop) {
-        // Backprop is no longer trainable so null passed along
-        super((Frame) SwingUtilities.getRoot(networkPanel), networkPanel, null);
+        super((Frame) SwingUtilities.getRoot(networkPanel), networkPanel, backprop);
         this.backprop = backprop;
         init();
         initDefaultTabs();
@@ -80,8 +77,7 @@ public class BackpropEditorDialog extends SupervisedTrainingDialog {
         setTitle("Edit Backprop Network");
 
         // Trainer tab
-        currentTrainer = null;
-        // currentTrainer = new BackpropTrainer(backprop);
+        currentTrainer = new BackpropTrainer(backprop);
         networkPanel.getNetwork().getUpdateManager().addAction(updater);
         IterativeControlsPanel iterativeControls = new IterativeControlsPanel(currentTrainer);
         addTab("Train", iterativeControls);

@@ -13,9 +13,11 @@
  */
 package org.simbrain.network.subnetworks;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.trainers.TrainingSet;
+import org.simbrain.network.trainers.MatrixDataset;
+import org.simbrain.network.trainers.Trainable2;
 
 import java.awt.geom.Point2D;
 
@@ -24,12 +26,12 @@ import java.awt.geom.Point2D;
  *
  * @author Jeff Yoshimi
  */
-public class BackpropNetwork extends FeedForward  {
+public class BackpropNetwork extends FeedForward implements Trainable2 {
 
     /**
      * Training set.
      */
-    private final TrainingSet trainingSet = new TrainingSet();
+    private final MatrixDataset trainingSet;
 
     /**
      * Construct a new backprop network.
@@ -40,18 +42,15 @@ public class BackpropNetwork extends FeedForward  {
      */
     public BackpropNetwork(Network network, int[] nodesPerLayer, Point2D initialPosition) {
         super(network, nodesPerLayer, initialPosition, new LinearRule());
+        trainingSet = new MatrixDataset(nodesPerLayer[0], nodesPerLayer[nodesPerLayer.length-1]);
         setLabel("Backprop");
     }
 
-    /**
-     * Construct a new backprop network with a default location of (0,0).
-     *
-     * @param network       reference to root network
-     * @param nodesPerLayer number of layers
-     */
-    public BackpropNetwork(Network network, int[] nodesPerLayer) {
-        super(network, nodesPerLayer, new Point2D.Double(1, 1), new LinearRule());
-        setLabel("Backprop");
+
+    @NotNull
+    @Override
+    public MatrixDataset getTrainingSet() {
+        return trainingSet;
     }
 
 

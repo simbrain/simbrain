@@ -2,16 +2,37 @@ package org.simbrain.network.smile
 
 import org.simbrain.util.Utils
 import smile.io.Read
+import smile.math.matrix.Matrix
 import smile.nlp.normalizer.SimpleNormalizer
 import smile.nlp.stemmer.PorterStemmer
 import smile.nlp.tokenizer.SimpleSentenceSplitter
 import smile.nlp.tokenizer.SimpleTokenizer
 import smile.plot.swing.BoxPlot
 
+// To see examples of basic Smile matrix operations see
+// SmileNLPSandbox, SmileTest, SmileTestKt, SmileUtils, SpikeResponderMatrixTest
+
 fun main() {
     // boxPlot()
-    nlpBasics() // Possibly move to SmileNLPSandbox
+    // nlpBasics()
+    matrixBasics()
 }
+
+fun matrixBasics() {
+    val zeros = Matrix(5,4)
+    println("zeros: $zeros")
+    val filled = Matrix(5,4, 2.0)
+    println("filled: $filled")
+    val diagonal = Matrix.eye(5)
+    println("diagonal: $diagonal")
+    val specific = Matrix(arrayOf(
+        doubleArrayOf(1.0, 2.0, 3.0),
+        doubleArrayOf(4.0, 5.0, 6.0),
+        doubleArrayOf(7.0, 8.0, 9.0)
+    ))
+    println("specific: $specific")
+}
+
 
 fun nlpBasics() {
     val speech = Utils.getTextFromURL("https://radiochemistry.org/speech_archives/text/king.shtml")

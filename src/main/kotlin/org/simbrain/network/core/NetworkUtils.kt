@@ -10,15 +10,14 @@ import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.util.DoubleArrayConverter
-import org.simbrain.util.MatrixConverter
-import org.simbrain.util.SimbrainPreferences
+import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
-import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import smile.math.matrix.Matrix
 
 /**
  * If a subnetwork or synapse group has more than this many synapses, then the initial synapse visibility flag is
@@ -240,4 +239,32 @@ fun List<Synapse>.decayStrengthBasedOnLength(decay: DecayFunction) {
 
 fun Synapse.decayStrengthBasedOnLength(decay: DecayFunction) {
     strength *= decay.getScalingFactor(length)
+}
+
+fun ArrayLayer.getError(targets: Matrix): Matrix {
+    outputs.validateShape(targets)
+    return targets.sub(outputs)
+}
+
+/**
+ * Apply LMS to the weight matrix using the provided error vector, which must have the same shape as this weight
+ * matrix's output
+ */
+fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
+    // TODO: This can be replaced by derivative (which in linear case just is source outputs)
+
+    outputError.validateShape(target.outputs)
+    // Outer product of provided error on output layer
+    val outerProduct = outputError.mm(source.outputs.transpose())
+    weightMatrix.add(outerProduct.mul(epsilon))
+}
+
+/**
+ * Learn to produce current target activations (which might have been "force set") from current source activations.
+ * Uses least-mean-squares.
+ */
+fun WeightMatrix.learnCurrentOutput(epsilon: Double = .1) {
+    val targets = target.outputs.clone()
+    val actualOutputs = output
+    applyLMS(targets.sub(actualOutputs), epsilon)
 }

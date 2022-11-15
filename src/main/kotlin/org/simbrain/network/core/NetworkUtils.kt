@@ -257,6 +257,7 @@ fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
     // Outer product of provided error on output layer
     val outerProduct = outputError.mm(source.outputs.transpose())
     weightMatrix.add(outerProduct.mul(epsilon))
+    events.fireUpdated()
 }
 
 /**

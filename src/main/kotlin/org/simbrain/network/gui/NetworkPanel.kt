@@ -27,8 +27,6 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
-import org.simbrain.network.trainers.LMSIterative
-import org.simbrain.network.trainers.TrainingSet
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.widgets.EditablePanel
@@ -112,6 +110,75 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     // TODO: Use preference default
     var backgroundColor = Color.white
+
+    /**
+     * Main initialization of the network panel.
+     */
+    init {
+        super.setLayout(BorderLayout())
+
+        canvas.apply {
+            // Always render in high quality
+            setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)
+            animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
+            interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
+
+            // Remove default event listeners
+            removeInputEventListener(panEventHandler)
+            removeInputEventListener(zoomEventHandler)
+
+            // Event listeners
+            addInputEventListener(MouseEventHandler(this@NetworkPanel))
+            addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
+            addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
+            addInputEventListener(textHandle)
+            addInputEventListener(WandEventHandler(this@NetworkPanel));
+
+            // Don't show text when the canvas is sufficiently zoomed in
+            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    filterScreenElements<NeuronNode>().forEach {
+                        it.updateTextVisibility()
+                    }
+                }
+            }
+        }
+
+        initEventHandlers()
+
+        toolbars.apply {
+
+            cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+            val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
+            add("Center", JPanel(flowLayout).apply {
+                add(mainToolBar)
+                add(runToolBar)
+                add(editToolBar)
+            })
+        }
+
+        add("North", toolbars)
+        add("Center", canvas)
+        add("South", JToolBar().apply { add(timeLabel) })
+
+        // Register support for tool tips
+        // TODO: might be a memory leak, if not unregistered when the parent frame is removed
+        // TODO: copy from old code. Re-verify.
+        ToolTipManager.sharedInstance().registerComponent(this)
+
+        addKeyBindings()
+
+        // Repaint whenever window is opened or changed.
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(arg0: ComponentEvent) {
+                zoomToFitPage()
+            }
+        })
+
+        // Add all network elements (important for de-serializing)
+        network.modelsInReconstructionOrder.forEach { createNode(it) }
+
+    }
 
     val isRunning
         get() = network.isRunning
@@ -714,15 +781,15 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
     }
 
-    fun showLMS() {
-        val sources = selectionManager.filterSelectedSourceModels<Neuron>()
-        val targets = selectionManager.filterSelectedModels<Neuron>()
-        val sourceActivations = arrayOf(sources.activations.toDoubleArray())
-        val targetActivations = arrayOf(targets.activations.toDoubleArray())
-        val ts = TrainingSet(sourceActivations, targetActivations)
-        val lms = LMSIterative(sources, targets, ts)
-        showLMSDialog(lms)
-    }
+    // fun showLMS() {
+    //     val sources = selectionManager.filterSelectedSourceModels<Neuron>()
+    //     val targets = selectionManager.filterSelectedModels<Neuron>()
+    //     val sourceActivations = arrayOf(sources.activations.toDoubleArray())
+    //     val targetActivations = arrayOf(targets.activations.toDoubleArray())
+    //     val ts = TrainingSet(sourceActivations, targetActivations)
+    //     val lms = LMSIterative(sources, targets, ts)
+    //     showLMSDialog(lms)
+    // }
 
     /**
      * TODO: Work in progress.
@@ -740,73 +807,18 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         undoManager.redo()
     }
 
+
     /**
-     * Main initialization of the network panel.
+     * Apply "hot key" based one-shot learning, which uses current activations (which may have been hand-set) to
+     * train (for now) selected weight matrices.
      */
-    init {
-        super.setLayout(BorderLayout())
-
-        canvas.apply {
-            // Always render in high quality
-            setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)
-            animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
-            interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
-
-            // Remove default event listeners
-            removeInputEventListener(panEventHandler)
-            removeInputEventListener(zoomEventHandler)
-
-            // Event listeners
-            addInputEventListener(MouseEventHandler(this@NetworkPanel))
-            addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
-            addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
-            addInputEventListener(textHandle)
-            addInputEventListener(WandEventHandler(this@NetworkPanel));
-
-            // Don't show text when the canvas is sufficiently zoomed in
-            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                GlobalScope.launch(Dispatchers.Main) {
-                    filterScreenElements<NeuronNode>().forEach {
-                        it.updateTextVisibility()
-                    }
+    fun applyImmediateLearning() {
+        filterScreenElements<WeightMatrixNode>().forEach {
+            it.model.let { wm ->
+                if (wm is WeightMatrix) {
+                    wm.learnCurrentOutput()
                 }
             }
         }
-
-        initEventHandlers()
-
-        toolbars.apply {
-
-            cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
-            val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
-            add("Center", JPanel(flowLayout).apply {
-                add(mainToolBar)
-                add(runToolBar)
-                add(editToolBar)
-            })
-        }
-
-        add("North", toolbars)
-        add("Center", canvas)
-        add("South", JToolBar().apply { add(timeLabel) })
-
-        // Register support for tool tips
-        // TODO: might be a memory leak, if not unregistered when the parent frame is removed
-        // TODO: copy from old code. Re-verify.
-        ToolTipManager.sharedInstance().registerComponent(this)
-
-        addKeyBindings()
-
-        // Repaint whenever window is opened or changed.
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(arg0: ComponentEvent) {
-                zoomToFitPage()
-            }
-        })
-
-        // Add all network elements (important for de-serializing)
-        network.modelsInReconstructionOrder.forEach { createNode(it) }
-
     }
-
 }

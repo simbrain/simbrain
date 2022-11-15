@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.*
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.matrix.NeuronArray
@@ -76,10 +77,13 @@ class PlacementManager() {
      * Paste a list of objects using the delta between the current anchor point and the
      * previous anchor point.
      */
-    fun placeObjects(models: List<LocatableModel>) {
-        if (models.isEmpty()) {
+    fun placeObjects(initModels: List<LocatableModel>) {
+        if (initModels.isEmpty()) {
             return
         }
+
+        // NeuronCollections should not be placed.
+        val models = initModels.filter { it !is NeuronCollection }
 
         models.moveToOrigin()
 

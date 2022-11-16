@@ -135,3 +135,35 @@ fun makeDoubleSequence(start: Double, stop: Double, step: Double): Sequence<Doub
 fun makeStringArray(start: Double, stop: Double, f: (Double) -> Double, step: Double = 1.0): String {
     return "[${makeDoubleSequence(start, stop, step).map(f).joinToString(",")}]"
 }
+
+/**
+ * Parse the provided value into a double if possible, else throw an exception
+ */
+fun tryParsingDouble(value: Any?): Double {
+    if (value is Double) {
+        return value
+    }
+    if (value is String) {
+        return value.toDouble()
+    }
+    if (value is Int) {
+        return value.toDouble()
+    }
+    throw NumberFormatException("Tried to parse a value that was not double into double")
+}
+
+/**
+ * Parse the provided value into an integer if possible, else throw an exception.
+ */
+fun tryParsingInt(value: Any?): Int {
+    if (value is Int) {
+        return value
+    }
+    if (value is String) {
+        return value.toInt()
+    }
+    if (value is Double) {
+        return value.toInt()
+    }
+    throw NumberFormatException("Tried to parse a value that was not int into int")
+}

@@ -1,6 +1,8 @@
 package org.simbrain.util.table
 
 import org.simbrain.util.sampleWithoutReplacement
+import org.simbrain.util.tryParsingDouble
+import org.simbrain.util.tryParsingInt
 import smile.math.matrix.Matrix
 
 /**
@@ -106,38 +108,6 @@ class BasicDataWrapper(
         } catch (e: NumberFormatException) {
             println("There was a problem parsing ${value} in a column of type ${columns[colIndex].type}")
         }
-    }
-
-    /**
-     * Parse the provided value into a double if possible, else throw an exception
-     */
-    private fun tryParsingDouble(value: Any?): Double {
-        if (value is Double) {
-            return value
-        }
-        if (value is String) {
-            return value.toDouble()
-        }
-        if (value is Int) {
-            return value.toDouble()
-        }
-        throw NumberFormatException("Tried to parse a value that was not double into double")
-    }
-
-    /**
-     * Parse the provided value into an integer if possible, else throw an exception.
-     */
-    fun tryParsingInt(value: Any?): Int {
-        if (value is Int) {
-            return value
-        }
-        if (value is String) {
-            return value.toInt()
-        }
-        if (value is Double) {
-            return value.toInt()
-        }
-        throw NumberFormatException("Tried to parse a value that was not int into int")
     }
 
     override fun randomizeColumn(col: Int) {

@@ -30,6 +30,7 @@ import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
+import org.simbrain.network.gui.dialogs.showLMSCreationDialog
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
@@ -193,7 +194,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addGroupAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addGroupAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addGroupAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
-            // addGroupAction("LMS (Least Mean Squares)") { LMSCreationDialog(networkPanel) },
+            addGroupAction("LMS (Least Mean Squares)") { networkPanel.showLMSCreationDialog() },
             addGroupAction("SOM Network") { SOMCreationDialog(networkPanel) },
             // addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
         )

@@ -19,7 +19,6 @@ import org.simbrain.network.gui.nodes.SynapseGroup2Node
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.smile.SmileClassifier
-import org.simbrain.network.trainers.LMSIterative
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createDialog
 import org.simbrain.util.display
@@ -151,18 +150,6 @@ fun NetworkPanel.showWeightMatrix() {
         dialog.title = "Weight Matrix Viewer"
         dialog.isVisible = true
     }
-}
-
-
-/**
- * Show dialog for LMS training
- */
-fun NetworkPanel.showLMSDialog(lms: LMSIterative) {
-//    LMSEditorDialog2(this, lms).apply {
-//        modalityType = Dialog.ModalityType.MODELESS
-//        pack()
-//        isVisible = true
-//    }
 }
 
 fun SynapseGroup2Node.getDialog(): StandardDialog {

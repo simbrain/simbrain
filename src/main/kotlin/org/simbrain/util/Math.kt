@@ -167,3 +167,8 @@ fun tryParsingInt(value: Any?): Int {
     }
     throw NumberFormatException("Tried to parse a value that was not int into int")
 }
+
+fun DoubleArray.minus(other: DoubleArray): DoubleArray {
+    return zip(other).map { (a, b) -> a - b }.toDoubleArray()
+}
+

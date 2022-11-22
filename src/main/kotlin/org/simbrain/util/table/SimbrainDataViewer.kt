@@ -25,7 +25,7 @@ import javax.swing.text.JTextComponent
  * model is mutable or not, different GUI actions are enabled. These actions can be further customized  depending on
  * the context.
  */
-class SimbrainDataViewer(
+open class SimbrainDataViewer(
     model: SimbrainDataModel,
     useDefaultToolbarAndMenu: Boolean = true
 ) : JPanel() {
@@ -270,6 +270,7 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
 
         // Camick end
     }
+
 }
 
 fun main() {

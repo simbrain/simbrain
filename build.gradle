@@ -1,5 +1,3 @@
-import static org.apache.tools.ant.taskdefs.condition.Os.*
-
 plugins {
     id 'java'
     id 'idea'
@@ -48,15 +46,15 @@ dependencies {
 
     // Smile
     implementation 'com.github.haifengl:smile-kotlin:2.6.0'
-    if (isFamily(FAMILY_MAC) && isArch('aarch64')) {
+//    if (isFamily(FAMILY_MAC) && isArch('aarch64')) {
         implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.8'
         implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.21-1.5.8'
         implementation group: 'org.bytedeco', name: 'openblas-platform', version: '0.3.21-1.5.8'
         implementation group: 'org.bytedeco', name: 'arpack-ng', version: '3.8.0-1.5.8'
         implementation group: 'org.bytedeco', name: 'arpack-ng-platform', version: '3.8.0-1.5.8'
-    } else {
-        implementation 'com.github.haifengl:smile-mkl:2.6.0'
-    }
+//    } else {
+//        implementation 'com.github.haifengl:smile-mkl:2.6.0'
+//    }
     implementation 'com.github.haifengl:smile-plot:2.6.0'
     implementation 'com.github.haifengl:smile-nlp:2.6.0'
 

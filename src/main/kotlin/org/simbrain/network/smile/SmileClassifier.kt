@@ -111,7 +111,7 @@ class SmileClassifier(
         var nin = 4
 
         @UserParameter(label = "Number of outputs (classes)",  description = "Ignored for some classifiers (e.g. SVM)" +
-                " that can only produce 2 outputs", conditionalEnablingMethod = "usesOutputs", order = 10)
+                " that can only produce 2 outputs", conditionalEnablingMethod = "usesOutputs", order = 20)
         var nout = 2
 
         @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order = 40)

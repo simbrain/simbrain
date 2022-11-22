@@ -8,6 +8,8 @@ import org.simbrain.network.core.getError
 import org.simbrain.network.core.learnCurrentOutput
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.subnetworks.LMSNetwork
+import org.simbrain.util.rowMatrixTransposed
 import smile.math.matrix.Matrix
 
 class NetworkUtilTest {
@@ -44,6 +46,20 @@ class NetworkUtilTest {
         // println(wm1.weightMatrix)
         assertArrayEquals(doubleArrayOf(-1.0, -2.0, -2.0), wm1.weightMatrix.col(0) )
         assertArrayEquals(doubleArrayOf(2.0, 3.0, 2.0), wm1.weightMatrix.col(1) )
+    }
+
+    @Test
+    fun `test lms in a feed forward net`() {
+        val ff = LMSNetwork(net, 5, 5)
+        val target =  ff.trainingSet.targets.rowMatrixTransposed(1)
+
+        ff.inputLayer.isClamped = true
+        ff.inputLayer.setActivations(ff.trainingSet.inputs.row(1))
+        ff.update()
+        val outputs = ff.outputLayer.activations
+        val error = target.sub(outputs)
+        // TODO: Make an actual test; this was just to recreate a crash
+        ff.weightMatrix.applyLMS(error, .1)
     }
 
     @Test

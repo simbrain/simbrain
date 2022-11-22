@@ -75,7 +75,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
         setLabel("Subnetwork");
     }
 
-    public void addModel(NetworkModel model) {
+    public final void addModel(NetworkModel model) {
         modelList.add(model);
         model.setId(getParentNetwork().getIdManager().getAndIncrementId(model.getClass()));
         if (model instanceof LocatableModel) {

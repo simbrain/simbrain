@@ -107,8 +107,8 @@ inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {
  */
 fun <T : JComponent> T.createAction(
     iconPath: String? = null,
-    name: String,
-    description: String = name,
+    name: String? = null,
+    description: String? = null,
     keyCombo: KeyCombination? = null,
     block: T.(e: ActionEvent) -> Unit
 ): AbstractAction {
@@ -161,12 +161,12 @@ fun NetworkPanel.createConditionallyEnabledAction(
 }
 
 /**
- * Create an action with a char rather than a key combinaation
+ * Create an action with a char rather than a key combination
  */
 fun <T : JComponent> T.createAction(
     iconPath: String = "",
     name: String = "",
-    description: String = name,
+    description: String = "",
     keyCombo: Char,
     block: T.(e: ActionEvent) -> Unit
 ): AbstractAction {

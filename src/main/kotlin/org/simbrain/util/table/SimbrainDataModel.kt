@@ -214,6 +214,14 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     open fun deleteRow(selectedRow: Int, fireEvent: Boolean = true) {}
 
+    fun insertRowAtBottom() {
+        insertRow(rowCount)
+    }
+
+    fun deleteLastRow() {
+        deleteRow(rowCount - 1 , true)
+    }
+
 }
 
 class Column(

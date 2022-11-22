@@ -242,7 +242,7 @@ fun Synapse.decayStrengthBasedOnLength(decay: DecayFunction) {
 }
 
 fun ArrayLayer.getError(targets: Matrix): Matrix {
-    outputs.validateShape(targets)
+    outputs.validateSameShape(targets)
     return targets.sub(outputs)
 }
 
@@ -253,7 +253,7 @@ fun ArrayLayer.getError(targets: Matrix): Matrix {
 fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
     // TODO: This can be replaced by derivative (which in linear case just is source outputs)
 
-    outputError.validateShape(target.outputs)
+    outputError.validateSameShape(target.outputs)
     // Outer product of provided error on output layer
     val outerProduct = outputError.mm(source.outputs.transpose())
     weightMatrix.add(outerProduct.mul(epsilon))

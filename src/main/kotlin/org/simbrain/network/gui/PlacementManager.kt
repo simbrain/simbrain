@@ -78,12 +78,12 @@ class PlacementManager() {
      * previous anchor point.
      */
     fun placeObjects(initModels: List<LocatableModel>) {
-        if (initModels.isEmpty()) {
-            return
-        }
 
         // NeuronCollections should not be placed.
         val models = initModels.filter { it !is NeuronCollection }
+        if (models.isEmpty()) {
+            return
+        }
 
         models.moveToOrigin()
 

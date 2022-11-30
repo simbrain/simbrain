@@ -3,16 +3,17 @@ package org.simbrain.network.util
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.subnetworks.LMSNetwork
+import org.simbrain.network.trainers.*
 import org.simbrain.util.rowMatrixTransposed
 import org.simbrain.util.sse
 import smile.math.matrix.Matrix
 
-class NetworkUtilTest {
+class TrainingUtilsTest {
 
     val net = Network()
     val na1 = NeuronArray(net, 2)

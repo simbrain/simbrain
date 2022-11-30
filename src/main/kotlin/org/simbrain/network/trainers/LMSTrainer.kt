@@ -18,7 +18,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.simbrain.network.core.applyLMS
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.util.UserParameter

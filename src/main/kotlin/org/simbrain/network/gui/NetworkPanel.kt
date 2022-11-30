@@ -27,6 +27,7 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
+import org.simbrain.network.trainers.trainCurrentOutputLMS
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.widgets.EditablePanel

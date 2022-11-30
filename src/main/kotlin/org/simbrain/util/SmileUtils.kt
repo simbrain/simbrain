@@ -7,7 +7,8 @@ import smile.math.matrix.Matrix
  */
 fun Matrix.validateSameShape(target: Matrix) {
     if (target.nrows() != nrows() || target.ncols() != ncols()) {
-        throw IllegalArgumentException("Matrix with shape $shapeString does not match matrix with shape $shapeString")
+        throw IllegalArgumentException("Matrix with shape $shapeString does not match matrix with shape " +
+                "${target.shapeString}")
     }
 }
 

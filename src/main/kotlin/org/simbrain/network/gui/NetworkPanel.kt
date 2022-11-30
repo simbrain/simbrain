@@ -816,7 +816,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         filterScreenElements<WeightMatrixNode>().forEach {
             it.model.let { wm ->
                 if (wm is WeightMatrix) {
-                    wm.learnCurrentOutput()
+                    wm.trainCurrentOutputLMS()
                 }
             }
         }

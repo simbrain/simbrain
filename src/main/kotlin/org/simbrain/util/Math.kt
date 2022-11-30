@@ -25,6 +25,13 @@ infix fun Iterable<Double>.sse(other: Iterable<Double>) = (this squaredError oth
 
 infix fun Iterable<Double>.mse(other: Iterable<Double>) = (this squaredError other).average()
 
+infix fun DoubleArray.squaredError(other: DoubleArray) =
+    this.zip(other).map { (a, b) -> (a - b).let { it * it } }
+
+infix fun DoubleArray.sse(other: DoubleArray) = (this squaredError other).sum()
+
+infix fun DoubleArray.mse(other: DoubleArray) = (this squaredError other).average()
+
 @JvmName("squaredErrorInt")
 infix fun Iterable<Int>.squaredError(other: Iterable<Int>) = this.zip(other).map { (a, b) -> (a - b).let { it * it } }
 

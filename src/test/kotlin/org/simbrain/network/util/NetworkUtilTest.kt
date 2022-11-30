@@ -1,15 +1,15 @@
 package org.simbrain.network.util
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.applyLMS
-import org.simbrain.network.core.getError
-import org.simbrain.network.core.learnCurrentOutput
+import org.simbrain.network.core.*
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.util.rowMatrixTransposed
+import org.simbrain.util.sse
 import smile.math.matrix.Matrix
 
 class NetworkUtilTest {
@@ -36,7 +36,7 @@ class NetworkUtilTest {
     }
 
     @Test
-    fun `test weight matrix add error`() {
+    fun `test weight lms weight updates`() {
         val outputError = Matrix(3,1, 2.0)
         na1.setActivations(doubleArrayOf(-1.0, 1.0))
         // outputError * na1.activations + wm2.weights
@@ -46,6 +46,45 @@ class NetworkUtilTest {
         // println(wm1.weightMatrix)
         assertArrayEquals(doubleArrayOf(-1.0, -2.0, -2.0), wm1.weightMatrix.col(0) )
         assertArrayEquals(doubleArrayOf(2.0, 3.0, 2.0), wm1.weightMatrix.col(1) )
+    }
+
+    @Test
+    fun `test forward pass`() {
+        val inputs = Matrix(doubleArrayOf(-1.0, 1.0))
+        listOf(wm1, wm2).forwardPass(inputs)
+        listOf(wm1, wm2).printActivationsAndWeights(true)
+        assertArrayEquals(inputs.col(0), wm2.target.outputs.col(0))
+    }
+
+
+    @Test
+    fun `test lms`() {
+        na1.setActivations(doubleArrayOf(-1.0, 1.0))
+        val target = doubleArrayOf(5.0, -1.0, .5)
+        na2.setActivations(target)
+        // println("Before: ${wm1.output}")
+        repeat(100) {
+            wm1.trainCurrentOutputLMS()
+        }
+        // println("After: ${wm1.output}")
+        assertArrayEquals(target, wm1.output.col(0), .01)
+    }
+
+    @Test
+    fun `test backprop`() {
+        val inputs = Matrix(doubleArrayOf(-1.0, 1.0))
+        // TODO: Blows up for larger targets, like 30
+        val targets = Matrix(doubleArrayOf(1.75, -.5))
+        (na3.updateRule as LinearRule).lowerBound = -100.0
+        (na3.updateRule as LinearRule).upperBound = 100.0
+        wm1.randomize()
+        wm2.randomize()
+        repeat(50) {
+            listOf(wm1, wm2).applyBackprop(inputs, targets, .1)
+            // println(targets.col(0) sse wm2.output.col(0))
+        }
+        // println("After: ${wm2.output}")
+        assertEquals(0.0, targets.col(0) sse wm2.output.col(0), .01)
     }
 
     @Test
@@ -60,19 +99,6 @@ class NetworkUtilTest {
         val error = target.sub(outputs)
         // TODO: Make an actual test; this was just to recreate a crash
         ff.weightMatrix.applyLMS(error, .1)
-    }
-
-    @Test
-    fun `test lms`() {
-        na1.setActivations(doubleArrayOf(-1.0, 1.0))
-        val target = doubleArrayOf(1.0, -1.0, .5)
-        na2.setActivations(target)
-        // println("Before: ${wm1.output}")
-        repeat(100) {
-            wm1.learnCurrentOutput()
-        }
-        // println("After: ${wm1.output}")
-        assertArrayEquals(target, wm1.output.col(0), .01)
     }
 
 }

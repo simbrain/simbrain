@@ -29,18 +29,41 @@ interface EvoSim {
     suspend fun eval(): Double
 }
 
+/**
+ * A typed list of Genes, with functions to copy and concatenate.
+ */
 class Chromosome2<P, G : Gene2<P>>(genes: List<G>) : MutableList<G> by ArrayList(genes) {
+
+    /**
+     * Provides a copy of the chromosome.
+     */
     fun copy() = Chromosome2(map { it.copy() as G })
 
+    /**
+     * Provides the ability to concatenate chromsomes. See usages.
+     */
     operator fun plus(other: Chromosome2<P, G>) = Chromosome2(buildList { addAll(this@Chromosome2); addAll(other); })
 }
 
+/**
+ * The main evolutionary code.
+ * Assumes fitness, i.e. bigger numbers are better. For "error", the eval function should return a negative number.
+ * Returns all simulations from the last generation of the run.
+ *
+ * @param populatingFunction initial evolutionary sim
+ * @param populationSize stays constant during the run
+ * @param eliminationRatio how many sims to eliminate each generation.
+ * @param stoppingFunction a function that determines when to stop running the sim. Generally check a generation
+ * number and for fitness.
+ * @param peek code to run each iteration, for example to update a progress bar
+ */
 suspend fun evaluator2(
+
     populatingFunction: (index: Int) -> EvoSim,
     populationSize: Int,
     eliminationRatio: Double,
-    peek: GenerationFitnessPair.() -> Unit,
     stoppingFunction: GenerationFitnessPair.() -> Boolean,
+    peek: GenerationFitnessPair.() -> Unit = {},
     seed: Long = Random.nextLong(),
     random: Random = Random(seed)
 ): List<EvoSim> = coroutineScope {

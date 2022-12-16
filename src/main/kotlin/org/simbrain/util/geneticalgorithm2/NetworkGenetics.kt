@@ -34,6 +34,10 @@ class NodeGene2(override val template: Neuron) : NetworkGene2<Neuron>() {
 
 }
 
+/**
+ * Describes a synapse connecting two neurons, associated with nodegenes.  When expressed, will wait until the
+ * associated node genes are expressed first.
+ */
 class ConnectionGene2(override val template: Synapse, val source: NodeGene2, val target: NodeGene2) :
     NetworkGene2<Synapse>() {
 

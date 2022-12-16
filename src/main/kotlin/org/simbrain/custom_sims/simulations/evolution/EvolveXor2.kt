@@ -73,20 +73,23 @@ val evolveXor2 = newSim {
                 }
             }
 
-            if (random.nextDouble() < 0.9) {
+            if (random.nextDouble() < 0.25) {
                 val (source, target) = if (random.nextBoolean()) {
-                    val source = hiddens.toList().sampleWithoutReplacement().first()
-                    val target = outputs.toList().sampleWithoutReplacement().first()
-                    source to target
-                } else {
+                    // Input to hidden
                     val source = inputs.sampleWithoutReplacement().first()
                     val target = hiddens.sampleWithoutReplacement().first()
+                    source to target
+                } else {
+                    // Hidden to output
+                    val source = hiddens.toList().sampleWithoutReplacement().first()
+                    val target = outputs.toList().sampleWithoutReplacement().first()
                     source to target
                 }
                 connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
-            if (random.nextDouble() < 0.1) {
+            // Add a new hidden unit
+            if (random.nextDouble() < 0.25) {
                 hiddens.add(nodeGene2())
             }
 
@@ -135,15 +138,17 @@ val evolveXor2 = newSim {
 
             return testData.sumOf { (input, output) ->
                 phenotype.await().inputs.neuronList.activations = input
-                workspace.iterateSuspend(20)
-                -(phenotype.await().outputs.neuronList.activations sse output)
+                // Iterate more each run if allowing recurent connections
+                workspace.iterateSuspend(2)
+                val error = (phenotype.await().outputs.neuronList.activations sse output)
+                -error
             }
         }
 
     }
 
     workspace.coroutineScope.launch {
-        val maxGeneratioms = 200
+        val maxGeneratioms = 500
         val progressWindow = ProgressWindow(maxGeneratioms, "Error")
         val lastGeneration = evaluator2(
             populatingFunction = { Xor2Sim() },
@@ -163,7 +168,7 @@ val evolveXor2 = newSim {
             }
         )
 
-        lastGeneration.take(5).forEach {
+        lastGeneration.take(1).forEach {
             with(it.visualize(workspace) as Xor2Sim) {
                 build()
                 val phenotype = this.phenotype.await()

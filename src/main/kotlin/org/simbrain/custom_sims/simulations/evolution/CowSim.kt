@@ -90,11 +90,15 @@ val evolveCow = newSim {
                     strength += random.nextDouble(-1.0, 1.0)
                 }
             }
-            if (random.nextDouble() < 0.9) {
+
+            // TODO: Only make new connections if it does NOT exist already
+            if (random.nextDouble() < 0.1) {
                 val source = (inputs + hiddens + outputs + drives).toList().sampleWithoutReplacement().first()
                 val target = (hiddens + outputs).toList().sampleWithoutReplacement().first()
                 connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
+
+            // Make hidden layer larger
             if (random.nextDouble() < 0.1) {
                 hiddens.add(nodeGene2())
             }

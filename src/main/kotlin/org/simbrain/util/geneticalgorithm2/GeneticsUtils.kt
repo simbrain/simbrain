@@ -37,12 +37,24 @@ fun <P : NetworkModel, G : NetworkGene2<P>> chromosome2(repeat: Int = 1, block: 
         listOf()
     ).apply { repeat(repeat) { block() } }
 
+/**
+ * Provides an ability to express node and connection genes in a network. Called as network.express(chromosome).
+ * Adds synapses corresponding to the connections in the provided chromosomes.
+ */
 context(Genotype2)
-        suspend fun <P : NetworkModel, G : NetworkGene2<P>> Network.express(Chromosome2: Chromosome2<P, G>): List<P> {
+suspend fun <P : NetworkModel, G : NetworkGene2<P>>
+        Network.express(Chromosome2: Chromosome2<P, G>): List<P> {
     return Chromosome2.map { it.express(this@express) }
 }
 
 data class GenerationFitnessPair(val generation: Int, val fitnessScores: List<Double>) {
-    fun nthPercentileFitness(nth: Double) = fitnessScores[(fitnessScores.lastIndex * nth / 100).roundToInt()]
+
+    /**
+     * Example: give it 5 and it returns the 5th percentile. 0 for the best.
+     * Call with a list to get a distribution.
+     */
     fun nthPercentileFitness(nth: Int) = nthPercentileFitness(nth.toDouble())
+
+    fun nthPercentileFitness(nth: Double) = fitnessScores[(fitnessScores.lastIndex * nth / 100).roundToInt()]
+
 }

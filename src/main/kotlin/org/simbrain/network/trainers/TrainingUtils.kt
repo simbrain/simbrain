@@ -56,6 +56,7 @@ fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
     applyLMS(targets.sub(actualOutputs), epsilon)
 }
 
+// TODO: For hidden layers don't use epsilon. 
 /**
  * Backpropagate the provided errors through this weight matrix, and return the new error.
  */

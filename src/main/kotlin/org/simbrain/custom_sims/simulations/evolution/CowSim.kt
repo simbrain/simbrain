@@ -152,7 +152,7 @@ val evolveCow = newSim {
                 }.also { entity.addSensor(it) }
             }
         }
-        val centerLakeSensors = entities.map { entity ->
+        val centerLakeSensors = entities.associateWith { entity ->
             TileSensor("water", radius = 0.0).apply {
                 decayFunction.dispersion = EntityType.COW.imageWidth / 1.4
             }.also { entity.addSensor(it) }
@@ -187,7 +187,7 @@ val evolveCow = newSim {
             // What to do when a cow finds water
             workspace.addUpdateAction("water found") {
                 with(odorWorld.tileMap) {
-                    centerLakeSensors.toList().forEach { sensor ->
+                    centerLakeSensors[entity]?.let { sensor ->
                         if (sensor.currentValue > 0.5) {
                             addFitness(1.0 / iterationsPerRun)
                             thirstNeuron.forceSetActivation(0.0)

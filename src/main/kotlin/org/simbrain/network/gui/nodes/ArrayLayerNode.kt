@@ -9,6 +9,7 @@ import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Font
 import java.awt.RenderingHints
+import javax.swing.SwingUtilities
 
 abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer):
     ScreenElement(networkPanel) {
@@ -20,7 +21,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
     /**
      * Margin around main box in pixels. Override to specify further.
      */
-    open protected val margin = 10.0
+    protected open val margin = 10.0
 
     init {
         layer.events.apply {
@@ -89,7 +90,9 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
     }
 
     fun updateBorder() {
-        borderBox = createBorder()
+        SwingUtilities.invokeLater {
+            borderBox = createBorder()
+        }
     }
 
     private fun pushBoundsToModel() {

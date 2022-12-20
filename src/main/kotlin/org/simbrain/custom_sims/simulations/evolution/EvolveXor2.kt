@@ -10,11 +10,8 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.format
+import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm2.*
-import org.simbrain.util.point
-import org.simbrain.util.sampleWithoutReplacement
-import org.simbrain.util.sse
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import kotlin.random.Random
@@ -73,23 +70,22 @@ val evolveXor2 = newSim {
                 }
             }
 
-            if (random.nextDouble() < 0.25) {
+            val existingPairs = connections.map { it.source to it.target }.toSet()
+
+            val availableInputToHidden = (inputs cartesianProduct hiddens) - existingPairs
+            val availableHiddenToTarget = (hiddens cartesianProduct outputs) - existingPairs
+
+            if (random.nextDouble() < 0.25 && availableInputToHidden.isNotEmpty() && availableHiddenToTarget.isNotEmpty()) {
                 val (source, target) = if (random.nextBoolean()) {
-                    // Input to hidden
-                    val source = inputs.sampleWithoutReplacement().first()
-                    val target = hiddens.sampleWithoutReplacement().first()
-                    source to target
+                    availableInputToHidden.sampleOne()
                 } else {
-                    // Hidden to output
-                    val source = hiddens.toList().sampleWithoutReplacement().first()
-                    val target = outputs.toList().sampleWithoutReplacement().first()
-                    source to target
+                    availableHiddenToTarget.sampleOne()
                 }
                 connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
             // Add a new hidden unit
-            if (random.nextDouble() < 0.25) {
+            if (random.nextDouble() < 0.1) {
                 hiddens.add(nodeGene2())
             }
 

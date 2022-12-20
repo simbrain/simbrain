@@ -32,6 +32,8 @@ fun <T> List<T>.sampleWithReplacement(
     }
 }
 
+fun <T> List<T>.sampleOne(random: Random = Random(Random.nextLong())) = this[random.nextInt(size)]
+
 fun <T> List<T>.sampleWithoutReplacement(
     random: Random = Random(Random.nextLong()),
     restartIfExhausted: Boolean = false

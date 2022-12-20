@@ -10,6 +10,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.util.cartesianProduct
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm2.*
 import org.simbrain.util.piccolo.createTileMapLayer
@@ -17,7 +18,7 @@ import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.piccolo.nextGridCoordinate
 import org.simbrain.util.point
-import org.simbrain.util.sampleWithoutReplacement
+import org.simbrain.util.sampleOne
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorldComponent
@@ -39,7 +40,13 @@ val evolveCow = newSim {
         var hiddens = chromosome2(2) { add(nodeGene2()) }
         var outputs = chromosome2(3) { add(nodeGene2 { upperBound = 10.0; lowerBound = -10.0 }) }
         var drives = chromosome2(1) { add(nodeGene2 { isClamped = true }) }
-        var connections = chromosome2(0) { add(connectionGene2(inputs.first(), outputs.first())) }
+        var connections = chromosome2(1) {
+            repeat(3) {
+                add(connectionGene2(inputs.sampleOne(), hiddens.sampleOne()))
+                add(connectionGene2(hiddens.sampleOne(), outputs.sampleOne()))
+            }
+            add(connectionGene2(drives[0], hiddens.sampleOne()))
+        }
 
         inner class Phenotype(
             val inputs: NeuronCollection,
@@ -91,10 +98,16 @@ val evolveCow = newSim {
                 }
             }
 
-            // TODO: Only make new connections if it does NOT exist already
-            if (random.nextDouble() < 0.1) {
-                val source = (inputs + hiddens + outputs + drives).toList().sampleWithoutReplacement().first()
-                val target = (hiddens + outputs).toList().sampleWithoutReplacement().first()
+            val existingPairs = connections.map { it.source to it.target }.toSet()
+            val availableConnections = ((inputs + hiddens + outputs) cartesianProduct (hiddens + outputs)) - existingPairs
+            if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
+                val (source, target) = availableConnections.sampleOne(random)
+                connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+            }
+
+            val availablePairs = (drives cartesianProduct (inputs + hiddens + outputs)) - existingPairs
+            if (random.nextDouble() < 0.25 && availablePairs.isNotEmpty()) {
+                val (source, target) = availablePairs.sampleOne(random)
                 connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
@@ -261,7 +274,7 @@ val evolveCow = newSim {
             populationSize = 100,
             eliminationRatio = 0.5,
             stoppingFunction = {
-                nthPercentileFitness(5) > 25 || generation > maxGenerations
+                nthPercentileFitness(10) > 10 || generation > maxGenerations
             },
             peek = {
                 listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {

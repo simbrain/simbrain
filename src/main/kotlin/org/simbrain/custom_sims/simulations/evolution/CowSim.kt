@@ -7,7 +7,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.cartesianProduct
@@ -25,8 +24,7 @@ import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.TileSensor
-import kotlin.math.abs
-import kotlin.math.pow
+import java.awt.Dimension
 import kotlin.random.Random
 
 val maxGenerations = 50
@@ -36,16 +34,17 @@ val evolveCow = newSim {
 
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
         override val random: Random = Random(seed)
-        var inputs = chromosome2(3) { add(nodeGene2 { isClamped = true }) }
-        var hiddens = chromosome2(2) { add(nodeGene2()) }
-        var outputs = chromosome2(3) { add(nodeGene2 { upperBound = 10.0; lowerBound = -10.0 }) }
-        var drives = chromosome2(1) { add(nodeGene2 { isClamped = true }) }
-        var connections = chromosome2(1) {
+        var inputChromosome = chromosome2(3) { add(nodeGene2 { isClamped = true }) }
+        var hiddenChromosome = chromosome2(2) { add(nodeGene2()) }
+        var outputChromosome = chromosome2(3) { add(nodeGene2 { upperBound = 10.0; lowerBound = -10.0 }) }
+        var driveChromosome = chromosome2(1) { add(nodeGene2 { activation = 10.0; upperBound = 10.0; isClamped = true
+        }) }
+        var connectionChromosome = chromosome2(1) {
             repeat(3) {
-                add(connectionGene2(inputs.sampleOne(), hiddens.sampleOne()))
-                add(connectionGene2(hiddens.sampleOne(), outputs.sampleOne()))
+                add(connectionGene2(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
+                add(connectionGene2(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
             }
-            add(connectionGene2(drives[0], hiddens.sampleOne()))
+            add(connectionGene2(driveChromosome[0], hiddenChromosome.sampleOne()))
         }
 
         inner class Phenotype(
@@ -56,64 +55,64 @@ val evolveCow = newSim {
             val connections: List<Synapse>
         )
 
-        suspend fun build(network: Network): Phenotype {
+        suspend fun expressWith(network: Network): Phenotype {
             return Phenotype(
-                NeuronCollection(network, network.express(inputs)).also {
+                NeuronCollection(network, network.express(inputChromosome)).also {
                     network.addNetworkModel(it); it.label = "input"
                 },
-                NeuronCollection(network, network.express(hiddens)).also {
+                NeuronCollection(network, network.express(hiddenChromosome)).also {
                     network.addNetworkModel(it); it.label = "hidden"
                 },
-                NeuronCollection(network, network.express(outputs)).also {
+                NeuronCollection(network, network.express(outputChromosome)).also {
                     network.addNetworkModel(it); it.label = "output"
                 },
-                NeuronCollection(network, network.express(drives)).also {
+                NeuronCollection(network, network.express(driveChromosome)).also {
                     network.addNetworkModel(it); it.label = "drives"
                 },
-                network.express(connections)
+                network.express(connectionChromosome)
             )
         }
 
         fun copy() = CowGenotype(random.nextLong()).apply {
             val current = this@CowGenotype
             val new = this@apply
-            new.inputs = current.inputs.copy()
-            new.hiddens = current.hiddens.copy()
-            new.outputs = current.outputs.copy()
-            new.drives = current.drives.copy()
-            new.connections = current.connections.copy()
+            new.inputChromosome = current.inputChromosome.copy()
+            new.hiddenChromosome = current.hiddenChromosome.copy()
+            new.outputChromosome = current.outputChromosome.copy()
+            new.driveChromosome = current.driveChromosome.copy()
+            new.connectionChromosome = current.connectionChromosome.copy()
         }
 
         fun mutate() {
-            hiddens.forEach {
+            hiddenChromosome.forEach {
                 it.mutate {
                     with(dataHolder as BiasedScalarData) {
                         bias += random.nextDouble(-1.0, 1.0)
                     }
                 }
             }
-            connections.forEach {
+            connectionChromosome.forEach {
                 it.mutate {
                     strength += random.nextDouble(-1.0, 1.0)
                 }
             }
 
-            val existingPairs = connections.map { it.source to it.target }.toSet()
-            val availableConnections = ((inputs + hiddens + outputs) cartesianProduct (hiddens + outputs)) - existingPairs
+            val existingPairs = connectionChromosome.map { it.source to it.target }.toSet()
+            val availableConnections = ((inputChromosome + hiddenChromosome + outputChromosome) cartesianProduct (hiddenChromosome + outputChromosome)) - existingPairs
             if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
                 val (source, target) = availableConnections.sampleOne(random)
-                connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
-            val availablePairs = (drives cartesianProduct (inputs + hiddens + outputs)) - existingPairs
+            val availablePairs = (driveChromosome cartesianProduct (inputChromosome + hiddenChromosome + outputChromosome)) - existingPairs
             if (random.nextDouble() < 0.25 && availablePairs.isNotEmpty()) {
                 val (source, target) = availablePairs.sampleOne(random)
-                connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
             // Make hidden layer larger
             if (random.nextDouble() < 0.1) {
-                hiddens.add(nodeGene2())
+                hiddenChromosome.add(nodeGene2())
             }
         }
     }
@@ -126,7 +125,7 @@ val evolveCow = newSim {
         val random = Random(cowGenotypes.first().random.nextInt())
 
         val thirstThreshold = 5.0
-        val fitness = mutableMapOf<CowGenotype.Phenotype, Double>()
+        val cowFitnesses = mutableMapOf<CowGenotype.Phenotype, Double>()
 
         private val _cowPhenotypes = CompletableDeferred<List<CowGenotype.Phenotype>>()
         val cowPhenotypes: Deferred<List<CowGenotype.Phenotype>> get() = _cowPhenotypes
@@ -158,6 +157,7 @@ val evolveCow = newSim {
                 it.location = point((i + 1) * 100, (i + 1) * 100)
             }
         }
+        // Water sensors that can guide the cow
         val sensors = entities.map { entity ->
             List(3) { index ->
                 TileSensor("water", radius = 60.0, angle = (index * 120.0)).apply {
@@ -165,6 +165,7 @@ val evolveCow = newSim {
                 }.also { entity.addSensor(it) }
             }
         }
+        // Central water sensor to determine when water is actually found.
         val centerLakeSensors = entities.associateWith { entity ->
             TileSensor("water", radius = 0.0).apply {
                 decayFunction.dispersion = EntityType.COW.imageWidth / 1.4
@@ -189,22 +190,24 @@ val evolveCow = newSim {
             }
         }
 
-        fun addUpdateActions(phenotype: CowGenotype.Phenotype, entity: OdorWorldEntity) {
+        fun addUpdateActions(cow: CowGenotype.Phenotype, entity: OdorWorldEntity) {
 
-            val thirstNeuron = phenotype.drives.neuronList.first()
+            val thirstNeuron = cow.drives.neuronList.first()
 
             fun addFitness(fitnessDelta: Double) {
-                fitness[phenotype] = (fitness[phenotype]?:0.0) + fitnessDelta
+                cowFitnesses[cow] = (cowFitnesses[cow]?:0.0) + fitnessDelta
             }
 
             // What to do when a cow finds water
             workspace.addUpdateAction("water found") {
                 with(odorWorld.tileMap) {
                     centerLakeSensors[entity]?.let { sensor ->
+                        // Water found
                         if (sensor.currentValue > 0.5) {
-                            addFitness(1.0 / iterationsPerRun)
+                            // Reset thirst node
                             thirstNeuron.forceSetActivation(0.0)
-                            clear( lakeLayer)
+                            // Relocate the lake
+                            clear(lakeLayer)
                             val newLocation = randomTileCoordinate()
                             makeLake(newLocation, lakeSize, lakeSize, lakeLayer)
                         }
@@ -212,33 +215,38 @@ val evolveCow = newSim {
                 }
             }
 
-            // Every iteration water is not found increase the thirst Neuron
-            // Also update fitness on this basis
+            // Update thirst and fitness
             workspace.addUpdateAction("update thirst") {
                 thirstNeuron.forceSetActivation(thirstNeuron.activation + 0.005)
-                if (thirstNeuron.activation > thirstThreshold) {
-                    addFitness(-(thirstNeuron.activation - thirstThreshold) * (20.0 / iterationsPerRun))
-                } else {
-                    addFitness(10.0 / iterationsPerRun)
-                }
+                addFitness(-thirstNeuron.activation)
+                // if (thirstNeuron.activation > thirstThreshold) {
+                //     // Thirsty! Reduce fitness
+                //     // addFitness(-(thirstNeuron.activation - thirstThreshold) * (20.0 / iterationsPerRun))
+                // } else {
+                //     // Satiated. Increase fitness. Scale by iterations by run so that 10 is max fitness from
+                //     // satiation per trial.
+                //     addFitness(10.0 / iterationsPerRun)
+                // }
             }
 
-
-            // Increase thirst when more energy is used
+            // Impose a fitness cost for motion and increase thirst with motion
             workspace.addUpdateAction("update energy") {
-                val outputsActivations =
-                    phenotype.outputs.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
-                val allActivations =
-                    (phenotype.inputs.neuronList + phenotype.outputs.neuronList).activations.sumOf { abs(it) } * 2
-                val energy = (outputsActivations + allActivations) * (1 / iterationsPerRun)
-                addFitness(-energy)
-                thirstNeuron.activation += energy
+                // val outputsActivations =
+                //     cow.outputs.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
+                // val allActivations =
+                //     (cow.inputs.neuronList + cow.outputs.neuronList).activations.sumOf { abs(it) } * 2
+                // val energy = (outputsActivations + allActivations) * (1 / iterationsPerRun)
+                val energy = (entity.speed * entity.speed)  / (iterationsPerRun*2)
+                // addFitness(-energy)
+                // thirstNeuron.activation += energy
             }
         }
 
         override suspend fun build() {
-            if (_cowPhenotypes.isActive) {
-                _cowPhenotypes.complete(cowGenotypes.zip(networks).map { (genotype, network) -> genotype.build(network) })
+            if (!_cowPhenotypes.isCompleted) {
+                // Express the genotypes
+                _cowPhenotypes.complete(cowGenotypes.zip(networks).map { (genotype, network) -> genotype.expressWith(network) })
+                // Make couplings
                 with(workspace.couplingManager) {
                     val cows = _cowPhenotypes.await()
                     (0..cows.lastIndex).map { i ->
@@ -263,25 +271,30 @@ val evolveCow = newSim {
         override suspend fun eval(): Double {
             build()
             workspace.iterateSuspend(iterationsPerRun)
-            return fitness.values.min()
+            // Determine a fitness for the sim based on the fitness of each cow
+            return cowFitnesses.values.min()
         }
     }
 
     workspace.coroutineScope.launch {
-        val progressWindow = ProgressWindow(maxGenerations, "Fitness")
+        val progressWindow = ProgressWindow(maxGenerations, "Fitness").apply {
+            minimumSize = Dimension(300, 100)
+            setLocationRelativeTo(null)
+        }
         val cowSims = evaluator2(
             populatingFunction = { CowSim() },
             populationSize = 100,
             eliminationRatio = 0.5,
             stoppingFunction = {
-                nthPercentileFitness(10) > 10 || generation > maxGenerations
+                nthPercentileFitness(10) > -1000 || generation > maxGenerations
             },
             peek = {
                 listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                     "$it: ${nthPercentileFitness(it).format(3)}"
                 }.also {
                     println("[$generation] $it")
-                    progressWindow.text = "Error: ${nthPercentileFitness(0).format(3)}"
+                    progressWindow.text = "5th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
+                    progressWindow.value = generation
                 }
             }
         )

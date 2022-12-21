@@ -38,8 +38,7 @@ fun <P : NetworkModel, G : NetworkGene2<P>> chromosome2(repeat: Int = 1, block: 
     ).apply { repeat(repeat) { block() } }
 
 /**
- * Provides an ability to express node and connection genes in a network. Called as network.express(chromosome).
- * Adds synapses corresponding to the connections in the provided chromosomes.
+ * Utility to create network models in a network, given their description as NetworkGenes.
  */
 context(Genotype2)
 suspend fun <P : NetworkModel, G : NetworkGene2<P>>

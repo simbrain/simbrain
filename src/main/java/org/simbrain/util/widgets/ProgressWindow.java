@@ -50,8 +50,6 @@ public class ProgressWindow extends JFrame {
         return valueLabel.getText();
     }
 
-
-
     public JProgressBar getProgressBar() {
         return progressBar;
     }

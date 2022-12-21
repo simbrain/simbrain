@@ -14,6 +14,7 @@ import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm2.*
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
+import java.awt.Dimension
 import kotlin.random.Random
 
 val evolveXor2 = newSim {
@@ -24,10 +25,10 @@ val evolveXor2 = newSim {
 
         override val random: Random = Random(seed)
 
-        var inputs = chromosome2(2) { add(nodeGene2 { isClamped = true }) }
-        var hiddens = chromosome2(2) { add(nodeGene2()) }
-        var outputs = chromosome2(1) { add(nodeGene2()) }
-        var connections = chromosome2(0) { add(connectionGene2(inputs.first(), outputs.first())) }
+        var inputLayerChromosome = chromosome2(2) { add(nodeGene2 { isClamped = true }) }
+        var hiddenLayerChromosome = chromosome2(2) { add(nodeGene2()) }
+        var outputLayerChromosome = chromosome2(1) { add(nodeGene2()) }
+        var connectionChromosome = chromosome2(0) { add(connectionGene2(inputLayerChromosome.first(), outputLayerChromosome.first())) }
 
         inner class Phenotype(
             val inputs: NeuronCollection,
@@ -36,12 +37,12 @@ val evolveXor2 = newSim {
             val connections: List<Synapse>
         )
 
-        suspend fun build(network: Network): Phenotype {
+        suspend fun expressWith(network: Network): Phenotype {
             return Phenotype(
-                NeuronCollection(network, network.express(inputs)).also { network.addNetworkModel(it); it.label = "input" },
-                NeuronCollection(network, network.express(hiddens)).also { network.addNetworkModel(it); it.label = "hidden" },
-                NeuronCollection(network, network.express(outputs)).also { network.addNetworkModel(it); it.label = "output" },
-                network.express(connections)
+                NeuronCollection(network, network.express(inputLayerChromosome)).also { network.addNetworkModel(it); it.label = "input" },
+                NeuronCollection(network, network.express(hiddenLayerChromosome)).also { network.addNetworkModel(it); it.label = "hidden" },
+                NeuronCollection(network, network.express(outputLayerChromosome)).also { network.addNetworkModel(it); it.label = "output" },
+                network.express(connectionChromosome)
             )
         }
 
@@ -49,14 +50,14 @@ val evolveXor2 = newSim {
             val current = this@XorGenotype
             val new = this@apply
 
-            new.inputs = current.inputs.copy()
-            new.hiddens = current.hiddens.copy()
-            new.outputs = current.outputs.copy()
-            new.connections = current.connections.copy()
+            new.inputLayerChromosome = current.inputLayerChromosome.copy()
+            new.hiddenLayerChromosome = current.hiddenLayerChromosome.copy()
+            new.outputLayerChromosome = current.outputLayerChromosome.copy()
+            new.connectionChromosome = current.connectionChromosome.copy()
         }
 
         fun mutate() {
-            hiddens.forEach {
+            hiddenLayerChromosome.forEach {
                 it.mutate {
                     with(dataHolder as BiasedScalarData) {
                         bias += random.nextDouble(-1.0, 1.0)
@@ -64,29 +65,30 @@ val evolveXor2 = newSim {
                 }
             }
 
-            connections.forEach {
+            connectionChromosome.forEach {
                 it.mutate {
                     strength += random.nextDouble(-1.0, 1.0)
                 }
             }
 
-            val existingPairs = connections.map { it.source to it.target }.toSet()
-
-            val availableInputToHidden = (inputs cartesianProduct hiddens) - existingPairs
-            val availableHiddenToTarget = (hiddens cartesianProduct outputs) - existingPairs
-
+            // Ensure existing connections are not used when creating new connections
+            val existingConnections = connectionChromosome.map { it.source to it.target }.toSet()
+            val availableInputToHidden = (inputLayerChromosome cartesianProduct hiddenLayerChromosome) - existingConnections
+            val availableHiddenToTarget = (hiddenLayerChromosome cartesianProduct outputLayerChromosome) - existingConnections
             if (random.nextDouble() < 0.25 && availableInputToHidden.isNotEmpty() && availableHiddenToTarget.isNotEmpty()) {
                 val (source, target) = if (random.nextBoolean()) {
+                    // Make a new connection from the input to hidden layer
                     availableInputToHidden.sampleOne()
                 } else {
+                    // Make a new connection from the hidden to output layer
                     availableHiddenToTarget.sampleOne()
                 }
-                connections.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
             // Add a new hidden unit
             if (random.nextDouble() < 0.1) {
-                hiddens.add(nodeGene2())
+                hiddenLayerChromosome.add(nodeGene2())
             }
 
         }
@@ -110,8 +112,8 @@ val evolveXor2 = newSim {
         }
 
         override suspend fun build() {
-            if (_phenotype.isActive) {
-                _phenotype.complete(xor2Genotype.build(network))
+            if (!_phenotype.isCompleted) {
+                _phenotype.complete(xor2Genotype.expressWith(network))
             }
         }
 
@@ -134,7 +136,7 @@ val evolveXor2 = newSim {
 
             return testData.sumOf { (input, output) ->
                 phenotype.await().inputs.neuronList.activations = input
-                // Iterate more each run if allowing recurent connections
+                // Iterate more each run if allowing recurrent connections
                 workspace.iterateSuspend(2)
                 val error = (phenotype.await().outputs.neuronList.activations sse output)
                 -error
@@ -144,23 +146,26 @@ val evolveXor2 = newSim {
     }
 
     workspace.coroutineScope.launch {
-        val maxGeneratioms = 500
-        val progressWindow = ProgressWindow(maxGeneratioms, "Error")
+        val maxGenerations = 500
+        val progressWindow = ProgressWindow(maxGenerations, "Error").apply {
+            minimumSize = Dimension(300, 100)
+            setLocationRelativeTo(null)
+        }
         val lastGeneration = evaluator2(
             populatingFunction = { Xor2Sim() },
             populationSize = 100,
             eliminationRatio = 0.5,
             peek = {
-                progressWindow.value = generation
                 listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                     "$it: ${nthPercentileFitness(it).format(3)}"
                 }.also {
                     println("[$generation] $it")
-                    progressWindow.text = "Error: ${nthPercentileFitness(0).format(3)}"
+                    progressWindow.text = "5th Percentile MSE: ${nthPercentileFitness(5).format(3)}"
+                    progressWindow.value = generation
                 }
             },
             stoppingFunction = {
-                nthPercentileFitness(5) > -0.05 || generation > maxGeneratioms
+                nthPercentileFitness(5) > -0.01 || generation > maxGenerations
             }
         )
 

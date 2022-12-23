@@ -26,9 +26,9 @@ import org.simbrain.workspace.component_actions.SaveAction
 import org.simbrain.workspace.component_actions.SaveAsAction
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.world.textworld.TextWorld
-import org.simbrain.world.textworld.TextWorldActions.getShowPreferencesDialogAction
-import org.simbrain.world.textworld.TextWorldActions.getTextAction
 import org.simbrain.world.textworld.TextWorldComponent
+import org.simbrain.world.textworld.loadText
+import org.simbrain.world.textworld.textWorldPrefs
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -126,13 +126,13 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         file.add(SaveAction(this))
         file.add(SaveAsAction(this))
         file.addSeparator()
-        file.add(getTextAction(world))
+        file.add(world.loadText)
         file.addSeparator()
         file.add(CloseAction(workspaceComponent))
 
         // Edit menu
         // loadDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
-        preferences.action = getShowPreferencesDialogAction(world)
+        preferences.action = world.textWorldPrefs
         // edit.add(loadDictionary);
         edit.addSeparator()
         edit.add(preferences)

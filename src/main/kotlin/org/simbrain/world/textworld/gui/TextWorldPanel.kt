@@ -18,9 +18,7 @@
  */
 package org.simbrain.world.textworld.gui
 
-import org.simbrain.world.textworld.TextWorld
-import org.simbrain.world.textworld.TextWorldActions.getExtractDictionaryAction
-import org.simbrain.world.textworld.TextWorldActions.showDictionaryEditor
+import org.simbrain.world.textworld.*
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -97,8 +95,8 @@ class TextWorldPanel private constructor(
         //     topToolbarPanel.add(openCloseToolBar);
         // }
         val dictionaryToolBar = JToolBar()
-        dictionaryToolBar.add(showDictionaryEditor(world))
-        dictionaryToolBar.add(getExtractDictionaryAction(world))
+        dictionaryToolBar.add(world.dictionaryEditor)
+        dictionaryToolBar.add(world.extractDictionary)
         topToolbarPanel.add(dictionaryToolBar)
         add(topToolbarPanel, BorderLayout.NORTH)
         val bottomToolbarPanel = JPanel()

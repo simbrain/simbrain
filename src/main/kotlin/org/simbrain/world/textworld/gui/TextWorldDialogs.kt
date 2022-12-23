@@ -2,7 +2,7 @@ package org.simbrain.world.textworld.gui
 
 import net.miginfocom.swing.MigLayout
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.Utils.createAction
+import org.simbrain.util.createAction
 import org.simbrain.util.display
 import org.simbrain.util.embeddingSimilarity
 import org.simbrain.world.textworld.TextWorld
@@ -21,7 +21,7 @@ fun TextWorld.showComparisonDialog(): StandardDialog {
         val word2cb = JComboBox(tokenVectorMap.tokensMap.keys.toTypedArray())
         val similarity = JLabel("Similarity: ")
 
-        val compareWords =  createAction("blah", "blah", "menu_icons/Gauge.png") {
+        val compareWords = createAction {
             val vec1 = tokenVectorMap.get(word1cb.selectedItem as String)
             val vec2 = tokenVectorMap.get(word2cb.selectedItem as String)
             println("Vector 1: ${vec1.contentToString()}")

@@ -132,6 +132,31 @@ fun <T : JComponent> T.createAction(
     }
 }
 
+/**
+ * Create an action when no JComponent available. Key combo's not possible.
+ */
+fun createAction(
+    iconPath: String? = null,
+    name: String? = null,
+    description: String? = null,
+    block: (e: ActionEvent) -> Unit
+): AbstractAction {
+    return object : AbstractAction() {
+        init {
+            if (iconPath != null) {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+            }
+
+            putValue(NAME, name)
+            putValue(SHORT_DESCRIPTION, description)
+        }
+
+        override fun actionPerformed(e: ActionEvent) {
+            block(e)
+        }
+    }
+}
+
 fun NetworkPanel.createConditionallyEnabledAction(
     iconPath: String? = null,
     name: String,

@@ -117,7 +117,19 @@
   <tile id="406">
    <properties>
     <property name="label" value="DirtRoadTurnDownRight"/>
-    <property name="type" value="DirtRoad"/>
+    <property name="type" value="dirtRoad"/>
+   </properties>
+  </tile>
+  <tile id="573">
+   <properties>
+    <property name="label" value="DaisyCenter"/>
+    <property name="type" value="flower"/>
+   </properties>
+  </tile>
+  <tile id="744">
+   <properties>
+    <property name="label" value="BlueFlowerCenter"/>
+    <property name="type" value="flower"/>
    </properties>
   </tile>
  </tileset>

@@ -9,15 +9,12 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.cartesianProduct
-import org.simbrain.util.format
+import org.simbrain.util.*
+import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.geneticalgorithm2.*
 import org.simbrain.util.piccolo.createTileMapLayer
 import org.simbrain.util.piccolo.loadTileMap
-import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.piccolo.nextGridCoordinate
-import org.simbrain.util.point
-import org.simbrain.util.sampleOne
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorldComponent
@@ -27,32 +24,35 @@ import org.simbrain.world.odorworld.sensors.TileSensor
 import java.awt.Dimension
 import kotlin.random.Random
 
+val grazingCows = newSim {
 
-val evolveCow = newSim {
-
-    val maxGenerations = 50
+    val maxGenerations = 2
     val iterationsPerRun = 2000
 
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
         override val random: Random = Random(seed)
-        var inputChromosome = chromosome2(3) { add(nodeGene2 { isClamped = true }) }
+        var inputChromosome = chromosome2(1) {
+            repeat(3) {
+                add(nodeGene2 { isClamped = true })
+            }
+            // Won't get coupled to. Serves as an initial "drive" neuron
+            add(nodeGene2{isClamped = true; forceSetActivation(1.0)})
+        }
         var hiddenChromosome = chromosome2(2) { add(nodeGene2()) }
         var outputChromosome = chromosome2(3) { add(nodeGene2 { upperBound = 10.0; lowerBound = -10.0 }) }
-        var driveChromosome = chromosome2(1) { add(nodeGene2 { activation = 10.0; upperBound = 10.0; isClamped = true
-        }) }
         var connectionChromosome = chromosome2(1) {
             repeat(3) {
                 add(connectionGene2(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
                 add(connectionGene2(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
             }
-            add(connectionGene2(driveChromosome[0], hiddenChromosome.sampleOne()))
+            // Force an initial "drive"
+            add(connectionGene2(inputChromosome[3], hiddenChromosome.sampleOne()))
         }
 
         inner class Phenotype(
             val inputs: NeuronCollection,
             val hiddens: NeuronCollection,
             val outputs: NeuronCollection,
-            val drives: NeuronCollection,
             val connections: List<Synapse>
         )
 
@@ -67,9 +67,6 @@ val evolveCow = newSim {
                 NeuronCollection(network, network.express(outputChromosome)).also {
                     network.addNetworkModel(it); it.label = "output"
                 },
-                NeuronCollection(network, network.express(driveChromosome)).also {
-                    network.addNetworkModel(it); it.label = "drives"
-                },
                 network.express(connectionChromosome)
             )
         }
@@ -80,7 +77,6 @@ val evolveCow = newSim {
             new.inputChromosome = current.inputChromosome.copy()
             new.hiddenChromosome = current.hiddenChromosome.copy()
             new.outputChromosome = current.outputChromosome.copy()
-            new.driveChromosome = current.driveChromosome.copy()
             new.connectionChromosome = current.connectionChromosome.copy()
         }
 
@@ -105,12 +101,6 @@ val evolveCow = newSim {
                 connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
-            val availablePairs = (driveChromosome cartesianProduct (inputChromosome + hiddenChromosome + outputChromosome)) - existingPairs
-            if (random.nextDouble() < 0.25 && availablePairs.isNotEmpty()) {
-                val (source, target) = availablePairs.sampleOne(random)
-                connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
-            }
-
             // Make hidden layer larger
             if (random.nextDouble() < 0.1) {
                 hiddenChromosome.add(nodeGene2())
@@ -125,7 +115,6 @@ val evolveCow = newSim {
 
         val random = Random(cowGenotypes.first().random.nextInt())
 
-        val thirstThreshold = 5.0
         val cowFitnesses = mutableMapOf<CowGenotype.Phenotype, Double>()
 
         private val _cowPhenotypes = CompletableDeferred<List<CowGenotype.Phenotype>>()
@@ -140,15 +129,16 @@ val evolveCow = newSim {
         }.world.apply {
             loadTileMap("empty.tmx")
             with(tileMap) {
-                updateMapSize(32, 32)
+                updateMapSize(25, 25)
                 fill("Grass1")
             }
         }
-        val lakeLayer = with(odorWorld.tileMap) {
-            val layer = createTileMapLayer("Lake Layer")
+        val flowerLayer = with(odorWorld.tileMap) {
+            val layer = createTileMapLayer("Flower Layer")
             layers.add(layer)
             layer
         }
+
         val networks = List(cowGenotypes.size) { index ->
             NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
         }
@@ -161,15 +151,16 @@ val evolveCow = newSim {
         // Water sensors that can guide the cow
         val sensors = entities.map { entity ->
             List(3) { index ->
-                TileSensor("water", radius = 60.0, angle = (index * 120.0)).apply {
+                TileSensor("flower", radius = 60.0, angle = (index * 120.0)).apply {
                     decayFunction.dispersion = 250.0
                 }.also { entity.addSensor(it) }
             }
         }
         // Central water sensor to determine when water is actually found.
-        val centerLakeSensors = entities.associateWith { entity ->
-            TileSensor("water", radius = 0.0).apply {
-                decayFunction.dispersion = EntityType.COW.imageWidth / 1.4
+        val centerFlowerSensors = entities.associateWith { entity ->
+            TileSensor("flower", radius = 0.0).apply {
+                decayFunction = StepDecayFunction()
+                decayFunction.dispersion = 30.0
             }.also { entity.addSensor(it) }
         }
         val effectors = entities.map { entity ->
@@ -177,13 +168,8 @@ val evolveCow = newSim {
             entity.effectors
         }
 
-
         init {
-            List(1) { randomTileCoordinate() }.forEach {
-                with(odorWorld.tileMap) {
-                    makeLake(it, lakeSize, lakeSize, lakeLayer)
-                }
-            }
+            addFlowers()
             workspace.coroutineScope.launch {
                 (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->
                     addUpdateActions(phenotype, entity)
@@ -191,56 +177,45 @@ val evolveCow = newSim {
             }
         }
 
-        fun addUpdateActions(cow: CowGenotype.Phenotype, entity: OdorWorldEntity) {
+        fun addFlowers(numFlowers: Int = 5) {
+            odorWorld.tileMap.clear(flowerLayer)
+            List(numFlowers) { randomTileCoordinate().int }.forEach {
+                odorWorld.tileMap.setTile(it.x, it.y, "DaisyCenter",flowerLayer)
+            }
+        }
 
-            val thirstNeuron = cow.drives.neuronList.first()
+        fun addUpdateActions(cow: CowGenotype.Phenotype, entity: OdorWorldEntity) {
 
             fun addFitness(fitnessDelta: Double) {
                 cowFitnesses[cow] = (cowFitnesses[cow]?:0.0) + fitnessDelta
             }
+            addFitness(0.0) // To initialize fitness
 
             // What to do when a cow finds water
-            workspace.addUpdateAction("water found") {
+            workspace.addUpdateAction("flowers found") {
                 with(odorWorld.tileMap) {
-                    centerLakeSensors[entity]?.let { sensor ->
-                        // Water found
-                        if (sensor.currentValue > 0.5) {
-                            // Reset thirst node
-                            thirstNeuron.forceSetActivation(0.0)
-                            // Relocate the lake
-                            clear(lakeLayer)
-                            val newLocation = randomTileCoordinate()
-                            makeLake(newLocation, lakeSize, lakeSize, lakeLayer)
+                    centerFlowerSensors[entity]?.let { sensor ->
+                        // Flowers found
+                        if (sensor.currentValue > .5) {
+                            entity.location.toTileCoordinate().let {(x,y) ->
+                                // If there is a flower there
+                                if(flowerLayer[x, y] != 0) {
+                                    // Erase that tile
+                                    flowerLayer.setTile(x, y, 0)
+                                    // Add a new flower somewhere else
+                                    randomTileCoordinate().int.let {(x,y) ->
+                                        odorWorld.tileMap.setTile(x, y, "DaisyCenter",flowerLayer)
+                                    }
+                                }
+                            }
+
+                            // Update fitness
+                            addFitness(1.0)
                         }
                     }
                 }
             }
 
-            // Update thirst and fitness
-            workspace.addUpdateAction("update thirst") {
-                thirstNeuron.forceSetActivation(thirstNeuron.activation + 0.005)
-                addFitness(-thirstNeuron.activation)
-                // if (thirstNeuron.activation > thirstThreshold) {
-                //     // Thirsty! Reduce fitness
-                //     // addFitness(-(thirstNeuron.activation - thirstThreshold) * (20.0 / iterationsPerRun))
-                // } else {
-                //     // Satiated. Increase fitness. Scale by iterations by run so that 10 is max fitness from
-                //     // satiation per trial.
-                //     addFitness(10.0 / iterationsPerRun)
-                // }
-            }
-
-            // Impose a fitness cost for motion and increase thirst with motion
-            workspace.addUpdateAction("update energy") {
-                // val outputsActivations =
-                //     cow.outputs.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
-                // val allActivations =
-                //     (cow.inputs.neuronList + cow.outputs.neuronList).activations.sumOf { abs(it) } * 2
-                // val energy = (outputsActivations + allActivations) * (1 / iterationsPerRun)
-                val energy = (entity.speed * entity.speed)  / (iterationsPerRun*2)
-                // addFitness(-energy)
-                // thirstNeuron.activation += energy
-            }
         }
 
         override suspend fun build() {
@@ -278,7 +253,7 @@ val evolveCow = newSim {
     }
 
     workspace.coroutineScope.launch {
-        val progressWindow = ProgressWindow(maxGenerations, "Fitness").apply {
+        val progressWindow = ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
             minimumSize = Dimension(300, 100)
             setLocationRelativeTo(null)
         }
@@ -287,14 +262,14 @@ val evolveCow = newSim {
             populationSize = 100,
             eliminationRatio = 0.5,
             stoppingFunction = {
-                nthPercentileFitness(10) > -1000 || generation > maxGenerations
+                nthPercentileFitness(10) > 400 || generation > maxGenerations
             },
             peek = {
                 listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                     "$it: ${nthPercentileFitness(it).format(3)}"
                 }.also {
                     println("[$generation] $it")
-                    progressWindow.text = "5th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
+                    progressWindow.text = "10th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
                     progressWindow.value = generation
                 }
             }
@@ -306,7 +281,6 @@ val evolveCow = newSim {
                     it.inputs.location = point( 0, 150)
                     it.hiddens.location = point( 0, 60)
                     it.outputs.location = point(0, -25)
-                    it.drives.location = point(200, 60)
                 }
             }
         }

@@ -27,7 +27,6 @@ abstract class DecayFunction(
 
 ) : CopyableObject {
 
-
     /**
      * Get the decay amount for the given distance.
      *

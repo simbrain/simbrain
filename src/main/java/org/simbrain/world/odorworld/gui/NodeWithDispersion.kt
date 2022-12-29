@@ -18,10 +18,10 @@ class DispersionNode(override val sensor: WithDispersion): NodeWithDispersion {
 
     private fun makeDispersionCircle(): PPath = with(sensor.decayFunction) {
         PPath.createEllipse(
-            -dispersion / 2,
-            -dispersion / 2,
-            dispersion,
-            dispersion
+            -dispersion,
+            -dispersion,
+            dispersion * 2,
+            dispersion * 2
         ).apply {
             paint = null
             stroke = BasicStroke(

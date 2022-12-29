@@ -3,7 +3,6 @@ package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
@@ -46,8 +45,6 @@ import kotlin.concurrent.timerTask
  * Main GUI representation of a [Network].
  */
 class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel() {
-
-    val mainScope = MainScope()
 
     /**
      * Main Piccolo canvas object.
@@ -111,6 +108,68 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     // TODO: Use preference default
     var backgroundColor = Color.white
+
+
+    val isRunning
+        get() = network.isRunning
+
+    /**
+     * How much to nudge objects per key click.
+     */
+    var nudgeAmount = 2.0
+
+    /**
+     * Text object event handler.
+     */
+    val textHandle: TextEventHandler = TextEventHandler(this)
+
+    /**
+     * Manages placement of new nodes, groups, etc.
+     */
+    val placementManager = PlacementManager()
+
+    /**
+     * Undo Manager
+     */
+    val undoManager = UndoManager()
+
+    /**
+     * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update is complete.
+     */
+    private val updateComplete = AtomicInteger(0)
+
+    /**
+     * Whether to display update priorities.
+     */
+    var prioritiesVisible = false
+        set(value) {
+            field = value
+            filterScreenElements<NeuronNode>().forEach { it.setPriorityView(value) }
+        }
+
+    /**
+     * Whether to display free weights (those not in a synapse group) or not.
+     */
+    var freeWeightsVisible = true
+        set(value) {
+            field = value
+            network.freeSynapses.forEach { it.isVisible = value }
+            network.events.fireFreeWeightVisibilityChanged(value)
+        }
+
+    /**
+     * Turn GUI on or off.
+     */
+    var guiOn = true
+        set(guiOn) {
+            if (guiOn) {
+                this.setUpdateComplete(false)
+                //this.updateSynapseNodes()
+                updateComplete.decrementAndGet()
+            }
+            field = guiOn
+        }
+
 
     /**
      * Main initialization of the network panel.
@@ -180,66 +239,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         network.modelsInReconstructionOrder.forEach { createNode(it) }
 
     }
-
-    val isRunning
-        get() = network.isRunning
-
-    /**
-     * How much to nudge objects per key click.
-     */
-    var nudgeAmount = 2.0
-
-    /**
-     * Text object event handler.
-     */
-    val textHandle: TextEventHandler = TextEventHandler(this)
-
-    /**
-     * Manages placement of new nodes, groups, etc.
-     */
-    val placementManager = PlacementManager()
-
-    /**
-     * Undo Manager
-     */
-    val undoManager = UndoManager()
-
-    /**
-     * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update is complete.
-     */
-    private val updateComplete = AtomicInteger(0)
-
-    /**
-     * Whether to display update priorities.
-     */
-    var prioritiesVisible = false
-        set(value) {
-            field = value
-            filterScreenElements<NeuronNode>().forEach { it.setPriorityView(value) }
-        }
-
-    /**
-     * Whether to display free weights (those not in a synapse group) or not.
-     */
-    var freeWeightsVisible = true
-        set(value) {
-            field = value
-            network.freeSynapses.forEach { it.isVisible = value }
-            network.events.fireFreeWeightVisibilityChanged(value)
-        }
-
-    /**
-     * Turn GUI on or off.
-     */
-    var guiOn = true
-        set(guiOn) {
-            if (guiOn) {
-                this.setUpdateComplete(false)
-                //this.updateSynapseNodes()
-                updateComplete.decrementAndGet()
-            }
-            field = guiOn
-        }
 
     /** TODO: Javadoc. */
     fun setUpdateComplete(updateComplete: Boolean) {

@@ -255,13 +255,9 @@ class ParameterWidget(
             } else "<html>" + tips.stream().collect(Collectors.joining("<br/>")) + "</html>"
         }
 
-    /**
-     * Set the value of the widget. If value is null then the "null" state of
-     * the widget is displayed.
-     */
     var widgetValue: Any?
         get() = if (!parameter.isEditable) {
-            throw IllegalArgumentException("Trying to edit a non-editable object")
+            (component as JLabel).text
         } else if (parameter.isString) {
             if ((component as TextWithNull?)!!.isNull()) null else component!!.text
         } else if (parameter.isNumeric) {
@@ -283,12 +279,13 @@ class ParameterWidget(
         }
         set(value) {
             if (!parameter.isEditable) {
-                (component as JLabel?)!!.text = value?.toString() ?: SimbrainConstants.NULL_STRING
+                // non-editable widgets are represented with JLabels
+                (component as JLabel).text = value?.toString() ?: SimbrainConstants.NULL_STRING
             } else if (parameter.isBoolean) {
                 if (value == null) {
-                    (component as YesNoNull?)!!.setNull()
+                    (component as YesNoNull).setNull()
                 } else {
-                    (component as YesNoNull?)!!.isSelected = (value as Boolean?)!!
+                    (component as YesNoNull).isSelected = (value as Boolean?)!!
                 }
             } else if (parameter.isColor) {
                 (component as ColorSelector?)!!.value = value as Color?

@@ -6,12 +6,11 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit
 import org.piccolo2d.nodes.PImage
 import org.simbrain.util.component1
 import org.simbrain.util.component2
+import org.simbrain.world.odorworld.events.TileMapEvents
 import java.awt.Color
 import java.awt.Point
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
-import java.beans.PropertyChangeListener
-import java.beans.PropertyChangeSupport
 import java.util.*
 
 /**
@@ -105,11 +104,11 @@ class TileMap(width: Int, height: Int) {
     @Transient
     private var idTileMapping = HashMap<Int, Tile>()
 
-    /**
-     * The layers of this map.
-     */
     @XStreamImplicit
-    val layers = mutableListOf(TileMapLayer("Default Layer", width, height, true))
+    @XStreamAlias("layers")
+    private val _layers = mutableListOf(TileMapLayer("Default Layer", width, height, true))
+    val layers: List<TileMapLayer>
+        get() = _layers
 
     /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)
@@ -119,11 +118,9 @@ class TileMap(width: Int, height: Int) {
 
     private var guiEnabled = false
 
-    /**
-     * Support for property change events.
-     */
     @Transient
-    private var changeSupport = PropertyChangeSupport(this)
+    var events = TileMapEvents(this)
+        private set
 
     /**
      * Get a list of images of each layer of this map.
@@ -196,8 +193,14 @@ class TileMap(width: Int, height: Int) {
         if (guiEnabled) {
             val oldRenderedImage = layerImage
             val newRenderedImage = renderImage(tileSets, true)
-            changeSupport.firePropertyChange("layerImageChanged", oldRenderedImage, newRenderedImage)
+            events.fireLayerImageChanged(oldRenderedImage, newRenderedImage)
         }
+    }
+
+    fun addLayer(layer: TileMapLayer): TileMapLayer {
+        _layers.add(layer)
+        events.fireLayerAdded()
+        return layer
     }
 
     /**
@@ -322,15 +325,11 @@ class TileMap(width: Int, height: Int) {
         }
     }
 
-    fun addPropertyChangeListener(listener: PropertyChangeListener?) {
-        changeSupport.addPropertyChangeListener(listener)
-    }
-
     /**
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private fun readResolve(): Any {
-        changeSupport = PropertyChangeSupport(this)
+        events = TileMapEvents(this)
         tileSetRanges = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
         idTileMapping = HashMap()
         return this

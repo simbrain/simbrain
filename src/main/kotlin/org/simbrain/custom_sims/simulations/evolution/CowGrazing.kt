@@ -133,10 +133,8 @@ val grazingCows = newSim {
                 fill("Grass1")
             }
         }
-        val flowerLayer = with(odorWorld.tileMap) {
-            val layer = createTileMapLayer("Flower Layer")
-            layers.add(layer)
-            layer
+        val flowerLayer = odorWorld.tileMap.run{
+            addLayer(createTileMapLayer("Flower Layer"))
         }
 
         val networks = List(cowGenotypes.size) { index ->

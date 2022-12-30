@@ -144,10 +144,8 @@ val evolveCow = newSim {
                 fill("Grass1")
             }
         }
-        val lakeLayer = with(odorWorld.tileMap) {
-            val layer = createTileMapLayer("Lake Layer")
-            layers.add(layer)
-            layer
+        val lakeLayer = odorWorld.tileMap.run{
+            addLayer(createTileMapLayer("Lake Layer"))
         }
         val networks = List(cowGenotypes.size) { index ->
             NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network

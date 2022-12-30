@@ -26,13 +26,13 @@ class OdorWorldEvents(val world: OdorWorld):Event(PropertyChangeSupport(world)) 
     fun onAnimationStopped(handler: Runnable) = "AnimationStopped".event(handler)
     fun fireAnimationStopped() = "AnimationStopped"()
 
-    fun onTileMapChanged(handler: Runnable) = "TileMapChanged".event(handler)
-    fun fireTileMapChanged() = "TileMapChanged"()
-
     fun onEntityAdded(handler: Consumer<OdorWorldEntity>) = "EntityAdded".itemAddedEvent(handler)
     fun fireEntityAdded(entity: OdorWorldEntity) = "EntityAdded"(new = entity)
 
     fun onEntityRemoved(handler: Consumer<OdorWorldEntity>) = "EntityRemoved".itemRemovedEvent(handler)
     fun fireEntityRemoved(entity: OdorWorldEntity) = "EntityRemoved"(old = entity)
 
+    // Has to happen here so that when the tile map is changed the event object does not change
+    fun onTileMapChanged(handler: Runnable) = "TileMapChanged".event(handler)
+    fun fireTileMapChanged() = "TileMapChanged"()
 }

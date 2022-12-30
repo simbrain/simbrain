@@ -519,7 +519,7 @@ public class OdorWorld implements EditableObject, Bounded {
 
     public void setTileMap(TileMap tileMap) {
         this.tileMap = tileMap;
-        events.fireTileMapChanged();
+        getEvents().fireTileMapChanged();
     }
 
     public void start() {

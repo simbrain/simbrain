@@ -311,8 +311,7 @@ fun TileMap.getTileStackNear(location: Point2D, radius: Double = 10.0): List<Pai
 context (TileMap)
 val GridCoordinate.isInMap get() = x.toInt() in 0 until width && y.toInt() in 0 until height
 
-context (TileMap)
-fun createTileMapLayer(name: String, collision: Boolean = false) = TileMapLayer(name, width, height, collision)
+fun TileMap.createTileMapLayer(name: String, collision: Boolean = false) = TileMapLayer(name, width, height, collision)
 
 fun TileMap.getCoordinates(topLeftLocation: GridCoordinate, width: Int, height: Int): List<GridCoordinate> {
     val (x, y) = topLeftLocation.int

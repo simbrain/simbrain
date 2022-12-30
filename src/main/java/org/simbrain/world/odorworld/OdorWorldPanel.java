@@ -232,21 +232,15 @@ public class OdorWorldPanel extends JPanel {
 
         // Full tile map update
         world.getEvents().onTileMapChanged(() -> {
-            canvas.getLayer().removeAllChildren();
-            layerImageList = world.getTileMap().createImageList();
-            canvas.getLayer().addChildren(layerImageList);
-            for (OdorWorldEntity oe : world.getEntityList()) {
-                EntityNode node = new EntityNode(world, oe);
-                canvas.getLayer().addChild(node);
-            }
-            repaint();
+            renderAllLayers(world);
+        });
+
+        world.getTileMap().getEvents().onLayerAdded(() -> {
+            renderAllLayers(world);
         });
 
         // Single layer update
-        world.getTileMap().addPropertyChangeListener(e -> {
-            if ("layerImageChanged".equals(e.getPropertyName())) {
-                PImage oldImage = (PImage) e.getOldValue();
-                PImage newImage = (PImage) e.getNewValue();
+        world.getTileMap().getEvents().onLayerImageChanged((oldImage, newImage) -> {
                 int index = canvas.getLayer().indexOfChild(oldImage);
                 canvas.getLayer().removeChild(oldImage);
                 if (index != -1) {
@@ -254,7 +248,6 @@ public class OdorWorldPanel extends JPanel {
                 } else {
                     canvas.getLayer().addChild(newImage);
                 }
-            }
         });
 
         world.getEvents().onWorldStarted(() -> {
@@ -293,6 +286,17 @@ public class OdorWorldPanel extends JPanel {
         }, 10, 10);
 
         world.getEvents().fireTileMapChanged();
+    }
+
+    private void renderAllLayers(OdorWorld world) {
+        canvas.getLayer().removeAllChildren();
+        layerImageList = world.getTileMap().createImageList();
+        canvas.getLayer().addChildren(layerImageList);
+        for (OdorWorldEntity oe : world.getEntityList()) {
+            EntityNode node = new EntityNode(world, oe);
+            canvas.getLayer().addChild(node);
+        }
+        repaint();
     }
 
     private void centerCameraToSelectedEntity() {

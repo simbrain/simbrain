@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.simbrain.util.piccolo.TMXUtils.showTilePicker;
+import static org.simbrain.world.odorworld.TileMapDialogsKt.showTilePicker;
 
 /**
  * Handle simbrain drag events, which pan the canvas, create lassos for

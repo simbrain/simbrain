@@ -36,7 +36,7 @@ val grazingCows = newSim {
                 add(nodeGene2 { isClamped = true })
             }
             // Won't get coupled to. Serves as an initial "drive" neuron
-            add(nodeGene2{isClamped = true; forceSetActivation(1.0)})
+            add(nodeGene2 { isClamped = true; forceSetActivation(1.0) })
         }
         var hiddenChromosome = chromosome2(2) { add(nodeGene2()) }
         var outputChromosome = chromosome2(3) { add(nodeGene2 { upperBound = 10.0; lowerBound = -10.0 }) }
@@ -95,7 +95,8 @@ val grazingCows = newSim {
             }
 
             val existingPairs = connectionChromosome.map { it.source to it.target }.toSet()
-            val availableConnections = ((inputChromosome + hiddenChromosome + outputChromosome) cartesianProduct (hiddenChromosome + outputChromosome)) - existingPairs
+            val availableConnections =
+                ((inputChromosome + hiddenChromosome + outputChromosome) cartesianProduct (hiddenChromosome + outputChromosome)) - existingPairs
             if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
                 val (source, target) = availableConnections.sampleOne(random)
                 connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
@@ -122,7 +123,7 @@ val grazingCows = newSim {
 
         fun randomTileCoordinate() = with(odorWorld.tileMap) { random.nextGridCoordinate() }
         private val lakeSize
-            get() = random.nextInt(2,8)
+            get() = random.nextInt(2, 8)
 
         val odorWorld = OdorWorldComponent("Odor World 1").also {
             workspace.addWorkspaceComponent(it)
@@ -133,7 +134,7 @@ val grazingCows = newSim {
                 fill("Grass1")
             }
         }
-        val flowerLayer = odorWorld.tileMap.run{
+        val flowerLayer = odorWorld.tileMap.run {
             addLayer(createTileMapLayer("Flower Layer"))
         }
 
@@ -146,6 +147,7 @@ val grazingCows = newSim {
                 it.location = point((i + 1) * 100, (i + 1) * 100)
             }
         }
+
         // Water sensors that can guide the cow
         val sensors = entities.map { entity ->
             List(3) { index ->
@@ -154,6 +156,7 @@ val grazingCows = newSim {
                 }.also { entity.addSensor(it) }
             }
         }
+
         // Central water sensor to determine when water is actually found.
         val centerFlowerSensors = entities.associateWith { entity ->
             TileSensor("flower", radius = 0.0).apply {
@@ -178,14 +181,14 @@ val grazingCows = newSim {
         fun addFlowers(numFlowers: Int = 5) {
             odorWorld.tileMap.clear(flowerLayer)
             List(numFlowers) { randomTileCoordinate().int }.forEach {
-                odorWorld.tileMap.setTile(it.x, it.y, "DaisyCenter",flowerLayer)
+                odorWorld.tileMap.setTile(it.x, it.y, "DaisyCenter", flowerLayer)
             }
         }
 
         fun addUpdateActions(cow: CowGenotype.Phenotype, entity: OdorWorldEntity) {
 
             fun addFitness(fitnessDelta: Double) {
-                cowFitnesses[cow] = (cowFitnesses[cow]?:0.0) + fitnessDelta
+                cowFitnesses[cow] = (cowFitnesses[cow] ?: 0.0) + fitnessDelta
             }
             addFitness(0.0) // To initialize fitness
 
@@ -195,16 +198,15 @@ val grazingCows = newSim {
                     centerFlowerSensors[entity]?.let { sensor ->
                         // Flowers found
                         if (sensor.currentValue > .5) {
-                            entity.location.toTileCoordinate().let {(x,y) ->
-                                // If there is a flower there
-                                if(flowerLayer[x, y] != 0) {
-                                    // Erase that tile
-                                    flowerLayer.setTile(x, y, 0)
-                                    // Add a new flower somewhere else
-                                    randomTileCoordinate().int.let {(x,y) ->
-                                        odorWorld.tileMap.setTile(x, y, "DaisyCenter",flowerLayer)
-                                    }
-                                }
+
+                            // Erase that tile
+                            entity.location.toTileCoordinate().let { (x, y) ->
+                                flowerLayer.setTile(x, y, 0)
+                            }
+
+                            // Add a new flower somewhere else
+                            randomTileCoordinate().int.let { (x, y) ->
+                                odorWorld.tileMap.setTile(x, y, "DaisyCenter", flowerLayer)
                             }
 
                             // Update fitness
@@ -219,7 +221,8 @@ val grazingCows = newSim {
         override suspend fun build() {
             if (!_cowPhenotypes.isCompleted) {
                 // Express the genotypes
-                _cowPhenotypes.complete(cowGenotypes.zip(networks).map { (genotype, network) -> genotype.expressWith(network) })
+                _cowPhenotypes.complete(
+                    cowGenotypes.zip(networks).map { (genotype, network) -> genotype.expressWith(network) })
                 // Make couplings
                 with(workspace.couplingManager) {
                     val cows = _cowPhenotypes.await()
@@ -276,8 +279,8 @@ val grazingCows = newSim {
             with(it.visualize(workspace) as CowSim) {
                 build()
                 cowPhenotypes.await().forEach {
-                    it.inputs.location = point( 0, 150)
-                    it.hiddens.location = point( 0, 60)
+                    it.inputs.location = point(0, 150)
+                    it.hiddens.location = point(0, 60)
                     it.outputs.location = point(0, -25)
                 }
             }

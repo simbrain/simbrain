@@ -45,7 +45,7 @@ class TileSensor @JvmOverloads constructor(
         currentValue = 0.0
         val sensorLocation = computeAbsoluteLocation(parent)
         currentValue = with(parent.world.tileMap) {
-            (relativeGridCoordinates ?: getRelativeGridLocationsInRadius(decayFunction.dispersion).toList().also { relativeGridCoordinates = it })
+            getRelativeGridLocationsInRadius(decayFunction.dispersion)
                 .map { it + sensorLocation.asPixelCoordinate().toGridCoordinate() }
                 .map { it.asGridCoordinate() to getTileStackAt(it.x.toInt(), it.y.toInt()) }
                 .filter { (_, tiles) -> tiles.any { it.type == tileType } }

@@ -1,5 +1,7 @@
 package org.simbrain.util
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -153,6 +155,33 @@ fun createAction(
 
         override fun actionPerformed(e: ActionEvent) {
             block(e)
+        }
+    }
+}
+
+fun <T> T.createSuspendAction(
+    iconPath: String? = null,
+    name: String? = null,
+    description: String? = null,
+    keyCombo: KeyCombination? = null,
+    block: suspend T.(e: ActionEvent) -> Unit
+): AbstractAction where T : JComponent, T : CoroutineScope {
+    return object : AbstractAction() {
+        init {
+            if (iconPath != null) {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+            }
+
+            putValue(NAME, name)
+            putValue(SHORT_DESCRIPTION, description)
+            if (keyCombo != null) {
+                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
+                this@createSuspendAction.bindTo(keyCombo, this)
+            }
+        }
+
+        override fun actionPerformed(e: ActionEvent) {
+            launch { block(e) }
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.simbrain.network.events
 
 import org.simbrain.util.Event
+import org.simbrain.util.Events2
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
@@ -26,4 +27,11 @@ class TrainerEvents(val trainer: Any) : Event(PropertyChangeSupport(trainer)) {
     fun onProgressUpdated(handler: Consumer<Pair<String, Int>>) = "ProgressUpdated".itemAddedEvent(handler)
     fun fireProgressUpdated(message:String, percent:Int) = "ProgressUpdated"(new = message to percent)
 
+}
+
+class TrainerEvents2: Events2() {
+    val beginTraining = NoArgEvent()
+    val endTraining = NoArgEvent()
+    val errorUpdated = AddedEvent<Double>()
+    val progressUpdated = AddedEvent<Pair<String, Int>>()
 }

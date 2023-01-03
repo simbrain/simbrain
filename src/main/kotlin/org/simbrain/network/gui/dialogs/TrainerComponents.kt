@@ -1,5 +1,9 @@
 package org.simbrain.network.gui.dialogs
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.trainers.LMSTrainer
 import org.simbrain.plot.timeseries.TimeSeriesModel
@@ -9,6 +13,7 @@ import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.Utils.round
 import org.simbrain.util.createAction
+import org.simbrain.util.createSuspendAction
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
@@ -18,7 +23,11 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JProgressBar
 
-class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPanel() {
+class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPanel(), CoroutineScope {
+
+    private val job = SupervisorJob()
+
+    override val coroutineContext = Dispatchers.Swing + job
 
     val iterationsLabel = JLabel("--- ")
 
@@ -26,7 +35,7 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
 
     var numTicks = 1000
 
-    private val runAction = createAction(
+    private val runAction = createSuspendAction(
         "menu_icons/Play.png", description = "Iterate training until stop button is pressed."
     ) {
         lmsTrainer.startTraining()
@@ -38,11 +47,12 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         lmsTrainer.stopTraining()
     }
 
-    private val stepAction = createAction(
+    private val stepAction = createSuspendAction(
         "menu_icons/Step.png", description = "Iterate training once."
     ) {
-        lmsTrainer.events.fireBeginTraining()
+        lmsTrainer.events.beginTraining.fire().await()
         lmsTrainer.iterate()
+        lmsTrainer.events.endTraining.fire().await()
     }
 
     private val randomizeAction = createAction(
@@ -71,11 +81,11 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         labelPanel.addItem(errorText, errorBar)
         runTools.add(labelPanel)
 
-        lmsTrainer.events.onErrorUpdated(Runnable {
+        lmsTrainer.events.errorUpdated.on {
             iterationsLabel.text = "" + lmsTrainer.iteration
             errorBar.value = (numTicks * lmsTrainer.error).toInt()
             errorBar.string = "" + round(lmsTrainer.error, 4)
-        })
+        }
 
         layout = MigLayout("ins 0, gap 0px 0px")
         add(runTools)
@@ -114,9 +124,9 @@ class ErrorTimeSeries(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         add(mainPanel)
 
         model.addScalarTimeSeries(errorText)
-        lmsTrainer.events.onErrorUpdated(Runnable {
+        lmsTrainer.events.errorUpdated.on {
             model.addData(0, lmsTrainer.iteration.toDouble(), lmsTrainer.error)
-        })
+        }
     }
 }
 

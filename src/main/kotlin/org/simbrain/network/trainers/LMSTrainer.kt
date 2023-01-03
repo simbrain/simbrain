@@ -12,13 +12,9 @@
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
 package org.simbrain.network.trainers
-
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.simbrain.network.events.TrainerEvents
+import org.simbrain.network.events.TrainerEvents2
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -41,18 +37,14 @@ class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
 
     var isRunning = false
 
-    val events = TrainerEvents(this)
+    val events = TrainerEvents2()
 
-    fun startTraining() {
+    suspend fun startTraining() {
         isRunning = true
-        events.fireBeginTraining()
-        GlobalScope.launch(Dispatchers.Swing) {
+        events.beginTraining.fire()
+        withContext(Dispatchers.Default) {
             while(isRunning) {
-                // On each iteration, switch context to the computational thread, then hand things back to Swing for
-                // graphics update.
-                withContext(Dispatchers.Default){
-                    iterate()
-                }
+                iterate()
             }
         }
     }
@@ -61,13 +53,13 @@ class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
         isRunning = false
     }
 
-    fun iterate() {
+    suspend fun iterate() {
         iteration++
         // TODO: Other update types
         if (updateType == UpdateMethod.STOCHASTIC) {
             trainRow(Random.nextInt(lmsNet.trainingSet.inputs.nrows()))
         }
-        events.fireErrorUpdated(error)
+        events.errorUpdated.fire(error).await()
     }
 
     fun trainRow(rowNum: Int) {

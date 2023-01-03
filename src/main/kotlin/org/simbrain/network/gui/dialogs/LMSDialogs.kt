@@ -40,7 +40,7 @@ fun LMSNetwork.getTrainingDialog(): StandardDialog {
         val targets = MatrixEditor(trainingSet.targets)
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
 
-        trainer.events.onBeginTraining{
+        trainer.events.beginTraining.on {
             trainerProps.commitChanges()
         }
 

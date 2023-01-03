@@ -50,9 +50,9 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
     private val stepAction = createSuspendAction(
         "menu_icons/Step.png", description = "Iterate training once."
     ) {
-        lmsTrainer.events.beginTraining.fire().await()
+        lmsTrainer.events.beginTraining.fireAndSuspend()
         lmsTrainer.iterate()
-        lmsTrainer.events.endTraining.fire().await()
+        lmsTrainer.events.endTraining.fireAndSuspend()
     }
 
     private val randomizeAction = createAction(

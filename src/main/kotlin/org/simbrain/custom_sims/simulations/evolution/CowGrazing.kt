@@ -9,12 +9,13 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.*
+import org.simbrain.util.cartesianProduct
 import org.simbrain.util.decayfunctions.StepDecayFunction
+import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm2.*
-import org.simbrain.util.piccolo.createTileMapLayer
-import org.simbrain.util.piccolo.loadTileMap
-import org.simbrain.util.piccolo.nextGridCoordinate
+import org.simbrain.util.piccolo.*
+import org.simbrain.util.point
+import org.simbrain.util.sampleOne
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorldComponent
@@ -26,7 +27,7 @@ import kotlin.random.Random
 
 val grazingCows = newSim {
 
-    val maxGenerations = 2
+    val maxGenerations = 50
     val iterationsPerRun = 2000
 
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
@@ -200,7 +201,7 @@ val grazingCows = newSim {
                         if (sensor.currentValue > .5) {
 
                             // Erase that tile
-                            entity.location.toTileCoordinate().let { (x, y) ->
+                            entity.location.asPixelCoordinate().toGridCoordinate().int.let { (x, y) ->
                                 flowerLayer.setTile(x, y, 0)
                             }
 

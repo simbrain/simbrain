@@ -4,11 +4,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import com.thoughtworks.xstream.annotations.XStreamImplicit
 import org.piccolo2d.nodes.PImage
-import org.simbrain.util.component1
-import org.simbrain.util.component2
 import org.simbrain.world.odorworld.events.TileMapEvents
 import java.awt.Color
-import java.awt.Point
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.*
@@ -269,7 +266,7 @@ class TileMap(width: Int, height: Int) {
      * @param y pixel y location
      * @return a list of tiles at that location in the same order as in the xml file
      */
-    fun getTileStackAtPixel(x: Double, y: Double) = pixelToTileCoordinate(x, y).let { (tileX, tileY) ->
+    fun getTileStackAtPixel(x: Double, y: Double) = pixelToGridCoordinate(x, y).let { (tileX, tileY) ->
         getTileStackAt(tileX, tileY)
     }
 
@@ -281,24 +278,10 @@ class TileMap(width: Int, height: Int) {
      */
     fun getTileStackAtPixel(p: Point2D) = getTileStackAtPixel(p.x, p.y)
 
-    /**
-     * Converts pixel location to tile coordinate.
-     *
-     * @param x pixel x location
-     * @param y pixel y location
-     * @return the corresponding tile location
-     */
-    fun pixelToTileCoordinate(x: Double, y: Double) = Point((x / tileWidth).toInt(), (y / tileHeight).toInt())
+    fun pixelToGridCoordinate(x: Double, y: Double) = GridCoordinate((x / tileWidth).toInt(), (y / tileHeight).toInt
+        ()).int
 
-    fun pixelToTileCoordinate(p: Point2D) = pixelToTileCoordinate(p.x, p.y)
-
-    /**
-     * Converts pixel location to tile coordinate.
-     *
-     * @param p pixel location
-     * @return the corresponding tile location
-     */
-    fun Point2D.toTileCoordinate() = pixelToTileCoordinate(x, y)
+    fun pixelToGridCoordinate(p: Point2D) = pixelToGridCoordinate(p.x, p.y)
 
     /**
      * Get layer by name.

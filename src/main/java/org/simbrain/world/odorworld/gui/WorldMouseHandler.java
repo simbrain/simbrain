@@ -145,8 +145,8 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
 
                 var tileMap = odorWorldPanel.getWorld().getTileMap();
                 showTilePicker(tileMap.getTileSets(), (tileId) -> {
-                    var p= tileMap.pixelToTileCoordinate(world.getLastClickedPosition());
-                    odorWorldPanel.getWorld().getTileMap().setTile(p.x, p.y, tileId);
+                    var p= tileMap.pixelToGridCoordinate(world.getLastClickedPosition());
+                    odorWorldPanel.getWorld().getTileMap().setTile(p.getX(), p.getY(), tileId);
                 });
 
             }

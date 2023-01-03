@@ -4,13 +4,8 @@ import org.piccolo2d.PCanvas
 import org.piccolo2d.PLayer
 import org.piccolo2d.nodes.PPath
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.component1
-import org.simbrain.util.component2
 import org.simbrain.util.onDoubleClick
-import org.simbrain.util.piccolo.PTiledImage
-import org.simbrain.util.piccolo.Tile
-import org.simbrain.util.piccolo.TileMap
-import org.simbrain.util.piccolo.TileSet
+import org.simbrain.util.piccolo.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import java.awt.*
 import java.awt.event.MouseEvent
@@ -105,11 +100,11 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
 /**
  * Returns a dialog that shows the images in each layer at a point.
  */
-fun TileMap.editor(pixelCoordinate: Point2D) = StandardDialog().apply {
+fun TileMap.editor(p: Point2D) = StandardDialog().apply {
 
     val gbc = GridBagConstraints()
 
-    val (x, y) = pixelCoordinate.toTileCoordinate()
+    val (x, y) = p.asPixelCoordinate().toGridCoordinate().int
 
     title = "Set tile(s) at ($x, $y)"
 

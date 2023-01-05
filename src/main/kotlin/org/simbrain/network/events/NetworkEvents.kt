@@ -3,6 +3,7 @@ package org.simbrain.network.events
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.util.Event
+import org.simbrain.util.Events2
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
@@ -34,4 +35,8 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
         "FreeWeightVisibilityChanged".itemAddedEvent(handler)
     fun fireFreeWeightVisibilityChanged(state: Boolean) = "FreeWeightVisibilityChanged"(new =state)
 
+}
+
+class NetworkEvents2: Events2() {
+    val zoomToFitPage = NoArgEvent()
 }

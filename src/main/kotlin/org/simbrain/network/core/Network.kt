@@ -9,6 +9,7 @@ import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.events.NetworkEvents
+import org.simbrain.network.events.NetworkEvents2
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
@@ -70,6 +71,10 @@ class Network {
      */
     @Transient
     var events = NetworkEvents(this)
+        private set
+
+    @Transient
+    var events2 = NetworkEvents2()
         private set
 
     /**

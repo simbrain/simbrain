@@ -1,9 +1,7 @@
 package org.simbrain.network.gui
 
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
@@ -34,12 +32,10 @@ import org.simbrain.util.widgets.ToggleButton
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.util.Timer
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.*
 import javax.swing.event.InternalFrameAdapter
 import javax.swing.event.InternalFrameEvent
-import kotlin.concurrent.timerTask
 
 /**
  * Main GUI representation of a [Network].
@@ -82,7 +78,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     var autoZoom = true
         set(value) {
             field = value
-            zoomToFitPage()
+            network.events2.zoomToFitPage.fireAndForget()
         }
 
     var editMode: EditMode = EditMode.SELECTION
@@ -231,7 +227,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         // Repaint whenever window is opened or changed.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                zoomToFitPage()
+                network.events2.zoomToFitPage.fireAndForget()
             }
         })
 
@@ -246,41 +242,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             return
         }
         this.updateComplete.set(if (updateComplete) 0 else 3)
-    }
-
-    val zoomToFitPage = fun(): (Boolean) -> Unit {
-        var timer: Timer? = null
-        return fun(forceZoom: Boolean) {
-
-            // Implements debounce. If many requests are made they will all be cancelled, until the last one.
-            timer?.cancel()
-
-            timer = Timer().apply {
-                schedule(timerTask {
-                    SwingUtilities.invokeLater {
-                        if (autoZoom && editMode.isSelection || forceZoom) {
-                            val filtered = canvas.layer.getUnionOfChildrenBounds(null)
-                            val adjustedFiltered = PBounds(
-                                filtered.getX() - 10, filtered.getY() - 10,
-                                filtered.getWidth() + 20, filtered.getHeight() + 20
-                            )
-                            canvas.camera.setViewBounds(adjustedFiltered)
-                        }
-                    }
-                }, 10)
-            }
-        }
-    }()
-
-    /**
-     * Rescales the camera so that all objects in the canvas can be seen. Compare "zoom to fit page" in draw programs.
-     *
-     * @param forceZoom if true force the zoom to happen
-     */
-    fun zoomToFitPage() {
-        GlobalScope.launch(Dispatchers.Main) {
-            zoomToFitPage(false)
-        }
     }
 
     /**
@@ -307,7 +268,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 selectionManager.add(node)
             }
         }
-        zoomToFitPage()
+        network.events2.zoomToFitPage.fireAndForget()
     }
 
     private fun createNode(model: NetworkModel): ScreenElement {
@@ -460,7 +421,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         selectionManager.selection.forEach { delete(it) }
 
         // Zoom events are costly so only zoom after main deletion events
-        zoomToFitPage(true)
+        network.events2.zoomToFitPage.fireAndForget()
     }
 
     private fun createEditToolBar() = CustomToolBar().apply {
@@ -747,10 +708,20 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
         }
         event.onModelRemoved {
-            zoomToFitPage()
+            network.events2.zoomToFitPage.fireAndForget()
         }
         event.onUpdateTimeDisplay { timeLabel.update() }
         event.onUpdateCompleted { repaint() }
+        network.events2.zoomToFitPage.on {
+            if (autoZoom && editMode.isSelection) {
+                val filtered = canvas.layer.getUnionOfChildrenBounds(null)
+                val adjustedFiltered = PBounds(
+                    filtered.getX() - 10, filtered.getY() - 10,
+                    filtered.getWidth() + 20, filtered.getHeight() + 20
+                )
+                canvas.camera.setViewBounds(adjustedFiltered)
+            }
+        }
 
     }
 
@@ -821,4 +792,5 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
         }
     }
+
 }

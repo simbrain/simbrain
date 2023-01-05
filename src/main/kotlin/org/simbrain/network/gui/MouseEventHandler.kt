@@ -166,7 +166,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             }
         }
         networkPanel.canvas.layer.removeChild(placementManagerDelta)
-        networkPanel.zoomToFitPage()
+        networkPanel.network.events2.zoomToFitPage.fireAndForget()
     }
 
     /**

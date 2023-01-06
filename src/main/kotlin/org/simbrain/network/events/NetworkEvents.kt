@@ -38,5 +38,5 @@ class NetworkEvents(network: Network) : Event(PropertyChangeSupport(network)) {
 }
 
 class NetworkEvents2: Events2() {
-    val zoomToFitPage = NoArgEvent()
+    val zoomToFitPage = NoArgEvent(debounce = 20)
 }

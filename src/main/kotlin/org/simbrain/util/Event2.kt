@@ -18,35 +18,56 @@ import javax.swing.SwingUtilities
  *
  * For examples see [TrainerEvents2]
  */
-open class Events2 {
+open class Events2: CoroutineScope {
+
+    private val job = SupervisorJob()
+
+    override val coroutineContext = Dispatchers.Swing + job
 
     /**
      * Associates events to their listeners
      */
-    private val eventMapping = HashMap<EventObject, LinkedList<Pair<CoroutineDispatcher, (new: Any?, old: Any?) -> Unit>>>()
+    private val eventMapping = HashMap<EventObject, LinkedList<Pair<CoroutineDispatcher, suspend (new: Any?, old: Any?) -> Unit>>>()
 
     abstract inner class EventObject {
 
-        protected fun onHelper(dispatcher: CoroutineDispatcher, run: (new: Any?, old: Any?) -> Unit) {
+        abstract val debounce: Int
+
+        private var debounceEndTime = System.currentTimeMillis()
+
+        protected fun onSuspendHelper(dispatcher: CoroutineDispatcher, run: suspend (new: Any?, old: Any?) -> Unit) {
             eventMapping.getOrPut(this@EventObject) { LinkedList() }.add(dispatcher to run)
         }
 
-        protected suspend fun fireHelper(run: ((new: Any?, old: Any?) -> Unit) -> Unit) = coroutineScope {
-            async {
-                eventMapping[this@EventObject]
-                    ?.groupBy { (dispatcher) -> dispatcher }
-                    ?.flatMap { (dispatcher, group) ->
-                        withContext(dispatcher) {
-                            group.map { (_, handler) -> async { run(handler) } }
+        protected fun onHelper(dispatcher: CoroutineDispatcher, run: (new: Any?, old: Any?) -> Unit) {
+            eventMapping.getOrPut(this@EventObject) { LinkedList() }.add(dispatcher to { new, old -> async { run(new, old) } })
+        }
+
+        protected suspend fun fireHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit): Deferred<Unit> {
+            val now = System.currentTimeMillis()
+            return async {
+                if (now >= debounceEndTime) {
+                    debounceEndTime = now + debounce
+                    eventMapping[this@EventObject]
+                        ?.groupBy { (dispatcher) -> dispatcher }
+                        ?.flatMap { (dispatcher, group) ->
+                            withContext(dispatcher) {
+                                group.map { (_, handler) -> async { run(handler) } }
+                            }
                         }
-                    }
-                    ?.awaitAll()
+                        ?.awaitAll()
+                }
             }
         }
 
-        fun fireAndForgetHelper(run: ((new: Any?, old: Any?) -> Unit) -> Unit) {
+        fun fireAndForgetHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
+            val now = System.currentTimeMillis()
+            if (now < debounceEndTime) return
+            debounceEndTime = now + debounce
             SwingUtilities.invokeLater {
-                eventMapping[this@EventObject]?.forEach { (_, handler) -> run(handler) }
+                runBlocking {
+                    eventMapping[this@EventObject]?.map { (_, handler) -> async { run(handler) } }
+                }
             }
         }
     }
@@ -54,11 +75,15 @@ open class Events2 {
     /**
      * No argument events, e.g. neuronChanged.fire() and neuronChanged.on { .. do stuff...}.
      */
-    inner class NoArgEvent: EventObject() {
+    inner class NoArgEvent(override val debounce: Int = 0) : EventObject() {
 
         /**
          * Kotlin "on"
          */
+        fun onSuspending(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend () -> Unit) = onSuspendHelper(dispatcher) {
+                _, _ -> handler()
+        }
+
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: () -> Unit) = onHelper(dispatcher) {
                 _, _ -> handler()
         }
@@ -101,12 +126,20 @@ open class Events2 {
      * Add events, e.g. neuronAdded.fire(newNeuron), neuronAdded.on{ newNeuron -> ...}.
      * Functinos are the same as in the no-arg case.
      */
-    inner class AddedEvent<T>: EventObject() {
+    inner class AddedEvent<T>(override val debounce: Int = 0) : EventObject() {
+
+        @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (new: T) -> Unit) = onHelper(dispatcher) {
             new, _ -> handler(new as T)
         }
 
+        @Suppress("UNCHECKED_CAST")
+        fun onSuspending(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: T) -> Unit) = onSuspendHelper(dispatcher) {
+                new, _ -> handler(new as T)
+        }
+
         @JvmOverloads
+        @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: Consumer<T>) = onHelper(dispatcher) {
                 new, _ -> handler.accept(new as T)
         }
@@ -130,12 +163,20 @@ open class Events2 {
      * just use no-arg.
      * Functions are the same as in the no-arg case.
      */
-    inner class RemovedEvent<T>: EventObject() {
+    inner class RemovedEvent<T>(override val debounce: Int = 0) : EventObject() {
+
+        @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (old: T) -> Unit) = onHelper(dispatcher) {
                 _, old -> handler(old as T)
         }
 
+        @Suppress("UNCHECKED_CAST")
+        fun onSuspending(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (old: T) -> Unit) = onSuspendHelper(dispatcher) {
+                _, old -> handler(old as T)
+        }
+
         @JvmOverloads
+        @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: Consumer<T>) = onHelper(dispatcher) {
                 _, old -> handler.accept(old as T)
         }
@@ -158,17 +199,26 @@ open class Events2 {
      * Changed events, e.g. updateRuleChanged.fire(oldRule, newRule), updateRuleChanged.on{ or, nr -> ...}.
      * Functions are the same as in the no-arg case.
      */
-    inner class ChangedEvent<T>: EventObject() {
+    inner class ChangedEvent<T>(override val debounce: Int = 0) : EventObject() {
+
+        @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (new: T, old: T) -> Unit) = onHelper(dispatcher) {
                 new, old -> handler(new as T, old as T)
         }
 
+        @Suppress("UNCHECKED_CAST")
+
+        fun onSuspending(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (new: T, old: T) -> Unit) = onSuspendHelper(dispatcher) {
+                new, old -> handler(new as T, old as T)
+        }
+
         @JvmOverloads
+        @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: BiConsumer<T, T>) = onHelper(dispatcher) {
                 new, old -> handler.accept(new as T, old as T)
         }
 
-        suspend fun fire(new: T, old: T) = fireHelper { handler -> handler(new, old) }
+        suspend fun fire(new: T, old: T) = fireHelper { handler -> if (new != old) handler(new, old) }
 
         suspend fun fireAndSuspend(new: T, old: T) = fire(new, old).await()
 
@@ -178,7 +228,7 @@ open class Events2 {
             }
         }
 
-        fun fireAndForget(new: T, old: T) = fireAndForgetHelper { handler -> handler(new, old) }
+        fun fireAndForget(new: T, old: T) = fireAndForgetHelper { handler -> if (new != old) handler(new, old) }
 
     }
 

@@ -4,6 +4,7 @@ import org.simbrain.util.*
 import org.simbrain.util.table.Column
 import org.simbrain.util.table.SimbrainDataViewer
 import org.simbrain.util.table.createFromDoubleArray
+import org.simbrain.world.textworld.gui.showComparisonDialog
 import java.util.*
 
 /**
@@ -59,6 +60,13 @@ val TextWorld.loadText get() = createAction(
     if (theFile != null) {
         text = Utils.readFileContents(theFile)
     }
+}
+
+val TextWorld.calculateCosineSimilarity get() = createAction(
+    name = "Calculate similarity",
+    iconPath = "menu_icons/Gauge.png"
+) {
+    showComparisonDialog().display()
 }
 
 val TextWorld.textWorldPrefs get() = createAction(

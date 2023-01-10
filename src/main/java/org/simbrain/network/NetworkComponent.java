@@ -18,7 +18,7 @@
 package org.simbrain.network;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.events.NetworkEvents;
+import org.simbrain.network.events.NetworkEvents2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
@@ -68,10 +68,10 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        NetworkEvents event = network.getEvents();
+        NetworkEvents2 event = network.getEvents2();
         this.network.setName(getName());
 
-        event.onModelAdded(m -> {
+        event.getModelAdded().on(m -> {
             setChangedSinceLastSave(true);
             if (m instanceof AttributeContainer) {
                 fireAttributeContainerAdded((AttributeContainer) m);
@@ -81,7 +81,7 @@ public final class NetworkComponent extends WorkspaceComponent {
             }
         });
 
-        event.onModelRemoved(m -> {
+        event.getModelRemoved().on(m -> {
             setChangedSinceLastSave(true);
             if (m instanceof AttributeContainer) {
                 fireAttributeContainerRemoved((AttributeContainer) m);

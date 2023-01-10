@@ -8,7 +8,6 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.events.NetworkEvents2
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -69,10 +68,6 @@ class Network {
     /**
      * Handle network events.
      */
-    @Transient
-    var events = NetworkEvents(this)
-        private set
-
     @Transient
     var events2 = NetworkEvents2()
         private set
@@ -213,10 +208,10 @@ class Network {
         }
 
         updateTime()
-        events.fireUpdateTimeDisplay(false)
+        events2.updateTimeDisplay.fireAndForget(false)
         iterCount++
         setUpdateCompleted(true)
-        events.fireUpdateCompleted()
+        events2.updateCompleted.fireAndForget()
     }
 
     /**
@@ -378,11 +373,11 @@ class Network {
         if (model.shouldAdd()) {
             model.id = idManager.getAndIncrementId(model.javaClass)
             networkModels.add(model)
-            model.events.onDeleted{
+            model.events.onDeleted {
                 networkModels.remove(it)
-                events.fireModelRemoved(it)
+                events2.modelRemoved.fireAndForget(it)
             }
-            events.fireModelAdded(model)
+            events2.modelAdded.fireAndForget(model)
             if (model is Neuron) updatePriorityList()
         }
     }
@@ -438,7 +433,7 @@ class Network {
      */
     private fun readResolve(): Any {
 
-        events = NetworkEvents(this)
+        events2 = NetworkEvents2()
         updateCompleted = AtomicBoolean(false)
         updatePriorityList();
 

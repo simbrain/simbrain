@@ -43,19 +43,21 @@ open class Events2: CoroutineScope {
             eventMapping.getOrPut(this@EventObject) { LinkedList() }.add(dispatcher to { new, old -> async { run(new, old) } })
         }
 
+        private suspend inline fun runAllHandlers(crossinline run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) = eventMapping[this@EventObject]
+            ?.groupBy { (dispatcher) -> dispatcher }
+            ?.flatMap { (dispatcher, group) ->
+                withContext(dispatcher) {
+                    group.map { (_, handler) -> async { run(handler) } }
+                }
+            }
+            ?.awaitAll()
+
         protected suspend fun fireHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit): Deferred<Unit> {
             val now = System.currentTimeMillis()
             return async {
                 if (now >= debounceEndTime) {
                     debounceEndTime = now + debounce
-                    eventMapping[this@EventObject]
-                        ?.groupBy { (dispatcher) -> dispatcher }
-                        ?.flatMap { (dispatcher, group) ->
-                            withContext(dispatcher) {
-                                group.map { (_, handler) -> async { run(handler) } }
-                            }
-                        }
-                        ?.awaitAll()
+                    runAllHandlers(run)
                 }
             }
         }
@@ -65,9 +67,7 @@ open class Events2: CoroutineScope {
             if (now < debounceEndTime) return
             debounceEndTime = now + debounce
             SwingUtilities.invokeLater {
-                runBlocking {
-                    eventMapping[this@EventObject]?.map { (_, handler) -> async { run(handler) } }
-                }
+                eventMapping[this@EventObject]?.forEach { (_, handler) -> runBlocking { run(handler) } }
             }
         }
     }
@@ -80,11 +80,7 @@ open class Events2: CoroutineScope {
         /**
          * Kotlin "on"
          */
-        fun onSuspending(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend () -> Unit) = onSuspendHelper(dispatcher) {
-                _, _ -> handler()
-        }
-
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: () -> Unit) = onHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend () -> Unit) = onSuspendHelper(dispatcher) {
                 _, _ -> handler()
         }
 
@@ -129,12 +125,7 @@ open class Events2: CoroutineScope {
     inner class AddedEvent<T>(override val debounce: Int = 0) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (new: T) -> Unit) = onHelper(dispatcher) {
-            new, _ -> handler(new as T)
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        fun onSuspending(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: T) -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: T) -> Unit) = onSuspendHelper(dispatcher) {
                 new, _ -> handler(new as T)
         }
 
@@ -166,12 +157,7 @@ open class Events2: CoroutineScope {
     inner class RemovedEvent<T>(override val debounce: Int = 0) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (old: T) -> Unit) = onHelper(dispatcher) {
-                _, old -> handler(old as T)
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        fun onSuspending(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (old: T) -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (old: T) -> Unit) = onSuspendHelper(dispatcher) {
                 _, old -> handler(old as T)
         }
 
@@ -202,13 +188,8 @@ open class Events2: CoroutineScope {
     inner class ChangedEvent<T>(override val debounce: Int = 0) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (new: T, old: T) -> Unit) = onHelper(dispatcher) {
-                new, old -> handler(new as T, old as T)
-        }
 
-        @Suppress("UNCHECKED_CAST")
-
-        fun onSuspending(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (new: T, old: T) -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (new: T, old: T) -> Unit) = onSuspendHelper(dispatcher) {
                 new, old -> handler(new as T, old as T)
         }
 

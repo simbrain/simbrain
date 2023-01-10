@@ -150,7 +150,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         set(value) {
             field = value
             network.freeSynapses.forEach { it.isVisible = value }
-            network.events.fireFreeWeightVisibilityChanged(value)
+            network.events2.freeWeightVisibilityChanged.fireAndForget(value)
         }
 
     /**
@@ -700,18 +700,18 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     private fun initEventHandlers() {
-        val event = network.events
-        event.onModelAdded {
+        val event = network.events2
+        event.modelAdded.on {
             createNode(it)
             if (it is LocatableModel && it.shouldBePlaced) {
                 placementManager.placeObject(it)
             }
         }
-        event.onModelRemoved {
+        event.modelRemoved.on {
             network.events2.zoomToFitPage.fireAndForget()
         }
-        event.onUpdateTimeDisplay { timeLabel.update() }
-        event.onUpdateCompleted { repaint() }
+        event.updateActionsChanged.on { timeLabel.update() }
+        event.updateCompleted.on { repaint() }
         network.events2.zoomToFitPage.on {
             if (autoZoom && editMode.isSelection) {
                 val filtered = canvas.layer.getUnionOfChildrenBounds(null)

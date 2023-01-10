@@ -49,7 +49,7 @@ public class NeuronCollection extends AbstractNeuronCollection {
             });
         });
 
-        net.getEvents().onModelRemoved(n -> {
+        net.getEvents2().getModelRemoved().on(n -> {
             if (n instanceof Neuron) {
                 removeNeuron((Neuron) n);
                 events.fireLocationChange();

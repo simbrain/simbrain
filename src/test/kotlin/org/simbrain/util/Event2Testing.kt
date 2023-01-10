@@ -40,7 +40,7 @@ class Event2Testing {
 
     @Test
     fun `ensure suspending events wait for handler to complete`() {
-        testEvents2.longEvent.onSuspending {
+        testEvents2.longEvent.on {
             delay(100L)
         }
         val time = measureTimeMillis {
@@ -70,7 +70,7 @@ class Event2Testing {
 
     @Test
     fun `ensure fire() and forget doesn't wait for handler to complete`() {
-        testEvents2.longNonSuspendingEvent.onSuspending(Dispatchers.Default) {
+        testEvents2.longNonSuspendingEvent.on(Dispatchers.Default) {
             delay(200L)
         }
         val time = runBlocking {
@@ -85,7 +85,7 @@ class Event2Testing {
 
     @Test
     fun `ensure fireAndForget() doesn't wait for handler to complete`() {
-        testEvents2.longFireAndForgetEvent.onSuspending(Dispatchers.Default) {
+        testEvents2.longFireAndForgetEvent.on(Dispatchers.Default) {
             delay(200L)
         }
         val time = measureTimeMillis {

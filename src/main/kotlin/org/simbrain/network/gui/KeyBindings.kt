@@ -58,7 +58,6 @@ fun NetworkPanel.addKeyBindings() {
     bindTo("6", networkActions.selectIncomingWeightsAction)
     bindTo("7", networkActions.selectOutgoingWeightsAction)
     bind("8") {
-        network.events2.debug.fireAndForget()
         selectionManager.selectedModels.filterIsInstance<LocatableModel>().forEach { println(it.location) }
     }
 }

@@ -32,7 +32,6 @@ import org.simbrain.util.widgets.ToggleButton
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
-import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.*
 import javax.swing.event.InternalFrameAdapter
 import javax.swing.event.InternalFrameEvent
@@ -130,11 +129,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     val undoManager = UndoManager()
 
     /**
-     * Set to 3 since update neurons, synapses, and groups each decrement it by 1. If 0, update is complete.
-     */
-    private val updateComplete = AtomicInteger(0)
-
-    /**
      * Whether to display update priorities.
      */
     var prioritiesVisible = false
@@ -157,14 +151,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      * Turn GUI on or off.
      */
     var guiOn = true
-        set(guiOn) {
-            if (guiOn) {
-                this.setUpdateComplete(false)
-                //this.updateSynapseNodes()
-                updateComplete.decrementAndGet()
-            }
-            field = guiOn
-        }
 
 
     /**
@@ -234,14 +220,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         // Add all network elements (important for de-serializing)
         network.modelsInReconstructionOrder.forEach { createNode(it) }
 
-    }
-
-    /** TODO: Javadoc. */
-    fun setUpdateComplete(updateComplete: Boolean) {
-        if (!updateComplete && this.updateComplete.get() != 0) {
-            return
-        }
-        this.updateComplete.set(if (updateComplete) 0 else 3)
     }
 
     /**
@@ -711,7 +689,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             network.events2.zoomToFitPage.fireAndForget()
         }
         event.updateActionsChanged.on { timeLabel.update() }
-        event.updateCompleted.on { repaint() }
+        event.updated.on { repaint() }
         network.events2.zoomToFitPage.on {
             if (autoZoom && editMode.isSelection) {
                 val filtered = canvas.layer.getUnionOfChildrenBounds(null)

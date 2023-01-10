@@ -58,8 +58,6 @@ public final class IterateNetworkAction extends AbstractAction {
     @Override
     public void actionPerformed(final ActionEvent event) {
         Logger.debug("actionPerformed called");
-        networkPanel.getNetwork().setOneOffRun(true);
         networkPanel.getNetwork().update();
-        networkPanel.getNetwork().setOneOffRun(false);
     }
 }

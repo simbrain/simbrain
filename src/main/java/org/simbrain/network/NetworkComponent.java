@@ -128,18 +128,6 @@ public final class NetworkComponent extends WorkspaceComponent {
         return ret;
     }
 
-    /**
-     * Sets whether or not this component is marked as currently running...
-     * meant to be false if only doing a one-off update
-     *
-     * @param running
-     */
-    @Override
-    public void setRunning(boolean running) {
-        super.setRunning(running);
-        network.setOneOffRun(!running);
-    }
-
     public Network getNetwork() {
         return network;
     }

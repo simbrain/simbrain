@@ -689,7 +689,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             network.events2.zoomToFitPage.fireAndForget()
         }
         event.updateActionsChanged.on { timeLabel.update() }
-        event.updated.on { repaint() }
+        event.updated.on {
+            repaint()
+            timeLabel.update()
+        }
         network.events2.zoomToFitPage.on {
             if (autoZoom && editMode.isSelection) {
                 val filtered = canvas.layer.getUnionOfChildrenBounds(null)

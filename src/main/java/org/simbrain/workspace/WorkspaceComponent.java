@@ -138,8 +138,7 @@ public abstract class WorkspaceComponent {
     /**
      * Called by Workspace to update the state of the component.
      */
-    public void update() {
-    }
+    public abstract void update();
 
     /**
      * Override to return a collection of all {@link AttributeContainer}'s currently managed by this

@@ -157,21 +157,6 @@ class Network {
     var name: String? = null
 
     /**
-     * A counter for the total number of iterations run by this network.
-     */
-    private var iterCount = 0
-
-    /**
-     * How frequently this network should fire events.
-     */
-    var updateFreq = 1
-
-    /**
-     * A special flag for if the network is being run for a one-time single iteration.
-     */
-    var oneOffRun = false
-
-    /**
      * Returns a linked hash set of models of the specified type.
      */
     fun <T : NetworkModel> getModels(cls: Class<T>) = networkModels[cls]
@@ -208,10 +193,8 @@ class Network {
         }
 
         updateTime()
-        events2.updateTimeDisplay.fireAndForget(false)
-        iterCount++
         setUpdateCompleted(true)
-        events2.updateCompleted.fireAndForget()
+        events2.updated.fireAndForget()
     }
 
     /**
@@ -604,8 +587,6 @@ class Network {
             synapse.isFrozen = freeze
         }
     }
-
-    val isRedrawTime: Boolean = oneOffRun || (iterCount % updateFreq == 0)
 
     val freeNeurons get() = networkModels.get<Neuron>()
 

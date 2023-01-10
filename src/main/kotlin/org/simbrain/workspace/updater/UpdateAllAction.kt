@@ -16,7 +16,9 @@ class UpdateAllAction(@Transient val updater: WorkspaceUpdater) : UpdateAction(d
     override suspend fun run(): Unit = coroutineScope {
         val components = updater.components
         updateCouplings()
-        components.map {
+        components
+            .filter { it.updateOn }
+            .map {
             async {
                PerformanceMonitor.record("Updating Component ${it.name}") {
                    it.update()

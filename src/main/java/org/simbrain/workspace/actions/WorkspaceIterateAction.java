@@ -20,7 +20,6 @@ package org.simbrain.workspace.actions;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,30 +45,13 @@ public final class WorkspaceIterateAction extends WorkspaceAction {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, toolkit.getMenuShortcutKeyMask());
         putValue(ACCELERATOR_KEY, keyStroke);
-
-        // Listen to workspace updater so that this button can be enabled or
-        // disabled depending on whether the workspace is running or not.
-        workspace.getUpdater().addUpdaterListener(new WorkspaceUpdaterListener() {
-            public void changeNumThreads() {
-            }
-
-            public void changedUpdateController() {
-            }
-
-            public void updatingStarted() {
-                setEnabled(false);
-            }
-
-            public void updatingFinished() {
-                setEnabled(true);
-            }
-
-            public void updatedCouplings(int update) {
-            }
-
-            public void workspaceUpdated() {
-            }
+        workspace.getUpdater().getEvents().getRunStarted().on(() -> {
+            setEnabled(false);
         });
+        workspace.getUpdater().getEvents().getRunFinished().on(() -> {
+            setEnabled(true);
+        });
+
     }
 
     /**

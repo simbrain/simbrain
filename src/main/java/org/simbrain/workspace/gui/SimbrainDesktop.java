@@ -40,7 +40,6 @@ import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
 import org.simbrain.workspace.updater.PerformanceMonitor;
-import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -192,45 +191,6 @@ public class SimbrainDesktop {
      */
     private static Map<WorkspaceComponent, DesktopComponent<?>> guiComponents = new LinkedHashMap<WorkspaceComponent, DesktopComponent<?>>();
 
-    /**
-     * Associates script submenunames ({@link Simulation#getSubmenuName()})
-     * with submenus in the script menu.
-     */
-    private HashMap<String, JMenu> submenuMap = new HashMap<>();
-
-    /**
-     * Listens for workspace updater events.
-     */
-    private final WorkspaceUpdaterListener updaterListener = new WorkspaceUpdaterListener() {
-
-        @Override
-        public void changeNumThreads() {
-        }
-
-        @Override
-        public void changedUpdateController() {
-        }
-
-        @Override
-        public void updatedCouplings(int update) {
-        }
-
-        @Override
-        public void updatingStarted() {
-            StandardDialog.setSimulationRunning(true);
-        }
-
-        @Override
-        public void updatingFinished() {
-            StandardDialog.setSimulationRunning(false);
-        }
-
-        @Override
-        public void workspaceUpdated() {
-            updateTimeLabel();
-        }
-    };
-
     // TODO this should be addressed at a higher level
     public static SimbrainDesktop getDesktop(final Workspace workspace) {
         return INSTANCES.get(workspace);
@@ -269,7 +229,6 @@ public class SimbrainDesktop {
         });
 
         events.onComponentAdded(workspaceComponent -> addDesktopComponent(workspaceComponent));
-
         events.onComponentRemoved(wc -> {
             DesktopComponent<?> component = guiComponents.get(wc);
             if (component == null) {
@@ -289,7 +248,16 @@ public class SimbrainDesktop {
             updateTimeLabel();
         });
 
-        workspace.getUpdater().addUpdaterListener(updaterListener);
+        workspace.getUpdater().getEvents().getWorkspaceUpdated().on(() -> {
+            updateTimeLabel();
+        });
+        workspace.getUpdater().getEvents().getRunStarted().on(() -> {
+            StandardDialog.setSimulationRunning(true);
+        });
+        workspace.getUpdater().getEvents().getRunFinished().on(() -> {
+            StandardDialog.setSimulationRunning(false);
+        });
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         workspaceBounds = new Rectangle(WORKSPACE_INSET, WORKSPACE_INSET, screenSize.width - (WORKSPACE_INSET * 2), screenSize.height - (WORKSPACE_INSET * 2));
 

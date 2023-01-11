@@ -20,7 +20,6 @@ package org.simbrain.workspace.gui;
 
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
-import org.simbrain.workspace.updater.WorkspaceUpdaterListener;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -37,7 +36,7 @@ import java.util.ArrayList;
  * of the represented component. Once it's fixed, the test of this will be
  * setting component properties via terminal and seeing the change reflected.
  */
-public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
+public class ComponentPanel extends JPanel {
 
     /**
      * Table representing workspace components.
@@ -66,7 +65,6 @@ public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
      */
     public ComponentPanel(final SimbrainDesktop desktop) {
         super(new BorderLayout());
-        desktop.getWorkspace().getUpdater().addUpdaterListener(this);
         this.desktop = desktop;
 
         // Set up table
@@ -82,7 +80,6 @@ public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
         JPanel panel = new JPanel(new BorderLayout());
         panel.add("Center", scrollPane);
 
-        changedUpdateController();
         panel.add("North", updateLabel);
 
         add(panel);
@@ -226,30 +223,5 @@ public class ComponentPanel extends JPanel implements WorkspaceUpdaterListener {
 
     }
 
-    public void changeNumThreads() {
-        // TODO Auto-generated method stub
-    }
-
-    public void changedUpdateController() {
-        // TODO:
-        // updateLabel.setText("Current updater: " +
-        // desktop.getWorkspace().getUpdator().getCurrentUpdatorName());
-    }
-
-    public void updatedCouplings(int update) {
-        // TODO Auto-generated method stub
-    }
-
-    public void updatingFinished() {
-        // TODO Auto-generated method stub
-    }
-
-    public void updatingStarted() {
-        // TODO Auto-generated method stub
-    }
-
-    public void workspaceUpdated() {
-        // TODO Auto-generated method stub
-    }
 
 }

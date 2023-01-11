@@ -195,7 +195,7 @@ public class UpdateActionManager {
         }
     }
 
-    public void addNonRemovalAction(UpdateAction action) {
+    public void addNonRemovableAction(UpdateAction action) {
         nonRemovableActions.add(action);
         for (UpdateManagerListener listener : listeners) {
             listener.actionAdded(action);

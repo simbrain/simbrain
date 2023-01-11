@@ -68,7 +68,7 @@ class PerformanceMonitorPanel(private val workspace: Workspace) : JPanel(BorderL
             }
         }
 
-        workspace.addNonRemovalAction("performance monitor") {
+        workspace.addNonRemovableAction("performance monitor") {
             timers.entries.filter { (_, record) ->
                 record.markForDeletion
             }.forEach { (key) -> timers.remove(key) }

@@ -479,8 +479,8 @@ class Workspace @JvmOverloads constructor(
         updater.updateManager.addAction(updateAction(description, longDescription, action))
     }
 
-    fun addNonRemovalAction(description: String, longDescription: String = description, action: suspend () -> Unit) {
-        updater.updateManager.addNonRemovalAction(updateAction(description, longDescription, action))
+    fun addNonRemovableAction(description: String, longDescription: String = description, action: suspend () -> Unit) {
+        updater.updateManager.addNonRemovableAction(updateAction(description, longDescription, action))
     }
 
     /**

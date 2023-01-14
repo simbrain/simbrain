@@ -119,11 +119,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     val textHandle: TextEventHandler = TextEventHandler(this)
 
     /**
-     * Manages placement of new nodes, groups, etc.
-     */
-    val placementManager = PlacementManager()
-
-    /**
      * Undo Manager
      */
     val undoManager = UndoManager()
@@ -299,7 +294,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
 
         val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron) }
-        neuronGroup.applyLayout()
+        // neuronGroup.applyLayout()
         createNeuronGroupNode().apply { addNeuronNodes(neuronNodes) }
     }
 
@@ -412,7 +407,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun copy() {
         if (selectionManager.isEmpty) return
-        placementManager.anchorPoint =
+        network.placementManager.anchorPoint =
             selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
@@ -681,9 +676,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val event = network.events2
         event.modelAdded.on {
             createNode(it)
-            if (it is LocatableModel && it.shouldBePlaced) {
-                placementManager.placeObject(it)
-            }
         }
         event.modelRemoved.on {
             network.events2.zoomToFitPage.fireAndForget()

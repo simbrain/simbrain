@@ -500,4 +500,4 @@ fun List<BuilderFitnessPair>.uniformSample() = sequence {
     }
 }
 
-fun EvolutionWorkspace() = Workspace(MainScope() + Dispatchers.Default)
+fun EvolutionWorkspace() = Workspace()

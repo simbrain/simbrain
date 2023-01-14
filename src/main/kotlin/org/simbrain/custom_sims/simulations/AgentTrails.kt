@@ -167,7 +167,7 @@ val kAgentTrails = newSim {
             }
 
             fun moveMouseVerticallyThroughLocation(location: Point2D) {
-                workspace.coroutineScope.launch {
+                workspace.launch {
                     resetObjects()
                     network.clearActivations()
                     val (x, y) = location
@@ -189,7 +189,7 @@ val kAgentTrails = newSim {
                 moveMouseVerticallyThroughLocation(flowerLocation)
             }
             addButton("Cheese > Flower") {
-                workspace.coroutineScope.launch {
+                workspace.launch {
                     resetObjects()
                     network.clearActivations()
                     val (x, y) = cheeseLocation
@@ -205,7 +205,7 @@ val kAgentTrails = newSim {
                 }
             }
             addButton("Cheese > Fish") {
-                workspace.coroutineScope.launch {
+                workspace.launch {
                     resetObjects()
                     network.clearActivations()
                     val (x, y) = cheeseLocation
@@ -221,7 +221,7 @@ val kAgentTrails = newSim {
                 }
             }
             addButton("Random motion") {
-                workspace.coroutineScope.launch {
+                workspace.launch {
                     resetObjects()
                     network.clearActivations()
                     cheese.randomizeLocationAndHeading()

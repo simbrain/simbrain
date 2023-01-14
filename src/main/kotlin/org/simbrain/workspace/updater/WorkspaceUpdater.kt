@@ -68,7 +68,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         events.runStarted.fire()
-        withContext(workspace.coroutineScope.coroutineContext) {
+        withContext(workspace.coroutineContext) {
             while (isRunning) {
                 doUpdate()
             }
@@ -89,7 +89,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         events.runStarted.fire()
-        withContext(workspace.coroutineScope.coroutineContext) {
+        withContext(workspace.coroutineContext) {
             doUpdate()
         }
         events.runFinished.fire()
@@ -130,7 +130,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         events.runStarted.fire()
-        withContext(workspace.coroutineScope.coroutineContext) {
+        withContext(workspace.coroutineContext) {
             repeat(numIterations) {
                 doUpdate()
             }
@@ -149,7 +149,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
     private suspend fun doUpdate() {
         time++
         Logger.trace("starting: $time")
-        withContext(workspace.coroutineScope.coroutineContext) {
+        withContext(workspace.coroutineContext) {
             for (action in updateManager.actionList + updateManager.nonRemovableActions) {
                 with(PerformanceMonitor) {
                     action()

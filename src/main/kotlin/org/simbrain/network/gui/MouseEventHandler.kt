@@ -72,7 +72,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
     override fun mouseClicked(event: PInputEvent?) {
         super.mouseClicked(event)
         event?.position?.let {
-            networkPanel.placementManager.lastClickedLocation = it
+            networkPanel.network.placementManager.lastClickedLocation = it
         }
     }
 
@@ -153,7 +153,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
             // Reset the anchor point in the placement manager
             val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
-            val pm = networkPanel.placementManager
+            val pm = networkPanel.network.placementManager
             pm.anchorPoint = topLeft
 
             // Only reset the delta if alt/option key is down
@@ -215,7 +215,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         // Show placementManagerDelta for placement manager
         if (event.isAltDown) {
             val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
-            val pm = networkPanel.placementManager
+            val pm = networkPanel.network.placementManager
             networkPanel.canvas.layer.removeChild(placementManagerDelta)
             placementManagerDelta = PPath.createLine(
                 topLeft.x, topLeft.y,

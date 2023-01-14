@@ -1,13 +1,10 @@
 package org.simbrain.world.odorworld.entities
 
-import org.simbrain.util.UserParameter
-import org.simbrain.util.Utils
+import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.environment.SmellSource
-import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.UniformRealDistribution
-import org.simbrain.util.toRadian
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
@@ -258,7 +255,8 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun setLocationRelativeToCenter(x: Int, y: Int) {
-        TODO()
+        val (nx, ny) = point(x, y) + world.location
+        setLocation(nx, ny)
     }
 
     /**

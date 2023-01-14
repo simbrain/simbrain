@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -18,8 +17,6 @@ import java.awt.Dimension
 import kotlin.random.Random
 
 val evolveXor2 = newSim {
-
-    val coroutineScope = workspace.coroutineScope
 
     class XorGenotype(seed: Long = Random.nextLong()) : Genotype2 {
 
@@ -97,7 +94,7 @@ val evolveXor2 = newSim {
 
     class Xor2Sim(
         val xor2Genotype: XorGenotype = XorGenotype(),
-        val workspace: Workspace = HeadlessWorkspace()
+        val workspace: Workspace = Workspace()
     ) : EvoSim {
 
         val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
@@ -122,7 +119,7 @@ val evolveXor2 = newSim {
         }
 
         override fun copy(): EvoSim {
-            return Xor2Sim(xor2Genotype.copy(), HeadlessWorkspace())
+            return Xor2Sim(xor2Genotype.copy(), Workspace())
         }
 
         override suspend fun eval(): Double {
@@ -145,40 +142,38 @@ val evolveXor2 = newSim {
 
     }
 
-    workspace.coroutineScope.launch {
-        val maxGenerations = 500
-        val progressWindow = ProgressWindow(maxGenerations, "Error").apply {
-            minimumSize = Dimension(300, 100)
-            setLocationRelativeTo(null)
-        }
-        val lastGeneration = evaluator2(
-            populatingFunction = { Xor2Sim() },
-            populationSize = 100,
-            eliminationRatio = 0.5,
-            peek = {
-                listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                    "$it: ${nthPercentileFitness(it).format(3)}"
-                }.also {
-                    println("[$generation] $it")
-                    progressWindow.text = "5th Percentile MSE: ${nthPercentileFitness(5).format(3)}"
-                    progressWindow.value = generation
-                }
-            },
-            stoppingFunction = {
-                nthPercentileFitness(5) > -0.01 || generation > maxGenerations
-            }
-        )
-
-        lastGeneration.take(1).forEach {
-            with(it.visualize(workspace) as Xor2Sim) {
-                build()
-                val phenotype = this.phenotype.await()
-                phenotype.inputs.neuronList.forEach { it.increment = 1.0 }
-                phenotype.inputs.location = point( 0, 150)
-                phenotype.hiddens.location = point( 0, 60)
-                phenotype.outputs.location = point(0, -25)
-            }
-        }
-        progressWindow.close()
+    val maxGenerations = 500
+    val progressWindow = ProgressWindow(maxGenerations, "Error").apply {
+        minimumSize = Dimension(300, 100)
+        setLocationRelativeTo(null)
     }
+    val lastGeneration = evaluator2(
+        populatingFunction = { Xor2Sim() },
+        populationSize = 100,
+        eliminationRatio = 0.5,
+        peek = {
+            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
+                "$it: ${nthPercentileFitness(it).format(3)}"
+            }.also {
+                println("[$generation] $it")
+                progressWindow.text = "5th Percentile MSE: ${nthPercentileFitness(5).format(3)}"
+                progressWindow.value = generation
+            }
+        },
+        stoppingFunction = {
+            nthPercentileFitness(5) > -0.01 || generation > maxGenerations
+        }
+    )
+
+    lastGeneration.take(1).forEach {
+        with(it.visualize(workspace) as Xor2Sim) {
+            build()
+            val phenotype = this.phenotype.await()
+            phenotype.inputs.neuronList.forEach { it.increment = 1.0 }
+            phenotype.inputs.location = point( 0, 150)
+            phenotype.hiddens.location = point( 0, 60)
+            phenotype.outputs.location = point(0, -25)
+        }
+    }
+    progressWindow.close()
 }

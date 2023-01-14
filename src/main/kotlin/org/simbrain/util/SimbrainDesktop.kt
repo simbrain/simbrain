@@ -18,7 +18,7 @@ data class Placement(
 )
 
 fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, placement: Placement.() -> Unit) {
-    workspace.coroutineScope.launch {
+    workspace.launch {
         val (location, width, height) = Placement().apply(placement)
         val desktopComponent = withContext(Dispatchers.Main) {
             getDesktopComponent(workspaceComponent)

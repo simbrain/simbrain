@@ -309,5 +309,7 @@ val evolveAvoider = newSim {
 }
 
 fun main() {
-    evolveAvoider.run()
+    runBlocking {
+        evolveAvoider.run()
+    }
 }

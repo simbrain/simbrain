@@ -120,7 +120,7 @@ val evolveCow = newSim {
 
     class CowSim(
         val cowGenotypes: List<CowGenotype> = List(2) { CowGenotype() },
-        val workspace: Workspace = HeadlessWorkspace()
+        val workspace: Workspace = Workspace()
     ) : EvoSim {
 
         val random = Random(cowGenotypes.first().random.nextInt())
@@ -182,7 +182,7 @@ val evolveCow = newSim {
                     makeLake(it, lakeSize, lakeSize, lakeLayer)
                 }
             }
-            workspace.coroutineScope.launch {
+            workspace.launch {
                 (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->
                     addUpdateActions(phenotype, entity)
                 }
@@ -265,7 +265,7 @@ val evolveCow = newSim {
 
         override fun visualize(workspace: Workspace) = CowSim(cowGenotypes.map { it.copy() }, workspace)
 
-        override fun copy() = CowSim(cowGenotypes.map { it.copy() }, HeadlessWorkspace())
+        override fun copy() = CowSim(cowGenotypes.map { it.copy() }, Workspace())
 
         override suspend fun eval(): Double {
             build()
@@ -275,7 +275,7 @@ val evolveCow = newSim {
         }
     }
 
-    workspace.coroutineScope.launch {
+    workspace.launch {
         val progressWindow = ProgressWindow(maxGenerations, "Fitness").apply {
             minimumSize = Dimension(300, 100)
             setLocationRelativeTo(null)

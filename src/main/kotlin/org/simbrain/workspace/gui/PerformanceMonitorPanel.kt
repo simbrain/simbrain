@@ -54,7 +54,7 @@ class PerformanceMonitorPanel(private val workspace: Workspace) : JPanel(BorderL
 
         this.add("Center", contentPanel)
 
-        workspace.coroutineScope.launch(Dispatchers.Default) {
+        workspace.launch(Dispatchers.Default) {
             PerformanceMonitor.flow.collect { (identifier, name, threadName, nanoTime) ->
                 val properties = timers.getOrPut(identifier) { TimerProperties(name, nanoTime, nanoTime, nanoTime) }
                 val (_, min, avg, max) = properties

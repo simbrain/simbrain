@@ -1,9 +1,7 @@
 package org.simbrain.network.core
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
@@ -13,6 +11,7 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
@@ -48,7 +47,13 @@ private val LOG_10 = ln(10.0)
  * To remove models use [Network.getModels] and call .delete() on the resulting models. Get models can be called with
  * an argument to filter by model type, e.g getModels(Neuron.class)
  */
-class Network {
+class Network: CoroutineScope {
+
+    @Transient
+    private var job = SupervisorJob()
+
+    @Transient
+    override var coroutineContext = Dispatchers.Default + job
 
     /**
      * Two types of time used in simulations.
@@ -155,6 +160,12 @@ class Network {
      * An optional name for the network that defaults to "Network[current_id]".
      */
     var name: String? = null
+
+    /**
+     * Manages placement of new nodes, groups, etc.
+     */
+    @Transient
+    var placementManager = PlacementManager()
 
     /**
      * Returns a linked hash set of models of the specified type.
@@ -356,11 +367,30 @@ class Network {
         if (model.shouldAdd()) {
             model.id = idManager.getAndIncrementId(model.javaClass)
             networkModels.add(model)
+            if (model is LocatableModel && model.shouldBePlaced) {
+                placementManager.placeObject(model)
+            }
             model.events.onDeleted {
                 networkModels.remove(it)
                 events2.modelRemoved.fireAndForget(it)
             }
             events2.modelAdded.fireAndForget(model)
+            if (model is Neuron) updatePriorityList()
+        }
+    }
+
+    suspend fun addNetworkModelSuspend(model: NetworkModel) {
+        if (model.shouldAdd()) {
+            model.id = idManager.getAndIncrementId(model.javaClass)
+            networkModels.add(model)
+            if (model is LocatableModel && model.shouldBePlaced) {
+                placementManager.placeObject(model)
+            }
+            model.events.onDeleted {
+                networkModels.remove(it)
+                events2.modelRemoved.fireAndForget(it)
+            }
+            events2.modelAdded.fireAndSuspend(model)
             if (model is Neuron) updatePriorityList()
         }
     }
@@ -415,6 +445,12 @@ class Network {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private fun readResolve(): Any {
+
+        job = SupervisorJob()
+
+        coroutineContext = Dispatchers.Default + job
+
+        placementManager = PlacementManager()
 
         events2 = NetworkEvents2()
         updateCompleted = AtomicBoolean(false)
@@ -666,8 +702,8 @@ class Network {
             NeuronGroup {
         val ng = NeuronGroup(this, numNeurons)
         ng.setNeuronType(rule)
-        addNetworkModel(ng)
         ng.setLocation(x, y)
+        addNetworkModel(ng)
         layoutNeuronGroup(ng, layoutName)
         return ng
     }

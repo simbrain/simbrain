@@ -1,9 +1,6 @@
 package org.simbrain.workspace
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import org.simbrain.util.SimbrainPreferences
 import org.simbrain.workspace.couplings.Coupling
@@ -44,15 +41,13 @@ import java.util.*
  * @author Matt Watson
  * @author Tim Shea
  */
-class Workspace @JvmOverloads constructor(
-    /**
-     * Effectively the main event queue for a Simbrain workspace. It uses the Swing Event queue and thus includes all
-     * those events, but you can use it with co-routine syntax (rather than InvokeLater, for example). Get the
-     * benefit of a single-threaded event queue but without the drawbacks, because things can be suspended.
-     */
+class Workspace: CoroutineScope {
+
     @Transient
-    val coroutineScope: CoroutineScope = MainScope())
-{
+    private var job = SupervisorJob()
+
+    @Transient
+    override var coroutineContext = Dispatchers.Default + job
 
     @Transient
     private val _componentList = ArrayList<WorkspaceComponent>()
@@ -183,7 +178,7 @@ class Workspace @JvmOverloads constructor(
         for (wc in componentList) {
             wc.start()
         }
-        coroutineScope.launch {
+        launch {
             updater.run()
         }
     }
@@ -206,7 +201,7 @@ class Workspace @JvmOverloads constructor(
         for (wc in componentList) {
             wc.start()
         }
-        coroutineScope.launch {
+        launch {
             updater.runOnce()
         }
         stop()
@@ -223,20 +218,18 @@ class Workspace @JvmOverloads constructor(
         for (wc in componentList) {
             wc.start()
         }
-        coroutineScope.launch {
+        launch {
             updater.iterate(numIterations, finishingTask)
         }
         stop()
     }
 
     suspend fun iterateSuspend(numIterations: Int) {
-        withContext(coroutineScope.coroutineContext) {
-            for (wc in componentList) {
-                wc.start()
-            }
-            updater.iterate(numIterations)
-            stop()
+        for (wc in componentList) {
+            wc.start()
         }
+        updater.iterate(numIterations)
+        stop()
     }
 
     /**

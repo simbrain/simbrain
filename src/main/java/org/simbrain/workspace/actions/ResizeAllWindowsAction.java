@@ -21,8 +21,7 @@ package org.simbrain.workspace.actions;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
-
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -56,10 +55,10 @@ public final class ResizeAllWindowsAction extends WorkspaceAction {
     public void actionPerformed(final ActionEvent event) {
         int maxX = 0;
         int maxY = 0;
-        double desktopHeight = desktop.getDesktop().getSize().getHeight();
-        double desktopWidth = desktop.getDesktop().getSize().getWidth();
+        double desktopHeight = desktop.desktop.getSize().getHeight();
+        double desktopWidth = desktop.desktop.getSize().getWidth();
 
-        for (Component c : desktop.getDesktop().getComponents()) {
+        for (Component c : desktop.desktop.getComponents()) {
             int bottomRightX = (int) (c.getWidth() + c.getX());
             int bottomRightY = (int) (c.getHeight() + c.getY());
 
@@ -77,7 +76,7 @@ public final class ResizeAllWindowsAction extends WorkspaceAction {
         double finalScalingRatio = xScalingRatio > yScalingRatio ? 1 / xScalingRatio : 1 / yScalingRatio;
 
         if (finalScalingRatio < 1) {
-            for (Component c : desktop.getDesktop().getComponents()) {
+            for (Component c : desktop.desktop.getComponents()) {
                 double orignalTopLeftX = c.getX();
                 double orignalTopLeftY = c.getY();
                 int originalWidth = c.getWidth();

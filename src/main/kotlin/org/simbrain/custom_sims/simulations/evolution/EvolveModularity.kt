@@ -231,7 +231,7 @@ val evolveModularity = newSim {
                 val wspace = this@newSim.workspace
                 createControlPanel("Control Panel", 5, 10) {
                     addButton("Random pattern") {
-                        wspace.coroutineScope.launch {
+                        wspace.launch {
                             rightRetina.getProducts().activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                             leftRetina.getProducts().activations = DoubleArray(4) { Random().nextInt(2).toDouble() }.asList()
                             wspace.iterate()
@@ -239,7 +239,7 @@ val evolveModularity = newSim {
                     }
                     for (i in 0..7) {
                         addButton("Left Pattern ${i+1}") {
-                            wspace.coroutineScope.launch {
+                            wspace.launch {
                                 leftRetina.getProducts().activations = leftInputs[i]
                                 wspace.iterate()
                             }
@@ -247,7 +247,7 @@ val evolveModularity = newSim {
                     }
                     for (i in 0..7) {
                         addButton("Right Pattern ${i+1}") {
-                            wspace.coroutineScope.launch {
+                            wspace.launch {
                                 rightRetina.getProducts().activations = rightInputs[i]
                                 wspace.iterate()
                             }
@@ -284,6 +284,6 @@ val evolveModularity = newSim {
 
 }
 
-fun main() {
+suspend fun main() {
     evolveNetwork.run()
 }

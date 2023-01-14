@@ -19,7 +19,7 @@ fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
 
     val creator = LMSNetwork.LMSCreator(
         network.idManager.getProposedId(LMSNetwork::class.java),
-        placementManager.lastClickedLocation
+        network.placementManager.lastClickedLocation
     )
     return creator.createDialog {
         network.addNetworkModel(creator.create(network))

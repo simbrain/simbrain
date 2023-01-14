@@ -203,7 +203,7 @@ val isopodSim = newSim {
                 resetIsopod()
                 log = ""
                 var iteration = 0
-                workspace.coroutineScope.launch {
+                workspace.launch {
                     log += "# Heading: ${isopod.heading}\n"
                     while (++iteration < maxIterationsPerTrial) {
                         workspace.iterateSuspend(1)
@@ -223,7 +223,7 @@ val isopodSim = newSim {
             val numTrialsTF = addTextField("Number of trials", "" + defaultNumTrials)
 
             addButton("Run trials") {
-                workspace.coroutineScope.launch {
+                workspace.launch {
                     log = ""
                     var iteration = 0
                     defaultNumTrials = Integer.parseInt(numTrialsTF.text)

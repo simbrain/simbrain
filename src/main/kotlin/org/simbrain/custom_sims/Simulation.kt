@@ -1,8 +1,9 @@
 package org.simbrain.custom_sims
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.plus
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
@@ -27,7 +28,7 @@ class SimulationScope private constructor(
     val workspace: Workspace
 ) {
 
-    constructor(desktop: SimbrainDesktop? = null): this(desktop, desktop?.workspace ?: Workspace(MainScope()))
+    constructor(desktop: SimbrainDesktop? = null): this(desktop, desktop?.workspace ?: Workspace())
 
     private constructor(workspace: Workspace): this(null, workspace)
 
@@ -38,21 +39,29 @@ class SimulationScope private constructor(
     /**
      * If Desktop exists, provide a context for convenient access.
      */
-    fun withGui(block: SimbrainDesktop.() -> Unit) {
-        desktop?.run(block)
+    suspend fun withGui(block: suspend SimbrainDesktop.() -> Unit) {
+        if (desktop != null) {
+            desktop.block()
+        }
     }
-
-    @Suppress("FunctionName")
-    fun HeadlessWorkspace() = Workspace(workspace.coroutineScope + Dispatchers.Default)
 }
 
-class NewSimulation(val task: SimulationScope.() -> Unit) {
+class NewSimulation(val task: suspend SimulationScope.() -> Unit): CoroutineScope {
+
+    private val job = SupervisorJob()
+
+    override val coroutineContext = Dispatchers.Default + job
+
     fun run(desktop: SimbrainDesktop? = null) {
-        SimulationScope(desktop).apply(task)
+        launch {
+            with(SimulationScope(desktop)) {
+                task()
+            }
+        }
     }
 }
 
-fun newSim(block: SimulationScope.() -> Unit) = NewSimulation(block)
+fun newSim(block: suspend SimulationScope.() -> Unit) = NewSimulation(block)
 
 fun SimulationScope.addNetworkComponent(name: String, config: NetworkComponent.() -> Unit = { }): NetworkComponent {
     return NetworkComponent(name)
@@ -106,7 +115,7 @@ fun SimulationScope.addTimeSeries(name: String?): TimeSeriesPlotComponent {
     return timeSeriesPlotComponent
 }
 
-fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
+suspend fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
     withGui {
         place(component) {
             location = point(x,y)

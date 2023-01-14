@@ -75,14 +75,12 @@ suspend fun evaluator2(
         val agentFitnessPair = (population zip fitnessScores).shuffled().sortedByDescending { it.second }
         val eliminationCount = (agentFitnessPair.size * eliminationRatio).roundToInt()
         val survivors = agentFitnessPair.take(populationSize - eliminationCount).map { (sim) -> sim }
-        population = (survivors.map { async { it.copy() } } + survivors.sampleWithReplacement(random).take(eliminationCount)
+        population = (survivors.map { it.copy() } + survivors.sampleWithReplacement(random).take(eliminationCount)
             .toList().map {
-                async {
-                    it.copy().apply {
-                        mutate()
-                    }
+                it.copy().apply {
+                    mutate()
                 }
-            }).awaitAll()
+            })
         val generationFitnessPair = GenerationFitnessPair(generation, agentFitnessPair.map { it.second })
         peek(generationFitnessPair)
     } while (!stoppingFunction(generationFitnessPair))

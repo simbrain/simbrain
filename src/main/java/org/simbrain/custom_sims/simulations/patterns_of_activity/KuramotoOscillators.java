@@ -67,6 +67,13 @@ public class KuramotoOscillators extends Simulation {
         // Set up plot
         setUpProjectionPlot();
 
+        // "Halo" based on prediction error
+        sim.getWorkspace().addUpdateAction(ColorPlotKt.createColorPlotUpdateAction(
+                plot.getProjector(),
+                predictionRes,
+                errorNeuron.getActivation()
+        ));
+
     }
 
     private void setUpNetwork() {
@@ -149,13 +156,6 @@ public class KuramotoOscillators extends Simulation {
         errorNeuron.setClamped(true);
         errorNeuron.setLabel("Error");
 
-        // "Halo" based on prediction error
-        sim.getWorkspace().addUpdateAction(ColorPlotKt.createColorPlotUpdateAction(
-                plot.getProjector(),
-                predictionRes,
-                errorNeuron.getActivation()
-        ));
-
     }
 
     private void setUpWorld() {
@@ -196,9 +196,9 @@ public class KuramotoOscillators extends Simulation {
         sim.couple(inputProducer, plotConsumer);
 
         // Text of nearest world object to projection plot current dot
-        Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
-        Consumer plotText = sim.getConsumer(plot, "setLabel");
-        sim.couple(currentObject, plotText);
+        // Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
+        // Consumer plotText = sim.getConsumer(plot, "setLabel");
+        // sim.couple(currentObject, plotText);
 
     }
 

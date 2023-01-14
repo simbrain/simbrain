@@ -1,5 +1,6 @@
 package org.simbrain.network.subnetworks
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -26,10 +27,12 @@ class SOMTest {
 
     @Test
     fun `test som node creation`() {
-        val som = SOMNetwork(net, 1, 2)
-        val np = NetworkPanel(NetworkComponent("Test", net))
-        net.addNetworkModel(som)
-        assertEquals(3, np.neuronNodeMapping.keys.size)
+        runBlocking {
+            val som = SOMNetwork(net, 1, 2)
+            val np = NetworkPanel(NetworkComponent("Test", net))
+            net.addNetworkModelSuspend(som)
+            assertEquals(3, np.neuronNodeMapping.keys.size)
+        }
     }
 
 }

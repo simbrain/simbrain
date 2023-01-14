@@ -214,7 +214,7 @@ val linkedNeuronList = newSim {
 
         val network = networkComponent.network
 
-        workspace.coroutineScope.launch(Dispatchers.Main) {
+        workspace.launch(Dispatchers.Main) {
             val neurons = (1..10000).map {
                 async(Dispatchers.Default) { Neuron(network) }
             }.awaitAll()

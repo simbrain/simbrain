@@ -112,7 +112,7 @@ val grazingCows = newSim {
 
     class CowSim(
         val cowGenotypes: List<CowGenotype> = List(2) { CowGenotype() },
-        val workspace: Workspace = HeadlessWorkspace()
+        val workspace: Workspace = Workspace()
     ) : EvoSim {
 
         val random = Random(cowGenotypes.first().random.nextInt())
@@ -172,7 +172,7 @@ val grazingCows = newSim {
 
         init {
             addFlowers()
-            workspace.coroutineScope.launch {
+            workspace.launch {
                 (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->
                     addUpdateActions(phenotype, entity)
                 }
@@ -244,7 +244,7 @@ val grazingCows = newSim {
 
         override fun visualize(workspace: Workspace) = CowSim(cowGenotypes.map { it.copy() }, workspace)
 
-        override fun copy() = CowSim(cowGenotypes.map { it.copy() }, HeadlessWorkspace())
+        override fun copy() = CowSim(cowGenotypes.map { it.copy() }, Workspace())
 
         override suspend fun eval(): Double {
             build()
@@ -254,7 +254,7 @@ val grazingCows = newSim {
         }
     }
 
-    workspace.coroutineScope.launch {
+    workspace.launch {
         val progressWindow = ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
             minimumSize = Dimension(300, 100)
             setLocationRelativeTo(null)

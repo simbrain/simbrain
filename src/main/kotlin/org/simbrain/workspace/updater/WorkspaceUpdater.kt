@@ -67,7 +67,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        events.runStarted.fire()
+        events.runStarted.fireAndForget()
         withContext(workspace.coroutineContext) {
             while (isRunning) {
                 doUpdate()
@@ -77,7 +77,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (component in workspace.componentList) {
             component.isRunning = false
         }
-        events.runFinished.fire()
+        events.runFinished.fireAndForget()
     }
 
     /**
@@ -88,11 +88,11 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        events.runStarted.fire()
+        events.runStarted.fireAndForget()
         withContext(workspace.coroutineContext) {
             doUpdate()
         }
-        events.runFinished.fire()
+        events.runFinished.fireAndForget()
         isRunning = false
         for (component in workspace.componentList) {
             component.isRunning = false
@@ -105,9 +105,9 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         runBlocking {
-            events.runStarted.fire()
+            events.runStarted.fireAndForget()
             doUpdate()
-            events.runFinished.fire()
+            events.runFinished.fireAndForget()
         }
         isRunning = false
         for (component in workspace.componentList) {
@@ -129,7 +129,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        events.runStarted.fire()
+        events.runStarted.fireAndForget()
         withContext(workspace.coroutineContext) {
             repeat(numIterations) {
                 doUpdate()
@@ -140,7 +140,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (component in workspace.componentList) {
             component.isRunning = false
         }
-        events.runFinished.fire()
+        events.runFinished.fireAndForget()
     }
 
     /**
@@ -156,7 +156,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
                 }
             }
         }
-        events.workspaceUpdated.fire()
+        events.workspaceUpdated.fireAndForget()
         Logger.trace("done: $time")
     }
 

@@ -41,7 +41,7 @@ class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
 
     suspend fun startTraining() {
         isRunning = true
-        events.beginTraining.fire()
+        events.beginTraining.fireAndForget()
         withContext(Dispatchers.Default) {
             while(isRunning) {
                 iterate()
@@ -59,7 +59,7 @@ class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
         if (updateType == UpdateMethod.STOCHASTIC) {
             trainRow(Random.nextInt(lmsNet.trainingSet.inputs.nrows()))
         }
-        events.errorUpdated.fire(error).await()
+        events.errorUpdated.fireAndSuspend(error)
     }
 
     fun trainRow(rowNum: Int) {

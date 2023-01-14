@@ -139,7 +139,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         events.onColorChange { updateColor() }
         events.onLabelChange { _, _ ->
             updateTextLabel()
-            networkPanel.network.events2.zoomToFitPage.fireAndForget()
+            networkPanel.network.events2.zoomToFitPage.fireAndForgetJava()
         }
         events.onClampChanged { updateClampStatus() }
         events.onLocationChange { pullViewPositionFromModel() }

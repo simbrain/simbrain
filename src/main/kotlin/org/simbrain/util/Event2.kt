@@ -52,9 +52,19 @@ open class Events2: CoroutineScope {
             }
             ?.awaitAll()
 
-        protected suspend fun fireHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit): Deferred<Unit> {
+        protected suspend fun fireAndSuspendHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
             val now = System.currentTimeMillis()
-            return async {
+            async {
+                if (now >= debounceEndTime) {
+                    debounceEndTime = now + debounce
+                    runAllHandlers(run)
+                }
+            }.await()
+        }
+
+        protected suspend fun fireAndForgetHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
+            val now = System.currentTimeMillis()
+            launch {
                 if (now >= debounceEndTime) {
                     debounceEndTime = now + debounce
                     runAllHandlers(run)
@@ -62,7 +72,7 @@ open class Events2: CoroutineScope {
             }
         }
 
-        fun fireAndForgetHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
+        fun fireAndForgetJavaHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
             val now = System.currentTimeMillis()
             if (now < debounceEndTime) return
             debounceEndTime = now + debounce
@@ -95,26 +105,26 @@ open class Events2: CoroutineScope {
         /**
          * Kotlin "fire". By itself it's like "fireAndForget".
          */
-        suspend fun fire() = fireHelper { handler -> handler(null, null) }
+        suspend fun fireAndForget() = fireAndForgetHelper { handler -> handler(null, null) }
 
         /**
          * Like java fireAndBlock() but suspends rather than blocking, so that the GUI remains responsive.
          */
-        suspend fun fireAndSuspend() = fire().await()
+        suspend fun fireAndSuspend() = fireAndSuspendHelper { handler -> handler(null, null) }
 
         /**
          * Java fire and block. Fire event and wait for it to terminate before continuing.
          */
         fun fireAndBlock() {
             runBlocking {
-                fire().await()
+                fireAndSuspend()
             }
         }
 
         /**
          * Java fire and forget.
          */
-        fun fireAndForget() = fireAndForgetHelper { handler -> handler(null, null) }
+        fun fireAndForgetJava() = fireAndForgetJavaHelper { handler -> handler(null, null) }
 
     }
 
@@ -135,17 +145,17 @@ open class Events2: CoroutineScope {
                 new, _ -> handler.accept(new as T)
         }
 
-        suspend fun fire(new: T) = fireHelper { handler -> handler(new, null) }
+        suspend fun fireAndForget(new: T) = fireAndForgetHelper { handler -> handler(new, null) }
 
-        suspend fun fireAndSuspend(new: T) = fire(new).await()
+        suspend fun fireAndSuspend(new: T) = fireAndSuspendHelper { handler -> handler(new, null) }
 
         fun fireAndBlock(new: T) {
             runBlocking {
-                fire(new).await()
+                fireAndSuspend(new)
             }
         }
 
-        fun fireAndForget(new: T) = fireAndForgetHelper { handler -> handler(new, null) }
+        fun fireAndForgetJava(new: T) = fireAndForgetJavaHelper { handler -> handler(new, null) }
 
     }
 
@@ -167,17 +177,17 @@ open class Events2: CoroutineScope {
                 _, old -> handler.accept(old as T)
         }
 
-        suspend fun fire(old: T) = fireHelper { handler -> handler(null, old) }
+        suspend fun fireAndForget(old: T) = fireAndForgetHelper { handler -> handler(null, old) }
 
-        suspend fun fireAndSuspend(old: T) = fire(old).await()
+        suspend fun fireAndSuspend(old: T) = fireAndSuspendHelper { handler -> handler(null, old) }
 
         fun fireAndBlock(old: T) {
             runBlocking {
-                fire(old).await()
+                fireAndSuspend(old)
             }
         }
 
-        fun fireAndForget(old: T) = fireAndForgetHelper { handler -> handler(null, old) }
+        fun fireAndForgetJava(old: T) = fireAndForgetJavaHelper { handler -> handler(null, old) }
 
     }
 
@@ -199,17 +209,17 @@ open class Events2: CoroutineScope {
                 new, old -> handler.accept(new as T, old as T)
         }
 
-        suspend fun fire(new: T, old: T) = fireHelper { handler -> if (new != old) handler(new, old) }
+        suspend fun fireAndForget(new: T, old: T) = fireAndForgetHelper { handler -> if (new != old) handler(new, old) }
 
-        suspend fun fireAndSuspend(new: T, old: T) = fire(new, old).await()
+        suspend fun fireAndSuspend(new: T, old: T) = fireAndSuspendHelper { handler -> if (new != old) handler(new, old) }
 
         fun fireAndBlock(new: T, old: T) {
             runBlocking {
-                fire(new, old).await()
+                fireAndSuspend(new, old)
             }
         }
 
-        fun fireAndForget(new: T, old: T) = fireAndForgetHelper { handler -> if (new != old) handler(new, old) }
+        fun fireAndForgetJava(new: T, old: T) = fireAndForgetJavaHelper { handler -> if (new != old) handler(new, old) }
 
     }
 

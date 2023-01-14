@@ -76,7 +76,7 @@ class Event2Testing {
         val time = runBlocking {
             measureTimeMillis {
                 repeat(10) {
-                    testEvents2.longNonSuspendingEvent.fire()
+                    testEvents2.longNonSuspendingEvent.fireAndForget()
                 }
             }
         }
@@ -90,7 +90,7 @@ class Event2Testing {
         }
         val time = measureTimeMillis {
             repeat(20) {
-                testEvents2.longFireAndForgetEvent.fireAndForget()
+                testEvents2.longFireAndForgetEvent.fireAndForgetJava()
             }
         }
         assert(time < 1500) { "expect test to take only a bit more than 1 second, took actually ${time}ms" }

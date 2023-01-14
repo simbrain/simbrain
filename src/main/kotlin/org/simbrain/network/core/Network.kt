@@ -205,7 +205,7 @@ class Network: CoroutineScope {
 
         updateTime()
         setUpdateCompleted(true)
-        events2.updated.fireAndForget()
+        events2.updated.fireAndForgetJava()
     }
 
     /**
@@ -372,9 +372,9 @@ class Network: CoroutineScope {
             }
             model.events.onDeleted {
                 networkModels.remove(it)
-                events2.modelRemoved.fireAndForget(it)
+                events2.modelRemoved.fireAndForgetJava(it)
             }
-            events2.modelAdded.fireAndForget(model)
+            events2.modelAdded.fireAndForgetJava(model)
             if (model is Neuron) updatePriorityList()
         }
     }
@@ -388,7 +388,7 @@ class Network: CoroutineScope {
             }
             model.events.onDeleted {
                 networkModels.remove(it)
-                events2.modelRemoved.fireAndForget(it)
+                events2.modelRemoved.fireAndForgetJava(it)
             }
             events2.modelAdded.fireAndSuspend(model)
             if (model is Neuron) updatePriorityList()

@@ -52,6 +52,6 @@ public final class ZoomToFitPageAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        networkPanel.getNetwork().getEvents2().getZoomToFitPage().fireAndForget();
+        networkPanel.getNetwork().getEvents2().getZoomToFitPage().fireAndForgetJava();
     }
 }

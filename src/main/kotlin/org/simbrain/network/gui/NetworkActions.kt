@@ -300,7 +300,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         enablingCondition = ConditionallyEnabledAction.EnablingCondition.NEURONS
     ) {
         GridLayout().layoutNeurons(selectionManager.filterSelectedModels<Neuron>())
-        network.events2.zoomToFitPage.fireAndForget()
+        network.events2.zoomToFitPage.fireAndForgetJava()
     }
 
     /**
@@ -315,6 +315,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }.onEach {
             it.events.fireSelected()
         }
-        network.events2.zoomToFitPage.fireAndForget()
+        network.events2.zoomToFitPage.fireAndForgetJava()
     }
 }

@@ -49,8 +49,9 @@ class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
         }
     }
 
-    fun stopTraining() {
+    suspend fun stopTraining() {
         isRunning = false
+        events.endTraining.fireAndForget()
     }
 
     suspend fun iterate() {

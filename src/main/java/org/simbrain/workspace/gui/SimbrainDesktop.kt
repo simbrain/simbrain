@@ -231,7 +231,16 @@ class SimbrainDesktop(val workspace: Workspace) {
         bar.add(actionManager.saveWorkspaceAction)
         bar.addSeparator()
         bar.add(actionManager.iterateAction)
-        bar.add(ToggleButton(actionManager.runControlActions))
+        bar.add(ToggleButton(actionManager.runControlActions).apply {
+            setAction("Run")
+            workspace.updater.events.runStarted.on{
+                setAction("Stop")
+            }
+            workspace.updater.events.runFinished.on{
+                setAction("Run")
+            }
+
+        })
         bar.addSeparator()
         bar.add(actionManager.openCouplingManagerAction)
         bar.addSeparator()

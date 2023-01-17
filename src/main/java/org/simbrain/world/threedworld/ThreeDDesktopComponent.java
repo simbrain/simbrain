@@ -95,6 +95,7 @@ public class ThreeDDesktopComponent extends DesktopComponent<ThreeDWorldComponen
         }
 
         JToolBar editToolbar = new JToolBar();
+        // TODO: When (if ever) this is re-implemented, update to use listeners. See SimbrainDesktop.
         editToolbar.add(new ToggleButton(Arrays.asList(component.getWorld().getAction("Control Agent"), component.getWorld().getAction("Release Agent"))));
         editToolbar.add(component.getWorld().getAction("Camera Home"));
         editToolbar.add(createToggleButton(component.getWorld().getAction("Snap Transforms"), true));

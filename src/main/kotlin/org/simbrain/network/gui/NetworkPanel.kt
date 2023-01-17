@@ -668,6 +668,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     private fun createRunToolBar() = CustomToolBar().apply {
         with(networkActions) {
             add(iterateNetworkAction)
+            // TODO: Consider getting rid of this, since the workspace level run is sufficient for most purposes
             add(ToggleButton(networkControlActions))
         }
     }

@@ -36,13 +36,17 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
     var numTicks = 1000
 
     private val runAction = createSuspendAction(
-        "menu_icons/Play.png", description = "Iterate training until stop button is pressed."
+        name = "Run",
+        iconPath ="menu_icons/Play.png",
+        description = "Iterate training until stop button is pressed."
     ) {
         lmsTrainer.startTraining()
     }
 
-    private val stopAction = createAction(
-        "menu_icons/Stop.png", description = "Stop training."
+    private val stopAction = createSuspendAction(
+        name = "Stop",
+        iconPath = "menu_icons/Stop.png",
+        description = "Stop training."
     ) {
         lmsTrainer.stopTraining()
     }
@@ -50,9 +54,7 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
     private val stepAction = createSuspendAction(
         "menu_icons/Step.png", description = "Iterate training once."
     ) {
-        lmsTrainer.events.beginTraining.fireAndSuspend()
         lmsTrainer.iterate()
-        lmsTrainer.events.endTraining.fireAndSuspend()
     }
 
     private val randomizeAction = createAction(
@@ -66,7 +68,15 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         val errorPlot = ErrorTimeSeries(lmsTrainer, errorText)
 
         val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
-        runTools.add(ToggleButton(listOf(runAction, stopAction)))
+        runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
+            setAction("Run")
+            lmsTrainer.events.beginTraining.on {
+                setAction("Stop")
+            }
+            lmsTrainer.events.endTraining.on {
+                setAction("Run")
+            }
+        })
         runTools.add(JButton(stepAction))
         val randomizeButton = JButton(randomizeAction)
         randomizeButton.hideActionText = true

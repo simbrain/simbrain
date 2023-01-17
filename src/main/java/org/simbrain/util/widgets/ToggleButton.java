@@ -19,77 +19,30 @@
 package org.simbrain.util.widgets;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Toggle button. Used when a button iterates through a sequence of modes.
+ * JButton that "toggles" through states that are externally set.
  */
 public final class ToggleButton extends JButton {
 
-    /**
-     * List of actions.
-     */
-    private final List actions;
+    private List<Action> actions;
 
-    /**
-     * Index to current action.
-     */
-    private int index;
-
-    /**
-     * Create a new toggle button with the specified list of actions.
-     *
-     * @param actions list of actions, must not be null and must not be empty
-     */
-    public ToggleButton(final List actions) {
-
+    public ToggleButton(final List<Action> actions) {
         super();
-
-        if (actions == null) {
-            throw new IllegalArgumentException("actions must not be null");
-        }
-        if (actions.size() == 0) {
-            throw new IllegalArgumentException("actions must not be empty");
-        }
-
-        index = 0;
-        this.actions = new ArrayList(actions);
-        updateAction();
-
-        addActionListener(new ActionListener() {
-            /** @see ActionListener */
-            public void actionPerformed(final ActionEvent event) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    /** @see Runnable */
-                    public void run() {
-                        incrementIndex();
-                        updateAction();
-                    }
-                });
-            }
-        });
+        this.actions = actions;
     }
 
     /**
-     * Increment index.
+     * Set the current action
      */
-    private void incrementIndex() {
-        index++;
+    public void setAction(String name) {
 
-        if (index >= actions.size()) {
-            index = 0;
+        var action = actions.stream().filter(a -> a.getValue(Action.NAME) == name).findFirst();
+        if (action.isPresent()) {
+            setAction(action.get());
+            // no label for toolbar buttons
+            setText("");
         }
-    }
-
-    /**
-     * Update action.
-     */
-    private void updateAction() {
-        setAction((Action) actions.get(index));
-        // no label for toolbar buttons
-        setText("");
     }
 }

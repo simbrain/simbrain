@@ -114,7 +114,7 @@ public class WorkspaceSerializer {
 
         serializeComponents(serializer, archive, zipStream);
         serializeCouplings(archive);
-        serializeUpdateActions(archive);
+        // serializeUpdateActions(archive);
 
         ZipEntry entry = new ZipEntry("contents.xml");
         zipStream.putNextEntry(entry);
@@ -241,7 +241,7 @@ public class WorkspaceSerializer {
         deserializeComponents(archive, deserializer, byteArrays);
 
         deserializeCouplings(archive);
-        deserializeUpdateActions(archive, deserializer);
+        // deserializeUpdateActions(archive, deserializer);
         deserializeWorkspaceParameters(archive);
 
     }

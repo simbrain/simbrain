@@ -69,7 +69,6 @@ public final class NetworkComponent extends WorkspaceComponent {
     private void init() {
 
         NetworkEvents2 event = network.getEvents2();
-        this.network.setName(getName());
 
         event.getModelAdded().on(m -> {
             setChangedSinceLastSave(true);
@@ -124,7 +123,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      * @return the new network component
      */
     public NetworkComponent copy() {
-        NetworkComponent ret = new NetworkComponent("Copy of " + network.getName(), network.copy());
+        NetworkComponent ret = new NetworkComponent("Copy of " + getName(), network.copy());
         return ret;
     }
 
@@ -134,7 +133,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
     @Override
     public void update() {
-        network.update();
+        network.update(getName());
     }
 
     @Override

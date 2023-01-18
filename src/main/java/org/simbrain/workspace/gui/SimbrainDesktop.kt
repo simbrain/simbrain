@@ -459,21 +459,6 @@ class SimbrainDesktop(val workspace: Workspace) {
     }
 
     /**
-     * Returns the desktop component corresponding to a named workspace component.
-     *
-     * @param componentName name of desktop component to return
-     * @return component desktop component, or null if none found
-     */
-    fun getDesktopComponent(componentName: String?): DesktopComponent<*>? {
-        val wc = workspace.getComponent(componentName)
-        return if (wc != null) {
-            guiComponents[wc]
-        } else {
-            null
-        }
-    }
-
-    /**
      * Utility class for adding internal frames, which are not wrappers for WorkspaceComponents. Wraps GUI Component in
      * a JInternalFrame for Desktop.
      */

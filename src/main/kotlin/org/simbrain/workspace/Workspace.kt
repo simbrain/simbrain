@@ -3,6 +3,7 @@ package org.simbrain.workspace
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import org.simbrain.util.SimbrainPreferences
+import org.simbrain.util.SimpleIdManager
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceEvents
@@ -51,7 +52,6 @@ class Workspace: CoroutineScope {
 
     @Transient
     private val _componentList = ArrayList<WorkspaceComponent>()
-
     val componentList: List<WorkspaceComponent> get() = Collections.unmodifiableList(_componentList)
 
     /**
@@ -87,12 +87,8 @@ class Workspace: CoroutineScope {
     @Transient
     val events = WorkspaceEvents(this)
 
-    /**
-     * Mapping from workspace component types to integers which show how many
-     * have been added. For naming new workspace components.
-     */
     @Transient
-    private val componentNameIndices = Hashtable<Class<*>, Int?>()
+    var idManager = SimpleIdManager { cls -> _componentList.count { comp -> comp.javaClass == cls } }
 
     /**
      * Delay in milliseconds between update cycles. Used to artificially slow
@@ -122,21 +118,10 @@ class Workspace: CoroutineScope {
         component.setChangedSinceLastSave(false)
         setWorkspaceChanged(true)
 
-        /*
-         * Handle component naming.
-         *
-         * If the component has not yet been named, name as follows: (ClassName
-         * - "Component") + index where index iterates as new components are
-         * added. e.g. Network 1, Network 2, etc.
-         */if (component.name.equals("", ignoreCase = true)) {
-            if (componentNameIndices[component.javaClass] == null) {
-                componentNameIndices[component.javaClass] = 1
-            } else {
-                val index = componentNameIndices[component.javaClass]!!
-                componentNameIndices[component.javaClass] = index + 1
-            }
-            component.name = component.simpleName + componentNameIndices[component.javaClass]
+        if (component.name.isEmpty()) {
+            component.name =  idManager.getAndIncrementId(component.javaClass)
         }
+
         events.fireComponentAdded(component)
         component.events.onAttributeContainerRemoved { attributeContainer: AttributeContainer? ->
             couplingManager.removeAttributeContainer(
@@ -304,10 +289,7 @@ class Workspace: CoroutineScope {
         }
 
     /**
-     * Get a component using its name id. Used in terminal mode.
-     *
-     * @param id name of component
-     * @return Workspace Component
+     * Get a component using its id.
      */
     fun getComponent(id: String?): WorkspaceComponent? {
         return componentList.firstOrNull { it.name.equals(id, ignoreCase = true) }
@@ -481,4 +463,8 @@ class Workspace: CoroutineScope {
      */
     val couplings: Collection<Coupling>
         get() = couplingManager.couplings
+
+    fun initIdManager() {
+        idManager = SimpleIdManager { cls -> _componentList.count { comp -> comp.javaClass == cls } }
+    }
 }

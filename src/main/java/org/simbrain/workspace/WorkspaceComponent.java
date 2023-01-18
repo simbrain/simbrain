@@ -139,7 +139,6 @@ public abstract class WorkspaceComponent {
      * Called by Workspace to update the state of the component.
      */
     public void update() {
-
     }
 
     /**
@@ -189,15 +188,8 @@ public abstract class WorkspaceComponent {
         return name;
     }
 
-    /**
-     * @param name the name to set
-     */
     public void setName(String name) {
         this.name = name;
-        // TODO: Think about this
-        // for (WorkspaceComponentListener listener : this.getListeners()) {
-        // listener.setTitle(name);
-        // }
     }
 
     @Override
@@ -207,7 +199,7 @@ public abstract class WorkspaceComponent {
 
     /**
      * Retrieves a simple version of a component name from its class, e.g.
-     * "Network" from "org.simbrain.network.NetworkComponent"/
+     * "Network" from "org.simbrain.network.NetworkComponent".
      *
      * @return the simple name.
      */

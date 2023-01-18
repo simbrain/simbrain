@@ -92,7 +92,6 @@ public class WorkspaceTest {
         newN1.forceSetActivation(.8);
         workspace.simpleIterate();
         assertEquals(.8, newN2.getActivation(), .0001);
-
     }
 
     @Test

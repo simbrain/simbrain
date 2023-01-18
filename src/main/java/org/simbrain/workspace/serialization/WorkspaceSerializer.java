@@ -339,6 +339,7 @@ public class WorkspaceSerializer {
         if (archive.getWorkspaceParameters() != null) {
             workspace.setUpdateDelay(archive.getWorkspaceParameters().getUpdateDelay());
             workspace.getUpdater().setTime(archive.getWorkspaceParameters().getSavedTime());
+            workspace.initIdManager();
         }
     }
 

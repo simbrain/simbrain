@@ -157,11 +157,6 @@ class Network: CoroutineScope {
         private set
 
     /**
-     * An optional name for the network that defaults to "Network[current_id]".
-     */
-    var name: String? = null
-
-    /**
      * Manages placement of new nodes, groups, etc.
      */
     @Transient
@@ -192,12 +187,14 @@ class Network: CoroutineScope {
      * The core update function of the neural network. Calls the current update function on each neuron, decays all the
      * neurons, and checks their bounds.
      */
-    fun update() {
+    @JvmOverloads
+
+    fun update(name: String = "") {
 
         // Main update
         updateManager.actionList.forEach {
             runBlocking {
-                PerformanceMonitor.record(it, "${this@Network.name}:${it.description}") {
+                PerformanceMonitor.record(it, "${name}:${it.description}") {
                     it.run()
                 }
             }

@@ -20,35 +20,40 @@ package org.simbrain.util
 
 import org.simbrain.util.SimpleIdManager.SimpleId
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.function.Function
 
 /**
- * Maintains a map from Classes to [SimpleId]'s, to easily
- * manage ids for a set of classes. You give it a way to associat
- *
- * Initialize with a function that associates types to initial ids.
+ * Maintains a map from Classes to [SimpleId]'s, to easily manage ids for a set of classes.
+ * Can also be used as a way to generate names for objects.
  *
  * See [org.simbrain.network.core.Network] for an example.
  */
-class SimpleIdManager (
-    private val initIdFunction: Function<Class<*>, Int>
-) {
-
-    private val idMap = HashMap<Class<*>, SimpleId>()
+class SimpleIdManager @JvmOverloads constructor (
+    /**
+     * Associate classes with initial numbers. Like network.class -> networkList.size()
+     */
+    var initIdFunction: (Class<*>) -> Int = {1},
 
     /**
-     * Initialize a class > id mapping.
-     *
-     * @param clazz the class to associate with ids
-     * @param rootName the root name for the id, e.g. Neuron
-     * @param initId the initial id number, e.g. 2 to start at Neuron_2
+     * Associate classes with id "root" name. Like "NetworkComponent" -> Network
      */
-    private fun initClassIdMapping(clazz: Class<*>, rootName: String, initId: Int) {
-        idMap[clazz] = SimpleId(rootName, initId)
-    }
+    var baseNameGenerator: (Class<*>) -> String = { c -> c.simpleName},
 
-    private fun initClassIdMapping(clazz: Class<*>, initId: Int) {
-        initClassIdMapping(clazz, clazz.simpleName, initId)
+    /**
+     * Network_1, Network_2, etc.
+     */
+    var delimeter: String = "_"
+) {
+
+
+    /**
+     * E.g. String.class -> "Neuron_1".  The integer in neuron 1 keeps getting incremented as more neurons are added.
+     */
+    private val idMap = HashMap<Class<*>, SimpleId>()
+
+    private fun putClassIdMapping(clazz: Class<*>) {
+        val rootName = baseNameGenerator(clazz)
+        val initId = initIdFunction(clazz)
+        idMap[clazz] = SimpleId(rootName, initId, delimeter)
     }
 
     /**
@@ -56,7 +61,7 @@ class SimpleIdManager (
      */
     fun getAndIncrementId(clazz: Class<*>): String {
         if (!idMap.containsKey(clazz)) {
-            initClassIdMapping(clazz, initIdFunction.apply(clazz))
+            putClassIdMapping(clazz)
         }
         return idMap[clazz]!!.andIncrement
     }
@@ -66,7 +71,7 @@ class SimpleIdManager (
      */
     fun getProposedId(clazz: Class<*>): String {
         if (!idMap.containsKey(clazz)) {
-            initClassIdMapping(clazz, initIdFunction.apply(clazz))
+            putClassIdMapping(clazz)
         }
         return idMap[clazz]!!.proposedId
     }
@@ -74,11 +79,10 @@ class SimpleIdManager (
     /**
      * An id based on a base name and an integer index.
      */
-    class SimpleId(
-        /**
-         * The base name of the id.
-         */
-        private val rootName: String, initialIndex: Int
+    class SimpleId @JvmOverloads constructor(
+        val rootName: String,
+        val initialIndex: Int,
+        val delimeter: String = "_"
     ) {
 
         /**
@@ -94,13 +98,13 @@ class SimpleIdManager (
          * Returns a simple identifier and increments id index.
          */
         val andIncrement: String
-            get() = rootName + "_" + index.getAndIncrement()
+            get() = rootName + delimeter + index.getAndIncrement()
 
         /**
          * "Peek" ahead the next id that will be made if [.getAndIncrement] is called.
          */
         val proposedId: String
-            get() = rootName + "_" + index
+            get() = rootName + delimeter + index
         val currentIndex: Int
             get() = index.get()
     }

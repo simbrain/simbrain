@@ -153,7 +153,7 @@ class Network: CoroutineScope {
      * Manage ids for all network elements.
      */
     @Transient
-    var idManager = SimpleIdManager { cls -> networkModels.getRawModelSet(cls).size + 1 }
+    var idManager = SimpleIdManager({ cls -> networkModels.getRawModelSet(cls).size + 1 })
         private set
 
     /**
@@ -456,7 +456,7 @@ class Network: CoroutineScope {
         // Initialize update manager
         updateManager.postOpenInit()
         networkModels.allInReconstructionOrder.forEach { it.postOpenInit() }
-        idManager = SimpleIdManager { cls -> networkModels.getRawModelSet(cls).size + 1 }
+        idManager = SimpleIdManager ({ cls -> networkModels.getRawModelSet(cls).size + 1 })
         return this
     }
 

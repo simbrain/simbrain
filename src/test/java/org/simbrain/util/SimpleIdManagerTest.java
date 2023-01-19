@@ -39,4 +39,18 @@ public class SimpleIdManagerTest {
     }
 
 
+    @Test
+    public void testCustomBaseName() {
+        SimpleIdManager manager = new SimpleIdManager(c -> 4, c -> "test");
+        assertEquals("test_4", manager.getAndIncrementId(String.class) );
+    }
+
+
+    @Test
+    public void testDelimeter() {
+        SimpleIdManager manager = new SimpleIdManager(c -> 1, c -> "test", "*");
+        assertEquals("test*1", manager.getAndIncrementId(Object.class) );
+    }
+
+
 }

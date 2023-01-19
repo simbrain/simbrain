@@ -28,13 +28,15 @@ import java.util.*
  * [org.simbrain.network.core.Network] that the workspace component
  * creates and wraps.  The gui component is a [javax.swing.JPanel]  and
  * can either manage the graphics or (more typically) hold custom panels etc.
- * that do. De-serialization has a lot of steps, but the main things to be aware
+ * that do.
+ *
+ * De-serialization has a lot of steps, but the main things to be aware
  * of are to handle custom model deserializing in a readresolve method in the
  * main model object (e.g. Network or OdorWorld) and that if any special
  * graphical syncing is needed that it can be done the guicomponent constructor
  * by overriding [DesktopComponent.postAddInit]. Other init can happen in
  * overrides of [WorkspaceComponent.save] and in a
- * static open method that must also be created. An example is [ ][org.simbrain.world.odorworld.OdorWorldComponent.open]
+ * static open method that must also be created. An example is [org.simbrain.world.odorworld.OdorWorldComponent.open]
  * <br></br>
  * For instructions on setting up serialization see [WorkspaceSerializer].
  *
@@ -88,7 +90,7 @@ class Workspace: CoroutineScope {
     val events = WorkspaceEvents(this)
 
     @Transient
-    var idManager = SimpleIdManager { cls -> _componentList.count { comp -> comp.javaClass == cls } }
+    lateinit var idManager: SimpleIdManager
 
     /**
      * Delay in milliseconds between update cycles. Used to artificially slow
@@ -100,11 +102,12 @@ class Workspace: CoroutineScope {
     var couplingManager = CouplingManager(this)
         private set
 
-    /**
-     * The updater used to manage component updates.
-     */
     @Transient
     val updater = WorkspaceUpdater(this)
+
+    init {
+        initIdManager()
+    }
 
     /**
      * Adds a workspace component to the workspace.
@@ -118,8 +121,9 @@ class Workspace: CoroutineScope {
         component.setChangedSinceLastSave(false)
         setWorkspaceChanged(true)
 
+        // If there is no custom name, use the id manager to produce a default name
         if (component.name.isEmpty()) {
-            component.name =  idManager.getAndIncrementId(component.javaClass)
+            component.name = idManager.getAndIncrementId(component.javaClass)
         }
 
         events.fireComponentAdded(component)
@@ -465,6 +469,10 @@ class Workspace: CoroutineScope {
         get() = couplingManager.couplings
 
     fun initIdManager() {
-        idManager = SimpleIdManager { cls -> _componentList.count { comp -> comp.javaClass == cls } }
+        idManager = SimpleIdManager(
+            initIdFunction = { cls -> _componentList.count { comp -> comp.javaClass == cls } },
+            baseNameGenerator = { cls -> cls.simpleName.removeSuffix("Component") + " " },
+            delimeter = " "
+        )
     }
 }

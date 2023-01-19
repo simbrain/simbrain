@@ -1,0 +1,37 @@
+Chess is an abstract strategy game and involves no hidden information.
+It is played on a chessboard with 64 squares arranged in an eight-by-eight grid.
+At the start, each player controls sixteen pieces: one king, one queen, two rooks, two bishops, two knights, and eight pawns.
+The player controlling the white pieces moves first, followed by the player controlling the black pieces.
+The object of the game is to checkmate the opponent's king, whereby the king is under immediate attack (in "check") and there is no way for it to escape.
+There are also several ways a game can end in a draw.
+
+Chess pieces are divided into two different colored sets.
+While the sets might not be literally white and black (e.g. the light set may be a yellowish or off-white color, the dark set may be brown or red), they are always referred to as "white" and "black".
+The players of the sets are referred to as White and Black, respectively.
+Each set consists of sixteen pieces: one king, one queen, two rooks, two bishops, two knights, and eight pawns.
+
+The pieces are set out as shown in the diagram and photo.
+Thus, on White's first rank, from left to right, the pieces are placed in the following order: rook, knight, bishop, queen, king, bishop, knight, rook.
+On the second rank is placed a row of eight pawns.
+Black's position mirrors White's, with an equivalent piece on the same file.
+The board is placed with a light square at the right-hand corner nearest to each player.
+The correct positions of the king and queen may be remembered by the phrase "queen on her own color" – i.e. the white queen begins on a light square, and the black queen on a dark square.
+
+The king moves one square in any direction.
+There is also a special move called castling that involves moving the king and a rook.
+A rook can move any number of squares along a rank or file, but cannot leap over other pieces.
+Along with the king, a rook is involved during the king's castling move.
+A bishop can move any number of squares diagonally, but cannot leap over other pieces.
+A queen combines the power of a rook and bishop and can move any number of squares along a rank, file, or diagonal, but cannot leap over other pieces.
+A knight moves to any of the closest squares that are not on the same rank, file, or diagonal.
+The knight is the only piece that can leap over other pieces.
+A pawn can move forward to the unoccupied square immediately in front of it on the same file, or on its first move it can advance two squares along the same file, provided both squares are unoccupied (black dots in the diagram).
+
+When a king is under immediate attack, it is said to be in check.
+A move in response to a check is legal only if it results in a position where the king is no longer in check.
+This can involve capturing the checking piece; interposing a piece between the checking piece and the king (which is possible only if the attacking piece is a queen, rook, or bishop and there is a square between it and the king); or moving the king to a square where it is not under attack.
+Castling is not a permissible response to a check.
+
+The object of the game is to checkmate the opponent; this occurs when the opponent's king is in check, and there is no legal way to get it out of check.
+It is never legal for a player to make a move that puts or leaves the player's own king in check.
+In casual games, it is common to announce "check" when putting the opponent's king in check, but this is not required by the rules of chess and is not usually done in tournaments.

@@ -16,7 +16,7 @@ import kotlin.math.roundToLong
 /**
  * Display update action performance and thread monitor.
  *
- * @author jyoshimi, Tim Shea
+ * @author Tim Shea, Yulin Li
  */
 class PerformanceMonitorPanel(private val workspace: Workspace) : JPanel(BorderLayout()) {
 

@@ -23,6 +23,7 @@ import bsh.util.JConsole;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import java.awt.*;
 import java.util.concurrent.Executors;
@@ -77,6 +78,7 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         interpreter.getErr();
         try {
             interpreter.set("workspace", workspace);
+            interpreter.set("desktop", SimbrainDesktop.getDesktop(workspace));
             interpreter.set("bsh.prompt", ">");
             interpreter.eval("addClassPath(\"scripts/console\");");
             interpreter.print("Simbrain console\n");

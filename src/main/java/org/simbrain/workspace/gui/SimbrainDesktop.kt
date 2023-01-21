@@ -48,21 +48,13 @@ import javax.swing.event.*
 /**
  * Creates a Swing-based environment for working with a workspace.
  *
- *
  * Also provides wrappers for GUI elements called from a terminal.
  *
  * @author Matt Watson
  * @author Jeff Yoshimi
  */
 class SimbrainDesktop(val workspace: Workspace) {
-    /**
-     * Returns the internal desktop object. Sometimes useful in scripts.
-     *
-     * @return
-     */
-    /**
-     * Desktop pane.
-     */
+
     @JvmField
     val desktop: JDesktopPane = JDesktopPane()
 
@@ -80,13 +72,9 @@ class SimbrainDesktop(val workspace: Workspace) {
      * Whether the bottom dock is visible.
      */
     private var dockVisible = true
+
     /**
-     * Returns the main frame for the desktop.
-     *
-     * @return the main frame for the desktop.
-     */
-    /**
-     * the frame that will hold the workspace.
+     * The frame that will hold the workspace.
      */
     val frame: JFrame = JFrame(FRAME_TITLE)
 
@@ -144,11 +132,7 @@ class SimbrainDesktop(val workspace: Workspace) {
      * Listener for swing component changes.
      */
     private val componentListener: ComponentListener = object : ComponentAdapter() {
-        /**
-         * Responds to component moved events.
-         *
-         * @param event SimbrainComponent event
-         */
+
         override fun componentMoved(event: ComponentEvent) {
 
             // Prevent window from being moved outside of visible area
@@ -167,11 +151,6 @@ class SimbrainDesktop(val workspace: Workspace) {
             workspace.setWorkspaceChanged(true)
         }
 
-        /**
-         * Responds to component resized events.
-         *
-         * @param arg0 SimbrainComponent event
-         */
         override fun componentResized(arg0: ComponentEvent) {
             // System.out.println("Component resized");
             workspace.setWorkspaceChanged(true)
@@ -441,11 +420,6 @@ class SimbrainDesktop(val workspace: Workspace) {
     }
 
     val desktopComponents: Collection<DesktopComponent<*>>
-        /**
-         * Returns a list of all desktop components.
-         *
-         * @return the list of components
-         */
         get() = guiComponents.values
 
     /**
@@ -546,15 +520,10 @@ class SimbrainDesktop(val workspace: Workspace) {
 
             override fun internalFrameDeactivated(arg0: InternalFrameEvent) {}
             override fun internalFrameDeiconified(arg0: InternalFrameEvent) {
-                // TODO Auto-generated method stub
             }
-
             override fun internalFrameIconified(arg0: InternalFrameEvent) {
-                // TODO Auto-generated method stub
             }
-
             override fun internalFrameOpened(arg0: InternalFrameEvent) {
-                // TODO Auto-generated method stub
             }
         })
         desktop.add(internalFrame)

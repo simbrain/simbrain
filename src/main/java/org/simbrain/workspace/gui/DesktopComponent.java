@@ -277,11 +277,12 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
         return (workspaceComponent == null) ? "null" : workspaceComponent.getName();
     }
 
-    /**
-     * @param name the name to set
-     */
     public void setTitle(final String name) {
         getParentFrame().setTitle(name);
+    }
+
+    public String getTitle() {
+        return getParentFrame().getTitle();
     }
 
     /**
@@ -325,9 +326,6 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
         return this.parentFrame;
     }
 
-    /**
-     * @return the desktop
-     */
     public SimbrainDesktop getDesktop() {
         return desktop;
     }

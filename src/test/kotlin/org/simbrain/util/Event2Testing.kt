@@ -9,10 +9,10 @@ import kotlin.system.measureTimeMillis
 
 
 class TestEvents : Events2() {
-    val debouncingEvent = NoArgEvent(debounce = 1000)
+    val throttlingEvent = NoArgEvent(interval = 100, timingMode = TimingMode.Throttle)
+    val debouncingEvent = NoArgEvent(interval = 100, timingMode = TimingMode.Debounce)
     val longEvent = NoArgEvent()
     val blockingEvent = NoArgEvent()
-    val longNonSuspendingEvent = NoArgEvent()
     val longFireAndForgetEvent = NoArgEvent()
     val changedEvent = ChangedEvent<String>()
 }
@@ -22,20 +22,43 @@ class Event2Testing {
     val testEvents2 = TestEvents()
 
     @Test
+    fun `ensure throttle is limiting rates`() {
+        var counter = 0
+        testEvents2.throttlingEvent.on {
+            counter++
+        }
+        runBlocking {
+            repeat(20) {
+                testEvents2.throttlingEvent.fireAndForget()
+                delay(50L)
+            }
+            // 10 events for 1 second (20*50 milliseconds)
+            assertEquals(10, counter)
+        }
+    }
+
+    @Test
     fun `ensure debounce is limiting rates`() {
         var counter = 0
         testEvents2.debouncingEvent.on {
             counter++
         }
-        repeat(5) {
-            testEvents2.debouncingEvent.fireAndBlock()
-        }
         runBlocking {
-            repeat(5) {
-                testEvents2.debouncingEvent.fireAndSuspend()
+            testEvents2.debouncingEvent.fireAndForget()
+            delay(50L)
+            assertEquals(0, counter, "should not fire before timeout")
+            delay(100L)
+            assertEquals(1, counter, "event should fire after timeout")
+
+            counter = 0
+
+            repeat(10) {
+                testEvents2.debouncingEvent.fireAndForget()
+                delay(50L)
             }
+            delay(100L)
+            assertEquals(1, counter, "all but one event should fire after timeout")
         }
-        assertEquals(1, counter)
     }
 
     @Test
@@ -69,28 +92,13 @@ class Event2Testing {
     }
 
     @Test
-    fun `ensure fire() and forget doesn't wait for handler to complete`() {
-        testEvents2.longNonSuspendingEvent.on(Dispatchers.Default) {
-            delay(200L)
-        }
-        val time = runBlocking {
-            measureTimeMillis {
-                repeat(10) {
-                    testEvents2.longNonSuspendingEvent.fireAndForget()
-                }
-            }
-        }
-        assert(time < 1500) { "expect test to take only a bit more than 1 second, took actually ${time}ms" }
-    }
-
-    @Test
     fun `ensure fireAndForget() doesn't wait for handler to complete`() {
         testEvents2.longFireAndForgetEvent.on(Dispatchers.Default) {
             delay(200L)
         }
         val time = measureTimeMillis {
             repeat(20) {
-                testEvents2.longFireAndForgetEvent.fireAndForgetJava()
+                testEvents2.longFireAndForgetEvent.fireAndForget()
             }
         }
         assert(time < 1500) { "expect test to take only a bit more than 1 second, took actually ${time}ms" }

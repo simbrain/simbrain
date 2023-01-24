@@ -134,7 +134,7 @@ public class NetworkUpdateManager {
      */
     public void swapElements(final int index1, final int index2) {
         Collections.swap(actionList, index1, index2);
-        network.getEvents2().getUpdateActionsChanged().fireAndForgetJava();
+        network.getEvents2().getUpdateActionsChanged().fireAndForget();
     }
 
     /**
@@ -142,7 +142,7 @@ public class NetworkUpdateManager {
      */
     public void addAction(UpdateAction action) {
         actionList.add(action);
-        network.getEvents2().getUpdateActionsChanged().fireAndForgetJava();
+        network.getEvents2().getUpdateActionsChanged().fireAndForget();
     }
 
     /**
@@ -150,7 +150,7 @@ public class NetworkUpdateManager {
      */
     public void removeAction(UpdateAction action) {
         actionList.remove(action);
-        network.getEvents2().getUpdateActionsChanged().fireAndForgetJava();
+        network.getEvents2().getUpdateActionsChanged().fireAndForget();
     }
 
     /**
@@ -158,7 +158,7 @@ public class NetworkUpdateManager {
      */
     public void clear() {
         actionList.clear();
-        network.getEvents2().getUpdateActionsChanged().fireAndForgetJava();
+        network.getEvents2().getUpdateActionsChanged().fireAndForget();
     }
 
 }

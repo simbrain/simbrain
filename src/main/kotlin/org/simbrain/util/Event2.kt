@@ -5,7 +5,6 @@ import kotlinx.coroutines.swing.Swing
 import java.util.*
 import java.util.function.BiConsumer
 import java.util.function.Consumer
-import javax.swing.SwingUtilities
 
 /**
  * Event objects corresponding to no-arg, adding, removing, and changing objects. Each object has a set of functions
@@ -29,11 +28,22 @@ open class Events2: CoroutineScope {
      */
     private val eventMapping = HashMap<EventObject, LinkedList<Pair<CoroutineDispatcher, suspend (new: Any?, old: Any?) -> Unit>>>()
 
+    enum class TimingMode {
+        Throttle, Debounce
+    }
+
     abstract inner class EventObject {
 
-        abstract val debounce: Int
+        abstract val interval: Int
 
-        private var debounceEndTime = System.currentTimeMillis()
+        private var intervalEndTime = System.currentTimeMillis()
+
+        abstract var timingMode: TimingMode
+
+        private val batchNew = mutableListOf<Any?>()
+        private val batchOld = mutableListOf<Any?>()
+
+        private var job: Job? = null
 
         protected fun onSuspendHelper(dispatcher: CoroutineDispatcher, run: suspend (new: Any?, old: Any?) -> Unit) {
             eventMapping.getOrPut(this@EventObject) { LinkedList() }.add(dispatcher to run)
@@ -54,30 +64,91 @@ open class Events2: CoroutineScope {
 
         protected suspend fun fireAndSuspendHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
             val now = System.currentTimeMillis()
-            async {
-                if (now >= debounceEndTime) {
-                    debounceEndTime = now + debounce
-                    runAllHandlers(run)
-                }
-            }.await()
+            when (timingMode) {
+                TimingMode.Throttle -> async {
+                    if (now >= intervalEndTime) {
+                        intervalEndTime = now + interval
+                        runAllHandlers(run)
+                    }
+                }.await()
+                TimingMode.Debounce -> async {
+                    job?.cancel()
+                    job = launch {
+                        delay(interval.toLong())
+                        runAllHandlers(run)
+                    }
+                    job?.join()
+                }.await()
+            }
         }
 
-        protected suspend fun fireAndForgetHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
+        protected suspend fun batchFireAndSuspendHelper(new: Any?, old: Any?) {
             val now = System.currentTimeMillis()
-            launch {
-                if (now >= debounceEndTime) {
-                    debounceEndTime = now + debounce
-                    runAllHandlers(run)
+            new?.let { batchNew.add(it) }
+            old?.let { batchOld.add(it) }
+            when (timingMode) {
+                TimingMode.Throttle -> async {
+                    if (now >= intervalEndTime) {
+                        intervalEndTime = now + interval
+                        runAllHandlers { handler -> handler(batchNew, batchOld) }
+                        batchNew.clear()
+                        batchOld.clear()
+                    }
+                }.await()
+                TimingMode.Debounce -> launch {
+                    job?.cancel()
+                    job = launch {
+                        delay(interval.toLong())
+                        runAllHandlers { handler -> handler(batchNew, batchOld) }
+                        batchNew.clear()
+                        batchOld.clear()
+                    }
+                    job?.join()
                 }
             }
         }
 
-        fun fireAndForgetJavaHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
+        protected fun fireAndForgetHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
             val now = System.currentTimeMillis()
-            if (now < debounceEndTime) return
-            debounceEndTime = now + debounce
-            SwingUtilities.invokeLater {
-                eventMapping[this@EventObject]?.forEach { (_, handler) -> runBlocking { run(handler) } }
+            when (timingMode) {
+                TimingMode.Throttle -> launch {
+                    if (now >= intervalEndTime) {
+                        intervalEndTime = now + interval
+                        runAllHandlers(run)
+                    }
+                }
+                TimingMode.Debounce -> launch {
+                    job?.cancel()
+                    job = launch {
+                        delay(interval.toLong())
+                        runAllHandlers(run)
+                    }
+                }
+            }
+        }
+
+        protected fun batchedFireAndForgetHelper(new: Any?, old: Any?) {
+            val now = System.currentTimeMillis()
+            batchNew.add(new)
+            batchOld.add(old)
+            when (timingMode) {
+                TimingMode.Throttle -> launch {
+                    if (now >= intervalEndTime) {
+                        intervalEndTime = now + interval
+                        runAllHandlers { handler -> handler(batchNew, batchOld) }
+                        batchNew.clear()
+                        batchOld.clear()
+                    }
+                }
+                TimingMode.Debounce -> launch {
+                    job?.cancel()
+                    job = launch {
+                        delay(interval.toLong())
+                        runAllHandlers { handler -> handler(batchNew, batchOld) }
+                        batchNew.clear()
+                        batchOld.clear()
+                    }
+                }
             }
         }
     }
@@ -85,7 +156,7 @@ open class Events2: CoroutineScope {
     /**
      * No argument events, e.g. neuronChanged.fire() and neuronChanged.on { .. do stuff...}.
      */
-    inner class NoArgEvent(override val debounce: Int = 0) : EventObject() {
+    inner class NoArgEvent(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         /**
          * Kotlin "on"
@@ -105,7 +176,7 @@ open class Events2: CoroutineScope {
         /**
          * Kotlin "fire". By itself it's like "fireAndForget".
          */
-        suspend fun fireAndForget() = fireAndForgetHelper { handler -> handler(null, null) }
+        fun fireAndForget() = fireAndForgetHelper { handler -> handler(null, null) }
 
         /**
          * Like java fireAndBlock() but suspends rather than blocking, so that the GUI remains responsive.
@@ -121,18 +192,13 @@ open class Events2: CoroutineScope {
             }
         }
 
-        /**
-         * Java fire and forget.
-         */
-        fun fireAndForgetJava() = fireAndForgetJavaHelper { handler -> handler(null, null) }
-
     }
 
     /**
      * Add events, e.g. neuronAdded.fire(newNeuron), neuronAdded.on{ newNeuron -> ...}.
      * Functinos are the same as in the no-arg case.
      */
-    inner class AddedEvent<T>(override val debounce: Int = 0) : EventObject() {
+    inner class AddedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: T) -> Unit) = onSuspendHelper(dispatcher) {
@@ -145,7 +211,7 @@ open class Events2: CoroutineScope {
                 new, _ -> handler.accept(new as T)
         }
 
-        suspend fun fireAndForget(new: T) = fireAndForgetHelper { handler -> handler(new, null) }
+        fun fireAndForget(new: T) = fireAndForgetHelper { handler -> handler(new, null) }
 
         suspend fun fireAndSuspend(new: T) = fireAndSuspendHelper { handler -> handler(new, null) }
 
@@ -155,8 +221,30 @@ open class Events2: CoroutineScope {
             }
         }
 
-        fun fireAndForgetJava(new: T) = fireAndForgetJavaHelper { handler -> handler(new, null) }
+    }
 
+    inner class BatchAddedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
+
+        @Suppress("UNCHECKED_CAST")
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: List<T>) -> Unit) = onSuspendHelper(dispatcher) {
+                new, _ -> handler(new as List<T>)
+        }
+
+        @JvmOverloads
+        @Suppress("UNCHECKED_CAST")
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: Consumer<List<T>>) = onHelper(dispatcher) {
+                new, _ -> handler.accept(new as List<T>)
+        }
+
+        fun fireAndForget(new: T) = batchedFireAndForgetHelper(new, null)
+
+        suspend fun fireAndSuspend(new: T) = batchFireAndSuspendHelper(new, null)
+
+        fun fireAndBlock(new: T) {
+            runBlocking {
+                fireAndSuspend(new)
+            }
+        }
     }
 
     /**
@@ -164,7 +252,7 @@ open class Events2: CoroutineScope {
      * just use no-arg.
      * Functions are the same as in the no-arg case.
      */
-    inner class RemovedEvent<T>(override val debounce: Int = 0) : EventObject() {
+    inner class RemovedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (old: T) -> Unit) = onSuspendHelper(dispatcher) {
@@ -177,7 +265,7 @@ open class Events2: CoroutineScope {
                 _, old -> handler.accept(old as T)
         }
 
-        suspend fun fireAndForget(old: T) = fireAndForgetHelper { handler -> handler(null, old) }
+        fun fireAndForget(old: T) = fireAndForgetHelper { handler -> handler(null, old) }
 
         suspend fun fireAndSuspend(old: T) = fireAndSuspendHelper { handler -> handler(null, old) }
 
@@ -187,15 +275,13 @@ open class Events2: CoroutineScope {
             }
         }
 
-        fun fireAndForgetJava(old: T) = fireAndForgetJavaHelper { handler -> handler(null, old) }
-
     }
 
     /**
      * Changed events, e.g. updateRuleChanged.fire(oldRule, newRule), updateRuleChanged.on{ or, nr -> ...}.
      * Functions are the same as in the no-arg case.
      */
-    inner class ChangedEvent<T>(override val debounce: Int = 0) : EventObject() {
+    inner class ChangedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
 
@@ -219,8 +305,30 @@ open class Events2: CoroutineScope {
             }
         }
 
-        fun fireAndForgetJava(new: T, old: T) = fireAndForgetJavaHelper { handler -> if (new != old) handler(new, old) }
+    }
 
+    inner class BatchChangedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
+
+        @Suppress("UNCHECKED_CAST")
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: List<T>, old: List<T>) -> Unit) = onSuspendHelper(dispatcher) {
+                new, old -> handler(new as List<T>, old as List<T>)
+        }
+
+        @JvmOverloads
+        @Suppress("UNCHECKED_CAST")
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: BiConsumer<List<T>, List<T>>) = onHelper(dispatcher) {
+                new, old -> handler.accept(new as List<T>, old as List<T>)
+        }
+
+        fun fireAndForget(new: T, old: T) = batchedFireAndForgetHelper(new, old)
+
+        suspend fun fireAndSuspend(new: T, old: T) = batchFireAndSuspendHelper(new, old)
+
+        fun fireAndBlock(new: T, old: T) {
+            runBlocking {
+                fireAndSuspend(new, old)
+            }
+        }
     }
 
 }

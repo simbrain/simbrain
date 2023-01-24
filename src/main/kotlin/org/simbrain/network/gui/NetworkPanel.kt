@@ -77,7 +77,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     var autoZoom = true
         set(value) {
             field = value
-            network.events2.zoomToFitPage.fireAndForgetJava()
+            network.events2.zoomToFitPage.fireAndForget()
         }
 
     var editMode: EditMode = EditMode.SELECTION
@@ -139,7 +139,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         set(value) {
             field = value
             network.freeSynapses.forEach { it.isVisible = value }
-            network.events2.freeWeightVisibilityChanged.fireAndForgetJava(value)
+            network.events2.freeWeightVisibilityChanged.fireAndForget(value)
         }
 
     /**
@@ -208,7 +208,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         // Repaint whenever window is opened or changed.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                network.events2.zoomToFitPage.fireAndForgetJava()
+                network.events2.zoomToFitPage.fireAndForget()
             }
         })
 
@@ -241,7 +241,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 selectionManager.add(node)
             }
         }
-        network.events2.zoomToFitPage.fireAndForgetJava()
+        network.events2.zoomToFitPage.fireAndForget()
     }
 
     private fun createNode(model: NetworkModel): ScreenElement {
@@ -394,7 +394,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         selectionManager.selection.forEach { delete(it) }
 
         // Zoom events are costly so only zoom after main deletion events
-        network.events2.zoomToFitPage.fireAndForgetJava()
+        network.events2.zoomToFitPage.fireAndForget()
     }
 
     private fun createEditToolBar() = CustomToolBar().apply {
@@ -675,11 +675,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     private fun initEventHandlers() {
         val event = network.events2
-        event.modelAdded.on {
-            createNode(it)
+        event.modelAdded.on { list ->
+            list.forEach { createNode(it) }
         }
         event.modelRemoved.on {
-            network.events2.zoomToFitPage.fireAndForgetJava()
+            network.events2.zoomToFitPage.fireAndForget()
         }
         event.updateActionsChanged.on { timeLabel.update() }
         event.updated.on {

@@ -70,14 +70,16 @@ public final class NetworkComponent extends WorkspaceComponent {
 
         NetworkEvents2 event = network.getEvents2();
 
-        event.getModelAdded().on(m -> {
-            setChangedSinceLastSave(true);
-            if (m instanceof AttributeContainer) {
-                fireAttributeContainerAdded((AttributeContainer) m);
-            }
-            if (m instanceof NeuronGroup) {
-                ((NeuronGroup)m).getNeuronList().forEach(this::fireAttributeContainerAdded);
-            }
+        event.getModelAdded().on(list -> {
+            list.forEach(m -> {
+                setChangedSinceLastSave(true);
+                if (m instanceof AttributeContainer) {
+                    fireAttributeContainerAdded((AttributeContainer) m);
+                }
+                if (m instanceof NeuronGroup) {
+                    ((NeuronGroup)m).getNeuronList().forEach(this::fireAttributeContainerAdded);
+                }
+            });
         });
 
         event.getModelRemoved().on(m -> {

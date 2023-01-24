@@ -1,9 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
@@ -214,24 +210,22 @@ val linkedNeuronList = newSim {
 
         val network = networkComponent.network
 
-        workspace.launch(Dispatchers.Main) {
-            val neurons = (1..10000).map {
-                async(Dispatchers.Default) { Neuron(network) }
-            }.awaitAll()
+        val neurons = (1..10000).map {
+            Neuron(network)
+        }
 
-            neurons.forEach { network.addNetworkModel(it) }
-            val (first) = neurons
-            first.activation = 1.0
+        neurons.forEach { network.addNetworkModel(it) }
+        val (first) = neurons
+        first.activation = 1.0
 
-            val synapses = with(network) {
-                neurons.windowed(2) { (n1, n2) ->
-                    addSynapse(n1, n2) {
-                        strength = 1.0
-                    }
+        val synapses = with(network) {
+            neurons.windowed(2) { (n1, n2) ->
+                addSynapse(n1, n2) {
+                    strength = 1.0
                 }
             }
-            HexagonalGridLayout.layoutNeurons(neurons, 40, 40)
         }
+        HexagonalGridLayout.layoutNeurons(neurons, 40, 40)
         withGui {
             getDesktopComponent(networkComponent).apply {
                 parentFrame.let { frame ->

@@ -3,32 +3,35 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.cartesianProduct
+import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
-import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm2.*
 import org.simbrain.util.piccolo.*
-import org.simbrain.util.point
-import org.simbrain.util.sampleOne
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.serialization.WorkspaceSerializer
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.TileSensor
 import java.awt.Dimension
+import java.io.FileInputStream
+import java.io.IOException
 import kotlin.random.Random
 
 val grazingCows = newSim {
 
-    val maxGenerations = 50
-    val iterationsPerRun = 2000
+    var maxGenerations = 50
+    var iterationsPerRun = 2000
+    var populationSize = 100
+    var eliminationRatio = .5
 
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
         override val random: Random = Random(seed)
@@ -110,6 +113,38 @@ val grazingCows = newSim {
         }
     }
 
+    // What to do when a cow finds water
+    fun addFindFlowerAction(workspace: Workspace, entity: OdorWorldEntity, fitnessLambda: (Double) -> Unit = {}) {
+        val world = entity.world
+        workspace.addUpdateAction("${entity.name} found a flower") {
+            with(world.tileMap) {
+                val flowerLayer = this.getLayer("Flower Layer")
+
+                fun randomTileCoordinate() = Random.nextGridCoordinate()
+                (entity.getSensor("centralFlowerSensor") as TileSensor).let { sensor ->
+                    // Flowers found
+                    if (sensor.currentValue > .5) {
+
+                        // Erase that tile
+                        entity.location.asPixelCoordinate().toGridCoordinate().int.let { (x, y) ->
+                            flowerLayer.setTile(x, y, 0)
+                        }
+
+                        // Add a new flower somewhere else
+                        randomTileCoordinate().int.let { (x, y) ->
+                            world.tileMap.setTile(x, y, "DaisyCenter", flowerLayer)
+                        }
+
+                        // Update fitness
+                        fitnessLambda(1.0)
+                    }
+                }
+            }
+        }
+
+    }
+
+
     class CowSim(
         val cowGenotypes: List<CowGenotype> = List(2) { CowGenotype() },
         val workspace: Workspace = Workspace()
@@ -161,6 +196,7 @@ val grazingCows = newSim {
         // Central water sensor to determine when water is actually found.
         val centerFlowerSensors = entities.associateWith { entity ->
             TileSensor("flower", radius = 0.0).apply {
+                label = "centralFlowerSensor"
                 decayFunction = StepDecayFunction()
                 decayFunction.dispersion = 30.0
             }.also { entity.addSensor(it) }
@@ -193,30 +229,7 @@ val grazingCows = newSim {
             }
             addFitness(0.0) // To initialize fitness
 
-            // What to do when a cow finds water
-            workspace.addUpdateAction("flowers found") {
-                with(odorWorld.tileMap) {
-                    centerFlowerSensors[entity]?.let { sensor ->
-                        // Flowers found
-                        if (sensor.currentValue > .5) {
-
-                            // Erase that tile
-                            entity.location.asPixelCoordinate().toGridCoordinate().int.let { (x, y) ->
-                                flowerLayer.setTile(x, y, 0)
-                            }
-
-                            // Add a new flower somewhere else
-                            randomTileCoordinate().int.let { (x, y) ->
-                                odorWorld.tileMap.setTile(x, y, "DaisyCenter", flowerLayer)
-                            }
-
-                            // Update fitness
-                            addFitness(1.0)
-                        }
-                    }
-                }
-            }
-
+            addFindFlowerAction(workspace, entity) { addFitness(1.0) }
         }
 
         override suspend fun build() {
@@ -254,38 +267,88 @@ val grazingCows = newSim {
         }
     }
 
-    workspace.launch {
-        val progressWindow = ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
-            minimumSize = Dimension(300, 100)
-            setLocationRelativeTo(null)
-        }
-        val cowSims = evaluator2(
-            populatingFunction = { CowSim() },
-            populationSize = 100,
-            eliminationRatio = 0.5,
-            stoppingFunction = {
-                nthPercentileFitness(10) > 400 || generation > maxGenerations
-            },
-            peek = {
-                listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                    "$it: ${nthPercentileFitness(it).format(3)}"
-                }.also {
-                    println("[$generation] $it")
-                    progressWindow.text = "10th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
-                    progressWindow.value = generation
+    fun runSim() {
+        workspace.launch {
+            val progressWindow = ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
+                minimumSize = Dimension(300, 100)
+                setLocationRelativeTo(null)
+            }
+            val cowSims = evaluator2(
+                populatingFunction = { CowSim() },
+                populationSize = populationSize,
+                eliminationRatio = eliminationRatio,
+                stoppingFunction = {
+                    nthPercentileFitness(10) > 400 || generation > maxGenerations
+                },
+                peek = {
+                    listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
+                        "$it: ${nthPercentileFitness(it).format(3)}"
+                    }.also {
+                        println("[$generation] $it")
+                        progressWindow.text = "10th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
+                        progressWindow.value = generation
+                    }
+                }
+            )
+            cowSims.take(1).forEach {
+                with(it.visualize(workspace) as CowSim) {
+                    build()
+                    withGui {
+                        workspace.componentList.filterIsInstance<OdorWorldComponent>().first().apply {
+                            place(this, 280, 10, 476, 432)
+                        }
+                        workspace.componentList.filterIsInstance<NetworkComponent>().forEachIndexed { i, net ->
+                            place(net, 768, 10 + i * 282, 326, 282)
+                        }
+                    }
+                    cowPhenotypes.await().forEach {
+                        it.inputs.location = point(0, 150)
+                        it.hiddens.location = point(0, 60)
+                        it.outputs.location = point(0, -25)
+                    }
                 }
             }
-        )
-        cowSims.take(1).forEach {
-            with(it.visualize(workspace) as CowSim) {
-                build()
-                cowPhenotypes.await().forEach {
-                    it.inputs.location = point(0, 150)
-                    it.hiddens.location = point(0, 60)
-                    it.outputs.location = point(0, -25)
-                }
-            }
+            progressWindow.close()
         }
-        progressWindow.close()
     }
+
+    withGui {
+        workspace.clearWorkspace()
+        createControlPanel("Control Panel", 5, 10) {
+
+            val maxGenTf = addTextField("Max Generations", "" + maxGenerations)
+            val iterationsPerRunTf = addTextField("Num iterations per generation", "" + iterationsPerRun)
+            val populationSizeTf = addTextField("Population size", "" + populationSize)
+            val eliminationRatioTf = addTextField("Elimination ratio", "" + eliminationRatio)
+
+            addButton("Evolve") {
+                maxGenerations = maxGenTf.text.toInt()
+                iterationsPerRun = iterationsPerRunTf.text.toInt()
+                populationSize = populationSizeTf.text.toInt()
+                eliminationRatio = eliminationRatioTf.text.toDouble()
+                runSim()
+            }
+
+            addButton("Load file") {
+                val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+                val simFile = simulationChooser.showOpenDialog()
+                val serializer = WorkspaceSerializer(workspace)
+                try {
+                    if (simFile != null) {
+                        workspace.removeAllComponents()
+                        workspace.updater.updateManager.reset()
+                        serializer.deserialize(FileInputStream(simFile))
+                    }
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
+                val world = workspace.componentList.filterIsInstance<OdorWorldComponent>().first().world
+                world.entityList.forEach { addFindFlowerAction(workspace, it) }
+
+            }
+        }
+    }
+
+
 }

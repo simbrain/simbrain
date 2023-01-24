@@ -65,6 +65,9 @@ public class UpdateActionManager {
         public void actionOrderChanged();
     }
 
+    /**
+     * Basically just the performance monitor for now.  (UpdateAll can be removed for custom sims).
+     */
     private final ArrayList<UpdateAction> nonRemovableActions = new ArrayList<>();
 
     /**
@@ -235,6 +238,16 @@ public class UpdateActionManager {
             removeAction(action);
         }
     }
+
+
+    /**
+     * Reset the update manager by removing all actions and adding back the default ones.
+     */
+    public void reset() {
+        clear();
+        setDefaultUpdateActions();
+    }
+
 
     /**
      * Puts the update in its default configuration, with Buffered update as the

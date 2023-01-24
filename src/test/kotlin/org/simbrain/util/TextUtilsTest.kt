@@ -86,6 +86,12 @@ class TextUtilsTest {
     }
 
     @Test
+    fun `Remove stopwords`() {
+        val tokens = simpleText.tokenizeWordsFromSentence().uniqueTokensFromArray()
+        assertEquals(listOf<String>("simple","sentence","hard"), removeStopWords(tokens))
+    }
+
+    @Test
     fun `co-occurrence matrix is correct size`() {
         val tokens = simpleText.tokenizeWordsFromSentence().uniqueTokensFromArray()
         val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, 2, true).second
@@ -109,11 +115,11 @@ class TextUtilsTest {
         val cooccurrenceMatrixLong = generateCooccurrenceMatrix(windowSizeText, 4, true).second
         val smallWindowSimilarity = embeddingSimilarity(
                 wordEmbeddingQuery("Jean", tokens, cooccurrenceMatrixShort),
-                wordEmbeddingQuery("Albert", tokens, cooccurrenceMatrixShort),
+                wordEmbeddingQuery("Albert", tokens, cooccurrenceMatrixShort)
             )
         val longWindowSimilarity = embeddingSimilarity(
                 wordEmbeddingQuery("Jean", tokens, cooccurrenceMatrixLong),
-                wordEmbeddingQuery("Albert", tokens, cooccurrenceMatrixLong),
+                wordEmbeddingQuery("Albert", tokens, cooccurrenceMatrixLong)
             )
         assertTrue(smallWindowSimilarity < longWindowSimilarity)
     }

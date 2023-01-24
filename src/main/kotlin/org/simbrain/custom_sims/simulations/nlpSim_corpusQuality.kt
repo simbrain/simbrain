@@ -10,8 +10,7 @@ import org.simbrain.util.point
  */
 val nlpSim_corpusQuality = newSim {
 
-    // TODOS
-    // 2. Word co-occurrences and training set quality (factors outside the parameters that affect performance)
+    // 3. "Training set quality" (factors outside the parameters that affect performance)
     //
     // Potentially different training corpora:
     //              Small           Medium
@@ -24,6 +23,8 @@ val nlpSim_corpusQuality = newSim {
     // Demonstrate how these biases influence usage, which influences the resulting word embeddings
     //
     // Polysemy and word embeddings / catastrophic forgetting
+    //
+    // How to train/load two embeddings?
 
     workspace.clearWorkspace()
 

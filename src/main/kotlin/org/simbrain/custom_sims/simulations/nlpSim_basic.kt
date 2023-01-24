@@ -10,23 +10,32 @@ import org.simbrain.util.point
  */
 val nlpSim_basic = newSim {
 
-    // TODOS
-    // 0. Step-by-step demonstration of the algorithm (count matrix -> PPMI transform, visualize matrix using tables)
+    // 1. "Basics of word embeddings and co-occurrence matrices"
     //
-    // Co-occurrence matrix will be pre-trained and displayed on the main screen.
-    // Vertical bar on the size showing radio button options for count matrix, ppmi transform
-    // As students click the different options, a second co-occurrence will reflect the difference (for quick comparisons).
-    //
-    // Training text is displayed as well.
+    // Training:
     // For the text reader, it will have options for skipGram and window size
     // The text highlight will reflect what options are selected. Maybe two different colors, target = red, context = blue?
+    //
+    // Co-occurrences to vectors:
+    // Columns as the actual word embeddings, illustrate how they are based on the co-occurrences
+    // Maybe have them test out similarity, see that raw co-occ. don't work that well
+    //
+    // Post-training transformations:
+    // Co-occurrence matrix will be pre-trained and displayed on the main screen.
+    // Vertical bar on the side showing radio button options for count matrix, ppmi transform
+    // As students click the different options, a second co-occurrence will reflect the difference (for quick comparisons).
+    //
+    // Option: heatmap plot?
+    //
+    // Unrelated issue: What is the best way for people to update the settings?
+
 
     workspace.clearWorkspace()
 
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = getResource("nlp/mlk.txt")
+    val text = getResource("nlp/river_streams.txt") // Example: check "river" and "ocean", "river" and "stream", "lake" and "ocean", n.b. regenerate embeddings after settings change
     textWorld.loadDictionary(text)
     textWorld.text = text
 

@@ -10,15 +10,13 @@ import org.simbrain.util.point
  */
 val nlpSim_geomSpace = newSim {
 
-    // TODOS
-    // 1. Geometric thinking (what is a vector space? what is a word embedding? how can we plot words in space?)
-    //    - Start with a pre-loaded dictionary and a small set of words. See unit test example.
+    // 2. "Geometric thinking and vector spaces"
     //
     // Start with a pre-trained dictionary.
     // Multiple dimensionality reduction methods:
-    // - 2x2 vector space
-    // - 3x3 vector space
-    // - nxn vector space
+    // - 2d vector space
+    // - 3d vector space
+    // - Nd vector space
     // Illustrate how the word are embedded into a high dimensional space
     //
     // Second point: distance and similarity

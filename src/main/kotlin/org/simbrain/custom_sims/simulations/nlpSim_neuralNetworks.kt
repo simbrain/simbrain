@@ -10,8 +10,10 @@ import org.simbrain.util.point
  */
 val nlpSim_neuralNetworks = newSim {
 
-    // TODOS
-    // 3. Word embeddings and neural networks
+    // 4. "Word embeddings and neural networks"
+    //
+    // Training of a NN based on word embeddings
+    // Example: Send word embeddings to SOM
     //
     // Potentially implement an alternative algorithm, using a neural network trained on next word prediction
     // Export a layer weights as the word embedding

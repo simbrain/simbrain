@@ -8,31 +8,17 @@ import org.simbrain.util.point
  * Todo
  *
  */
-val nlpSim = newSim {
+val nlpSim_neuralNetworks = newSim {
 
-    // TODOS
-    // - Adjust bounds
-    // - Make a new simpler version of this for first lessons below
-    // ---
-    // Dot product seems high
-    // - Remove stop words (and add toggle)
-    // - Ability to update co-occurrence matrix with new texts
-    // - Unit tests of Ntree / Evaluate alternatives to NTree. Need a way to store the vectors for fast nearest
-    // neighbor search / vector search / kd-tree
-    //      https://cloud.google.com/blog/products/ai-machine-learning/vertex-matching-engine-blazing-fast-and-massively-scalable-nearest-neighbor-search
-    // - Sammon map fails after one click when immediate moving from PCA
-    // - Poor performance and occasional errors running sammon map while loading new items
-    // - (Hard) Better algorithm for label display in PCA. Detect crowding and show some other way.
-
-    // Possible lessons
-    // 0. Step-by-step demonstration of the algorithm (count matrix -> PPMI transform, visualize matrix using tables)
-    // 1. Geometric thinking (what is a vector space? what is a word embedding? how can we plot words in space?)
-    //    - Start with a pre-loaded dictionary and a small set of words. See unit test example.
-    // 2. Word co-occurrences and training set quality (factors outside the parameters that affect performance)
-    // 3. Word embeddings and neural networks
-    // 4. Shortcomings of DSM: polysemy (what happens to words with multiple meanings/senses?)
-    
-    // Something that generates text?
+    // 4. "Word embeddings and neural networks"
+    //
+    // Training of a NN based on word embeddings
+    // Example: Send word embeddings to SOM
+    //
+    // Potentially implement an alternative algorithm, using a neural network trained on next word prediction
+    // Export a layer weights as the word embedding
+    // Comparison between the traditional count methods vs next word prediction
+    // Generate text using the neural network?
 
     workspace.clearWorkspace()
 

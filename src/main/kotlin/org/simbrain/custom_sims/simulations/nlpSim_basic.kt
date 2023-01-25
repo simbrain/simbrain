@@ -8,38 +8,34 @@ import org.simbrain.util.point
  * Todo
  *
  */
-val nlpSim = newSim {
+val nlpSim_basic = newSim {
 
-    // TODOS
-    // - Adjust bounds
-    // - Make a new simpler version of this for first lessons below
-    // ---
-    // Dot product seems high
-    // - Remove stop words (and add toggle)
-    // - Ability to update co-occurrence matrix with new texts
-    // - Unit tests of Ntree / Evaluate alternatives to NTree. Need a way to store the vectors for fast nearest
-    // neighbor search / vector search / kd-tree
-    //      https://cloud.google.com/blog/products/ai-machine-learning/vertex-matching-engine-blazing-fast-and-massively-scalable-nearest-neighbor-search
-    // - Sammon map fails after one click when immediate moving from PCA
-    // - Poor performance and occasional errors running sammon map while loading new items
-    // - (Hard) Better algorithm for label display in PCA. Detect crowding and show some other way.
+    // 1. "Basics of word embeddings and co-occurrence matrices"
+    //
+    // Training:
+    // For the text reader, it will have options for skipGram and window size
+    // The text highlight will reflect what options are selected. Maybe two different colors, target = red, context = blue?
+    //
+    // Co-occurrences to vectors:
+    // Columns as the actual word embeddings, illustrate how they are based on the co-occurrences
+    // Maybe have them test out similarity, see that raw co-occ. don't work that well
+    //
+    // Post-training transformations:
+    // Co-occurrence matrix will be pre-trained and displayed on the main screen.
+    // Vertical bar on the side showing radio button options for count matrix, ppmi transform
+    // As students click the different options, a second co-occurrence will reflect the difference (for quick comparisons).
+    //
+    // Option: heatmap plot?
+    //
+    // Unrelated issue: What is the best way for people to update the settings?
 
-    // Possible lessons
-    // 0. Step-by-step demonstration of the algorithm (count matrix -> PPMI transform, visualize matrix using tables)
-    // 1. Geometric thinking (what is a vector space? what is a word embedding? how can we plot words in space?)
-    //    - Start with a pre-loaded dictionary and a small set of words. See unit test example.
-    // 2. Word co-occurrences and training set quality (factors outside the parameters that affect performance)
-    // 3. Word embeddings and neural networks
-    // 4. Shortcomings of DSM: polysemy (what happens to words with multiple meanings/senses?)
-    
-    // Something that generates text?
 
     workspace.clearWorkspace()
 
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = getResource("nlp/mlk.txt")
+    val text = getResource("nlp/river_streams.txt") // Example: check "river" and "ocean", "river" and "stream", "lake" and "ocean", n.b. regenerate embeddings after settings change
     textWorld.loadDictionary(text)
     textWorld.text = text
 

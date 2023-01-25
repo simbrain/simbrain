@@ -8,31 +8,20 @@ import org.simbrain.util.point
  * Todo
  *
  */
-val nlpSim = newSim {
+val nlpSim_geomSpace = newSim {
 
-    // TODOS
-    // - Adjust bounds
-    // - Make a new simpler version of this for first lessons below
-    // ---
-    // Dot product seems high
-    // - Remove stop words (and add toggle)
-    // - Ability to update co-occurrence matrix with new texts
-    // - Unit tests of Ntree / Evaluate alternatives to NTree. Need a way to store the vectors for fast nearest
-    // neighbor search / vector search / kd-tree
-    //      https://cloud.google.com/blog/products/ai-machine-learning/vertex-matching-engine-blazing-fast-and-massively-scalable-nearest-neighbor-search
-    // - Sammon map fails after one click when immediate moving from PCA
-    // - Poor performance and occasional errors running sammon map while loading new items
-    // - (Hard) Better algorithm for label display in PCA. Detect crowding and show some other way.
-
-    // Possible lessons
-    // 0. Step-by-step demonstration of the algorithm (count matrix -> PPMI transform, visualize matrix using tables)
-    // 1. Geometric thinking (what is a vector space? what is a word embedding? how can we plot words in space?)
-    //    - Start with a pre-loaded dictionary and a small set of words. See unit test example.
-    // 2. Word co-occurrences and training set quality (factors outside the parameters that affect performance)
-    // 3. Word embeddings and neural networks
-    // 4. Shortcomings of DSM: polysemy (what happens to words with multiple meanings/senses?)
-    
-    // Something that generates text?
+    // 2. "Geometric thinking and vector spaces"
+    //
+    // Start with a pre-trained dictionary.
+    // Multiple dimensionality reduction methods:
+    // - 2d vector space
+    // - 3d vector space
+    // - Nd vector space
+    // Illustrate how the word are embedded into a high dimensional space
+    //
+    // Second point: distance and similarity
+    // Show how distance would be calculated in the various vector spaces
+    // Comparison of Euclidean distance vs cosine distance
 
     workspace.clearWorkspace()
 

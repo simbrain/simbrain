@@ -97,6 +97,7 @@ class TextWorldPanel private constructor(
         val dictionaryToolBar = JToolBar()
         dictionaryToolBar.add(world.dictionaryEditor)
         dictionaryToolBar.add(world.extractDictionary)
+        dictionaryToolBar.add(world.calculateCosineSimilarity)
         topToolbarPanel.add(dictionaryToolBar)
         add(topToolbarPanel, BorderLayout.NORTH)
         val bottomToolbarPanel = JPanel()

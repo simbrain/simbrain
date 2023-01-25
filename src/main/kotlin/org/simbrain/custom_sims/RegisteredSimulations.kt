@@ -47,6 +47,10 @@ val simulations = dir<Any>("Simulations") {
         }
         dir("NLP") {
             item("NLP") { nlpSim }
+            item("NLP - Introduction") { nlpSim_basic }
+            item("NLP - Geometric Spaces") {nlpSim_geomSpace}
+            item("NLP - Corpus Quality") {nlpSim_corpusQuality}
+            item("NLP - Neural Networks") {nlpSim_neuralNetworks}
         }
     }
 

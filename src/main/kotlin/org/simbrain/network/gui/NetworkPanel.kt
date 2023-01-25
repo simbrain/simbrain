@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PMouseWheelZoomEventHandler
@@ -675,7 +676,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     private fun initEventHandlers() {
         val event = network.events2
-        event.modelAdded.on { list ->
+        event.modelAdded.on(Dispatchers.Swing) { list ->
             list.forEach { createNode(it) }
         }
         event.modelRemoved.on {

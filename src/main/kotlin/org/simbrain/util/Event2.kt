@@ -26,7 +26,7 @@ open class Events2: CoroutineScope {
     /**
      * Associates events to their listeners
      */
-    private val eventMapping = HashMap<EventObject, LinkedList<Pair<CoroutineDispatcher, suspend (new: Any?, old: Any?) -> Unit>>>()
+    private val eventMapping = HashMap<EventObject, LinkedList<Pair<CoroutineDispatcher?, suspend (new: Any?, old: Any?) -> Unit>>>()
 
     enum class TimingMode {
         Throttle, Debounce
@@ -45,72 +45,34 @@ open class Events2: CoroutineScope {
 
         private var job: Job? = null
 
-        protected fun onSuspendHelper(dispatcher: CoroutineDispatcher, run: suspend (new: Any?, old: Any?) -> Unit) {
+        protected fun onSuspendHelper(dispatcher: CoroutineDispatcher?, run: suspend (new: Any?, old: Any?) -> Unit) {
             eventMapping.getOrPut(this@EventObject) { LinkedList() }.add(dispatcher to run)
         }
 
-        protected fun onHelper(dispatcher: CoroutineDispatcher, run: (new: Any?, old: Any?) -> Unit) {
+        protected fun onHelper(dispatcher: CoroutineDispatcher?, run: (new: Any?, old: Any?) -> Unit) {
             eventMapping.getOrPut(this@EventObject) { LinkedList() }.add(dispatcher to { new, old -> async { run(new, old) } })
         }
 
         private suspend inline fun runAllHandlers(crossinline run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) = eventMapping[this@EventObject]
             ?.groupBy { (dispatcher) -> dispatcher }
             ?.flatMap { (dispatcher, group) ->
-                withContext(dispatcher) {
+                if (dispatcher != null) {
+                    withContext(dispatcher) {
+                        group.map { (_, handler) -> async { run(handler) } }
+                    }
+                } else {
                     group.map { (_, handler) -> async { run(handler) } }
                 }
             }
             ?.awaitAll()
 
-        protected suspend fun fireAndSuspendHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
-            val now = System.currentTimeMillis()
-            when (timingMode) {
-                TimingMode.Throttle -> async {
-                    if (now >= intervalEndTime) {
-                        intervalEndTime = now + interval
-                        runAllHandlers(run)
-                    }
-                }.await()
-                TimingMode.Debounce -> async {
-                    job?.cancel()
-                    job = launch {
-                        delay(interval.toLong())
-                        runAllHandlers(run)
-                    }
-                    job?.join()
-                }.await()
-            }
-        }
+        protected suspend fun fireAndSuspendHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) = fireAndForgetHelper(run).join()
 
-        protected suspend fun batchFireAndSuspendHelper(new: Any?, old: Any?) {
-            val now = System.currentTimeMillis()
-            new?.let { batchNew.add(it) }
-            old?.let { batchOld.add(it) }
-            when (timingMode) {
-                TimingMode.Throttle -> async {
-                    if (now >= intervalEndTime) {
-                        intervalEndTime = now + interval
-                        runAllHandlers { handler -> handler(batchNew, batchOld) }
-                        batchNew.clear()
-                        batchOld.clear()
-                    }
-                }.await()
-                TimingMode.Debounce -> launch {
-                    job?.cancel()
-                    job = launch {
-                        delay(interval.toLong())
-                        runAllHandlers { handler -> handler(batchNew, batchOld) }
-                        batchNew.clear()
-                        batchOld.clear()
-                    }
-                    job?.join()
-                }
-            }
-        }
+        protected suspend fun batchFireAndSuspendHelper(new: Any?, old: Any?) = batchedFireAndForgetHelper(new, old).join()
 
-        protected fun fireAndForgetHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
+        protected fun fireAndForgetHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit): Job {
             val now = System.currentTimeMillis()
-            when (timingMode) {
+            return when (timingMode) {
                 TimingMode.Throttle -> launch {
                     if (now >= intervalEndTime) {
                         intervalEndTime = now + interval
@@ -127,11 +89,11 @@ open class Events2: CoroutineScope {
             }
         }
 
-        protected fun batchedFireAndForgetHelper(new: Any?, old: Any?) {
+        protected fun batchedFireAndForgetHelper(new: Any?, old: Any?): Job {
             val now = System.currentTimeMillis()
             batchNew.add(new)
             batchOld.add(old)
-            when (timingMode) {
+            return when (timingMode) {
                 TimingMode.Throttle -> launch {
                     if (now >= intervalEndTime) {
                         intervalEndTime = now + interval
@@ -148,6 +110,7 @@ open class Events2: CoroutineScope {
                         batchNew.clear()
                         batchOld.clear()
                     }
+                    job?.join()
                 }
             }
         }
@@ -161,7 +124,7 @@ open class Events2: CoroutineScope {
         /**
          * Kotlin "on"
          */
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend () -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: suspend () -> Unit) = onSuspendHelper(dispatcher) {
                 _, _ -> handler()
         }
 
@@ -169,7 +132,7 @@ open class Events2: CoroutineScope {
          * Java "on"
          */
         @JvmOverloads
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: java.lang.Runnable) = onHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: java.lang.Runnable) = onHelper(dispatcher) {
             _, _ -> handler.run()
         }
 
@@ -201,13 +164,13 @@ open class Events2: CoroutineScope {
     inner class AddedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: T) -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: suspend (new: T) -> Unit) = onSuspendHelper(dispatcher) {
                 new, _ -> handler(new as T)
         }
 
         @JvmOverloads
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: Consumer<T>) = onHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: Consumer<T>) = onHelper(dispatcher) {
                 new, _ -> handler.accept(new as T)
         }
 
@@ -226,13 +189,13 @@ open class Events2: CoroutineScope {
     inner class BatchAddedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: List<T>) -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: suspend (new: List<T>) -> Unit) = onSuspendHelper(dispatcher) {
                 new, _ -> handler(new as List<T>)
         }
 
         @JvmOverloads
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: Consumer<List<T>>) = onHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: Consumer<List<T>>) = onHelper(dispatcher) {
                 new, _ -> handler.accept(new as List<T>)
         }
 
@@ -255,13 +218,13 @@ open class Events2: CoroutineScope {
     inner class RemovedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (old: T) -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: (old: T) -> Unit) = onSuspendHelper(dispatcher) {
                 _, old -> handler(old as T)
         }
 
         @JvmOverloads
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: Consumer<T>) = onHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: Consumer<T>) = onHelper(dispatcher) {
                 _, old -> handler.accept(old as T)
         }
 
@@ -285,13 +248,13 @@ open class Events2: CoroutineScope {
 
         @Suppress("UNCHECKED_CAST")
 
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: (new: T, old: T) -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: (new: T, old: T) -> Unit) = onSuspendHelper(dispatcher) {
                 new, old -> handler(new as T, old as T)
         }
 
         @JvmOverloads
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: BiConsumer<T, T>) = onHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: BiConsumer<T, T>) = onHelper(dispatcher) {
                 new, old -> handler.accept(new as T, old as T)
         }
 
@@ -310,13 +273,13 @@ open class Events2: CoroutineScope {
     inner class BatchChangedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: suspend (new: List<T>, old: List<T>) -> Unit) = onSuspendHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: suspend (new: List<T>, old: List<T>) -> Unit) = onSuspendHelper(dispatcher) {
                 new, old -> handler(new as List<T>, old as List<T>)
         }
 
         @JvmOverloads
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Swing, handler: BiConsumer<List<T>, List<T>>) = onHelper(dispatcher) {
+        fun on(dispatcher: CoroutineDispatcher? = null, handler: BiConsumer<List<T>, List<T>>) = onHelper(dispatcher) {
                 new, old -> handler.accept(new as List<T>, old as List<T>)
         }
 

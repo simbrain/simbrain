@@ -179,3 +179,10 @@ fun DoubleArray.minus(other: DoubleArray): DoubleArray {
     return zip(other).map { (a, b) -> a - b }.toDoubleArray()
 }
 
+/**
+ * Return a string representation of the vector rounded to the specified precision
+ */
+fun DoubleArray.toString(precision: Int): String {
+    return joinToString(",") { it.format(precision) }
+}
+

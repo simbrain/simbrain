@@ -1,7 +1,5 @@
 package org.simbrain.util
 
-import smile.math.MathEx.cos
-import smile.math.MathEx.dot
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
 
@@ -189,7 +187,8 @@ fun wordEmbeddingQuery(targetWord: String, tokens: List<String>, cooccurrenceMat
  *
  * Cosine similarity is normalized dot product.
  */
-fun embeddingSimilarity(vectorA: DoubleArray, vectorB: DoubleArray, simfun: (DoubleArray, DoubleArray)->Double = smile.math.MathEx::cos): Double {
+fun embeddingSimilarity(vectorA: DoubleArray, vectorB: DoubleArray, simfun: (DoubleArray, DoubleArray) -> Double =
+    smile.math.MathEx::cos): Double {
     return simfun(vectorA, vectorB)
 }
 

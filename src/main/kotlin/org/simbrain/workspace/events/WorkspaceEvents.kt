@@ -1,6 +1,7 @@
 package org.simbrain.workspace.events
 
 import org.simbrain.util.Event
+import org.simbrain.util.Events2
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import java.beans.PropertyChangeSupport
@@ -26,4 +27,11 @@ class WorkspaceEvents(workspace: Workspace) : Event(PropertyChangeSupport(worksp
     fun onComponentRemoved(handler: Consumer<WorkspaceComponent>) = "ComponentRemoved".itemRemovedEvent(handler)
     fun fireComponentRemoved(component: WorkspaceComponent) = "ComponentRemoved"(old = component)
     
+}
+
+class WorkspaceEvents2: Events2() {
+    val workspaceCleared = NoArgEvent()
+    val workspaceOpened = NoArgEvent()
+    val componentAdded = AddedEvent<WorkspaceComponent>()
+    val componentRemoved = RemovedEvent<WorkspaceComponent>()
 }

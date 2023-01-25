@@ -20,6 +20,8 @@ package org.simbrain.workspace.gui
 
 import bsh.Interpreter
 import bsh.util.JConsole
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.NewSimulation
@@ -845,7 +847,7 @@ class SimbrainDesktop(val workspace: Workspace) {
         wsToolBar = createToolBar()
         createContextMenu()
         val events = workspace.events
-        events.onWorkspaceCleared {
+        events.workspaceCleared.on {
             guiComponents.clear()
             desktop.removeAll()
             desktop.repaint()
@@ -853,9 +855,9 @@ class SimbrainDesktop(val workspace: Workspace) {
             lastTimestep = 0
             updateTimeLabel()
         }
-        events.onComponentAdded { workspaceComponent: WorkspaceComponent -> addDesktopComponent(workspaceComponent) }
-        events.onComponentRemoved { wc: WorkspaceComponent ->
-            val component = guiComponents[wc] ?: return@onComponentRemoved
+        events.componentAdded.on(Dispatchers.Swing) { addDesktopComponent(it) }
+        events.componentRemoved.on(Dispatchers.Swing) { wc  ->
+            val component = guiComponents[wc] ?: return@on
             guiComponents.remove(wc)
             component.parentFrame.dispose()
             if (!lastFocusedStack.isEmpty()) {
@@ -863,7 +865,7 @@ class SimbrainDesktop(val workspace: Workspace) {
             }
             moveLastFocusedComponentToFront()
         }
-        events.onNewWorkspaceOpened {
+        events.workspaceOpened.on(Dispatchers.Swing) {
             frame.title = workspace.currentFile!!.name
             lastTimestep = 0
             updateTimeLabel()

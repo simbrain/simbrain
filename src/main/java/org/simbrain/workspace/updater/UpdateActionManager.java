@@ -21,7 +21,7 @@ package org.simbrain.workspace.updater;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingEvents;
-import org.simbrain.workspace.events.WorkspaceEvents;
+import org.simbrain.workspace.events.WorkspaceEvents2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -121,14 +121,14 @@ public class UpdateActionManager {
      */
     private void addListeners() {
         // Add / remove component actions as needed
-        WorkspaceEvents events = workspaceUpdater.getWorkspace().getEvents();
+        WorkspaceEvents2 events = workspaceUpdater.getWorkspace().getEvents();
 
-        events.onComponentAdded(wc -> {
+        events.getComponentAdded().on(wc -> {
             UpdateComponent componentAction = new UpdateComponent(wc);
             componentActionMap.put(wc, componentAction);
         });
 
-        events.onComponentRemoved(wc -> removeAction(componentActionMap.remove(wc)));
+        events.getComponentRemoved().on(wc -> removeAction(componentActionMap.remove(wc)));
 
         // Add / remove coupling actions as needed
         CouplingEvents couplingEvents = workspaceUpdater.getWorkspace().getCouplingManager().getEvents();

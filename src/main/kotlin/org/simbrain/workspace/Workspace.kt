@@ -6,7 +6,7 @@ import org.simbrain.util.SimbrainPreferences
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
-import org.simbrain.workspace.events.WorkspaceEvents
+import org.simbrain.workspace.events.WorkspaceEvents2
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.workspace.updater.WorkspaceUpdater
@@ -87,7 +87,7 @@ class Workspace: CoroutineScope {
      * because writes to this list are uncommon.
      */
     @Transient
-    val events = WorkspaceEvents(this)
+    val events = WorkspaceEvents2()
 
     @Transient
     lateinit var idManager: SimpleIdManager
@@ -126,7 +126,7 @@ class Workspace: CoroutineScope {
             component.name = idManager.getAndIncrementId(component.javaClass)
         }
 
-        events.fireComponentAdded(component)
+        events.componentAdded.fireAndForget(component)
         component.events.onAttributeContainerRemoved { attributeContainer: AttributeContainer? ->
             couplingManager.removeAttributeContainer(
                 attributeContainer!!
@@ -146,7 +146,7 @@ class Workspace: CoroutineScope {
         // this.getCouplingManager().removeCouplings(component);
         _componentList.remove(component)
         setWorkspaceChanged(true)
-        events.fireComponentRemoved(component)
+        events.componentRemoved.fireAndForget(component)
     }
 
     /**
@@ -239,7 +239,7 @@ class Workspace: CoroutineScope {
         setWorkspaceChanged(false)
         currentFile = null
         couplingManager = CouplingManager(this)
-        events.fireWorkspaceCleared()
+        events.workspaceCleared.fireAndForget()
         updater.updateManager.setDefaultUpdateActions()
     }
 
@@ -379,7 +379,7 @@ class Workspace: CoroutineScope {
                 serializer.deserialize(FileInputStream(theFile))
                 currentFile = theFile
                 setWorkspaceChanged(false)
-                events.fireNewWorkspaceOpened()
+                events.workspaceOpened.fireAndForget()
             }
         } catch (e: IOException) {
             e.printStackTrace()

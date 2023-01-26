@@ -26,8 +26,9 @@ fun getSimbrainXStream(): XStream {
     return XStream(DomDriver("UTF-8")).apply {
         ignoreUnknownElements()
         allowTypesByWildcard(
+            // be sure to sync these with the build.gradle simbrainJvmArgs --add-opens items
             arrayOf(
-                "org.simbrain.**", "java.awt.**", "org.jfree.**", "javax.swing.event.**", "java.beans.**",
+                "org.simbrain.**", "java.awt.**", "java.awt.geom.**", "org.jfree.**", "javax.swing.event.**", "java.beans.**",
                 "smile.math.**", "java.util.concurrent.**"
             )
         )

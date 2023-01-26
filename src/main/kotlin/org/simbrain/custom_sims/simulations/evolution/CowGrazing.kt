@@ -330,22 +330,24 @@ val grazingCows = newSim {
             }
 
             addButton("Load file") {
-                val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
-                val simFile = simulationChooser.showOpenDialog()
-                val serializer = WorkspaceSerializer(workspace)
-                try {
-                    if (simFile != null) {
-                        workspace.removeAllComponents()
-                        workspace.updater.updateManager.reset()
-                        serializer.deserialize(FileInputStream(simFile))
+                workspace.launch {
+                    val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+                    val simFile = simulationChooser.showOpenDialog()
+                    val serializer = WorkspaceSerializer(workspace)
+                    try {
+                        if (simFile != null) {
+                            workspace.removeAllComponents()
+                            workspace.updater.updateManager.reset()
+                            serializer.deserialize(FileInputStream(simFile))
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
                     }
-                } catch (e: IOException) {
-                    e.printStackTrace()
+
+                    val world = workspace.componentList.filterIsInstance<OdorWorldComponent>().first().world
+                    world.entityList.forEach { addFindFlowerAction(workspace, it) }
+
                 }
-
-                val world = workspace.componentList.filterIsInstance<OdorWorldComponent>().first().world
-                world.entityList.forEach { addFindFlowerAction(workspace, it) }
-
             }
         }
     }

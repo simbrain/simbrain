@@ -49,7 +49,7 @@ class CouplingManager(val workspace: Workspace) {
     /**
      * List of listeners to fire updates when couplings are changed.
      */
-    val events = CouplingEvents(this)
+    val events = CouplingEvents2()
 
     /**
      * A collection of all producible and consumable methods that are visible
@@ -193,7 +193,7 @@ class CouplingManager(val workspace: Workspace) {
         _couplings.add(it)
         attributeContainerCouplings.getOrPut(it.producer.baseObject) { LinkedHashSet() }.add(it)
         attributeContainerCouplings.getOrPut(it.consumer.baseObject) { LinkedHashSet() }.add(it)
-        events.fireCouplingAdded(it)
+        events.couplingAdded.fireAndForget(it)
     }
 
     /**
@@ -264,7 +264,7 @@ class CouplingManager(val workspace: Workspace) {
         couplings.forEach { coupling ->
             removeCouplingWithoutFiringEvent(coupling)
         }
-        events.fireCouplingsRemoved(couplings)
+        events.couplingsRemoved.fireAndForget(couplings)
     }
 
     /**
@@ -301,7 +301,7 @@ class CouplingManager(val workspace: Workspace) {
      */
     fun removeCoupling(coupling: Coupling) {
         removeCouplingWithoutFiringEvent(coupling)
-        events.fireCouplingRemoved(coupling)
+        events.couplingRemoved.fireAndForget(coupling)
     }
 
     private fun removeCouplingWithoutFiringEvent(coupling: Coupling) {
@@ -331,7 +331,7 @@ class CouplingManager(val workspace: Workspace) {
                     attributeContainerCouplings[coupling.producer.baseObject]?.remove(coupling)
                 }
             }
-            events.fireCouplingsRemoved(it.toList())
+            events.couplingsRemoved.fireAndForget(it.toList())
         }
         attributeContainerCouplings.remove(attributeContainer)
     }

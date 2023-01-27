@@ -69,7 +69,7 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         // Workspace object is not available in the constructor.
         super.setWorkspace(workspace);
 
-        getWorkspace().getCouplingManager().getEvents().onCouplingAdded(c -> {
+        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(c -> {
             // A new array coupling is being added to this time series
             if (c.getConsumer().getBaseObject() == model) {
 

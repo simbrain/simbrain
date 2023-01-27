@@ -91,7 +91,7 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
         // Workspace object is not available in the constructor.
         super.setWorkspace(workspace);
 
-        getWorkspace().getCouplingManager().getEvents().onCouplingAdded(c -> {
+        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(c -> {
             if (c.getConsumer().getBaseObject() == DataWorldComponent.this) {
                 if (c.getProducer().getLabelArray() != null) {
                     dataTable.setColumnHeadings(Arrays.asList(c.getProducer().getLabelArray()));

@@ -1,6 +1,7 @@
 package org.simbrain.workspace.couplings
 
 import org.simbrain.util.Event
+import org.simbrain.util.Events2
 import java.beans.PropertyChangeSupport
 import java.util.function.Consumer
 
@@ -17,5 +18,13 @@ class CouplingEvents(couplingManager: CouplingManager) : Event(PropertyChangeSup
 
     fun onCouplingsRemoved(handler: Consumer<Iterable<Coupling>>) = "CouplingsRemoved".itemRemovedEvent(handler)
     fun fireCouplingsRemoved(couplings: Iterable<Coupling>) = "CouplingsRemoved"(old = couplings)
+
+}
+
+class CouplingEvents2: Events2() {
+
+    val couplingAdded = AddedEvent<Coupling>()
+    val couplingRemoved = RemovedEvent<Coupling>()
+    val couplingsRemoved = RemovedEvent<Iterable<Coupling>>()
 
 }

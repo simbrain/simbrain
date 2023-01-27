@@ -53,7 +53,7 @@ public class PieChartComponent extends WorkspaceComponent {
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
 
-        getWorkspace().getCouplingManager().getEvents().onCouplingAdded(c -> {
+        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(c -> {
             if (c.getConsumer().getBaseObject() == model) {
                 model.setSliceNames(c.getProducer().getLabelArray());
             }

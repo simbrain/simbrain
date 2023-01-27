@@ -67,7 +67,7 @@ public class BarChartComponent extends WorkspaceComponent {
 
         // When couplings are added, if the consumer is this bar chart, set the bar labels to the label array, if any
         // of the producer
-        getWorkspace().getCouplingManager().getEvents().onCouplingAdded(c -> {
+        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(c -> {
             if (c.getConsumer().getBaseObject() == model) {
                 model.setBarNames(c.getProducer().getLabelArray());
             }

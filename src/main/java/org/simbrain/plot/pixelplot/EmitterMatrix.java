@@ -4,6 +4,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.imageworld.events.ImageEvents;
+import org.simbrain.world.imageworld.events.ImageEvents2;
 import org.simbrain.world.imageworld.filters.Filter;
 
 import java.awt.image.BufferedImage;
@@ -49,7 +50,7 @@ public class EmitterMatrix implements AttributeContainer {
     /**
      * Handle Image source Events.
      */
-    private transient ImageEvents events = new ImageEvents(this);
+    private transient ImageEvents2 events = new ImageEvents2();
 
     /**
      * Construct an empty emitter matrix.
@@ -171,7 +172,7 @@ public class EmitterMatrix implements AttributeContainer {
                 }
             }
         }
-        events.fireImageUpdate();
+        events.getImageUpdate().fireAndForget();
     }
 
     public BufferedImage getImage() {
@@ -188,7 +189,7 @@ public class EmitterMatrix implements AttributeContainer {
         return "Emitter Matrix";
     }
 
-    public ImageEvents getEvents() {
+    public ImageEvents2 getEvents() {
         return events;
     }
 
@@ -196,7 +197,7 @@ public class EmitterMatrix implements AttributeContainer {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new ImageEvents(this);
+        events = new ImageEvents2();
         return this;
     }
 }

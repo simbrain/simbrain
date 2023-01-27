@@ -43,7 +43,7 @@ public class ThreeDImagePanel extends JPanel {
             currentSource = value;
             nextSource = value;
             // currentSource.getEvents().onResize(this::onResize);
-            currentSource.getEvents().onImageUpdate(this::onImageUpdate);
+            currentSource.getEvents().getImageUpdate().on(this::onImageUpdate);
         } else {
             nextSource = value;
         }
@@ -86,7 +86,7 @@ public class ThreeDImagePanel extends JPanel {
             // currentSource.removeListener(this);
             currentSource = nextSource;
             //currentSource.getEvents().onResize(this::onResize);
-            currentSource.getEvents().onImageUpdate(this::onImageUpdate);
+            currentSource.getEvents().getImageUpdate().on(this::onImageUpdate);
         }
         if (currentSource.isEnabled()) {
             repaint();

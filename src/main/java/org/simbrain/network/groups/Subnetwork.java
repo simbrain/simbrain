@@ -19,7 +19,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkModelList;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.LocationEvents2;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
@@ -51,7 +51,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     /**
      * Event support.
      */
-    protected transient LocationEvents events = new LocationEvents(this);
+    protected transient LocationEvents2 events = new LocationEvents2();
 
     /**
      * List of neuron groups.
@@ -79,12 +79,12 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
         modelList.add(model);
         model.setId(getParentNetwork().getIdManager().getAndIncrementId(model.getClass()));
         if (model instanceof LocatableModel) {
-            ((LocatableModel) model).getEvents().onLocationChange(() -> {
-                getEvents().fireLocationChange();
+            ((LocatableModel) model).getEvents().getLocationChanged().on(() -> {
+                getEvents().getLocationChanged().fireAndForget();
             });
         }
-        getEvents().fireLocationChange();
-        model.getEvents().onDeleted(m -> {
+        getEvents().getLocationChanged().fireAndForget();
+        model.getEvents().getDeleted().on(m -> {
             modelList.remove(m);
             if (modelList.getSize() == 0) {
                 delete();
@@ -100,7 +100,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
             modelList.remove(m);
             m.delete();
         });
-        events.fireDeleted();
+        events.getDeleted().fireAndForget(this);
     }
 
     public NetworkModelList getModelList() {
@@ -152,7 +152,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new LocationEvents(this);
+            events = new LocationEvents2();
         }
         modelList.getAllInReconstructionOrder().forEach(NetworkModel::postOpenInit);
     }
@@ -179,7 +179,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
 
     @NotNull
     @Override
-    public LocationEvents getEvents() {
+    public LocationEvents2 getEvents() {
         return events;
     }
 }

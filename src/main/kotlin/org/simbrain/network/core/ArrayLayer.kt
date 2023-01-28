@@ -22,7 +22,7 @@ abstract class ArrayLayer(
     var isClamped = false
         set(clamped) {
             field = clamped
-            events.fireClampChanged()
+            events.clampChanged.fireAndForget()
         }
 
     /**
@@ -58,22 +58,22 @@ abstract class ArrayLayer(
     override fun randomize() {
         // TODO: Find non-obtrusive way to set randomizer for cases besides neuronarray
         inputs.randomize(UniformRealDistribution())
-        events.fireUpdated()
+        events.updated.fireAndForget()
     }
 
     override fun clear() {
         inputs.mul(0.0)
-        events.fireUpdated();
+        events.updated.fireAndForget()
     }
 
     override fun increment() {
         inputs.add(increment)
-        events.fireUpdated()
+        events.updated.fireAndForget()
     }
 
     override fun decrement() {
         inputs.sub(increment)
-        events.fireUpdated()
+        events.updated.fireAndForget()
     }
 
     override fun getNetwork(): Network {

@@ -28,3 +28,12 @@ class SynapseGroup2Events(val sg: SynapseGroup2) : NetworkModelEvents(sg) {
     fun fireVisibilityChange() = "VisibilityChange"()
 
 }
+
+// Lol
+class SynapseGroup2Events2: NetworkModelEvents2() {
+    val visibilityChanged = NoArgEvent()
+    val synapseAdded = AddedEvent<Synapse>()
+    val synapseRemoved = RemovedEvent<Synapse>()
+    val synapseListChanged = NoArgEvent()
+    val locationChanged = ChangedEvent<Point2D>()
+}

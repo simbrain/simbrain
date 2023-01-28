@@ -196,7 +196,7 @@ class DeepNet(
         } else {
             outputs = Matrix(outputSize(), 1)
         }
-        events.fireUpdated()
+        events.updated.fireAndForget()
         inputs.mul(0.0) // clear inputs
     }
 

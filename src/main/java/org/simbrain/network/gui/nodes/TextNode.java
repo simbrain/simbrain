@@ -22,7 +22,7 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.NetworkTextObject;
-import org.simbrain.network.events.NetworkTextEvents;
+import org.simbrain.network.events.LocationEvents2;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
@@ -70,9 +70,9 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         this.setBounds(pStyledText.getBounds());
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
-        NetworkTextEvents events = text.getEvents();
-        events.onDeleted(n -> removeFromParent());
-        events.onLocationChange(this::pullViewPositionFromModel);
+        LocationEvents2 events = text.getEvents();
+        events.getDeleted().on(n -> removeFromParent());
+        events.getLocationChanged().on(this::pullViewPositionFromModel);
 
         update();
         pushViewPositionToModel();

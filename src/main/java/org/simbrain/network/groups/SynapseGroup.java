@@ -16,7 +16,8 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.*;
-import org.simbrain.network.events.SynapseGroupEvents;
+import org.simbrain.network.events.NetworkModelEvents2;
+import org.simbrain.network.events.SynapseGroup2Events2;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -75,7 +76,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     /**
      * Event support
      */
-    protected transient SynapseGroupEvents events = new SynapseGroupEvents(this);
+    protected transient SynapseGroup2Events2 events = new SynapseGroup2Events2();
 
     /**
      * The <b>default>/b> polarized randomizer associated with excitatory.
@@ -230,7 +231,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
             delete();
             throw new IllegalStateException(errMessage);
         }
-        events.fireVisibilityChange();
+        events.getVisibilityChanged().fireAndForget();
     }
 
     /**
@@ -370,7 +371,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         inSynapseSet.forEach(Synapse::delete);
         // targetNeuronGroup.removeIncomingSg(this);
         // sourceNeuronGroup.removeOutgoingSg(this);
-        events.fireDeleted();
+        events.getDeleted().fireAndForget(this);
     }
 
     @Override
@@ -397,7 +398,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
 
     public void setDisplaySynapses(boolean displaySynapses) {
         this.displaySynapses = displaySynapses;
-        events.fireVisibilityChange();
+        events.getVisibilityChanged().fireAndForget();
     }
 
     public boolean isDisplaySynapses() {
@@ -834,7 +835,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new SynapseGroupEvents(this);
+            events = new SynapseGroup2Events2();
         }
         exSynapseSet.forEach(Synapse::postOpenInit);
         inSynapseSet.forEach(Synapse::postOpenInit);
@@ -847,7 +848,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * @param synapse synapse to add
      */
     private void fireSynapseAdded(Synapse synapse) {
-        events.fireSynapseAdded(synapse);
+        events.getSynapseAdded().fireAndForget(synapse);
     }
 
     /**
@@ -856,14 +857,14 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * @param synapse synapse to remove
      */
     private void fireSynapseRemoved(Synapse synapse) {
-        events.fireSynapseRemoved(synapse);
+        events.getSynapseRemoved().fireAndForget(synapse);
     }
 
     public Network getParentNetwork() {
         return parentNetwork;
     }
 
-    public SynapseGroupEvents getEvents() {
+    public NetworkModelEvents2 getEvents() {
         return events;
     }
 

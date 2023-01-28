@@ -43,16 +43,16 @@ public class NeuronCollection extends AbstractNeuronCollection {
         subsamplingManager.resetIndices();
 
         neurons.forEach(n -> {
-            n.getEvents().onLocationChange(() -> events.fireLocationChange());
-            n.getEvents().onActivationChange((aold, anew) -> {
+            n.getEvents().getLocationChanged().on(() -> events.getLocationChanged());
+            n.getEvents().getActivationChanged().on((aold, anew) -> {
                 invalidateCachedActivations();
             });
         });
 
-        net.getEvents2().getModelRemoved().on(n -> {
+        net.getEvents().getModelRemoved().on(n -> {
             if (n instanceof Neuron) {
                 removeNeuron((Neuron) n);
-                events.fireLocationChange();
+                events.getLocationChanged().fireAndForget();
                 if (isEmpty()) {
                     delete();
                 }
@@ -70,14 +70,14 @@ public class NeuronCollection extends AbstractNeuronCollection {
         for (Neuron neuron : getNeuronList()) {
             neuron.offset(offsetX, offsetY, false);
         }
-        events.fireLocationChange();
+        events.getLocationChanged().fireAndForget();
     }
 
     /**
      * Call after deleting neuron collection from parent network.
      */
     public void delete() {
-        events.fireDeleted();
+        events.getDeleted().fireAndForget(this);
     }
 
     /**

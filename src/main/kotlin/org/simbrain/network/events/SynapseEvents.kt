@@ -22,3 +22,9 @@ class SynapseEvents(val synapse: Synapse) : NetworkModelEvents(synapse) {
     fun fireVisibilityChanged(old: Boolean, new: Boolean) = "VisibilityChanged"(old = old, new = new)
 
 }
+
+class SynapseEvents2: NetworkModelEvents2() {
+    val strengthUpdated = NoArgEvent()
+    val learningRuleUpdated = ChangedEvent<SynapseUpdateRule>()
+    val visbilityChanged = ChangedEvent<Boolean>()
+}

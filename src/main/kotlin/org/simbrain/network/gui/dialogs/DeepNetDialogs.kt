@@ -63,7 +63,7 @@ fun getDeepNetEditDialog(deepNet: DeepNet): StandardDialog {
         editor.commitChanges()
         layerEditor.commitChanges()
         // TODO: Rebuild deep net, but only if layer editor changed. Yulin.
-        deepNet.events.fireUpdated()
+        deepNet.events.updated.fireAndForget()
     }
     return dialog
 }

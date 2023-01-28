@@ -2,7 +2,6 @@ package org.simbrain.network.events
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.util.Event
-import java.beans.PropertyChangeSupport
 
 /**
  * @see Event
@@ -19,4 +18,8 @@ open class LocationEvents(model: NetworkModel) : NetworkModelEvents(model) {
      */
     open fun fireLocationChange() = "LocationChange"()
 
+}
+
+open class LocationEvents2: NetworkModelEvents2() {
+    val locationChanged = NoArgEvent()
 }

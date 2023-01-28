@@ -2,7 +2,7 @@ package org.simbrain.network.core;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
-import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.LocationEvents2;
 import org.simbrain.workspace.AttributeContainer;
 import smile.math.matrix.Matrix;
 
@@ -79,7 +79,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
     /**
      * Event support.
      */
-    private transient LocationEvents events = new LocationEvents(this);
+    private transient LocationEvents2 events = new LocationEvents2();
 
     /**
      * Returns the output size for this layer.
@@ -95,7 +95,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
      * Register a callback function to run when the location of this object is updated.
      */
     public void onLocationChange(Runnable task) {
-        getEvents().onLocationChange(task);
+        getEvents().getLocationChanged().on(task);
     }
 
     public abstract Network getNetwork();
@@ -132,26 +132,26 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new LocationEvents(this);
+            events = new LocationEvents2();
         }
     }
 
     @NotNull
     @Override
-    public LocationEvents getEvents() {
+    public LocationEvents2 getEvents() {
         return events;
     }
 
     @Override
     public void delete() {
-        getEvents().fireDeleted();
+        getEvents().getDeleted().fireAndForget(this);
     }
 
     /**
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new LocationEvents(this);
+        events = new LocationEvents2();
         return this;
     }
 
@@ -165,7 +165,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
     public void setLocation(Point2D location) {
         this.x = location.getX();
         this.y = location.getY();
-        getEvents().fireLocationChange();
+        getEvents().getLocationChanged().fireAndForget();
     }
 
     public double getX() {
@@ -182,7 +182,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
 
     public void setWidth(double width) {
         this.width = width;
-        getEvents().fireLocationChange();
+        getEvents().getLocationChanged().fireAndForget();
     }
 
     public double getHeight() {
@@ -191,7 +191,7 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
 
     public void setHeight(double height) {
         this.height = height;
-        getEvents().fireLocationChange();
+        getEvents().getLocationChanged().fireAndForget();
     }
 
 }

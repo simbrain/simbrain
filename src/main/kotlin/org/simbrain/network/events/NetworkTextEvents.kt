@@ -2,8 +2,6 @@ package org.simbrain.network.events
 
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.util.Event
-import java.beans.PropertyChangeSupport
-import java.util.function.Consumer
 
 /**
  * @see Event

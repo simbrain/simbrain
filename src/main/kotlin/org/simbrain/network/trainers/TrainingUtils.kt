@@ -43,7 +43,7 @@ fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
     // TODO: Bias
     val weightDeltas = outputError.mm(source.outputs.transpose())
     weightMatrix.add(weightDeltas.mul(epsilon))
-    events.fireUpdated()
+    events.updated.fireAndForget()
 }
 
 /**

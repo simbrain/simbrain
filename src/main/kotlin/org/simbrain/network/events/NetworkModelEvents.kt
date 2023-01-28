@@ -2,6 +2,7 @@ package org.simbrain.network.events
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.util.Event
+import org.simbrain.util.Events2
 import java.beans.PropertyChangeSupport
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -25,5 +26,15 @@ open class NetworkModelEvents(val model: NetworkModel) : Event(PropertyChangeSup
 
     fun onUpdated(handler: Runnable) = "Updated".event(handler)
     fun fireUpdated() = "Updated"()
+
+}
+
+open class NetworkModelEvents2: Events2() {
+
+    val selected = AddedEvent<NetworkModel>()
+    var deleted = RemovedEvent<NetworkModel>()
+    var labelChanged = ChangedEvent<String>()
+    var clampChanged = NoArgEvent()
+    var updated = NoArgEvent()
 
 }

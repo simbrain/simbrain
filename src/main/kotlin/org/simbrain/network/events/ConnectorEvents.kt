@@ -18,3 +18,8 @@ class ConnectorEvents(val wm: Connector) : NetworkModelEvents(wm) {
     fun fireLineUpdated() = "LineUpdated"()
 
 }
+
+class ConnectorEvents2: NetworkModelEvents2() {
+    val locationChanged = ChangedEvent<Point2D>()
+    val lineUpdated = NoArgEvent()
+}

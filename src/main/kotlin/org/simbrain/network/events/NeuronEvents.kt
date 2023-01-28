@@ -29,3 +29,11 @@ class NeuronEvents(val neuron: Neuron) : LocationEvents(neuron) {
     fun fireUpdateRuleChange(old: NeuronUpdateRule?, new: NeuronUpdateRule) = "UpdateRuleChange"(old = old, new = new)
 
 }
+
+class NeuronEvents2: LocationEvents2() {
+
+    val activationChanged = ChangedEvent<Double>()
+    val spiked = AddedEvent<Boolean>()
+    val colorChanged = NoArgEvent()
+    val updateRuleChanged = ChangedEvent<NeuronUpdateRule>()
+}

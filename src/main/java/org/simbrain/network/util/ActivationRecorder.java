@@ -87,7 +87,7 @@ public class ActivationRecorder {
             e.printStackTrace();
         }
 
-        nc.getEvents().fireRecordingStarted();
+        nc.getEvents().getRecordingStarted().fireAndForget();
     }
 
     /**
@@ -99,7 +99,7 @@ public class ActivationRecorder {
             valueWriter = null;
         }
         recording = false;
-        nc.getEvents().fireRecordingStopped();
+        nc.getEvents().getRecordingStopped().fireAndBlock();
     }
 
     /**

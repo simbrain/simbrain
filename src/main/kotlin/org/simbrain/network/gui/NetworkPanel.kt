@@ -78,7 +78,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     var autoZoom = true
         set(value) {
             field = value
-            network.events2.zoomToFitPage.fireAndForget()
+            network.events.zoomToFitPage.fireAndForget()
         }
 
     var editMode: EditMode = EditMode.SELECTION
@@ -140,7 +140,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         set(value) {
             field = value
             network.freeSynapses.forEach { it.isVisible = value }
-            network.events2.freeWeightVisibilityChanged.fireAndForget(value)
+            network.events.freeWeightVisibilityChanged.fireAndForget(value)
         }
 
     /**
@@ -209,7 +209,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         // Repaint whenever window is opened or changed.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                network.events2.zoomToFitPage.fireAndForget()
+                network.events.zoomToFitPage.fireAndForget()
             }
         })
 
@@ -235,14 +235,14 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      */
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also { node ->
         canvas.layer.addChild(node)
-        node.model.events.onSelected {
+        node.model.events.selected.on {
             if (node is NeuronGroupNode) {
                 selectionManager.add(node.interactionBox)
             } else {
                 selectionManager.add(node)
             }
         }
-        network.events2.zoomToFitPage.fireAndForget()
+        network.events.zoomToFitPage.fireAndForget()
     }
 
     private fun createNode(model: NetworkModel): ScreenElement {
@@ -395,7 +395,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         selectionManager.selection.forEach { delete(it) }
 
         // Zoom events are costly so only zoom after main deletion events
-        network.events2.zoomToFitPage.fireAndForget()
+        network.events.zoomToFitPage.fireAndForget()
     }
 
     private fun createEditToolBar() = CustomToolBar().apply {
@@ -675,19 +675,19 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     private fun initEventHandlers() {
-        val event = network.events2
+        val event = network.events
         event.modelAdded.on(Dispatchers.Swing) { list ->
             list.forEach { createNode(it) }
         }
         event.modelRemoved.on {
-            network.events2.zoomToFitPage.fireAndForget()
+            network.events.zoomToFitPage.fireAndForget()
         }
         event.updateActionsChanged.on { timeLabel.update() }
         event.updated.on(Dispatchers.Swing) {
             repaint()
             timeLabel.update()
         }
-        network.events2.zoomToFitPage.on {
+        network.events.zoomToFitPage.on {
             if (autoZoom && editMode.isSelection) {
                 val filtered = canvas.layer.getUnionOfChildrenBounds(null)
                 val adjustedFiltered = PBounds(

@@ -6,7 +6,7 @@ import org.simbrain.network.core.ArrayLayer;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.events.NeuronArrayEvents;
+import org.simbrain.network.events.NeuronArrayEvents2;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.util.UserParameter;
@@ -49,7 +49,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
             order = 10)
     private boolean gridMode = false;
 
-    private transient NeuronArrayEvents events = new NeuronArrayEvents(this);
+    private transient NeuronArrayEvents2 events = new NeuronArrayEvents2();
 
     /**
      * Construct a neuron array.
@@ -96,7 +96,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     public void randomize() {
         activations = Matrix.rand(size(),1,
                 new GaussianDistribution(0, 1));
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override
@@ -115,13 +115,13 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     @NotNull
     @Override
-    public NeuronArrayEvents getEvents() {
+    public NeuronArrayEvents2 getEvents() {
         return events;
     }
 
     @Override
     public void onCommit() {
-        getEvents().fireLabelChange("", getLabel());
+        getEvents().getLabelChanged().fireAndForget("", getLabel());
     }
 
     @Override
@@ -137,7 +137,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
      */
     public void offset(final double offsetX, final double offsetY) {
         setLocation(getX() + offsetX, getY() + offsetY);
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     /**
@@ -176,13 +176,13 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         }
         updateRule.apply(this, dataHolder);
         getInputs().mul(0); // clear inputs
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
 
     public void setActivations(Matrix newActivations) {
         activations = newActivations;
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     public void setActivations(double[] newActivations) {
@@ -190,7 +190,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     }
 
     public void fireLocationChange() {
-        getEvents().fireLocationChange();
+        getEvents().getLocationChanged().fireAndForget();
     }
 
     /**
@@ -219,25 +219,25 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     @Override
     public void clear() {
         activations.mul(0);
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override
     public void increment() {
         activations.add(getIncrement());
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override
     public void decrement() {
         activations.sub(getIncrement());
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     public void setUpdateRule(NeuronUpdateRule updateRule) {
         this.updateRule = updateRule;
         dataHolder = updateRule.createMatrixData(size());
-        getEvents().fireUpdateRuleChange();
+        getEvents().getUpdated().fireAndForget();
     }
 
     public NeuronUpdateRule getUpdateRule() {
@@ -254,7 +254,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     public void setGridMode(boolean gridMode) {
         this.gridMode = gridMode;
-        getEvents().fireGridModeChange();
+        getEvents().getUpdated().fireAndForget();
     }
 
     public boolean isGridMode() {
@@ -265,7 +265,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new NeuronArrayEvents(this);
+        events = new NeuronArrayEvents2();
         return this;
     }
 

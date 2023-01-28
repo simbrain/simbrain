@@ -268,7 +268,7 @@ open class Events2: CoroutineScope {
                 new, old -> handler.accept(new as T, old as T)
         }
 
-        suspend fun fireAndForget(new: T, old: T) = fireAndForgetHelper { handler -> if (new != old) handler(new, old) }
+        fun fireAndForget(new: T, old: T) = fireAndForgetHelper { handler -> if (new != old) handler(new, old) }
 
         suspend fun fireAndSuspend(new: T, old: T) = fireAndSuspendHelper { handler -> if (new != old) handler(new, old) }
 

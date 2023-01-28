@@ -162,7 +162,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public void delete() {
         super.delete();
-        events.fireDeleted();
+        events.getDeleted().fireAndForget(this);
         neuronList.forEach(Neuron::delete);
         activationRecorder.stopRecording();
     }

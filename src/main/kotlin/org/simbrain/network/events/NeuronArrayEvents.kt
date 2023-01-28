@@ -15,3 +15,8 @@ open class NeuronArrayEvents(na: NeuronArray) : LocationEvents(na) {
     fun fireUpdateRuleChange() = "UpdateRuleChange"()
 
 }
+
+class NeuronArrayEvents2: LocationEvents2() {
+    val gridModeChanged = NoArgEvent()
+    val updateRuleChanged = NoArgEvent()
+}

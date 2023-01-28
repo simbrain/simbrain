@@ -63,25 +63,25 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         interactionBox = SynapseGroup2InteractionBox(networkPanel, synapseGroup, this)
         interactionBox.setText(synapseGroup.label)
         addChild(interactionBox)
-        synapseGroup.source.events.onLocationChange { layoutChildren() }
-        synapseGroup.target.events.onLocationChange { layoutChildren() }
+        synapseGroup.source.events.locationChanged.on { layoutChildren() }
+        synapseGroup.target.events.locationChanged.on { layoutChildren() }
 
         // Handle events
         val events = synapseGroup.events
-        events.onDeleted { s: NetworkModel -> removeFromParent() }
-        events.onLabelChange { o: String, n: String -> updateText() }
-        events.onVisibilityChange {
+        events.deleted.on { s: NetworkModel -> removeFromParent() }
+        events.labelChanged.on { o: String, n: String -> updateText() }
+        events.visibilityChanged.on {
             setVisibility()
         }
-        events.onSynapseAdded { s ->
+        events.synapseAdded.on { s ->
             this@SynapseGroup2Node.networkPanel.createNode(s)
             refreshVisible()
         }
-        events.onSynapseRemoved { s ->
+        events.synapseRemoved.on { s ->
             s.delete()
             refreshVisible()
         }
-        events.onSynapseListChanged() {
+        events.synapseListChanged.on{
             setVisibility()
             refreshVisible()
         }

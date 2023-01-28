@@ -179,7 +179,7 @@ fun SynapseGroup2Node.getDialog(): StandardDialog {
         matrixViewerPanel.add(matrixViewer)
     }
 
-    synapseGroup.events.onSynapseListChanged(){
+    synapseGroup.events.synapseListChanged.on {
         sap.fullUpdate()
         initWeightMatrixViewer()
     }

@@ -21,7 +21,7 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.SynapseEvents;
+import org.simbrain.network.events.SynapseEvents2;
 import org.simbrain.network.gui.NetworkPanel;
 
 import javax.swing.*;
@@ -148,19 +148,19 @@ public final class SynapseNode extends ScreenElement {
         circle.setPickable(true);
         line.setPickable(false);
 
-        SynapseEvents events = synapse.getEvents();
+        SynapseEvents2 events = synapse.getEvents();
 
-        events.onDeleted(s -> removeFromParent());
-        events.onStrengthUpdate(() -> {
+        events.getDeleted().on(s -> removeFromParent());
+        events.getStrengthUpdated().on(() -> {
             updateColor();
             updateDiameter();
         });
-        events.onVisibilityChanged((oldVisibility, newVisibility) -> setVisible(newVisibility));
+        events.getVisbilityChanged().on((oldVisibility, newVisibility) -> setVisible(newVisibility));
         setVisible(synapse.isVisible());
-        events.onClampChanged(this::updateClampStatus);
+        events.getClampChanged().on(this::updateClampStatus);
 
         // Respond to spiking events
-        source.getNeuron().getEvents().onSpiked(s -> updateSpikeColor());
+        source.getNeuron().getEvents().getSpiked().on(s -> updateSpikeColor());
 
     }
 

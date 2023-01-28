@@ -19,7 +19,7 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.SynapseEvents;
+import org.simbrain.network.events.SynapseEvents2;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -210,7 +210,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Support for property change events.
      */
-    private transient SynapseEvents events = new SynapseEvents(this);
+    private transient SynapseEvents2 events = new SynapseEvents2();
 
     static {
         Properties properties = Utils.getSimbrainProperties();
@@ -475,7 +475,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     public void forceSetStrength(final double wt) {
         strength = wt;
-        events.fireStrengthUpdate();
+        events.getStrengthUpdated().fireAndForget();
     }
 
     public double getUpperBound() {
@@ -484,7 +484,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     public void setUpperBound(final double d) {
         upperBound = d;
-        events.fireStrengthUpdate(); // to force a graphics update
+        events.getStrengthUpdated().fireAndForget(); // to force a graphics update
     }
 
     public double getLowerBound() {
@@ -493,7 +493,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     public void setLowerBound(final double d) {
         lowerBound = d;
-        events.fireStrengthUpdate(); // to force a graphics update
+        events.getStrengthUpdated().fireAndForget(); // to force a graphics update
     }
 
     public double getIncrement() {
@@ -749,9 +749,9 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
         // change support initialized.
         if (events == null) {
-            events = new SynapseEvents(this);
+            events = new SynapseEvents2();
         }
-        events.fireLearningRuleUpdate(oldRule, learningRule);
+        events.getLearningRuleUpdated().fireAndForget(oldRule, learningRule);
     }
 
     /**
@@ -842,7 +842,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         // Trying to fire an event from here causes problems relating to
         // template synapses
         if (getNetwork() != null && !isTemplate) {
-            getEvents().fireClampChanged();
+            getEvents().getClampChanged().fireAndForget();
         }
     }
 
@@ -856,7 +856,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     @Override
     public void postOpenInit() {
-        events = new SynapseEvents(this);
+        events = new SynapseEvents2();
         if (getTarget() != null) {
             if (getTarget().getFanIn() != null) {
                 getTarget().addAfferent(this);
@@ -900,7 +900,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         setFrozen(!isFrozen());
     }
 
-    public SynapseEvents getEvents() {
+    public SynapseEvents2 getEvents() {
         return events;
     }
 
@@ -920,7 +920,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         if (getTarget() != null) {
             getTarget().removeAfferent(this);
         }
-        getEvents().fireDeleted();
+        getEvents().getDeleted().fireAndForget(this);
     }
 
     public void hardClear() {
@@ -937,7 +937,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     }
 
     public void setVisible(boolean newVisibility) {
-        events.fireVisibilityChanged(isVisible, newVisibility);
+        events.getVisbilityChanged().fireAndForget(isVisible, newVisibility);
         isVisible = newVisibility;
     }
 

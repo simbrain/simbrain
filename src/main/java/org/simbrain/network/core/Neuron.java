@@ -21,7 +21,7 @@ package org.simbrain.network.core;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.events.NeuronEvents;
+import org.simbrain.network.events.NeuronEvents2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
@@ -195,7 +195,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Support for property change events.
      */
-    private transient NeuronEvents events = new NeuronEvents(this);
+    private transient NeuronEvents2 events = new NeuronEvents2();
 
     /**
      * Local data holder for neuron update rule.
@@ -265,7 +265,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public void postOpenInit() {
-        events = new NeuronEvents(this);
+        events = new NeuronEvents2();
         fanOut = new HashMap<>();
         fanIn = new ArrayList<>();
         if (polarity == null) {
@@ -331,7 +331,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
         if (getNetwork() != null) {
             getNetwork().updateTimeType();
-            events.fireUpdateRuleChange(oldRule, updateRule);
+            events.getUpdateRuleChanged().fireAndForget(oldRule, updateRule);
         }
     }
 
@@ -381,7 +381,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
                 activation = act;
             }
         }
-        events.fireActivationChange(lastActivation, act);
+        events.getActivationChanged().fireAndForget(lastActivation, act);
     }
 
     /**
@@ -396,7 +396,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void forceSetActivation(final double act) {
         lastActivation = getActivation();
         activation = act;
-        events.fireActivationChange(lastActivation, act);
+        events.getActivationChanged().fireAndForget(lastActivation, act);
     }
 
     @Producible()
@@ -778,7 +778,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     public void setClamped(final boolean clamped) {
         this.clamped = clamped;
-        getEvents().fireClampChanged();
+        getEvents().getClampChanged().fireAndForget();
     }
 
     /**
@@ -936,7 +936,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void setPolarity(Polarity polarity) {
         this.polarity = polarity;
         fanOut.values().forEach(s -> s.setStrength(polarity.value(s.getStrength())));
-        events.fireColorChange();
+        events.getColorChanged().fireAndForget();
     }
 
     // TODO: Move these methods to SpikingScalarData?
@@ -950,7 +950,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         if (dataHolder instanceof SpikingScalarData) {
             ((SpikingScalarData) dataHolder).setHasSpiked(spike, parent.getTime());
         }
-        events.fireSpiked(spike);
+        events.getSpiked().fireAndForget(spike);
     }
 
     public Double getLastSpikeTime() {
@@ -977,7 +977,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         y = position.getY();
         tempDebugNan(this);
         if (fireEvent) {
-            events.fireLocationChange();
+            events.getLocationChanged().fireAndForget();
         }
     }
 
@@ -1040,7 +1040,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void setX(final double x, boolean fireEvent) {
         this.x = x;
         if (fireEvent) {
-            events.fireLocationChange();
+            events.getLocationChanged().fireAndForget();
         }
     }
 
@@ -1051,7 +1051,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void setY(final double y, boolean fireEvent) {
         this.y = y;
         if (fireEvent) {
-            events.fireLocationChange();
+            events.getLocationChanged().fireAndForget();
         }
     }
 
@@ -1061,7 +1061,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     public void setZ(final double z) {
         this.z = z;
-        events.fireLocationChange();
+        events.getLocationChanged().fireAndForget();
     }
 
     /**
@@ -1084,7 +1084,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         return getId();
     }
 
-    public NeuronEvents getEvents() {
+    public NeuronEvents2 getEvents() {
         return events;
     }
 
@@ -1092,7 +1092,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void delete() {
         getNetwork().updatePriorityList();
         deleteConnectedSynapses();
-        events.fireDeleted();
+        events.getDeleted().fireAndForget(this);
     }
 
 }

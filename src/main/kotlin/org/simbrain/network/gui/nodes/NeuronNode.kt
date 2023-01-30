@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
@@ -131,7 +133,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         // Handle events
         val events = neuron.events
         events.deleted.on { n: NetworkModel? -> removeFromParent() }
-        events.activationChanged.on { o: kotlin.Double?, n: kotlin.Double? ->
+        events.activationChanged.on(Dispatchers.Swing) { _, _ ->
             updateColor()
             updateText()
         }

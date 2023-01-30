@@ -1092,7 +1092,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void delete() {
         getNetwork().updatePriorityList();
         deleteConnectedSynapses();
-        events.getDeleted().fireAndForget(this);
+        events.getDeleted().fireAndBlock(this);
     }
 
 }

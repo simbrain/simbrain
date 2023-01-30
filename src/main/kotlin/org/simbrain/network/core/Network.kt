@@ -202,7 +202,7 @@ class Network: CoroutineScope {
 
         updateTime()
         setUpdateCompleted(true)
-        events.updated.fireAndForget()
+        events.updated.fireAndBlock()
     }
 
     /**

@@ -40,7 +40,7 @@ import javax.swing.event.InternalFrameEvent
 /**
  * Main GUI representation of a [Network].
  */
-class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel() {
+class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
      * Main Piccolo canvas object.
@@ -53,6 +53,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      * Reference to the model network
      */
     val network: Network = networkComponent.network
+
+    override val coroutineContext get() = network.coroutineContext
 
     /**
      * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s

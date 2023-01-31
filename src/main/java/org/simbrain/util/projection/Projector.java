@@ -97,7 +97,7 @@ public class Projector implements AttributeContainer {
     /**
      * Handle network events.
      */
-    private transient ProjectorEvents events = new ProjectorEvents(this);
+    private transient ProjectorEvents2 events = new ProjectorEvents2();
 
     /**
      * Probability of the current state relative to the {@link #predictor} object.
@@ -149,7 +149,7 @@ public class Projector implements AttributeContainer {
         // TODO: This seems to be called twice when adding a projection component.
         upstairs = new Dataset(dims);
         downstairs = new Dataset(2);
-        events.fireDataChanged();
+        events.getDataChanged().fireAndForget();
     }
 
     private void init() {
@@ -165,7 +165,7 @@ public class Projector implements AttributeContainer {
      * Updates datasets from persistent forms of data.
      */
     public void postOpenInit() {
-        events = new ProjectorEvents(this);
+        events = new ProjectorEvents2();
         init();
     }
 
@@ -195,7 +195,7 @@ public class Projector implements AttributeContainer {
         if (existingPoint != null) {
             // That point was already in the dataset
             currentPoint = existingPoint;
-            events.firePointFound(currentPoint);
+            events.getPointFound().fireAndForget(currentPoint);
         } else {
             // It's a new point
             currentPoint = point;
@@ -208,7 +208,7 @@ public class Projector implements AttributeContainer {
             }
             downstairs.addPoint(newPoint);
             projectionMethod.project();
-            events.fireDataChanged();
+            events.getDataChanged().fireAndForget();
         }
 
         if (useColorManager) {
@@ -236,7 +236,7 @@ public class Projector implements AttributeContainer {
     public void setProjectionMethod(final ProjectionMethod method) {
         projectionMethod = method;
         method.init();
-        events.fireDataChanged();
+        events.getDataChanged().fireAndForget();
         projectionMethod.project();
     }
 
@@ -291,7 +291,7 @@ public class Projector implements AttributeContainer {
         }
         projectionMethod.init();
         projectionMethod.project();
-        events.fireDataChanged();
+        events.getDataChanged().fireAndForget();
     }
 
     /**
@@ -365,7 +365,7 @@ public class Projector implements AttributeContainer {
     public void reset() {
         upstairs.clear();
         downstairs.clear();
-        events.fireDataChanged();
+        events.getDataChanged().fireAndForget();
         predictor.clear();
     }
 
@@ -412,7 +412,7 @@ public class Projector implements AttributeContainer {
      */
     public void randomize(int upperBound) {
         downstairs.randomize(upperBound);
-        events.fireDataChanged();
+        events.getDataChanged().fireAndForget();
     }
 
     public DataColoringManager getColorManager() {
@@ -479,7 +479,7 @@ public class Projector implements AttributeContainer {
         return "Projector";
     }
 
-    public ProjectorEvents getEvents() {
+    public ProjectorEvents2 getEvents() {
         return events;
     }
 

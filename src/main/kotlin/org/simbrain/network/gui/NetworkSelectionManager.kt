@@ -1,7 +1,7 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.events.NetworkSelectionEvent
+import org.simbrain.network.events.NetworkSelectionEvent2
 import org.simbrain.network.gui.nodes.ScreenElement
 import java.util.concurrent.CopyOnWriteArraySet
 
@@ -20,7 +20,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     /**
      * Handle network selection events.
      */
-    val events = NetworkSelectionEvent(this)
+    val events = NetworkSelectionEvent2()
 
     /**
      * "Green" selection from lasso.
@@ -180,7 +180,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     private fun modifySourceSelection(block: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
         val old = HashSet(sourceSelection)
         (sourceSelection as CopyOnWriteArraySet).block()
-        events.fireSourceSelection(old, sourceSelection)
+        events.sourceSelection.fireAndForget(old, sourceSelection)
     }
 
     /**
@@ -190,7 +190,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
         val old = HashSet(selection)
         // Invoke provided action
         (selection as CopyOnWriteArraySet).action()
-        events.fireSelection(old, selection)
+        events.selection.fireAndForget(old, selection)
     }
 
 

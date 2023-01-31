@@ -56,6 +56,6 @@ class ShowTrainerAction(val networkPanel: NetworkPanel) : AbstractAction("Show T
     init {
         putValue(Action.SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Trainer.png"))
         updateAction()
-        networkPanel.selectionManager.events.onSelection { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
     }
 }

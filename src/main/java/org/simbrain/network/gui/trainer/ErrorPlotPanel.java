@@ -13,7 +13,6 @@
  */
 package org.simbrain.network.gui.trainer;
 
-import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel;
@@ -83,9 +82,9 @@ public class ErrorPlotPanel extends JPanel {
         add(mainPanel);
 
         model.addScalarTimeSeries("Error");
-        trainer.getEvents().onErrorUpdated(() -> {
+        trainer.getEvents().getErrorUpdated().on((error) -> {
             if (model != null) {
-                model.addData(0, trainer.getIteration(), trainer.getError());
+                model.addData(0, trainer.getIteration(), error);
                 updateErrorField();
             }
         });

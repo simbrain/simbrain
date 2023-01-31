@@ -20,9 +20,8 @@ package org.simbrain.network.gui.trainer;
 
 import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
-import org.simbrain.network.trainers.Trainer.DataNotInitializedException;
-import org.simbrain.util.ResourceManager;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -152,7 +151,7 @@ public class IterativeControlsPanel extends JPanel {
         propsBox.add(graphPanel);
 
         add(propsBox);
-        trainer.getEvents().onErrorUpdated(() -> {
+        trainer.getEvents().getErrorUpdated().on((error) -> {
             iterationsLabel.setText("" + trainer.getIteration());
             updateError();
         });

@@ -25,7 +25,6 @@ import org.simbrain.network.gui.showSelectedSynapseProperties
 import java.awt.Toolkit
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
-import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.KeyStroke
@@ -59,6 +58,6 @@ class SetSynapsePropertiesAction(networkPanel: NetworkPanel) : ConditionallyEnab
         updateAction()
 
         // add a selection listener to update state based on selection
-        networkPanel.selectionManager.events.onSelection { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
     }
 }

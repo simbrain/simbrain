@@ -45,6 +45,6 @@ class SetTextPropertiesAction(private val networkPanel: NetworkPanel, private va
     init {
         putValue(Action.SHORT_DESCRIPTION, "Set the properties of this text, e.g. font and size")
         updateAction()
-        networkPanel.selectionManager.events.onSelection { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
     }
 }

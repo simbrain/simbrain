@@ -233,7 +233,7 @@ public class BackpropTrainer extends IterableTrainer {
             mse = trainRow(getIteration() % numTrainingExamples);
         }
         incrementIteration();
-        getEvents().fireErrorUpdated();
+        getEvents().getErrorUpdated().fireAndForget(mse);
     }
 
     /**

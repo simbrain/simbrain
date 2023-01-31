@@ -160,7 +160,7 @@ public class DataWorldComponent extends WorkspaceComponent implements AttributeC
     @Override
     public void update() {
         dataTable.updateCurrentRow();
-        this.getEvents().fireComponentUpdated();
+        this.getEvents().getComponentUpdated().fireAndForget();
     }
 
     @Override

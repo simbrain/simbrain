@@ -109,7 +109,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
         val events = neuronArray.events
 
-        events.onGridModeChange {
+        events.gridModeChanged.on {
             gridMode = neuronArray.isGridMode
         }
         gridMode = neuronArray.isGridMode
@@ -119,14 +119,14 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         labelBackground.setBounds(labelText.bounds)
         labelBackground.addChild(labelText)
         addChild(labelBackground)
-        events.onLabelChange { o, n -> updateTextLabel() }
+        events.labelChanged.on { o, n -> updateTextLabel() }
         updateTextLabel()
 
-        events.onUpdated {
+        events.updated.on {
             updateActivationImage()
             updateInfoText()
         }
-        events.onUpdateRuleChange {
+        events.updateRuleChanged.on {
             if (!neuronArray.updateRule.isSpikingRule) {
                 mainNode.removeChild(spikeImage)
             }

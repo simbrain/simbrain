@@ -67,24 +67,24 @@ public class ZoeConnector extends Connector {
 
     @Override
     public void randomize() {
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override
     public void increment() {
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override
     public void decrement() {
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     /**
      * Set all entries to 0.
      */
     public void hardClear() {
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override

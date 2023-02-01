@@ -72,6 +72,9 @@ open class Events2: CoroutineScope {
 
         protected fun fireAndForgetHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit): Job {
             val now = System.currentTimeMillis()
+            if (interval == 0) {
+                return launch { runAllHandlers(run) }
+            }
             return when (timingMode) {
                 TimingMode.Throttle -> launch {
                     if (now >= intervalEndTime) {
@@ -90,6 +93,13 @@ open class Events2: CoroutineScope {
         }
 
         protected fun batchedFireAndForgetHelper(new: Any?, old: Any?): Job {
+            if (interval == 0) {
+                return launch {
+                    runAllHandlers { handler -> handler(batchNew, batchOld) }
+                    batchNew.clear()
+                    batchOld.clear()
+                }
+            }
             val now = System.currentTimeMillis()
             batchNew.add(new)
             batchOld.add(old)
@@ -258,7 +268,7 @@ open class Events2: CoroutineScope {
                 new, old -> handler.accept(new as T, old as T)
         }
 
-        suspend fun fireAndForget(new: T, old: T) = fireAndForgetHelper { handler -> if (new != old) handler(new, old) }
+        fun fireAndForget(new: T, old: T) = fireAndForgetHelper { handler -> if (new != old) handler(new, old) }
 
         suspend fun fireAndSuspend(new: T, old: T) = fireAndSuspendHelper { handler -> if (new != old) handler(new, old) }
 

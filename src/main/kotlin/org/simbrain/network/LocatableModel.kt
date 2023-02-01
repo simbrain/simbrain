@@ -1,6 +1,6 @@
 package org.simbrain.network
 
-import org.simbrain.network.events.LocationEvents
+import org.simbrain.network.events.LocationEvents2
 import org.simbrain.util.*
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
@@ -29,7 +29,7 @@ abstract class LocatableModel() : NetworkModel() {
     /**
      * Implementing classes must fire and handle location events.
      */
-    abstract override val events: LocationEvents
+    abstract override val events: LocationEvents2
 
     /**
      * Must call this _after_ adding a network model, because adding the model places the model using the layout

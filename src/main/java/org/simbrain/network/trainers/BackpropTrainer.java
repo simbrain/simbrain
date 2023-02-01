@@ -233,7 +233,7 @@ public class BackpropTrainer extends IterableTrainer {
             mse = trainRow(getIteration() % numTrainingExamples);
         }
         incrementIteration();
-        getEvents().fireErrorUpdated();
+        getEvents().getErrorUpdated().fireAndForget(mse);
     }
 
     /**
@@ -379,7 +379,7 @@ public class BackpropTrainer extends IterableTrainer {
             //     biasVector.putScalar(ii, biasVector.getDouble(ii) + deltaVal);
             //     lastBiasDeltas.putScalar(ii, deltaVal);
             // }
-            weightMatrix.getEvents().fireUpdated();
+            weightMatrix.getEvents().getUpdated().fireAndForget();
             layerIndex++;
         }
     }

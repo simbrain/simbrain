@@ -181,7 +181,7 @@ public class ProjectSammon extends IterableProjectionMethod {
 
         currentCloseness = e / dstarSum;
         setError(currentCloseness);
-        projector.getEvents().fireDataChanged();
+        projector.getEvents().getDataChanged().fireAndForget();
         // System.out.println("currentCloseness = " + currentCloseness);
     }
 

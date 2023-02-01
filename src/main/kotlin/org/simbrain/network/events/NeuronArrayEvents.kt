@@ -1,17 +1,11 @@
 package org.simbrain.network.events
 
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.util.Event
+import org.simbrain.util.Events2
 
 /**
- * @see [Event].
+ * See [Events2].
  */
-open class NeuronArrayEvents(na: NeuronArray) : LocationEvents(na) {
-
-    fun onGridModeChange(handler: Runnable) = "GridModeChange".event(handler)
-    fun fireGridModeChange() = "GridModeChange"()
-
-    fun onUpdateRuleChange(handler: Runnable) = "UpdateRuleChange".event(handler)
-    fun fireUpdateRuleChange() = "UpdateRuleChange"()
-
+class NeuronArrayEvents2: LocationEvents2() {
+    val gridModeChanged = NoArgEvent()
+    val updateRuleChanged = NoArgEvent()
 }

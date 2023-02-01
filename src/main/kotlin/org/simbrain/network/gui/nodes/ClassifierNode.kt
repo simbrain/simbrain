@@ -32,7 +32,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
 
     init {
         val events = smileClassifier.events
-        events.onUpdated {
+        events.updated.on {
             updateActivationImages()
             updateInfoText()
             updateBorder()

@@ -25,9 +25,9 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     init {
         layer.events.apply {
-            onDeleted { removeFromParent() }
-            onClampChanged { updateBorder() }
-            onLocationChange { pullViewPositionFromModel() }
+            deleted.on { removeFromParent() }
+            clampChanged.on { updateBorder() }
+            locationChanged.on { pullViewPositionFromModel() }
         }
         pickable = true
 

@@ -27,7 +27,7 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.events.WorkspaceComponentEvents;
+import org.simbrain.workspace.events.WorkspaceComponentEvents2;
 import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -95,10 +95,10 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
         }
 
         // Add a default update listener
-        WorkspaceComponentEvents events = workspaceComponent.getEvents();
+        WorkspaceComponentEvents2 events = workspaceComponent.getEvents();
 
-        events.onGUIToggled(() -> DesktopComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn()));
-        events.onComponentClosing(this::close);
+        events.getGuiToggled().on(() -> DesktopComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn()));
+        events.getComponentClosing().on(this::close);
 
         Logger.trace(this.getClass().getCanonicalName() + " created");
     }

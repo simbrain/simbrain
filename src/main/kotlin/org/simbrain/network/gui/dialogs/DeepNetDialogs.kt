@@ -63,7 +63,7 @@ fun getDeepNetEditDialog(deepNet: DeepNet): StandardDialog {
         editor.commitChanges()
         layerEditor.commitChanges()
         // TODO: Rebuild deep net, but only if layer editor changed. Yulin.
-        deepNet.events.fireUpdated()
+        deepNet.events.updated.fireAndForget()
     }
     return dialog
 }
@@ -228,11 +228,11 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         }
 
         // Register events
-        deepNet.trainerEvents.onBeginTraining {
+        deepNet.trainerEvents.beginTraining.on {
             console.text += "Begin training\n"
             console.caretPosition = console.text.length
         }
-        deepNet.trainerEvents.onEndTraining {
+        deepNet.trainerEvents.endTraining.on {
             console.text += "End training\n"
             console.text += "Loss = ${SimbrainMath.roundDouble(deepNet.lossValue, 10)}\n"
             console.caretPosition = console.text.length

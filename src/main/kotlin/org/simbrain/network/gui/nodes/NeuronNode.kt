@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
@@ -130,20 +132,20 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
         // Handle events
         val events = neuron.events
-        events.onDeleted { n: NetworkModel? -> removeFromParent() }
-        events.onActivationChange { o: kotlin.Double?, n: kotlin.Double? ->
+        events.deleted.on { n: NetworkModel? -> removeFromParent() }
+        events.activationChanged.on(Dispatchers.Swing) { _, _ ->
             updateColor()
             updateText()
         }
-        events.onSpiked { updateSpikeColor() }
-        events.onColorChange { updateColor() }
-        events.onLabelChange { _, _ ->
+        events.spiked.on { updateSpikeColor() }
+        events.colorChanged.on { updateColor() }
+        events.labelChanged.on { _, _ ->
             updateTextLabel()
-            networkPanel.network.events2.zoomToFitPage.fireAndForget()
+            networkPanel.network.events.zoomToFitPage.fireAndForget()
         }
-        events.onClampChanged { updateClampStatus() }
-        events.onLocationChange { pullViewPositionFromModel() }
-        events.onUpdateRuleChange { _, _ -> updateShape() }
+        events.clampChanged.on { updateClampStatus() }
+        events.locationChanged.on { pullViewPositionFromModel() }
+        events.updateRuleChanged.on { _, _ -> updateShape() }
     }
 
     /**

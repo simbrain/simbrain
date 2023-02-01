@@ -2,7 +2,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.core.Connector;
-import org.simbrain.network.events.ConnectorEvents;
+import org.simbrain.network.events.ConnectorEvents2;
 import org.simbrain.network.gui.ImageBox;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixArrow;
@@ -87,11 +87,11 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         setPickable(true);
 
-        ConnectorEvents events = weightMatrix.getEvents();
-        events.onDeleted(w -> removeFromParent());
-        events.onUpdated(this::renderMatrixToImage);
-        wm.getSource().getEvents().onLocationChange(arrow::invalidateFullBounds);
-        wm.getTarget().getEvents().onLocationChange(arrow::invalidateFullBounds);
+        ConnectorEvents2 events = weightMatrix.getEvents();
+        events.getDeleted().on(w -> removeFromParent());
+        events.getUpdated().on(this::renderMatrixToImage);
+        wm.getSource().getEvents().getLocationChanged().on(arrow::invalidateFullBounds);
+        wm.getTarget().getEvents().getLocationChanged().on(arrow::invalidateFullBounds);
         invalidateFullBounds();
     }
 
@@ -239,7 +239,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
             tabs.addTab("Weight Matrix", wmViewer);
             dialog.addClosingTask(() -> {
                 ((WeightMatrix) weightMatrix).setWeights(wm.get2DDoubleArray());
-                weightMatrix.getEvents().fireUpdated();
+                weightMatrix.getEvents().getUpdated().fireAndForget();
             });
         }
 

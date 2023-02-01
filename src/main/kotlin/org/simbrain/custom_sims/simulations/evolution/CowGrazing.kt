@@ -175,7 +175,7 @@ val grazingCows = newSim {
         }
 
         val networks = List(cowGenotypes.size) { index ->
-            NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
+            NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it, true) }.network
         }
         val entities = List(cowGenotypes.size) { i ->
             OdorWorldEntity(odorWorld, EntityType.COW).also {
@@ -263,7 +263,7 @@ val grazingCows = newSim {
             build()
             workspace.iterateSuspend(iterationsPerRun)
             // Determine a fitness for the sim based on the fitness of each cow
-            return cowFitnesses.values.min()
+            return cowFitnesses.values.minOrNull() ?: 0.0
         }
     }
 

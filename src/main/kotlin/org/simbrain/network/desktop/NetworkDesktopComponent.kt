@@ -141,8 +141,9 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
 
         // Toggle the network panel's visiblity if the workspace component is
         // set to "gui off"
-        component.events.onGUIToggled(Runnable
-        { networkPanel.guiOn = workspaceComponent!!.isGuiOn })
+        component.events.guiToggled.on {
+            networkPanel.guiOn = workspaceComponent!!.isGuiOn
+        }
     }
 
 }

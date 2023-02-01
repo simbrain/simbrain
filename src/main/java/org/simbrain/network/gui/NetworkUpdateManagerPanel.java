@@ -132,7 +132,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
 
         add(buttonPanel, BorderLayout.SOUTH);
 
-        network.getEvents2().getUpdateActionsChanged().on(this::updateCurrentActionsList);
+        network.getEvents().getUpdateActionsChanged().on(this::updateCurrentActionsList);
 
         // Help button
         Action helpAction = new ShowHelpAction("Pages/Network/update.html");

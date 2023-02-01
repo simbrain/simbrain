@@ -498,7 +498,6 @@ class SimbrainDesktop(val workspace: Workspace) {
 
             override fun internalFrameClosing(e: InternalFrameEvent) {
                 desktopComponent!!.close()
-                guiComponents.remove(workspaceComponent)
             }
 
             override fun internalFrameClosed(e: InternalFrameEvent) {

@@ -19,7 +19,7 @@
 package org.simbrain.network.trainers;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.events.TrainerEvents;
+import org.simbrain.network.events.TrainerEvents2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -49,7 +49,7 @@ public abstract class Trainer implements EditableObject {
     /**
      * Handle trainer events.
      */
-    private transient TrainerEvents events;
+    private transient TrainerEvents2 events;
 
     /**
      * Construct the trainer and pass in a reference to the trainable element.
@@ -144,7 +144,7 @@ public abstract class Trainer implements EditableObject {
         return newTrainer;
     }
 
-    public TrainerEvents getEvents() {
+    public TrainerEvents2 getEvents() {
         return events;
     }
 }

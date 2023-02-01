@@ -107,7 +107,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
     @Override
     public void update() {
         // Notify Gui that this component was updated.
-        getEvents().fireComponentUpdated();
+        getEvents().getComponentUpdated().fireAndForget();
     }
 
     public Projector getProjector() {

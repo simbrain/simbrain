@@ -1,7 +1,7 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.ConnectorEvents;
+import org.simbrain.network.events.ConnectorEvents2;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -31,7 +31,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     /**
      * Event support.
      */
-    private transient ConnectorEvents events = new ConnectorEvents(this);
+    private transient ConnectorEvents2 events = new ConnectorEvents2();
 
     /**
      * Whether to render an image of this entity.
@@ -56,10 +56,10 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     protected void initEvents() {
 
         // When the parents of the matrix are deleted, delete the matrix
-        source.getEvents().onDeleted(m -> {
+        source.getEvents().getDeleted().on(m -> {
             delete();
         });
-        target.getEvents().onDeleted(m -> {
+        target.getEvents().getDeleted().on(m -> {
             delete();
         });
     }
@@ -67,7 +67,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new ConnectorEvents(this);
+            events = new ConnectorEvents2();
         }
         initEvents();
     }
@@ -76,7 +76,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     public void delete() {
         source.removeOutgoingConnector(this);
         target.removeIncomingConnector(this);
-        getEvents().fireDeleted();
+        getEvents().getDeleted().fireAndForget(this);
     }
 
     public Layer getSource() {
@@ -96,7 +96,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     }
 
     @Override
-    public ConnectorEvents getEvents() {
+    public ConnectorEvents2 getEvents() {
         return events;
     }
 

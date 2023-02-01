@@ -3,7 +3,7 @@ package org.simbrain.network.groups;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.*;
-import org.simbrain.network.events.NeuronCollectionEvents;
+import org.simbrain.network.events.NeuronCollectionEvents2;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
@@ -59,7 +59,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     /**
      * Support for property change events.
      */
-    protected transient NeuronCollectionEvents events = new NeuronCollectionEvents(this);
+    protected transient NeuronCollectionEvents2 events = new NeuronCollectionEvents2();
 
     /**
      * Cache of neuron activation values.
@@ -197,7 +197,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         neuronList.forEach(n -> {
             n.offset(delta.getX(), delta.getY());
         });
-        events.fireLocationChange();
+        events.getLocationChanged().fireAndForget();
     }
 
     public Rectangle2D getBound() { return LocatableModelKt.getBound(neuronList); }
@@ -243,7 +243,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         for (Neuron neuron : neuronList) {
             neuron.offset(offsetX, offsetY, false);
         }
-        events.fireLocationChange();
+        events.getLocationChanged().fireAndForget();
     }
 
     /**
@@ -276,13 +276,13 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * Add listener to indicated neuron.
      */
     protected void addListener(Neuron n) {
-        n.getEvents().onLocationChange(() -> events.fireLocationChange());
+        n.getEvents().getLocationChanged().on(() -> events.getLocationChanged().fireAndForget());
         // n.getEvents().onLocationChange(fireLocationChange); // TODO Reimplement when debounce is working
-        n.getEvents().onDeleted(neuronList::remove);
-        n.getEvents().onActivationChange((aold,anew) -> {
+        n.getEvents().getDeleted().on(neuronList::remove);
+        n.getEvents().getActivationChanged().on((aold,anew) -> {
             invalidateCachedActivations();
         });
-        n.getEvents().onDeleted(neuron-> {
+        n.getEvents().getDeleted().on(neuron-> {
             neuronList.remove(neuron);
             if (isEmpty()) {
                 delete();
@@ -739,7 +739,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new NeuronCollectionEvents(this);
+            events = new NeuronCollectionEvents2();
         }
 
         // TODO: Resave and remove
@@ -748,7 +748,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         }
     }
 
-    public NeuronCollectionEvents getEvents() {
+    public NeuronCollectionEvents2 getEvents() {
         return events;
     }
 
@@ -786,7 +786,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
                 .map(a -> a + amount)
                 .toArray();
         setActivations(newActivations);
-        events.fireUpdated();
+        events.getUpdated().fireAndForget();
     }
 
     /**
@@ -798,7 +798,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
                 .map(a -> a - amount)
                 .toArray();
         setActivations(newActivations);
-        events.fireUpdated();
+        events.getUpdated().fireAndForget();
     }
 
     /**
@@ -807,7 +807,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     public void clearArray() {
         double[] newActivations = new double[getActivations().length];
         setActivations(newActivations);
-        events.fireUpdated();
+        events.getUpdated().fireAndForget();
     }
 
     @Override

@@ -37,7 +37,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
             statsLabel.text = classifier.stats
         }
         updateStatsLabel()
-        events.onUpdated {
+        events.updated.on {
             updateStatsLabel()
         }
 

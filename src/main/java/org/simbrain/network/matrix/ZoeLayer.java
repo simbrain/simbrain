@@ -41,7 +41,7 @@ public class ZoeLayer extends ArrayLayer implements EditableObject, AttributeCon
     @Override
     public void update() {
         System.out.println("Zoë Layer updated");
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override

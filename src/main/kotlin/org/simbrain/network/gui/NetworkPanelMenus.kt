@@ -157,7 +157,7 @@ val NetworkPanel.viewMenu
             add(JCheckBoxMenuItem(showPrioritiesAction).apply { this.state = networkPanel.prioritiesVisible })
             add(JCheckBoxMenuItem(toggleFreeWeightVisibility).apply {
                 this.state = networkPanel.freeWeightsVisible
-                networkPanel.network.events2.freeWeightVisibilityChanged.on {
+                networkPanel.network.events.freeWeightVisibilityChanged.on {
                     this.state = it
                 }
             })

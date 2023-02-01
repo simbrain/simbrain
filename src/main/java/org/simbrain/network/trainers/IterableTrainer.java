@@ -13,7 +13,7 @@
  */
 package org.simbrain.network.trainers;
 
-import org.simbrain.network.events.TrainerEvents;
+import org.simbrain.network.events.TrainerEvents2;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -42,7 +42,7 @@ public abstract class IterableTrainer implements EditableObject {
     /**
      * Handle trainer events.
      */
-    private transient TrainerEvents events = new TrainerEvents(this);
+    private transient TrainerEvents2 events = new TrainerEvents2();
 
     /**
      * Current stopping condition.
@@ -116,7 +116,7 @@ public abstract class IterableTrainer implements EditableObject {
         getTrainingSet().getInputs();
         getTrainingSet().getTargets();
 
-        events.fireBeginTraining();
+        events.getBeginTraining().fireAndForget();
         switch (stoppingCondition) {
             case NONE -> apply();
             case NUM_ITERATIONS -> {
@@ -137,7 +137,7 @@ public abstract class IterableTrainer implements EditableObject {
             default -> {
             }
         }
-        events.fireEndTraining();
+        events.getEndTraining().fireAndForget();
 
     }
 
@@ -210,7 +210,7 @@ public abstract class IterableTrainer implements EditableObject {
 
     }
 
-    public TrainerEvents getEvents() {
+    public TrainerEvents2 getEvents() {
         return events;
     }
 }

@@ -21,7 +21,7 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.LocationEvents2;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
@@ -94,10 +94,10 @@ public class SubnetworkNode extends ScreenElement {
 
         setContextMenu(this.getDefaultContextMenu());
 
-        LocationEvents events = subnetwork.getEvents();
-        events.onDeleted(n -> removeFromParent());
-        events.onLabelChange((o, n) -> updateText());
-        events.onLocationChange(this::layoutChildren);
+        LocationEvents2 events = subnetwork.getEvents();
+        events.getDeleted().on(n -> removeFromParent());
+        events.getLabelChanged().on((o, n) -> updateText());
+        events.getLocationChanged().on(this::layoutChildren);
     }
 
     @Override
@@ -114,12 +114,12 @@ public class SubnetworkNode extends ScreenElement {
     public void addNode(ScreenElement node) {
         outlinedObjects.add(node);
         node.lowerToBottom();
-        node.getModel().getEvents().onDeleted(sg -> {
+        node.getModel().getEvents().getDeleted().on(sg -> {
             outlinedObjects.remove(node);
             outline.resetOutlinedNodes(outlinedObjects);
         });
         if (node.getModel() instanceof LocatableModel) {
-            ((LocatableModel)node.getModel()).getEvents().fireLocationChange();
+            ((LocatableModel)node.getModel()).getEvents().getLocationChanged().fireAndForget();
         }
 
         outline.resetOutlinedNodes(outlinedObjects);

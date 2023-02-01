@@ -210,7 +210,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
                 executor.execute(() -> {
                     while (proj.isRunning()) {
                         proj.iterate();
-                        proj.getEvents().fireDataChanged();
+                        proj.getEvents().getDataChanged().fireAndForget();
                     }
                 });
             }
@@ -291,12 +291,12 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         // Other initialization
         initializeComboBoxes();
 
-        proj.getEvents().onPointFound(p -> update());
-        proj.getEvents().onDataChanged(() -> {
+        proj.getEvents().getPointFound().on(p -> update());
+        proj.getEvents().getDataChanged().on(() -> {
             resetData();
             update();
         });
-        proj.getEvents().onColorsChanged(() -> {
+        proj.getEvents().getColorsChanged().on(() -> {
             proj.resetColors();
             update();
         });
@@ -347,7 +347,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
                 if (projMethod instanceof ProjectCoordinate) {
                     ((ProjectCoordinate) projMethod).setHiD1(adjustDimension1.getSelectedIndex());
                     projMethod.project();
-                    getWorkspaceComponent().getProjector().getEvents().fireDataChanged();
+                    getWorkspaceComponent().getProjector().getEvents().getDataChanged().fireAndForget();
                 }
             }
         });
@@ -358,7 +358,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
                 if (projecMethod instanceof ProjectCoordinate) {
                     ((ProjectCoordinate) projecMethod).setHiD2(adjustDimension2.getSelectedIndex());
                     projecMethod.project();
-                    getWorkspaceComponent().getProjector().getEvents().fireDataChanged();
+                    getWorkspaceComponent().getProjector().getEvents().getDataChanged().fireAndForget();
                 }
             }
         });

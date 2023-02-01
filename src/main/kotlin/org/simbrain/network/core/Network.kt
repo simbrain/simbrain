@@ -74,7 +74,7 @@ class Network: CoroutineScope {
      * Handle network events.
      */
     @Transient
-    var events2 = NetworkEvents2()
+    var events = NetworkEvents2()
         private set
 
     /**
@@ -202,7 +202,7 @@ class Network: CoroutineScope {
 
         updateTime()
         setUpdateCompleted(true)
-        events2.updated.fireAndForget()
+        events.updated.fireAndBlock()
     }
 
     /**
@@ -367,11 +367,11 @@ class Network: CoroutineScope {
             if (model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)
             }
-            model.events.onDeleted {
+            model.events.deleted.on {
                 networkModels.remove(it)
-                events2.modelRemoved.fireAndForget(it)
+                events.modelRemoved.fireAndForget(it)
             }
-            events2.modelAdded.fireAndForget(model)
+            events.modelAdded.fireAndForget(model)
             if (model is Neuron) updatePriorityList()
         }
     }
@@ -383,11 +383,11 @@ class Network: CoroutineScope {
             if (model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)
             }
-            model.events.onDeleted {
+            model.events.deleted.on {
                 networkModels.remove(it)
-                events2.modelRemoved.fireAndForget(it)
+                events.modelRemoved.fireAndForget(it)
             }
-            events2.modelAdded.fireAndSuspend(model)
+            events.modelAdded.fireAndSuspend(model)
             if (model is Neuron) updatePriorityList()
         }
     }
@@ -449,7 +449,7 @@ class Network: CoroutineScope {
 
         placementManager = PlacementManager()
 
-        events2 = NetworkEvents2()
+        events = NetworkEvents2()
         updateCompleted = AtomicBoolean(false)
         updatePriorityList();
 

@@ -20,7 +20,7 @@ package org.simbrain.workspace;
 
 import org.pmw.tinylog.Logger;
 import org.simbrain.workspace.couplings.CouplingManager;
-import org.simbrain.workspace.events.WorkspaceComponentEvents;
+import org.simbrain.workspace.events.WorkspaceComponentEvents2;
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.DesktopComponent;
 
@@ -46,7 +46,7 @@ public abstract class WorkspaceComponent {
      */
     private Workspace workspace;
 
-    transient private WorkspaceComponentEvents events = new WorkspaceComponentEvents(this);
+    transient private WorkspaceComponentEvents2 events = new WorkspaceComponentEvents2();
 
     /**
      * Whether this component has changed since last save.
@@ -123,7 +123,7 @@ public abstract class WorkspaceComponent {
      * calls the haschanged dialog.
      */
     public void tryClosing() {
-        events.fireComponentClosing();
+        events.getComponentClosing().fireAndForget();
         //TODO: If there is no Gui then close must be called directly
     }
 
@@ -163,7 +163,7 @@ public abstract class WorkspaceComponent {
      * Notify listeners that an {@link AttributeContainer} has been added to the component.
      */
     public void fireAttributeContainerAdded(AttributeContainer addedContainer) {
-        events.fireAttributeContainerAdded(addedContainer);
+        events.getAttributeContainerAdded().fireAndForget(addedContainer);
     }
 
     /**
@@ -171,7 +171,7 @@ public abstract class WorkspaceComponent {
      * component.
      */
     public void fireAttributeContainerRemoved(AttributeContainer removedContainer) {
-        events.fireAttributeContainerRemoved(removedContainer);
+        events.getAttributeContainerRemoved().fireAndForget(removedContainer);
     }
 
     /**
@@ -279,7 +279,7 @@ public abstract class WorkspaceComponent {
 
     public void setGuiOn(boolean guiOn) {
         this.guiOn = guiOn;
-        events.fireGUIToggled();
+        events.getGuiToggled().fireAndForget();
     }
 
     public boolean getUpdateOn() {
@@ -291,7 +291,7 @@ public abstract class WorkspaceComponent {
      */
     public void setUpdateOn(boolean updateOn) {
         this.updateOn = updateOn;
-        events.fireComponentOnOffToggled();
+        events.getGuiToggled().fireAndForget();
     }
 
     /**
@@ -325,7 +325,7 @@ public abstract class WorkspaceComponent {
         this.serializePriority = serializePriority;
     }
 
-    public WorkspaceComponentEvents getEvents() {
+    public WorkspaceComponentEvents2 getEvents() {
         return events;
     }
 

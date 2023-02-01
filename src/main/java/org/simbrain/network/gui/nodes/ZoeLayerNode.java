@@ -23,7 +23,7 @@ import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.LocationEvents2;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.matrix.ZoeLayer;
 import org.simbrain.util.ImageKt;
@@ -88,14 +88,14 @@ public class ZoeLayerNode extends ScreenElement {
         this.layer = lyr;
         networkPanel = np;
 
-        LocationEvents events = layer.getEvents();
-        events.onDeleted(n -> removeFromParent());
-        events.onUpdated(() -> {
+        LocationEvents2 events = layer.getEvents();
+        events.getDeleted().on(n -> removeFromParent());
+        events.getUpdated().on(() -> {
             renderArrayToActivationsImage();
             updateInfoText();
         });
         // events.onClampChanged(this::updateClampStatus);
-        events.onLocationChange(this::pullViewPositionFromModel);
+        events.getLocationChanged().on(this::pullViewPositionFromModel);
 
         // Info text
         infoText = new PText();

@@ -25,7 +25,6 @@ import org.simbrain.network.gui.showSelectedNeuronProperties
 import java.awt.Toolkit
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
-import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.KeyStroke
@@ -65,7 +64,7 @@ class SetNeuronPropertiesAction(networkPanel: NetworkPanel) : ConditionallyEnabl
         putValue(Action.SHORT_DESCRIPTION, "Set the properties of selected neurons")
         updateAction()
 
-        networkPanel.selectionManager.events.onSelection { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
 
     }
 }

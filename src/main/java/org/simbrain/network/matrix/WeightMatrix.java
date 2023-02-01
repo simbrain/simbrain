@@ -94,7 +94,7 @@ public class WeightMatrix extends Connector {
 
         psrMatrix = new Matrix(target.inputSize(), source.outputSize());
 
-        getEvents().onUpdated(() -> {
+        getEvents().getUpdated().on(() -> {
            updateExcitatoryMask();
            updateInhibitoryMask();
         });
@@ -130,7 +130,7 @@ public class WeightMatrix extends Connector {
         for (int i = 0; i < len; i++) {
             weightMatrix.set(i / weightMatrix.ncols(), i % weightMatrix.ncols(), newWeights[i]);
         }
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     /**
@@ -139,7 +139,7 @@ public class WeightMatrix extends Connector {
     public void diagonalize() {
         clear();
         weightMatrix = Matrix.eye(target.inputSize(), source.outputSize());
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override
@@ -149,7 +149,7 @@ public class WeightMatrix extends Connector {
 
         if (!(prototypeRule instanceof StaticSynapseRule)){
             prototypeRule.apply(this, dataHolder);
-            getEvents().fireUpdated();
+            getEvents().getUpdated().fireAndForget();
         }
     }
 
@@ -248,19 +248,19 @@ public class WeightMatrix extends Connector {
     randomize() {
         weightMatrix = Matrix.rand(getTarget().inputSize(), getSource().outputSize(),
                 new GaussianDistribution(0, 1));
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override
     public void increment() {
         weightMatrix.add(increment);
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override
     public void decrement() {
         weightMatrix.sub(increment);
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     /**
@@ -268,7 +268,7 @@ public class WeightMatrix extends Connector {
      */
     public void hardClear() {
         weightMatrix = new Matrix(weightMatrix.nrows(), weightMatrix.ncols());
-        getEvents().fireUpdated();
+        getEvents().getUpdated().fireAndForget();
     }
 
     @Override

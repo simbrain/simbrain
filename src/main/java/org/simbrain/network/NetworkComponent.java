@@ -68,7 +68,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        NetworkEvents2 event = network.getEvents2();
+        NetworkEvents2 event = network.getEvents();
 
         event.getModelAdded().on(list -> {
             list.forEach(m -> {

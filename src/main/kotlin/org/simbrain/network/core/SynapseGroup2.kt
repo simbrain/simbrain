@@ -4,7 +4,7 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.events.SynapseGroup2Events
+import org.simbrain.network.events.SynapseGroup2Events2
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.util.SimnetUtils
@@ -45,7 +45,7 @@ class SynapseGroup2 @JvmOverloads constructor(
     val inhibitoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 0.0))
 
     @Transient
-    override var events: SynapseGroup2Events = SynapseGroup2Events(this)
+    override var events = SynapseGroup2Events2()
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
@@ -57,7 +57,7 @@ class SynapseGroup2 @JvmOverloads constructor(
         set(value) {
             field = value
             this.synapses.forEach { it.isVisible = value }
-            events.fireVisibilityChange()
+            events.visibilityChanged.fireAndForget()
         }
 
     init {
@@ -81,18 +81,18 @@ class SynapseGroup2 @JvmOverloads constructor(
         this.synapses.forEach { it.delete() }
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
-        events.fireDeleted()
+        events.deleted.fireAndForget(this)
     }
 
     fun addSynapse(syn: Synapse) {
         syn.isVisible = displaySynapses
         this.synapses.add(syn)
-        events.fireSynapseAdded(syn)
+        events.synapseAdded.fireAndForget(syn)
     }
 
     fun removeSynapse(syn: Synapse) {
         this.synapses.remove(syn)
-        events.fireSynapseRemoved(syn)
+        events.synapseRemoved.fireAndForget(syn)
     }
 
     fun isRecurrent(): Boolean {
@@ -115,7 +115,7 @@ class SynapseGroup2 @JvmOverloads constructor(
 
     override fun postOpenInit() {
         if (events == null) {
-            events = SynapseGroup2Events(this)
+            events = SynapseGroup2Events2()
         }
         this.synapses.forEach { it.postOpenInit() }
     }
@@ -154,7 +154,7 @@ class SynapseGroup2 @JvmOverloads constructor(
             false
         )
         syns.forEach { addSynapse(it) }
-        events.fireSynapseListChanged()
+        events.synapseListChanged.fireAndForget()
     }
 
     fun getWeightMatrixArray(): Array<DoubleArray> {

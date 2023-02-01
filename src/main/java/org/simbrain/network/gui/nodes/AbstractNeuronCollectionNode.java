@@ -1,8 +1,8 @@
 package org.simbrain.network.gui.nodes;
 
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.NeuronCollectionEvents;
-import org.simbrain.network.events.NeuronEvents;
+import org.simbrain.network.events.NeuronCollectionEvents2;
+import org.simbrain.network.events.NeuronEvents2;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.SFileChooser;
@@ -51,20 +51,20 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
         addChild(outlinedObjects);
 
-        NeuronCollectionEvents events = nc.getEvents();
-        events.onDeleted(n ->  {
+        NeuronCollectionEvents2 events = nc.getEvents();
+        events.getDeleted().on(n ->  {
             removeFromParent();
         });
-        events.onLabelChange((o,n) -> {
+        events.getLabelChanged().on((o,n) -> {
             updateText();
         });
-        events.onLocationChange(() -> {
+        events.getLocationChanged().on(() -> {
             pullPositionFromModel();
             outlinedObjects.updateBounds();
         });
 
-        events.onRecordingStarted(this::updateText);
-        events.onRecordingStopped(this::updateText);
+        events.getRecordingStarted().on(this::updateText);
+        events.getRecordingStopped().on(this::updateText);
 
     }
 
@@ -114,13 +114,13 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         this.neuronNodes.addAll(neuronNodes);
         for (NeuronNode neuronNode : neuronNodes) {
             // Listen directly to neuron nodes for property change events
-            NeuronEvents neuronEvents = neuronNode.getNeuron().getEvents();
-            neuronEvents.onDeleted(n -> {
+            NeuronEvents2 neuronEvents = neuronNode.getNeuron().getEvents();
+            neuronEvents.getDeleted().on(n -> {
                 this.neuronNodes.remove(neuronNode);
                 outlinedObjects.resetOutlinedNodes(this.neuronNodes);
             });
-            neuronEvents.onLocationChange(() -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
-            neuronEvents.onLabelChange((o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.getLocationChanged().on(() -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.getLabelChanged().on((o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
         }
         outlinedObjects.resetOutlinedNodes(this.neuronNodes);
     }

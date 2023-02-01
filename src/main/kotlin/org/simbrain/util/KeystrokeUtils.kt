@@ -1,5 +1,7 @@
 package org.simbrain.util
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.MagicConstant
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -74,13 +76,13 @@ fun JComponent.bindTo(keyCombo: KeyCombination, action: AbstractAction) {
 inline fun <C: JComponent> C.bind(vararg keys: String, crossinline action: C.() -> Unit) {
     val keyName = "Key ${keys.joinToString("")}"
     keys.forEach { key -> putInputMap(KeyStroke.getKeyStroke(key.toUpperCase()), keyName) }
-    actionMap.put(keyName) { action() }
+    putActionMap(keyName, action)
 }
 
 inline fun <C: JComponent> C.bind(keyStroke: KeyStroke, crossinline action: C.() -> Unit) {
     val keyName = "Key $keyStroke"
     putInputMap(keyStroke, keyName)
-    actionMap.put(keyName) { action() }
+    putActionMap(keyName, action)
 }
 
 inline fun <C: JComponent> C.bind(
@@ -89,19 +91,27 @@ inline fun <C: JComponent> C.bind(
 ) {
     val keyName = "Key vki_$key"
     putInputMap(KeyStroke.getKeyStroke(key, 0), keyName)
-    actionMap.put(keyName) { action() }
+    putActionMap(keyName, action)
 }
 
 inline fun <C: JComponent> C.bind(vararg keys: KeyCombination, crossinline action: C.() -> Unit) {
     val keyName = "Key ${keys.joinToString("")}"
     keys.forEach { key ->
         key.withKeyStroke { getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(it, keyName) }
-        actionMap.put(keyName) { action() }
+        putActionMap(keyName, action)
     }
 }
 
 fun JComponent.putInputMap(keyStroke: KeyStroke, mapKey: String) {
     getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, mapKey)
+}
+
+inline fun <C: JComponent> C.putActionMap(key: String, crossinline action: C.() -> Unit) {
+    if (this is CoroutineScope) {
+        actionMap.put(key) { launch { action() } }
+    } else {
+        actionMap.put(key) { action() }
+    }
 }
 
 inline fun ActionMap.put(key: String, crossinline action: () -> Unit) {

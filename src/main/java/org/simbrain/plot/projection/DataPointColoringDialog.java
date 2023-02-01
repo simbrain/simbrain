@@ -308,7 +308,7 @@ public class DataPointColoringDialog extends StandardDialog implements ActionLis
     @Override
     protected void closeDialogOk() {
         commitChanges();
-        projector.getEvents().fireColorsChanged();
+        projector.getEvents().getColorsChanged().fireAndForget();
         super.closeDialogOk();
     }
 

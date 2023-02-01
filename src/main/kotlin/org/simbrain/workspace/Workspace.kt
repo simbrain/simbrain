@@ -127,6 +127,7 @@ class Workspace: CoroutineScope {
             component.name = idManager.getAndIncrementId(component.javaClass)
         }
 
+
         if (blocking) {
             events.componentAdded.fireAndBlock(component)
         } else {

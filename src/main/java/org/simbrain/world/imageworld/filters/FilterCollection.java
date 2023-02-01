@@ -34,10 +34,10 @@ public class FilterCollection {
     public FilterCollection(ImageSource imageSource) {
         this.imageSource = imageSource;
         initializeDefaultFilters();
-        imageSource.getEvents().onResize(() -> {
+        imageSource.getEvents().getResize().on(() -> {
             filters.forEach(Filter::initScaleOp);
         });
-        imageSource.getEvents().onImageUpdate(() -> {
+        imageSource.getEvents().getImageUpdate().on(() -> {
             filters.forEach(Filter::updateFilter);
         });
     }
@@ -47,10 +47,10 @@ public class FilterCollection {
      */
     public Object readResolve() {
         events = new FilterCollectionEvents(this);
-        imageSource.getEvents().onResize(() -> {
+        imageSource.getEvents().getResize().on(() -> {
             filters.forEach(Filter::initScaleOp);
         });
-        imageSource.getEvents().onImageUpdate(() -> {
+        imageSource.getEvents().getImageUpdate().on(() -> {
             filters.forEach(Filter::updateFilter);
         });
         return this;
@@ -68,7 +68,7 @@ public class FilterCollection {
                 "Unfiltered",
                 imageSource, new IdentityOp(), imageSource.getWidth(), imageSource.getHeight()
         );
-        imageSource.getEvents().onResize(() -> {
+        imageSource.getEvents().getResize().on(() -> {
             unfiltered.setHeight(imageSource.getCurrentImage().getHeight());
             unfiltered.setWidth(imageSource.getCurrentImage().getWidth());
             unfiltered.initChannels();

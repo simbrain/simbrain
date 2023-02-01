@@ -31,7 +31,7 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         setLayout(new BorderLayout());
         add(BorderLayout.NORTH, getPixelDisplayToolbar());
         add(BorderLayout.CENTER, emitterPanel);
-        getWorkspaceComponent().getEmitter().getEvents().onImageUpdate(this::repaint);
+        getWorkspaceComponent().getEmitter().getEvents().getImageUpdate().on(this::repaint);
     }
 
     private class EmitterPanel extends JPanel {

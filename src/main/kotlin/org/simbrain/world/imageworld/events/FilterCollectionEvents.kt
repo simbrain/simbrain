@@ -1,27 +1,15 @@
 package org.simbrain.world.imageworld.events
 
-import org.simbrain.util.Event
-import org.simbrain.world.imageworld.filters.FilterCollection
+import org.simbrain.util.Events2
 import org.simbrain.world.imageworld.filters.Filter
-import java.beans.PropertyChangeSupport
-import java.util.function.Consumer
 
 /**
- * See [Event].
+ * See [Events2].
  */
-class FilterCollectionEvents(val source : FilterCollection) : Event(PropertyChangeSupport(source)) {
+class FilterCollectionEvents2: Events2() {
 
-    fun onFilterAdded(handler: Consumer<Filter>) = "FilterAdded".itemAddedEvent(handler)
-    fun fireFilterAdded(filter: Filter) = "FilterAdded"(new = filter)
-
-    fun onFilterRemoved(handler: Consumer<Filter>) =
-        "FilterRemoved".itemRemovedEvent(handler)
-    fun fireFilterRemoved(filter: Filter) = "FilterRemoved"(old = filter)
-
-    /**
-     * The current filter has changed.
-     */
-    fun onFilterChanged(handler: Runnable) = "FilterChanged".event(handler)
-    fun fireFilterChanged() = "FilterChanged"()
+    val filterAdded = AddedEvent<Filter>()
+    val filterRemoved = RemovedEvent<Filter>()
+    val filterChanged = ChangedEvent<Filter>()
 
 }

@@ -91,7 +91,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             updateButtons();
             repaint();
         });
-        imageWorld.getFilterCollection().getEvents().onFilterChanged(this::repaint);
+        imageWorld.getFilterCollection().getEvents().getFilterChanged().on((o, n) -> this.repaint());
 
         // Toolbars
         add(toolbars, BorderLayout.NORTH);

@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld.filters;
 
 import org.simbrain.world.imageworld.ImageSource;
-import org.simbrain.world.imageworld.events.FilterCollectionEvents;
+import org.simbrain.world.imageworld.events.FilterCollectionEvents2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class FilterCollection {
     /**
      * Handle FilterSelector Events.
      */
-    private transient FilterCollectionEvents events = new FilterCollectionEvents(this);
+    private transient FilterCollectionEvents2 events = new FilterCollectionEvents2();
 
     public FilterCollection(ImageSource imageSource) {
         this.imageSource = imageSource;
@@ -46,7 +46,7 @@ public class FilterCollection {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new FilterCollectionEvents(this);
+        events = new FilterCollectionEvents2();
         imageSource.getEvents().getResize().on(() -> {
             filters.forEach(Filter::initScaleOp);
         });
@@ -103,7 +103,7 @@ public class FilterCollection {
      */
     public void addFilter(Filter filter) {
         filters.add(filter);
-        events.fireFilterAdded(filter);
+        events.getFilterAdded().fireAndForget(filter);
     }
 
     /**
@@ -117,7 +117,7 @@ public class FilterCollection {
             return;
         }
         filters.remove(filter);
-        getEvents().fireFilterRemoved(filter);
+        getEvents().getFilterRemoved().fireAndForget(filter);
     }
 
     public ImageSource getImageSource() {
@@ -132,12 +132,13 @@ public class FilterCollection {
         return currentFilter;
     }
 
+
     public void setCurrentFilter(Filter currentFilter) {
+        events.getFilterChanged().fireAndForget(this.currentFilter, currentFilter);
         this.currentFilter = currentFilter;
-        events.fireFilterChanged();
     }
 
-    public FilterCollectionEvents getEvents() {
+    public FilterCollectionEvents2 getEvents() {
         return events;
     }
 

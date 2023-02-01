@@ -13,10 +13,8 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.util.Event
+import org.simbrain.util.Events2
 import org.simbrain.util.propertyeditor.CopyableObject
-import java.beans.PropertyChangeSupport
-import java.util.function.Consumer
 
 /**
  * Subclasses are genes that express products that can be added to a [Network].
@@ -39,7 +37,7 @@ class NodeGene private constructor(val template: Neuron = Neuron(null)): Network
 
     override val product = CompletableDeferred<Neuron>()
 
-    val events = NodeGeneEvents(this)
+    val events = NodeGeneEvents2()
 
     fun mutate(config: Neuron.() -> Unit) {
         template.apply(config)
@@ -47,7 +45,7 @@ class NodeGene private constructor(val template: Neuron = Neuron(null)): Network
 
     override fun copy(): NodeGene {
         val newGene = NodeGene(template.deepCopy())
-        events.fireCopied(newGene)
+        events.copy.fireAndForget(newGene)
         return newGene
     }
 
@@ -57,9 +55,8 @@ class NodeGene private constructor(val template: Neuron = Neuron(null)): Network
 
 }
 
-class NodeGeneEvents(nodeGene: NodeGene) : Event(PropertyChangeSupport(nodeGene)) {
-    fun onCopy(handler: Consumer<NodeGene>) = "Copy".itemAddedEvent(handler)
-    fun fireCopied(copied: NodeGene) = "Copy"(new = copied)
+class NodeGeneEvents2: Events2() {
+    val copy = AddedEvent<NodeGene>()
 }
 
 
@@ -73,8 +70,8 @@ class ConnectionGene(private val template: Synapse, val source: NodeGene, val ta
     init {
         source.fanOut.add(this)
         target.fanIn.add(this)
-        source.events.onCopy { sourceCopy = it }
-        target.events.onCopy { targetCopy = it }
+        source.events.copy.on { sourceCopy = it }
+        target.events.copy.on { targetCopy = it }
     }
 
     fun mutate(block: Synapse.() -> Unit) {

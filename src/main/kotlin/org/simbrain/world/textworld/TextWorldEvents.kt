@@ -1,23 +1,15 @@
 package org.simbrain.world.textworld
 
-import org.simbrain.util.Event
-import java.beans.PropertyChangeSupport
-import java.util.function.Consumer
+import org.simbrain.util.Events2
 
 /**
- * See [Event].
+ * See [Events2].
  */
-class TextWorldEvents(val world: TextWorld): Event(PropertyChangeSupport(world)) {
+class TextWorldEvents2: Events2() {
 
-    fun onTextChanged(handler: Runnable) = "TextChanged".event(handler)
-    fun fireTextChanged() = "TextChanged"()
+    val textChanged = NoArgEvent()
+    val tokenVectorMapChanged = NoArgEvent()
+    val currentTokenChanged = AddedEvent<TextWorld.TextItem?>()
+    val cursorPositionChanged = NoArgEvent()
 
-    fun onTokenVectorMapChanged(handler: Runnable) = "TokenVectorMapChanged".event(handler)
-    fun fireTokenVectorMapChanged() = "TokenVectorMapChanged"()
-
-    fun onCurrentTokenChanged(handler: Consumer<TextWorld.TextItem?>) = "CurrentTokenChanged".itemAddedEvent(handler)
-    fun fireCurrentTokenChanged(token: TextWorld.TextItem?) = "CurrentTokenChanged"(new = token)
-
-    fun onCursorPositionChanged(handler: Runnable) = "CursorPositionChanged".event(handler)
-    fun fireCursorPositionChanged() = "CursorPositionChanged"()
 }

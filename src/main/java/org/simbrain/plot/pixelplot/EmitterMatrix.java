@@ -3,7 +3,6 @@ package org.simbrain.plot.pixelplot;
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
-import org.simbrain.world.imageworld.events.ImageEvents;
 import org.simbrain.world.imageworld.events.ImageEvents2;
 import org.simbrain.world.imageworld.filters.Filter;
 

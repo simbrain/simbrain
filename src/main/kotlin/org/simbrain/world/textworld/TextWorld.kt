@@ -78,7 +78,7 @@ class TextWorld : AttributeContainer, EditableObject {
     )
         set(value) {
             field = value
-            events.fireTokenVectorMapChanged()
+            events.tokenVectorMapChanged.fireAndForget()
         }
 
     /**
@@ -93,7 +93,7 @@ class TextWorld : AttributeContainer, EditableObject {
         get() = _text
         set(value) {
             _text = value
-            events.fireTextChanged()
+            events.textChanged.fireAndForget()
         }
 
     /**
@@ -109,7 +109,7 @@ class TextWorld : AttributeContainer, EditableObject {
     var currentItem: TextItem? = null
         set(value) {
             field = value
-            events.fireCurrentTokenChanged(value)
+            events.currentTokenChanged.fireAndForget(value)
         }
 
     /**
@@ -170,7 +170,7 @@ class TextWorld : AttributeContainer, EditableObject {
     private var matcher: Matcher = pattern.matcher(text)
 
     @Transient
-    var events = TextWorldEvents(this)
+    var events = TextWorldEvents2()
 
     /**
      * Returns the double array associated with the currently selected token
@@ -308,7 +308,7 @@ class TextWorld : AttributeContainer, EditableObject {
     @Consumable
     fun addTextAtCursor(newText: String) {
         text = StringBuilder(text).insert(position, " $newText ").toString()
-        events.fireTextChanged()
+        events.textChanged.fireAndForget()
     }
 
     /**
@@ -318,7 +318,7 @@ class TextWorld : AttributeContainer, EditableObject {
     fun addTextAtEnd(newText: String) {
         position = text.length
         text += " $newText"
-        events.fireTextChanged()
+        events.textChanged.fireAndForget()
     }
 
     /**
@@ -336,7 +336,7 @@ class TextWorld : AttributeContainer, EditableObject {
             lastPosition = position
             position = newPosition
             if (fireEvent) {
-                events.fireCursorPositionChanged()
+                events.cursorPositionChanged.fireAndForget()
             }
         } else {
             System.err.println("Invalid position:$newPosition")
@@ -362,7 +362,7 @@ class TextWorld : AttributeContainer, EditableObject {
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
     fun readResolve(): TextWorld {
-        events = TextWorldEvents(this)
+        events = TextWorldEvents2()
         return this
     }
 

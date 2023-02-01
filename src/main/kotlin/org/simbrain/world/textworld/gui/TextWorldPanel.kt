@@ -158,7 +158,7 @@ class TextWorldPanel private constructor(
                 // inputScrollPane.revalidate();
             }
         })
-        world.events.onTextChanged {
+        world.events.textChanged.on {
             SwingUtilities.invokeLater {
                 textArea.text = world.text
                 if (world.position < textArea.document.length) {
@@ -167,11 +167,11 @@ class TextWorldPanel private constructor(
             }
         }
 
-        world.events.onCursorPositionChanged {
+        world.events.cursorPositionChanged.on {
             textArea.caretPosition = world.position
         }
 
-        world.events.onCurrentTokenChanged {
+        world.events.currentTokenChanged.on {
             if (it!!.text.equals("", ignoreCase = true)) {
                 removeHighlights(textArea)
             } else {

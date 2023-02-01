@@ -1,6 +1,5 @@
 package org.simbrain.world.imageworld;
 
-import org.simbrain.world.imageworld.events.ImageEvents;
 import org.simbrain.world.imageworld.events.ImageEvents2;
 
 import java.awt.image.BufferedImage;

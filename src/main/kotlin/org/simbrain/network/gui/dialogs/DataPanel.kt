@@ -2,7 +2,7 @@ package org.simbrain.network.gui.dialogs
 
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.trainer.TrainerGuiActions
-import org.simbrain.util.Event
+import org.simbrain.util.Events2
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.table.NumericTable
@@ -13,8 +13,6 @@ import smile.classification.Classifier
 import smile.classification.SVM
 import smile.math.kernel.PolynomialKernel
 import java.awt.BorderLayout
-import java.beans.PropertyChangeSupport
-import java.util.function.Consumer
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JPanel
@@ -36,7 +34,7 @@ class DataPanel: JPanel() {
     val table: NumericTable = NumericTable().apply {
         addTableModelListener { event ->
             when (event.type) {
-                TableModelEvent.INSERT -> events.fireInsert(event.firstRow)
+                TableModelEvent.INSERT -> events.insertRow.fireAndForget(event.firstRow)
             }
         }
     }
@@ -66,7 +64,7 @@ class DataPanel: JPanel() {
         toolbars.add(this)
     }
 
-    val events = DataPanelEvents(this)
+    val events = DataPanelEvents2()
 
     fun applyData() {
         val data = sequence {
@@ -81,18 +79,17 @@ class DataPanel: JPanel() {
             }
         }.toList().toTypedArray()
 
-        events.fireApply(data)
+        events.updateData.fireAndForget(data)
     }
 
 }
 
-class DataPanelEvents(dataPanel: DataPanel): Event(PropertyChangeSupport(dataPanel)) {
-
-    fun onApply(handler: Consumer<Array<DoubleArray>>) = "Apply".itemAddedEvent(handler)
-    fun fireApply(data: Array<DoubleArray>) = "Apply"(new = data)
-
-    fun onInsert(handler: Consumer<Int>) = "Insert".itemAddedEvent(handler)
-    fun fireInsert(rowNumber: Int) = "Insert"(new = rowNumber)
+/**
+ * See [Events2].
+ */
+class DataPanelEvents2: Events2() {
+    val updateData = AddedEvent<Array<DoubleArray>>()
+    val insertRow = AddedEvent<Int>()
 }
 
 fun main() {
@@ -114,7 +111,7 @@ fun main() {
                 doubleArrayOf(1.0, 0.0),
                 doubleArrayOf(1.0, 1.0)
             ))
-            events.onApply { data -> println(data.contentDeepToString()) }
+            events.updateData.on { data -> println(data.contentDeepToString()) }
             addClosingTask { applyData() }
             mainPanel.add(this)
         }
@@ -140,12 +137,12 @@ fun main() {
             }
         }
 
-        inputPanel.events.onApply { data ->
+        inputPanel.events.updateData.on { data ->
             input = data
             invokeCallback(input, target)
         }
 
-        targetPanel.events.onApply { data ->
+        targetPanel.events.updateData.on { data ->
             target = data.map { it[0].toInt() }.toIntArray()
             invokeCallback(input, target)
         }

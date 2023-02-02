@@ -65,15 +65,15 @@ public class ThreeDWorldComponent extends WorkspaceComponent {
     public ThreeDWorldComponent(String name) {
         super(name);
         world = new ThreeDWorld();
-        world.getEvents().onClosed(this::close);
-        world.getEvents().onAgentAdded(this::fireAttributeContainerAdded);
-        world.getEvents().onAgentAdded(agent -> {
+        world.getEvents().getClosed().on(this::close);
+        world.getEvents().getAgentAdded().on(this::fireAttributeContainerAdded);
+        world.getEvents().getAgentAdded().on(agent -> {
             fireAttributeContainerAdded(agent);
             setChangedSinceLastSave(true);
-            agent.getEvents().onSensorAdded(this::fireAttributeContainerAdded);
-            agent.getEvents().onEffectorAdded(this::fireAttributeContainerAdded);
-            agent.getEvents().onSensorRemoved(this::fireAttributeContainerRemoved);
-            agent.getEvents().onEffectorRemoved(this::fireAttributeContainerRemoved);
+            agent.getEvents().getSensorAdded().on(this::fireAttributeContainerAdded);
+            agent.getEvents().getEffectorAdded().on(this::fireAttributeContainerAdded);
+            agent.getEvents().getSensorDeleted().on(this::fireAttributeContainerRemoved);
+            agent.getEvents().getEffectorDeleted().on(this::fireAttributeContainerRemoved);
             setChangedSinceLastSave(true);
         });
         // TODO: Removed (see odorworldcomponent)

@@ -12,7 +12,7 @@ import org.simbrain.world.threedworld.controllers.SelectionController;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.Agent;
 import org.simbrain.world.threedworld.entities.Entity;
-import org.simbrain.world.threedworld.events.ThreeDWorldEvents;
+import org.simbrain.world.threedworld.events.ThreeDWorldEvents2;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class ThreeDWorld implements AppState {
     private transient ContextMenu contextMenu;
     private AtomicInteger idCounter;
 
-    private transient ThreeDWorldEvents events = new ThreeDWorldEvents(this);
+    private transient ThreeDWorldEvents2 events = new ThreeDWorldEvents2();
 
     /**
      * Construct a new default ThreeDWorld().
@@ -67,7 +67,7 @@ public class ThreeDWorld implements AppState {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new ThreeDWorldEvents(this);
+        events = new ThreeDWorldEvents2();
         initialized = false;
         engine.getStateManager().attach(this);
         //cameraController = new CameraController(this);
@@ -177,7 +177,7 @@ public class ThreeDWorld implements AppState {
         agentController.registerInput();
         scene.load(engine);
         initialized = true;
-        events.fireInitialized();
+        events.getInitialized().fireAndForget();
         engine.queueState(ThreeDEngine.State.RenderOnly, false);
     }
 
@@ -204,7 +204,7 @@ public class ThreeDWorld implements AppState {
             for (Entity entity : getEntities()) {
                 entity.update(tpf);
             }
-            events.fireUpdated();
+            events.getUpdated().fireAndForget();
         }
     }
 
@@ -225,7 +225,7 @@ public class ThreeDWorld implements AppState {
         } catch (Exception ex) {
             // Ignore exceptions during shutdown
         }
-        events.fireClosed();
+        events.getClosed().fireAndForget();
     }
 
     /**
@@ -241,12 +241,12 @@ public class ThreeDWorld implements AppState {
 
     public void addAgent(Agent agent) {
         entities.add(agent);
-        events.fireAgentAdded(agent);
+        events.getAgentAdded().fireAndForget(agent);
     }
 
     // TODO: Add agent removed
 
-    public ThreeDWorldEvents getEvents() {
+    public ThreeDWorldEvents2 getEvents() {
         return events;
     }
 }

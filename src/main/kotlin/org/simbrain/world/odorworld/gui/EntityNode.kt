@@ -53,46 +53,46 @@ class EntityNode(
         updateImage()
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
-        entity.events.onDeleted { e: OdorWorldEntity? -> removeFromParent() }
-        entity.events.onMoved { update() }
-        entity.events.onTypeChanged { o: EntityType?, n: EntityType? -> updateImage() }
+        entity.events.deleted.on { e: OdorWorldEntity? -> removeFromParent() }
+        entity.events.moved.on { update() }
+        entity.events.typeChanged.on { o: EntityType?, n: EntityType? -> updateImage() }
 
         fun updateSensorsEffectorsVisibility() {
             visualizableAttributeMap.values.forEach { it?.visible = entity.isShowSensorsAndEffectors }
         }
 
         updateSensorsEffectorsVisibility()
-        entity.events.onPropertyChanged {
+        entity.events.propertyChanged.on {
             updateSensorsEffectorsVisibility()
         }
 
-        entity.events.onUpdated { update() }
-        entity.events.onSensorAdded { s: Sensor? ->
+        entity.events.updated.on { update() }
+        entity.events.sensorAdded.on { s: Sensor? ->
             if (s is VisualizableEntityAttribute) {
                 val toAdd = s as VisualizableEntityAttribute
                 addAttribute(toAdd)
             }
         }
-        entity.events.onEffectorAdded { e: Effector? ->
+        entity.events.effectorAdded.on { e: Effector? ->
             if (e is VisualizableEntityAttribute) {
                 val toAdd = e as VisualizableEntityAttribute
                 addAttribute(toAdd)
             }
         }
-        entity.events.onSensorRemoved { s: Sensor? ->
+        entity.events.sensorRemoved.on { s: Sensor? ->
             if (s is VisualizableEntityAttribute) {
                 val toRemove = s as VisualizableEntityAttribute
                 removeAttribute(toRemove)
             }
         }
-        entity.events.onEffectorRemoved { e: Effector? ->
+        entity.events.effectorRemoved.on { e: Effector? ->
             if (e is VisualizableEntityAttribute) {
                 val toRemove = e as VisualizableEntityAttribute
                 removeAttribute(toRemove)
             }
         }
         drawDispersionCircleAround(this)
-        entity.events.onPropertyChanged {
+        entity.events.propertyChanged.on {
             drawDispersionCircleAround(this)
         }
     }

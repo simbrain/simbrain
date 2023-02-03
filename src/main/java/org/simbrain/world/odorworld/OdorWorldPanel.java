@@ -198,13 +198,13 @@ public class OdorWorldPanel extends JPanel {
 
         // PCamera camera = canvas.getCamera();
 
-        world.getEvents().onEntityAdded(e -> {
+        world.getEvents().getEntityAdded().on(e -> {
             EntityNode node = new EntityNode(world, e);
             canvas.getLayer().addChild(node);
             selectionModel.setSelection(Collections.singleton(node)); // not working
             repaint();
         });
-        world.getEvents().onEntityRemoved(e -> {
+        world.getEvents().getEntityRemoved().on(e -> {
             var entityNode = canvas.getLayer().getAllNodes()
                     .stream().filter(n -> n instanceof EntityNode)
                     .filter(n -> ((EntityNode)n).getEntity() == e)
@@ -214,14 +214,14 @@ public class OdorWorldPanel extends JPanel {
                 repaint();
             }
         });
-        world.getEvents().onUpdated(this::centerCameraToSelectedEntity);
-        world.getEvents().onFrameAdvance(() -> {
+        world.getEvents().getUpdated().on(this::centerCameraToSelectedEntity);
+        world.getEvents().getFrameAdvanced().on(() -> {
             canvas.getLayer().getChildrenReference().stream()
                     .filter(i -> i instanceof EntityNode)
                     .forEach(i -> ((EntityNode) i).advance());
             repaint();
         });
-        world.getEvents().onAnimationStopped(() -> {
+        world.getEvents().getAnimationStopped().on(() -> {
             // When movement is stopped use the "static" animation so we don't show entities in strange
             // intermediate states
             canvas.getLayer().getChildrenReference().stream()
@@ -231,16 +231,16 @@ public class OdorWorldPanel extends JPanel {
         });
 
         // Full tile map update
-        world.getEvents().onTileMapChanged(() -> {
+        world.getEvents().getTileMapChanged().on(() -> {
             renderAllLayers(world);
         });
 
-        world.getTileMap().getEvents().onLayerAdded(() -> {
+        world.getTileMap().getEvents().getLayerAdded().on(() -> {
             renderAllLayers(world);
         });
 
         // Single layer update
-        world.getTileMap().getEvents().onLayerImageChanged((oldImage, newImage) -> {
+        world.getTileMap().getEvents().getLayerImageChanged().on((oldImage, newImage) -> {
                 int index = canvas.getLayer().indexOfChild(oldImage);
                 canvas.getLayer().removeChild(oldImage);
                 if (index != -1) {
@@ -250,7 +250,7 @@ public class OdorWorldPanel extends JPanel {
                 }
         });
 
-        world.getEvents().onWorldStarted(() -> {
+        world.getEvents().getWorldStarted().on(() -> {
             if (movementTimer != null) {
                 movementTimer.cancel();
                 movementTimer = null;
@@ -259,12 +259,12 @@ public class OdorWorldPanel extends JPanel {
             animationTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    world.getEvents().fireFrameAdvance();
+                    world.getEvents().getFrameAdvanced().fireAndForget();
                 }
             }, 50, 50);
         });
 
-        world.getEvents().onWorldStopped(() -> {
+        world.getEvents().getWorldStopped().on(() -> {
             movementTimer = new Timer();
             movementTimer.schedule(new TimerTask() {
                 @Override
@@ -285,7 +285,7 @@ public class OdorWorldPanel extends JPanel {
             }
         }, 10, 10);
 
-        world.getEvents().fireTileMapChanged();
+        world.getEvents().getTileMapChanged().fireAndForget();
     }
 
     private void renderAllLayers(OdorWorld world) {

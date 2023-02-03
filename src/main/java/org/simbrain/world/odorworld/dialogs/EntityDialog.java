@@ -99,11 +99,11 @@ public class EntityDialog extends StandardDialog {
         super.closeDialogOk();
         EntityType oldType = entityRef.getEntityType();
         mainEditor.commitChanges();
-        entityRef.getEvents().fireTypeChanged(oldType, entityRef.getEntityType());
+        entityRef.getEvents().getTypeChanged().fireAndForget(oldType, entityRef.getEntityType());
         if (smellPanel != null) {
             smellPanel.commitChanges();
         }
-        entityRef.getEvents().firePropertyChanged();
+        entityRef.getEvents().getPropertyChanged().fireAndForget();
     }
 
     @Override

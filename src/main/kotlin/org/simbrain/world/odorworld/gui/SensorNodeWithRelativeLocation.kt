@@ -29,7 +29,7 @@ abstract class SensorNodeWithRelativeLocation(val sensor: SensorWithRelativeLoca
         labelText.font = labelText.font.deriveFont(9.0f)
         updateLabel()
         shape.addChild(labelText)
-        sensor.events.onPropertyChange {
+        sensor.events.propertyChanged.on {
             updateLabel()
         }
     }

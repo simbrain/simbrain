@@ -107,7 +107,7 @@ val evolvePursuer = newSim {
                 location = point(random.nextDouble() * 300, random.nextDouble() * 300)
                 heading = UniformRealDistribution(0.0, 360.0).sampleDouble()
                 speed = 3.0
-                events.onCollided {
+                events.collided.on {
                     if (it === mouse) reset()
                 }
             }
@@ -163,7 +163,7 @@ val evolvePursuer = newSim {
                 }
 
                 cheeses.forEach { cheese ->
-                    cheese.events.onCollided {
+                    cheese.events.collided.on {
                         cheese.location = point(
                             random.nextDouble(100.0, 300.0),
                             random.nextDouble(0.0, 300.0)
@@ -196,7 +196,7 @@ val evolvePursuer = newSim {
                 var score = 0.0
 
                 cheeses.forEach {
-                    it.events.onCollided { other ->
+                    it.events.collided.on { other ->
                         if (other === mouse) {
                             score += 1
                         }

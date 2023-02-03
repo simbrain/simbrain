@@ -66,17 +66,17 @@ public class OdorWorldComponent extends WorkspaceComponent {
     }
 
     private void init() {
-        world.getEvents().onEntityAdded(entity -> {
+        world.getEvents().getEntityAdded().on(entity -> {
             fireAttributeContainerAdded(entity);
             setChangedSinceLastSave(true);
-            entity.getEvents().onSensorAdded(this::fireAttributeContainerAdded);
-            entity.getEvents().onEffectorAdded(this::fireAttributeContainerAdded);
-            entity.getEvents().onSensorRemoved(this::fireAttributeContainerRemoved);
-            entity.getEvents().onEffectorRemoved(this::fireAttributeContainerRemoved);
+            entity.getEvents().getSensorAdded().on(this::fireAttributeContainerAdded);
+            entity.getEvents().getEffectorAdded().on(this::fireAttributeContainerAdded);
+            entity.getEvents().getSensorRemoved().on(this::fireAttributeContainerRemoved);
+            entity.getEvents().getEffectorRemoved().on(this::fireAttributeContainerRemoved);
             setChangedSinceLastSave(true);
         });
 
-        world.getEvents().onEntityRemoved(e -> {
+        world.getEvents().getEntityRemoved().on(e -> {
             fireAttributeContainerRemoved(e);
             e.getSensors().forEach(this::fireAttributeContainerRemoved);
             e.getEffectors().forEach(this::fireAttributeContainerRemoved);

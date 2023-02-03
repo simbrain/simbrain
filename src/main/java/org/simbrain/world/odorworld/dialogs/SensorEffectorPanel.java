@@ -214,11 +214,11 @@ public class SensorEffectorPanel extends JPanel {
 
         // Set up event listeners
         if (type == PanelType.Sensor) {
-            parentEntity.getEvents().onSensorAdded(s -> model.addAttribute(s));
-            parentEntity.getEvents().onSensorRemoved(s -> model.removeAttribute(s));
+            parentEntity.getEvents().getSensorAdded().on(s -> model.addAttribute(s));
+            parentEntity.getEvents().getSensorRemoved().on(s -> model.removeAttribute(s));
         } else {
-            parentEntity.getEvents().onEffectorAdded(e -> model.addAttribute(e));
-            parentEntity.getEvents().onEffectorRemoved(e -> model.removeAttribute(e));
+            parentEntity.getEvents().getEffectorAdded().on(e -> model.addAttribute(e));
+            parentEntity.getEvents().getEffectorRemoved().on(e -> model.removeAttribute(e));
         }
 
     }
@@ -266,7 +266,7 @@ public class SensorEffectorPanel extends JPanel {
             dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
         });
         dialog.addClosingTask(() -> {
-            attribute.getEvents().firePropertyChanged();
+            attribute.getEvents().getPropertyChanged().fireAndForget();
         });
         dialog.pack();
         dialog.setVisible(true);

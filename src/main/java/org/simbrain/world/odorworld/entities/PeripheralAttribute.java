@@ -2,7 +2,7 @@ package org.simbrain.world.odorworld.entities;
 
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.world.odorworld.events.SensorEffectorEvents;
+import org.simbrain.world.odorworld.events.SensorEffectorEvents2;
 
 /**
  * Interface for effectors and sensors. "Peripheral" is supposed to suggest
@@ -19,7 +19,7 @@ public interface PeripheralAttribute extends AttributeContainer, CopyableObject 
 
     void update(OdorWorldEntity parent);
 
-    SensorEffectorEvents getEvents();
+    SensorEffectorEvents2 getEvents();
 
     /**
      * Called by reflection to return a custom description for the {@link

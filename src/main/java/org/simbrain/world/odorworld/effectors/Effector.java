@@ -21,7 +21,7 @@ package org.simbrain.world.odorworld.effectors;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
-import org.simbrain.world.odorworld.events.SensorEffectorEvents;
+import org.simbrain.world.odorworld.events.SensorEffectorEvents2;
 
 import java.util.List;
 
@@ -65,7 +65,7 @@ public abstract class Effector implements PeripheralAttribute {
     /**
      * Handle events.
      */
-    private transient SensorEffectorEvents events = new SensorEffectorEvents(this);
+    private transient SensorEffectorEvents2 events = new SensorEffectorEvents2();
 
     /**
      * Construct an effector.
@@ -116,12 +116,12 @@ public abstract class Effector implements PeripheralAttribute {
     public abstract Effector copy();
 
     @Override
-    public SensorEffectorEvents getEvents() {
+    public SensorEffectorEvents2 getEvents() {
         return events;
     }
 
     private Object readResolve() {
-        events = new SensorEffectorEvents(this);
+        events = new SensorEffectorEvents2();
         return this;
     }
 

@@ -10,7 +10,7 @@ import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
-import org.simbrain.world.odorworld.events.EntityEvents
+import org.simbrain.world.odorworld.events.EntityEvents2
 import org.simbrain.world.odorworld.intersect
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
@@ -24,7 +24,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     @UserParameter(label = "Type", order = 2)
     var entityType: EntityType = EntityType.SWISS,
     @Transient
-    var events: EntityEvents = EntityEvents(),
+    var events: EntityEvents2 = EntityEvents2(),
 ) :
     EditableObject,
     AttributeContainer,
@@ -109,7 +109,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             .associateWith { moveInX.intersect(it) }
             .filter { it.value.intersect }
             .minByOrNull { it.value.dx }
-            ?.apply { events.fireCollided(key) }?.value?.dx ?: 0.0
+            ?.apply { events.collided.fireAndForget(key) }?.value?.dx ?: 0.0
 
         val moveInY = Bound(x + (dx - distanceXShortenBy * directionX), y + dy, width, height)
 
@@ -117,7 +117,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             .associateWith { moveInY.intersect(it) }
             .filter { it.value.intersect }
             .minByOrNull { it.value.dy }
-            ?.apply { events.fireCollided(key) }?.value?.dy ?: 0.0
+            ?.apply { events.collided.fireAndForget(key) }?.value?.dy ?: 0.0
 
         val newX = x + (dx - distanceXShortenBy * directionX)
         val newY = y + (dy - distanceYShortenBy * directionY)
@@ -155,17 +155,17 @@ class OdorWorldEntity @JvmOverloads constructor(
         if (effector.id == null) {
             effector.setId(world.effectorIDGenerator.andIncrement)
         }
-        events.fireEffectorAdded(effector)
+        events.effectorAdded.fireAndForget(effector)
     }
 
     fun removeAllEffectors() {
-        _effectors.forEach { events.fireEffectorRemoved(it) }
+        _effectors.forEach { events.effectorRemoved.fireAndForget(it) }
         _effectors.clear()
     }
 
     fun removeEffector(effector: Effector) {
         _effectors.remove(effector)
-        events.fireEffectorRemoved(effector)
+        events.effectorRemoved.fireAndForget(effector)
     }
 
     fun addSensor(sensor: Sensor) {
@@ -173,7 +173,7 @@ class OdorWorldEntity @JvmOverloads constructor(
         if (sensor.id == null) {
             sensor.setId(world.sensorIDGenerator.andIncrement)
         }
-        events.fireSensorAdded(sensor)
+        events.sensorAdded.fireAndForget(sensor)
     }
 
     fun addDefaultSensorsEffectors() {
@@ -196,13 +196,13 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun removeAllSensors() {
-        _sensors.forEach { events.fireSensorRemoved(it) }
+        _sensors.forEach { events.sensorRemoved.fireAndForget(it) }
         _sensors.clear()
     }
 
     fun removeSensor(sensor: Sensor) {
         _sensors.remove(sensor)
-        events.fireSensorRemoved(sensor)
+        events.sensorRemoved.fireAndForget(sensor)
     }
 
     fun delete() {

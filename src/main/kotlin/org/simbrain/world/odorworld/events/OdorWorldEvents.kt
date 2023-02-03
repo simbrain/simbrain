@@ -1,38 +1,18 @@
 package org.simbrain.world.odorworld.events
 
-import org.simbrain.util.Event
-import org.simbrain.world.odorworld.OdorWorld
+import org.simbrain.util.Events2
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import java.beans.PropertyChangeSupport
-import java.util.function.Consumer
 
 /**
- * See [Event].
+ * See [Events2].
  */
-class OdorWorldEvents(val world: OdorWorld):Event(PropertyChangeSupport(world)) {
-
-    fun onUpdated(handler: Runnable) = "Updated".event(handler)
-    fun fireUpdated() = "Updated"()
-
-    fun onFrameAdvance(handler: Runnable) = "FrameAdvance".event(handler)
-    fun fireFrameAdvance() = "FrameAdvance"()
-
-    fun onWorldStarted(handler: Runnable) = "WorldStarted".event(handler)
-    fun fireWorldStarted() = "WorldStarted"()
-
-    fun onWorldStopped(handler: Runnable) = "WorldStopped".event(handler)
-    fun fireWorldStopped() = "WorldStopped"()
-
-    fun onAnimationStopped(handler: Runnable) = "AnimationStopped".event(handler)
-    fun fireAnimationStopped() = "AnimationStopped"()
-
-    fun onEntityAdded(handler: Consumer<OdorWorldEntity>) = "EntityAdded".itemAddedEvent(handler)
-    fun fireEntityAdded(entity: OdorWorldEntity) = "EntityAdded"(new = entity)
-
-    fun onEntityRemoved(handler: Consumer<OdorWorldEntity>) = "EntityRemoved".itemRemovedEvent(handler)
-    fun fireEntityRemoved(entity: OdorWorldEntity) = "EntityRemoved"(old = entity)
-
-    // Has to happen here so that when the tile map is changed the event object does not change
-    fun onTileMapChanged(handler: Runnable) = "TileMapChanged".event(handler)
-    fun fireTileMapChanged() = "TileMapChanged"()
+class OdorWorldEvents2: Events2() {
+    val updated = NoArgEvent()
+    val frameAdvanced = NoArgEvent()
+    val worldStarted = NoArgEvent()
+    val worldStopped = NoArgEvent()
+    val animationStopped = NoArgEvent()
+    val entityAdded = AddedEvent<OdorWorldEntity>()
+    val entityRemoved = RemovedEvent<OdorWorldEntity>()
+    val tileMapChanged = NoArgEvent()
 }

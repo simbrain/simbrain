@@ -91,8 +91,8 @@ public class HearingNode extends EntityAttributeNode {
         hearingBubbleTrailSmall.setPickable(false);
         hearingText.setPickable(false);
         shape.setVisible(false);
-        sensor.getEvents().onUpdate(this::updateSensor);
-        sensor.getEvents().onPropertyChange(this::updateSensor);
+        sensor.getEvents().getUpdated().on(this::updateSensor);
+        sensor.getEvents().getPropertyChanged().on(this::updateSensor);
     }
 
     @Override

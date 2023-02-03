@@ -127,7 +127,7 @@ val evolveMouse = newSim {
                 }
 
                 cheeses.forEach { cheese ->
-                    cheese.events.onCollided {
+                    cheese.events.collided.on {
                         cheese.location = point(
                             random.nextDouble(100.0, 300.0),
                             random.nextDouble(0.0, 300.0)

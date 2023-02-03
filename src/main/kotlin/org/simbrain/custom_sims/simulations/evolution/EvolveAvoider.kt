@@ -123,7 +123,7 @@ val evolveAvoider = newSim {
                 location = point(random.nextDouble()*300,random.nextDouble()*300)
                 heading = UniformRealDistribution(0.0,360.0).sampleDouble()
                 speed = 3.0
-                events.onCollided {
+                events.collided.on {
                     if (it === mouse) reset()
                 }
             }
@@ -233,7 +233,7 @@ val evolveAvoider = newSim {
                 var score = 0.0
 
                 fun OdorWorldEntity.handleCollision() {
-                    events.onCollided { other ->
+                    events.collided.on { other ->
                         if (other === mouse) {
                             score -= 1
                         }

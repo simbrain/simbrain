@@ -30,7 +30,7 @@ import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.Bounded;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.events.OdorWorldEvents;
+import org.simbrain.world.odorworld.events.OdorWorldEvents2;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.awt.geom.Point2D;
@@ -105,7 +105,7 @@ public class OdorWorld implements EditableObject, Bounded {
     /**
      * Event support
      */
-    protected transient OdorWorldEvents events = new OdorWorldEvents(this);
+    protected transient OdorWorldEvents2 events = new OdorWorldEvents2();
 
     /**
      * Last clicked position.
@@ -123,15 +123,15 @@ public class OdorWorld implements EditableObject, Bounded {
      */
     public void update() {
         entityList.forEach(OdorWorldEntity::update);
-        events.fireUpdated();
+        events.getUpdated().fireAndForget();
     }
 
     /**
      * Stop animation.
      */
     public void stopAnimation() {
-        events.fireAnimationStopped();
-        events.fireWorldStopped();
+        events.getAnimationStopped().fireAndForget();
+        events.getWorldStopped().fireAndForget();
     }
 
     /**
@@ -152,7 +152,7 @@ public class OdorWorld implements EditableObject, Bounded {
         // Add entity to the map
         entityList.add(entity);
 
-        events.fireEntityAdded(entity);
+        events.getEntityAdded().fireAndForget(entity);
 
         // Recompute max stimulus length
         recomputeMaxVectorNorm();
@@ -344,13 +344,13 @@ public class OdorWorld implements EditableObject, Bounded {
             entityList.remove(entity);
             entity.delete();
             for (Sensor sensor : entity.getSensors()) {
-                entity.getEvents().fireSensorRemoved(sensor);
+                entity.getEvents().getSensorRemoved().fireAndForget(sensor);
             }
             for (Effector effector : entity.getEffectors()) {
-                entity.getEvents().fireEffectorRemoved(effector);
+                entity.getEvents().getEffectorRemoved().fireAndForget(effector);
             }
             recomputeMaxVectorNorm();
-            events.fireEntityRemoved(entity);
+            events.getEntityRemoved().fireAndForget(entity);
         }
 
     }
@@ -380,7 +380,7 @@ public class OdorWorld implements EditableObject, Bounded {
      */
     private Object readResolve() {
 
-        events = new OdorWorldEvents(this);
+        events = new OdorWorldEvents2();
 
         for (OdorWorldEntity entity : entityList) {
 //            entity.postSerializationInit();
@@ -519,11 +519,11 @@ public class OdorWorld implements EditableObject, Bounded {
 
     public void setTileMap(TileMap tileMap) {
         this.tileMap = tileMap;
-        getEvents().fireTileMapChanged();
+        getEvents().getTileMapChanged().fireAndForget();
     }
 
     public void start() {
-        events.fireWorldStarted();
+        events.getWorldStarted().fireAndForget();
     }
 
     public Point2D getLastClickedPosition() {
@@ -539,7 +539,7 @@ public class OdorWorld implements EditableObject, Bounded {
         return "Odor World";
     }
 
-    public OdorWorldEvents getEvents() {
+    public OdorWorldEvents2 getEvents() {
         return events;
     }
 

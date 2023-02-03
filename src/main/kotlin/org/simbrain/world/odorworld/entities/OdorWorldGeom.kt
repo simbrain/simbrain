@@ -30,7 +30,7 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
     override var x = 0.0
         set(value) {
             field = value
-            event.fireMoved()
+            event.moved.fireAndForget()
             dirty = true
         }
 
@@ -38,7 +38,7 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
     override var y = 0.0
         set(value) {
             field = value
-            event.fireMoved()
+            event.moved.fireAndForget()
             dirty = true
         }
 
@@ -67,7 +67,7 @@ class Rotation(@Transient private val event: EntityLocationEvent) : Rotatable {
     override var heading = 0.0
         set(value) {
             field = ((value % 360.0) + 360.0) % 360.0
-            event.fireMoved()
+            event.moved.fireAndForget()
         }
 }
 

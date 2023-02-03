@@ -58,7 +58,7 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
 
-        worldPanel.getWorld().getEvents().onTileMapChanged(this::setGuiSizeToWorldSize);
+        worldPanel.getWorld().getEvents().getTileMapChanged().on(this::setGuiSizeToWorldSize);
 
         // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
 

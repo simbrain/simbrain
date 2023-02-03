@@ -132,7 +132,7 @@ val isopodSim = newSim {
                 theta = -45.0
                 addSensor(this)
             }
-            events.onCollided {
+            events.collided.on {
                 if (it is OdorWorldEntity) {
                     log += "# Collided with ${it.name}\n"
                 } else {

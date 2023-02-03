@@ -43,7 +43,7 @@ class ObjectSensorNode(override val sensor: ObjectSensor) : EntityAttributeNode(
         updateLabel()
         shape.addChild(labelText)
         drawDispersionCircleAround(shape)
-        sensor.events.onPropertyChange {
+        sensor.events.propertyChanged.on {
             updateLabel()
             drawDispersionCircleAround(shape)
         }

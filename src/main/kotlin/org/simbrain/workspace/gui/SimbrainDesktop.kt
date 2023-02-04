@@ -58,7 +58,7 @@ import javax.swing.event.*
 class SimbrainDesktop(val workspace: Workspace) {
 
     @JvmField
-    val desktop: JDesktopPane = JDesktopPane()
+    val desktopPane: JDesktopPane = JDesktopPane()
 
     /**
      * Cached context menu.
@@ -142,10 +142,10 @@ class SimbrainDesktop(val workspace: Workspace) {
             val y = event.component.bounds.getY().toInt()
             val width = event.component.bounds.getWidth().toInt()
             val height = event.component.bounds.getHeight().toInt()
-            if (x < desktop.visibleRect.getX()) {
+            if (x < desktopPane.visibleRect.getX()) {
                 event.component.setBounds(0, y, width, height)
             }
-            if (y < desktop.visibleRect.getY()) {
+            if (y < desktopPane.visibleRect.getY()) {
                 event.component.setBounds(x, 0, width, height)
             }
 
@@ -220,7 +220,6 @@ class SimbrainDesktop(val workspace: Workspace) {
             workspace.updater.events.runFinished.on{
                 setAction("Run")
             }
-
         })
         bar.addSeparator()
         bar.add(actionManager.openCouplingManagerAction)
@@ -319,13 +318,6 @@ class SimbrainDesktop(val workspace: Workspace) {
         }
         fileMenu.addSeparator()
         fileMenu.add(actionManager.clearWorkspaceAction)
-        fileMenu.addSeparator()
-        fileMenu.add(actionManager.openNetworkAction)
-        val worldSubMenu = JMenu("Open World")
-        for (action in actionManager.openWorldActions) {
-            worldSubMenu.add(action)
-        }
-        fileMenu.add(worldSubMenu)
         fileMenu.addSeparator()
         fileMenu.add(actionManager.showUpdaterDialog)
         fileMenu.addSeparator()
@@ -527,7 +519,7 @@ class SimbrainDesktop(val workspace: Workspace) {
             override fun internalFrameOpened(arg0: InternalFrameEvent) {
             }
         })
-        desktop.add(internalFrame)
+        desktopPane.add(internalFrame)
     }
 
     /**
@@ -570,8 +562,8 @@ class SimbrainDesktop(val workspace: Workspace) {
             // This should be coordinated with the logic in
             // RepositionAllWindowsSction
             val highestComponentNumber = guiComponents.size + 1
-            val xMax = desktop.width - desktopComponent.preferredSize.getWidth()
-            val yMax = desktop.height - desktopComponent.preferredSize.getHeight()
+            val xMax = desktopPane.width - desktopComponent.preferredSize.getWidth()
+            val yMax = desktopPane.height - desktopComponent.preferredSize.getHeight()
             componentFrame.setBounds(
                 (highestComponentNumber * DEFAULT_WINDOW_OFFSET % xMax).toInt(),
                 (highestComponentNumber * DEFAULT_WINDOW_OFFSET % yMax).toInt(),
@@ -586,7 +578,7 @@ class SimbrainDesktop(val workspace: Workspace) {
         registerComponentInstance(workspaceComponent, desktopComponent)
         componentFrame.isVisible = true
         componentFrame.title = workspaceComponent.name
-        desktop.add(componentFrame)
+        desktopPane.add(componentFrame)
         lastFocusedStack.push(desktopComponent)
         desktopComponent.parentFrame.pack()
         // System.out.println(lastOpened.getName());
@@ -848,8 +840,8 @@ class SimbrainDesktop(val workspace: Workspace) {
         val events = workspace.events
         events.workspaceCleared.on {
             guiComponents.clear()
-            desktop.removeAll()
-            desktop.repaint()
+            desktopPane.removeAll()
+            desktopPane.repaint()
             frame.title = FRAME_TITLE
             lastTimestep = 0
             updateTimeLabel()
@@ -888,12 +880,12 @@ class SimbrainDesktop(val workspace: Workspace) {
 
         // Set up Desktop
         if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")) {
-            desktop.background = Color.WHITE
-            desktop.border = BorderFactory.createLoweredBevelBorder()
+            desktopPane.background = Color.WHITE
+            desktopPane.border = BorderFactory.createLoweredBevelBorder()
         }
-        desktop.addMouseListener(mouseListener)
-        desktop.addKeyListener(WorkspaceKeyAdapter(workspace))
-        desktop.preferredSize =
+        desktopPane.addMouseListener(mouseListener)
+        desktopPane.addKeyListener(WorkspaceKeyAdapter(workspace))
+        desktopPane.preferredSize =
             Dimension(screenSize.width - WORKSPACE_INSET * 2, screenSize.height - WORKSPACE_INSET * 3)
 
         // Create the Tabbed Pane for bottom of the desktop
@@ -910,7 +902,7 @@ class SimbrainDesktop(val workspace: Workspace) {
         // Set up the main panel
         horizontalSplitter = JSplitPane(JSplitPane.VERTICAL_SPLIT)
         horizontalSplitter.dividerLocation = dividerLocation
-        horizontalSplitter.topComponent = desktop
+        horizontalSplitter.topComponent = desktopPane
         horizontalSplitter.bottomComponent = bottomDock
         val mainPanel = JPanel(BorderLayout())
         mainPanel.add(wsToolBar, "North")
@@ -983,14 +975,14 @@ class SimbrainDesktop(val workspace: Workspace) {
          *
          * @return visible width.
          */
-        get() = desktop.visibleRect.getWidth()
+        get() = desktopPane.visibleRect.getWidth()
     val height: Double
         /**
          * Returns the height of the visible portion of the desktop.
          *
          * @return the visible height
          */
-        get() = desktop.visibleRect.getHeight()
+        get() = desktopPane.visibleRect.getHeight()
 
     /**
      * Position a component given an index. Lays out components in a pattern moving diagonally and downward across the
@@ -1021,10 +1013,10 @@ class SimbrainDesktop(val workspace: Workspace) {
             // Add window below the current window at a slight offent
             desktopComponent.parentFrame.setBounds(
                 ((positionIndex + 1) * DEFAULT_WINDOW_OFFSET
-                        % (desktop.width - desktopComponent
+                        % (desktopPane.width - desktopComponent
                     .preferredSize.getWidth())).toInt(),
                 ((positionIndex + 1) * DEFAULT_WINDOW_OFFSET
-                        % (desktop.height - desktopComponent
+                        % (desktopPane.height - desktopComponent
                     .preferredSize.getHeight())).toInt(),
                 desktopComponent.preferredSize.getWidth().toInt(),
                 desktopComponent.preferredSize.getHeight().toInt()
@@ -1046,6 +1038,44 @@ class SimbrainDesktop(val workspace: Workspace) {
         var i = 0
         for (component in desktopComponents) {
             positionComponent(i++, component)
+        }
+    }
+
+    fun resizeAllWindows() {
+        var maxX = 0
+        var maxY = 0
+        val desktopHeight: Double = desktopPane.getSize().getHeight()
+        val desktopWidth: Double = desktopPane.getSize().getWidth()
+
+        for (c in desktopPane.getComponents()) {
+            val bottomRightX = (c.width + c.x)
+            val bottomRightY = (c.height + c.y)
+            if (maxX < bottomRightX) {
+                maxX = bottomRightX
+            }
+            if (maxY < bottomRightY) {
+                maxY = bottomRightY
+            }
+        }
+
+        val xScalingRatio = maxX / desktopWidth
+        val yScalingRatio = maxY / desktopHeight
+
+        val finalScalingRatio = if (xScalingRatio > yScalingRatio) 1 / xScalingRatio else 1 / yScalingRatio
+
+        if (finalScalingRatio < 1) {
+            for (c in desktopPane.getComponents()) {
+                val orignalTopLeftX = c.x.toDouble()
+                val orignalTopLeftY = c.y.toDouble()
+                val originalWidth = c.width
+                val originalHeight = c.height
+                c.setBounds(
+                    (orignalTopLeftX * finalScalingRatio).toInt(),
+                    (orignalTopLeftY * finalScalingRatio).toInt(),
+                    (originalWidth * finalScalingRatio).toInt(),
+                    (originalHeight * finalScalingRatio).toInt()
+                )
+            }
         }
     }
 

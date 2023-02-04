@@ -18,13 +18,10 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.genericframe.GenericJInternalFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.Producer;
-import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
@@ -32,15 +29,13 @@ import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsu
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.lang.reflect.Type;
 import java.util.List;
 
 /**
  * GUI dialog for creating couplings.
  */
-public class DesktopCouplingManager extends JPanel implements ActionListener {
+public class DesktopCouplingManager extends JPanel {
 
     /**
      * Flag to ensure that only one dialog is opened at a time.
@@ -73,20 +68,13 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
     private SimbrainDesktop desktop;
 
     /**
-     * Reference of parent frame.
-     */
-    private GenericFrame frame;
-
-    /**
      * Creates and displays the coupling manager.
      *
      * @param desktop reference to parent desktop
-     * @param frame   reference to parent frame
      */
-    public DesktopCouplingManager(final SimbrainDesktop desktop, final GenericJInternalFrame frame) {
+    public DesktopCouplingManager(final SimbrainDesktop desktop) {
         super(new BorderLayout());
         this.desktop = desktop;
-        this.frame = frame;
         isVisible = true;
 
         // Left Panel
@@ -141,18 +129,10 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
 
         JButton addCouplingsButton = new JButton("Add Coupling(s)");
         addCouplingsButton.setActionCommand("addCouplings");
-        addCouplingsButton.addActionListener(this);
+        addCouplingsButton.addActionListener((e) -> {
+            addCouplings();
+        });
         bottomPanel.add(addCouplingsButton);
-
-        JButton okButton = new JButton("OK");
-        okButton.setActionCommand("ok");
-        okButton.addActionListener(this);
-        bottomPanel.add(okButton);
-
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.setActionCommand("cancel");
-        cancelButton.addActionListener(this);
-        bottomPanel.add(cancelButton);
 
         // Center panel with couplings
         JComponent couplingList = new CouplingListPanel(desktop, desktop.getWorkspace().getCouplings());
@@ -166,33 +146,6 @@ public class DesktopCouplingManager extends JPanel implements ActionListener {
         centerPanel.setPreferredSize(new Dimension(800, 400));
         this.add("Center", centerPanel);
         this.add("South", bottomPanel);
-
-        frame.getRootPane().setDefaultButton(okButton);
-        frame.pack();
-    }
-
-    /**
-     * @param event to listen.
-     * @see ActionListener
-     */
-    public void actionPerformed(final ActionEvent event) {
-
-        // Refresh component lists
-        if (event.getSource() instanceof JComboBox) {
-            WorkspaceComponent component = (WorkspaceComponent) ((JComboBox) event.getSource()).getSelectedItem();
-        }
-
-        // Handle Button Presses
-        if (event.getSource() instanceof JButton) {
-            JButton button = (JButton) event.getSource();
-            if (button.getActionCommand().equalsIgnoreCase("addCouplings")) {
-                addCouplings();
-            } else if (button.getActionCommand().equalsIgnoreCase("ok")) {
-                frame.dispose();
-            } else if (button.getActionCommand().equalsIgnoreCase("cancel")) {
-                frame.dispose();
-            }
-        }
     }
 
     /**

@@ -16,388 +16,201 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.gui;
+package org.simbrain.workspace.gui
 
-import bsh.EvalError;
-import bsh.Interpreter;
-import org.simbrain.util.Utils;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.actions.*;
-import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.imageworld.ImageWorldComponent;
-import org.simbrain.world.odorworld.OdorWorldComponent;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import org.simbrain.console.ConsoleComponent
+import org.simbrain.docviewer.DocViewerComponent
+import org.simbrain.network.NetworkComponent
+import org.simbrain.util.CmdOrCtrl
+import org.simbrain.util.KeyCombination
+import org.simbrain.util.createAction
+import org.simbrain.util.displayInDialog
+import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
+import java.awt.event.KeyEvent
+import javax.swing.Action
 
 /**
  * Workspace action manager contains references to all the actions for a Workspace.
  */
-public class WorkspaceActionManager {
+class WorkspaceActionManager(desktop: SimbrainDesktop) {
 
-    /**
-     * Location of script menu directory.
-     */
-    private static final String SCRIPT_MENU_DIRECTORY = "scripts/scriptmenu";
+    val workspace = desktop.workspace
 
-    private static Action createComponentFactoryAction(Workspace workspace, String name, String icon) {
-        return Utils.createAction(name, "Create " + name, icon,
-                () -> workspace.getComponentFactory().createWorkspaceComponent(name));
+    val newNetworkAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Network.png",
+        name = "New network",
+        description = "Add a new network to the desktop",
+        keyCombo = CmdOrCtrl + 'N'
+    ) {
+        workspace.addWorkspaceComponent(NetworkComponent(""))
     }
 
-    /**
-     * New network action.
-     */
-    private final Action newNetworkAction;
-
-    /**
-     * New console action.
-     */
-    private final Action newConsoleAction;
-
-    /**
-     * New document viewer.
-     */
-    private final Action newDocViewerAction;
-
-    /**
-     * Clear workspace action.
-     */
-    private final Action clearWorkspaceAction;
-
-    /**
-     * Open network action.
-     */
-    private final Action openNetworkAction;
-
-    /**
-     * Open workspace action.
-     */
-    private final Action openWorkspaceAction;
-
-    /**
-     * Save workspace action.
-     */
-    private final Action saveWorkspaceAction;
-
-    /**
-     * Save workspace as action.
-     */
-    private final Action saveWorkspaceAsAction;
-
-    /**
-     * Quit workspace action.
-     */
-    private final Action quitWorkspaceAction;
-
-    /**
-     * Global workspace update action.
-     */
-    private final Action iterateAction;
-
-    /**
-     * Global workspace run action.
-     */
-    private final Action runAction;
-
-    /**
-     * Global workspace stop action.
-     */
-    private final Action stopAction;
-
-    /**
-     * Opens the coupling manager.
-     */
-    private final Action openCouplingManagerAction;
-
-    /**
-     * Opens the coupling list.
-     */
-    private final Action openCouplingListAction;
-
-    /**
-     * Opens the list of workspace components.
-     */
-    private final Action openWorkspaceComponentListAction;
-
-    /**
-     * Show hide property tab.
-     */
-    private final Action propertyTabAction;
-
-    /**
-     * Open script editor action.
-     */
-    private final Action showScriptEditorAction;
-
-    /**
-     * Open script editor action.
-     */
-    private final Action showUpdaterDialog;
-
-    /**
-     * Reposition windows action.
-     */
-    private final Action repositionAllWindowsAction;
-
-    /**
-     * Resize windows action.
-     */
-    private final Action resizeAllWindowsAction;
-
-    /**
-     * List of actions which create charts.
-     */
-    private List<Action> newChartActions;
-
-    /**
-     * List of actions which open worlds.
-     */
-    private List<Action> openWorldActions;
-
-    /**
-     * List of actions which create new worlds.
-     */
-    private List<Action> newWorldActions;
-
-    /**
-     * Create a new workspace action manager for the specified workspace.
-     *
-     * @param desktop workspace, must not be null
-     */
-    public WorkspaceActionManager(SimbrainDesktop desktop) {
-        Workspace workspace = desktop.getWorkspace();
-
-        clearWorkspaceAction = new ClearWorkspaceAction(desktop);
-
-        openNetworkAction = new OpenNetworkAction(workspace);
-        openWorldActions = Arrays.asList(
-                new OpenComponentAction<>(DataWorldComponent.class, "Data Table", "menu_icons/Table.png", workspace),
-                new OpenComponentAction<>(OdorWorldComponent.class, "Odor World", "menu_icons/SwissIcon.png", workspace),
-                new OpenComponentAction<>(ImageWorldComponent.class, "Image Display", "menu_icons/camera.png", workspace));
-
-        openWorkspaceAction = new OpenWorkspaceAction(desktop);
-        saveWorkspaceAction = new SaveWorkspaceAction(desktop);
-        saveWorkspaceAsAction = new SaveWorkspaceAsAction(desktop);
-
-        newNetworkAction = new NewNetworkAction(workspace);
-        newConsoleAction = new NewConsoleAction(workspace);
-        newDocViewerAction = new NewDocViewerAction(workspace);
-
-        newChartActions = Arrays.asList(
-                createComponentFactoryAction(workspace, "Bar Chart", "menu_icons/BarChart.png"),
-                createComponentFactoryAction(workspace, "Histogram", "menu_icons/BarChart.png"),
-                createComponentFactoryAction(workspace, "Pie Chart", "menu_icons/PieChart.png"),
-                createComponentFactoryAction(workspace, "Pixel Plot", "menu_icons/grid.png"),
-                createComponentFactoryAction(workspace, "Projection Plot", "menu_icons/ProjectionIcon.png"),
-                createComponentFactoryAction(workspace, "Raster Plot", "menu_icons/ScatterIcon.png"),
-                createComponentFactoryAction(workspace, "Time Series", "menu_icons/CurveChart.png"));
-
-        newWorldActions = Arrays.asList(
-                createComponentFactoryAction(workspace, "Data Table", "menu_icons/Table.png"),
-                createComponentFactoryAction(workspace, "Odor World", "menu_icons/SwissIcon.png"),
-                createComponentFactoryAction(workspace, "3D World", "menu_icons/World.png"),
-                createComponentFactoryAction(workspace, "Image World", "menu_icons/photo.png"),
-                createComponentFactoryAction(workspace, "Text World", "menu_icons/Text.png"));
-                //createComponentFactoryAction(workspace, "Device Interaction", "Text.png"));
-
-        quitWorkspaceAction = new QuitWorkspaceAction(desktop);
-
-        iterateAction = new WorkspaceIterateAction(workspace);
-        runAction = Utils.createAction("Run", "Run Workspace", "menu_icons/Play.png", workspace::run);
-        stopAction = Utils.createAction("Stop", "Stop Workspace", "menu_icons/Stop.png", workspace::stop);
-
-        showScriptEditorAction = new ScriptEditorAction(desktop);
-        showUpdaterDialog = new ShowWorkspaceUpdaterDialog(desktop);
-
-        openCouplingManagerAction = new OpenCouplingManagerAction(desktop);
-        openCouplingListAction = new OpenCouplingListAction(desktop);
-        openWorkspaceComponentListAction = new OpenWorkspaceComponentListAction(desktop);
-
-        propertyTabAction = new PropertyTabAction(desktop);
-
-        repositionAllWindowsAction = new RepositionAllWindowsAction(desktop);
-        resizeAllWindowsAction= new ResizeAllWindowsAction(desktop);
+    val newConsoleAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Terminal2.png",
+        name = "New console",
+        description = "Add a new console (terminal window) to the desktop"
+    ) {
+        val console = ConsoleComponent("")
+        workspace.addWorkspaceComponent(console)
     }
 
-    /**
-     * Return a list of run control actions.
-     */
-    public List<Action> getRunControlActions() {
-        return Arrays.asList(runAction, stopAction);
+    val newDocViewerAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Copy.png",
+        name = "New doc viewer",
+        description = "Add a new document viewer window to the desktop"
+    ) {
+        val docViewer = DocViewerComponent()
+        workspace.addWorkspaceComponent(docViewer)
     }
 
-    /**
-     * @return Open and save workspace actions.
-     */
-    public List<Action> getOpenSaveWorkspaceActions() {
-        return Arrays.asList(openWorkspaceAction, saveWorkspaceAction, saveWorkspaceAsAction);
+    val clearWorkspaceAction = desktop.desktopPane.createAction(
+        name = "Clear desktop",
+        description = "Remove all windows from the desktop",
+        keyCombo = CmdOrCtrl + 'K'
+    ) {
+        desktop.clearDesktop()
     }
 
-    /**
-     * @return Open worlds actions.
-     */
-    public List<Action> getOpenWorldActions() {
-        return openWorldActions;
+    val openWorkspaceAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Open.png",
+        name = "Open Workspace File (.zip) ...",
+        description = "Open a workspace file from .zip"
+    ) {
+        desktop.openWorkspace()
     }
 
-    /**
-     * @return New worlds actions.
-     */
-    public List<Action> getNewWorldActions() {
-        // These should be in alphabetical order in the resulting menus
-        return newWorldActions;
+    val saveWorkspaceAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Save.png",
+        name = "Save workspace",
+        description = "Save current workspace file",
+        keyCombo = CmdOrCtrl + 'S'
+    ) {
+        desktop.save()
     }
 
-    /**
-     * @return Simbrain gauge actions.
-     */
-    public List<Action> getPlotActions() {
-        return newChartActions;
+    private val saveWorkspaceAsAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Save.png",
+        name = "Save workspace as...",
+        description = "Save current workspace file as .zip"
+    ) {
+        desktop.saveAs()
     }
 
-    public Action getNewNetworkAction() {
-        return newNetworkAction;
+    val quitWorkspaceAction = desktop.desktopPane.createAction(
+        name = "Quit Simbrain",
+        description = "Quit Simbrain",
+        keyCombo = CmdOrCtrl + 'Q'
+    ) {
+        desktop.quit(false)
     }
 
-    public Action getNewConsoleAction() {
-        return newConsoleAction;
+    val iterateAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Step.png",
+        name = "Iterate workspace",
+        description = "Iterate workspace once",
+        initBlock = {
+            workspace.updater.events.runStarted.on { isEnabled = false }
+            workspace.updater.events.runFinished.on { isEnabled = true }
+        },
+        keyCombo = KeyCombination(KeyEvent.VK_SPACE)
+    ) {
+        workspace.iterate()
     }
 
-    public Action getNewDocViewerAction() {
-        return newDocViewerAction;
+    val runAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Play.png",
+        name = "Run",
+        description = "Run workspace"
+    ) {
+        workspace.run()
     }
 
-    public Action getClearWorkspaceAction() {
-        return clearWorkspaceAction;
+    val stopAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Stop.png",
+        name = "Stop",
+        description = "Stop workspace"
+    ) {
+        workspace.stop()
     }
 
-    public Action getOpenNetworkAction() {
-        return openNetworkAction;
+    val openCouplingManagerAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Coupling.png",
+        name = "Open coupling manager...",
+        description = "Open workspace coupling manager."
+    ) {
+        DesktopCouplingManager(desktop).displayInDialog {  }
     }
 
-    public Action getShowScriptEditorAction() {
-        return showScriptEditorAction;
+    val openCouplingListAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/CouplingList.png",
+        name = "Open coupling list...",
+        description = "Open list of workspace couplings."
+    ) {
+        CouplingListPanel(desktop, desktop.workspace.couplings).displayInDialog {  }
     }
 
-    public Action getOpenWorkspaceAction() {
-        return openWorkspaceAction;
+    val propertyTabAction = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/systemMonitor.png",
+        name = "Show / hide dock",
+        description = "Toggle dock visibility."
+    ) {
+        desktop.toggleDock()
     }
 
-    public Action getSaveWorkspaceAction() {
-        return saveWorkspaceAction;
+    val showUpdaterDialog = desktop.desktopPane.createAction(
+        iconPath = "menu_icons/Sequence.png",
+        name = "Edit Update Sequence...",
+        description = "Edit workspace update actions"
+    ) {
+        WorkspaceUpdateManagerPanel(workspace).displayInDialog {  }
     }
 
-    public Action getQuitWorkspaceAction() {
-        return quitWorkspaceAction;
+    val repositionAllWindowsAction = desktop.desktopPane.createAction(
+        name = "Gather windows",
+        description = "Repositions and resize all windows. Useful when windows get \"lost\" offscreen."
+    ) {
+        desktop.repositionAllWindows()
     }
 
-    public Action getIterateAction() {
-        return iterateAction;
+    val resizeAllWindowsAction = desktop.desktopPane.createAction(
+        name = "Resize windows",
+        description = "Resize all windows on screen so they fit on the current desktop. Useful when windows get \"lost\" offscreen."
+    ) {
+        desktop.resizeAllWindows()
     }
 
-    public Action getRunAction() {
-        return runAction;
-    }
+    val runControlActions = listOf(runAction, stopAction)
 
-    public Action getStopAction() {
-        return stopAction;
-    }
+    val openSaveWorkspaceActions = listOf(openWorkspaceAction, saveWorkspaceAction, saveWorkspaceAsAction)
 
-    public Action getOpenCouplingManagerAction() {
-        return openCouplingManagerAction;
-    }
-
-    public Action getOpenCouplingListAction() {
-        return openCouplingListAction;
-    }
-
-    public Action getOpenWorkspaceComponentListAction() {
-        return openWorkspaceComponentListAction;
-    }
-
-    public Action getPropertyTabAction() {
-        return propertyTabAction;
-    }
-
-    public Action getShowUpdaterDialog() {
-        return showUpdaterDialog;
-    }
-
-    public Action getRepositionAllWindowsAction() {
-        return repositionAllWindowsAction;
-    }
-    public Action getResizeAllWindowsAction() {
-        return resizeAllWindowsAction;
-    }
-
-    /**
-     * Create an action based on the name of a script.
-     */
-    public final class ScriptAction extends WorkspaceAction implements Comparable<ScriptAction> {
-
-        /**
-         * Name of script for use in actions (e.g. menu items).
-         */
-        private String scriptName;
-
-        /**
-         * Reference to workspace.
-         */
-        private Workspace workspace;
-
-        /**
-         * Reference to Simbrain Desktop.
-         */
-        private SimbrainDesktop desktop;
-
-        /**
-         * Create a new add gauge action with the specified workspace.
-         *
-         * @param desktop    Simbrain desktop
-         * @param scriptName name of script
-         */
-        public ScriptAction(final SimbrainDesktop desktop,
-                            final String scriptName) {
-            super(scriptName, desktop.getWorkspace());
-            // putValue(SHORT_DESCRIPTION, name);
-            this.scriptName = scriptName;
-            this.desktop = desktop;
-            this.workspace = desktop.getWorkspace();
-        }
-
-        /**
-         * @param event
-         * @see AbstractAction
-         */
-        public void actionPerformed(final ActionEvent event) {
-
-            Interpreter interpreter = new Interpreter();
-
-            try {
-                interpreter.set("workspace", workspace);
-                interpreter.set("desktop", desktop);
-                interpreter.source(SCRIPT_MENU_DIRECTORY + '/' + scriptName);
-            } catch (FileNotFoundException e) {
-                System.out.println("File not found");
-                e.printStackTrace();
-            } catch (IOException e) {
-                System.out.println("IO Exception");
-                e.printStackTrace();
-            } catch (EvalError e) {
-                System.out.println("Evaluation error");
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public int compareTo(ScriptAction scriptAction) {
-            return this.scriptName.toLowerCase().compareTo(scriptAction.scriptName.toLowerCase());
+    fun createComponentFactoryAction(
+        name: String,
+        iconPath: String
+    ): Action {
+        return createAction(
+            name = name,
+            iconPath = iconPath,
+            description = "Create $name"
+        ) {
+            workspace.componentFactory.createWorkspaceComponent(name)
         }
     }
+
+    val plotActions = listOf(
+        createComponentFactoryAction("Bar Chart", "menu_icons/BarChart.png"),
+        createComponentFactoryAction("Histogram", "menu_icons/BarChart.png"),
+        createComponentFactoryAction("Pie Chart", "menu_icons/PieChart.png"),
+        createComponentFactoryAction("Pixel Plot", "menu_icons/grid.png"),
+        createComponentFactoryAction("Projection Plot", "menu_icons/ProjectionIcon.png"),
+        createComponentFactoryAction("Raster Plot", "menu_icons/ScatterIcon.png"),
+        createComponentFactoryAction("Time Series", "menu_icons/CurveChart.png")
+    )
+    val newWorldActions = listOf(
+        createComponentFactoryAction("Data Table", "menu_icons/Table.png"),
+        createComponentFactoryAction("Odor World", "menu_icons/SwissIcon.png"),
+        createComponentFactoryAction("3D World", "menu_icons/World.png"),
+        createComponentFactoryAction("Image World", "menu_icons/photo.png"),
+        createComponentFactoryAction("Text World", "menu_icons/Text.png")
+    )
 
 }

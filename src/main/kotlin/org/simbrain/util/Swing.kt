@@ -112,6 +112,7 @@ fun <T : JComponent> T.createAction(
     name: String? = null,
     description: String? = null,
     keyCombo: KeyCombination? = null,
+    initBlock: AbstractAction.() -> Unit = {},
     block: T.(e: ActionEvent) -> Unit
 ): AbstractAction {
     return object : AbstractAction() {
@@ -126,6 +127,8 @@ fun <T : JComponent> T.createAction(
                 keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
                 this@createAction.bindTo(keyCombo, this)
             }
+
+            initBlock()
         }
 
         override fun actionPerformed(e: ActionEvent) {
@@ -222,9 +225,10 @@ fun <T : JComponent> T.createAction(
     name: String = "",
     description: String = "",
     keyCombo: Char,
+    initBlock: AbstractAction.() -> Unit = {},
     block: T.(e: ActionEvent) -> Unit
 ): AbstractAction {
-    return createAction(iconPath, name, description, KeyCombination(keyCombo), block)
+    return createAction(iconPath, name, description, KeyCombination(keyCombo), initBlock, block)
 }
 
 /**

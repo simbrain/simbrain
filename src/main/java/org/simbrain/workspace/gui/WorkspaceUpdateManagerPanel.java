@@ -15,7 +15,6 @@ package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
@@ -24,7 +23,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Panel for display and ordering of workspace update actions.
@@ -158,9 +159,8 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
      * Construct workspace update manager panel.
      *
      * @param workspace    parent workspace
-     * @param parentDialog dialog containing this panel
      */
-    public WorkspaceUpdateManagerPanel(Workspace workspace, StandardDialog parentDialog) {
+    public WorkspaceUpdateManagerPanel(Workspace workspace) {
         super(new BorderLayout());
         this.workspace = workspace;
 
@@ -207,18 +207,18 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
 
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // Help button
-        if (parentDialog != null) {
-            Action helpAction = new ShowHelpAction("Pages/Workspace/update.html");
-            parentDialog.addButton(new JButton(helpAction));
-            parentDialog.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent evt) {
-                    super.windowClosing(evt);
-                    workspace.getUpdater().getUpdateManager().removeListener(listener);
-                }
-            });
-        }
+        // // Help button
+        // if (parentDialog != null) {
+        //     Action helpAction = new ShowHelpAction("Pages/Workspace/update.html");
+        //     parentDialog.addButton(new JButton(helpAction));
+        //     parentDialog.addWindowListener(new WindowAdapter() {
+        //         @Override
+        //         public void windowClosing(WindowEvent evt) {
+        //             super.windowClosing(evt);
+        //             workspace.getUpdater().getUpdateManager().removeListener(listener);
+        //         }
+        //     });
+        // }
 
         workspace.getUpdater().getUpdateManager().addListener(listener);
     }

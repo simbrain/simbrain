@@ -19,6 +19,7 @@
 package org.simbrain.world.odorworld.sensors
 
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.sum
 import org.simbrain.workspace.Producible
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
@@ -46,10 +47,8 @@ class SmellSensor @JvmOverloads constructor(
         smellVector = parent.world.entityList
             .filter { it != parent } // Don't smell yourself
             .map { Pair(it.smellSource, SimbrainMath.distance(it.location, computeAbsoluteLocation(parent))) }
-            .filter { (_, _) -> true }
             .map { (smellSource, distance) -> smellSource.getStimulus(distance) }
-            .map { it.sum() }
-            .toDoubleArray()
+            .sum()
     }
 
     /**

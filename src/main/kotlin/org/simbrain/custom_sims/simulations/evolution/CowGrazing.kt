@@ -113,7 +113,7 @@ val grazingCows = newSim {
         }
     }
 
-    // What to do when a cow finds water
+    // What to do when a cow finds flower
     fun addFindFlowerAction(workspace: Workspace, entity: OdorWorldEntity, fitnessLambda: (Double) -> Unit = {}) {
         val world = entity.world
         workspace.addUpdateAction("${entity.name} found a flower") {

@@ -3,6 +3,8 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.table.SimbrainDataViewer
+import javax.swing.JInternalFrame
 
 /**
  * Todo
@@ -42,7 +44,19 @@ val nlpSim_basic = newSim {
             width = 400
             height = 500
         }
+
+        val internalFrame = JInternalFrame("Co-occurence matrix", true, true)
+        internalFrame.setLocation(8, 365)
+        addInternalFrame(internalFrame)
+        val tableViewer = SimbrainDataViewer(textWorld.tokenVectorMap.createTableModel())
+        internalFrame.contentPane = tableViewer
+        internalFrame.isVisible = true
+        internalFrame.pack()
+        textWorld.events.tokenVectorMapChanged.on {
+            tableViewer.model = textWorld.tokenVectorMap.createTableModel()
+        }
     }
+
 
     // Network
     // val networkComponent = addNetworkComponent("Network")

@@ -2,6 +2,9 @@ package org.simbrain.world.textworld
 
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.NTree
+import org.simbrain.util.table.Column
+import org.simbrain.util.table.SimbrainDataModel
+import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
 
 /**
@@ -58,4 +61,15 @@ class TokenVectorMap(
         // TODO: Add a default minimum distance and if above that, return null or zero vector
         return treeMap.getClosestPoint(DataPoint(key)).label
     }
+
+    fun createTableModel(): SimbrainDataModel {
+        // TODO: Find a way to show the tokens as rowHeaders
+        val table = createFromDoubleArray(tokenVectorMatrix.replaceNaN(0.0).toArray())
+        table.insertColumn(0, "Token", Column.DataType.StringType)
+        tokensMap.keys.forEachIndexed { rowIndex, token ->
+            table.setValueAt(token, rowIndex, 0)
+        }
+        return table
+    }
+
 }

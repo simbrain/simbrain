@@ -35,11 +35,15 @@ open class SimbrainDataViewer(
 
     val scrollPane = DataViewerScrollPane(table)
 
-    var model:SimbrainDataModel = model
+    var model:SimbrainDataModel
+        get() = table.model
         set(value) {
-            // Reset the table data
-            field = value
-            value.fireTableStructureChanged()
+            // TODO: Allow for structure changes
+            (0 until value.rowCount).forEach {i ->
+                (0 until value.columnCount).forEach{j ->
+                    table.model.setValueAt(value.getValueAt(i,j),i,j)
+                }
+            }
         }
 
     init {

@@ -1,9 +1,7 @@
 package org.simbrain.world.textworld
 
 import org.simbrain.util.*
-import org.simbrain.util.table.Column
 import org.simbrain.util.table.SimbrainDataViewer
-import org.simbrain.util.table.createFromDoubleArray
 import org.simbrain.world.textworld.gui.showComparisonDialog
 import java.util.*
 
@@ -35,15 +33,13 @@ val TextWorld.dictionaryEditor
         description = "Edit dictionary...",
         iconPath = "menu_icons/Table.png"
     ) {
-        // TODO: Find a way to show the tokens as rowHeaders
-        // Find a way to make it immutable
-        val model = createFromDoubleArray(tokenVectorMap.tokenVectorMatrix.replaceNaN(0.0).toArray())
-        model.insertColumn(0, "Token", Column.DataType.StringType)
-        tokenVectorMap.tokensMap.keys.forEachIndexed { rowIndex, token ->
-            model.setValueAt(token, rowIndex, 0)
-        }
-        SimbrainDataViewer(model).displayInDialog().apply {
+
+        val viewer = SimbrainDataViewer(tokenVectorMap.createTableModel())
+        viewer.displayInDialog().apply {
             title = "Dictionary with ${tokenVectorMap.size} unique entries"
+        }
+        events.tokenVectorMapChanged.on {
+            viewer.model = tokenVectorMap.createTableModel()
         }
     }
 

@@ -46,11 +46,11 @@ val simulations = dir<Any>("Simulations") {
             item("Simple Operant") {SimpleOperant()}
         }
         dir("NLP") {
-            item("NLP") { nlpSim }
-            item("NLP - Introduction") { nlpSim_basic }
-            item("NLP - Geometric Spaces") {nlpSim_geomSpace}
-            item("NLP - Corpus Quality") {nlpSim_corpusQuality}
-            item("NLP - Neural Networks") {nlpSim_neuralNetworks}
+            // item("NLP") { nlpSim }
+            item("1. Introduction") { nlpSim_basic }
+            item("2. Geometric Spaces") {nlpSim_geomSpace}
+            item("3. Corpus Quality") {nlpSim_corpusQuality}
+            item("4. Neural Networks") {nlpSim_neuralNetworks}
         }
     }
 

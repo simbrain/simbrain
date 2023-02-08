@@ -12,6 +12,7 @@ val nlpSim_basic = newSim {
 
     // 1. "Basics of word embeddings and co-occurrence matrices"
     //
+    // TODO: Offload "Training" to textbook chapter.
     // Training:
     // For the text reader, it will have options for skipGram and window size
     // The text highlight will reflect what options are selected. Maybe two different colors, target = red, context = blue?
@@ -24,10 +25,6 @@ val nlpSim_basic = newSim {
     // Co-occurrence matrix will be pre-trained and displayed on the main screen.
     // Vertical bar on the side showing radio button options for count matrix, ppmi transform
     // As students click the different options, a second co-occurrence will reflect the difference (for quick comparisons).
-    //
-    // Option: heatmap plot?
-    //
-    // Unrelated issue: What is the best way for people to update the settings?
 
 
     workspace.clearWorkspace()

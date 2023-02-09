@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.util.decayfunctions.LinearDecayFunction
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -14,6 +15,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
 
 /**
@@ -147,9 +149,21 @@ val isopodSim = newSim {
         fun addFish(x: Double, y: Double) {
             odorWorld.addEntity(x, y, EntityType.FISH).apply {
                 name = "Fish"
-                smellSource = SmellSource.createScalarSource(1).apply {
-                    dispersion = 350.0
+                // Smell value when agent is right on top of fish
+                val maxVal = 1.1
+                smellSource = SmellSource.createScalarSource(maxVal).apply {
+                    // How the smell decays with distances
+                    decayFunction = LinearDecayFunction()
+                    decayFunction.peakDistance = 0.0
+                    decayFunction.dispersion = 350.0
+                    showDispersion = true
                 }
+                // A convenient way to show the hit radius. Not used as a sensor.
+                addSensor(ObjectSensor().apply{
+                    radius = 0.0
+                    decayFunction.dispersion = hitRadius.toDouble()
+                    showDispersion = true
+                })
             }
         }
 

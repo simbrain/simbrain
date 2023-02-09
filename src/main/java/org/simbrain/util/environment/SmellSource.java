@@ -91,7 +91,7 @@ public class SmellSource implements EditableObject {
         }
     }
 
-    public static SmellSource createScalarSource(final int val) {
+    public static SmellSource createScalarSource(final double val) {
         return new SmellSource(new double[] {val});
     }
 

@@ -24,7 +24,7 @@ import org.simbrain.network.util.SimnetUtils.getEuclideanDist
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.decayfunctions.DecayFunction
-import org.simbrain.util.decayfunctions.ExponentialDecayFunction
+import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.propertyeditor.EditableObject
 
 class DistanceBased (
@@ -37,7 +37,7 @@ class DistanceBased (
         description = "Decay function for connectionprobability",
         isObjectType = true,
         order = 1)
-    var decayFunction: DecayFunction = ExponentialDecayFunction()
+    var decayFunction: DecayFunction = GaussianDecayFunction()
 
 ) : ConnectionStrategy(), EditableObject {
 

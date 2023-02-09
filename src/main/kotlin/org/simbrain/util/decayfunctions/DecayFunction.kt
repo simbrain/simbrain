@@ -32,8 +32,12 @@ abstract class DecayFunction(
      *
      * Returns a number between 0 and 1 that can also be treated as a probability.
      */
-    // TODO: But note these are not normalized to be probability density functions
     abstract fun getScalingFactor(distance: Double): Double
+
+    // TODO: Stub for future implementation of, for example, elliptical decay functions
+    // open fun getScalingFactor(relativeLocation: Point2D): Double {
+    //     return 0.0
+    // }
 
     /**
      * Distance from peak.
@@ -71,7 +75,7 @@ abstract class DecayFunction(
             return listOf(
                 StepDecayFunction::class.java,
                 LinearDecayFunction::class.java,
-                ExponentialDecayFunction::class.java,
+                GaussianDecayFunction::class.java,
             )
         }
     }

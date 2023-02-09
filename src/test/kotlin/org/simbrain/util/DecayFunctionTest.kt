@@ -3,7 +3,7 @@ package org.simbrain.util
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.simbrain.util.decayfunctions.ExponentialDecayFunction
+import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
 import org.simbrain.util.decayfunctions.StepDecayFunction
 
@@ -51,23 +51,24 @@ class DecayFunctionTest {
         // println(makeStringArray(0.0, 10.0, decay::getScalingFactor))
     }
 
+    // Value of the normal pdf without the normalizing constant at 1 stdev
+    val valAtOneStdev = 0.6065306597126334
+
     @Test
-    fun `test exponential`() {
-        val decay = ExponentialDecayFunction()
+    fun `test gaussian`() {
+        val decay = GaussianDecayFunction()
         decay.dispersion = 1.0
         assertEquals(1.0, decay.getScalingFactor(0.0))
-        assertEquals(1/Math.E, decay.getScalingFactor(1.0))
-        // println(makeStringArray(0.0, 10.0, decay::getScalingFactor))
+        assertEquals(valAtOneStdev, decay.getScalingFactor(decay.dispersion/2))
     }
 
-    //TODO
     @Test
-    fun `test exponential with peak`() {
-        val decay = ExponentialDecayFunction()
+    fun `test gaussian with peak`() {
+        val decay = GaussianDecayFunction()
         decay.dispersion = 2.0
         decay.peakDistance = 10.0
-        assertEquals(1/decay.dispersion, decay.getScalingFactor(10.0))
-        // println(makeStringArray(0.0,20.0, decay::getScalingFactor))
+        assertEquals(1.0 , decay.getScalingFactor(10.0))
+        assertEquals(valAtOneStdev, decay.getScalingFactor(10 +decay.dispersion/2))
     }
 
 }

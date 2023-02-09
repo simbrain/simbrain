@@ -80,7 +80,7 @@ class GeneticsTest {
     fun `node events are working properly`() {
         val node = nodeGene()
         var counter = 0
-        node.events.onCopy { counter++ }
+        node.events.copy.on { counter++ }
         node.copy()
         assertEquals(counter, 1)
     }

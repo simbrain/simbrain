@@ -56,10 +56,10 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     protected void initEvents() {
 
         // When the parents of the matrix are deleted, delete the matrix
-        source.getEvents().getDeleted().on(m -> {
+        source.getEvents().getDeleted().on(null, true, m -> {
             delete();
         });
-        target.getEvents().getDeleted().on(m -> {
+        target.getEvents().getDeleted().on(null, true, m -> {
             delete();
         });
     }

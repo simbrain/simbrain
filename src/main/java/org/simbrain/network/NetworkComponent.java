@@ -70,7 +70,7 @@ public final class NetworkComponent extends WorkspaceComponent {
 
         NetworkEvents2 event = network.getEvents();
 
-        event.getModelAdded().on(list -> {
+        event.getModelAdded().on(null, true, list -> {
             list.forEach(m -> {
                 setChangedSinceLastSave(true);
                 if (m instanceof AttributeContainer) {

@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
@@ -119,14 +121,14 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         labelBackground.setBounds(labelText.bounds)
         labelBackground.addChild(labelText)
         addChild(labelBackground)
-        events.labelChanged.on { o, n -> updateTextLabel() }
+        events.labelChanged.on(Dispatchers.Swing) { o, n -> updateTextLabel() }
         updateTextLabel()
 
-        events.updated.on {
+        events.updated.on(Dispatchers.Swing) {
             updateActivationImage()
             updateInfoText()
         }
-        events.updateRuleChanged.on {
+        events.updateRuleChanged.on(Dispatchers.Swing) {
             if (!neuronArray.updateRule.isSpikingRule) {
                 mainNode.removeChild(spikeImage)
             }

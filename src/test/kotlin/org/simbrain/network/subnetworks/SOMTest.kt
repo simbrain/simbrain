@@ -30,7 +30,7 @@ class SOMTest {
         runBlocking {
             val som = SOMNetwork(net, 1, 2)
             val np = NetworkPanel(NetworkComponent("Test", net))
-            net.addNetworkModelSuspend(som)
+            net.addNetworkModel(som)?.join()
             assertEquals(3, np.neuronNodeMapping.keys.size)
         }
     }

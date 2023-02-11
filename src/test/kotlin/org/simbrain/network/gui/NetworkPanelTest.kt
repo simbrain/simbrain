@@ -16,8 +16,8 @@ class NetworkPanelTest {
             val np = NetworkPanel(nc)
             val n1 = Neuron(net)
             val n2 = Neuron(net)
-            net.addNetworkModelSuspend(n1)
-            net.addNetworkModelSuspend(n2)
+            net.addNetworkModel(n1)
+            net.addNetworkModel(n2)?.join()
             assertEquals(2, np.screenElements.size)
         }
     }

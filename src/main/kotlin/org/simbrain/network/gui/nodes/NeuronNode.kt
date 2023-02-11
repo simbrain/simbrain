@@ -132,7 +132,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
         // Handle events
         val events = neuron.events
-        events.deleted.on { n: NetworkModel? -> removeFromParent() }
+        events.deleted.on(Dispatchers.Swing) { n: NetworkModel? -> removeFromParent() }
         events.activationChanged.on(Dispatchers.Swing) { _, _ ->
             updateColor()
             updateText()

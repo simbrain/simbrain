@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.projection;
 
+import kotlinx.coroutines.Dispatchers;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -291,12 +292,12 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         // Other initialization
         initializeComboBoxes();
 
-        proj.getEvents().getPointFound().on(p -> update());
-        proj.getEvents().getDataChanged().on(() -> {
+        proj.getEvents().getPointFound().on(Dispatchers.getMain(), true, p -> update());
+        proj.getEvents().getDataChanged().on(Dispatchers.getMain(), true, () -> {
             resetData();
             update();
         });
-        proj.getEvents().getColorsChanged().on(() -> {
+        proj.getEvents().getColorsChanged().on(Dispatchers.getMain(), true, () -> {
             proj.resetColors();
             update();
         });
@@ -529,7 +530,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         public Paint getItemPaint(int row, int column) {
             Projector projector = getWorkspaceComponent().getProjector();
             if (column >= projector.getNumPoints()) {
-                System.out.println("getItemPaint:" + column + ">" + projector.getNumPoints());
                 return Color.green;
             }
             DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(column));
@@ -572,7 +572,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         public String generateToolTip(XYDataset data, int series, int item) {
             Projector projector = getWorkspaceComponent().getProjector();
             if (item >= projector.getNumPoints()) {
-                System.out.println("generateToolTip:" + item + ">" + projector.getNumPoints());
                 return null;
             }
             DataPoint point = projector.getUpstairs().getPoint(item);
@@ -585,14 +584,12 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
     }
 
     public void resetData() {
-        EventQueue.invokeLater(() -> {
-            xyCollection.getSeries(0).clear();
-            int size = getWorkspaceComponent().getProjector().getNumPoints();
-            for (int i = 0; i < size; i++) {
-                DataPoint point = getWorkspaceComponent().getProjector().getDownstairs().getPoint(i);
-                xyCollection.getSeries(0).add(point.get(0), point.get(1));
-            }
-        });
+        xyCollection.getSeries(0).clear();
+        int size = getWorkspaceComponent().getProjector().getNumPoints();
+        for (int i = 0; i < size; i++) {
+            DataPoint point = getWorkspaceComponent().getProjector().getDownstairs().getPoint(i);
+            xyCollection.getSeries(0).add(point.get(0), point.get(1));
+        }
 
     }
 

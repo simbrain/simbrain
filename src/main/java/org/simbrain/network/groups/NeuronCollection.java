@@ -47,16 +47,13 @@ public class NeuronCollection extends AbstractNeuronCollection {
             n.getEvents().getActivationChanged().on((aold, anew) -> {
                 invalidateCachedActivations();
             });
-        });
-
-        net.getEvents().getModelRemoved().on(n -> {
-            if (n instanceof Neuron) {
-                removeNeuron((Neuron) n);
+            n.getEvents().getDeleted().on(null, true, toDelete -> {
+                removeNeuron((Neuron) toDelete);
                 events.getLocationChanged().fireAndForget();
                 if (isEmpty()) {
                     delete();
                 }
-            }
+            });
         });
     }
 

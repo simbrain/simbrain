@@ -84,7 +84,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
             });
         }
         getEvents().getLocationChanged().fireAndForget();
-        model.getEvents().getDeleted().on(m -> {
+        model.getEvents().getDeleted().on(null, true, m -> {
             modelList.remove(m);
             if (modelList.getSize() == 0) {
                 delete();

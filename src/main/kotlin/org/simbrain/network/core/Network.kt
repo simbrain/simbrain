@@ -360,36 +360,22 @@ class Network: CoroutineScope {
     /**
      * Add a new [NetworkModel]. All network models MUST be added using this method.
      */
-    fun addNetworkModel(model: NetworkModel) {
+    fun addNetworkModel(model: NetworkModel): Job? {
         if (model.shouldAdd()) {
             model.id = idManager.getAndIncrementId(model.javaClass)
             networkModels.add(model)
             if (model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)
             }
-            model.events.deleted.on {
+            model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
                 events.modelRemoved.fireAndForget(it)
             }
-            events.modelAdded.fireAndForget(model)
+            val job = events.modelAdded.fireAndSuspend(model)
             if (model is Neuron) updatePriorityList()
+            return job
         }
-    }
-
-    suspend fun addNetworkModelSuspend(model: NetworkModel) {
-        if (model.shouldAdd()) {
-            model.id = idManager.getAndIncrementId(model.javaClass)
-            networkModels.add(model)
-            if (model is LocatableModel && model.shouldBePlaced) {
-                placementManager.placeObject(model)
-            }
-            model.events.deleted.on {
-                networkModels.remove(it)
-                events.modelRemoved.fireAndForget(it)
-            }
-            events.modelAdded.fireAndSuspend(model)
-            if (model is Neuron) updatePriorityList()
-        }
+        return null
     }
 
     /**

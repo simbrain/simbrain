@@ -681,15 +681,15 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         event.modelAdded.on(Dispatchers.Swing) { list ->
             list.forEach { createNode(it) }
         }
-        event.modelRemoved.on {
+        event.modelRemoved.on(Dispatchers.Swing) {
             network.events.zoomToFitPage.fireAndForget()
         }
-        event.updateActionsChanged.on { timeLabel.update() }
+        event.updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
         event.updated.on(Dispatchers.Swing) {
             repaint()
             timeLabel.update()
         }
-        network.events.zoomToFitPage.on {
+        network.events.zoomToFitPage.on(Dispatchers.Swing) {
             if (autoZoom && editMode.isSelection) {
                 val filtered = canvas.layer.getUnionOfChildrenBounds(null)
                 val adjustedFiltered = PBounds(

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import kotlinx.coroutines.Dispatchers;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
@@ -150,7 +151,7 @@ public final class SynapseNode extends ScreenElement {
 
         SynapseEvents2 events = synapse.getEvents();
 
-        events.getDeleted().on(s -> removeFromParent());
+        events.getDeleted().on(Dispatchers.getMain(), s -> removeFromParent());
         events.getStrengthUpdated().on(() -> {
             updateColor();
             updateDiameter();

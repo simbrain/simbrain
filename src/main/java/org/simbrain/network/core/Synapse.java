@@ -920,7 +920,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         if (getTarget() != null) {
             getTarget().removeAfferent(this);
         }
-        getEvents().getDeleted().fireAndForget(this);
+        getEvents().getDeleted().fireAndBlock(this);
     }
 
     public void hardClear() {

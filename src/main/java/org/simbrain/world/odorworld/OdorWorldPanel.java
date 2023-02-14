@@ -18,6 +18,7 @@
  */
 package org.simbrain.world.odorworld;
 
+import kotlinx.coroutines.Dispatchers;
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
 import org.piccolo2d.PNode;
@@ -198,13 +199,13 @@ public class OdorWorldPanel extends JPanel {
 
         // PCamera camera = canvas.getCamera();
 
-        world.getEvents().getEntityAdded().on(e -> {
+        world.getEvents().getEntityAdded().on(Dispatchers.getMain(), e -> {
             EntityNode node = new EntityNode(world, e);
             canvas.getLayer().addChild(node);
             selectionModel.setSelection(Collections.singleton(node)); // not working
             repaint();
         });
-        world.getEvents().getEntityRemoved().on(e -> {
+        world.getEvents().getEntityRemoved().on(Dispatchers.getMain(), e -> {
             var entityNode = canvas.getLayer().getAllNodes()
                     .stream().filter(n -> n instanceof EntityNode)
                     .filter(n -> ((EntityNode)n).getEntity() == e)
@@ -214,14 +215,14 @@ public class OdorWorldPanel extends JPanel {
                 repaint();
             }
         });
-        world.getEvents().getUpdated().on(this::centerCameraToSelectedEntity);
-        world.getEvents().getFrameAdvanced().on(() -> {
+        world.getEvents().getUpdated().on(Dispatchers.getMain(), true, this::centerCameraToSelectedEntity);
+        world.getEvents().getFrameAdvanced().on(Dispatchers.getMain(), () -> {
             canvas.getLayer().getChildrenReference().stream()
                     .filter(i -> i instanceof EntityNode)
                     .forEach(i -> ((EntityNode) i).advance());
             repaint();
         });
-        world.getEvents().getAnimationStopped().on(() -> {
+        world.getEvents().getAnimationStopped().on(Dispatchers.getMain(), () -> {
             // When movement is stopped use the "static" animation so we don't show entities in strange
             // intermediate states
             canvas.getLayer().getChildrenReference().stream()
@@ -231,16 +232,16 @@ public class OdorWorldPanel extends JPanel {
         });
 
         // Full tile map update
-        world.getEvents().getTileMapChanged().on(() -> {
+        world.getEvents().getTileMapChanged().on(Dispatchers.getMain(), () -> {
             renderAllLayers(world);
         });
 
-        world.getTileMap().getEvents().getLayerAdded().on(() -> {
+        world.getTileMap().getEvents().getLayerAdded().on(Dispatchers.getMain(), () -> {
             renderAllLayers(world);
         });
 
         // Single layer update
-        world.getTileMap().getEvents().getLayerImageChanged().on((oldImage, newImage) -> {
+        world.getTileMap().getEvents().getLayerImageChanged().on(Dispatchers.getMain(), (oldImage, newImage) -> {
                 int index = canvas.getLayer().indexOfChild(oldImage);
                 canvas.getLayer().removeChild(oldImage);
                 if (index != -1) {

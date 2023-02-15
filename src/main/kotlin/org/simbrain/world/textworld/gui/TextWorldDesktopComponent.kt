@@ -132,9 +132,9 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
 
         // Edit menu
         // loadDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
-        preferences.action = world.textWorldPrefs
         // edit.add(loadDictionary);
-        edit.addSeparator()
+        // edit.addSeparator()
+        preferences.action = world.textWorldPrefs
         edit.add(preferences)
         menuBar.add(edit)
 

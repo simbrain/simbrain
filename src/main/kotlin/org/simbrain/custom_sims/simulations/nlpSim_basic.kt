@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addTextWorld
+import org.simbrain.custom_sims.getResource
+import org.simbrain.custom_sims.newSim
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.table.SimbrainDataViewer
@@ -39,13 +41,13 @@ val nlpSim_basic = newSim {
 
     withGui {
         place(twc) {
-            location = point(0, 0)
+            location = point(10, 10)
             width = 400
             height = 500
         }
 
-        val internalFrame = JInternalFrame("Co-occurence matrix", true, true)
-        internalFrame.setLocation(450, 0)
+        val internalFrame = JInternalFrame("Co-occurrence matrix", true, true)
+        internalFrame.setLocation(400, 10)
         addInternalFrame(internalFrame)
         val tableViewer = SimbrainDataViewer(textWorld.tokenVectorMap.createTableModel())
         internalFrame.contentPane = tableViewer

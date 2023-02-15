@@ -57,7 +57,7 @@ class TextWorld : AttributeContainer, EditableObject {
     @UserParameter(label = "Embedding type", description = "Method for converting text to vectors", order = 1 )
     var embeddingType = EmbeddingType.COC
 
-    @UserParameter(label = "Window size", order = 20 )
+    @UserParameter(label = "Window size", minimumValue =  1.0, order = 20 )
     var windowSize = 2
 
     @UserParameter(label = "SkipGram", order = 30 )

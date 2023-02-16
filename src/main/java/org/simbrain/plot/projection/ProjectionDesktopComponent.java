@@ -190,7 +190,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         iterateBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Step.png"));
         iterateBtn.addActionListener(e -> {
-            proj.iterate();
+            executor.execute(proj::iterate);
             update();
         });
 
@@ -219,7 +219,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         JButton clearBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Eraser.png"));
         clearBtn.addActionListener(e ->
-                SwingUtilities.invokeLater(() -> {
+                executor.execute(() -> {
                     getWorkspaceComponent().clearData();
                     xyCollection.getSeries(0).clear();
                 }));
@@ -230,7 +230,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         });
 
         JButton randomBtn = new JButton(ResourceManager.getImageIcon("menu_icons/Rand.png"));
-        randomBtn.addActionListener(e -> getWorkspaceComponent().getProjector().randomize(100));
+        randomBtn.addActionListener(e -> executor.execute(() -> getWorkspaceComponent().getProjector().randomize(100)));
 
         JToolBar theToolBar = new JToolBar();
         theToolBar.add(projectionList);
@@ -297,6 +297,11 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
             resetData();
             update();
         });
+        proj.getEvents().getMethodChanged().on(Dispatchers.getMain(), true, (o, n) -> {
+            resetData();
+            update();
+            updateToolBar();
+        });
         proj.getEvents().getColorsChanged().on(Dispatchers.getMain(), true, () -> {
             proj.resetColors();
             update();
@@ -333,8 +338,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedMethod = (String) projectionList.getSelectedItem();
-                getWorkspaceComponent().getProjector().setProjectionMethod(selectedMethod);
-                updateToolBar();
+                executor.execute(() -> getWorkspaceComponent().getProjector().setProjectionMethod(selectedMethod));
             }
         });
         projectionList.getModel().setSelectedItem(getWorkspaceComponent().getProjector().getCurrentMethodString());
@@ -346,9 +350,10 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
             ProjectionMethod projMethod = getWorkspaceComponent().getProjector().getProjectionMethod();
             if (projMethod != null) {
                 if (projMethod instanceof ProjectCoordinate) {
-                    ((ProjectCoordinate) projMethod).setHiD1(adjustDimension1.getSelectedIndex());
-                    projMethod.project();
-                    getWorkspaceComponent().getProjector().getEvents().getDataChanged().fireAndForget();
+                    executor.execute(() -> {
+                        ((ProjectCoordinate) projMethod).setHiD1(adjustDimension1.getSelectedIndex());
+                        projMethod.project();
+                    });
                 }
             }
         });
@@ -357,9 +362,10 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
             ProjectionMethod projecMethod = getWorkspaceComponent().getProjector().getProjectionMethod();
             if (projecMethod != null) {
                 if (projecMethod instanceof ProjectCoordinate) {
-                    ((ProjectCoordinate) projecMethod).setHiD2(adjustDimension2.getSelectedIndex());
-                    projecMethod.project();
-                    getWorkspaceComponent().getProjector().getEvents().getDataChanged().fireAndForget();
+                    executor.execute(() -> {
+                        ((ProjectCoordinate) projecMethod).setHiD2(adjustDimension2.getSelectedIndex());
+                        projecMethod.project();
+                    });
                 }
             }
         });
@@ -496,7 +502,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
      */
     protected void update() {
         chart.fireChartChanged();
-        updateToolBar();
         dimsLabel.setText("     Dimensions: " + getWorkspaceComponent().getProjector().getUpstairs().getDimensions());
         pointsLabel.setText("  Datapoints: " + getWorkspaceComponent().getProjector().getDownstairs().getNumPoints());
         if (getWorkspaceComponent().getProjector().getProjectionMethod().isIterable()) {
@@ -552,7 +557,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         public String generateLabel(XYDataset dataset, int series, int item) {
             Projector projector = getWorkspaceComponent().getProjector();
             if (item >= projector.getNumPoints()) {
-                System.out.println("generateLabel:" + item + ">" + projector.getNumPoints());
                 return null;
             }
             DataPointColored point = ((DataPointColored) projector.getUpstairs().getPoint(item));
@@ -590,7 +594,6 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
             DataPoint point = getWorkspaceComponent().getProjector().getDownstairs().getPoint(i);
             xyCollection.getSeries(0).add(point.get(0), point.get(1));
         }
-
     }
 
 }

@@ -9,4 +9,5 @@ class ProjectorEvents2: Events2() {
     val dataChanged = NoArgEvent()
     val pointFound = AddedEvent<DataPoint>()
     val colorsChanged = NoArgEvent()
+    val methodChanged = ChangedEvent<ProjectionMethod>()
 }

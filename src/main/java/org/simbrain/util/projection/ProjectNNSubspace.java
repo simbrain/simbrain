@@ -232,6 +232,8 @@ public class ProjectNNSubspace extends ProjectionMethod {
             }
         }
 
+        projector.getEvents().getDataChanged().fireAndBlock();
+
     }
 
     @Override

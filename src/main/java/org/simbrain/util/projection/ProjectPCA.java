@@ -42,6 +42,7 @@ public class ProjectPCA extends ProjectionMethod {
     public void project() {
         // projectPCAJama();
         projectPCASmile();
+        projector.getEvents().getDataChanged().fireAndBlock();
     }
 
     private void projectPCASmile() {

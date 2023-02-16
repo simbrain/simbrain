@@ -98,7 +98,7 @@ public class NTree implements Iterable<DataPoint> {
      * @return the number of points in the tree
      */
     public int size() {
-        return all.size();
+        return list.size();
     }
 
     /**

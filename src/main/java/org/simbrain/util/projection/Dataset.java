@@ -45,7 +45,7 @@ public class Dataset {
     /**
      * Number of dimensions in the dataset.
      */
-    private int dimensions;
+    private final int dimensions;
 
     /**
      * Matrix of interpoint distances.

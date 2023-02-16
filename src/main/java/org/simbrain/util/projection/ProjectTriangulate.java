@@ -104,6 +104,7 @@ public class ProjectTriangulate extends ProjectionMethod {
 
                 lastAdded2D.setData(new double[]{x, y});
         }
+        projector.getEvents().getDataChanged().fireAndBlock();
     }
 
     @Override

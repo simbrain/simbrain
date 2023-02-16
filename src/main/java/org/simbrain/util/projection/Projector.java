@@ -120,6 +120,8 @@ public class Projector implements AttributeContainer {
      */
     private transient volatile boolean isUpdateCompleted;
 
+    private final transient Object lock = new Object();
+
     /**
      * Default constructor for projector.
      */
@@ -176,54 +178,55 @@ public class Projector implements AttributeContainer {
      */
     public void addDatapoint(final DataPoint point) {
 
-        Logger.debug("addDatapoint called");
-        if (point.getDimension() != this.getDimensions() || (projectionMethod == null) || (getUpstairs() == null)) {
-            return;
-        }
-
-        //point.setData(SimbrainMath.roundVec(point.getData(), 1));
-
-        // Iterable functions to be re-initialized when new data is added
-        if (projectionMethod.isIterable()) {
-            ((IterableProjectionMethod) projectionMethod).setNeedsReInit(true);
-        }
-
-        // Add the point directly to the upstairs dataset. If the point already
-        // exists just change colors and return. If the point is new. add a
-        // point downstairs, and call the projection algorithm.
-        DataPoint existingPoint = upstairs.addPoint(point, tolerance);
-        if (existingPoint != null) {
-            // That point was already in the dataset
-            currentPoint = existingPoint;
-            events.getPointFound().fireAndForget(currentPoint);
-        } else {
-            // It's a new point
-            currentPoint = point;
-            DataPoint newPoint;
-            if (point.getDimension() == 1) {
-                // For 1-d datasets plot points on a horizontal line
-                newPoint = new DataPoint(new double[]{point.get(0), 0});
-            } else {
-                newPoint = new DataPoint(new double[]{point.get(0), point.get(1)});
+        synchronized (lock) {
+            Logger.debug("addDatapoint called");
+            if (point.getDimension() != this.getDimensions() || (projectionMethod == null) || (getUpstairs() == null)) {
+                return;
             }
-            downstairs.addPoint(newPoint);
-            projectionMethod.project();
-            events.getDataChanged().fireAndForget();
-        }
 
-        if (useColorManager) {
-            if (colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
-                // Update predictor
-                if ((upstairs.getLastPoint() != null) && (upstairs.getCurrentPoint() != null)) {
-                    currentStateProbabilty = predictor.addSourceTargetPair(
-                            (DataPointColored) upstairs.getLastPoint(),
-                            (DataPointColored) upstairs.getCurrentPoint());
-                } else {
-                    currentStateProbabilty = 0;
-                }
-                colorManager.updateBayes();
+            //point.setData(SimbrainMath.roundVec(point.getData(), 1));
+
+            // Iterable functions to be re-initialized when new data is added
+            if (projectionMethod.isIterable()) {
+                ((IterableProjectionMethod) projectionMethod).setNeedsReInit(true);
+            }
+
+            // Add the point directly to the upstairs dataset. If the point already
+            // exists just change colors and return. If the point is new. add a
+            // point downstairs, and call the projection algorithm.
+            DataPoint existingPoint = upstairs.addPoint(point, tolerance);
+            if (existingPoint != null) {
+                // That point was already in the dataset
+                currentPoint = existingPoint;
+                events.getPointFound().fireAndForget(currentPoint);
             } else {
-                colorManager.updateDataPointColors(upstairs);
+                // It's a new point
+                currentPoint = point;
+                DataPoint newPoint;
+                if (point.getDimension() == 1) {
+                    // For 1-d datasets plot points on a horizontal line
+                    newPoint = new DataPoint(new double[]{point.get(0), 0});
+                } else {
+                    newPoint = new DataPoint(new double[]{point.get(0), point.get(1)});
+                }
+                downstairs.addPoint(newPoint);
+                projectionMethod.project();
+            }
+
+            if (useColorManager) {
+                if (colorManager.getColoringMethod() == DataColoringManager.ColoringMethod.Bayesian) {
+                    // Update predictor
+                    if ((upstairs.getLastPoint() != null) && (upstairs.getCurrentPoint() != null)) {
+                        currentStateProbabilty = predictor.addSourceTargetPair(
+                                (DataPointColored) upstairs.getLastPoint(),
+                                (DataPointColored) upstairs.getCurrentPoint());
+                    } else {
+                        currentStateProbabilty = 0;
+                    }
+                    colorManager.updateBayes();
+                } else {
+                    colorManager.updateDataPointColors(upstairs);
+                }
             }
         }
     }
@@ -234,9 +237,10 @@ public class Projector implements AttributeContainer {
      * @param method the new projection algorithm
      */
     public void setProjectionMethod(final ProjectionMethod method) {
+        var old = projectionMethod;
         projectionMethod = method;
         method.init();
-        events.getDataChanged().fireAndForget();
+        events.getMethodChanged().fireAndForget(old, method);
         projectionMethod.project();
     }
 
@@ -363,10 +367,12 @@ public class Projector implements AttributeContainer {
      * Reset the projector. Clear the underlying datasets.
      */
     public void reset() {
-        upstairs.clear();
-        downstairs.clear();
-        events.getDataChanged().fireAndForget();
-        predictor.clear();
+        synchronized (lock) {
+            upstairs.clear();
+            downstairs.clear();
+            events.getDataChanged().fireAndForget();
+            predictor.clear();
+        }
     }
 
     /**
@@ -411,8 +417,10 @@ public class Projector implements AttributeContainer {
      * @param upperBound the upper bound of randomization
      */
     public void randomize(int upperBound) {
-        downstairs.randomize(upperBound);
-        events.getDataChanged().fireAndForget();
+        synchronized (lock) {
+            downstairs.randomize(upperBound);
+            events.getDataChanged().fireAndForget();
+        }
     }
 
     public DataColoringManager getColorManager() {
@@ -516,5 +524,9 @@ public class Projector implements AttributeContainer {
      */
     public boolean isUpdateCompleted() {
         return isUpdateCompleted;
+    }
+
+    public Object getLock() {
+        return lock;
     }
 }

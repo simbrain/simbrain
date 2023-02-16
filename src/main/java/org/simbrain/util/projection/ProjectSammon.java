@@ -137,52 +137,54 @@ public class ProjectSammon extends IterableProjectionMethod {
     @Override
     public void iterate() {
 
-        if (projector.getUpstairs().getNumPoints() < 2) {
-            return;
-        }
+        synchronized (projector.getLock()) {
+            if (projector.getUpstairs().getNumPoints() < 2) {
+                return;
+            }
 
-        // If new points were added re-initialize
-        if (needsReInit()) {
-            init();
-        }
+            // If new points were added re-initialize
+            if (needsReInit()) {
+                init();
+            }
 
-        yArray = projector.getDownstairs().asArrayList();
-        d = projector.getDownstairs().getDistances();
+            yArray = projector.getDownstairs().asArrayList();
+            d = projector.getDownstairs().getDistances();
 
-        // Computes partials
-        for (int m = 0; m < projector.getNumPoints(); m++) {
-            yM = yArray.get(m).getVector();
-            yNew = new double[projector.getDownstairs().getDimensions()];
+            // Computes partials
+            for (int m = 0; m < projector.getNumPoints(); m++) {
+                yM = yArray.get(m).getVector();
+                yNew = new double[projector.getDownstairs().getDimensions()];
 
-            for (int n = 0; n < projector.getDownstairs().getDimensions(); n++) {
-                partialSum = 0;
+                for (int n = 0; n < projector.getDownstairs().getDimensions(); n++) {
+                    partialSum = 0;
 
-                for (int i = 0; i < projector.getNumPoints(); i++) {
-                    if (i == m) {
-                        continue;
+                    for (int i = 0; i < projector.getNumPoints(); i++) {
+                        if (i == m) {
+                            continue;
+                        }
+                        yI = yArray.get(i).getVector();
+                        partialSum += (((dstar[i][m] - d[i][m]) * (yI[n] - yM[n])) / dstar[i][m] / d[i][m]);
                     }
-                    yI = yArray.get(i).getVector();
-                    partialSum += (((dstar[i][m] - d[i][m]) * (yI[n] - yM[n])) / dstar[i][m] / d[i][m]);
+
+                    yNew[n] = yM[n] - ((epsilon * 2 * partialSum) / dstarSum);
                 }
 
-                yNew[n] = yM[n] - ((epsilon * 2 * partialSum) / dstarSum);
+                projector.getDownstairs().getPoint(m).setData(yNew);
             }
 
-            projector.getDownstairs().getPoint(m).setData(yNew);
-        }
-
-        // Computes Closeness
-        e = 0;
-        for (int i = 0; i < projector.getNumPoints(); i++) {
-            for (int j = i + 1; j < projector.getNumPoints(); j++) {
-                e += ((dstar[i][j] - d[i][j]) * (dstar[i][j] - d[i][j])) / dstar[i][j];
+            // Computes Closeness
+            e = 0;
+            for (int i = 0; i < projector.getNumPoints(); i++) {
+                for (int j = i + 1; j < projector.getNumPoints(); j++) {
+                    e += ((dstar[i][j] - d[i][j]) * (dstar[i][j] - d[i][j])) / dstar[i][j];
+                }
             }
-        }
 
-        currentCloseness = e / dstarSum;
-        setError(currentCloseness);
-        projector.getEvents().getDataChanged().fireAndForget();
-        // System.out.println("currentCloseness = " + currentCloseness);
+            currentCloseness = e / dstarSum;
+            setError(currentCloseness);
+            projector.getEvents().getDataChanged().fireAndForget();
+            // System.out.println("currentCloseness = " + currentCloseness);
+        }
     }
 
     /**

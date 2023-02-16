@@ -75,6 +75,8 @@ public class ProjectCoordinate extends ProjectionMethod {
             projector.getDownstairs().getPoint(i).setData(newLowDPoint);
         }
 
+        projector.getEvents().getDataChanged().fireAndBlock();
+
         // System.out.println("-->" + hiD1);
         // System.out.println("-->" + hiD2);
     }

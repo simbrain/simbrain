@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
+import kotlinx.coroutines.Dispatchers;
 import org.piccolo2d.util.PPaintContext;
 import org.simbrain.network.core.Connector;
 import org.simbrain.network.events.ConnectorEvents2;
@@ -89,9 +90,9 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         ConnectorEvents2 events = weightMatrix.getEvents();
         events.getDeleted().on(w -> removeFromParent());
-        events.getUpdated().on(this::renderMatrixToImage);
-        wm.getSource().getEvents().getLocationChanged().on(arrow::invalidateFullBounds);
-        wm.getTarget().getEvents().getLocationChanged().on(arrow::invalidateFullBounds);
+        events.getUpdated().on(Dispatchers.getMain(), this::renderMatrixToImage);
+        wm.getSource().getEvents().getLocationChanged().on(Dispatchers.getMain(), arrow::invalidateFullBounds);
+        wm.getTarget().getEvents().getLocationChanged().on(Dispatchers.getMain(), arrow::invalidateFullBounds);
         invalidateFullBounds();
     }
 

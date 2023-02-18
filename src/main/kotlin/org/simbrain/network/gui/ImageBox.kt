@@ -7,17 +7,14 @@ import org.simbrain.util.scale
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.image.BufferedImage
-import javax.swing.SwingUtilities
 
 class ImageBox(val width: Int, val height: Int, thickness: Float) : PNode() {
 
     var image: BufferedImage? = null
         set(image) {
             field = image
-            SwingUtilities.invokeLater {
-                pImage.image = image!!.scale(width, height)
-                setBounds(0.0, 0.0, width.toDouble(), height.toDouble())
-            }
+            pImage.image = image!!.scale(width, height)
+            setBounds(0.0, 0.0, width.toDouble(), height.toDouble())
         }
 
     private val box = PPath.createRectangle(0.0, 0.0, width.toDouble(), height.toDouble())!!

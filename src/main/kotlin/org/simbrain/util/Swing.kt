@@ -189,6 +189,34 @@ fun <T> T.createSuspendAction(
     }
 }
 
+fun <T> T.createSuspendAction(
+    iconPath: String? = null,
+    name: String? = null,
+    description: String? = null,
+    keyCombo: KeyCombination? = null,
+    coroutineScope: CoroutineScope,
+    block: suspend T.(e: ActionEvent) -> Unit
+): AbstractAction where T : JComponent {
+    return object : AbstractAction() {
+        init {
+            if (iconPath != null) {
+                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+            }
+
+            putValue(NAME, name)
+            putValue(SHORT_DESCRIPTION, description)
+            if (keyCombo != null) {
+                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
+                this@createSuspendAction.bindTo(keyCombo, this)
+            }
+        }
+
+        override fun actionPerformed(e: ActionEvent) {
+            coroutineScope.launch { block(e) }
+        }
+    }
+}
+
 fun NetworkPanel.createConditionallyEnabledAction(
     iconPath: String? = null,
     name: String,

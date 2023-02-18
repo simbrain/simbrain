@@ -238,3 +238,12 @@ fun List<Synapse>.decayStrengthBasedOnLength(decay: DecayFunction) {
 fun Synapse.decayStrengthBasedOnLength(decay: DecayFunction) {
     strength *= decay.getScalingFactor(length)
 }
+
+/**
+ * Return true if the synapse "overlaps" an existing synapse
+ */
+fun Synapse.overlapsExistingSynapse(): Boolean {
+    // For the source neuron, check if there is already a fanOut synapse linking to the same target,
+    // and if there is, it is not this synapse
+    return this.source.fanOut[target].let { it != null && it != this }
+}

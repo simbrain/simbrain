@@ -846,7 +846,7 @@ class SimbrainDesktop(val workspace: Workspace) {
             lastTimestep = 0
             updateTimeLabel()
         }
-        events.componentAdded.on(Dispatchers.Swing) { addDesktopComponent(it) }
+        events.componentAdded.on(Dispatchers.Swing, wait = true) { addDesktopComponent(it) }
         events.componentRemoved.on(Dispatchers.Swing) { wc  ->
             val component = guiComponents[wc] ?: return@on
             guiComponents.remove(wc)

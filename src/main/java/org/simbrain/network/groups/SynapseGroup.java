@@ -417,8 +417,8 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         if (toDelete != null) {
             // TODO: Discuss np check with Zoë
             // TODO: Replace with toDelete.delete();?
-            toDelete.getSource().removeEfferent(toDelete);
-            toDelete.getTarget().removeAfferent(toDelete);
+            toDelete.getSource().removeFromFanOut(toDelete);
+            toDelete.getTarget().removeFromFanIn(toDelete);
         }
         this.excitatoryRatio = getExcitatoryRatioPrecise();
         if (isDisplaySynapses()) {

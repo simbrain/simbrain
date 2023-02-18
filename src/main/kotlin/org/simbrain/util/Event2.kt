@@ -6,6 +6,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
+val useEventDebug = false
+
 /**
  * Event objects corresponding to no-arg, adding, removing, and changing objects. Each object has a set of functions
  * on it that allow for firing them and waiting (via blocking in java or suspending in kotlin), and firing and
@@ -310,8 +312,6 @@ open class Events2: CoroutineScope {
     }
 
 }
-
-val useEventDebug = false
 
 data class EventObjectHandler(
     val dispatcher: CoroutineDispatcher?,

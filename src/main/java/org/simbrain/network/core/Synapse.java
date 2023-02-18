@@ -428,17 +428,13 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      */
     private void setSourceAndTarget(final Neuron newSource, final Neuron newTarget) {
 
-        if (this.source != null) {
-            this.source.removeEfferent(this);
-        }
-        if (this.target != null) {
-            this.target.removeAfferent(this);
-        }
         if (newSource != null && newTarget != null) {
             this.source = newSource;
             this.target = newTarget;
-            newSource.addEfferent(this);
-            newTarget.addAfferent(this);
+            if (shouldAdd()) {
+                newSource.addToFanOut(this);
+                newTarget.addToFanIn(this);
+            }
         }
     }
 
@@ -859,7 +855,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         events = new SynapseEvents2();
         if (getTarget() != null) {
             if (getTarget().getFanIn() != null) {
-                getTarget().addAfferent(this);
+                getTarget().addToFanIn(this);
             } else {
                 System.out.println("Warning:" + getId() + " has null fanIn");
                 // In the past I had to manually remove these synapses
@@ -871,7 +867,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         }
         if (getSource() != null) {
             if (getSource().getFanOut() != null) {
-                getSource().addEfferent(this);
+                getSource().addToFanOut(this);
             } else {
                 System.out.println("Warning:" + getId() + " has null fanOut");
                 // removeSynapse(synapse);
@@ -915,10 +911,10 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     public void delete() {
         // Remove references to this synapse from parent neurons
         if (getSource() != null) {
-            getSource().removeEfferent(this);
+            getSource().removeFromFanOut(this);
         }
         if (getTarget() != null) {
-            getTarget().removeAfferent(this);
+            getTarget().removeFromFanIn(this);
         }
         getEvents().getDeleted().fireAndBlock(this);
     }
@@ -941,4 +937,8 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         isVisible = newVisibility;
     }
 
+    @Override
+    public boolean shouldAdd() {
+        return !NetworkUtilsKt.overlapsExistingSynapse(this);
+    }
 }

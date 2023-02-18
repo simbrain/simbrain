@@ -445,20 +445,9 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      *
      * @param synapse the synapse for which this neuron is a source to add.
      */
-    public void addEfferent(final Synapse synapse) {
+    public void addToFanOut(final Synapse synapse) {
         if (fanOut != null) {
-            Synapse dup = fanOut.get(synapse.getTarget());
-            if (dup == null) {
-                // There is no duplicate
-                fanOut.put(synapse.getTarget(), synapse);
-            } else {
-                // There is a duplicate connecting src and target
-                // Check that we're not trying to add the exact same synapse...
-                if (!dup.equals(synapse)) {
-                    fanOut.get(synapse.getTarget()).delete();
-                    fanOut.put(synapse.getTarget(), synapse);
-                } // Do nothing if we are.
-            }
+            fanOut.put(synapse.getTarget(), synapse);
         }
     }
 
@@ -466,7 +455,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Remove an efferent (outgoing) weight from this neuron. Used by synapse but should not generally be called
      * directly.
      */
-    public void removeEfferent(final Synapse synapse) {
+    public void removeFromFanOut(final Synapse synapse) {
         if (fanOut != null) {
             fanOut.remove(synapse.getTarget());
         }
@@ -478,7 +467,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      *
      * Does <b>NOT</b> add this synapse to the network or any intermediate bodies.
      */
-    public void addAfferent(final Synapse source) {
+    public void addToFanIn(final Synapse source) {
         if (fanIn != null) {
             fanIn.add(source);
         }
@@ -488,7 +477,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Remove an afferent (incoming) weight from this neuron. Used by synapse but should not generally be called
      * directly.
      */
-    public void removeAfferent(final Synapse synapse) {
+    public void removeFromFanIn(final Synapse synapse) {
         if (fanIn != null) {
             fanIn.remove(synapse);
         }

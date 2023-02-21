@@ -666,7 +666,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             network.events.zoomToFitPage.fireAndForget()
         }
         event.updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
-        event.updated.on(Dispatchers.Swing) {
+        event.updated.on(Dispatchers.Swing, wait = true) {
             repaint()
             timeLabel.update()
         }

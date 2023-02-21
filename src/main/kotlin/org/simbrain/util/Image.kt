@@ -128,6 +128,10 @@ fun BufferedImage.scale(w: Int, h: Int) = BufferedImage(w, h, BufferedImage.TYPE
             AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(this, it)!!
 }
 
+fun Int.toColor(): Color {
+    return Color(this)
+}
+
 /**
  * Display an image in a panel.
  */

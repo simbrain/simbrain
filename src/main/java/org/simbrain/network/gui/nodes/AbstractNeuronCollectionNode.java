@@ -81,7 +81,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
      */
     @Override
     public void layoutChildren() {
-        if (this.getVisible() && !networkPanel.isRunning()) {
+        if (this.getVisible()) {
             interactionBox.setOffset(outlinedObjects.getFullBounds().getX() + Outline.ARC_SIZE / 2,
                     outlinedObjects.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
         }
@@ -99,9 +99,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
     @Override
     public void offset(double dx, double dy) {
-        if (networkPanel.isRunning()) {
-            return;
-        }
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.offset(dx, dy);
         }

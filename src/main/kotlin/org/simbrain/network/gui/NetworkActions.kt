@@ -6,7 +6,6 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.core.decayStrengthBasedOnLength
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction
-import org.simbrain.network.gui.actions.ShowDebugAction
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons
@@ -15,7 +14,6 @@ import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction
 import org.simbrain.network.gui.actions.edit.*
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction
 import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction
-import org.simbrain.network.gui.actions.network.*
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction
 import org.simbrain.network.gui.actions.neuron.NewNeuronAction
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction
@@ -25,7 +23,7 @@ import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction
 import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
-import org.simbrain.network.gui.actions.toolbar.ShowRunToolBarAction
+import org.simbrain.network.gui.dialogs.NetworkDialog
 import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
@@ -35,6 +33,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
+import java.awt.event.KeyEvent
 import javax.swing.AbstractAction
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JOptionPane
@@ -51,12 +50,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val copyAction = CopyAction(networkPanel)
     val cutAction = CutAction(networkPanel)
     val deleteAction = DeleteAction(networkPanel)
-    val iterateNetworkAction = IterateNetworkAction(networkPanel)
     val neuronCollectionAction = NeuronCollectionAction(networkPanel)
     val newNeuronAction = NewNeuronAction(networkPanel)
     val pasteAction = PasteAction(networkPanel)
     val randomizeObjectsAction = RandomizeObjectsAction(networkPanel)
-    val runNetworkAction = RunNetworkAction(networkPanel)
     val selectAllAction = SelectAllAction(networkPanel)
     val selectAllNeuronsAction = SelectAllNeuronsAction(networkPanel)
     val selectAllWeightsAction = SelectAllWeightsAction(networkPanel)
@@ -67,22 +64,44 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setSourceNeurons = SetSourceNeurons(networkPanel)
     val setSynapsePropertiesAction = SetSynapsePropertiesAction(networkPanel)
 
-    val showDebugAction = ShowDebugAction(networkPanel)
     val showEditToolBarAction = ShowEditToolBarAction(networkPanel)
     val showLayoutDialogAction = ShowLayoutDialogAction(networkPanel)
-    val showMainToolBarAction = ShowMainToolBarAction(networkPanel)
-    val showNetworkPreferencesAction = ShowNetworkPreferencesAction(networkPanel)
-    val showNetworkUpdaterDialog = ShowNetworkUpdaterDialog(networkPanel)
     val showPrioritiesAction = ShowPrioritiesAction(networkPanel)
-    val showRunToolBarAction = ShowRunToolBarAction(networkPanel)
     val showWeightMatrixAction = ShowWeightMatrixAction(networkPanel)
     val spaceHorizontalAction = SpaceHorizontalAction(networkPanel)
     val spaceVerticalAction = SpaceVerticalAction(networkPanel)
-    val stopNetworkAction = StopNetworkAction(networkPanel)
     val testInputAction = TestInputAction(networkPanel)
     val textEditModeAction = TextEditModeAction(networkPanel)
     val wandEditModeAction = WandEditModeAction(networkPanel)
     val zoomToFitPageAction = ZoomToFitPageAction(networkPanel)
+
+    val showMainToolBarAction = ShowMainToolBarAction(networkPanel)
+
+    val showNetworkUpdaterDialog = networkPanel.createSuspendAction(
+        name = "Edit Update Sequence...",
+        description = "Edit the update sequence for this network",
+        iconPath = "menu_icons/Sequence.png"
+    ) {
+        NetworkUpdateManagerPanel(networkPanel.network).displayInDialog()
+    }
+
+    val showNetworkPreferencesAction = networkPanel.createSuspendAction(
+        name = "Network Preferences...",
+        description = "Show the network preference dialog",
+        iconPath = "menu_icons/Prefs.png",
+        keyCombo = CmdOrCtrl + ','
+    ) {
+        NetworkDialog(networkPanel).display()
+    }
+
+    val iterateNetworkAction = networkPanel.createSuspendAction(
+        name = "Iterate network",
+        description = "Step network update algorithm (\"spacebar\")",
+        iconPath = "menu_icons/Step.png",
+        keyCombo = KeyCombination(KeyEvent.VK_SPACE)
+    ) {
+        networkPanel.network.update()
+    }
 
     val addDeepNetAction = if (Utils.isM1Mac()) {
         networkPanel.createAction(
@@ -156,9 +175,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val clipboardActions
         get() = listOf(copyAction, cutAction, pasteAction)
-
-    val networkControlActions
-        get() = listOf(runNetworkAction, stopNetworkAction)
 
     val networkEditingActions
         get() = listOf(newNeuronAction, deleteAction)

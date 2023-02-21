@@ -143,9 +143,4 @@ public final class NetworkComponent extends WorkspaceComponent {
         return XStreamUtils.getSimbrainXStream().toXML(network);
     }
 
-    @Override
-    public void start() {
-        // Stop any local network running that is occurring
-        network.setRunning(false);
-    }
 }

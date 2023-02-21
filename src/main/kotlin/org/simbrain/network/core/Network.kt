@@ -121,16 +121,6 @@ class Network: CoroutineScope {
     var timeStep = DEFAULT_TIME_STEP
 
     /**
-     * Local thread flag for starting and stopping the network
-     */
-    private val _isRunning = AtomicBoolean()
-    var isRunning: Boolean
-        get() = _isRunning.get()
-        set(value) {
-            _isRunning.set(value)
-        }
-
-    /**
      * Whether this is a discrete or continuous time network.
      */
     private var timeType = TimeType.DISCRETE

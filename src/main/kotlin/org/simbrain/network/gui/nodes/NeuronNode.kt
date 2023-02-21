@@ -31,8 +31,10 @@ import org.simbrain.network.gui.neuronContextMenu
 import org.simbrain.network.gui.neuronDialog
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator
 import org.simbrain.util.SimbrainConstants
+import org.simbrain.util.SimbrainPreferences
 import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.toColor
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
@@ -114,7 +116,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
         // Set up label text
         //priorityText.setFont(PRIORITY_FONT);
-        labelBackground.paint = networkPanel.backgroundColor
+        labelBackground.paint = SimbrainPreferences.getInt("networkBackgroundColor").toColor()
         labelBackground.setBounds(labelText.bounds)
         labelBackground.addChild(labelText)
         addChild(labelBackground)
@@ -498,20 +500,13 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
     override fun resetToDefault() {
         if (!customStrokeColor) {
-            mainShape!!.strokePaint = SynapseNode.getLineColor()
+            mainShape.strokePaint = SynapseNode.getLineColor()
         }
         // TODO: Check if change only?
-        labelBackground.paint = networkPanel.backgroundColor
+        labelBackground.paint = SimbrainPreferences.getInt("networkBackgroundColor").toColor()
         updateColor()
     }
 
-    //@Override
-//public void setGrouped(final boolean isGrouped) {
-//    super.setGrouped(isGrouped);
-//    for (SynapseNode synapseNode : connectedSynapses) {
-//        synapseNode.setGrouped(isGrouped);
-//    }
-//}
     override fun getModel(): Neuron {
         return neuron
     }

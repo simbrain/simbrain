@@ -149,7 +149,6 @@ val NetworkPanel.viewMenu
     get() = JMenu("View").apply {
         with(networkActions) {
             add(JMenu("Toolbars").apply {
-                add(showRunToolBarAction.toMenuItem().apply { isSelected = runToolBar.isVisible })
                 add(showMainToolBarAction.toMenuItem().apply { isSelected = mainToolBar.isVisible })
                 add(showEditToolBarAction.toMenuItem().apply { isSelected = editToolBar.isVisible })
             })

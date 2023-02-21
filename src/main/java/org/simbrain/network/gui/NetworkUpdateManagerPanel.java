@@ -16,7 +16,6 @@ package org.simbrain.network.gui;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.updater.UpdateAction;
 
 import javax.swing.*;
@@ -53,13 +52,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
      */
     private static final String SCRIPT_DIR = "." + System.getProperty("file.separator") + "scripts" + System.getProperty("file.separator") + "updateScripts" + System.getProperty("file.separator") + "networkUpdate";
 
-    /**
-     * Creates a new update manager panel.
-     *
-     * @param network
-     * @param parentDialog
-     */
-    public NetworkUpdateManagerPanel(final Network network, final StandardDialog parentDialog) {
+    public NetworkUpdateManagerPanel(final Network network) {
 
         super(new BorderLayout());
         this.network = network;
@@ -135,8 +128,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
         network.getEvents().getUpdateActionsChanged().on(this::updateCurrentActionsList);
 
         // Help button
-        Action helpAction = new ShowHelpAction("Pages/Network/update.html");
-        parentDialog.addButton(new JButton(helpAction));
+        // Action helpAction = new ShowHelpAction("Pages/Network/update.html");
+        // parentDialog.addButton(new JButton(helpAction));
 
     }
 

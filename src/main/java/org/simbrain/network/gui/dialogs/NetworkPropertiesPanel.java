@@ -24,6 +24,7 @@ import org.simbrain.network.gui.nodes.NeuronNode;
 import org.simbrain.network.gui.nodes.NodeHandle;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.LabelledItemPanel;
+import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.SelectionMarquee;
 
@@ -274,9 +275,10 @@ public class NetworkPropertiesPanel extends JPanel {
     private void updateColors() {
         Color theColor = showColorChooser();
         if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
-            if (theColor != null) {
-                networkPanel.setBackgroundColor(theColor);
-            }
+            // TODO
+            // if (theColor != null) {
+            //     networkPanel.setBackgroundColor(theColor);
+            // }
         } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
             if (theColor != null) {
                 SynapseNode.setLineColor(theColor);
@@ -360,7 +362,7 @@ public class NetworkPropertiesPanel extends JPanel {
      */
     public void setIndicatorColor() {
         if (cbChangeColor.getSelectedItem().toString().equals(BACKGROUND)) {
-            colorIndicator.setBackground(networkPanel.getBackgroundColor());
+            colorIndicator.setBackground(new Color(SimbrainPreferences.getInt("networkBackgroundColor")));
         } else if (cbChangeColor.getSelectedItem().toString().equals(LINE)) {
             colorIndicator.setBackground(SynapseNode.getLineColor());
         } else if (cbChangeColor.getSelectedItem().toString().equals(HOTNODE)) {

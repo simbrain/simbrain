@@ -29,7 +29,6 @@ import org.simbrain.network.trainers.trainCurrentOutputLMS
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.widgets.EditablePanel
-import org.simbrain.util.widgets.ToggleButton
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -100,16 +99,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     val mainToolBar = createMainToolBar()
 
-    val runToolBar = createRunToolBar().apply { isVisible = false }
-
     val editToolBar = createEditToolBar()
-
-    // TODO: Use preference default
-    var backgroundColor = Color.white
-
-
-    val isRunning
-        get() = network.isRunning
 
     /**
      * How much to nudge objects per key click.
@@ -176,7 +166,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
             // Don't show text when the canvas is sufficiently zoomed in
             camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                GlobalScope.launch(Dispatchers.Main) {
+                launch(Dispatchers.Main) {
                     filterScreenElements<NeuronNode>().forEach {
                         it.updateTextVisibility()
                     }
@@ -192,7 +182,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
             add("Center", JPanel(flowLayout).apply {
                 add(mainToolBar)
-                add(runToolBar)
                 add(editToolBar)
             })
         }
@@ -665,14 +654,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             networkModeActions.forEach { add(it) }
             addSeparator()
             add(ToggleAutoZoom(this@NetworkPanel))
-        }
-    }
-
-    private fun createRunToolBar() = CustomToolBar().apply {
-        with(networkActions) {
-            add(iterateNetworkAction)
-            // TODO: Consider getting rid of this, since the workspace level run is sufficient for most purposes
-            add(ToggleButton(networkControlActions))
         }
     }
 

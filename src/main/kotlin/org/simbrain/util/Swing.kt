@@ -149,7 +149,7 @@ fun createAction(
     return object : AbstractAction() {
         init {
             if (iconPath != null) {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon(iconPath))
             }
 
             putValue(NAME, name)

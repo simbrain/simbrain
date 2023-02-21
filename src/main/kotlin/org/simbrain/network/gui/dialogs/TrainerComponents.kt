@@ -134,7 +134,7 @@ class ErrorTimeSeries(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         add(mainPanel)
 
         model.addScalarTimeSeries(errorText)
-        lmsTrainer.events.errorUpdated.on {
+        lmsTrainer.events.errorUpdated.on(Dispatchers.Swing) {
             model.addData(0, lmsTrainer.iteration.toDouble(), lmsTrainer.error)
         }
     }

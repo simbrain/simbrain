@@ -18,6 +18,8 @@
  */
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.groups.SynapseGroup
@@ -63,8 +65,8 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         interactionBox = SynapseGroup2InteractionBox(networkPanel, synapseGroup, this)
         interactionBox.setText(synapseGroup.label)
         addChild(interactionBox)
-        synapseGroup.source.events.locationChanged.on { layoutChildren() }
-        synapseGroup.target.events.locationChanged.on { layoutChildren() }
+        synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) { layoutChildren() }
+        synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) { layoutChildren() }
 
         // Handle events
         val events = synapseGroup.events

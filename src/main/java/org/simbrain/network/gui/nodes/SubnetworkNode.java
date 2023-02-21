@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import kotlinx.coroutines.Dispatchers;
 import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
@@ -97,7 +98,7 @@ public class SubnetworkNode extends ScreenElement {
         LocationEvents2 events = subnetwork.getEvents();
         events.getDeleted().on(n -> removeFromParent());
         events.getLabelChanged().on((o, n) -> updateText());
-        events.getLocationChanged().on(this::layoutChildren);
+        events.getLocationChanged().on(Dispatchers.getMain(), this::layoutChildren);
     }
 
     @Override

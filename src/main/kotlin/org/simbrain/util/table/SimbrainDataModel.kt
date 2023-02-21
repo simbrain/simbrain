@@ -210,6 +210,12 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     open fun deleteColumn(selectedColumn: Int, fireEvent: Boolean = true) {}
 
+    open fun setColumnNames(columnNames: List<String?>) {
+        columns = columns.mapIndexed { i, col ->
+            Column(columnNames.getOrNull(i) ?: "Column ${i + 1}", col.type)
+        }.toMutableList()
+    }
+
     open fun insertRow(selectedRow: Int) {}
 
     open fun deleteRow(selectedRow: Int, fireEvent: Boolean = true) {}

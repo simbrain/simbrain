@@ -18,7 +18,7 @@ class BasicDataWrapper(
     var data: MutableList<MutableList<Any?>> = data
         set(value) {
             field = value
-            columns = inferColumns(value)
+            columns = inferColumns(columns.map { it.columName }, value)
         }
 
     /**
@@ -141,6 +141,11 @@ class BasicDataWrapper(
 private fun inferColumns(data: MutableList<MutableList<Any?>>) =
     data[0].mapIndexed { i, value ->
         createColumn("Column ${i + 1}", value)
+    }.toMutableList()
+
+private fun inferColumns(names: List<String?>, data: MutableList<MutableList<Any?>>) =
+    data[0].mapIndexed { i, value ->
+        createColumn(names.getOrNull(i) ?: "Column ${i + 1}", value)
     }.toMutableList()
 
 fun createFrom2DArray(data: Array<out Array<out Any?>>): BasicDataWrapper {

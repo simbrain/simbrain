@@ -1,16 +1,21 @@
-package org.simbrain.util.widgets;
+package org.simbrain.util.widgets
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import org.simbrain.util.table.BasicDataWrapper
+import java.awt.Color
+import java.awt.Component
+import java.awt.Font
+import java.beans.PropertyChangeEvent
+import java.beans.PropertyChangeListener
+import javax.swing.JScrollPane
+import javax.swing.JTable
+import javax.swing.JViewport
+import javax.swing.UIManager
+import javax.swing.event.ChangeEvent
+import javax.swing.event.ChangeListener
+import javax.swing.event.TableModelEvent
+import javax.swing.event.TableModelListener
+import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.table.TableColumn
 
 /*
  *	Use a JTable as a renderer for row numbers of a given main table.
@@ -21,173 +26,128 @@ import java.beans.PropertyChangeListener;
  *
  * @author Rob Camick
  */
-public class RowNumberTable extends JTable
-        implements ChangeListener, PropertyChangeListener, TableModelListener
-{
-    private JTable main;
+class RowNumberTable(private val main: JTable) : JTable(), ChangeListener, PropertyChangeListener, TableModelListener {
 
-    public RowNumberTable(JTable table)
-    {
-        main = table;
-        main.addPropertyChangeListener( this );
-        main.getModel().addTableModelListener( this );
+    var rowNames = main.model.let { if (it is BasicDataWrapper) it.rowNames else listOf() }
+        set(value) {
+            field = value
+            revalidate()
+        }
 
-
-        setGridColor(Color.gray);
-
-        setFocusable( false );
-        setAutoCreateColumnsFromModel( false );
-        setSelectionModel( main.getSelectionModel() );
-
-        TableColumn column = new TableColumn();
-        column.setHeaderValue(" ");
-        addColumn( column );
-        column.setCellRenderer(new RowNumberRenderer());
-
-        getColumnModel().getColumn(0).setPreferredWidth(50);
-        setPreferredScrollableViewportSize(getPreferredSize());
+    init {
+        main.addPropertyChangeListener(this)
+        main.model.addTableModelListener(this)
+        setGridColor(Color.gray)
+        isFocusable = false
+        setAutoCreateColumnsFromModel(false)
+        setSelectionModel(main.selectionModel)
+        val column = TableColumn()
+        column.headerValue = " "
+        addColumn(column)
+        column.cellRenderer = RowNumberRenderer()
+        getColumnModel().getColumn(0).preferredWidth = 50
+        preferredScrollableViewportSize = preferredSize
     }
 
-    @Override
-    public void addNotify()
-    {
-        super.addNotify();
-
-        Component c = getParent();
-
+    override fun addNotify() {
+        super.addNotify()
         //  Keep scrolling of the row table in sync with the main table.
-
-        if (c instanceof JViewport)
-        {
-            JViewport viewport = (JViewport)c;
-            viewport.addChangeListener( this );
-        }
+        (parent as? JViewport)?.addChangeListener(this)
     }
 
     /*
      *  Delegate method to main table
      */
-    @Override
-    public int getRowCount()
-    {
-        return main.getRowCount();
-    }
+    override fun getRowCount(): Int = main.rowCount
 
-    @Override
-    public int getRowHeight(int row)
-    {
-        int rowHeight = main.getRowHeight(row);
-
-        if (rowHeight != super.getRowHeight(row))
-        {
-            super.setRowHeight(row, rowHeight);
+    override fun getRowHeight(row: Int): Int {
+        val rowHeight = main.getRowHeight(row)
+        if (rowHeight != super.getRowHeight(row)) {
+            super.setRowHeight(row, rowHeight)
         }
-
-        return rowHeight;
+        return rowHeight
     }
 
     /*
      *  No model is being used for this table so just use the row number
      *  as the value of the cell.
      */
-    @Override
-    public Object getValueAt(int row, int column)
-    {
-        return Integer.toString(row + 1);
+    override fun getValueAt(row: Int, column: Int): Any {
+        return rowNames.getOrNull(row) ?: (row + 1).toString()
     }
 
     /*
      *  Don't edit data in the main TableModel by mistake
      */
-    @Override
-    public boolean isCellEditable(int row, int column)
-    {
-        return false;
-    }
+    override fun isCellEditable(row: Int, column: Int) = false
 
     /*
      *  Do nothing since the table ignores the model
      */
-    @Override
-    public void setValueAt(Object value, int row, int column) {}
+    override fun setValueAt(value: Any, row: Int, column: Int) {}
+
     //
     //  Implement the ChangeListener
     //
-    public void stateChanged(ChangeEvent e)
-    {
+    override fun stateChanged(e: ChangeEvent) {
         //  Keep the scrolling of the row table in sync with main table
-
-        JViewport viewport = (JViewport) e.getSource();
-        JScrollPane scrollPane = (JScrollPane)viewport.getParent();
-        scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
+        val viewport = e.source as JViewport
+        val scrollPane = viewport.parent as JScrollPane
+        scrollPane.verticalScrollBar.value = viewport.viewPosition.y
     }
+
     //
     //  Implement the PropertyChangeListener
     //
-    public void propertyChange(PropertyChangeEvent e)
-    {
+    override fun propertyChange(e: PropertyChangeEvent) {
         //  Keep the row table in sync with the main table
-
-        if ("selectionModel".equals(e.getPropertyName()))
-        {
-            setSelectionModel( main.getSelectionModel() );
+        if ("selectionModel" == e.propertyName) {
+            setSelectionModel(main.selectionModel)
         }
-
-        if ("rowHeight".equals(e.getPropertyName()))
-        {
-            repaint();
+        if ("rowHeight" == e.propertyName) {
+            repaint()
         }
-
-        if ("model".equals(e.getPropertyName()))
-        {
-            main.getModel().addTableModelListener( this );
-            revalidate();
+        if ("model" == e.propertyName) {
+            main.model.addTableModelListener(this)
+            revalidate()
         }
     }
 
     //
     //  Implement the TableModelListener
     //
-    @Override
-    public void tableChanged(TableModelEvent e)
-    {
-        revalidate();
+    override fun tableChanged(e: TableModelEvent) {
+        if (main != null) { // do not simplify this. the super constructor calls this before main is set up.
+            rowNames = main.model.let { if (it is BasicDataWrapper) it.rowNames else listOf() }
+        }
+        revalidate()
     }
 
     /*
      *  Attempt to mimic the table header renderer
      */
-    private static class RowNumberRenderer extends DefaultTableCellRenderer
-    {
-        public RowNumberRenderer()
-        {
-            setHorizontalAlignment(JLabel.CENTER);
+    private class RowNumberRenderer : DefaultTableCellRenderer() {
+        init {
+            horizontalAlignment = CENTER
         }
 
-        public Component getTableCellRendererComponent(
-                JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-        {
-            if (table != null)
-            {
-                JTableHeader header = table.getTableHeader();
-
-                if (header != null)
-                {
-                    setForeground(header.getForeground());
-                    setBackground(header.getBackground());
-                    setFont(header.getFont());
+        override fun getTableCellRendererComponent(
+            table: JTable, value: Any, isSelected: Boolean, hasFocus: Boolean, row: Int, column: Int
+        ): Component {
+            if (table != null) {
+                val header = table.tableHeader
+                if (header != null) {
+                    foreground = header.foreground
+                    background = header.background
+                    font = header.font
                 }
             }
-
-            if (isSelected)
-            {
-                setFont( getFont().deriveFont(Font.BOLD) );
+            if (isSelected) {
+                font = font.deriveFont(Font.BOLD)
             }
-
-            setText((value == null) ? "" : value.toString());
-            setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-
-            return this;
+            text = value?.toString() ?: ""
+            border = UIManager.getBorder("TableHeader.cellBorder")
+            return this
         }
     }
 }

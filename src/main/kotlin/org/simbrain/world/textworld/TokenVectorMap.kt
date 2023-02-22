@@ -2,7 +2,6 @@ package org.simbrain.world.textworld
 
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.NTree
-import org.simbrain.util.table.Column
 import org.simbrain.util.table.SimbrainDataModel
 import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
@@ -66,7 +65,7 @@ class TokenVectorMap(
         // TODO: Find a way to show the tokens as rowHeaders
         val table = createFromDoubleArray(tokenVectorMatrix.replaceNaN(0.0).toArray())
         table.setColumnNames(tokensMap.keys.toList())
-        table.insertColumn(0, "Token", Column.DataType.StringType)
+        table.rowNames = tokensMap.keys.toList()
         tokensMap.keys.forEachIndexed { rowIndex, token ->
             table.setValueAt(token, rowIndex, 0)
         }

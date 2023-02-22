@@ -21,6 +21,12 @@ class BasicDataWrapper(
             columns = inferColumns(columns.map { it.columName }, value)
         }
 
+    var rowNames = listOf<String?>()
+        set(value) {
+            field = value
+            fireTableDataChanged()
+        }
+
     /**
      * Insert column to left, unless the index is -1 (no selection) in which case it is added as the right-most column.
      */

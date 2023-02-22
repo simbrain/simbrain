@@ -12,6 +12,7 @@ import org.simbrain.util.point
 import org.simbrain.util.showSaveDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -135,9 +136,7 @@ val isopodSim = newSim {
                 addSensor(this)
             }
             events.collided.on {
-                if (it is OdorWorldEntity) {
-                    log += "# Collided with ${it.name}\n"
-                } else {
+                if (it is OdorWorld) {
                     log += "# Collided with wall\n"
                 }
                 collision = true
@@ -206,6 +205,7 @@ val isopodSim = newSim {
             .filter { it.entityType == EntityType.FISH }
             .any { fish -> fish.location.distance(isopod.location) < hitRadius }
         if (foundFish) {
+            log += "# Collided with fish\n"
             collision = true
         }
     })

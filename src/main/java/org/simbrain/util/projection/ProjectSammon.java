@@ -31,9 +31,6 @@ import java.util.ArrayList;
  */
 public class ProjectSammon extends IterableProjectionMethod {
 
-    /**
-     * Array of datasets.
-     */
     private ArrayList<DataPoint> yArray;
 
     /**
@@ -42,7 +39,7 @@ public class ProjectSammon extends IterableProjectionMethod {
     protected double perturbationAmount;
 
     /**
-     * Sammon Map Settings. epsilon or "magic factor".
+     * Step size. Default value is set using SimbrainPreferences.
      */
     private double epsilon;
 

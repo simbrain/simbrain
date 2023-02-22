@@ -209,8 +209,23 @@ public class Projector implements AttributeContainer {
                 } else {
                     newPoint = new DataPoint(new double[]{point.get(0), point.get(1)});
                 }
+
                 downstairs.addPoint(newPoint);
-                projectionMethod.project();
+
+                if (projectionMethod.isIterable()) {
+                    // TODO: Make number of points and projection methods settable
+                    // For iterable projection methods we need a way to deal with new points
+                    // For the first 10 points we use PCA. After that we use triangulation
+                    if (getNumPoints() < 10) {
+                        ProjectPCA pca  = new ProjectPCA(this);
+                        pca.project();
+                    } else {
+                        ProjectTriangulate triangulate = new ProjectTriangulate(this);
+                        triangulate.project();
+                    }
+                } else {
+                    projectionMethod.project();
+                }
             }
 
             if (useColorManager) {

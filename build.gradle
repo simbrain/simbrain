@@ -65,6 +65,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.github.haifengl/smile-core
     implementation group: 'com.github.haifengl', name: 'smile-core', version: '2.6.0'
+    // implementation group: 'com.github.haifengl', name: 'smile-manifold', version: '2.6.0'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'

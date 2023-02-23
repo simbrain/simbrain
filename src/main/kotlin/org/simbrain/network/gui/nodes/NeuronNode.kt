@@ -30,11 +30,8 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.neuronContextMenu
 import org.simbrain.network.gui.neuronDialog
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator
-import org.simbrain.util.SimbrainConstants
-import org.simbrain.util.SimbrainPreferences
-import org.simbrain.util.Utils
+import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.util.toColor
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
@@ -128,7 +125,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         updateTextLabel()
         updateBounds()
         updateClampStatus()
-        centerFullBoundsOnPoint(neuron.x, neuron.y)
+        pullViewPositionFromModel()
         pickable = true
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this)
 
@@ -146,7 +143,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             networkPanel.network.events.zoomToFitPage.fireAndForget()
         }
         events.clampChanged.on { updateClampStatus() }
-        events.locationChanged.on { pullViewPositionFromModel() }
+        events.locationChanged.on(wait = true) { pullViewPositionFromModel() }
         events.updateRuleChanged.on { _, _ -> updateShape() }
     }
 
@@ -442,17 +439,8 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        super.offset(dx, dy)
-        pushViewPositionToModel()
-    }
-
-    /**
-     * Update the position of the model neuron based on the global coordinates
-     * of this pnode.
-     */
-    fun pushViewPositionToModel() {
-        val p = this.globalTranslation
-        neuron.location = p
+        neuron.location += point(dx, dy)
+        pullViewPositionFromModel()
     }
 
     /**
@@ -462,7 +450,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
     fun pullViewPositionFromModel() {
         // This is not necessarily a performance drain.  These updates do not automatically cause the
         // canvas to repaint.  See PRoot#processInputs
-        val p: Point2D = Point2D.Double(neuron.x, neuron.y)
+        val p = neuron.location
         this.globalTranslation = p
     }
 

@@ -254,6 +254,7 @@ val isopodSim = newSim {
                             }
                         }
                         trialNum++
+                        iteration = 0
                         collision = false
                     }
                     trialNum = 0

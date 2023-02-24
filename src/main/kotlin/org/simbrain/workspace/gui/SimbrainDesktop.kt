@@ -21,6 +21,7 @@ package org.simbrain.workspace.gui
 import bsh.Interpreter
 import bsh.util.JConsole
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
@@ -299,7 +300,9 @@ class SimbrainDesktop(val workspace: Workspace) {
             if (newSimulation is NewSimulation) {
                 newSimulation.run(this@SimbrainDesktop)
             } else if (newSimulation is Simulation) {
-                newSimulation.instantiate(this).run()
+                workspace.launch {
+                    newSimulation.instantiate(this@SimbrainDesktop).run()
+                }
             }
         }
         return scriptMenu

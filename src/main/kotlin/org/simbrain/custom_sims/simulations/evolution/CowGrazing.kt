@@ -1,8 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
@@ -13,17 +11,17 @@ import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.geneticalgorithm2.*
-import org.simbrain.util.piccolo.*
+import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.sensors.TileSensor
+import org.simbrain.world.odorworld.getRandomLocation
+import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.Dimension
 import java.io.FileInputStream
-import java.io.IOException
 import kotlin.random.Random
 
 val grazingCows = newSim {
@@ -117,31 +115,16 @@ val grazingCows = newSim {
     fun addFindFlowerAction(workspace: Workspace, entity: OdorWorldEntity, fitnessLambda: (Double) -> Unit = {}) {
         val world = entity.world
         workspace.addUpdateAction("${entity.name} found a flower") {
-            with(world.tileMap) {
-                val flowerLayer = this.getLayer("Flower Layer")
-
-                fun randomTileCoordinate() = Random.nextGridCoordinate()
-                (entity.getSensor("centralFlowerSensor") as TileSensor).let { sensor ->
-                    // Flowers found
-                    if (sensor.currentValue > .5) {
-
-                        // Erase that tile
-                        entity.location.asPixelCoordinate().toGridCoordinate().int.let { (x, y) ->
-                            flowerLayer.setTile(x, y, 0)
-                        }
-
-                        // Add a new flower somewhere else
-                        randomTileCoordinate().int.let { (x, y) ->
-                            world.tileMap.setTile(x, y, "DaisyCenter", flowerLayer)
-                        }
-
-                        // Update fitness
-                        fitnessLambda(1.0)
-                    }
+            (entity.getSensor("centralFlowerSensor") as ObjectSensor).let { sensor ->
+                // Flowers found
+                sensor.getSensedObjects(entity, .5).forEach {
+                    it.location = world.getRandomLocation()
+                    // Update fitness
+                    fitnessLambda(1.0)
                 }
             }
-        }
 
+        }
     }
 
 
@@ -157,21 +140,15 @@ val grazingCows = newSim {
         private val _cowPhenotypes = CompletableDeferred<List<CowGenotype.Phenotype>>()
         val cowPhenotypes: Deferred<List<CowGenotype.Phenotype>> get() = _cowPhenotypes
 
-        fun randomTileCoordinate() = with(odorWorld.tileMap) { random.nextGridCoordinate() }
-        private val lakeSize
-            get() = random.nextInt(2, 8)
-
         val odorWorld = OdorWorldComponent("Odor World 1").also {
             workspace.addWorkspaceComponent(it)
         }.world.apply {
+            isObjectsBlockMovement = false
             loadTileMap("empty.tmx")
             with(tileMap) {
                 updateMapSize(25, 25)
                 fill("Grass1")
             }
-        }
-        val flowerLayer = odorWorld.tileMap.run {
-            addLayer(createTileMapLayer("Flower Layer"))
         }
 
         val networks = List(cowGenotypes.size) { index ->
@@ -184,41 +161,40 @@ val grazingCows = newSim {
             }
         }
 
-        // Water sensors that can guide the cow
         val sensors = entities.map { entity ->
+            // Main sensors to guide the cow
             List(3) { index ->
-                TileSensor("flower", radius = 60.0, angle = (index * 120.0)).apply {
+                ObjectSensor(EntityType.FLOWER, radius = 60.0, theta = (index * 120.0)).apply {
                     decayFunction.dispersion = 250.0
                 }.also { entity.addSensor(it) }
             }
         }
 
-        // Central water sensor to determine when water is actually found.
-        val centerFlowerSensors = entities.associateWith { entity ->
-            TileSensor("flower", radius = 0.0).apply {
-                label = "centralFlowerSensor"
-                decayFunction = StepDecayFunction()
-                decayFunction.dispersion = 30.0
-            }.also { entity.addSensor(it) }
-        }
         val effectors = entities.map { entity ->
             entity.addDefaultEffectors()
             entity.effectors
         }
 
         init {
-            addFlowers()
+            // Central flower sensor to determine when the flower is actually found.
+            entities.forEach{
+                it.addSensor(
+                    ObjectSensor(EntityType.FLOWER, radius = 0.0).apply {
+                        label = "centralFlowerSensor"
+                        decayFunction = StepDecayFunction()
+                        decayFunction.dispersion = 30.0
+                    }
+                )
+            }
+            repeat(5) {
+                val loc = odorWorld.getRandomLocation()
+                odorWorld.addEntity(loc.x.toInt(), loc.y.toInt(),
+                    EntityType.FLOWER, doubleArrayOf(1.0))
+            }
             workspace.launch {
                 (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->
                     addUpdateActions(phenotype, entity)
                 }
-            }
-        }
-
-        fun addFlowers(numFlowers: Int = 5) {
-            odorWorld.tileMap.clear(flowerLayer)
-            List(numFlowers) { randomTileCoordinate().int }.forEach {
-                odorWorld.tileMap.setTile(it.x, it.y, "DaisyCenter", flowerLayer)
             }
         }
 
@@ -322,6 +298,7 @@ val grazingCows = newSim {
             val eliminationRatioTf = addTextField("Elimination ratio", "" + eliminationRatio)
 
             addButton("Evolve") {
+                workspace.removeAllComponents()
                 maxGenerations = maxGenTf.text.toInt()
                 iterationsPerRun = iterationsPerRunTf.text.toInt()
                 populationSize = populationSizeTf.text.toInt()
@@ -334,19 +311,18 @@ val grazingCows = newSim {
                     val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
                     val simFile = simulationChooser.showOpenDialog()
                     val serializer = WorkspaceSerializer(workspace)
-                    try {
-                        if (simFile != null) {
-                            workspace.removeAllComponents()
-                            workspace.updater.updateManager.reset()
+                    if (simFile != null) {
+                        workspace.removeAllComponents()
+                        workspace.updater.updateManager.reset()
+                        withContext(Dispatchers.IO) {
                             serializer.deserialize(FileInputStream(simFile))
                         }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
                     }
 
                     val world = workspace.componentList.filterIsInstance<OdorWorldComponent>().first().world
-                    world.entityList.forEach { addFindFlowerAction(workspace, it) }
-
+                    world.entityList
+                        .filter { e -> e.entityType == EntityType.COW }
+                        .forEach { addFindFlowerAction(workspace, it) }
                 }
             }
         }

@@ -45,6 +45,23 @@ class ObjectSensor @JvmOverloads constructor(
         }
     }
 
+    fun getSensedObjects(parent: OdorWorldEntity, threshold: Double): List<OdorWorldEntity> {
+        currentValue = 0.0
+        val retList = ArrayList<OdorWorldEntity>()
+        val sensorLocation = computeAbsoluteLocation(parent)
+        for (otherEntity in parent.world.entityList) {
+            if (otherEntity.entityType == objectType) {
+                val scaleFactor = decayFunction.getScalingFactor(
+                    SimbrainMath.distance(sensorLocation, otherEntity.location)
+                )
+                if ((baseValue * scaleFactor) > threshold) {
+                    retList.add(otherEntity)
+                }
+            }
+        }
+        return retList
+    }
+
     override fun copy(): ObjectSensor {
         return ObjectSensor(objectType, radius, theta).applyCommonCopy().apply {
             objectType = this@ObjectSensor.objectType

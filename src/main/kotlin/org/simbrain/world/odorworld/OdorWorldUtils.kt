@@ -1,9 +1,11 @@
 package org.simbrain.world.odorworld
 
+import org.simbrain.util.point
 import org.simbrain.world.odorworld.entities.BoundIntersection
 import org.simbrain.world.odorworld.entities.Bounded
+import java.awt.geom.Point2D
 import kotlin.math.min
-
+import kotlin.random.Random
 
 fun Bounded.intersect(other: Bounded): BoundIntersection {
     val a = this
@@ -28,3 +30,6 @@ fun Bounded.intersect(other: Bounded): BoundIntersection {
 
 }
 
+fun OdorWorld.getRandomLocation(rand: Random = Random): Point2D {
+    return point(rand.nextInt(width.toInt()), rand.nextInt(height.toInt()))
+}

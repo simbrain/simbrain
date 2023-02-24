@@ -223,6 +223,14 @@ class Workspace: CoroutineScope {
         stop()
     }
 
+    suspend fun iterateWhile(predicate: () -> Boolean) {
+        for (wc in componentList) {
+            wc.start()
+        }
+        updater.iterateWhile(predicate)
+        stop()
+    }
+
     /**
      * Simple non-synchronized updater for non-GUI applications running
      * in a single thread.

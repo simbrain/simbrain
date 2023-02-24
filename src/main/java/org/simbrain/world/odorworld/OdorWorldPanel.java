@@ -251,12 +251,14 @@ public class OdorWorldPanel extends JPanel {
                 }
         });
 
-        world.getEvents().getWorldStarted().on(() -> {
+        world.getEvents().getWorldStarted().on(null, true, () -> {
             if (movementTimer != null) {
                 movementTimer.cancel();
                 movementTimer = null;
             }
-            animationTimer = new Timer();
+            if (animationTimer == null) {
+                animationTimer = new Timer();
+            }
             animationTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -265,7 +267,7 @@ public class OdorWorldPanel extends JPanel {
             }, 50, 50);
         });
 
-        world.getEvents().getWorldStopped().on(() -> {
+        world.getEvents().getWorldStopped().on(null, true, () -> {
             movementTimer = new Timer();
             movementTimer.schedule(new TimerTask() {
                 @Override
@@ -275,6 +277,7 @@ public class OdorWorldPanel extends JPanel {
             }, 10, 10);
             if (animationTimer != null) {
                 animationTimer.cancel();
+                animationTimer = null;
             }
         });
 

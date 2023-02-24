@@ -136,7 +136,7 @@ val isopodSim = newSim {
                 addSensor(this)
             }
             events.collided.on {
-                if (it is OdorWorld) {
+                if (it is OdorWorld && !collision) {
                     log += "# Collided with wall\n"
                 }
                 collision = true
@@ -245,13 +245,11 @@ val isopodSim = newSim {
                         log += "# Trial: ${trialNum + 1}\n"
                         resetIsopod()
                         log += "# Heading: ${isopod.heading}\n"
-                        while (++iteration < maxIterationsPerTrial) {
-                            workspace.iterateSuspend(1)
-                            if (collision) {
-                                break
-                            } else {
+                        workspace.iterateWhile {
+                            if (!collision) {
                                 log +=  "${isopod.x}, ${isopod.y}\n"
                             }
+                            !collision && ++iteration < maxIterationsPerTrial
                         }
                         trialNum++
                         iteration = 0

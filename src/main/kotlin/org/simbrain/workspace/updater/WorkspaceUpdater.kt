@@ -130,10 +130,8 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         events.runStarted.fireAndForget()
-        withContext(workspace.coroutineContext) {
-            repeat(numIterations) {
-                doUpdate()
-            }
+        repeat(numIterations) {
+            doUpdate()
         }
         isRunning = false
         finishingTask()
@@ -141,6 +139,22 @@ class WorkspaceUpdater(val workspace: Workspace) {
             component.isRunning = false
         }
         events.runFinished.fireAndForget()
+    }
+
+    suspend fun iterateWhile(predicate: () -> Boolean) {
+        isRunning = true
+        for (wc in workspace.componentList) {
+            wc.isRunning = true
+        }
+        events.runStarted.fireAndSuspend()
+        do {
+            doUpdate()
+        } while (predicate())
+        isRunning = false
+        for (component in workspace.componentList) {
+            component.isRunning = false
+        }
+        events.runFinished.fireAndSuspend()
     }
 
     /**

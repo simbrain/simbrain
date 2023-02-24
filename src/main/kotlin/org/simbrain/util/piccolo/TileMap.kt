@@ -306,6 +306,7 @@ class TileMap(width: Int, height: Int) {
             it.clear(width, height)
             it.renderImage(tileSets, true)
         }
+        events.mapSizeChanged.fireAndBlock()
     }
 
     /**

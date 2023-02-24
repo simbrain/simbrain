@@ -240,6 +240,10 @@ public class OdorWorldPanel extends JPanel {
             renderAllLayers(world);
         });
 
+        world.getTileMap().getEvents().getMapSizeChanged().on(Dispatchers.getMain(), () -> {
+            world.events.getTileMapChanged().fireAndBlock();
+        });
+
         // Single layer update
         world.getTileMap().getEvents().getLayerImageChanged().on(Dispatchers.getMain(), (oldImage, newImage) -> {
                 int index = canvas.getLayer().indexOfChild(oldImage);

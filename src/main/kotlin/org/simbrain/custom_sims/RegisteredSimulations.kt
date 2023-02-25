@@ -89,7 +89,10 @@ val simulations = dir<Any>("Simulations") {
             item("Edge Of Chaos") { EdgeOfChaos() }
             item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
         }
-        item("Object Tracking") { objectTrackingSim }
+        dir("Falandays") {
+            item("Pattern Completion") { multiScalePatternCompletion }
+            item("Object Tracking") { objectTrackingSim }
+        }
     }
 
     dir("Evolution") {

@@ -14,4 +14,5 @@ class NetworkEvents2: Events2() {
     val modelRemoved = RemovedEvent<NetworkModel>()
     val updateActionsChanged = NoArgEvent()
     val freeWeightVisibilityChanged = AddedEvent<Boolean>()
+    val selected = AddedEvent<List<NetworkModel>>()
 }

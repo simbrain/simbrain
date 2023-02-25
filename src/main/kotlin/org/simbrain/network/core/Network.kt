@@ -555,8 +555,9 @@ class Network: CoroutineScope {
      *
      * @param toAdd list of objects to add.
      */
-    fun addNetworkModels(toAdd: List<NetworkModel>) {
-        toAdd.forEach { addNetworkModel(it) }
+    fun addNetworkModels(toAdd: List<NetworkModel>): Job {
+        val jobs = toAdd.mapNotNull { addNetworkModel(it) }
+        return launch { jobs.joinAll() }
     }
 
     /**
@@ -675,9 +676,9 @@ class Network: CoroutineScope {
             NeuronGroup {
         val ng = NeuronGroup(this, numNeurons)
         ng.setNeuronType(rule)
-        ng.setLocation(x, y)
         addNetworkModel(ng)
         layoutNeuronGroup(ng, layoutName)
+        ng.setLocation(x, y)
         return ng
     }
 
@@ -706,6 +707,10 @@ class Network: CoroutineScope {
      */
     fun connect(source: NeuronGroup, target: NeuronGroup, connector: ConnectionStrategy): List<Synapse?>? {
         return connector.connectNeurons(this, source.neuronList, target.neuronList)
+    }
+
+    suspend fun selectModels(models: List<NetworkModel>) {
+        events.selected.fireAndSuspend(models)
     }
 
 }

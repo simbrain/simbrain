@@ -70,9 +70,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     val networkActions = NetworkActions(this)
 
     /**
-     * Associates neurons with neuron nodes for use mainly in creating synapse nodes.
+     * Associates network models with screen elements
      */
-    val neuronNodeMapping: Map<Neuron, NeuronNode> = HashMap()
+    private val modelNodeMap = HashMap<NetworkModel, ScreenElement>()
 
     val timeLabel = TimeLabel(this).apply { update() }
 
@@ -251,7 +251,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is ZoeLayer -> createNode(model)
             is DeepNet -> createNode(model)
             else -> throw IllegalArgumentException()
-        }
+        }.also { modelNodeMap[model] = it }
     }
 
     fun createNode(neuron: Neuron) = addScreenElement {
@@ -265,15 +265,12 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
         })
         Neuron.tempDebugNan(neuron)
-        NeuronNode(this, neuron).also {
-            (neuronNodeMapping as HashMap)[neuron] = it
-            selectionManager.set(it)
-        }
+        NeuronNode(this, neuron)
     }
 
     fun createNode(synapse: Synapse) = addScreenElement {
-        val source = neuronNodeMapping[synapse.source] ?: throw IllegalStateException("Neuron node does not exist")
-        val target = neuronNodeMapping[synapse.target] ?: throw IllegalStateException("Neuron node does not exist")
+        val source = modelNodeMap[synapse.source] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
+        val target = modelNodeMap[synapse.target] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
         SynapseNode(this, source, target, synapse)
     }.also { it.lowerToBottom() }
 
@@ -285,7 +282,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             else -> NeuronGroupNode(this, neuronGroup)
         }
 
-        val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron) }
+        val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron).also { modelNodeMap[neuron] = it } }
         // neuronGroup.applyLayout()
         createNeuronGroupNode().apply { addNeuronNodes(neuronNodes) }
     }
@@ -306,7 +303,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
         val neuronNodes = neuronCollection.neuronList.map {
-            neuronNodeMapping[it] ?: throw IllegalStateException("Neuron node does not exist")
+            modelNodeMap[it] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
         }
         NeuronCollectionNode(this, neuronCollection).apply { addNeuronNodes(neuronNodes) }
     }
@@ -658,26 +655,30 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     private fun initEventHandlers() {
-        val event = network.events
-        event.modelAdded.on(Dispatchers.Swing) { list ->
-            list.forEach { createNode(it) }
-        }
-        event.modelRemoved.on(Dispatchers.Swing) {
-            network.events.zoomToFitPage.fireAndForget()
-        }
-        event.updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
-        event.updated.on(Dispatchers.Swing, wait = true) {
-            repaint()
-            timeLabel.update()
-        }
-        network.events.zoomToFitPage.on(Dispatchers.Swing) {
-            if (autoZoom && editMode.isSelection) {
-                val filtered = canvas.layer.getUnionOfChildrenBounds(null)
-                val adjustedFiltered = PBounds(
-                    filtered.getX() - 10, filtered.getY() - 10,
-                    filtered.getWidth() + 20, filtered.getHeight() + 20
-                )
-                canvas.camera.setViewBounds(adjustedFiltered)
+        network.events.apply {
+            modelAdded.on(Dispatchers.Swing) { list ->
+                list.forEach { createNode(it) }
+            }
+            modelRemoved.on(Dispatchers.Swing) {
+                zoomToFitPage.fireAndForget()
+            }
+            updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
+            updated.on(Dispatchers.Swing, wait = true) {
+                repaint()
+                timeLabel.update()
+            }
+            zoomToFitPage.on(Dispatchers.Swing) {
+                if (autoZoom && editMode.isSelection) {
+                    val filtered = canvas.layer.getUnionOfChildrenBounds(null)
+                    val adjustedFiltered = PBounds(
+                        filtered.getX() - 10, filtered.getY() - 10,
+                        filtered.getWidth() + 20, filtered.getHeight() + 20
+                    )
+                    canvas.camera.setViewBounds(adjustedFiltered)
+                }
+            }
+            selected.on { list ->
+                selectionManager.set(list.mapNotNull { modelNodeMap[it] })
             }
         }
 
@@ -750,5 +751,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
         }
     }
+
+    fun getNode(model: NetworkModel) = modelNodeMap[model]
 
 }

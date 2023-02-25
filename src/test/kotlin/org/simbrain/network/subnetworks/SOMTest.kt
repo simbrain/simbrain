@@ -8,6 +8,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.nodes.NeuronNode
 
 class SOMTest {
 
@@ -31,7 +32,7 @@ class SOMTest {
             val som = SOMNetwork(net, 1, 2)
             val np = NetworkPanel(NetworkComponent("Test", net))
             net.addNetworkModel(som)?.join()
-            assertEquals(3, np.neuronNodeMapping.keys.size)
+            assertEquals(3, np.filterScreenElements<NeuronNode>().size)
         }
     }
 

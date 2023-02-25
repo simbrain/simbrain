@@ -15,7 +15,6 @@ import org.simbrain.network.gui.actions.edit.*
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction
 import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction
 import org.simbrain.network.gui.actions.neuron.AddNeuronsAction
-import org.simbrain.network.gui.actions.neuron.NewNeuronAction
 import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction
 import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction
 import org.simbrain.network.gui.actions.selection.*
@@ -51,7 +50,16 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val cutAction = CutAction(networkPanel)
     val deleteAction = DeleteAction(networkPanel)
     val neuronCollectionAction = NeuronCollectionAction(networkPanel)
-    val newNeuronAction = NewNeuronAction(networkPanel)
+    val newNeuronAction = networkPanel.createSuspendAction(
+        name = "Add Neuron",
+        description = """Add or "put" new node (p)""",
+        iconPath = "menu_icons/AddNeuron.png",
+        keyCombo = KeyCombination('P')
+    ) {
+        val neuron = Neuron(network)
+        network.addNetworkModel(neuron)?.join()
+        network.selectModels(listOf(neuron))
+    }
     val pasteAction = PasteAction(networkPanel)
     val randomizeObjectsAction = RandomizeObjectsAction(networkPanel)
     val selectAllAction = SelectAllAction(networkPanel)
@@ -322,15 +330,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     /**
      * Quick create 100 nodes
      */
-    val fast100 = networkPanel.createAction(
+    val fast100 = networkPanel.createSuspendAction(
         name = "Add 100 nodes",
     ) {
         List(100) { Neuron(network) }.apply {
-            network.addNetworkModels(this)
+            network.addNetworkModels(this).join()
             GridLayout().layoutNeurons(this)
-        }.onEach {
-            it.events.selected.fireAndForget(it)
-        }
-        network.events.zoomToFitPage.fireAndForget()
+        }.also { network.selectModels(it) }
+        network.events.zoomToFitPage.fireAndSuspend()
     }
 }

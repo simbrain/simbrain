@@ -173,7 +173,7 @@ public class MpfsSOM extends Simulation {
             // Custom display of SOM neurons handled here
             for (Neuron neuron : averagePoliticalAffiliation.keySet()) {
 
-                NeuronNode node = sim.getNetworkPanel(nc).getNeuronNodeMapping().get(neuron);
+                NeuronNode node = (NeuronNode) sim.getNetworkPanel(nc).getNode(neuron);
 
                 if (node == null) {
                     continue;

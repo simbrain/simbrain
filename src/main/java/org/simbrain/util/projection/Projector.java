@@ -160,6 +160,8 @@ public class Projector implements AttributeContainer {
         projectionMethods.put(ProjectNNSubspace.class, "NN Subspace");
         projectionMethods.put(ProjectPCA.class, "PCA");
         projectionMethods.put(ProjectTriangulate.class, "Triangulation");
+        projectionMethods.put(ProjectUMAP.class, "UMAP");
+        projectionMethods.put(ProjectTSNE.class, "TSNE");
         projectionMethods.put(ProjectSammon.class, "Sammon Map");
     }
 

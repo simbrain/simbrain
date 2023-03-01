@@ -142,7 +142,6 @@ public class ProjectPCA extends ProjectionMethod {
 
     @Override
     public void init() {
-        // TODO Auto-generated method stub
     }
 
 }

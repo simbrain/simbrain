@@ -1,11 +1,13 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.core.decayStrengthBasedOnLength
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction
+import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons
@@ -48,7 +50,15 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val clearSourceNeurons = ClearSourceNeurons(networkPanel)
     val copyAction = CopyAction(networkPanel)
     val cutAction = CutAction(networkPanel)
-    val deleteAction = DeleteAction(networkPanel)
+    val deleteAction = networkPanel.createConditionallyEnabledAction(
+        name = "Delete",
+        description = """Delete selected node(s) ("Backspace" or "Delete")""",
+        enablingCondition = EnablingCondition.ALLITEMS,
+        iconPath = "menu_icons/DeleteNeuron.png",
+        keyCombos = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
+    ) {
+        launch { deleteSelectedObjects() }
+    }
     val neuronCollectionAction = NeuronCollectionAction(networkPanel)
     val newNeuronAction = networkPanel.createSuspendAction(
         name = "Add Neuron",

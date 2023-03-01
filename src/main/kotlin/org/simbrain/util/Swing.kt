@@ -222,8 +222,8 @@ fun NetworkPanel.createConditionallyEnabledAction(
     name: String,
     enablingCondition: ConditionallyEnabledAction.EnablingCondition,
     description: String = name,
-    keyCombo: KeyCombination? = null,
-    block: NetworkPanel.() -> Unit
+    keyCombos: List<KeyCombination>,
+    block: suspend NetworkPanel.() -> Unit
 ): AbstractAction {
     return object : ConditionallyEnabledAction(this, name, enablingCondition) {
         init {
@@ -233,17 +233,33 @@ fun NetworkPanel.createConditionallyEnabledAction(
 
             putValue(NAME, name)
             putValue(SHORT_DESCRIPTION, description)
-            if (keyCombo != null) {
+            keyCombos.forEach { keyCombo ->
                 keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
                 this@createConditionallyEnabledAction.bindTo(keyCombo, this)
             }
         }
 
         override fun actionPerformed(e: ActionEvent) {
-            block()
+            launch { block() }
         }
     }
 }
+
+fun NetworkPanel.createConditionallyEnabledAction(
+    iconPath: String? = null,
+    name: String,
+    enablingCondition: ConditionallyEnabledAction.EnablingCondition,
+    description: String = name,
+    keyCombo: KeyCombination? = null,
+    block: suspend NetworkPanel.() -> Unit
+) = createConditionallyEnabledAction(
+    iconPath,
+    name,
+    enablingCondition,
+    description,
+    keyCombo?.let { listOf(it) } ?: listOf(),
+    block
+)
 
 /**
  * Create an action with a char rather than a key combination

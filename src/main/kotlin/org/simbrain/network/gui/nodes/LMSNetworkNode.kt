@@ -4,7 +4,6 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.actions.edit.CopyAction
 import org.simbrain.network.gui.actions.edit.CutAction
-import org.simbrain.network.gui.actions.edit.DeleteAction
 import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.dialogs.getTrainingDialog
 import org.simbrain.network.subnetworks.LMSNetwork
@@ -43,7 +42,7 @@ class LMSNetworkNode(networkPanel: NetworkPanel, private val lmsNet: LMSNetwork)
         contextMenu.add(networkPanel.createAction(name = "Edit network") {
             propertyDialog.display()
         })
-        contextMenu.add(DeleteAction(networkPanel))
+        contextMenu.add(networkPanel.networkActions.deleteAction)
         contextMenu.addSeparator()
 
         // Train Submenu

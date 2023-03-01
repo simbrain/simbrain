@@ -20,7 +20,6 @@ fun NetworkPanel.addKeyBindings() {
     bind(Shift + VK_DOWN) { nudge(0, 1) }
     bind(Shift + VK_LEFT) { nudge(-1, 0) }
     bind(Shift + VK_RIGHT) { nudge(1, 0) }
-    bind("delete", "back_space") { deleteSelectedObjects() }
     bind(VK_ESCAPE) { selectionManager.clear(); selectionManager.clearAllSource() }
 
     bind(Shift + 'C') { hardClearSelectedObjects() }

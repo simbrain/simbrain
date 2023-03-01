@@ -1,8 +1,8 @@
 package org.simbrain.util.table
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import smile.io.Read
@@ -118,12 +118,9 @@ val DataViewerTable.showHistogramAction
         "Histogram",
         "Create histograms for data in selected column"
     ) {
-        GlobalScope.launch(context = Dispatchers.Default) {
-            try {
-                val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas();
-                canvas.window()
-            } catch(e: Exception){
-            }
+        launch(Dispatchers.Swing) {
+            val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas();
+            canvas.window()
         }
     }
 
@@ -133,7 +130,7 @@ val DataViewerTable.showBoxPlotAction
         "Boxplot column",
         "Create boxplot for data all numeric columns"
     ) {
-        GlobalScope.launch(context = Dispatchers.Default) {
+        launch(context = Dispatchers.Default) {
             val canvas = BoxPlot.of(*model.getColumnMajorArray()).canvas();
             canvas.window()
         }
@@ -148,7 +145,7 @@ val DataViewerTable.showScatterPlotAction
         "Scatter Plots",
         "Show all pairwise scatter plots across columns"
     ) {
-        GlobalScope.launch(context = Dispatchers.Default) {
+        launch(context = Dispatchers.Default) {
             // TODO: User should be able to set which column is class
             // TODO: Set mark
             if (model is DataFrameWrapper) {

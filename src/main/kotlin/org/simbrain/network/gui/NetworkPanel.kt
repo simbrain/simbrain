@@ -28,10 +28,12 @@ import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.trainCurrentOutputLMS
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
+import org.simbrain.util.piccolo.unionOfGlobalFullBounds
 import org.simbrain.util.widgets.EditablePanel
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.util.prefs.PreferenceChangeListener
 import javax.swing.*
 import javax.swing.event.InternalFrameAdapter
 import javax.swing.event.InternalFrameEvent
@@ -140,6 +142,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      */
     var guiOn = true
 
+    private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fireAndBlock() }
 
     /**
      * Main initialization of the network panel.
@@ -332,7 +335,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
             is SOMNetwork -> SOMNetworkNode(this, subnetwork)
             // is EchoStateNetwork -> ESNNetworkNode(this, subnetwork)
-            //is SimpleRecurrentNetwork -> SRNNetworkNode(this, subnetwork)
+            // is SimpleRecurrentNetwork -> SRNNetworkNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
             is LMSNetwork -> LMSNetworkNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)
@@ -359,30 +362,27 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
 
         fun delete(screenElement: ScreenElement) {
-            with(network) {
-                when (screenElement) {
-                    is NeuronNode -> {
-                        screenElement.model.delete()
+            when (screenElement) {
+                is NeuronNode -> {
+                    screenElement.model.delete()
 
-                        undoManager.addUndoableAction(object : UndoableAction {
-                            override fun undo() {
-                                network.addNetworkModel(screenElement.model)
-                            }
+                    undoManager.addUndoableAction(object : UndoableAction {
+                        override fun undo() {
+                            network.addNetworkModel(screenElement.model)
+                        }
 
-                            override fun redo() {
-                                screenElement.model.delete()
-                            }
-                        })
-                    }
-                    is InteractionBox -> deleteGroup(screenElement)
-                    else -> screenElement.model.delete()
+                        override fun redo() {
+                            screenElement.model.delete()
+                        }
+                    })
                 }
+                is InteractionBox -> deleteGroup(screenElement)
+                else -> screenElement.model.delete()
             }
         }
 
         selectionManager.selection.forEach { delete(it) }
 
-        // Zoom events are costly so only zoom after main deletion events
         network.events.zoomToFitPage.fireAndForget()
     }
 
@@ -661,6 +661,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
             modelRemoved.on(Dispatchers.Swing) {
                 zoomToFitPage.fireAndForget()
+                modelNodeMap.remove(it)
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
             updated.on(Dispatchers.Swing, wait = true) {
@@ -669,7 +670,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
             zoomToFitPage.on(Dispatchers.Swing) {
                 if (autoZoom && editMode.isSelection) {
-                    val filtered = canvas.layer.getUnionOfChildrenBounds(null)
+                    val filtered = screenElements.unionOfGlobalFullBounds()
                     val adjustedFiltered = PBounds(
                         filtered.getX() - 10, filtered.getY() - 10,
                         filtered.getWidth() + 20, filtered.getHeight() + 20

@@ -443,6 +443,8 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         pullViewPositionFromModel()
     }
 
+
+
     /**
      * Updates the position of the view neuron based on the position of the
      * model neuron.

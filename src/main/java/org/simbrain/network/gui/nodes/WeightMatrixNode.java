@@ -9,7 +9,6 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.WeightMatrixArrow;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
-import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.matrix.ZoeConnector;
@@ -167,7 +166,7 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
             }
         };
         contextMenu.add(editArray);
-        contextMenu.add(new DeleteAction(getNetworkPanel()));
+        contextMenu.add(getNetworkPanel().getNetworkActions().getDeleteAction());
 
         contextMenu.addSeparator();
         Action randomizeAction = new AbstractAction("Randomize") {

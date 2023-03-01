@@ -34,8 +34,8 @@ import org.simbrain.util.piccolo.Outline;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * PNode representation of a subnetwork. This class contains an interaction box
@@ -76,7 +76,7 @@ public class SubnetworkNode extends ScreenElement {
     /**
      * The outlined objects
      */
-    private List<ScreenElement> outlinedObjects = new ArrayList<>();
+    private final Set<ScreenElement> outlinedObjects = new LinkedHashSet<>();
 
     /**
      * Create a subnetwork node.

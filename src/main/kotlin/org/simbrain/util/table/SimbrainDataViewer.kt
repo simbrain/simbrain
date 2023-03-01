@@ -1,5 +1,9 @@
 package org.simbrain.util.table
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTableHeader
 import org.simbrain.util.cartesianProduct
@@ -143,7 +147,11 @@ class DataViewerScrollPane(val table: JTable): JScrollPane(table) {
 
 }
 
-class DataViewerTable(val model: SimbrainDataModel) : JTable(model) {
+class DataViewerTable(val model: SimbrainDataModel) : JTable(model), CoroutineScope {
+
+    private var job = SupervisorJob()
+
+    override var coroutineContext = Dispatchers.Swing + job
 
     val popUpMenu = JPopupMenu()
 

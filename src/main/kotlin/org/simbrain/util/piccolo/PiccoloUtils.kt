@@ -24,6 +24,8 @@ val PNode?.hasScreenElement
 val PInputEvent.isDoubleClick
     get() = clickCount == 2 && button == MouseEvent.BUTTON1
 
+fun Collection<PNode>.unionOfGlobalFullBounds() = map { it.globalFullBounds }.fold(PBounds()) { acc, b -> acc.add(b); acc }
+
 /**
  * Add a black border around a PImage. Must be called after the image's bounds have been set.
  */

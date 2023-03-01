@@ -27,7 +27,6 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
-import org.simbrain.network.gui.actions.edit.DeleteAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 
 import javax.swing.*;
@@ -100,7 +99,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         //contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
         //contextMenu.addSeparator();
 
-        contextMenu.add(new DeleteAction(getNetworkPanel()));
+        contextMenu.add(getNetworkPanel().getNetworkActions().getDeleteAction());
 
         final var textNodes = getNetworkPanel().getSelectionManager().getSelection().stream()
                 .filter(TextNode.class::isInstance)

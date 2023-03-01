@@ -6,7 +6,9 @@ import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.nodes.ScreenElement;
 
 import java.awt.*;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * A node that draws an outline around a set of nodes.
@@ -30,6 +32,10 @@ public class Outline extends PNode {
 
     private Collection<? extends ScreenElement> outlinedNodes = null;
 
+    private boolean dirtyBounds = false;
+
+    private final PropertyChangeListener markBoundsDirty = (evt) -> dirtyBounds = true;
+
     /**
      * Construct the outline object.
      */
@@ -45,20 +51,25 @@ public class Outline extends PNode {
      * set to null at every update. Also note that no event is fired when setting outlined nodes.
      * Update only occurs after {@link #updateBounds()} is called.
      */
-    public void resetOutlinedNodes(Collection<? extends ScreenElement> outlinedNodes) {
+    public void resetOutlinedNodes(Set<? extends ScreenElement> outlinedNodes) {
+        if (this.outlinedNodes != null) {
+            this.outlinedNodes.forEach(node -> node.removePropertyChangeListener(PROPERTY_FULL_BOUNDS, markBoundsDirty));
+        }
+        outlinedNodes.forEach(node -> node.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, markBoundsDirty));
         this.outlinedNodes = outlinedNodes;
+        dirtyBounds = true;
         invalidateFullBounds();
     }
 
     @Override
     public boolean validateFullBounds() {
-        if (outlinedNodes != null) {
+        if (dirtyBounds) {
             PBounds bounds = new PBounds();
             for (ScreenElement node : outlinedNodes) {
                 bounds.add(node.getFullBounds());
             }
             updateBound(bounds.x, bounds.y, bounds.width, bounds.height);
-            outlinedNodes = null;
+            dirtyBounds = false;
         }
         return super.validateFullBounds();
     }

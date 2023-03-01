@@ -26,7 +26,6 @@ import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.actions.edit.CopyAction
 import org.simbrain.network.gui.actions.edit.CutAction
-import org.simbrain.network.gui.actions.edit.DeleteAction
 import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.matrix.NeuronArray
@@ -210,7 +209,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             }
         }
         contextMenu.add(editArray)
-        contextMenu.add(DeleteAction(networkPanel))
+        contextMenu.add(networkPanel.networkActions.deleteAction)
         contextMenu.addSeparator()
         contextMenu.add(networkPanel.networkActions.connectSelectedModels)
         contextMenu.addSeparator()

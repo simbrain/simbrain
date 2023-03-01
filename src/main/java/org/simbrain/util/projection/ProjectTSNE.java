@@ -19,6 +19,7 @@
 package org.simbrain.util.projection;
 
 import smile.manifold.TSNE;
+import smile.projection.PCA;
 
 public class ProjectTSNE extends ProjectionMethod {
 
@@ -36,8 +37,9 @@ public class ProjectTSNE extends ProjectionMethod {
             return;
         }
 
-        // TODO: PCA for pre-processing
-        TSNE tsne = new TSNE(projector.getUpstairs().getDoubleArray(), 2);
+        var pca = PCA.fit(projector.getUpstairs().getDoubleArray());
+        pca.setProjection(15);
+        TSNE tsne = new TSNE(pca.project(projector.getUpstairs().getDoubleArray()), 2);
         // System.out.println(tsne);
         System.out.println("---");
         projector.getDownstairs().setData(tsne.coordinates);
@@ -46,6 +48,7 @@ public class ProjectTSNE extends ProjectionMethod {
 
     @Override
     public void init() {
+
     }
 
 }

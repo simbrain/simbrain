@@ -267,7 +267,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 network.addNetworkModel(neuron)
             }
         })
-        Neuron.tempDebugNan(neuron)
         NeuronNode(this, neuron)
     }
 

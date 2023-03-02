@@ -38,10 +38,7 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -964,31 +961,13 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void setLocation(Point2D position, boolean fireEvent) {
         x = position.getX();
         y = position.getY();
-        tempDebugNan(this);
         if (fireEvent) {
             events.getLocationChanged().fireAndForget();
         }
     }
-
-    // TODO: This is just temporary until the source of the problem is identified
-    public static void tempDebugNan(Neuron test) {
-        if (Double.isNaN(test.x) || Double.isNaN(test.y)) {
-            String message = "x = " + test.x + " and y = " + test.y + ", resetting neuron location to (0,0)";
-            test.x = (0);
-            test.y = (0);
-            System.out.println(message);
-            Toolkit.getDefaultToolkit().beep();
-            JOptionPane optionPane = new JOptionPane(message, JOptionPane.WARNING_MESSAGE);
-            JDialog dialog = optionPane.createDialog("Warning!");
-            dialog.setAlwaysOnTop(true);
-            dialog.setVisible(true);
-        }
-    }
-
     public void setLocation(final double x, final double y, boolean fireEvent) {
         setLocation(point(x, y), fireEvent);
     }
-
     public double[] getPosition3D() {
         return new double[]{x, y, z};
     }

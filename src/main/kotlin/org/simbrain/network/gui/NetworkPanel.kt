@@ -687,7 +687,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     private fun NetworkSelectionManager.setUpSelectionEvents() {
         events.apply {
-            selection.on { old, new ->
+            selection.on(Dispatchers.Swing) { old, new ->
                 val (removed, added) = old complement new
                 removed.forEach { NodeHandle.removeSelectionHandleFrom(it) }
                 added.forEach {
@@ -698,7 +698,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                     }
                 }
             }
-            sourceSelection.on { old, new ->
+            sourceSelection.on(Dispatchers.Swing) { old, new ->
                 val (removed, added) = old complement new
                 removed.forEach { NodeHandle.removeSourceHandleFrom(it) }
                 added.forEach {

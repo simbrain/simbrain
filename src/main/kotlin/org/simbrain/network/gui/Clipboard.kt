@@ -16,44 +16,37 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui;
+package org.simbrain.network.gui
 
-import org.simbrain.network.LocatableModel;
-import org.simbrain.network.NetworkModel;
-import org.simbrain.network.util.SimnetUtils;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
+import kotlinx.coroutines.launch
+import org.simbrain.network.LocatableModel
+import org.simbrain.network.NetworkModel
+import org.simbrain.network.util.SimnetUtils
 
 /**
  * Buffer which holds network objects for cutting and pasting.
  */
-public class Clipboard {
-
+object Clipboard {
     // To add new copy-pastable items, must update:
     // 1) SimnetUtils.getCopy()
     // 2) Network.addObjects
     // 3) NetworkPanel.getSelectedModels()
-
     /**
      * Static list of cut or copied objects.
      */
-    private static List<NetworkModel> copiedObjects = new ArrayList<>();
+    private var copiedObjects: List<NetworkModel> = ArrayList()
 
     /**
      * List of components which listen for changes to this clipboard.
      */
-    private static HashSet listenerList = new HashSet();
+    private val listenerList = HashSet<ClipboardListener>()
 
     /**
      * Clear the clipboard.
      */
-    public static void clear() {
-        copiedObjects = new ArrayList<>();
-        fireClipboardChanged();
+    fun clear() {
+        copiedObjects = ArrayList()
+        fireClipboardChanged()
     }
 
     /**
@@ -61,10 +54,10 @@ public class Clipboard {
      *
      * @param objects objects to add
      */
-    public static void add(final List<NetworkModel> objects) {
-        copiedObjects = objects;
+    fun add(objects: List<NetworkModel>) {
+        copiedObjects = objects
         // System.out.println("add-->"+ Arrays.asList(objects));
-        fireClipboardChanged();
+        fireClipboardChanged()
     }
 
     /**
@@ -72,61 +65,57 @@ public class Clipboard {
      *
      * @param net the network to paste into
      */
-    public static void paste(final NetworkPanel net) {
-        if (isEmpty()) {
-            return;
+    fun paste(net: NetworkPanel) {
+        if (isEmpty) {
+            return
         }
 
         // Create a copy of the clipboard objects.
-        List<NetworkModel> copy = SimnetUtils.getCopy(net.getNetwork(), copiedObjects);
-        copy.stream().filter(LocatableModel.class::isInstance)
-                .forEach(l -> ((LocatableModel) l).setShouldBePlaced(false));
+        val copy = SimnetUtils.getCopy(net.network, copiedObjects)
+        copy.filterIsInstance<LocatableModel>()
+            .forEach { it.shouldBePlaced = false }
 
-        // Add the copied object
-        net.getNetwork().addNetworkModels(copy);
+        net.launch {
+            // Add the copied object
+            net.network.addNetworkModels(copy).join()
 
-        // Unselect "old" copied objects
-        net.getSelectionManager().clear();
+            // Unselect "old" copied objects
+            net.selectionManager.clear()
 
-        // Paste objects intelligently using placement manager
-        net.getNetwork().getPlacementManager().placeObjects(copy.stream()
-                .filter(LocatableModel.class::isInstance)
-                .map(LocatableModel.class::cast)
-                .collect(Collectors.toList())
-        );
-        copy.stream().filter(LocatableModel.class::isInstance)
-                .forEach(l -> ((LocatableModel) l).setShouldBePlaced(true));
+            // Paste objects intelligently using placement manager
+            net.network.placementManager.placeObjects(
+                copy.filterIsInstance<LocatableModel>()
+                    .onEach { it.shouldBePlaced = true }
+            )
 
-        // Select copied objects after pasting them
-        copy.forEach(NetworkModel::select);
-
-        net.repaint();
+            // Select copied objects after pasting them
+            copy.forEach { it.select() }
+        }
     }
 
-    /**
-     * @return true if there's nothing in the clipboard, false otherwise
-     */
-    public static boolean isEmpty() {
-        return copiedObjects.isEmpty();
-    }
+    @JvmStatic
+    val isEmpty: Boolean
+        /**
+         * @return true if there's nothing in the clipboard, false otherwise
+         */
+        get() = copiedObjects.isEmpty()
 
     /**
      * Add the specified clipboard listener.
      *
      * @param l listener to add
      */
-    public static void addClipboardListener(final ClipboardListener l) {
-        listenerList.add(l);
+    @JvmStatic
+    fun addClipboardListener(l: ClipboardListener) {
+        listenerList.add(l)
     }
 
     /**
      * Fire a clipboard changed event to all registered model listeners.
      */
-    public static void fireClipboardChanged() {
-        for (Iterator i = listenerList.iterator(); i.hasNext(); ) {
-            ClipboardListener listener = (ClipboardListener) i.next();
-            listener.clipboardChanged();
+    fun fireClipboardChanged() {
+        for (listener in listenerList) {
+            listener.clipboardChanged()
         }
     }
-
 }

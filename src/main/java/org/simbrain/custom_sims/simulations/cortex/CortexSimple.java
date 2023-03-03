@@ -9,7 +9,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.updaterules.IntegrateAndFireRule;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
@@ -202,8 +201,9 @@ public class CortexSimple extends Simulation {
         ProbabilityDistribution inRand = new LogNormalDistribution(exlocation, exscale, true);
 
         Sparse con = new Sparse(sparsity, false, false);
+        con.setConnectionDensity(0.65);
 
-        SynapseGroup2 sg = SynapseGroup.createSynapseGroup(src, tar, con, 0.65);
+        SynapseGroup2 sg = new SynapseGroup2(src, tar, con);
         // sg.setRandomizers(exRand, inRand);
         sg.setLabel("Synapses");
 

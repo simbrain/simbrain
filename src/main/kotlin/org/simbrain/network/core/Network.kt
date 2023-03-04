@@ -369,29 +369,6 @@ class Network: CoroutineScope {
     }
 
     /**
-     * Create a [NeuronCollection] from a provided list of neurons
-     */
-    fun createNeuronCollection(neuronList: List<Neuron>): NeuronCollection? {
-
-        // Filter out free neurons (a neuron is free if its parent group is null)
-        val freeNeurons: List<Neuron> = neuronList
-            // .filter(n -> n.getParentGroup() == null)  // TODO
-            .toList()
-
-        // Only make the neuron collection if some neurons have been selected
-        if (freeNeurons.isNotEmpty()) {
-            // Make the collection
-            val nc = NeuronCollection(this, freeNeurons)
-
-            if (nc.shouldAdd()) {
-                nc.label = idManager.getProposedId(nc.javaClass)
-                return nc
-            }
-        }
-        return null
-    }
-
-    /**
      * Returns the precision of the current time step.
      *
      * @return the precision of the current time step.

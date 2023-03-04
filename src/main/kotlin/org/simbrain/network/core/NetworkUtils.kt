@@ -200,7 +200,7 @@ fun connectAllToAll(source: NeuronGroup, target: Neuron, value: Double): List<Sy
     return wts
 }
 
-fun Network.createNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {
+fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {
     val neurons = (0 until numNeurons).map {
         Neuron(this).apply(template)
     }
@@ -208,8 +208,8 @@ fun Network.createNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): Li
     return neurons
 }
 
-fun Network.createNeuronCollection(numNeurons: Int) : NeuronCollection {
-    val nc = NeuronCollection(this, createNeurons(numNeurons))
+fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
+    val nc = NeuronCollection(this, addNeurons(numNeurons, template))
     addNetworkModel(nc)
     return nc
 }

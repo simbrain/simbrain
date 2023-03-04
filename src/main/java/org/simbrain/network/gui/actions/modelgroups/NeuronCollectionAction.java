@@ -51,12 +51,15 @@ public final class NeuronCollectionAction extends ConditionallyEnabledAction {
     @Override
     public void actionPerformed(final ActionEvent event) {
         List<Neuron> neuronList = getNetworkPanel().getSelectionManager().filterSelectedModels(Neuron.class);
+        var network = getNetworkPanel().getNetwork();
         if (neuronList.size() > 0) {
-            NeuronCollection nc = getNetworkPanel().getNetwork().createNeuronCollection(neuronList);
-            if (nc != null) {
-                getNetworkPanel().getNetwork().addNetworkModel(nc);
+            NeuronCollection nc = new NeuronCollection(network, neuronList);
+            if (nc.shouldAdd()) {
+                nc.setLabel(network.getIdManager().getProposedId(nc.getClass()));
+                network.addNetworkModel(nc);
             }
         }
     }
+
 
 }

@@ -1,22 +1,19 @@
 package org.simbrain.custom_sims.simulations
 
-import org.jetbrains.kotlin.backend.common.lower.rangeContainsLoweringPhase
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.SynapseGroup2
-import org.simbrain.network.core.createNeurons
+import org.simbrain.network.core.addNeurons
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.KuramotoRule
 import org.simbrain.util.place
 import org.simbrain.util.point
-import kotlin.math.roundToInt
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /**
  * Create a simulation of Cortex...
@@ -119,7 +116,7 @@ val cortexKuramoto = newSim {
 
     // Finally create neuron regions!
     for (i in 1..numNetworks) {
-        val regionNeurons = network.createNeurons(numNodesListAdjusted[i - 1]) { kuramotoTemplate() }
+        val regionNeurons = network.addNeurons(numNodesListAdjusted[i - 1]) { kuramotoTemplate() }
         val region = NeuronCollection(network, regionNeurons)
 
         network.addNetworkModel(region)

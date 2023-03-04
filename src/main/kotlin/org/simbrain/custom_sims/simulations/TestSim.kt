@@ -4,8 +4,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.createNeurons
-import org.simbrain.network.groups.NeuronCollection
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
@@ -34,9 +33,7 @@ val testSim = newSim {
     val network = networkComponent.network
 
     // Subnetwork 1
-    val neuronList1 = network.createNeurons(6)
-    val region1 = NeuronCollection(network, neuronList1)
-    network.addNetworkModel(region1)
+    val region1 = network.addNeuronCollection(6)
     region1.apply {
         label = "Region 1"
         layout(GridLayout())
@@ -50,38 +47,33 @@ val testSim = newSim {
     val sparse = Sparse(connectionDensity = 0.3).apply {
         percentExcitatory = 10.0
     }
-
-    val syns = sparse.connectNeurons(network, neuronList1, neuronList1)
+    val syns = sparse.connectNeurons(network, region1.neuronList, region1.neuronList)
     network.addNetworkModels(syns)
     // Set up some references
-    val straightNeuron = neuronList1[2]
-    val leftNeuron = neuronList1[3]
-    val rightNeuron =  neuronList1[4]
+    val straightNeuron = region1.neuronList[2]
+    val leftNeuron = region1.neuronList[3]
+    val rightNeuron =  region1.neuronList[4]
 
     // Subnetwork 2
-    val neuronList2 = network.createNeurons(20) {
+    val region2 = network.addNeuronCollection(20) {
         updateRule = DecayRule().apply {
             decayFraction = .2
         }
-    }
-    val region2 = NeuronCollection(network, neuronList2)
-    network.addNetworkModel(region2)
-    region2.apply {
+    }.apply {
         label = "Region 2"
         layout(GridLayout())
         location = point(500, -50)
     }
-    val region2weights = radial.connectNeurons(network, neuronList2, neuronList2)
+    val region2weights = radial.connectNeurons(network, region2.neuronList, region2.neuronList)
     network.addNetworkModels(region2weights)
 
     // Make connections between regions
-    val region1_to_2_weights = sparse.connectNeurons(network, neuronList1, neuronList2)
+    val region1_to_2_weights = sparse.connectNeurons(network, region1.neuronList, region2.neuronList)
     network.addNetworkModels(region1_to_2_weights)
 
     // TODO: Temp because excitatory ratio not working
     region1.randomizeIncomingWeights()
     region2.randomizeIncomingWeights()
-
 
     // Location of the network in the desktop
     withGui {

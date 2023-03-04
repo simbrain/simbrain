@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.createNeuronCollection
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.KNNClassifier
@@ -24,7 +24,7 @@ val irisClassifier = newSim {
     val iris = Read.arff("simulations/tables/iris.arff")
 
     // Add a neuron collection for setting inputs to the network
-    val inputNc = network.createNeuronCollection(4)
+    val inputNc = network.addNeuronCollection(4)
     inputNc.label = "Inputs"
     inputNc.setClamped(true)
     inputNc.location = point(0, 0)

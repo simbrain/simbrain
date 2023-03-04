@@ -119,9 +119,7 @@ public class NetworkUpdateManager {
 
         return availableActionList;
     }
-    /**
-     * Return the list of current update actions.
-     */
+
     public List<UpdateAction> getActionList() {
         return actionList;
     }
@@ -143,6 +141,13 @@ public class NetworkUpdateManager {
     public void addAction(UpdateAction action) {
         actionList.add(action);
         network.getEvents().getUpdateActionsChanged().fireAndForget();
+    }
+
+    /**
+     * Add an action at a specified position, i.e. update order.
+     */
+    public void addAction(int index, UpdateAction action) {
+        actionList.add(index, action);
     }
 
     /**

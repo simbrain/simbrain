@@ -279,7 +279,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         n.getEvents().getLocationChanged().on(() -> events.getLocationChanged().fireAndForget());
         // n.getEvents().onLocationChange(fireLocationChange); // TODO Reimplement when debounce is working
         n.getEvents().getDeleted().on(neuronList::remove);
-        n.getEvents().getActivationChanged().on(null, true, (aold,anew) -> {
+        n.getEvents().getActivationChanged().on((aold,anew) -> {
             invalidateCachedActivations();
         });
         n.getEvents().getDeleted().on(neuron-> {

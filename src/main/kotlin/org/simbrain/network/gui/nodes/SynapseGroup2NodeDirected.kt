@@ -5,6 +5,7 @@ import org.simbrain.util.component1
 import org.simbrain.util.component2
 import org.simbrain.util.line
 import org.simbrain.util.p
+import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
 
 /**
@@ -21,7 +22,7 @@ class SynapseGroup2NodeDirected(private val synapseGroupNode: SynapseGroup2Node)
     private val target = synapseGroupNode.synapseGroup.target
     private fun isBidirectional() = target.outgoingSg.any { it.target == source }
 
-    private val arrow = bezierArrow {
+    private val arrow: BezierArrow = bezierArrow {
 
         lateralOffset {
             if (isBidirectional()) 0.35 else 0.5

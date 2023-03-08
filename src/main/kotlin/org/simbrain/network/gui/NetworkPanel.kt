@@ -311,7 +311,13 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun createNode(synapseGroup: SynapseGroup2) = addScreenElement {
-        synapseGroup.synapses.map { s -> createNode(s) }
+        with(synapseGroup.synapses) {
+            if (size < network.synapseGroupExpendedVisibilityThreshold) {
+                forEach {
+                    createNode(it)
+                }
+            }
+        }
         SynapseGroup2Node(this, synapseGroup)
     }
 

@@ -65,8 +65,15 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         interactionBox = SynapseGroup2InteractionBox(networkPanel, synapseGroup, this)
         interactionBox.setText(synapseGroup.label)
         addChild(interactionBox)
-        synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) { layoutChildren() }
-        synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) { layoutChildren() }
+        fun invalidateArrow() {
+            when (currentNode) {
+                directedNode -> directedNode?.invalidateFullBounds()
+                recurrentNode -> recurrentNode?.invalidateFullBounds()
+                expandedNode -> expandedNode?.invalidateFullBounds()
+            }
+        }
+        synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) { invalidateArrow() }
+        synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) { invalidateArrow() }
 
         // Handle events
         val events = synapseGroup.events
@@ -132,9 +139,6 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         raiseToTop()
     }
 
-    override fun layoutChildren() {
-        currentNode!!.layoutChildren()
-    }
 
     /**
      * Update the text in the interaction box.

@@ -121,7 +121,7 @@ class SynapseGroup2InteractionBox(
 
         // Synapse Visibility
         menu.addSeparator()
-        menu.add(networkPanel.networkActions.synapseGroupVisibilityAction)
+        menu.add(networkPanel.networkActions.createSynapseGroupVisibilityAction())
 
         // Coupling menu
         val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(synapseGroup)

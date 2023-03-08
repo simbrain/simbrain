@@ -25,8 +25,10 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
+import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -400,7 +402,11 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
 
         @Consumable()
         public void setValue(double value) {
-            series.add(timeSupplier.get(), (Number) value);
+            try {
+                SwingUtilities.invokeAndWait(() -> series.add(timeSupplier.get(), (Number) value));
+            } catch (InterruptedException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override

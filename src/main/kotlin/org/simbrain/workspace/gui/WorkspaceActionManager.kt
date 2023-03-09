@@ -21,7 +21,10 @@ package org.simbrain.workspace.gui
 import org.simbrain.console.ConsoleComponent
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
-import org.simbrain.util.*
+import org.simbrain.util.CmdOrCtrl
+import org.simbrain.util.KeyCombination
+import org.simbrain.util.createAction
+import org.simbrain.util.displayInDialog
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import java.awt.event.KeyEvent
 import javax.swing.Action
@@ -33,7 +36,7 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
 
     val workspace = desktop.workspace
 
-    val newNetworkAction = desktop.desktopPane.createSuspendAction(
+    val newNetworkAction = desktop.desktopPane.createAction(
         iconPath = "menu_icons/Network.png",
         name = "New network",
         description = "Add a new network to the desktop",

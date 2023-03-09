@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-val useEventDebug = false
+val useEventDebug = true
 
 /**
  * Event objects corresponding to no-arg, adding, removing, and changing objects. Each object has a set of functions

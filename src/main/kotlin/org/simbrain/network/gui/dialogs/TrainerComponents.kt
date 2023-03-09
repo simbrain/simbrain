@@ -13,7 +13,6 @@ import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.Utils.round
 import org.simbrain.util.createAction
-import org.simbrain.util.createSuspendAction
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
@@ -35,7 +34,7 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
 
     var numTicks = 1000
 
-    private val runAction = createSuspendAction(
+    private val runAction = createAction(
         name = "Run",
         iconPath ="menu_icons/Play.png",
         description = "Iterate training until stop button is pressed."
@@ -43,7 +42,7 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         lmsTrainer.startTraining()
     }
 
-    private val stopAction = createSuspendAction(
+    private val stopAction = createAction(
         name = "Stop",
         iconPath = "menu_icons/Stop.png",
         description = "Stop training."
@@ -51,7 +50,7 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         lmsTrainer.stopTraining()
     }
 
-    private val stepAction = createSuspendAction(
+    private val stepAction = createAction(
         "menu_icons/Step.png", description = "Iterate training once."
     ) {
         lmsTrainer.iterate()

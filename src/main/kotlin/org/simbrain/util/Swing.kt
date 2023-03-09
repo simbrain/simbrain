@@ -2,8 +2,7 @@ package org.simbrain.util
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction
+import kotlinx.coroutines.runBlocking
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.Component
@@ -105,15 +104,16 @@ inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {
 }
 
 /**
- * Similar to Utils.createAction but using Kotlin context. Can be used with any JComponent.
+ * The base createAction function. Requires a list of key combos. See other versions if only one or no keyboard shortcut was used.
  */
 fun <T : JComponent> T.createAction(
     iconPath: String? = null,
     name: String? = null,
     description: String? = null,
-    keyCombo: KeyCombination? = null,
+    keyCombos: List<KeyCombination>,
     initBlock: AbstractAction.() -> Unit = {},
-    block: T.(e: ActionEvent) -> Unit
+    coroutineScope: CoroutineScope? = null,
+    block: suspend T.(e: ActionEvent) -> Unit
 ): AbstractAction {
     return object : AbstractAction() {
         init {
@@ -123,7 +123,7 @@ fun <T : JComponent> T.createAction(
 
             putValue(NAME, name)
             putValue(SHORT_DESCRIPTION, description)
-            if (keyCombo != null) {
+            keyCombos.forEach { keyCombo ->
                 keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
                 this@createAction.bindTo(keyCombo, this)
             }
@@ -132,13 +132,32 @@ fun <T : JComponent> T.createAction(
         }
 
         override fun actionPerformed(e: ActionEvent) {
-            block(e)
+            if (coroutineScope != null) {
+                coroutineScope.launch { block(e) }
+            } else if (this@createAction is CoroutineScope) {
+                this@createAction.launch { block(e) }
+            } else {
+                runBlocking { block(e) }
+            }
         }
     }
 }
 
 /**
- * Create an action when no JComponent available. Key combo's not possible.
+ * The [createAction] with one or no keyboard shortcut.
+ */
+fun <T : JComponent> T.createAction(
+    iconPath: String? = null,
+    name: String? = null,
+    description: String? = null,
+    keyCombo: KeyCombination? = null,
+    initBlock: AbstractAction.() -> Unit = {},
+    coroutineScope: CoroutineScope? = null,
+    block: suspend T.(e: ActionEvent) -> Unit
+) = createAction(iconPath, name, description, keyCombo?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
+
+/**
+ * Create an action when no JComponent available. Keyboard shortcuts are not possible.
  */
 fun createAction(
     iconPath: String? = null,
@@ -162,107 +181,8 @@ fun createAction(
     }
 }
 
-fun <T> T.createSuspendAction(
-    iconPath: String? = null,
-    name: String? = null,
-    description: String? = null,
-    keyCombo: KeyCombination? = null,
-    block: suspend T.(e: ActionEvent) -> Unit
-): AbstractAction where T : JComponent, T : CoroutineScope {
-    return object : AbstractAction() {
-        init {
-            if (iconPath != null) {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
-            }
-
-            putValue(NAME, name)
-            putValue(SHORT_DESCRIPTION, description)
-            if (keyCombo != null) {
-                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
-                this@createSuspendAction.bindTo(keyCombo, this)
-            }
-        }
-
-        override fun actionPerformed(e: ActionEvent) {
-            launch { block(e) }
-        }
-    }
-}
-
-fun <T> T.createSuspendAction(
-    iconPath: String? = null,
-    name: String? = null,
-    description: String? = null,
-    keyCombo: KeyCombination? = null,
-    coroutineScope: CoroutineScope,
-    block: suspend T.(e: ActionEvent) -> Unit
-): AbstractAction where T : JComponent {
-    return object : AbstractAction() {
-        init {
-            if (iconPath != null) {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
-            }
-
-            putValue(NAME, name)
-            putValue(SHORT_DESCRIPTION, description)
-            if (keyCombo != null) {
-                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
-                this@createSuspendAction.bindTo(keyCombo, this)
-            }
-        }
-
-        override fun actionPerformed(e: ActionEvent) {
-            coroutineScope.launch { block(e) }
-        }
-    }
-}
-
-fun NetworkPanel.createConditionallyEnabledAction(
-    iconPath: String? = null,
-    name: String,
-    enablingCondition: ConditionallyEnabledAction.EnablingCondition,
-    description: String = name,
-    keyCombos: List<KeyCombination>,
-    block: suspend NetworkPanel.() -> Unit
-): AbstractAction {
-    return object : ConditionallyEnabledAction(this, name, enablingCondition) {
-        init {
-            if (iconPath != null) {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
-            }
-
-            putValue(NAME, name)
-            putValue(SHORT_DESCRIPTION, description)
-            keyCombos.forEach { keyCombo ->
-                keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
-                this@createConditionallyEnabledAction.bindTo(keyCombo, this)
-            }
-        }
-
-        override fun actionPerformed(e: ActionEvent) {
-            launch { block() }
-        }
-    }
-}
-
-fun NetworkPanel.createConditionallyEnabledAction(
-    iconPath: String? = null,
-    name: String,
-    enablingCondition: ConditionallyEnabledAction.EnablingCondition,
-    description: String = name,
-    keyCombo: KeyCombination? = null,
-    block: suspend NetworkPanel.() -> Unit
-) = createConditionallyEnabledAction(
-    iconPath,
-    name,
-    enablingCondition,
-    description,
-    keyCombo?.let { listOf(it) } ?: listOf(),
-    block
-)
-
 /**
- * Create an action with a char rather than a key combination
+ * [createAction] with a char rather than a keyboard shortcut
  */
 fun <T : JComponent> T.createAction(
     iconPath: String = "",
@@ -270,9 +190,18 @@ fun <T : JComponent> T.createAction(
     description: String = "",
     keyCombo: Char,
     initBlock: AbstractAction.() -> Unit = {},
-    block: T.(e: ActionEvent) -> Unit
+    coroutineScope: CoroutineScope? = null,
+    block: suspend T.(e: ActionEvent) -> Unit
 ): AbstractAction {
-    return createAction(iconPath, name, description, KeyCombination(keyCombo), initBlock, block)
+    return createAction(
+        iconPath = iconPath,
+        name = name,
+        description = description,
+        keyCombos = listOf(KeyCombination(keyCombo)),
+        initBlock = initBlock,
+        coroutineScope = coroutineScope,
+        block = block
+    )
 }
 
 /**

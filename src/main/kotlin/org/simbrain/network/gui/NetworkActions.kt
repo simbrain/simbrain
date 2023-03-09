@@ -60,7 +60,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         launch { deleteSelectedObjects() }
     }
     val neuronCollectionAction = NeuronCollectionAction(networkPanel)
-    val newNeuronAction = networkPanel.createSuspendAction(
+    val newNeuronAction = networkPanel.createAction(
         name = "Add Neuron",
         description = """Add or "put" new node (p)""",
         iconPath = "menu_icons/AddNeuron.png",
@@ -95,7 +95,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val showMainToolBarAction = ShowMainToolBarAction(networkPanel)
 
-    val showNetworkUpdaterDialog = networkPanel.createSuspendAction(
+    val showNetworkUpdaterDialog = networkPanel.createAction(
         name = "Edit Update Sequence...",
         description = "Edit the update sequence for this network",
         iconPath = "menu_icons/Sequence.png"
@@ -103,7 +103,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         NetworkUpdateManagerPanel(networkPanel.network).displayInDialog()
     }
 
-    val showNetworkPreferencesAction = networkPanel.createSuspendAction(
+    val showNetworkPreferencesAction = networkPanel.createAction(
         name = "Network Preferences...",
         description = "Show the network preference dialog",
         iconPath = "menu_icons/Prefs.png",
@@ -112,7 +112,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         NetworkDialog(networkPanel).display()
     }
 
-    val iterateNetworkAction = networkPanel.createSuspendAction(
+    val iterateNetworkAction = networkPanel.createAction(
         name = "Iterate network",
         description = "Step network update algorithm (\"spacebar\")",
         iconPath = "menu_icons/Step.png",
@@ -346,7 +346,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     /**
      * Quick create 100 nodes
      */
-    val fast100 = networkPanel.createSuspendAction(
+    val fast100 = networkPanel.createAction(
         name = "Add 100 nodes",
     ) {
         List(100) { Neuron(network) }.apply {

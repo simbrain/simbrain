@@ -134,6 +134,7 @@ public class ProjectionComponent extends WorkspaceComponent implements Attribute
         System.out.println("--------------------------------------");
     }
 
+    // TODO: Replace with prediction error?
     /**
      * Probability of the current point relative to past predictions. Only works
      * with Bayesian coloring

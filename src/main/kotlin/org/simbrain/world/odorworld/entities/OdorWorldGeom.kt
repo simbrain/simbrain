@@ -58,6 +58,9 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
         }
 }
 
+/**
+ * Heading in degrees with 0 facing right.
+ */
 interface Rotatable {
     var heading: Double
 }

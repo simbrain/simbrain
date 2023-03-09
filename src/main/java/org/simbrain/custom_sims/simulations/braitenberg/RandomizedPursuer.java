@@ -24,9 +24,8 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import java.util.Arrays;
 
 /**
- * Create a Braitenberg pursuer with a projection plot to sensor neurons.
- * Button to run it from randomized spots to creates a cognitive map
- * of its input space.
+ * Create a Braitenberg pursuer with a projection plot to sensor neurons and study the maps that develop within it.
+ * Prediction plot gives a sense of when the model is working well.
  */
 public class RandomizedPursuer extends Simulation {
 
@@ -62,8 +61,11 @@ public class RandomizedPursuer extends Simulation {
         // Build the network
         buildNetwork();
 
+        // TODO: Commenting this out for now. The button doesn't do much
         // Set up control panel
-        setUpControlPanel();
+        // setUpControlPanel();
+        mouse.setLocation(50, 50);
+        mouse.setHeading(-45);
 
         // Set up Plots
         setUpPlots();
@@ -77,7 +79,7 @@ public class RandomizedPursuer extends Simulation {
 
     private void createOdorWorld() {
 
-        oc = sim.addOdorWorld(626,8,378,297, "World");
+        oc = sim.addOdorWorld(440,8,378,297, "World");
         oc.getWorld().setObjectsBlockMovement(false);
 
         mouse = oc.getWorld().addEntity(0, 0, EntityType.MOUSE);
@@ -93,7 +95,7 @@ public class RandomizedPursuer extends Simulation {
     }
 
     private void buildNetwork() {
-        nc = sim.addNetwork(179,8,447,296, "Pursuer");
+        nc = sim.addNetwork(10,8,447,296, "Pursuer");
         Network net = nc.getNetwork();
         Vehicle pursuer = new Vehicle(sim, net);
         vehicleNetwork = pursuer.addPursuer(10, 10,
@@ -111,7 +113,7 @@ public class RandomizedPursuer extends Simulation {
     private void setUpPlots() {
 
         // Projection plot
-        ProjectionComponent projComp = sim.addProjectionPlot(178,304,441,308, "Sensory states");
+        ProjectionComponent projComp = sim.addProjectionPlot(10,304,441,308, "Sensory states");
         Projector proj = projComp.getProjector();
         proj.setTolerance(1);
         //proj.setProjectionMethod("Coordinate Projection");
@@ -123,7 +125,7 @@ public class RandomizedPursuer extends Simulation {
         projComp.getProjector().getColorManager().setColoringMethod("Bayesian");
 
         // Time series
-        TimeSeriesPlotComponent tsPlot = sim.addTimeSeries(619,304,384,308, "Prediction");
+        TimeSeriesPlotComponent tsPlot = sim.addTimeSeries(440,304,384,308, "Prediction Error");
         tsPlot.getModel().setAutoRange(false);
         tsPlot.getModel().setFixedWidth(false);
         tsPlot.getModel().setWindowSize(1000);

@@ -79,7 +79,7 @@ public class KuramotoOscillators extends Simulation {
     private void setUpNetwork() {
 
         // Set up network
-        NetworkComponent nc = sim.addNetwork(10,10,337,499,
+        NetworkComponent nc = sim.addNetwork(10,10,436,689,
             "Patterns of Activity");
         net = nc.getNetwork();
         net.setTimeStep(0.5);
@@ -104,7 +104,7 @@ public class KuramotoOscillators extends Simulation {
         reservoirNet = new NeuronGroup(net, neuronList);
         reservoirNet.setLayout(new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(neuronList.size())));
         net.addNetworkModel(reservoirNet);
-        reservoirNet.setLocation(150,-242);
+        reservoirNet.setLocation(185,50);
         reservoirNet.applyLayout(-5, -85);
         reservoirNet.setLabel("Recurrent Layer");
 
@@ -119,22 +119,23 @@ public class KuramotoOscillators extends Simulation {
 
         // Inputs
         inputNetwork = net.addNeuronGroup(1, 1, 3);
-        inputNetwork.setLocation(reservoirNet.getCenterX() - inputNetwork.getWidth()/2, reservoirNet.getMaxY()+150);
         inputNetwork.setLowerBound(-100);
         inputNetwork.setUpperBound(100);
-        net.addNetworkModel(inputNetwork);
         inputNetwork.setLabel("Sensory Neurons");
+        net.addNetworkModel(inputNetwork);
 
         // Inputs to reservoir
         SynapseGroup2 inpSynG = SynapseGroup.createSynapseGroup(inputNetwork, reservoirNet,
             new Sparse(0.7, true, false));
         // TODO
         // inpSynG.setStrength(40, Polarity.EXCITATORY);
-        // inpSynG.setRandomizers(NormalDistri bution.builder().mean(10).standardDeviation(2.5).build(),
+        // inpSynG.setRandomizers(NormalDistribution.builder().mean(10).standardDeviation(2.5).build(),
         //     NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         inpSynG.randomize();
         inpSynG.setDisplaySynapses(false);
         net.addNetworkModel(inpSynG);
+
+        inputNetwork.setLocation(130, 660);
 
         // Couple from mouse to input nodes
         sim.couple(smellSensor, inputNetwork);
@@ -142,7 +143,7 @@ public class KuramotoOscillators extends Simulation {
         // Prediction net
         predictionRes = net.addNeuronGroup(1,1,  netSize);
         HexagonalGridLayout.layoutNeurons(predictionRes.getNeuronList(), spacing, spacing);
-        predictionRes.setLocation(reservoirNet.getMinX()-reservoirNet.getWidth() - 300, reservoirNet.getMinY()-100);
+        predictionRes.setLocation(500, 63);
         predictionRes.setLabel("Predicted States");
         predictionRes.setLowerBound(-10);
         predictionRes.setUpperBound(10);
@@ -152,7 +153,7 @@ public class KuramotoOscillators extends Simulation {
         net.addUpdateAction((new TrainPredictionNet(this)));
 
         // Error
-        errorNeuron = net.addNeuron((int) predictionRes.getMinX()-70, (int) predictionRes.getMinY()-45);
+        errorNeuron = net.addNeuron(380, 500);
         errorNeuron.setClamped(true);
         errorNeuron.setLabel("Error");
 
@@ -161,7 +162,7 @@ public class KuramotoOscillators extends Simulation {
     private void setUpWorld() {
 
         // Set up odor world
-        OdorWorldComponent oc = sim.addOdorWorld(346,10,510,499, "World");
+        OdorWorldComponent oc = sim.addOdorWorld(465, 7, 430, 430, "World");
         oc.getWorld().setObjectsBlockMovement(false);
         oc.getWorld().setUseCameraCentering(false);
         oc.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
@@ -187,7 +188,7 @@ public class KuramotoOscillators extends Simulation {
     private void setUpProjectionPlot() {
 
         // Projection of main reservoir
-        plot = sim.addProjectionPlot(855,10,452,499,"Cognitive Map");
+        plot = sim.addProjectionPlot(467,412,410,278,"Cognitive Map");
         plot.getProjector().init(reservoirNet.size());
         plot.getProjector().setTolerance(1);
         //plot.getProjector().setUseColorManager(false);
@@ -196,7 +197,7 @@ public class KuramotoOscillators extends Simulation {
         sim.couple(inputProducer, plotConsumer);
 
         // Text of nearest world object to projection plot current dot
-        // Producer currentObject = sim.getProducer(mouse, "getNearbyObjects");
+        // Producer currentObject = sim.getProducer(mouse, "getNearestObjectName");
         // Consumer plotText = sim.getConsumer(plot, "setLabel");
         // sim.couple(currentObject, plotText);
 

@@ -17,7 +17,6 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
 import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
-import org.simbrain.custom_sims.simulations.patterns_of_activity.ModularOscillatoryNetwork
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity
 import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main
 import org.simbrain.custom_sims.simulations.sorn.SORN
@@ -72,7 +71,8 @@ val simulations = dir<Any>("Simulations") {
         }
         dir("Cognitive Maps") {
             item("Agent Trails") { kAgentTrails }
-            item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
+            item("RandomizedPursuer") { RandomizedPursuer() }
+            // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
             item("KuramotoOscillators") {KuramotoOscillators()}
         }
         dir("RL") {
@@ -80,7 +80,6 @@ val simulations = dir<Any>("Simulations") {
             item("Actor Critic") { ActorCritic() }
         }
         dir("Agents") {
-            item("RandomizedPursuer") { RandomizedPursuer() }
             item("Isopod Simulation") { isopodSim }
             item("Braitenberg") { Braitenberg() }
         }

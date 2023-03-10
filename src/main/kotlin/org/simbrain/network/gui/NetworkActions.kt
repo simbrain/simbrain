@@ -55,7 +55,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = """Delete selected node(s) ("Backspace" or "Delete")""",
         enablingCondition = EnablingCondition.ALLITEMS,
         iconPath = "menu_icons/DeleteNeuron.png",
-        keyCombos = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
+        keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
     ) {
         launch { deleteSelectedObjects() }
     }
@@ -64,7 +64,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Add Neuron",
         description = """Add or "put" new node (p)""",
         iconPath = "menu_icons/AddNeuron.png",
-        keyCombo = KeyCombination('P')
+        keyboardShorcut = KeyCombination('P')
     ) {
         val neuron = Neuron(network)
         network.addNetworkModel(neuron)?.join()
@@ -107,7 +107,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Network Preferences...",
         description = "Show the network preference dialog",
         iconPath = "menu_icons/Prefs.png",
-        keyCombo = CmdOrCtrl + ','
+        keyboardShorcut = CmdOrCtrl + ','
     ) {
         NetworkDialog(networkPanel).display()
     }
@@ -116,7 +116,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Iterate network",
         description = "Step network update algorithm (\"spacebar\")",
         iconPath = "menu_icons/Step.png",
-        keyCombo = KeyCombination(KeyEvent.VK_SPACE)
+        keyboardShorcut = KeyCombination(KeyEvent.VK_SPACE)
     ) {
         networkPanel.network.update()
     }
@@ -125,7 +125,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.createAction(
             name = "Add Deep Network...",
             description = "Deep Network is not currently supported on M1 Macs",
-            keyCombo = CmdOrCtrl + Shift + 'D'
+            keyboardShorcut = CmdOrCtrl + Shift + 'D'
         ) {
             JOptionPane.showConfirmDialog(
                 null,
@@ -136,7 +136,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.createAction(
             name = "Add Deep Network...",
             description = "Create a new deep network",
-            keyCombo = CmdOrCtrl + Shift + 'D'
+            keyboardShorcut = CmdOrCtrl + Shift + 'D'
         ) {
             showDeepNetCreationDialog()
         }
@@ -148,7 +148,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val toggleFreeWeightVisibility = networkPanel.createAction(
         name = "Toggle Weight Visibility",
         description = "Toggle visibilty of free weights",
-        keyCombo = KeyCombination('5')
+        keyboardShorcut = KeyCombination('5')
     ) { event ->
         event.source.let {
             if (it is JCheckBoxMenuItem) {
@@ -162,7 +162,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val addSmileClassifier = networkPanel.createAction(
         name = "Add Smile Classifier...",
         description = "Create a new Smile classifier",
-        keyCombo = CmdOrCtrl + Shift + 'S'
+        keyboardShorcut = CmdOrCtrl + Shift + 'S'
     ) {
         showClassifierCreationDialog()
     }
@@ -207,7 +207,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val showSynapseAdjustmentPanel = networkPanel.createConditionallyEnabledAction(
         iconPath = "menu_icons/Rand.png",
         name = "Weight randomization dialog...",
-        keyCombo = CmdOrCtrl + 'R',
+        keyboardShortcuts = CmdOrCtrl + 'R',
         enablingCondition = ConditionallyEnabledAction.EnablingCondition.SYNAPSES
     ) {
         createSynapseAdjustmentPanel(
@@ -271,7 +271,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     fun createSynapseGroupVisibilityAction() = networkPanel.createAction(
         name = "Toggle visibility of selected synapse groups",
-        keyCombo = CmdOrCtrl + 'T',
+        keyboardShorcut = CmdOrCtrl + 'T',
         initBlock = {
             isEnabled = networkPanel.selectionManager.filterSelectedModels<SynapseGroup2>().isNotEmpty() &&
                     networkPanel.selectionManager.filterSelectedModels<SynapseGroup2>().none {
@@ -336,7 +336,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val fastGridAction = networkPanel.createConditionallyEnabledAction(
         name = "Apply grid layout to selected nodes",
-        keyCombo = CmdOrCtrl + 'L',
+        keyboardShortcuts = CmdOrCtrl + 'L',
         enablingCondition = ConditionallyEnabledAction.EnablingCondition.NEURONS
     ) {
         GridLayout().layoutNeurons(selectionManager.filterSelectedModels<Neuron>())

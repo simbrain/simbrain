@@ -15,13 +15,13 @@ fun NetworkPanel.createConditionallyEnabledAction(
     name: String,
     enablingCondition: ConditionallyEnabledAction.EnablingCondition,
     description: String = name,
-    keyCombos: List<KeyCombination>,
+    keyboardShortcuts: List<KeyCombination>,
     block: suspend NetworkPanel.(e: ActionEvent) -> Unit
 ) = this.createAction(
     iconPath = iconPath,
     name = name,
     description = description,
-    keyCombos = keyCombos,
+    keyboardShortcuts = keyboardShortcuts,
     initBlock = {
         fun updateAction() {
             isEnabled = selectionManager.checkEnablingFunction(enablingCondition)
@@ -41,13 +41,13 @@ fun NetworkPanel.createConditionallyEnabledAction(
     name: String,
     enablingCondition: ConditionallyEnabledAction.EnablingCondition,
     description: String = name,
-    keyCombo: KeyCombination? = null,
+    keyboardShortcuts: KeyCombination? = null,
     block: suspend NetworkPanel.(e: ActionEvent) -> Unit
 ) = this.createConditionallyEnabledAction(
     iconPath,
     name,
     enablingCondition,
     description,
-    keyCombo?.let { listOf(it) } ?: listOf(),
+    keyboardShortcuts?.let { listOf(it) } ?: listOf(),
     block
 )

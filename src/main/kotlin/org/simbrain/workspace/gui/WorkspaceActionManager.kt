@@ -18,56 +18,29 @@
  */
 package org.simbrain.workspace.gui
 
-import org.simbrain.console.ConsoleComponent
-import org.simbrain.docviewer.DocViewerComponent
-import org.simbrain.network.NetworkComponent
 import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
 import org.simbrain.util.displayInDialog
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
-import java.awt.event.KeyEvent
 import javax.swing.Action
 
 /**
  * Workspace action manager contains references to all the actions for a Workspace.
  */
-class WorkspaceActionManager(desktop: SimbrainDesktop) {
+class WorkspaceActionManager(val desktop: SimbrainDesktop) {
 
     val workspace = desktop.workspace
 
-    val newNetworkAction = desktop.desktopPane.createAction(
-        iconPath = "menu_icons/Network.png",
-        name = "New network",
-        description = "Add a new network to the desktop",
-        keyCombo = CmdOrCtrl + 'N',
-        coroutineScope = workspace
-    ) {
-        workspace.addWorkspaceComponent(NetworkComponent(""))
-    }
-
-    val newConsoleAction = desktop.desktopPane.createAction(
-        iconPath = "menu_icons/Terminal2.png",
-        name = "New console",
-        description = "Add a new console (terminal window) to the desktop"
-    ) {
-        val console = ConsoleComponent("")
-        workspace.addWorkspaceComponent(console)
-    }
-
-    val newDocViewerAction = desktop.desktopPane.createAction(
-        iconPath = "menu_icons/Copy.png",
-        name = "New doc viewer",
-        description = "Add a new document viewer window to the desktop"
-    ) {
-        val docViewer = DocViewerComponent()
-        workspace.addWorkspaceComponent(docViewer)
-    }
+    val newNetworkAction = createComponentFactoryAction("Network", "menu_icons/Network.png", CmdOrCtrl + 'N')
+    val newConsoleAction = createComponentFactoryAction("Console", "menu_icons/Terminal2.png")
+    val newDocViewerAction = createComponentFactoryAction("Document Viewer", "menu_icons/Copy.png")
 
     val clearWorkspaceAction = desktop.desktopPane.createAction(
         name = "Clear desktop",
         description = "Remove all windows from the desktop",
-        keyCombo = CmdOrCtrl + 'K'
+        keyboardShorcut = CmdOrCtrl + 'K',
+        coroutineScope = workspace
     ) {
         desktop.clearDesktop()
     }
@@ -75,7 +48,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     val openWorkspaceAction = desktop.desktopPane.createAction(
         iconPath = "menu_icons/Open.png",
         name = "Open Workspace File (.zip) ...",
-        description = "Open a workspace file from .zip"
+        description = "Open a workspace file from .zip",
+        coroutineScope = workspace
     ) {
         desktop.openWorkspace()
     }
@@ -84,7 +58,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
         iconPath = "menu_icons/Save.png",
         name = "Save workspace",
         description = "Save current workspace file",
-        keyCombo = CmdOrCtrl + 'S'
+        keyboardShorcut = CmdOrCtrl + 'S',
+        coroutineScope = workspace
     ) {
         desktop.save()
     }
@@ -92,7 +67,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     private val saveWorkspaceAsAction = desktop.desktopPane.createAction(
         iconPath = "menu_icons/Save.png",
         name = "Save workspace as...",
-        description = "Save current workspace file as .zip"
+        description = "Save current workspace file as .zip",
+        coroutineScope = workspace
     ) {
         desktop.saveAs()
     }
@@ -100,7 +76,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     val quitWorkspaceAction = desktop.desktopPane.createAction(
         name = "Quit Simbrain",
         description = "Quit Simbrain",
-        keyCombo = CmdOrCtrl + 'Q'
+        keyboardShorcut = CmdOrCtrl + 'Q',
+        coroutineScope = workspace
     ) {
         desktop.quit(false)
     }
@@ -113,7 +90,7 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
             workspace.updater.events.runStarted.on { isEnabled = false }
             workspace.updater.events.runFinished.on { isEnabled = true }
         },
-        keyCombo = KeyCombination(KeyEvent.VK_SPACE)
+        coroutineScope = workspace
     ) {
         workspace.iterate()
     }
@@ -121,7 +98,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     val runAction = desktop.desktopPane.createAction(
         iconPath = "menu_icons/Play.png",
         name = "Run",
-        description = "Run workspace"
+        description = "Run workspace",
+        coroutineScope = workspace
     ) {
         workspace.run()
     }
@@ -129,7 +107,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     val stopAction = desktop.desktopPane.createAction(
         iconPath = "menu_icons/Stop.png",
         name = "Stop",
-        description = "Stop workspace"
+        description = "Stop workspace",
+        coroutineScope = workspace
     ) {
         workspace.stop()
     }
@@ -137,7 +116,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     val openCouplingManagerAction = desktop.desktopPane.createAction(
         iconPath = "menu_icons/Coupling.png",
         name = "Open coupling manager...",
-        description = "Open workspace coupling manager."
+        description = "Open workspace coupling manager.",
+        coroutineScope = workspace
     ) {
         DesktopCouplingManager(desktop).displayInDialog {  }
     }
@@ -145,7 +125,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     val openCouplingListAction = desktop.desktopPane.createAction(
         iconPath = "menu_icons/CouplingList.png",
         name = "Open coupling list...",
-        description = "Open list of workspace couplings."
+        description = "Open list of workspace couplings.",
+        coroutineScope = workspace
     ) {
         CouplingListPanel(desktop, desktop.workspace.couplings).displayInDialog {  }
     }
@@ -153,7 +134,8 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     val propertyTabAction = desktop.desktopPane.createAction(
         iconPath = "menu_icons/systemMonitor.png",
         name = "Show / hide dock",
-        description = "Toggle dock visibility."
+        description = "Toggle dock visibility.",
+        coroutineScope = workspace
     ) {
         desktop.toggleDock()
     }
@@ -161,21 +143,24 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
     val showUpdaterDialog = desktop.desktopPane.createAction(
         iconPath = "menu_icons/Sequence.png",
         name = "Edit Update Sequence...",
-        description = "Edit workspace update actions"
+        description = "Edit workspace update actions",
+        coroutineScope = workspace
     ) {
         WorkspaceUpdateManagerPanel(workspace).displayInDialog {  }
     }
 
     val repositionAllWindowsAction = desktop.desktopPane.createAction(
         name = "Gather windows",
-        description = "Repositions and resize all windows. Useful when windows get \"lost\" offscreen."
+        description = "Repositions and resize all windows. Useful when windows get \"lost\" offscreen.",
+        coroutineScope = workspace
     ) {
         desktop.repositionAllWindows()
     }
 
     val resizeAllWindowsAction = desktop.desktopPane.createAction(
         name = "Resize windows",
-        description = "Resize all windows on screen so they fit on the current desktop. Useful when windows get \"lost\" offscreen."
+        description = "Resize all windows on screen so they fit on the current desktop. Useful when windows get \"lost\" offscreen.",
+        coroutineScope = workspace
     ) {
         desktop.resizeAllWindows()
     }
@@ -186,12 +171,15 @@ class WorkspaceActionManager(desktop: SimbrainDesktop) {
 
     fun createComponentFactoryAction(
         name: String,
-        iconPath: String
+        iconPath: String,
+        keyboardShortcut: KeyCombination? = null
     ): Action {
-        return createAction(
+        return desktop.desktopPane.createAction(
             name = name,
             iconPath = iconPath,
-            description = "Create $name"
+            description = "Create $name",
+            keyboardShorcut = keyboardShortcut,
+            coroutineScope = workspace
         ) {
             workspace.componentFactory.createWorkspaceComponent(name)
         }

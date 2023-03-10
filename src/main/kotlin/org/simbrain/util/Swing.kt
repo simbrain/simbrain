@@ -110,7 +110,7 @@ fun <T : JComponent> T.createAction(
     iconPath: String? = null,
     name: String? = null,
     description: String? = null,
-    keyCombos: List<KeyCombination>,
+    keyboardShortcuts: List<KeyCombination>,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
     block: suspend T.(e: ActionEvent) -> Unit
@@ -118,12 +118,12 @@ fun <T : JComponent> T.createAction(
     return object : AbstractAction() {
         init {
             if (iconPath != null) {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon(iconPath))
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon(iconPath))
             }
 
             putValue(NAME, name)
             putValue(SHORT_DESCRIPTION, description)
-            keyCombos.forEach { keyCombo ->
+            keyboardShortcuts.forEach { keyCombo ->
                 keyCombo.withKeyStroke { putValue(ACCELERATOR_KEY, it) }
                 this@createAction.bindTo(keyCombo, this)
             }
@@ -150,11 +150,11 @@ fun <T : JComponent> T.createAction(
     iconPath: String? = null,
     name: String? = null,
     description: String? = null,
-    keyCombo: KeyCombination? = null,
+    keyboardShorcut: KeyCombination? = null,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
     block: suspend T.(e: ActionEvent) -> Unit
-) = createAction(iconPath, name, description, keyCombo?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
+) = createAction(iconPath, name, description, keyboardShorcut?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
 
 /**
  * Create an action when no JComponent available. Keyboard shortcuts are not possible.
@@ -188,7 +188,7 @@ fun <T : JComponent> T.createAction(
     iconPath: String = "",
     name: String = "",
     description: String = "",
-    keyCombo: Char,
+    keyboardShortcut: Char,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
     block: suspend T.(e: ActionEvent) -> Unit
@@ -197,7 +197,7 @@ fun <T : JComponent> T.createAction(
         iconPath = iconPath,
         name = name,
         description = description,
-        keyCombos = listOf(KeyCombination(keyCombo)),
+        keyboardShortcuts = listOf(KeyCombination(keyboardShortcut)),
         initBlock = initBlock,
         coroutineScope = coroutineScope,
         block = block

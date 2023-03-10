@@ -27,8 +27,6 @@ import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
 import org.simbrain.world.deviceinteraction.DeviceInteractionComponent;
 import org.simbrain.world.deviceinteraction.DeviceInteractionDesktopComponent;
-import org.simbrain.world.game.GameComponent;
-import org.simbrain.world.game.GameDesktopComponent;
 import org.simbrain.world.imageworld.ImageWorldComponent;
 import org.simbrain.world.imageworld.gui.ImageWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -59,6 +57,9 @@ public class AbstractComponentFactory {
 
     public AbstractComponentFactory(Workspace workspace) {
         this.workspace = workspace;
+
+        putWorkspaceComponentFactory("Network", () -> new NetworkComponent(""));
+        putGuiComponentFactory(NetworkComponent.class, NetworkDesktopComponent::new);
 
         // World components
         putWorkspaceComponentFactory("3D World", () -> ThreeDWorldComponent.create(workspace, ""));
@@ -105,10 +106,10 @@ public class AbstractComponentFactory {
         putGuiComponentFactory(RasterPlotComponent.class, RasterPlotDesktopComponent::new);
 
         // Other
+        putWorkspaceComponentFactory("Document Viewer", () -> new DocViewerComponent(""));
         putGuiComponentFactory(DocViewerComponent.class, DocViewerDesktopComponent::new);
+        putWorkspaceComponentFactory("Console", () -> new ConsoleComponent(""));
         putGuiComponentFactory(ConsoleComponent.class, ConsoleDesktopComponent::new);
-        putGuiComponentFactory(NetworkComponent.class, NetworkDesktopComponent::new);
-        putGuiComponentFactory(GameComponent.class, GameDesktopComponent::new);
     }
 
     public void putWorkspaceComponentFactory(String name, WorkspaceComponentFactory factory) {

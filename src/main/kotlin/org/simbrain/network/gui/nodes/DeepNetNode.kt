@@ -97,7 +97,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
         // Train Submenu
         val trainDeepNet = networkPanel.createAction(
             name = "Train...",
-            keyCombo = CmdOrCtrl + 'T'
+            keyboardShorcut = CmdOrCtrl + 'T'
         ) {
             // TODO: Commented out code prevents the dialog being opened for multiple
             //  deep net nodes, but prevents it being called from right click node.

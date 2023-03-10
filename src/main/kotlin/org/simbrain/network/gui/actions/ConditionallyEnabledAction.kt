@@ -1,6 +1,5 @@
 package org.simbrain.network.gui.actions
 
-
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.NetworkSelectionManager
 import org.simbrain.network.gui.nodes.NeuronNode

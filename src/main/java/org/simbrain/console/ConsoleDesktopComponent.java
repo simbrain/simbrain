@@ -22,9 +22,14 @@ import bsh.Interpreter;
 import bsh.util.JConsole;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
+import org.simbrain.workspace.component_actions.CloseAction;
+import org.simbrain.workspace.component_actions.OpenAction;
+import org.simbrain.workspace.component_actions.SaveAction;
+import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.Executors;
 
@@ -33,12 +38,7 @@ import java.util.concurrent.Executors;
  */
 public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> {
 
-    /**
-     * Constructor.
-     *
-     * @param frame     frame of interpreter
-     * @param component workspace component
-     */
+
     public ConsoleDesktopComponent(GenericFrame frame, ConsoleComponent component) {
         super(frame, component);
         setPreferredSize(new Dimension(500, 400));
@@ -47,6 +47,17 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         Interpreter interpreter = getSimbrainInterpreter(console, super.getWorkspaceComponent().getWorkspace());
         Executors.newSingleThreadExecutor().execute(interpreter);
         add("Center", console);
+
+        JMenuBar menu = new JMenuBar();
+        getParentFrame().setJMenuBar(menu);
+        JMenu fileMenu = new JMenu("File");
+        menu.add(fileMenu);
+        fileMenu.add(new OpenAction(this));
+        fileMenu.add(new SaveAction(this));
+        fileMenu.add(new SaveAsAction(this));
+        fileMenu.addSeparator();
+        fileMenu.add(new CloseAction(getWorkspaceComponent()));
+
     }
 
     /**

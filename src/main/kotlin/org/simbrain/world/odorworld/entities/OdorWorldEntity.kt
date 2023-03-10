@@ -147,7 +147,10 @@ class OdorWorldEntity @JvmOverloads constructor(
     override val decayFunction: DecayFunction get() = smellSource.decayFunction
 
     override fun toString(): String {
-        return "name = $name type = $entityType location = (${Utils.round(x, 2)}, ${Utils.round(y, 2)})"
+        return """
+            [$name] <$entityType>
+            ${location.format(2)} ${if (isRotating) "$heading°" else ""}
+        """.trimIndent()
     }
 
     fun addEffector(effector: Effector) {

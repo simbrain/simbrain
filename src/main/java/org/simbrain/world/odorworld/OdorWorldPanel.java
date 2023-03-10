@@ -137,14 +137,37 @@ public class OdorWorldPanel extends JPanel {
         @Override
         public String getToolTipText(MouseEvent event) {
 
-            List<Tile> selectedTiles = getTileStack(event.getPoint());
-            if (selectedTiles == null) {
+            var allNode = new ArrayList<>(((Collection<PNode>) getCanvas().getLayer().getAllNodes()).stream().toList());
+            Collections.reverse(allNode);
+
+            var firstNode = allNode.stream()
+                    .filter(it -> {
+                        if (it instanceof PImage) {
+                            return true;
+                        } else if (it instanceof EntityNode) {
+                            return it.getFullBounds().contains(getCamera().localToView(event.getPoint()));
+                        }
+                        return false;
+                    })
+                    .findFirst();
+
+            if (firstNode.isEmpty()) {
                 return "";
             }
-            StringBuilder sb = new StringBuilder("Tile Ids: ");
-            selectedTiles.stream().filter(Objects::nonNull).forEach(tile -> sb.append(" (" + tile.getId() + ")"));
 
-            return sb.toString();
+            if (firstNode.get() instanceof PImage) {
+                List<Tile> selectedTiles = getTileStack(event.getPoint());
+                if (selectedTiles == null) {
+                    return "";
+                }
+                StringBuilder sb = new StringBuilder("Tile Ids: ");
+                selectedTiles.stream().filter(Objects::nonNull).forEach(tile -> sb.append(" (" + tile.getId() + ")"));
+
+                return sb.toString();
+            } else if (firstNode.get() instanceof EntityNode) {
+                return ((EntityNode) firstNode.get()).getEntity().toString();
+            }
+            return "";
         }
 
     }

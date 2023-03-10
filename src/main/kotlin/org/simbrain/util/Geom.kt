@@ -238,6 +238,8 @@ fun Point2D.withVector(u: Int, v: Int): Line2D = Line2D.Double(x, y, x + u, y + 
 
 infix fun Point2D.cross(other: Point2D) = this.x * other.y - other.x * this.y
 
+fun Point2D.format(digits: Int) = "(${x.format(digits)}, ${y.format(digits)})"
+
 sealed interface Intersection {
     data class Time(val time: Double): Intersection
     data class Point(val point: Point2D): Intersection

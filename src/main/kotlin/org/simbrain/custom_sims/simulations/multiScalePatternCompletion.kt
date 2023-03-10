@@ -1,11 +1,13 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.updateAction
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.core.addNeuronCollection
+import org.simbrain.network.core.setLabels
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
@@ -13,6 +15,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.workspace.updater.UpdateComponent
 import java.util.*
 
 /**
@@ -23,6 +26,8 @@ val multiScalePatternCompletion = newSim {
     // TODOS:
     // - Encapsulate state machine into a class
     // - Put inputs in text world with couplings
+
+    // STATE MACHINE
 
     class Transition(val from: String, val to: String, val probability: Double)
 
@@ -55,14 +60,15 @@ val multiScalePatternCompletion = newSim {
 
     // Create the input sequence
     val inputSequence = mutableListOf<String>()
-    repeat(10) {
+    repeat(1000) {
         val firstWord = nounVerbTransitions.sampleFirst()
         inputSequence.add(firstWord)
         val secondWord = nounVerbTransitions.sampleNext(firstWord)
         inputSequence.add(secondWord)
         val thirdWord = verbNounTransitions.sampleNext(secondWord)
         inputSequence.add(thirdWord)
-        // println("$firstWord $secondWord $thirdWord")
+        val sentenceBreak = "END"
+        inputSequence.add(sentenceBreak)
     }
 
     // NETWORK
@@ -83,18 +89,18 @@ val multiScalePatternCompletion = newSim {
         NeuronCollection(network, it)
     }.apply {
         label = "Reservoir"
-        layout(GridLayout())
         location = point(0, 0)
     }
-    network.addNetworkModel(reservoir)
+    network.addNetworkModel(reservoir)?.join()
+    reservoir.layout(GridLayout())
     val sparse = Sparse()
     sparse.connectionDensity = .1
     val reservoirSynapseGroup = SynapseGroup2(reservoir, reservoir, sparse)
-    val dist = NormalDistribution(1.0, .1)
+    val dist = NormalDistribution(0.0, 1.0)
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
     }
-    network.addNetworkModel(reservoirSynapseGroup)?.join()
+    network.addNetworkModel(reservoirSynapseGroup)
 
     // Input nodes
     val inputs = network.addNeuronCollection(5) {
@@ -102,6 +108,7 @@ val multiScalePatternCompletion = newSim {
         network.addNetworkModel(this)
     }.apply {
         label = "Inputs"
+        setLabels(listOf("man", "dog", "walks", "bites", "END" ))
         setClamped(true)
         layout(LineLayout())
         location = point(-550, 0)
@@ -118,24 +125,42 @@ val multiScalePatternCompletion = newSim {
     // Location of the network in the desktop
     withGui {
         place(networkComponent) {
-            location = point(0, 0)
+            location = point(385, 0)
             width = 800
             height = 600
         }
     }
 
-    val inputEncodings = mapOf(
-        "man"   to doubleArrayOf(1.0, 0.0, 0.0, 0.0),
-        "dog"   to doubleArrayOf(0.0, 1.0, 0.0, 0.0),
-        "walks" to doubleArrayOf(0.0, 0.0, 1.0, 0.0),
-        "bites" to doubleArrayOf(0.0, 0.0, 0.0, 1.0)
-    )
+    // TEXT WORLD
+    val textWorld = addTextWorld("Text World")
+    textWorld.world.text = inputSequence.joinToString(" ")
 
-    var wordIndex = 0
+    withGui {
+        place(textWorld) {
+            location = point(0, 0)
+            width = 400
+            height = 500
+        }
+    }
+
+    // WORKSPACE UPDATE RULES
+
+    val inputEncodings = mapOf(
+        "man"   to doubleArrayOf(1.0, 0.0, 0.0, 0.0, 0.0),
+        "dog"   to doubleArrayOf(0.0, 1.0, 0.0, 0.0, 0.0),
+        "walks" to doubleArrayOf(0.0, 0.0, 1.0, 0.0, 0.0),
+        "bites" to doubleArrayOf(0.0, 0.0, 0.0, 1.0, 0.0),
+        "END"   to doubleArrayOf(0.0, 0.0, 0.0, 0.0, 1.0)
+    )
+    val zeroInput = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0)
+
     network.updateManager.addAction(0, updateAction("Set inputs") {
-        val word = inputSequence[wordIndex++ % inputSequence.size]
-        println(word)
-        inputs.forceSetActivations(inputEncodings[word])
+        val word = textWorld.world.currentItem?.text
+        inputs.forceSetActivations(inputEncodings[word]?:zeroInput )
     })
+
+    workspace.updater.updateManager.clear()
+    workspace.updater.updateManager.addAction(UpdateComponent(textWorld))
+    workspace.updater.updateManager.addAction(UpdateComponent(networkComponent))
 }
 

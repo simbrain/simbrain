@@ -3,10 +3,7 @@ package org.simbrain.network.core
 import com.thoughtworks.xstream.XStream
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.groups.Subnetwork
-import org.simbrain.network.groups.SynapseGroup
+import org.simbrain.network.groups.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.NeuronArray
@@ -82,6 +79,10 @@ var List<Neuron?>.labels: List<String>
     set(values) = values.forEachIndexed { index, label ->
         this[index]?.let { it.label = label }
     }
+
+fun AbstractNeuronCollection.setLabels(labels: List<String>) {
+    neuronList.labels = labels
+}
 
 var List<Neuron>.auxValues: List<Double>
     get() = map { it.auxValue }

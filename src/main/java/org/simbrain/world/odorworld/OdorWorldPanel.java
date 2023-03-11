@@ -98,6 +98,8 @@ public class OdorWorldPanel extends JPanel {
      */
     private List<PImage> layerImageList;
 
+    private OdorWorldActions odorWorldActions = new OdorWorldActions(this);
+
     void debugToolTips() {
 
         if (tileSelectionModel != null) {
@@ -256,19 +258,16 @@ public class OdorWorldPanel extends JPanel {
 
         // Full tile map update
         world.getEvents().getTileMapChanged().on(Dispatchers.getMain(), () -> {
-            renderAllLayers(world);
-        });
+            world.getTileMap().getEvents().getLayerAdded().on(Dispatchers.getMain(), () -> {
+                renderAllLayers(world);
+            });
 
-        world.getTileMap().getEvents().getLayerAdded().on(Dispatchers.getMain(), () -> {
-            renderAllLayers(world);
-        });
+            world.getTileMap().getEvents().getMapSizeChanged().on(Dispatchers.getMain(), () -> {
+                world.events.getTileMapChanged().fireAndBlock();
+            });
 
-        world.getTileMap().getEvents().getMapSizeChanged().on(Dispatchers.getMain(), () -> {
-            world.events.getTileMapChanged().fireAndBlock();
-        });
-
-        // Single layer update
-        world.getTileMap().getEvents().getLayerImageChanged().on(Dispatchers.getMain(), (oldImage, newImage) -> {
+            // Single layer update
+            world.getTileMap().getEvents().getLayerImageChanged().on(Dispatchers.getMain(), (oldImage, newImage) -> {
                 int index = canvas.getLayer().indexOfChild(oldImage);
                 canvas.getLayer().removeChild(oldImage);
                 if (index != -1) {
@@ -276,6 +275,8 @@ public class OdorWorldPanel extends JPanel {
                 } else {
                     canvas.getLayer().addChild(newImage);
                 }
+            });
+            renderAllLayers(world);
         });
 
         world.getEvents().getWorldStarted().on(null, true, () -> {
@@ -468,7 +469,7 @@ public class OdorWorldPanel extends JPanel {
 
 
     /**
-     * Create a popup menu based on location of mouse click.
+     * Create a popup menu based on location of mouse `click`.
      *
      * @param entity the entity for which to build the menu
      * @return the popup menu
@@ -479,7 +480,8 @@ public class OdorWorldPanel extends JPanel {
         if (entity == null) {
             contextMenu.add(new JMenuItem(new AddEntityAction(this)));
             contextMenu.add(new JMenuItem(new AddAgentAction(this)));
-            contextMenu.add(new JMenuItem(new AddTile(this)));
+            contextMenu.add(new JMenuItem(odorWorldActions.getAddTileAction()));
+            contextMenu.add(new JMenuItem(odorWorldActions.getFillLayerAction()));
             contextMenu.addSeparator();
         } else {
             contextMenu.add(new JMenuItem(new ShowEntityDialogAction(entity)));

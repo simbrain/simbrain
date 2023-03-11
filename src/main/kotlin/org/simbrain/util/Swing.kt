@@ -107,9 +107,9 @@ inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {
  * The base createAction function. Requires a list of key combos. See other versions if only one or no keyboard shortcut was used.
  */
 fun <T : JComponent> T.createAction(
-    iconPath: String? = null,
     name: String? = null,
     description: String? = null,
+    iconPath: String? = null,
     keyboardShortcuts: List<KeyCombination>,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
@@ -147,21 +147,21 @@ fun <T : JComponent> T.createAction(
  * The [createAction] with one or no keyboard shortcut.
  */
 fun <T : JComponent> T.createAction(
-    iconPath: String? = null,
     name: String? = null,
     description: String? = null,
+    iconPath: String? = null,
     keyboardShorcut: KeyCombination? = null,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
     block: suspend T.(e: ActionEvent) -> Unit
-) = createAction(iconPath, name, description, keyboardShorcut?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
+) = createAction(name, description, iconPath, keyboardShorcut?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
 
 /**
  * Create an action when no JComponent available. Keyboard shortcuts are not possible.
  */
 fun createAction(
-    iconPath: String? = null,
     name: String? = null,
+    iconPath: String? = null,
     description: String? = null,
     block: (e: ActionEvent) -> Unit
 ): AbstractAction {

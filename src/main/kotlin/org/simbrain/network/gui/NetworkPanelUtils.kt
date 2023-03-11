@@ -18,9 +18,9 @@ fun NetworkPanel.createConditionallyEnabledAction(
     keyboardShortcuts: List<KeyCombination>,
     block: suspend NetworkPanel.(e: ActionEvent) -> Unit
 ) = this.createAction(
-    iconPath = iconPath,
     name = name,
     description = description,
+    iconPath = iconPath,
     keyboardShortcuts = keyboardShortcuts,
     initBlock = {
         fun updateAction() {

@@ -207,8 +207,8 @@ class EntityNode(
         if (entity.isRotating) {
             (sprite as RotatingSprite?)!!.updateHeading(entity.heading)
         }
-        setOffset(entity.x, entity.y)
         updateAttributesNodes()
+        setOffset(entity.x, entity.y)
     }
 
     /**

@@ -141,6 +141,7 @@ public class GridSensorNode extends EntityAttributeNode {
 
     @Override
     public void update(OdorWorldEntity entity) {
+        setOffset(-entity.getX(), -entity.getY());
         if (!isGridSizeConsistent()) {
             redrawGrid();
         }

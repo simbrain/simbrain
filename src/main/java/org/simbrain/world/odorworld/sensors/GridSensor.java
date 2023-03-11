@@ -168,11 +168,11 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @Override
     public void update(OdorWorldEntity parent) {
         values = new double[columns * rows];
-        // int gridX = (int) (computeAbsoluteLocation(parent).getX() / width - x);
-        // int gridY = (int) (computeAbsoluteLocation(parent).getY() / height - y);
-        // if (gridX < columns && gridY < rows && gridX >= 0 && gridY >= 0) {
-        //     values[gridX + gridY * rows] = DEFAULT_ACTIVATION;
-        // }
+        int gridX = (int) (parent.getX() / width - x);
+        int gridY = (int) (parent.getY() / height - y);
+        if (gridX < columns && gridY < rows && gridX >= 0 && gridY >= 0) {
+            values[gridX + gridY * rows] = DEFAULT_ACTIVATION;
+        }
     }
 
     /**

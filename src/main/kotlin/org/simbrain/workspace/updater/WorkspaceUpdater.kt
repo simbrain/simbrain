@@ -21,6 +21,8 @@ import org.simbrain.workspace.events.WorkspaceUpdaterEvents
  * threads that can be configured), for cases when component updating happens
  * concurrently.
  *
+ * To make a new custom UpdateAction in kotlin use the updateAction() function.
+ *
  * @author Matt Watson
  * @author Jeff Yoshimi
  */

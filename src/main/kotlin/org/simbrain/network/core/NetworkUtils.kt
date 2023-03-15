@@ -174,7 +174,7 @@ fun connect(source: Neuron, target: Neuron, rule: SynapseUpdateRule, value: Doub
 /**
  * Connect input nodes to target nodes with weights initialized to a value.
  */
-fun connectAllToAll(source: NeuronGroup, target: NeuronGroup, value: Double): List<Synapse>? {
+fun connectAllToAll(source: NeuronGroup, target: NeuronGroup, value: Double): List<Synapse> {
     val wts = connectAllToAll(source, target)
     wts.forEach{wt: Synapse -> wt.forceSetStrength(value)}
     return wts

@@ -24,7 +24,6 @@ fun Bounded.intersect(other: Bounded): BoundIntersection {
     } else {
         val xCollision = min((topLeftA.x + a.width) - topLeftB.x, (topLeftB.x + b.width) - topLeftA.x)
         val yCollision = min((topLeftA.y + a.height) - topLeftB.y, (topLeftB.y + b.height) - topLeftA.y)
-
         BoundIntersection(xCollision > 0 && yCollision > 0, xCollision, yCollision)
     }
 

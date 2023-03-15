@@ -72,8 +72,7 @@ public class RandomizedPursuer extends Simulation {
 
         // Set up custom update
         WorkspaceUpdater updater = sim.getWorkspace().getUpdater();
-        updater.getUpdateManager().addAction(
-                new UpdateComponent(oc),0);
+        updater.getUpdateManager().addAction(new UpdateComponent(oc),0);
 
     }
 

@@ -1,7 +1,6 @@
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
-import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic
 import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment
@@ -18,7 +17,6 @@ import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
 import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity
-import org.simbrain.custom_sims.simulations.rl_sim.RL_Sim_Main
 import org.simbrain.custom_sims.simulations.sorn.SORN
 import org.simbrain.custom_sims.simulations.test.ConvertSim
 import org.simbrain.custom_sims.simulations.test.ReadSim
@@ -76,8 +74,7 @@ val simulations = dir<Any>("Simulations") {
             item("KuramotoOscillators") {KuramotoOscillators()}
         }
         dir("RL") {
-            item("RL_Sim_Main") { RL_Sim_Main() }
-            item("Actor Critic") { ActorCritic() }
+            item("Actor Critic") { actorCritic }
         }
         dir("Agents") {
             item("Isopod Simulation") { isopodSim }

@@ -46,7 +46,7 @@ val isopodSim = newSim {
         location = point(0, 100)
         upperBound = 100.0
         label = "Left"
-        with (updateRule as LinearRule) {
+        with(updateRule as LinearRule) {
             noiseGenerator = noiseSource
             addNoise = true
         }
@@ -55,7 +55,7 @@ val isopodSim = newSim {
         location = point(100, 100)
         upperBound = 100.0
         label = "Right"
-        with (updateRule as LinearRule) {
+        with(updateRule as LinearRule) {
             noiseGenerator = noiseSource
             addNoise = true
         }
@@ -110,7 +110,7 @@ val isopodSim = newSim {
         wrapAround = false
         isObjectsBlockMovement = true
 
-        tileMap.updateMapSize(25,25)
+        tileMap.updateMapSize(25, 25)
         tileMap.fill("water_1")
 
         // Body could be represented by a triangle or rhombus
@@ -158,7 +158,7 @@ val isopodSim = newSim {
                     showDispersion = true
                 }
                 // A convenient way to show the hit radius. Not used as a sensor.
-                addSensor(ObjectSensor().apply{
+                addSensor(ObjectSensor().apply {
                     radius = 0.0
                     decayFunction.dispersion = hitRadius.toDouble()
                     showDispersion = true
@@ -197,7 +197,7 @@ val isopodSim = newSim {
 
     fun resetIsopod() {
         isopod.location = odorWorld.centerLocation
-        isopod.heading = UniformRealDistribution(0.0,360.0).sampleDouble()
+        isopod.heading = UniformRealDistribution(0.0, 360.0).sampleDouble()
     }
 
     workspace.addUpdateAction(updateAction("Found fish") {
@@ -224,7 +224,7 @@ val isopodSim = newSim {
                         if (collision) {
                             break
                         } else {
-                            log +=  "${isopod.x}, ${isopod.y}\n"
+                            log += "${isopod.x}, ${isopod.y}\n"
                         }
                     }
                     collision = false
@@ -234,31 +234,32 @@ val isopodSim = newSim {
                 }
             }
 
-            val numTrialsTF = addTextField("Number of trials", "" + defaultNumTrials)
+            addTextField("Number of trials", "" + defaultNumTrials) {
+                it.toIntOrNull()?.let { num ->
+                    defaultNumTrials = num
+                }
+            }
 
             addButton("Run trials") {
-                workspace.launch {
-                    log = ""
-                    var iteration = 0
-                    defaultNumTrials = Integer.parseInt(numTrialsTF.text)
-                    while(trialNum < defaultNumTrials) {
-                        log += "# Trial: ${trialNum + 1}\n"
-                        resetIsopod()
-                        log += "# Heading: ${isopod.heading}\n"
-                        workspace.iterateWhile {
-                            if (!collision) {
-                                log +=  "${isopod.x}, ${isopod.y}\n"
-                            }
-                            !collision && ++iteration < maxIterationsPerTrial
+                log = ""
+                var iteration = 0
+                while (trialNum < defaultNumTrials) {
+                    log += "# Trial: ${trialNum + 1}\n"
+                    resetIsopod()
+                    log += "# Heading: ${isopod.heading}\n"
+                    workspace.iterateWhile {
+                        if (!collision) {
+                            log += "${isopod.x}, ${isopod.y}\n"
                         }
-                        trialNum++
-                        iteration = 0
-                        collision = false
+                        !collision && ++iteration < maxIterationsPerTrial
                     }
-                    trialNum = 0
-                    showSaveDialog("", "multipleTrials.csv") {
-                        writeText(log)
-                    }
+                    trialNum++
+                    iteration = 0
+                    collision = false
+                }
+                trialNum = 0
+                showSaveDialog("", "multipleTrials.csv") {
+                    writeText(log)
                 }
             }
         }

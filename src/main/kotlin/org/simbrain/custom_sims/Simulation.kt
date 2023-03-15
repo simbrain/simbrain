@@ -4,17 +4,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.util.ResourceManager
-import org.simbrain.util.Utils
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.loadTileMap
-import org.simbrain.util.place
-import org.simbrain.util.point
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -151,8 +147,15 @@ fun SimulationScope.addDocViewer(title: String?, fileName: String): DocViewerCom
 
 val SimulationScope.couplingManager get() = workspace.couplingManager
 
-fun SimbrainDesktop.createControlPanel(name: String, x: Int, y: Int, config: ControlPanel.() -> Unit): ControlPanel {
-    return ControlPanel.makePanel(this, name, x, y).apply(config)
+fun SimbrainDesktop.createControlPanel(name: String, x: Int, y: Int, config: ControlPanelKt.() -> Unit): ControlPanelKt {
+    return ControlPanelKt(name)
+        .apply { setLocation(x, y) }
+        .apply(config)
+        .also {
+            addInternalFrame(it)
+            it.pack()
+            it.isVisible = true
+        }
 }
 
 fun updateAction(description: String, longDescription: String = description, action: () -> Unit)

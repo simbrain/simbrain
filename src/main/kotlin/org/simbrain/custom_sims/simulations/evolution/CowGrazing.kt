@@ -179,7 +179,7 @@ val grazingCows = newSim {
             // Central flower sensor to determine when the flower is actually found.
             entities.forEach{
                 it.addSensor(
-                    ObjectSensor(EntityType.FLOWER, radius = 0.0).apply {
+                    ObjectSensor(EntityType.DANDELIONS, radius = 0.0).apply {
                         label = "centralFlowerSensor"
                         decayFunction = StepDecayFunction()
                         decayFunction.dispersion = 30.0
@@ -189,7 +189,7 @@ val grazingCows = newSim {
             repeat(5) {
                 val loc = odorWorld.getRandomLocation()
                 odorWorld.addEntity(loc.x.toInt(), loc.y.toInt(),
-                    EntityType.FLOWER, doubleArrayOf(1.0))
+                    EntityType.DANDELIONS, doubleArrayOf(1.0))
             }
             workspace.launch {
                 (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->

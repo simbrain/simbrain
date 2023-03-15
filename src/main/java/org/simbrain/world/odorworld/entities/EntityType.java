@@ -35,6 +35,8 @@ public enum EntityType {
     CANDLE("Candle", false, false, false, 32, 32),
     FISH("Fish", false, false, false, 32, 32),
     FLOWER("Flower", false, false, false, 32, 32),
+    DANDELIONS("Dandelions", false, false, false, 32, 32),
+    GERANIUMS("Geraniums", false, false, false, 32, 32),
     TULIP("Tulip", false, false, false, 32, 32),
     FLAX("Flax", false, false, false, 32, 32),
     PANSY("Pansy", false, false, false, 32, 32),

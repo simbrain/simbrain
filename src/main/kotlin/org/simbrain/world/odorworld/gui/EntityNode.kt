@@ -177,6 +177,8 @@ class EntityNode(
                 )
 
             EntityType.CANDLE -> sprite = Sprite(OdorWorldResourceManager.getStaticImage("Candle.png"))
+            EntityType.DANDELIONS -> sprite = Sprite(OdorWorldResourceManager.getStaticImage("Dandelions.png"))
+            EntityType.GERANIUMS -> sprite = Sprite(OdorWorldResourceManager.getStaticImage("Geraniums.png"))
             EntityType.BLUECHEESE -> sprite = Sprite(OdorWorldResourceManager.getStaticImage("Bluecheese.gif"))
             EntityType.MOUSE -> sprite = RotatingSprite(RotatingEntityManager.getMouse())
             EntityType.CIRCLE -> sprite = RotatingSprite(

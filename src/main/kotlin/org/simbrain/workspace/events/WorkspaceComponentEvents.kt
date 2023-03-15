@@ -8,6 +8,7 @@ import org.simbrain.workspace.AttributeContainer
  */
 class WorkspaceComponentEvents2: Events2() {
     val componentUpdated = NoArgEvent()
+    val componentMinimized = AddedEvent<Boolean>()
     val guiToggled = NoArgEvent()
     val componentOnOffToggled = NoArgEvent()
     val componentClosing = NoArgEvent()

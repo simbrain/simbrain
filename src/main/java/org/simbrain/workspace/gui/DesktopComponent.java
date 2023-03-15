@@ -34,6 +34,7 @@ import org.simbrain.world.odorworld.OdorWorldComponent;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyVetoException;
 import java.io.*;
 
 /**
@@ -99,6 +100,13 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
 
         events.getGuiToggled().on(() -> DesktopComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn()));
         events.getComponentClosing().on(this::close);
+        events.getComponentMinimized().on((minimized) -> {
+            try {
+                DesktopComponent.this.getParentFrame().setIcon(minimized);
+            } catch (PropertyVetoException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         Logger.trace(this.getClass().getCanonicalName() + " created");
     }

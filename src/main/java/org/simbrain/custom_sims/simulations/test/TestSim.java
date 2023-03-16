@@ -56,7 +56,7 @@ public class TestSim extends Simulation {
         // BUILD NETWORK
         NetworkComponent networkComponent = new NetworkComponent("Recurrent Network");
         workspace.addWorkspaceComponent(networkComponent);
-        sim.getDesktop().getDesktopComponent(networkComponent).getParentFrame().setBounds(20, 20, 446, 337);
+        sim.getDesktop().getDesktopComponent(networkComponent).parentFrame.setBounds(20, 20, 446, 337);
 
         Network network = networkComponent.getNetwork();
         NeuronGroup ng = new NeuronGroup(network, numNeurons);
@@ -81,7 +81,7 @@ public class TestSim extends Simulation {
         barChart.getModel().setAutoRange(false);
         barChart.getModel().setUpperBound(12);
         workspace.addWorkspaceComponent(barChart);
-        sim.getDesktop().getDesktopComponent(barChart).getParentFrame().setBounds(500,20,537,345);
+        sim.getDesktop().getDesktopComponent(barChart).parentFrame.setBounds(500,20,537,345);
 
         // COUPLING NETWORK TO BARCHART
         Producer neuronProducer = workspace.getCouplingManager().getProducer(ng, "getActivations");

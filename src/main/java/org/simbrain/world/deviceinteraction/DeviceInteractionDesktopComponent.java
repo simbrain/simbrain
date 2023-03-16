@@ -3,10 +3,10 @@ package org.simbrain.world.deviceinteraction;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,7 +85,7 @@ public class DeviceInteractionDesktopComponent extends DesktopComponent<DeviceIn
         super(frame, component);
         world = component.getWorld();
         JToolBar openSaveToolBar = new JToolBar();
-        openSaveToolBar.add(new OpenAction(this));
+        openSaveToolBar.add(SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(this));
         openSaveToolBar.add(new SaveAction(this));
         panel = new DeviceInteractionPanel(world, openSaveToolBar);
         this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
@@ -112,7 +112,7 @@ public class DeviceInteractionDesktopComponent extends DesktopComponent<DeviceIn
 
         // File Menu
         menuBar.add(file);
-        file.add(new OpenAction(this));
+        file.add(SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(this));
         file.add(new SaveAction(this));
         file.add(new SaveAsAction(this));
         file.addSeparator();
@@ -138,7 +138,7 @@ public class DeviceInteractionDesktopComponent extends DesktopComponent<DeviceIn
         helpItem.setAction(helpAction);
         help.add(helpItem);
 
-        getParentFrame().setJMenuBar(menuBar);
+        parentFrame.setJMenuBar(menuBar);
     }
 
 }

@@ -22,6 +22,7 @@ import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
 import org.simbrain.util.displayInDialog
+import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import javax.swing.Action
 
@@ -201,5 +202,15 @@ class WorkspaceActionManager(val desktop: SimbrainDesktop) {
         createComponentFactoryAction("Image World", "menu_icons/photo.png"),
         createComponentFactoryAction("Text World", "menu_icons/Text.png")
     )
+
+    fun <T: WorkspaceComponent> createOpenAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(
+        name = "Open...",
+        iconPath = "menu_icons/Open.png",
+        description = "Open a new component",
+        keyboardShorcut = CmdOrCtrl + 'O',
+        coroutineScope = workspace
+    ) {
+        desktopComponent.showOpenFileDialog()
+    }
 
 }

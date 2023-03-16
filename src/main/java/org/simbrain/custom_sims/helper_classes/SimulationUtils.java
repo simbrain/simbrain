@@ -7,7 +7,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SimbrainDesktopKt;
+import org.simbrain.util.SimbrainDesktopUtilsKt;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.couplings.Coupling;
@@ -53,7 +53,7 @@ public class SimulationUtils {
     public void addComponent(
             WorkspaceComponent wc, int x, int y, int width, int height) {
         workspace.addWorkspaceComponent(wc);
-        SwingUtilities.invokeLater(() -> SimbrainDesktopKt.place(desktop, wc, x, y, width, height));
+        SwingUtilities.invokeLater(() -> SimbrainDesktopUtilsKt.place(desktop, wc, x, y, width, height));
     }
 
     /**
@@ -104,7 +104,7 @@ public class SimulationUtils {
         String html = getResource(fileName);
         docViewer.setText(html);
         workspace.addWorkspaceComponent(docViewer);
-        SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height));
+        SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).parentFrame.setBounds(x, y, width, height));
         return docViewer;
     }
 

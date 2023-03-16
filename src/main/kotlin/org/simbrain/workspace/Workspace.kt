@@ -114,8 +114,7 @@ class Workspace: CoroutineScope {
      *
      * @param component The component to add.
      */
-    @JvmOverloads
-    fun addWorkspaceComponent(component: WorkspaceComponent, blocking: Boolean = false) {
+    fun addWorkspaceComponent(component: WorkspaceComponent) {
         Logger.debug("adding component: $component")
         _componentList.add(component)
         component.workspace = this
@@ -127,8 +126,9 @@ class Workspace: CoroutineScope {
             component.name = idManager.getAndIncrementId(component.javaClass)
         }
 
-
-        events.componentAdded.fireAndBlock(component)
+        runBlocking {
+            events.componentAdded.fireAndSuspend(component)
+        }
         component.events.attributeContainerRemoved.on { attributeContainer: AttributeContainer? ->
             couplingManager.removeAttributeContainer(
                 attributeContainer!!

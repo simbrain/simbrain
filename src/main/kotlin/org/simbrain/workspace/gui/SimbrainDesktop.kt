@@ -49,17 +49,64 @@ import javax.swing.*
 import javax.swing.event.*
 
 /**
- * Creates a Swing-based environment for working with a workspace.
+ * Creates a singleton Swing-based environment for working with a workspace.
  *
  * Also provides wrappers for GUI elements called from a terminal.
  *
  * @author Matt Watson
  * @author Jeff Yoshimi
  */
-class SimbrainDesktop(val workspace: Workspace) {
+object SimbrainDesktop {
+
+    val workspace = Workspace()
 
     @JvmField
     val desktopPane: JDesktopPane = JDesktopPane()
+
+    /**
+     * Name to display in Simbrain desktop window.
+     */
+    private const val FRAME_TITLE = "Simbrain 4 Beta"
+
+    /**
+     * Associates workspace components with their corresponding desktop components.
+     */
+    private val workspaceComponentDesktopComponentMap: MutableMap<WorkspaceComponent, DesktopComponent<*>> = LinkedHashMap()
+
+    val desktopComponents: Collection<DesktopComponent<*>>
+        get() = workspaceComponentDesktopComponentMap.values
+
+
+    /**
+     * Reference to the last internal frames that were focused, so that they can get the focus when the next one is
+     * closed.
+     */
+    private val lastFocusedStack = Stack<DesktopComponent<*>>()
+
+    /**
+     * The x offset for popup menus.
+     */
+    private const val MENU_X_OFFSET = 5
+
+    /**
+     * The y offset for popup menus.
+     */
+    private const val MENU_Y_OFFSET = 53
+
+    /**
+     * The default serial version ID.
+     */
+    private const val serialVersionUID = 1L
+
+    /**
+     * Initial indent of entire workspace.
+     */
+    private const val WORKSPACE_INSET = 80
+
+    /**
+     * After placing one simbrain window how far away to put the next one.
+     */
+    private const val DEFAULT_WINDOW_OFFSET = 30
 
     /**
      * Cached context menu.
@@ -99,7 +146,7 @@ class SimbrainDesktop(val workspace: Workspace) {
     /**
      * Workspace action manager.
      */
-    private val actionManager = WorkspaceActionManager(this)
+    val actionManager = WorkspaceActionManager(this)
 
     /**
      * Interpreter for terminal.
@@ -416,8 +463,6 @@ class SimbrainDesktop(val workspace: Workspace) {
         contextMenu!!.add(actionManager.newConsoleAction)
     }
 
-    val desktopComponents: Collection<DesktopComponent<*>>
-        get() = guiComponents.values
 
     /**
      * Returns the desktop component corresponding to a workspace component.
@@ -426,7 +471,7 @@ class SimbrainDesktop(val workspace: Workspace) {
      * @return component guicomponent
      */
     fun getDesktopComponent(component: WorkspaceComponent): DesktopComponent<*> {
-        return guiComponents[component]!!
+        return workspaceComponentDesktopComponentMap[component]!!
     }
 
     /**
@@ -536,7 +581,7 @@ class SimbrainDesktop(val workspace: Workspace) {
         desktopComponent: DesktopComponent<*>
     ) {
         desktopComponent.desktop = this
-        guiComponents[workspaceComponent] = desktopComponent
+        workspaceComponentDesktopComponentMap[workspaceComponent] = desktopComponent
     }
 
     /**
@@ -554,7 +599,7 @@ class SimbrainDesktop(val workspace: Workspace) {
         // Either add the window at a default location, or relative to the last
         // added window. Note that this is overridden when individual
         // components are opened
-        if (guiComponents.size == 0) {
+        if (workspaceComponentDesktopComponentMap.size == 0) {
             componentFrame.setBounds(
                 DEFAULT_WINDOW_OFFSET,
                 DEFAULT_WINDOW_OFFSET,
@@ -564,7 +609,7 @@ class SimbrainDesktop(val workspace: Workspace) {
         } else {
             // This should be coordinated with the logic in
             // RepositionAllWindowsSction
-            val highestComponentNumber = guiComponents.size + 1
+            val highestComponentNumber = workspaceComponentDesktopComponentMap.size + 1
             val xMax = desktopPane.width - desktopComponent.preferredSize.getWidth()
             val yMax = desktopPane.height - desktopComponent.preferredSize.getHeight()
             componentFrame.setBounds(
@@ -685,7 +730,7 @@ class SimbrainDesktop(val workspace: Workspace) {
      * Helper method to clear all components from the desktop.
      */
     private fun clearComponents() {
-        guiComponents.clear()
+        workspaceComponentDesktopComponentMap.clear()
         workspace.clearWorkspace()
     }
 
@@ -828,7 +873,6 @@ class SimbrainDesktop(val workspace: Workspace) {
      * @param workspace The workspace for this desktop.
      */
     init {
-        INSTANCES[workspace] = this
         frame.iconImages = Arrays.asList(
             ResourceManager.getImage("simbrain_iconset" + Utils.FS + "20.png"),
             ResourceManager.getImage("simbrain_iconset" + Utils.FS + "32.png"),
@@ -842,7 +886,7 @@ class SimbrainDesktop(val workspace: Workspace) {
         createContextMenu()
         val events = workspace.events
         events.workspaceCleared.on {
-            guiComponents.clear()
+            workspaceComponentDesktopComponentMap.clear()
             desktopPane.removeAll()
             desktopPane.repaint()
             frame.title = FRAME_TITLE
@@ -851,8 +895,8 @@ class SimbrainDesktop(val workspace: Workspace) {
         }
         events.componentAdded.on(Dispatchers.Swing, wait = true) { addDesktopComponent(it) }
         events.componentRemoved.on(Dispatchers.Swing) { wc  ->
-            val component = guiComponents[wc] ?: return@on
-            guiComponents.remove(wc)
+            val component = workspaceComponentDesktopComponentMap[wc] ?: return@on
+            workspaceComponentDesktopComponentMap.remove(wc)
             component.parentFrame.dispose()
             if (!lastFocusedStack.isEmpty()) {
                 lastFocusedStack.remove(component)
@@ -1082,116 +1126,60 @@ class SimbrainDesktop(val workspace: Workspace) {
         }
     }
 
-    companion object {
-        /**
-         * The x offset for popup menus.
-         */
-        private const val MENU_X_OFFSET = 5
+    /**
+     * Called by componentBounds.bsh
+     */
+    fun getComponentBoundsString() = desktopPane.allFrames.joinToString("\n") {
+        "${it.title} (${it.x}, ${it.y}, ${it.width}, ${it.height})"
+    }
 
-        /**
-         * The y offset for popup menus.
-         */
-        private const val MENU_Y_OFFSET = 53
+    /**
+     * Creates an instance of the proper wrapper class around the provided instance.
+     *
+     * @param component   The component to wrap.
+     * @param parentFrame The frame of this component
+     * @return A new desktop component wrapping the provided component.
+     */
+    @JvmStatic
+    fun createDesktopComponent(parentFrame: GenericFrame?, component: WorkspaceComponent): DesktopComponent<*> {
+        val genericFrame = parentFrame ?: DesktopInternalFrame(component)
+        return component.workspace.componentFactory.createGuiComponent(genericFrame, component)
+    }
 
-        /**
-         * The default serial version ID.
-         */
-        private const val serialVersionUID = 1L
+    /**
+     * Show Gui View of a workspace component. Used from terminal.
+     *
+     * @param component component to view
+     */
+    fun showJFrame(component: WorkspaceComponent) {
+        val theFrame = GenericJFrame()
+        val desktopComponent = createDesktopComponent(theFrame, component)
+        theFrame.isResizable = true
+        theFrame.isVisible = true
+        theFrame.setBounds(100, 100, 200, 200)
+        theFrame.contentPane = desktopComponent
+    }
 
-        /**
-         * Initial indent of entire workspace.
-         */
-        private const val WORKSPACE_INSET = 80
-
-        /**
-         * After placing one simbrain window how far away to put the next one.
-         */
-        private const val DEFAULT_WINDOW_OFFSET = 30
-
-        /**
-         * Reference to the last internal frames that were focused, so that they can get the focus when the next one is
-         * closed.
-         */
-        private val lastFocusedStack = Stack<DesktopComponent<*>>()
-
-        /**
-         * TODO: Create Javadoc comment.
-         */
-        private val INSTANCES: MutableMap<Workspace, SimbrainDesktop> = HashMap()
-        val instances: Map<Workspace, SimbrainDesktop>
-            // TODO: Review. Part of a hack solution in NeuronGroupNode
-            get() = INSTANCES
-
-        /**
-         * Name to display in Simbrain desktop window.
-         */
-        private const val FRAME_TITLE = "Simbrain 4 Beta"
-
-        /**
-         * Associates workspace components with their corresponding gui components.
-         */
-        private val guiComponents: MutableMap<WorkspaceComponent, DesktopComponent<*>> = LinkedHashMap()
-
-        // TODO this should be addressed at a higher level
-        @JvmStatic
-        fun getDesktop(workspace: Workspace): SimbrainDesktop? {
-            return INSTANCES[workspace]
-        }
-
-        /**
-         * Creates an instance of the proper wrapper class around the provided instance.
-         *
-         * @param component   The component to wrap.
-         * @param parentFrame The frame of this component
-         * @return A new desktop component wrapping the provided component.
-         */
-        @JvmStatic
-        fun createDesktopComponent(parentFrame: GenericFrame?, component: WorkspaceComponent): DesktopComponent<*> {
-            val genericFrame = parentFrame ?: DesktopInternalFrame(component)
-            return component.workspace.componentFactory.createGuiComponent(genericFrame, component)
-        }
-
-        /**
-         * Show Gui View of a workspace component. Used from terminal.
-         *
-         * @param component component to view
-         */
-        fun showJFrame(component: WorkspaceComponent) {
-            val theFrame = GenericJFrame()
-            val desktopComponent = createDesktopComponent(theFrame, component)
-            theFrame.isResizable = true
-            theFrame.isVisible = true
-            theFrame.setBounds(100, 100, 200, 200)
-            theFrame.contentPane = desktopComponent
-        }
-
-        /**
-         * Simbrain main method. Creates a single instance of the Simulation class
-         *
-         * @param args currently not used
-         */
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val workspace = Workspace()
-            try {
-                // Line below for Ubuntu so that icons don't turn on by default
-                // See https://stackoverflow.com/questions/10356725/jdesktoppane-has-a-toolbar-at-bottom-of-window-on-linux
-                if (Utils.isLinux()) {
-                    UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
-                }
-                UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName()
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
+    /**
+     * Simbrain main method. Creates a single instance of the Simulation class
+     *
+     * @param args currently not used
+     */
+    @JvmStatic
+    fun main(args: Array<String>) {
+        try {
+            // Line below for Ubuntu so that icons don't turn on by default
+            // See https://stackoverflow.com/questions/10356725/jdesktoppane-has-a-toolbar-at-bottom-of-window-on-linux
+            if (Utils.isLinux()) {
+                UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
             }
-
-            // InterceptingEventQueue eventQueue = new InterceptingEventQueue(workspace);
-            //
-            // workspace.setTaskSynchronizationManager(eventQueue);
-            //
-            // Toolkit.getDefaultToolkit().getSystemEventQueue().push(eventQueue);
-            SwingUtilities.invokeLater { SimbrainDesktop(workspace).createAndShowGUI() }
+            UIManager.setLookAndFeel(
+                UIManager.getSystemLookAndFeelClassName()
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+
+        SwingUtilities.invokeLater { createAndShowGUI() }
     }
 }

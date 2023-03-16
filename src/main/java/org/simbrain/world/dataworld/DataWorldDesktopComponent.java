@@ -24,10 +24,10 @@ import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.TableActionManager;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -123,7 +123,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
 
         // Add file menu
         mb.add(fileMenu);
-        fileMenu.add(new OpenAction(this));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(this));
         fileMenu.add(new SaveAction(this));
         fileMenu.add(new SaveAsAction(this));
         fileMenu.addSeparator();
@@ -153,9 +153,9 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         helpMenu.add(helpItem);
         mb.add(helpMenu);
 
-        getParentFrame().setJMenuBar(mb);
+        parentFrame.setJMenuBar(mb);
 
-        if (this.getParentFrame().getJMenuBar() == null) {
+        if (this.parentFrame.getJMenuBar() == null) {
             addMenuBar(table);
         }
         resizePanel();
@@ -192,8 +192,8 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
      */
     private void resizePanel() {
         scroller.resize();
-        if (getParentFrame() != null) {
-            getParentFrame().pack();
+        if (parentFrame != null) {
+            parentFrame.pack();
         }
     }
 

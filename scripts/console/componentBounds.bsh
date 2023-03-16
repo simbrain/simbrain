@@ -7,9 +7,5 @@ import javax.swing.*;
 // then use this command to determine those bounds, and then use the bounds in your script.
 //
 void componentBounds() {
-    for(DesktopComponent dc : desktop.getDesktopComponents()) {
-    	print(dc.getTitle() + " (" + dc.getParentFrame().getX() + "," + dc.getParentFrame().getY() + "," + dc.getWidth()
-    		+ "," + dc.getHeight() + ")");
-    }
-
+    print(desktop.getComponentBoundsString());
 }

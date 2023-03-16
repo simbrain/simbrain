@@ -62,12 +62,12 @@ fun newSim(block: suspend SimulationScope.() -> Unit) = NewSimulation(block)
 fun SimulationScope.addNetworkComponent(name: String, config: NetworkComponent.() -> Unit = { }): NetworkComponent {
     return NetworkComponent(name)
         .apply(config)
-        .also { workspace.addWorkspaceComponent(it, true) }
+        .also { workspace.addWorkspaceComponent(it) }
 }
 
 fun SimulationScope.addNetworkComponent(name: String, network : Network): NetworkComponent {
     return NetworkComponent(name, network)
-        .also { workspace.addWorkspaceComponent(it, true) }
+        .also { workspace.addWorkspaceComponent(it) }
 }
 
 fun SimulationScope.addOdorWorldComponent(
@@ -78,7 +78,7 @@ fun SimulationScope.addOdorWorldComponent(
     return OdorWorldComponent(name ?: map)
         .apply(config)
         .also { if (map != "empty.tmx") it.world.tileMap = loadTileMap(map) }
-        .also { workspace.addWorkspaceComponent(it, true) }
+        .also { workspace.addWorkspaceComponent(it) }
 }
 
 /**
@@ -87,27 +87,27 @@ fun SimulationScope.addOdorWorldComponent(
  * @param name title to display at top of panel
  * @return the component the plot builder
  */
-fun SimulationScope.addProjectionPlot(name: String?): ProjectionComponent {
+suspend fun SimulationScope.addProjectionPlot(name: String?): ProjectionComponent {
     val projectionComponent = ProjectionComponent(name)
-    workspace.addWorkspaceComponent(projectionComponent, true)
+    workspace.addWorkspaceComponent(projectionComponent)
     return projectionComponent
 }
 
 fun SimulationScope.addImageWorld(name: String?): ImageWorldComponent {
     val imageWorldComponent = ImageWorldComponent(name)
-    workspace.addWorkspaceComponent(imageWorldComponent, true)
+    workspace.addWorkspaceComponent(imageWorldComponent)
     return imageWorldComponent
 }
 
 fun SimulationScope.addTextWorld(name: String?): TextWorldComponent {
     val textWorldComponent = TextWorldComponent(name)
-    workspace.addWorkspaceComponent(textWorldComponent, true)
+    workspace.addWorkspaceComponent(textWorldComponent)
     return textWorldComponent
 }
 
 fun SimulationScope.addTimeSeries(name: String?): TimeSeriesPlotComponent {
     val timeSeriesPlotComponent = TimeSeriesPlotComponent(name)
-    workspace.addWorkspaceComponent(timeSeriesPlotComponent, true)
+    workspace.addWorkspaceComponent(timeSeriesPlotComponent)
     return timeSeriesPlotComponent
 }
 
@@ -141,7 +141,7 @@ fun SimulationScope.addDocViewer(title: String?, fileName: String): DocViewerCom
         "custom_sims" + Utils.FS + fileName
     )
     docViewer.text = html
-    workspace.addWorkspaceComponent(docViewer, true)
+    workspace.addWorkspaceComponent(docViewer)
     return docViewer
 }
 

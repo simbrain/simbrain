@@ -56,7 +56,7 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         add("Center", worldPanel);
         menu = new OdorWorldFrameMenu(this, component.getWorld());
         menu.setUpMenus();
-        getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
+        parentFrame.setJMenuBar(menu); // TODO: Move menu creation to this
 
         worldPanel.getWorld().getEvents().getTileMapChanged().on(this::setGuiSizeToWorldSize);
 
@@ -64,7 +64,7 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
 
         menu = new OdorWorldFrameMenu(this, worldPanel.getWorld());
         menu.setUpMenus();
-        getParentFrame().setJMenuBar(menu);
+        parentFrame.setJMenuBar(menu);
         SwingUtilities.invokeLater(this::setGuiSizeToWorldSize);
     }
 
@@ -73,14 +73,14 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
      * Ignore the default panel preferences.
      */
     public void setGuiSizeToWorldSize() {
-        int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
-        int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
-        getParentFrame().setPreferredSize(new Dimension(Math.min((int) (worldPanel.getWorld().getWidth() + widthOffset), 800),
+        int widthOffset = parentFrame.getSize().width - worldPanel.getWidth();
+        int heightOffset = parentFrame.getSize().height - worldPanel.getHeight();
+        parentFrame.setPreferredSize(new Dimension(Math.min((int) (worldPanel.getWorld().getWidth() + widthOffset), 800),
                 Math.min((int) (worldPanel.getWorld().getHeight() + heightOffset), 800)));
-        getParentFrame().setMaximumSize(
+        parentFrame.setMaximumSize(
                 new Dimension((int) (worldPanel.getWorld().getWidth() + widthOffset),
                         (int) (worldPanel.getWorld().getHeight() + heightOffset)));
-        getParentFrame().pack();
+        parentFrame.pack();
     }
 
     /**

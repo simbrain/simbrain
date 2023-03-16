@@ -24,10 +24,10 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -87,7 +87,7 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
 
         // File Menu
         menuBar.add(file);
-        file.add(new OpenAction(this));
+        file.add(SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(this));
         file.add(new SaveAction(this));
         file.add(new SaveAsAction(this));
         file.addSeparator();
@@ -125,7 +125,7 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
         helpMenu.add(helpItem);
         menuBar.add(helpMenu);
 
-        getParentFrame().setJMenuBar(menuBar);
+        parentFrame.setJMenuBar(menuBar);
 
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
         textArea.setContentType("text/html");

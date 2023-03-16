@@ -152,7 +152,7 @@ val grazingCows = newSim {
         }
 
         val networks = List(cowGenotypes.size) { index ->
-            NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it, true) }.network
+            NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
         }
         val entities = List(cowGenotypes.size) { i ->
             OdorWorldEntity(odorWorld, EntityType.COW).also {

@@ -105,7 +105,7 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         bar.add(editMenu);
         bar.add(helpMenu);
 
-        getParentFrame().setJMenuBar(bar);
+        parentFrame.setJMenuBar(bar);
     }
 
     public void actionPerformed(ActionEvent e) {

@@ -155,7 +155,7 @@ public final class OscWorldDesktopComponent extends DesktopComponent<OscWorldCom
         toolBar.add(createOscOutMessageAction);
 
         menuBar.add(file);
-        getParentFrame().setJMenuBar(menuBar);
+        parentFrame.setJMenuBar(menuBar);
 
         LabelledItemPanel inPanel = new LabelledItemPanel();
         inPanel.addItem("OSC in host:", new JLabel(oscWorldComponent.getOscInHost()));

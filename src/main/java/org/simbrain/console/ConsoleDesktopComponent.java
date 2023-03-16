@@ -23,7 +23,6 @@ import bsh.util.JConsole;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.OpenAction;
 import org.simbrain.workspace.component_actions.SaveAction;
 import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.DesktopComponent;
@@ -49,10 +48,10 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         add("Center", console);
 
         JMenuBar menu = new JMenuBar();
-        getParentFrame().setJMenuBar(menu);
+        parentFrame.setJMenuBar(menu);
         JMenu fileMenu = new JMenu("File");
         menu.add(fileMenu);
-        fileMenu.add(new OpenAction(this));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(this));
         fileMenu.add(new SaveAction(this));
         fileMenu.add(new SaveAsAction(this));
         fileMenu.addSeparator();
@@ -89,7 +88,7 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         interpreter.getErr();
         try {
             interpreter.set("workspace", workspace);
-            interpreter.set("desktop", SimbrainDesktop.getDesktop(workspace));
+            interpreter.set("desktop", SimbrainDesktop.INSTANCE);
             interpreter.set("bsh.prompt", ">");
             interpreter.eval("addClassPath(\"scripts/console\");");
             interpreter.print("Simbrain console\n");

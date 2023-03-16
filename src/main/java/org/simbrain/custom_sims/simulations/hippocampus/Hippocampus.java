@@ -238,6 +238,7 @@ public class Hippocampus extends Simulation {
 
         // Lesion checkbox
         bottomPanel.addCheckBox("Lesion MTL", hippoLesioned, () -> {
+
             if (hippoLesioned == true) {
                 hippoLesioned = false;
             } else {

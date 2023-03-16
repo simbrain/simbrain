@@ -21,10 +21,10 @@ package org.simbrain.world.textworld.gui
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.component_actions.CloseAction
-import org.simbrain.workspace.component_actions.OpenAction
 import org.simbrain.workspace.component_actions.SaveAction
 import org.simbrain.workspace.component_actions.SaveAsAction
 import org.simbrain.workspace.gui.DesktopComponent
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.textworld.TextWorld
 import org.simbrain.world.textworld.TextWorldComponent
 import org.simbrain.world.textworld.loadText
@@ -41,7 +41,7 @@ import javax.swing.JToolBar
  * **ReaderComponentDesktopGui** is the gui view for the reader world.
  */
 class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldComponent) :
-    DesktopComponent<TextWorldComponent?>(frame, component) {
+    DesktopComponent<TextWorldComponent>(frame, component) {
     /**
      * Menu Bar.
      */
@@ -96,7 +96,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
     init {
         world = component.world
         val openSaveToolBar = JToolBar()
-        openSaveToolBar.add(OpenAction(this))
+        openSaveToolBar.add(SimbrainDesktop.actionManager.createOpenAction(this))
         openSaveToolBar.add(SaveAction(this))
         panel = TextWorldPanel.createReaderPanel(world, openSaveToolBar)
         this.preferredSize = Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)
@@ -122,7 +122,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
 
         // File Menu
         menuBar.add(file)
-        file.add(OpenAction(this))
+        file.add(SimbrainDesktop.actionManager.createOpenAction(this))
         file.add(SaveAction(this))
         file.add(SaveAsAction(this))
         file.addSeparator()

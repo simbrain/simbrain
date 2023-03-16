@@ -23,10 +23,10 @@ import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.component_actions.CloseAction
-import org.simbrain.workspace.component_actions.OpenAction
 import org.simbrain.workspace.component_actions.SaveAction
 import org.simbrain.workspace.component_actions.SaveAsAction
 import org.simbrain.workspace.gui.DesktopComponent
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JMenu
@@ -37,14 +37,14 @@ import javax.swing.JOptionPane
  * Network desktop component. An extension of the Gui component for this class
  * which is used in the Simbrain desktop.
  */
-class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent) :
-    DesktopComponent<NetworkComponent?>(frame, component) {
+class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) :
+    DesktopComponent<NetworkComponent>(frame, component) {
 
     val networkPanel = NetworkPanel(component)
 
     fun createFileMenu(): JMenu {
         val fileMenu = JMenu("File")
-        fileMenu.add(OpenAction(this))
+        fileMenu.add(actionManager.createOpenAction(this))
         fileMenu.add(SaveAction(this))
         fileMenu.add(SaveAsAction(this))
         fileMenu.addSeparator()
@@ -142,7 +142,7 @@ class NetworkDesktopComponent(frame: GenericFrame?, component: NetworkComponent)
         // Toggle the network panel's visiblity if the workspace component is
         // set to "gui off"
         component.events.guiToggled.on {
-            networkPanel.guiOn = workspaceComponent!!.isGuiOn
+            networkPanel.guiOn = workspaceComponent.isGuiOn
         }
     }
 

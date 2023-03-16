@@ -16,67 +16,91 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace.gui;
+package org.simbrain.workspace.gui
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.pmw.tinylog.Logger;
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.SimbrainPreferences;
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
-import org.simbrain.workspace.events.WorkspaceComponentEvents2;
-import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer;
-import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.odorworld.OdorWorldComponent;
-
-import javax.swing.*;
-import java.awt.*;
-import java.beans.PropertyVetoException;
-import java.io.*;
+import com.thoughtworks.xstream.XStream
+import com.thoughtworks.xstream.io.xml.DomDriver
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.pmw.tinylog.Logger
+import org.simbrain.network.NetworkComponent
+import org.simbrain.util.SFileChooser
+import org.simbrain.util.SimbrainPreferences
+import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.gui.SimbrainDesktop.createDesktopComponent
+import org.simbrain.workspace.gui.SimbrainDesktop.getDesktopComponent
+import org.simbrain.workspace.gui.SimbrainDesktop.registerComponentInstance
+import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer
+import org.simbrain.world.dataworld.DataWorldComponent
+import org.simbrain.world.odorworld.OdorWorldComponent
+import java.awt.Dimension
+import java.awt.Rectangle
+import java.beans.PropertyVetoException
+import java.io.*
+import javax.swing.JOptionPane
+import javax.swing.JPanel
 
 /**
- * A gui view on a {@link org.simbrain.workspace.WorkspaceComponent}.
+ * A gui view on a [org.simbrain.workspace.WorkspaceComponent].
  *
  * All desktop component graphical updates should happen via events.
  *
- * For custom size overrides {@link #getPreferredSize()}
+ * For custom size overrides [.getPreferredSize]
  *
  * @param <E> the type of the workspace component.
- */
-public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPanel {
-
+</E> */
+abstract class DesktopComponent<E : WorkspaceComponent>(
+    /**
+     * Reference to parent frame.
+     */
+    @JvmField var parentFrame: GenericFrame, workspaceComponent: E
+) : JPanel() {
     /**
      * serial version UID.
      */
-    private final long serialVersionUID = 1L;
+    private val serialVersionUID = 1L
 
     /**
      * Default size for new components;
      */
-    private final Dimension DEFAULT_SIZE = new Dimension(500,500);
-
+    private val DEFAULT_SIZE = Dimension(500, 500)
+    /**
+     * Returns the workspace component wrapped by this instance.
+     *
+     * @return the workspace component wrapped by this instance.
+     */
     /**
      * Reference to workspace component.
      */
-    private E workspaceComponent;
+    var workspaceComponent: E
+        private set
 
     /**
      * File Chooser.
      */
-    private final SFileChooser chooser;
-
+    private val chooser: SFileChooser
     /**
-     * Reference to parent frame.
+     * Returns the parent from of this view.
+     *
+     * @return the parent from of this view.
      */
-    private GenericFrame parentFrame;
-
+    /**
+     * Sets the parent frame of this view.
+     *
+     * @param parentFrame the new parent.
+     */
+    /**
+     * TODO: This should really be set at construction time, but that would
+     * require deep changes so this should suffice for now.
+     *
+     * @param desktop the desktop to set
+     */
     /**
      * Reference to parent desktop.
      */
-    private SimbrainDesktop desktop;
+    @JvmField
+    var desktop: SimbrainDesktop? = null
 
     /**
      * Construct a workspace component.
@@ -84,142 +108,133 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
      * @param frame              the parent frame.
      * @param workspaceComponent the component to wrap.
      */
-    public DesktopComponent(final GenericFrame frame, final E workspaceComponent) {
-        super();
-        this.parentFrame = frame;
-        this.workspaceComponent = workspaceComponent;
-        String defaultDirectory = getDefaultDirectory(workspaceComponent.getClass());
-
-        chooser = new SFileChooser(defaultDirectory, null);
-        for (String format : workspaceComponent.getFormats()) {
-            chooser.addExtension(format);
+    init {
+        this.workspaceComponent = workspaceComponent
+        val defaultDirectory = getDefaultDirectory(workspaceComponent::class.java)
+        chooser = SFileChooser(defaultDirectory, null)
+        for (format in workspaceComponent.formats) {
+            chooser.addExtension(format)
         }
 
         // Add a default update listener
-        WorkspaceComponentEvents2 events = workspaceComponent.getEvents();
-
-        events.getGuiToggled().on(() -> DesktopComponent.this.getParentFrame().setVisible(workspaceComponent.isGuiOn()));
-        events.getComponentClosing().on(this::close);
-        events.getComponentMinimized().on((minimized) -> {
+        val events = workspaceComponent.events
+        events.guiToggled.on { parentFrame.setVisible(workspaceComponent.isGuiOn) }
+        events.componentClosing.on { close() }
+        events.componentMinimized.on { minimized ->
             try {
-                DesktopComponent.this.getParentFrame().setIcon(minimized);
-            } catch (PropertyVetoException e) {
-                throw new RuntimeException(e);
+                parentFrame.setIcon(minimized)
+            } catch (e: PropertyVetoException) {
+                throw RuntimeException(e)
             }
-        });
-
-        Logger.trace(this.getClass().getCanonicalName() + " created");
+        }
+        Logger.trace(this.javaClass.canonicalName + " created")
     }
 
     /**
      * Closes this view.
      */
-    public void close() {
+    fun close() {
         if (workspaceComponent.hasChangedSinceLastSave()) {
-            boolean hasCancelled = showHasChangedDialog();
+            val hasCancelled = showHasChangedDialog()
             if (hasCancelled) {
-                return;
+                return
             }
         }
-        workspaceComponent.close();
+        workspaceComponent.close()
     }
 
     /**
      * Calls up a dialog for opening a workspace component.
      */
-    @SuppressWarnings("unchecked")
-    public void showOpenFileDialog() {
-
-        SFileChooser chooser = new SFileChooser(getDefaultDirectory(workspaceComponent.getClass()), null);
-
-        for (String format : workspaceComponent.getFormats()) {
-            chooser.addExtension(format);
+    suspend fun showOpenFileDialog() {
+        val chooser = SFileChooser(getDefaultDirectory(workspaceComponent.javaClass), null)
+        for (format in workspaceComponent.formats) {
+            chooser.addExtension(format)
         }
-
-        File file = chooser.showOpenDialog();
-        String dir = file.getParentFile().getAbsolutePath();
-        String name = file.getName();
-        String ext = SFileChooser.getExtension(file);
-
-        FileInputStream inputStream;
-        try {
-            inputStream = new FileInputStream(file);
-        } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(null, String.format("File %s was not found.", file));
-            return;
+        val file = chooser.showOpenDialog()
+        val dir = file.parentFile.absolutePath
+        val name = file.name
+        val ext = SFileChooser.getExtension(file)
+        val inputStream: FileInputStream = try {
+            withContext(Dispatchers.IO) {
+                FileInputStream(file)
+            }
+        } catch (ex: FileNotFoundException) {
+            JOptionPane.showMessageDialog(null, String.format("File %s was not found.", file))
+            return
         }
-
-        E newComponent;
-        try {
-            newComponent = (E) WorkspaceComponentDeserializer.deserializeWorkspaceComponent(workspaceComponent.getClass(), name, inputStream, ext);
-        } catch (ReflectiveOperationException ex) {
-            String message = String.format("Failed to deserialize workspace component %s\nCould not execute open method in class %s.", name, workspaceComponent.getClass().getSimpleName());
-            JOptionPane.showMessageDialog(null, message);
-            ex.printStackTrace();
-            return;
+        val newComponent: E = try {
+            WorkspaceComponentDeserializer.deserializeWorkspaceComponent(
+                workspaceComponent::class.java,
+                name,
+                inputStream,
+                ext
+            ) as E
+        } catch (ex: ReflectiveOperationException) {
+            val message = String.format(
+                "Failed to deserialize workspace component %s\nCould not execute open method in class %s.",
+                name,
+                workspaceComponent.javaClass.simpleName
+            )
+            JOptionPane.showMessageDialog(null, message)
+            ex.printStackTrace()
+            return
         }
-
-        Rectangle bounds = getParentFrame().getBounds();
-        Workspace workspace = workspaceComponent.getWorkspace();
-        workspace.removeWorkspaceComponent(workspaceComponent);
-        workspaceComponent = newComponent;
-
-        workspace.addWorkspaceComponent(workspaceComponent);
-        workspaceComponent.setCurrentFile(file);
-        setDefaultDirectory(workspaceComponent.getClass(), dir);
-        SimbrainDesktop desktop = SimbrainDesktop.getDesktop(workspace);
-        DesktopComponent desktopComponent = desktop.getDesktopComponent(workspaceComponent);
-        desktop.registerComponentInstance(workspaceComponent, desktopComponent);
-        desktopComponent.getParentFrame().setBounds(bounds);
-        workspaceComponent.setName(name);
-        getParentFrame().setTitle(name);
+        val bounds = parentFrame.bounds
+        val workspace = workspaceComponent.workspace
+        workspace.removeWorkspaceComponent(workspaceComponent)
+        workspaceComponent = newComponent
+        workspace.addWorkspaceComponent(workspaceComponent)
+        workspaceComponent.currentFile = file
+        setDefaultDirectory(workspaceComponent.javaClass, dir)
+        val desktopComponent = getDesktopComponent(workspaceComponent)
+        registerComponentInstance(workspaceComponent, desktopComponent)
+        desktopComponent.parentFrame.bounds = bounds
+        workspaceComponent.name = name
+        parentFrame.title = name
     }
 
     /**
      * Show the dialog for saving a workspace component.
      */
-    public void showSaveFileDialog() {
-        File theFile = workspaceComponent.getCurrentFile();
-
+    open fun showSaveFileDialog() {
+        var theFile = workspaceComponent.currentFile
         if (theFile == null) {
-            theFile = new File(getName());
+            theFile = File(name)
         }
-
-        theFile = chooser.showSaveDialog(theFile);
-
+        theFile = chooser.showSaveDialog(theFile)
         if (theFile != null) {
-            workspaceComponent.setCurrentFile(theFile);
-
+            workspaceComponent.currentFile = theFile
             try {
-                FileOutputStream stream = new FileOutputStream(theFile);
+                val stream = FileOutputStream(theFile)
                 // TODO format?
-                workspaceComponent.save(stream, null);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+                workspaceComponent.save(stream, null)
+            } catch (e: FileNotFoundException) {
+                throw RuntimeException(e)
             }
 
             // workspaceComponent.setCurrentDirectory(theFile.getParentFile()
             // .getAbsolutePath());
-            setDefaultDirectory(workspaceComponent.getClass(), theFile.getParentFile().getAbsolutePath());
-            workspaceComponent.setName(theFile.getName());
-            getParentFrame().setTitle(workspaceComponent.getName());
+            setDefaultDirectory(workspaceComponent.javaClass, theFile.parentFile.absolutePath)
+            workspaceComponent.name = theFile.name
+            parentFrame.title = workspaceComponent.name
         }
     }
 
     /**
      * Save vs. save-as. Saves the currentfile.
      */
-    public void save() {
+    open fun save() {
         // System.out.println("Network save:" +
         // workspaceComponent.getCurrentFile());
-        if (workspaceComponent.getCurrentFile() == null) {
-            showSaveFileDialog();
+        if (workspaceComponent.currentFile == null) {
+            showSaveFileDialog()
         } else {
             try {
-                FileOutputStream stream = new FileOutputStream(workspaceComponent.getCurrentFile());
-                workspaceComponent.save(stream, null);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+                val stream = FileOutputStream(workspaceComponent.currentFile)
+                workspaceComponent.save(stream, null)
+            } catch (e: FileNotFoundException) {
+                throw RuntimeException(e)
             }
         }
     }
@@ -230,28 +245,9 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
      * @param ostream the stream to write to
      * @throws IOException if an IO error occurs
      */
-    public void save(final OutputStream ostream) throws IOException {
-        new XStream(new DomDriver()).toXML(this.getParentFrame().getBounds(), ostream);
-    }
-
-    /**
-     * Creates a new desktop component from the provided stream.
-     *
-     * @param component the component to create the desktop component for.
-     * @param istream   the inputstream containing the serialized data.
-     * @param name      the name of the desktop component.
-     * @return a new component.
-     */
-    public static DesktopComponent<?> open(final WorkspaceComponent component, final InputStream istream, final String name) {
-        // SimbrainDesktop desktop =
-        // SimbrainDesktop.getDesktop(component.getWorkspace());
-        DesktopComponent<?> dc = SimbrainDesktop.createDesktopComponent(null, component);
-        Rectangle bounds = (Rectangle) new XStream(new DomDriver()).fromXML(istream);
-
-        dc.setTitle(name);
-        dc.setBounds(bounds);
-
-        return dc;
+    @Throws(IOException::class)
+    fun save(ostream: OutputStream?) {
+        XStream(DomDriver()).toXML(parentFrame.bounds, ostream)
     }
 
     /**
@@ -259,21 +255,32 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
      *
      * @return true if user cancels
      */
-    public boolean showHasChangedDialog() {
-        Object[] options = {"Save", "Don't Save", "Cancel"};
-        int s = JOptionPane.showInternalOptionDialog(this, "This component has changed since last save,\n" + "Would you like to save these changes?", "Component Has Changed", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-
+    fun showHasChangedDialog(): Boolean {
+        val options = arrayOf<Any>("Save", "Don't Save", "Cancel")
+        val s = JOptionPane.showInternalOptionDialog(
+            this,
+            """
+     This component has changed since last save,
+     Would you like to save these changes?
+     """.trimIndent(),
+            "Component Has Changed",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE,
+            null,
+            options,
+            options[0]
+        )
         if (s == JOptionPane.OK_OPTION) {
-            this.save();
-            workspaceComponent.close();
-            return false;
+            this.save()
+            workspaceComponent.close()
+            return false
         } else if (s == JOptionPane.NO_OPTION) {
-            workspaceComponent.close();
-            return false;
+            workspaceComponent.close()
+            return false
         } else if (s == JOptionPane.CANCEL_OPTION) {
-            return true;
+            return true
         }
-        return false;
+        return false
     }
 
     /**
@@ -281,72 +288,29 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
      *
      * @return the name of underlying component.
      */
-    public String getName() {
-        return (workspaceComponent == null) ? "null" : workspaceComponent.getName();
+    override fun getName(): String {
+        return if (workspaceComponent == null) "null" else workspaceComponent.name
     }
 
-    public void setTitle(final String name) {
-        getParentFrame().setTitle(name);
-    }
-
-    public String getTitle() {
-        return getParentFrame().getTitle();
-    }
-
-    /**
-     * Retrieves a simple version of a component name from its class, e.g.
-     * "Network" from "org.simbrain.network.NetworkComponent"/
-     *
-     * @return the simple name.
-     */
-    public String getSimpleName() {
-        String simpleName = getClass().getSimpleName();
-        if (simpleName.endsWith("Component")) {
-            simpleName = simpleName.replaceFirst("Component", "");
+    var title: String?
+        get() = parentFrame.title
+        set(name) {
+            parentFrame.title = name
         }
-        return simpleName;
-    }
-
-    /**
-     * Returns the workspace component wrapped by this instance.
-     *
-     * @return the workspace component wrapped by this instance.
-     */
-    public E getWorkspaceComponent() {
-        return workspaceComponent;
-    }
-
-    /**
-     * Sets the parent frame of this view.
-     *
-     * @param parentFrame the new parent.
-     */
-    public void setParentFrame(final GenericFrame parentFrame) {
-        this.parentFrame = parentFrame;
-    }
-
-    /**
-     * Returns the parent from of this view.
-     *
-     * @return the parent from of this view.
-     */
-    public GenericFrame getParentFrame() {
-        return this.parentFrame;
-    }
-
-    public SimbrainDesktop getDesktop() {
-        return desktop;
-    }
-
-    /**
-     * TODO: This should really be set at construction time, but that would
-     * require deep changes so this should suffice for now.
-     *
-     * @param desktop the desktop to set
-     */
-    public void setDesktop(SimbrainDesktop desktop) {
-        this.desktop = desktop;
-    }
+    val simpleName: String
+        /**
+         * Retrieves a simple version of a component name from its class, e.g.
+         * "Network" from "org.simbrain.network.NetworkComponent"/
+         *
+         * @return the simple name.
+         */
+        get() {
+            var simpleName = javaClass.simpleName
+            if (simpleName.endsWith("Component")) {
+                simpleName = simpleName.replaceFirst("Component".toRegex(), "")
+            }
+            return simpleName
+        }
 
     /**
      * Returns the default directory for specific component types.
@@ -354,18 +318,18 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
      * @param componentType the component type
      * @return the directory
      */
-    private String getDefaultDirectory(Class<? extends WorkspaceComponent> componentType) {
-        String defaultDirectory;
-        if (componentType == OdorWorldComponent.class) {
-            defaultDirectory = SimbrainPreferences.getString("workspaceOdorWorldDirectory");
-        } else if (componentType == DataWorldComponent.class) {
-            defaultDirectory = SimbrainPreferences.getString("workspaceTableDirectory");
-        } else if (componentType == NetworkComponent.class) {
-            defaultDirectory = SimbrainPreferences.getString("workspaceNetworkDirectory");
+    private fun getDefaultDirectory(componentType: Class<out WorkspaceComponent>): String {
+        val defaultDirectory: String
+        defaultDirectory = if (componentType == OdorWorldComponent::class.java) {
+            SimbrainPreferences.getString("workspaceOdorWorldDirectory")
+        } else if (componentType == DataWorldComponent::class.java) {
+            SimbrainPreferences.getString("workspaceTableDirectory")
+        } else if (componentType == NetworkComponent::class.java) {
+            SimbrainPreferences.getString("workspaceNetworkDirectory")
         } else {
-            defaultDirectory = SimbrainPreferences.getString("workspaceBaseDirectory");
+            SimbrainPreferences.getString("workspaceBaseDirectory")
         }
-        return defaultDirectory;
+        return defaultDirectory
     }
 
     /**
@@ -374,20 +338,39 @@ public abstract class DesktopComponent<E extends WorkspaceComponent> extends JPa
      * @param componentType the component type
      * @param dir           the directory to set
      */
-    private void setDefaultDirectory(Class<? extends WorkspaceComponent> componentType, String dir) {
-        if (componentType == OdorWorldComponent.class) {
-            SimbrainPreferences.putString("workspaceOdorWorldDirectory", dir);
-        } else if (componentType == DataWorldComponent.class) {
-            SimbrainPreferences.putString("workspaceTableDirectory", dir);
-        } else if (componentType == NetworkComponent.class) {
-            SimbrainPreferences.putString("workspaceNetworkDirectory", dir);
+    private fun setDefaultDirectory(componentType: Class<out WorkspaceComponent>, dir: String) {
+        if (componentType == OdorWorldComponent::class.java) {
+            SimbrainPreferences.putString("workspaceOdorWorldDirectory", dir)
+        } else if (componentType == DataWorldComponent::class.java) {
+            SimbrainPreferences.putString("workspaceTableDirectory", dir)
+        } else if (componentType == NetworkComponent::class.java) {
+            SimbrainPreferences.putString("workspaceNetworkDirectory", dir)
         } else {
-            SimbrainPreferences.putString("workspaceBaseDirectory", dir);
+            SimbrainPreferences.putString("workspaceBaseDirectory", dir)
         }
     }
 
-    @Override
-    public Dimension getPreferredSize() {
-        return DEFAULT_SIZE;
+    override fun getPreferredSize(): Dimension {
+        return DEFAULT_SIZE
+    }
+
+    companion object {
+        /**
+         * Creates a new desktop component from the provided stream.
+         *
+         * @param component the component to create the desktop component for.
+         * @param istream   the inputstream containing the serialized data.
+         * @param name      the name of the desktop component.
+         * @return a new component.
+         */
+        fun open(component: WorkspaceComponent?, istream: InputStream?, name: String?): DesktopComponent<*> {
+            // SimbrainDesktop desktop =
+            // SimbrainDesktop.getDesktop(component.getWorkspace());
+            val dc = createDesktopComponent(null, component!!)
+            val bounds = XStream(DomDriver()).fromXML(istream) as Rectangle
+            dc.title = name
+            dc.bounds = bounds
+            return dc
+        }
     }
 }

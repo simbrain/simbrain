@@ -19,6 +19,7 @@
 package org.simbrain.plot.actions;
 
 import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class PlotActionManager {
     @SuppressWarnings("unchecked")
     public PlotActionManager(DesktopComponent component) {
 
-        openPlotAction = new OpenPlotAction(component);
+        openPlotAction = SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(component);
         savePlotAction = new SavePlotAction(component);
         savePlotAsAction = new SavePlotAsAction(component);
     }

@@ -22,9 +22,8 @@ class SimbrainDesktopTest {
                 }
             }
         }
-        val desktop = SimbrainDesktop(Workspace())
-        desktop.frame.isVisible = true
-        hiSim.run(desktop)
+        SimbrainDesktop.frame.isVisible = true
+        hiSim.run(SimbrainDesktop)
     }
 
 }

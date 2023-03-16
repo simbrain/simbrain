@@ -494,7 +494,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         bar.add(editMenu);
         bar.add(helpMenu);
 
-        getParentFrame().setJMenuBar(bar);
+        parentFrame.setJMenuBar(bar);
     }
 
     /**

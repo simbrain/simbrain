@@ -86,7 +86,7 @@ public class WorkspaceSerializer {
      */
     public WorkspaceSerializer(Workspace workspace) {
         this.workspace = workspace;
-        this.desktop = SimbrainDesktop.getDesktop(workspace);
+        this.desktop = SimbrainDesktop.INSTANCE;
     }
 
     /**
@@ -162,8 +162,8 @@ public class WorkspaceSerializer {
         try {
             zipStream.putNextEntry(entry);
             serializer.serializeComponent(component, zipStream);
-            if (SimbrainDesktop.getDesktop(workspace) != null) {
-                DesktopComponent<?> desktopComponent = SimbrainDesktop.getDesktop(workspace).getDesktopComponent(component);
+            if (SimbrainDesktop.INSTANCE != null) {
+                DesktopComponent<?> desktopComponent = SimbrainDesktop.INSTANCE.getDesktopComponent(component);
                 // Makes it possible to save a non-GUI simulation
                 if (desktopComponent != null) {
                     ArchivedWorkspaceComponent.ArchivedDesktopComponent dc = archiveComp.addDesktopComponent(desktopComponent);
@@ -304,7 +304,7 @@ public class WorkspaceSerializer {
                         Rectangle bounds =
                                 (Rectangle) XStreamUtils.getSimbrainXStream().fromXML(new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
                         DesktopComponent<?> desktopComponent = desktop.getDesktopComponent(wc);
-                        desktopComponent.getParentFrame().setBounds(bounds);
+                        desktopComponent.parentFrame.setBounds(bounds);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

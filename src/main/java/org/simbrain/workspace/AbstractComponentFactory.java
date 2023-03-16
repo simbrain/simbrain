@@ -25,8 +25,6 @@ import org.simbrain.util.table.NumericTable;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.DataWorldDesktopComponent;
-import org.simbrain.world.deviceinteraction.DeviceInteractionComponent;
-import org.simbrain.world.deviceinteraction.DeviceInteractionDesktopComponent;
 import org.simbrain.world.imageworld.ImageWorldComponent;
 import org.simbrain.world.imageworld.gui.ImageWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -79,9 +77,6 @@ public class AbstractComponentFactory {
 
         // putWorkspaceComponentFactory("Pixel Plot", PixelPlotComponent::new);
         // putGuiComponentFactory(PixelPlotComponent.class, PixelPlotDesktopComponent::new);
-
-        putWorkspaceComponentFactory("Device Interaction", () -> new DeviceInteractionComponent(""));
-        putGuiComponentFactory(DeviceInteractionComponent.class, DeviceInteractionDesktopComponent::new);
 
         // Plot components
         putWorkspaceComponentFactory("Bar Chart", () -> new BarChartComponent(""));

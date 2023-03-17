@@ -6,7 +6,11 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-val useEventDebug = true
+val useEventDebug = false.also {
+    if (it) {
+        println("Event Debug Mode is on. It could have performance impacts, especially in evolutions.")
+    }
+}
 
 /**
  * Event objects corresponding to no-arg, adding, removing, and changing objects. Each object has a set of functions

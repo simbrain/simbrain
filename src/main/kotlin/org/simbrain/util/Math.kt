@@ -2,6 +2,7 @@ package org.simbrain.util
 
 import org.simbrain.util.math.SimbrainMath
 import smile.math.matrix.Matrix
+import kotlin.math.sqrt
 
 /**
  * Numeric utilities in Kotlin. Comparable to [SimbrainMath].
@@ -186,3 +187,6 @@ fun DoubleArray.toString(precision: Int): String {
     return joinToString(",") { it.format(precision) }
 }
 
+fun DoubleArray.euclideanDistance(other: DoubleArray) = this.zip(other) { a, b -> (a - b) * (a - b) }
+    .sum()
+    .let { sqrt(it) }

@@ -95,6 +95,8 @@ class OdorWorldEntity @JvmOverloads constructor(
             heading += dtheta
         }
 
+        if (speed == 0.0) return
+
         val dx = cos(heading.toRadian()) * speed
         val dy = -sin(heading.toRadian()) * speed
 

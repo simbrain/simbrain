@@ -2,7 +2,7 @@ package org.simbrain.util.projection
 
 import smile.projection.PCA
 
-class PCAProjection2(dimension: Int): ProjectionMethod2(dimension) {
+class PCAProjection2 @JvmOverloads constructor (dimension: Int = 3): ProjectionMethod2(dimension) {
 
     val initialProjectionMethod = CoordinateProjection2(dimension)
 
@@ -30,4 +30,15 @@ class PCAProjection2(dimension: Int): ProjectionMethod2(dimension) {
         }
     }
 
+    override fun copy() = PCAProjection2(dimension)
+
+    override val name = "PCA"
+
+    // Kotlin hack to support "static method in superclass"
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ProjectionMethod2.getTypes()
+        }
+    }
 }

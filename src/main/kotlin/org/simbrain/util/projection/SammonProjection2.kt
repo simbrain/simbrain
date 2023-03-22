@@ -1,6 +1,6 @@
 package org.simbrain.util.projection
 
-class SammonProjection2(dimension: Int): ProjectionMethod2(dimension) {
+class SammonProjection2 @JvmOverloads constructor (dimension: Int = 3): ProjectionMethod2(dimension) {
 
     val downstairsInitializationMethod = CoordinateProjection2(dimension)
 
@@ -13,8 +13,17 @@ class SammonProjection2(dimension: Int): ProjectionMethod2(dimension) {
 
     fun iterate(dataset: Dataset2) {
         if (dataset.kdTree.size < 2) return
-
-
     }
 
+    override val name = "Sammon"
+
+    override fun copy() = SammonProjection2(dimension)
+
+    // Kotlin hack to support "static method in superclass"
+    companion object {
+        @JvmStatic
+        fun getTypes(): List<Class<*>> {
+            return ProjectionMethod2.getTypes()
+        }
+    }
 }

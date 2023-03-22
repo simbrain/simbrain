@@ -1,6 +1,11 @@
 package org.simbrain.util.projection
 
-class Projector2(initialDimension: Int) {
+import org.simbrain.util.UserParameter
+import org.simbrain.util.createDialog
+import org.simbrain.util.display
+import org.simbrain.util.propertyeditor.EditableObject
+
+class Projector2(initialDimension: Int): EditableObject {
 
     var dimension: Int = initialDimension
         set(value) {
@@ -10,9 +15,15 @@ class Projector2(initialDimension: Int) {
 
     var dataset = Dataset2(dimension)
 
+    @UserParameter(label = "tolerance", minimumValue = 0.0)
     var tolerance: Double = 0.1
 
+    @UserParameter(label = "Projection Method", isObjectType = true)
     var projectionMethod: ProjectionMethod2 = CoordinateProjection2(dimension)
+        set(value) {
+            field = value
+            project()
+        }
 
     fun addDataPoint(newPoint: DataPoint2) {
         val closestPoint = dataset.kdTree.findClosestNPoint(newPoint)
@@ -43,4 +54,7 @@ fun main() {
     println(projector.dataset)
     projector.project()
     println(projector.dataset)
+    projector.createDialog {
+
+    }.display()
 }

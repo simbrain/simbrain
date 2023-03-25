@@ -22,8 +22,7 @@ class CoordinateProjection2 @JvmOverloads constructor (dimension: Int = 3): Proj
 
     override fun project(dataset: Dataset2) {
         dataset.kdTree.forEach {
-            it.downstairsPoint[0] = it.upstairsPoint[dim1]
-            it.downstairsPoint[1] = it.upstairsPoint[dim2]
+            initializeDownstairsPoint(dataset, it)
         }
     }
 

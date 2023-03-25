@@ -205,6 +205,11 @@ class KDTree(private val dimension: Int) : Iterable<DataPoint2> {
         return node
     }
 
+    fun clear() {
+        root = null
+        pointCount = 0
+    }
+
 }
 
 fun main() {

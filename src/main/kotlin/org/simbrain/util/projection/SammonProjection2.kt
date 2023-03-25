@@ -1,18 +1,69 @@
 package org.simbrain.util.projection
 
+import org.simbrain.util.UserParameter
+import kotlin.math.pow
+
 class SammonProjection2 @JvmOverloads constructor (dimension: Int = 3): ProjectionMethod2(dimension) {
 
     val downstairsInitializationMethod = CoordinateProjection2(dimension)
 
+    @UserParameter(label = "Epsilon")
+    var epsilon = 0.1
+
+    var numPoints = 0
+
     override fun project(dataset: Dataset2) {
+        // fun List<List<Double>>.thing() = joinToString("\n") {
+        //     it.joinToString(", ") {
+        //         it.format(2)
+        //     }
+        // }
+        upstairsDistances = dataset.computeUpstairsDistances()
+        upstairsDistanceSum = upstairsDistances?.sumOf { it.sum() }
+        // downstairsDistances = dataset.computeDownstairsDistances()
+        // println("UP")
+        // upstairsDistances?.let { println(it.thing()) }
+        // println("DOWN")
+        // downstairsDistances?.let { println(it.thing()) }
     }
 
     override fun initializeDownstairsPoint(dataset: Dataset2, point: DataPoint2) {
         downstairsInitializationMethod.initializeDownstairsPoint(dataset, point)
     }
 
+    var upstairsDistances: List<List<Double>>? = null
+    var downstairsDistances: List<List<Double>>? = null
+    var upstairsDistanceSum: Double? = null
+
     fun iterate(dataset: Dataset2) {
         if (dataset.kdTree.size < 2) return
+        downstairsDistances = dataset.computeDownstairsDistances()
+        dataset.kdTree.forEachIndexed { j, p1 ->
+            var partialSum = 0.0
+            (0 until p1.downstairsPoint.size).forEach { d ->
+                dataset.kdTree.forEachIndexed { i, p2 ->
+                    if (i != j) {
+                        partialSum += (
+                                (upstairsDistances!![i][j] - downstairsDistances!![i][j])
+                                        * (p2.downstairsPoint[d] - p1.downstairsPoint[d])
+                                ) / upstairsDistances!![i][j] / downstairsDistances!![i][j]
+                    }
+                }
+
+                p1.downstairsPoint[d] = p1.downstairsPoint[d] - ((epsilon * 2 * partialSum) / upstairsDistanceSum!!)
+            }
+        }
+
+        // Computes Closeness
+
+        // Computes Closeness
+        var e = 0.0
+        for (i in 0 until dataset.kdTree.size) {
+            for (j in i + 1 until dataset.kdTree.size) {
+                e += (upstairsDistances!![i][j] - downstairsDistances!![i][j]).pow(2) / upstairsDistances!![i][j]
+            }
+        }
+        // println(e / upstairsDistanceSum!!)
     }
 
     override val name = "Sammon"

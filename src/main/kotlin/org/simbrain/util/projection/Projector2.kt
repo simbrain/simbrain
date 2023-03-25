@@ -1,11 +1,20 @@
 package org.simbrain.util.projection
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.simbrain.util.UserParameter
 import org.simbrain.util.createDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.EditableObject
 
-class Projector2(initialDimension: Int): EditableObject {
+class Projector2(initialDimension: Int): EditableObject, CoroutineScope {
+
+    @Transient
+    private var job = SupervisorJob()
+
+    @Transient
+    override var coroutineContext = Dispatchers.Default + job
 
     var dimension: Int = initialDimension
         set(value) {
@@ -39,6 +48,12 @@ class Projector2(initialDimension: Int): EditableObject {
     fun addDataPoint(array: DoubleArray) = addDataPoint(DataPoint2(array))
 
     fun project() = projectionMethod.project(dataset)
+
+    private fun readResolve(): Any {
+        job = SupervisorJob()
+        coroutineContext = Dispatchers.Default + job
+        return this
+    }
 
 }
 

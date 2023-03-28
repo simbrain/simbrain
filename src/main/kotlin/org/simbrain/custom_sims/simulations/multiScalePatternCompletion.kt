@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.setLabels
@@ -19,7 +20,7 @@ import java.util.*
 /**
  * See https://www.sciencedirect.com/science/article/pii/S0006899321004352
  */
-val multiScalePatternCompletion = newSim {
+val allostaticPatternCompletion = newSim {
 
     // TODOS:
     // - Encapsulate state machine into a class
@@ -78,12 +79,12 @@ val multiScalePatternCompletion = newSim {
 
     // Basic setup
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Multi Scale Pattern Completion")
+    val networkComponent = addNetworkComponent("Allostatic Pattern Completion")
     val network = networkComponent.network
 
     // Reservoir
     val reservoir = List(numResNeurons) {
-        AllostaticNeuron(network, AllostaticUpdateRule())
+        Neuron(network, AllostaticUpdateRule())
     }.let {
         network.addNetworkModels(it)
         NeuronCollection(network, it)
@@ -119,7 +120,7 @@ val multiScalePatternCompletion = newSim {
     inputsToRes.label = "Inputs to Res"
     network.addNetworkModel(inputsToRes)
     inputsToRes.synapses.forEach { s ->
-        s.strength = 0.75
+        s.strength = 5.0
     }
 
     // Location of the network in the desktop

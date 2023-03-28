@@ -1,6 +1,6 @@
 package org.simbrain.network.core
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
 
@@ -25,9 +25,9 @@ class SpikingNeuronTest {
         rule.threshold = .5
         n2.updateRule = rule
         net.update()
-        assertEquals(true, n2.isSpike)
+        assertTrue(n2.isSpike)
         net.update()
-        assertEquals(false, n2.isSpike)
+        assertFalse(n2.isSpike)
     }
 
     @Test

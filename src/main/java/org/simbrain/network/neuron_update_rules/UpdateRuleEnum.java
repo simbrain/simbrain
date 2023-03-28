@@ -1,5 +1,6 @@
 package org.simbrain.network.neuron_update_rules;
 
+import org.simbrain.custom_sims.simulations.AllostaticUpdateRule;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule;
 import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule;
@@ -32,7 +33,8 @@ public enum UpdateRuleEnum {
     SIGMOIDAL(SigmoidalRule.class),
     SPIKINGTHRESHOLD(SpikingThresholdRule.class),
     THREEVALUE(ThreeValueRule.class),
-    TIMEDACCUMULATOR(TimedAccumulatorRule.class);
+    TIMEDACCUMULATOR(TimedAccumulatorRule.class),
+    ALLOSTATIC(AllostaticUpdateRule .class);
 
     /**
      * A specific {@link NeuronUpdateRule}.

@@ -85,8 +85,8 @@ val simulations = dir<Any>("Simulations") {
             item("Edge Of Chaos") { EdgeOfChaos() }
             item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
         }
-        dir("Falandays") {
-            item("Pattern Completion") { multiScalePatternCompletion }
+        dir("Allostatic Reservoirs") {
+            item("Pattern Completion") { allostaticPatternCompletion }
             item("Object Tracking") { objectTrackingSim }
         }
     }

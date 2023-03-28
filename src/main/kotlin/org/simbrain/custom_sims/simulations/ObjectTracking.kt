@@ -10,6 +10,7 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.environment.SmellSource
@@ -35,10 +36,9 @@ val objectTrackingSim = newSim {
     val sensoryNeurons = 31
     // Radius in pixels of the cheese's revolution around the agent.
     val radiusOfRevolution = 100.0
-    // Varoables to make cheese change direction once in a while
+    // Varaables to make cheese change direction once in a while
     var counter = 0
     var direction = 1 // 1 for counterclockwise -1 for clockwise
-
 
     // Basic setup
     workspace.clearWorkspace()
@@ -52,7 +52,7 @@ val objectTrackingSim = newSim {
     // Add a self-connected neuron array to the network
     val resNeurons = (0..numResNeurons).map {
         val rule = AllostaticUpdateRule()
-        val neuron = AllostaticNeuron(network, rule)
+        val neuron = Neuron(network, AllostaticUpdateRule())
         neuron
     }
     network.addNetworkModels(resNeurons)
@@ -241,47 +241,78 @@ class PercentIncomingNeuronRule: LinearRule() {
     }
 }
 
-fun Neuron.getSpikingInput(): Double {
+/**
+ * See equation (1) in Falandays et. al. 2021
+ */
+fun Neuron.getAllostaticInput(): Double {
+    // Treat linear inputs as sensors and do normal connectionist updating
     val sensorInputs = fanIn.filter { it.source.updateRule is LinearRule}.sumOf { it.source.activation * it.strength }
+    // For spiking inputs sum weight strengths for pre-synaptic nodes that fired
     val weightsOfSpikingNodes = fanIn.filter { it.source.isSpike}.sumOf { it.strength }
     return sensorInputs + weightsOfSpikingNodes
 }
 
-class AllostaticNeuron(parent: Network, rule: NeuronUpdateRule) : Neuron(parent, rule) {
-    var target = 1.0
-    var threshold = 2.0
-    var applyLearning = false
+class AllostaticDataHolder(
+    target: Double = 1.0,
+
+    @UserParameter(label = "threshold", minimumValue = 2.0)
+    var threshold: Double = 2.0
+
+) : SpikingScalarData() {
+
+    @UserParameter(label = "target", minimumValue = 1.0)
+    var target = target
+
+    override fun copy(): SpikingScalarData {
+        return AllostaticDataHolder(target, threshold)
+    }
 }
 
-
+/**
+ * From Falandays' et. al 2021. Add Homeostasis with adjustible set point
+ *
+ * Each node is characterized by 4 variables:
+ * (1) a current activation level xn, initialized at 0;
+ * (2) a fixed leak rate lr of 0.75 (e.g. if the activation level of a node is 1 at time t, the activation level will
+ * be 0.75 at time t + 1, + in the absence of further input);
+ * (3) a variable target activation level, initialized at Tn = 1;
+ * (4) and a variable spiking threshold T’n, which was = always equal to 2Tn
+ */
 class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
 
-    val leakRate = .25
-    val learningRate = .01
+    @UserParameter(label = "leakRate")
+    var leakRate = .75
+
+    @UserParameter(label = "learning rate")
+    var learningRate = .01
+
+    override fun createScalarData() = AllostaticDataHolder()
 
     override fun apply(n: Neuron, data: ScalarDataHolder) {
 
-        n as AllostaticNeuron
+        data as AllostaticDataHolder
 
-        val newActivation = n.activation * (1-leakRate) + n.getSpikingInput()
+        // Equation 1
+        val newActivation = n.activation * leakRate + n.getAllostaticInput()
         n.activation = max(0.0, newActivation ) // Prevent from going below 0
 
         // Only apply learning if neuron has just spiked
-        // n.applyLearning = n.isSpike
         n.isSpike = false
-        if (n.activation > n.threshold) {
+
+        // Equation 2
+        if (n.activation > data.threshold) {
             n.isSpike = true
             // println("Spike!")
-            n.activation -= n.threshold
+            // Equation 3
+            n.activation -= data.threshold
         }
 
-        val error = n.activation - n.target
+        val error = n.activation - data.target
 
         // Weights
         val toTrain= n.fanIn
-            .filter { it.source is AllostaticNeuron}
+            .filter { it.source.updateRule is SpikingNeuronUpdateRule}
             .filter { it.source.isSpike}
-            // .filter { (it.source as AllostaticNeuron).applyLearning }
 
         toTrain.forEach {  s ->
             if (toTrain.isNotEmpty()) {
@@ -289,19 +320,22 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
             }
         }
 
-        n.target += error * learningRate
-        n.target = max(n.target, 1.0)
-        n.threshold = 2*n.target
+        data.target += error * learningRate
+        // Minimum target is 1
+        data.target = max(data.target, 1.0)
+        data.threshold = 2*data.target
 
         // println("target = ${n.target}, threshold = ${n.threshold}, activation = ${n.activation}")
     }
 
     override fun deepCopy(): NeuronUpdateRule {
-        return AllostaticUpdateRule()
+        val copy = AllostaticUpdateRule()
+        copy.leakRate = leakRate
+        copy.learningRate = learningRate
+        return copy
     }
 
     override val name = "Allostatic Update Rule"
-
 
     // Test getSpikingInput
     fun main() {
@@ -320,7 +354,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
         net.addNetworkModels(s1, s2)
         n1.isSpike = true
         n2.isSpike = true
-        println(n3.getSpikingInput())
+        println(n3.getAllostaticInput())
     }
 
 }

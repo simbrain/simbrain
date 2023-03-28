@@ -40,7 +40,7 @@ import kotlin.math.roundToInt
 class Sparse @JvmOverloads constructor(
 
     /**
-     * What percent (as a probability) of possible connectios to make.
+     * What percent (as a probability) of possible connections to make.
      */
     var connectionDensity: Double = 0.8,
 

@@ -6,7 +6,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.core.decayStrengthBasedOnLength
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
@@ -208,7 +207,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Rand.png",
         name = "Weight randomization dialog...",
         keyboardShortcuts = CmdOrCtrl + 'R',
-        enablingCondition = ConditionallyEnabledAction.EnablingCondition.SYNAPSES
+        enablingCondition = EnablingCondition.SYNAPSES
     ) {
         createSynapseAdjustmentPanel(
             network.getModels<Synapse>().toList(),
@@ -236,7 +235,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     fun applyConnectionAction(strategy: ConnectionStrategy): AbstractAction {
         return networkPanel.createConditionallyEnabledAction(
             name = "Connect ${strategy.name}...",
-            enablingCondition = ConditionallyEnabledAction.EnablingCondition.SOURCE_AND_TARGET_NEURONS
+            enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS
         ) {
             val connectionSelector = ConnectionSelector(strategy)
             ConnectionStrategyPanel(connectionSelector).displayInDialog {
@@ -290,7 +289,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val decayWeightsAction = networkPanel.createConditionallyEnabledAction(
         name = "Decay selected weights based on axon length",
-        enablingCondition = ConditionallyEnabledAction.EnablingCondition.SYNAPSES
+        enablingCondition = EnablingCondition.SYNAPSES
     ) {
         DecayFunction.DecayFunctionSelector().createDialog {
             selectionManager.filterSelectedModels<Synapse>()
@@ -303,7 +302,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val pruneWeightsAction = networkPanel.createConditionallyEnabledAction(
         name = "Prune selected weights",
-        enablingCondition = ConditionallyEnabledAction.EnablingCondition.SYNAPSES
+        enablingCondition = EnablingCondition.SYNAPSES
     ) {
         val threshold: String = JOptionPane.showInputDialog(
             null,
@@ -316,11 +315,31 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
     /**
+     * Prune selected weights. Weights whose absolute value is less then the threshold are removed.
+     */
+    val fastSparseAction  = networkPanel.createConditionallyEnabledAction(
+        name = "Create sparse connection",
+        enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS
+    ) {
+        val sparsity: String = JOptionPane.showInputDialog(
+            null,
+            "Sparsity (0 to 1):",
+            ".1"
+        )
+        val sparse = Sparse().apply {
+            connectionDensity = sparsity.toDouble()
+        }
+        sparse.connectNeurons(network,
+            selectionManager.filterSelectedSourceModels<Neuron>(),
+            selectionManager.filterSelectedModels<Neuron>())
+    }
+
+    /**
      * Randomize the polarity of selected nodes. Note that this will change the polarity of outgoing synapses.
      */
     val randomizePolarityAction = networkPanel.createConditionallyEnabledAction(
         name = "Randomize polarity of selected neurons",
-        enablingCondition = ConditionallyEnabledAction.EnablingCondition.NEURONS
+        enablingCondition = EnablingCondition.NEURONS
     ) {
         // TODO: Indicate the threshold somehow in a prompt
         ProbabilityDistribution.Randomizer().createDialog { dist ->
@@ -337,7 +356,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val fastGridAction = networkPanel.createConditionallyEnabledAction(
         name = "Apply grid layout to selected nodes",
         keyboardShortcuts = CmdOrCtrl + 'L',
-        enablingCondition = ConditionallyEnabledAction.EnablingCondition.NEURONS
+        enablingCondition = EnablingCondition.NEURONS
     ) {
         GridLayout().layoutNeurons(selectionManager.filterSelectedModels<Neuron>())
         network.events.zoomToFitPage.fireAndForget()

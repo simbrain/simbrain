@@ -76,6 +76,7 @@ val NetworkPanel.actionMenu
             // Alphabetical by action name
             add(fast100)
             add(fastGridAction)
+            add(fastSparseAction)
             add(decayWeightsAction)
             add(pruneWeightsAction)
             add(randomizePolarityAction)

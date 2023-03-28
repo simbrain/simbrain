@@ -2,9 +2,9 @@ package org.simbrain.util.projection
 
 import smile.projection.PCA
 
-class PCAProjection2 @JvmOverloads constructor (dimension: Int = 3): ProjectionMethod2(dimension) {
+class PCAProjection2: ProjectionMethod2() {
 
-    val initialProjectionMethod = CoordinateProjection2(dimension)
+    val initialProjectionMethod = CoordinateProjection2()
 
     var pca: PCA? = null
 
@@ -30,7 +30,7 @@ class PCAProjection2 @JvmOverloads constructor (dimension: Int = 3): ProjectionM
         }
     }
 
-    override fun copy() = PCAProjection2(dimension)
+    override fun copy() = PCAProjection2()
 
     override val name = "PCA"
 

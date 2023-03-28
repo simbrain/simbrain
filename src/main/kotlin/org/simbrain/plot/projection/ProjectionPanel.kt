@@ -11,19 +11,41 @@ import org.jfree.chart.JFreeChart
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.createAction
-import org.simbrain.util.createDialog
-import org.simbrain.util.display
+import org.simbrain.util.*
+import org.simbrain.util.projection.ProjectionMethod2
 import org.simbrain.util.projection.Projector2
 import org.simbrain.util.projection.SammonProjection2
+import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Dimension
+import java.awt.FlowLayout
 import javax.swing.*
 import kotlin.random.Random
+import kotlin.reflect.full.primaryConstructor
 
 class ProjectionPanel: JPanel(), CoroutineScope {
-
     val projector = Projector2(5)
+
+    init {
+        layout = BorderLayout()
+        projector.events.dataChanged.on {
+            update()
+        }
+        projector.events.methodChanged2.on { o, n ->
+            if (n.name == "Sammon") {
+                bottomPanel.add(errorLabel)
+            } else {
+                bottomPanel.remove(errorLabel)
+            }
+            bottomPanel.revalidate()
+            bottomPanel.repaint()
+            launch { update() }
+        }
+        projector.events.iteration.on { error ->
+            errorLabel.text = "Error: ${error.format(2)}"
+        }
+
+    }
 
     override var coroutineContext = projector.coroutineContext
 
@@ -32,7 +54,7 @@ class ProjectionPanel: JPanel(), CoroutineScope {
         iconPath = "menu_icons/Rand.png"
     ) {
         projector.dataset.randomizeDownstairs()
-        update()
+        projector.events.dataChanged.fireAndForget()
     }
 
     var running = false
@@ -68,13 +90,29 @@ class ProjectionPanel: JPanel(), CoroutineScope {
         running = false
     }
 
+    val prefsAction = createAction(
+        iconPath = "menu_icons/Prefs.png",
+        name = "Preferences...",
+        description = "Set projection preferences"
+    ) {
+        showPrefDialog()
+    }
+
+    fun showPrefDialog() {
+        projector.createDialog {
+            it.project()
+            launch { update() }
+        }.display()
+    }
+
     private suspend fun iterate() {
         projector.projectionMethod.let { projection ->
             if (projection is SammonProjection2) {
                 projection.iterate(projector.dataset)
+                projector.events.iteration.fireAndSuspend(projection.error)
             }
         }
-        update()
+        projector.events.dataChanged.fireAndForget()
     }
 
     /**
@@ -99,20 +137,48 @@ class ProjectionPanel: JPanel(), CoroutineScope {
         xyPlot.foregroundAlpha = .5f // TODO: Make this settable
     }
 
+    val projectionMethods = ProjectionMethod2.getTypes()
+        .associateWith { it.kotlin.primaryConstructor!!.call() }
+    val projectionSelector = JComboBox<ProjectionMethod2>().apply {
+        maximumSize = Dimension(200, 100)
+        projectionMethods.values.forEach {
+            addItem(it)
+        }.also {
+            addActionListener {
+                println(selectedItem)
+                projector.projectionMethod = (selectedItem as ProjectionMethod2)
+            }
+        }
+    }
+
     private val chartPanel = ChartPanel(chart).also {
         add("Center", it)
     }
 
-
+    val pointsLabel = JLabel()
+    val dimensionsLabel = JLabel()
+    val errorLabel = JLabel("Error: ---")
+    val bottomPanel = JPanel().apply {
+        layout = FlowLayout(FlowLayout.LEFT)
+        add(pointsLabel)
+        add(Box.createHorizontalStrut(25));
+        add(dimensionsLabel)
+        add(Box.createHorizontalStrut(25));
+    }.also {
+        add("South", it)
+    }
     private val toolbars = JToolBar().apply {
+        add(projectionSelector)
+        addSeparator()
+        add(prefsAction)
+        add(randomizeAction)
+        addSeparator()
         add(iterateAction)
         add(runAction)
         add(stopAction)
-        add(randomizeAction)
     }.also {
         add("North", it)
     }
-
 
     suspend fun update() {
         withContext(Dispatchers.Swing) {
@@ -121,11 +187,12 @@ class ProjectionPanel: JPanel(), CoroutineScope {
                 val (x, y) = it.downstairsPoint
                 xyCollection.getSeries(0).add(x, y)
             }
+            pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
+            dimensionsLabel.text = "Dimensions: ${projector.dimension}"
         }
     }
 
 }
-
 
 suspend fun main() {
     val random = Random(1)
@@ -134,9 +201,9 @@ suspend fun main() {
             // repeat(100) {
             //     projector.addDataPoint(DoubleArray(5) { random.nextDouble() })
             // }
-            projector.projectionMethod = SammonProjection2(projector.dimension).apply {
-                epsilon = 100.0
-            }
+            // projector.projectionMethod = SammonProjection2(projector.dimension).apply {
+            //     epsilon = 100.0
+            // }
             (0 until 40).forEach { p ->
                 projector.addDataPoint(DoubleArray(100) { p.toDouble() })
             }
@@ -149,10 +216,7 @@ suspend fun main() {
             add(JMenu("Edit").apply {
                 add(JMenuItem("Preferences...").apply {
                     addActionListener {
-                        projectionPanel.projector.createDialog {
-                            it.project()
-                            // projectionPanel.update()
-                        }.display()
+                        projectionPanel.showPrefDialog()
                     }
                 })
                 add(projectionPanel.randomizeAction)

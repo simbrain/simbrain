@@ -8,7 +8,7 @@ import kotlin.math.pow
  *
  * https://www.sciencedirect.com/science/article/abs/pii/S0167865597000937
  */
-class TriangulateProjection2 @JvmOverloads constructor(dimension: Int = 3): ProjectionMethod2(dimension) {
+class TriangulateProjection2: ProjectionMethod2() {
 
     override fun project(dataset: Dataset2) {
         dataset.kdTree.forEachIndexed { index, point ->
@@ -16,16 +16,16 @@ class TriangulateProjection2 @JvmOverloads constructor(dimension: Int = 3): Proj
         }
     }
 
-    fun triangulatePoint(dataset: Dataset2, point: DataPoint2, index: Int) {
+    private fun triangulatePoint(dataset: Dataset2, point: DataPoint2, index: Int) {
         when (index) {
             0 -> point.setDownstairs(doubleArrayOf(0.0, 0.0))
             1 -> {
-                val nearestPoint = dataset.kdTree.findClosestNPoint(point)
-                val distance = nearestPoint!!.euclideanDistance(point)
+                val nearestPoint = dataset.kdTree.findClosestNPoints(point, 2)[1]
+                val distance = nearestPoint.euclideanDistance(point)
                 point.setDownstairs(doubleArrayOf(distance, 0.0))
             }
             2 -> {
-                val (p1, p2) = dataset.kdTree.findClosestNPoints(point, 2)
+                val (p1, p2) = dataset.kdTree.findClosestNPoints(point, 3).slice(1..2)
                 val d1 = p1.euclideanDistance(point)
                 val d2 = p2.euclideanDistance(point)
                 val x = (d1 * p1.downstairsPoint[0] + d2 * p2.downstairsPoint[0]) / (d1 + d2)
@@ -33,7 +33,7 @@ class TriangulateProjection2 @JvmOverloads constructor(dimension: Int = 3): Proj
                 point.setDownstairs(doubleArrayOf(x, y))
             }
             else -> {
-                val (p1, p2, p3) = dataset.kdTree.findClosestNPoints(point, 3)
+                val (p1, p2, p3) = dataset.kdTree.findClosestNPoints(point, 4).slice(1..3)
                 val (p1x, p1y) = p1.downstairsPoint
                 val (p2x, p2y) = p2.downstairsPoint
                 val (p3x, p3y) = p3.downstairsPoint
@@ -91,7 +91,7 @@ class TriangulateProjection2 @JvmOverloads constructor(dimension: Int = 3): Proj
 
     }
 
-    override fun copy() = TriangulateProjection2(dimension)
+    override fun copy() = TriangulateProjection2()
 
     override val name = "Triangulate"
 

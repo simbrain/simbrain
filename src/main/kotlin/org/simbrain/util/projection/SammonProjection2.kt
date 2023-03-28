@@ -3,11 +3,11 @@ package org.simbrain.util.projection
 import org.simbrain.util.UserParameter
 import kotlin.math.pow
 
-class SammonProjection2 @JvmOverloads constructor (dimension: Int = 3): ProjectionMethod2(dimension) {
+class SammonProjection2: ProjectionMethod2() {
 
-    val downstairsInitializationMethod = CoordinateProjection2(dimension)
+    val downstairsInitializationMethod = CoordinateProjection2()
 
-    @UserParameter(label = "Epsilon")
+    @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .1)
     var epsilon = 0.1
 
     var numPoints = 0
@@ -55,20 +55,20 @@ class SammonProjection2 @JvmOverloads constructor (dimension: Int = 3): Projecti
         }
 
         // Computes Closeness
-
-        // Computes Closeness
-        var e = 0.0
+        error = 0.0
         for (i in 0 until dataset.kdTree.size) {
             for (j in i + 1 until dataset.kdTree.size) {
-                e += (upstairsDistances!![i][j] - downstairsDistances!![i][j]).pow(2) / upstairsDistances!![i][j]
+                error += (upstairsDistances!![i][j] - downstairsDistances!![i][j]).pow(2) / upstairsDistances!![i][j]
             }
         }
         // println(e / upstairsDistanceSum!!)
     }
 
+    var error = 0.0
+
     override val name = "Sammon"
 
-    override fun copy() = SammonProjection2(dimension)
+    override fun copy() = SammonProjection2()
 
     // Kotlin hack to support "static method in superclass"
     companion object {

@@ -2,23 +2,13 @@ package org.simbrain.util.projection
 
 import org.simbrain.util.UserParameter
 
-class CoordinateProjection2 @JvmOverloads constructor (dimension: Int = 3): ProjectionMethod2(dimension) {
+class CoordinateProjection2: ProjectionMethod2() {
 
-    @UserParameter(label = "dim1")
+    @UserParameter(label = "dim1", minimumValue = 0.0)
     var dim1 = 0
-        set(value) {
-            if (value in 0 until dimension) {
-                field = value
-            }
-        }
 
-    @UserParameter(label = "dim2")
+    @UserParameter(label = "dim2", minimumValue = 0.0)
     var dim2 = 1
-        set(value) {
-            if (value in 0 until dimension) {
-                field = value
-            }
-        }
 
     override fun project(dataset: Dataset2) {
         dataset.kdTree.forEach {
@@ -31,7 +21,7 @@ class CoordinateProjection2 @JvmOverloads constructor (dimension: Int = 3): Proj
         point.downstairsPoint[1] = point.upstairsPoint[dim2]
     }
 
-    override fun copy() = CoordinateProjection2(dimension)
+    override fun copy() = CoordinateProjection2()
 
     override val name = "Coordinate"
 

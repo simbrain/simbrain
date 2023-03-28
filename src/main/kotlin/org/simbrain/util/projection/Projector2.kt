@@ -8,13 +8,16 @@ import org.simbrain.util.createDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.EditableObject
 
-class Projector2(initialDimension: Int): EditableObject, CoroutineScope {
+class Projector2(initialDimension: Int) : EditableObject, CoroutineScope {
 
     @Transient
     private var job = SupervisorJob()
 
     @Transient
     override var coroutineContext = Dispatchers.Default + job
+
+    @Transient
+    val events = ProjectorEvents2()
 
     var dimension: Int = initialDimension
         set(value) {
@@ -27,11 +30,13 @@ class Projector2(initialDimension: Int): EditableObject, CoroutineScope {
     @UserParameter(label = "tolerance", minimumValue = 0.0)
     var tolerance: Double = 0.1
 
-    @UserParameter(label = "Projection Method", isObjectType = true)
-    var projectionMethod: ProjectionMethod2 = CoordinateProjection2(dimension)
+    @UserParameter(label = "Projection Method", useSetter = true, isObjectType = true)
+    var projectionMethod: ProjectionMethod2 = CoordinateProjection2()
         set(value) {
+            val oldMethod = field
             field = value
             project()
+            events.methodChanged2.fireAndForget(oldMethod, value)
         }
 
     fun addDataPoint(newPoint: DataPoint2) {

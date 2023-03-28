@@ -28,6 +28,7 @@ fun NetworkPanel.createConditionallyEnabledAction(
         }
         updateAction()
         selectionManager.events.selection.on { _, _ -> updateAction() }
+        selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
     },
     coroutineScope = null,
     block

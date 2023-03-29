@@ -11,13 +11,11 @@ import kotlin.math.pow
 class TriangulateProjection2: ProjectionMethod2() {
 
     override fun project(dataset: Dataset2) {
-        dataset.kdTree.forEachIndexed { index, point ->
-            triangulatePoint(dataset, point, index)
-        }
+
     }
 
-    private fun triangulatePoint(dataset: Dataset2, point: DataPoint2, index: Int) {
-        when (index) {
+    private fun triangulatePoint(dataset: Dataset2, point: DataPoint2) {
+        when (dataset.kdTree.size) {
             0 -> point.setDownstairs(doubleArrayOf(0.0, 0.0))
             1 -> {
                 val nearestPoint = dataset.kdTree.findClosestNPoints(point, 2)[1]
@@ -88,7 +86,7 @@ class TriangulateProjection2: ProjectionMethod2() {
     }
 
     override fun addPoint(dataset: Dataset2, point: DataPoint2) {
-
+        triangulatePoint(dataset, point)
     }
 
     override fun copy() = TriangulateProjection2()

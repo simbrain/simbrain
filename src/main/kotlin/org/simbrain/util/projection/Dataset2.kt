@@ -39,6 +39,20 @@ class Dataset2(val dimension: Int) {
         }
     }
 
+    fun perturbOverlappingPoints(perturbation: Double = 0.1, epsilon: Double = 1e-6) {
+        kdTree.map { it.downstairsPoint }.forEach { i ->
+            kdTree.map { it.downstairsPoint }.forEach { j ->
+                if (i !== j) {
+                    val distance = i.euclideanDistance(j)
+                    if (distance < epsilon) {
+                        i[0] += Random.nextDouble(-perturbation, +perturbation)
+                        i[1] += Random.nextDouble(-perturbation, +perturbation)
+                    }
+                }
+            }
+        }
+    }
+
     override fun toString() = """
         |upstairs:
         |${kdTree.joinToString("\n|") { it.upstairsPoint.contentToString() }}

@@ -18,6 +18,7 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
         // }
         upstairsDistances = dataset.computeUpstairsDistances()
         upstairsDistanceSum = upstairsDistances?.sumOf { it.sum() }
+        dataset.perturbOverlappingPoints()
         // downstairsDistances = dataset.computeDownstairsDistances()
         // println("UP")
         // upstairsDistances?.let { println(it.thing()) }

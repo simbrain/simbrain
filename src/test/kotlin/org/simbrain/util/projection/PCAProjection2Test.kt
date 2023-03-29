@@ -11,7 +11,7 @@ class PCAProjection2Test {
 
         // Creation projector
         val proj = Projector2(3)
-        proj.projectionMethod = PCAProjection2(3)
+        proj.projectionMethod = PCAProjection2()
 
         // Create upstairs data
         proj.addDataPoint(doubleArrayOf(-1.0, -1.0, 1.0))

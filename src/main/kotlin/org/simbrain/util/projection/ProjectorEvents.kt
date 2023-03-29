@@ -10,8 +10,14 @@ class ProjectorEvents2: Events2() {
     val pointFound = AddedEvent<DataPoint>()
     val colorsChanged = NoArgEvent()
     val methodChanged = ChangedEvent<ProjectionMethod>()
-    val methodChanged2 = ChangedEvent<ProjectionMethod2>()
     val iteration = AddedEvent<Double>()
+
+}
+
+class ProjectorEvents3: Events2() {
+    val downstairsChanged = NoArgEvent()
+    val methodChanged = ChangedEvent<ProjectionMethod2>()
+    val iterated = AddedEvent<Double>()
     val beginTraining = NoArgEvent()
     val endTraining = NoArgEvent()
 

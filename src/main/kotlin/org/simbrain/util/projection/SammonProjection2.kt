@@ -25,8 +25,8 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
         // downstairsDistances?.let { println(it.thing()) }
     }
 
-    override fun initializeDownstairsPoint(dataset: Dataset2, point: DataPoint2) {
-        downstairsInitializationMethod.initializeDownstairsPoint(dataset, point)
+    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
+        downstairsInitializationMethod.addPoint(dataset, point)
     }
 
     var upstairsDistances: List<List<Double>>? = null

@@ -12,13 +12,17 @@ class CoordinateProjection2: ProjectionMethod2() {
 
     override fun project(dataset: Dataset2) {
         dataset.kdTree.forEach {
-            initializeDownstairsPoint(dataset, it)
+            projectPoint(it)
         }
     }
 
-    override fun initializeDownstairsPoint(dataset: Dataset2, point: DataPoint2) {
+    private fun projectPoint(point: DataPoint2) {
         point.downstairsPoint[0] = point.upstairsPoint[dim1]
         point.downstairsPoint[1] = point.upstairsPoint[dim2]
+    }
+
+    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
+        projectPoint(point)
     }
 
     override fun copy() = CoordinateProjection2()

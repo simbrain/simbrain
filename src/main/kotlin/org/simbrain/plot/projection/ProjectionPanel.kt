@@ -29,10 +29,10 @@ class ProjectionPanel: JPanel(), CoroutineScope {
 
     init {
         layout = BorderLayout()
-        projector.events.dataChanged.on {
+        projector.events.downstairsChanged.on {
             update()
         }
-        projector.events.methodChanged2.on { o, n ->
+        projector.events.methodChanged.on { o, n ->
 
             if (n is IterableProjectionMethod2) {
                 northPanel.add(runToolbar)
@@ -47,7 +47,7 @@ class ProjectionPanel: JPanel(), CoroutineScope {
             bottomPanel.repaint()
             launch { update() }
         }
-        projector.events.iteration.on { error ->
+        projector.events.iterated.on { error ->
             errorLabel.text = "Error: ${error.format(2)}"
         }
 
@@ -60,7 +60,7 @@ class ProjectionPanel: JPanel(), CoroutineScope {
         iconPath = "menu_icons/Rand.png"
     ) {
         projector.dataset.randomizeDownstairs()
-        projector.events.dataChanged.fireAndForget()
+        projector.events.downstairsChanged.fireAndForget()
     }
 
     var running = false
@@ -117,10 +117,10 @@ class ProjectionPanel: JPanel(), CoroutineScope {
         projector.projectionMethod.let { projection ->
             if (projection is IterableProjectionMethod2) {
                 projection.iterate(projector.dataset)
-                projector.events.iteration.fireAndSuspend(projection.error)
+                projector.events.iterated.fireAndSuspend(projection.error)
             }
         }
-        projector.events.dataChanged.fireAndForget()
+        projector.events.downstairsChanged.fireAndSuspend()
     }
 
     /**

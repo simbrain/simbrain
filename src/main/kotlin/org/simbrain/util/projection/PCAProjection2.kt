@@ -20,10 +20,10 @@ class PCAProjection2: ProjectionMethod2() {
         }
     }
 
-    override fun initializeDownstairsPoint(dataset: Dataset2, point: DataPoint2) {
+    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
         pca.let {
             if (it == null) {
-                initialProjectionMethod.initializeDownstairsPoint(dataset, point)
+                initialProjectionMethod.addPoint(dataset, point)
             } else {
                 point.setDownstairs(it.project(point.upstairsPoint))
             }

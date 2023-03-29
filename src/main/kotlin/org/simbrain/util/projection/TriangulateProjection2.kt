@@ -87,7 +87,7 @@ class TriangulateProjection2: ProjectionMethod2() {
         }
     }
 
-    override fun initializeDownstairsPoint(dataset: Dataset2, point: DataPoint2) {
+    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
 
     }
 

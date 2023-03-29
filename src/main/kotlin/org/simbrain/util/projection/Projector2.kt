@@ -17,7 +17,7 @@ class Projector2(initialDimension: Int) : EditableObject, CoroutineScope {
     override var coroutineContext = Dispatchers.Default + job
 
     @Transient
-    val events = ProjectorEvents2()
+    val events = ProjectorEvents3()
 
     var dimension: Int = initialDimension
         set(value) {
@@ -36,7 +36,7 @@ class Projector2(initialDimension: Int) : EditableObject, CoroutineScope {
             val oldMethod = field
             field = value
             project()
-            events.methodChanged2.fireAndForget(oldMethod, value)
+            events.methodChanged.fireAndForget(oldMethod, value)
         }
 
     fun addDataPoint(newPoint: DataPoint2) {
@@ -46,7 +46,7 @@ class Projector2(initialDimension: Int) : EditableObject, CoroutineScope {
         } else {
             dataset.kdTree.insert(newPoint)
             dataset.currentPoint = newPoint
-            projectionMethod.initializeDownstairsPoint(dataset, newPoint)
+            projectionMethod.addPoint(dataset, newPoint)
         }
     }
 

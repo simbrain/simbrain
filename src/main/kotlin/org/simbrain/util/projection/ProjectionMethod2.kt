@@ -28,7 +28,7 @@ abstract class ProjectionMethod2() : CopyableObject {
      *
      *  Change name to updatePoint or add point?
      */
-    abstract fun initializeDownstairsPoint(dataset: Dataset2, point: DataPoint2)
+    abstract fun addPoint(dataset: Dataset2, point: DataPoint2)
 
     abstract override fun copy(): ProjectionMethod2
 

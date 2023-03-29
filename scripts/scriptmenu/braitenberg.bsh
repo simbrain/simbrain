@@ -46,41 +46,30 @@ import java.util.*;
             vehicle2.getSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightr.getText()));
             workspace.iterate();
         }});
-    panel.addItem("Pursuers", buttonPursuer);
+    panel.addItem("Same pair", buttonPursuer);
 
     JButton buttonAvoider = new JButton("Make");
     buttonAvoider.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            vehicle1.getSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightl.getText()));
-            vehicle1.getSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
-            vehicle2.getSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightl.getText()));
-            vehicle2.getSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightr.getText()));
+            vehicle1.getSynapse("Synapse_1").setStrength(Double.parseDouble(weightl.getText()));
+            vehicle1.getSynapse("Synapse_2").setStrength(Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_2").setStrength(Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_1").setStrength(Double.parseDouble(weightl.getText()));
             workspace.iterate();
-
         }});
-    panel.addItem("Avoiders", buttonAvoider);
+    panel.addItem("Reversed pair", buttonAvoider);
 
     JButton buttonAvoiderPursuer = new JButton("Make");
     buttonAvoiderPursuer.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent arg0) {
-            vehicle1.getSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightl.getText()));
-            vehicle1.getSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
-            vehicle2.getSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightl.getText()));
-            vehicle2.getSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightr.getText()));
+            vehicle1.getSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightl.getText()));
+            vehicle1.getSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightr.getText()));
+            vehicle2.getSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightl.getText()));
+            vehicle2.getSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightr.getText()));
             workspace.iterate();
         }});
-    panel.addItem("Avoider-Pursuer", buttonAvoiderPursuer);
+    panel.addItem("Opposite pair", buttonAvoiderPursuer);
 
-    JButton buttonReverseWeights = new JButton("Do it!");
-    buttonReverseWeights.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent arg0) {
-            vehicle2.getSynapse("Synapse_2").setStrength(vehicle1.getSynapse("Synapse_2").getStrength());
-            vehicle2.getSynapse("Synapse_1").setStrength(vehicle1.getSynapse("Synapse_1").getStrength());
-            
-            workspace.iterate();
-        }});
-    panel.addItem("Reverse weights", buttonReverseWeights);
-    
     JTextField weightl = new JTextField("100");
     panel.addItem("Left weight", weightl);
     JTextField weightr = new JTextField("50");

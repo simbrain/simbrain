@@ -3,14 +3,12 @@ package org.simbrain.util.projection
 import org.simbrain.util.UserParameter
 import kotlin.math.pow
 
-class SammonProjection2: ProjectionMethod2() {
+class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
 
     val downstairsInitializationMethod = CoordinateProjection2()
 
     @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .1)
     var epsilon = 0.1
-
-    var numPoints = 0
 
     override fun project(dataset: Dataset2) {
         // fun List<List<Double>>.thing() = joinToString("\n") {
@@ -35,7 +33,7 @@ class SammonProjection2: ProjectionMethod2() {
     var downstairsDistances: List<List<Double>>? = null
     var upstairsDistanceSum: Double? = null
 
-    fun iterate(dataset: Dataset2) {
+    override fun iterate(dataset: Dataset2) {
         if (dataset.kdTree.size < 2) return
         downstairsDistances = dataset.computeDownstairsDistances()
         dataset.kdTree.forEachIndexed { j, p1 ->
@@ -64,7 +62,7 @@ class SammonProjection2: ProjectionMethod2() {
         // println(e / upstairsDistanceSum!!)
     }
 
-    var error = 0.0
+    override var error = 0.0
 
     override val name = "Sammon"
 

@@ -12,9 +12,10 @@ import org.jfree.chart.plot.PlotOrientation
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.util.*
+import org.simbrain.util.projection.IterableProjectionMethod2
 import org.simbrain.util.projection.ProjectionMethod2
 import org.simbrain.util.projection.Projector2
-import org.simbrain.util.projection.SammonProjection2
+import org.simbrain.util.widgets.ToggleButton
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -32,11 +33,16 @@ class ProjectionPanel: JPanel(), CoroutineScope {
             update()
         }
         projector.events.methodChanged2.on { o, n ->
-            if (n.name == "Sammon") {
+
+            if (n is IterableProjectionMethod2) {
+                northPanel.add(runToolbar)
                 bottomPanel.add(errorLabel)
             } else {
                 bottomPanel.remove(errorLabel)
+                northPanel.remove(runToolbar)
             }
+            northPanel.revalidate()
+            northPanel.repaint()
             bottomPanel.revalidate()
             bottomPanel.repaint()
             launch { update() }
@@ -74,6 +80,7 @@ class ProjectionPanel: JPanel(), CoroutineScope {
     ) {
         if (!running) {
             running = true
+            projector.events.beginTraining.fireAndSuspend()
             launch {
                 while (running) {
                     iterate()
@@ -88,6 +95,7 @@ class ProjectionPanel: JPanel(), CoroutineScope {
         description = "Stop"
     ) {
         running = false
+        projector.events.endTraining.fireAndSuspend()
     }
 
     val prefsAction = createAction(
@@ -107,7 +115,7 @@ class ProjectionPanel: JPanel(), CoroutineScope {
 
     private suspend fun iterate() {
         projector.projectionMethod.let { projection ->
-            if (projection is SammonProjection2) {
+            if (projection is IterableProjectionMethod2) {
                 projection.iterate(projector.dataset)
                 projector.events.iteration.fireAndSuspend(projection.error)
             }
@@ -145,7 +153,6 @@ class ProjectionPanel: JPanel(), CoroutineScope {
             addItem(it)
         }.also {
             addActionListener {
-                println(selectedItem)
                 projector.projectionMethod = (selectedItem as ProjectionMethod2)
             }
         }
@@ -167,18 +174,33 @@ class ProjectionPanel: JPanel(), CoroutineScope {
     }.also {
         add("South", it)
     }
-    private val toolbars = JToolBar().apply {
+
+    private val northPanel = JPanel(FlowLayout(FlowLayout.LEFT)).also{
+        add("North", it)
+    }
+
+    private val toolbar = JToolBar().apply {
         add(projectionSelector)
         addSeparator()
         add(prefsAction)
         add(randomizeAction)
-        addSeparator()
-        add(iterateAction)
-        add(runAction)
-        add(stopAction)
     }.also {
-        add("North", it)
+        northPanel.add(it)
     }
+
+    private val runToolbar = JToolBar().apply {
+        add(ToggleButton(listOf(stopAction, runAction)).apply{
+            setAction("Run")
+            projector.events.beginTraining.on {
+                setAction("Stop")
+            }
+            projector.events.endTraining.on {
+                setAction("Run")
+            }
+        })
+        add(iterateAction)
+    }
+
 
     suspend fun update() {
         withContext(Dispatchers.Swing) {
@@ -219,8 +241,6 @@ suspend fun main() {
                         projectionPanel.showPrefDialog()
                     }
                 })
-                add(projectionPanel.randomizeAction)
-                add(projectionPanel.iterateAction)
             })
         }
 

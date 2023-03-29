@@ -12,5 +12,7 @@ class ProjectorEvents2: Events2() {
     val methodChanged = ChangedEvent<ProjectionMethod>()
     val methodChanged2 = ChangedEvent<ProjectionMethod2>()
     val iteration = AddedEvent<Double>()
+    val beginTraining = NoArgEvent()
+    val endTraining = NoArgEvent()
 
 }

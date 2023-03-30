@@ -6,6 +6,7 @@ import kotlin.math.pow
 class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
 
     val downstairsInitializationMethod = CoordinateProjection2()
+    val downstairsInitializationMethod2 = TriangulateProjection2()
 
     @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .1)
     var epsilon = 0.1
@@ -17,7 +18,11 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
     }
 
     override fun addPoint(dataset: Dataset2, point: DataPoint2) {
-        downstairsInitializationMethod.addPoint(dataset, point)
+        if (dataset.kdTree.size < 15) {
+            downstairsInitializationMethod.addPoint(dataset, point)
+        } else {
+            downstairsInitializationMethod2.addPoint(dataset, point)
+        }
     }
 
     var upstairsDistances: List<List<Double>>? = null

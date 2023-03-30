@@ -66,7 +66,7 @@ class KDTree(private val dimension: Int) : Iterable<DataPoint2> {
         }
     }
 
-    fun findClosestNPoint(target: DataPoint2) = findClosestNPoints(target, 1).firstOrNull()
+    fun findClosestPoint(target: DataPoint2) = findClosestNPoints(target, 1).firstOrNull()
 
     fun findClosestNPoints(target: DataPoint2, n: Int): List<DataPoint2> {
         val closestNPoints = PriorityQueue<SearchNode>()

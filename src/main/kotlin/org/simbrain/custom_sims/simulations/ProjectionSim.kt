@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addProjectionPlot
+import org.simbrain.custom_sims.addProjectionPlot2
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.matrix.NeuronArray
@@ -35,7 +35,7 @@ val projectionSim = newSim {
     }
 
     // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot("Activations")
+    val projectionPlot = addProjectionPlot2("Activations")
     withGui {
         place(projectionPlot) {
             location = point(410, 0)

@@ -192,6 +192,7 @@ class WorkspaceActionManager(val desktop: SimbrainDesktop) {
         createComponentFactoryAction("Pie Chart", "menu_icons/PieChart.png"),
         createComponentFactoryAction("Pixel Plot", "menu_icons/grid.png"),
         createComponentFactoryAction("Projection Plot", "menu_icons/ProjectionIcon.png"),
+        createComponentFactoryAction("Projection2 Plot", "menu_icons/ProjectionIcon.png"),
         createComponentFactoryAction("Raster Plot", "menu_icons/ScatterIcon.png"),
         createComponentFactoryAction("Time Series", "menu_icons/CurveChart.png")
     )

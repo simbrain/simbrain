@@ -24,8 +24,7 @@ import javax.swing.*
 import kotlin.random.Random
 import kotlin.reflect.full.primaryConstructor
 
-class ProjectionPanel: JPanel(), CoroutineScope {
-    val projector = Projector2(5)
+class ProjectionPanel(val projector: Projector2): JPanel(), CoroutineScope {
 
     init {
         layout = BorderLayout()
@@ -219,7 +218,7 @@ class ProjectionPanel: JPanel(), CoroutineScope {
 suspend fun main() {
     val random = Random(1)
     StandardDialog().apply {
-        val projectionPanel = ProjectionPanel().apply {
+        val projectionPanel = ProjectionPanel(Projector2(5)).apply {
             // repeat(100) {
             //     projector.addDataPoint(DoubleArray(5) { random.nextDouble() })
             // }
@@ -241,6 +240,12 @@ suspend fun main() {
                         projectionPanel.showPrefDialog()
                     }
                 })
+            })
+            add(JMenuItem("Add Point").apply {
+                addActionListener {
+                    projectionPanel.projector.addDataPoint(DoubleArray(100) { random.nextDouble() })
+                    projectionPanel.projector.project()
+                }
             })
         }
 

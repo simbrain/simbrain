@@ -8,6 +8,7 @@ import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.plot.projection.ProjectionComponent2
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.loadTileMap
@@ -89,6 +90,12 @@ fun SimulationScope.addOdorWorldComponent(
  */
 suspend fun SimulationScope.addProjectionPlot(name: String?): ProjectionComponent {
     val projectionComponent = ProjectionComponent(name)
+    workspace.addWorkspaceComponent(projectionComponent)
+    return projectionComponent
+}
+
+suspend fun SimulationScope.addProjectionPlot2(name: String): ProjectionComponent2 {
+    val projectionComponent = ProjectionComponent2(name)
     workspace.addWorkspaceComponent(projectionComponent)
     return projectionComponent
 }

@@ -8,7 +8,7 @@ import org.simbrain.util.createDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.EditableObject
 
-class Projector2(initialDimension: Int) : EditableObject, CoroutineScope {
+class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
     @Transient
     private var job = SupervisorJob()
@@ -40,13 +40,14 @@ class Projector2(initialDimension: Int) : EditableObject, CoroutineScope {
         }
 
     fun addDataPoint(newPoint: DataPoint2) {
-        val closestPoint = dataset.kdTree.findClosestNPoint(newPoint)
+        val closestPoint = dataset.kdTree.`findClosestPoint`(newPoint)
         if (closestPoint != null && closestPoint.euclideanDistance(newPoint) < tolerance) {
             dataset.currentPoint = closestPoint
         } else {
             dataset.kdTree.insert(newPoint)
             dataset.currentPoint = newPoint
             projectionMethod.addPoint(dataset, newPoint)
+            events.downstairsChanged.fireAndBlock()
         }
     }
 

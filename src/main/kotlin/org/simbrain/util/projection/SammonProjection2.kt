@@ -11,19 +11,9 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
     var epsilon = 0.1
 
     override fun project(dataset: Dataset2) {
-        // fun List<List<Double>>.thing() = joinToString("\n") {
-        //     it.joinToString(", ") {
-        //         it.format(2)
-        //     }
-        // }
         upstairsDistances = dataset.computeUpstairsDistances()
         upstairsDistanceSum = upstairsDistances?.sumOf { it.sum() }
         dataset.perturbOverlappingPoints()
-        // downstairsDistances = dataset.computeDownstairsDistances()
-        // println("UP")
-        // upstairsDistances?.let { println(it.thing()) }
-        // println("DOWN")
-        // downstairsDistances?.let { println(it.thing()) }
     }
 
     override fun addPoint(dataset: Dataset2, point: DataPoint2) {

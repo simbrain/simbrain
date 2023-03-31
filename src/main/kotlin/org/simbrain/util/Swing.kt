@@ -10,7 +10,6 @@ import java.awt.event.*
 import java.io.File
 import javax.swing.*
 
-
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
     addWindowListener(object : WindowAdapter() {
         override fun windowClosed(e: WindowEvent?) {

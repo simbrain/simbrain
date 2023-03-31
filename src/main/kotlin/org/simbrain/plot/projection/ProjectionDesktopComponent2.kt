@@ -1,29 +1,264 @@
 package org.simbrain.plot.projection
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
+import org.jfree.chart.ChartFactory
+import org.jfree.chart.ChartPanel
+import org.jfree.chart.JFreeChart
+import org.jfree.chart.plot.PlotOrientation
+import org.jfree.data.xy.XYSeries
+import org.jfree.data.xy.XYSeriesCollection
+import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.util.projection.IterableProjectionMethod2
+import org.simbrain.util.projection.ProjectionMethod2
+import org.simbrain.util.projection.Projector2
+import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.gui.DesktopComponent
+import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Dimension
-import javax.swing.JMenu
-import javax.swing.JMenuBar
-import javax.swing.JMenuItem
+import java.awt.FlowLayout
+import javax.swing.*
+import kotlin.reflect.full.primaryConstructor
 
-class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComponent2): DesktopComponent<ProjectionComponent2>(frame, component) {
+class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComponent2)
+    : DesktopComponent<ProjectionComponent2>(frame, component), CoroutineScope {
 
+    val projector = component.projector
+    override var coroutineContext = projector.coroutineContext
 
-    val projectionPanel = ProjectionPanel(component.projector)
+    var running = false
 
-    init {
-        preferredSize = Dimension(500, 400)
-        add(projectionPanel)
-        frame.jMenuBar = JMenuBar().apply {
-            add(JMenu("Edit").apply {
-                add(JMenuItem("Preferences...").apply {
-                    addActionListener {
-                        projectionPanel.showPrefDialog()
-                    }
-                })
-            })
+    // Actions
+    val iterateAction = createAction(
+        iconPath = "menu_icons/Step.png",
+        name = "Iterate",
+        description = "Iterate once"
+    ) {
+        iterate()
+    }
+
+    val runAction = createAction(
+        iconPath = "menu_icons/Play.png",
+        name = "Run",
+        description = "Run",
+        coroutineScope = projector
+    ) {
+        if (!running) {
+            running = true
+            projector.events.beginTraining.fireAndSuspend()
+            launch {
+                while (running) {
+                    iterate()
+                }
+            }
         }
     }
 
+    val stopAction = createAction(
+        iconPath = "menu_icons/Stop.png",
+        name = "Stop",
+        description = "Stop"
+    ) {
+        running = false
+        projector.events.endTraining.fireAndSuspend()
+    }
+
+    val prefsAction = createAction(
+        iconPath = "menu_icons/Prefs.png",
+        name = "Preferences...",
+        description = "Set projection preferences"
+    ) {
+        showPrefDialog()
+    }
+
+    val randomizeAction = createAction(
+        name = "Randomize",
+        description = "Randomize points",
+        iconPath = "menu_icons/Rand.png"
+    ) {
+        projector.dataset.randomizeDownstairs()
+        projector.events.downstairsChanged.fireAndForget()
+    }
+
+    val clearDataAction = createAction(
+        name = "Clear",
+        description = "Clear all points",
+        iconPath = "menu_icons/Eraser.png"
+    ) {
+        projector.dataset.kdTree.clear()
+        projector.events.downstairsChanged.fireAndForget()
+    }
+
+    // Top stuff
+    val projectionMethods = ProjectionMethod2.getTypes()
+        .associateWith { it.kotlin.primaryConstructor!!.call() }
+    val projectionSelector = JComboBox<ProjectionMethod2>().apply {
+        maximumSize = Dimension(200, 100)
+        projectionMethods.values.forEach {
+            addItem(it)
+        }.also {
+            addActionListener {
+                projector.projectionMethod = (selectedItem as ProjectionMethod2)
+            }
+        }
+    }
+    val mainToolbar = JToolBar().apply {
+        add(projectionSelector)
+        addSeparator()
+        add(prefsAction)
+        add(randomizeAction)
+        add(clearDataAction)
+    }
+    private val runToolbar = JToolBar().apply {
+        add(ToggleButton(listOf(stopAction, runAction)).apply {
+            setAction("Run")
+            projector.events.beginTraining.on {
+                setAction("Stop")
+            }
+            projector.events.endTraining.on {
+                setAction("Run")
+            }
+        })
+        add(iterateAction)
+    }
+
+    val topPanel = JPanel(FlowLayout(FlowLayout.LEFT)).also {
+        it.add(mainToolbar)
+    }
+
+    // Central Chart Panel
+    private suspend fun iterate() {
+        projector.projectionMethod.let { projection ->
+            if (projection is IterableProjectionMethod2) {
+                projection.iterate(projector.dataset)
+                projector.events.iterated.fireAndSuspend(projection.error)
+            }
+        }
+        projector.events.downstairsChanged.fireAndSuspend()
+    }
+
+    /**
+     * JChart representation of the data.
+     */
+    private val xyCollection: XYSeriesCollection = XYSeriesCollection().apply {
+        addSeries(XYSeries("Data", false, true))
+    }
+
+    /**
+     * The JFreeChart chart.
+     */
+    private val chart: JFreeChart = ChartFactory.createScatterPlot(
+        "", "Projection X", "Projection Y",
+        xyCollection, PlotOrientation.VERTICAL, false, true, false
+    ).apply {
+        xyPlot.backgroundPaint = Color.white
+        xyPlot.domainGridlinePaint = Color.gray
+        xyPlot.rangeGridlinePaint = Color.gray
+        xyPlot.domainAxis.isAutoRange = true
+        xyPlot.rangeAxis.isAutoRange = true
+        xyPlot.foregroundAlpha = .5f // TODO: Make this settable
+    }
+    val chartPanel = ChartPanel(chart).also {
+        add(it)
+    }
+
+    // Bottom stuff
+    val pointsLabel = JLabel()
+    val dimensionsLabel = JLabel()
+    val errorLabel = JLabel("Error: ---")
+    val bottomPanel = JPanel().apply {
+        layout = FlowLayout(FlowLayout.LEFT)
+        add(pointsLabel)
+        add(Box.createHorizontalStrut(25));
+        add(dimensionsLabel)
+        add(Box.createHorizontalStrut(25));
+    }
+
+    fun showPrefDialog() {
+        projector.createDialog {
+            it.project()
+            launch { update() }
+        }.display()
+    }
+
+    suspend fun update() {
+        withContext(Dispatchers.Swing) {
+            xyCollection.getSeries(0).clear()
+            projector.dataset.kdTree.forEach {
+                val (x, y) = it.downstairsPoint
+                xyCollection.getSeries(0).add(x, y)
+            }
+            pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
+            dimensionsLabel.text = "Dimensions: ${projector.dimension}"
+        }
+    }
+
+    init {
+        layout = BorderLayout()
+
+        add("North", topPanel)
+        add("Center", chartPanel)
+        add("South", bottomPanel)
+
+        frame.jMenuBar = JMenuBar().apply {
+            add(JMenu("Edit").apply {
+                val prefsAction: Action = prefsAction
+                add(JMenuItem(prefsAction))
+            })
+        }
+
+        launch {
+            update()
+        }
+
+        projector.events.downstairsChanged.on {
+            update()
+        }
+        projector.events.methodChanged.on { o, n ->
+            if (n is IterableProjectionMethod2) {
+                topPanel.add(runToolbar)
+                bottomPanel.add(errorLabel)
+            } else {
+                bottomPanel.remove(errorLabel)
+                topPanel.remove(runToolbar)
+            }
+            topPanel.revalidate()
+            topPanel.repaint()
+            bottomPanel.revalidate()
+            bottomPanel.repaint()
+            launch { update() }
+        }
+        projector.events.iterated.on { error ->
+            errorLabel.text = "Error: ${error.format(2)}"
+        }
+    }
+
+}
+
+fun main() {
+    val projector = Projector2(5).apply {
+        // val random = Random(1)
+        // repeat(100) {
+        //     projector.addDataPoint(DoubleArray(5) { random.nextDouble() })
+        // }
+        // projector.projectionMethod = SammonProjection2(projector.dimension).apply {
+        //     epsilon = 100.0
+        // }
+        (0 until 40).forEach { p ->
+            addDataPoint(DoubleArray(100) { p.toDouble() })
+        }
+        dataset.randomizeDownstairs()
+        project()
+    }
+    StandardDialog().apply{
+        val desktopComponent = ProjectionDesktopComponent2(
+            this, ProjectionComponent2("test", projector))
+        contentPane = desktopComponent
+        makeVisible()
+    }
 }

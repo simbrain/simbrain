@@ -27,10 +27,10 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
     var dataset = Dataset2(dimension)
 
-    @UserParameter(label = "tolerance", minimumValue = 0.0)
+    @UserParameter(label = "tolerance", minimumValue = 0.0, order =  1)
     var tolerance: Double = 0.1
 
-    @UserParameter(label = "Projection Method", useSetter = true, isObjectType = true)
+    @UserParameter(label = "Projection Method", useSetter = true, isObjectType = true, order = 10)
     var projectionMethod: ProjectionMethod2 = CoordinateProjection2()
         set(value) {
             val oldMethod = field

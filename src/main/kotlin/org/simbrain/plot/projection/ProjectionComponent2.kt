@@ -7,9 +7,8 @@ import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.WorkspaceComponent
 import java.io.OutputStream
 
-class ProjectionComponent2(name: String): WorkspaceComponent(name), AttributeContainer {
-
-    val projector = Projector2()
+class ProjectionComponent2 @JvmOverloads constructor(name: String, val projector: Projector2 = Projector2()):
+    WorkspaceComponent(name), AttributeContainer {
 
     override fun save(output: OutputStream?, format: String?) {
         TODO("Not yet implemented")

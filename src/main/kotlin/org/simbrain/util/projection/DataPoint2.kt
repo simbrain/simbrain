@@ -2,7 +2,7 @@ package org.simbrain.util.projection
 
 import org.simbrain.util.euclideanDistance
 
-class DataPoint2(val upstairsPoint: DoubleArray, downstairsDimension: Int = 2, var label: String? = null, var color: Int? = null) {
+class DataPoint2(val upstairsPoint: DoubleArray, downstairsDimension: Int = 2, var label: String? = null) {
 
     val downstairsPoint = DoubleArray(downstairsDimension)
 

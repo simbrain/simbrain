@@ -9,6 +9,7 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.plot.PlotOrientation
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.util.*
@@ -18,10 +19,8 @@ import org.simbrain.util.projection.ProjectionMethod2
 import org.simbrain.util.projection.Projector2
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.gui.DesktopComponent
-import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.FlowLayout
+import java.awt.*
+import java.awt.geom.Ellipse2D
 import javax.swing.*
 import kotlin.reflect.full.primaryConstructor
 
@@ -82,7 +81,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         iconPath = "menu_icons/Rand.png"
     ) {
         projector.dataset.randomizeDownstairs()
-        projector.events.downstairsChanged.fireAndForget()
+        projector.events.datasetChanged.fireAndForget()
     }
 
     val clearDataAction = createAction(
@@ -91,7 +90,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         iconPath = "menu_icons/Eraser.png"
     ) {
         projector.dataset.kdTree.clear()
-        projector.events.downstairsChanged.fireAndForget()
+        projector.events.datasetChanged.fireAndForget()
     }
 
     // Top stuff
@@ -139,7 +138,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
                 projector.events.iterated.fireAndSuspend(projection.error)
             }
         }
-        projector.events.downstairsChanged.fireAndSuspend()
+        projector.events.datasetChanged.fireAndSuspend()
     }
 
     /**
@@ -162,6 +161,12 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         xyPlot.domainAxis.isAutoRange = true
         xyPlot.rangeAxis.isAutoRange = true
         xyPlot.foregroundAlpha = .5f // TODO: Make this settable
+        // Custom render points as dots (not squares) and use custom tooltips
+        // that show high-d point
+        val renderer = CustomRenderer2(projector)
+        xyPlot.renderer = renderer
+        renderer.setSeriesLinesVisible(0, false)
+        renderer.setSeriesShape(0, Ellipse2D.Double(-7.0, -7.0, 7.0, 7.0))
     }
     val chartPanel = ChartPanel(chart).also {
         add(it)
@@ -192,6 +197,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             projector.dataset.kdTree.forEach {
                 val (x, y) = it.downstairsPoint
                 xyCollection.getSeries(0).add(x, y)
+                xyCollection.getSeries(1).add(255, 0)
             }
             pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
             dimensionsLabel.text = "Dimensions: ${projector.dimension}"
@@ -216,7 +222,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             update()
         }
 
-        projector.events.downstairsChanged.on {
+        projector.events.datasetChanged.on {
             update()
         }
         projector.events.methodChanged.on { o, n ->
@@ -260,5 +266,22 @@ fun main() {
             this, ProjectionComponent2("test", projector))
         contentPane = desktopComponent
         makeVisible()
+    }
+}
+
+
+private class CustomRenderer2(val projector: Projector2) : XYLineAndShapeRenderer() {
+    override fun getItemPaint(row: Int, column: Int): Paint {
+        return Color.DARK_GRAY
+        // if (column == 1) {
+        //
+        // }
+        //
+        // val point = projector.upstairs.getPoint(column) as DataPointColored
+        // return if (point != null) {
+        //     point.color
+        // } else {
+        //     Color.green
+        // }
     }
 }

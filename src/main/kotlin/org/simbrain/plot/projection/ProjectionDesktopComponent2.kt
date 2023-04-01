@@ -231,6 +231,12 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         add("South", bottomPanel)
 
         frame.jMenuBar = JMenuBar().apply {
+            add(JMenu("File").apply {
+                add(JMenuItem(importAction))
+                add(JMenuItem(exportAction))
+                addSeparator()
+                add(JMenuItem(closeAction))
+            })
             add(JMenu("Edit").apply {
                 val prefsAction: Action = prefsAction
                 add(JMenuItem(prefsAction))

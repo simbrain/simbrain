@@ -55,9 +55,9 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         return fileMenu
     }
 
-    override fun showSaveFileDialog() {
+    override fun showExportDialog() {
         if (showUncompressedSynapseGroupWarning()) {
-            super.showSaveFileDialog()
+            super.showExportDialog()
         }
     }
 

@@ -58,6 +58,6 @@ public final class SaveAsAction extends AbstractAction {
      * @see AbstractAction
      */
     public void actionPerformed(final ActionEvent event) {
-        desktopComponent.showSaveFileDialog();
+        desktopComponent.showExportDialog();
     }
 }

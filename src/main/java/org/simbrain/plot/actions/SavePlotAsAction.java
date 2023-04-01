@@ -53,6 +53,6 @@ public final class SavePlotAsAction extends AbstractAction {
      * {@inheritDoc}
      */
     public void actionPerformed(final ActionEvent event) {
-        component.showSaveFileDialog();
+        component.showExportDialog();
     }
 }

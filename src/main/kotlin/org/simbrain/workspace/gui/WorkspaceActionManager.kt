@@ -211,7 +211,7 @@ class WorkspaceActionManager(val desktop: SimbrainDesktop) {
         keyboardShorcut = CmdOrCtrl + 'O',
         coroutineScope = workspace
     ) {
-        desktopComponent.showOpenFileDialog()
+        desktopComponent.showImportDialog()
     }
 
 }

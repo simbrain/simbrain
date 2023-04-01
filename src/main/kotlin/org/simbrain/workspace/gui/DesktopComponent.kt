@@ -26,11 +26,13 @@ import org.pmw.tinylog.Logger
 import org.simbrain.network.NetworkComponent
 import org.simbrain.util.SFileChooser
 import org.simbrain.util.SimbrainPreferences
+import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.createDesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.getDesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.registerComponentInstance
+import org.simbrain.workspace.gui.SimbrainDesktop.workspace
 import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer
 import org.simbrain.world.dataworld.DataWorldComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
@@ -56,51 +58,44 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
      */
     @JvmField var parentFrame: GenericFrame, workspaceComponent: E
 ) : JPanel() {
-    /**
-     * serial version UID.
-     */
-    private val serialVersionUID = 1L
 
     /**
-     * Default size for new components;
+     * Default size for new components.
      */
     private val DEFAULT_SIZE = Dimension(500, 500)
-    /**
-     * Returns the workspace component wrapped by this instance.
-     *
-     * @return the workspace component wrapped by this instance.
-     */
-    /**
-     * Reference to workspace component.
-     */
+
     var workspaceComponent: E
         private set
 
-    /**
-     * File Chooser.
-     */
     private val chooser: SFileChooser
-    /**
-     * Returns the parent from of this view.
-     *
-     * @return the parent from of this view.
-     */
-    /**
-     * Sets the parent frame of this view.
-     *
-     * @param parentFrame the new parent.
-     */
-    /**
-     * TODO: This should really be set at construction time, but that would
-     * require deep changes so this should suffice for now.
-     *
-     * @param desktop the desktop to set
-     */
-    /**
-     * Reference to parent desktop.
-     */
+
     @JvmField
     var desktop: SimbrainDesktop? = null
+
+    val exportAction = createAction(
+        iconPath = "menu_icons/Save.png",
+        name = "Export to xml...",
+        description = "Export component to .xml",
+        coroutineScope = workspace
+    ) {
+        showExportDialog()
+    }
+
+    val importAction = createAction(
+        iconPath = "menu_icons/Open.png",
+        name = "Import from xml...",
+        description = "Import component from .xml",
+        coroutineScope = workspace
+    ) {
+        showImportDialog()
+    }
+
+    val closeAction = createAction(
+        name = "Close component",
+        coroutineScope = workspace
+    ) {
+        close()
+    }
 
     /**
      * Construct a workspace component.
@@ -130,9 +125,6 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
         Logger.trace(this.javaClass.canonicalName + " created")
     }
 
-    /**
-     * Closes this view.
-     */
     fun close() {
         if (workspaceComponent.hasChangedSinceLastSave()) {
             val hasCancelled = showHasChangedDialog()
@@ -144,9 +136,9 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
     }
 
     /**
-     * Calls up a dialog for opening a workspace component.
+     * Dialog for importing a workspace component.
      */
-    suspend fun showOpenFileDialog() {
+    suspend fun showImportDialog() {
         val chooser = SFileChooser(getDefaultDirectory(workspaceComponent.javaClass), null)
         for (format in workspaceComponent.formats) {
             chooser.addExtension(format)
@@ -195,9 +187,9 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
     }
 
     /**
-     * Show the dialog for saving a workspace component.
+     * Dialog for explorting a workspace component to xml.
      */
-    open fun showSaveFileDialog() {
+    open fun showExportDialog() {
         var theFile = workspaceComponent.currentFile
         if (theFile == null) {
             theFile = File(name)
@@ -228,7 +220,7 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
         // System.out.println("Network save:" +
         // workspaceComponent.getCurrentFile());
         if (workspaceComponent.currentFile == null) {
-            showSaveFileDialog()
+            showExportDialog()
         } else {
             try {
                 val stream = FileOutputStream(workspaceComponent.currentFile)
@@ -297,6 +289,7 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
         set(name) {
             parentFrame.title = name
         }
+
     val simpleName: String
         /**
          * Retrieves a simple version of a component name from its class, e.g.

@@ -18,7 +18,7 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     override var coroutineContext = Dispatchers.Default + job
 
     @Transient
-    val events = ProjectorEvents3()
+    var events = ProjectorEvents3()
 
     var dimension: Int = initialDimension
         set(value) {
@@ -72,6 +72,7 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     private fun readResolve(): Any {
         job = SupervisorJob()
         coroutineContext = Dispatchers.Default + job
+        events = ProjectorEvents3()
         return this
     }
 

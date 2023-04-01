@@ -1,10 +1,16 @@
 package org.simbrain.util.projection
 
+import com.thoughtworks.xstream.converters.Converter
+import com.thoughtworks.xstream.converters.MarshallingContext
+import com.thoughtworks.xstream.converters.UnmarshallingContext
+import com.thoughtworks.xstream.io.HierarchicalStreamReader
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import java.util.*
 import kotlin.math.abs
 
-class KDTree(private val dimension: Int) : Iterable<DataPoint2> {
+class KDTree(val dimension: Int) : Iterable<DataPoint2> {
 
+    @Transient
     private var pointCount = 0
     val size get() = pointCount
 
@@ -15,6 +21,7 @@ class KDTree(private val dimension: Int) : Iterable<DataPoint2> {
         var right: Node? = null
     )
 
+    @Transient
     private var root: Node? = null
 
     private fun buildTree(points: List<DataPoint2>, depth: Int): Node? {
@@ -211,6 +218,36 @@ class KDTree(private val dimension: Int) : Iterable<DataPoint2> {
     }
 
 }
+
+
+class KDTreeConvertor : Converter {
+    override fun canConvert(type: Class<*>): Boolean {
+        return type == KDTree::class.java
+    }
+
+    override fun marshal(source: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+        val kdTree = source as KDTree
+        writer.startNode("dimensions")
+        context.convertAnother(kdTree.dimension)
+        writer.endNode()
+        writer.startNode("datapoints")
+        context.convertAnother(kdTree.toList())
+        writer.endNode()
+    }
+
+    override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
+        reader.moveDown()
+        val dims = reader.value.toInt()
+        reader.moveUp()
+        reader.moveDown()
+        val datapoints = context.convertAnother(reader.value, ArrayList::class.java) as List<DataPoint2>
+        reader.moveUp()
+        val kdTree = KDTree(dims)
+        datapoints.forEach { kdTree.insert(it) }
+        return kdTree
+    }
+}
+
 
 fun main() {
     val points = listOf(

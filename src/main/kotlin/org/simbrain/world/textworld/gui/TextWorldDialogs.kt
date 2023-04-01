@@ -41,8 +41,8 @@ fun TextWorld.showComparisonDialog(): StandardDialog {
                 }
             }
 
-            word1cb.toolTipText = vec1.toString(2)
-            word2cb.toolTipText = vec2.toString(2)
+            word1cb.toolTipText = vec1.format(2)
+            word2cb.toolTipText = vec2.format(2)
 
             similarity.text = "Similarity: ${embeddingSimilarity(vec1, vec2, distanceFunction).format(3)}"
             pack()

@@ -183,7 +183,7 @@ fun DoubleArray.minus(other: DoubleArray): DoubleArray {
 /**
  * Return a string representation of the vector rounded to the specified precision
  */
-fun DoubleArray.toString(precision: Int): String {
+fun DoubleArray.format(precision: Int): String {
     return joinToString(",") { it.format(precision) }
 }
 

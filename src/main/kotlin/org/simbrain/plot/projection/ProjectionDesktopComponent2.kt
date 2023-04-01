@@ -8,12 +8,17 @@ import kotlinx.coroutines.withContext
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
+import org.jfree.chart.labels.CustomXYToolTipGenerator
+import org.jfree.chart.labels.StandardXYItemLabelGenerator
+import org.jfree.chart.labels.XYItemLabelGenerator
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
+import org.jfree.data.xy.XYDataset
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.util.projection.DataPoint2
 import org.simbrain.util.projection.IterableProjectionMethod2
 import org.simbrain.util.projection.ProjectionMethod2
 import org.simbrain.util.projection.Projector2
@@ -31,6 +36,11 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     override var coroutineContext = projector.coroutineContext
 
     var running = false
+
+    /**
+     * Ordered list of [DataPoint2] points so that the renderer can access points by index.
+     */
+    val pointList = ArrayList<DataPoint2>()
 
     // Actions
     val iterateAction = createAction(
@@ -148,6 +158,16 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         addSeries(XYSeries("Data", false, true))
     }
 
+    private val renderer = CustomRenderer2(this).apply {
+        setSeriesLinesVisible(0, projector.connectPoints)
+        setSeriesShape(0, Ellipse2D.Double(-7.0, -7.0, 7.0, 7.0))
+        val generator = CustomToolTipGenerator(this@ProjectionDesktopComponent2)
+        setSeriesToolTipGenerator(0, generator)
+        defaultItemLabelsVisible = true
+        defaultItemLabelGenerator = LegendXYItemLabelGenerator(this@ProjectionDesktopComponent2)
+    }
+
+
     /**
      * The JFreeChart chart.
      */
@@ -161,12 +181,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         xyPlot.domainAxis.isAutoRange = true
         xyPlot.rangeAxis.isAutoRange = true
         xyPlot.foregroundAlpha = .5f // TODO: Make this settable
-        // Custom render points as dots (not squares) and use custom tooltips
-        // that show high-d point
-        val renderer = CustomRenderer2(projector)
         xyPlot.renderer = renderer
-        renderer.setSeriesLinesVisible(0, false)
-        renderer.setSeriesShape(0, Ellipse2D.Double(-7.0, -7.0, 7.0, 7.0))
     }
     val chartPanel = ChartPanel(chart).also {
         add(it)
@@ -187,17 +202,21 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     fun showPrefDialog() {
         projector.createDialog {
             it.project()
-            launch { update() }
+            launch {
+                it.events.settingsChanged.fireAndSuspend()
+                update()
+            }
         }.display()
     }
 
     suspend fun update() {
         withContext(Dispatchers.Swing) {
             xyCollection.getSeries(0).clear()
+            pointList.clear()
             projector.dataset.kdTree.forEach {
+                pointList.add(it)
                 val (x, y) = it.downstairsPoint
                 xyCollection.getSeries(0).add(x, y)
-                xyCollection.getSeries(1).add(255, 0)
             }
             pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
             dimensionsLabel.text = "Dimensions: ${projector.dimension}"
@@ -224,6 +243,9 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
 
         projector.events.datasetChanged.on {
             update()
+        }
+        projector.events.settingsChanged.on {
+            renderer.setSeriesLinesVisible(0, projector.connectPoints)
         }
         projector.events.methodChanged.on { o, n ->
             if (n is IterableProjectionMethod2) {
@@ -255,8 +277,9 @@ fun main() {
         // projector.projectionMethod = SammonProjection2(projector.dimension).apply {
         //     epsilon = 100.0
         // }
-        (0 until 40).forEach { p ->
-            addDataPoint(DoubleArray(100) { p.toDouble() })
+        (0 until 40).forEach {p ->
+            val point= DataPoint2(DoubleArray(100) { p.toDouble() }, label = "$p")
+            addDataPoint(point)
         }
         dataset.randomizeDownstairs()
         project()
@@ -269,19 +292,25 @@ fun main() {
     }
 }
 
-
-private class CustomRenderer2(val projector: Projector2) : XYLineAndShapeRenderer() {
-    override fun getItemPaint(row: Int, column: Int): Paint {
-        return Color.DARK_GRAY
-        // if (column == 1) {
-        //
-        // }
-        //
-        // val point = projector.upstairs.getPoint(column) as DataPointColored
-        // return if (point != null) {
-        //     point.color
-        // } else {
-        //     Color.green
-        // }
+private class CustomRenderer2(val proj: ProjectionDesktopComponent2) : XYLineAndShapeRenderer() {
+    override fun getItemPaint(series: Int, index: Int): Paint {
+        if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
+            return proj.projector.hotColor
+        } else {
+            return proj.projector.baseColor
+        }
     }
 }
+
+private class CustomToolTipGenerator(val proj: ProjectionDesktopComponent2) : CustomXYToolTipGenerator() {
+    override fun generateToolTip(data: XYDataset, series: Int, index: Int): String {
+        return proj.pointList[index].upstairsPoint.format(2)
+    }
+}
+
+class LegendXYItemLabelGenerator(val proj: ProjectionDesktopComponent2) : StandardXYItemLabelGenerator(), XYItemLabelGenerator {
+    override fun generateLabel(dataset: XYDataset, series: Int, index: Int): String? {
+        return if (proj.projector.showLabels) proj.pointList[index].label else null
+    }
+}
+

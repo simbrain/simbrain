@@ -7,6 +7,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.createDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.EditableObject
+import java.awt.Color
 
 class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
@@ -27,10 +28,23 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
     var dataset = Dataset2(dimension)
 
-    @UserParameter(label = "tolerance", minimumValue = 0.0, order =  1)
+    @UserParameter(label = "Tolerance", minimumValue = 0.0, order =  1)
     var tolerance: Double = 0.1
 
-    @UserParameter(label = "Projection Method", useSetter = true, isObjectType = true, order = 10)
+    @UserParameter(label = "Connect points", order = 10)
+    var connectPoints = false
+
+    @UserParameter(label = "Hot color", order = 20)
+    var hotColor = Color.red
+
+    @UserParameter(label = "Base color", order = 30)
+    var baseColor = Color.DARK_GRAY
+
+    @UserParameter(label = "Show labels", description = "Show text labels sometimes associated with points", order = 40)
+    var showLabels = true
+
+
+    @UserParameter(label = "Projection Method", useSetter = true, isObjectType = true, order = 100)
     var projectionMethod: ProjectionMethod2 = CoordinateProjection2()
         set(value) {
             val oldMethod = field

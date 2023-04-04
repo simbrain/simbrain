@@ -54,15 +54,17 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
         }
 
     fun addDataPoint(newPoint: DataPoint2) {
-        val closestPoint = dataset.kdTree.findClosestPoint(newPoint)
-        if (closestPoint != null && closestPoint.euclideanDistance(newPoint) < tolerance) {
-            dataset.currentPoint = closestPoint
-        } else {
-            dataset.kdTree.insert(newPoint)
-            dataset.currentPoint = newPoint
-            projectionMethod.addPoint(dataset, newPoint)
+        synchronized(dataset) {
+            val closestPoint = dataset.kdTree.findClosestPoint(newPoint)
+            if (closestPoint != null && closestPoint.euclideanDistance(newPoint) < tolerance) {
+                dataset.currentPoint = closestPoint
+            } else {
+                dataset.kdTree.insert(newPoint)
+                dataset.currentPoint = newPoint
+                projectionMethod.addPoint(dataset, newPoint)
+            }
+            events.datasetChanged.fireAndBlock()
         }
-        events.datasetChanged.fireAndBlock()
     }
 
     fun addDataPoint(array: DoubleArray) = addDataPoint(DataPoint2(array))

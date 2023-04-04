@@ -15,11 +15,12 @@ class ProjectorEvents2: Events2() {
 }
 
 class ProjectorEvents3: Events2() {
+    val pointAdded = AddedEvent<DoubleArray>()
     val datasetChanged = NoArgEvent()
     val settingsChanged = NoArgEvent()
     val methodChanged = ChangedEvent<ProjectionMethod2>()
     val iterated = AddedEvent<Double>()
-    val beginTraining = NoArgEvent()
-    val endTraining = NoArgEvent()
+    val startIterating = NoArgEvent()
+    val stopIterating = NoArgEvent()
 
 }

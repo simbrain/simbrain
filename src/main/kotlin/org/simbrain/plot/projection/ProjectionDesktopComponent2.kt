@@ -59,7 +59,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     ) {
         if (!running) {
             running = true
-            projector.events.beginTraining.fireAndSuspend()
+            projector.events.startIterating.fireAndSuspend()
             launch {
                 while (running) {
                     iterate()
@@ -74,7 +74,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         description = "Stop"
     ) {
         running = false
-        projector.events.endTraining.fireAndSuspend()
+        projector.events.stopIterating.fireAndSuspend()
     }
 
     val prefsAction = createAction(
@@ -99,8 +99,10 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         description = "Clear all points",
         iconPath = "menu_icons/Eraser.png"
     ) {
-        projector.dataset.kdTree.clear()
-        projector.events.datasetChanged.fireAndForget()
+        synchronized(projector.dataset) {
+            projector.dataset.kdTree.clear()
+            projector.events.datasetChanged.fireAndForget()
+        }
     }
 
     // Top stuff
@@ -126,10 +128,10 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     private val runToolbar = JToolBar().apply {
         add(ToggleButton(listOf(stopAction, runAction)).apply {
             setAction("Run")
-            projector.events.beginTraining.on {
+            projector.events.startIterating.on {
                 setAction("Stop")
             }
-            projector.events.endTraining.on {
+            projector.events.stopIterating.on {
                 setAction("Run")
             }
         })
@@ -254,6 +256,8 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             renderer.setSeriesLinesVisible(0, projector.connectPoints)
         }
         projector.events.methodChanged.on { o, n ->
+            running = false
+            projector.events.stopIterating.fireAndBlock()
             if (n is IterableProjectionMethod2) {
                 topPanel.add(runToolbar)
                 bottomPanel.add(errorLabel)

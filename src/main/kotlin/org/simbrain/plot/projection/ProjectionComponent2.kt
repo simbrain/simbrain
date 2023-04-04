@@ -17,10 +17,7 @@ class ProjectionComponent2 @JvmOverloads constructor(name: String, val projector
 
     @Consumable
     fun addPoint(newPoint: DoubleArray) {
-        if (newPoint.size != projector.dimension) {
-            projector.dimension = newPoint.size
-        }
-        projector.addDataPoint(DataPoint2(newPoint))
+        projector.events.pointAdded.fireAndBlock(newPoint)
     }
 
     override fun getAttributeContainers(): List<AttributeContainer> {
@@ -32,6 +29,15 @@ class ProjectionComponent2 @JvmOverloads constructor(name: String, val projector
 
     override fun getXML(): String {
         return getProjectorXStream().toXML(projector)
+    }
+
+    init {
+        projector.events.pointAdded.on(wait = true) {
+            if (it.size != projector.dimension) {
+                projector.dimension = it.size
+            }
+            projector.addDataPoint(DataPoint2(it))
+        }
     }
 
     companion object {

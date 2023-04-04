@@ -119,33 +119,9 @@ class KDTree(val dimension: Int) : Iterable<DataPoint2> {
     }
 
     override fun iterator(): Iterator<DataPoint2> {
-        val stack = Stack<Node>()
-        var current: Node? = root
-
-        while (current != null) {
-            stack.push(current)
-            current = current.left
-        }
-
-        return object : Iterator<DataPoint2> {
-            override fun hasNext(): Boolean {
-                return stack.isNotEmpty()
-            }
-
-            override fun next(): DataPoint2 {
-                if (!hasNext()) throw NoSuchElementException()
-
-                val nextNode = stack.pop()
-                current = nextNode.right
-
-                while (current != null) {
-                    stack.push(current)
-                    current = current?.left
-                }
-
-                return nextNode.point
-            }
-        }
+        val nodes = mutableListOf<DataPoint2>()
+        inOrderTraversal(root) { nodes.add(it) }
+        return nodes.iterator()
     }
 
     private fun findMinimum(node: Node?, targetAxis: Int, searchAxis: Int): Node? {

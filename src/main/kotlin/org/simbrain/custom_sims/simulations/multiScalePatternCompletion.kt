@@ -12,6 +12,7 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.projection.PCAProjection2
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.workspace.updater.UpdateComponent
 import org.simbrain.workspace.updater.UpdateCoupling
@@ -24,10 +25,8 @@ val allostaticPatternCompletion = newSim {
 
     // TODOS:
     // - Encapsulate state machine into a class
-    // - Put inputs in text world with couplings
 
     // STATE MACHINE
-
     class Transition(val from: String, val to: String, val probability: Double)
 
     fun List<Transition>.sampleFirst(): String {
@@ -145,8 +144,9 @@ val allostaticPatternCompletion = newSim {
     }
 
     // PCA
-    val pca = addProjectionPlot("Activations")
+    val pca = addProjectionPlot2("Activations")
     pca.projector.tolerance = .2
+    pca.projector.projectionMethod = PCAProjection2()
     withGui {
         place(pca) {
             location = point(143, 200)
@@ -160,11 +160,12 @@ val allostaticPatternCompletion = newSim {
         val pcaLabel = pca.getConsumer("setLabel")
         couplingManager.createCoupling(currentWord, pcaLabel)
     }
-    val networkPCACoupling = couplingManager.createCoupling(reservoir, pca)
 
+    // Reservoir to plot coupling. Comment / uncomment depending on whether activations or spikes are used.
+    val activationPCACoupling = couplingManager.createCoupling(reservoir, pca)
+    var spikes: DoubleArray? = null
 
-
-    // WORKSPACE UPDATE RULES
+    // CUSTOM UPDATE
 
     val inputEncodings = mapOf(
         "man" to doubleArrayOf(1.0, 0.0, 0.0, 0.0, 0.0),
@@ -175,18 +176,22 @@ val allostaticPatternCompletion = newSim {
     )
     val zeroInput = doubleArrayOf(0.0, 0.0, 0.0, 0.0, 0.0)
 
+
     network.updateManager.addAction(0, updateAction("Set inputs") {
         val word = textWorld.world.currentItem?.text
         inputs.forceSetActivations(inputEncodings[word] ?: zeroInput)
-        // val spikes = reservoir.neuronList.map{
-        //     if ((it as AllostaticNeuron).isSpike) 1.0 else 0.0
-        // }.toDoubleArray()
+        spikes = reservoir.neuronList.map {
+            if (it.isSpike) 1.0 else 0.0
+        }.toDoubleArray()
     })
 
     workspace.updater.updateManager.clear()
     workspace.updater.updateManager.addAction(UpdateComponent(textWorld))
     workspace.updater.updateManager.addAction(UpdateComponent(networkComponent))
-    workspace.updater.updateManager.addAction(UpdateCoupling(networkPCACoupling))
+    workspace.updater.updateManager.addAction(updateAction("Send spikes to pca") {
+        spikes?.let { pca.addPoint(it) }
+    })
+    // workspace.updater.updateManager.addAction(UpdateCoupling(activationPCACoupling))
     workspace.updater.updateManager.addAction(UpdateCoupling(textCoupling))
     workspace.updater.updateManager.addAction(UpdateComponent(pca))
 }

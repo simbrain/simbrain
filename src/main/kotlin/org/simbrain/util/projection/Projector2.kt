@@ -26,7 +26,24 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
             field = value
         }
 
+    /**
+     * The main data structure for a projection. A set of [DataPoint2]s, each of which has two double arrays, one of
+     * which ("upstairs") represents the high dimensional data, and the other of which ("downstairs") represents the
+     * low dimensional data.
+     */
     var dataset = Dataset2(dimension)
+
+    /**
+     * The method used to project from high dimensional data upstairs to low dimensional data downstairs.
+     */
+    @UserParameter(label = "Projection Method", useSetter = true, isObjectType = true, order = 100)
+    var projectionMethod: ProjectionMethod2 = CoordinateProjection2()
+        set(value) {
+            val oldMethod = field
+            field = value
+            init()
+            events.methodChanged.fireAndForget(oldMethod, value)
+        }
 
     @UserParameter(label = "Tolerance", minimumValue = 0.0, order =  1)
     var tolerance: Double = 0.1
@@ -44,15 +61,6 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     var showLabels = true
 
 
-    @UserParameter(label = "Projection Method", useSetter = true, isObjectType = true, order = 100)
-    var projectionMethod: ProjectionMethod2 = CoordinateProjection2()
-        set(value) {
-            val oldMethod = field
-            field = value
-            project()
-            events.methodChanged.fireAndForget(oldMethod, value)
-        }
-
     fun addDataPoint(newPoint: DataPoint2) {
         synchronized(dataset) {
             val closestPoint = dataset.kdTree.findClosestPoint(newPoint)
@@ -67,9 +75,11 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
         }
     }
 
-    fun addDataPoint(array: DoubleArray) = addDataPoint(DataPoint2(array))
+    fun init() {
+        projectionMethod.init(dataset)
+    }
 
-    fun project() = projectionMethod.project(dataset)
+    fun addDataPoint(array: DoubleArray) = addDataPoint(DataPoint2(array))
 
     private fun readResolve(): Any {
         job = SupervisorJob()
@@ -82,7 +92,7 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
 fun main() {
     val projector = Projector2(4)
-    projector.project()
+    projector.init()
     println(projector.dataset)
     projector.addDataPoint(doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0))
     projector.addDataPoint(doubleArrayOf(2.0, 3.0, 4.0, 5.0, 6.0))
@@ -90,7 +100,7 @@ fun main() {
     projector.addDataPoint(doubleArrayOf(4.0, 5.0, 6.0, 7.0, 8.0))
     projector.addDataPoint(doubleArrayOf(5.0, 6.0, 7.0, 8.0, 9.0))
     println(projector.dataset)
-    projector.project()
+    projector.init()
     println(projector.dataset)
     projector.createDialog {
 

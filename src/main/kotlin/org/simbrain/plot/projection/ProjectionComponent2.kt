@@ -20,6 +20,11 @@ class ProjectionComponent2 @JvmOverloads constructor(name: String, val projector
         projector.events.pointAdded.fireAndBlock(newPoint)
     }
 
+    @Consumable
+    fun setLabel(label: String?) {
+        projector.dataset.currentPoint?.label = label
+    }
+
     override fun getAttributeContainers(): List<AttributeContainer> {
         val container: MutableList<AttributeContainer> = ArrayList()
         container.add(this)

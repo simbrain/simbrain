@@ -11,7 +11,7 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
     @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .1)
     var epsilon = 0.1
 
-    override fun project(dataset: Dataset2) {
+    override fun init(dataset: Dataset2) {
         initDistances(dataset)
     }
 

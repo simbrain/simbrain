@@ -203,7 +203,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
 
     fun showPrefDialog() {
         projector.createDialog {
-            it.project()
+            it.init()
             launch {
                 it.events.settingsChanged.fireAndSuspend()
                 update()
@@ -292,7 +292,7 @@ fun main() {
             addDataPoint(point)
         }
         dataset.randomizeDownstairs()
-        project()
+        init()
     }
     StandardDialog().apply{
         val desktopComponent = ProjectionDesktopComponent2(

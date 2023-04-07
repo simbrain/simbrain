@@ -17,7 +17,7 @@ class PCAProjection2Test {
         proj.addDataPoint(doubleArrayOf(-1.0, -1.0, 1.0))
         proj.addDataPoint(doubleArrayOf(-2.0, -1.0, 2.0))
         proj.addDataPoint(doubleArrayOf(-3.0, -2.0, 1.0))
-        proj.project()
+        proj.init()
 
         // Reference interpoint distances based on sklearn PCA
         val largestInterpointDist = 2.2360679774997894

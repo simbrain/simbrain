@@ -10,7 +10,7 @@ import kotlin.math.pow
  */
 class TriangulateProjection2: ProjectionMethod2() {
 
-    override fun project(dataset: Dataset2) {
+    override fun init(dataset: Dataset2) {
 
     }
 

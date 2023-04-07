@@ -10,7 +10,7 @@ class CoordinateProjection2: ProjectionMethod2() {
     @UserParameter(label = "dim2", minimumValue = 0.0)
     var dim2 = 1
 
-    override fun project(dataset: Dataset2) {
+    override fun init(dataset: Dataset2) {
         dataset.kdTree.forEach {
             projectPoint(it)
         }

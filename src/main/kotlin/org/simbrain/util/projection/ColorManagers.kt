@@ -1,70 +1,91 @@
 package org.simbrain.util.projection
 
+import org.simbrain.util.HSBInterpolate
 import org.simbrain.util.UserParameter
+import org.simbrain.util.math.SimbrainMath.max
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.toHSB
 import java.awt.Color
+import kotlin.math.min
 
+/**
+ * Manages the colors of datapoints in a [DataPoint2]]. Most subclasses maintain a mapping from datapoints to values
+ * which are then mapped to colors.
+ */
 abstract class ColoringManager: CopyableObject {
 
     abstract var projector: Projector2?
 
-    abstract fun bumpColor(dataPoint: DataPoint2)
-
+    /**
+     * Gets the color associated with a datapoint.
+     */
     abstract fun getColor(dataPoint: DataPoint2): Color
 
+    /**
+     * Sets this point as the "active" point, i.e the [Dataset2.currentPoint].
+     */
+    abstract fun activate(dataPoint: DataPoint2)
+
+    /**
+     * Update colors associated with all points in the [Dataset2]
+     */
     abstract fun updateAllColors()
 
     companion object {
 
-        /**
-         * Decay functions for drop-down list used by [org.simbrain.util.propertyeditor.ObjectTypeEditor] to set a
-         * type of probability distribution.
-         */
         @JvmStatic
         fun getTypes() = listOf(
-            DecayColoringManager::class.java
+            DecayColoringManager::class.java,
+            FrequencyColoringManager::class.java
         )
     }
 
 }
 
+/**
+ * When activated a color goes to [Projector2.hotColor] then decays to [Projector2.baseColor] in a set number of steps.
+ */
 class DecayColoringManager: ColoringManager() {
 
     override var projector: Projector2? = null
         set(value) {
             field = value
-            colors = initColors()
+            valuesToColors = initColors()
         }
 
-    @UserParameter(label = "Steps", description = "Steps to base color", minimumValue = 0.0)
+    @UserParameter(label = "Steps", description = "Steps to base color", useSetter = true, minimumValue = 0.0)
     var stepsToBase = 100
         set(value) {
             field = value
-            colors = initColors()
+            valuesToColors = initColors()
+            updateAllColors()
         }
 
-    var colors = initColors()
+    /**
+     * A list of colors indexed by values.
+     */
+    var valuesToColors = initColors()
 
     fun initColors() = projector?.let {
         HSBInterpolate(it.baseColor.toHSB(), it.hotColor.toHSB(), stepsToBase)
     } ?: listOf()
 
-    private var dataPointSteps: MutableMap<DataPoint2, Int> = HashMap()
+    private var pointsToValues: MutableMap<DataPoint2, Int> = HashMap()
 
-    override fun bumpColor(dataPoint: DataPoint2) {
-        dataPointSteps[dataPoint] = stepsToBase - 1
+    override fun activate(dataPoint: DataPoint2) {
+        pointsToValues[dataPoint] = stepsToBase - 1
     }
 
     override fun getColor(dataPoint: DataPoint2): Color {
-        val colorIndex = dataPointSteps.getOrDefault(dataPoint, 0)
-        return colors[colorIndex]
+        val colorIndex = pointsToValues.getOrDefault(dataPoint, 0)
+        return valuesToColors[colorIndex]
     }
 
     override fun updateAllColors() {
-       dataPointSteps.keys.forEach { dataPoint ->
-           dataPointSteps[dataPoint]?.let {
+       pointsToValues.keys.forEach { dataPoint ->
+           pointsToValues[dataPoint]?.let {
                if (it > 0) {
-                   dataPointSteps[dataPoint] = it - 1
+                   pointsToValues[dataPoint] = min(it - 1, stepsToBase - 1)
                }
            }
        }
@@ -81,32 +102,44 @@ class DecayColoringManager: ColoringManager() {
 
     companion object {
 
-        /**
-         * Decay functions for drop-down list used by [org.simbrain.util.propertyeditor.ObjectTypeEditor] to set a
-         * type of probability distribution.
-         */
         @JvmStatic
         fun getTypes() = ColoringManager.getTypes()
     }
 }
 
-fun Color.toHSB() = FloatArray(3) { 0.0f }.let { Color.RGBtoHSB(red, green, blue, it) }
+/**
+ * Colors points so that more frequently visited points are colored hotter.
+ */
+class FrequencyColoringManager: ColoringManager() {
 
-fun HSBInterpolate(fromColor: FloatArray, toColor: FloatArray, steps: Int): List<Color> {
-    val difference = toColor - fromColor
-    // hue is a flattened circle of length 1
-    if (difference[0] > 0.5) {
-        difference[0] = difference[0] - 1
-    } else if (difference[0] < -0.5) {
-        difference[0] = difference[0] + 1
+    override var projector: Projector2? = null
+
+    private val visitCounts: MutableMap<DataPoint2, Int> = HashMap()
+
+    private var maxCount = 1
+
+    override fun activate(dataPoint: DataPoint2) {
+        val count = visitCounts.getOrDefault(dataPoint, 0)
+        visitCounts[dataPoint] = count + 1
+        maxCount = max(maxCount, count)
     }
-    val (h, s, b) = fromColor
-    val (dh, ds, db) = difference / steps.toFloat()
-    return (0 until steps).map {
-        Color.getHSBColor((1 + h + it * dh) % 1.0f, s + it * ds, b + it * db)
+
+    // TODO: Cache hotcolor and bascolor
+    override fun getColor(dataPoint: DataPoint2): Color {
+        val t = (visitCounts[dataPoint] ?: 0).toDouble() / maxCount
+        return HSBInterpolate(projector!!.baseColor.toHSB(), projector!!.hotColor.toHSB(), t)
+    }
+
+    override fun updateAllColors() {
+    }
+
+    override fun copy() = FrequencyColoringManager()
+
+    override val name = "FrequencyColoringManager"
+
+    companion object {
+
+        @JvmStatic
+        fun getTypes() = ColoringManager.getTypes()
     }
 }
-
-operator fun FloatArray.minus(other: FloatArray) = (this zip other).map { (a, b) -> a - b }.toFloatArray()
-
-operator fun FloatArray.div(scalar: Float) = map { it / scalar }.toFloatArray()

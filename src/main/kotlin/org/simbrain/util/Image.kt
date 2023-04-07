@@ -141,6 +141,41 @@ fun BufferedImage.display() {
     }.displayInDialog()
 }
 
+
+fun Color.toHSB() = FloatArray(3) { 0.0f }.let { Color.RGBtoHSB(red, green, blue, it) }
+
+fun HSBInterpolate(fromColor: FloatArray, toColor: FloatArray, steps: Int): List<Color> {
+    val difference = toColor - fromColor
+    // hue is a flattened circle of length 1
+    if (difference[0] > 0.5) {
+        difference[0] = difference[0] - 1
+    } else if (difference[0] < -0.5) {
+        difference[0] = difference[0] + 1
+    }
+    val (h, s, b) = fromColor
+    val (dh, ds, db) = difference / steps.toFloat()
+    return (0 until steps).map {
+        Color.getHSBColor((1 + h + it * dh) % 1.0f, s + it * ds, b + it * db)
+    }
+}
+
+/**
+ * Returns a color at value "t" (between 0 and 1) between fromColor and tColor
+ */
+fun HSBInterpolate(fromColor: FloatArray, toColor: FloatArray, t: Double): Color {
+    val tclipped = t.clip(0.0, 1.0).toFloat()
+    val difference = toColor - fromColor
+    // hue is a flattened circle of length 1
+    if (difference[0] > 0.5) {
+        difference[0] = difference[0] - 1
+    } else if (difference[0] < -0.5) {
+        difference[0] = difference[0] + 1
+    }
+    val (h, s, b) = fromColor
+    val (dh, ds, db) = difference * tclipped
+    return Color.getHSBColor((1 + h + dh) % 1.0f, s + ds, b + db)
+}
+
 fun main() {
     val arr = UniformRealDistribution(0.0,1.0).sampleDouble(100)
     val intArray =  UniformIntegerDistribution().apply {

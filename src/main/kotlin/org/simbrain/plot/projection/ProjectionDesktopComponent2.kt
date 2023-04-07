@@ -224,7 +224,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
             dimensionsLabel.text = "Dimensions: ${projector.dimension}"
             projector.coloringManager.updateAllColors()
-            projector.dataset.currentPoint?.let { projector.coloringManager.bumpColor(it) }
+            projector.dataset.currentPoint?.let { projector.coloringManager.activate(it) }
         }
     }
 

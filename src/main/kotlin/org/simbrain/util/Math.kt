@@ -190,3 +190,9 @@ fun DoubleArray.format(precision: Int): String {
 fun DoubleArray.euclideanDistance(other: DoubleArray) = this.zip(other) { a, b -> (a - b) * (a - b) }
     .sum()
     .let { sqrt(it) }
+
+operator fun FloatArray.minus(other: FloatArray) = (this zip other).map { (a, b) -> a - b }.toFloatArray()
+
+operator fun FloatArray.div(scalar: Float) = map { it / scalar }.toFloatArray()
+
+operator fun FloatArray.times(scalar: Float) = map { it * scalar }.toFloatArray()

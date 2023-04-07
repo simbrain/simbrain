@@ -35,4 +35,34 @@ class KDTreeTest {
             assert(aa === bb)
         }
     }
+
+
+    @Test
+    fun `findClosestPoints finds closest points`() {
+        val projector = Projector2(4)
+        projector.init()
+        println(projector.dataset)
+        projector.addDataPoint(doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0))
+        projector.addDataPoint(doubleArrayOf(2.0, 3.0, 4.0, 5.0, 6.0))
+        projector.addDataPoint(doubleArrayOf(3.0, 4.0, 5.0, 6.0, 7.0))
+        projector.addDataPoint(doubleArrayOf(4.0, 5.0, 6.0, 7.0, 8.0))
+        projector.addDataPoint(doubleArrayOf(5.0, 6.0, 7.0, 8.0, 9.0))
+
+        val searchPoint = DataPoint2(doubleArrayOf(1.1, 2.0, 3.0, 4.0, 5.0))
+        val closestPoints = projector.dataset.kdTree.findClosestNPoints(searchPoint, 3)
+        closestPoints.forEach { point ->
+            println("Closest point: $point")
+        }
+
+        projector.addDataPoint(doubleArrayOf(1.5, 2.0, 3.0, 4.0, 5.0))
+        projector.addDataPoint(doubleArrayOf(2.5, 3.0, 4.0, 5.0, 6.0))
+        projector.addDataPoint(doubleArrayOf(3.5, 4.0, 5.0, 6.0, 7.0))
+        projector.addDataPoint(doubleArrayOf(4.5, 5.0, 6.0, 7.0, 8.0))
+        projector.addDataPoint(doubleArrayOf(5.5, 6.0, 7.0, 8.0, 9.0))
+
+        val closestPoints2 = projector.dataset.kdTree.findClosestNPoints(searchPoint, 3)
+        closestPoints2.forEach { point ->
+            println("Closest point: $point")
+        }
+    }
 }

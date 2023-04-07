@@ -204,6 +204,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     fun showPrefDialog() {
         projector.createDialog {
             it.init()
+            it.coloringManager.projector = it
             launch {
                 it.events.settingsChanged.fireAndSuspend()
                 update()
@@ -222,6 +223,8 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             }
             pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
             dimensionsLabel.text = "Dimensions: ${projector.dimension}"
+            projector.coloringManager.updateAllColors()
+            projector.dataset.currentPoint?.let { projector.coloringManager.bumpColor(it) }
         }
     }
 
@@ -243,10 +246,6 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
                 val prefsAction: Action = prefsAction
                 add(JMenuItem(prefsAction))
             })
-        }
-
-        launch {
-            update()
         }
 
         projector.events.datasetChanged.on {
@@ -273,6 +272,9 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         }
         projector.events.iterated.on { error ->
             errorLabel.text = "Error: ${error.format(2)}"
+        }
+        launch {
+            update()
         }
     }
 
@@ -306,9 +308,8 @@ private class CustomRenderer2(val proj: ProjectionDesktopComponent2) : XYLineAnd
     override fun getItemPaint(series: Int, index: Int): Paint {
         if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
             return proj.projector.hotColor
-        } else {
-            return proj.projector.baseColor
         }
+        return proj.projector.coloringManager.getColor(proj.pointList[index])
     }
 }
 

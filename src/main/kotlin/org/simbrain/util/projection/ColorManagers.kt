@@ -19,7 +19,7 @@ abstract class ColoringManager: CopyableObject {
     /**
      * Gets the color associated with a datapoint.
      */
-    abstract fun getColor(dataPoint: DataPoint2): Color
+    abstract fun getColor(dataPoint: DataPoint2): Color?
 
     /**
      * Sets this point as the "active" point, i.e the [Dataset2.currentPoint].
@@ -35,12 +35,43 @@ abstract class ColoringManager: CopyableObject {
 
         @JvmStatic
         fun getTypes() = listOf(
+            NoOpColoringManager::class.java,
             DecayColoringManager::class.java,
             FrequencyColoringManager::class.java
         )
     }
 
 }
+
+/**
+ * "Null" coloring manager for when we don't use colors.
+ */
+class NoOpColoringManager: ColoringManager() {
+
+    override var projector: Projector2? = null
+
+    override fun getColor(dataPoint: DataPoint2): Color? {
+        return null
+    }
+
+    override fun activate(dataPoint: DataPoint2) {
+    }
+
+    override fun updateAllColors() {
+    }
+
+    override fun copy(): NoOpColoringManager {
+        return NoOpColoringManager()
+    }
+
+    override val name = "None"
+
+    companion object {
+        @JvmStatic
+        fun getTypes() = ColoringManager.getTypes()
+    }
+}
+
 
 /**
  * When activated a color goes to [Projector2.hotColor] then decays to [Projector2.baseColor] in a set number of steps.

@@ -60,9 +60,8 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Show labels", description = "Show text labels sometimes associated with points", order = 40)
     var showLabels = true
 
-
     @UserParameter(label = "Coloring Manager", isObjectType = true, order = 110)
-    var coloringManager: ColoringManager = DecayColoringManager().also { it.projector = this }
+    var coloringManager: ColoringManager = NoOpColoringManager().also { it.projector = this }
 
     fun addDataPoint(newPoint: DataPoint2) {
         synchronized(dataset) {

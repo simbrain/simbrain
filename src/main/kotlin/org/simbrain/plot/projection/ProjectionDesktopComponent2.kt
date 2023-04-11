@@ -310,7 +310,7 @@ private class CustomRenderer2(val proj: ProjectionDesktopComponent2) : XYLineAnd
         if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
             return proj.projector.hotColor
         }
-        return proj.projector.coloringManager.getColor(proj.pointList[index])
+        return proj.projector.coloringManager.getColor(proj.pointList[index])?: proj.projector.baseColor
     }
 }
 

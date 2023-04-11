@@ -25,25 +25,23 @@ class PCAProjection2: ProjectionMethod2() {
         reFitPCA(dataset)
     }
 
+    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
+        if (dataset.kdTree.size < 3) {
+            initialProjectionMethod.addPoint(dataset, point)
+            return
+        }
+        if (!freeze && pca == null) {
+            reFitPCA(dataset)
+        }
+        // Project the new point onto PCA components
+        point.setDownstairs(pca!!.project(point.upstairsPoint))
+    }
+
     private fun reFitPCA(dataset: Dataset2) {
         val upstairs = dataset.computeUpstairsArray()
         pca = PCA.fit(upstairs).also {
             it.setProjection(2)
             dataset.setDownstairsData(it.project(upstairs))
-        }
-    }
-
-    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
-        pca.let {
-            if (it == null) {
-                initialProjectionMethod.addPoint(dataset, point)
-            } else {
-                if (!freeze) {
-                    reFitPCA(dataset)
-                }
-                // Project the new point onto PCA components
-                point.setDownstairs(it.project(point.upstairsPoint))
-            }
         }
     }
 

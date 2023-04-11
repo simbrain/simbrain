@@ -255,6 +255,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             renderer.setSeriesLinesVisible(0, projector.connectPoints)
         }
         projector.events.methodChanged.on { o, n ->
+            projectionSelector.selectedItem = projectionMethods[n.javaClass]
             running = false
             projector.events.stopIterating.fireAndBlock()
             if (n is IterableProjectionMethod2) {

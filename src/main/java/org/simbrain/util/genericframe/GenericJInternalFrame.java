@@ -12,9 +12,12 @@ public class GenericJInternalFrame extends JInternalFrame implements GenericFram
         addPropertyChangeListener(evt -> {
             if (JInternalFrame.IS_MAXIMUM_PROPERTY.equals(evt.getPropertyName())) {
                 if (Boolean.TRUE.equals(evt.getNewValue())) {
-                    // Frame is being maximized
-                    setSize(getMaximumSize());
-                    validate(); // Make sure the frame layout is updated
+                    var width = getMaximumSize().width;
+                    if (width != Integer.MAX_VALUE) {
+                        // Frame is being maximized
+                        setSize(getMaximumSize());
+                        validate(); // Make sure the frame layout is updated
+                    }
                 }
             }
         });

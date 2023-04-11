@@ -140,6 +140,9 @@ class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = nu
  */
 class FrequencyColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
 
+    @UserParameter(label = "High frequency color", order = 10)
+    var highFrequencyColor = Color.green
+
     private val visitCounts: MutableMap<DataPoint2, Int> = HashMap()
 
     private var maxCount = 1
@@ -153,7 +156,7 @@ class FrequencyColoringManager @JvmOverloads constructor(projector: Projector2? 
     // TODO: Cache hotcolor and bascolor
     override fun getColor(dataPoint: DataPoint2): Color {
         val t = (visitCounts[dataPoint] ?: 0).toDouble() / maxCount
-        return HSBInterpolate(projector!!.baseColor.toHSB(), projector!!.hotColor.toHSB(), t)
+        return HSBInterpolate(projector!!.baseColor.toHSB(), highFrequencyColor.toHSB(), t)
     }
 
     override fun updateAllColors() {

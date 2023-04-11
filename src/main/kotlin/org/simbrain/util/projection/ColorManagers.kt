@@ -12,9 +12,7 @@ import kotlin.math.min
  * Manages the colors of datapoints in a [DataPoint2]]. Most subclasses maintain a mapping from datapoints to values
  * which are then mapped to colors.
  */
-abstract class ColoringManager: CopyableObject {
-
-    abstract var projector: Projector2?
+abstract class ColoringManager(open var projector: Projector2? = null): CopyableObject {
 
     /**
      * Gets the color associated with a datapoint.
@@ -46,9 +44,8 @@ abstract class ColoringManager: CopyableObject {
 /**
  * "Null" coloring manager for when we don't use colors.
  */
-class NoOpColoringManager: ColoringManager() {
+class NoOpColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
 
-    override var projector: Projector2? = null
 
     override fun getColor(dataPoint: DataPoint2): Color? {
         return null
@@ -76,9 +73,9 @@ class NoOpColoringManager: ColoringManager() {
 /**
  * When activated a color goes to [Projector2.hotColor] then decays to [Projector2.baseColor] in a set number of steps.
  */
-class DecayColoringManager: ColoringManager() {
+class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
 
-    override var projector: Projector2? = null
+    override var projector: Projector2? = projector
         set(value) {
             field = value
             valuesToColors = initColors()
@@ -141,9 +138,7 @@ class DecayColoringManager: ColoringManager() {
 /**
  * Colors points so that more frequently visited points are colored hotter.
  */
-class FrequencyColoringManager: ColoringManager() {
-
-    override var projector: Projector2? = null
+class FrequencyColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
 
     private val visitCounts: MutableMap<DataPoint2, Int> = HashMap()
 

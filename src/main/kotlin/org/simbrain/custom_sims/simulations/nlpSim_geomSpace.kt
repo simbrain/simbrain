@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.projection.PCAProjection2
 
 /**
  * Todo
@@ -58,7 +59,9 @@ val nlpSim_geomSpace = newSim {
     // }
 
     // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot("Activations")
+    val projectionPlot = addProjectionPlot2("Activations")
+    projectionPlot.projector.tolerance = .2
+    projectionPlot.projector.projectionMethod = PCAProjection2()
     withGui {
         place(projectionPlot) {
             location = point(450, 0)

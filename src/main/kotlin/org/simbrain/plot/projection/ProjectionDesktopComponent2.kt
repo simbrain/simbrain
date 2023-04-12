@@ -102,6 +102,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         synchronized(projector.dataset) {
             projector.dataset.kdTree.clear()
             projector.events.datasetChanged.fireAndForget()
+            projector.events.datasetCleared.fireAndForget()
         }
     }
 
@@ -223,8 +224,6 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             }
             pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
             dimensionsLabel.text = "Dimensions: ${projector.dimension}"
-            projector.coloringManager.updateAllColors()
-            projector.dataset.currentPoint?.let { projector.coloringManager.activate(it) }
         }
     }
 
@@ -250,6 +249,9 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
 
         projector.events.datasetChanged.on {
             update()
+        }
+        projector.events.datasetCleared.on {
+            projector.coloringManager.reset()
         }
         projector.events.settingsChanged.on {
             renderer.setSeriesLinesVisible(0, projector.connectPoints)

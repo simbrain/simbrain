@@ -29,13 +29,16 @@ abstract class ColoringManager(open var projector: Projector2? = null): Copyable
      */
     abstract fun updateAllColors()
 
+    abstract fun reset()
+
     companion object {
 
         @JvmStatic
         fun getTypes() = listOf(
             NoOpColoringManager::class.java,
             DecayColoringManager::class.java,
-            FrequencyColoringManager::class.java
+            FrequencyColoringManager::class.java,
+            MarkovColoringManager::class.java
         )
     }
 
@@ -55,6 +58,10 @@ class NoOpColoringManager @JvmOverloads constructor(projector: Projector2? = nul
     }
 
     override fun updateAllColors() {
+    }
+
+    override fun reset() {
+
     }
 
     override fun copy(): NoOpColoringManager {
@@ -98,7 +105,7 @@ class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = nu
         HSBInterpolate(it.baseColor.toHSB(), it.hotColor.toHSB(), stepsToBase)
     } ?: listOf()
 
-    private var pointsToValues: MutableMap<DataPoint2, Int> = HashMap()
+    private val pointsToValues: MutableMap<DataPoint2, Int> = HashMap()
 
     override fun activate(dataPoint: DataPoint2) {
         pointsToValues[dataPoint] = stepsToBase - 1
@@ -117,6 +124,10 @@ class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = nu
                }
            }
        }
+    }
+
+    override fun reset() {
+        pointsToValues.clear()
     }
 
     override fun copy(): DecayColoringManager {
@@ -162,9 +173,64 @@ class FrequencyColoringManager @JvmOverloads constructor(projector: Projector2? 
     override fun updateAllColors() {
     }
 
+    override fun reset() {
+        maxCount = 1
+        visitCounts.clear()
+    }
+
     override fun copy() = FrequencyColoringManager()
 
     override val name = "FrequencyColoringManager"
+
+    companion object {
+
+        @JvmStatic
+        fun getTypes() = ColoringManager.getTypes()
+    }
+}
+
+
+class MarkovColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
+
+    @UserParameter(label = "High frequency color", order = 10)
+    var highFrequencyColor = Color.green
+
+    private val transitionCounts: MutableMap<DataPoint2, MutableMap<DataPoint2, Int>> = HashMap()
+
+    private var lastPoint: DataPoint2? = null
+
+    private var maxCounts: MutableMap<DataPoint2, Int> = HashMap()
+
+    override fun activate(dataPoint: DataPoint2) {
+        lastPoint?.let { prev ->
+            transitionCounts.getOrPut(prev) {
+                mutableMapOf(dataPoint to 0)
+            }
+            val count = transitionCounts[prev]!![dataPoint] ?: 0
+            transitionCounts[prev]!![dataPoint] = count + 1
+            maxCounts[prev] = max(maxCounts[prev]?:0, count)
+        }
+        lastPoint = dataPoint
+    }
+
+    override fun getColor(dataPoint: DataPoint2): Color {
+        val currentPoint = projector!!.dataset.currentPoint
+        val t = (transitionCounts[currentPoint]?.get(dataPoint) ?: 0).toDouble() / (maxCounts[currentPoint] ?: 1)
+        return HSBInterpolate(projector!!.baseColor.toHSB(), highFrequencyColor.toHSB(), t)
+    }
+
+    override fun updateAllColors() {
+    }
+
+    override fun reset() {
+        maxCounts.clear()
+        transitionCounts.clear()
+        lastPoint = null
+    }
+
+    override fun copy() = MarkovColoringManager()
+
+    override val name = "MarkovColoringManager"
 
     companion object {
 

@@ -42,6 +42,8 @@ class ProjectionComponent2 @JvmOverloads constructor(name: String, val projector
                 projector.dimension = it.size
             }
             projector.addDataPoint(DataPoint2(it))
+            projector.coloringManager.updateAllColors()
+            projector.dataset.currentPoint?.let { projector.coloringManager.activate(it) }
         }
     }
 

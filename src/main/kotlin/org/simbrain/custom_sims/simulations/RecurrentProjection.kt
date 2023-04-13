@@ -9,6 +9,7 @@ import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.projection.PCAProjection2
 import javax.swing.JOptionPane
 
 /**
@@ -29,7 +30,9 @@ val recurrentProjection = newSim {
 
     // Add a self-connected neuron array to the network
     val recurrentNet = network.addNeuronCollection(numNeurons)
+    recurrentNet.label = "Network"
     recurrentNet.layout(GridLayout())
+    recurrentNet.randomize()
     network.addNetworkModel(recurrentNet)?.join()
     Sparse().apply {
         connectionDensity = .25
@@ -48,6 +51,8 @@ val recurrentProjection = newSim {
 
     // Location of the projection in the desktop
     val projectionPlot = addProjectionPlot2("Activations")
+    projectionPlot.projector.tolerance = 2.0
+    projectionPlot.projector.projectionMethod = PCAProjection2()
     withGui {
         place(projectionPlot) {
             location = point(410, 0)

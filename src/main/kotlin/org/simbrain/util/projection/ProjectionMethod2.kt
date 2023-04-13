@@ -36,7 +36,8 @@ abstract class ProjectionMethod2() : CopyableObject {
             CoordinateProjection2::class.java,
             PCAProjection2::class.java,
             SammonProjection2::class.java,
-            TriangulateProjection2::class.java
+            TriangulateProjection2::class.java,
+            TSNEProjection::class.java
         )
     }
 

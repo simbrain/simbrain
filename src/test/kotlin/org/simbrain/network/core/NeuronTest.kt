@@ -16,7 +16,7 @@ class NeuronTest {
     var s2: Synapse
 
     init {
-        net.addNetworkModels(listOf(n1, n2, n3))
+        net.addNetworkModelsAsync(listOf(n1, n2, n3))
         s1 = net.addSynapse(n1, n3)
         s2 = net.addSynapse(n2, n3)
     }

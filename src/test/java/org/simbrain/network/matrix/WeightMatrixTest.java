@@ -23,7 +23,7 @@ public class WeightMatrixTest {
         na1 = new NeuronArray(net, 2);
         na2 = new NeuronArray(net, 2);
         wm = new WeightMatrix(net, na1, na2);
-        net.addNetworkModels(List.of(na1, na2, wm));
+        net.addNetworkModelsAsync(List.of(na1, na2, wm));
     }
     @Test
     public void testMatrixOperations() {
@@ -115,7 +115,7 @@ public class WeightMatrixTest {
         NeuronGroup ng = new NeuronGroup(net, 2);
         WeightMatrix wm2 = new WeightMatrix(net, na1, ng);
         wm2.diagonalize();
-        net.addNetworkModels(List.of(ng, wm2));
+        net.addNetworkModelsAsync(List.of(ng, wm2));
         net.update();
         assertArrayEquals(new double[]{.5,-.5}, ng.getActivations(), 0.0);
         net.update(); // All should be cleared on second update

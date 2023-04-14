@@ -42,7 +42,7 @@ private val LOG_10 = ln(10.0)
  * data structure is a [NetworkModelList] that associates classes of [NetworkModel] with linked hash sets of
  * instances of those types.
  *
- * To add models, use [Network.addNetworkModel] and friends.
+ * To add models, use [Network.addNetworkModelAsync] and friends.
  *
  * To remove models use [Network.getModels] and call .delete() on the resulting models. Get models can be called with
  * an argument to filter by model type, e.g getModels(Neuron.class)
@@ -349,10 +349,14 @@ class Network: CoroutineScope {
             yieldAll(networkModels.get<Subnetwork>().flatMap { it.modelList.get() })
         }.toList()
 
+    suspend fun addNetworkModel(model: NetworkModel) {
+        addNetworkModelAsync(model)?.join()
+    }
+
     /**
      * Add a new [NetworkModel]. All network models MUST be added using this method.
      */
-    fun addNetworkModel(model: NetworkModel): Job? {
+    fun addNetworkModelAsync(model: NetworkModel): Job? {
         if (model.shouldAdd()) {
             model.id = idManager.getAndIncrementId(model.javaClass)
             networkModels.add(model)
@@ -361,7 +365,7 @@ class Network: CoroutineScope {
             }
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
-                events.modelRemoved.fireAndForget(it)
+                events.modelRemoved.fireAndSuspend(it)
             }
             val job = events.modelAdded.fireAndSuspend(model)
             if (model is Neuron) updatePriorityList()
@@ -529,14 +533,22 @@ class Network: CoroutineScope {
         updateManager.removeAction(action)
     }
 
+    suspend fun addNetworkModels(toAdd: List<NetworkModel>) {
+        addNetworkModelsAsync(toAdd).join()
+    }
+
     /**
      * Adds a list of network elements to this network. Used in copy / paste.
      *
      * @param toAdd list of objects to add.
      */
-    fun addNetworkModels(toAdd: List<NetworkModel>): Job {
-        val jobs = toAdd.mapNotNull { addNetworkModel(it) }
+    fun addNetworkModelsAsync(toAdd: List<NetworkModel>): Job {
+        val jobs = toAdd.mapNotNull { addNetworkModelAsync(it) }
         return launch { jobs.joinAll() }
+    }
+
+    suspend fun addNetworkModels(vararg toAdd: NetworkModel) {
+        toAdd.mapNotNull { addNetworkModelAsync(it) }.joinAll()
     }
 
     /**
@@ -544,8 +556,8 @@ class Network: CoroutineScope {
      *
      * Ex: addNetworkModels(synapse1, synapse2, neuron1, neuron2, ...)
      */
-    fun addNetworkModels(vararg toAdd: NetworkModel) {
-        toAdd.forEach { addNetworkModel(it) }
+    fun addNetworkModelsAsync(vararg toAdd: NetworkModel) {
+        toAdd.forEach { addNetworkModelAsync(it) }
     }
 
     /**
@@ -582,28 +594,28 @@ class Network: CoroutineScope {
     val freeSynapses get() = networkModels.get<Synapse>()
 
     fun addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
-        .apply(this::addNetworkModel)
+        .apply(this::addNetworkModelAsync)
         .also(block)
 
     fun addNeuron(x: Int, y: Int) = Neuron(this)
         .also{
-            addNetworkModel(it)
+            addNetworkModelAsync(it)
             it.location = point(x,y)
         }
 
     fun addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
         .apply(block)
-        .also(this::addNetworkModel)
+        .also(this::addNetworkModelAsync)
 
     fun addNeuronGroup(count: Int, template: Neuron.() -> Unit = { }) = NeuronGroup(this, List(count) {
         Neuron(this).apply(template)
-    }).also { addNetworkModel(it) }
+    }).also { addNetworkModelAsync(it) }
 
     fun addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
         return NeuronGroup(this, List(count) {
             Neuron(this).apply(template)
         }).also {
-            addNetworkModel(it)
+            addNetworkModelAsync(it)
             if (location != null) {
                 val (x, y) = location
                 it.setLocation(x, y)
@@ -616,7 +628,7 @@ class Network: CoroutineScope {
         template: Neuron.() -> Unit
     ) = NeuronGroup(this, List(count) {
         Neuron(this).apply(template)
-    }).also { addNetworkModel(it) }
+    }).also { addNetworkModelAsync(it) }
 
     fun <R> Network.withConnectionStrategy(
         connectionStrategy: ConnectionStrategy,
@@ -641,7 +653,7 @@ class Network: CoroutineScope {
      */
     fun addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup2 {
         val sg = SynapseGroup.createSynapseGroup(source, target)
-        addNetworkModel(sg)
+        addNetworkModelAsync(sg)
         return sg
     }
 
@@ -655,7 +667,7 @@ class Network: CoroutineScope {
             NeuronGroup {
         val ng = NeuronGroup(this, numNeurons)
         ng.setNeuronType(rule)
-        addNetworkModel(ng)
+        addNetworkModelAsync(ng)
         layoutNeuronGroup(ng, layoutName)
         ng.setLocation(x, y)
         return ng

@@ -65,7 +65,7 @@ fun NetworkPanel.showSelectedSynapseProperties() {
 fun NetworkPanel.showNeuronArrayCreationDialog() {
     NeuronArray.CreationTemplate().createDialog {
         val neuronArray = it.create(network)
-        network.addNetworkModel(neuronArray)
+        network.addNetworkModelAsync(neuronArray)
     }.also {
         it.title = "Create Neuron Array"
     }.display()
@@ -212,7 +212,7 @@ fun NetworkPanel.showClassifierCreationDialog() {
 
     dialog.addClosingTask {
         ape.commitChanges()
-        network.addNetworkModel(creator.create(network))
+        network.addNetworkModelAsync(creator.create(network))
     }
     dialog.title = "Create Smile Classifier"
     dialog.makeVisible()

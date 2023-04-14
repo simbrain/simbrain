@@ -64,7 +64,7 @@ public class lstmBlock extends Simulation {
             Neuron neuron = new Neuron(network);
             neuron.setIncrement(1);
             neuron.setClamped(true);
-            network.addNetworkModel(neuron);
+            network.addNetworkModelAsync(neuron);
             neuron.setLabel("Gate "+(i+1));
             gates.add(neuron);
         }
@@ -73,37 +73,37 @@ public class lstmBlock extends Simulation {
         // Create the four units of the LSTM cell, three products (AND gates) and one sum (OR gate)
         // The load unit allows the info value to enter the store if the gate 1 is high
         Neuron load=new Neuron(network,new ProductRule());
-        network.addNetworkModel(load);
+        network.addNetworkModelAsync(load);
         load.setLabel("Load");
         load.setX(0);load.setY(-GRID_SPACE);
 
         // The maintain unit allows the store value to remain in the store if gate 2 is high
         Neuron maintain=new Neuron(network,new ProductRule());
         maintain.setLabel("Maintain");
-        network.addNetworkModel(maintain);
+        network.addNetworkModelAsync(maintain);
         maintain.setX(GRID_SPACE);maintain.setY(-GRID_SPACE);
 
         // The store unit takes the sum of the load and maintain signals
         Neuron store=new Neuron(network,new LinearRule());
         store.setLabel("Store");
-        network.addNetworkModel(store);
+        network.addNetworkModelAsync(store);
         store.setX(0);store.setY(-2*GRID_SPACE);
 
         // The out unit allows the store value to be read out of the cell if gate 3 is high
         Neuron out=new Neuron(network,new ProductRule());
         out.setLabel("Out");
-        network.addNetworkModel(out);
+        network.addNetworkModelAsync(out);
         out.setX(0);out.setY(-3*GRID_SPACE);
 
         // Create the internal connections of the LSTM cell, set all connections to a strength of 1
-        network.addNetworkModel(new Synapse((Neuron) gates.get(0),load,1));
-        network.addNetworkModel(new Synapse((Neuron) gates.get(1),load,1));
-        network.addNetworkModel(new Synapse((Neuron) gates.get(2),maintain,1));
-        network.addNetworkModel(new Synapse(store,maintain,1));
-        network.addNetworkModel(new Synapse(load,store,1));
-        network.addNetworkModel(new Synapse(maintain,store,1));
-        network.addNetworkModel(new Synapse((Neuron) gates.get(3),out,1));
-        network.addNetworkModel(new Synapse(store,out,1));
+        network.addNetworkModelAsync(new Synapse((Neuron) gates.get(0),load,1));
+        network.addNetworkModelAsync(new Synapse((Neuron) gates.get(1),load,1));
+        network.addNetworkModelAsync(new Synapse((Neuron) gates.get(2),maintain,1));
+        network.addNetworkModelAsync(new Synapse(store,maintain,1));
+        network.addNetworkModelAsync(new Synapse(load,store,1));
+        network.addNetworkModelAsync(new Synapse(maintain,store,1));
+        network.addNetworkModelAsync(new Synapse((Neuron) gates.get(3),out,1));
+        network.addNetworkModelAsync(new Synapse(store,out,1));
 
 
     }

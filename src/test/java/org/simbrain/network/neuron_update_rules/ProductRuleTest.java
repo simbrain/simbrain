@@ -17,13 +17,13 @@ public class ProductRuleTest {
         Neuron input1 =  new Neuron(net);
         input1.setActivation(0.4);
         input1.setClamped(true);
-        net.addNetworkModel(input1);
+        net.addNetworkModelAsync(input1);
 
         // Setup the input neuron
         Neuron input2 =  new Neuron(net);
         input2.setActivation(0.8);
         input2.setClamped(true);
-        net.addNetworkModel(input2);
+        net.addNetworkModelAsync(input2);
 
         // Set up the rule.
         productRule.setUpperBound(1);
@@ -33,15 +33,15 @@ public class ProductRuleTest {
         // Set up the output neuron
         Neuron output = new Neuron(net, productRule);
         output.setActivation(0.0);
-        net.addNetworkModel(output);
+        net.addNetworkModelAsync(output);
 
         // Connect the input to the output
         Synapse w13 = new Synapse(input1, output, 1);
-        net.addNetworkModel(w13);
+        net.addNetworkModelAsync(w13);
 
         // Connect the input to the output
         Synapse w23 = new Synapse(input2, output, 1);
-        net.addNetworkModel(w23);
+        net.addNetworkModelAsync(w23);
 
 
         // Upper Bound (u) = 1, lower bound (l) = -1, use Weight = false,
@@ -61,17 +61,17 @@ public class ProductRuleTest {
         Neuron input1 =  new Neuron(net);
         input1.setActivation(0.4);
         input1.setClamped(true);
-        net.addNetworkModel(input1);
+        net.addNetworkModelAsync(input1);
 
         Neuron input2 =  new Neuron(net);
         input2.setActivation(0.8);
         input2.setClamped(true);
-        net.addNetworkModel(input2);
+        net.addNetworkModelAsync(input2);
 
         Neuron input3 =  new Neuron(net);
         input3.setActivation(-0.5);
         input3.setClamped(true);
-        net.addNetworkModel(input3);
+        net.addNetworkModelAsync(input3);
 
         // Set up the rule.
         productRule.setUpperBound(1);
@@ -81,17 +81,17 @@ public class ProductRuleTest {
         // Set up the output neuron
         Neuron output = new Neuron(net, productRule);
         output.setActivation(0.0);
-        net.addNetworkModel(output);
+        net.addNetworkModelAsync(output);
 
         // Connect the input to the output
         Synapse w14 = new Synapse(input1, output, 1);
-        net.addNetworkModel(w14);
+        net.addNetworkModelAsync(w14);
 
         Synapse w24 = new Synapse(input2, output, 1);
-        net.addNetworkModel(w24);
+        net.addNetworkModelAsync(w24);
 
         Synapse w34 = new Synapse(input3, output, 1);
-        net.addNetworkModel(w34);
+        net.addNetworkModelAsync(w34);
 
         // Upper Bound (u) = 1, lower bound (l) = -1, use Weight = false,
         // weighted input (W) = 0.4, 0.8, -0.5

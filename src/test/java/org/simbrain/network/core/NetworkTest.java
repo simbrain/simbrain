@@ -31,31 +31,31 @@ public class NetworkTest {
 
         n1 = new Neuron(net);
         n1.setLabel("neuron1");
-        net.addNetworkModel(n1);
+        net.addNetworkModelAsync(n1);
         n2 = new Neuron(net);
         n2.setLabel("neuron2");
-        net.addNetworkModel(n2);
+        net.addNetworkModelAsync(n2);
 
         s1 = new Synapse(n1, n2);
-        net.addNetworkModel(s1);
+        net.addNetworkModelAsync(s1);
 
         nc1 = new NeuronCollection(net, List.of(n1, n2));
-        net.addNetworkModel(nc1);
+        net.addNetworkModelAsync(nc1);
 
         ng1 = new NeuronGroup(net, 10);
         ng1.setLabel("neuron_group_1");
-        net.addNetworkModel(ng1);
+        net.addNetworkModelAsync(ng1);
         ng2 = new NeuronGroup(net, 10);
         ng2.setLabel("ng2");
-        net.addNetworkModel(ng2);
+        net.addNetworkModelAsync(ng2);
 
         sg1 = new SynapseGroup2(ng1, ng2);
-        net.addNetworkModel(sg1);
+        net.addNetworkModelAsync(sg1);
 
         na1 = new NeuronArray(net, 10);
         na2 = new NeuronArray(net, 10);
         wm1 = new WeightMatrix(net ,na1, na2);
-        net.addNetworkModels(List.of(na1,na2, wm1));
+        net.addNetworkModelsAsync(List.of(na1,na2, wm1));
     }
 
     @Test

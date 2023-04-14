@@ -29,7 +29,7 @@ class SubnetworkTest {
     @Test
     fun `subnet deleted when empty` () {
         val ff = FeedForward(net, intArrayOf(2,2,2),  Point2D.Double(0.0,0.0))
-        net.addNetworkModel(ff);
+        net.addNetworkModelAsync(ff);
         ff.modelList.all.forEach(NetworkModel::delete)
         assertEquals(0, net.allModels.size)
     }

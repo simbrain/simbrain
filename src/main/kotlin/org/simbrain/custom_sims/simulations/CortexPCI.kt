@@ -119,7 +119,7 @@ val cortexKuramoto = newSim {
         val regionNeurons = network.addNeurons(numNodesListAdjusted[i - 1]) { kuramotoTemplate() }
         val region = NeuronCollection(network, regionNeurons)
 
-        network.addNetworkModel(region)
+        network.addNetworkModelAsync(region)
         neuronRegionList.add(region)
 
         // Increment GUI row after 3 neuron regions have been displayed

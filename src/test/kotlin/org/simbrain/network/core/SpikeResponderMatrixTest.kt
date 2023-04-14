@@ -35,7 +35,7 @@ class SpikeResponderMatrixTest {
         listOf(n1, n2, n3).forEach {
             it.clear()
         }
-        net.addNetworkModels(n1, n2, n3, wm1, wm2)
+        net.addNetworkModelsAsync(n1, n2, n3, wm1, wm2)
     }
 
     @Test
@@ -47,7 +47,7 @@ class SpikeResponderMatrixTest {
         val arr2 = arr1.deepCopy(net2)
         val wmArr1Arr2 = WeightMatrix(net2, arr1, arr2)
         wmArr1Arr2.setSpikeResponder(StepResponder())
-        net2.addNetworkModels(arr1, arr2, wmArr1Arr2)
+        net2.addNetworkModelsAsync(arr1, arr2, wmArr1Arr2)
         net2.update() // Caused exceptions in earlier iterations.
         assertEquals(4, arr2.size())
         assertTrue(arr2.updateRule is IntegrateAndFireRule)

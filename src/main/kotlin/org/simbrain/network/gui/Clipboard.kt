@@ -77,7 +77,7 @@ object Clipboard {
 
         net.launch {
             // Add the copied object
-            net.network.addNetworkModels(copy).join()
+            net.network.addNetworkModels(copy)
 
             // Unselect "old" copied objects
             net.selectionManager.clear()

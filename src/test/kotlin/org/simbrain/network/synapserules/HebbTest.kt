@@ -15,7 +15,7 @@ class HebbTest {
     var s12 = Synapse(n1,n2)
 
     init {
-        net.addNetworkModels(n1, n2, s12)
+        net.addNetworkModelsAsync(n1, n2, s12)
         s12.learningRule = HebbianRule().apply {
             learningRate = 1.0
         }

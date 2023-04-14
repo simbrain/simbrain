@@ -86,7 +86,7 @@ class ConnectionGene(private val template: Synapse, val source: NodeGene, val ta
         return withTimeout(1000) {
             Synapse(context.network, source.product.await(), target.product.await(), template.learningRule, template)
                 .also {
-                    context.network.addNetworkModel(it)
+                    context.network.addNetworkModelAsync(it)
                     product.complete(it)
                 }
         }
@@ -145,7 +145,7 @@ class NetworkGeneticsContext(val network: Network) {
 
     suspend fun <P, G: NetworkGene<P>> express(chromosome: Chromosome<P, G>): List<P> = chromosome.map {
         it.buildWithContext(this).also { product ->
-            if (product is Neuron) network.addNetworkModel(product)
+            if (product is Neuron) network.addNetworkModelAsync(product)
         }
     }
 
@@ -155,7 +155,7 @@ class NetworkGeneticsContext(val network: Network) {
         return { network ->
             map { it.buildWithContext(this@NetworkGeneticsContext) }
                 .let { NeuronGroup(network, it).apply(block) }
-                .also { network.addNetworkModel(it) }
+                .also { network.addNetworkModelAsync(it) }
         }
     }
 
@@ -163,9 +163,9 @@ class NetworkGeneticsContext(val network: Network) {
         return { network ->
             map { it.buildWithContext(this@NetworkGeneticsContext) }
                 .let {
-                    it.forEach(network::addNetworkModel)
+                    it.forEach(network::addNetworkModelAsync)
                     NeuronCollection(network, it).apply(block) }
-                .also { network.addNetworkModel(it) }
+                .also { network.addNetworkModelAsync(it) }
         }
     }
 

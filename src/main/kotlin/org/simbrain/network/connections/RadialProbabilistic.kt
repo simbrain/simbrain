@@ -121,7 +121,7 @@ class RadialProbabilistic(
         )
         val syns = exc + inh
         if (addToNetwork) {
-            network.addNetworkModels(syns)
+            network.addNetworkModelsAsync(syns)
         }
         return syns
     }

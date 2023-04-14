@@ -144,7 +144,7 @@ public class Hippocampus extends Simulation {
         cg.setLayout(new LineLayout());
         cg.applyLayout(-5, -85);
         cg.setUpdateMethod("AS");
-        net.addNetworkModel(cg);
+        net.addNetworkModelAsync(cg);
         cg.setLocation(x, y);
         return cg;
     }
@@ -162,7 +162,7 @@ public class Hippocampus extends Simulation {
         // TODO: Weight matrices?
         // synGroup.setLowerBound(0, Polarity.EXCITATORY);
         // synGroup.setUpperBound(1, Polarity.EXCITATORY);
-        net.addNetworkModel(synGroup);
+        net.addNetworkModelAsync(synGroup);
         return synGroup;
     }
 

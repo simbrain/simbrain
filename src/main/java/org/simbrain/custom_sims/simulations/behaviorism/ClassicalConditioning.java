@@ -59,13 +59,13 @@ public class ClassicalConditioning extends Simulation {
         // Construct the network
         Neuron bellDetectorNeuron = new Neuron(net);
         bellDetectorNeuron.setClamped(true);
-        net.addNetworkModel(bellDetectorNeuron);
+        net.addNetworkModelAsync(bellDetectorNeuron);
         bellDetectorNeuron.setLocation(295, 194);
         bellDetectorNeuron.setLabel("Bell Detector");
 
         Neuron cheeseDetectorNeuron = new Neuron(net);
         cheeseDetectorNeuron.setClamped(false);
-        net.addNetworkModel(cheeseDetectorNeuron);
+        net.addNetworkModelAsync(cheeseDetectorNeuron);
         cheeseDetectorNeuron.setLocation(160, 194);
         cheeseDetectorNeuron.setLabel("Cheese Detector");
 
@@ -73,20 +73,20 @@ public class ClassicalConditioning extends Simulation {
         responseRule.setThreshold(.5);
         responseRule.setLowerBound(0);
         Neuron salivationResponse = new Neuron(net, responseRule);
-        net.addNetworkModel(salivationResponse);
+        net.addNetworkModelAsync(salivationResponse);
         salivationResponse.setLocation(160, 60);
         salivationResponse.setLabel("Salivation");
 
         Synapse cheeseToSalivation = new Synapse(cheeseDetectorNeuron, salivationResponse,1);
         cheeseToSalivation.setUpperBound(1);
-        net.addNetworkModel(cheeseToSalivation);
+        net.addNetworkModelAsync(cheeseToSalivation);
 
         Synapse association = new Synapse(bellDetectorNeuron, cheeseDetectorNeuron);
         association.setStrength(0);
         association.setLowerBound(0);
         association.setUpperBound(1);
 
-        net.addNetworkModel(association);
+        net.addNetworkModelAsync(association);
         sim.getNetworkPanel(nc).getSelectionManager().clear();
 
         // Create the odor world

@@ -69,7 +69,7 @@ public class CorticalBranching extends Simulation {
         }
         NeuronGroup ng1 = new NeuronGroup(net, neurons);
         ng1.setLabel("CorticalBranching");
-        net.addNetworkModel(ng1);
+        net.addNetworkModelAsync(ng1);
         ng1.setLayout(layout);
         ng1.applyLayout(new Point2D.Double(0.0 ,0.0));
 
@@ -94,7 +94,7 @@ public class CorticalBranching extends Simulation {
         }
 
         sg.setLabel("Recurrent Synapses");
-        net.addNetworkModel(sg);
+        net.addNetworkModelAsync(sg);
 
     }
 

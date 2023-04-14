@@ -90,9 +90,9 @@ public final class ConnectorDialog extends StandardDialog {
         for (Layer source: sources) {
             for (Layer target: targets) {
                 if (widget == Connector.ConnectorEnum.DENSE) {
-                    net.addNetworkModel(new WeightMatrix(net, source, target));
+                    net.addNetworkModelAsync(new WeightMatrix(net, source, target));
                 } else if (widget == Connector.ConnectorEnum.ZOE) {
-                    net.addNetworkModel(new ZoeConnector(net, source, target));
+                    net.addNetworkModelAsync(new ZoeConnector(net, source, target));
                 }
             }
         }

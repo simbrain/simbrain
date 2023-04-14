@@ -66,7 +66,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShorcut = KeyCombination('P')
     ) {
         val neuron = Neuron(network)
-        network.addNetworkModel(neuron)?.join()
+        network.addNetworkModel(neuron)
         network.selectModels(listOf(neuron))
     }
     val pasteAction = PasteAction(networkPanel)
@@ -369,7 +369,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Add 100 nodes",
     ) {
         List(100) { Neuron(network) }.apply {
-            network.addNetworkModels(this).join()
+            network.addNetworkModels(this)
             GridLayout().layoutNeurons(this)
         }.also { network.selectModels(it) }
         network.events.zoomToFitPage.fireAndSuspend()

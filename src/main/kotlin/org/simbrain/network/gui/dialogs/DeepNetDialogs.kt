@@ -43,7 +43,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
         ape.commitChanges()
         layerList.commitChanges()
         val deepNet = creator.create(network, layerList.layers)
-        network.addNetworkModel(deepNet)
+        network.addNetworkModelAsync(deepNet)
     }
     dialog.pack()
     dialog.setLocationRelativeTo(null)

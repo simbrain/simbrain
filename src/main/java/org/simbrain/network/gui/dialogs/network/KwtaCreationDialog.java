@@ -91,7 +91,7 @@ public class KwtaCreationDialog extends StandardDialog {
         KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK.getText()));
         layoutPanel.commitChanges();
         layout.layoutNeurons(kWTA.getNeuronList());
-        networkPanel.getNetwork().addNetworkModel(kWTA);
+        networkPanel.getNetwork().addNetworkModelAsync(kWTA);
         networkPanel.repaint();
         super.closeDialogOk();
     }

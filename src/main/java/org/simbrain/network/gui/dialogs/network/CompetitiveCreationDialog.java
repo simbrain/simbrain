@@ -109,7 +109,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
         layoutPanel.commitChanges();
         cn.getCompetitive().setLayout(layout);
         cn.getCompetitive().applyLayout(-5, -85);
-        networkPanel.getNetwork().addNetworkModel(cn);
+        networkPanel.getNetwork().addNetworkModelAsync(cn);
         super.closeDialogOk();
     }
 

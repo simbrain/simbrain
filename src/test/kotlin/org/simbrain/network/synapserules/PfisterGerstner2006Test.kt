@@ -1,12 +1,9 @@
 package org.simbrain.network.synapserules
 
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.synapse_update_rules.HebbianRule
-import org.simbrain.network.synapse_update_rules.OjaRule
 import org.simbrain.network.synapse_update_rules.PfisterGerstner2006Rule
 
 class PfisterGerstner2006Test {
@@ -17,7 +14,7 @@ class PfisterGerstner2006Test {
     var s12 = Synapse(n1,n2)
 
     init {
-        net.addNetworkModels(n1, n2, s12)
+        net.addNetworkModelsAsync(n1, n2, s12)
         s12.learningRule = PfisterGerstner2006Rule().apply {
 
         }

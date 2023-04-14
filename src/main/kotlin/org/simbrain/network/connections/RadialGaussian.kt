@@ -142,7 +142,7 @@ class RadialGaussian(
         val syns: List<Synapse> = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
-            network.addNetworkModels(syns)
+            network.addNetworkModelsAsync(syns)
         }
         return syns
     }
@@ -196,7 +196,7 @@ class RadialGaussian(
                         val s: Synapse = Synapse(src, tar)
                         synapses.add(s)
                         if (loose) {
-                            src.getNetwork().addNetworkModel(s)
+                            src.getNetwork().addNetworkModelAsync(s)
                         }
                     }
                 }

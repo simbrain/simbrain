@@ -65,9 +65,9 @@ open class Events2: CoroutineScope {
             ?.map { (dispatcher, wait, handler, stackTrace) ->
                 try {
                     if (dispatcher != null) {
-                        launch(dispatcher) { run(handler) }.let { if (wait) withTimeout(5000) { it.join() } else it }
+                        launch(dispatcher) { run(handler) }.let { if (wait) withTimeout(60*1000) { it.join() } else it }
                     } else {
-                        launch { run(handler) }.let { if (wait) withTimeout(5000) { it.join() } else it }
+                        launch { run(handler) }.let { if (wait) withTimeout(60*1000) { it.join() } else it }
                     }
                 } catch (e: TimeoutCancellationException) {
                     throw IllegalStateException("Event time out on dispatcher $dispatcher. Event handler created by ${stackTrace.contentDeepToString()}")
@@ -236,7 +236,7 @@ open class Events2: CoroutineScope {
     inner class RemovedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: (old: T) -> Unit) = onSuspendHelper(dispatcher, wait) {
+        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (old: T) -> Unit) = onSuspendHelper(dispatcher, wait) {
                 _, old -> handler(old as T)
         }
 

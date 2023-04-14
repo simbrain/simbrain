@@ -23,7 +23,7 @@ val projectionSim = newSim {
     val neuronArray = NeuronArray(network, 25)
     val weightMatrix = WeightMatrix(network, neuronArray, neuronArray)
     weightMatrix.randomize()
-    network.addNetworkModels(listOf(neuronArray, weightMatrix))
+    network.addNetworkModelsAsync(listOf(neuronArray, weightMatrix))
 
     // Location of the network in the desktop
     withGui {

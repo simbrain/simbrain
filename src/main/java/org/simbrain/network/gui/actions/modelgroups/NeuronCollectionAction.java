@@ -56,7 +56,7 @@ public final class NeuronCollectionAction extends ConditionallyEnabledAction {
             NeuronCollection nc = new NeuronCollection(network, neuronList);
             if (nc.shouldAdd()) {
                 nc.setLabel(network.getIdManager().getProposedId(nc.getClass()));
-                network.addNetworkModel(nc);
+                network.addNetworkModelAsync(nc);
             }
         }
     }

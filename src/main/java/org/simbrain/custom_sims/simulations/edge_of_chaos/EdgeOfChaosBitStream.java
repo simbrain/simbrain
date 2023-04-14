@@ -105,7 +105,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         sgRes1 = EdgeOfChaos.connectReservoir(net, res1, variance, 4);
         sgRes2 = sgRes1.copy(res2, res2);
         sgRes2.setLabel("Recurrent Synapses");
-        net.addNetworkModel(sgRes2);
+        net.addNetworkModelAsync(sgRes2);
 
         // Set up "bit-stream" inputs
         bitStream1 = buildBitStream(res1);
@@ -129,7 +129,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         bitStreamInputs.setClamped(true);
         bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
         bitStreamInputs.setInputMode(true);
-        net.addNetworkModel(bitStreamInputs);
+        net.addNetworkModelAsync(bitStreamInputs);
         bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
         return bitStreamInputs;
     }

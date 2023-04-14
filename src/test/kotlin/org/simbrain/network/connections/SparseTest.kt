@@ -15,7 +15,7 @@ class SparseTest {
     @BeforeEach
     fun setUp() {
         sparse = Sparse()
-        net.addNetworkModels(List(10) { Neuron(net) })
+        net.addNetworkModelsAsync(List(10) { Neuron(net) })
     }
 
     // TODO: Check equalize efferents

@@ -103,7 +103,7 @@ public class KuramotoOscillators extends Simulation {
         }
         reservoirNet = new NeuronGroup(net, neuronList);
         reservoirNet.setLayout(new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(neuronList.size())));
-        net.addNetworkModel(reservoirNet);
+        net.addNetworkModelAsync(reservoirNet);
         reservoirNet.setLocation(185,50);
         reservoirNet.applyLayout(-5, -85);
         reservoirNet.setLabel("Recurrent Layer");
@@ -114,7 +114,7 @@ public class KuramotoOscillators extends Simulation {
         ConnectionStrategy recConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 3,
             DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50);
         SynapseGroup2 recSyns = SynapseGroup.createSynapseGroup(reservoirNet, reservoirNet, recConnection);
-        net.addNetworkModel(recSyns);
+        net.addNetworkModelAsync(recSyns);
         recSyns.setLabel("Recurrent");
 
         // Inputs
@@ -122,7 +122,7 @@ public class KuramotoOscillators extends Simulation {
         inputNetwork.setLowerBound(-100);
         inputNetwork.setUpperBound(100);
         inputNetwork.setLabel("Sensory Neurons");
-        net.addNetworkModel(inputNetwork);
+        net.addNetworkModelAsync(inputNetwork);
 
         // Inputs to reservoir
         SynapseGroup2 inpSynG = SynapseGroup.createSynapseGroup(inputNetwork, reservoirNet,
@@ -133,7 +133,7 @@ public class KuramotoOscillators extends Simulation {
         //     NormalDistribution.builder().mean(-10).standardDeviation(2.5).build());
         inpSynG.randomize();
         inpSynG.setDisplaySynapses(false);
-        net.addNetworkModel(inpSynG);
+        net.addNetworkModelAsync(inpSynG);
 
         inputNetwork.setLocation(130, 660);
 

@@ -48,7 +48,7 @@ val testSim = newSim {
         percentExcitatory = 10.0
     }
     val syns = sparse.connectNeurons(network, region1.neuronList, region1.neuronList)
-    network.addNetworkModels(syns)
+    network.addNetworkModelsAsync(syns)
     // Set up some references
     val straightNeuron = region1.neuronList[2]
     val leftNeuron = region1.neuronList[3]
@@ -65,11 +65,11 @@ val testSim = newSim {
         location = point(500, -50)
     }
     val region2weights = radial.connectNeurons(network, region2.neuronList, region2.neuronList)
-    network.addNetworkModels(region2weights)
+    network.addNetworkModelsAsync(region2weights)
 
     // Make connections between regions
     val region1_to_2_weights = sparse.connectNeurons(network, region1.neuronList, region2.neuronList)
-    network.addNetworkModels(region1_to_2_weights)
+    network.addNetworkModelsAsync(region1_to_2_weights)
 
     // TODO: Temp because excitatory ratio not working
     region1.randomizeIncomingWeights()
@@ -206,7 +206,7 @@ val linkedNeuronList = newSim {
             Neuron(network)
         }
 
-        neurons.forEach { network.addNetworkModel(it) }
+        neurons.forEach { network.addNetworkModelAsync(it) }
         val (first) = neurons
         first.activation = 1.0
 

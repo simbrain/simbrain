@@ -16,7 +16,7 @@ class OjaTest {
     var s2 = Synapse(n2,out)
 
     init {
-        net.addNetworkModels(n1, n2, out, s1, s2)
+        net.addNetworkModelsAsync(n1, n2, out, s1, s2)
         s1.learningRule = OjaRule().apply {
             learningRate = 0.2
             normalizationFactor = 1.0

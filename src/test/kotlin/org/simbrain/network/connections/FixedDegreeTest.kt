@@ -24,7 +24,7 @@ class FixedDegreeTest {
         n2.location = point(0, 50)
         n3 = Neuron(net);
         n3.location = point(0, 100)
-        net.addNetworkModels(listOf(n1, n2, n3))
+        net.addNetworkModelsAsync(listOf(n1, n2, n3))
     }
 
     @Test

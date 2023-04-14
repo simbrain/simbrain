@@ -148,7 +148,7 @@ public final class NeuronGroupDialog extends StandardDialog {
 
         if (isCreationDialog) {
             neuronGroup = ngCreator.create(networkPanel.getNetwork());
-            networkPanel.getNetwork().addNetworkModel(neuronGroup);
+            networkPanel.getNetwork().addNetworkModelAsync(neuronGroup);
         } else {
             neuronGroup.applyLayout();
         }

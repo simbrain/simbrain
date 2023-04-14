@@ -89,7 +89,7 @@ class FixedDegree(
         }
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
-            network.addNetworkModels(syns)
+            network.addNetworkModelsAsync(syns)
         }
         return syns
     }

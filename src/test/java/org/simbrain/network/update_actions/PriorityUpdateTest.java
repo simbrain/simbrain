@@ -35,7 +35,7 @@ class PriorityUpdateTest {
 
         s1 = new Synapse(n1, n2);
         s2 = new Synapse(n2, n3);
-        net.addNetworkModels(List.of(n1,n2,n3,s1,s2));
+        net.addNetworkModelsAsync(List.of(n1,n2,n3,s1,s2));
 
         net.update();
 

@@ -18,7 +18,7 @@ public class SpikeThresholdTest {
         Neuron input1 =  new Neuron(net);
         input1.setActivation(0.675);
         input1.setClamped(true);
-        net.addNetworkModel(input1);
+        net.addNetworkModelAsync(input1);
 
         // Set up the rule
         spRule.setThreshold(0.4);
@@ -26,11 +26,11 @@ public class SpikeThresholdTest {
         // Set up the output neuron
         Neuron output = new Neuron(net, spRule);
         output.setActivation(0.0);
-        net.addNetworkModel(output);
+        net.addNetworkModelAsync(output);
 
         // Connect the input to the output
         Synapse w12 = new Synapse(input1, output, 2);
-        net.addNetworkModel(w12);
+        net.addNetworkModelAsync(w12);
 
         // Threshold = 0.4, Activation = 0.675
         net.update();

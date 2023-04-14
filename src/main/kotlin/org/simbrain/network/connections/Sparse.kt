@@ -90,14 +90,14 @@ class Sparse @JvmOverloads constructor(
             is ConnectionsResult.Add -> {
                 polarizeSynapses(result.connectionsToAdd, percentExcitatory)
                 if (addToNetwork) {
-                    network.addNetworkModels(result.connectionsToAdd)
+                    network.addNetworkModelsAsync(result.connectionsToAdd)
                 }
                 result.connectionsToAdd
             }
             is ConnectionsResult.Reset -> {
                 polarizeSynapses(result.resultConnections, percentExcitatory)
                 if (addToNetwork) {
-                    network.addNetworkModels(result.resultConnections)
+                    network.addNetworkModelsAsync(result.resultConnections)
                 }
                 result.resultConnections
             }

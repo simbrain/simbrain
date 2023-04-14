@@ -181,7 +181,7 @@ class CortexSimple : Simulation {
             neurons.add(neuron)
         }
         val ng = NeuronGroup(net, neurons)
-        net!!.addNetworkModel(ng)?.join()
+        net!!.addNetworkModel(ng)
         // ng.setLayout(layout);
         // ng.applyLayout();
         return ng
@@ -207,7 +207,7 @@ class CortexSimple : Simulation {
         // sg.setUpperBound(0, Polarity.INHIBITORY);
         //
         // sg.setSpikeResponder(new UDF(), Polarity.BOTH);
-        net!!.addNetworkModel(sg)
+        net!!.addNetworkModelAsync(sg)
         return sg
     }
 

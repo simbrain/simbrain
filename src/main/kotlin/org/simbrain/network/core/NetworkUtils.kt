@@ -144,7 +144,7 @@ fun layoutNeuronGroup(ng: NeuronGroup, layoutName: String) {
 fun connect(source: Neuron, target: Neuron, value: Double): Synapse {
     val synapse = Synapse(source, target)
     synapse.forceSetStrength(value)
-    source.network.addNetworkModel(synapse)
+    source.network.addNetworkModelAsync(synapse)
     return synapse
 }
 
@@ -156,7 +156,7 @@ fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double, u
     synapse.forceSetStrength(value)
     synapse.lowerBound = lowerBound
     synapse.upperBound = upperBound
-    source.network.addNetworkModel(synapse)
+    source.network.addNetworkModelAsync(synapse)
 }
 
 /**
@@ -167,7 +167,7 @@ fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double, u
 fun connect(source: Neuron, target: Neuron, rule: SynapseUpdateRule, value: Double): Synapse? {
     val synapse = Synapse(source, target, rule)
     synapse.forceSetStrength(value)
-    source.network.addNetworkModel(synapse)
+    source.network.addNetworkModelAsync(synapse)
     return synapse
 }
 
@@ -205,13 +205,13 @@ fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<
     val neurons = (0 until numNeurons).map {
         Neuron(this).apply(template)
     }
-    addNetworkModels(neurons)
+    addNetworkModelsAsync(neurons)
     return neurons
 }
 
 fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
     val nc = NeuronCollection(this, addNeurons(numNeurons, template))
-    addNetworkModel(nc)
+    addNetworkModelAsync(nc)
     return nc
 }
 

@@ -21,7 +21,7 @@ public class IAC_Test {
         iacRule.setLowerBound(-1);
         Neuron iacNeuron = new Neuron(net, iacRule);
         iacNeuron.setActivation(0.0);
-        net.addNetworkModel(iacNeuron);
+        net.addNetworkModelAsync(iacNeuron);
 
         // See if it decays to provided rest value
         iacRule.setRest(0.1);

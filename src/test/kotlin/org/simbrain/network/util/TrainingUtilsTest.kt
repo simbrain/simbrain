@@ -26,7 +26,7 @@ class TrainingUtilsTest {
         listOf(na1, na2, na3).forEach {
             it.clear()
         }
-        net.addNetworkModels(na1, na2, na3, wm1, wm2)
+        net.addNetworkModelsAsync(na1, na2, na3, wm1, wm2)
     }
 
     @Test

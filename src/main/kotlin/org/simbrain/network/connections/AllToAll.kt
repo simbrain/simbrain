@@ -61,7 +61,7 @@ class AllToAll(
         val syns = connectAllToAll(source, target, allowSelfConnection)
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
-            network.addNetworkModels(syns)
+            network.addNetworkModelsAsync(syns)
         }
         return syns
     }

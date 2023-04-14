@@ -264,7 +264,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
 
             override fun redo() {
-                network.addNetworkModel(neuron)
+                network.addNetworkModelAsync(neuron)
             }
         })
         NeuronNode(this, neuron)
@@ -373,7 +373,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
                     undoManager.addUndoableAction(object : UndoableAction {
                         override fun undo() {
-                            network.addNetworkModel(screenElement.model)
+                            network.addNetworkModelAsync(screenElement.model)
                         }
 
                         override fun redo() {
@@ -585,7 +585,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             } else {
                 // TODO: Ability to set defaults for weight matrix that is added
                 sources.zip(targets) { s, t ->
-                    network.addNetworkModel(WeightMatrix(network, s, t))
+                    network.addNetworkModelAsync(WeightMatrix(network, s, t))
                 }
             }
             return true
@@ -617,7 +617,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val src = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
         val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
         if (src.isNotEmpty() && tar.isNotEmpty()) {
-            network.addNetworkModel(SynapseGroup2(src.first(), tar.first()))
+            network.addNetworkModelAsync(SynapseGroup2(src.first(), tar.first()))
             return true;
         }
         return false

@@ -50,7 +50,7 @@ class DistanceBased (
         val syns = connectRadial(source, target, decayFunction)
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
-            network.addNetworkModels(syns)
+            network.addNetworkModelsAsync(syns)
         }
         return syns
     }

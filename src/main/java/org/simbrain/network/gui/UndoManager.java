@@ -127,7 +127,7 @@ public class UndoManager {
 
             @Override
             public void redo() {
-                network.addNetworkModel(newNeuron);
+                network.addNetworkModelAsync(newNeuron);
             }
         };
 

@@ -63,7 +63,7 @@ public class TestSim extends Simulation {
         ng.setLabel("Recurrent network");
         // ng.setNeuronType("DecayRule");
         ng.setUpperBound(10);
-        network.addNetworkModel(ng);
+        network.addNetworkModelAsync(ng);
         ng.randomize();
 
         // LAYOUT NEURONS

@@ -17,7 +17,7 @@ public class NeuronArrayTest {
 
     @BeforeEach
     public void setUp() {
-        net.addNetworkModel(na);
+        net.addNetworkModelAsync(na);
     }
 
     @Test
@@ -47,7 +47,7 @@ public class NeuronArrayTest {
         var naTarget = new NeuronArray(net, 3);
         WeightMatrix wm1 = new WeightMatrix(net, na1, naTarget);
         wm1.setWeights(new double[]{5, -1, 1, 1,-1,-1});
-        net.addNetworkModels(na1, naTarget, wm1);
+        net.addNetworkModelsAsync(na1, naTarget, wm1);
         // Expecting 5 for first row, 2 for second row, and 0 for the last row
         assertArrayEquals(new double[]{5,2,0}, naTarget.getExcitatoryInputs());
 
@@ -56,7 +56,7 @@ public class NeuronArrayTest {
         na2.setActivations(new double[]{1, 1});
         WeightMatrix wm2 = new WeightMatrix(net, na2, naTarget);
         wm2.setWeights(new double[]{1, 0, -1, -1,1,1});
-        net.addNetworkModels(na2, wm2);
+        net.addNetworkModelsAsync(na2, wm2);
         // Now expecting 6, 2, 2
         assertArrayEquals(new double[]{6,2,2}, naTarget.getExcitatoryInputs());
     }
@@ -68,7 +68,7 @@ public class NeuronArrayTest {
         var naTarget = new NeuronArray(net, 3);
         WeightMatrix wm1 = new WeightMatrix(net, na1, naTarget);
         wm1.setWeights(new double[]{5, -1, 1, 1,-1,-1});
-        net.addNetworkModels(na1, naTarget, wm1);
+        net.addNetworkModelsAsync(na1, naTarget, wm1);
         // Expecting -1 for first row, 0 for second row, and -2 for the last row
         assertArrayEquals(new double[]{-1,0,-2}, naTarget.getInhibitoryInputs());
 
@@ -77,7 +77,7 @@ public class NeuronArrayTest {
         na2.setActivations(new double[]{1, 1});
         WeightMatrix wm2 = new WeightMatrix(net, na2, naTarget);
         wm2.setWeights(new double[]{1, 0, -1, -1,1,1});
-        net.addNetworkModels(na2, wm2);
+        net.addNetworkModelsAsync(na2, wm2);
         // Now expecting -1, -2, -2
         assertArrayEquals(new double[]{-1,-2,-2}, naTarget.getInhibitoryInputs());
     }

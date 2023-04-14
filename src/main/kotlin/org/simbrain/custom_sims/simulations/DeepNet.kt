@@ -80,7 +80,7 @@ val deepNetSim = newSim {
         ),
         4
     )
-    network.addNetworkModel(deepNet)
+    network.addNetworkModelAsync(deepNet)
     deepNet.trainingDataset = trainingSet
     deepNet.testingDataset = testingSet
 

@@ -106,7 +106,7 @@ public class RandomizedPursuer extends Simulation {
         Neuron sensor2 = net.getNeuronByLabel("Swiss (R)");
         sensorNodes = new NeuronCollection(net, Arrays.asList(sensor1, sensor2));
         sensorNodes.setLabel("Sensor Nodes");
-        net.addNetworkModel(sensorNodes);
+        net.addNetworkModelAsync(sensorNodes);
     }
 
     private void setUpPlots() {

@@ -11,7 +11,7 @@ class MorrisLecarTest {
     val mlRule = MorrisLecarRule()
     val n = Neuron(net, mlRule)
     init {
-        net.addNetworkModel(n)
+        net.addNetworkModelAsync(n)
     }
 
     @Test

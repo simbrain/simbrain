@@ -11,7 +11,7 @@ class AdExTest {
     val adEx = AdExIFRule()
     val n = Neuron(net, adEx)
     init {
-        net.addNetworkModel(n)
+        net.addNetworkModelAsync(n)
     }
 
     @Test

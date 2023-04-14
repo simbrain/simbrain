@@ -41,7 +41,7 @@ val irisClassifier = newSim {
     smileClassifier.train()
 
     val weightMatrix = WeightMatrix(network, inputNc, smileClassifier)
-    network.addNetworkModels(weightMatrix, smileClassifier)
+    network.addNetworkModelsAsync(weightMatrix, smileClassifier)
     smileClassifier.location = point(0, -300)
 
     // Location of the network in the desktop

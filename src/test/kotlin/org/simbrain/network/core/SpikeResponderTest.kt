@@ -15,7 +15,7 @@ class SpikeResponderTest {
     val s2 = Synapse(n2, n3) // This one has the spike responder
 
     init {
-        net.addNetworkModels(n1, n2, n3, s1, s2)
+        net.addNetworkModelsAsync(n1, n2, n3, s1, s2)
     }
 
     @Test

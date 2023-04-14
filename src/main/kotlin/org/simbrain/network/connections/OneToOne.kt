@@ -51,7 +51,7 @@ class OneToOne(
         val syns = connectOneToOne(source, target, useBidirectionalConnections)
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
-            network.addNetworkModels(syns)
+            network.addNetworkModelsAsync(syns)
         }
         return syns
     }

@@ -24,7 +24,7 @@ class NodeGene2(override val template: Neuron) : NetworkGene2<Neuron>() {
     }
 
     override suspend fun express(network: Network) = Neuron(network, template).also {
-        network.addNetworkModel(it)
+        network.addNetworkModelAsync(it)
         expressedNeuron.complete(it)
     }
 
@@ -52,7 +52,7 @@ class ConnectionGene2(override val template: Synapse, val source: NodeGene2, val
     override suspend fun express(network: Network) =
         with(withTimeout(1000) { source.expressedNeuron.await() } to withTimeout(1000) { target.expressedNeuron.await() }) {
             val (source, target) = this
-            Synapse(network, source, target, template.learningRule, template).also { network.addNetworkModel(it) }
+            Synapse(network, source, target, template.learningRule, template).also { network.addNetworkModelAsync(it) }
         }
 
     override fun copy(): ConnectionGene2 {

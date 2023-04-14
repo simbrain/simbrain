@@ -192,11 +192,11 @@ public class AddNeuronsDialog extends StandardDialog {
             if (inGroup) {
                 NeuronGroup ng = new NeuronGroup(networkPanel.getNetwork(), addedNeurons);
                 ng.setLayout(layoutObject.getLayout());
-                networkPanel.getNetwork().addNetworkModel(ng);
+                networkPanel.getNetwork().addNetworkModelAsync(ng);
                 ng.applyLayout();
                 ng.setLabel(groupPanel.tfGroupName.getText());
             } else {
-                addedNeurons.forEach(networkPanel.getNetwork()::addNetworkModel);
+                addedNeurons.forEach(networkPanel.getNetwork()::addNetworkModelAsync);
                 layoutObject.getLayout().layoutNeurons(addedNeurons);
             }
         }

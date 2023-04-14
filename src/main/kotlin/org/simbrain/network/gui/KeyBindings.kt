@@ -44,10 +44,10 @@ fun NetworkPanel.addKeyBindings() {
     bind("S") { selectNeuronsInNeuronGroups() }
     bindTo("T", networkActions.textEditModeAction)
     //TODO Make default settable (same with neuron?)
-    bind("Y") { network.addNetworkModel(NeuronArray(network,50)) }
+    bind("Y") { network.addNetworkModelAsync(NeuronArray(network,50)) }
     bind(Shift +'Y') { showNeuronArrayCreationDialog() }
     bind(CmdOrCtrl + 'Y') { redo() }
-    bind(Shift + 'Z') { network.addNetworkModel(ZoeLayer(network, 10)) } // TODO: Temp testing key command
+    bind(Shift + 'Z') { network.addNetworkModelAsync(ZoeLayer(network, 10)) } // TODO: Temp testing key command
     bind(CmdOrCtrl + 'Z') { undo() }
     bind(CmdOrCtrl + Shift + 'Z') { redo() }
 

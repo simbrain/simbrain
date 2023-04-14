@@ -105,7 +105,7 @@ public class SOMCreationDialog extends StandardDialog {
         layoutPanel.commitChanges();
         som.getSom().setLayout(layout);
         som.getSom().applyLayout();
-        networkPanel.getNetwork().addNetworkModel(som);
+        networkPanel.getNetwork().addNetworkModelAsync(som);
         super.closeDialogOk();
     }
 

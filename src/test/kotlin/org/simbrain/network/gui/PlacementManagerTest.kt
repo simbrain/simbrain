@@ -17,10 +17,10 @@ class PlacementManagerTest {
 
         // Place two neurons. They should be offset by default amount
         val n1 = Neuron(net)
-        net.addNetworkModel(n1)
+        net.addNetworkModelAsync(n1)
         pm.placeObject(n1)
         val n2 = Neuron(net)
-        net.addNetworkModel(n2)
+        net.addNetworkModelAsync(n2)
         pm.placeObject(n2)
         val neuronOffset = pm.deltaDragMap.get(n2::class)
         assertEquals(neuronOffset!!.x, n2.x, .01)
@@ -31,13 +31,13 @@ class PlacementManagerTest {
 
         pm.lastClickedLocation = point(100.0, 0.0)
         val n1 = Neuron(net)
-        net.addNetworkModel(n1)
+        net.addNetworkModelAsync(n1)
         pm.placeObject(n1)
         assertEquals(100.0, n1.x, .01 )
 
         // Subsequent should be offset from there by default amount
         val n2 = Neuron(net)
-        net.addNetworkModel(n2)
+        net.addNetworkModelAsync(n2)
         pm.placeObject(n2)
         val neuronOffset =  pm.deltaDragMap.get(n2::class)
         assertEquals(100 + neuronOffset!!.x, n2.x, .01)
@@ -46,10 +46,10 @@ class PlacementManagerTest {
     @Test
     fun `test neuron array`() {
         val na1 = NeuronArray(net, 20)
-        net.addNetworkModel(na1)
+        net.addNetworkModelAsync(na1)
         pm.placeObject(na1)
         val na2 = NeuronArray(net, 20)
-        net.addNetworkModel(na2)
+        net.addNetworkModelAsync(na2)
         pm.placeObject(na2)
         val offset = pm.deltaDragMap.get(na2::class)
         assertEquals(offset!!.y, na2.location.y, .01 )

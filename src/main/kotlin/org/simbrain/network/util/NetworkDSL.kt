@@ -7,7 +7,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.workspace.Workspace
 
 fun neuron(config: Neuron.() -> Unit = { }) = fun(network: Network) =
-        Neuron(network).apply(config).also { network.addNetworkModel(it) }
+        Neuron(network).apply(config).also { network.addNetworkModelAsync(it) }
 
 fun workspace(config: WorkspaceBuilder.() -> Unit = { }) = WorkspaceBuilder().apply(config).workspace
 
@@ -34,13 +34,13 @@ class WorkspaceBuilder {
 class NetworkBuilder {
     val network = Network()
 
-    fun neuron(config: Neuron.() -> Unit = { }) = Neuron(network).apply(config).also { network.addNetworkModel(it) }
+    fun neuron(config: Neuron.() -> Unit = { }) = Neuron(network).apply(config).also { network.addNetworkModelAsync(it) }
 
     fun synapse(source: Neuron, target: Neuron, config: Synapse.() -> Unit = { }) = Synapse(source, target)
         .apply(config)
-        .also { network.addNetworkModel(it) }
+        .also { network.addNetworkModelAsync(it) }
 
-    operator fun ((Network) -> Neuron).unaryPlus() = this(network).also { network.addNetworkModel(it) }
+    operator fun ((Network) -> Neuron).unaryPlus() = this(network).also { network.addNetworkModelAsync(it) }
 
     operator fun Collection<(Network) -> Neuron>.unaryPlus() = map { +it }
 

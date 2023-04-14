@@ -56,7 +56,7 @@ public class MpfsSOM extends Simulation {
         som = new SOMNetwork(net, numSOMNodes, 29);
         som.getSom().setLayout(new HexagonalGridLayout(40, 40, 5));
         som.getSom().applyLayout(-5, -85);
-        net.addNetworkModel(som);
+        net.addNetworkModelAsync(som);
         som.getInputLayer().setLayout(new GridLayout(70, 60, 5));
         som.getInputLayer().applyLayout(-5, -85);
 

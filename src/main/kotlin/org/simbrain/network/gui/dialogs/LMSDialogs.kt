@@ -22,7 +22,7 @@ fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
         network.placementManager.lastClickedLocation
     )
     return creator.createDialog {
-        network.addNetworkModel(creator.create(network))
+        network.addNetworkModelAsync(creator.create(network))
     }
 
 }
@@ -62,7 +62,7 @@ fun main() {
     val np = NetworkPanel(networkComponent)
     val result = with(networkComponent.network) {
         val lmsNet = LMSNetwork(this, 5, 5)
-        addNetworkModel(lmsNet)
+        addNetworkModelAsync(lmsNet)
         lmsNet
     }
     LMSNetworkNode(np,result ).propertyDialog.run { makeVisible() }

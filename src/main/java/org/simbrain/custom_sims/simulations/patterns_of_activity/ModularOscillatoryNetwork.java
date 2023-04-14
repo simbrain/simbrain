@@ -163,7 +163,7 @@ public class ModularOscillatoryNetwork extends Simulation {
         ConnectionStrategy radialConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 2,
             DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50.0);
         SynapseGroup2 sg = new SynapseGroup2(sourceNg, targetNg, radialConnection);
-        net.addNetworkModel(sg);
+        net.addNetworkModelAsync(sg);
         sg.setDisplaySynapses(false);
         return sg;
     }
@@ -174,7 +174,7 @@ public class ModularOscillatoryNetwork extends Simulation {
         // TODO!
         // , exRatio)
 //        sparse.connectNeurons(sg);
-        net.addNetworkModel(sg);
+        net.addNetworkModelAsync(sg);
         sg.setDisplaySynapses(false);
         return sg;
     }

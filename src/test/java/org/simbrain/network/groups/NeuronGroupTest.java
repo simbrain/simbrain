@@ -16,14 +16,14 @@ public class NeuronGroupTest {
     NeuronGroup ng = new NeuronGroup(net, 2);
     {
         ng.setLabel("test");
-        net.addNetworkModel(ng);
+        net.addNetworkModelAsync(ng);
     }
 
 
     @Test
     public void testDeepCopy() {
         NeuronGroup ng2 = ng.deepCopy(net);
-        net.addNetworkModel(ng2);
+        net.addNetworkModelAsync(ng2);
         assertEquals(2, ng2.getNeuronList().size());
         // Labels should not be copied
         assertNotEquals("test", ng2.getLabel());
@@ -35,7 +35,7 @@ public class NeuronGroupTest {
         ng.getNeuron(1).setActivation(-1.0);
         NeuronGroup ng2 = new NeuronGroup(net, 2);
         WeightMatrix wm = new WeightMatrix(net, ng, ng2);
-        net.addNetworkModels(List.of(ng2, wm));
+        net.addNetworkModelsAsync(List.of(ng2, wm));
         net.update();
         assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
     }
@@ -45,7 +45,7 @@ public class NeuronGroupTest {
         ng.setActivations(new double[]{1.0, -1.0});
         NeuronGroup ng2 = new NeuronGroup(net, 2);
         WeightMatrix wm = new WeightMatrix(net, ng, ng2);
-        net.addNetworkModels(List.of(ng2, wm));
+        net.addNetworkModelsAsync(List.of(ng2, wm));
         net.update();
         assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
     }
@@ -57,7 +57,7 @@ public class NeuronGroupTest {
         ng.getNeuron(1).setActivation(-1.0);
         NeuronGroup ng2 = new NeuronGroup(net, 2);
         WeightMatrix wm = new WeightMatrix(net, ng, ng2);
-        net.addNetworkModels(List.of(ng2, wm));
+        net.addNetworkModelsAsync(List.of(ng2, wm));
         net.update();
         assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
     }
@@ -67,7 +67,7 @@ public class NeuronGroupTest {
         ng.randomize();
         SoftmaxGroup ng2 = new SoftmaxGroup(net, 5);
         WeightMatrix wm = new WeightMatrix(net, ng, ng2);
-        net.addNetworkModels(List.of(ng2, wm));
+        net.addNetworkModelsAsync(List.of(ng2, wm));
         net.update();
         // System.out.println(Arrays.toString(ng2.getActivations()));
         assertEquals(1.0, Arrays.stream(ng2.getActivations()).sum(), .01);

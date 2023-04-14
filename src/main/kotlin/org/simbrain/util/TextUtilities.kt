@@ -91,8 +91,8 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
     val adjustedMatrix = cocMatrix.clone().div(expectedValues)
 
     if (positive) {
-        for (indexRow in 0 until adjustedMatrix.nrows()) {
-            for (indexCol in 0 until adjustedMatrix.ncols()) {
+        for (indexRow in 0 until adjustedMatrix.nrow()) {
+            for (indexCol in 0 until adjustedMatrix.ncol()) {
                 if (adjustedMatrix[indexRow, indexCol] < 0) {
                     adjustedMatrix[indexRow, indexCol] = 0.0
                 }

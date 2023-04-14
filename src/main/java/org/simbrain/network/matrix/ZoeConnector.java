@@ -91,7 +91,7 @@ public class ZoeConnector extends Connector {
     public String toString() {
         return getId() + " todo!";
         // return getId()
-        //         + " (" + weightMatrix.nrows() + "x" + weightMatrix.ncols() + ") "
+        //         + " (" + weightMatrix.nrow() + "x" + weightMatrix.ncol() + ") "
         //         + "connecting " + source.getId() + " to " + target.getId();
     }
 }

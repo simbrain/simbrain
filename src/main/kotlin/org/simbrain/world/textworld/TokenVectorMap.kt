@@ -34,7 +34,7 @@ class TokenVectorMap(
     }
 
     init {
-        if (tokens.size != tokenVectorMatrix.nrows()) {
+        if (tokens.size != tokenVectorMatrix.nrow()) {
             throw IllegalArgumentException("token list must be same length as token vector matrix has rows")
         }
     }

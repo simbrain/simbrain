@@ -165,7 +165,7 @@ class DeepNet(
             if (outputProbabilities) {
                 // Softmax case
                 val predictions = deepNetLayers.predictSoftly(floatInputs)
-                outputs = Matrix(predictions.toDoubleArray())
+                outputs = Matrix.column(predictions.toDoubleArray())
                 // TODO: Below _should_ use predictSoftlyAndGetActivations, but that is not currently exposed in
                 //  kotlindl
                 val test = deepNetLayers.predictSoftly(floatInputs)

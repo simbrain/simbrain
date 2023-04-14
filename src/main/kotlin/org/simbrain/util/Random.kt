@@ -17,8 +17,8 @@ fun DoubleArray.randomize(dist: ProbabilityDistribution) {
 }
 
 fun Matrix.randomize(dist: ProbabilityDistribution) {
-    (0 until nrows()).forEach{i ->
-        (0 until ncols()).forEach{j ->
+    (0 until nrow()).forEach{i ->
+        (0 until ncol()).forEach{j ->
             set(i,j,dist.sampleDouble())
         }
     }

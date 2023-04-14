@@ -165,7 +165,7 @@ fun createFromDoubleArray(data: Array<DoubleArray>): BasicDataWrapper {
 fun createFromMatrix(data: Matrix): BasicDataWrapper {
     return BasicDataWrapper(
         data.toArray().map { it.toMutableList() as MutableList<Any?> }.toMutableList(),
-        (1..data.ncols()).map { createColumn("$it", 0.0) }.toMutableList()
+        (1..data.ncol()).map { createColumn("$it", 0.0) }.toMutableList()
     )
 }
 

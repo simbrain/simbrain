@@ -113,7 +113,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     @Override
     public Matrix getOutputs() {
         // TODO: Performance drain? Consider caching this.
-        return new Matrix(getActivations());
+        return Matrix.column(getActivations());
     }
 
     @Override

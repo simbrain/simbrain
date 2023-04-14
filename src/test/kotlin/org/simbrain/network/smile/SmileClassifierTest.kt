@@ -54,7 +54,7 @@ class SmileClassifierTest {
     fun testInit() {
         val classifier = SmileClassifier(net, SVMClassifier(4))
         net.addNetworkModel(classifier)
-        classifier.addInputs(Matrix(doubleArrayOf(1.0,2.0,3.0,4.0)))
+        classifier.addInputs(Matrix.column(doubleArrayOf(1.0,2.0,3.0,4.0)))
         assertEquals(10.0, classifier.inputs.sum())
         net.update()
         assertEquals(2, classifier.outputs.size())
@@ -63,16 +63,16 @@ class SmileClassifierTest {
     @Test
     fun `test SVM XOR`() {
         net.addNetworkModel(xorSVM)
-        xorSVM.addInputs(Matrix(doubleArrayOf(0.0, 0.0, 0.0)))
+        xorSVM.addInputs(Matrix.column(doubleArrayOf(0.0, 0.0, 0.0)))
         net.update()
         assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputs.col(0))
-        xorSVM.addInputs(Matrix(doubleArrayOf(1.0, 0.0, 0.0)))
+        xorSVM.addInputs(Matrix.column(doubleArrayOf(1.0, 0.0, 0.0)))
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 1.0), xorSVM.outputs.col(0))
-        xorSVM.addInputs(Matrix(doubleArrayOf(0.0, 1.0, 0.0)))
+        xorSVM.addInputs(Matrix.column(doubleArrayOf(0.0, 1.0, 0.0)))
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 1.0), xorSVM.outputs.col(0))
-        xorSVM.addInputs(Matrix(doubleArrayOf(1.0, 1.0, 0.0)))
+        xorSVM.addInputs(Matrix.column(doubleArrayOf(1.0, 1.0, 0.0)))
         net.update()
         assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputs.col(0))
     }
@@ -93,7 +93,7 @@ class SmileClassifierTest {
         net.addNetworkModels(listOf(inputNa, wm1, xorSVM, wm2, outputNa))
 
         // Set inputs
-        inputNa.addInputs(Matrix(doubleArrayOf(0.0, 1.0, 0.0)))
+        inputNa.addInputs(Matrix.column(doubleArrayOf(0.0, 1.0, 0.0)))
 
         // Expected values after one update
         net.update()

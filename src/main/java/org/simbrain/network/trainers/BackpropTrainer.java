@@ -189,7 +189,7 @@ public class BackpropTrainer extends IterableTrainer {
 
         // Weight Matrix group list is ordered from input to output layers
         for (WeightMatrix wm : net.getModelList().get(WeightMatrix.class)) {
-            lastWeightUpdates.add(new Matrix(wm.getWeightMatrix().nrows(), wm.getWeightMatrix().ncols()));
+            lastWeightUpdates.add(new Matrix(wm.getWeightMatrix().nrow(), wm.getWeightMatrix().ncol()));
         }
 
         // Initialize layers
@@ -213,8 +213,8 @@ public class BackpropTrainer extends IterableTrainer {
             }
             ii++;
         }
-        errors = new Matrix(1, getOutputLayer().ncols());
-        batchErrors = new Matrix(1, getOutputLayer().ncols());
+        errors = new Matrix(1, getOutputLayer().ncol());
+        batchErrors = new Matrix(1, getOutputLayer().ncol());
         setLearningRate(DEFAULT_LEARNING_RATE);
         setMomentum(DEFAULT_MOMENTUM);
     }
@@ -245,10 +245,10 @@ public class BackpropTrainer extends IterableTrainer {
     private double trainRow(int row) {
         batchErrors.mul(0);
         // Get the inputs and feed them forward
-        inputLayer = net.getTrainingSet().getInputs().row(new int[]{row});
+        inputLayer = net.getTrainingSet().getInputs().row(new double[]{row});
         updateNetwork();
         // Backpropagate error
-        targetVector = targetData.row(new int[]{row});
+        targetVector = targetData.row(new double[]{row});
         targetVector = getOutputLayer().sub(errors);
         batchErrors.add(errors);
         backpropagateError();
@@ -269,9 +269,9 @@ public class BackpropTrainer extends IterableTrainer {
         for (int row = firstRow; row < lastRow; row++) {
 
             // Get the inputs and feed them forward
-            inputLayer = inputData.row(new int[]{row});
+            inputLayer = inputData.row(new double[]{row});
             updateNetwork();
-            targetVector = targetData.row(new int[]{row});
+            targetVector = targetData.row(new double[]{row});
             targetVector = getOutputLayer().sub(errors);
 
             // Calculate batch errors
@@ -362,8 +362,8 @@ public class BackpropTrainer extends IterableTrainer {
 
             // Update weights, traversing along weight matrix in column-major order
             int kk = 0;
-            for (int ii = 0; ii < prevLayer.ncols(); ii++) {
-                for (int jj = 0; jj < currentLayer.ncols(); jj++) {
+            for (int ii = 0; ii < prevLayer.ncol(); ii++) {
+                for (int jj = 0; jj < currentLayer.ncol(); jj++) {
                     float deltaVal =
                             (float) (learningRate * deltas.get(layerIndex).get(jj, 0) * prevLayer.get(ii, 0)
                                     + (momentum * lastDeltas.get(kk, 0)));
@@ -373,7 +373,7 @@ public class BackpropTrainer extends IterableTrainer {
                 }
             }
             // // Update biases
-            // for (int ii = 0; ii < biasVector.ncols(); ii++) {
+            // for (int ii = 0; ii < biasVector.ncol(); ii++) {
             //     float deltaVal =
             //             (float) (learningRate * deltas.get(layerIndex).getDouble(ii) + (momentum * lastBiasDeltas.getDouble(ii)));
             //     biasVector.putScalar(ii, biasVector.getDouble(ii) + deltaVal);
@@ -403,7 +403,7 @@ public class BackpropTrainer extends IterableTrainer {
         // Randomize biases
         // TODO: Move randomization of ndarrays to utility method
         for (int kk = 0; kk < biases.size(); ++kk) {
-            for (int ii = 0; ii < biases.get(kk).ncols(); ii++) {
+            for (int ii = 0; ii < biases.get(kk).ncol(); ii++) {
                 biases.get(kk).set(ii, 0, (Math.random() * 0.1) - 0.05);
             }
         }

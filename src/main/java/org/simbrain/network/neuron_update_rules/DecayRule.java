@@ -123,7 +123,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
             vals[i] = decayRule(array.getInputs().col(0)[i],
                     array.getActivations().col(0)[i], ((BiasedMatrixData)data).getBiases()[i]);
         }
-        array.setActivations(new Matrix(vals));
+        array.setActivations(Matrix.column(vals));
     }
 
     @Override

@@ -65,7 +65,7 @@ fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix
     val weightDeltas = layerError.mm(source.outputs.transpose())
     weightMatrix.add(weightDeltas.clone().mul(epsilon))
     // TODO: Write a smile version of colSums
-    return Matrix(weightDeltas.colSums())
+    return Matrix.column(weightDeltas.colSums())
 }
 
 /**

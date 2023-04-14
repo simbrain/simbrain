@@ -162,6 +162,6 @@ class SynapseGroup2 @JvmOverloads constructor(
     }
 
     fun getWeightMatrix(): Matrix {
-        return Matrix(SimnetUtils.getWeights(source.neuronList, target.neuronList));
+        return Matrix.of(SimnetUtils.getWeights(source.neuronList, target.neuronList));
     }
 }

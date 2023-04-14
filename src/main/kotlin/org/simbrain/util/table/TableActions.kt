@@ -172,8 +172,8 @@ val DataViewerTable.importArff
                     val df = Read.arff(arffFile.absolutePath)
                     val columns = df.names().zip(df.types())
                         .map { (name, type) -> Column(name, type.getColumnDataType()) }.toMutableList()
-                    val dfData = (0 until df.nrows()).map { i ->
-                        (0 until df.ncols()).map { j ->
+                    val dfData = (0 until df.nrow()).map { i ->
+                        (0 until df.ncol()).map { j ->
                             df[i][j]
                         }.toMutableList()
                     }.toMutableList()
@@ -217,7 +217,7 @@ fun DataViewerTable.importCSVAction(fixedColumns: Boolean = false) = createActio
                 }
             } else if (it is DataFrameWrapper) {
                 val data = Read.csv(csvFile.absolutePath)
-                if (checkColumns(data.ncols())) {
+                if (checkColumns(data.ncol())) {
                     it.df = data
                     it.fireTableStructureChanged()
                 }

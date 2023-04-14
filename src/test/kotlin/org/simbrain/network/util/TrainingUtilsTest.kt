@@ -51,7 +51,7 @@ class TrainingUtilsTest {
 
     @Test
     fun `test forward pass`() {
-        val inputs = Matrix(doubleArrayOf(-1.0, 1.0))
+        val inputs = Matrix.column(doubleArrayOf(-1.0, 1.0))
         listOf(wm1, wm2).forwardPass(inputs)
         listOf(wm1, wm2).printActivationsAndWeights(true)
         assertArrayEquals(inputs.col(0), wm2.target.outputs.col(0))
@@ -73,9 +73,9 @@ class TrainingUtilsTest {
 
     @Test
     fun `test backprop`() {
-        val inputs = Matrix(doubleArrayOf(-1.0, 1.0))
+        val inputs = Matrix.column(doubleArrayOf(-1.0, 1.0))
         // TODO: Blows up for larger targets, like 30
-        val targets = Matrix(doubleArrayOf(1.75, -.5))
+        val targets = Matrix.column(doubleArrayOf(1.75, -.5))
         (na3.updateRule as LinearRule).lowerBound = -100.0
         (na3.updateRule as LinearRule).upperBound = 100.0
         wm1.randomize()

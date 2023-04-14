@@ -128,7 +128,7 @@ public class WeightMatrix extends Connector {
     public void setWeights(double[] newWeights) {
         int len = Math.min((int) weightMatrix.size(), newWeights.length);
         for (int i = 0; i < len; i++) {
-            weightMatrix.set(i / weightMatrix.ncols(), i % weightMatrix.ncols(), newWeights[i]);
+            weightMatrix.set(i / weightMatrix.ncol(), i % weightMatrix.ncol(), newWeights[i]);
         }
         getEvents().getUpdated().fireAndForget();
     }
@@ -169,7 +169,7 @@ public class WeightMatrix extends Connector {
         } else {
             // Updates the psrMatrix in the spiking case
             spikeResponder.apply(this, spikeResponseData);
-            return new Matrix(psrMatrix.rowSums());
+            return Matrix.column(psrMatrix.rowSums());
         }
     }
 
@@ -183,8 +183,8 @@ public class WeightMatrix extends Connector {
             // Populate each row of the psrMatrix with the element-wise product of the pre-synaptic output vector and
             // that row of the matrix
             var output = source.getOutputs();
-            for (int i = 0; i <  weightMatrix.nrows(); i++) {
-                for (int j = 0; j < weightMatrix.ncols(); j++) {
+            for (int i = 0; i <  weightMatrix.nrow(); i++) {
+                for (int j = 0; j < weightMatrix.ncol(); j++) {
                     var newVal = weightMatrix.get(i,j) * output.get(j, 0);
                     psrMatrix.set(i,j, newVal);
                 }
@@ -194,8 +194,8 @@ public class WeightMatrix extends Connector {
 
     private void updateExcitatoryMask() {
         excitatoryMask = weightMatrix.clone();
-        for (int i = 0; i <  excitatoryMask.nrows(); i++) {
-            for (int j = 0; j < excitatoryMask.ncols(); j++) {
+        for (int i = 0; i <  excitatoryMask.nrow(); i++) {
+            for (int j = 0; j < excitatoryMask.ncol(); j++) {
                 var newVal = (excitatoryMask.get(i,j) > 0) ? 1 : 0;
                 excitatoryMask.set(i,j, newVal);
             }
@@ -204,8 +204,8 @@ public class WeightMatrix extends Connector {
 
     private void updateInhibitoryMask() {
         inhibitoryMask = weightMatrix.clone();
-        for (int i = 0; i <  inhibitoryMask.nrows(); i++) {
-            for (int j = 0; j < inhibitoryMask.ncols(); j++) {
+        for (int i = 0; i <  inhibitoryMask.nrow(); i++) {
+            for (int j = 0; j < inhibitoryMask.ncol(); j++) {
                 var newVal = (inhibitoryMask.get(i,j) < 0) ? 1 : 0;
                 inhibitoryMask.set(i,j, newVal);
             }
@@ -267,14 +267,14 @@ public class WeightMatrix extends Connector {
      * Set all entries to 0.
      */
     public void hardClear() {
-        weightMatrix = new Matrix(weightMatrix.nrows(), weightMatrix.ncols());
+        weightMatrix = new Matrix(weightMatrix.nrow(), weightMatrix.ncol());
         getEvents().getUpdated().fireAndForget();
     }
 
     @Override
     public String toString() {
         return getId()
-                + " (" + weightMatrix.nrows() + "x" + weightMatrix.ncols() + ") "
+                + " (" + weightMatrix.nrow() + "x" + weightMatrix.ncol() + ") "
                 + "connecting " + source.getId() + " to " + target.getId();
     }
 
@@ -284,7 +284,7 @@ public class WeightMatrix extends Connector {
 
     public void setSpikeResponder(SpikeResponder spikeResponder) {
         this.spikeResponder = spikeResponder;
-        spikeResponseData = spikeResponder.createMatrixData(weightMatrix.nrows(), weightMatrix.ncols());
+        spikeResponseData = spikeResponder.createMatrixData(weightMatrix.nrow(), weightMatrix.ncol());
     }
 
 }

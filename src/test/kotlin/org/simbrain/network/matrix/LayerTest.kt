@@ -14,7 +14,7 @@ class LayerTest {
 
     @Test
     internal fun `getWeightedInputs returns correct values`() {
-        na1.activations = Matrix(doubleArrayOf(1.0,-1.0))
+        na1.activations = Matrix.column(doubleArrayOf(1.0,-1.0))
         wm.diagonalize()
         assertArrayEquals(doubleArrayOf(1.0,-1.0), wm.output.col(0), 0.0)
     }

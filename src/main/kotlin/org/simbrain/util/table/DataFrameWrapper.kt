@@ -15,11 +15,11 @@ class DataFrameWrapper(var df : DataFrame): SimbrainDataModel() {
     override var columns: MutableList<Column> = df.schema().fields().map { Column(it.name, it.type)  }.toMutableList()
 
     override fun getRowCount(): Int {
-        return df.nrows()
+        return df.nrow()
     }
 
     override fun getColumnCount(): Int {
-        return df.ncols()
+        return df.ncol()
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {

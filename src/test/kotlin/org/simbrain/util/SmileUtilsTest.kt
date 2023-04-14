@@ -8,7 +8,7 @@ import smile.math.matrix.Matrix
 
 class SmileUtilsTest {
 
-    val testMatrix = Matrix(arrayOf(
+    val testMatrix = Matrix.of(arrayOf(
         doubleArrayOf(1.0, 2.0, 3.0),
         doubleArrayOf(4.0, 5.0, 6.0),
         doubleArrayOf(7.0, 8.0, 9.0)
@@ -26,19 +26,9 @@ class SmileUtilsTest {
     }
 
     @Test
-    fun `test row matrix access`() {
-        assertEquals(4.0, testMatrix.rowMatrix(1)[0,0])
-    }
-
-    @Test
-    fun `test column matrix access`() {
-        assertEquals(2.0, testMatrix.colMatrix(1)[0,0])
-    }
-
-    @Test
     fun `test row matrix transposed`() {
         val rmt = testMatrix.rowMatrixTransposed(1)
-        assertEquals(3, rmt.nrows())
-        assertEquals(1, rmt.ncols())
+        assertEquals(3, rmt.nrow())
+        assertEquals(1, rmt.ncol())
     }
 }

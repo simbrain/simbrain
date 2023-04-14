@@ -97,7 +97,7 @@ public class BinaryRule extends NeuronUpdateRule {
         for (int i = 0; i < vals.length ; i++) {
             vals[i] = binaryRule(array.getInputs().col(0)[i], ((BiasedMatrixData)data).getBiases()[i]);
         }
-        array.setActivations(new Matrix(vals));
+        array.setActivations(Matrix.column(vals));
     }
 
     @Override

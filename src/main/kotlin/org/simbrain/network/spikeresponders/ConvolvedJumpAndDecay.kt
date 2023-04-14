@@ -48,8 +48,8 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
         val na = conn.source.let { if (it is NeuronArray) it else return }
         val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
         if (na.updateRule.isSpikingRule) {
-            for (i in 0 until wm.weightMatrix.nrows()) {
-                for (j in 0 until wm.weightMatrix.ncols()) {
+            for (i in 0 until wm.weightMatrix.nrow()) {
+                for (j in 0 until wm.weightMatrix.ncol()) {
                     val psr = convolvedJumpAndDecay(
                         spikeData.spikes[j],
                         wm.psrMatrix[i, j],

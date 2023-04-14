@@ -100,7 +100,7 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
             vals[i] = linearRule(array.getInputs().col(0)[i],
                     ((BiasedMatrixData)data).getBiases()[i]);
         }
-        array.setActivations(new Matrix(vals));
+        array.setActivations(Matrix.column(vals));
     }
 
     @Override

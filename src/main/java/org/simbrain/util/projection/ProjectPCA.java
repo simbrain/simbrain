@@ -18,7 +18,8 @@
  */
 package org.simbrain.util.projection;
 
-import smile.projection.PCA;
+
+import smile.feature.extraction.PCA;
 
 /**
  * <B>ProjectPCA</B> Projects the high-dimensional dataset along its two
@@ -62,9 +63,9 @@ public class ProjectPCA extends ProjectionMethod {
         }
 
         PCA pca = PCA.fit(projector.getUpstairs().getDoubleArray());
-        pca.setProjection(2);
+        pca = pca.getProjection(2);
         projector.getDownstairs()
-                .setData(pca.project(projector.getUpstairs().getDoubleArray()));
+                .setData(pca.apply(projector.getUpstairs().getDoubleArray()));
     }
 
     // /**

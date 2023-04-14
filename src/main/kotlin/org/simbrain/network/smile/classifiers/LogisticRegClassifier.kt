@@ -4,7 +4,6 @@ import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.util.UserParameter
 import smile.classification.Classifier
 import smile.classification.LogisticRegression
-import smile.classification.SoftClassifier
 import smile.math.matrix.Matrix
 import smile.validation.metric.Accuracy
 
@@ -36,9 +35,9 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
     override fun predict(input: DoubleArray): Int {
         val ret: Int
         if (showProbabilities) {
-            ret = (model as SoftClassifier).predict(input, outputProbabilities)
+            ret = model!!.predict(input, outputProbabilities)
         }  else {
-            ret = (model as Classifier).predict(input)
+            ret = model!!.predict(input)
         }
         return ret
     }
@@ -46,7 +45,7 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
     override fun getOutputVector(winner: Int): Matrix {
         assertValidWinnerIndex(winner)
         if (showProbabilities) {
-            return Matrix(outputProbabilities)
+            return Matrix.column(outputProbabilities)
         } else {
             return super.getOutputVector(winner)
         }

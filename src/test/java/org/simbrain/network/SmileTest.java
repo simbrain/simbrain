@@ -4,12 +4,9 @@ import org.junit.jupiter.api.Test;
 import smile.classification.KNN;
 import smile.classification.SVM;
 import smile.io.Read;
-import smile.math.kernel.GaussianKernel;
 import smile.math.kernel.PolynomialKernel;
 import smile.math.matrix.Matrix;
-import smile.regression.SVR;
 import smile.stat.distribution.GaussianDistribution;
-import smile.validation.CrossValidation;
 import smile.validation.metric.Accuracy;
 import smile.validation.metric.ConfusionMatrix;
 
@@ -36,8 +33,8 @@ public class SmileTest {
         start_time = System.currentTimeMillis();
         var matrix_a = Matrix.eye(2, 3);
 
-        var rows = matrix_a.nrows();
-        var cols = matrix_a.ncols();
+        var rows = matrix_a.nrow();
+        var cols = matrix_a.ncol();
         var result = "Shape: " + rows + " x " + cols;
         // System.out.println("Shape: "+rows+" x "+cols);
         assertEquals("Shape: 2 x 3", result);
@@ -49,7 +46,7 @@ public class SmileTest {
     @Test
     public void matrix_2x3_ones() {
         double[][] ones = {{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
-        var matrix_ones = new Matrix(2, 3, ones);
+        var matrix_ones = Matrix.of(ones);
         // System.out.println(matrix_ones);
         var sums = matrix_ones.sum();
         // System.out.println("Sums: "+sums);
@@ -60,7 +57,7 @@ public class SmileTest {
     public void set_entry_matrix() {
 
         double[][] ones = {{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
-        var matrix_ones = new Matrix(2, 3, ones);
+        var matrix_ones = Matrix.of(ones);
         // Set the value of entry 1,3 to 3
 
         matrix_ones.set(0, 2, 3);
@@ -75,9 +72,9 @@ public class SmileTest {
     public void matrix_multiplication() {
         start_time = System.currentTimeMillis();
         double[][] twos = {{2.0, 2.0, 2.0}, {2.0, 2.0, 2.0}};
-        var matrix_twos = new Matrix(2, 3, twos);
+        var matrix_twos = Matrix.of(twos);
         double[][] threes = {{3.0, 3.0}, {3.0, 3.0}, {3.0, 3.0}};
-        var matrix_threes = new Matrix(3, 2, threes);
+        var matrix_threes = Matrix.of(threes);
         stop_time = System.currentTimeMillis();
         // System.out.println(result_matrix);
         difference = stop_time - start_time;
@@ -128,7 +125,7 @@ public class SmileTest {
     @Test
     public void matrixVector() {
         double[] vec = {1.0, 2.0};
-        Matrix mat = new Matrix(new double[][]{
+        Matrix mat = Matrix.of(new double[][]{
                 {1,-1},{0,2}
         });
         double[] result = mat.mv(vec);
@@ -183,16 +180,16 @@ public class SmileTest {
         var test_x = test_data.select(0,1,2,3).toArray();
         var test_y = test_data.column(4).toDoubleArray();
 
-        var model =
-                CrossValidation.regression(
-                        5,
-                        test_x,
-                        test_y,
-                        (a,b) -> SVR.fit(x, y, new GaussianKernel(0.6), 20, 10, 1E-3)
-                );
-
-        //var model = SVR.fit(x,y,0.01, 1000,1E-3);
-        System.out.println(model);
+        // var model =
+        //         CrossValidation.regression(
+        //                 5,
+        //                 test_x,
+        //                 test_y,
+        //                 (a,b) -> SVR.fit(x, y, new GaussianKernel(0.6), 20, 10, 1E-3)
+        //         );
+        //
+        // //var model = SVR.fit(x,y,0.01, 1000,1E-3);
+        // System.out.println(model);
     }
 
 }

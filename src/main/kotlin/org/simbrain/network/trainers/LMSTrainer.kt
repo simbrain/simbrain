@@ -58,13 +58,13 @@ class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
         iteration++
         // TODO: Other update types
         if (updateType == UpdateMethod.STOCHASTIC) {
-            trainRow(Random.nextInt(lmsNet.trainingSet.inputs.nrows()))
+            trainRow(Random.nextInt(lmsNet.trainingSet.inputs.nrow()))
         }
         events.errorUpdated.fireAndSuspend(error)
     }
 
     fun trainRow(rowNum: Int) {
-        if (rowNum !in 0 until lmsNet.trainingSet.inputs.nrows()) {
+        if (rowNum !in 0 until lmsNet.trainingSet.inputs.nrow()) {
             throw IllegalArgumentException("Trying to train invalid row number $rowNum")
         }
         val targets = lmsNet.trainingSet.targets.rowMatrixTransposed(rowNum)

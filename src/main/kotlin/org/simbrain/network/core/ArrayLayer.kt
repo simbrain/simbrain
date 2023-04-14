@@ -52,7 +52,7 @@ abstract class ArrayLayer(
 
     @Consumable
     fun addInputs(inputs: DoubleArray?) {
-        addInputs(Matrix(inputs))
+        addInputs(Matrix.column(inputs))
     }
 
     override fun randomize() {

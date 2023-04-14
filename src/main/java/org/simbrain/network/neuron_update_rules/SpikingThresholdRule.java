@@ -81,7 +81,7 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
                 vals[i] = 0;
             }
         }
-        array.setActivations(new Matrix(vals));
+        array.setActivations(Matrix.column(vals));
     }
 
     @Override

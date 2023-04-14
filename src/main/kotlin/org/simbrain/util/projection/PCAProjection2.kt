@@ -1,7 +1,7 @@
 package org.simbrain.util.projection
 
 import org.simbrain.util.UserParameter
-import smile.projection.PCA
+import smile.feature.extraction.PCA
 
 class PCAProjection2: ProjectionMethod2() {
 
@@ -34,14 +34,13 @@ class PCAProjection2: ProjectionMethod2() {
             reFitPCA(dataset)
         }
         // Project the new point onto PCA components
-        point.setDownstairs(pca!!.project(point.upstairsPoint))
+        point.setDownstairs(pca!!.apply(point.upstairsPoint))
     }
 
     private fun reFitPCA(dataset: Dataset2) {
         val upstairs = dataset.computeUpstairsArray()
-        pca = PCA.fit(upstairs).also {
-            it.setProjection(2)
-            dataset.setDownstairsData(it.project(upstairs))
+        pca = PCA.fit(upstairs).getProjection(2).also {
+            dataset.setDownstairsData(it.apply(upstairs))
         }
     }
 

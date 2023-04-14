@@ -186,7 +186,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     }
 
     public void setActivations(double[] newActivations) {
-        setActivations(new Matrix(newActivations));
+        setActivations(Matrix.column(newActivations));
     }
 
     public void fireLocationChange() {

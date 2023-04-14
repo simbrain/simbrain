@@ -18,15 +18,15 @@ class SmileRegressionTest {
     fun `test regresson tree`() {
         val iris = Read.arff("simulations/tables/iris.arff")
         val decisionTree = cart(Formula.of("class", "."), iris)
-        // (0 until iris.nrows()).forEach { i ->
+        // (0 until iris.nrow()).forEach { i ->
         //     println("${iris[i]} -> ${decisionTree.predict(iris.get(i))}")
         //     println("${decisionTree.predict(iris.get(i))}")
         // }
         val schema = StructType(
-            StructField("sepallength", DataType.of(Int.javaClass)),
-            StructField("sepalwidth", DataType.of(Int.javaClass)),
-            StructField("petallength", DataType.of(Int.javaClass)),
-            StructField("petalwidth", DataType.of(Int.javaClass))
+            StructField("sepallength", DataType.of(Double::class.java)),
+            StructField("sepalwidth", DataType.of(Double::class.java)),
+            StructField("petallength", DataType.of(Double::class.java)),
+            StructField("petalwidth", DataType.of(Double::class.java))
         )
         // TODO: Get the label
         val result = decisionTree.predict(Tuple.of(doubleArrayOf(6.0,2.2,5.0,1.5), schema))

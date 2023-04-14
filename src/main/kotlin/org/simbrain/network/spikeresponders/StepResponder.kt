@@ -60,20 +60,20 @@ class StepResponder(
         if (na.updateRule.isSpikingRule) {
             spikeData.spikes.forEachIndexed { col, spiked ->
                 if (spiked) {
-                    for (row in 0 until stepResponseData.counterMatrix.nrows()) {
+                    for (row in 0 until stepResponseData.counterMatrix.nrow()) {
                         stepResponseData.counterMatrix.set(row, col, responseDuration.toDouble())
                         wm.psrMatrix.set(row, col, responseHeight * wm.weightMatrix.get(row, col))
                     }
                 } else {
-                    for (row in 0 until stepResponseData.counterMatrix.nrows()) {
+                    for (row in 0 until stepResponseData.counterMatrix.nrow()) {
                         stepResponseData.counterMatrix.set(row, col, stepResponseData.counterMatrix.get(row, col) - 1)
                         if (stepResponseData.counterMatrix.get(row, col) < 0) {
                             stepResponseData.counterMatrix.set(row, col, 0.0)
                         }
                     }
                 }
-                for (i in 0 until stepResponseData.counterMatrix.nrows())
-                    for (j in 0 until stepResponseData.counterMatrix.ncols()) {
+                for (i in 0 until stepResponseData.counterMatrix.nrow())
+                    for (j in 0 until stepResponseData.counterMatrix.ncol()) {
                         if (stepResponseData.counterMatrix.get(i, j) <= 0) {
                             wm.psrMatrix.set(i, j, 0.0)
                         }

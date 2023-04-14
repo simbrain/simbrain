@@ -246,7 +246,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     SimbrainJTable.createTable(arrayData)
                 )
                 dialog.addClosingTask {
-                    neuronArray.addInputs(Matrix(arrayData.vectorCurrentRow))
+                    neuronArray.addInputs(Matrix.column(arrayData.vectorCurrentRow))
                     neuronArray.update()
                 }
                 dialog.pack()

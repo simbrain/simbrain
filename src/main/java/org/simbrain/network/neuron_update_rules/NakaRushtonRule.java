@@ -165,7 +165,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
                     array.getNetwork().getTimeStep(),
                     ((NakaMatrixData)data).getA()[i]);
         }
-        array.setActivations(new Matrix(vals));
+        array.setActivations(Matrix.column(vals));
     }
 
     @Override

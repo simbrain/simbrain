@@ -45,27 +45,16 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlin-deeplearning-api:0.4.0'
 
     // Smile
-    implementation 'com.github.haifengl:smile-kotlin:2.6.0'
-//    if (isFamily(FAMILY_MAC) && isArch('aarch64')) {
-        implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.8'
-        implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.21-1.5.8'
-        implementation group: 'org.bytedeco', name: 'openblas-platform', version: '0.3.21-1.5.8'
-        implementation group: 'org.bytedeco', name: 'arpack-ng', version: '3.8.0-1.5.8'
-        implementation group: 'org.bytedeco', name: 'arpack-ng-platform', version: '3.8.0-1.5.8'
-//    } else {
-//        implementation 'com.github.haifengl:smile-mkl:2.6.0'
-//    }
-    implementation 'com.github.haifengl:smile-plot:2.6.0'
-    implementation 'com.github.haifengl:smile-nlp:2.6.0'
+    implementation group: 'com.github.haifengl', name: 'smile-core', version: '3.0.1'
+    implementation 'com.github.haifengl:smile-kotlin:3.0.1'
+    implementation 'com.github.haifengl:smile-plot:3.0.1'
+    implementation 'com.github.haifengl:smile-nlp:3.0.1'
+    implementation group: 'org.bytedeco', name: 'openblas-platform', version: '0.3.21-1.5.8'
 
     // JUnit
     implementation 'org.junit.jupiter:junit-jupiter:5.9.0'
     testImplementation(platform('org.junit:junit-bom:5.7.1'))
     testImplementation('org.junit.jupiter:junit-jupiter:5.9.0')
-
-    // https://mvnrepository.com/artifact/com.github.haifengl/smile-core
-    implementation group: 'com.github.haifengl', name: 'smile-core', version: '2.6.0'
-    // implementation group: 'com.github.haifengl', name: 'smile-manifold', version: '2.6.0'
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'

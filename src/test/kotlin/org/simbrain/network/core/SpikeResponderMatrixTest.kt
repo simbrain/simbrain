@@ -59,7 +59,7 @@ class SpikeResponderMatrixTest {
         val nr = NonResponder()
         wm2.setSpikeResponder(nr)
 
-        n2.activations = Matrix(doubleArrayOf(1.0, 1.0))
+        n2.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         assertArrayEquals(doubleArrayOf(1.0, -1.0, 1.0), n3.activationArray)
     }
@@ -70,13 +70,13 @@ class SpikeResponderMatrixTest {
         val pr = ProbabilisticResponder()
         pr.activationProbability = 1.0
         wm2.setSpikeResponder(pr)
-        n1.activations = Matrix(doubleArrayOf(1.0, 1.0))
+        n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update() // extra update to propagate from layer 1 to 2
         assertArrayEquals(doubleArrayOf(1.0, -1.0, 1.0), n3.activationArray)
 
         pr.activationProbability = 0.0
-        n1.activations = Matrix(doubleArrayOf(1.0, 1.0))
+        n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), n3.activationArray)
@@ -92,7 +92,7 @@ class SpikeResponderMatrixTest {
         step.responseHeight = .5
         step.responseDuration = 3
 
-        n1.activations = Matrix(doubleArrayOf(1.0, 0.0))
+        n1.activations = Matrix.column(doubleArrayOf(1.0, 0.0))
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 0.0), wm1.psrMatrix.rowSums())
         assertArrayEquals(doubleArrayOf(1.0, 0.0), n2.activationArray, .001)
@@ -137,7 +137,7 @@ class SpikeResponderMatrixTest {
         step.responseHeight = 1.0
         step.responseDuration = 2
 
-        n1.activations = Matrix(doubleArrayOf(1.0, 1.0))
+        n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update()
         assertArrayEquals(doubleArrayOf(2.0,2.0,2.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(0))

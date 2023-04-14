@@ -25,7 +25,7 @@ fun matrixBasics() {
     println("filled: $filled")
     val diagonal = Matrix.eye(5)
     println("diagonal: $diagonal")
-    val specific = Matrix(arrayOf(
+    val specific = Matrix.of(arrayOf(
         doubleArrayOf(1.0, 2.0, 3.0),
         doubleArrayOf(4.0, 5.0, 6.0),
         doubleArrayOf(7.0, 8.0, 9.0)

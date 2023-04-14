@@ -3,7 +3,6 @@ package org.simbrain.util
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.simbrain.custom_sims.getResource
 import smile.math.matrix.Matrix
 
 class TextUtilsTest {
@@ -79,7 +78,7 @@ class TextUtilsTest {
             doubleArrayOf(1.0, 4.0, 0.0),
             doubleArrayOf(1.0, 0.0, 0.0)
         )
-        val temporaryMatrix = Matrix(A)
+        val temporaryMatrix = Matrix.of(A)
         val adjustedMatrix = manualPPMI(temporaryMatrix, true)
         assertTrue(temporaryMatrix[0,1] > adjustedMatrix[0,0])
         assertEquals(temporaryMatrix[0,0], adjustedMatrix[0,0])
@@ -95,8 +94,8 @@ class TextUtilsTest {
     fun `co-occurrence matrix is correct size`() {
         val tokens = simpleText.tokenizeWordsFromSentence().uniqueTokensFromArray()
         val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, 2, true).second
-        assertEquals(tokens.size, cooccurrenceMatrix.nrows())
-        assertEquals(tokens.size, cooccurrenceMatrix.ncols())
+        assertEquals(tokens.size, cooccurrenceMatrix.nrow())
+        assertEquals(tokens.size, cooccurrenceMatrix.ncol())
     }
 
     @Test

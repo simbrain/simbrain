@@ -22,11 +22,11 @@ public class MatrixConverter implements Converter {
         Matrix matrix =  ((Matrix) source);
 
         writer.startNode("rows");
-        context.convertAnother(matrix.nrows());
+        context.convertAnother(matrix.nrow());
         writer.endNode();
 
         writer.startNode("cols");
-        context.convertAnother(matrix.ncols());
+        context.convertAnother(matrix.ncol());
         writer.endNode();
 
         writer.startNode("data");
@@ -50,7 +50,7 @@ public class MatrixConverter implements Converter {
         double[] flatData = DoubleArrayConverter.stringToArray(reader.getValue());
         reader.moveUp();
 
-        return new Matrix(CollectionsKt.reshape(rows, cols, flatData));
+        return Matrix.of(CollectionsKt.reshape(rows, cols, flatData));
     }
 
 }

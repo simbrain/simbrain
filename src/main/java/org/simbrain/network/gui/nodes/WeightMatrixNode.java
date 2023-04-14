@@ -112,8 +112,8 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
                 img = ImageKt.toSimbrainColorImage(tempArray, 10, 10);
             } else {
                 double[] pixelArray = ((WeightMatrix)weightMatrix).getWeights();
-                img = ImageKt.toSimbrainColorImage(pixelArray, ((WeightMatrix)weightMatrix).getWeightMatrix().ncols(),
-                        ((WeightMatrix)weightMatrix).getWeightMatrix().nrows());
+                img = ImageKt.toSimbrainColorImage(pixelArray, ((WeightMatrix)weightMatrix).getWeightMatrix().ncol(),
+                        ((WeightMatrix)weightMatrix).getWeightMatrix().nrow());
 
             }
 

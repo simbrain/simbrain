@@ -176,8 +176,8 @@ public abstract class IterableTrainer implements EditableObject {
         if (getTrainingSet() == null) {
             return 0;
         }
-        int inputRows = getTrainingSet().getInputs().nrows();
-        int targetRows = getTrainingSet().getTargets().nrows();
+        int inputRows = getTrainingSet().getInputs().nrow();
+        int targetRows = getTrainingSet().getTargets().nrow();
         return Math.min(inputRows, targetRows);
     }
 

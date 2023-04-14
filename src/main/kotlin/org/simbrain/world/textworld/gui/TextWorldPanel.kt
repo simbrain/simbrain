@@ -18,6 +18,8 @@
  */
 package org.simbrain.world.textworld.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.world.textworld.*
 import java.awt.BorderLayout
 import java.awt.Color
@@ -158,25 +160,24 @@ class TextWorldPanel private constructor(
                 // inputScrollPane.revalidate();
             }
         })
-        world.events.textChanged.on {
-            SwingUtilities.invokeLater {
-                textArea.text = world.text
-                if (world.position < textArea.document.length) {
-                    textArea.caretPosition = world.position
-                }
+        world.events.textChanged.on(Dispatchers.Swing, wait = true) {
+            textArea.text = world.text
+            if (world.position < textArea.document.length) {
+                textArea.caretPosition = world.position
             }
         }
 
-        world.events.cursorPositionChanged.on {
+        world.events.cursorPositionChanged.on(Dispatchers.Swing, wait = true) {
             textArea.caretPosition = world.position
         }
 
-        world.events.currentTokenChanged.on {
+        world.events.currentTokenChanged.on(Dispatchers.Swing, wait = true) {
             if (it!!.text.equals("", ignoreCase = true)) {
                 removeHighlights(textArea)
             } else {
                 highlight(it.beginPosition, it.endPosition)
             }
+            textArea.caretPosition = world.position
         }
 
         //     override fun preferencesChanged() {

@@ -5,12 +5,16 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
-import com.jme3.math.ColorRGBA;
+import com.jme3.system.AppSettings;
+import com.jme3.system.JmeCanvasContext;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Temporary app for learning about JME.
@@ -18,8 +22,37 @@ import com.jme3.math.ColorRGBA;
 public class TestJME extends SimpleApplication {
 
     public static void main(String[] args) {
-        TestJME app = new TestJME();
-        app.start(); // start the game
+
+        JFrame window = new JFrame("Swing Application");
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel(new FlowLayout()); // a panel
+        // add all your Swing components ...
+        panel.add(new JButton("Some Swing Component"));
+
+        AppSettings settings = new AppSettings(true);
+        settings.setWidth(640);
+        settings.setHeight(480);
+
+        TestJME canvasApplication = new TestJME();
+        canvasApplication.setSettings(settings);
+        canvasApplication.createCanvas(); // create canvas!
+        JmeCanvasContext ctx = (JmeCanvasContext) canvasApplication.getContext();
+        ctx.setSystemListener(canvasApplication);
+        Dimension dim = new Dimension(640, 480);
+        ctx.getCanvas().setPreferredSize(dim);
+
+        // add the JME canvas
+        panel.add(ctx.getCanvas());
+
+        window.add(panel);
+        window.pack();
+        window.setVisible(true);
+
+        canvasApplication.startCanvas();
+
+        // TestJME app = new TestJME();
+        // app.start(); // start the game
     }
 
 //    @Override

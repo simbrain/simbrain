@@ -142,6 +142,11 @@ public class ThreeDContext implements JmeContext {
     }
 
     @Override
+    public SystemListener getSystemListener() {
+        return null;
+    }
+
+    @Override
     public void create(boolean wait) {
         if (actualContext != null) {
             throw new IllegalStateException("ThreeDContext cannot be recreated");
@@ -156,6 +161,26 @@ public class ThreeDContext implements JmeContext {
         if (actualContext == null)
             throw new IllegalStateException("ThreeDContext cannot be destroyed");
         actualContext.destroy(wait);
+    }
+
+    @Override
+    public int getFramebufferHeight() {
+        return 0;
+    }
+
+    @Override
+    public int getFramebufferWidth() {
+        return 0;
+    }
+
+    @Override
+    public int getWindowXPosition() {
+        return 0;
+    }
+
+    @Override
+    public int getWindowYPosition() {
+        return 0;
     }
 
     @Override

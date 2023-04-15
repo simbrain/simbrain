@@ -385,10 +385,10 @@ class SparsePanel(
         val density = Utils.doubleParsable(densityTf)
         return if (!java.lang.Double.isNaN(density)) {
             if (density == 1.0) {
-                connectAllToAll(source, target, allowSelfConnect)
+                createAllToAllSynapses(source, target, allowSelfConnect)
             } else {
                 val result =
-                    connectSparse(source, target, density, allowSelfConnect, equalizeEfferentsChkBx.isSelected)
+                    createSparseSynapses(source, target, density, allowSelfConnect, equalizeEfferentsChkBx.isSelected)
                 if (result is ConnectionsResult.Add) {
                     result.connectionsToAdd
                 } else {

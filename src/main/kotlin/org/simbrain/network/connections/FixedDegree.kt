@@ -83,9 +83,9 @@ class FixedDegree(
         addToNetwork: Boolean
     ): List<Synapse> {
         val syns = if (useRadius) {
-            connectFixedDegreeInRadius(source, target, degree, radius, direction, allowSelfConnections)
+            createFixedDegreeInRadiusSynapses(source, target, degree, radius, direction, allowSelfConnections)
         } else {
-            connectFixedDegree(source, target, degree, direction, allowSelfConnections)
+            createFixedDegreeSynapses(source, target, degree, direction, allowSelfConnections)
         }
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
@@ -125,7 +125,7 @@ class FixedDegree(
 /**
  * For each neuron in [src] connect to or from at most a fixed number [degree] of neurons in [tar].
  */
-fun connectFixedDegree(
+fun createFixedDegreeSynapses(
     src: List<Neuron>,
     tar: List<Neuron>,
     degree: Int,
@@ -133,14 +133,14 @@ fun connectFixedDegree(
     allowSelfConnection: Boolean = false
 ): List<Synapse> {
     val syns = ArrayList<Synapse>()
-    src.forEach { n -> syns.addAll(n.connectToN(tar, degree, direction, allowSelfConnection)) }
+    src.forEach { n -> syns.addAll(n.createToNSynapses(tar, degree, direction, allowSelfConnection)) }
     return syns
 }
 
 /**
- * Check in a radius and within it make fixed degree connections as using [Neuron.connectToN]
+ * Check in a radius and within it make fixed degree connections as using [Neuron.createToNSynapses]
  */
-fun connectFixedDegreeInRadius(
+fun createFixedDegreeInRadiusSynapses(
     src: List<Neuron>,
     tar: List<Neuron>,
     degree: Int,
@@ -149,7 +149,7 @@ fun connectFixedDegreeInRadius(
     allowSelfConnection: Boolean = false
 ): List<Synapse> {
     val syns = ArrayList<Synapse>()
-    src.forEach { n -> syns.addAll(n.connectToN(n.getNeuronsInRadius(tar, radius),
+    src.forEach { n -> syns.addAll(n.createToNSynapses(n.getNeuronsInRadius(tar, radius),
         degree, direction,
         allowSelfConnection)) }
     return syns
@@ -158,7 +158,7 @@ fun connectFixedDegreeInRadius(
 /**
  * Connect a neuron to N other neurons, in a provided pool of neurons.
  */
-fun Neuron.connectToN(
+fun Neuron.createToNSynapses(
     pool: List<Neuron>,
     N: Int,
     direction: Direction = Direction.IN,

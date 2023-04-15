@@ -3,6 +3,7 @@ package org.simbrain.network.core
 import com.thoughtworks.xstream.XStream
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.groups.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
@@ -199,6 +200,10 @@ fun connectAllToAll(source: NeuronGroup, target: Neuron, value: Double): List<Sy
     val wts = connectAllToAll(source, target)
     wts.forEach{ wt: Synapse -> wt.forceSetStrength(value) }
     return wts
+}
+
+fun Network.connect(source: List<Neuron>, target: List<Neuron>, connectionStrategy: ConnectionStrategy): List<Synapse> {
+    return connectionStrategy.connectNeurons(this, source, target)
 }
 
 fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {

@@ -139,7 +139,7 @@ class RadialGaussian(
         target: List<Neuron>,
         addToNetwork: Boolean
     ): List<Synapse> {
-        val syns: List<Synapse> = connectRadialPolarized(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
+        val syns: List<Synapse> = createRadialPolarizedSynapses(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModelsAsync(syns)
@@ -261,7 +261,7 @@ class RadialGaussian(
     }
 }
 
-fun connectRadialPolarized(
+fun createRadialPolarizedSynapses(
     source: List<Neuron>,
     target: List<Neuron>,
     eeDistConst: Double = DEFAULT_EI_CONST,
@@ -317,7 +317,7 @@ fun connectRadialPolarized(
  * polarity.
  * @param lambda average connection distance.
  */
-fun connectRadialNoPolarity(
+fun createRadialNoPolaritySynapses(
     source: List<Neuron>,
     target: List<Neuron>,
     distConst: Double,

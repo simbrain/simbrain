@@ -16,7 +16,7 @@ import java.awt.*;
 import java.util.List;
 
 import static org.simbrain.network.connections.ConnectionUtilitiesKt.polarizeSynapses;
-import static org.simbrain.network.connections.SparseKt.connectSparse;
+import static org.simbrain.network.connections.SparseKt.createSparseSynapses;
 
 /**
  * Playground for testing new features.
@@ -71,7 +71,7 @@ public class TestSim extends Simulation {
         layout.layoutNeurons((List<Neuron>) network.getFreeNeurons());
 
         // CREATE SYNAPSES
-        connectSparse(network.getFlatNeuronList(),
+        createSparseSynapses(network.getFlatNeuronList(),
                 network.getFlatNeuronList(), sparsity, false, false);
         polarizeSynapses(network.getFlatSynapseList(), excitatoryRatio);
 

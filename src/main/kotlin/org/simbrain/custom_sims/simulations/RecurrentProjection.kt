@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.addNeuronCollection
+import org.simbrain.network.core.connect
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -34,11 +35,9 @@ val recurrentProjection = newSim {
     recurrentNet.layout(GridLayout())
     recurrentNet.randomize()
     network.addNetworkModel(recurrentNet)
-    Sparse().apply {
+    network.connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
         connectionDensity = .25
-    }.also {
-        it.connectNeurons(network, recurrentNet.neuronList, recurrentNet.neuronList)
-    }
+    })
 
     // Location of the network in the desktop
     withGui {

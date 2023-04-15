@@ -113,10 +113,10 @@ class RadialProbabilistic(
         target: List<Neuron>,
         addToNetwork: Boolean
     ): List<Synapse> {
-        val exc = connectProbabilistically(source, target, excitatoryProbability,
+        val exc = createProbabilisticallySynapses(source, target, excitatoryProbability,
             excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1)
         )
-        val inh = connectProbabilistically(source, target, excitatoryProbability,
+        val inh = createProbabilisticallySynapses(source, target, excitatoryProbability,
             excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1)
         )
         val syns = exc + inh
@@ -150,7 +150,7 @@ class RadialProbabilistic(
 
 }
 
-fun connectProbabilistically(
+fun createProbabilisticallySynapses(
     src: List<Neuron>,
     tar: List<Neuron>,
     prob: Double,
@@ -159,14 +159,14 @@ fun connectProbabilistically(
     randomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
 ): List<Synapse> {
     val syns = ArrayList<Synapse>()
-    src.forEach { n -> syns.addAll(n.connectProbabilistically(tar, prob, radius)) }
+    src.forEach { n -> syns.addAll(n.createProbabilisticallySynapses(tar, prob, radius)) }
     return syns
 }
 
 /**
  * Connect a neuron to N other neurons, in a provided pool of neurons, using a provided probability
  */
-fun Neuron.connectProbabilistically(
+fun Neuron.createProbabilisticallySynapses(
     pool: List<Neuron>,
     prob: Double,
     radius: Double,

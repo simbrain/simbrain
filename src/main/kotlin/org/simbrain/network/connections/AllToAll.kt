@@ -58,7 +58,7 @@ class AllToAll(
         target: List<Neuron>,
         addToNetwork: Boolean
     ): List<Synapse> {
-        val syns = connectAllToAll(source, target, allowSelfConnection)
+        val syns = createAllToAllSynapses(source, target, allowSelfConnection)
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModelsAsync(syns)
@@ -78,7 +78,7 @@ class AllToAll(
 /**
  * Connects every source neuron to every target neuron.
  */
-fun connectAllToAll(
+fun createAllToAllSynapses(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
     allowSelfConnection: Boolean = false

@@ -47,7 +47,7 @@ class DistanceBased (
         target: List<Neuron>,
         addToNetwork: Boolean
     ): List<Synapse> {
-        val syns = connectRadial(source, target, decayFunction)
+        val syns = createRadialSynapses(source, target, decayFunction)
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModelsAsync(syns)
@@ -75,7 +75,7 @@ class DistanceBased (
     }
 }
 
-fun connectRadial (
+fun createRadialSynapses (
     source: List<Neuron>,
     target: List<Neuron>,
     decay: DecayFunction

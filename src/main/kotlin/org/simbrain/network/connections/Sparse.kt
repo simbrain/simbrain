@@ -61,31 +61,13 @@ class Sparse @JvmOverloads constructor(
     var allowSelfConnection: Boolean = false
 ) : ConnectionStrategy(), EditableObject {
 
-    /**
-     * Connect source to target neurons using this instance of the sparse
-     * object's properties to set all parameters of the connections.
-     *
-     * @param sourceNeurons the source neurons
-     * @param targetNeurons the target neurons
-     * @return the newly creates synapses connecting source to target
-     */
-    fun connect(sourceNeurons: List<Neuron>, targetNeurons: List<Neuron>): ConnectionsResult {
-        return connectSparse(
-            sourceNeurons,
-            targetNeurons,
-            connectionDensity,
-            allowSelfConnection,
-            equalizeEfferents
-        )
-    }
-
     override fun connectNeurons(
         network: Network,
         source: List<Neuron>,
         target: List<Neuron>,
         addToNetwork: Boolean
     ): List<Synapse> {
-        val result = connectSparse(source, target, connectionDensity, allowSelfConnection, equalizeEfferents)
+        val result = createSparseSynapses(source, target, connectionDensity, allowSelfConnection, equalizeEfferents)
         return when(result) {
             is ConnectionsResult.Add -> {
                 polarizeSynapses(result.connectionsToAdd, percentExcitatory)
@@ -127,7 +109,7 @@ class Sparse @JvmOverloads constructor(
 
 }
 
-fun connectEqualized(
+fun createEqualizedSynapses(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
     connectionDensity: Double,
@@ -158,7 +140,7 @@ fun connectEqualized(
     return ConnectionsResult.Reset(connections.map { (source, target) -> Synapse(source, target) }.toList())
 }
 
-fun connectSparse(
+fun createSparseSynapses(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
     sparsity: Double,
@@ -194,16 +176,16 @@ fun connectSparse(
     }
 }
 
-fun connectSparse(
+fun createSparseSynapses(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
     sparsity: Double = .01,
     selfConnectionAllowed: Boolean = false,
     equalizeEfferents: Boolean = false
 ): ConnectionsResult = if (equalizeEfferents) {
-    connectEqualized(sourceNeurons, targetNeurons, sparsity, selfConnectionAllowed)
+    createEqualizedSynapses(sourceNeurons, targetNeurons, sparsity, selfConnectionAllowed)
 } else {
-    connectSparse(sourceNeurons, targetNeurons, sparsity, selfConnectionAllowed)
+    createSparseSynapses(sourceNeurons, targetNeurons, sparsity, selfConnectionAllowed)
 }
 
 sealed interface ConnectionsResult {

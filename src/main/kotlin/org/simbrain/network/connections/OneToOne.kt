@@ -48,7 +48,7 @@ class OneToOne(
         target: List<Neuron>,
         addToNetwork: Boolean
     ): List<Synapse> {
-        val syns = connectOneToOne(source, target, useBidirectionalConnections)
+        val syns = createOneToOneSynapses(source, target, useBidirectionalConnections)
         polarizeSynapses(syns, percentExcitatory)
         if (addToNetwork) {
             network.addNetworkModelsAsync(syns)
@@ -89,7 +89,7 @@ private fun getSortedNeuronList(neuronList: List<Neuron>, comparator: Orientatio
 /**
  * Connect neurons 1-1
  */
-fun connectOneToOne(
+fun createOneToOneSynapses(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
     useBidirectionalConnections: Boolean = false

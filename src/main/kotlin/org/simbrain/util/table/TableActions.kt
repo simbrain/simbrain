@@ -23,38 +23,38 @@ fun SimbrainDataViewer.addSimpleDefaults()  {
 
 val DataViewerTable.randomizeAction
     get() = createAction(
-        "menu_icons/Rand.png",
-        "Randomize",
-        "Randomize selected cells",
-        CmdOrCtrl + 'R'
+        name = "Randomize",
+        description = "Randomize selected cells",
+        iconPath = "menu_icons/Rand.png",
+        keyboardShorcut = CmdOrCtrl + 'R'
     ) {
         randomizeSelectedCells()
     }
 
 val DataViewerTable.randomizeColumnAction
     get() = createAction(
-        "menu_icons/Rand_C.png",
-        "Randomize column",
-        "Randomize cells in selected column",
+        name = "Randomize column",
+        description = "Randomize cells in selected column",
+        iconPath = "menu_icons/Rand_C.png"
     ) {
         model.randomizeColumn(selectedColumn)
     }
 
 val DataViewerTable.zeroFillAction
     get() = createAction(
-        "menu_icons/Fill_0.png",
-        "Zero Fill",
-        "Zero Fill selected cells",
-        'Z'
+        name = "Zero Fill",
+        description = "Zero Fill selected cells",
+        iconPath = "menu_icons/Fill_0.png",
+        keyboardShortcut = 'Z'
     ) {
         zeroFillSelectedCells()
     }
 
 val DataViewerTable.fillAction
     get() = createAction(
-        "menu_icons/Fill.png",
-        "Fill...",
-        "Fill selected cells"
+        name = "Fill...",
+        description = "Fill selected cells",
+        iconPath = "menu_icons/Fill.png"
     ) {
         val fillVal = JOptionPane.showInputDialog(this, "Value:", "0").toDouble()
         fillSelectedCells(fillVal)
@@ -62,9 +62,9 @@ val DataViewerTable.fillAction
 
 val DataViewerTable.editRandomizerAction
     get() = createAction(
-        "menu_icons/Prefs.png",
-        "Edit randomizer...",
-        "Edit table wide randomizer"
+        name = "Edit randomizer...",
+        description = "Edit table wide randomizer",
+        iconPath = "menu_icons/Prefs.png"
     ) {
         val editor = AnnotatedPropertyEditor(model.cellRandomizer)
         val dialog: StandardDialog = editor.dialog
@@ -77,36 +77,36 @@ val DataViewerTable.editRandomizerAction
 
 val DataViewerTable.insertColumnAction
     get() = createAction(
-        "menu_icons/AddTableColumn.png",
-        "Insert column",
-        "Insert column to the right of selected column, or as the left-most column if none is selected."
+        name = "Insert column",
+        description = "Insert column to the right of selected column, or as the left-most column if none is selected.",
+        iconPath = "menu_icons/AddTableColumn.png"
     ) {
         insertColumn()
     }
 
 val DataViewerTable.deleteColumnAction
     get() = createAction(
-        "menu_icons/DeleteColumnTable.png",
-        "Delete columns",
-        "Delete selected columns"
+        name = "Delete columns",
+        description = "Delete selected columns",
+        iconPath = "menu_icons/DeleteColumnTable.png"
     ) {
         deleteSelectedColumns()
     }
 
 val DataViewerTable.insertRowAction
     get() = createAction(
-        "menu_icons/AddTableRow.png",
-        "Insert row",
-        "Insert row to above the selected row, or as the bottom row if none is selected."
+        name = "Insert row",
+        description = "Insert row to above the selected row, or as the bottom row if none is selected.",
+        iconPath = "menu_icons/AddTableRow.png"
     ) {
         insertRow()
     }
 
 val DataViewerTable.deleteRowAction
     get() = createAction(
-        "menu_icons/DeleteRowTable.png",
-        "Delete rows",
-        "Delete selected rows"
+        name = "Delete rows",
+        description = "Delete selected rows",
+        iconPath = "menu_icons/DeleteRowTable.png"
     ) {
         deleteSelectedRows()
     }
@@ -114,9 +114,9 @@ val DataViewerTable.deleteRowAction
 
 val DataViewerTable.showHistogramAction
     get() = createAction(
-        "menu_icons/histogram.png",
-        "Histogram",
-        "Create histograms for data in selected column"
+        name = "menu_icons/histogram.png",
+        description = "Histogram",
+        iconPath = "Create histograms for data in selected column"
     ) {
         launch(Dispatchers.Swing) {
             val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas();
@@ -126,9 +126,9 @@ val DataViewerTable.showHistogramAction
 
 val DataViewerTable.showBoxPlotAction
     get() = createAction(
-        "menu_icons/BarChart.png", // TODO Better Icon
-        "Boxplot column",
-        "Create boxplot for data all numeric columns"
+        name = "Boxplot column",
+        description = "Create boxplot for data all numeric columns",
+        iconPath = "menu_icons/BarChart.png" // TODO Better Icon
     ) {
         launch(context = Dispatchers.Default) {
             val canvas = BoxPlot.of(*model.getColumnMajorArray()).canvas();
@@ -141,9 +141,9 @@ val DataViewerTable.showBoxPlotAction
 // Maybe be possible to adapt that code to a more generic context
 val DataViewerTable.showScatterPlotAction
     get() = createAction(
-        "menu_icons/ScatterIcon.png",
-        "Scatter Plots",
-        "Show all pairwise scatter plots across columns"
+        name = "Scatter Plots",
+        description = "Show all pairwise scatter plots across columns",
+        iconPath = "menu_icons/ScatterIcon.png"
     ) {
         launch(context = Dispatchers.Default) {
             // TODO: User should be able to set which column is class
@@ -157,9 +157,9 @@ val DataViewerTable.showScatterPlotAction
 
 val DataViewerTable.importArff
     get() = createAction(
-        "menu_icons/Import.png",
-        "Import arff file...",
-        "Import WEKA arff file"
+        name = "Import arff file...",
+        description = "Import WEKA arff file",
+        iconPath = "menu_icons/Import.png"
     ) {
         val chooser = SFileChooser(TABLE_DIRECTORY, "", "arff")
         val arffFile = chooser.showOpenDialog()
@@ -189,9 +189,9 @@ val DataViewerTable.importCsv
     get() = importCSVAction()
 
 fun DataViewerTable.importCSVAction(fixedColumns: Boolean = false) = createAction(
-    "menu_icons/Import.png",
-    "Import csv...",
-    "Import comma separated values file"
+    name ="Import csv...",
+    description = "Import comma separated values file",
+    iconPath= "menu_icons/Import.png"
 ) {
     val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
     val csvFile = chooser.showOpenDialog()
@@ -228,9 +228,9 @@ fun DataViewerTable.importCSVAction(fixedColumns: Boolean = false) = createActio
 
 val DataViewerTable.editColumnAction
     get() = createAction(
-        "menu_icons/Prefs.png",
-        "Edit column...",
-        "Edit column properties"
+        name = "Edit column...",
+        description =  "Edit column properties",
+        iconPath = "menu_icons/Prefs.png"
     ) {
         if (model is BasicDataWrapper) {
             if (selectedColumn >= 0) {

@@ -209,9 +209,15 @@ fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<
     return neurons
 }
 
-fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
+fun Network.addNeuronCollectionAsync(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
     val nc = NeuronCollection(this, addNeurons(numNeurons, template))
     addNetworkModelAsync(nc)
+    return nc
+}
+
+suspend fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
+    val nc = NeuronCollection(this, addNeurons(numNeurons, template))
+    addNetworkModel(nc)
     return nc
 }
 

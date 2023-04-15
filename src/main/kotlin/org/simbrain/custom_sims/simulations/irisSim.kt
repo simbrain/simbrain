@@ -24,10 +24,11 @@ val irisClassifier = newSim {
     val iris = Read.arff("simulations/tables/iris.arff")
 
     // Add a neuron collection for setting inputs to the network
-    val inputNc = network.addNeuronCollection(4)
-    inputNc.label = "Inputs"
-    inputNc.setClamped(true)
-    inputNc.location = point(0, 0)
+    val inputNc = network.addNeuronCollection(4).apply{
+        label = "Inputs"
+        setClamped(true)
+        location = point(0, 0)
+    }
 
     // Choose a classifier here
     // val classifier = LogisticRegClassifier(4, 3)
@@ -41,7 +42,7 @@ val irisClassifier = newSim {
     smileClassifier.train()
 
     val weightMatrix = WeightMatrix(network, inputNc, smileClassifier)
-    network.addNetworkModelsAsync(weightMatrix, smileClassifier)
+    network.addNetworkModels(weightMatrix, smileClassifier)
     smileClassifier.location = point(0, -300)
 
     // Location of the network in the desktop

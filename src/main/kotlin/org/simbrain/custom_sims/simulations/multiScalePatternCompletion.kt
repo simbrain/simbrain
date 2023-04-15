@@ -4,7 +4,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SynapseGroup2
-import org.simbrain.network.core.addNeuronCollection
+import org.simbrain.network.core.addNeuronCollectionAsync
 import org.simbrain.network.core.setLabels
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
@@ -103,7 +103,7 @@ val allostaticPatternCompletion = newSim {
     network.addNetworkModelAsync(reservoirSynapseGroup)
 
     // Input nodes
-    val inputs = network.addNeuronCollection(5) {
+    val inputs = network.addNeuronCollectionAsync(5) {
         updateRule = LinearRule()
         network.addNetworkModelAsync(this)
     }.apply {

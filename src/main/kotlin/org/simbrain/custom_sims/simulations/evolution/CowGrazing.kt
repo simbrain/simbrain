@@ -164,7 +164,7 @@ val grazingCows = newSim {
         val sensors = entities.map { entity ->
             // Main sensors to guide the cow
             List(3) { index ->
-                ObjectSensor(EntityType.FLOWER, radius = 60.0, theta = (index * 120.0)).apply {
+                ObjectSensor(EntityType.DANDELIONS, radius = 60.0, theta = (index * 120.0)).apply {
                     decayFunction.dispersion = 250.0
                 }.also { entity.addSensor(it) }
             }

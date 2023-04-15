@@ -46,7 +46,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
     init {
 
         val events = deepNet.events
-        events.updated.on {
+        events.updated.on(wait = true) {
             infoText.text = computeInfoText()
             renderActivations()
         }

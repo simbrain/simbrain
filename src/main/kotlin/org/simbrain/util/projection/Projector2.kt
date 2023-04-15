@@ -45,7 +45,7 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
             events.methodChanged.fireAndForget(oldMethod, value)
         }
 
-    @UserParameter(label = "Tolerance", minimumValue = 0.0, order =  1)
+    @UserParameter(label = "Tolerance", minimumValue = 0.0, increment = .1, order =  1)
     var tolerance: Double = 0.1
 
     @UserParameter(label = "Connect points", order = 10)

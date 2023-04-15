@@ -62,11 +62,11 @@ val allostaticPatternCompletion = newSim {
     val inputSequence = mutableListOf<String>()
     repeat(1000) {
         val firstWord = nounVerbTransitions.sampleFirst()
-        inputSequence.add(firstWord)
+        inputSequence.add("${firstWord}_S")
         val secondWord = nounVerbTransitions.sampleNext(firstWord)
-        inputSequence.add(secondWord)
+        inputSequence.add("${secondWord}_V")
         val thirdWord = verbNounTransitions.sampleNext(secondWord)
-        inputSequence.add(thirdWord)
+        inputSequence.add("${thirdWord}_O")
         val sentenceBreak = "END"
         inputSequence.add(sentenceBreak)
     }
@@ -178,7 +178,10 @@ val allostaticPatternCompletion = newSim {
 
 
     network.updateManager.addAction(0, updateAction("Set inputs") {
-        val word = textWorld.world.currentItem?.text
+        var word = textWorld.world.currentItem?.text
+        if (!word.equals("END")) {
+            word = word?.dropLast(2)
+        }
         inputs.forceSetActivations(inputEncodings[word] ?: zeroInput)
         spikes = reservoir.neuronList.map {
             if (it.isSpike) 1.0 else 0.0

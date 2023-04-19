@@ -1,5 +1,7 @@
 package org.simbrain.world.imageworld.gui;
 
+import kotlinx.coroutines.Dispatchers;
+import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.SimbrainPreferences;
@@ -70,6 +72,10 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
      */
     private JButton previousImagesButton;
 
+    private JButton takeSnapshotButton;
+
+    private JLabel frameLabel = new JLabel();
+
     /**
      * Construct a new ImageDesktopComponent GUI.
      *
@@ -87,8 +93,8 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
 
         // Main image
         add(new ImagePanel(), BorderLayout.CENTER);
-        imageWorld.getImageAlbum().getEvents().getImageUpdate().on(() -> {
-            updateButtons();
+        imageWorld.getImageAlbum().getEvents().getImageUpdate().on(Dispatchers.getDefault(), true, () -> {
+            updateToolbar();
             repaint();
         });
         imageWorld.getFilterCollection().getEvents().getFilterChanged().on((o, n) -> this.repaint());
@@ -103,7 +109,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         setupToolbars();
 
         add(imageAlbumToolbar, BorderLayout.SOUTH);
-        updateButtons();
+        updateToolbar();
 
         // Set up the file chooser
         fileChooser = new SFileChooser(SimbrainPreferences.getString("imagesDirectory"), "");
@@ -153,6 +159,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
+            imageWorld.getFilterCollection().getCurrentFilter().updateFilter();
             g.drawImage(imageWorld.getFilterCollection().getCurrentFilter().getFilteredImage(),
                     0, 0, getWidth(), getHeight(), this);
         }
@@ -172,7 +179,11 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) {
                 return;
             }
-            image.setRGB(x, y, penColor.getRGB());
+            if (evt.isShiftDown()) {
+                image.setRGB(x, y, ImageKt.invert(penColor).getRGB());
+            } else {
+                image.setRGB(x, y, penColor.getRGB());
+            }
             imageWorld.getImageAlbum().fireImageUpdate();
         }
     }
@@ -240,6 +251,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
 
         getImageAlbumButtons().forEach(imageAlbumToolbar::add);
 
+
         JButton createCanvas = new JButton();
         createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
         createCanvas.setToolTipText("New canvas...");
@@ -256,7 +268,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             myPanel.add(hInp);
             int result = JOptionPane.showConfirmDialog(null, myPanel, "Create new canvas, enter dimensions.", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                imageWorld.createBlankCanvas(Integer.parseInt(wInp.getText()), Integer.parseInt(hInp.getText()));
+                imageWorld.resetImageAlbum(Integer.parseInt(wInp.getText()), Integer.parseInt(hInp.getText()));
             }
         });
         sourceToolbar.add(createCanvas);
@@ -342,8 +354,16 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
      *
      * @return the list of buttons
      */
-    public java.util.List<JButton> getImageAlbumButtons() {
-        java.util.List<JButton> returnList = new LinkedList<>();
+    public java.util.List<Component> getImageAlbumButtons() {
+        java.util.List<Component> returnList = new LinkedList<>();
+
+        var deleteCurrentImage = new JButton();
+        deleteCurrentImage.setIcon(ResourceManager.getSmallIcon("menu_icons/RedX.png"));
+        deleteCurrentImage.setToolTipText("Delete Current Image");
+        deleteCurrentImage.addActionListener(e -> {
+            imageWorld.getImageAlbum().deleteCurrentImage();
+        });
+        returnList.add(deleteCurrentImage);
 
         JButton loadImagesButton = new JButton();
         loadImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/photo.png"));
@@ -369,6 +389,18 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         });
         returnList.add(nextImagesButton);
 
+        takeSnapshotButton = new JButton();
+        takeSnapshotButton.setIcon(ResourceManager.getSmallIcon("menu_icons/Camera.png"));
+        takeSnapshotButton.setToolTipText("Take Snapshot");
+        takeSnapshotButton.addActionListener(e -> {
+            imageWorld.getImageAlbum().takeSnapshot();
+        });
+        returnList.add(takeSnapshotButton);
+
+
+        returnList.add(frameLabel);
+
+
         return returnList;
     }
 
@@ -384,18 +416,14 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             imageWorld.loadImages(files);
 
             // Update status of buttons
-            updateButtons();
+            updateToolbar();
 
             // Save preferences
             SimbrainPreferences.putString("imagesDirectory", fileChooser.getCurrentLocation());
         }
     }
 
-    /**
-     * Update whether buttons are enabled or not based on the status of the
-     * image world.
-     */
-    public void updateButtons() {
+    public void updateToolbar() {
         // Disable next / previous buttons when there is less than two images
         if (imageWorld.getNumImages() < 2) {
             nextImagesButton.setEnabled(false);
@@ -404,7 +432,10 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             nextImagesButton.setEnabled(true);
             previousImagesButton.setEnabled(true);
         }
-
+        var index = imageWorld.getImageAlbum().getFrameIndex();
+        var numFrames = imageWorld.getImageAlbum().getNumFrames();
+        var humanReadableFrameIndex = Math.min(index + 1, numFrames);
+        frameLabel.setText(humanReadableFrameIndex + "/" + numFrames);
     }
 
     @Override

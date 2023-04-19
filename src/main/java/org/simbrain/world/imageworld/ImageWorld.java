@@ -42,10 +42,10 @@ public class ImageWorld {
     }
 
     /**
-     * Replace the current image with a blank canvas of the indicated size.
+     * Clear the image album and set the current image with a blank canvas of the indicated size.
      */
-    public void createBlankCanvas(int width, int height) {
-        imageAlbum.setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB));
+    public void resetImageAlbum(int width, int height) {
+        imageAlbum.reset(width, height);
     }
 
     /**

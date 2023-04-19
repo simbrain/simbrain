@@ -176,6 +176,14 @@ fun HSBInterpolate(fromColor: FloatArray, toColor: FloatArray, t: Double): Color
     return Color.getHSBColor((1 + h + dh) % 1.0f, s + ds, b + db)
 }
 
+fun BufferedImage.copy(): BufferedImage {
+    val result = BufferedImage(width, height, type)
+    copyData(result.raster)
+    return result
+}
+
+fun Color.invert() = Color(255 - red, 255 - green, 255 - blue)
+
 fun main() {
     val arr = UniformRealDistribution(0.0,1.0).sampleDouble(100)
     val intArray =  UniformIntegerDistribution().apply {

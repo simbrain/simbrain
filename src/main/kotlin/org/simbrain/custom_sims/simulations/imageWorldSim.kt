@@ -59,7 +59,7 @@ val imageWorldSim = newSim {
     val component = addImageWorld("Image World")
     placeComponent(component,390,9,500,405)
     val imageWorld = component.world
-    imageWorld.createBlankCanvas(10, 10)
+    imageWorld.resetImageAlbum(10, 10)
     imageWorld.setCurrentFilter("Threshold 10x10")
 
     // Couple

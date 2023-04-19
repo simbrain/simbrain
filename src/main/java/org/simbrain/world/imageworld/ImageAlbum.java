@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld;
 
+import org.simbrain.util.ImageKt;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -87,6 +88,7 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
      */
     public void addImage(BufferedImage image) {
         frames.add(image);
+        frameIndex = frames.size() - 1;
         setCurrentImage(image);
     }
 
@@ -141,6 +143,36 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
         if (frameIndex >= 0 && frameIndex < frames.size()) {
             setCurrentImage(frames.get(frameIndex));
         }
+    }
+
+    public int getFrameIndex() {
+        return frameIndex;
+    }
+
+    public void reset(int width, int height) {
+        frames.clear();
+        frameIndex = 0;
+        setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB), true);
+    }
+
+    /**
+     * Add the current image world image to the album.
+     */
+    public void takeSnapshot() {
+        var snapshot = ImageKt.copy(getCurrentImage());
+        addImage(snapshot);
+    }
+
+    public void deleteCurrentImage() {
+        if (frames.size() == 0) {
+            return;
+        }
+        if (frames.size() == 1) {
+            reset(getCurrentImage().getWidth(), getCurrentImage().getHeight());
+            return;
+        }
+        frames.remove(frameIndex);
+        previousFrame();
     }
 
 }

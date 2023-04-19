@@ -58,6 +58,7 @@ val simulations = dir<Any>("Simulations") {
         item("Deep Net - Mnist") { deepNetSim }
         item("Spiking Neuron") { spikingNetwork }
         item("Mnist Images") { mnistSim }
+        item("Image World") { imageWorldSim }
         item("LSTM") { lstmBlock() }
     }
 
@@ -93,16 +94,16 @@ val simulations = dir<Any>("Simulations") {
     }
 
     dir("Evolution") {
-        item("Evolve Avoider") { evolveAvoider }
-        item("Evolve Resource Pursuer") { evolveResourcePursuer }
-        item("Evolve Thirsty Cows") { evolveCow }
+        // item("Evolve Avoider") { evolveAvoider }
+        // item("Evolve Resource Pursuer") { evolveResourcePursuer }
+        // item("Evolve Thirsty Cows") { evolveCow }
         item("Evolve Grazing Cows") { grazingCows }
-        item("Evolve AutoEncoder") { evolveAutoAssociator }
-        item("Evolve Modular (Clune et. al.)") { evolveModularity }
-        item("Evolve Network (Sandbox)") { evolveNetwork }
-        item("Evolve Pursuer") { evolvePursuer }
-        item("Evolve Mouse (Sandbox)") { evolveMouse }
-        item("Evolve XOR") { evolveXor }
+        // item("Evolve AutoEncoder") { evolveAutoAssociator }
+        // item("Evolve Modular (Clune et. al.)") { evolveModularity }
+        // item("Evolve Network (Sandbox)") { evolveNetwork }
+        // item("Evolve Pursuer") { evolvePursuer }
+        // item("Evolve Mouse (Sandbox)") { evolveMouse }
+        // item("Evolve XOR") { evolveXor }
         item("Evolve XOR2") { evolveXor2 }
     }
 

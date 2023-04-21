@@ -11,9 +11,9 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
-import org.jetbrains.kotlinx.dl.dataset.handler.TEST_IMAGES_ARCHIVE
-import org.jetbrains.kotlinx.dl.dataset.handler.extractImages
-import org.jetbrains.kotlinx.dl.dataset.mnist
+import org.jetbrains.kotlinx.dl.dataset.embedded.TEST_IMAGES_ARCHIVE
+import org.jetbrains.kotlinx.dl.dataset.embedded.extractImages
+import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
 import org.simbrain.custom_sims.*
 import org.simbrain.network.kotlindl.*
 import org.simbrain.util.place

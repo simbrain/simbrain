@@ -6,7 +6,7 @@ jpackage --input ..\build\main\ `
     --main-jar Simbrain.jar `
     --dest ..\dist `
     --name "Simbrain" `
-    --app-version 3.05 `
+    --app-version 3.06 `
     --icon simbrain.ico `
     --java-options "-Duser.dir=`$APPDIR --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.desktop/java.awt=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED" `
     --win-menu --win-menu-group Simbrain --vendor Simbrain --verbose

@@ -278,6 +278,10 @@ public abstract class SimbrainDataTable<T> extends AbstractTableModel {
         return list;
     }
 
+    public List<List<T>> getRowData() {
+        return rowData;
+    }
+
     /**
      * @param columnHeadings the columnHeadings to set
      */

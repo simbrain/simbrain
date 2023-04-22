@@ -309,10 +309,12 @@ fun main() {
 
 private class CustomRenderer2(val proj: ProjectionDesktopComponent2) : XYLineAndShapeRenderer() {
     override fun getItemPaint(series: Int, index: Int): Paint {
+        val projector = proj.projector
+        val hotColor = if (projector.useHotColor) projector.hotColor else projector.baseColor
         if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
-            return proj.projector.hotColor
+            return hotColor
         }
-        return proj.projector.coloringManager.getColor(proj.pointList[index])?: proj.projector.baseColor
+        return projector.coloringManager.getColor(proj.pointList[index])?: projector.baseColor
     }
 }
 

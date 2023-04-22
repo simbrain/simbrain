@@ -47,6 +47,7 @@ import java.util.List;
  * @author jyoshimi
  * @see org.simbrain.util.table.SimbrainDataTable
  */
+@Deprecated
 public class SimbrainJTable extends JXTable {
 
     /**

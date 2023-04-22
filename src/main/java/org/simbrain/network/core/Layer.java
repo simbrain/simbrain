@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.events.LocationEvents2;
 import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Producible;
 import smile.math.matrix.Matrix;
 
 import java.awt.geom.Point2D;
@@ -55,6 +56,11 @@ public abstract class Layer extends LocatableModel implements AttributeContainer
      * output layer.
      */
     public abstract Matrix getOutputs();
+
+    @Producible
+    public double[] getOutputActivations() {
+        return getOutputs().col(0);
+    }
 
     /**
      * x coordinate of center of layer.

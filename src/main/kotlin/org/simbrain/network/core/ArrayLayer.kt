@@ -4,6 +4,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.randomize
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.Consumable
+import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 
 /**
@@ -83,4 +84,7 @@ abstract class ArrayLayer(
     override fun toggleClamping() {
         isClamped = !isClamped
     }
+
+    @Producible
+    fun getInputActivations() = inputs.col(0)
 }

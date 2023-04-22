@@ -18,10 +18,13 @@
  */
 package org.simbrain.workspace.gui
 
+import org.simbrain.plot.projection.ProjectionComponent2
 import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
 import org.simbrain.util.displayInDialog
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import javax.swing.Action
@@ -212,6 +215,37 @@ class WorkspaceActionManager(val desktop: SimbrainDesktop) {
         coroutineScope = workspace
     ) {
         desktopComponent.showImportDialog()
+    }
+
+    /**
+     * Uses the default producer of the attribute container
+     */
+    @JvmOverloads
+    fun createCoupledProjectionPlotAction(container: AttributeContainer, name: String = "Projection Plot") = desktop.desktopPane.createAction(
+        name = name,
+        iconPath = "menu_icons/ProjectionIcon.png",
+        description = "Create Coupled Projection Plot",
+        coroutineScope = workspace
+    ) {
+        val projectionComponent = ProjectionComponent2("Projection")
+        workspace.addWorkspaceComponent(projectionComponent)
+        with(workspace.couplingManager) {
+            container couple projectionComponent
+        }
+    }
+
+    @JvmOverloads
+    fun createCoupledProjectionPlotAction(producer: Producer, name: String = "Projection Plot") = desktop.desktopPane.createAction(
+        name = name,
+        iconPath = "menu_icons/ProjectionIcon.png",
+        description = "Create Coupled Projection Plot",
+        coroutineScope = workspace
+    ) {
+        val projectionComponent = ProjectionComponent2("Projection")
+        workspace.addWorkspaceComponent(projectionComponent)
+        with(workspace.couplingManager) {
+            producer couple projectionComponent.getConsumer("addPoint")
+        }
     }
 
 }

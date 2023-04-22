@@ -95,6 +95,7 @@ open class SimbrainDataViewer(
         if (model is DataFrameWrapper) {
             addAction(table.showScatterPlotAction)
         }
+        addAction(table.openProjectionAction)
         addSeparator()
         addAction(table.showHistogramAction)
         addAction(table.showBoxPlotAction)

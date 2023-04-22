@@ -28,6 +28,7 @@ import org.simbrain.util.SimpleFrame;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.NumericMatrix;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
@@ -168,6 +169,10 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         // Recording action
         menu.addSeparator();
         menu.add(new RecordingAction());
+
+        // Projection Plot Action
+        menu.addSeparator();
+        menu.add(SimbrainDesktop.INSTANCE.getActionManager().createCoupledProjectionPlotAction(neuronCollection));
 
         // Coupling menu
         menu.addSeparator();

@@ -3,8 +3,11 @@ package org.simbrain.util.table
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
+import org.simbrain.plot.projection.ProjectionComponent2
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.io.Read
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
@@ -114,9 +117,9 @@ val DataViewerTable.deleteRowAction
 
 val DataViewerTable.showHistogramAction
     get() = createAction(
-        name = "menu_icons/histogram.png",
-        description = "Histogram",
-        iconPath = "Create histograms for data in selected column"
+        iconPath = "menu_icons/histogram.png",
+        name = "Histogram",
+        description = "Create histograms for data in selected column"
     ) {
         launch(Dispatchers.Swing) {
             val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas();
@@ -154,6 +157,19 @@ val DataViewerTable.showScatterPlotAction
             }
         }
     }
+
+val DataViewerTable.openProjectionAction get() = createAction(
+    iconPath = "menu_icons/ProjectionIcon.png",
+    description = "Open Projection"
+) {
+    withContext(Dispatchers.Default) {
+        val projectionComponent = ProjectionComponent2("$name Projection")
+        projectionComponent.projector.useHotColor = false
+        SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
+        val points = model.get2DDoubleArray()
+        points.forEach { projectionComponent.addPoint(it) }
+    }
+}
 
 val DataViewerTable.importArff
     get() = createAction(

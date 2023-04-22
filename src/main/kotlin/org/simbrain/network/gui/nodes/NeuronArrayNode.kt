@@ -35,6 +35,7 @@ import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
 import org.simbrain.util.table.SimbrainJTableScrollPanel
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.event.ActionEvent
@@ -255,6 +256,10 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             }
         }
         contextMenu.add(editComponents)
+
+        // Projection Plot Action
+        contextMenu.addSeparator()
+        contextMenu.add(actionManager.createCoupledProjectionPlotAction(neuronArray))
 
         // Coupling menu
         contextMenu.addSeparator()

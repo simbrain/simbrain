@@ -60,6 +60,9 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Show labels", description = "Show text labels sometimes associated with points", order = 40)
     var showLabels = true
 
+    @UserParameter(label = "Use hot point", description = "If true, current point is rendered using the hotpoint color", order = 50)
+    var useHotColor = true
+
     @UserParameter(label = "Coloring Manager", isObjectType = true, order = 110)
     var coloringManager: ColoringManager = NoOpColoringManager().also { it.projector = this }
 

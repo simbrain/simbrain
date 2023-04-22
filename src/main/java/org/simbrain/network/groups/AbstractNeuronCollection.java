@@ -140,7 +140,8 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     /**
      * Return inputs as a double array. Either create the array or return a cache of it.
      */
-    public double[] getInputArray() {
+    @Producible
+    public double[] getInputActivations() {
         if (cachedInputsDirty) {
             inputs = neuronList.stream()
                     .map(Neuron::getInput)

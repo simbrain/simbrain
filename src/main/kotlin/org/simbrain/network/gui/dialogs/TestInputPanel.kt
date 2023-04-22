@@ -18,18 +18,18 @@
  */
 package org.simbrain.network.gui.dialogs
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.trainer.DataPanel
+import org.simbrain.plot.projection.ProjectionComponent2
 import org.simbrain.util.createAction
 import org.simbrain.util.math.NumericMatrix
 import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
+import org.simbrain.workspace.gui.SimbrainDesktop
 import java.beans.PropertyChangeEvent
 import javax.swing.*
 
@@ -101,10 +101,15 @@ class TestInputPanel private constructor(
         val iterationCheckBox = JCheckBox(iterationModeAction)
         iterationCheckBox.isSelected = iterationMode
         toolbars.add(table.toolbarEditRows)
+
+        val projectionToolbar = JToolBar()
+        projectionToolbar.add(openProjectionAction)
+        toolbars.add(projectionToolbar)
+
         val testToolBar = JToolBar()
         testToolBar.add(test)
         testToolBar.add(advance)
-        testToolBar.add(testTable)
+        // testToolBar.add(testTable)
         testToolBar.add(iterationCheckBox)
         toolbars.add(testToolBar)
     }
@@ -143,6 +148,17 @@ class TestInputPanel private constructor(
         description = "Test table"
     ) {
         testTable()
+    }
+
+    private val openProjectionAction = createAction(
+        iconPath = "menu_icons/ProjectionIcon.png",
+        description = "Open Projection"
+    ) {
+        val projectionComponent = ProjectionComponent2("$name Projection")
+        projectionComponent.projector.useHotColor = false
+        SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
+        val points = table.data.rowData.map { row -> row.map { (it as Double) }.toDoubleArray() }
+        points.forEach { projectionComponent.addPoint(it) }
     }
 
     /**

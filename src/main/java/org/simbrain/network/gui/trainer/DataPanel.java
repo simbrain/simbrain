@@ -34,6 +34,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
+@Deprecated
 public class DataPanel extends JPanel {
 
     /**

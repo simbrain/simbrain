@@ -10,6 +10,7 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.toSimbrainColorImage
+import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 
@@ -99,6 +100,19 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             add(JMenuItem("Set Properties / Train ...").apply { addActionListener {
                 propertyDialog.run { makeVisible() }
             } })
+            addSeparator()
+            with(SimbrainDesktop.workspace.couplingManager) {
+                add(SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
+                        smileClassifier.getProducer("getInputActivations"),
+                        name = "Input Projection"
+                    )
+                )
+                add(SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
+                        smileClassifier.getProducer("getOutputActivations"),
+                        name = "Output Projection"
+                    )
+                )
+            }
         }
     }
 

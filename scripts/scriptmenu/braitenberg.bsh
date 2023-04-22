@@ -17,9 +17,6 @@ import java.util.*;
 //
 // Braitenberg Simulation
 //
-// TODO: Correct synapse ids
-//      Find biases, dispersion
-//
 {
     
     // Clear workspace

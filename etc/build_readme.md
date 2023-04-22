@@ -9,16 +9,17 @@ Certificates were obtained from UC Merced IT.
 To activate console run jpackage with the -win-console command
 
 Additional information about the builds are in comments to the build files referenced below.
+
 ## Mac build process
-- `ant build` 
-- `etc/make_app.sh`
+- Use terminal to run `ant build`
+- Got to `etc` and run `sh  make_app.sh`
 - dmg produced in `dist`
 
-<!-- UPDTAE BELOW BASED ON NEW SCRIPT -->
 ## PC build process 
-- `ant build`
-- `etc/make_app.bat`
-- .exe installer produced in `dist`
+- Same as mac but .exe installer produced in `dist`
 
 ## Linux build process
 - Just unzip the file in `dist`, which has an executible jar 
+
+## Debug
+- If app fails to run go to `Simbrain.app/Contents/app` and invoke using `java -jar Simbrain.jar`

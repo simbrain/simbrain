@@ -201,7 +201,7 @@ public class SimbrainDesktop {
     private JLabel runningLabel = new JLabel();
 
     /** Name to display in Simbrain desktop window. */
-    private static String FRAME_TITLE = "Simbrain 3.05";
+    private static String FRAME_TITLE = "Simbrain 3.06";
 
     /**
      * Associates workspace components with their corresponding gui components.
@@ -1112,6 +1112,7 @@ public class SimbrainDesktop {
             } else {
                 saveAs(); // Show save-as if there is no current file.
             }
+            workspace.getComponentList().forEach(wc -> wc.setChangedSinceLastSave(false));
         }
     }
 
@@ -1124,6 +1125,7 @@ public class SimbrainDesktop {
         if (file != null) {
             frame.setTitle(file.getName());
             WorkspaceSerializer.save(file, workspace);
+            workspace.getComponentList().forEach(wc -> wc.setChangedSinceLastSave(false));
         }
     }
 

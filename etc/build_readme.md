@@ -12,7 +12,7 @@ Additional information about the builds are in comments to the build files refer
 
 ## Mac build process
 - Use terminal to run `ant build`
-- Got to `etc` and run `sh  make_app.sh`
+- Got to `etc` and run `zsh make_app.sh` or press the play button at the top of the file
 - dmg produced in `dist`
 
 ## PC build process 

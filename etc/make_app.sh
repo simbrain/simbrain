@@ -2,10 +2,6 @@
 #
 # Assumes "ant build" has been called and that the proper certificate is in the keychain on the computer from which this is run
 #
-# To code sign, unpackage the dmg after it's made, go to the folder it is in (dist) and run
-# `codesign -fs "University of California, Merced" Simbrain.app`
-# Then repackage it into a dmg by placing it in a folder and using Disk Utility, File > New Image
-# Title is Simbrain-3.0X.dmg
 
 # See https://github.com/x-stream/xstream/issues/262
 JVM_ARGS="-Duser.dir=\$APPDIR "

@@ -118,6 +118,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
                 projector.projectionMethod = (selectedItem as ProjectionMethod2)
             }
         }
+        selectedItem = projectionMethods[projector.projectionMethod.javaClass]
     }
     val mainToolbar = JToolBar().apply {
         add(projectionSelector)

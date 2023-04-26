@@ -1,34 +1,15 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.getResource
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.table.SimbrainDataViewer
 import javax.swing.JInternalFrame
 
 /**
- * Todo
- *
+ * Basics of word embeddings and co-occurrence matrices
  */
 val nlpSim_basic = newSim {
-
-    // 1. "Basics of word embeddings and co-occurrence matrices"
-    //
-    // TODO: Offload "Training" to textbook chapter.
-    // Training:
-    // For the text reader, it will have options for skipGram and window size
-    // The text highlight will reflect what options are selected.
-    //
-    // Co-occurrences to vectors:
-    // Columns as the actual word embeddings, illustrate how they are based on the co-occurrences
-    // Maybe have them test out similarity, see that raw co-occ. don't work that well
-    //
-    // Post-training transformations:
-    // Co-occurrence matrix will be pre-trained and displayed on the main screen.
-    // As students click the different options, a second co-occurrence will reflect the difference (for quick comparisons).
-
 
     workspace.clearWorkspace()
 
@@ -59,47 +40,23 @@ val nlpSim_basic = newSim {
     }
 
 
-    // Network
-    // val networkComponent = addNetworkComponent("Network")
-    // val network = networkComponent.network
-    // val nc = network.createNeuronCollection(textWorld.tokenVectorMap.size).apply {
-    //     label = "Vector Embeddings for Word Tokens"
-    //     location = point(0, 0)
-    //     layout(GridLayout())
-    // }
-
-    // withGui {
-    //     place(networkComponent) {
-    //         location = point(450, 0)
-    //         width = 400
-    //         height = 400
-    //     }
-    // }
-
-    // Location of the projection in the desktop
-//    val projectionPlot = addProjectionPlot("Activations")
-//    withGui {
-//        place(projectionPlot) {
-//            location = point(450, 0)
-//            width = 500
-//            height = 500
-//        }
-//    }
-//
-//    // Couple the text world to neuron collection
-//    with(couplingManager) {
-//        // createCoupling(
-//        //     textWorld.getProducer("getCurrentVector"),
-//        //     nc.getConsumer("addInputs")
-//        // )
-//        createCoupling(
-//            textWorld.getProducer("getCurrentVector"),
-//            projectionPlot.getConsumer("addPoint")
-//        )
-//        createCoupling(
-//            textWorld.getProducer("getCurrentToken"),
-//            projectionPlot.getConsumer("setLabel")
-//        )
-//    }
+   val projectionPlot = addProjectionPlot2("Activations")
+   withGui {
+       place(projectionPlot) {
+           location = point(970, 10)
+           width = 500
+           height = 500
+       }
+   }
+    with(couplingManager) {
+        createCoupling(
+            textWorld.getProducer("getCurrentVector"),
+            projectionPlot.getConsumer("addPoint")
+        )
+        createCoupling(
+            textWorld.getProducer("getCurrentToken"),
+            projectionPlot.getConsumer("setLabel")
+        )
+    }
 
 }

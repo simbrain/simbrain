@@ -61,7 +61,7 @@ val nlpSim_corpusQuality = newSim {
     // }
 
     // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot("Activations")
+    val projectionPlot = addProjectionPlot2("Activations")
     withGui {
         place(projectionPlot) {
             location = point(450, 0)
@@ -70,12 +70,7 @@ val nlpSim_corpusQuality = newSim {
         }
     }
 
-    // Couple the text world to neuron collection
     with(couplingManager) {
-        // createCoupling(
-        //     textWorld.getProducer("getCurrentVector"),
-        //     nc.getConsumer("addInputs")
-        // )
         createCoupling(
             textWorld.getProducer("getCurrentVector"),
             projectionPlot.getConsumer("addPoint")

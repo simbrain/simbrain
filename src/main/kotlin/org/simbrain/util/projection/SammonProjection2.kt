@@ -9,7 +9,7 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
     val downstairsInitializationMethod2 = TriangulateProjection2()
 
     @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .1)
-    var epsilon = 0.1
+    var epsilon = 100.0
 
     override fun init(dataset: Dataset2) {
         initDistances(dataset)

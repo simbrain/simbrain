@@ -13,7 +13,7 @@ Additional information about the builds are in comments to the build files refer
 ## Mac build process
 - Use terminal from `simbrain` dir to run `ant build`
 - Got to `etc` and run `zsh make_app.sh` or press the play button at the top of the file
-- dmg produced in `dist`
+- A dmg file is produced in `dist`
 
 ## PC build process 
 - Same as mac but .exe installer produced in `dist`
@@ -22,15 +22,17 @@ Additional information about the builds are in comments to the build files refer
 - Just unzip the file in `dist`, which has an executible jar 
 
 ## Code signing
-To code sign from `simbrain` directory
+To code sign from `simbrain` directory, and obviously replace `3.0X` with a version number
 - Unpackage the dmg after it's made
   - `hdiutil attach dist/Simbrain-3.0X.dmg`
 - Copy to a temp dir
   - `cp -r /Volumes/Simbrain/Simbrain.app /tmp/Simbrain.app`
 - Code sign (see internal notes)
 - Repackage
-  - `hdiutil create -volname Simbrain3.06 -srcfolder /tmp/Simbrain.app -ov -format UDZO Simbrain-3.06.dmg`
+  - `hdiutil create -volname Simbrain3.0X -srcfolder /tmp/Simbrain.app -ov -format UDZO Simbrain-3.0X.dmg`
 - Move the resulting file to the `dist` dir since our rsync scripts assume it's there
+  - `mv Simbrain-3.0X.dmg dist`
+- Run rsync script (see internal notes)
 
 ## Debug
 - If app fails to run go to `Simbrain.app/Contents/app` and invoke using `java -jar Simbrain.jar`

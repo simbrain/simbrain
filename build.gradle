@@ -11,7 +11,8 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-def version = "4Beta"
+def versionName = "4Beta"
+def version = "4.0.0"
 
 def simbrainJvmArgs = [ '--add-opens','java.base/java.util=ALL-UNNAMED',
                         '--add-opens','java.desktop/java.awt=ALL-UNNAMED',
@@ -227,7 +228,6 @@ task jpackageMacOS(type: Exec) {
 }
 
 task signMacApp(type: Exec, dependsOn: jpackageMacOS) {
-    // Only execute the task if running on macOS
     onlyIf { OperatingSystem.current().isMacOsX() }
 
     def appPath = "${dist}/Simbrain.app"
@@ -245,11 +245,10 @@ task signMacApp(type: Exec, dependsOn: jpackageMacOS) {
 }
 
 task createMacDmg(type: Exec, dependsOn: signMacApp) {
-    // Only execute the task if running on macOS
     onlyIf { OperatingSystem.current().isMacOsX() }
 
     def appPath = "${dist}/Simbrain.app"
-    def dmgPath = "${dist}/Simbrain-${version}.dmg"
+    def dmgPath = "${dist}/Simbrain-${versionName}.dmg"
 
     doFirst {
         // Set up the hdiutil command and its arguments
@@ -298,7 +297,7 @@ task jpackageWindows(type: Exec) {
 task signWindowsApp(type: Exec, dependsOn: jpackageWindows) {
     onlyIf { OperatingSystem.current().isWindows() }
 
-    def appPath = "${dist}/Simbrain-${version}.exe"
+    def appPath = "${dist}/Simbrain-${versionName}.exe"
 
     doFirst {
 
@@ -306,4 +305,9 @@ task signWindowsApp(type: Exec, dependsOn: jpackageWindows) {
         executable signtool
         args 'sign', '/a', '/fd', 'SHA256', appPath
     }
+}
+
+task rsyncDownloads(type: Exec) {
+    def DEST = System.getenv('DEST')
+    commandLine 'rsync', dist, '-avzP', '-e', 'ssh', "$DEST"
 }

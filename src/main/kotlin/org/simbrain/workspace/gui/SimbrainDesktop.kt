@@ -919,11 +919,7 @@ object SimbrainDesktop {
             screenSize.height - WORKSPACE_INSET * 2
         )
 
-        // Set the bottom dock to visible or not based on the properties file.
-        val properties = Utils.getSimbrainProperties()
-        if (properties.containsKey("showBottomDock")) {
-            dockVisible = java.lang.Boolean.parseBoolean(properties.getProperty("showBottomDock"))
-        }
+        dockVisible = false
 
         // Set up Desktop
         if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")) {

@@ -390,7 +390,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         returnList.add(nextImagesButton);
 
         takeSnapshotButton = new JButton();
-        takeSnapshotButton.setIcon(ResourceManager.getSmallIcon("menu_icons/Camera.png"));
+        takeSnapshotButton.setIcon(ResourceManager.getSmallIcon("menu_icons/camera.png"));
         takeSnapshotButton.setToolTipText("Take Snapshot");
         takeSnapshotButton.addActionListener(e -> {
             imageWorld.getImageAlbum().takeSnapshot();

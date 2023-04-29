@@ -47,6 +47,12 @@ public class Utils {
      */
     public static final String FS = System.getProperty("file.separator");
 
+    /** User directory where java is launched from. */
+    public static final String USER_DIR = System.getProperty("user.dir");
+
+    /** Directory where files should be saved. */
+    public static final String USER_HOME = new JFileChooser().getFileSystemView().getDefaultDirectory().toString();
+
     /**
      * Helper method that returns the date and time in a format that can be used to create filenames.
      *

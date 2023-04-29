@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     id 'java'
     id 'idea'
@@ -6,9 +8,11 @@ plugins {
     // id 'checkstyle'
     // Fixes problem with long filenames
     id "ua.eshepelyuk.ManifestClasspath" version "1.0.0"
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-def versionName = "Simbrain4Beta"
+def version = "4Beta"
+
 def simbrainJvmArgs = [ '--add-opens','java.base/java.util=ALL-UNNAMED',
                         '--add-opens','java.desktop/java.awt=ALL-UNNAMED',
                         '--add-opens','java.desktop/java.awt.geom=ALL-UNNAMED',
@@ -21,6 +25,10 @@ def simbrainJvmArgs = [ '--add-opens','java.base/java.util=ALL-UNNAMED',
 mainClassName = 'org.simbrain.workspace.gui.Splasher'
 compileJava.options.encoding = 'UTF-8'
 
+def docs = "docs"
+def dist = "${buildDir}/dist"
+def buildMain = "${buildDir}/main"
+
 // When updating also search for "jvmTarget" and update those
 sourceCompatibility = 1.17
 
@@ -32,12 +40,6 @@ dependencies {
 
     // Kotlin
     implementation 'org.jetbrains.kotlin:kotlin-reflect:1.7.20'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-jvm-host:1.7.20'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-jsr223:1.7.20'
-    implementation 'org.jetbrains.kotlin:kotlin-compiler-embeddable:1.7.20'
-    implementation 'org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.7.20'
-    implementation 'org.jetbrains.kotlin:kotlin-script-util:1.7.20'
-    implementation 'org.jetbrains.kotlin:kotlin-script-runtime:1.7.20'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4'
 
@@ -54,7 +56,7 @@ dependencies {
     implementation group: 'org.bytedeco', name: 'openblas-platform', version: '0.3.21-1.5.8'
 
     // JUnit
-    implementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
     testImplementation(platform('org.junit:junit-bom:5.7.1'))
     testImplementation('org.junit.jupiter:junit-jupiter:5.9.0')
 
@@ -137,3 +139,171 @@ compileTestKotlin {
     kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
 
+
+// Configure the shadow plugin
+shadowJar {
+    archiveClassifier.set('shadow')
+    manifest {
+        attributes 'Main-Class': 'org.simbrain.workspace.gui.Splasher'
+    }
+}
+
+
+task buildDistribution(type: Copy) {
+    dependsOn shadowJar
+
+    doFirst {
+        // Get the path to the JAR file created by the shadowJar task
+        File shadowJarFile = shadowJar.archiveFile.get().getAsFile()
+
+        // Set the source for the copy operation
+        from shadowJarFile
+    }
+
+    // Copy docs
+    from("${docs}") {
+        into 'docs'
+    }
+
+    // Copy simulations
+    from('simulations') {
+        exclude '**/archives/**'
+        into 'simulations'
+    }
+
+    from("scripts") {
+        into "scripts"
+    }
+
+    from "etc/License.txt"
+
+    // Set the base destination directory for all copy operations
+    into "${buildMain}"
+
+}
+
+task cleanDistribution {
+
+    doLast {
+        delete dist
+    }
+}
+
+
+task jpackageMacOS(type: Exec) {
+
+    onlyIf { OperatingSystem.current().isMacOsX() }
+
+    dependsOn cleanDistribution
+    dependsOn shadowJar
+    dependsOn buildDistribution
+
+    def iconFile = 'etc/simbrain.icns'
+
+    def javaHome = System.getProperty("java.home")
+    def jpackageBinary = OperatingSystem.current().isWindows() ? 'jpackage.exe' : 'jpackage'
+    def jpackagePath = file("${javaHome}/bin/${jpackageBinary}")
+
+    doFirst {
+        // Define JVM arguments
+        def jvmArgs = [
+                '-Duser.dir=\$APPDIR',
+                '--add-opens=java.base/java.util=ALL-UNNAMED',
+                '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
+                '--add-opens=java.base/java.util.concurrent=ALL-UNNAMED'
+        ].join(' ')
+
+        // Set up the jpackage command and its arguments
+        executable jpackagePath
+        args '--input', buildMain,
+                '--main-jar', 'simbrain-shadow.jar',
+                '--dest', dist,
+                '--name', 'Simbrain',
+                '--app-version', version,
+                '--icon', iconFile,
+                '--java-options', jvmArgs,
+                '--type', 'app-image'
+    }
+}
+
+task signMacApp(type: Exec, dependsOn: jpackageMacOS) {
+    // Only execute the task if running on macOS
+    onlyIf { OperatingSystem.current().isMacOsX() }
+
+    def appPath = "${dist}/Simbrain.app"
+    def signingIdentity = System.getenv('SIGNING_IDENTITY')
+
+    doFirst {
+        if (signingIdentity == null || signingIdentity.isEmpty()) {
+            throw new GradleException("SIGNING_IDENTITY environment variable is not set or empty.")
+        }
+
+        // Set up the codesign command and its arguments
+        executable 'codesign'
+        args '-fs', signingIdentity, appPath
+    }
+}
+
+task createMacDmg(type: Exec, dependsOn: signMacApp) {
+    // Only execute the task if running on macOS
+    onlyIf { OperatingSystem.current().isMacOsX() }
+
+    def appPath = "${dist}/Simbrain.app"
+    def dmgPath = "${dist}/Simbrain-${version}.dmg"
+
+    doFirst {
+        // Set up the hdiutil command and its arguments
+        executable 'hdiutil'
+        args 'create', '-volname', 'Simbrain', '-srcfolder', appPath, '-ov', '-format', 'UDZO', dmgPath
+    }
+}
+
+task jpackageWindows(type: Exec) {
+    onlyIf { OperatingSystem.current().isWindows() }
+
+    dependsOn cleanDistribution
+    dependsOn shadowJar
+    dependsOn buildDistribution
+
+    def iconFile = 'etc/simbrain.ico'
+
+    def javaHome = System.getProperty("java.home")
+    def jpackageBinary = OperatingSystem.current().isWindows() ? 'jpackage.exe' : 'jpackage'
+    def jpackagePath = file("${javaHome}/bin/${jpackageBinary}")
+
+    doFirst {
+        // Define JVM arguments
+        def jvmArgs = [
+                '-Duser.dir=\$APPDIR',
+                '--add-opens=java.base/java.util=ALL-UNNAMED',
+                '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
+                '--add-opens=java.base/java.util.concurrent=ALL-UNNAMED'
+        ].join(' ')
+
+        // Set up the jpackage command and its arguments
+        executable jpackagePath
+        args '--input', buildMain,
+                '--main-jar', 'simbrain-shadow.jar',
+                '--dest', dist,
+                '--name', 'Simbrain',
+                '--app-version', version,
+                '--icon', iconFile,
+                '--java-options', jvmArgs,
+                '--win-menu',
+                '--win-menu-group', 'Simbrain',
+                '--vendor', 'Simbrain'
+    }
+}
+
+task signWindowsApp(type: Exec, dependsOn: jpackageWindows) {
+    onlyIf { OperatingSystem.current().isWindows() }
+
+    def appPath = "${dist}/Simbrain-${version}.exe"
+
+    doFirst {
+
+        // Set up the codesign command and its arguments
+        executable signtool
+        args 'sign', '/a', '/fd', 'SHA256', appPath
+    }
+}

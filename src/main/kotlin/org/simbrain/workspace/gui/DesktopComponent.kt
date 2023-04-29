@@ -26,6 +26,7 @@ import org.pmw.tinylog.Logger
 import org.simbrain.network.NetworkComponent
 import org.simbrain.util.SFileChooser
 import org.simbrain.util.SimbrainPreferences
+import org.simbrain.util.Utils
 import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.WorkspaceComponent
@@ -311,16 +312,17 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
      * @param componentType the component type
      * @return the directory
      */
-    private fun getDefaultDirectory(componentType: Class<out WorkspaceComponent>): String {
-        val defaultDirectory: String
-        defaultDirectory = if (componentType == OdorWorldComponent::class.java) {
-            SimbrainPreferences.getString("workspaceOdorWorldDirectory")
+    private fun getDefaultDirectory(
+        componentType: Class<out WorkspaceComponent?>
+    ): String {
+        val defaultDirectory: String = if (componentType == OdorWorldComponent::class.java) {
+            Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "worlds"
         } else if (componentType == DataWorldComponent::class.java) {
-            SimbrainPreferences.getString("workspaceTableDirectory")
+            Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "tables"
         } else if (componentType == NetworkComponent::class.java) {
-            SimbrainPreferences.getString("workspaceNetworkDirectory")
+            Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "networks"
         } else {
-            SimbrainPreferences.getString("workspaceBaseDirectory")
+            Utils.USER_DIR + Utils.FS + "simulations"
         }
         return defaultDirectory
     }

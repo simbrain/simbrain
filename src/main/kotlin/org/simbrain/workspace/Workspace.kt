@@ -2,8 +2,8 @@ package org.simbrain.workspace
 
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
-import org.simbrain.util.SimbrainPreferences
 import org.simbrain.util.SimpleIdManager
+import org.simbrain.util.Utils
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceEvents2
@@ -296,11 +296,7 @@ class Workspace: CoroutineScope {
     /**
      * @param currentDirectory the currentDirectory to set
      */
-    var currentDirectory: String?
-        get() = SimbrainPreferences.getString("workspaceSimulationDirectory")
-        set(currentDirectory) {
-            SimbrainPreferences.putString("workspaceSimulationDirectory", currentDirectory)
-        }
+    var currentDirectory = Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "workspaces"
 
     /**
      * Get a component using its id.

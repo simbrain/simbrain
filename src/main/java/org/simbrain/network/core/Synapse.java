@@ -34,7 +34,10 @@ import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <b>Synapse</b> objects represent "connections" between neurons, which learn
@@ -211,18 +214,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      * Support for property change events.
      */
     private transient SynapseEvents2 events = new SynapseEvents2();
-
-    static {
-        Properties properties = Utils.getSimbrainProperties();
-        if (properties.containsKey("weightUpperBound")) {
-            DEFAULT_UPPER_BOUND = Double.parseDouble(properties.getProperty("weightUpperBound"));
-
-        }
-        if (properties.containsKey("weightLowerBound")) {
-            DEFAULT_LOWER_BOUND = Double.parseDouble(properties.getProperty("weightLowerBound"));
-        }
-
-    }
 
     /**
      * Construct a synapse using a source and target neuron, defaulting to ClampedSynapse and assuming the parent of the

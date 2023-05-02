@@ -248,7 +248,7 @@ task createMacDmg(type: Exec, dependsOn: signMacApp) {
     onlyIf { OperatingSystem.current().isMacOsX() }
 
     def appPath = "${dist}/Simbrain.app"
-    def dmgPath = "${dist}/Simbrain-${versionName}.dmg"
+    def dmgPath = "${dist}/Simbrain${versionName}.dmg"
 
     doFirst {
         // Set up the hdiutil command and its arguments
@@ -297,17 +297,67 @@ task jpackageWindows(type: Exec) {
 task signWindowsApp(type: Exec, dependsOn: jpackageWindows) {
     onlyIf { OperatingSystem.current().isWindows() }
 
-    def appPath = "${dist}/Simbrain-${versionName}.exe"
+    def appPath = "${dist}/Simbrain-${version}.exe"
+
+    def signtool = findWindowsSignTool()
 
     doFirst {
-
-        // Set up the codesign command and its arguments
         executable signtool
         args 'sign', '/a', '/fd', 'SHA256', appPath
     }
 }
 
-task rsyncDownloads(type: Exec) {
-    def DEST = System.getenv('DEST')
-    commandLine 'rsync', dist, '-avzP', '-e', 'ssh', "$DEST"
+task pushMacInstaller(type: Exec) {
+    def dmgPath = "${dist}/Simbrain${versionName}.dmg"
+    def dest = System.getenv('DEST')
+    commandLine 'rsync', dmgPath, '-avzP', '-e', 'ssh', "$dest"
+}
+
+task pushWindowsInstaller(type: Exec, dependsOn: signWindowsApp) {
+    doFirst {
+        copy {
+            from dist
+            into dist
+            include "Simbrain-${version}.exe"
+
+            rename "Simbrain-${version}.exe", "Simbrain${versionName}.exe"
+        }
+    }
+    def exePath = "${dist}/Simbrain${versionName}.exe"
+    def dest = System.getenv('DEST')
+    commandLine 'rsync', exePath, '-avzP', '-e', 'ssh', "$dest"
+}
+
+task createZip(type: Zip, dependsOn: buildDistribution) {
+    from buildMain
+    archiveFileName = "Simbrain${versionName}.zip"
+    destinationDirectory = file("${dist}")
+}
+
+task pushZip(type: Exec, dependsOn: createZip) {
+    def zipPath = "${dist}/Simbrain${versionName}.zip"
+    def dest = System.getenv('DEST')
+    commandLine 'rsync', zipPath, '-avzP', '-e', 'ssh', "$dest"
+}
+
+static def findWindowsSignTool() {
+    def windowsKitsFolder = new File("C:/Program Files (x86)/Windows Kits/10/bin/")
+    if (!windowsKitsFolder.exists()) {
+        throw new GradleException("Windows Kits folder not found")
+    }
+
+    def sdkVersions = windowsKitsFolder.listFiles().findAll { it.isDirectory() }
+    if (sdkVersions.empty) {
+        throw new GradleException("No SDK version found in Windows Kits folder")
+    }
+
+    // Sort SDK versions in descending order and find the highest version
+    def highestSdkVersion = sdkVersions.sort { -it.name }.first()
+    def signToolPath = new File(highestSdkVersion, "x64/SignTool.exe")
+
+    if (!signToolPath.exists()) {
+        throw new GradleException("SignTool.exe not found in the highest SDK version folder")
+    }
+
+    return signToolPath.absolutePath
 }

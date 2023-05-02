@@ -643,12 +643,12 @@ public class SimbrainDesktop {
         fileMenu.addSeparator();
         fileMenu.add(actionManager.getClearWorkspaceAction());
 
-        JMenu worldSubMenu = new JMenu("Open World");
-        for (Action action : actionManager.getOpenWorldActions()) {
-            worldSubMenu.add(action);
-        }
-        fileMenu.add(worldSubMenu);
-        fileMenu.addSeparator();
+        // JMenu worldSubMenu = new JMenu("Open World");
+        // for (Action action : actionManager.getOpenWorldActions()) {
+        //     worldSubMenu.add(action);
+        // }
+        // fileMenu.add(worldSubMenu);
+        // fileMenu.addSeparator();
         fileMenu.add(actionManager.getShowUpdaterDialog());
         fileMenu.add(actionManager.getShowPropertyDialogAction());
         fileMenu.addSeparator();

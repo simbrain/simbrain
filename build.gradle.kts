@@ -1,0 +1,379 @@
+import org.gradle.internal.os.OperatingSystem
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    `java-library`
+    idea
+    application
+    kotlin("jvm") version "1.7.0"
+    id("ua.eshepelyuk.ManifestClasspath") version "1.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+}
+
+val versionName = "4Beta"
+val version = "4.0.0"
+val docs = "docs"
+val dist = "${buildDir}/dist"
+val buildMain = "${buildDir}/main"
+
+val simbrainJvmArgs = listOf(
+    "--add-opens", "java.base/java.util=ALL-UNNAMED",
+    "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
+    "--add-opens", "java.desktop/java.awt.geom=ALL-UNNAMED",
+    "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
+    "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+    "--add-opens", "java.base/java.lang=ALL-UNNAMED"
+    // "-Djava.library.path", "/opt/homebrew/opt/openblas/lib/",
+    // "-Dorg.bytedeco.openblas.load", "blas"
+)
+
+application {
+    mainClass.set("org.simbrain.workspace.gui.Splasher")
+    applicationDefaultJvmArgs = simbrainJvmArgs
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // Kotlin
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.20")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
+
+    // Kotlin DL
+    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:0.5.0")
+    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:0.5.0")
+    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset-jvm:0.5.0")
+
+    // Smile
+    implementation(group = "com.github.haifengl", name = "smile-core", version = "3.0.1")
+    implementation("com.github.haifengl:smile-kotlin:3.0.1")
+    implementation("com.github.haifengl:smile-plot:3.0.1")
+    implementation("com.github.haifengl:smile-nlp:3.0.1")
+    implementation(group = "org.bytedeco", name = "openblas-platform", version = "0.3.21-1.5.8")
+
+    // JUnit
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
+    testImplementation(platform("org.junit:junit-bom:5.7.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+    implementation(group = "org.apache.commons", name = "commons-math3", version = "3.6.1")
+
+    // jsoup HTML parser library @ https://jsoup.org/
+    implementation("org.jsoup:jsoup:1.15.4")
+
+    //https://mvnrepository.com/artifact/org.ostermiller/utils
+    implementation(group = "org.ostermiller", name = "utils", version = "1.07.00")
+
+    // https://mvnrepository.com/artifact/org.tinylog/tinylog/1.3.6
+    implementation(group = "org.tinylog", name = "tinylog", version = "1.3.6")
+    // https://mvnrepository.com/artifact/org.tinylog/tinylog-impl
+    runtimeOnly(group = "org.tinylog", name = "tinylog-impl", version = "2.6.1")
+    // https://mvnrepository.com/artifact/org.tinylog/slf4j-tinylog
+    runtimeOnly(group = "org.tinylog", name = "slf4j-tinylog", version = "2.6.1")
+
+    // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
+    implementation(group = "com.thoughtworks.xstream", name = "xstream", version = "1.4.20")
+
+    // https://mvnrepository.com/artifact/org.piccolo2d/piccolo2d-extras
+    implementation(group = "org.piccolo2d", name = "piccolo2d-extras", version = "3.0.1")
+    implementation(group = "org.piccolo2d", name = "piccolo2d-core", version = "3.0.1")
+
+    // https://mvnrepository.com/artifact/org.jfree/jfreechart
+    implementation(group = "org.jfree", name = "jfreechart", version = "1.5.4")
+
+    // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
+    implementation(group = "org.swinglabs", name = "swingx-core", version = "1.6.2-2")
+
+    // https://mvnrepository.com/artifact/com.miglayout/miglayout-swing
+    implementation(group = "com.miglayout", name = "miglayout-swing", version = "11.0")
+
+    // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
+    implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.3.1")
+
+    // https://mvnrepository.com/artifact/org.beanshell/bsh
+    implementation(group = "org.beanshell", name = "bsh", version = "2.0b5")
+
+    // JMonkeyEngine
+    implementation("org.jmonkeyengine:jme3-core:3.6.0-stable")
+    implementation("org.jmonkeyengine:jme3-jbullet:3.6.0-stable")
+    implementation("org.jmonkeyengine:jme3-desktop:3.6.0-stable")
+    implementation("org.jmonkeyengine:jme3-lwjgl:3.6.0-stable")
+}
+
+tasks.test {
+    jvmArgs(simbrainJvmArgs)
+    useJUnitPlatform()
+}
+
+// Sample invocation:
+// gradle runSim -PsimName="Test Sim"
+tasks.register<JavaExec>("runSim") {
+    jvmArgs(simbrainJvmArgs)
+    classpath = sourceSets["main"].runtimeClasspath
+    main = "org.simbrain.custom_sims.RegisteredSimulationsKt"
+    if (project.hasProperty("simName")) {
+        args(project.property("simName") as String)
+    }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = "17"
+        freeCompilerArgs = listOf(
+            "-Xuse-experimental=kotlin.experimental.ExperimentalTypeInference",
+            "-Xjvm-default=all",
+            "-Xcontext-receivers"
+        )
+    }
+}
+
+// Configure the shadow plugin
+tasks.shadowJar {
+    archiveClassifier.set("shadow")
+    manifest {
+        attributes(
+            "Main-Class" to "org.simbrain.workspace.gui.Splasher"
+        )
+    }
+}
+
+tasks.register<Copy>("buildDistribution") {
+    dependsOn("shadowJar")
+
+    doFirst {
+        // Get the path to the JAR file created by the shadowJar task
+        val shadowJarFile: File = tasks.shadowJar.get().archiveFile.get().asFile
+
+        // Set the source for the copy operation
+        from(shadowJarFile)
+    }
+
+    // Copy docs
+    from(docs) {
+        into("docs")
+    }
+
+    // Copy simulations
+    from("simulations") {
+        exclude("**/archives/**")
+        into("simulations")
+    }
+
+    from("scripts") {
+        into("scripts")
+    }
+
+    from("etc/License.txt")
+
+    // Set the base destination directory for all copy operations
+    into(buildMain)
+}
+
+tasks.register("cleanDistribution") {
+    doLast {
+        delete(dist)
+    }
+}
+
+if (OperatingSystem.current().isMacOsX) {
+    tasks.register<Exec>("jpackageMacOS") {
+        onlyIf { OperatingSystem.current().isMacOsX }
+
+        dependsOn("cleanDistribution")
+        dependsOn("shadowJar")
+        dependsOn("buildDistribution")
+
+        val iconFile = "etc/simbrain.icns"
+
+        val javaHome = System.getProperty("java.home")
+        val jpackageBinary = if (OperatingSystem.current().isWindows) "jpackage.exe" else "jpackage"
+        val jpackagePath = file("${javaHome}/bin/$jpackageBinary")
+
+        doFirst {
+            // Define JVM arguments
+            val jvmArgs = listOf(
+                "-Duser.dir=\\\$APPDIR",
+                "--add-opens=java.base/java.util=ALL-UNNAMED",
+                "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
+                "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+            ).joinToString(" ")
+
+            // Set up the jpackage command and its arguments
+            executable(jpackagePath)
+            args("--input", buildMain,
+                "--main-jar", "simbrain-shadow.jar",
+                "--dest", dist,
+                "--name", "Simbrain",
+                "--app-version", project.version,
+                "--icon", iconFile,
+                "--java-options", jvmArgs,
+                "--type", "app-image"
+            )
+        }
+    }
+
+    tasks.register<Exec>("signMacApp") {
+        onlyIf { OperatingSystem.current().isMacOsX }
+
+        dependsOn("jpackageMacOS")
+
+        val appPath = "${dist}/Simbrain.app"
+        val signingIdentity = System.getenv("SIGNING_IDENTITY")
+
+        doFirst {
+            if (signingIdentity == null || signingIdentity.isEmpty()) {
+                throw GradleException("SIGNING_IDENTITY environment variable is not set or empty.")
+            }
+
+            // Set up the codesign command and its arguments
+            executable("codesign")
+            args("-fs", signingIdentity, appPath)
+        }
+    }
+
+    tasks.register<Exec>("createMacDmg") {
+        onlyIf { OperatingSystem.current().isMacOsX }
+
+        dependsOn("signMacApp")
+
+        val appPath = "${dist}/Simbrain.app"
+        val dmgPath = "${dist}/Simbrain${versionName}.dmg"
+
+        doFirst {
+            // Set up the hdiutil command and its arguments
+            executable("hdiutil")
+            args("create", "-volname", "Simbrain", "-srcfolder", appPath, "-ov", "-format", "UDZO", dmgPath)
+        }
+    }
+
+    tasks.register<Exec>("pushMacInstaller") {
+        val dmgPath = "${dist}/Simbrain${versionName}.dmg"
+        val dest = System.getenv("DEST")
+        commandLine("rsync", dmgPath, "-avzP", "-e", "ssh", dest)
+    }
+}
+
+if (OperatingSystem.current().isWindows) {
+    tasks.register<Exec>("jpackageWindows") {
+        onlyIf { OperatingSystem.current().isWindows }
+
+        dependsOn("cleanDistribution")
+        dependsOn("shadowJar")
+        dependsOn("buildDistribution")
+
+        val iconFile = "etc/simbrain.ico"
+
+        val javaHome = System.getProperty("java.home")
+        val jpackageBinary = if (OperatingSystem.current().isWindows) "jpackage.exe" else "jpackage"
+        val jpackagePath = file("${javaHome}/bin/$jpackageBinary")
+
+        doFirst {
+            // Define JVM arguments
+            val jvmArgs = listOf(
+                "-Duser.dir=\\\$APPDIR",
+                "--add-opens=java.base/java.util=ALL-UNNAMED",
+                "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
+                "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+            ).joinToString(" ")
+
+            // Set up the jpackage command and its arguments
+            executable(jpackagePath)
+            args("--input", buildMain,
+                "--main-jar", "simbrain-shadow.jar",
+                "--dest", dist,
+                "--name", "Simbrain",
+                "--app-version", project.version,
+                "--icon", iconFile,
+                "--java-options", jvmArgs,
+                "--win-menu",
+                "--win-menu-group", "Simbrain",
+                "--vendor", "Simbrain"
+            )
+        }
+    }
+
+    tasks.register<Exec>("signWindowsApp") {
+        onlyIf { OperatingSystem.current().isWindows }
+
+        dependsOn("jpackageWindows")
+
+        val appPath = "${dist}/Simbrain-${project.version}.exe"
+
+        val signtool = findWindowsSignTool()
+
+        doFirst {
+            if (signtool == null) {
+                throw GradleException("Windows signtool not found.")
+            }
+
+            executable(signtool)
+            args("sign", "/a", "/fd", "SHA256", appPath)
+        }
+    }
+
+    tasks.register<Exec>("pushWindowsInstaller") {
+
+        onlyIf { OperatingSystem.current().isWindows }
+
+        dependsOn("signWindowsApp")
+
+        doFirst {
+            copy {
+                from(dist)
+                into(dist)
+                include("Simbrain-${project.version}.exe")
+
+                rename("Simbrain-${project.version}.exe", "Simbrain${versionName}.exe")
+            }
+        }
+        val exePath = "${dist}/Simbrain${versionName}.exe"
+        val dest = System.getenv("DEST")
+        commandLine("rsync", exePath, "-avzP", "-e", "ssh", dest)
+    }
+}
+
+tasks.register<Zip>("createZip") {
+    dependsOn("buildDistribution")
+    from(buildMain)
+    archiveFileName.set("Simbrain${versionName}.zip")
+    destinationDirectory.set(file(dist))
+}
+
+tasks.register<Exec>("pushZip") {
+    dependsOn("createZip")
+
+    val zipPath = "${dist}/Simbrain${versionName}.zip"
+    val dest = System.getenv("DEST")
+    commandLine("rsync", zipPath, "-avzP", "-e", "ssh", dest)
+}
+
+fun findWindowsSignTool(): String {
+    val windowsKitsFolder = File("C:/Program Files (x86)/Windows Kits/10/bin/")
+    if (!windowsKitsFolder.exists()) {
+        throw GradleException("Windows Kits folder not found")
+    }
+
+    val sdkVersions = windowsKitsFolder.listFiles()?.filter { it.isDirectory }
+    if (sdkVersions.isNullOrEmpty()) {
+        throw GradleException("No SDK version found in Windows Kits folder")
+    }
+
+    // Sort SDK versions in descending order and find the highest version
+    val highestSdkVersion = sdkVersions.sortedByDescending { it.name }.first()
+    val signToolPath = File(highestSdkVersion, "x64/SignTool.exe")
+
+    if (!signToolPath.exists()) {
+        throw GradleException("SignTool.exe not found in the highest SDK version folder")
+    }
+
+    return signToolPath.absolutePath
+}

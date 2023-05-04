@@ -18,7 +18,9 @@
  */
 package org.simbrain.network.gui.actions.modelgroups;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.*;
@@ -44,9 +46,10 @@ public final class NewNeuronGroupAction extends ConditionallyEnabledAction {
 
         putValue(NAME, "Convert Neurons to Neuron Group");
         putValue(SHORT_DESCRIPTION,
-                "Convert selected neurons to a neuron group (G)");
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(KeyStroke.getKeyStroke('G'), this);
+                "Convert selected neurons to a neuron group (Cmd-G)");
+        putValue(this.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+                KeyEvent.VK_G, Toolkit.getDefaultToolkit()
+                        .getMenuShortcutKeyMask()));
         networkPanel.getActionMap().put(this, this);
 
     }

@@ -150,6 +150,7 @@ public class KeyBindings {
         panel.getActionMap().put("unselectAll", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 panel.unselectAll();
+                panel.clearSourceElements();
             }
         });
 

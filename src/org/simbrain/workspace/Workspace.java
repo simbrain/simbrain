@@ -641,6 +641,7 @@ public class Workspace {
      * @param theFile the file to try to open
      */
     public void openWorkspace(final File theFile) {
+        stop();
         WorkspaceSerializer serializer = new WorkspaceSerializer(this);
         try {
             if (theFile != null) {

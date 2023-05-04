@@ -32,7 +32,7 @@ To code sign from `simbrain` directory, and obviously replace `3.0X` with a vers
   - `hdiutil create -volname Simbrain3.0X -srcfolder /tmp/Simbrain.app -ov -format UDZO Simbrain-3.0X.dmg`
 - Move the resulting file to the `dist` dir since our rsync scripts assume it's there
   - `mv Simbrain-3.0X.dmg dist`
-- Run rsync script (see internal notes)
+- Push to website with ./etc/put_downloads.sh
 
 ## Debug
 - If app fails to run go to `Simbrain.app/Contents/app` and invoke using `java -jar Simbrain.jar`

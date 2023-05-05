@@ -144,6 +144,7 @@ tasks.shadowJar {
             "Main-Class" to "org.simbrain.workspace.gui.Splasher"
         )
     }
+    archiveFileName.set("Simbrain.jar")
 }
 
 tasks.register<Copy>("buildDistribution") {
@@ -210,7 +211,7 @@ if (OperatingSystem.current().isMacOsX) {
             // Set up the jpackage command and its arguments
             executable(jpackagePath)
             args("--input", buildMain,
-                "--main-jar", "simbrain-shadow.jar",
+                "--main-jar", "Simbrain.jar",
                 "--dest", dist,
                 "--name", "Simbrain",
                 "--app-version", project.version,
@@ -288,7 +289,7 @@ if (OperatingSystem.current().isWindows) {
             // Set up the jpackage command and its arguments
             executable(jpackagePath)
             args("--input", buildMain,
-                "--main-jar", "simbrain-shadow.jar",
+                "--main-jar", "Simbrain.jar",
                 "--dest", dist,
                 "--name", "Simbrain",
                 "--app-version", project.version,
@@ -341,11 +342,75 @@ if (OperatingSystem.current().isWindows) {
     }
 }
 
+val runScriptFile = File.createTempFile("run", ".sh").apply {
+    val dollar = "$"
+    writeText("""
+        #!/bin/bash
+        
+        # Check if Java is installed and if the version is 17 or higher
+        java_version=${'$'}(java -version 2>&1 | head -n 1 | awk -F\" '{print ${'$'}2}' | awk -F\\. '{print ${'$'}1}')
+        jdk_folder="jdk-17"
+        if [[ -z "${dollar}java_version" ]] || [[ "${dollar}java_version" -lt 17 ]]; then
+            if [[ ! -d "${dollar}jdk_folder" ]]; then
+                echo "Java 17 or higher not found. Downloading Azul Zulu JDK 17..."
+                os_name=${dollar}(uname -s)
+                os_arch=${dollar}(uname -m)
+
+                if [[ "${dollar}os_name" == "Linux" ]]; then
+                    if [[ "${dollar}os_arch" == "x86_64" ]]; then
+                        jdk_url="https://cdn.azul.com/zulu/bin/zulu17.30.15-ca-jdk17.0.1-linux_x64.tar.gz"
+                    elif [[ "${dollar}os_arch" == "aarch64" ]]; then
+                        jdk_url="https://cdn.azul.com/zulu/bin/zulu17.30.15-ca-jdk17.0.1-linux_aarch64.tar.gz"
+                    fi
+                elif [[ "${dollar}os_name" == "Darwin" ]]; then
+                    if [[ "${dollar}os_arch" == "x86_64" ]]; then
+                        jdk_url="https://cdn.azul.com/zulu/bin/zulu17.30.15-ca-jdk17.0.1-macosx_x64.tar.gz"
+                    elif [[ "${dollar}os_arch" == "arm64" ]]; then
+                        jdk_url="https://cdn.azul.com/zulu/bin/zulu17.30.15-ca-jdk17.0.1-macosx_aarch64.tar.gz"
+                    fi
+                fi
+
+                if [[ -z "${dollar}jdk_url" ]]; then
+                    echo "Unsupported platform: ${dollar}os_name ${dollar}os_arch"
+                    exit 1
+                fi
+
+                mkdir -p "${dollar}jdk_folder"
+
+                if command -v wget >/dev/null 2>&1; then
+                    wget -q -O - "${dollar}jdk_url" | tar xz -C "${dollar}jdk_folder" --strip-components=1
+                elif command -v curl >/dev/null 2>&1; then
+                    curl -Ls "${dollar}jdk_url" | tar xz -C "${dollar}jdk_folder" --strip-components=1
+                else
+                    echo "Neither wget nor curl is available. Please install one of them and try again."
+                    exit 1
+                fi
+            fi
+            java_path="./${dollar}jdk_folder/bin/java"
+        else
+            java_path="java"
+        fi
+        
+        # Run the jar using the appropriate Java version
+        ${dollar}java_path -jar Simbrain.jar
+    """.trimIndent())
+    setExecutable(true)
+    deleteOnExit()
+}
+
 tasks.register<Zip>("createZip") {
     dependsOn("buildDistribution")
-    from(buildMain)
     archiveFileName.set("Simbrain${versionName}.zip")
     destinationDirectory.set(file(dist))
+    // Include the run.sh file
+    val dir = "Simbrain${versionName}"
+    from(buildMain) {
+        into(dir)
+    }
+    from(runScriptFile) {
+        into(dir)
+        rename { "run.sh" }
+    }
 }
 
 tasks.register<Exec>("pushZip") {

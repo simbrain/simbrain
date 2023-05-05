@@ -23,8 +23,6 @@ import bsh.util.JConsole;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -51,9 +49,8 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         parentFrame.setJMenuBar(menu);
         JMenu fileMenu = new JMenu("File");
         menu.add(fileMenu);
-        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(this));
-        fileMenu.add(new SaveAction(this));
-        fileMenu.add(new SaveAsAction(this));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
         fileMenu.addSeparator();
         fileMenu.add(new CloseAction(getWorkspaceComponent()));
 

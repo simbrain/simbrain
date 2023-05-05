@@ -41,11 +41,6 @@ public class PlotActionManager {
     private final Action savePlotAction;
 
     /**
-     * Save component as action.
-     */
-    private final Action savePlotAsAction;
-
-    /**
      * Plot component action manager.
      *
      * @param component Gui component.
@@ -53,16 +48,15 @@ public class PlotActionManager {
     @SuppressWarnings("unchecked")
     public PlotActionManager(DesktopComponent component) {
 
-        openPlotAction = SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(component);
-        savePlotAction = new SavePlotAction(component);
-        savePlotAsAction = new SavePlotAsAction(component);
+        openPlotAction = SimbrainDesktop.INSTANCE.getActionManager().createImportAction(component);
+        savePlotAction = SimbrainDesktop.INSTANCE.getActionManager().createExportAction(component);
     }
 
     /**
      * @return the open/save plot actions.
      */
     public List<Action> getOpenSavePlotActions() {
-        return Arrays.asList(new Action[]{openPlotAction, savePlotAction, savePlotAsAction});
+        return Arrays.asList(new Action[]{openPlotAction, savePlotAction});
     }
 
     /**
@@ -79,10 +73,4 @@ public class PlotActionManager {
         return savePlotAction;
     }
 
-    /**
-     * @return the savePlotAsAction
-     */
-    public Action getSavePlotAsAction() {
-        return savePlotAsAction;
-    }
 }

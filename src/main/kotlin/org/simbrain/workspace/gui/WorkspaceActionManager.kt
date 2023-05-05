@@ -207,15 +207,26 @@ class WorkspaceActionManager(val desktop: SimbrainDesktop) {
         createComponentFactoryAction("Text World", "menu_icons/Text.png")
     )
 
-    fun <T: WorkspaceComponent> createOpenAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(
-        name = "Open...",
+    fun <T: WorkspaceComponent> createImportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(
+        name = "Import from xml...",
         iconPath = "menu_icons/Open.png",
-        description = "Open a new component",
+        description = "Import from xml",
         keyboardShorcut = CmdOrCtrl + 'O',
         coroutineScope = workspace
     ) {
         desktopComponent.showImportDialog()
     }
+
+    fun <T: WorkspaceComponent> createExportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(
+        name = "Export to xml...",
+        iconPath = "menu_icons/Save.png",
+        description = "Export to xml",
+        keyboardShorcut = CmdOrCtrl + 'S',
+        coroutineScope = workspace
+    ) {
+        desktopComponent.showExportDialog()
+    }
+
 
     /**
      * Uses the default producer of the attribute container

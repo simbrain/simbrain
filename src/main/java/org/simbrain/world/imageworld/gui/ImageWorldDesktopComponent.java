@@ -8,8 +8,6 @@ import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -213,9 +211,8 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         fileMenu.add(pasteAction);
 
         fileMenu.addSeparator();
-        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(this));
-        fileMenu.add(new SaveAction(this));
-        fileMenu.add(new SaveAsAction(this));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
         fileMenu.addSeparator();
         fileMenu.add(new CloseAction(getWorkspaceComponent()));
 

@@ -24,6 +24,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -42,8 +43,9 @@ public final class NeuronCollectionAction extends ConditionallyEnabledAction {
         super(networkPanel, "Add Neurons to  Collection", EnablingCondition.NEURONS);
 
         putValue(NAME, "Add Neurons to Collection");
-        putValue(SHORT_DESCRIPTION, "Add selected neurons to a neuron collection (Shift-G)");
-        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('G'), this);
+        putValue(SHORT_DESCRIPTION, "Add selected neurons to a neuron collection (Cmd-G)");
+        networkPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke('G', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), this);
         networkPanel.getActionMap().put(this, this);
 
     }

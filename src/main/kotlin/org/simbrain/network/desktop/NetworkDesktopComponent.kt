@@ -23,8 +23,6 @@ import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.component_actions.CloseAction
-import org.simbrain.workspace.component_actions.SaveAction
-import org.simbrain.workspace.component_actions.SaveAsAction
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BorderLayout
@@ -44,9 +42,8 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
 
     fun createFileMenu(): JMenu {
         val fileMenu = JMenu("File")
-        fileMenu.add(actionManager.createOpenAction(this))
-        fileMenu.add(SaveAction(this))
-        fileMenu.add(SaveAsAction(this))
+        fileMenu.add(actionManager.createImportAction(this))
+        fileMenu.add(actionManager.createExportAction(this))
         fileMenu.addSeparator()
         fileMenu.add(networkPanel.networkActions.showNetworkUpdaterDialog);
         fileMenu.add(networkPanel.networkActions.showNetworkPreferencesAction);

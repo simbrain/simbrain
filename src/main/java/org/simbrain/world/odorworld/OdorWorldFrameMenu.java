@@ -21,8 +21,6 @@ package org.simbrain.world.odorworld;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
-import org.simbrain.workspace.component_actions.SaveAction;
-import org.simbrain.workspace.component_actions.SaveAsAction;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.actions.LoadTileMapAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
@@ -121,9 +119,8 @@ public class OdorWorldFrameMenu extends JMenuBar {
      */
     public void setUpFileMenu() {
         add(fileMenu);
-        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createOpenAction(parent));
-        fileMenu.add(new SaveAction(parent));
-        fileMenu.add(new SaveAsAction(parent));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(parent));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(parent));
         fileMenu.addSeparator();
 
         JMenu loadTileMapMenu = new JMenu("Load Tile Map...");

@@ -378,6 +378,7 @@ class Workspace: CoroutineScope {
      * @param theFile the file to try to open
      */
     fun openWorkspace(theFile: File?) {
+        stop()
         val serializer = WorkspaceSerializer(this)
         try {
             if (theFile != null) {

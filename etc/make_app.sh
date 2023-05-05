@@ -1,3 +1,6 @@
+#!/usr/bin/env zsh
+
+#
 # Script for building Simbrain.app
 #
 # Assumes "ant build" has been called and that the proper certificate is in the keychain on the computer from which this is run
@@ -11,4 +14,4 @@ JVM_ARGS+="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED "
 
 jpackage --input ../build/main/	 --main-jar Simbrain.jar --dest ../dist --name "Simbrain" \
 	 --app-version 3.06 --icon simbrain.icns \
-	 --java-options $JVM_ARGS
+	 --java-options $JVM_ARGS --type app-image

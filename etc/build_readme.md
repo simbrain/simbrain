@@ -4,7 +4,7 @@
 
 ## PC build process 
 - Same as mac but .exe installer produced in `dist`
-
+- Rename resulting file to `Simbrain-installer.exe`
 ## Linux build process
 - Linux just uses the zip in `dist` so the push downloads script takes care of that after the build is run
 

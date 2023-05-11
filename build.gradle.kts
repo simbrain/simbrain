@@ -346,7 +346,7 @@ val runScriptFile = File.createTempFile("run", ".sh").apply {
     val dollar = "$"
     writeText("""
         #!/bin/bash
-        
+
         # Check if Java is installed and if the version is 17 or higher
         java_version=${'$'}(java -version 2>&1 | head -n 1 | awk -F\" '{print ${'$'}2}' | awk -F\\. '{print ${'$'}1}')
         jdk_folder="jdk-17"
@@ -390,7 +390,7 @@ val runScriptFile = File.createTempFile("run", ".sh").apply {
         else
             java_path="java"
         fi
-        
+
         # Run the jar using the appropriate Java version
         ${dollar}java_path -jar Simbrain.jar
     """.trimIndent())
@@ -412,14 +412,14 @@ tasks.register<Zip>("createZip") {
         rename { "run.sh" }
     }
 }
-
-tasks.register<Exec>("pushZip") {
-    dependsOn("createZip")
-
-    val zipPath = "${dist}/Simbrain${versionName}.zip"
-    val dest = System.getenv("DEST")
-    commandLine("rsync", zipPath, "-avzP", "-e", "ssh", dest)
-}
+//
+// tasks.register<Exec>("pushZip") {
+//     dependsOn("createZip")
+//
+//     val zipPath = "${dist}/Simbrain${versionName}.zip"
+//     val dest = System.getenv("DEST")
+//     commandLine("rsync", zipPath, "-avzP", "-e", "ssh", dest)
+// }
 
 fun findWindowsSignTool(): String {
     val windowsKitsFolder = File("C:/Program Files (x86)/Windows Kits/10/bin/")

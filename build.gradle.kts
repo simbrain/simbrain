@@ -16,6 +16,8 @@ val docs = "docs"
 val dist = "${buildDir}/dist"
 val buildMain = "${buildDir}/main"
 
+val pushDest = System.getenv("DEST") ?: ""
+
 val simbrainJvmArgs = listOf(
     "--add-opens", "java.base/java.util=ALL-UNNAMED",
     "--add-opens", "java.desktop/java.awt=ALL-UNNAMED",
@@ -257,9 +259,9 @@ if (OperatingSystem.current().isMacOsX) {
     }
 
     tasks.register<Exec>("pushMacInstaller") {
+        onlyIf { OperatingSystem.current().isMacOsX && pushDest.isNotEmpty() }
         val dmgPath = "${dist}/Simbrain${versionName}.dmg"
-        val dest = System.getenv("DEST")
-        commandLine("rsync", dmgPath, "-avzP", "-e", "ssh", dest)
+        commandLine("rsync", dmgPath, "-avzP", "-e", "ssh", pushDest)
     }
 }
 
@@ -323,7 +325,7 @@ if (OperatingSystem.current().isWindows) {
 
     tasks.register<Exec>("pushWindowsInstaller") {
 
-        onlyIf { OperatingSystem.current().isWindows }
+        onlyIf { OperatingSystem.current().isWindows && pushDest.isNotEmpty() }
 
         dependsOn("signWindowsApp")
 
@@ -337,8 +339,7 @@ if (OperatingSystem.current().isWindows) {
             }
         }
         val exePath = "${dist}/Simbrain${versionName}.exe"
-        val dest = System.getenv("DEST")
-        commandLine("rsync", exePath, "-avzP", "-e", "ssh", dest)
+        commandLine("rsync", exePath, "-avzP", "-e", "ssh", pushDest)
     }
 }
 
@@ -412,14 +413,15 @@ tasks.register<Zip>("createZip") {
         rename { "run.sh" }
     }
 }
-//
-// tasks.register<Exec>("pushZip") {
-//     dependsOn("createZip")
-//
-//     val zipPath = "${dist}/Simbrain${versionName}.zip"
-//     val dest = System.getenv("DEST")
-//     commandLine("rsync", zipPath, "-avzP", "-e", "ssh", dest)
-// }
+
+tasks.register<Exec>("pushZip") {
+    onlyIf { pushDest.isNotEmpty() }
+    dependsOn("createZip")
+
+    val zipPath = "${dist}/Simbrain${versionName}.zip"
+
+    commandLine("rsync", zipPath, "-avzP", "-e", "ssh", pushDest)
+}
 
 fun findWindowsSignTool(): String {
     val windowsKitsFolder = File("C:/Program Files (x86)/Windows Kits/10/bin/")

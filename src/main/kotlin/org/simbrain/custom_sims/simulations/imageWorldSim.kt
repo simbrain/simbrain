@@ -14,7 +14,6 @@ import org.simbrain.util.point
  */
 val imageWorldSim = newSim {
 
-
     // Basic setup
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")

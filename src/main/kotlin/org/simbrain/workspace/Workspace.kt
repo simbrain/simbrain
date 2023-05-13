@@ -478,7 +478,7 @@ class Workspace: CoroutineScope {
     fun initIdManager() {
         idManager = SimpleIdManager(
             initIdFunction = { cls -> _componentList.count { comp -> comp.javaClass == cls } },
-            baseNameGenerator = { cls -> cls.simpleName.removeSuffix("Component") + " " },
+            baseNameGenerator = { cls -> cls.simpleName.removeSuffix("Component") },
             delimeter = " "
         )
     }

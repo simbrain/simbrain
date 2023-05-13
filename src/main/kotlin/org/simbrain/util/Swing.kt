@@ -205,7 +205,7 @@ fun <T : JComponent> T.createAction(
 
 /**
  * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor]. The provided block is executed when
- * closing the dialog.
+ * closing the dialog. Add [display] after this call to create and display the dialog.
  */
 fun <E : EditableObject> E.createDialog(block: (E) -> Unit): StandardDialog {
     val editor = AnnotatedPropertyEditor(this)

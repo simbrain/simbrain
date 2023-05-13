@@ -92,6 +92,7 @@ public class Hopfield extends Subnetwork implements Trainable {
         // Create main neuron group
         neuronGroup = new NeuronGroup(root, numNeurons);
         neuronGroup.setLabel("The Neurons");
+        neuronGroup.applyLayout();
         addModel(neuronGroup);
 
         // Set neuron rule

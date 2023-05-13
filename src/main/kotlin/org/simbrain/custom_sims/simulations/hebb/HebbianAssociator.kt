@@ -1,16 +1,14 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addProjectionPlot2
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.newSim
-import org.simbrain.network.connections.Sparse
+import org.simbrain.custom_sims.*
+import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.connect
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.synapse_update_rules.HebbianRule
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.projection.FrequencyColoringManager
 
 /**
  * Demo for studying Hebbian Pattern association
@@ -23,33 +21,57 @@ val hebbianAssociator = newSim {
     val network = networkComponent.network
 
     // Add a self-connected neuron array to the network
-    val recurrentNet = network.addNeuronCollection(25).apply {
+    val recurrentNet = network.addNeuronCollection(49).apply {
         label = "Neurons"
         layout(GridLayout(40.0, 40.0))
     }
     network.addNetworkModel(recurrentNet)
-    network.connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
-        connectionDensity = .15
-    }).forEach { s ->
+    val recurrentWeights = network.connect(recurrentNet.neuronList, recurrentNet.neuronList, AllToAll())
+    recurrentWeights.forEach { s ->
         s.learningRule = HebbianRule().apply {
-            learningRate = .01
+            learningRate = .1
         }
     }
 
-    // Location of the network in the desktop
     withGui {
         place(networkComponent) {
-            location = point(0, 0)
+            location = point(280, 10)
             width = 400
             height = 400
+        }
+        createControlPanel("Control Panel", 5, 10) {
+
+            addButton("Training Mode (clamped nodes)") {
+                recurrentNet.setClamped(true)
+                recurrentWeights.forEach { it.isFrozen = false }
+            }.apply {
+                toolTipText = "Clamps nodes and unclamps weights"
+            }
+            addButton("Test Mode (clamped weights)") {
+                recurrentNet.setClamped(false)
+                recurrentWeights.forEach { it.isFrozen = true }
+            }.apply {
+                toolTipText = "Clamps weights and unclamps nodes"
+            }
+            addButton("All nodes to -1") {
+                recurrentNet.neuronList.forEach{n -> n.forceSetActivation(-1.0)}
+            }.apply {
+                toolTipText = "Provides a `palette` for creating patterns"
+            }
+            addTextField("Learning rate", "" + .1) {
+                it.toDoubleOrNull()?.let { num ->
+                    recurrentWeights.forEach { (it.learningRule as HebbianRule).learningRate = num }
+                }
+            }
         }
     }
 
     // Location of the projection in the desktop
     val projectionPlot = addProjectionPlot2("Activations")
+    projectionPlot.projector.coloringManager = FrequencyColoringManager(projectionPlot.projector)
     withGui {
         place(projectionPlot) {
-            location = point(410, 0)
+            location = point(667, 10)
             width = 400
             height = 400
         }

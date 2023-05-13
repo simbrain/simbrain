@@ -64,8 +64,10 @@ val simulations = dir<Any>("Simulations") {
 
     dir("Cognitive Science") {
         dir("Hebbian") {
-            item("Basic Hebb") { hebbianAssociatorSimple }
-            item("Recurrent Hebb") { hebbianAssociator }
+            item("1. Basic Hebb") { hebbianAssociatorSimple }
+            item("2. Feed Forward Associator") { hebbianFeedForward }
+            item("3. Recurrent Hebb") { hebbianAssociator }
+            item("4. Hopfield") { hopfieldSim }
         }
         dir("Neuroscience") {
             item("Cortex (Kuramoto)") { cortexKuramoto }

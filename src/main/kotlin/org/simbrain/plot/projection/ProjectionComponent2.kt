@@ -31,7 +31,6 @@ class ProjectionComponent2 @JvmOverloads constructor(name: String, val projector
         return container
     }
 
-
     override fun getXML(): String {
         return getProjectorXStream().toXML(projector)
     }

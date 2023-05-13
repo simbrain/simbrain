@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
-import org.simbrain.network.trainers.LMSTrainer
+import org.simbrain.network.trainers.IterableTrainer2
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
@@ -22,7 +22,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JProgressBar
 
-class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPanel(), CoroutineScope {
+class TrainerControls(trainer: IterableTrainer2, errorText: String = "Error") : JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()
 
@@ -39,7 +39,7 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         iconPath ="menu_icons/Play.png",
         description = "Iterate training until stop button is pressed."
     ) {
-        lmsTrainer.startTraining()
+        trainer.startTraining()
     }
 
     private val stopAction = createAction(
@@ -47,32 +47,32 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         iconPath = "menu_icons/Stop.png",
         description = "Stop training."
     ) {
-        lmsTrainer.stopTraining()
+        trainer.stopTraining()
     }
 
     private val stepAction = createAction(
         "menu_icons/Step.png", description = "Iterate training once."
     ) {
-        lmsTrainer.iterate()
+        trainer.iterate()
     }
 
     private val randomizeAction = createAction(
         "menu_icons/Rand.png", description = "Randomize network.",
     ) {
-        lmsTrainer.lmsNet.randomize()
+        trainer.subnet.randomize()
     }
 
     init {
 
-        val errorPlot = ErrorTimeSeries(lmsTrainer, errorText)
+        val errorPlot = ErrorTimeSeries(trainer, errorText)
 
         val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
-            lmsTrainer.events.beginTraining.on {
+            trainer.events.beginTraining.on {
                 setAction("Stop")
             }
-            lmsTrainer.events.endTraining.on {
+            trainer.events.endTraining.on {
                 setAction("Run")
             }
         })
@@ -90,10 +90,10 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         labelPanel.addItem(errorText, errorBar)
         runTools.add(labelPanel)
 
-        lmsTrainer.events.errorUpdated.on {
-            iterationsLabel.text = "" + lmsTrainer.iteration
-            errorBar.value = (numTicks * lmsTrainer.error).toInt()
-            errorBar.string = "" + round(lmsTrainer.error, 4)
+        trainer.events.errorUpdated.on {
+            iterationsLabel.text = "" + trainer.iteration
+            errorBar.value = (numTicks * trainer.error).toInt()
+            errorBar.string = "" + round(trainer.error, 4)
         }
 
         layout = MigLayout("ins 0, gap 0px 0px")
@@ -103,8 +103,7 @@ class TrainerControls(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
 
 }
 
-// TODO: Generalize to trainer
-class ErrorTimeSeries(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPanel() {
+class ErrorTimeSeries(trainer: IterableTrainer2, errorText: String = "Error") : JPanel() {
 
     val graphPanel: TimeSeriesPlotPanel
 
@@ -112,7 +111,7 @@ class ErrorTimeSeries(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         val mainPanel = JPanel()
 
         // TODO: Consider passing some of these values in
-        val model = TimeSeriesModel { lmsTrainer.iteration }
+        val model = TimeSeriesModel { trainer.iteration }
         model.rangeLowerBound = 0.0
         model.rangeUpperBound = 5.0
         model.isFixedWidth = true
@@ -133,8 +132,8 @@ class ErrorTimeSeries(lmsTrainer: LMSTrainer, errorText: String = "Error") : JPa
         add(mainPanel)
 
         model.addScalarTimeSeries(errorText)
-        lmsTrainer.events.errorUpdated.on(Dispatchers.Swing) {
-            model.addData(0, lmsTrainer.iteration.toDouble(), lmsTrainer.error)
+        trainer.events.errorUpdated.on(Dispatchers.Swing) {
+            model.addData(0, trainer.iteration.toDouble(), trainer.error)
         }
     }
 }

@@ -15,6 +15,7 @@ package org.simbrain.network.trainers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.simbrain.network.events.TrainerEvents2
+import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -22,14 +23,18 @@ import org.simbrain.util.rowMatrixTransposed
 import kotlin.random.Random
 
 
-// TODO: Pull structures in common with BackpropTrainer.kt (to be written) out as IterableTrainer.kt
-class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
+// Randomization / Initialization strategy
+// Stopping Condition. See iterable trainer.
+// Loss Function
+// See API for kotlindl
+
+abstract class IterableTrainer2(val subnet: Subnetwork): EditableObject {
 
     @UserParameter(label = "Learning Rate", order = 1)
     val learningRate = .01
 
     @UserParameter(label = "Update type", order = 1)
-    val updateType = UpdateMethod.STOCHASTIC
+    val updateType = LMSTrainer2.UpdateMethod.STOCHASTIC
 
     var iteration = 0
 
@@ -54,7 +59,14 @@ class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
         events.endTraining.fireAndForget()
     }
 
-    suspend fun iterate() {
+    abstract suspend fun iterate()
+}
+
+class LMSTrainer2(val lmsNet: LMSNetwork) : IterableTrainer2(lmsNet) {
+
+    // More abstraction possible
+
+    override suspend fun iterate() {
         iteration++
         // TODO: Other update types
         if (updateType == UpdateMethod.STOCHASTIC) {
@@ -84,8 +96,4 @@ class LMSTrainer(val lmsNet: LMSNetwork) : EditableObject {
         SINGLE { override fun toString() = "Single (one row per iteration)" }
     }
 
-    // Randomization / Initialization strategy
-    // Stopping Condition. See iterable trainer.
-    // Loss Function
-    // See API for kotlindl
 }

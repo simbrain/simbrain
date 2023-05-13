@@ -14,7 +14,7 @@ import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
 /**
- * GUI representation of KotlinDL deep network.
+ * GUI representation of an LMS Network
  */
 class LMSNetworkNode(networkPanel: NetworkPanel, private val lmsNet: LMSNetwork):
     SubnetworkNode(networkPanel, lmsNet) {

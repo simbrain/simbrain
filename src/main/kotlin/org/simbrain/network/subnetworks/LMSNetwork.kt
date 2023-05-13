@@ -16,7 +16,7 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
-import org.simbrain.network.trainers.LMSTrainer
+import org.simbrain.network.trainers.LMSTrainer2
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable2
 import org.simbrain.util.UserParameter
@@ -33,7 +33,9 @@ class LMSNetwork(network: Network, nInputs: Int, nOutputs: Int, initialPosition:
 
     override val trainingSet: MatrixDataset
 
-    val trainer =  LMSTrainer(this)
+    val trainer by lazy {
+        LMSTrainer2(this)
+    }
 
     init {
         layerList.forEach { it.updateRule = LinearRule() }

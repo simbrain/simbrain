@@ -6,20 +6,17 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.BiConsumer
 import java.util.function.Consumer
 
-val useEventDebug = false.also {
-    if (it) {
-        println("Event Debug Mode is on. It could have performance impacts, especially in evolutions.")
-    }
-}
-
 /**
  * Event objects corresponding to no-arg, adding, removing, and changing objects. Each object has a set of functions
  * on it that allow for firing them and waiting (via blocking in java or suspending in kotlin), and firing and
- * "forgetting". They are also associated with event handling "on" functions, which can be associated with a
- * dispatcher within which that block is executed.
+ * "forgetting".
  *
- * Provides for a convenient api. Just implement the events you need and all the event firing and handling functions
- * are provided.
+ * Event handling is via "on" functions, which can be associated with a dispatcher within which that block is executed.
+ *   For GUI stuff that must be single-threaded, the Swing dispatch thread should be used, as opposed to events
+ *   between models.
+ *
+ *   A wait option on handlers can be used if the fire function that triggers it, should block, i.e. wait for the
+ *   event handling to finish before continuing execution.
  *
  * For examples see [TrainerEvents2]
  */
@@ -175,7 +172,7 @@ open class Events2: CoroutineScope {
 
     /**
      * Add events, e.g. neuronAdded.fire(newNeuron), neuronAdded.on{ newNeuron -> ...}.
-     * Functinos are the same as in the no-arg case.
+     * Functions are the same as in the no-arg case.
      */
     inner class AddedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
@@ -341,5 +338,14 @@ data class EventObjectHandler(
         result = 31 * result + wait.hashCode()
         result = 31 * result + handler.hashCode()
         return result
+    }
+}
+
+/**
+ * If set to true stack traces are printed out on event timeouts.
+ */
+val useEventDebug = false.also {
+    if (it) {
+        println("Event Debug Mode is on. It could have performance impacts, especially in evolutions.")
     }
 }

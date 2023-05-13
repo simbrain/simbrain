@@ -136,15 +136,15 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             updateColor()
             updateText()
         }
-        events.spiked.on { updateSpikeColor() }
-        events.colorChanged.on { updateColor() }
-        events.labelChanged.on { _, _ ->
+        events.spiked.on(Dispatchers.Swing) { updateSpikeColor() }
+        events.colorChanged.on(Dispatchers.Swing) { updateColor() }
+        events.labelChanged.on(Dispatchers.Swing) { _, _ ->
             updateTextLabel()
             networkPanel.network.events.zoomToFitPage.fireAndForget()
         }
-        events.clampChanged.on { updateClampStatus() }
+        events.clampChanged.on(Dispatchers.Swing)  { updateClampStatus() }
         events.locationChanged.on(wait = true) { pullViewPositionFromModel() }
-        events.updateRuleChanged.on { _, _ -> updateShape() }
+        events.updateRuleChanged.on(Dispatchers.Swing) { _, _ -> updateShape() }
     }
 
     /**

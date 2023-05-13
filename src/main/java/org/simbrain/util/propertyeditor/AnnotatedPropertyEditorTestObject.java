@@ -1,5 +1,7 @@
 package org.simbrain.util.propertyeditor;
 
+import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwingKt;
 import org.simbrain.util.UserParameter;
@@ -13,6 +15,10 @@ import java.util.Arrays;
  * @author Jeff Yoshimi
  */
 public class AnnotatedPropertyEditorTestObject implements EditableObject {
+
+    // Not working
+    @UserParameter(label = "Non editable item", editable = false)
+    private String theLabel = "I'm a label";
 
     @UserParameter(label = "Color")
     Color theColor = Color.red;
@@ -33,8 +39,8 @@ public class AnnotatedPropertyEditorTestObject implements EditableObject {
 
     // @UserParameter(label = "Float object")
     Float theFloatObject = .123213f;
-   // Long theLongObject = 12321L;
-   // Short theShortObject = 20;
+    // Long theLongObject = 12321L;
+    // Short theShortObject = 20;
 
     // Primitive number tests
     @UserParameter(label = "Int primitive", description = "The int", minimumValue = -10, maximumValue = 10, order = 1)
@@ -48,15 +54,20 @@ public class AnnotatedPropertyEditorTestObject implements EditableObject {
     float theFloat = 0;
 
     // @UserParameter(label = "The long", description = "The long", minimumValue = -10, maximumValue = 10, defaultValue = "5", order = 1)
-   // long theLong = 20L;
-   // short theShort = 20; // TODO: Figure out about shorts...
+    // long theLong = 20L;
+    // short theShort = 20; // TODO: Figure out about shorts...
 
     @UserParameter(label = "Double Array")
-    double[] doubleArray = new double[] {.1, .2, .3, 4};
+    double[] doubleArray = new double[]{.1, .2, .3, 4};
 
     @UserParameter(label = "Enum")
 
     private TestEnum theEnum = TestEnum.FOUR;
+
+
+    @UserParameter(label = "Object type", isObjectType = true)
+
+    private Layout theLayout = new LineLayout();
 
     public enum TestEnum {
         ONE("One"), TWO("Two"), THREE("Three"), FOUR("Four"), FIVE("Five");
@@ -75,20 +86,19 @@ public class AnnotatedPropertyEditorTestObject implements EditableObject {
     public String toString() {
 
         return "(Test Object) \n" +
+                "The Enum: " + theEnum + "\n"
+                + "The Color: " + theColor + "\n"
+                + "The Boolean Object: "
+                + theBooleanObject + "\n" + "The Boolean: "
+                + theBool + "\n" + "The String: " + theString
+                + "\n" + "The Integer Object: " + theIntObject
+                + "\n" + "The Double Array: " + Arrays.toString(doubleArray)
+                + "\n" + "The Double Object: " + theDoubleObject + "\n"
+                + "The Float Object: " + theFloatObject + "\n" + "The Long Object: " + "\n"
+                + "The int: " + theInt + "\n" + "The double: " + theDouble + "\n"
+                + "The float: " + theFloat + "\n"
+                + "Update rule: " + theLayout + "\n";
 
-            "The Enum: " + theEnum + "\n"
-            + "The Color: " + theColor + "\n"
-            + "The Boolean Object: "
-            + theBooleanObject + "\n" + "The Boolean: "
-            + theBool + "\n" + "The String: " + theString
-            + "\n" + "The Integer Object: " + theIntObject
-            + "\n" + "The Double Array: " + Arrays.toString(doubleArray)
-            + "\n" + "The Double Object: " + theDoubleObject + "\n"
-            + "The Float Object: " + theFloatObject + "\n" + "The Long Object: " + "\n"
-            + "The int: " + theInt + "\n" + "The double: " + theDouble + "\n"
-            + "The float: " + theFloat + "\n";
-
-        //TODO: Longs and shorts
     }
 
 
@@ -148,33 +158,33 @@ public class AnnotatedPropertyEditorTestObject implements EditableObject {
         this.theFloatObject = theFloatObject;
     }
 
-//    /**
-//     * @return the theLongObject
-//     */
-//    public Long getTheLongObject() {
-//        return theLongObject;
-//    }
-//
-//    /**
-//     * @param theLongObject the theLongObject to set
-//     */
-//    public void setTheLongObject(Long theLongObject) {
-//        this.theLongObject = theLongObject;
-//    }
-//
-//    /**
-//     * @return the theShortObject
-//     */
-//    public Short getTheShortObject() {
-//        return theShortObject;
-//    }
-//
-//    /**
-//     * @param theShortObject the theShortObject to set
-//     */
-//    public void setTheShortObject(Short theShortObject) {
-//        this.theShortObject = theShortObject;
-//    }
+    //    /**
+    //     * @return the theLongObject
+    //     */
+    //    public Long getTheLongObject() {
+    //        return theLongObject;
+    //    }
+    //
+    //    /**
+    //     * @param theLongObject the theLongObject to set
+    //     */
+    //    public void setTheLongObject(Long theLongObject) {
+    //        this.theLongObject = theLongObject;
+    //    }
+    //
+    //    /**
+    //     * @return the theShortObject
+    //     */
+    //    public Short getTheShortObject() {
+    //        return theShortObject;
+    //    }
+    //
+    //    /**
+    //     * @param theShortObject the theShortObject to set
+    //     */
+    //    public void setTheShortObject(Short theShortObject) {
+    //        this.theShortObject = theShortObject;
+    //    }
 
     public int getTheInt() {
         return theInt;
@@ -200,33 +210,33 @@ public class AnnotatedPropertyEditorTestObject implements EditableObject {
         this.theFloat = theFloat;
     }
 
-//    /**
-//     * @return the theLong
-//     */
-//    public long getTheLong() {
-//        return theLong;
-//    }
-//
-//    /**
-//     * @param theLong the theLong to set
-//     */
-//    public void setTheLong(long theLong) {
-//        this.theLong = theLong;
-//    }
+    //    /**
+    //     * @return the theLong
+    //     */
+    //    public long getTheLong() {
+    //        return theLong;
+    //    }
+    //
+    //    /**
+    //     * @param theLong the theLong to set
+    //     */
+    //    public void setTheLong(long theLong) {
+    //        this.theLong = theLong;
+    //    }
 
-//    /**
-//     * @return the theShort
-//     */
-//    public short getTheShort() {
-//        return theShort;
-//    }
-//
-//    /**
-//     * @param theShort the theShort to set
-//     */
-//    public void setTheShort(short theShort) {
-//        this.theShort = theShort;
-//    }
+    //    /**
+    //     * @return the theShort
+    //     */
+    //    public short getTheShort() {
+    //        return theShort;
+    //    }
+    //
+    //    /**
+    //     * @param theShort the theShort to set
+    //     */
+    //    public void setTheShort(short theShort) {
+    //        this.theShort = theShort;
+    //    }
 
     public double[] getDoubleArray() {
         return doubleArray;

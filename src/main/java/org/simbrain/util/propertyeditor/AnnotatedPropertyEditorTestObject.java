@@ -1,12 +1,10 @@
 package org.simbrain.util.propertyeditor;
 
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.SwingKt;
 import org.simbrain.util.UserParameter;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
 /**
@@ -14,42 +12,50 @@ import java.util.Arrays;
  *
  * @author Jeff Yoshimi
  */
-public class TestObject implements EditableObject {
+public class AnnotatedPropertyEditorTestObject implements EditableObject {
 
-    /**
-     * Color test
-     */
     @UserParameter(label = "Color")
     Color theColor = Color.red;
 
-    // Boolean tests
+    @UserParameter(label = "Boolean primitive")
     boolean theBool = true;
+
+    // @UserParameter(label = "Boolean object")
     Boolean theBooleanObject = true;
 
-    // String Test
+    @UserParameter(label = "String")
     String theString = "testing";
 
-    // Object number tests (TODO Name)
+    // @UserParameter(label = "Int object")
     Integer theIntObject = 1;
+    // @UserParameter(label = "Double object")
     Double theDoubleObject = 1.1;
+
+    // @UserParameter(label = "Float object")
     Float theFloatObject = .123213f;
-//    Long theLongObject = 12321L;
-//    Short theShortObject = 20;
+   // Long theLongObject = 12321L;
+   // Short theShortObject = 20;
 
     // Primitive number tests
-    @UserParameter(label = "The int", description = "The int", minimumValue = -10, maximumValue = 10, order = 1)
+    @UserParameter(label = "Int primitive", description = "The int", minimumValue = -10, maximumValue = 10, order = 1)
     int theInt = 1;
-    double theDouble = .9092342;
-    float theFloat = 0;
-//    @UserParameter(label = "The long", description = "The long", minimumValue = -10, maximumValue = 10, defaultValue = "5", order = 1)
-//    long theLong = 20L;
-//    short theShort = 20; // TODO: Figure out about shorts...
 
-    // Array test(s)
+    @UserParameter(label = "Double primitive", description = "The int", minimumValue = -10, maximumValue = 10, order
+            = 1)
+    double theDouble = .9092342;
+
+    @UserParameter(label = "Float primitive")
+    float theFloat = 0;
+
+    // @UserParameter(label = "The long", description = "The long", minimumValue = -10, maximumValue = 10, defaultValue = "5", order = 1)
+   // long theLong = 20L;
+   // short theShort = 20; // TODO: Figure out about shorts...
+
     @UserParameter(label = "Double Array")
     double[] doubleArray = new double[] {.1, .2, .3, 4};
 
-    // Enum / Combo Box test
+    @UserParameter(label = "Enum")
+
     private TestEnum theEnum = TestEnum.FOUR;
 
     public enum TestEnum {
@@ -232,24 +238,14 @@ public class TestObject implements EditableObject {
 
     /**
      * Simple test routine.
-     *
-     * @param args not used.
      */
     public static void main(String[] args) {
-
-        TestObject testObject = new TestObject();
-        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(testObject);
-        StandardDialog dialog = editor.getDialog();
-        dialog.pack();
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        dialog.addWindowListener(new WindowAdapter() {
-            public void windowClosed(WindowEvent arg) {
-                editor.commitChanges();
-                System.out.println(testObject);
-            }
+        AnnotatedPropertyEditorTestObject testObject = new AnnotatedPropertyEditorTestObject();
+        StandardDialog dialog = SwingKt.createDialog(testObject);
+        dialog.addClosingTask(() -> {
+            System.out.println(testObject);
         });
-        dialog.setVisible(true);
-
+        SwingKt.display(dialog);
     }
 
 

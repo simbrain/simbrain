@@ -31,8 +31,11 @@ public class ColorSelector extends JPanel {
         colorIndicator.setBackground(color);
         add(colorIndicator);
         colorButton.addActionListener(arg0 -> {
-            color = JColorChooser.showDialog(this, "Choose Color", color);
-            colorIndicator.setBackground(color);
+            var selectedColor = JColorChooser.showDialog(this, "Choose Color", color);
+            if (selectedColor != null) {
+                color = selectedColor;
+                colorIndicator.setBackground(color);
+            }
         });
     }
     

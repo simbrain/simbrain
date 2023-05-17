@@ -20,11 +20,13 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.UserParameter
 import java.awt.Color
-import java.lang.reflect.Field
-import java.lang.reflect.Method
 import java.math.BigDecimal
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.reflect.*
+import kotlin.reflect.full.*
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.jvmErasure
 
 /**
  * Wrapper for [UserParameter] annotations containing various utility
@@ -33,84 +35,11 @@ import java.util.regex.Pattern
  * @author O. J. Coleman
  * @author Jeff Yoshimi
  */
-class Parameter : Comparable<Parameter> {
+class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
 
     val annotation: UserParameter
 
-    /**
-     * The Field for this Parameter, when  [UserParameter] annotates a field
-     */
-    private var theField: Field? = null
-
-    /**
-     * The Getter for this Parameter, when [UserParameter] annotates a
-     * method. The getter is what should be annotated.
-     */
-    private var getter: Method? = null
-
-    /**
-     * The Setter for this Parameter, when [UserParameter] annotates a
-     * method OR when [UserParameter.useSetter] is set to true;
-     *
-     * NOTE: The setter should not be annotated, but should be inferred
-     * using the standard naming conventions. E.g. if `double
-     * neuron.getActivation()` is annotated then Parameter assumes that
-     * the `neuron.setActivation(double)` exists as well.
-     */
-    private var setter: Method? = null
-
-    /**
-     * Construct a parameter object from a field.
-     *
-     * @param field the field
-     */
-    constructor(field: Field) {
-        this.theField = field
-        annotation = field.getAnnotation(UserParameter::class.java)
-        if (annotation.useSetter) {
-            val cappedName = field.name.substring(0, 1).uppercase(Locale.getDefault()) + field.name.substring(1)
-            val setterName = "set$cappedName"
-            setter = try {
-                field.declaringClass.getDeclaredMethod(setterName, field.type)
-            } catch (e: NoSuchMethodException) {
-                throw RuntimeException("Field " + field.name + " does not have a setter named " + setterName)
-            }
-        }
-    }
-
-    /**
-     * Construct a parameter object from a method (a getter).
-     *
-     * @param getter the method
-     */
-    constructor(getter: Method) {
-        this.getter = getter
-        annotation = getter.getAnnotation(UserParameter::class.java)
-
-        // No setter needed if annotation is not editable
-        if (!annotation.editable) {
-            return
-        }
-        var setterName = ""
-        setterName = if (getter.name.startsWith("is")) {
-            "set" + getter.name.substring(2)
-        } else if (getter.name.startsWith("get")) {
-            "set" + getter.name.substring(3)
-        } else {
-            throw RuntimeException("The getter must begin with 'is' or 'get'. " + getter.name + " is what was provided.")
-        }
-
-        // Assume setter is named as one would expect given the getter, with a "set" in place of a "get" or "is"
-        val retType = getter.returnType
-        setter = try {
-            getter.declaringClass.getDeclaredMethod(setterName, retType)
-        } catch (e: NoSuchMethodException) {
-            throw RuntimeException(
-                "Class " + getter.name + " has a getter (" + getter.name + "), but no " +
-                        "corresponding setter (" + setterName + ")"
-            )
-        }
-    }
+    private var property: KProperty1<*, *>? = property
 
     /**
      * Returns the type of the object represented by this parameter. For a field
@@ -119,12 +48,8 @@ class Parameter : Comparable<Parameter> {
      *
      * @return the type of the represented objet
      */
-    val type: Class<*>
-        get() = if (isFieldAnnotation) {
-            theField!!.type
-        } else {
-            getter!!.returnType
-        }
+    val type: KType
+        get() = property!!.returnType
 
     val isEditable: Boolean
         get() = annotation.editable
@@ -136,16 +61,10 @@ class Parameter : Comparable<Parameter> {
         get() = !isEmbeddedObject
 
     /**
-     * Returns true if this annotation is field based, false otherwise
-     */
-    val isFieldAnnotation
-        get() = theField?.javaClass != null
-
-    /**
      * Abstract over methods and fields.
      */
     private val name
-        get() = if (isFieldAnnotation) theField!!.name else getter!!.name
+        get() = property!!.name
 
     /**
      * Returns true if this is an annotation for an object type field to be
@@ -167,45 +86,45 @@ class Parameter : Comparable<Parameter> {
     val isNumeric: Boolean
         get() = isNumericFloat || isNumericInteger
     val isNumericFloat: Boolean
-        get() = floatTypes.contains(type)
+        get() = floatTypes.contains(type.jvmErasure)
     val isNumericInteger: Boolean
-        get() = integerTypes.contains(type)
+        get() = integerTypes.contains(type.jvmErasure)
 
     /**
      * Returns true if the type of field or method is an enum
      */
     val isEnum: Boolean
-        get() = type.isEnum ?: false
+        get() = type.jvmErasure.isSubclassOf(Enum::class)
 
     /**
      * Returns true if the type of the field or method is boolean.
      */
     val isBoolean: Boolean
-        get() = type == java.lang.Boolean.TYPE || type == Boolean::class.java
+        get() = type.jvmErasure == Boolean::class
 
     /**
      * Returns true if the type of the field or method is Color.
      */
     val isColor: Boolean
-        get() = type == Color::class.java
+        get() = type.jvmErasure == Color::class
 
     /**
      * Returns true if the type of the field or method is double[].
      */
     val isDoubleArray: Boolean
-        get() = type == DoubleArray::class.java
+        get() = type.jvmErasure == DoubleArray::class
 
     /**
      * Returns true if the type of the field or method is double[].
      */
     val isIntArray: Boolean
-        get() = type == IntArray::class.java
+        get() = type.jvmErasure == IntArray::class
 
     /**
      * Returns true iff the type of the field or method is String.
      */
     val isString: Boolean
-        get() = type == String::class.java
+        get() = type.jvmErasure == String::class
 
     /**
      * Returns true iff the UserParameter defines a minimum value.
@@ -230,11 +149,15 @@ class Parameter : Comparable<Parameter> {
      * @throws NullPointerException If *object* is null.
      */
     fun getFieldValue(instance: Any?): Any? {
-        setAccessible(true)
-        return if (isFieldAnnotation) {
-            theField!![instance]
-        } else {
-            getter!!.invoke(instance)
+        return try {
+            val isAccessible = property!!.isAccessible
+            property!!.isAccessible = true
+            val result = property!!.getter.call(instance)
+            property!!.isAccessible = isAccessible
+            result
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
+            null
         }
     }
 
@@ -252,47 +175,15 @@ class Parameter : Comparable<Parameter> {
      * null.
      */
     fun setFieldValue(theObject: Any, initVal: Any) {
-        // println("object = ${theObject?.javaClass?.simpleName}, field = ${theField?.name}, value = $initVal")
-        val value = interpretValue(initVal)
-        validateValue(value)
-        setAccessible(true)
-        if (annotation.useSetter) {
-            setter!!.invoke(theObject, value)
-        } else if (isFieldAnnotation) {
-            theField!![theObject] = value
-        } else {
-            setter!!.invoke(theObject, value)
+        validateValue(initVal)
+        property?.let {
+            if (it is KMutableProperty<*>) {
+                val isAccessible = it.isAccessible
+                it.isAccessible = true
+                it.setter.call(theObject, initVal)
+                it.isAccessible = isAccessible
+            }
         }
-    }
-
-    /**
-     * Attempt to convert the given value to the type of this parameter field.
-     *
-     * @param theVal The value to convert/interpret.
-     * @throws IllegalArgumentException If the given value cannot be converted
-     * to the field type.
-     * @throws RuntimeException         If a Java reflection API error occurs.
-     * @throws NullPointerException     If *value* is null.
-     */
-    fun interpretValue(theVal: Any): Any {
-
-        var retVal = theVal
-        // Get the parameter type.
-        var paramType = type
-        val valueType: Class<*> = retVal.javaClass
-        if (paramType.isPrimitive) {
-            return theVal
-        }
-        if (paramType.isAssignableFrom(valueType)) {
-            return theVal
-        }
-
-        // Convert the given value to the field type.
-        // Find a constructor taking a single argument of the type given.
-        var constructor = paramType.getConstructor(valueType)
-        retVal = constructor.newInstance(theVal)
-
-        return retVal
     }
 
     /**
@@ -304,13 +195,10 @@ class Parameter : Comparable<Parameter> {
      * @throws NullPointerException If *value* is null.
      */
     private fun validateValue(initVal: Any?): String? {
-        // Convert if necessary (this is mostly a no-op if the value is already of the same type as the field).
-        val value = interpretValue(initVal!!)
-
         // Validate against regex if applicable.
-        if (annotation.regexValidation.trim { it <= ' ' } != "" && value is String) {
+        if (annotation.regexValidation.trim { it <= ' ' } != "" && initVal is String) {
             val p = Pattern.compile(annotation.regexValidation.trim { it <= ' ' })
-            val m = p.matcher(value as String?)
+            val m = p.matcher(initVal)
             if (!m.matches()) {
                 return "Value is invalid, it must match the regular expression /" + p.pattern() + "/."
             }
@@ -318,9 +206,9 @@ class Parameter : Comparable<Parameter> {
 
         // If this is a numeric type, test against the min and max values if specified.
         if (isNumeric) {
-            val numericValue = value as Number?
-            require(!(hasMinValue() && numericValue!!.toDouble() < annotation.minimumValue)) { "Value is lower than minimum allowed." }
-            require(!(hasMaxValue() && numericValue!!.toDouble() > annotation.maximumValue)) { "Value is greater than maximum allowed." }
+            val numericValue = initVal as Number
+            require(!(hasMinValue() && numericValue.toDouble() < annotation.minimumValue)) { "Value is lower than minimum allowed." }
+            require(!(hasMaxValue() && numericValue.toDouble() > annotation.maximumValue)) { "Value is greater than maximum allowed." }
         }
         return null
     }
@@ -329,40 +217,15 @@ class Parameter : Comparable<Parameter> {
      * Impose ordering by [UserParameter.order] and then field name.
      */
     override fun compareTo(other: Parameter): Int {
-        val result = Integer.compare(annotation.order, other.annotation.order)
+        val result = annotation.order.compareTo(other.annotation.order)
         return if (result != 0) {
             result
-        } else name.compareTo(other.name)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return if (other is Parameter) {
-            if (other.isFieldAnnotation) {
-                theField == other.theField
-            } else {
-                getter == other.getter
-            }
-        } else false
-    }
-
-    /**
-     * Make sure we can access fields and private getters.
-     */
-    private fun setAccessible(newVal: Boolean) {
-        if (isFieldAnnotation) {
-            theField!!.isAccessible = newVal
         } else {
-            getter!!.isAccessible = newVal
+            name.compareTo(other.name)
         }
     }
 
-    override fun hashCode(): Int {
-        return if (isFieldAnnotation) {
-            theField.hashCode()
-        } else {
-            getter.hashCode()
-        }
-    }
+
 
     override fun toString(): String {
         return "Parameter " + annotation.label
@@ -373,7 +236,7 @@ class Parameter : Comparable<Parameter> {
          * Static cache of annotated fields for a class.
          * Avoids multiple runs of expensive reflection code.
          */
-        private val classParameters: MutableMap<Class<*>, Set<Parameter>> = HashMap()
+        private val classParameters: MutableMap<KClass<*>, Set<Parameter>> = HashMap()
 
         /**
          * Get the available [Parameter]s ([UserParameter] annotated
@@ -382,85 +245,37 @@ class Parameter : Comparable<Parameter> {
          *
          * @return The available Parameters, sorted according to [ ][UserParameter.order]()}.
          */
-        fun getParameters(paramClass: Class<*>): Set<Parameter> {
-            if (!classParameters.containsKey(paramClass)) {
-                val params: MutableSet<Parameter> = TreeSet()
-                val fieldAndMethodNames: MutableSet<String> = HashSet()
-
-                // Get all parent classes, which may also contain annotations
-                for (clazz in getParentClasses(paramClass)) {
-                    // System.out.println("paramClass = [" + paramClass + "]");
-                    for (f in clazz!!.declaredFields) {
-                        //System.out.println("declaredField = [" + f + "]");
-                        if (f.isAnnotationPresent(UserParameter::class.java)) {
-                            if (fieldAndMethodNames.contains(f.name)) {
-                                // TODO Make a special exception? Probably not, it's only for developers when making update rules etc.
-                                throw RuntimeException("A field with the same name, '" + f.name + "', is declared in a super-class of " + paramClass.name)
-                            }
-                            fieldAndMethodNames.add(f.name)
-                            params.add(Parameter(f))
-                        }
-                    }
-                    for (m in clazz.methods) {
-                        if (m.isAnnotationPresent(UserParameter::class.java)) {
-                            if (fieldAndMethodNames.contains(m.name)) {
-                                throw RuntimeException("A method with the same name, '" + m.name + "', is declared in a super-class of " + paramClass.name)
-                            }
-                            fieldAndMethodNames.add(m.name)
-                            params.add(Parameter(m))
-                        }
-                    }
+        fun getParameters(paramClass: KClass<*>): Set<Parameter> {
+            return classParameters.getOrPut(paramClass) {
+                val params = (paramClass.allSuperclasses + paramClass).flatMap { clazz ->
+                    clazz.declaredMemberProperties.filter { it.hasAnnotation<UserParameter>() }
+                        .map { Parameter(it) }
                 }
-                classParameters[paramClass] = Collections.unmodifiableSet(params)
+                Collections.unmodifiableSet(params.toSet())
             }
-            return classParameters[paramClass]!!
-        }
-
-        /**
-         * Gets a list containing this class and all its superclasses and interfaecs up to the
-         * parent ConfigurableBase. The list is ordered from super to this class.
-         */
-        protected fun getParentClasses(clazz: Class<*>): List<Class<*>?> {
-            val classes: MutableList<Class<*>?> = ArrayList()
-            var parentClass = clazz
-            // Add superclasses
-            while (parentClass != Any::class.java) {
-                classes.add(parentClass)
-                parentClass = classes[classes.size - 1]!!.superclass
-            }
-            // Add interfaces
-            classes.addAll(Arrays.asList(*clazz.interfaces))
-            classes.reverse()
-            return classes
         }
 
         /**
          * Set of all floating-point types.
          */
-        protected val floatTypes: MutableSet<Class<*>> = HashSet()
-
-        init {
-            floatTypes.add(java.lang.Double.TYPE)
-            floatTypes.add(Double::class.java)
-            floatTypes.add(java.lang.Float.TYPE)
-            floatTypes.add(Float::class.java)
-            floatTypes.add(BigDecimal::class.java)
-        }
+        protected val floatTypes: MutableSet<KClass<out Any>> = mutableSetOf(
+            Double::class,
+            Float::class,
+            BigDecimal::class
+        )
 
         /**
          * Set of all integer types.
          */
-        protected val integerTypes: MutableSet<Class<*>> = HashSet()
+        protected val integerTypes: MutableSet<KClass<out Any>> = mutableSetOf(
+            Byte::class,
+            Short::class,
+            Int::class,
+            Long::class
+        )
+    }
 
-        init {
-            integerTypes.add(java.lang.Byte.TYPE)
-            integerTypes.add(Byte::class.java)
-            integerTypes.add(java.lang.Short.TYPE)
-            integerTypes.add(Short::class.java)
-            integerTypes.add(Integer.TYPE)
-            integerTypes.add(Int::class.java)
-            integerTypes.add(java.lang.Long.TYPE)
-            integerTypes.add(Long::class.java)
-        }
+    init {
+        annotation = property.findAnnotations(UserParameter::class).first()
     }
 }

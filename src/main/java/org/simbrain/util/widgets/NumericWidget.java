@@ -63,7 +63,7 @@ public class NumericWidget extends JPanel {
             " will be updated immediately.");
         String probDist =parameter.getAnnotation().probDist();
 
-        paramClass = parameter.getType();
+        paramClass = parameter.getType().getClass();
 
         // Handle randomizer button
         if (!probDist.isEmpty()) {

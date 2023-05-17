@@ -223,3 +223,10 @@ fun showWarningDialog(message: String) {
     dialog.isAlwaysOnTop = true
     JOptionPane.showMessageDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
 }
+
+
+fun showWarningConfirmDialog(message: String): Int {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    return JOptionPane.showConfirmDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
+}

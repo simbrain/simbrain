@@ -6,6 +6,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.widgets.NumericWidget
+import org.simbrain.util.widgets.TextWithNull
 
 /**
  * Also see [TestObject.java]
@@ -37,6 +38,22 @@ class AnnotatedPropertyEditorTest {
         val ape = AnnotatedPropertyEditor(n1)
         val widgetVal = (ape.getWidget("Activation")?.component as NumericWidget).value
         assertEquals(.75, widgetVal)
+    }
+
+    @Test
+    fun `test commit string widget`() {
+        val ape = AnnotatedPropertyEditor(n1)
+        (ape.getWidget("Label")?.component as TextWithNull).text = "test"
+        ape.commitChanges()
+        assertEquals("test", n1.label)
+    }
+
+    @Test
+    fun `test fill field value string widget`() {
+        n1.label = "test"
+        val ape = AnnotatedPropertyEditor(n1)
+        val widgetVal = (ape.getWidget("Label")?.component as TextWithNull).text
+        assertEquals("test", widgetVal)
     }
 
     @Test

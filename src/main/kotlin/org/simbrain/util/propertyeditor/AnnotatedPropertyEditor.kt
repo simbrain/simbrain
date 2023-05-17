@@ -128,7 +128,7 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
         // Create a list of widgets
         widgets = TreeSet()
         val parameters = Parameter.getParameters(
-            editedObjects[0]!!.javaClass
+            editedObjects.first()::class
         )
         parameters.forEach{p -> widgets.add(ParameterWidget(this, p)) }
 

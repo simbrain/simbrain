@@ -32,14 +32,18 @@ public class AnnotatedPropertyEditorTestObject implements EditableObject {
     @UserParameter(label = "String")
     String theString = "testing";
 
-    // @UserParameter(label = "Int object")
+    @UserParameter(label = "Int object")
     Integer theIntObject = 1;
-    // @UserParameter(label = "Double object")
+    @UserParameter(label = "Double object")
     Double theDoubleObject = 1.1;
 
-    // @UserParameter(label = "Float object")
+    @UserParameter(label = "Float object")
     Float theFloatObject = .123213f;
+
+    // @UserParameter(label = "Long object")
     // Long theLongObject = 12321L;
+    //
+    // @UserParameter(label = "Short object")
     // Short theShortObject = 20;
 
     // Primitive number tests

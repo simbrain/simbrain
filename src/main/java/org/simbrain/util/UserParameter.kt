@@ -16,173 +16,145 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.util;
-
-import org.simbrain.util.stats.ProbabilityDistribution;
-
-import java.lang.annotation.*;
+package org.simbrain.util
 
 /**
  * Annotation for user-configurable parameter fields that provides for
  * specifying meta-data such as label, description, and validation criteria.
  * This information may be used by dialog builders to construct input fields.
- * <br>
+ * <br></br>
  * The annotation can be used on fields or getter or setter named using java conventions.
- * <br>
+ * <br></br>
  * When used in a method, it should be used on a getter, and the interface that
  * contains the getter should have an appropriately named corresponding setter.
- * E.g. <code>getLowerBound</code> will try to find a setter named
- * <code>setUpperBound</code> or <code>isClipped</code> will be associated with
- * <code>setClipped</code>.
+ * E.g. `getLowerBound` will try to find a setter named
+ * `setUpperBound` or `isClipped` will be associated with
+ * `setClipped`.
  *
  * @author O. J. Coleman
  */
-@Documented
-@Target({ElementType.FIELD, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface UserParameter {
-
+annotation class UserParameter(
     /**
      * Label for the parameter.
      */
-    String label();
-
+    val label: String,
     /**
      * Description for the parameter. Displayed in the corresponding widget's
      * tooltip.
      */
-    String description() default "";
-
+    val description: String = "",
     /**
      * An optional parameter which prevents the dialog from accepting values
      * smaller than this.  Distinct from model code which enforces upper or lower
      * bounds.
      */
-    double minimumValue() default Double.NaN;
-
+    val minimumValue: Double = Double.NaN,
     /**
      * An optional parameter which prevents the dialog from accepting values
      * larger than this. Distinct from model code which enforces upper or lower
      * bounds.
      */
-    double maximumValue() default Double.NaN;
-
+    val maximumValue: Double = Double.NaN,
     /**
      * Name of a method which returns a String, which is the initial value for the String widget.
      * Note: Currently only supported for setting a String field for a single object.
      */
     // TODO: Possibly generalize to objects of any type. Currently only works with String based fields.
     // TODO: Think about multi-object case.
-    String initialValueMethod() default "";
-
+    val initialValueMethod: String = "",
     /**
-     * Amount that the {@link org.simbrain.util.widgets.SpinnerNumberModelWithNull}
+     * Amount that the [org.simbrain.util.widgets.SpinnerNumberModelWithNull]
      * changes when clicked up or down. Note that it is up to the user of the
      * annotation to set this so that it makes sense.
      */
-    double increment() default 1;
-
+    val increment: Double = 1.0,
     /**
      * If set to true, then when setting a parameter value the setter is invoked.
      * Assumes that the setter is named set + fieldName, where the first letter
-     *  of field name is capitalized. E.g. activation -> setActivation.
+     * of field name is capitalized. E.g. activation -> setActivation.
      */
-    boolean useSetter() default false;
-
+    val useSetter: Boolean = false,
     /**
-     * A string to indicate a user preference stored in {@link SimbrainPreferences}.
+     * A string to indicate a user preference stored in [SimbrainPreferences].
      * If this optional field is set a restore defaults button will appear in the
      * property editor which, if pressed, will restore a fields value using
      * this key.
      *
      * TODO: Note that "restore defaults" has not yet been implemented.
      */
-    String preferenceKey() default "";
-
+    val preferenceKey: String = "",
     /**
      * The probability distribution to use when generating random values for
-     * this parameter. For options see {@link ProbabilityDistribution}
+     * this parameter. For options see [ProbabilityDistribution]
      */
-    String probDist() default "";
-
+    val probDist: String = "",
     /**
      * The default "first parameter" to use when when opening the randomizer panel for this field.
      * Corresponds to the mean of a normal distribution. For other cases see
-     * {@link ProbabilityDistribution}
+     * [ProbabilityDistribution]
      */
-    double probParam1() default 0;
-
+    val probParam1: Double = 0.0,
     /**
      * The default "second parameter" to use when when opening the randomizer panel for this field.
      * Corresponds to the standard deviation of a normal distribution. For other cases see
-     * {@link ProbabilityDistribution}
+     * [ProbabilityDistribution]
      */
-    double probParam2() default 1.0;
-
+    val probParam2: Double = 1.0,
     /**
      * Used to determine the order of parameters when displayed to a user.
      * Optional. If two parameters have the same order value then they will be
      * ordered according to the field name. Lower numbers are higher up in the panel.
      */
-    int order() default 0;
-
+    val order: Int = 0,
     /**
      * The name of the tab this parameter associated with. If a single tab annotation is set then the
      * AnnotatedPropertyEditor will be a JTabbedPane. In that case, any field in the EditableObject where the tab
      * annotation is empty will be put in a "Main" tab.
      */
-    String tab() default "";
-
+    val tab: String = "",
     /**
      * Whether the parameter represents an object to be edited by
-     * a {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}. Assumes
+     * a [org.simbrain.util.propertyeditor.ObjectTypeEditor]. Assumes
      * the relevant object is an abstract class and the user wants to specify
      * the type of that class: examples include NeuronUpdateRules and their types,
      * SynapseUpdateRules and their types, etc.
      */
-    boolean isObjectType() default false;
-
+    val isObjectType: Boolean = false,
     /**
      * For object type editors, whether the detail triangle should be present when opening
      * the editor
      */
-    boolean showDetails() default true;
-
+    val showDetails: Boolean = true,
     /**
-     * Method name for static method returning the type map for an {@link org.simbrain.util.propertyeditor.ObjectTypeEditor},
+     * Method name for static method returning the type map for an [org.simbrain.util.propertyeditor.ObjectTypeEditor],
      * e.g. "getTypeMap".  Defaults to "getTypes". This method should be contained in the
-     * class whose types are being edited. For example {@link ProbabilityDistribution} has a {@code getTypes()} method that
+     * class whose types are being edited. For example [ProbabilityDistribution] has a `getTypes()` method that
      * returns a list of the types of its subclasses.
      *
      * @return the name of the method that returns types.  The default is usually fine.
      */
-    String typeListMethod() default "getTypes";
-
+    val typeListMethod: String = "getTypes",
     /**
      * Set to false to make this a "display" type.
      */
-    boolean editable() default true;
-
+    val editable: Boolean = true,
     /**
      * Name of a method whose value determines whether this component is visible or not. Only called once when the
      * editor is opened.
      */
-    String conditionalVisibilityMethod() default "";
-
+    val conditionalVisibilityMethod: String = "",
     /**
      * Name of a method which returns a lambda which is used to determine whether this component is enabled or not.
      */
-    String conditionalEnablingMethod() default "";
-
+    val conditionalEnablingMethod: String = "",
     /**
      * Regular expression to validate (String) values against. This is only
      * applied to parameters that are provided as strings. Optional.
      */
-    String regexValidation() default "";
-
-     /**
+    val regexValidation: String = "",
+    /**
      * Returns true if the annotated field contains an object with its own annotated fields, allowing for recursie
-      * embedding of property editors.
+     * embedding of property editors.
      */
-    boolean isEmbeddedObject() default false;
-}
+    val isEmbeddedObject: Boolean = false
+)

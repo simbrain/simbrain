@@ -21,13 +21,19 @@ package org.simbrain.util.propertyeditor
 import org.simbrain.util.BiMap
 import org.simbrain.util.SimbrainConstants
 import org.simbrain.util.UserParameter
+import org.simbrain.util.callNoArgConstructor
 import org.simbrain.util.widgets.*
 import java.awt.Color
-import java.awt.event.ActionEvent
 import java.lang.reflect.InvocationTargetException
 import java.util.function.Function
 import java.util.stream.Collectors
 import javax.swing.*
+import kotlin.reflect.KClass
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.functions
+import kotlin.reflect.full.staticFunctions
+import kotlin.reflect.jvm.jvmErasure
 
 /**
  * A wrapper class for a [Parameter] and an associated GUI widget
@@ -128,19 +134,19 @@ class ParameterWidget(
     /**
      * Create an appropriate widget for this parameter.
      */
-    protected fun makeWidget(): JComponent? {
+    protected fun makeWidget(): JComponent {
         if (parameter.isObjectType) {
             // Assumes the type list is contained in the class corresponding to the parameter.
             // Example: NeuronUpdateRule maintains a list of types  of neuronupdaterules.
             val methodName: String = parameter.annotation.typeListMethod
             val typeMap = getTypeMap(
-                parameter.type!!, methodName
+                parameter.type.jvmErasure, methodName
             )
             val ote = ObjectTypeEditor.createEditor(
-                editableObjects as List<CopyableObject?>, typeMap,
+                editableObjects as List<CopyableObject>, typeMap,
                 parameter.annotation.label, parameter.annotation.showDetails
             )
-            ote.dropDown.addActionListener { e: ActionEvent? -> SwingUtilities.invokeLater { parent.onWidgetChanged() } }
+            ote.dropDown!!.addActionListener { SwingUtilities.invokeLater { parent.onWidgetChanged() } }
             return ote
         }
 
@@ -156,8 +162,11 @@ class ParameterWidget(
         }
         if (parameter.isBoolean) {
             val ynn = YesNoNull()
-            ynn.addActionListener { e -> SwingUtilities.invokeLater {
-                parent.onWidgetChanged() } }
+            ynn.addActionListener { e ->
+                SwingUtilities.invokeLater {
+                    parent.onWidgetChanged()
+                }
+            }
             return ynn
         }
         if (parameter.isColor) {
@@ -172,14 +181,13 @@ class ParameterWidget(
         if (parameter.isEnum) {
             try {
                 val clazz = parameter.type
-                val method = clazz?.getDeclaredMethod("values")
+                val method = clazz.jvmErasure.functions.find { it.name == "values" }
                 // TODO: Not sure the null argument is correct below.
-                val enumValues = method?.invoke(null) as Array<Any>
+                val enumValues = method!!.call() as Array<Any>
                 return ChoicesWithNull(enumValues)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-            return null
         }
         if (parameter.isNumeric) {
 
@@ -215,7 +223,7 @@ class ParameterWidget(
         }
         throw IllegalArgumentException(
             "You have annotated a field type (" +
-                    parameter.type?.canonicalName + ") that is not yet supported"
+                    parameter.type.jvmErasure.qualifiedName + ") that is not yet supported"
         )
     }
 
@@ -261,7 +269,14 @@ class ParameterWidget(
         } else if (parameter.isString) {
             if ((component as TextWithNull?)!!.isNull()) null else component!!.text
         } else if (parameter.isNumeric) {
-            if ((component as NumericWidget?)!!.isNull) null else component!!.value
+            if ((component as NumericWidget?)!!.isNull) null else when (parameter.type.jvmErasure) {
+                Double::class -> component!!.value
+                Float::class -> (component!!.value as Double).toFloat()
+                Int::class -> component!!.value
+                Long::class -> component!!.value
+                Short::class -> component!!.value
+                else -> throw IllegalArgumentException("Invalid numeric type ${parameter.type.jvmErasure.qualifiedName}")
+            }
         } else if (parameter.isBoolean) {
             if ((component as YesNoNull?)!!.isNull) null else component!!.isSelected
         } else if (parameter.isColor) {
@@ -378,29 +393,28 @@ class ParameterWidget(
 
     companion object {
         /**
-         * Takes a class and method name and returns a type map.
+         * Returns the map from names to types for use in combo boxes. (for example "Linear" -> LinearRule::class)
          */
         @JvmStatic
-        fun getTypeMap(c: Class<*>, methodName: String?): BiMap<String, Class<*>>? {
-            val typeMap = BiMap<String, Class<*>>()
-            try {
-                val m = c.getDeclaredMethod(methodName)
-                val types = m.invoke(null) as List<Class<*>>
-                for (type in types) {
-                    try {
-                        val inst = type.getDeclaredConstructor().newInstance() as EditableObject
-                        typeMap[inst.name] = type
-                    } catch (e: InstantiationException) {
-                        e.printStackTrace()
-                    } catch (e: IllegalAccessException) {
-                        e.printStackTrace()
-                    }
-                }
-                return typeMap
-            } catch (e: Exception) {
-                e.printStackTrace()
+        fun getTypeMap(c: KClass<*>, methodName: String?): BiMap<String, KClass<*>> {
+            val typeMap = BiMap<String, KClass<*>>()
+
+            // getting the methodName function (usually named `getTypes`)
+            val functions = c.staticFunctions.toMutableList()
+            c.companionObject?.functions?.let { functions.addAll(it) }
+            val m = functions.first { it.name == methodName }
+
+            // calling the getTypes function which returns a list of classes
+            val types = if (m.parameters.isEmpty()) {
+                m.call() as List<Class<*>>
+            } else {
+                m.call(c.companionObjectInstance) as List<Class<*>>
             }
-            return null
+
+            // constructing the map from names to types.
+            types.map { it.kotlin.callNoArgConstructor() as EditableObject }
+                .forEach { typeMap[it.name] = it::class }
+            return typeMap
         }
     }
 }

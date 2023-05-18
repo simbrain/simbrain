@@ -33,6 +33,7 @@ package org.simbrain.util
  *
  * @author O. J. Coleman
  */
+@Target(AnnotationTarget.PROPERTY, AnnotationTarget.FIELD, AnnotationTarget.PROPERTY_GETTER)
 annotation class UserParameter(
     /**
      * Label for the parameter.

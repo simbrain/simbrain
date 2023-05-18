@@ -135,12 +135,12 @@ class ObjectTypeEditor private constructor(
      */
     init {
         check(objectList.isNotEmpty()) { "Can't edit empty list of objects" }
-        val consistent = objectList.map { it!!::class }.toSet().size == 1
+        val consistent = objectList.map { it::class }.toSet().size == 1
         if (!consistent) {
             cbStartState = SimbrainConstants.NULL_STRING
             editorPanel = AnnotatedPropertyEditor(emptyList())
         } else {
-            cbStartState = typeMap.getInverse(objectList.first()!!::class)
+            cbStartState = typeMap.getInverse(objectList.first()::class)
             editorPanel = AnnotatedPropertyEditor(objectList)
         }
         layoutPanel(showDetails)

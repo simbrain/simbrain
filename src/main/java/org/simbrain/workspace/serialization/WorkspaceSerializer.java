@@ -19,7 +19,6 @@
 package org.simbrain.workspace.serialization;
 
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.couplings.Coupling;
@@ -362,7 +361,7 @@ public class WorkspaceSerializer {
     }
 
     public static <T> WorkspaceComponent showOpenComponentDialog(Class<T> type) {
-        String defaultDirectory = SimbrainPreferences.getString("workspace" + type.getSimpleName() + "Directory");
+        String defaultDirectory = WorkspacePreferences.INSTANCE.getBaseDirectory();
         SFileChooser chooser = new SFileChooser(defaultDirectory, "XML File", "xml");
         File file = chooser.showOpenDialog();
         if (file != null) {

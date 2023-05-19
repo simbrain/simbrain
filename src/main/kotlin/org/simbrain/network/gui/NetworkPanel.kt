@@ -14,6 +14,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.groups.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.actions.edit.ToggleAutoZoom
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
@@ -26,7 +27,6 @@ import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.trainCurrentOutputLMS
-import org.simbrain.util.SimbrainPreferences2
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
@@ -157,7 +157,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
             interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
 
-            background = SimbrainPreferences2.networkBackgroundColor
+            background = NetworkPreferences.backgroundColor
 
             // Remove default event listeners
             removeInputEventListener(panEventHandler)

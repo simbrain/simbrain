@@ -1,9 +1,14 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addProjectionPlot2
+import org.simbrain.custom_sims.addTextWorld
+import org.simbrain.custom_sims.couplingManager
+import org.simbrain.custom_sims.newSim
+import org.simbrain.util.Utils.FS
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.PCAProjection2
+import java.io.File
 
 /**
  * Todo
@@ -29,7 +34,7 @@ val nlpSim_geomSpace = newSim {
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = getResource("nlp/mlk.txt")
+    val text = File("simulations" + FS + "texts" + FS + "mlk.txt").readText()
     textWorld.loadDictionary(text)
     textWorld.text = text
 

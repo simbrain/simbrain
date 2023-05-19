@@ -32,7 +32,6 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.*;
@@ -44,8 +43,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.geom.Ellipse2D;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
@@ -250,13 +247,13 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         JLabel stepSizeLabel = new JLabel("Step Size");
         stepSizeLabel.setToolTipText(stepSizeToolTip);
 
-        sammonStepSizePanel.add(stepSizeLabel);
-        JTextField sammonStepSize = new JFormattedTextField("" + SimbrainPreferences.getDouble(
-                "projectorSammonEpsilon"));
-        sammonStepSize.setColumns(3);
-        sammonStepSize.setToolTipText(stepSizeToolTip);
-        sammonStepSizePanel.add(sammonStepSize);
-        theToolBar.add(sammonStepSizePanel);
+        // sammonStepSizePanel.add(stepSizeLabel);
+        // JTextField sammonStepSize = new JFormattedTextField("" + Network.getDouble(
+        //         "projectorSammonEpsilon"));
+        // sammonStepSize.setColumns(3);
+        // sammonStepSize.setToolTipText(stepSizeToolTip);
+        // sammonStepSizePanel.add(sammonStepSize);
+        // theToolBar.add(sammonStepSizePanel);
 
         adjustDimension1.setToolTipText("Dimension 1");
         adjustDimension2.setToolTipText("Dimension 2");
@@ -309,17 +306,17 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
 
         // Epsilon field should update the model whenever a user clicks out of
         // it.
-        sammonStepSize.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                ProjectionMethod projMethod = getWorkspaceComponent().getProjector().getProjectionMethod();
-                if (projMethod != null) {
-                    if (projMethod instanceof ProjectSammon) {
-                        ((ProjectSammon) projMethod).setEpsilon(Utils.doubleParsable(sammonStepSize.getText()));
-                    }
-                }
-            }
-        });
+        // sammonStepSize.addFocusListener(new FocusAdapter() {
+        //     @Override
+        //     public void focusLost(FocusEvent e) {
+        //         ProjectionMethod projMethod = getWorkspaceComponent().getProjector().getProjectionMethod();
+        //         if (projMethod != null) {
+        //             if (projMethod instanceof ProjectSammon) {
+        //                 ((ProjectSammon) projMethod).setEpsilon(Utils.doubleParsable(sammonStepSize.getText()));
+        //             }
+        //         }
+        //     }
+        // });
         resetData();
         update();
         updateToolBar();

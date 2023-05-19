@@ -25,7 +25,6 @@ import kotlinx.coroutines.withContext
 import org.pmw.tinylog.Logger
 import org.simbrain.network.NetworkComponent
 import org.simbrain.util.SFileChooser
-import org.simbrain.util.SimbrainPreferences
 import org.simbrain.util.Utils
 import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
@@ -179,7 +178,6 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
         workspaceComponent = newComponent
         workspace.addWorkspaceComponent(workspaceComponent)
         workspaceComponent.currentFile = file
-        setDefaultDirectory(workspaceComponent.javaClass, dir)
         val desktopComponent = getDesktopComponent(workspaceComponent)
         registerComponentInstance(workspaceComponent, desktopComponent)
         desktopComponent.parentFrame.bounds = bounds
@@ -208,7 +206,7 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
 
             // workspaceComponent.setCurrentDirectory(theFile.getParentFile()
             // .getAbsolutePath());
-            setDefaultDirectory(workspaceComponent.javaClass, theFile.parentFile.absolutePath)
+            // setDefaultDirectory(workspaceComponent.javaClass, theFile.parentFile.absolutePath)
             workspaceComponent.name = theFile.name
             parentFrame.title = workspaceComponent.name
         }
@@ -325,24 +323,6 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
             Utils.USER_DIR + Utils.FS + "simulations"
         }
         return defaultDirectory
-    }
-
-    /**
-     * Set the default directory for specific component types.
-     *
-     * @param componentType the component type
-     * @param dir           the directory to set
-     */
-    private fun setDefaultDirectory(componentType: Class<out WorkspaceComponent>, dir: String) {
-        if (componentType == OdorWorldComponent::class.java) {
-            SimbrainPreferences.putString("workspaceOdorWorldDirectory", dir)
-        } else if (componentType == DataWorldComponent::class.java) {
-            SimbrainPreferences.putString("workspaceTableDirectory", dir)
-        } else if (componentType == NetworkComponent::class.java) {
-            SimbrainPreferences.putString("workspaceNetworkDirectory", dir)
-        } else {
-            SimbrainPreferences.putString("workspaceBaseDirectory", dir)
-        }
     }
 
     override fun getPreferredSize(): Dimension {

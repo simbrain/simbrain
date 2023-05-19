@@ -27,11 +27,15 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.neuronContextMenu
 import org.simbrain.network.gui.neuronDialog
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator
-import org.simbrain.util.*
+import org.simbrain.util.SimbrainConstants
+import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.plus
+import org.simbrain.util.point
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
@@ -113,7 +117,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
         // Set up label text
         //priorityText.setFont(PRIORITY_FONT);
-        labelBackground.paint = SimbrainPreferences.getInt("networkBackgroundColor").toColor()
+        labelBackground.paint = NetworkPreferences.backgroundColor
         labelBackground.setBounds(labelText.bounds)
         labelBackground.addChild(labelText)
         addChild(labelBackground)
@@ -493,7 +497,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             mainShape.strokePaint = SynapseNode.getLineColor()
         }
         // TODO: Check if change only?
-        labelBackground.paint = SimbrainPreferences.getInt("networkBackgroundColor").toColor()
+        labelBackground.paint = NetworkPreferences.backgroundColor
         updateColor()
     }
 

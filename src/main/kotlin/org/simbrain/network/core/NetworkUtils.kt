@@ -5,6 +5,7 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.groups.*
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.NeuronArray
@@ -20,7 +21,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  * set false.
  */
 @Transient
-var synapseVisibilityThreshold = SimbrainPreferences.getInt("networkSynapseVisibilityThreshold")
+var synapseVisibilityThreshold = NetworkPreferences.synapseVisibilityThreshold
 
 /**
  * Provides an ordering on [NetworkModels] so that the networks are rebuilt in a proper order, for example with

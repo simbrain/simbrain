@@ -1,9 +1,14 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addProjectionPlot2
+import org.simbrain.custom_sims.addTextWorld
+import org.simbrain.custom_sims.couplingManager
+import org.simbrain.custom_sims.newSim
+import org.simbrain.util.Utils.FS
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.table.SimbrainDataViewer
+import java.io.File
 import javax.swing.JInternalFrame
 
 /**
@@ -16,7 +21,8 @@ val nlpSim_basic = newSim {
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = getResource("nlp/river_streams.txt") // Example: check "river" and "ocean", "river" and "stream", "lake" and "ocean", n.b. regenerate embeddings after settings change
+    val text = File("simulations" + FS + "texts" + FS + "river_streams.txt").readText()
+    // Example: check "river" and "ocean", "river" and "stream", "lake" and "ocean", n.b. regenerate embeddings after settings change
     textWorld.loadDictionary(text)
     textWorld.text = text
 

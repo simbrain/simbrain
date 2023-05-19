@@ -1,8 +1,13 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addProjectionPlot
+import org.simbrain.custom_sims.addTextWorld
+import org.simbrain.custom_sims.couplingManager
+import org.simbrain.custom_sims.newSim
+import org.simbrain.util.Utils
 import org.simbrain.util.place
 import org.simbrain.util.point
+import java.io.File
 
 /**
  * Todo
@@ -25,7 +30,7 @@ val nlpSim_neuralNetworks = newSim {
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = getResource("nlp/mlk.txt")
+    val text = File("simulations" + Utils.FS + "texts" + Utils.FS + "mlk.txt").readText()
     textWorld.loadDictionary(text)
     textWorld.text = text
 

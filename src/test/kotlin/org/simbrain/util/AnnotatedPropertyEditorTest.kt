@@ -20,8 +20,7 @@ class AnnotatedPropertyEditorTest {
     // Todo
     //  Check each data type
     //  Check each widget type (see Parameter Widget and org.simbrain.util.widgets)
-    //  Test several levels of test
-    //  Test as many fields of UserParameter as possible. Esp min / max
+    //  Test as many fields of UserParameter as possible. Esp min / max.
     //  Check internal list of todos
 
     @Test

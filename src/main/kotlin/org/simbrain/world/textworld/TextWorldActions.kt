@@ -88,7 +88,7 @@ val TextWorld.textWorldPrefs
  * @param dir directory to set
  */
 var dictionaryDirectory: String?
-    get() = SimbrainPreferences.getString("textWorldDictionaryDirectory")
+    get() = TextWorldPreferences.dictionaryDirectory
     set(dir) {
-        SimbrainPreferences.putString("textWorldDictionaryDirectory", dir)
+        TextWorldPreferences.dictionaryDirectory = dir.toString()
     }

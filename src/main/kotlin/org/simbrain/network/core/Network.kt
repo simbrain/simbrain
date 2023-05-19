@@ -12,11 +12,15 @@ import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.PlacementManager
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
-import org.simbrain.util.*
+import org.simbrain.util.SimpleIdManager
+import org.simbrain.util.component1
+import org.simbrain.util.component2
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.point
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.updater.PerformanceMonitor
@@ -30,7 +34,7 @@ import kotlin.math.ln
 /**
  * The initial time-step for the network.
  */
-private val DEFAULT_TIME_STEP = SimbrainPreferences.getDouble("networkDefaultTimeStep")
+private val DEFAULT_TIME_STEP = NetworkPreferences.defaultTimeStep
 
 /**
  * Constant value for Math.log(10); used to approximate log 10.

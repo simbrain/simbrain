@@ -18,8 +18,6 @@
  */
 package org.simbrain.util.projection;
 
-import org.simbrain.util.SimbrainPreferences;
-
 import java.util.ArrayList;
 
 /**
@@ -119,8 +117,8 @@ public class ProjectSammon extends IterableProjectionMethod {
 
     @Override
     public void init() {
-        perturbationAmount = SimbrainPreferences.getDouble("projectorSammonPerturbationAmount");
-        epsilon = SimbrainPreferences.getDouble("projectorSammonEpsilon");
+        perturbationAmount = ProjectionPreferences.INSTANCE.getSammonPerturbationAmount();
+        epsilon = ProjectionPreferences.INSTANCE.getSammonEpsilon();
         dstar = projector.getUpstairs().getDistances();
         dstarSum = projector.getUpstairs().getSumDistances();
         projector.getDownstairs().perturbOverlappingPoints(perturbationAmount);
@@ -184,18 +182,11 @@ public class ProjectSammon extends IterableProjectionMethod {
         }
     }
 
-    /**
-     * @return the epsilon
-     */
     public double getEpsilon() {
         return epsilon;
     }
 
-    /**
-     * @param epsilon the epsilon to set
-     */
     public void setEpsilon(double epsilon) {
-        SimbrainPreferences.putDouble("projectorSammonEpsilon", epsilon);
         this.epsilon = epsilon;
     }
 

@@ -20,7 +20,6 @@ package org.simbrain.util.projection;
 
 import com.Ostermiller.util.CSVParser;
 import org.pmw.tinylog.Logger;
-import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Producible;
 
@@ -71,7 +70,7 @@ public class Projector implements AttributeContainer {
     /**
      * Distance within which added points are considered old and are thus not added.
      */
-    protected double tolerance = SimbrainPreferences.getDouble("projectorTolerance");;
+    protected double tolerance = ProjectionPreferences.INSTANCE.getTolerance();
 
     /**
      * References to projection objects.

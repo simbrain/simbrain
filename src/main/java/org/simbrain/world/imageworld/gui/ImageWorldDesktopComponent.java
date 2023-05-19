@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers;
 import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.component_actions.CloseAction;
@@ -14,6 +13,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.imageworld.ImageClipboard;
 import org.simbrain.world.imageworld.ImageWorld;
 import org.simbrain.world.imageworld.ImageWorldComponent;
+import org.simbrain.world.imageworld.ImageWorldPreferences;
 
 import javax.swing.*;
 import java.awt.*;
@@ -110,7 +110,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         updateToolbar();
 
         // Set up the file chooser
-        fileChooser = new SFileChooser(SimbrainPreferences.getString("imagesDirectory"), "");
+        fileChooser = new SFileChooser(ImageWorldPreferences.INSTANCE.getImageDirectory(), "");
         // TODO: Below breaks the file chooser
         //fileChooser.setUseImagePreview(true);
         // String[] exts = ImageIO.getReaderFileSuffixes();
@@ -416,7 +416,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
             updateToolbar();
 
             // Save preferences
-            SimbrainPreferences.putString("imagesDirectory", fileChooser.getCurrentLocation());
+            ImageWorldPreferences.INSTANCE.setImageDirectory(fileChooser.getCurrentLocation());
         }
     }
 

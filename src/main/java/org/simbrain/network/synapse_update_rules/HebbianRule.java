@@ -21,11 +21,11 @@ package org.simbrain.network.synapse_update_rules;
 import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
+import org.simbrain.network.gui.dialogs.NetworkPreferences;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
-import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.UserParameter;
 import smile.math.matrix.Matrix;
 
@@ -36,7 +36,7 @@ public class HebbianRule extends SynapseUpdateRule {
 
     @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule",
         preferenceKey = "hebbLearningRate",  increment = .1,  order = 1)
-    private double learningRate = SimbrainPreferences.getDouble("hebbLearningRate");
+    private double learningRate = NetworkPreferences.INSTANCE.getLearningRate();
 
     @Override
     public void init(Synapse synapse) {

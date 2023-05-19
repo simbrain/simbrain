@@ -22,7 +22,6 @@ import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
-import org.simbrain.util.SimbrainPreferences;
 import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.table.NumericTable;
 import org.simbrain.util.table.SimbrainJTable;
@@ -113,7 +112,7 @@ public class TrainerGuiActions {
      * @param dir directory to set
      */
     public static void setDataDirectory(final String dir) {
-        SimbrainPreferences.putString("networkTableDirectory", dir);
+        // SimbrainPreferences.putString("networkTableDirectory", dir);
     }
 
     /**
@@ -122,7 +121,7 @@ public class TrainerGuiActions {
      * @return return the data directory
      */
     public static String getDataDirectory() {
-        return SimbrainPreferences.getString("networkTableDirectory");
+        return "."; // SimbrainPreferences.getString("networkTableDirectory");
     }
 
     /**

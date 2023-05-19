@@ -23,7 +23,7 @@ import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction
 import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
-import org.simbrain.network.gui.dialogs.NetworkDialog
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
@@ -108,7 +108,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Prefs.png",
         keyboardShorcut = CmdOrCtrl + ','
     ) {
-        NetworkDialog(networkPanel).display()
+        getPreferenceDialog(NetworkPreferences).apply {
+            addClosingTask {
+                // TODO: Temp
+                // networkPanel.canvas.background = NetworkPreferences.networkBackgroundColor
+            }
+        }.display()
     }
 
     val iterateNetworkAction = networkPanel.createAction(

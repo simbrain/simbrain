@@ -132,6 +132,8 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
             fileMenu.add(action);
         }
         fileMenu.addSeparator();
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
+        fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         JMenu editMenu = new JMenu("Edit");

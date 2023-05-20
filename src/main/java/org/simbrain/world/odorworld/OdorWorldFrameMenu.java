@@ -152,6 +152,9 @@ public class OdorWorldFrameMenu extends JMenuBar {
         fileMenu.add(loadTileMapMenu);
         fileMenu.addSeparator();
         fileMenu.add(new ShowWorldPrefsAction(parent.getWorldPanel()));
+        fileMenu.addSeparator();
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(parent));
+        fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(parent));
     }
 

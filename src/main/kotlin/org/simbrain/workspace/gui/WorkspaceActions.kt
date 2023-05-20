@@ -28,6 +28,7 @@ import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import javax.swing.Action
+import javax.swing.JOptionPane
 
 /**
  * Workspace action manager contains references to all the actions for a Workspace.
@@ -236,6 +237,20 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
     ) {
         desktopComponent.workspaceComponent.tryClosing()
     }
+
+    fun <T: WorkspaceComponent> createRenameAction(desktopComponent: DesktopComponent<T>) = desktopComponent
+        .createAction(
+            name = "Rename...",
+            description = "Rename this component",
+            coroutineScope = workspace
+        ) {
+            val newTitle: String = JOptionPane.showInputDialog(
+                null,
+                "Rename component",
+                desktopComponent.title
+            )
+            desktopComponent.title = newTitle
+        }
 
     /**
      * Uses the default producer of the attribute container

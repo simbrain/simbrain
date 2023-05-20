@@ -125,6 +125,8 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         fileMenu.addSeparator();
         fileMenu.add(table.getMenuCSV(true, true));
         fileMenu.addSeparator();
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
+        fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         // Edit menu

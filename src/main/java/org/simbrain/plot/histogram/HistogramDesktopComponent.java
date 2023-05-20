@@ -75,6 +75,8 @@ public class HistogramDesktopComponent extends DesktopComponent<HistogramCompone
             fileMenu.add(action);
         }
         fileMenu.addSeparator();
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
+        fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         // Not currently used

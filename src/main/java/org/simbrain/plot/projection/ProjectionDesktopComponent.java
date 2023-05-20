@@ -451,6 +451,8 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         exportImport.add(ProjectionPlotActions.getExportDataHi(getWorkspaceComponent().getProjector()));
         exportImport.add(ProjectionPlotActions.getExportDataLow(getWorkspaceComponent().getProjector()));
         fileMenu.addSeparator();
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
+        fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         final JMenu editMenu = new JMenu("Edit");

@@ -213,6 +213,8 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
         fileMenu.addSeparator();
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
+        fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         // Help Menu

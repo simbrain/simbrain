@@ -51,6 +51,10 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
         fileMenu.addSeparator();
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
+        fileMenu.addSeparator();
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
+        fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
     }

@@ -124,6 +124,8 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         file.addSeparator()
         file.add(world.loadText)
         file.addSeparator()
+        file.add(SimbrainDesktop.actionManager.createRenameAction(this))
+        file.addSeparator()
         file.add(SimbrainDesktop.actionManager.createCloseAction(this))
 
         // Edit menu

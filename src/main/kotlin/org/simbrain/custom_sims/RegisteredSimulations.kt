@@ -35,33 +35,6 @@ import org.simbrain.util.dir
  */
 val simulations = dir<Any>("Simulations") {
 
-    dir("Course Materials") {
-        dir("Behaviorism") {
-            item("Operant With Environment") { OperantWithEnvironment() }
-            item("Classical Conditioning") { ClassicalConditioning() }
-            item("Operant Conditioning") {OperantConditioning()}
-            item("Simple Operant") {SimpleOperant()}
-        }
-        dir("NLP") {
-            // item("NLP") { nlpSim }
-            item("1. Introduction") { nlpSim_basic }
-            item("2. Geometric Spaces") {nlpSim_geomSpace}
-            item("3. Corpus Quality") {nlpSim_corpusQuality}
-            item("4. Neural Networks") {nlpSim_neuralNetworks}
-        }
-    }
-
-    dir("Demos") {
-        item("Projection") { projectionSim }
-        item("Recurrent network") { recurrentProjection }
-        item("Iris Classifier") { irisClassifier }
-        item("Deep Net - Mnist") { deepNetSim }
-        item("Spiking Neuron") { spikingNetwork }
-        item("Mnist Images") { mnistSim }
-        item("Image World") { imageWorldSim }
-        item("LSTM") { lstmBlock() }
-    }
-
     dir("Cognitive Science") {
         dir("Hebbian") {
             item("1. Basic Hebb") { hebbianAssociatorSimple }
@@ -69,34 +42,47 @@ val simulations = dir<Any>("Simulations") {
             item("3. Recurrent Hebb") { hebbianAssociator }
             item("4. Hopfield") { hopfieldSim }
         }
-        dir("Neuroscience") {
-            item("Cortex (Kuramoto)") { cortexKuramoto }
-            item("Hippocampus") { Hippocampus() }
-            item("Cerebellum") { Cerebellum() }
-            item("Cortex Simple") {CortexSimple()}
-        }
         dir("Cognitive Maps") {
             item("Agent Trails") { kAgentTrails }
             item("RandomizedPursuer") { RandomizedPursuer() }
             // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
-            item("KuramotoOscillators") {KuramotoOscillators()}
+            item("KuramotoOscillators") { KuramotoOscillators() }
         }
         dir("RL") {
             item("Actor Critic") { actorCritic }
         }
-        dir("Agents") {
+        dir("Braitenberg") {
             item("Isopod Simulation") { isopodSim }
             item("Braitenberg") { Braitenberg() }
         }
         dir("Reservoir") {
-            item("Binary Reservoir") {binaryReservoir }
+            item("Binary Reservoir") { binaryReservoir }
             item("Edge Of Chaos") { EdgeOfChaos() }
             item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
-        }
-        dir("Allostatic Reservoirs") {
             item("Pattern Completion") { allostaticPatternCompletion }
             item("Object Tracking") { objectTrackingSim }
         }
+    }
+
+    dir("Behaviorism") {
+        item("Operant With Environment") { OperantWithEnvironment() }
+        item("Classical Conditioning") { ClassicalConditioning() }
+        item("Operant Conditioning") { OperantConditioning() }
+        item("Simple Operant") { SimpleOperant() }
+    }
+    dir("NLP") {
+        // item("NLP") { nlpSim }
+        item("1. Introduction") { nlpSim_basic }
+        item("2. Geometric Spaces") { nlpSim_geomSpace }
+        item("3. Corpus Quality") { nlpSim_corpusQuality }
+        item("4. Neural Networks") { nlpSim_neuralNetworks }
+    }
+
+    dir("Neuroscience") {
+        item("Cortex (Kuramoto)") { cortexKuramoto }
+        item("Hippocampus") { Hippocampus() }
+        item("Cerebellum") { Cerebellum() }
+        item("Cortex Simple") { CortexSimple() }
     }
 
     dir("Evolution") {
@@ -113,6 +99,17 @@ val simulations = dir<Any>("Simulations") {
         item("Evolve XOR2") { evolveXor2 }
     }
 
+    dir("Demos") {
+        item("Projection") { projectionSim }
+        item("Recurrent network") { recurrentProjection }
+        item("Iris Classifier") { irisClassifier }
+        item("Deep Net - Mnist") { deepNetSim }
+        item("Spiking Neuron") { spikingNetwork }
+        item("Mnist Images") { mnistSim }
+        item("Image World") { imageWorldSim }
+        item("LSTM") { lstmBlock() }
+    }
+
     dir("Testing") {
         item("Test Sim") { testSim }
         item("Linked Neuron List") { linkedNeuronList }
@@ -121,9 +118,9 @@ val simulations = dir<Any>("Simulations") {
             item("ReadSim") { ReadSim() }
             item("Creatures") { CreaturesSim() }
             item("MPFS") { MpfsSOM() }
-            item("PatternsOfActivity") {PatternsOfActivity()}
+            item("PatternsOfActivity") { PatternsOfActivity() }
             item("SORN") { SORN() }
-            item("Cortical Branching") {CorticalBranching()}
+            item("Cortical Branching") { CorticalBranching() }
         }
     }
 
@@ -136,9 +133,9 @@ fun main(args: Array<String>) {
 
     if (args.isEmpty()) throw IllegalArgumentException(
         "Please supply a simulation name or an index. A list of possible values are:\n" +
-        simulations.items.mapIndexed { index, (name, _) ->
-        "\t$index. $name"
-        }.joinToString("\n")
+                simulations.items.mapIndexed { index, (name, _) ->
+                    "\t$index. $name"
+                }.joinToString("\n")
     )
 
     val (_, sim) = try {
@@ -147,16 +144,15 @@ fun main(args: Array<String>) {
     } catch (e: NumberFormatException) {
         val name = args[0]
         simulations.items
-            .firstOrNull { (key, _) -> key == name } ?:
-        throw IllegalArgumentException(
-                "Simulation $name not found. A list of possible values are:\n" +
-                simulations.items.mapIndexed { index, (name, _) -> "\t$index. $name" }.joinToString("\n")
-            )
+            .firstOrNull { (key, _) -> key == name } ?: throw IllegalArgumentException(
+            "Simulation $name not found. A list of possible values are:\n" +
+                    simulations.items.mapIndexed { index, (name, _) -> "\t$index. $name" }.joinToString("\n")
+        )
     } catch (e: NoSuchElementException) {
         throw IllegalArgumentException("Index is out of bound")
     }
     when (sim) {
-        is NewSimulation ->  sim.run()
+        is NewSimulation -> sim.run()
         is Simulation -> sim.run()
     }
 }

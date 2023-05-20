@@ -3,7 +3,6 @@ package org.simbrain.world.threedworld;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.util.widgets.ToggleButton;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.threedworld.entities.EditorDialog;
@@ -50,7 +49,7 @@ public class ThreeDDesktopComponent extends DesktopComponent<ThreeDWorldComponen
         worldMenu.addSeparator();
         worldMenu.add(component.getWorld().getAction("Load Scene"));
         worldMenu.add(component.getWorld().getAction("Edit Camera Controller"));
-        worldMenu.add(new CloseAction(component));
+        worldMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
         menuBar.add(worldMenu);
 
         JMenu entitiesMenu = new JMenu("Entities");

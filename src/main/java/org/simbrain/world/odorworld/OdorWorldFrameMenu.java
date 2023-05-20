@@ -20,7 +20,6 @@ package org.simbrain.world.odorworld;
 
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.actions.LoadTileMapAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
@@ -150,11 +149,10 @@ public class OdorWorldFrameMenu extends JMenuBar {
             }
         }));
 
-
         fileMenu.add(loadTileMapMenu);
         fileMenu.addSeparator();
         fileMenu.add(new ShowWorldPrefsAction(parent.getWorldPanel()));
-        fileMenu.add(new CloseAction(parent.getWorkspaceComponent()));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(parent));
     }
 
     /**

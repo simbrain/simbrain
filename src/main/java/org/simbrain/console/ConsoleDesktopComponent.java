@@ -22,7 +22,6 @@ import bsh.Interpreter;
 import bsh.util.JConsole;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -52,7 +51,7 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
         fileMenu.addSeparator();
-        fileMenu.add(new CloseAction(getWorkspaceComponent()));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
     }
 

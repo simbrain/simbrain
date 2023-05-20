@@ -22,7 +22,6 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.*
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.workspace.component_actions.CloseAction
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BorderLayout
@@ -48,7 +47,7 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         fileMenu.add(networkPanel.networkActions.showNetworkUpdaterDialog);
         fileMenu.add(networkPanel.networkActions.showNetworkPreferencesAction);
         fileMenu.addSeparator()
-        fileMenu.add(CloseAction(workspaceComponent))
+        fileMenu.add(actionManager.createCloseAction(this))
         return fileMenu
     }
 

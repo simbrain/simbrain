@@ -21,8 +21,8 @@ package org.simbrain.plot.timeseries;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,7 +69,7 @@ public class TimeSeriesDesktopComponent extends DesktopComponent<TimeSeriesPlotC
             fileMenu.add(action);
         }
         fileMenu.addSeparator();
-        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         JMenu editMenu = new JMenu("Edit");
         editMenu.add(new JMenuItem(TimeSeriesPlotActions.getPropertiesDialogAction(timeSeriesPanel)));

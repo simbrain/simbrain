@@ -36,8 +36,8 @@ import org.simbrain.util.Utils;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.projection.*;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
@@ -451,7 +451,7 @@ public class ProjectionDesktopComponent extends DesktopComponent<ProjectionCompo
         exportImport.add(ProjectionPlotActions.getExportDataHi(getWorkspaceComponent().getProjector()));
         exportImport.add(ProjectionPlotActions.getExportDataLow(getWorkspaceComponent().getProjector()));
         fileMenu.addSeparator();
-        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         final JMenu editMenu = new JMenu("Edit");
         final JMenuItem preferencesGeneral = new JMenuItem("Preferences...");

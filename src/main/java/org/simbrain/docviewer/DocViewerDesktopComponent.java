@@ -23,7 +23,6 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -113,7 +112,7 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
         });
         file.add(item);
         file.addSeparator();
-        file.add(new CloseAction(this.getWorkspaceComponent()));
+        file.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         JMenu helpMenu = new JMenu("Help");
         JMenuItem helpItem = new JMenuItem("Help");

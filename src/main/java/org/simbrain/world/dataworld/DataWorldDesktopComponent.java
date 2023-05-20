@@ -23,7 +23,6 @@ import org.simbrain.util.table.SimbrainJTable;
 import org.simbrain.util.table.SimbrainJTableScrollPanel;
 import org.simbrain.util.table.TableActionManager;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -126,7 +125,7 @@ public class DataWorldDesktopComponent extends DesktopComponent<DataWorldCompone
         fileMenu.addSeparator();
         fileMenu.add(table.getMenuCSV(true, true));
         fileMenu.addSeparator();
-        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         // Edit menu
         JMenu editMenu = table.getMenuEdit();

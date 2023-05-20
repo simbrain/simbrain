@@ -20,7 +20,6 @@ package org.simbrain.world.textworld.gui
 
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.widgets.ShowHelpAction
-import org.simbrain.workspace.component_actions.CloseAction
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.textworld.TextWorld
@@ -125,7 +124,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         file.addSeparator()
         file.add(world.loadText)
         file.addSeparator()
-        file.add(CloseAction(workspaceComponent))
+        file.add(SimbrainDesktop.actionManager.createCloseAction(this))
 
         // Edit menu
         // loadDictionary.setAction(TextWorldActions.showDictionaryEditor(world));

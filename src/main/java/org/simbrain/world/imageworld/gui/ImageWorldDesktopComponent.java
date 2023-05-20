@@ -6,7 +6,6 @@ import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.CouplingMenu;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -214,7 +213,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
         fileMenu.addSeparator();
-        fileMenu.add(new CloseAction(getWorkspaceComponent()));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         // Help Menu
         JMenu helpMenu = new JMenu("Help");

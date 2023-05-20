@@ -146,7 +146,7 @@ object SimbrainDesktop {
     /**
      * Workspace action manager.
      */
-    val actionManager = WorkspaceActionManager(this)
+    val actionManager = WorkspaceActions(this)
 
     /**
      * Interpreter for terminal.

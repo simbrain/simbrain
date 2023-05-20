@@ -21,8 +21,8 @@ package org.simbrain.plot.histogram;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.component_actions.CloseAction;
 import org.simbrain.workspace.gui.DesktopComponent;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,7 +75,7 @@ public class HistogramDesktopComponent extends DesktopComponent<HistogramCompone
             fileMenu.add(action);
         }
         fileMenu.addSeparator();
-        fileMenu.add(new CloseAction(this.getWorkspaceComponent()));
+        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
         // Not currently used
         JMenu editMenu = new JMenu("Edit");

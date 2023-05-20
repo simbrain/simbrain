@@ -32,7 +32,7 @@ import javax.swing.Action
 /**
  * Workspace action manager contains references to all the actions for a Workspace.
  */
-class WorkspaceActionManager(val desktop: SimbrainDesktop) {
+class WorkspaceActions(val desktop: SimbrainDesktop) {
 
     val workspace = desktop.workspace
 
@@ -227,6 +227,15 @@ class WorkspaceActionManager(val desktop: SimbrainDesktop) {
         desktopComponent.showExportDialog()
     }
 
+    fun <T: WorkspaceComponent> createCloseAction(desktopComponent: DesktopComponent<T>) = desktopComponent
+        .createAction(
+        name = "Close",
+        description = "Close component",
+        keyboardShorcut = CmdOrCtrl + 'W',
+        coroutineScope = workspace
+    ) {
+        desktopComponent.workspaceComponent.tryClosing()
+    }
 
     /**
      * Uses the default producer of the attribute container

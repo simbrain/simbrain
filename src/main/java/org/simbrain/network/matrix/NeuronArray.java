@@ -254,7 +254,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     public void setGridMode(boolean gridMode) {
         this.gridMode = gridMode;
-        getEvents().getUpdated().fireAndForget();
+        getEvents().getGridModeChanged().fireAndBlock();
     }
 
     public boolean isGridMode() {

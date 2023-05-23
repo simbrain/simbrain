@@ -126,6 +126,9 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
     val isString: Boolean
         get() = type.jvmErasure == String::class
 
+    val useSetter: Boolean
+        get() = annotation.useSetter
+
     /**
      * Returns true iff the UserParameter defines a minimum value.
      */
@@ -177,11 +180,18 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
     fun setFieldValue(theObject: Any, initVal: Any) {
         validateValue(initVal)
         property?.let {
-            if (it is KMutableProperty<*>) {
-                val isAccessible = it.isAccessible
-                it.isAccessible = true
-                it.setter.call(theObject, initVal)
-                it.isAccessible = isAccessible
+            fun setKotlinProperty() {
+                if (it is KMutableProperty<*>) {
+                    val isAccessible = it.isAccessible
+                    it.isAccessible = true
+                    it.setter.call(theObject, initVal)
+                    it.isAccessible = isAccessible
+                }
+            }
+            if (useSetter) {
+                theObject::class.memberFunctions.firstOrNull { it.name == "set${name.capitalize()}" }?.call(theObject, initVal) ?: setKotlinProperty()
+            } else {
+                setKotlinProperty()
             }
         }
     }

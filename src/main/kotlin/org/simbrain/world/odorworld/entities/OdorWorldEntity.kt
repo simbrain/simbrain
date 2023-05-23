@@ -307,4 +307,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             movement.dtheta = value
         }
 
+
+    override val childrenContainers: List<AttributeContainer>
+        get() = sensors + effectors
 }

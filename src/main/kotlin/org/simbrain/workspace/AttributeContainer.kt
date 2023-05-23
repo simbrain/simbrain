@@ -19,20 +19,17 @@
 package org.simbrain.workspace
 
 /**
- * Designates an object as one that contains [Consumable]
- * or [Producible] annotations, that can be linked together in
+ * Designates an object as one that contains [Consumable] or [Producible] annotations, that can be linked together in
  * [Coupling]s.
  */
-interface AttributeContainer {// TODO: Remove default.
+interface AttributeContainer {
     /**
-     * Returns an attribute id that can be used to identify this container. Used in persistence
-     * (see [org.simbrain.workspace.serialization.ArchivedAttribute] and in displaying
-     * Producers and Consumers. Attributes are persisted as a triple <component id, attribute id, methodname>.
-     * If there is only a single attribute in component, the id can be simple.  Compare "neuron_1" in networkcomponent
-     * with "pie chart" in PieChartCompnent.
-     *
-     * @return the String id.
-    </component> */
+     * Returns an attribute id that can be used to identify this container. Used in persistence (see
+     * [org.simbrain.workspace.serialization.ArchivedAttribute] and in displaying Producers and Consumers.
+     */
     val id: String?
         get() = "TODO"
+
+    val childrenContainers: List<AttributeContainer>?
+        get() = null
 }

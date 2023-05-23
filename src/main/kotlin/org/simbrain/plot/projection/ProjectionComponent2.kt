@@ -66,4 +66,5 @@ class ProjectionComponent2 @JvmOverloads constructor(name: String, val projector
         getProjectorXStream().toXML(projector, output)
     }
 
+    override val id: String get() = name
 }

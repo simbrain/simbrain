@@ -26,11 +26,16 @@ class CouplingMenu(
     init {
         text = "Create ${source.javaClass.simpleName} Coupling"
         removeAll()
-        sourceComponent.couplingManager.run {
-            source.visibleProducers.forEach { createProducerSubmenu(it) }
+        val sources = buildList {
+            var current = listOf(source)
+            while (current.isNotEmpty()) {
+                addAll(current)
+                current = current.flatMap { it.childrenContainers ?: emptyList() }
+            }
         }
-        sourceComponent.couplingManager.run {
-            source.visibleConsumers.forEach { createConsumerSubmenu(it) }
+        with(sourceComponent.couplingManager) {
+            sources.flatMap { it.visibleProducers }.forEach { createProducerSubmenu(it) }
+            sources.flatMap { it.visibleConsumers }.forEach { createConsumerSubmenu(it) }
         }
     }
 

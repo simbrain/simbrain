@@ -36,7 +36,6 @@ class SmellSensor @JvmOverloads constructor(
      * by summing over scaled "distal" stimuli.
      */
     @get:Producible(customDescriptionMethod = "getAttributeDescription")
-    @Transient
     var smellVector = DoubleArray(0)
 
     /**

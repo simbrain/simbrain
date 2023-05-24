@@ -120,7 +120,7 @@ public abstract class Effector implements PeripheralAttribute {
         return events;
     }
 
-    private Object readResolve() {
+    public Object readResolve() {
         events = new SensorEffectorEvents2();
         return this;
     }

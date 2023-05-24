@@ -3,6 +3,7 @@ package org.simbrain.world.threedworld.entities;
 import com.jme3.bullet.collision.PhysicsCollisionGroupListener;
 import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.control.RigidBodyControl;
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.workspace.Producible;
 
 public class CollisionSensor implements Sensor, PhysicsCollisionGroupListener {
@@ -68,4 +69,9 @@ public class CollisionSensor implements Sensor, PhysicsCollisionGroupListener {
         agent.removeSensor(this);
     }
 
+    @Nullable
+    @Override
+    public String getId() {
+        return getName();
+    }
 }

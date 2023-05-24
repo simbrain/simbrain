@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.timeseries;
 
+import org.jetbrains.annotations.Nullable;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.simbrain.util.UserParameter;
@@ -370,6 +371,12 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.removePropertyChangeListener(listener);
+    }
+
+    @Nullable
+    @Override
+    public String getId() {
+        return "Time Series";
     }
 
     /**

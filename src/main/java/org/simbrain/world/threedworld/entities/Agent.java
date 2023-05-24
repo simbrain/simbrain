@@ -4,6 +4,7 @@ import com.jme3.bounding.BoundingVolume;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
 import org.simbrain.world.threedworld.events.EntityEvents2;
@@ -207,5 +208,11 @@ public class Agent implements Entity {
 
     public EntityEvents2 getEvents() {
         return events;
+    }
+
+    @Nullable
+    @Override
+    public String getId() {
+        return getName();
     }
 }

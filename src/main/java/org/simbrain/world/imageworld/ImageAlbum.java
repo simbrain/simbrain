@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.util.ImageKt;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -175,4 +176,9 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
         previousFrame();
     }
 
+    @Nullable
+    @Override
+    public String getId() {
+        return "Image album";
+    }
 }

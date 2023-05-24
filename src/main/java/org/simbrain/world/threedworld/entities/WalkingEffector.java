@@ -3,12 +3,19 @@ package org.simbrain.world.threedworld.entities;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 
 import javax.swing.*;
 
 public class WalkingEffector implements Effector {
+    @Nullable
+    @Override
+    public String getId() {
+        return getName();
+    }
+
     private class WalkingEffectorEditor extends EffectorEditor {
         private JFormattedTextField walkSpeedField = new JFormattedTextField(EditorDialog.floatFormat);
         private JFormattedTextField turnSpeedField = new JFormattedTextField(EditorDialog.floatFormat);

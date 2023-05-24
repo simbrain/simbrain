@@ -28,7 +28,6 @@ interface AttributeContainer {
      * [org.simbrain.workspace.serialization.ArchivedAttribute] and in displaying Producers and Consumers.
      */
     val id: String?
-        get() = "TODO"
 
     val childrenContainers: List<AttributeContainer>?
         get() = null

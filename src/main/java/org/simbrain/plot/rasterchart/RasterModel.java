@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 /**
  * Data model for a raster plot.
  */
-public class RasterModel implements AttributeContainer, EditableObject {
+public class RasterModel implements EditableObject {
 
     /**
      * Default number of data sources for plot initialization.

@@ -66,6 +66,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     /**
      * Whatever phrases the entity can currently "hear".
      */
+    @Transient
     val currentlyHeardPhrases: MutableList<String> = arrayListOf()
 
     val isRotating get() = entityType.isRotating

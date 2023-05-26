@@ -11,6 +11,6 @@ object WorkspacePreferences: PreferenceHolder {
     var baseDirectory by StringPreference("." + Utils.FS +"simulations")
 
     @UserParameter(label = "Sim directory")
-    var workspaceSimulationDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "workspaces");
+    var simulationDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "workspaces");
 
 }

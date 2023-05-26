@@ -39,6 +39,7 @@ import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.updater.PerformanceMonitor.enabled
 import java.awt.*
 import java.awt.event.*
@@ -643,7 +644,7 @@ object SimbrainDesktop {
      * Shows the dialog for opening a workspace file.
      */
     fun openWorkspace() {
-        val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+        val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
             workspace.openWorkspace(simFile)

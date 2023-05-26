@@ -26,11 +26,17 @@ val hebbianFeedForward = newSim {
 
     withGui {
         createControlPanel("Control Panel", 5, 10) {
-            addButton("Stub") {
-                println(network)
-                println(world)
+            addButton("Training Mode (clamped nodes)") {
+                network.freeNeurons.forEach{n -> n.isClamped = true }
+                network.freezeSynapses(false)
+            }.apply {
+                toolTipText = "Clamps nodes and unclamps weights"
             }
-            addTextField("Stub", "" + .01) {
+            addButton("Test Mode (clamped weights)") {
+                network.freeNeurons.forEach{n -> n.isClamped = false }
+                network.freezeSynapses(true)
+            }.apply {
+                toolTipText = "Clamps weights and unclamps nodes"
             }
         }
     }

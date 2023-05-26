@@ -33,8 +33,6 @@ class OjaTest {
         out.isClamped = true
     }
 
-
-
     @Test
     fun `test basic update`() {
         n1.forceSetActivation(1.0)

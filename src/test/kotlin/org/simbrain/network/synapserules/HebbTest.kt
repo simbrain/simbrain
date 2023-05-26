@@ -39,10 +39,11 @@ class HebbTest {
     fun `test different learning rates`() {
         n1.forceSetActivation(1.0)
         n2.forceSetActivation(1.0)
-        (s12.learningRule as HebbianRule).learningRate = .1
+        (s12.learningRule as HebbianRule).learningRate = .25
         net.update()
+        assertEquals(.25,s12.strength )
         net.update()
-        assertEquals(.2,s12.strength )
+        assertEquals(.5,s12.strength )
     }
 
     @Test

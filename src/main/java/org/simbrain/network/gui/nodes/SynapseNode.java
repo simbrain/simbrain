@@ -159,6 +159,7 @@ public final class SynapseNode extends ScreenElement {
         events.getVisbilityChanged().on((oldVisibility, newVisibility) -> setVisible(newVisibility));
         setVisible(synapse.isVisible());
         events.getClampChanged().on(this::updateClampStatus);
+        updateClampStatus();
 
         // Respond to spiking events
         source.getNeuron().getEvents().getSpiked().on(s -> updateSpikeColor());

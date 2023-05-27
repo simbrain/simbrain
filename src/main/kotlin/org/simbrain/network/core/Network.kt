@@ -576,15 +576,14 @@ class Network: CoroutineScope {
         }
     }
 
-    /**
-     * Freeze or unfreeze all synapses in the network.
-     *
-     * @param freeze frozen if true; unfrozen if false
-     */
+
+    fun clampNeurons(clamped: Boolean) {
+        freeNeurons.forEach{n -> n.isClamped = clamped}
+    }
+
     fun freezeSynapses(freeze: Boolean) {
         // Freeze synapses in synapse groups
         for (group in networkModels.get<SynapseGroup>()) {
-            // TODO
             // group.setFrozen(freeze, Polarity.BOTH)
         }
         // Freeze free synapses

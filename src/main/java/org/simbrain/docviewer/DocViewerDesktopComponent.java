@@ -87,6 +87,8 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
         file.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
         file.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
         file.addSeparator();
+        file.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
+        file.addSeparator();
         JMenuItem item = new JMenuItem("Import html...");
         item.addActionListener(new ActionListener() {
             @Override

@@ -153,12 +153,13 @@ fun connect(source: Neuron, target: Neuron, value: Double): Synapse {
 /**
  * Make a single source -> target neuron connection with specified upper and lower bounds for the synapses.
  */
-fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double, upperBound: Double) {
+fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double, upperBound: Double): Synapse {
     val synapse = Synapse(source, target)
     synapse.forceSetStrength(value)
     synapse.lowerBound = lowerBound
     synapse.upperBound = upperBound
     source.network.addNetworkModelAsync(synapse)
+    return synapse
 }
 
 /**
@@ -260,3 +261,12 @@ fun Synapse.overlapsExistingSynapse(): Boolean {
     // and if there is, it is not this synapse
     return this.source.fanOut[target].let { it != null && it != this }
 }
+
+// fun List<Synapse>.clamp(clamped: Boolean) = {
+//     forEach { it.isFrozen = clamped}
+// }
+//
+// fun List<Neuron>.clamp(clamped: Boolean) = {
+//     forEach { it.isClamped = clamped}
+// }
+

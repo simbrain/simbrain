@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace.gui;
 
+import kotlinx.coroutines.Dispatchers;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents2;
 
@@ -85,9 +86,9 @@ public class ComponentPanel extends JPanel {
         add(panel);
 
         WorkspaceEvents2 events = desktop.getWorkspace().getEvents();
-        events.getWorkspaceCleared().on(model::clear);
-        events.getComponentAdded().on(model::addRow);
-        events.getComponentRemoved().on(model::removeRow);
+        events.getWorkspaceCleared().on(Dispatchers.getDefault(), model::clear);
+        events.getComponentAdded().on(Dispatchers.getDefault(), model::addRow);
+        events.getComponentRemoved().on(Dispatchers.getDefault(), model::removeRow);
     }
 
     /**

@@ -419,6 +419,12 @@ class Network: CoroutineScope {
         // Initialize update manager
         updateManager.postOpenInit()
         networkModels.allInReconstructionOrder.forEach { it.postOpenInit() }
+        networkModels.allInReconstructionOrder.forEach { model ->
+            model.events.deleted.on(wait = true) {
+                networkModels.remove(it)
+                events.modelRemoved.fireAndSuspend(it)
+            }
+        }
         idManager = SimpleIdManager ({ cls -> networkModels.getRawModelSet(cls).size + 1 })
         return this
     }

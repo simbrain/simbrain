@@ -13,11 +13,11 @@ val hebbianFeedForward = newSim {
 
     // Basic setup
     workspace.openWorkspace(File("simulations" + FS + "workspaces"+ FS + "hebbFF.zip"))
-    val network = (workspace.getComponent("Network 1") as NetworkComponent).network
+    val network = (workspace.getComponent("Network") as NetworkComponent).network
     val nice = network.getNeuronByLabel("\"nice\"")
     val yuck = network.getNeuronByLabel("\"yuck\"")
 
-    val world = (workspace.getComponent("OdorWorld 1") as OdorWorldComponent).world
+    val world = (workspace.getComponent("Stimuli") as OdorWorldComponent).world
 
     fun unclampOutputs() {
         nice?.isClamped = false

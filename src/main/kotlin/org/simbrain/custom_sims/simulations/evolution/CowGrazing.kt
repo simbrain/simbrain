@@ -30,6 +30,7 @@ val grazingCows = newSim {
     var iterationsPerRun = 2000
     var populationSize = 100
     var eliminationRatio = .5
+    var numFlowers = 10
 
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
         override val random: Random = Random(seed)
@@ -186,7 +187,7 @@ val grazingCows = newSim {
                     }
                 )
             }
-            repeat(5) {
+            repeat(numFlowers) {
                 val loc = odorWorld.getRandomLocation()
                 odorWorld.addEntity(loc.x.toInt(), loc.y.toInt(),
                     EntityType.DANDELIONS, doubleArrayOf(1.0))

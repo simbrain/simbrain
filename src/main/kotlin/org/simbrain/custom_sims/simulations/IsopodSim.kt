@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
@@ -80,6 +81,8 @@ val isopodSim = newSim {
     // Create the weights
     connect(neuronLeftSensor, neuronLeftTurning, 10.0, 0.0, 50.0)
     connect(neuronRightSensor, neuronRightTurning, 10.0, 0.0, 50.0)
+    var leftSpeedWeight: Synapse? = null
+    var rightSpeedWeight: Synapse? = null
 
     // Location of the network in the desktop
     withGui {
@@ -224,7 +227,9 @@ val isopodSim = newSim {
                         if (collision) {
                             break
                         } else {
-                            log += "${isopod.x}, ${isopod.y}\n"
+                            log += "${isopod.x}, ${isopod.y}, ${isopod.y}," +
+                                    "${neuronLeftSensor.activation},${neuronRightSensor.activation}" +
+                                    ",${neuronStraight.activation}\n"
                         }
                     }
                     collision = false
@@ -260,6 +265,18 @@ val isopodSim = newSim {
                 trialNum = 0
                 showSaveDialog("", "multipleTrials.csv") {
                     writeText(log)
+                }
+            }
+
+            addButton("Speed inhibition") {
+                if (leftSpeedWeight == null) {
+                    leftSpeedWeight = connect(neuronLeftSensor, neuronStraight, -1.0, -50.0, 50.0)
+                    rightSpeedWeight = connect(neuronRightSensor, neuronStraight, -1.0, -50.0, 50.0)
+                } else {
+                    leftSpeedWeight?.delete()
+                    leftSpeedWeight = null
+                    rightSpeedWeight?.delete()
+                    rightSpeedWeight = null
                 }
             }
         }

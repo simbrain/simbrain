@@ -250,6 +250,7 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
                 desktopComponent.title
             )
             desktopComponent.title = newTitle
+            workspaceComponent.name = newTitle
         }
 
     /**

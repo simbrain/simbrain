@@ -74,6 +74,7 @@ val isopodSim = newSim {
     }
     val neuronStraight = network.addNeuron {
         location = point(50, 0)
+        lowerBound = 0.0
         upperBound = 10.0
         label = "Straight"
         (dataHolder as BiasedScalarData).bias = 5.0
@@ -214,6 +215,13 @@ val isopodSim = newSim {
         }
     })
 
+    fun logAgentState() {
+        log += "${isopod.x}, ${isopod.y}, ${isopod.y}," +
+                "${neuronLeftSensor.activation},${neuronRightSensor.activation}" +
+                "${neuronLeftTurning.activation},${neuronRightTurning.activation}" +
+                ",${neuronStraight.activation}\n"
+    }
+
     withGui {
         createControlPanel("Control Panel", 5, 10) {
 
@@ -228,9 +236,7 @@ val isopodSim = newSim {
                         if (collision) {
                             break
                         } else {
-                            log += "${isopod.x}, ${isopod.y}, ${isopod.y}," +
-                                    "${neuronLeftSensor.activation},${neuronRightSensor.activation}" +
-                                    ",${neuronStraight.activation}\n"
+                            logAgentState()
                         }
                     }
                     collision = false
@@ -255,7 +261,7 @@ val isopodSim = newSim {
                     log += "# Heading: ${isopod.heading}\n"
                     workspace.iterateWhile {
                         if (!collision) {
-                            log += "${isopod.x}, ${isopod.y}\n"
+                            logAgentState()
                         }
                         !collision && ++iteration < maxIterationsPerTrial
                     }

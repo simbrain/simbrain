@@ -343,7 +343,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
             is SOMNetwork -> SOMNetworkNode(this, subnetwork)
             // is EchoStateNetwork -> ESNNetworkNode(this, subnetwork)
-            // is SimpleRecurrentNetwork -> SRNNetworkNode(this, subnetwork)
+            is SRNNetwork -> SRNNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
             is LMSNetwork -> LMSNetworkNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)

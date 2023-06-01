@@ -1,9 +1,10 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addProjectionPlot
+import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.Utils
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -15,11 +16,6 @@ import java.io.File
  */
 val nlpSim_neuralNetworks = newSim {
 
-    // 4. "Word embeddings and neural networks"
-    //
-    // Training of a NN based on word embeddings
-    // Example: Send word embeddings to SOM
-    //
     // Potentially implement an alternative algorithm, using a neural network trained on next word prediction
     // Export a layer weights as the word embedding
     // Comparison between the traditional count methods vs next word prediction
@@ -27,61 +23,61 @@ val nlpSim_neuralNetworks = newSim {
 
     workspace.clearWorkspace()
 
-    // Text World
-    val twc = addTextWorld("Text World")
-    val textWorld = twc.world
+    // Text World for Inputs
+    val textWorld = addTextWorld("Text World (Inputs)")
     val text = File("simulations" + Utils.FS + "texts" + Utils.FS + "mlk.txt").readText()
-    textWorld.loadDictionary(text)
-    textWorld.text = text
+    textWorld.world.loadDictionary(text)
+    textWorld.world.text = text
 
     withGui {
-        place(twc) {
+        place(textWorld) {
             location = point(0, 0)
-            width = 400
-            height = 500
+            width = 450
+            height = 250
         }
     }
 
     // Network
-    // val networkComponent = addNetworkComponent("Network")
-    // val network = networkComponent.network
-    // val nc = network.createNeuronCollection(textWorld.tokenVectorMap.size).apply {
-    //     label = "Vector Embeddings for Word Tokens"
-    //     location = point(0, 0)
-    //     layout(GridLayout())
-    // }
+    val networkComponent = addNetworkComponent("Network")
+    val network = networkComponent.network
+    val srn = SRNNetwork(
+        network,
+        textWorld.world.tokenVectorMap.dimension,
+        10,
+        textWorld.world.tokenVectorMap.dimension,
+        point(0,0))
+    network.addNetworkModel(srn)
 
-    // withGui {
-    //     place(networkComponent) {
-    //         location = point(450, 0)
-    //         width = 400
-    //         height = 400
-    //     }
-    // }
-
-    // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot("Activations")
     withGui {
-        place(projectionPlot) {
-            location = point(450, 0)
+        place(networkComponent) {
+            location = point(460, 0)
             width = 500
-            height = 500
+            height = 550
         }
     }
 
+    // Text World for Outputs
+    val textWorldOut = addTextWorld("Text World (Outputs)")
+    textWorldOut.world.loadDictionary(text)
+
+    withGui {
+        place(textWorldOut) {
+            location = point(0, 265)
+            width = 450
+            height = 250
+        }
+    }
+
+
     // Couple the text world to neuron collection
     with(couplingManager) {
-        // createCoupling(
-        //     textWorld.getProducer("getCurrentVector"),
-        //     nc.getConsumer("addInputs")
-        // )
         createCoupling(
-            textWorld.getProducer("getCurrentVector"),
-            projectionPlot.getConsumer("addPoint")
+            textWorld.world.getProducer("getCurrentVector"),
+            srn.getConsumer("addInputs")
         )
         createCoupling(
-            textWorld.getProducer("getCurrentToken"),
-            projectionPlot.getConsumer("setLabel")
+            srn.getProducer("getOutputs"),
+            textWorldOut.world.getConsumer("displayClosestWord")
         )
     }
 

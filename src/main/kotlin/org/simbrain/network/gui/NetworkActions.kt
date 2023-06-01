@@ -23,12 +23,9 @@ import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction
 import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
-import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
+import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
-import org.simbrain.network.gui.dialogs.showDeepNetCreationDialog
-import org.simbrain.network.gui.dialogs.showLMSCreationDialog
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
@@ -234,7 +231,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addGroupAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
             addGroupAction("LMS (Least Mean Squares)") { networkPanel.showLMSCreationDialog() },
             addGroupAction("SOM Network") { SOMCreationDialog(networkPanel) },
-            // addGroupAction("SRN (Simple Recurrent Network)") { SRNCreationDialog(networkPanel) }
+            addGroupAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
         )
 
     fun applyConnectionAction(strategy: ConnectionStrategy): AbstractAction {

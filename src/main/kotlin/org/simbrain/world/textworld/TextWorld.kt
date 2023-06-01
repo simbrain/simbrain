@@ -58,10 +58,10 @@ class TextWorld : AttributeContainer, EditableObject {
     var embeddingType = EmbeddingType.COC
 
     @UserParameter(label = "Window size", minimumValue =  1.0, order = 20 )
-    var windowSize = 2
+    var windowSize = 5
 
     @UserParameter(label = "SkipGram", order = 30 )
-    var skipGram = false
+    var skipGram = true
 
     @UserParameter(label = "Use PPMI", order = 40 )
     var usePPMI = true
@@ -184,7 +184,7 @@ class TextWorld : AttributeContainer, EditableObject {
         get() = currentItem.let {
             if (it == null) {
                 // Zero vector if no current item
-                DoubleArray(tokenVectorMap.size)
+                DoubleArray(tokenVectorMap.dimension)
             } else {
                 // TODO: Not sure if this is the best place to call lowercase()
                 tokenVectorMap.get(it.text.lowercase())

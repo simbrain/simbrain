@@ -22,12 +22,24 @@ class TokenVectorMap(
      */
     var tokensMap: Map<String, Int> = tokens.mapIndexed{i, t -> t to i}.toMap()
 
+    /**
+     * Number of entries in the dictionary, i.e. number of words that have associated embeddings.
+     */
     val size = tokensMap.size
+
+    /**
+     * The number of dimensions in the word embedding space. Tokens are associated with vectors with this many
+     * components.
+     *
+     */
+    var dimension = size
+        // Currently because the matrices are always square the dimension just corresponds to number of rows
+        get() = size
 
     /**
      * N-Tree (optimized to find vectors near a given vector) associating vectors with tokens.
      */
-    private val treeMap = NTree(size).apply {
+    private val treeMap = NTree(dimension).apply {
         tokensMap.forEach { (token, i) ->
             add(DataPoint(tokenVectorMatrix.row(i), token))
         }
@@ -48,7 +60,7 @@ class TokenVectorMap(
             return tokenVectorMatrix.row(tokenIndex)
         } else {
             // Zero array if no matching token is found
-            return DoubleArray(size)
+            return DoubleArray(dimension)
         }
     }
 

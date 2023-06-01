@@ -24,7 +24,7 @@ val WeightMatrix.sourceLayer get()= source as NeuronArray
 val WeightMatrix.targetLayer get()= target as NeuronArray
 
 /**
- * Return the difference between the provided vector and the curent activaions in this layer.
+ * Return the difference between the provided vector and the current activations in this layer.
  */
 fun ArrayLayer.getError(targets: Matrix): Matrix {
     outputs.validateSameShape(targets)
@@ -41,6 +41,7 @@ fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
 
     // TODO: Can this be replaced by backprop with linear, since derivative is then just source activations
     // TODO: Bias
+    // TODO: derivative of output activations
     val weightDeltas = outputError.mm(source.outputs.transpose())
     weightMatrix.add(weightDeltas.mul(epsilon))
     events.updated.fireAndForget()
@@ -69,7 +70,7 @@ fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix
 }
 
 /**
- * Print debigging info for a list of weight matrices.
+ * Print debugging info for a list of weight matrices.
  */
 fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) {
     println(first().source)

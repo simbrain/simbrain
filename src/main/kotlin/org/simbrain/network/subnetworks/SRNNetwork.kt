@@ -17,8 +17,16 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.trainers.LMSTrainer2
+import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.Trainable2
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNeuronGroup
+import org.simbrain.util.UserParameter
+import org.simbrain.util.point
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.workspace.Consumable
+import org.simbrain.workspace.Producible
 import java.awt.geom.Point2D
 
 /**
@@ -28,48 +36,53 @@ import java.awt.geom.Point2D
  */
 open class SRNNetwork(
     network: Network,
-    numInputNodes: Int,
-    numHiddenNodes: Int,
-    numOutputNodes: Int,
-    initialPosition: Point2D?) : Subnetwork(network) {
+    numInputNodes: Int = 10,
+    numHiddenNodes: Int = 10,
+    numOutputNodes: Int = 10,
+    initialPosition: Point2D = point(0, 0)) : Subnetwork(network), Trainable2 {
+
+    //TODO: Extend Feed forward?
 
     var betweenLayerInterval = 250
 
-    var inputLayer: NeuronArray
-        private set
+    override var inputLayer: NeuronArray = NeuronArray(network, numInputNodes)
 
-    var hiddenLayer: NeuronArray
-        private set
+    var hiddenLayer: NeuronArray = NeuronArray(network, numHiddenNodes)
 
-    var outputLayer: NeuronArray
-        private set
+    var contextLayer: NeuronArray = NeuronArray(network, numHiddenNodes)
+
+    override var outputLayer: NeuronArray =   NeuronArray(network, numOutputNodes)
+
+    override var trainingSet: MatrixDataset = MatrixDataset(numInputNodes, numOutputNodes)
+
+    // TODO
+    var trainer: LMSTrainer2? = null
 
     init {
         label = "Layered Network"
 
         inputLayer = NeuronArray(network, numInputNodes)
-        addModel(inputLayer)
         hiddenLayer = NeuronArray(network, numHiddenNodes)
-        addModel(hiddenLayer)
+        contextLayer = NeuronArray(network, numHiddenNodes)
         outputLayer = NeuronArray(network, numOutputNodes)
-        addModel(outputLayer)
+        addModels(inputLayer, hiddenLayer, contextLayer, outputLayer)
 
         offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH,
             (betweenLayerInterval / 2).toDouble(), 100.0, 200.0 )
         offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH,
             (betweenLayerInterval / 2).toDouble(), 100.0, 200.0 )
+        offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST,
+            100.0, 100.0, 200.0 )
 
         val wmInHidden = WeightMatrix(parentNetwork, inputLayer, hiddenLayer)
         wmInHidden.randomize()
-        addModel(wmInHidden)
-
+        val wmCopy = WeightMatrix(parentNetwork, contextLayer, hiddenLayer)
+        wmInHidden.clear()
         val wmHiddenOut = WeightMatrix(parentNetwork, hiddenLayer, outputLayer)
         wmHiddenOut.randomize()
-        addModel(wmHiddenOut)
+        addModels(wmInHidden, wmCopy, wmHiddenOut)
 
-        if (initialPosition != null) {
-            setLocation(initialPosition.x, initialPosition.y)
-        }
+        setLocation(initialPosition.x, initialPosition.y)
     }
 
     override val name: String
@@ -82,7 +95,47 @@ open class SRNNetwork(
         inputLayer.update()
         hiddenLayer.updateInputs()
         hiddenLayer.update()
+        contextLayer.activations = hiddenLayer.activations
         outputLayer.updateInputs()
         outputLayer.update()
+    }
+
+    // Forwarded from output layer
+    @Producible
+    fun getOutputs(): DoubleArray {
+        return outputLayer.activationArray
+    }
+
+    // Forwards to input layer
+    @Consumable
+    open fun addInputs(inputs: DoubleArray) {
+        inputLayer.addInputs(inputs)
+    }
+
+    /**
+     * Helper class for creating SRN Networks.
+     */
+    class SRNCreator(proposedLabel: String, val initialPosition: Point2D) : EditableObject {
+
+        @UserParameter(label = "Label", order = 5)
+        private val label = proposedLabel
+
+        @UserParameter(label = "Number of inputs", order = 10)
+        var nin = 5
+
+        @UserParameter(label = "Number of hidden", order = 20)
+        var nhidden = 5
+
+        @UserParameter(label = "Number of outputs",  order = 30)
+        var nout = 4
+
+        //TODO: Node type
+
+        override val name = "SRN Network"
+
+        fun create(net: Network): SRNNetwork {
+            return SRNNetwork(net, nin, nhidden, nout, initialPosition)
+        }
+
     }
 }

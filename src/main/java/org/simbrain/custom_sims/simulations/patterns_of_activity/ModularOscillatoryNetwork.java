@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.simbrain.network.connections.RadialGaussianKt.*;
+import static org.simbrain.network.core.NetworkUtilsKt.addNeuronGroup;
 import static org.simbrain.network.core.NetworkUtilsKt.connect;
 
 
@@ -98,7 +99,7 @@ public class ModularOscillatoryNetwork extends Simulation {
     private NeuronGroup addInputGroup(int x, int y) {
 
         // Alternate form would be based on vectors
-        NeuronGroup ng = net.addNeuronGroup(x, y, mouse.getSensors().size());
+        NeuronGroup ng = addNeuronGroup(net, x, y, mouse.getSensors().size());
         ng.setLayout(new LineLayout(LineLayout.LineOrientation.VERTICAL));
         ng.applyLayout(-5, -85);
         ng.setLabel("Object Sensors");
@@ -131,7 +132,7 @@ public class ModularOscillatoryNetwork extends Simulation {
     }
 
     private NeuronGroup addBinaryModule(int x, int y, int numNeurons, String name) {
-        NeuronGroup ng = net.addNeuronGroup(x, y, numNeurons);
+        NeuronGroup ng = addNeuronGroup(net, x, y, numNeurons);
         BinaryRule rule = new BinaryRule();
         ng.setNeuronType(rule);
         HexagonalGridLayout.layoutNeurons(ng.getNeuronList(), 40, 40);
@@ -141,7 +142,7 @@ public class ModularOscillatoryNetwork extends Simulation {
     }
 
     private NeuronGroup addModule(int x, int y, int numNeurons, String name, NeuronUpdateRule rule) {
-        NeuronGroup ng = net.addNeuronGroup(x, y, numNeurons);
+        NeuronGroup ng = addNeuronGroup(net, x, y, numNeurons);
         //KuramotoRule rule = new KuramotoRule();
         //NakaRushtonRule rule = new NakaRushtonRule();
         //rule.setNaturalFrequency(.1);

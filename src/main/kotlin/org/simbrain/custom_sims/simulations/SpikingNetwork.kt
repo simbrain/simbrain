@@ -4,6 +4,8 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTimeSeries
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.core.addNeuron
+import org.simbrain.network.core.addSynapse
 import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.util.place

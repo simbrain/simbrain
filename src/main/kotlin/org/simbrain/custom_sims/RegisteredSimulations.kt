@@ -19,7 +19,6 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscilla
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity
 import org.simbrain.custom_sims.simulations.sorn.SORN
 import org.simbrain.custom_sims.simulations.test.ConvertSim
-import org.simbrain.custom_sims.simulations.test.ReadSim
 import org.simbrain.custom_sims.simulations.test.lstmBlock
 import org.simbrain.util.dir
 
@@ -115,7 +114,6 @@ val simulations = dir<Any>("Simulations") {
         item("Linked Neuron List") { linkedNeuronList }
         dir("Defunct?") {
             item("ConvertSim") { ConvertSim() }
-            item("ReadSim") { ReadSim() }
             item("Creatures") { CreaturesSim() }
             item("MPFS") { MpfsSOM() }
             item("PatternsOfActivity") { PatternsOfActivity() }

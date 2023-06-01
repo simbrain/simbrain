@@ -2,9 +2,8 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.connectAllToAll
-import org.simbrain.network.core.updateNeurons
+import org.simbrain.network.core.*
+import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.subnetworks.WinnerTakeAll
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
@@ -97,8 +96,10 @@ val actorCritic = newSim {
     mouse.addSensor(gridSensor)
 
     val sensorNeurons = network.addNeuronGroup(
-        100.0, 100.0, numTilesInADimension * numTilesInADimension, "Grid"
+        100.0, 100.0, numTilesInADimension * numTilesInADimension
     ).apply {
+        layout = GridLayout(50.0, 50.0)
+        applyLayout()
         label = "Sensor Nodes"
     }
 

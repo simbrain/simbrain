@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.simbrain.network.core.NetworkUtilsKt.getModelByLabel;
 
 public class NetworkTest {
     Network net;
@@ -88,10 +89,10 @@ public class NetworkTest {
 
     @Test
     public void getByLabel() {
-        assertEquals(n1, net.getNeuronByLabel("neuron1"));
-        assertEquals(n2, net.getNeuronByLabel("neuron2"));
-        assertEquals(ng1, net.getNeuronGroupByLabel("neuron_group_1"));
-        assertEquals(ng2, net.getNeuronGroupByLabel("ng2"));
+        assertEquals(n1, getModelByLabel(net, Neuron.class, "neuron1"));
+        assertEquals(n2, getModelByLabel(net, Neuron.class, "neuron2"));
+        assertEquals(ng1, getModelByLabel(net, NeuronGroup.class, "neuron_group_1"));
+        assertEquals(ng2, getModelByLabel(net, NeuronGroup.class, "ng2"));
     }
 
     @Test
@@ -99,10 +100,10 @@ public class NetworkTest {
         String xmlRep = XStreamUtils.getSimbrainXStream().toXML(net);
         Network fromXml = (Network) XStreamUtils.getSimbrainXStream().fromXML(xmlRep);
 
-        assertNotNull(fromXml.getNeuronByLabel("neuron1") );
-        assertNotNull(fromXml.getNeuronByLabel("neuron2") );
-        assertNotNull(fromXml.getNeuronGroupByLabel("neuron_group_1") );
-        assertNotNull(fromXml.getNeuronGroupByLabel("ng2") );
+        assertNotNull(getModelByLabel(fromXml, Neuron.class, "neuron1"));
+        assertNotNull(getModelByLabel(fromXml, Neuron.class, "neuron2"));
+        assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "neuron_group_1"));
+        assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "ng2"));
     }
 
     @Test

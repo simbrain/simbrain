@@ -92,6 +92,16 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
         });
     }
 
+    public final void addModels(List<NetworkModel> models) {
+        models.forEach(this::addModel);
+    }
+
+    public final void addModels(NetworkModel... models) {
+        for (NetworkModel model : models) {
+            addModel(model);
+        }
+    }
+
     /**
      * Delete this subnetwork and its children.
      */

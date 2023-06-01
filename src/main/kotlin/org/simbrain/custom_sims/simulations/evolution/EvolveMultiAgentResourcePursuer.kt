@@ -8,6 +8,7 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.activations
+import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
@@ -382,7 +383,7 @@ val evolveMultiAgentResourcePursuer = newSim {
                 val newMice = world.entityList.filter { it.entityType == EntityType.MOUSE }
                 val networkComponents = workspace.componentList.filterIsInstance<NetworkComponent>()
                 val networks = networkComponents.map { it.network }
-                val thirstNeurons = networks.map { it.getNeuronByLabel("Thirst")!! }
+                val thirstNeurons = networks.map { it.getModelByLabel<Neuron>("Thirst") }
                 val sharedSet = HashSet<GridCoordinate>()
                 (newMice zip thirstNeurons).forEach { (newMouse, thirstNeuron) ->
                     workspace.onReachingWater(sharedSet, thirstNeuron, world, newMouse, { println("hit") }) {

@@ -11,6 +11,7 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.activations
+import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
@@ -326,7 +327,7 @@ val evolveResourcePursuer = newSim {
                 val newMouse = world.entityList.first()
                 val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().first()
                 val network = networkComponent.network
-                val thirstNeuron = network.getNeuronByLabel("Thirst")!!
+                val thirstNeuron = network.getModelByLabel<Neuron>("Thirst")
                 workspace.onReachingWater(thirstNeuron, world, newMouse, { println("hit") }) {
                     println("bad")
                 }

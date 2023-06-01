@@ -18,6 +18,7 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.*;
 import org.simbrain.network.events.NetworkModelEvents2;
 import org.simbrain.network.events.SynapseGroup2Events2;
+import org.simbrain.network.gui.dialogs.NetworkPreferences;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -36,7 +37,6 @@ import java.util.stream.Collectors;
 
 import static org.simbrain.network.connections.ConnectionUtilitiesKt.DEFAULT_EXCITATORY_STRENGTH;
 import static org.simbrain.network.connections.ConnectionUtilitiesKt.DEFAULT_INHIBITORY_STRENGTH;
-import static org.simbrain.network.core.NetworkUtilsKt.getSynapseVisibilityThreshold;
 
 /**
  * A group of synapses. Must connect a source and target neuron group.
@@ -388,7 +388,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * visibility threshold, then individual synapses will not be displayed.
      */
     public void initializeSynapseVisibility() {
-        int threshold = getSynapseVisibilityThreshold();
+        int threshold = NetworkPreferences.INSTANCE.getSynapseVisibilityThreshold();
         if (sourceNeuronGroup.size() * targetNeuronGroup.size() > threshold) {
             displaySynapses = false;
         } else {

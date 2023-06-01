@@ -7,6 +7,7 @@ import org.jetbrains.kotlinx.dl.dataset.embedded.TEST_IMAGES_ARCHIVE
 import org.jetbrains.kotlinx.dl.dataset.embedded.extractImages
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
 import org.simbrain.custom_sims.*
+import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
 import org.simbrain.util.point

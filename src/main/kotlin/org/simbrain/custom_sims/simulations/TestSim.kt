@@ -6,6 +6,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.addNeuronCollectionAsync
+import org.simbrain.network.core.addSynapse
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.neuron_update_rules.DecayRule

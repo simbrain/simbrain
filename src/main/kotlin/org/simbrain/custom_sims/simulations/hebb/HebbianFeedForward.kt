@@ -2,6 +2,8 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.getModelByLabel
 import org.simbrain.util.Utils.FS
 import org.simbrain.world.odorworld.OdorWorldComponent
 import java.io.File
@@ -14,8 +16,8 @@ val hebbianFeedForward = newSim {
     // Basic setup
     workspace.openWorkspace(File("simulations" + FS + "workspaces"+ FS + "hebbFF.zip"))
     val network = (workspace.getComponent("Network") as NetworkComponent).network
-    val nice = network.getNeuronByLabel("\"nice\"")
-    val yuck = network.getNeuronByLabel("\"yuck\"")
+    val nice: Neuron = network.getModelByLabel("\"nice\"")
+    val yuck: Neuron = network.getModelByLabel("\"yuck\"")
 
     val world = (workspace.getComponent("Stimuli") as OdorWorldComponent).world
 

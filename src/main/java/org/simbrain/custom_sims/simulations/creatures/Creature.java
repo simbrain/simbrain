@@ -2,6 +2,8 @@ package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.environment.SmellSource;
 import org.simbrain.workspace.Consumer;
@@ -13,8 +15,6 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
 import org.simbrain.world.odorworld.sensors.ObjectSensor;
-
-import static org.simbrain.network.core.NetworkUtilsKt.connect;
 
 /**
  * Each instance of this class represents one particular creature in the simulation.
@@ -677,6 +677,13 @@ public class Creature {
 
         couple(biochem.getChemByName("Endorphin"), dash.getNeuron(0));
         couple(biochem.getChemByName("Reward"), dash.getNeuron(1));
+    }
+
+    static Synapse connect(Neuron source, Neuron target, SynapseUpdateRule rule, double value) {
+        Synapse synapse = new Synapse(source, target, rule);
+        synapse.forceSetStrength(value);
+        source.getNetwork().addNetworkModelAsync(synapse);
+        return (synapse);
     }
 
 }

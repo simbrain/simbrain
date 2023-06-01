@@ -22,7 +22,6 @@ import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.useInhibitoryParams
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.LabelledItemPanel
@@ -33,6 +32,8 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.ObjectTypeEditor
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.ProbabilityDistribution.Randomizer
+import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -620,6 +621,23 @@ fun createSynapseAdjustmentPanel(
 
 fun createSynapseAdjustmentPanel(synapses: List<Synapse>): SynapseAdjustmentPanel? {
     return createSynapseAdjustmentPanel(synapses)
+}
+
+/**
+ * Convenience methods to set parameters for inhibitory methods in a prob. dist
+ */
+fun ProbabilityDistribution.useInhibitoryParams() {
+    when(this) {
+        is UniformRealDistribution -> {
+            ceil = 0.0
+            floor = -1.0
+        }
+        is NormalDistribution ->   mean = -1.0
+        is UniformIntegerDistribution -> {
+            ceil = 0
+            floor = -1
+        }
+    }
 }
 
 fun main() {

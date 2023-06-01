@@ -16,8 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.simbrain.network.core.NetworkUtilsKt.connectAllToAll;
-import static org.simbrain.network.core.NetworkUtilsKt.getFreeSynapse;
+import static org.simbrain.network.core.NetworkUtilsKt.*;
 
 /**
  * Simulation to demonstrate classical and operant conditioning.
@@ -63,13 +62,13 @@ public class OperantConditioning extends Simulation {
         net = nc.getNetwork();
 
         // Behavioral nodes
-        behaviorNet = net.addNeuronGroup(-14, 73, numNeurons);
+        behaviorNet = addNeuronGroup(net, -14, 73, numNeurons);
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
         behaviorNet.applyLayout();
         behaviorNet.setLabel("Behaviors");
 
         // Stimulus nodes
-        stimulusNet = net.addNeuronGroup(-9.8, 269.93, numNeurons);
+        stimulusNet = addNeuronGroup(net, -9.8, 269.93, numNeurons);
         ((LineLayout) stimulusNet.getLayout()).setSpacing(100);
         stimulusNet.applyLayout();
         stimulusNet.setClamped(true);
@@ -77,10 +76,10 @@ public class OperantConditioning extends Simulation {
         stimulusNet.setIncrement(1);
 
         // Reward and punish nodes
-        rewardNeuron = net.addNeuron((int) stimulusNet.getMaxX() + 100,
+        rewardNeuron = addNeuron(net, (int) stimulusNet.getMaxX() + 100,
                 (int) stimulusNet.getCenterY());
         rewardNeuron.setLabel("Food Pellet");
-        punishNeuron = net.addNeuron((int) rewardNeuron.getX() + 100,
+        punishNeuron = addNeuron(net, (int) rewardNeuron.getX() + 100,
                 (int) stimulusNet.getCenterY());
         punishNeuron.setLabel("Shock");
 

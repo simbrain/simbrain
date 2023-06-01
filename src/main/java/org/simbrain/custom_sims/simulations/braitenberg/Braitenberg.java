@@ -4,6 +4,7 @@ import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.SimulationUtils;
 import org.simbrain.custom_sims.helper_classes.Vehicle;
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.workspace.Workspace;
@@ -16,6 +17,8 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import static org.simbrain.network.core.NetworkUtilsKt.getModelById;
 
 /**
  * Playground for testing new features. A lot of stuff is commented out but
@@ -83,11 +86,11 @@ public class Braitenberg extends Simulation {
         buttonPursuer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 ng1.setLabel("Pursuer");
-                vehicle1.getNetwork().getFreeSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightl.getText()));
-                vehicle1.getNetwork().getFreeSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightr.getText()));
+                getModelById(vehicle1.getNetwork(), Synapse.class, "Synapse_1").setStrength(1*Double.parseDouble(weightl.getText()));
+                getModelById(vehicle1.getNetwork(), Synapse.class, "Synapse_2").setStrength(1*Double.parseDouble(weightr.getText()));
                 ng2.setLabel("Pursuer");
-                vehicle2.getNetwork().getFreeSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightl.getText()));
-                vehicle2.getNetwork().getFreeSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightr.getText()));
+                getModelById(vehicle2.getNetwork(), Synapse.class, "Synapse_2").setStrength(1*Double.parseDouble(weightl.getText()));
+                getModelById(vehicle2.getNetwork(), Synapse.class, "Synapse_1").setStrength(1*Double.parseDouble(weightr.getText()));
                 workspace.iterate();
             }});
         panel.addItem("Pursuers", buttonPursuer);
@@ -97,11 +100,11 @@ public class Braitenberg extends Simulation {
         buttonAvoider.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 ng1.setLabel("Avoider");
-                vehicle1.getNetwork().getFreeSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightl.getText()));
-                vehicle1.getNetwork().getFreeSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
+                getModelById(vehicle1.getNetwork(), Synapse.class, "Synapse_1").setStrength(-1*Double.parseDouble(weightl.getText()));
+                getModelById(vehicle1.getNetwork(), Synapse.class, "Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
                 ng2.setLabel("Avoider");
-                vehicle2.getNetwork().getFreeSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightl.getText()));
-                vehicle2.getNetwork().getFreeSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightr.getText()));
+                getModelById(vehicle2.getNetwork(), Synapse.class, "Synapse_2").setStrength(-1*Double.parseDouble(weightl.getText()));
+                getModelById(vehicle2.getNetwork(), Synapse.class, "Synapse_1").setStrength(-1*Double.parseDouble(weightr.getText()));
                 workspace.iterate();
 
             }});
@@ -112,11 +115,11 @@ public class Braitenberg extends Simulation {
         buttonAvoiderPursuer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 ng1.setLabel("Avoider");
-                vehicle1.getNetwork().getFreeSynapse("Synapse_1").setStrength(-1*Double.parseDouble(weightl.getText()));
-                vehicle1.getNetwork().getFreeSynapse("Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
+                getModelById(vehicle1.getNetwork(), Synapse.class, "Synapse_1").setStrength(-1*Double.parseDouble(weightl.getText()));
+                getModelById(vehicle1.getNetwork(), Synapse.class, "Synapse_2").setStrength(-1*Double.parseDouble(weightr.getText()));
                 ng2.setLabel("Pursuer");
-                vehicle2.getNetwork().getFreeSynapse("Synapse_2").setStrength(1*Double.parseDouble(weightl.getText()));
-                vehicle2.getNetwork().getFreeSynapse("Synapse_1").setStrength(1*Double.parseDouble(weightr.getText()));
+                getModelById(vehicle2.getNetwork(), Synapse.class, "Synapse_2").setStrength(1*Double.parseDouble(weightl.getText()));
+                getModelById(vehicle2.getNetwork(), Synapse.class, "Synapse_1").setStrength(1*Double.parseDouble(weightr.getText()));
                 workspace.iterate();
             }});
         panel.addItem("Avoider-Pursuer", buttonAvoiderPursuer);
@@ -128,8 +131,8 @@ public class Braitenberg extends Simulation {
                 String label1 = ng1.getLabel();
                 ng1.setLabel(ng2.getLabel());
                 ng2.setLabel(label1);
-                vehicle2.getNetwork().getFreeSynapse("Synapse_2").setStrength(vehicle1.getNetwork().getFreeSynapse("Synapse_2").getStrength());
-                vehicle2.getNetwork().getFreeSynapse("Synapse_1").setStrength(vehicle1.getNetwork().getFreeSynapse("Synapse_1").getStrength());
+                getModelById(vehicle2.getNetwork(), Synapse.class, "Synapse_2").setStrength(getModelById(vehicle1.getNetwork(), Synapse.class, "Synapse_2").getStrength());
+                getModelById(vehicle2.getNetwork(), Synapse.class, "Synapse_1").setStrength(getModelById(vehicle1.getNetwork(), Synapse.class, "Synapse_1").getStrength());
                 workspace.iterate();
             }});
         panel.addItem("Reverse weights", buttonReverseWeights);

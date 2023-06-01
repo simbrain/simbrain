@@ -61,12 +61,12 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Default upper bound.
      */
-    private static double DEFAULT_UPPER_BOUND = 100;
+    public static double DEFAULT_UPPER_BOUND = 100;
 
     /**
      * Default lower bound.
      */
-    private static double DEFAULT_LOWER_BOUND = -100;
+    public static double DEFAULT_LOWER_BOUND = -100;
 
     /**
      * Strength of synapse.

@@ -5,23 +5,11 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.groups.*
-import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
-import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.NormalDistribution
-import org.simbrain.util.stats.distributions.UniformIntegerDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
-
-/**
- * If a subnetwork or synapse group has more than this many synapses, then the initial synapse visibility flag is
- * set false.
- */
-@Transient
-var synapseVisibilityThreshold = NetworkPreferences.synapseVisibilityThreshold
+import java.awt.geom.Point2D
 
 /**
  * Provides an ordering on [NetworkModels] so that the networks are rebuilt in a proper order, for example with
@@ -62,6 +50,36 @@ fun updateNeurons(neuronList: List<Neuron>) {
 fun getFreeSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
 
 /**
+ * Returns a network model with a matching label.  If more than one
+ * model has a matching label, the first found is returned.
+ */
+inline fun <reified T: NetworkModel> Network.getModelByLabel(label: String): T = getModels<T>().first {
+    it.label.equals(label, ignoreCase = true)
+}
+
+/**
+ * Version of getModelByLabel that works in Java.
+ */
+fun <T: NetworkModel> Network.getModelByLabel(clazz: Class<T>, label: String): T = getModels(clazz).first {
+    it.label.equals(label, ignoreCase = true)
+}
+
+/**
+ * Returns a network model with a matching id.  If more than one
+ * model has a matching id, the first found is returned.
+ */
+inline fun <reified T: NetworkModel> Network.getModelById(id: String): T = getModels<T>().first {
+    it.id.equals(id, ignoreCase = true)
+}
+
+/**
+ * Version of getModelById that works in Java.
+ */
+fun <T: NetworkModel> Network.getModelById(clazz: Class<T>, id: String): T = getModels(clazz).first {
+    it.id.equals(id, ignoreCase = true)
+}
+
+/**
  * Convenient access to a list of activations
  */
 var List<Neuron?>.activations: List<Double>
@@ -93,7 +111,7 @@ var List<Neuron>.auxValues: List<Double>
     }
 
 /**
- * Length in pixels of synapses. See Syanpse.length.
+ * Length in pixels of synapses. See Synapse.length.
  */
 val List<Synapse>.lengths: List<Double>
     get() = map { it.length }
@@ -113,47 +131,8 @@ fun networkUpdateAction(description: String, longDescription: String = descripti
         override fun getLongDescription(): String = longDescription
     }
 
-/**
- * Layout a neuron group.
- *
- * @param ng reference to the group
- * @param layoutName the type of layout to use: "line" (defaults to horizontal),
- * "vertical line", or "grid".  TODO: Add hex.
- */
-fun layoutNeuronGroup(ng: NeuronGroup, layoutName: String) {
-    if (layoutName.toLowerCase().contains("line")) {
-        if (layoutName.equals("vertical line", ignoreCase = true)) {
-            val lineLayout = LineLayout(50.0, LineLayout.LineOrientation.VERTICAL)
-            ng.layout = lineLayout
-        } else {
-            val lineLayout = LineLayout(50.0, LineLayout.LineOrientation.HORIZONTAL)
-            ng.layout = lineLayout
-        }
-    } else if (layoutName.equals("grid", ignoreCase = true)) {
-        val gridLayout = GridLayout(50.0, 50.0, Math.sqrt(ng.size().toDouble()).toInt()
-        )
-        ng.layout = gridLayout
-    }
-    ng.applyLayout()
-}
-
-/**
- * Make a single source -> target neuron connection.
- *
- * @param source the source neuron
- * @param target the target neuron
- */
-fun connect(source: Neuron, target: Neuron, value: Double): Synapse {
-    val synapse = Synapse(source, target)
-    synapse.forceSetStrength(value)
-    source.network.addNetworkModelAsync(synapse)
-    return synapse
-}
-
-/**
- * Make a single source -> target neuron connection with specified upper and lower bounds for the synapses.
- */
-fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double, upperBound: Double): Synapse {
+@JvmOverloads
+fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double = Synapse.DEFAULT_LOWER_BOUND, upperBound: Double = Synapse.DEFAULT_UPPER_BOUND): Synapse {
     val synapse = Synapse(source, target)
     synapse.forceSetStrength(value)
     synapse.lowerBound = lowerBound
@@ -162,35 +141,31 @@ fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double, u
     return synapse
 }
 
-/**
- * Connect source to target with a provided learning rule and value.
- *
- * @return the new synapse
- */
-fun connect(source: Neuron, target: Neuron, rule: SynapseUpdateRule, value: Double): Synapse? {
-    val synapse = Synapse(source, target, rule)
-    synapse.forceSetStrength(value)
-    source.network.addNetworkModelAsync(synapse)
-    return synapse
+fun Network.connect(source: List<Neuron>, target: List<Neuron>, connectionStrategy: ConnectionStrategy): List<Synapse> {
+    return connectionStrategy.connectNeurons(this, source, target)
+}
+
+fun Network.connect(source: AbstractNeuronCollection, target: AbstractNeuronCollection, connector: ConnectionStrategy): List<Synapse?> {
+    return connector.connectNeurons(this, source.neuronList, target.neuronList)
 }
 
 /**
  * Connect input nodes to target nodes with weights initialized to a value.
  */
-fun connectAllToAll(source: NeuronGroup, target: NeuronGroup, value: Double): List<Synapse> {
+fun connectAllToAll(source: AbstractNeuronCollection, target: AbstractNeuronCollection, value: Double): List<Synapse> {
     val wts = connectAllToAll(source, target)
-    wts.forEach{wt: Synapse -> wt.forceSetStrength(value)}
+    wts.forEach{ it.forceSetStrength(value) }
     return wts
 }
 
-fun connectAllToAll(source: NeuronGroup, target: NeuronGroup): List<Synapse> {
+fun connectAllToAll(source: AbstractNeuronCollection, target: AbstractNeuronCollection): List<Synapse> {
     return AllToAll().connectNeurons(source.network, source.neuronList, target.neuronList)
 }
 
 /**
  * Connect a source neuron group to a single target neuron
  */
-fun connectAllToAll(inputs: NeuronGroup, target: Neuron): List<Synapse> {
+fun connectAllToAll(inputs: AbstractNeuronCollection, target: Neuron): List<Synapse> {
     val connector = AllToAll()
     return connector.connectNeurons(inputs.network, inputs.neuronList, listOf(target))
 }
@@ -198,14 +173,10 @@ fun connectAllToAll(inputs: NeuronGroup, target: Neuron): List<Synapse> {
 /**
  * Connect input nodes to target node with weights initialized to a value.
  */
-fun connectAllToAll(source: NeuronGroup, target: Neuron, value: Double): List<Synapse> {
+fun connectAllToAll(source: AbstractNeuronCollection, target: Neuron, value: Double): List<Synapse> {
     val wts = connectAllToAll(source, target)
     wts.forEach{ wt: Synapse -> wt.forceSetStrength(value) }
     return wts
-}
-
-fun Network.connect(source: List<Neuron>, target: List<Neuron>, connectionStrategy: ConnectionStrategy): List<Synapse> {
-    return connectionStrategy.connectNeurons(this, source, target)
 }
 
 fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {
@@ -214,6 +185,40 @@ fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<
     }
     addNetworkModelsAsync(neurons)
     return neurons
+}
+
+fun Network.addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
+    .apply(this::addNetworkModelAsync)
+    .also(block)
+
+@JvmOverloads
+fun Network.addNeuron(x: Int, y: Int, block: Neuron.() -> Unit = { }) = addNeuron(block)
+    .also{ it.location = point(x,y) }
+
+fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
+    .apply(block)
+    .also(this::addNetworkModelAsync)
+
+fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
+    return NeuronGroup(this, List(count) {
+        Neuron(this).apply(template)
+    }).also {
+        addNetworkModelAsync(it)
+        if (location != null) {
+            val (x, y) = location
+            it.setLocation(x, y)
+        }
+    }
+}
+
+@JvmOverloads
+fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUpdateRule = LinearRule()):
+        NeuronGroup {
+    val ng = NeuronGroup(this, numNeurons)
+    ng.setNeuronType(rule)
+    addNetworkModelAsync(ng)
+    ng.setLocation(x, y)
+    return ng
 }
 
 fun Network.addNeuronCollectionAsync(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
@@ -229,23 +234,17 @@ suspend fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> 
 }
 
 /**
- * Convenience methods to set parameters for inhibitory methods in a prob. dist
+ * Add a synapse group between a source and target neuron group
+ *
+ * @return the new synapse group
  */
-fun ProbabilityDistribution.useInhibitoryParams() {
-    when(this) {
-        is UniformRealDistribution -> {
-            ceil = 0.0
-            floor = -1.0
-        }
-        is NormalDistribution ->   mean = -1.0
-        is UniformIntegerDistribution -> {
-            ceil = 0
-            floor = -1
-        }
-    }
+fun Network.addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup2 {
+    val sg = SynapseGroup.createSynapseGroup(source, target)
+    addNetworkModelAsync(sg)
+    return sg
 }
 
-fun List<Synapse>.decayStrengthBasedOnLength(decay: DecayFunction) {
+fun Collection<Synapse>.decayStrengthBasedOnLength(decay: DecayFunction) {
     forEach{ it.decayStrengthBasedOnLength(decay) }
 }
 
@@ -262,11 +261,13 @@ fun Synapse.overlapsExistingSynapse(): Boolean {
     return this.source.fanOut[target].let { it != null && it != this }
 }
 
-// fun List<Synapse>.clamp(clamped: Boolean) = {
-//     forEach { it.isFrozen = clamped}
-// }
-//
-// fun List<Neuron>.clamp(clamped: Boolean) = {
-//     forEach { it.isClamped = clamped}
-// }
+@JvmName("clampSynapses")
+fun Collection<Synapse>.clamp(clamped: Boolean) {
+    forEach { it.isFrozen = clamped }
+}
+
+@JvmName("clampNeurons")
+fun Collection<Neuron>.clamp(clamped: Boolean) {
+    forEach { it.isClamped = clamped }
+}
 

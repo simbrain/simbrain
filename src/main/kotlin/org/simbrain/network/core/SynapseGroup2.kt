@@ -6,6 +6,7 @@ import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.SynapseGroup2Events2
 import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -73,7 +74,7 @@ class SynapseGroup2 @JvmOverloads constructor(
      * visibility threshold, then individual synapses will not be displayed.
      */
     fun initializeSynapseVisibility() {
-        val threshold = synapseVisibilityThreshold
+        val threshold = NetworkPreferences.synapseVisibilityThreshold
         displaySynapses = source.size() * target.size() <= threshold
     }
 

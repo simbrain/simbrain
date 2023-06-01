@@ -2,11 +2,8 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
+import org.simbrain.network.core.*
 
-import org.simbrain.network.core.activations
-import org.simbrain.network.core.auxValues
-import org.simbrain.network.core.connectAllToAll
-import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.util.component1
 import org.simbrain.util.component2

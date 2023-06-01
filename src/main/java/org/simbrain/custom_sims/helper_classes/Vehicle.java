@@ -12,6 +12,7 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.simbrain.network.core.NetworkUtilsKt.addNeuron;
 import static org.simbrain.network.core.NetworkUtilsKt.connect;
 
 /**
@@ -83,27 +84,27 @@ public class Vehicle {
 
         // These have to be updated first to update properly
         // unless priority is used
-        Neuron leftInput = net.addNeuron(x, y + 100);
+        Neuron leftInput = addNeuron(net, x, y + 100);
         leftInput.setLabel(objectType + " (L)");
         leftInput.setClamped(true);
         neurons.add(leftInput);
 
-        Neuron rightInput = net.addNeuron(x + 100, y + 100);
+        Neuron rightInput = addNeuron(net, x + 100, y + 100);
         rightInput.setLabel(objectType + " (R)");
         rightInput.setClamped(true);
         neurons.add(rightInput);
 
-        Neuron leftTurn = net.addNeuron(x, y);
+        Neuron leftTurn = addNeuron(net, x, y);
         leftTurn.setLabel("Left");
         neurons.add(leftTurn);
 
-        Neuron straight = net.addNeuron(x + 50, y);
+        Neuron straight = addNeuron(net, x + 50, y);
         straight.setLabel("Speed");
         straight.setActivation(3);
         straight.setClamped(true);
         neurons.add(straight);
 
-        Neuron rightTurn = net.addNeuron(x + 100, y);
+        Neuron rightTurn = addNeuron(net, x + 100, y);
         rightTurn.setLabel("Right");
         neurons.add(rightTurn);
 

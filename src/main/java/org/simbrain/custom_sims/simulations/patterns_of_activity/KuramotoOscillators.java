@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.simbrain.network.connections.RadialGaussianKt.*;
+import static org.simbrain.network.core.NetworkUtilsKt.*;
 
 
 /**
@@ -118,7 +119,7 @@ public class KuramotoOscillators extends Simulation {
         recSyns.setLabel("Recurrent");
 
         // Inputs
-        inputNetwork = net.addNeuronGroup(1, 1, 3);
+        inputNetwork = addNeuronGroup(net, 1, 1, 3);
         inputNetwork.setLowerBound(-100);
         inputNetwork.setUpperBound(100);
         inputNetwork.setLabel("Sensory Neurons");
@@ -141,19 +142,19 @@ public class KuramotoOscillators extends Simulation {
         sim.couple(smellSensor, inputNetwork);
 
         // Prediction net
-        predictionRes = net.addNeuronGroup(1,1,  netSize);
+        predictionRes = addNeuronGroup(net, 1,1,  netSize);
         HexagonalGridLayout.layoutNeurons(predictionRes.getNeuronList(), spacing, spacing);
         predictionRes.setLocation(500, 63);
         predictionRes.setLabel("Predicted States");
         predictionRes.setLowerBound(-10);
         predictionRes.setUpperBound(10);
-        predictionSg = net.addSynapseGroup(reservoirNet, predictionRes);
+        predictionSg = addSynapseGroup(net, reservoirNet, predictionRes);
 
         // Train prediction network
         net.addUpdateAction((new TrainPredictionNet(this)));
 
         // Error
-        errorNeuron = net.addNeuron(380, 500);
+        errorNeuron = addNeuron(net, 380, 500);
         errorNeuron.setClamped(true);
         errorNeuron.setLabel("Error");
 

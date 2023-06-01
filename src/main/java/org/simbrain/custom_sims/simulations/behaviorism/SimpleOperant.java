@@ -13,6 +13,8 @@ import org.simbrain.workspace.updater.UpdateActionKt;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.simbrain.network.core.NetworkUtilsKt.addNeuronGroup;
+
 /**
  * Simulation to demonstrate classical and operant conditioning.
  *
@@ -48,7 +50,7 @@ public class SimpleOperant extends Simulation {
 
         // Build a network
         nc = sim.addNetwork(195, 9, 447, 296, "Behaviors");
-        behaviorNet = nc.getNetwork().addNeuronGroup(-9.25, 95.93, numNeurons);
+        behaviorNet = addNeuronGroup(nc.getNetwork(), -9.25, 95.93, numNeurons);
         behaviorNet.setLabel("Behaviors");
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
         behaviorNet.applyLayout(-5, -85);

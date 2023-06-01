@@ -23,6 +23,8 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor;
 
 import java.util.Arrays;
 
+import static org.simbrain.network.core.NetworkUtilsKt.getModelByLabel;
+
 /**
  * Create a Braitenberg pursuer with a projection plot to sensor neurons and study the maps that develop within it.
  * Prediction plot gives a sense of when the model is working well.
@@ -102,8 +104,8 @@ public class RandomizedPursuer extends Simulation {
                 (ObjectSensor) mouse.getSensors().get(0),
                 (ObjectSensor)  mouse.getSensors().get(1));
         vehicleNetwork.setLabel("Pursuer");
-        Neuron sensor1 = net.getNeuronByLabel("Swiss (L)");
-        Neuron sensor2 = net.getNeuronByLabel("Swiss (R)");
+        Neuron sensor1 = getModelByLabel(net, Neuron.class, "Swiss (L)");
+        Neuron sensor2 = getModelByLabel(net, Neuron.class, "Swiss (R)");
         sensorNodes = new NeuronCollection(net, Arrays.asList(sensor1, sensor2));
         sensorNodes.setLabel("Sensor Nodes");
         net.addNetworkModelAsync(sensorNodes);

@@ -4,7 +4,6 @@ import kotlinx.coroutines.*
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.ConnectionSelector
-import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.events.NetworkEvents2
 import org.simbrain.network.groups.NeuronCollection
@@ -15,17 +14,12 @@ import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.SimpleIdManager
-import org.simbrain.util.component1
-import org.simbrain.util.component2
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.util.point
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.updater.PerformanceMonitor
 import org.simbrain.workspace.updater.UpdateAction
-import java.awt.geom.Point2D
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -276,25 +270,9 @@ class Network: CoroutineScope {
         flatNeuronList.forEach(Neuron::clear)
     }
 
-    /**
-     * Find a neuron with a given string id.
-     *
-     * @param id id to search for.
-     * @return neuron with that id, null otherwise
-     */
-    fun getFreeNeuron(id: String?): Neuron? = networkModels.get<Neuron>().firstOrNull {
-        it.id.equals(id, ignoreCase = true)
-    }
+    val freeNeurons get() = networkModels.get<Neuron>()
 
-    /**
-     * Find a synapse with a given string id.
-     *
-     * @param id id to search for.
-     * @return synapse with that id, null otherwise
-     */
-    fun getFreeSynapse(id: String?): Synapse? = networkModels.get<Synapse>().firstOrNull {
-        it.id.equals(id, ignoreCase = true)
-    }
+    val freeSynapses get() = networkModels.get<Synapse>()
 
     /**
      * Create "flat" list of neurons, which includes the top-level neurons plus all group neurons.
@@ -508,28 +486,6 @@ class Network: CoroutineScope {
         "------Network------\n" + networkModels
 
     /**
-     * Returns a neuron with a matching label.  If more than one
-     * neuron has a matching label, the first found is returned.
-     *
-     * @param label label of neuron to search for
-     * @return matched Neuron, if any
-     */
-    fun getNeuronByLabel(label: String): Neuron? = flatNeuronList.firstOrNull {
-        it.label.equals(label, ignoreCase = true)
-    }
-
-    /**
-     * Returns a neurongroup with a matching label.  If more than one
-     * group has a matching label, the first one found is returned.
-     *
-     * @param label label of NeuronGroup to search for
-     * @return matched NeuronGroup, if any
-     */
-    fun getNeuronGroupByLabel(label: String): NeuronGroup? = flatNeuronGroupList.firstOrNull {
-        it.label.equals(label, ignoreCase = true)
-    }
-
-    /**
      * Forward to [NetworkUpdateManager.addAction]
      */
     fun addUpdateAction(action: UpdateAction) {
@@ -568,145 +524,6 @@ class Network: CoroutineScope {
      */
     fun addNetworkModelsAsync(vararg toAdd: NetworkModel) {
         toAdd.forEach { addNetworkModelAsync(it) }
-    }
-
-    /**
-     * Translate all neurons (the only objects with position information).
-     *
-     * @param offsetX x offset for translation.
-     * @param offsetY y offset for translation.
-     */
-    fun translate(offsetX: Double, offsetY: Double) {
-        for (neuron in flatNeuronList) {
-            neuron.offset(offsetX, offsetY)
-        }
-    }
-
-
-    fun clampNeurons(clamped: Boolean) {
-        freeNeurons.forEach{n -> n.isClamped = clamped}
-    }
-
-    fun freezeSynapses(freeze: Boolean) {
-        // Freeze synapses in synapse groups
-        for (group in networkModels.get<SynapseGroup>()) {
-            // group.setFrozen(freeze, Polarity.BOTH)
-        }
-        // Freeze free synapses
-        for (synapse in networkModels.get<Synapse>()) {
-            synapse.isFrozen = freeze
-        }
-    }
-
-    val freeNeurons get() = networkModels.get<Neuron>()
-
-    val freeSynapses get() = networkModels.get<Synapse>()
-
-    fun addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
-        .apply(this::addNetworkModelAsync)
-        .also(block)
-
-    fun addNeuron(x: Int, y: Int) = Neuron(this)
-        .also{
-            addNetworkModelAsync(it)
-            it.location = point(x,y)
-        }
-
-    fun addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
-        .apply(block)
-        .also(this::addNetworkModelAsync)
-
-    fun addNeuronGroup(count: Int, template: Neuron.() -> Unit = { }) = NeuronGroup(this, List(count) {
-        Neuron(this).apply(template)
-    }).also { addNetworkModelAsync(it) }
-
-    fun addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
-        return NeuronGroup(this, List(count) {
-            Neuron(this).apply(template)
-        }).also {
-            addNetworkModelAsync(it)
-            if (location != null) {
-                val (x, y) = location
-                it.setLocation(x, y)
-            }
-        }
-    }
-
-    fun createNeuronGroupTemplate(template: NeuronGroup.() -> Unit) = fun Network.(
-        count: Int,
-        template: Neuron.() -> Unit
-    ) = NeuronGroup(this, List(count) {
-        Neuron(this).apply(template)
-    }).also { addNetworkModelAsync(it) }
-
-    fun <R> Network.withConnectionStrategy(
-        connectionStrategy: ConnectionStrategy,
-        block: NetworkWithConnectionStrategy.() -> R
-    ): R {
-        return NetworkWithConnectionStrategy(this, connectionStrategy).run(block)
-    }
-
-    data class NetworkWithConnectionStrategy(
-        private val network: Network,
-        private val connectionStrategy: ConnectionStrategy
-    ) {
-        fun connect(source: List<Neuron>, target: List<Neuron>): List<Synapse> {
-            return connectionStrategy.connectNeurons(network, source, target)
-        }
-    }
-
-    /**
-     * Add a synapse group between a source and target neuron group
-     *
-     * @return the new synapse group
-     */
-    fun addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup2 {
-        val sg = SynapseGroup.createSynapseGroup(source, target)
-        addNetworkModelAsync(sg)
-        return sg
-    }
-
-    /**
-     * Add a neuron group at the specified location, with a specified number of neurons, layout,
-     * and update rule.
-     *
-     * @return the new neuron group
-     */
-    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int, layoutName: String, rule: NeuronUpdateRule):
-            NeuronGroup {
-        val ng = NeuronGroup(this, numNeurons)
-        ng.setNeuronType(rule)
-        addNetworkModelAsync(ng)
-        layoutNeuronGroup(ng, layoutName)
-        ng.setLocation(x, y)
-        return ng
-    }
-
-    /**
-     * Add a neuron group with a specified number of neurons, layout, and neuron update rule
-     *
-     * @return the new neuron group
-     */
-    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int, layoutName: String): NeuronGroup {
-        return addNeuronGroup(x, y, numNeurons, layoutName, LinearRule())
-    }
-
-    /**
-     * Add a new neuron group at the specified location, with a default line layout and linear neurons.
-     *
-     * @return the new neuron group.
-     */
-    fun addNeuronGroup(x: Double, y: Double, numNeurons: Int): NeuronGroup {
-        return addNeuronGroup(x, y, numNeurons, "line")
-    }
-
-    /**
-     * Connect source and target neuron groups with a provided connection strategy.
-     *
-     * @return the new synapses
-     */
-    fun connect(source: NeuronGroup, target: NeuronGroup, connector: ConnectionStrategy): List<Synapse?>? {
-        return connector.connectNeurons(this, source.neuronList, target.neuronList)
     }
 
     suspend fun selectModels(models: List<NetworkModel>) {

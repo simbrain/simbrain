@@ -6,6 +6,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -14,7 +15,8 @@ import org.simbrain.workspace.couplings.Coupling;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.simbrain.network.core.NetworkUtilsKt.connect;
+import static org.simbrain.network.core.NetworkUtilsKt.addNeuronGroup;
+import static org.simbrain.network.core.NetworkUtilsKt.addSynapseGroup;
 
 /**
  * A helper class for filling in networks, from either a base
@@ -57,7 +59,8 @@ public class CreaturesBrain {
     // Helper methods
 
     public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName, CreaturesNeuronRule neuronRule) {
-        NeuronGroup lobe = nc.getNetwork().addNeuronGroup(x, y, numNeurons, layoutName, neuronRule);
+        NeuronGroup lobe = addNeuronGroup(nc.getNetwork(), x, y, numNeurons, neuronRule);
+        layoutNeuronGroup(lobe, layoutName);
         lobe.setLabel(lobeName);
         lobes.add(lobe);
         return lobe;
@@ -152,7 +155,7 @@ public class CreaturesBrain {
         // generate a customized ConnectNeurons object to use.
 
         // Temporary method call
-        SynapseGroup2 synapseGroup = nc.getNetwork().addSynapseGroup(sourceLobe, targetLobe);
+        SynapseGroup2 synapseGroup = addSynapseGroup(nc.getNetwork(), sourceLobe, targetLobe);
 
         synapseGroup.setLabel(groupName);
 
@@ -286,7 +289,7 @@ public class CreaturesBrain {
 
             // Connect
             for (Neuron n : l.getNeuronList()) {
-                connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
+                Creature.connect(n, perception.getNeuronByLabel(n.getLabel()), new CreaturesSynapseRule(), 1);
             }
 
             // Increment pointer for the next loop
@@ -332,6 +335,22 @@ public class CreaturesBrain {
         }
 
         return null;
+    }
+
+    private static void layoutNeuronGroup(NeuronGroup ng, String layoutName) {
+        if (layoutName.toLowerCase().contains("line")) {
+            if (layoutName.equalsIgnoreCase("vertical line")) {
+                LineLayout lineLayout = new LineLayout(50.0, LineLayout.LineOrientation.VERTICAL);
+                ng.setLayout(lineLayout);
+            } else {
+                LineLayout lineLayout = new LineLayout(50.0, LineLayout.LineOrientation.HORIZONTAL);
+                ng.setLayout(lineLayout);
+            }
+        } else if (layoutName.equalsIgnoreCase("grid")) {
+            GridLayout gridLayout = new GridLayout(50.0, 50.0, (int) Math.sqrt(ng.size()));
+            ng.setLayout(gridLayout);
+        }
+        ng.applyLayout();
     }
 
 }

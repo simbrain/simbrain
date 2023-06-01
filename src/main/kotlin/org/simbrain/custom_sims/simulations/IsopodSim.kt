@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData

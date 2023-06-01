@@ -21,6 +21,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import static org.simbrain.network.core.NetworkUtilsKt.getModelByLabel;
+
 /**
  * TODO.
  */
@@ -297,12 +299,12 @@ public class Cerebellum extends Simulation {
     void loadCustomUpdater() {
 
         // References
-        Neuron dopamine = network.getNeuronByLabel("Basal Ganglia (GPi)");
-        Neuron output = network.getNeuronByLabel("Output");
-        Neuron target = network.getNeuronByLabel("Target");
-        Neuron purkinje = network.getNeuronByLabel("Purkinje");
+        Neuron dopamine = getModelByLabel(network, Neuron.class, "Basal Ganglia (GPi)");
+        Neuron output = getModelByLabel(network, Neuron.class, "Output");
+        Neuron target = getModelByLabel(network, Neuron.class, "Target");
+        Neuron purkinje = getModelByLabel(network, Neuron.class, "Purkinje");
         List<Synapse> p_fibers = purkinje.getFanIn();
-        Neuron i_olive = network.getNeuronByLabel("Inferior Olive");
+        Neuron i_olive = getModelByLabel(network, Neuron.class, "Inferior Olive");
 
         var networkUpdateAction = UpdateActionKt.create("Update basal ganglia", () -> {
             if (toggleLearning) {
@@ -360,9 +362,9 @@ public class Cerebellum extends Simulation {
     void setUpControlPanel() {
         panel = ControlPanel.makePanel(sim, "Train / Test", 4,9,230,221);
         
-        NeuronGroup inputs = network.getNeuronGroupByLabel("From Spinal Cord");
-        Neuron target = network.getNeuronByLabel("Target");
-        Neuron dopamine = network.getNeuronByLabel("Basal Ganglia (GPi)");
+        NeuronGroup inputs = getModelByLabel(network, NeuronGroup.class, "From Spinal Cord");
+        Neuron target = getModelByLabel(network, Neuron.class, "Target");
+        Neuron dopamine = getModelByLabel(network, Neuron.class, "Basal Ganglia (GPi)");
 
         // Just give the input of each to the model, without giving it a target
         // (and hence no Dopamine)

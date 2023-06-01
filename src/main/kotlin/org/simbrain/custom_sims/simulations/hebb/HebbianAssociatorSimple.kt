@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.addNeuron
 import org.simbrain.network.synapse_update_rules.HebbianRule
 import org.simbrain.util.place
 import org.simbrain.util.point

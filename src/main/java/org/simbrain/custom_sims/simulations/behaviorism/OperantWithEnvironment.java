@@ -21,8 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.simbrain.network.core.NetworkUtilsKt.connectAllToAll;
-import static org.simbrain.network.core.NetworkUtilsKt.getFreeSynapse;
+import static org.simbrain.network.core.NetworkUtilsKt.*;
 
 
 /**
@@ -68,13 +67,13 @@ public class OperantWithEnvironment extends Simulation {
         net = nc.getNetwork();
 
         // Behavioral nodes
-        behaviorNet = net.addNeuronGroup(-9.25, 95.93, numNeurons);
+        behaviorNet = addNeuronGroup(net, -9.25, 95.93, numNeurons);
         ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
         behaviorNet.applyLayout();
         behaviorNet.setLabel("Behaviors");
 
         // Stimulus nodes
-        stimulusNet = net.addNeuronGroup(-9.25, 295.93, numNeurons);
+        stimulusNet = addNeuronGroup(net, -9.25, 295.93, numNeurons);
         ((LineLayout) stimulusNet.getLayout()).setSpacing(100);
         stimulusNet.applyLayout();
         stimulusNet.setClamped(true);
@@ -82,10 +81,10 @@ public class OperantWithEnvironment extends Simulation {
         stimulusNet.setIncrement(1);
 
         // Reward and punish nodes
-        rewardNeuron = net.addNeuron((int)stimulusNet.getMaxX() + 100,
+        rewardNeuron = addNeuron(net, (int)stimulusNet.getMaxX() + 100,
             (int) stimulusNet.getCenterY());
         rewardNeuron.setLabel("Food Pellet");
-        punishNeuron = net.addNeuron((int) rewardNeuron.getX() + 100,
+        punishNeuron = addNeuron(net, (int) rewardNeuron.getX() + 100,
             (int) stimulusNet.getCenterY());
         punishNeuron.setLabel("Shock");
 

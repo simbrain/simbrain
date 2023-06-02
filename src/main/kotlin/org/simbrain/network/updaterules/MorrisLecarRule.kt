@@ -3,7 +3,7 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.MorrisLecarData
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
@@ -187,12 +187,12 @@ class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     /**
      * Add noise to neuron.
      */
-    private var addNoise = false
+    override var addNoise = false
 
     /**
      * A source of noise (nA).
      */
-    private var noiseGenerator: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
+    override var noiseGenerator: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
     override fun apply(neuron: Neuron, dat: ScalarDataHolder) {
         val data = dat as MorrisLecarData
         val dt = neuron.network.timeStep
@@ -215,7 +215,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         val i_L = g_L * (vMembrane - vRest_L)
         val i_ion = i_Ca + i_K + i_L
         var i_noise = 0.0
-        if (getAddNoise()) {
+        if (addNoise) {
             i_noise = noiseGenerator.sampleDouble()
         }
         return (i_bg - i_ion + i_syn + i_noise) / cMembrane
@@ -243,7 +243,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
     override fun deepCopy(): NeuronUpdateRule {
         val cpy = MorrisLecarRule()
-        cpy.setAddNoise(getAddNoise())
+        cpy.addNoise = addNoise
         cpy.g_Ca = g_Ca
         cpy.g_K = g_K
         cpy.cMembrane = cMembrane
@@ -265,24 +265,8 @@ class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     override val name: String
         get() = "Morris-Lecar"
 
-    override fun getNoiseGenerator(): ProbabilityDistribution {
-        return noiseGenerator
-    }
-
-    override fun setNoiseGenerator(noise: ProbabilityDistribution) {
-        noiseGenerator = noise
-    }
-
     fun setNoiseAmplitude(amp: Double) {
         (noiseGenerator as NormalDistribution).standardDeviation = amp
-    }
-
-    override fun getAddNoise(): Boolean {
-        return addNoise
-    }
-
-    override fun setAddNoise(addNoise: Boolean) {
-        this.addNoise = addNoise
     }
 
     fun getG_Ca(): Double {

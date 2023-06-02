@@ -19,7 +19,11 @@
 package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.*;
+import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
+import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SquashingFunctionEnum;
 import org.simbrain.util.stats.ProbabilityDistribution;

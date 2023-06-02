@@ -41,6 +41,8 @@ import javax.swing.*
  * objects must instantiate [EditableObject]. The fields that should be editable
  * are annotated with the [UserParameter] annotation.
  *
+ * Note that annotated interfaces must be in Kotlin.
+ *
  * Object types are created by updating a prototype object, then copying it. Thus objects using the object type
  * editor must instantiate [CopyableObject].
  *

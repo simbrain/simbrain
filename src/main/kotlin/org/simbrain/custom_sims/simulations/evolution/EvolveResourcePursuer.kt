@@ -16,8 +16,8 @@ import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule
+import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.piccolo.GridCoordinate

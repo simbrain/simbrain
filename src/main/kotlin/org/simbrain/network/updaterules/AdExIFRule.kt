@@ -22,7 +22,7 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.*
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath.clip
@@ -254,12 +254,12 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     /**
      * An option to add noise.
      */
-    private var addNoise = false
+    override var addNoise = false
 
     /**
      * The noise generator randomizer.
      */
-    private var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
+    override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * An absolute refractory period. Not normally a part of AdEx, but can
@@ -389,22 +389,6 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
     override val name: String
         get() = "AdEx Integrate and Fire"
-
-    override fun getNoiseGenerator(): ProbabilityDistribution {
-        return noiseGenerator
-    }
-
-    override fun setNoiseGenerator(noise: ProbabilityDistribution) {
-        noiseGenerator = noise
-    }
-
-    override fun getAddNoise(): Boolean {
-        return addNoise
-    }
-
-    override fun setAddNoise(noise: Boolean) {
-        addNoise = noise
-    }
 
     override fun getGraphicalLowerBound(): Double {
         return leakReversal - 20

@@ -20,7 +20,7 @@ package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -109,12 +109,12 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     /**
      * Noise generator.
      */
-    private var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
+    override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * Add noise to the neuron.
      */
-    private var addNoise = false
+    override var addNoise = false
 
     /**
      * An optional absolute refractory period. In many simulations this
@@ -132,7 +132,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         `in`.c = c
         `in`.d = d
         `in`.setiBg(getiBg())
-        `in`.setAddNoise(getAddNoise())
+        `in`.addNoise = addNoise
         `in`.noiseGenerator = noiseGenerator.deepCopy()
         return `in`
     }
@@ -170,22 +170,6 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
     fun setiBg(iBg: Double) {
         this.iBg = iBg
-    }
-
-    override fun getAddNoise(): Boolean {
-        return addNoise
-    }
-
-    override fun setAddNoise(addNoise: Boolean) {
-        this.addNoise = addNoise
-    }
-
-    override fun getNoiseGenerator(): ProbabilityDistribution {
-        return noiseGenerator
-    }
-
-    override fun setNoiseGenerator(noise: ProbabilityDistribution) {
-        noiseGenerator = noise
     }
 
     override val name: String

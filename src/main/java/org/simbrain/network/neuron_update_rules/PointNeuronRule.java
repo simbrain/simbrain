@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.math.SimbrainMath;
 

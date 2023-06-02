@@ -11,7 +11,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule
+import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.point

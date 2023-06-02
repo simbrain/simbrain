@@ -21,7 +21,7 @@
 // import org.simbrain.network.core.NetworkKt;
 // import org.simbrain.network.core.Neuron;
 // import org.simbrain.network.core.Synapse;
-// import org.simbrain.network.neuron_update_rules.interfaces.BiasedUpdateRule;
+// import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule;
 //
 // import java.util.List;
 //

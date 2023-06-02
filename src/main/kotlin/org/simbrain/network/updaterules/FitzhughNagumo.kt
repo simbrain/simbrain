@@ -22,7 +22,7 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -66,12 +66,12 @@ class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     /**
      * Noise generator.
      */
-    private var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
+    override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * Add noise to the neuron.
      */
-    private var addNoise = false
+    override var addNoise = false
 
     /**
      * Recovery rate
@@ -111,8 +111,8 @@ class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         copy.b = b
         copy.c = c
         copy.threshold = threshold
-        copy.setAddNoise(getAddNoise())
-        copy.setNoiseGenerator(noiseGenerator.deepCopy())
+        copy.addNoise = addNoise
+        copy.noiseGenerator = noiseGenerator.deepCopy()
         return copy
     }
 
@@ -187,22 +187,6 @@ class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
     fun setiBg(iBg: Double) {
         this.iBg = iBg
-    }
-
-    override fun getAddNoise(): Boolean {
-        return addNoise
-    }
-
-    override fun setAddNoise(addNoise: Boolean) {
-        this.addNoise = addNoise
-    }
-
-    override fun getNoiseGenerator(): ProbabilityDistribution {
-        return noiseGenerator
-    }
-
-    override fun setNoiseGenerator(noise: ProbabilityDistribution) {
-        noiseGenerator = noise
     }
 
     override val name: String

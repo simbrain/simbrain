@@ -24,8 +24,8 @@
 //
 //import org.simbrain.network.core.Neuron;
 //import org.simbrain.network.core.NeuronUpdateRule;
-//import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
-//import org.simbrain.network.neuron_update_rules.interfaces.ClippableUpdateRule;
+//import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+//import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 //import org.simbrain.util.SimbrainConstants;
 //import org.simbrain.util.Utils;
 //import org.simbrain.util.widgets.EditablePanel;

@@ -22,7 +22,7 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.neuron_update_rules.interfaces.NoisyUpdateRule
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -117,12 +117,12 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     /**
      * Noise generator.
      */
-    private var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
+    override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * Add noise to neuron.
      */
-    private var addNoise = false
+    override var addNoise = false
 
     override fun deepCopy(): IntegrateAndFireRule {
         val ifn = IntegrateAndFireRule()
@@ -132,7 +132,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         ifn.backgroundCurrent = backgroundCurrent
         ifn.timeConstant = timeConstant
         ifn.resistance = resistance
-        ifn.setAddNoise(getAddNoise())
+        ifn.addNoise = addNoise
         ifn.noiseGenerator = noiseGenerator.deepCopy()
         return ifn
     }
@@ -210,22 +210,6 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         // Equal chance of spiking or not spiking, taking on any value between
         // the resting potential and the threshold if not.
         return 2 * (threshold - restingPotential) * Math.random() + restingPotential
-    }
-
-    override fun getAddNoise(): Boolean {
-        return addNoise
-    }
-
-    override fun setAddNoise(addNoise: Boolean) {
-        this.addNoise = addNoise
-    }
-
-    override fun getNoiseGenerator(): ProbabilityDistribution {
-        return noiseGenerator
-    }
-
-    override fun setNoiseGenerator(noise: ProbabilityDistribution) {
-        noiseGenerator = noise
     }
 
     // An alternative here would be to have reset potential be the zero point

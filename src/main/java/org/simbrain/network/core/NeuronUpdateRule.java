@@ -19,11 +19,11 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.updaterules.AdExIFRule;
-import org.simbrain.network.updaterules.IzhikevichRule;
 import org.simbrain.network.neuron_update_rules.UpdateRuleEnum;
-import org.simbrain.network.neuron_update_rules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.AdExIFRule;
 import org.simbrain.network.updaterules.IntegrateAndFireRule;
+import org.simbrain.network.updaterules.IzhikevichRule;
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.MatrixDataHolder;

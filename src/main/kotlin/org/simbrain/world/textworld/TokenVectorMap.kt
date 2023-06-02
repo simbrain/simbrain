@@ -74,13 +74,9 @@ class TokenVectorMap(
     }
 
     fun createTableModel(): SimbrainDataModel {
-        // TODO: Find a way to show the tokens as rowHeaders
         val table = createFromDoubleArray(tokenVectorMatrix.replaceNaN(0.0).toArray())
         table.setColumnNames(tokensMap.keys.toList())
         table.rowNames = tokensMap.keys.toList()
-        tokensMap.keys.forEachIndexed { rowIndex, token ->
-            table.setValueAt(token, rowIndex, 0)
-        }
         return table
     }
 

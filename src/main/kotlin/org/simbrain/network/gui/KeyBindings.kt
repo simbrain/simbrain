@@ -42,7 +42,6 @@ fun NetworkPanel.addKeyBindings() {
     }
     bind(Ctrl + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
-    bindTo("T", networkActions.textEditModeAction)
     //TODO Make default settable (same with neuron?)
     bind("Y") { network.addNetworkModelAsync(NeuronArray(network,50)) }
     bind(Shift +'Y') { showNeuronArrayCreationDialog() }

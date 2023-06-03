@@ -36,7 +36,7 @@ import java.awt.event.WindowEvent
 import java.util.*
 import javax.swing.*
 
-fun NetworkPanel.showTextPropertyDialog(textNodes: List<TextNode>) {
+fun NetworkPanel.showTextPropertyDialog(textNodes: Collection<TextNode>) {
     TextDialog(textNodes).apply {
         setLocationRelativeTo(this@showTextPropertyDialog)
         isVisible = true

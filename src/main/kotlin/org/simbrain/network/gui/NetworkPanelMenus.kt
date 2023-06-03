@@ -64,6 +64,8 @@ val NetworkPanel.insertMenu
             add(newNetworkMenu)
             add(testInputAction)
             add(showWeightMatrixAction)
+            addSeparator()
+            add(newTextAction)
         }
     }
 

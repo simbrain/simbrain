@@ -10,8 +10,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Font dialog. Adapted from a post on website from a long time ago...
@@ -23,7 +22,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
     /**
      * Selection list.
      */
-    private List<TextNode> selectionList;
+    private Collection<TextNode> selectionList;
 
     /**
      * Tabbed pane for font and color effects.
@@ -156,7 +155,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
      * @param selectedTextNodes currently selected text nodes in the network
      *                          panel.
      */
-    public TextDialog(final List<TextNode> selectedTextNodes) {
+    public TextDialog(final Collection<TextNode> selectedTextNodes) {
         selectionList = selectedTextNodes;
         init();
         fillFieldValues();
@@ -234,7 +233,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
 
         boolean found = false;
 
-        TextNode firstNode = selectionList.get(0);
+        TextNode firstNode = selectionList.iterator().next();
 
         String theTextType = firstNode.getTextObject().getFontName();
         int theTextSize = firstNode.getTextObject().getFontSize();

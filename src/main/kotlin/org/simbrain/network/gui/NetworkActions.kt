@@ -2,10 +2,7 @@ package org.simbrain.network.gui
 
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.SynapseGroup2
-import org.simbrain.network.core.decayStrengthBasedOnLength
+import org.simbrain.network.core.*
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
@@ -85,11 +82,24 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val spaceHorizontalAction = SpaceHorizontalAction(networkPanel)
     val spaceVerticalAction = SpaceVerticalAction(networkPanel)
     val testInputAction = TestInputAction(networkPanel)
-    val textEditModeAction = TextEditModeAction(networkPanel)
     val wandEditModeAction = WandEditModeAction(networkPanel)
     val zoomToFitPageAction = ZoomToFitPageAction(networkPanel)
 
     val showMainToolBarAction = ShowMainToolBarAction(networkPanel)
+
+    val newTextAction = networkPanel.createAction(
+        name = "Add Text",
+        description = """Add text to the network""",
+        iconPath = "menu_icons/Text.png",
+        keyboardShorcut = KeyCombination('T')
+    ) {
+        textEntryDialog("", "Enter text to add to the network") {
+            if (it.isNotEmpty()) {
+                val textObject = NetworkTextObject(network, it)
+                network.addNetworkModelAsync(textObject)
+            }
+        }.display()
+    }
 
     val showNetworkUpdaterDialog = networkPanel.createAction(
         name = "Edit Update Sequence...",
@@ -201,7 +211,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val networkModeActions
         get() = listOf<AbstractAction>(
             selectionEditModeAction,
-            textEditModeAction,
             wandEditModeAction
         )
 

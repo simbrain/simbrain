@@ -110,11 +110,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     var nudgeAmount = 2.0
 
     /**
-     * Text object event handler.
-     */
-    val textHandle: TextEventHandler = TextEventHandler(this)
-
-    /**
      * Undo Manager
      */
     val undoManager = UndoManager()
@@ -167,7 +162,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             addInputEventListener(MouseEventHandler(this@NetworkPanel))
             addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
             addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
-            addInputEventListener(textHandle)
             addInputEventListener(WandEventHandler(this@NetworkPanel));
 
             // Don't show text when the canvas is sufficiently zoomed in
@@ -329,11 +323,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun createNode(text: NetworkTextObject) = addScreenElement {
-        TextNode(this, text).apply {
-            if (text.inputEvent != null) {
-                textHandle.startEditing(text.inputEvent, this.pStyledText);
-            }
-        }
+        TextNode(this, text)
     }
 
     fun createNode(subnetwork: Subnetwork) = addScreenElement {

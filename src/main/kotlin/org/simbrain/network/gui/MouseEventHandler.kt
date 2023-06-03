@@ -24,7 +24,6 @@ import org.piccolo2d.PNode
 import org.piccolo2d.event.PDragSequenceEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
-import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
@@ -35,7 +34,6 @@ import org.simbrain.util.Utils
 import org.simbrain.util.minus
 import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
-import org.simbrain.util.piccolo.isDoubleClick
 import org.simbrain.util.piccolo.screenElements
 import org.simbrain.util.rectangle
 import java.awt.Color
@@ -82,7 +80,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
                 val editMode = networkPanel.editMode
                 return if (editMode.isSelection && super.acceptsEvent(event, type)) {
-                    networkPanel.textHandle.stopEditing()
                     true
                 } else {
                     false
@@ -122,11 +119,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             event.isPanKeyDown -> mode = Mode.PAN
             pickedNode is PCamera -> {
                 if (!event.isShiftDown) networkPanel.selectionManager.clear()
-                mode = Mode.SELECTION
-            }
-            pickedNode is PStyledText && event.isDoubleClick -> {
-                networkPanel.selectionManager.clear()
-                networkPanel.textHandle.startEditing(event, pickedNode)
                 mode = Mode.SELECTION
             }
         }

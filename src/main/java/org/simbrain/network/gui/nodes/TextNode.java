@@ -19,6 +19,8 @@
 
 package org.simbrain.network.gui.nodes;
 
+import kotlin.Unit;
+import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.NetworkTextObject;
@@ -28,9 +30,12 @@ import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
+import org.simbrain.util.SwingKt;
+import org.simbrain.util.TextUtilitiesKt;
 
 import javax.swing.*;
 import javax.swing.text.*;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -96,20 +101,34 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         contextMenu.add(new PasteAction(getNetworkPanel()));
         contextMenu.addSeparator();
 
-        //contextMenu.add(getNetworkPanel().getActionManager().getGroupAction());
-        //contextMenu.addSeparator();
-
-        contextMenu.add(getNetworkPanel().getNetworkActions().getDeleteAction());
-
         final var textNodes = getNetworkPanel().getSelectionManager().getSelection().stream()
                 .filter(TextNode.class::isInstance)
                 .map(TextNode.class::cast)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+        textNodes.add(this);
 
-        if (!textNodes.isEmpty()) {
-            contextMenu.addSeparator();
-            contextMenu.add(new SetTextPropertiesAction(getNetworkPanel(), textNodes));
+        if (textNodes.size() == 1) {
+            contextMenu.add(new AbstractAction() {
+
+                {
+                    putValue(Action.NAME, "Edit Text...");
+                }
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SwingKt.display(TextUtilitiesKt.textEntryDialog(getTextObject().getText(), "Edit Text", 20, 5, (text) -> {
+                        getTextObject().setText(text);
+                        update();
+                        return Unit.INSTANCE;
+                    }));
+                }
+            });
         }
+
+        contextMenu.add(new SetTextPropertiesAction(getNetworkPanel(), textNodes));
+
+        contextMenu.addSeparator();
+        contextMenu.add(getNetworkPanel().getNetworkActions().getDeleteAction());
 
         return contextMenu;
     }
@@ -152,15 +171,14 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      * coordinates of this pnode.
      */
     public void pushViewPositionToModel() {
-        Point2D p = this.getGlobalTranslation();
-        PBounds bound = this.getFullBounds();
-        getTextObject().setLocation(plus(p, new Point2D.Double(bound.getWidth() / 2, bound.getHeight() / 2)));
+        var p = textObject.getLocation();
+        this.setGlobalTranslation(p);
     }
 
     @Override
     public void offset(double dx, double dy) {
-        pushViewPositionToModel();
-        super.offset(dx, dy);
+        textObject.setLocation(plus(textObject.getLocation(), new Point2D.Double(dx, dy)));
+        pullViewPositionFromModel();
     }
 
     /**
@@ -196,4 +214,13 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         return as;
     }
 
+    @Nullable
+    @Override
+    public JDialog getPropertyDialog() {
+        return TextUtilitiesKt.textEntryDialog(getTextObject().getText(), "Edit Text", 20, 5, (text) -> {
+            getTextObject().setText(text);
+            update();
+            return Unit.INSTANCE;
+        });
+    }
 }

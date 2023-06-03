@@ -2,6 +2,9 @@ package org.simbrain.util
 
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextArea
 
 /**
  * Sentence tokenizer: parse document into sentences and return as a list of sentences.
@@ -190,6 +193,27 @@ fun wordEmbeddingQuery(targetWord: String, tokens: List<String>, cooccurrenceMat
 fun embeddingSimilarity(vectorA: DoubleArray, vectorB: DoubleArray, simfun: (DoubleArray, DoubleArray) -> Double =
     smile.math.MathEx::cos): Double {
     return simfun(vectorA, vectorB)
+}
+
+@JvmOverloads
+fun textEntryDialog(initialString: String, title: String = "Edit Text", columns: Int = 20, rows: Int = 5, commitAction: (String) -> Unit = {}): StandardDialog {
+    val dialog = StandardDialog(null, title)
+    val panel = JPanel()
+    val textArea = JTextArea(initialString)
+    textArea.columns = columns
+    textArea.rows = rows
+
+    val scrollPane = JScrollPane(textArea)
+    scrollPane.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
+
+    panel.add(scrollPane)
+    dialog.contentPane = panel
+
+    dialog.addClosingTask {
+        commitAction(textArea.text)
+    }
+
+    return dialog
 }
 
 // Test main

@@ -189,7 +189,6 @@ final class WandEventHandler extends PDragSequenceEventHandler {
             EditMode editMode = networkPanel.getEditMode();
 
             if (editMode.isWand() && super.acceptsEvent(event, type)) {
-                networkPanel.getTextHandle().stopEditing();
                 return true;
             } else {
                 return false;

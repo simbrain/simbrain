@@ -28,7 +28,7 @@ import javax.swing.Action
 /**
  * Set neuron properties.
  */
-class SetTextPropertiesAction(private val networkPanel: NetworkPanel, private val textNodes: List<TextNode>)
+class SetTextPropertiesAction(private val networkPanel: NetworkPanel, private val textNodes: Collection<TextNode>)
     : AbstractAction("Text Properties...") {
 
     /**

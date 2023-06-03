@@ -24,6 +24,7 @@ import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.events.SynapseEvents2;
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.NetworkPreferences;
 
 import javax.swing.*;
 import java.awt.*;
@@ -89,33 +90,32 @@ public final class SynapseNode extends ScreenElement {
     /**
      * Color of "excitatory" synapses, with positive values.
      */
-    private static Color excitatoryColor = Color.red;
+    private static Color excitatoryColor = NetworkPreferences.INSTANCE.getExcitatorySynapseColor();
 
     /**
      * Color of "inhibitory" synapses, with negative values.
      */
-    private static Color inhibitoryColor = Color.blue;
+    private static Color inhibitoryColor = NetworkPreferences.INSTANCE.getInhibitorySynapseColor();
 
     /**
      * Color of "zero" weights.
      */
-    private static Color zeroWeightColor = Color.gray;
+    private static Color zeroWeightColor = NetworkPreferences.INSTANCE.getZeroWeightColor();
 
     /**
      * Maximum diameter of the circle representing the synapse.
      */
-    private static int maxDiameter = 20;
+    private static int maxDiameter = NetworkPreferences.INSTANCE.getMaxWeightSize();
 
     /**
      * Minimum diameter of the circle representing the synapse.
      */
-    private static int minDiameter = 7;
+    private static int minDiameter = NetworkPreferences.INSTANCE.getMinWeightSize();
 
     /**
      * Color of lines in synapse representation. Also used for node representation.
-     * TODO: Move it somewhere more sensible.
      */
-    private static Color lineColor = Color.black;
+    private static Color lineColor = NetworkPreferences.INSTANCE.getLineColor();
 
     /**
      * Create a new synapse node connecting a source and target neuron.

@@ -31,11 +31,8 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.neuronContextMenu
 import org.simbrain.network.gui.neuronDialog
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator
-import org.simbrain.util.SimbrainConstants
-import org.simbrain.util.Utils
+import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.util.plus
-import org.simbrain.util.point
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
@@ -298,10 +295,10 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             mainShape.paint = Color.white
         } else if (activation > gZeroPoint) {
             val saturation = SimbrainMath.rescale(activation, 0.0, gUp, 0.0, 1.0)
-            mainShape.paint = Color.getHSBColor(hotColor, saturation.toFloat(), 1f)
+            mainShape.paint = Color.getHSBColor(hotColor.toHSB()[0], saturation.toFloat(), 1f)
         } else if (activation < gZeroPoint) {
             val saturation = SimbrainMath.rescale(activation, 0.0, gLow, 0.0, 1.0)
-            mainShape.paint = Color.getHSBColor(coolColor, saturation.toFloat(), 1f)
+            mainShape.paint = Color.getHSBColor(coolColor.toHSB()[0], saturation.toFloat(), 1f)
         }
         if (!customStrokeColor) {
             // Color stroke paint based on Polarity
@@ -579,19 +576,19 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
          * Color of "active" neurons, with positive values.
          */
         @JvmStatic
-        var hotColor = Color.RGBtoHSB(255, 0, 0, null)[0]
+        var hotColor = NetworkPreferences.hotNodeColor
 
         /**
          * Color of "inhibited" neurons, with negative values.
          */
         @JvmStatic
-        var coolColor = Color.RGBtoHSB(0, 0, 255, null)[0]
+        var coolColor = NetworkPreferences.coolNodeColor
 
         /**
          * Color of "spiking" synapse.
          */
         @JvmStatic
-        var spikingColor = Color.yellow
+        var spikingColor = NetworkPreferences.spikingColor
     }
 
     private fun updateBounds() {

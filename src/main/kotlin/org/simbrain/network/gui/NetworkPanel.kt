@@ -107,7 +107,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     /**
      * How much to nudge objects per key click.
      */
-    var nudgeAmount = 2.0
+    var nudgeAmount = NetworkPreferences.nudgeAmount
 
     /**
      * Undo Manager

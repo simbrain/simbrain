@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui;
 
+import org.simbrain.network.gui.dialogs.NetworkPreferences;
 import org.simbrain.util.ResourceManager;
 
 import java.awt.*;
@@ -66,7 +67,7 @@ public final class EditMode {
     /**
      * Radius of wand in wand mode.
      */
-    private static int wandRadius = DEFAULT_WAND_RADIUS;
+    private static int wandRadius = NetworkPreferences.INSTANCE.getWandRadius();
 
     /**
      * The image used for the cursor.

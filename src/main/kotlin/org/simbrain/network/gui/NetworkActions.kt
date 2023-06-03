@@ -87,7 +87,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val showMainToolBarAction = ShowMainToolBarAction(networkPanel)
 
-    val newTextAction = networkPanel.createAction(
+    val addTextAction = networkPanel.createAction(
         name = "Add Text",
         description = """Add text to the network""",
         iconPath = "menu_icons/Text.png",

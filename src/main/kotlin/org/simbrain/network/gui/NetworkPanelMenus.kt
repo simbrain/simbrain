@@ -65,7 +65,7 @@ val NetworkPanel.insertMenu
             add(testInputAction)
             add(showWeightMatrixAction)
             addSeparator()
-            add(newTextAction)
+            add(addTextAction)
         }
     }
 
@@ -128,17 +128,20 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
         // Insert actions
         add(newNeuronAction)
         add(addNeuronsAction)
+        addSeparator()
         add(addNeuronArrayAction)
         add(addDeepNetAction)
         add(addSmileClassifier)
         add(newNetworkMenu)
         addSeparator()
+        add(addTextAction)
+        addSeparator()
 
         // Clipboard actions
         clipboardActions.forEach { add(it) }
-        addSeparator()
 
         // Connection actions
+        addSeparator()
         add(clearSourceNeurons)
         add(setSourceNeurons)
         addSeparator()

@@ -3,12 +3,8 @@ package org.simbrain.workspace.couplings
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import org.simbrain.network.core.Neuron
 import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
-import org.simbrain.world.odorworld.effectors.StraightMovement
-import org.simbrain.world.odorworld.effectors.Turning
-import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.lang.reflect.Method
 
 /**
@@ -132,31 +128,6 @@ class CouplingManager(val workspace: Workspace) {
         get() = couplingCache.getVisibleConsumers(this)
 
     /**
-     * Induces a priority on consumers which allows for auto-coupling, i.e. making couplings between
-     * [AttributeContainer]s without specifying specific consumers or producers.
-     */
-    val Consumer.preference: Int
-        get() = when {
-            baseObject is StraightMovement && method.name == "setAmount" -> 10
-            baseObject is Turning && method.name == "setAmount" -> 10
-            with(baseObject) { this is Neuron && isClamped && method.name == "forceSetActivation" } -> 10
-            with(baseObject) { this is Neuron && !isClamped && method.name == "addInputValue" } -> 10
-            else -> 0
-        }
-
-    /**
-     * See [Consumer.preference]
-     */
-    val Producer.preference: Int
-        get() = when {
-            baseObject is SmellSensor && method.name == "getSmellVector" -> 10
-            // Preference against text attributes, which are rarely used
-            method.returnType == String::class.java-> -10
-            else -> 0
-        }
-
-
-    /**
      * Find the first [Consumer] in an [AttributeContainer] which has the given method name
      */
     fun AttributeContainer.getConsumer(methodName: String): Consumer = with(couplingCache) {
@@ -206,7 +177,7 @@ class CouplingManager(val workspace: Workspace) {
      */
     fun createCoupling(producingContainer: AttributeContainer, consumingContainer: AttributeContainer): Coupling {
         val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers).filter { (a, b) -> a.type == b.type }
-            .sortedByDescending { (a, b) -> a.preference + b.preference }.firstOrNull() ?: throw RuntimeException(
+            .sortedBy { (a, b) -> a.priority + b.priority + (if (a.type == String::class.java) 1 else 0) }.firstOrNull() ?: throw RuntimeException(
             "No compatible attributes found between $producingContainer and $consumingContainer"
         )
         return producer couple consumer

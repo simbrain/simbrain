@@ -92,5 +92,6 @@ public class Consumer extends Attribute {
         public Consumer build() {
             return product;
         }
+
     }
 }

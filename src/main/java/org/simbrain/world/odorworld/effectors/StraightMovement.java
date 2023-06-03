@@ -80,7 +80,7 @@ public class StraightMovement extends Effector {
         return amount;
     }
 
-    @Consumable(customDescriptionMethod = "getAttributeDescription")
+    @Consumable(customDescriptionMethod = "getAttributeDescription", priority = 1)
     public void setAmount(double amount) {
         this.amount = amount;
     }

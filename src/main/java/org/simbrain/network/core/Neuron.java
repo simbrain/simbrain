@@ -562,7 +562,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * network they should use this. Called in couplings (by reflection) to allow multiple values to be added each
      * time step to a neuron. Inputs are cleared each time step.
      */
-    @Consumable(description = "Add activation")
+    @Consumable(description = "Add activation", priority = 1)
     public void addInputValue(double toAdd) {
         inputValue += toAdd;
     }

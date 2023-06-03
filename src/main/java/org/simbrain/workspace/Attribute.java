@@ -1,5 +1,6 @@
 package org.simbrain.workspace;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.couplings.Coupling;
 
@@ -49,9 +50,19 @@ public abstract class Attribute {
      * #setDescription(String)}, or using  the annotation element {@link
      * Consumable#description()} or {@link Producible#description()}, or
      * indirectly using {@link #customDescriptionMethod}. In the latter case any
-     * direct setting of the descriptio is overwritten.
+     * direct setting of the description is overwritten.
      */
     protected String description = "";
+
+    /**
+     * When creating coupling automatically, the highest priority items in an attribute container
+     * are coupled. For example, {@code neuronGroup couple projectionPlot}, selects the
+     * highest priority producer in neuronGroup and couples that to the hightest priority
+     * consumer in projectionPlot.
+     *
+     * Use priority = 1 for highest priority.
+     */
+    protected int priority = 100;
 
     /**
      * Initializing constructor.
@@ -155,6 +166,14 @@ public abstract class Attribute {
         return method;
     }
 
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -236,5 +255,11 @@ public abstract class Attribute {
          * @return the final product
          */
         public abstract T build();
+
+        @NotNull
+        public B priority(int priority) {
+            product().priority = priority;
+            return (B) this;
+        }
     }
 }

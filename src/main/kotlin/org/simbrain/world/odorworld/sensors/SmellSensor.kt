@@ -35,7 +35,7 @@ class SmellSensor @JvmOverloads constructor(
      * The current vale of the smell sensors. A vector of smells obtained
      * by summing over scaled "distal" stimuli.
      */
-    @get:Producible(customDescriptionMethod = "getAttributeDescription")
+    @get:Producible(customDescriptionMethod = "getAttributeDescription", priority = 1)
     var smellVector = DoubleArray(0)
 
     /**

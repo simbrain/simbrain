@@ -43,4 +43,6 @@ public @interface Producible {
      */
     boolean defaultVisibility() default true;
 
+    int priority() default 100;
+
 }

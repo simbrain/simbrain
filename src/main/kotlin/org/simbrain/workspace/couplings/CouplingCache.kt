@@ -88,6 +88,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
 
         fun (attributeContainer: AttributeContainer) = Producer.builder(attributeContainer, method)
                 .description(annotation.description)
+                .priority(annotation.priority)
                 .customDescription(customDescription)
                 .arrayDescriptionMethod(arrayDescriptionMethod)
                 .build()
@@ -110,6 +111,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
         val customDescription = javaClass.findMethod(annotation.customDescriptionMethod)
 
         fun (attributeContainer: AttributeContainer) = Consumer.builder(attributeContainer, method)
+                .priority(annotation.priority)
                 .description(annotation.description)
                 .customDescription(customDescription)
                 .build()

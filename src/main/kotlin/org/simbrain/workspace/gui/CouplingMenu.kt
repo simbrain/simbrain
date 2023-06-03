@@ -1,5 +1,6 @@
 package org.simbrain.workspace.gui
 
+import org.simbrain.workspace.Attribute
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
@@ -20,6 +21,8 @@ class CouplingMenu(
         private val source: AttributeContainer
 ) : JMenu() {
 
+    private val maxVisibleMenuItems = 36
+
     /**
      * Construct the menu.
      */
@@ -35,9 +38,25 @@ class CouplingMenu(
         }
         with(sourceComponent.couplingManager) {
             sources.flatMap { it.visibleProducers }.forEach { createProducerSubmenu(it) }
+            // TODO: possibly check to make sure that itemcount is not empty before adding this, though that is not
+            //  usually the case and the affordance of the lone separator might not be so bad
+            addSeparator()
             sources.flatMap { it.visibleConsumers }.forEach { createConsumerSubmenu(it) }
         }
     }
+
+    /**
+     * Provides a human-readable name of an attribute type.
+     */
+    private val Attribute.typeName: String
+        get() = with(this.type as Class<*>) {
+            when(this) {
+                Double::class.java -> "number"
+                DoubleArray::class.java -> "array"
+                String::class.java -> "text"
+                else -> simpleName
+            }
+        }
 
     /**
      * Create a custom name for this menu besides the default "Create X coupling".
@@ -68,7 +87,7 @@ class CouplingMenu(
                     }
                 }
             }
-        }.createSubmenu("${producer.simpleDescription} send to")
+        }.createSubmenu("Send ${producer.simpleDescription} (${producer.typeName}) to")
     }
 
     private fun createConsumerSubmenu(consumer: org.simbrain.workspace.Consumer) {
@@ -82,17 +101,14 @@ class CouplingMenu(
                             .let { yield(it) }
                 }
             }
-        }.createSubmenu("${consumer.simpleDescription} receive ${consumer.typeName} from")
+        }.createSubmenu("Receive ${consumer.simpleDescription} (${consumer.typeName}) from")
     }
 
     private fun Sequence<CouplingMenuItem>.createSubmenu(description: String) {
-
         val submenu = JMenu(description)
-
-        // TODO: magic number
         // TODO: "..." menu has no action
         if (firstOrNull() != null) {
-            take(36).let { items ->
+            take(maxVisibleMenuItems).let { items ->
                 items.map { it.create() }.forEach { submenu.add(it) }
                 if (items.count() > 35) {
                     submenu.add(JSeparator())
@@ -100,7 +116,6 @@ class CouplingMenu(
                 }
             }
         }
-
         add(submenu)
     }
 }

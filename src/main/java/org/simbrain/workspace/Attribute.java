@@ -91,63 +91,29 @@ public abstract class Attribute {
      */
     @Override
     public String toString() {
-        return getDescription();
+        return getSimpleDescription();
     }
 
     /**
-     * Return the nicely formatted type name of this attribute.
-     */
-    public String getTypeName() {
-        if (((Class<?>) getType()).isArray()) {
-            return ((Class<?>) getType()).getComponentType().getSimpleName() + " array";
-        } else {
-            return ((Class<?>) getType()).getSimpleName();
-        }
-    }
-
-    /**
-     * Return the description associated with this attribute. For use in the
-     * GUI. Returns
-     *
-     * <ol>
-     * <li>The results of the {@link #customDescriptionMethod} if set</li>
-     * <li>The {@link #description} if it's not empty.
-     * <li>A default format ID:methodName(Type).  E.g. Neuron25:getActivation(Double).
-     * </ol>
-     *
-     * @return the description
-     */
-    public String getDescription() {
-        String customDesc = getCustomDescription();
-        if (customDesc != null) {
-            return customDesc;
-        }
-        if (!description.isEmpty()) {
-            return description;
-        }
-
-        // The default description format
-        return getId() + ":" + method.getName();
-    }
-
-
-    /**
-     * Return a simple description of an attribute where the methodname portion
-     * has the "get" or "set" removed and it's all lower case.  Example:
-     * "Neuron1:getActivation" becomes "Neuron1:activation".
+     * Returns a human-readable description of an attribute. Example: Neuron1:activation
      *
      * @return the simplified description
      */
     public String getSimpleDescription() {
+
+        // Description is based on a custom method
         String customDesc = getCustomDescription();
         if (customDesc != null) {
             return customDesc;
         }
+
+        // Description is based on id + a provided description
         if (!description.isEmpty()) {
-            return description;
+            return getId() + ":" + description;
         }
 
-        // Get rid of get and set, add spaces, and capitalize first letter
+        // Description is based on id and a simplified version of the method name
+        // simpleMethodName gets rid of get and set, add spaces, and capitalize first letter
         String simpleMethodName = method.getName();
         if (method.getName().startsWith("get")) {
             simpleMethodName = simpleMethodName.replaceFirst("get", "");
@@ -155,9 +121,7 @@ public abstract class Attribute {
             simpleMethodName = simpleMethodName.replaceFirst("set", "");
         }
         simpleMethodName = Utils.splitCamelCase(simpleMethodName);
-        simpleMethodName = Utils.upperCaseFirstLetter(simpleMethodName);
-
-        // The default description format
+        simpleMethodName = Utils.upperCaseFirstLetter(simpleMethodName.toLowerCase());
         return getId() + ":" + simpleMethodName;
     }
 

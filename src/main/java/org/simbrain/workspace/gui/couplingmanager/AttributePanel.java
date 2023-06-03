@@ -250,8 +250,8 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
         public java.awt.Component getListCellRendererComponent(JList list, Object object, int index, boolean isSelected, boolean cellHasFocus) {
             DefaultListCellRenderer renderer = (DefaultListCellRenderer) super.getListCellRendererComponent(list, object, index, isSelected, cellHasFocus);
             // Set text color based on data type
-            Attribute atttribute = (Attribute) object;
-            renderer.setForeground(DesktopCouplingManager.getColor(atttribute.getType()));
+            Attribute attribute = (Attribute) object;
+            renderer.setForeground(DesktopCouplingManager.getColor(attribute.getType()));
             return renderer;
         }
 

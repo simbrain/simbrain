@@ -4,8 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Producible annotation marks a method as a potential producer for a coupling.
@@ -17,7 +15,7 @@ import java.util.List;
 public @interface Producible {
 
     /**
-     * Use this if you would like the producer to be described by a simple name.
+     * Use this if you would like the producer to be described by name you provide rather than a method name.
      * For more complex descriptions you can use {@link #customDescriptionMethod()}.
      */
     String description() default "";

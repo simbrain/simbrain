@@ -17,13 +17,13 @@ import java.lang.annotation.Target;
 public @interface Consumable {
 
     /**
-     * Use this if you would like the producer to be described by a simple name.
+     * Use this if you would like the producer to be described by name you provide rather than a method name.
      * For more complex descriptions you can use {@link #customDescriptionMethod()}.
      */
     String description() default "";
 
     /**
-     * The name of a method that returns a custom description for the producer.
+     * The name of a method that returns a custom description for the attribute.
      */
     String customDescriptionMethod() default "";
 

@@ -35,7 +35,7 @@ class ObjectSensor @JvmOverloads constructor(
     override fun update(parent: OdorWorldEntity) {
         currentValue = 0.0
         val sensorLocation = computeAbsoluteLocation(parent)
-        for (otherEntity in parent.world.entityList) {
+        for (otherEntity in parent.world.entityList - parent) {
             if (otherEntity.entityType == objectType) {
                 val scaleFactor = decayFunction.getScalingFactor(
                     SimbrainMath.distance(sensorLocation, otherEntity.location)

@@ -35,7 +35,8 @@ val grazingCows = newSim {
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
         override val random: Random = Random(seed)
         var inputChromosome = chromosome2(1) {
-            repeat(3) {
+            // Dandelion and cow sensors
+            repeat(6) {
                 add(nodeGene2 { isClamped = true })
             }
             // Won't get coupled to. Serves as an initial "drive" neuron
@@ -162,14 +163,22 @@ val grazingCows = newSim {
             }
         }
 
-        val sensors = entities.map { entity ->
-            // Main sensors to guide the cow
+        val dandelionSensors = entities.map { entity ->
             List(3) { index ->
                 ObjectSensor(EntityType.DANDELIONS, radius = 60.0, theta = (index * 120.0)).apply {
                     decayFunction.dispersion = 250.0
                 }.also { entity.addSensor(it) }
             }
         }
+
+        val cowSensors = entities.map { entity ->
+            List(3) { index ->
+                ObjectSensor(EntityType.COW, radius = 50.0, theta = (index * 120.0)).apply {
+                    decayFunction.dispersion = 200.0
+                }.also { entity.addSensor(it) }
+            }
+        }
+
 
         val effectors = entities.map { entity ->
             entity.addDefaultEffectors()
@@ -219,9 +228,11 @@ val grazingCows = newSim {
                     val cows = _cowPhenotypes.await()
                     (0..cows.lastIndex).map { i ->
                         val cow = cows[i]
-                        val sensor = sensors[i]
+                        val ds = dandelionSensors[i]
+                        ds couple cow.inputs.neuronList
+                        val cs = cowSensors[i]
+                        cs couple cow.inputs.neuronList.subList(3,6)
                         val effector = effectors[i]
-                        sensor couple cow.inputs.neuronList
                         cow.outputs.neuronList couple effector
                     }
                 }

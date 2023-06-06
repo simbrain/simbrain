@@ -667,7 +667,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 timeLabel.update()
             }
             zoomToFitPage.on(Dispatchers.Swing) {
-                if (autoZoom && editMode.isSelection) {
+                if (autoZoom) {
                     val filtered = screenElements.unionOfGlobalFullBounds()
                     val adjustedFiltered = PBounds(
                         filtered.getX() - 10, filtered.getY() - 10,

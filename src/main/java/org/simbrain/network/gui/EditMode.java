@@ -172,19 +172,12 @@ public final class EditMode {
         g2.drawOval(0, 0, wandRadius, wandRadius);
 
         // Draw wand itself
-        g2.setColor(Color.YELLOW);
+        // Pure yellow is (255, 255,0) but this does not look good when transparent on a white background.
+        // To get it to actually look yellow reduce the green component a bit.
+        g2.setColor(new Color(255, 230, 0, 180));
         g2.setStroke(new BasicStroke(1));
-        float alpha;
-        // Alpha levels do not display properly on modern Windows operating systems.
-        // On Windows, values between >0.0f and 1.0f gives the color a different brightness, with 1.0f being the brightest.
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            alpha = 1.0f; // 0.0f is 100% transparent, 0.1f is almost 100% black, and 1.0f is 100% bright.
-        } else {
-            alpha = .5f; // 0.0f is 100% transparent and 1.0f is 100% opaque.
-        }
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+
         g2.fillOval(0, 0, wandRadius, wandRadius);
-        // g2.fillRect(0, 0, radius, radius);
 
         Toolkit tk = Toolkit.getDefaultToolkit();
         Cursor newCursor = tk.createCustomCursor(cursorImage, CENTER_POINT, "wand");

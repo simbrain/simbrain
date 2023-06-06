@@ -228,10 +228,9 @@ val grazingCows = newSim {
                     val cows = _cowPhenotypes.await()
                     (0..cows.lastIndex).map { i ->
                         val cow = cows[i]
-                        val ds = dandelionSensors[i]
-                        ds couple cow.inputs.neuronList
-                        val cs = cowSensors[i]
-                        cs couple cow.inputs.neuronList.subList(3,6)
+                        (dandelionSensors[i] + cowSensors[i]).map { it.getProducer("getCurrentValue") }
+                            .zip(cow.inputs.neuronList.map { it.getConsumer(it::forceSetActivation.name) })
+                            .forEach { (producer, consumer) -> producer couple consumer }
                         val effector = effectors[i]
                         cow.outputs.neuronList couple effector
                     }

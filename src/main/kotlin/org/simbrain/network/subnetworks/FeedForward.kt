@@ -17,8 +17,11 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNeuronGroup
+import org.simbrain.util.randomize
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.geom.Point2D
 
 /**
@@ -43,6 +46,8 @@ open class FeedForward(
      * Ordered reference to [NeuronArray]'s maintained in [Subnetwork.modelList]
      */
     protected val layerList: MutableList<NeuronArray> = ArrayList()
+
+    val wmList: MutableList<WeightMatrix> = ArrayList()
 
     var inputLayer: NeuronArray
         private set
@@ -77,6 +82,7 @@ open class FeedForward(
             val wm = WeightMatrix(parentNetwork, lastLayer, hiddenLayer)
             wm.randomize()
             addModel(wm)
+            wmList.add(wm)
 
             // Reset last layer
             lastLayer = hiddenLayer
@@ -91,6 +97,16 @@ open class FeedForward(
         get() = "Feedforward"
 
     override fun onCommit() {}
+
+    val randomizer = UniformRealDistribution(-1.0, 1.0)
+
+    override fun randomize() {
+        wmList.forEach { wm -> wm.randomize() }
+        layerList
+            .map { it.dataHolder }
+            .filterIsInstance<BiasedMatrixData>()
+            .forEach { it.biases.randomize(randomizer)}
+    }
 
     override fun update() {
         inputLayer.updateInputs()

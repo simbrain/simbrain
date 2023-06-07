@@ -14,10 +14,9 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.Network
-import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.trainers.LMSTrainer2
+import org.simbrain.network.trainers.BackpropTrainer2
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable2
 import org.simbrain.network.util.Direction
@@ -39,32 +38,28 @@ open class SRNNetwork(
     numInputNodes: Int = 10,
     numHiddenNodes: Int = 10,
     numOutputNodes: Int = 10,
-    initialPosition: Point2D = point(0, 0)) : Subnetwork(network), Trainable2 {
+    initialPosition: Point2D = point(0, 0)) :
+        BackpropNetwork(network,
+            intArrayOf(numInputNodes, numHiddenNodes, numOutputNodes),
+            initialPosition), Trainable2 {
 
     //TODO: Extend Feed forward?
-
-    var betweenLayerInterval = 250
-
-    override var inputLayer: NeuronArray = NeuronArray(network, numInputNodes)
 
     var hiddenLayer: NeuronArray = NeuronArray(network, numHiddenNodes)
 
     var contextLayer: NeuronArray = NeuronArray(network, numHiddenNodes)
 
-    override var outputLayer: NeuronArray =   NeuronArray(network, numOutputNodes)
-
     override var trainingSet: MatrixDataset = MatrixDataset(numInputNodes, numOutputNodes)
 
-    // TODO
-    var trainer: LMSTrainer2? = null
+    override val trainer by lazy {
+        BackpropTrainer2(this)
+    }
 
     init {
-        label = "Layered Network"
+        label = "SRN"
 
-        inputLayer = NeuronArray(network, numInputNodes)
         hiddenLayer = NeuronArray(network, numHiddenNodes)
         contextLayer = NeuronArray(network, numHiddenNodes)
-        outputLayer = NeuronArray(network, numOutputNodes)
         addModels(inputLayer, hiddenLayer, contextLayer, outputLayer)
 
         offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH,

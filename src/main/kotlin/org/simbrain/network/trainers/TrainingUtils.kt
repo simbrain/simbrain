@@ -1,3 +1,4 @@
+
 /*
  * Part of Simbrain--a java-based neural network kit Copyright (C) 2005,2007 The
  * Authors. See http://www.simbrain.net/credits This program is free software;
@@ -18,10 +19,11 @@ import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix
+import kotlin.math.absoluteValue
 
 // TODO: Need a way to generalize across NeuronArrays and NeuronCollections
-val WeightMatrix.sourceLayer get()= source as NeuronArray
-val WeightMatrix.targetLayer get()= target as NeuronArray
+val WeightMatrix.src get()= source as NeuronArray
+val WeightMatrix.tar get()= target as NeuronArray
 
 /**
  * Return the difference between the provided vector and the current activations in this layer.
@@ -65,7 +67,7 @@ fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix
     layerError.validateSameShape(target.outputs)
     val weightDeltas = layerError.mm(source.outputs.transpose())
     weightMatrix.add(weightDeltas.clone().mul(epsilon))
-    // TODO: Write a smile version of colSums
+    events.updated.fireAndForget()
     return Matrix.column(weightDeltas.colSums())
 }
 
@@ -90,7 +92,7 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
  * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
  */
 fun List<WeightMatrix>.forwardPass(inputs: Matrix) {
-    first().sourceLayer.activations = inputs
+    first().src.activations = inputs
     for (wm in this) {
         wm.target.updateInputs()
         wm.target.update()
@@ -98,19 +100,24 @@ fun List<WeightMatrix>.forwardPass(inputs: Matrix) {
 }
 
 /**
- * Apply backprop algorithm to this list of matrices, for the provided input/target pair
+ * Apply backprop algorithm to this list of matrices, for the provided input/target pair. Assumes weight matrices are
+ * stored in a sequence from input to output layers
  */
-fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetVector: Matrix, epsilon: Double = .1)  {
+fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, epsilon: Double = .1): Double  {
 
-    inputVector.validateSameShape(first().sourceLayer.inputs)
-    targetVector.validateSameShape(last().targetLayer.inputs)
+    inputVector.validateSameShape(first().src.inputs)
+    targetValues.validateSameShape(last().tar.inputs)
 
     //TODO: activation function derivatives, bias updates
 
     forwardPass(inputVector)
     // printActivationsAndWeights()
-    var error: Matrix = last().targetLayer.getError(targetVector)
+    var errorVector: Matrix = last().tar.getError(targetValues)
+
     for (wm in this.reversed()) {
-        error = wm.applyBackprop(error, epsilon)
+        errorVector = wm.applyBackprop(errorVector, epsilon)
     }
+
+    // TODO
+    return errorVector.sum().absoluteValue
 }

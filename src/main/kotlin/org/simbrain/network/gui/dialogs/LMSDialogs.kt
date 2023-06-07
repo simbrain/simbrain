@@ -5,6 +5,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.LMSNetworkNode
 import org.simbrain.network.subnetworks.LMSNetwork
+import org.simbrain.network.trainers.Trainable2
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -27,7 +28,7 @@ fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
 
 }
 
-fun LMSNetwork.getTrainingDialog(): StandardDialog {
+fun Trainable2.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
         title = "Train LMS Network"

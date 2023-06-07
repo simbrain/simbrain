@@ -18,6 +18,8 @@ import org.simbrain.network.matrix.NeuronArray
 
 interface Trainable2 {
 
+    val trainer: IterableTrainer2
+
     val trainingSet: MatrixDataset
 
     val inputLayer: NeuronArray

@@ -37,7 +37,7 @@ class TrainerControls(trainer: IterableTrainer2, errorText: String = "Error") : 
     private val runAction = createAction(
         name = "Run",
         iconPath ="menu_icons/Play.png",
-        description = "Iterate training until stop button is pressed."
+        description = "Iterate training until stop button is pressed",
     ) {
         trainer.startTraining()
     }
@@ -45,21 +45,25 @@ class TrainerControls(trainer: IterableTrainer2, errorText: String = "Error") : 
     private val stopAction = createAction(
         name = "Stop",
         iconPath = "menu_icons/Stop.png",
-        description = "Stop training."
+        description = "Stop training.",
     ) {
         trainer.stopTraining()
     }
 
     private val stepAction = createAction(
-        "menu_icons/Step.png", description = "Iterate training once."
+        name = "Step",
+        description = "Iterate training once",
+        iconPath =  "menu_icons/Step.png",
     ) {
         trainer.iterate()
     }
 
     private val randomizeAction = createAction(
-        "menu_icons/Rand.png", description = "Randomize network.",
+        name = "Randomize",
+        description = "Randomize network",
+        iconPath = "menu_icons/Rand.png",
     ) {
-        trainer.subnet.randomize()
+        trainer.randomize()
     }
 
     init {

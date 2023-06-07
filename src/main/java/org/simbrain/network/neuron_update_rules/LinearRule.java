@@ -45,12 +45,12 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     /**
      * The Default upper bound.
      */
-    private static final double DEFAULT_UPPER_BOUND = 1.0;
+    private static final double DEFAULT_UPPER_BOUND = 10.0;
 
     /**
      * The Default lower bound.
      */
-    private static final double DEFAULT_LOWER_BOUND = -1.0;
+    private static final double DEFAULT_LOWER_BOUND = -10.0;
 
     /**
      * Default clipping setting.

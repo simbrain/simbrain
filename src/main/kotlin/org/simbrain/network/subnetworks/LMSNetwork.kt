@@ -33,7 +33,7 @@ class LMSNetwork(network: Network, nInputs: Int, nOutputs: Int, initialPosition:
 
     override val trainingSet: MatrixDataset
 
-    val trainer by lazy {
+    override val trainer by lazy {
         LMSTrainer2(this)
     }
 

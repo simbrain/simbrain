@@ -15,23 +15,32 @@ package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.trainers.BackpropTrainer2
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable2
 import java.awt.geom.Point2D
+import kotlin.math.min
 
 /**
  * Backprop network.
  *
  * @author Jeff Yoshimi
  */
-class BackpropNetwork(network: Network, nodesPerLayer: IntArray, initialPosition: Point2D?) :
+open class BackpropNetwork(network: Network, nodesPerLayer: IntArray, initialPosition: Point2D?) :
     FeedForward(network, nodesPerLayer, initialPosition), Trainable2 {
 
     override val trainingSet: MatrixDataset
 
+    override val trainer by lazy {
+        BackpropTrainer2(this)
+    }
+
     init {
         layerList.forEach { it.updateRule = LinearRule() }
-        trainingSet = MatrixDataset(nodesPerLayer[0], nodesPerLayer[nodesPerLayer.size - 1])
+        inputLayer.isClamped = true
+        val nin = nodesPerLayer.first()
+        val nout = nodesPerLayer.last()
+        trainingSet = MatrixDataset(nin, nout, min(nin,nout))
         label = "Backprop"
     }
 }

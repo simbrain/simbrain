@@ -157,14 +157,14 @@ open class Events2: CoroutineScope {
         /**
          * Like java fireAndBlock() but suspends rather than blocking, so that the GUI remains responsive.
          */
-        suspend fun fireAndSuspend() = fireAndSuspendHelper { handler -> handler(null, null) }
+        suspend fun fire() = fireAndSuspendHelper { handler -> handler(null, null) }
 
         /**
          * Java fire and block. Fire event and wait for it to terminate before continuing.
          */
         fun fireAndBlock() {
             runBlocking {
-                fireAndSuspend()
+                fire()
             }
         }
 
@@ -190,11 +190,11 @@ open class Events2: CoroutineScope {
         @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new)"))
         fun fireAndForget(new: T) = fireAndBlock(new)
 
-        suspend fun fireAndSuspend(new: T) = fireAndSuspendHelper { handler -> handler(new, null) }
+        suspend fun fire(new: T) = fireAndSuspendHelper { handler -> handler(new, null) }
 
         fun fireAndBlock(new: T) {
             runBlocking {
-                fireAndSuspend(new)
+                fire(new)
             }
         }
 
@@ -216,11 +216,11 @@ open class Events2: CoroutineScope {
         @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new)"))
         fun fireAndForget(new: T) = fireAndBlock(new)
 
-        fun fireAndSuspend(new: T) = batchFireAndSuspendHelper(new, null)
+        fun fire(new: T) = batchFireAndSuspendHelper(new, null)
 
         fun fireAndBlock(new: T) {
             runBlocking {
-                fireAndSuspend(new).join()
+                fire(new).join()
             }
         }
     }
@@ -246,11 +246,11 @@ open class Events2: CoroutineScope {
         @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(old)"))
         fun fireAndForget(old: T) = fireAndBlock(old)
 
-        suspend fun fireAndSuspend(old: T) = fireAndSuspendHelper { handler -> handler(null, old) }
+        suspend fun fire(old: T) = fireAndSuspendHelper { handler -> handler(null, old) }
 
         fun fireAndBlock(old: T) {
             runBlocking {
-                fireAndSuspend(old)
+                fire(old)
             }
         }
 
@@ -277,11 +277,11 @@ open class Events2: CoroutineScope {
         @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new, old)"))
         fun fireAndForget(new: T, old: T) = fireAndBlock(new, old)
 
-        suspend fun fireAndSuspend(new: T, old: T) = fireAndSuspendHelper { handler -> if (new != old) handler(new, old) }
+        suspend fun fire(new: T, old: T) = fireAndSuspendHelper { handler -> if (new != old) handler(new, old) }
 
         fun fireAndBlock(new: T, old: T) {
             runBlocking {
-                fireAndSuspend(new, old)
+                fire(new, old)
             }
         }
 
@@ -303,11 +303,11 @@ open class Events2: CoroutineScope {
         @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new, old)"))
         fun fireAndForget(new: T, old: T) = fireAndBlock(new, old)
 
-        suspend fun fireAndSuspend(new: T, old: T) = batchFireAndSuspendHelper(new, old)
+        suspend fun fire(new: T, old: T) = batchFireAndSuspendHelper(new, old)
 
         fun fireAndBlock(new: T, old: T) {
             runBlocking {
-                fireAndSuspend(new, old)
+                fire(new, old)
             }
         }
     }

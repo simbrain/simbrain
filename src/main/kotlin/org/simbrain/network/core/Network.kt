@@ -347,9 +347,9 @@ class Network: CoroutineScope {
             }
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
-                events.modelRemoved.fireAndSuspend(it)
+                events.modelRemoved.fire(it)
             }
-            val job = events.modelAdded.fireAndSuspend(model)
+            val job = events.modelAdded.fire(model)
             if (model is Neuron) updatePriorityList()
             return job
         }
@@ -400,7 +400,7 @@ class Network: CoroutineScope {
         networkModels.allInReconstructionOrder.forEach { model ->
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
-                events.modelRemoved.fireAndSuspend(it)
+                events.modelRemoved.fire(it)
             }
         }
         idManager = SimpleIdManager ({ cls -> networkModels.getRawModelSet(cls).size + 1 })
@@ -527,7 +527,7 @@ class Network: CoroutineScope {
     }
 
     suspend fun selectModels(models: List<NetworkModel>) {
-        events.selected.fireAndSuspend(models)
+        events.selected.fire(models)
     }
 
 }

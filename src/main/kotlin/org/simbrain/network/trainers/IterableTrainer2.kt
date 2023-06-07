@@ -65,7 +65,7 @@ abstract class IterableTrainer2(val net: Trainable2): EditableObject {
         if (updateType == UpdateMethod.STOCHASTIC) {
             trainRow(Random.nextInt(net.trainingSet.inputs.nrow()))
         }
-        events.errorUpdated.fireAndSuspend(error)
+        events.errorUpdated.fire(error)
     }
 
     abstract fun trainRow(rowNum: Int)

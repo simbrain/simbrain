@@ -148,7 +148,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        events.runStarted.fireAndSuspend()
+        events.runStarted.fire()
         do {
             doUpdate()
         } while (predicate())
@@ -156,7 +156,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (component in workspace.componentList) {
             component.isRunning = false
         }
-        events.runFinished.fireAndSuspend()
+        events.runFinished.fire()
     }
 
     /**

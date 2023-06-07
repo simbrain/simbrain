@@ -69,7 +69,7 @@ class Event2Testing {
         val time = measureTimeMillis {
             runBlocking {
                 repeat(10) {
-                    testEvents2.longEvent.fireAndSuspend()
+                    testEvents2.longEvent.fire()
                 }
             }
         }

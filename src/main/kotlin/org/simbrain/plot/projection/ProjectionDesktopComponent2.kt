@@ -59,7 +59,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     ) {
         if (!running) {
             running = true
-            projector.events.startIterating.fireAndSuspend()
+            projector.events.startIterating.fire()
             launch {
                 while (running) {
                     iterate()
@@ -74,7 +74,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         description = "Stop"
     ) {
         running = false
-        projector.events.stopIterating.fireAndSuspend()
+        projector.events.stopIterating.fire()
     }
 
     val prefsAction = createAction(
@@ -149,10 +149,10 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
         projector.projectionMethod.let { projection ->
             if (projection is IterableProjectionMethod2) {
                 projection.iterate(projector.dataset)
-                projector.events.iterated.fireAndSuspend(projection.error)
+                projector.events.iterated.fire(projection.error)
             }
         }
-        projector.events.datasetChanged.fireAndSuspend()
+        projector.events.datasetChanged.fire()
     }
 
     /**
@@ -208,7 +208,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             it.init()
             it.coloringManager.projector = it
             launch {
-                it.events.settingsChanged.fireAndSuspend()
+                it.events.settingsChanged.fire()
                 update()
             }
         }.display()

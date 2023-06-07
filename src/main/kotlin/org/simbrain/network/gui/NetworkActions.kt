@@ -383,6 +383,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             network.addNetworkModels(this)
             GridLayout().layoutNeurons(this)
         }.also { network.selectModels(it) }
-        network.events.zoomToFitPage.fireAndSuspend()
+        network.events.zoomToFitPage.fire()
     }
 }

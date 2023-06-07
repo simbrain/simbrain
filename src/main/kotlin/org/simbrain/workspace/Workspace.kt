@@ -127,7 +127,7 @@ class Workspace: CoroutineScope {
         }
 
         runBlocking {
-            events.componentAdded.fireAndSuspend(component)
+            events.componentAdded.fire(component)
         }
         component.events.attributeContainerRemoved.on { attributeContainer: AttributeContainer? ->
             couplingManager.removeAttributeContainer(

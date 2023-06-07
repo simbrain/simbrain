@@ -86,9 +86,13 @@ class CouplingCache(val couplingManager: CouplingManager) {
         val customDescription = javaClass.findMethod(annotation.customDescriptionMethod)
         val arrayDescriptionMethod = javaClass.findMethod(annotation.arrayDescriptionMethod)
 
+        val customPriorityMethod = javaClass.findMethod(annotation.customPriorityMethod)
+        val priority = customPriorityMethod?.invoke(this) as? Int ?: annotation.priority
+
+
         fun (attributeContainer: AttributeContainer) = Producer.builder(attributeContainer, method)
                 .description(annotation.description)
-                .priority(annotation.priority)
+                .priority(priority)
                 .customDescription(customDescription)
                 .arrayDescriptionMethod(arrayDescriptionMethod)
                 .build()
@@ -110,8 +114,11 @@ class CouplingCache(val couplingManager: CouplingManager) {
 
         val customDescription = javaClass.findMethod(annotation.customDescriptionMethod)
 
+        val customPriorityMethod = javaClass.findMethod(annotation.customPriorityMethod)
+        val priority = customPriorityMethod?.invoke(this) as? Int ?: annotation.priority
+
         fun (attributeContainer: AttributeContainer) = Consumer.builder(attributeContainer, method)
-                .priority(annotation.priority)
+                .priority(priority)
                 .description(annotation.description)
                 .customDescription(customDescription)
                 .build()

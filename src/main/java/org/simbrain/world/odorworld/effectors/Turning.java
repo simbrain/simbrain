@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld.effectors;
 
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
+import org.simbrain.workspace.couplings.CouplingManagerKt;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 /**
@@ -112,7 +113,7 @@ public class Turning extends Effector {
         return amount;
     }
 
-    @Consumable(customDescriptionMethod = "getAttributeDescription", priority = 1)
+    @Consumable(customDescriptionMethod = "getAttributeDescription", priority = CouplingManagerKt.HIGH_PRIORITY)
     public void setAmount(double amount) {
         this.amount = amount;
     }

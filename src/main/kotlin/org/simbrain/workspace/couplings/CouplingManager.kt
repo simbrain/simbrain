@@ -6,6 +6,13 @@ import kotlinx.coroutines.coroutineScope
 import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
 import java.lang.reflect.Method
+import kotlin.reflect.KFunction
+import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty0
+import kotlin.reflect.jvm.javaMethod
+
+const val HIGH_PRIORITY = 1
+const val LOW_PRIORITY = 100
 
 /**
  * Maintains a list of [Coupling]s, and of potential [Producer] and [Consumer] objects. Supports creation of
@@ -135,11 +142,31 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     /**
+     * getConsumer but using function reference which is preferable to using strings
+     */
+    fun AttributeContainer.getConsumer(kFunction: KFunction<Unit>): Consumer = getConsumer(kFunction.name)
+
+    /**
+     * getConsumer but using property reference which is preferable to using strings
+     */
+    fun <T> AttributeContainer.getConsumer(kProperty0: KMutableProperty0<T>): Consumer = getConsumer(kProperty0.setter.javaMethod!!.name)
+
+    /**
      * Find the first [Producer] in an [AttributeContainer] which has the given method name
      */
     fun AttributeContainer.getProducer(methodName: String) = with(couplingCache) {
         getProducer(methodName)
     }
+
+    /**
+     * getProducer but using function reference which is preferable to using strings
+     */
+    fun <T> AttributeContainer.getProducer(kFunction: KFunction<T>): Producer = getProducer(kFunction.name)
+
+    /**
+     * getProducer but using property reference which is preferable to using strings
+     */
+    fun <T> AttributeContainer.getProducer(kProperty0: KProperty0<T>): Producer = getProducer(kProperty0.getter.javaMethod!!.name)
 
     /**
      * A collection of all [compatibleProducers] in a given [WorkspaceComponent]

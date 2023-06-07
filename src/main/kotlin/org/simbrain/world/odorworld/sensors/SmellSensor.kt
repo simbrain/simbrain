@@ -20,6 +20,7 @@ package org.simbrain.world.odorworld.sensors
 
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.workspace.Producible
+import org.simbrain.workspace.couplings.HIGH_PRIORITY
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
 /**
@@ -35,7 +36,7 @@ class SmellSensor @JvmOverloads constructor(
      * The current vale of the smell sensors. A vector of smells obtained
      * by summing over scaled "distal" stimuli.
      */
-    @get:Producible(customDescriptionMethod = "getAttributeDescription", priority = 1)
+    @get:Producible(customDescriptionMethod = "getAttributeDescription", priority = HIGH_PRIORITY)
     var smellVector = DoubleArray(0)
 
     /**

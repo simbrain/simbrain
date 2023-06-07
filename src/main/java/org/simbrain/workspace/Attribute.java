@@ -3,6 +3,7 @@ package org.simbrain.workspace;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.couplings.Coupling;
+import org.simbrain.workspace.couplings.CouplingManagerKt;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -57,12 +58,14 @@ public abstract class Attribute {
     /**
      * When creating coupling automatically, the highest priority items in an attribute container
      * are coupled. For example, {@code neuronGroup couple projectionPlot}, selects the
-     * highest priority producer in neuronGroup and couples that to the hightest priority
+     * highest priority producer in neuronGroup and couples that to the highest priority
      * consumer in projectionPlot.
      *
      * Use priority = 1 for highest priority.
+     *
+     * Constants for LOW_PRIORITY and HIGH_PRIORITY are provided.
      */
-    protected int priority = 100;
+    protected int priority = CouplingManagerKt.LOW_PRIORITY;
 
     /**
      * Initializing constructor.

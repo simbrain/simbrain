@@ -37,6 +37,7 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
+import org.simbrain.workspace.couplings.CouplingManagerKt;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -389,7 +390,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      *
      * @param act the new activation value
      */
-    @Consumable()
+    @Consumable(customPriorityMethod = "forceSetActivationCouplingPriority")
     public void forceSetActivation(final double act) {
         lastActivation = getActivation();
         activation = act;
@@ -562,7 +563,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * network they should use this. Called in couplings (by reflection) to allow multiple values to be added each
      * time step to a neuron. Inputs are cleared each time step.
      */
-    @Consumable(description = "Add activation", priority = 1)
+    @Consumable(description = "Add activation", customPriorityMethod = "addInputValueCouplingPriority")
     public void addInputValue(double toAdd) {
         inputValue += toAdd;
     }
@@ -1061,6 +1062,31 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         getNetwork().updatePriorityList();
         deleteConnectedSynapses();
         events.getDeleted().fireAndBlock(this);
+    }
+
+    /**
+     * When the neuron is not clamped, couplings should use add inputs.  Called by reflection using
+     * {@link Consumable#customPriorityMethod()}
+     */
+    public int addInputValueCouplingPriority() {
+        if (isClamped()) {
+            return CouplingManagerKt.LOW_PRIORITY;
+        } else {
+            return CouplingManagerKt.HIGH_PRIORITY;
+        }
+    }
+
+
+    /**
+     * When the neuron is clamped, couplings should use force set activation.  Called by reflection using
+     * {@link Consumable#customPriorityMethod()}
+     */
+    public int forceSetActivationCouplingPriority() {
+        if (isClamped()) {
+            return CouplingManagerKt.HIGH_PRIORITY;
+        } else {
+            return CouplingManagerKt.LOW_PRIORITY;
+        }
     }
 
 }

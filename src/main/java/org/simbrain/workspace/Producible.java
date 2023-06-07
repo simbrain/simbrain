@@ -1,5 +1,7 @@
 package org.simbrain.workspace;
 
+import org.simbrain.workspace.couplings.CouplingManagerKt;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -43,6 +45,15 @@ public @interface Producible {
      */
     boolean defaultVisibility() default true;
 
-    int priority() default 100;
+    /**
+     * @see Attribute#priority
+     */
+    int priority() default CouplingManagerKt.LOW_PRIORITY;
+
+    /**
+     * The name of a method that can be used to set priority in a way that depends on the state of the base object.
+     * See {@link org.simbrain.network.core.Neuron} for examples
+     */
+    String customPriorityMethod() default "";
 
 }

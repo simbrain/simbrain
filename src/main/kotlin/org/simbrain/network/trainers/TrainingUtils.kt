@@ -17,9 +17,10 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.util.BiasedMatrixData
+import org.simbrain.util.sse
 import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix
-import kotlin.math.absoluteValue
 
 // TODO: Need a way to generalize across NeuronArrays and NeuronCollections
 val WeightMatrix.src get()= source as NeuronArray
@@ -67,8 +68,16 @@ fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix
     layerError.validateSameShape(target.outputs)
     val weightDeltas = layerError.mm(source.outputs.transpose())
     weightMatrix.add(weightDeltas.clone().mul(epsilon))
-    events.updated.fireAndForget()
-    return Matrix.column(weightDeltas.colSums())
+    events.updated.fireAndBlock()
+    return Matrix.column(weightDeltas.mul(weightMatrix).colSums())
+}
+
+fun NeuronArray.updateBiases(layerError: Matrix, epsilon: Double = .1) {
+    if (dataHolder is BiasedMatrixData) {
+        val weightDelta = layerError.clone().mul(epsilon).col(0)
+        (dataHolder as BiasedMatrixData).biases += weightDelta
+        events.updated.fireAndBlock()
+    }
 }
 
 /**
@@ -106,18 +115,21 @@ fun List<WeightMatrix>.forwardPass(inputs: Matrix) {
 fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, epsilon: Double = .1): Double  {
 
     inputVector.validateSameShape(first().src.inputs)
-    targetValues.validateSameShape(last().tar.inputs)
+    targetValues.validateSameShape(last().tar.outputs)
 
-    //TODO: activation function derivatives, bias updates
+    //TODO: activation function derivatives
 
     forwardPass(inputVector)
+    val error = last().tar.outputs sse targetValues
+
     // printActivationsAndWeights()
     var errorVector: Matrix = last().tar.getError(targetValues)
 
     for (wm in this.reversed()) {
+        wm.tar.updateBiases(errorVector, epsilon)
         errorVector = wm.applyBackprop(errorVector, epsilon)
     }
 
-    // TODO
-    return errorVector.sum().absoluteValue
+    return error
+
 }

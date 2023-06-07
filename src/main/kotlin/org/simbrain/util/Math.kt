@@ -19,6 +19,9 @@ fun <T : Comparable<T>> T.clip(range: ClosedRange<T>) =
  */
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
+fun DoubleArray.summedSquares() =
+    sumOf { it * it }
+
 infix fun Iterable<Double>.squaredError(other: Iterable<Double>) =
     this.zip(other).map { (a, b) -> (a - b).let { it * it } }
 

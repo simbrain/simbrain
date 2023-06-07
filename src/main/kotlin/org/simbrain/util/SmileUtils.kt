@@ -14,6 +14,9 @@ fun Matrix.validateSameShape(target: Matrix) {
 
 val Matrix.shapeString get() = "(${nrow()},${ncol()})"
 
+// TODO: Flatten the two arrays so that this can be used for arbitrary matrices (currently works only on vectors)
+infix fun Matrix.sse(other: Matrix) = (this.col(0) sse other.col(0))
+
 /**
  * Returns the matrix at a row, transposed.
  * A minor performance improvement, but originates in an effort to work around a bug with the MKL implementation.

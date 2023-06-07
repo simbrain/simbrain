@@ -43,5 +43,11 @@ class MathKtTest {
         val array = listOf(doubleArrayOf(1.0,2.0), doubleArrayOf(-1.0,1.0))
         assertArrayEquals(doubleArrayOf(0.0, 3.0),array.sum())
     }
+
+    @Test
+    fun `test sum squares`() {
+        val array = doubleArrayOf(1.0,2.0)
+        assertEquals(5.0,array.summedSquares())
+    }
 }
 

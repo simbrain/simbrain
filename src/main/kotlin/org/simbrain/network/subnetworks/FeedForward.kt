@@ -102,7 +102,7 @@ open class FeedForward(
 
     override fun randomize() {
         wmList.forEach { wm -> wm.randomize() }
-        layerList
+        (layerList - inputLayer)
             .map { it.dataHolder }
             .filterIsInstance<BiasedMatrixData>()
             .forEach { it.biases.randomize(randomizer)}

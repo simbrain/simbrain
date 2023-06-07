@@ -60,8 +60,8 @@ val NetworkPanel.insertMenu
             add(addNeuronArrayAction)
             add(addDeepNetAction)
             add(addSmileClassifier)
-            addSeparator()
             add(newNetworkMenu)
+            addSeparator()
             add(testInputAction)
             add(showWeightMatrixAction)
             addSeparator()
@@ -86,7 +86,7 @@ val NetworkPanel.actionMenu
     }
 
 val NetworkPanel.newNetworkMenu
-    get() = JMenu("Insert Network").apply {
+    get() = JMenu("Add Network").apply {
         networkActions.newNetworkActions.forEach { add(it) }
     }
 

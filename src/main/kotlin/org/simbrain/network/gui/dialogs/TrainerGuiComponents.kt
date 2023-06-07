@@ -136,7 +136,7 @@ class ErrorTimeSeries(trainer: IterableTrainer2, errorText: String = "Error") : 
         add(mainPanel)
 
         model.addScalarTimeSeries(errorText)
-        trainer.events.errorUpdated.on(Dispatchers.Swing) {
+        trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
             model.addData(0, trainer.iteration.toDouble(), trainer.error)
         }
     }

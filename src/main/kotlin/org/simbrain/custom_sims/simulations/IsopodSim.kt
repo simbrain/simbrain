@@ -216,7 +216,7 @@ val isopodSim = newSim {
     })
 
     fun logAgentState() {
-        log += "${isopod.x}, ${isopod.y}, ${isopod.y}," +
+        log += "${isopod.x}, ${isopod.y}," +
                 "${neuronLeftSensor.activation},${neuronRightSensor.activation}" +
                 "${neuronLeftTurning.activation},${neuronRightTurning.activation}" +
                 ",${neuronStraight.activation}\n"

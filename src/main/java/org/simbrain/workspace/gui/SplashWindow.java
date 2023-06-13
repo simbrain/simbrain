@@ -113,12 +113,12 @@ public final class SplashWindow extends Window {
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation((screenDim.width - imgWidth) / 2, (screenDim.height - imgHeight) / 2);
         setIconImages(Arrays.asList(
-                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "20.png"),
-                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "32.png"),
-                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "40.png"),
-                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "64.png"),
-                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "128.png"),
-                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "512.png")
+                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_20x20.png"),
+                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_32x32.png"),
+                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_40x40.png"),
+                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_64x64.png"),
+                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_128x128.png"),
+                ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_512x512.png")
         ));
 
         // Users shall be able to close the splash window by

@@ -147,7 +147,7 @@ object SimbrainDesktop {
     /**
      * Workspace action manager.
      */
-    val actionManager = WorkspaceActions(this)
+    val actionManager = WorkspaceActions()
 
     /**
      * Interpreter for terminal.
@@ -346,7 +346,9 @@ object SimbrainDesktop {
         val scriptMenu = JMenu("Simulations")
         simulations.addToMenu(scriptMenu) { newSimulation: Any? ->
             if (newSimulation is NewSimulation) {
-                newSimulation.run(this@SimbrainDesktop)
+                workspace.launch {
+                    newSimulation.run(this@SimbrainDesktop)
+                }
             } else if (newSimulation is Simulation) {
                 workspace.launch {
                     newSimulation.instantiate(this@SimbrainDesktop).run()

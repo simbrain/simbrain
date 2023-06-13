@@ -118,12 +118,17 @@ tasks.test {
 
 // Sample invocation:
 // gradle runSim -PsimName="Test Sim"
+// gradle runSim -PsimName="Evolve Grazing Cows" -PoptionString="20:1000:100:0.5"
 tasks.register<JavaExec>("runSim") {
     jvmArgs(simbrainJvmArgs)
     classpath = sourceSets["main"].runtimeClasspath
-    main = "org.simbrain.custom_sims.RegisteredSimulationsKt"
+    mainClass.set("org.simbrain.custom_sims.RegisteredSimulationsKt")
     if (project.hasProperty("simName")) {
-        args(project.property("simName") as String)
+        if (project.hasProperty("optionString")) {
+            args(project.property("simName") as String, project.property("optionString") as String)
+        } else {
+            args(project.property("simName") as String)
+        }
     }
 }
 

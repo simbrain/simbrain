@@ -3,7 +3,6 @@ package org.simbrain.custom_sims
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -36,29 +35,32 @@ class SimulationScope private constructor(
     /**
      * If Desktop exists, provide a context for convenient access.
      */
-    suspend fun withGui(block: suspend SimbrainDesktop.() -> Unit) {
+    suspend fun <T> withGui(block: suspend SimbrainDesktop.() -> T): T? {
         if (desktop != null) {
-            desktop.block()
+            return desktop.block()
         }
+        return null
     }
 }
 
-class NewSimulation(val task: suspend SimulationScope.() -> Unit): CoroutineScope {
+class NewSimulation(val task: suspend SimulationScope.(optionString: String?) -> Unit): CoroutineScope {
 
     private val job = SupervisorJob()
 
     override val coroutineContext = Dispatchers.Default + job
 
-    fun run(desktop: SimbrainDesktop? = null) {
-        launch {
-            with(SimulationScope(desktop)) {
-                task()
-            }
+    suspend fun run(desktop: SimbrainDesktop? = null, optionString: String? = null) {
+        with(SimulationScope(desktop)) {
+            task(optionString)
         }
     }
 }
 
-fun newSim(block: suspend SimulationScope.() -> Unit) = NewSimulation(block)
+/**
+ * When running simulation headless, the option string can be used to pass option to the simulation.
+ * @see CowGrazing
+ */
+fun newSim(block: suspend SimulationScope.(optionString: String?) -> Unit) = NewSimulation(block)
 
 fun SimulationScope.addNetworkComponent(name: String, config: NetworkComponent.() -> Unit = { }): NetworkComponent {
     return NetworkComponent(name)

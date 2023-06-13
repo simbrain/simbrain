@@ -398,13 +398,14 @@ class Workspace: CoroutineScope {
      *
      * @param file file to save.
      */
-    fun save(file: File?) {
+    @JvmOverloads
+    fun save(file: File?, headless: Boolean = false) {
         if (file != null) {
             try {
                 val ostream = FileOutputStream(file)
                 try {
                     val serializer = WorkspaceSerializer(this)
-                    serializer.serialize(ostream)
+                    serializer.serialize(ostream, headless)
                     setWorkspaceChanged(false)
                 } catch (e: Exception) {
                     e.printStackTrace()

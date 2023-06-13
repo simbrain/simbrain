@@ -205,6 +205,6 @@ val evolveNetwork = newSim {
 
 }
 
-fun main() {
+suspend fun main() {
     evolveNetwork.run()
 }

@@ -377,6 +377,6 @@ val evolveResourcePursuer = newSim {
 
 }
 
-fun main() {
+suspend fun main() {
     evolveResourcePursuer.run()
 }

@@ -127,7 +127,7 @@ val simulations = dir<Any>("Simulations") {
 /**
  * Called by build.gradle#runSim when invoking a headless simulation from the command line.
  */
-fun main(args: Array<String>) {
+suspend fun main(args: Array<String>) {
 
     if (args.isEmpty()) throw IllegalArgumentException(
         "Please supply a simulation name or an index. A list of possible values are:\n" +
@@ -150,7 +150,7 @@ fun main(args: Array<String>) {
         throw IllegalArgumentException("Index is out of bound")
     }
     when (sim) {
-        is NewSimulation -> sim.run()
+        is NewSimulation -> sim.run(optionString = if(args.size > 1) args[1] else null)
         is Simulation -> sim.run()
     }
 }

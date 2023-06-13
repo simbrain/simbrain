@@ -436,6 +436,6 @@ val evolveMultiAgentResourcePursuer = newSim {
 
 }
 
-fun main() {
+suspend fun main() {
     evolveMultiAgentResourcePursuer.run()
 }

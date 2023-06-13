@@ -33,61 +33,61 @@ import javax.swing.JOptionPane
 /**
  * Workspace action manager contains references to all the actions for a Workspace.
  */
-class WorkspaceActions(val desktop: SimbrainDesktop) {
+class WorkspaceActions {
 
-    val workspace = desktop.workspace
+    val workspace = SimbrainDesktop.workspace
 
     val newNetworkAction = createComponentFactoryAction("Network", "menu_icons/Network.png", CmdOrCtrl + 'N')
     val newConsoleAction = createComponentFactoryAction("Console", "menu_icons/Terminal2.png")
     val newDocViewerAction = createComponentFactoryAction("Document Viewer", "menu_icons/Copy.png")
 
-    val clearWorkspaceAction = desktop.desktopPane.createAction(
+    val clearWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
         name = "Clear desktop",
         description = "Remove all windows from the desktop",
         keyboardShorcut = CmdOrCtrl + 'K',
         coroutineScope = workspace
     ) {
-        desktop.clearDesktop()
+        SimbrainDesktop.clearDesktop()
     }
 
-    val openWorkspaceAction = desktop.desktopPane.createAction(
+    val openWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Open.png",
         name = "Open Workspace File (.zip) ...",
         description = "Open a workspace file from .zip",
         coroutineScope = workspace
     ) {
-        desktop.openWorkspace()
+        SimbrainDesktop.openWorkspace()
     }
 
-    val saveWorkspaceAction = desktop.desktopPane.createAction(
+    val saveWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Save.png",
         name = "Save workspace",
         description = "Save current workspace file",
         keyboardShorcut = CmdOrCtrl + 'S',
         coroutineScope = workspace
     ) {
-        desktop.save()
+        SimbrainDesktop.save()
     }
 
-    private val saveWorkspaceAsAction = desktop.desktopPane.createAction(
+    private val saveWorkspaceAsAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Save.png",
         name = "Save workspace as...",
         description = "Save current workspace file as .zip",
         coroutineScope = workspace
     ) {
-        desktop.saveAs()
+        SimbrainDesktop.saveAs()
     }
 
-    val quitWorkspaceAction = desktop.desktopPane.createAction(
+    val quitWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
         name = "Quit Simbrain",
         description = "Quit Simbrain",
         keyboardShorcut = CmdOrCtrl + 'Q',
         coroutineScope = workspace
     ) {
-        desktop.quit(false)
+        SimbrainDesktop.quit(false)
     }
 
-    val iterateAction = desktop.desktopPane.createAction(
+    val iterateAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Step.png",
         name = "Iterate workspace",
         description = "Iterate workspace once",
@@ -100,7 +100,7 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
         workspace.iterate()
     }
 
-    val runAction = desktop.desktopPane.createAction(
+    val runAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Play.png",
         name = "Run",
         description = "Run workspace",
@@ -109,7 +109,7 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
         workspace.run()
     }
 
-    val stopAction = desktop.desktopPane.createAction(
+    val stopAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Stop.png",
         name = "Stop",
         description = "Stop workspace",
@@ -118,34 +118,34 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
         workspace.stop()
     }
 
-    val openCouplingManagerAction = desktop.desktopPane.createAction(
+    val openCouplingManagerAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Coupling.png",
         name = "Open coupling manager...",
         description = "Open workspace coupling manager.",
         coroutineScope = workspace
     ) {
-        DesktopCouplingManager(desktop).displayInDialog {  }
+        DesktopCouplingManager(SimbrainDesktop).displayInDialog {  }
     }
 
-    val openCouplingListAction = desktop.desktopPane.createAction(
+    val openCouplingListAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/CouplingList.png",
         name = "Open coupling list...",
         description = "Open list of workspace couplings.",
         coroutineScope = workspace
     ) {
-        CouplingListPanel(desktop, desktop.workspace.couplings).displayInDialog {  }
+        CouplingListPanel(SimbrainDesktop, SimbrainDesktop.workspace.couplings).displayInDialog {  }
     }
 
-    val propertyTabAction = desktop.desktopPane.createAction(
+    val propertyTabAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/systemMonitor.png",
         name = "Show / hide dock",
         description = "Toggle dock visibility.",
         coroutineScope = workspace
     ) {
-        desktop.toggleDock()
+        SimbrainDesktop.toggleDock()
     }
 
-    val showUpdaterDialog = desktop.desktopPane.createAction(
+    val showUpdaterDialog = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Sequence.png",
         name = "Edit Update Sequence...",
         description = "Edit workspace update actions",
@@ -154,20 +154,20 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
         WorkspaceUpdateManagerPanel(workspace).displayInDialog {  }
     }
 
-    val repositionAllWindowsAction = desktop.desktopPane.createAction(
+    val repositionAllWindowsAction = SimbrainDesktop.desktopPane.createAction(
         name = "Gather windows",
         description = "Repositions and resize all windows. Useful when windows get \"lost\" offscreen.",
         coroutineScope = workspace
     ) {
-        desktop.repositionAllWindows()
+        SimbrainDesktop.repositionAllWindows()
     }
 
-    val resizeAllWindowsAction = desktop.desktopPane.createAction(
+    val resizeAllWindowsAction = SimbrainDesktop.desktopPane.createAction(
         name = "Resize windows",
-        description = "Resize all windows on screen so they fit on the current desktop. Useful when windows get \"lost\" offscreen.",
+        description = "Resize all windows on screen so they fit on the current SimbrainDesktop. Useful when windows get \"lost\" offscreen.",
         coroutineScope = workspace
     ) {
-        desktop.resizeAllWindows()
+        SimbrainDesktop.resizeAllWindows()
     }
 
     val runControlActions = listOf(runAction, stopAction)
@@ -179,7 +179,7 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
         iconPath: String,
         keyboardShortcut: KeyCombination? = null
     ): Action {
-        return desktop.desktopPane.createAction(
+        return SimbrainDesktop.desktopPane.createAction(
             name = name,
             iconPath = iconPath,
             description = "Create $name",
@@ -257,7 +257,7 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
      * Uses the default producer of the attribute container
      */
     @JvmOverloads
-    fun createCoupledProjectionPlotAction(container: AttributeContainer, name: String = "Projection Plot") = desktop.desktopPane.createAction(
+    fun createCoupledProjectionPlotAction(container: AttributeContainer, name: String = "Projection Plot") = SimbrainDesktop.desktopPane.createAction(
         name = name,
         iconPath = "menu_icons/ProjectionIcon.png",
         description = "Create Coupled Projection Plot",
@@ -271,7 +271,7 @@ class WorkspaceActions(val desktop: SimbrainDesktop) {
     }
 
     @JvmOverloads
-    fun createCoupledProjectionPlotAction(producer: Producer, name: String = "Projection Plot") = desktop.desktopPane.createAction(
+    fun createCoupledProjectionPlotAction(producer: Producer, name: String = "Projection Plot") = SimbrainDesktop.desktopPane.createAction(
         name = name,
         iconPath = "menu_icons/ProjectionIcon.png",
         description = "Create Coupled Projection Plot",

@@ -74,18 +74,12 @@ public class WorkspaceSerializer {
     private Workspace workspace;
 
     /**
-     * The desktop component for the workspace.
-     */
-    private SimbrainDesktop desktop;
-
-    /**
      * Creates a new serializer.
      *
      * @param workspace The workspace to serialize to or from.
      */
     public WorkspaceSerializer(Workspace workspace) {
         this.workspace = workspace;
-        this.desktop = SimbrainDesktop.INSTANCE;
     }
 
     /**
@@ -94,7 +88,7 @@ public class WorkspaceSerializer {
      * @param output The output stream to write to.
      * @throws IOException If there is an IO error.
      */
-    public void serialize(OutputStream output) throws IOException {
+    public void serialize(OutputStream output, boolean headless) throws IOException {
 
         // Create the zip output stream. ZipStream is a sequence of
         // ZipEntries, with extra utilities for iterating over them.
@@ -111,7 +105,7 @@ public class WorkspaceSerializer {
         // Currently sorts components by a serialization priority
         workspace.preSerializationInit();
 
-        serializeComponents(serializer, archive, zipStream);
+        serializeComponents(serializer, archive, zipStream, headless);
         serializeCouplings(archive);
         // serializeUpdateActions(archive);
 
@@ -119,6 +113,10 @@ public class WorkspaceSerializer {
         zipStream.putNextEntry(entry);
         archive.toXml(zipStream);
         zipStream.finish();
+    }
+
+    public void serialize(OutputStream output) throws IOException {
+        serialize(output, false);
     }
 
     /**
@@ -129,10 +127,10 @@ public class WorkspaceSerializer {
      * @param zipStream  The zipstream to write to.
      * @throws IOException If there is an IO error.
      */
-    private void serializeComponents(WorkspaceComponentSerializer serializer, ArchivedWorkspace archive, ZipOutputStream zipStream) throws IOException {
+    private void serializeComponents(WorkspaceComponentSerializer serializer, ArchivedWorkspace archive, ZipOutputStream zipStream, boolean headless) throws IOException {
         List<WorkspaceComponent> components = sortComponentsByPriority();
         for (WorkspaceComponent component : workspace.getComponentList()) {
-            serializeComponent(serializer, archive, component, zipStream);
+            serializeComponent(serializer, archive, component, zipStream, headless);
         }
     }
 
@@ -155,13 +153,13 @@ public class WorkspaceSerializer {
      * @param component  the component to serialize
      * @param zipStream  The zipstream to write to.
      */
-    private void serializeComponent(WorkspaceComponentSerializer serializer, ArchivedWorkspace archive, WorkspaceComponent component, ZipOutputStream zipStream) {
+    private void serializeComponent(WorkspaceComponentSerializer serializer, ArchivedWorkspace archive, WorkspaceComponent component, ZipOutputStream zipStream, boolean headless) {
         ArchivedWorkspaceComponent archiveComp = archive.addComponent(component);
         ZipEntry entry = new ZipEntry(archiveComp.getUri());
         try {
             zipStream.putNextEntry(entry);
             serializer.serializeComponent(component, zipStream);
-            if (SimbrainDesktop.INSTANCE != null) {
+            if (!headless) {
                 DesktopComponent<?> desktopComponent = SimbrainDesktop.INSTANCE.getDesktopComponent(component);
                 // Makes it possible to save a non-GUI simulation
                 if (desktopComponent != null) {
@@ -302,7 +300,7 @@ public class WorkspaceSerializer {
                     if (archivedComponent.getDesktopComponent() != null) {
                         Rectangle bounds =
                                 (Rectangle) XStreamUtils.getSimbrainXStream().fromXML(new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
-                        DesktopComponent<?> desktopComponent = desktop.getDesktopComponent(wc);
+                        DesktopComponent<?> desktopComponent = SimbrainDesktop.INSTANCE.getDesktopComponent(wc);
                         desktopComponent.parentFrame.setBounds(bounds);
                     }
                 } catch (Exception ex) {

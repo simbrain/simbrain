@@ -21,10 +21,11 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.getRandomLocation
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.Dimension
+import java.io.File
 import java.io.FileInputStream
 import kotlin.random.Random
 
-val grazingCows = newSim {
+val grazingCows = newSim { optionString ->
 
     var maxGenerations = 50
     var iterationsPerRun = 2000
@@ -251,11 +252,13 @@ val grazingCows = newSim {
         }
     }
 
-    fun runSim() {
-        workspace.launch {
-            val progressWindow = ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
-                minimumSize = Dimension(300, 100)
-                setLocationRelativeTo(null)
+    suspend fun runSim() {
+        withContext(workspace.coroutineContext) {
+            val progressWindow = withGui {
+                ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
+                    minimumSize = Dimension(300, 100)
+                    setLocationRelativeTo(null)
+                }
             }
             val cowSims = evaluator2(
                 populatingFunction = { CowSim() },
@@ -269,8 +272,10 @@ val grazingCows = newSim {
                         "$it: ${nthPercentileFitness(it).format(3)}"
                     }.also {
                         println("[$generation] $it")
-                        progressWindow.text = "10th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
-                        progressWindow.value = generation
+                        progressWindow?.apply {
+                            text = "10th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
+                            value = generation
+                        }
                     }
                 }
             )
@@ -290,9 +295,12 @@ val grazingCows = newSim {
                         it.hiddens.location = point(0, 60)
                         it.outputs.location = point(0, -25)
                     }
+                    if (desktop == null) {
+                        workspace.save(File("evolved.zip"), headless = true)
+                    }
                 }
             }
-            progressWindow.close()
+            progressWindow?.close()
         }
     }
 
@@ -333,6 +341,13 @@ val grazingCows = newSim {
             }
         }
     }
-
+    if (optionString?.isNotEmpty() == true) {
+        val options = optionString.split(":")
+        maxGenerations = options[0].toInt()
+        iterationsPerRun = options[1].toInt()
+        populationSize = options[2].toInt()
+        eliminationRatio = options[3].toDouble()
+        runSim()
+    }
 
 }

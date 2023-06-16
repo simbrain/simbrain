@@ -23,6 +23,8 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.Dimension
 import java.io.File
 import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.random.Random
 
 val grazingCows = newSim { optionString ->
@@ -296,7 +298,7 @@ val grazingCows = newSim { optionString ->
                         it.outputs.location = point(0, -25)
                     }
                     if (desktop == null) {
-                        workspace.save(File("evolved.zip"), headless = true)
+                        workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
                     }
                 }
             }

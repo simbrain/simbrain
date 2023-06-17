@@ -27,7 +27,9 @@ import java.awt.Color
 import java.lang.reflect.InvocationTargetException
 import java.util.function.Function
 import java.util.stream.Collectors
-import javax.swing.*
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.SwingUtilities
 import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObject
 import kotlin.reflect.full.companionObjectInstance
@@ -134,7 +136,7 @@ class ParameterWidget(
     /**
      * Create an appropriate widget for this parameter.
      */
-    protected fun makeWidget(): JComponent {
+    private fun makeWidget(): JComponent {
         if (parameter.isObjectType) {
             // Assumes the type list is contained in the class corresponding to the parameter.
             // Example: NeuronUpdateRule maintains a list of types  of neuronupdaterules.
@@ -152,10 +154,12 @@ class ParameterWidget(
 
         // Embedded objects are converted into separate property editors
         if (parameter.isEmbeddedObject) {
-            val panel = JPanel()
-            panel.border = BorderFactory.createLineBorder(Color.black)
-            // TODO: Add detail triangle
-            return AnnotatedPropertyEditor(editableObjects)
+            @Suppress("UNCHECKED_CAST")
+            return EmbeddedObjectEditor(
+                editableObjects as List<CopyableObject>,
+                parameter.annotation.label,
+                parameter.annotation.showDetails
+            )
         }
         if (!parameter.isEditable) {
             return JLabel()
@@ -287,6 +291,8 @@ class ParameterWidget(
             (component as IntArrayWidget?)!!.values
         } else if (parameter.annotation.isObjectType) {
             (component as ObjectTypeEditor?)!!.value
+        } else if (parameter.annotation.isEmbeddedObject) {
+            (component as EmbeddedObjectEditor).value
         } else if (parameter.isEnum) {
             if ((component as ChoicesWithNull?)!!.isNull) null else component!!.selectedItem
         } else {

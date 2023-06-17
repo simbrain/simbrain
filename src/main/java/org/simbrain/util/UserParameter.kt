@@ -157,5 +157,10 @@ annotation class UserParameter(
      * Returns true if the annotated field contains an object with its own annotated fields, allowing for recursie
      * embedding of property editors.
      */
-    val isEmbeddedObject: Boolean = false
+    val isEmbeddedObject: Boolean = false,
+    /**
+     * A string in the format of `object.function`.  When the object type editor is updated, this field is udpated
+     * using the provided function. If this is used, [isEmbeddedObject] must be true.
+     */
+    val refreshSource: String = "",
 )

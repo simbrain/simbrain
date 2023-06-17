@@ -111,7 +111,8 @@ class ObjectTypeEditor private constructor(
      * The object used to set the type of all edited objects, when their type
      * is changed.  This is why edited objects must have a copy function.
      */
-    private var prototypeObject: CopyableObject? = null
+    var prototypeObject: CopyableObject? = null
+        private set
 
     /**
      * Prototype mode is set to true as soon  as the combo box is changed. In

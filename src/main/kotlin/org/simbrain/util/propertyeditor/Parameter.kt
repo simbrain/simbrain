@@ -63,7 +63,7 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
     /**
      * Abstract over methods and fields.
      */
-    private val name
+    val name
         get() = property!!.name
 
     /**
@@ -129,6 +129,9 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
     val useSetter: Boolean
         get() = annotation.useSetter
 
+    val refreshSource: String
+        get() = annotation.refreshSource
+
     /**
      * Returns true iff the UserParameter defines a minimum value.
      */
@@ -189,7 +192,14 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
                 }
             }
             if (useSetter) {
-                theObject::class.memberFunctions.firstOrNull { it.name == "set${name.capitalize()}" }?.call(theObject, initVal) ?: setKotlinProperty()
+                val setter = theObject::class.memberFunctions.firstOrNull { it.name == "set${name.capitalize()}" }
+                setter?.let { s ->
+                    try {
+                        s.call(theObject, initVal)
+                    } catch (e: IllegalArgumentException) {
+                        throw IllegalArgumentException("Error setting value for parameter $name: expected type ${s.parameters.first()::class.simpleName}, got ${theObject::class.simpleName}")
+                    }
+                } ?: setKotlinProperty()
             } else {
                 setKotlinProperty()
             }

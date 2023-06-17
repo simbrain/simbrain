@@ -26,6 +26,7 @@ import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.*
+import kotlin.reflect.full.functions
 
 /**
  * Annotated property editor (or APE) is panel for editing collections of
@@ -104,12 +105,24 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
      * Call when widget changed to updated conditional enabling.
      */
     fun onWidgetChanged() {
-        // println(titleString)
         val widgetValues = widgets
             .filter { it.parameter.hasValue }
             .associate { it.label to it.widgetValue }
+
         widgets.filter { it.parameter.annotation.conditionalEnablingMethod.isNotEmpty() }
             .forEach { it.checkConditionalEnabling(widgetValues) }
+
+        // if refresh source is specified, then update the widget based on the value of the specified source
+        // only works for embedded objects
+        widgets.filter { it.parameter.annotation.refreshSource.isNotEmpty() }
+            .forEach {
+                val (objectName, functionName) = it.parameter.refreshSource.split(".")
+                val sourceObject = (widgets.first { w -> w.parameter.name == objectName }.component as ObjectTypeEditor).prototypeObject
+                sourceObject?.let { so ->
+                    val result = so::class.functions.first { fn -> fn.name == functionName }.call(so) as CopyableObject
+                    (it.component as EmbeddedObjectEditor).refreshPrototype(result)
+                }
+            }
     }
 
     /**
@@ -146,11 +159,11 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
         // Add parameter widgets after collecting list of params so they're in
         // the right order.
         for (pw in widgets) {
-            if (pw.parameter.isObjectType) {
+            if (pw.parameter.isObjectType || pw.parameter.isEmbeddedObject) {
                 if (isTabbedPane) {
                     addItemToTabPanel(pw)
                 } else {
-                    // Label is redundant for object types because it gets added in a border box
+                    // Label is redundant for these types because it gets added in a border box
                     (mainPanel as LabelledItemPanel).addItem(pw.component)
                 }
             } else {
@@ -209,7 +222,7 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
                 continue
             }
             if (pw.parameter.isEmbeddedObject) {
-                (pw.component as AnnotatedPropertyEditor).fillFieldValues()
+                (pw.component as EmbeddedObjectEditor).fillFieldValues()
                 continue
             }
             var consistent = true
@@ -294,21 +307,24 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
             if (!pw.parameter.isEditable) {
                 continue
             }
-            if (pw.parameter.isEmbeddedObject) {
-                (pw.component as AnnotatedPropertyEditor).commitChanges()
-                continue
-            }
             val widgetValue = pw.widgetValue ?: continue
-            if (pw.parameter.isObjectType) {
-                (pw.component as ObjectTypeEditor).commitChanges()
 
-                // TODO: Can this be migrated to the object type editor?
-                // Only overrwrite objects if combo box has changed
-                if ((pw.component as ObjectTypeEditor).isPrototypeMode) {
-                    // Reset the types of all the objects to copies of the displayed object
+            if (pw.parameter.isEmbeddedObject) {
+                (pw.component as EmbeddedObjectEditor).commitChanges()
+                // if the value has changed (prototype mode) it must be written back to the parent object
+                if (pw.component.isPrototypeMode) {
                     for (o in objectsToEdit) {
                         pw.parameter.setFieldValue(o, (widgetValue as CopyableObject).copy())
-                        // System.out.println("Rewriting object " + o + "," + widgetValue);
+                    }
+                }
+                continue
+            }
+            if (pw.parameter.isObjectType) {
+                (pw.component as ObjectTypeEditor).commitChanges()
+                // if the value has changed (prototype mode) it must be written back to the parent object
+                if (pw.component.isPrototypeMode) {
+                    for (o in objectsToEdit) {
+                        pw.parameter.setFieldValue(o, (widgetValue as CopyableObject).copy())
                     }
                 }
                 continue

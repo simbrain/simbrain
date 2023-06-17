@@ -198,7 +198,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Local data holder for neuron update rule.
      */
-    @UserParameter(label = "State variables", useSetter = true, isEmbeddedObject = true, order = 100)
+    @UserParameter(label = "State variables", useSetter = true, isEmbeddedObject = true, order = 100, refreshSource = "updateRule.createScalarData")
     private ScalarDataHolder dataHolder = new EmptyScalarData();
 
     /**

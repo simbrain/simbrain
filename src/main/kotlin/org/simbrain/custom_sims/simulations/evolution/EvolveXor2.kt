@@ -22,9 +22,9 @@ val evolveXor2 = newSim {
 
         override val random: Random = Random(seed)
 
-        var inputLayerChromosome = chromosome2(2) { add(nodeGene2 { isClamped = true }) }
-        var hiddenLayerChromosome = chromosome2(2) { add(nodeGene2()) }
-        var outputLayerChromosome = chromosome2(1) { add(nodeGene2()) }
+        var inputLayerChromosome = chromosome2(2) { add(nodeGene2 { isClamped = true; upperBound = 1.0; lowerBound = -1.0 }) }
+        var hiddenLayerChromosome = chromosome2(2) { add(nodeGene2 { upperBound = 1.0; lowerBound = -1.0 }) }
+        var outputLayerChromosome = chromosome2(1) { add(nodeGene2 { upperBound = 1.0; lowerBound = -1.0 }) }
         var connectionChromosome = chromosome2(1) {
             add(connectionGene2(inputLayerChromosome.sampleOne(random), hiddenLayerChromosome.sampleOne(random)))
             add(connectionGene2(hiddenLayerChromosome.sampleOne(random), outputLayerChromosome.sampleOne(random)))

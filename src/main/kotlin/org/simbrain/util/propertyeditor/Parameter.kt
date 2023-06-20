@@ -22,7 +22,6 @@ import org.simbrain.util.UserParameter
 import java.awt.Color
 import java.math.BigDecimal
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
@@ -215,14 +214,6 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
      * @throws NullPointerException If *value* is null.
      */
     private fun validateValue(initVal: Any?): String? {
-        // Validate against regex if applicable.
-        if (annotation.regexValidation.trim { it <= ' ' } != "" && initVal is String) {
-            val p = Pattern.compile(annotation.regexValidation.trim { it <= ' ' })
-            val m = p.matcher(initVal)
-            if (!m.matches()) {
-                return "Value is invalid, it must match the regular expression /" + p.pattern() + "/."
-            }
-        }
 
         // If this is a numeric type, test against the min and max values if specified.
         if (isNumeric) {

@@ -149,11 +149,6 @@ annotation class UserParameter(
      */
     val conditionalEnablingMethod: String = "",
     /**
-     * Regular expression to validate (String) values against. This is only
-     * applied to parameters that are provided as strings. Optional.
-     */
-    val regexValidation: String = "",
-    /**
      * Returns true if the annotated field contains an object with its own annotated fields, allowing for recursie
      * embedding of property editors.
      */

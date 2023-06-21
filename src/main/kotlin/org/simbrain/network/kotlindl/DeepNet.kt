@@ -23,7 +23,7 @@ import java.util.*
  * parameters can be changed but the structure of the network (number of layers and type of layer) cannot be.
  */
 class DeepNet(
-    private val network: Network,
+    network: Network,
     val tfLayers: ArrayList<TFLayer<*>>,
     nsamples: Int = 10
 ): ArrayLayer(network, (tfLayers[0] as TFInputLayer).numElements),
@@ -38,7 +38,7 @@ class DeepNet(
     /**
      * Output matrix
      */
-    private var outputs: Matrix? = null
+    override var outputs: Matrix = Matrix(outputSize(), 1)
 
     var prediction: Int = -1
     private set
@@ -101,10 +101,12 @@ class DeepNet(
      */
     var activations: List<*>
 
+    override val bound: Rectangle2D
+        get() = Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
+
     init {
         label = network.idManager.getProposedId(this.javaClass)
         buildNetwork()
-        outputs = Matrix(outputSize(), 1)
         inputData = Array(nsamples) { FloatArray(inputSize()) }
         targetData = FloatArray(nsamples)
         activations = deepNetLayers.layers.dropLast(1).filter { it.hasActivation }.map {
@@ -200,10 +202,6 @@ class DeepNet(
         inputs.mul(0.0) // clear inputs
     }
 
-    override fun getOutputs(): Matrix? {
-        return outputs
-    }
-
     override fun delete() {
         deepNetLayers.close()
         super.delete()
@@ -231,17 +229,9 @@ class DeepNet(
         return tfLayers.last().getRank()
     }
 
-    override fun getNetwork(): Network {
-        return network
-    }
-
     override fun toString(): String {
         return "${label}: : ${inputSize()} -> ${outputSize()}\n" +
                 deepNetLayers.layers.joinToString("\n") { it.name }
-    }
-
-    override fun getBound(): Rectangle2D {
-        return Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
     }
 
     /**

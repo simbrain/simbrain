@@ -151,6 +151,12 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         return inputs;
     }
 
+    @NotNull
+    @Override
+    public Matrix getInputs() {
+        return Matrix.column(getInputActivations());
+    }
+
     /**
      * Input and output size are the same for collections of neurons.
      */
@@ -201,27 +207,11 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         events.getLocationChanged().fireAndForget();
     }
 
+    @Override
+    @NotNull
     public Rectangle2D getBound() { return LocatableModelKt.getBound(neuronList); }
 
     public RectangleOutlines getOutlines() { return LocatableModelKt.getOutlines(neuronList); }
-
-    /**
-     * Return the width of this group, based on the positions of the neurons that comprise it.
-     *
-     * @return the width of the group
-     */
-    public double getWidth() {
-        return getBound().getWidth();
-    }
-
-    /**
-     * Return the height of this group, based on the positions of the neurons that comprise it.
-     *
-     * @return the height of the group
-     */
-    public double getHeight() {
-        return getBound().getHeight();
-    }
 
     /**
      * @return the longest dimensions upon which neurons are laid out.

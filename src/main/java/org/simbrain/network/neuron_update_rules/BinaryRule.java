@@ -22,7 +22,6 @@ import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
@@ -89,10 +88,9 @@ public class BinaryRule extends NeuronUpdateRule {
     }
 
     @Override
-    public void apply(Layer arr, MatrixDataHolder data) {
-        var array = (NeuronArray) arr;
-        for (int i = 0; i < array.getActivations().nrow() ; i++) {
-            array.getActivations().set(i, 0, binaryRule(array.getInputs().get(i, 0), ((BiasedMatrixData)data).getBiases().get(i, 0)));
+    public void apply(Layer array, MatrixDataHolder data) {
+        for (int i = 0; i < array.getOutputs().nrow() ; i++) {
+            array.getOutputs().set(i, 0, binaryRule(array.getInputs().get(i, 0), ((BiasedMatrixData)data).getBiases().get(i, 0)));
         }
     }
 

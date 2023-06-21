@@ -26,14 +26,10 @@ abstract class ArrayLayer(
             events.clampChanged.fireAndForget()
         }
 
-    /**
-     * Collects inputs from other network models using arrays.
-     */
-    val inputs: Matrix
+    override val inputs: Matrix = Matrix(inputSize, 1)
 
-    init {
-        inputs = Matrix(inputSize, 1)
-    }
+    override val network: Network
+        get() = parent
 
     override fun inputSize(): Int {
         return inputs.size().toInt()
@@ -47,8 +43,8 @@ abstract class ArrayLayer(
         addInputs(wtdInputs)
     }
 
-    override fun addInputs(newInputs: Matrix) {
-        inputs.add(newInputs)
+    override fun addInputs(inputs: Matrix) {
+        this.inputs.add(inputs)
     }
 
     @Consumable
@@ -75,10 +71,6 @@ abstract class ArrayLayer(
     override fun decrement() {
         inputs.sub(increment)
         events.updated.fireAndForget()
-    }
-
-    override fun getNetwork(): Network {
-        return parent
     }
 
     override fun toggleClamping() {

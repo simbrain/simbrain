@@ -22,7 +22,6 @@ import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
@@ -114,12 +113,11 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     private double floor = DEFAULT_FLOOR;
 
     @Override
-    public void apply(Layer arr, MatrixDataHolder data) {
-        var array = (NeuronArray) arr;
-        for (int i = 0; i < array.getActivations().nrow() ; i++) {
-            array.getActivations().set(i, 0, decayRule(
+    public void apply(Layer array, MatrixDataHolder data) {
+        for (int i = 0; i < array.getOutputs().nrow() ; i++) {
+            array.getOutputs().set(i, 0, decayRule(
                     array.getInputs().get(i, 0),
-                    array.getActivations().get(i, 0),
+                    array.getOutputs().get(i, 0),
                     ((BiasedMatrixData)data).getBiases().get(i, 0)
             ));
         }

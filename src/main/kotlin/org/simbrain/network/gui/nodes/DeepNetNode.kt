@@ -132,7 +132,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
         var totalHeight = infoText.height
 
         // Data from the deepNet being represented.
-        val output = deepNet.outputs!!.col(0).map { it.toFloat() }.toFloatArray()
+        val output = deepNet.outputs.col(0).map { it.toFloat() }.toFloatArray()
         val input = deepNet.floatInputs
         val inputLayer = (deepNet.tfLayers[0] as TFInputLayer)
         val inputActivations = if (inputLayer.layer?.outputShape?.rank() == 4) {

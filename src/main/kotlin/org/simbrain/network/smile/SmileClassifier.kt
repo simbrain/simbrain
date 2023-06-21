@@ -41,7 +41,10 @@ class SmileClassifier(
     /**
      * Output matrix.
      */
-    private var outputs = Matrix(classifier.outputSize, 1)
+    override var outputs = Matrix(classifier.outputSize, 1)
+
+    override val bound: Rectangle2D
+        get() = Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
 
     /**
      * Construct a classifier.
@@ -84,19 +87,8 @@ class SmileClassifier(
         return "${label} (${classifier.name}): $classifier.inputSize -> ${outputSize()}"
     }
 
-    /**
-     * Get predicted output as a matrix
-     */
-    override fun getOutputs(): Matrix {
-        return outputs
-    }
-
     override fun outputSize(): Int {
         return classifier.outputSize
-    }
-
-    override fun getBound(): Rectangle2D? {
-        return Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
     }
 
     /**

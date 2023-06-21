@@ -47,9 +47,9 @@ open class SpikingMatrixData(var size: Int) : MatrixDataHolder {
 }
 
 class NakaMatrixData(var size: Int) : MatrixDataHolder {
-    var a = DoubleArray(size)
+    var a = Matrix(size, 1)
     override fun copy() = NakaMatrixData(size).also {
-        it.a = a.copyOf()
+        it.a = a.clone()
     }
 }
 

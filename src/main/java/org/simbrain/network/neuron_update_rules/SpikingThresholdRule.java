@@ -21,7 +21,6 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
@@ -29,7 +28,6 @@ import org.simbrain.network.util.SpikingMatrixData;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
-import smile.math.matrix.Matrix;
 
 import java.util.Random;
 
@@ -68,20 +66,16 @@ public class SpikingThresholdRule extends SpikingNeuronUpdateRule implements Noi
     }
 
     @Override
-    public void apply(Layer arr, MatrixDataHolder data) {
-        var array = (NeuronArray) arr;
-        // TODO: Implement using matrix operations
-        double[] vals = new double[array.size()];
-        for (int i = 0; i < vals.length; i++) {
-            if (spikingThresholdRule(array.getInputs().col(0)[i])) {
+    public void apply(Layer array, MatrixDataHolder data) {
+        for (int i = 0; i < array.outputSize(); i++) {
+            if (spikingThresholdRule(array.getInputs().get(i, 0))) {
                 ((SpikingMatrixData) data).setHasSpiked(i, true, array.getNetwork().getTime());
-                vals[i] = 1;
+                array.getOutputs().set(i, 0, 1);
             } else {
                 ((SpikingMatrixData) data).setHasSpiked(i, false, array.getNetwork().getTime());
-                vals[i] = 0;
+                array.getOutputs().set(i, 0, 0);
             }
         }
-        array.setActivations(Matrix.column(vals));
     }
 
     @Override

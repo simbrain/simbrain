@@ -9,7 +9,7 @@
 // import static org.junit.jupiter.api.Assertions.assertEquals;
 //
 // /**
-//  * Tests for the underlying sigmoid math see {@link org.simbrain.util.math.SigmoidFunctionTests}
+//  * Tests for the underlying sigmoid math see {@link org.simbrain.network.util.SigmoidFunctionTests}
 //  */
 // public class SigmoidalDiscreteRuleTest {
 //

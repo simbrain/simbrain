@@ -22,23 +22,24 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.util.linspace
 import org.simbrain.util.math.SigmoidFunctions
+import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toMatrix
 
 class SigmoidFunctionTests {
 
-    // TODO: Check with Scott: "Check that the matrix forms are approximately equal to the singular forms"
     // TODO: Matrix derivative tests
-    // TODO: Failing inverse atan
-
-    val inputArray = linspace(-10.0, 10.0, 100).also {
-        it[0] = 0.0 // Center of sigmoid
-        it[1] = -1e9 // Small number -> lower bound of sigmoid
-        it[2] = 1e9 // Large number -> Upper bound of sigmoid
-    }
-
-    val inputMatrix = inputArray.toMatrix()
+    // TODO: Failing inverse tanh.  Seems to be a problem in the formula itself.
 
     val epsilon = 0.001
+
+    /**
+     * Input array where first three entries test special cases
+     */
+    val inputMatrix = linspace(-10.0, 10.0, 100).also {
+        it[0] = 0.0 // Zero
+        it[1] = -1e9 // Negative number with large absolute value -> lower bound of sigmoid
+        it[2] = 1e9 // Large number -> Upper bound of sigmoid
+    }.toMatrix()
 
 
     @Test
@@ -69,21 +70,22 @@ class SigmoidFunctionTests {
     fun `test matrix logistic `() {
         val outputMatrix = SigmoidFunctions.logistic(inputMatrix, 1.0, 0.0, 1.0);
         // print(outputMatrix.col(0).contentToString())
-        assertArrayEquals(inputArray.map { SigmoidFunctions.logistic(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
+        assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.logistic(it, 1.0, 0.0, 1.0) }
+            .toDoubleArray(),
             outputMatrix.col(0))
     }
 
     @Test
     fun `test matrix atan `() {
         val outputMatrix = SigmoidFunctions.atan(inputMatrix, 1.0, 0.0, 1.0);
-        assertArrayEquals(inputArray.map { SigmoidFunctions.atan(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
+        assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.atan(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
             outputMatrix.col(0))
     }
 
     @Test
     fun `test matrix tanh `() {
         val outputMatrix = SigmoidFunctions.tanh(inputMatrix, 1.0, 0.0, 1.0);
-        assertArrayEquals(inputArray.map { SigmoidFunctions.tanh(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
+        assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.tanh(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
             outputMatrix.col(0))
     }
     @Test
@@ -110,8 +112,8 @@ class SigmoidFunctionTests {
     fun `test scalar inverse atan`() {
         assertEquals(0.0, SigmoidFunctions.invAtan(0.0, 1.0, -1.0, 1.0), epsilon)
         assertEquals(0.0, SigmoidFunctions.invAtan(0.5, 1.0, 0.0, 1.0), epsilon)
-        // assertTrue(10 < SigmoidFunctions.invAtan(0.999, 1.0, -1.0, 1.0))
-        // assertTrue(-10 > SigmoidFunctions.invAtan(-0.999, 1.0, -1.0, 1.0))
+        assertTrue(10 < SigmoidFunctions.invAtan(0.999, 1.0, -1.0, 1.0))
+        assertTrue(-10 > SigmoidFunctions.invAtan(-0.999, 1.0, -1.0, 1.0))
     }
 
     @Test

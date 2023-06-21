@@ -17,11 +17,9 @@ class EmptyMatrixData : MatrixDataHolder {
 }
 
 class BiasedMatrixData(var size: Int) : MatrixDataHolder {
-    var biases = DoubleArray(size)
-    var biasesMatrix = Matrix(size, 1) // TODO
+    var biases = Matrix(size, 1)
     override fun copy() = BiasedMatrixData(size).also {
-        it.biases = biases.copyOf()
-        it.biasesMatrix = biasesMatrix.clone()
+        it.biases = biases.clone()
     }
 }
 

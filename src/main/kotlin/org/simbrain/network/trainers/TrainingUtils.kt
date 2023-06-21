@@ -18,6 +18,7 @@ import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.util.BiasedMatrixData
+import org.simbrain.util.plusAssign
 import org.simbrain.util.sse
 import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix

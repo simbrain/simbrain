@@ -35,7 +35,7 @@ fun Matrix.rowMatrixTransposed(rowIndex: Int): Matrix {
 /**
  * Convert a double array to a Smile Matrix / column vector.
  */
-fun DoubleArray.toMatrix() = Matrix.of(arrayOf(this)).transpose()
+fun DoubleArray.toMatrix() = Matrix.column(this)!!
 
 /**
  * Add the entries of a double array in-place to a Smile matrix / column vector. Assumes the matrix has as many rows
@@ -48,3 +48,17 @@ fun Matrix.add(toAdd: DoubleArray) {
     }
     (0 until nrow()).forEach { i -> set(i,0, toAdd[i]) }
 }
+
+operator fun Matrix.plusAssign(toAdd: DoubleArray) = add(toAdd)
+
+fun Matrix.clip(min: Double, max: Double) {
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            set(i,j, get(i,j).coerceIn(min, max))
+        }
+    }
+}
+
+operator fun Matrix.get(i: Int) = if (ncol() != 1) throw IllegalStateException("Must be a column vector") else get(i, 0)
+
+fun Matrix.toDoubleArray() = if (ncol() != 1) throw IllegalStateException("Must be a column vector") else col(0)!!

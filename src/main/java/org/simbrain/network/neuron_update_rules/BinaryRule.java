@@ -28,7 +28,6 @@ import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import smile.math.matrix.Matrix;
 
 import java.util.Random;
 
@@ -92,12 +91,9 @@ public class BinaryRule extends NeuronUpdateRule {
     @Override
     public void apply(Layer arr, MatrixDataHolder data) {
         var array = (NeuronArray) arr;
-        // TODO: Implement using matrix operations
-        double[] vals = new double[array.size()];
-        for (int i = 0; i < vals.length ; i++) {
-            vals[i] = binaryRule(array.getInputs().col(0)[i], ((BiasedMatrixData)data).getBiases()[i]);
+        for (int i = 0; i < array.getActivations().nrow() ; i++) {
+            array.getActivations().set(i, 0, binaryRule(array.getInputs().get(i, 0), ((BiasedMatrixData)data).getBiases().get(i, 0)));
         }
-        array.setActivations(Matrix.column(vals));
     }
 
     @Override

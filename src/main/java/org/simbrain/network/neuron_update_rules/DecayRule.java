@@ -33,7 +33,6 @@ import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
-import smile.math.matrix.Matrix;
 
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
@@ -117,13 +116,13 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     @Override
     public void apply(Layer arr, MatrixDataHolder data) {
         var array = (NeuronArray) arr;
-        // TODO: Implement using matrix operations
-        double[] vals = new double[array.size()];
-        for (int i = 0; i < vals.length ; i++) {
-            vals[i] = decayRule(array.getInputs().col(0)[i],
-                    array.getActivations().col(0)[i], ((BiasedMatrixData)data).getBiases()[i]);
+        for (int i = 0; i < array.getActivations().nrow() ; i++) {
+            array.getActivations().set(i, 0, decayRule(
+                    array.getInputs().get(i, 0),
+                    array.getActivations().get(i, 0),
+                    ((BiasedMatrixData)data).getBiases().get(i, 0)
+            ));
         }
-        array.setActivations(Matrix.column(vals));
     }
 
     @Override

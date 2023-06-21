@@ -34,7 +34,6 @@ import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
-import smile.math.matrix.Matrix;
 
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
@@ -94,13 +93,9 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     @Override
     public void apply(Layer arr, MatrixDataHolder data) {
         var array = (NeuronArray) arr;
-        // TODO: Implement using matrix operations
-        double[] vals = new double[array.size()];
-        for (int i = 0; i < vals.length ; i++) {
-            vals[i] = linearRule(array.getInputs().col(0)[i],
-                    ((BiasedMatrixData)data).getBiases()[i]);
+        for (int i = 0; i < array.getActivations().nrow() ; i++) {
+            array.getActivations().set(i, 0, linearRule(array.getInputs().get(i, 0), ((BiasedMatrixData)data).getBiases().get(i, 0)));
         }
-        array.setActivations(Matrix.column(vals));
     }
 
     @Override

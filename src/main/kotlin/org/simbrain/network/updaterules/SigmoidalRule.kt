@@ -50,7 +50,7 @@ class SigmoidalRule : AbstractSigmoidalRule() {
 
     override fun apply(arr: Layer, data: MatrixDataHolder) {
         var array = arr as NeuronArray
-        var weightedInputs = array.inputs.add((data as BiasedMatrixData).biasesMatrix)
+        var weightedInputs = array.inputs.add((data as BiasedMatrixData).biases)
         if (addNoise) {
             weightedInputs.add(noiseGenerator.sampleDouble(array.size()))
         }

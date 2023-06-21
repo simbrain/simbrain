@@ -31,3 +31,20 @@ fun Matrix.rowMatrixTransposed(rowIndex: Int): Matrix {
     }
     return ret
 }
+
+/**
+ * Convert a double array to a Smile Matrix / column vector.
+ */
+fun DoubleArray.toMatrix() = Matrix.of(arrayOf(this)).transpose()
+
+/**
+ * Add the entries of a double array in-place to a Smile matrix / column vector. Assumes the matrix has as many rows
+ * as the array has entries.
+ */
+fun Matrix.add(toAdd: DoubleArray) {
+    if (this.nrow() != toAdd.size) {
+        throw IllegalArgumentException("Trying to add a double array of length ${toAdd.size} to a matrix with ${nrow
+            ()} rows")
+    }
+    (0 until nrow()).forEach { i -> set(i,0, toAdd[i]) }
+}

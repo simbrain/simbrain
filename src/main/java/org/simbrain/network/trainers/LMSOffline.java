@@ -35,7 +35,7 @@
 // import org.simbrain.network.core.Neuron;
 // import org.simbrain.network.groups.Subnetwork;
 // import org.simbrain.network.groups.SynapseGroup;
-// import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+// import org.simbrain.network.updaterules.SigmoidalRule;
 // import org.simbrain.network.util.SimnetUtils;
 // import org.simbrain.util.math.Matrices;
 // import org.simbrain.util.stats.distributions.UniformDistribution;

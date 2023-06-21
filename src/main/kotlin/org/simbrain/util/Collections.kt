@@ -143,3 +143,6 @@ fun randShuffleK(inds: ArrayList<Int?>, k: Int, rand: Random) {
  * @see https://stackoverflow.com/questions/55786239/how-to-autogenerate-array-in-kotlin-similar-to-numpy
  */
 fun linspace(start: Int, stop: Int, numPoints: Int) = Array(numPoints) { start + it * ((stop - start) / (numPoints - 1)) }
+
+fun linspace(start: Double, stop: Double, numPoints: Int) = DoubleArray(numPoints) { start + it * ((stop - start) /
+        (numPoints - 1)) }

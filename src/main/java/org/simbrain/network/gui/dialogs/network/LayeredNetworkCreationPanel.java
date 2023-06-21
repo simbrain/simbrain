@@ -21,9 +21,9 @@ package org.simbrain.network.gui.dialogs.network;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.SigmoidalRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.FeedForward;
+import org.simbrain.network.updaterules.SigmoidalRule;
 
 import javax.swing.*;
 import java.awt.*;

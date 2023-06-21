@@ -21,9 +21,10 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SquashingFunctionEnum;
+import org.simbrain.util.math.SigmoidFunctionEnum;
 import org.simbrain.util.stats.ProbabilityDistribution;
 
 /**
@@ -91,7 +92,7 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
      * Construct a sigmoid update with a specified implementation.
      *
      */
-    public ContinuousSigmoidalRule(final SquashingFunctionEnum sFunction) {
+    public ContinuousSigmoidalRule(final SigmoidFunctionEnum sFunction) {
         super();
         this.sFunction = sFunction;
     }
@@ -125,9 +126,10 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
         double dt = neuron.getNetwork().getTimeStep();
 
         if (addNoise) {
-            inputTerm = (dt / tau) * (neuron.getInput() + bias + noiseGenerator.sampleDouble());
+            inputTerm =
+                    (dt / tau) * (neuron.getInput() + ((BiasedScalarData)data).getBias() + noiseGenerator.sampleDouble());
         } else {
-            inputTerm = (dt / tau) * (neuron.getInput() + bias);
+            inputTerm = (dt / tau) * (neuron.getInput() + ((BiasedScalarData)data).getBias());
         }
 
         netActivation = netActivation * (1 - (leak * dt / tau)) + inputTerm;

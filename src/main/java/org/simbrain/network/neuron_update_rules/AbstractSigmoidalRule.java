@@ -21,11 +21,14 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
-import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
+import org.simbrain.network.util.BiasedMatrixData;
+import org.simbrain.network.util.BiasedScalarData;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SquashingFunctionEnum;
+import org.simbrain.util.math.SigmoidFunctionEnum;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
@@ -35,37 +38,20 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  *
  * @author Zoë Tosi
  */
-public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule, InvertibleUpdateRule, BoundedUpdateRule, NoisyUpdateRule {
+public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements DifferentiableUpdateRule, InvertibleUpdateRule, BoundedUpdateRule, NoisyUpdateRule {
 
     /**
      * The default squashing function, informs the default upper and lower bounds.
      */
-    public static final SquashingFunctionEnum DEFAULT_SQUASHING_FUNCTION = SquashingFunctionEnum.ARCTAN;
+    public static final SigmoidFunctionEnum DEFAULT_SQUASHING_FUNCTION = SigmoidFunctionEnum.ARCTAN;
 
-    /**
-     * The Default upper bound.
-     */
     public static final double DEFAULT_UPPER_BOUND = DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
 
-    /**
-     * The Default lower bound.
-     */
     public static final double DEFAULT_LOWER_BOUND = DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
 
-    /**
-     * Current implementation.
-     */
     @UserParameter(label = "Implementation", order = -10)
-    protected SquashingFunctionEnum sFunction    ;
+    protected SigmoidFunctionEnum sFunction = SigmoidFunctionEnum.LOGISTIC;
 
-    /**
-     * See {@link BiasedUpdateRule}. In a sigmoidal node, shifts the inflection point to the left or right of the origin.
-     */
-    protected double bias;
-
-    /**
-     * Slope.
-     */
     @UserParameter(
             label = "Slope",
             description = "This represents how steep the sigmoidal is.",
@@ -98,37 +84,26 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     protected double lowerBound = DEFAULT_LOWER_BOUND;
 
     public AbstractSigmoidalRule() {
-        super();
-        sFunction = DEFAULT_SQUASHING_FUNCTION;
     }
 
-
-    public AbstractSigmoidalRule(SquashingFunctionEnum sFunction) {
-        super();
-        this.sFunction = sFunction;
-        setUpperBound(sFunction.getDefaultUpperBound());
-        setLowerBound(sFunction.getDefaultLowerBound());
+    @Override
+    public ScalarDataHolder createScalarData() {
+        return new BiasedScalarData();
     }
 
-    public SquashingFunctionEnum getSquashFunctionType() {
-        if (sFunction == null) {
-            sFunction = SquashingFunctionEnum.LOGISTIC; // TODO: Explain (backwards compat)
-        }
+    @Override
+    public MatrixDataHolder createMatrixData(int size) {
+        return new BiasedMatrixData(size);
+    }
+
+    public SigmoidFunctionEnum getType() {
         return sFunction;
     }
 
-    public final void setSquashFunctionType(SquashingFunctionEnum type) {
+    public final void setType(SigmoidFunctionEnum type) {
         this.sFunction = type;
         setUpperBound(type.getDefaultUpperBound());
         setLowerBound(type.getDefaultLowerBound());
-    }
-
-    public final int getSquashFunctionInt() {
-        return sFunction.ordinal();
-    }
-
-    public void setSquashFunctionInt(Integer typeIndex) {
-        this.sFunction = SquashingFunctionEnum.values()[typeIndex];
     }
 
     public double getSlope() {
@@ -164,8 +139,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
      * @return the copy.
      */
     protected AbstractSigmoidalRule baseDeepCopy(AbstractSigmoidalRule sr) {
-        sr.setBias(getBias());
-        sr.setSquashFunctionType(getSquashFunctionType());
+        sr.setType(getType());
         sr.setSlope(getSlope());
         sr.setAddNoise(getAddNoise());
         sr.setLowerBound(getLowerBound());
@@ -200,16 +174,6 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
         double lw = getLowerBound();
         double diff = up - lw;
         return sFunction.inverseVal(val, up, lw, diff);
-    }
-
-    @Override
-    public final double getBias() {
-        return bias;
-    }
-
-    @Override
-    public final void setBias(final double inflectionY) {
-        this.bias = inflectionY;
     }
 
 }

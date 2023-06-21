@@ -27,7 +27,7 @@
 // import org.simbrain.network.groups.NeuronGroup;
 // import org.simbrain.network.groups.Subnetwork;
 // import org.simbrain.network.groups.SynapseGroup;
-// import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+// import org.simbrain.network.updaterules.SigmoidalRule;
 // import org.simbrain.network.trainers.Trainable;
 // import org.simbrain.network.trainers.Trainer;
 // import org.simbrain.network.trainers.TrainingSet;

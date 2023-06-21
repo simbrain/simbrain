@@ -21,7 +21,7 @@
 // import org.simbrain.network.core.NeuronUpdateRule;
 // import org.simbrain.network.gui.NetworkPanel;
 // import org.simbrain.network.neuron_update_rules.LinearRule;
-// import org.simbrain.network.neuron_update_rules.SigmoidalRule;
+// import org.simbrain.network.updaterules.SigmoidalRule;
 // import org.simbrain.network.subnetworks.SimpleRecurrentNetwork;
 // import org.simbrain.util.LabelledItemPanel;
 // import org.simbrain.util.StandardDialog;

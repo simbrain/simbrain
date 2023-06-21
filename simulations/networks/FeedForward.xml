@@ -67,7 +67,7 @@
                       <default/>
                       <int>4</int>
                       <org.simbrain.network.core.Neuron>
-                        <updateRule class="org.simbrain.network.neuron_update_rules.SigmoidalRule">
+                        <updateRule class="org.simbrain.network.updaterules.SigmoidalRule">
                           <inputType>WEIGHTED</inputType>
                           <increment>0.1</increment>
                           <sFunction>LOGISTIC</sFunction>
@@ -104,7 +104,7 @@
                         <auxValue>0.0</auxValue>
                       </org.simbrain.network.core.Neuron>
                       <org.simbrain.network.core.Neuron>
-                        <updateRule class="org.simbrain.network.neuron_update_rules.SigmoidalRule">
+                        <updateRule class="org.simbrain.network.updaterules.SigmoidalRule">
                           <inputType>WEIGHTED</inputType>
                           <increment>0.1</increment>
                           <sFunction>LOGISTIC</sFunction>
@@ -141,7 +141,7 @@
                         <auxValue>0.0</auxValue>
                       </org.simbrain.network.core.Neuron>
                       <org.simbrain.network.core.Neuron>
-                        <updateRule class="org.simbrain.network.neuron_update_rules.SigmoidalRule">
+                        <updateRule class="org.simbrain.network.updaterules.SigmoidalRule">
                           <inputType>WEIGHTED</inputType>
                           <increment>0.1</increment>
                           <sFunction>LOGISTIC</sFunction>
@@ -178,7 +178,7 @@
                         <auxValue>0.0</auxValue>
                       </org.simbrain.network.core.Neuron>
                       <org.simbrain.network.core.Neuron>
-                        <updateRule class="org.simbrain.network.neuron_update_rules.SigmoidalRule">
+                        <updateRule class="org.simbrain.network.updaterules.SigmoidalRule">
                           <inputType>WEIGHTED</inputType>
                           <increment>0.1</increment>
                           <sFunction>LOGISTIC</sFunction>
@@ -253,7 +253,7 @@
                       <default/>
                       <int>2</int>
                       <org.simbrain.network.core.Neuron>
-                        <updateRule class="org.simbrain.network.neuron_update_rules.SigmoidalRule">
+                        <updateRule class="org.simbrain.network.updaterules.SigmoidalRule">
                           <inputType>WEIGHTED</inputType>
                           <increment>0.1</increment>
                           <sFunction>LOGISTIC</sFunction>
@@ -290,7 +290,7 @@
                         <auxValue>0.0</auxValue>
                       </org.simbrain.network.core.Neuron>
                       <org.simbrain.network.core.Neuron>
-                        <updateRule class="org.simbrain.network.neuron_update_rules.SigmoidalRule">
+                        <updateRule class="org.simbrain.network.updaterules.SigmoidalRule">
                           <inputType>WEIGHTED</inputType>
                           <increment>0.1</increment>
                           <sFunction>LOGISTIC</sFunction>

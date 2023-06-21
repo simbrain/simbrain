@@ -2,6 +2,7 @@ package org.simbrain.network.util
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
+import smile.math.matrix.Matrix
 import java.util.*
 
 /**
@@ -17,8 +18,10 @@ class EmptyMatrixData : MatrixDataHolder {
 
 class BiasedMatrixData(var size: Int) : MatrixDataHolder {
     var biases = DoubleArray(size)
+    var biasesMatrix = Matrix(size, 1) // TODO
     override fun copy() = BiasedMatrixData(size).also {
         it.biases = biases.copyOf()
+        it.biasesMatrix = biasesMatrix.clone()
     }
 }
 

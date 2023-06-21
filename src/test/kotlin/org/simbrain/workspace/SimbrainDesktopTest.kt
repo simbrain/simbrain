@@ -1,5 +1,6 @@
 package org.simbrain.workspace
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
@@ -23,7 +24,9 @@ class SimbrainDesktopTest {
             }
         }
         SimbrainDesktop.frame.isVisible = true
-        hiSim.run(SimbrainDesktop)
+        runBlocking {
+            hiSim.run(SimbrainDesktop)
+        }
     }
 
 }

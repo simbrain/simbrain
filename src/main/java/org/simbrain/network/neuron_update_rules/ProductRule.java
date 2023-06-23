@@ -20,7 +20,7 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.util.UserParameter;
 
 /**
@@ -59,7 +59,7 @@ public class ProductRule extends LinearRule {
     }
 
     @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
+    public void apply(Neuron neuron, BiasedScalarData data) {
 
         double val = 1;
         if (useWeights) {

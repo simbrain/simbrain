@@ -22,7 +22,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.util.BiasedScalarData;
-import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SigmoidFunctionEnum;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -121,15 +120,15 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
      * <p>
      * <b>x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))</b>
      */
-    public void apply(Neuron neuron, ScalarDataHolder data) {
+    public void apply(Neuron neuron, BiasedScalarData data) {
 
         double dt = neuron.getNetwork().getTimeStep();
 
         if (addNoise) {
             inputTerm =
-                    (dt / tau) * (neuron.getInput() + ((BiasedScalarData)data).getBias() + noiseGenerator.sampleDouble());
+                    (dt / tau) * (neuron.getInput() + data.getBias() + noiseGenerator.sampleDouble());
         } else {
-            inputTerm = (dt / tau) * (neuron.getInput() + ((BiasedScalarData)data).getBias());
+            inputTerm = (dt / tau) * (neuron.getInput() + data.getBias());
         }
 
         netActivation = netActivation * (1 - (leak * dt / tau)) + inputTerm;

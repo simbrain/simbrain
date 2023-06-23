@@ -28,8 +28,6 @@ import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
-import org.simbrain.network.util.MatrixDataHolder;
-import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
@@ -37,7 +35,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdateRule,
+public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule,
         BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
     /**
@@ -90,15 +88,15 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     @Override
-    public void apply(Layer array, MatrixDataHolder data) {
+    public void apply(Layer array, BiasedMatrixData data) {
         for (int i = 0; i < array.getOutputs().nrow() ; i++) {
-            array.getOutputs().set(i, 0, linearRule(array.getInputs().get(i, 0), ((BiasedMatrixData)data).getBiases().get(i, 0)));
+            array.getOutputs().set(i, 0, linearRule(array.getInputs().get(i, 0), data.getBiases().get(i, 0)));
         }
     }
 
     @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
-        neuron.setActivation(linearRule(neuron.getInput(), ((BiasedScalarData)data).getBias()));
+    public void apply(Neuron neuron, BiasedScalarData data) {
+        neuron.setActivation(linearRule(neuron.getInput(), data.getBias()));
     }
 
     public double linearRule(double input, double bias) {
@@ -113,12 +111,12 @@ public class LinearRule extends NeuronUpdateRule implements DifferentiableUpdate
     }
 
     @Override
-    public MatrixDataHolder createMatrixData(int size) {
+    public BiasedMatrixData createMatrixData(int size) {
         return new BiasedMatrixData(size);
     }
 
     @Override
-    public ScalarDataHolder createScalarData() {
+    public BiasedScalarData createScalarData() {
         return new BiasedScalarData();
     }
 

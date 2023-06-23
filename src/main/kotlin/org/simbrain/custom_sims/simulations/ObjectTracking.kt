@@ -9,6 +9,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
@@ -235,7 +236,7 @@ val objectTrackingSim = newSim {
  */
 class PercentIncomingNeuronRule: LinearRule() {
     val maxVal = 10.0
-    override fun apply(n: Neuron, data: ScalarDataHolder) {
+    override fun apply(n: Neuron, data: BiasedScalarData) {
         n.activation = maxVal * n.fanIn.count { it.source.isSpike }
             .toDouble() / n.fanIn.size
     }
@@ -328,7 +329,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
         // println("target = ${n.target}, threshold = ${n.threshold}, activation = ${n.activation}")
     }
 
-    override fun deepCopy(): NeuronUpdateRule {
+    override fun deepCopy(): AllostaticUpdateRule {
         val copy = AllostaticUpdateRule()
         copy.leakRate = leakRate
         copy.learningRate = learningRate

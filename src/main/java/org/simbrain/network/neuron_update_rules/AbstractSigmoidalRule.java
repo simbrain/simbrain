@@ -25,8 +25,6 @@ import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
-import org.simbrain.network.util.MatrixDataHolder;
-import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SigmoidFunctionEnum;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -38,7 +36,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  *
  * @author Zoë Tosi
  */
-public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements DifferentiableUpdateRule, InvertibleUpdateRule, BoundedUpdateRule, NoisyUpdateRule {
+public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule, InvertibleUpdateRule, BoundedUpdateRule, NoisyUpdateRule {
 
     /**
      * The default squashing function, informs the default upper and lower bounds.
@@ -87,12 +85,12 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule implements 
     }
 
     @Override
-    public ScalarDataHolder createScalarData() {
+    public BiasedScalarData createScalarData() {
         return new BiasedScalarData();
     }
 
     @Override
-    public MatrixDataHolder createMatrixData(int size) {
+    public BiasedMatrixData createMatrixData(int size) {
         return new BiasedMatrixData(size);
     }
 

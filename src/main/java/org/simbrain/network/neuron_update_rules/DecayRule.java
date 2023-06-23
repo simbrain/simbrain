@@ -27,8 +27,6 @@ import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
-import org.simbrain.network.util.MatrixDataHolder;
-import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
@@ -36,7 +34,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
  */
-public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
+public class DecayRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
     /**
      * The Default upper bound.
@@ -113,7 +111,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     private double floor = DEFAULT_FLOOR;
 
     @Override
-    public void apply(Layer array, MatrixDataHolder data) {
+    public void apply(Layer array, BiasedMatrixData data) {
         for (int i = 0; i < array.getOutputs().nrow() ; i++) {
             array.getOutputs().set(i, 0, decayRule(
                     array.getInputs().get(i, 0),
@@ -124,7 +122,7 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     }
 
     @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
+    public void apply(Neuron neuron, BiasedScalarData data) {
         neuron.setActivation(decayRule(neuron.getInput(),
                 neuron.getActivation(), ((BiasedScalarData)data).getBias()));
     }
@@ -158,12 +156,12 @@ public class DecayRule extends NeuronUpdateRule implements BoundedUpdateRule, Cl
     }
 
     @Override
-    public MatrixDataHolder createMatrixData(int size) {
+    public BiasedMatrixData createMatrixData(int size) {
         return new BiasedMatrixData(size);
     }
 
     @Override
-    public ScalarDataHolder createScalarData() {
+    public BiasedScalarData createScalarData() {
         return new BiasedScalarData();
     }
 

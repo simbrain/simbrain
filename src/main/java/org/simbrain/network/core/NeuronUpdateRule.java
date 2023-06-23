@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  *
  * @author jyoshimi
  */
-public abstract class NeuronUpdateRule implements CopyableObject {
+public abstract class NeuronUpdateRule<DS extends ScalarDataHolder, DM extends MatrixDataHolder> implements CopyableObject {
 
     /**
      * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor} to set the update rule
@@ -98,13 +98,13 @@ public abstract class NeuronUpdateRule implements CopyableObject {
      * @param neuron a reference to a neuron with its parameters and access to parent network (and thus time step, etc).
      * @param data a scalar data holder that can hold data that must be updated with this rule.
      */
-    public abstract void apply(Neuron neuron, ScalarDataHolder data);
+    public abstract void apply(Neuron neuron, DS data);
 
     /**
      * Override to return an appropriate data holder for a given rule.
      */
-    public ScalarDataHolder createScalarData() {
-        return DEFAULT_SCALAR_DATA;
+    public DS createScalarData() {
+        return (DS) DEFAULT_SCALAR_DATA;
     }
 
     /**
@@ -115,13 +115,13 @@ public abstract class NeuronUpdateRule implements CopyableObject {
      * @param layer reference to a layer and its matrix-valued data (inputs, activations).
      * @param dataHolder a holder for mutable data used in matrix versions of an update rule
      */
-    public void apply(Layer layer, MatrixDataHolder dataHolder) {}
+    public void apply(Layer layer, DM dataHolder) {}
 
     /**
      * Override to return an appropriate data holder for a given rule.
      */
-    public MatrixDataHolder createMatrixData(int size) {
-        return DEFAULT_MATRIX_DATA;
+    public DM createMatrixData(int size) {
+        return (DM) DEFAULT_MATRIX_DATA;
     }
 
     /**

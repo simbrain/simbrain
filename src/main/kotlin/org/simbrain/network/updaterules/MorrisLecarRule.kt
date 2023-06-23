@@ -1,7 +1,6 @@
 package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.MorrisLecarData
@@ -241,7 +240,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         return Math.cosh((vMembrane - v_w1) / (2 * v_w2))
     }
 
-    override fun deepCopy(): NeuronUpdateRule {
+    override fun deepCopy(): MorrisLecarRule {
         val cpy = MorrisLecarRule()
         cpy.addNoise = addNoise
         cpy.g_Ca = g_Ca

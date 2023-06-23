@@ -46,12 +46,12 @@ public class WeightMatrix extends Connector {
     /**
      * Holds data for prototype rule.
      */
-    private MatrixDataHolder dataHolder = new EmptyMatrixData();
+    private MatrixDataHolder dataHolder = EmptyMatrixData.INSTANCE;
 
     /**
      * Holds data for spike responder.
      */
-    public MatrixDataHolder spikeResponseData = new EmptyMatrixData();
+    public MatrixDataHolder spikeResponseData = EmptyMatrixData.INSTANCE;
 
     /**
      * The weight matrix object.

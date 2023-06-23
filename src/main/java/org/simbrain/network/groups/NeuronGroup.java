@@ -31,7 +31,7 @@ import org.simbrain.network.neurongroups.SoftmaxGroup;
 import org.simbrain.network.subnetworks.CompetitiveGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
-import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule;
+import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -276,8 +276,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
         double[] retArray = new double[getNeuronList().size()];
         int i = 0;
         for (Neuron neuron : getNeuronList()) {
-            if (neuron.getUpdateRule() instanceof BiasedUpdateRule) {
-                retArray[i++] = ((BiasedUpdateRule) neuron.getUpdateRule()).getBias();
+            if (neuron.getDataHolder() instanceof BiasedScalarData) {
+                retArray[i++] = ((BiasedScalarData) neuron.getDataHolder()).getBias();
             }
         }
         return retArray;

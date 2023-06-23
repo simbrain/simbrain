@@ -22,8 +22,8 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule;
-import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.BiasedMatrixData;
+import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.util.math.SimbrainMath;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.Random;
  * Cognitive Neuroscience, chapter 2. All page references below are are to this
  * book.
  */
-public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRule {
+public class PointNeuronRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> {
 
     /**
      * Excitatory inputs for connected Synapses.
@@ -161,11 +161,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
     private double refractoryPotential;
 
     /**
-     * Bias term.
-     */
-    private double bias;
-
-    /**
      * Output functions. (p. 45-48)
      */
     public enum OutputFunction {
@@ -278,7 +273,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
     @Override
     public PointNeuronRule deepCopy() {
         PointNeuronRule cn = new PointNeuronRule();
-        cn.setBias(bias);
         // TODO
         return cn;
     }
@@ -300,7 +294,7 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
     }
 
     @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
+    public void apply(Neuron neuron, BiasedScalarData data) {
 
         // Calculate the excitatory conductance (p. 44, eq. 2.16)
         excitatoryConductance = (1 - netTimeConstant) * excitatoryConductance + netTimeConstant * (getExcitatoryInputs());
@@ -334,11 +328,11 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
         } else if (outputFunction == OutputFunction.RATE_CODE) {
             double val = (gain * getPositiveComponent(membranePotential - thresholdPotential)) / (gain * getPositiveComponent(membranePotential - thresholdPotential) + 1);
             // TODO: Correct way to bias for this rule?
-            neuron.setActivation(val + bias);
+            neuron.setActivation(val + data.getBias());
         } else if (outputFunction == OutputFunction.LINEAR) {
             double val = gain * getPositiveComponent(membranePotential - thresholdPotential);
             // TODO: Correct way to bias for this rule?
-            neuron.setActivation(val + bias);
+            neuron.setActivation(val + data.getBias());
         } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
             neuron.setActivation(1); // TODO: Complete this implementation
         } else if (outputFunction == OutputFunction.NONE) {
@@ -347,6 +341,11 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
 
         // Display current values of variables for diagnostics.
         // printState(neuron);
+    }
+
+    @Override
+    public BiasedScalarData createScalarData() {
+        return new BiasedScalarData();
     }
 
     @Override
@@ -604,14 +603,6 @@ public class PointNeuronRule extends NeuronUpdateRule implements BiasedUpdateRul
 
     public void setInhibitoryMaxConductance(double inhibitoryMaxConductance) {
         this.inhibitoryMaxConductance = inhibitoryMaxConductance;
-    }
-
-    public double getBias() {
-        return bias;
-    }
-
-    public void setBias(double bias) {
-        this.bias = bias;
     }
 
     // TODO

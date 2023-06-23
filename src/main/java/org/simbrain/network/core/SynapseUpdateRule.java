@@ -61,12 +61,12 @@ public abstract class SynapseUpdateRule implements CopyableObject {
     /**
      * Default data holder for scalar data.
      */
-    private static final ScalarDataHolder DEFAULT_SCALAR_DATA = new EmptyScalarData();
+    private static final ScalarDataHolder DEFAULT_SCALAR_DATA = EmptyScalarData.INSTANCE;
 
     /**
      * Default data holder for matrix data.
      */
-    private static final MatrixDataHolder DEFAULT_MATRIX_DATA = new EmptyMatrixData();
+    private static final MatrixDataHolder DEFAULT_MATRIX_DATA = EmptyMatrixData.INSTANCE;
 
     /**
      * Defines the learning rule as it applies to scalar data.

@@ -24,8 +24,8 @@ import org.simbrain.network.updaterules.AdExIFRule;
 import org.simbrain.network.updaterules.IntegrateAndFireRule;
 import org.simbrain.network.updaterules.IzhikevichRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.util.BiasedMatrixData;
-import org.simbrain.network.util.BiasedScalarData;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
@@ -68,12 +68,12 @@ public abstract class NeuronUpdateRule<DS extends ScalarDataHolder, DM extends M
     /**
      * Default data holder for scalar data.
      */
-    private static final ScalarDataHolder DEFAULT_SCALAR_DATA = new BiasedScalarData();
+    private static final ScalarDataHolder DEFAULT_SCALAR_DATA = EmptyScalarData.INSTANCE;
 
     /**
      * Default data holder for matrix data.
      */
-    private static final MatrixDataHolder DEFAULT_MATRIX_DATA = new BiasedMatrixData(1);
+    private static final MatrixDataHolder DEFAULT_MATRIX_DATA = EmptyMatrixData.INSTANCE;
 
     /**
      * Provides the network level time step.

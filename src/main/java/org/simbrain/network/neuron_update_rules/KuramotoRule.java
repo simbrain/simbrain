@@ -5,11 +5,11 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
-import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
@@ -24,7 +24,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  * TODO: Contextual increment.  Proper randomize and bounds.
  * Remove un-needed overrides.  Finish GUI.   Include time step in gui.
  */
-public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
+public class KuramotoRule extends NeuronUpdateRule<EmptyScalarData, EmptyMatrixData> implements DifferentiableUpdateRule, BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
 
     /**
      * The Default upper bound.
@@ -49,11 +49,6 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
         description = "todo.",
             increment = .1, order = 1)
     public double naturalFrequency = 1;
-
-    /**
-     * Bias.
-     */
-    public double bias = 0;
 
     /**
      * Noise generator.
@@ -84,7 +79,7 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
     private double timeStep;
 
     @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
+    public void apply(Neuron neuron, EmptyScalarData data) {
 
         timeStep = neuron.getNetwork().getTimeStep();
 
@@ -129,7 +124,6 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
     @Override
     public KuramotoRule deepCopy() {
         KuramotoRule kr = new KuramotoRule();
-        kr.setBias(getBias());
         kr.setSlope(getSlope());
         kr.setClipped(isClipped());
         kr.setAddNoise(getAddNoise());
@@ -178,16 +172,6 @@ public class KuramotoRule extends NeuronUpdateRule implements BiasedUpdateRule, 
         } else {
             return naturalFrequency;
         }
-    }
-
-    @Override
-    public double getBias() {
-        return bias;
-    }
-
-    @Override
-    public void setBias(final double bias) {
-        this.bias = bias;
     }
 
     public void setSlope(final double slope) {

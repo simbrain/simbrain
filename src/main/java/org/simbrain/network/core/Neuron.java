@@ -24,10 +24,9 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.events.NeuronEvents2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
-import org.simbrain.network.util.EmptyScalarData;
+import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.network.util.SpikingScalarData;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -199,7 +198,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Local data holder for neuron update rule.
      */
     @UserParameter(label = "State variables", useSetter = true, isEmbeddedObject = true, order = 100, refreshSource = "updateRule.createScalarData")
-    private ScalarDataHolder dataHolder = new EmptyScalarData();
+    private ScalarDataHolder dataHolder = updateRule.createScalarData();
 
     /**
      * Construct a specific type of neuron.
@@ -776,8 +775,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @param upper upper bound for randomization.
      */
     public void randomizeBias(double lower, double upper) {
-        if (this.getUpdateRule() instanceof BiasedUpdateRule) {
-            ((BiasedUpdateRule) this.getUpdateRule()).setBias((upper - lower) * Math.random() + lower);
+        if (dataHolder instanceof BiasedScalarData) {
+            ((BiasedScalarData) dataHolder).setBias((upper - lower) * Math.random() + lower);
         }
     }
 

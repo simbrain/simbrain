@@ -14,7 +14,7 @@ import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
-import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule
+import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.distanceTo
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithms.*
@@ -175,8 +175,8 @@ val evolvePursuer = newSim {
             onMutate {
                 hiddens.forEach {
                     it.mutate {
-                        updateRule.let {
-                            if (it is BiasedUpdateRule) it.bias += random.nextDouble(-0.2, 0.2)
+                        dataHolder.let {
+                            if (it is BiasedScalarData) it.bias += random.nextDouble(-0.2, 0.2)
                         }
                     }
                 }

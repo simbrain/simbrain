@@ -12,8 +12,8 @@ interface MatrixDataHolder : CopyableObject {
     override fun copy(): MatrixDataHolder
 }
 
-class EmptyMatrixData : MatrixDataHolder {
-    override fun copy() = EmptyMatrixData()
+object EmptyMatrixData : MatrixDataHolder {
+    override fun copy() = this
 }
 
 class BiasedMatrixData(var size: Int) : MatrixDataHolder {
@@ -60,9 +60,9 @@ interface ScalarDataHolder : CopyableObject {
     override fun copy(): ScalarDataHolder
 }
 
-class EmptyScalarData : ScalarDataHolder {
+object EmptyScalarData : ScalarDataHolder {
     override fun copy(): EmptyScalarData {
-        return EmptyScalarData()
+        return this
     }
 }
 

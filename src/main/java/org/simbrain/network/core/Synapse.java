@@ -24,7 +24,6 @@ import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
-import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
@@ -202,13 +201,13 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      * Data holder for synapse
      */
     @UserParameter(label = "Learning data", isEmbeddedObject = true, order = 100)
-    private ScalarDataHolder dataHolder = new EmptyScalarData();
+    private ScalarDataHolder dataHolder = learningRule.createScalarData();
 
     /**
      * Data holder for spiker responder.
      */
     @UserParameter(label = "Spike data", isEmbeddedObject = true, order = 110)
-    private ScalarDataHolder spikeResponderData = new EmptyScalarData();
+    private ScalarDataHolder spikeResponderData = spikeResponder.createResponderData();
 
     /**
      * Support for property change events.

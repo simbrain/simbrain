@@ -16,8 +16,8 @@ import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
-import org.simbrain.network.updaterules.interfaces.BiasedUpdateRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
+import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithms.*
 import org.simbrain.util.piccolo.GridCoordinate
@@ -78,7 +78,9 @@ val evolveResourcePursuer = newSim {
                             it.lowerBound = -10.0
                             it.upperBound = 10.0
                         }
-                        if (it is BiasedUpdateRule) {
+                    }
+                    dataHolder.let {
+                        if (it is BiasedScalarData) {
                             it.bias = 1.0
                         }
                     }
@@ -215,8 +217,8 @@ val evolveResourcePursuer = newSim {
             onMutate {
                 hiddens.forEach {
                     it.mutate {
-                        updateRule.let {
-                            if (it is BiasedUpdateRule) it.bias += random.nextDouble(-0.2, 0.2)
+                        dataHolder.let {
+                            if (it is BiasedScalarData) it.bias += random.nextDouble(-0.2, 0.2)
                         }
                     }
                 }

@@ -26,7 +26,7 @@ public class ZoeConnector extends Connector {
     /**
      * Holds data for prototype rule.
      */
-    private MatrixDataHolder dataHolder = new EmptyMatrixData();
+    private MatrixDataHolder dataHolder = EmptyMatrixData.INSTANCE;
 
     /**
      * Construct the matrix.

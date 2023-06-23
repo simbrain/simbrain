@@ -75,14 +75,14 @@ public abstract class SpikeResponder implements CopyableObject {
      * Override to return an appropriate data holder for a given responder.
      */
     public ScalarDataHolder createResponderData() {
-        return new EmptyScalarData();
+        return EmptyScalarData.INSTANCE;
     }
 
     /**
      * Override to return an appropriate data holder for a given responder.
      */
     public MatrixDataHolder createMatrixData(int rows, int cols) {
-        return new EmptyMatrixData();
+        return EmptyMatrixData.INSTANCE;
     }
 
     /**

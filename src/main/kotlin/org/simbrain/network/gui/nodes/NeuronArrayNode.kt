@@ -145,7 +145,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     private fun updateActivationImage() {
         activationImage.removeAllChildren()
-        val activations = neuronArray.outputs.col(0)
+        val activations = neuronArray.outputs.toDoubleArray()
         if (gridMode) {
             // "Grid" case
             val len = sqrt(activations.size.toDouble()).toInt()
@@ -186,7 +186,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     private fun computeInfoText() = """
             ${neuronArray.id}    nodes: ${neuronArray.size()}
-            mean activation: ${neuronArray.activations.col(0).average().format(4)}
+            mean activation: ${neuronArray.activations.toDoubleArray().average().format(4)}
             """.trimIndent()
 
     /**
@@ -244,7 +244,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val editComponents: Action = object : AbstractAction("Edit Components...") {
             override fun actionPerformed(event: ActionEvent) {
                 val dialog = StandardDialog()
-                val arrayData = NumericTable(neuronArray.outputs.col(0))
+                val arrayData = NumericTable(neuronArray.outputs.toDoubleArray())
                 dialog.contentPane = SimbrainJTableScrollPanel(
                     SimbrainJTable.createTable(arrayData)
                 )

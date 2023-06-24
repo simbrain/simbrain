@@ -52,7 +52,7 @@ class DeepNet(
      * To access the actual inputs use getInputs().
      */
     val doubleInputs: DoubleArray
-        get() = super.inputs.col(0)
+        get() = super.inputs.toDoubleArray()
 
     /**
      * Float representation of [doubleInputs].
@@ -65,7 +65,7 @@ class DeepNet(
      */
     val outputArray: DoubleArray
         @Producible(description="Outputs")
-        get() = outputs?.col(0) ?: DoubleArray(outputSize())
+        get() = outputs?.toDoubleArray() ?: DoubleArray(outputSize())
 
     /**
      * The training data that can be edited by the user.

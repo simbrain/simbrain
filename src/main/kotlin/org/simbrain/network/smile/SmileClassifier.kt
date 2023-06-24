@@ -5,6 +5,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.awt.geom.Rectangle2D
@@ -68,7 +69,7 @@ class SmileClassifier(
      */
     override fun update() {
         if (classifier.model != null) {
-            winner = classifier.predict(inputs.col(0))
+            winner = classifier.predict(inputs.toDoubleArray())
             // println("Prediction of ${this.id} is: $winner")
             if (classifier.model != null) {
                 outputs = try {

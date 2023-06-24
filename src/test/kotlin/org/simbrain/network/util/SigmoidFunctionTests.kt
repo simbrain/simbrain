@@ -69,24 +69,24 @@ class SigmoidFunctionTests {
     @Test
     fun `test matrix logistic `() {
         val outputMatrix = SigmoidFunctions.logistic(inputMatrix, 1.0, 0.0, 1.0);
-        // print(outputMatrix.col(0).contentToString())
+        // print(outputMatrix.toDoubleArray().contentToString())
         assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.logistic(it, 1.0, 0.0, 1.0) }
             .toDoubleArray(),
-            outputMatrix.col(0))
+            outputMatrix.toDoubleArray())
     }
 
     @Test
     fun `test matrix atan `() {
         val outputMatrix = SigmoidFunctions.atan(inputMatrix, 1.0, 0.0, 1.0);
         assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.atan(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
-            outputMatrix.col(0))
+            outputMatrix.toDoubleArray())
     }
 
     @Test
     fun `test matrix tanh `() {
         val outputMatrix = SigmoidFunctions.tanh(inputMatrix, 1.0, 0.0, 1.0);
         assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.tanh(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
-            outputMatrix.col(0))
+            outputMatrix.toDoubleArray())
     }
     @Test
     fun `test logistic derivative`() {

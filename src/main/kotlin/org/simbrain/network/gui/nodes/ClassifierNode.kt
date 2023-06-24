@@ -9,6 +9,7 @@ import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.*
+import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toSimbrainColorImage
 import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JMenuItem
@@ -62,12 +63,12 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
     private fun updateActivationImages() {
         // TODO: Magic Numbers
         inputImage.apply {
-            image =   smileClassifier.inputs.col(0).toSimbrainColorImage(smileClassifier.inputSize(), 1)
+            image = smileClassifier.inputs.toDoubleArray().toSimbrainColorImage(smileClassifier.inputSize(), 1)
             val (x, y, w, h) = bounds
             setBounds(x, y, 100.0, 20.0)
         }
         outputImage.apply {
-            image =   smileClassifier.outputs.col(0).toSimbrainColorImage(smileClassifier.outputSize(), 1)
+            image = smileClassifier.outputs.toDoubleArray().toSimbrainColorImage(smileClassifier.outputSize(), 1)
             val (x, y, w, h) = bounds
             setBounds(x, y, 100.0, 20.0)
         }
@@ -89,8 +90,8 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
     override fun getToolTipText(): String {
         return  """ 
                 <html>
-                Output: (${Utils.doubleArrayToString(smileClassifier.outputs.col(0), 2)})<br>
-                Input: (${Utils.doubleArrayToString(smileClassifier.inputs.col(0), 2)})
+                Output: (${Utils.doubleArrayToString(smileClassifier.outputs.toDoubleArray(), 2)})<br>
+                Input: (${Utils.doubleArrayToString(smileClassifier.inputs.toDoubleArray(), 2)})
                 </html>
                 """.trimIndent()
     }

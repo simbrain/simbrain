@@ -11,6 +11,7 @@ import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.Utils
 import org.simbrain.util.table.DataFrameWrapper
+import org.simbrain.util.toDoubleArray
 import smile.classification.DecisionTree
 import smile.classification.NaiveBayes
 import smile.classification.SVM
@@ -65,16 +66,16 @@ class SmileClassifierTest {
         net.addNetworkModelAsync(xorSVM)
         xorSVM.addInputs(Matrix.column(doubleArrayOf(0.0, 0.0, 0.0)))
         net.update()
-        assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputs.col(0))
+        assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputs.toDoubleArray())
         xorSVM.addInputs(Matrix.column(doubleArrayOf(1.0, 0.0, 0.0)))
         net.update()
-        assertArrayEquals(doubleArrayOf(0.0, 1.0), xorSVM.outputs.col(0))
+        assertArrayEquals(doubleArrayOf(0.0, 1.0), xorSVM.outputs.toDoubleArray())
         xorSVM.addInputs(Matrix.column(doubleArrayOf(0.0, 1.0, 0.0)))
         net.update()
-        assertArrayEquals(doubleArrayOf(0.0, 1.0), xorSVM.outputs.col(0))
+        assertArrayEquals(doubleArrayOf(0.0, 1.0), xorSVM.outputs.toDoubleArray())
         xorSVM.addInputs(Matrix.column(doubleArrayOf(1.0, 1.0, 0.0)))
         net.update()
-        assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputs.col(0))
+        assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputs.toDoubleArray())
     }
 
     @Test
@@ -97,34 +98,34 @@ class SmileClassifierTest {
 
         // Expected values after one update
         net.update()
-        assertArrayEquals(doubleArrayOf(0.0, 1.0, 0.0),inputNa.activations.col(0), .001)
-        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputs.col(0), .001)
-        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputs.col(0), .001)
-        assertArrayEquals(doubleArrayOf(0.0, 0.0),outputNa.activations.col(0), .001)
+        assertArrayEquals(doubleArrayOf(0.0, 1.0, 0.0),inputNa.activations.toDoubleArray(), .001)
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputs.toDoubleArray(), .001)
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputs.toDoubleArray(), .001)
+        assertArrayEquals(doubleArrayOf(0.0, 0.0),outputNa.activations.toDoubleArray(), .001)
 
         // Expected values after two updates
         net.update()
-        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),inputNa.activations.col(0), .001)
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),inputNa.activations.toDoubleArray(), .001)
         // Inputs are immediately cleared. But an event is fired so that in the GUI the input would here
         // be seen as 0,1,0
-        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputs.col(0))
-        assertArrayEquals(doubleArrayOf(0.0, 1.0),xorSVM.outputs.col(0))
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputs.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(0.0, 1.0),xorSVM.outputs.toDoubleArray())
         // (1,0) has propagated from last update
-        assertArrayEquals(doubleArrayOf(1.0, 0.0),outputNa.activations.col(0))
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),outputNa.activations.toDoubleArray())
 
         // Expected values after three updates
         net.update()
-        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),inputNa.activations.col(0))
-        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputs.col(0))
-        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputs.col(0))
-        assertArrayEquals(doubleArrayOf(0.0, 1.0),outputNa.activations.col(0))
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),inputNa.activations.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputs.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputs.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(0.0, 1.0),outputNa.activations.toDoubleArray())
 
         // Expected values after four updates
         net.update()
-        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),inputNa.activations.col(0))
-        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputs.col(0))
-        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputs.col(0))
-        assertArrayEquals(doubleArrayOf(1.0, 0.0),outputNa.activations.col(0))
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),inputNa.activations.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputs.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputs.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),outputNa.activations.toDoubleArray())
 
         // TODO: A second version of this test using neurongroups or neuron collections
     }

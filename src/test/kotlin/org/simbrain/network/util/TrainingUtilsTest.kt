@@ -11,6 +11,7 @@ import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.trainers.*
 import org.simbrain.util.rowMatrixTransposed
 import org.simbrain.util.sse
+import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 
 class TrainingUtilsTest {
@@ -33,7 +34,7 @@ class TrainingUtilsTest {
     fun `test neuron array error`() {
         na1.setActivations(doubleArrayOf(-1.0, 1.0))
         val error = na1.getError(Matrix(2,1, 2.0))
-        assertArrayEquals(doubleArrayOf(3.0, 1.0 ), error.col(0))
+        assertArrayEquals(doubleArrayOf(3.0, 1.0 ), error.toDoubleArray())
     }
 
     @Test
@@ -54,7 +55,7 @@ class TrainingUtilsTest {
         val inputs = Matrix.column(doubleArrayOf(-1.0, 1.0))
         listOf(wm1, wm2).forwardPass(inputs)
         listOf(wm1, wm2).printActivationsAndWeights(true)
-        assertArrayEquals(inputs.col(0), wm2.target.outputs.col(0))
+        assertArrayEquals(inputs.toDoubleArray(), wm2.target.outputs.toDoubleArray())
     }
 
 
@@ -68,7 +69,7 @@ class TrainingUtilsTest {
             wm1.trainCurrentOutputLMS()
         }
         // println("After: ${wm1.output}")
-        assertArrayEquals(target, wm1.output.col(0), .01)
+        assertArrayEquals(target, wm1.output.toDoubleArray(), .01)
     }
 
     @Test
@@ -82,10 +83,10 @@ class TrainingUtilsTest {
         wm2.randomize()
         repeat(50) {
             listOf(wm1, wm2).applyBackprop(inputs, targets, .1)
-            // println(targets.col(0) sse wm2.output.col(0))
+            // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
         }
-        // println("After: ${wm2.output}")
-        assertEquals(0.0, targets.col(0) sse wm2.output.col(0), .01)
+        println("After: ${wm2.output}")
+        assertEquals(0.0, targets.toDoubleArray() sse wm2.output.toDoubleArray(), .01)
     }
 
     @Test

@@ -847,7 +847,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Return the upper bound for the the underlying rule, if it is bounded.
+     * Return the upper bound for the underlying rule, if it is bounded.
      * Else it simply returns a "graphical" upper bound. Used to color neuron
      * activations.
      *
@@ -862,7 +862,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Return the lower bound for the the underlying rule, if it is bounded.
+     * Return the lower bound for the underlying rule, if it is bounded.
      * Else it simply returns the "graphical" lower bound. Used to color neuron
      * activations.
      *

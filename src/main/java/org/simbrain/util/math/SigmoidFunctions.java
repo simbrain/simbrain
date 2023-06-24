@@ -143,6 +143,8 @@ public class SigmoidFunctions {
      *              an inverse of for val == 0
      * @return the value of val after being passed through the inverse tanh
      * function with these parameters
+     *
+     * TODO: Slope is ignored, and this is failing for values near ceil and floor
      */
     public static double invTanh(double val, double ceil, double floor, double slope) {
         double z = 0.5 * (((val - floor) / (ceil - floor)) - 0.5);

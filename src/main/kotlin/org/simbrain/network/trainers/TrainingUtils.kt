@@ -74,10 +74,12 @@ fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix
 }
 
 fun NeuronArray.updateBiases(layerError: Matrix, epsilon: Double = .1) {
-    if (dataHolder is BiasedMatrixData) {
-        val weightDelta = layerError.clone().mul(epsilon).col(0)
-        (dataHolder as BiasedMatrixData).biases += weightDelta
-        events.updated.fireAndBlock()
+    dataHolder.let{
+        if (it is BiasedMatrixData) {
+            val weightDelta = layerError.clone().mul(epsilon)
+            it.biases += weightDelta
+            events.updated.fireAndBlock()
+        }
     }
 }
 

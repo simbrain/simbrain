@@ -15,7 +15,7 @@ fun Matrix.validateSameShape(target: Matrix) {
 val Matrix.shapeString get() = "(${nrow()},${ncol()})"
 
 // TODO: Flatten the two arrays so that this can be used for arbitrary matrices (currently works only on vectors)
-infix fun Matrix.sse(other: Matrix) = (this.col(0) sse other.col(0))
+infix fun Matrix.sse(other: Matrix) = (this.toDoubleArray() sse other.toDoubleArray())
 
 /**
  * Returns the matrix at a row, transposed.
@@ -51,6 +51,8 @@ fun Matrix.add(toAdd: DoubleArray) {
 
 operator fun Matrix.plusAssign(toAdd: DoubleArray) = add(toAdd)
 
+operator fun Matrix.plusAssign(toAdd: Matrix) { add(toAdd) }
+
 fun Matrix.clip(min: Double, max: Double) {
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {
@@ -62,3 +64,10 @@ fun Matrix.clip(min: Double, max: Double) {
 operator fun Matrix.get(i: Int) = if (ncol() != 1) throw IllegalStateException("Must be a column vector") else get(i, 0)
 
 fun Matrix.toDoubleArray() = if (ncol() != 1) throw IllegalStateException("Must be a column vector") else col(0)!!
+
+fun Matrix.toSequence(): Sequence<Double> = if (ncol() != 1) throw IllegalStateException("Must be a column vector")
+else sequence {
+    for (i in (0 until this@Matrix.nrow())) {
+        yield(this@Matrix.get(i, 0))
+    }
+}

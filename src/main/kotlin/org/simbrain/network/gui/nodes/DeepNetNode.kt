@@ -60,7 +60,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
      */
     private fun computeInfoText() = "${deepNet.id} : ${deepNet.prediction}"
     // infoText.text = """
-    //      Output: (${Utils.doubleArrayToString(deepNet.outputs!!.col(0), 2)})
+    //      Output: (${Utils.doubleArrayToString(deepNet.outputs!!.toDoubleArray(), 2)})
     //
     //      Input: (${Utils.doubleArrayToString(deepNet.doubleInputs, 2)})
     //      """.trimIndent()
@@ -132,7 +132,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
         var totalHeight = infoText.height
 
         // Data from the deepNet being represented.
-        val output = deepNet.outputs.col(0).map { it.toFloat() }.toFloatArray()
+        val output = deepNet.outputs.toDoubleArray().map { it.toFloat() }.toFloatArray()
         val input = deepNet.floatInputs
         val inputLayer = (deepNet.tfLayers[0] as TFInputLayer)
         val inputActivations = if (inputLayer.layer?.outputShape?.rank() == 4) {

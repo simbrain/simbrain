@@ -2,6 +2,7 @@ package org.simbrain.network.core
 
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.events.LocationEvents2
+import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
@@ -58,7 +59,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
 
     @get:Producible
     val outputActivations: DoubleArray
-        get() = outputs.col(0)
+        get() = outputs.toDoubleArray()
 
     /**
      * x coordinate of center of layer.

@@ -31,6 +31,8 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
 
+import static java.lang.Math.max;
+
 /**
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
@@ -52,18 +54,25 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
      */
     private static final boolean DEFAULT_CLIPPING = true;
 
+    @UserParameter(
+            label = "Type",
+            description = "No clipping, clip floor and ceiling (piecewise linear), clip floor (relu)",
+            order = 10)
+    private ClippingType clippingType = ClippingType.PiecewiseLinear;
+
     /**
-     * Slope.
+     * Note that Relu case ignores provided bounds, though those bounds are still used by contextual increment and
+     * decrement.
      */
+    public enum ClippingType {NoClipping, PiecewiseLinear, Relu}
+
     @UserParameter(
             label = "Slope",
             description = "Slope of linear rule",
-            increment = .1)
+            increment = .1,
+            order = 20)
     private double slope = 1;
 
-    /**
-     * Noise generator.
-     */
     private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
     /**
@@ -103,10 +112,11 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
         if (addNoise) {
             ret  += noiseGenerator.sampleDouble();
         }
-        if (clipping) {
-            ret  = clip(ret);
-        }
-        return ret;
+        return switch (clippingType) {
+            case NoClipping -> ret;
+            case Relu -> max(0, ret);
+            case PiecewiseLinear -> clip(ret);
+        };
     }
 
     @Override
@@ -138,13 +148,11 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
 
     @Override
     public double getDerivative(double val) {
-        if (val >= getUpperBound()) {
-            return 0;
-        } else if (val <= getLowerBound()) {
-            return 0;
-        } else {
-            return slope;
-        }
+        return switch (clippingType) {
+            case NoClipping -> slope;
+            case Relu -> val <= 0 ? 0 : slope;
+            case PiecewiseLinear -> (val <= lowerBound || val >= upperBound) ? 0 : slope;
+        };
     }
 
     public void setSlope(final double slope) {
@@ -210,4 +218,11 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
         this.clipping = clipping;
     }
 
+    public ClippingType getClippingType() {
+        return clippingType;
+    }
+
+    public void setClippingType(ClippingType clippingType) {
+        this.clippingType = clippingType;
+    }
 }

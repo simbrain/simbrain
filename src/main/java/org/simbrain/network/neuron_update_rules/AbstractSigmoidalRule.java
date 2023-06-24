@@ -81,6 +81,12 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
      */
     protected double lowerBound = DEFAULT_LOWER_BOUND;
 
+    /**
+     * Bounded update rule is automatically clippable.  It is not needed here since sigmoids automatically respect
+     * upper and lower bounds but can still be turned on to constrain contextual increment and decrement.
+     */
+    private boolean isClipped = false;
+
     public AbstractSigmoidalRule() {
     }
 
@@ -174,4 +180,13 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
         return sFunction.inverseVal(val, up, lw, diff);
     }
 
+    @Override
+    public boolean isClipped() {
+        return isClipped;
+    }
+
+    @Override
+    public void setClipped(boolean b) {
+        isClipped = b;
+    }
 }

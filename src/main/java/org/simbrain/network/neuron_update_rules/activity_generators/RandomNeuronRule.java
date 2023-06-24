@@ -42,6 +42,12 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
 
     private double floor = -1.0;
 
+    /**
+     * Bounded update rule is automatically clippable.  It is not needed here since sigmoids automatically respect
+     * upper and lower bounds but can still be turned on to constrain contextual increment and decrement.
+     */
+    private boolean isClipped = false;
+
     @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
@@ -115,5 +121,15 @@ public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenera
 
     @Override
     public void setAddNoise(boolean noise) {
+    }
+
+    @Override
+    public boolean isClipped() {
+        return isClipped;
+    }
+
+    @Override
+    public void setClipped(boolean clipped) {
+        isClipped = clipped;
     }
 }

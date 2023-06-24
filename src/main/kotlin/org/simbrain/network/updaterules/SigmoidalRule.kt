@@ -61,28 +61,6 @@ class SigmoidalRule : AbstractSigmoidalRule() {
         return sr
     }
 
-    override fun contextualIncrement(n: Neuron) {
-        var act = n.activation
-        if (act < upperBound) {
-            act += n.increment
-            if (act > upperBound) {
-                act = upperBound
-            }
-            n.forceSetActivation(act)
-        }
-    }
-
-    override fun contextualDecrement(n: Neuron) {
-        var act = n.activation
-        if (act > lowerBound) {
-            act -= n.increment
-            if (act < lowerBound) {
-                act = lowerBound
-            }
-            n.forceSetActivation(act)
-        }
-    }
-
     override fun getDerivative(input: Double): Double {
         return sFunction.derivVal(input, upperBound, lowerBound, upperBound - lowerBound)
     }

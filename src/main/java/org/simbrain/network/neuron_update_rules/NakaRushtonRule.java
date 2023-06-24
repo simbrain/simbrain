@@ -127,6 +127,12 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     private double lowerBound = 0;
 
     /**
+     * Bounded update rule is automatically clippable.  It is not needed here since sigmoids automatically respect
+     * upper and lower bounds but can still be turned on to constrain contextual increment and decrement.
+     */
+    private boolean isClipped = false;
+
+    /**
      * Default constructor.
      */
     public NakaRushtonRule() {
@@ -210,17 +216,6 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
     @Override
     public ScalarDataHolder createScalarData() {
         return new NakaScalarData();
-    }
-
-    @Override
-    public void contextualIncrement(Neuron n) {
-        double act = n.getActivation();
-        if (act <= getUpperBound()) {
-            if (act + n.getIncrement() > getUpperBound()) {
-                act = getUpperBound();
-            }
-            n.forceSetActivation(act);
-        }
     }
 
     public double getSemiSaturationConstant() {
@@ -320,4 +315,13 @@ public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRu
         this.lowerBound = floor;
     }
 
+    @Override
+    public boolean isClipped() {
+        return isClipped;
+    }
+
+    @Override
+    public void setClipped(boolean clipped) {
+        isClipped = clipped;
+    }
 }

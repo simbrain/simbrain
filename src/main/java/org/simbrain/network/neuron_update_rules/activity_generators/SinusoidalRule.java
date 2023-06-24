@@ -72,6 +72,12 @@ public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerato
      */
     private boolean addNoise = false;
 
+    /**
+     * Bounded update rule is automatically clippable.  It is not needed here since sigmoids automatically respect
+     * upper and lower bounds but can still be turned on to constrain contextual increment and decrement.
+     */
+    private boolean isClipped = false;
+
     @Override
     public final TimeType getTimeType() {
         return TimeType.DISCRETE;
@@ -165,5 +171,15 @@ public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerato
     @Override
     public double getLowerBound() {
         return floor;
+    }
+
+    @Override
+    public boolean isClipped() {
+        return isClipped;
+    }
+
+    @Override
+    public void setClipped(boolean clipped) {
+        isClipped = clipped;
     }
 }

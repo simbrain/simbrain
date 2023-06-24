@@ -23,15 +23,15 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
-import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.util.UserParameter;
 
 /**
  * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
  * for the default growth rate. Does not use inputs from other neurons.
  */
-public class LogisticRule extends NeuronUpdateRule implements ActivityGenerator, BoundedUpdateRule, ClippableUpdateRule {
+public class LogisticRule extends NeuronUpdateRule<EmptyScalarData, EmptyMatrixData> implements ActivityGenerator, BoundedUpdateRule {
 
     /**
      * Growth rate.
@@ -74,7 +74,7 @@ public class LogisticRule extends NeuronUpdateRule implements ActivityGenerator,
     }
 
     @Override
-    public void apply(Neuron neuron, ScalarDataHolder data) {
+    public void apply(Neuron neuron, EmptyScalarData data) {
 
         // TODO: Note that the inputs have to be within the neuron's bounds for
         // behavior to be reasonable.
@@ -99,17 +99,6 @@ public class LogisticRule extends NeuronUpdateRule implements ActivityGenerator,
     @Override
     public String getName() {
         return "Logistic";
-    }
-
-    @Override
-    public double clip(double val) {
-        if (val < getLowerBound()) {
-            return getLowerBound();
-        }
-        if (val > getUpperBound()) {
-            return getUpperBound();
-        }
-        return val;
     }
 
     @Override

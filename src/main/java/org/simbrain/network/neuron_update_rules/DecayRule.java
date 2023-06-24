@@ -23,7 +23,6 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
@@ -34,7 +33,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
  */
-public class DecayRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
+public class DecayRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements BoundedUpdateRule, NoisyUpdateRule {
 
     /**
      * The Default upper bound.
@@ -116,15 +115,17 @@ public class DecayRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixDa
             array.getOutputs().set(i, 0, decayRule(
                     array.getInputs().get(i, 0),
                     array.getOutputs().get(i, 0),
-                    ((BiasedMatrixData)data).getBiases().get(i, 0)
+                    data.getBiases().get(i, 0)
             ));
         }
+        clip(array.getOutputs());
     }
 
     @Override
     public void apply(Neuron neuron, BiasedScalarData data) {
         neuron.setActivation(decayRule(neuron.getInput(),
-                neuron.getActivation(), ((BiasedScalarData)data).getBias()));
+                neuron.getActivation(), data.getBias()));
+        neuron.clip();
     }
 
     public double decayRule(double in, double activation, double bias) {
@@ -148,9 +149,6 @@ public class DecayRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixDa
         }
         if (addNoise) {
             val += noiseGenerator.sampleDouble();
-        }
-        if (clipping) {
-            val = clip(val);
         }
         return val;
     }
@@ -190,47 +188,6 @@ public class DecayRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixDa
         dn.setAddNoise(getAddNoise());
         dn.noiseGenerator = noiseGenerator.deepCopy();
         return dn;
-    }
-
-    @Override
-    public double clip(double val) {
-        if (val > getUpperBound()) {
-            return getUpperBound();
-        } else if (val < getLowerBound()) {
-            return getLowerBound();
-        } else {
-            return val;
-        }
-    }
-
-    @Override
-    public void contextualIncrement(Neuron n) {
-        double act = n.getActivation();
-        if (act >= getUpperBound() && isClipped()) {
-            return;
-        } else {
-            if (isClipped()) {
-                act = clip(act + n.getIncrement());
-            } else {
-                act = act + n.getIncrement();
-            }
-            n.forceSetActivation(act);
-        }
-    }
-
-    @Override
-    public void contextualDecrement(Neuron n) {
-        double act = n.getActivation();
-        if (act <= getLowerBound() && isClipped()) {
-            return;
-        } else {
-            if (isClipped()) {
-                act = clip(act - n.getIncrement());
-            } else {
-                act = act - n.getIncrement();
-            }
-            n.forceSetActivation(act);
-        }
     }
 
     public double getDecayAmount() {

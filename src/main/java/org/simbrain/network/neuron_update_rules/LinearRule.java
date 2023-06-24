@@ -24,7 +24,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
@@ -36,7 +35,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
 public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule,
-        BoundedUpdateRule, ClippableUpdateRule, NoisyUpdateRule {
+        BoundedUpdateRule, NoisyUpdateRule {
 
     /**
      * The Default upper bound.
@@ -121,17 +120,6 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
     }
 
     @Override
-    public double clip(double val) {
-        if (val > getUpperBound()) {
-            return getUpperBound();
-        } else if (val < getLowerBound()) {
-            return getLowerBound();
-        } else {
-            return val;
-        }
-    }
-
-    @Override
     public TimeType getTimeType() {
         return TimeType.DISCRETE;
     }
@@ -146,36 +134,6 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
         ln.setLowerBound(getLowerBound());
         ln.noiseGenerator = noiseGenerator.deepCopy();
         return ln;
-    }
-
-    @Override
-    public void contextualIncrement(Neuron n) {
-        double act = n.getActivation();
-        if (act >= getUpperBound() && isClipped()) {
-            return;
-        } else {
-            if (isClipped()) {
-                act = clip(act + n.getIncrement());
-            } else {
-                act = act + n.getIncrement();
-            }
-            n.forceSetActivation(act);
-        }
-    }
-
-    @Override
-    public void contextualDecrement(Neuron n) {
-        double act = n.getActivation();
-        if (act <= getLowerBound() && isClipped()) {
-            return;
-        } else {
-            if (isClipped()) {
-                act = clip(act - n.getIncrement());
-            } else {
-                act = act - n.getIncrement();
-            }
-            n.forceSetActivation(act);
-        }
     }
 
     @Override

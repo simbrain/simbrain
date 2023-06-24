@@ -176,6 +176,7 @@ public abstract class NeuronUpdateRule<DS extends ScalarDataHolder, DM extends M
      */
     public void contextualIncrement(Neuron n) {
         incrementActivation(n);
+        n.clip();
     }
 
     /**
@@ -185,6 +186,7 @@ public abstract class NeuronUpdateRule<DS extends ScalarDataHolder, DM extends M
      */
     public void contextualDecrement(Neuron n) {
         decrementActivation(n);
+        n.clip();
     }
 
     /**

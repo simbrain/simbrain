@@ -25,7 +25,6 @@ import org.simbrain.network.events.NeuronEvents2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.network.util.SpikingScalarData;
@@ -340,6 +339,12 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         this.dataHolder = data;
     }
 
+    public void clip() {
+        if (updateRule instanceof BoundedUpdateRule) {
+            activation = ((BoundedUpdateRule) updateRule).clip(activation);
+        }
+    }
+
     @Override
     public void updateInputs() {
         fanIn.forEach(Synapse::updateOutput);
@@ -372,11 +377,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         if (isClamped()) {
             return;
         } else {
-            if (updateRule instanceof ClippableUpdateRule) {
-                activation = ((ClippableUpdateRule) updateRule).clip(act);
-            } else {
-                activation = act;
-            }
+            activation = act;
+            clip();
         }
         events.getActivationChanged().fireAndForget(lastActivation, act);
     }

@@ -170,30 +170,6 @@ public class ContinuousSigmoidalRule extends AbstractSigmoidalRule {
     }
 
     @Override
-    public final void contextualIncrement(final Neuron n) {
-        double act = n.getActivation();
-        if (act < getUpperBound()) {
-            act += n.getIncrement();
-            if (act > getUpperBound()) {
-                act = getUpperBound();
-            }
-            n.forceSetActivation(act);
-        }
-    }
-
-    @Override
-    public final void contextualDecrement(final Neuron n) {
-        double act = n.getActivation();
-        if (act > getLowerBound()) {
-            act -= n.getIncrement();
-            if (act < getLowerBound()) {
-                act = getLowerBound();
-            }
-            n.forceSetActivation(act);
-        }
-    }
-
-    @Override
     public TimeType getTimeType() {
         return TimeType.CONTINUOUS;
     }

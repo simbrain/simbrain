@@ -378,7 +378,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
             return;
         } else {
             activation = act;
-            clip();
         }
         events.getActivationChanged().fireAndForget(lastActivation, act);
     }

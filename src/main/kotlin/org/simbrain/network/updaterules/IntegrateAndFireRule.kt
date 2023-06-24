@@ -23,9 +23,8 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.MatrixDataHolder
-import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils.round
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -44,7 +43,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  * @author Zoë Tosi
  *
  */
-open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
+open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixData>(), NoisyUpdateRule {
 
     @UserParameter(
         label = "Resistance (MΩ)",
@@ -137,8 +136,8 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         return ifn
     }
 
-    override fun apply(na: Layer, data: MatrixDataHolder) {
-        if (na is NeuronArray && data is SpikingMatrixData) {
+    override fun apply(na: Layer, data: SpikingMatrixData) {
+        if (na is NeuronArray) {
             for (i in 0 until na.size()) {
                 val(spiked, V) = intFireRule(
                     na.network.time,
@@ -152,7 +151,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         }
     }
 
-    override fun apply(n: Neuron, data: ScalarDataHolder) {
+    override fun apply(n: Neuron, data: SpikingScalarData) {
         val(spiked, V) = intFireRule(n.network.time, n.lastSpikeTime, n.network.timeStep, n.input, n.activation)
         n.isSpike = spiked
         n.activation = V

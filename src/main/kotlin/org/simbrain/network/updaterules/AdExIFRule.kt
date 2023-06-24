@@ -42,7 +42,7 @@ import org.simbrain.workspace.Producible
  *
  * @author Zoë Tosi
  */
-open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
+open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), NoisyUpdateRule {
 
     /**
      * Reset voltage (mV). Defaults to 3-spike bursting behavior at .8 nA
@@ -267,8 +267,8 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
      */
     var refractoryPeriod = 1.0
 
-    override fun apply(na: Layer, data: MatrixDataHolder) {
-        if (na is NeuronArray && data is AdexMatrixData) {
+    override fun apply(na: Layer, data: AdexMatrixData) {
+        if (na is NeuronArray) {
             for (i in 0 until na.size()) {
                 val excitInputs = na.excitatoryInputs
                 val inhibInputs = na.inhibitoryInputs
@@ -288,20 +288,18 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         }
     }
 
-    override fun createMatrixData(size: Int): MatrixDataHolder {
+    override fun createMatrixData(size: Int): AdexMatrixData {
         return AdexMatrixData(size)
     }
 
-    override fun apply(n: Neuron, data: ScalarDataHolder) {
-        if (data is AdexData) {
-            val (spiked, v, w) = adExRule(
-                n.activation, data.w, n.excitatoryInputs, n.inhibitoryInputs,
-                n.lastSpikeTime, n.network.time, n.network.timeStep
-            )
-            n.isSpike = spiked
-            n.activation = v
-            data.w = w
-        }
+    override fun apply(n: Neuron, data: AdexData) {
+        val (spiked, v, w) = adExRule(
+            n.activation, data.w, n.excitatoryInputs, n.inhibitoryInputs,
+            n.lastSpikeTime, n.network.time, n.network.timeStep
+        )
+        n.isSpike = spiked
+        n.activation = v
+        data.w = w
 
     }
 
@@ -360,13 +358,13 @@ open class AdExIFRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         } else {
             isSpike = false
         }
-        v_mem = clip(v_mem, -1000.0,1000.0)
+        v_mem = clip(v_mem, -1000.0, 1000.0)
 
         return Triple(isSpike, v_mem, w)
 
     }
 
-    override fun createScalarData(): ScalarDataHolder {
+    override fun createScalarData(): AdexData {
         return AdexData()
     }
 

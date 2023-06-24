@@ -23,8 +23,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.MatrixDataHolder
-import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
@@ -39,7 +37,7 @@ import org.simbrain.workspace.Producible
  *
  * @see http://www.scholarpedia.org/article/FitzHugh-Nagumo_model
  */
-class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
+class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>(), NoisyUpdateRule {
 
     /**
      * Constant background current. KEEP
@@ -116,18 +114,15 @@ class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         return copy
     }
 
-    override fun apply(n: Neuron, data: ScalarDataHolder) {
-        if (data !is FitzHughData) {
-            return
-        }
+    override fun apply(n: Neuron, data: FitzHughData) {
         val (spiked, v, w) = fitzhughNagumoRule(n.activation, data.w, n.input, n.network.timeStep)
         n.isSpike = spiked
         n.activation = v
         data.w = w
     }
 
-    override fun apply(na: Layer, data: MatrixDataHolder) {
-        if (na is NeuronArray && data is FitzHughMatrixData) {
+    override fun apply(na: Layer, data: FitzHughMatrixData) {
+        if (na is NeuronArray) {
             for (i in 0 until na.size()) {
                 val (spiked, v, w) = fitzhughNagumoRule(
                     na.activations.get(i, 0),
@@ -167,11 +162,11 @@ class FitzhughNagumo : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         }
     }
 
-    override fun createScalarData(): ScalarDataHolder {
+    override fun createScalarData(): FitzHughData {
         return FitzHughData()
     }
 
-    override fun createMatrixData(size: Int): MatrixDataHolder {
+    override fun createMatrixData(size: Int): FitzHughMatrixData {
         return FitzHughMatrixData(size)
     }
 

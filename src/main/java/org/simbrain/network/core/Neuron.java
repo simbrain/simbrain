@@ -319,7 +319,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      *
      * @param updateRule the neuronUpdateRule to set
      */
-    public void setUpdateRule(final NeuronUpdateRule updateRule) {
+    public void setUpdateRule(final NeuronUpdateRule<?,?> updateRule) {
 
         NeuronUpdateRule oldRule = this.updateRule;
         this.updateRule = updateRule;
@@ -334,7 +334,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Change the current update rule but perform no other initialization.
      */
-    public void changeUpdateRule(final NeuronUpdateRule updateRule, final ScalarDataHolder data) {
+    public void changeUpdateRule(final NeuronUpdateRule<?,?> updateRule, final ScalarDataHolder data) {
         this.updateRule = updateRule;
         this.dataHolder = data;
     }

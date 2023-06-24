@@ -104,30 +104,11 @@ open class SpikingScalarData(
     }
 }
 
+// In java they can't be stored in the same file as the update rule
 class NakaScalarData(@UserParameter(label = "a") var a: Double = 0.0) : ScalarDataHolder {
     override fun copy(): NakaScalarData {
         return NakaScalarData(a)
     }
 }
 
-class IzhikData(
-    @UserParameter(label = "a") var a: Double = 0.0,
-    @UserParameter(label = "b") var b: Double = 0.0,
-    @UserParameter(label = "c") var c: Double = 0.0,
-    @UserParameter(label = "d") var d: Double = 0.0
-) : ScalarDataHolder {
-    override fun copy(): IzhikData {
-        return IzhikData(a, b, c, d)
-    }
-}
-
-
-class MorrisLecarData(
-    @UserParameter(label = "w_K", description = "Fraction of open potassium channels")
-    var w_K: Double = 0.0,
-) : ScalarDataHolder {
-    override fun copy(): MorrisLecarData {
-        return MorrisLecarData(w_K)
-    }
-}
 

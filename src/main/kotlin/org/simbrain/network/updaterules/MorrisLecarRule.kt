@@ -3,8 +3,8 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.MorrisLecarData
-import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
@@ -12,7 +12,7 @@ import org.simbrain.util.stats.distributions.NormalDistribution
 /**
  * @author Zoë Tosi
  */
-class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
+class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixData>(), NoisyUpdateRule {
     /**
      * Calcium channel conductance (micro Siemens/cm^2).
      */
@@ -192,7 +192,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
      * A source of noise (nA).
      */
     override var noiseGenerator: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
-    override fun apply(neuron: Neuron, dat: ScalarDataHolder) {
+    override fun apply(neuron: Neuron, dat: MorrisLecarData) {
         val data = dat as MorrisLecarData
         val dt = neuron.network.timeStep
         val i_syn = neuron.input
@@ -224,7 +224,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         return phi * lambdaFunction(vMembrane) * (k_fractionFunction(vMembrane) - w_K)
     }
 
-    override fun createScalarData(): ScalarDataHolder {
+    override fun createScalarData(): MorrisLecarData {
         return MorrisLecarData()
     }
 
@@ -378,5 +378,15 @@ class MorrisLecarRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
 
     fun setThreshold(threshold: Double) {
         this.threshold = threshold
+    }
+}
+
+
+class MorrisLecarData(
+    @UserParameter(label = "w_K", description = "Fraction of open potassium channels")
+    var w_K: Double = 0.0,
+) : SpikingScalarData() {
+    override fun copy(): MorrisLecarData {
+        return MorrisLecarData(w_K)
     }
 }

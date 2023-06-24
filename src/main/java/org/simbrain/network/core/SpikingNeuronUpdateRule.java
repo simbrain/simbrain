@@ -19,8 +19,6 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.util.MatrixDataHolder;
-import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.network.util.SpikingMatrixData;
 import org.simbrain.network.util.SpikingScalarData;
 
@@ -33,7 +31,7 @@ import org.simbrain.network.util.SpikingScalarData;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
+public abstract class SpikingNeuronUpdateRule<DS extends SpikingScalarData, DM extends SpikingMatrixData> extends NeuronUpdateRule<DS, DM> {
 
     @Override
     public void clear(Neuron neuron) {
@@ -65,15 +63,15 @@ public abstract class SpikingNeuronUpdateRule extends NeuronUpdateRule {
      * Override to provide subclasses of SpikingMatrixData if needed.
      */
     @Override
-    public MatrixDataHolder createMatrixData(int size) {
-        return new SpikingMatrixData(size);
+    public DM createMatrixData(int size) {
+        return (DM) new SpikingMatrixData(size);
     }
 
     /**
      * Override to provide subclasses of SpikingScalarData if needed.
      */
     @Override
-    public ScalarDataHolder createScalarData() {
-        return new SpikingScalarData();
+    public DS createScalarData() {
+        return (DS) new SpikingScalarData();
     }
 }

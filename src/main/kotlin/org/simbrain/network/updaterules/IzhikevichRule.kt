@@ -21,7 +21,8 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -32,15 +33,10 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  * different types. Students could just look it up, but this would be
  * faster/cooler. Just a thought.
  */
-class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
-    /**
-     * Recovery.
-     */
+class IzhikevichRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixData>(), NoisyUpdateRule {
+
     private var recovery = 0.0
 
-    /**
-     * A.
-     */
     @UserParameter(
         label = "A",
         description = "Parameter for recovery variable.",
@@ -50,11 +46,8 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         probParam1 = .01,
         probParam2 = .12
     )
-    var a = .02
+    var a: Double = 0.0
 
-    /**
-     * B.
-     */
     @UserParameter(
         label = "B",
         description = "Parameter for recovery variable.",
@@ -65,11 +58,8 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         probParam1 = .15,
         probParam2 = .3
     )
-    var b = .2
+    var b: Double = 0.0
 
-    /**
-     * C.
-     */
     @UserParameter(
         label = "C",
         description = "The value for v which occurs after a spike.",
@@ -79,11 +69,8 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         probParam1 = -70.0,
         probParam2 = -45.0
     )
-    var c = -65.0
+    var c: Double = 0.0
 
-    /**
-     * D.
-     */
     @UserParameter(
         label = "D",
         description = "A constant value added to u after spikes.",
@@ -93,7 +80,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         probParam1 = 0.02,
         probParam2 = 10.0
     )
-    var d = 8.0
+    var d: Double = 0.0
 
     /**
      * Constant background current.
@@ -101,61 +88,44 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
     @UserParameter(label = "I bkgd", description = "Constant background current.", increment = .1, order = 5)
     private var iBg = 14.0
 
-    /**
-     * Threshold value to signal a spike.
-     */
+    @UserParameter(label = "Threshold", description = "Threshold value to signal a spike", increment = .1, order = 10)
     var threshold = 30.0
 
-    /**
-     * Noise generator.
-     */
     override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
-    /**
-     * Add noise to the neuron.
-     */
     override var addNoise = false
 
-    /**
-     * An optional absolute refractory period. In many simulations this
-     * promotes network stability.
-     */
-    var refractoryPeriod = 0.0 //ms
-
-    //TODO
-    private var timeStep = 0.0
-    private var `val` = 0.0
     override fun deepCopy(): IzhikevichRule {
-        val `in` = IzhikevichRule()
-        `in`.a = a
-        `in`.b = b
-        `in`.c = c
-        `in`.d = d
-        `in`.setiBg(getiBg())
-        `in`.addNoise = addNoise
-        `in`.noiseGenerator = noiseGenerator.deepCopy()
-        return `in`
+        val ir = IzhikevichRule()
+        ir.a = a
+        ir.b = b
+        ir.c = c
+        ir.d = d
+        ir.setiBg(getiBg())
+        ir.addNoise = addNoise
+        ir.noiseGenerator = noiseGenerator.deepCopy()
+        return ir
     }
 
-    override fun apply(neuron: Neuron, data: ScalarDataHolder) {
-        timeStep = neuron.network.timeStep
+    override fun apply(neuron: Neuron, data: SpikingScalarData) {
+        val timeStep = neuron.network.timeStep
         val activation = neuron.activation
-        var inputs = 0.0
-        inputs = neuron.input
+        var inputs = neuron.input
         if (addNoise) {
             inputs += noiseGenerator.sampleDouble()
         }
         inputs += iBg
         recovery += timeStep * (a * (b * activation - recovery))
-        `val` = activation + timeStep * (.04 * (activation * activation) + 5 * activation + 140 - recovery + inputs)
-        if (`val` >= threshold) {
-            `val` = c
+        var value = activation + timeStep * (.04 * (activation * activation) + 5 * activation + 140 - recovery +
+                inputs)
+        if (value >= threshold) {
+            value = c
             recovery += d
             neuron.isSpike = true
         } else {
             neuron.isSpike = false
         }
-        neuron.activation = `val`
+        neuron.activation = value
     }
 
     override fun getRandomValue(): Double {
@@ -183,3 +153,5 @@ class IzhikevichRule : SpikingNeuronUpdateRule(), NoisyUpdateRule {
         return c
     }
 }
+
+

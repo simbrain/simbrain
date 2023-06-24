@@ -10,7 +10,7 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
@@ -279,7 +279,7 @@ class AllostaticDataHolder(
  * (3) a variable target activation level, initialized at Tn = 1;
  * (4) and a variable spiking threshold T’n, which was = always equal to 2Tn
  */
-class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
+class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, SpikingMatrixData>() {
 
     @UserParameter(label = "leakRate")
     var leakRate = .75
@@ -287,9 +287,9 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule() {
     @UserParameter(label = "learning rate")
     var learningRate = .01
 
-    override fun createScalarData() = AllostaticDataHolder()
+    override fun createScalarData(): AllostaticDataHolder = AllostaticDataHolder()
 
-    override fun apply(n: Neuron, data: ScalarDataHolder) {
+    override fun apply(n: Neuron, data: AllostaticDataHolder) {
 
         data as AllostaticDataHolder
 

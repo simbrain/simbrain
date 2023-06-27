@@ -1,7 +1,9 @@
 package org.simbrain.network.util
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import java.util.*
 
@@ -14,6 +16,7 @@ interface MatrixDataHolder : CopyableObject {
 
 object EmptyMatrixData : MatrixDataHolder {
     override fun copy() = this
+    override fun toString(): String = ""
 }
 
 class BiasedMatrixData(var size: Int) : MatrixDataHolder {
@@ -21,6 +24,11 @@ class BiasedMatrixData(var size: Int) : MatrixDataHolder {
     override fun copy() = BiasedMatrixData(size).also {
         it.biases = biases.clone()
     }
+
+    override fun toString(): String {
+        return "Biases: ${Utils.getTruncatedArrayString(biases.toDoubleArray(), 10)}"
+    }
+
 }
 
 open class SpikingMatrixData(var size: Int) : MatrixDataHolder {
@@ -64,6 +72,7 @@ object EmptyScalarData : ScalarDataHolder {
     override fun copy(): EmptyScalarData {
         return this
     }
+    override fun toString(): String = ""
 }
 
 class BiasedScalarData(

@@ -13,6 +13,8 @@
  */
 package org.simbrain.network.neuron_update_rules.interfaces;
 
+import smile.math.matrix.Matrix;
+
 /**
  * Indicates that an update rule is differentiable, and has a getDerivative
  * function. Used by backprop.
@@ -22,12 +24,23 @@ package org.simbrain.network.neuron_update_rules.interfaces;
 public interface DifferentiableUpdateRule {
 
     /**
-     * The inverse of the activation function.
+     * The derivative of the activation function.
      *
      * @param val the value being sent through the neuron's derivative
      * @return the derivative of the neuron's activation function with respect
      * to val.
      */
     double getDerivative(double val);
+
+    /**
+     * Array based derivative. By default forwards to scalar derivative.
+     */
+    default Matrix getDerivative(Matrix input) {
+        var derivatives = new Matrix(input.nrow(), 1);
+        for (int i = 0; i < derivatives.nrow() ; i++) {
+            derivatives.set(i, 0, getDerivative(input.get(i, 0)));
+        }
+        return derivatives;
+    }
 
 }

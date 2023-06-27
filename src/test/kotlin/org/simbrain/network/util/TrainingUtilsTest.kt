@@ -12,6 +12,7 @@ import org.simbrain.network.trainers.*
 import org.simbrain.util.rowMatrixTransposed
 import org.simbrain.util.sse
 import org.simbrain.util.toDoubleArray
+import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 
 class TrainingUtilsTest {
@@ -20,6 +21,7 @@ class TrainingUtilsTest {
     val na1 = NeuronArray(net, 2)
     val na2 = NeuronArray(net, 3)
     val na3 = NeuronArray(net, 2)
+    var na1DataHolder = (na1.dataHolder as BiasedMatrixData)
     val wm1 = WeightMatrix(net, na1, na2)
     val wm2 = WeightMatrix(net, na2, na3)
 
@@ -33,8 +35,24 @@ class TrainingUtilsTest {
     @Test
     fun `test neuron array error`() {
         na1.setActivations(doubleArrayOf(-1.0, 1.0))
-        val error = na1.getError(Matrix(2,1, 2.0))
-        assertArrayEquals(doubleArrayOf(3.0, 1.0 ), error.toDoubleArray())
+        val error = na1.getError(doubleArrayOf(1.0, 1.0).toMatrix())
+        assertArrayEquals(doubleArrayOf(2.0, 0.0 ), error.toDoubleArray())
+    }
+
+    @Test
+    fun `test bias update`() {
+        na1DataHolder.biases = doubleArrayOf(1.0, 1.0).toMatrix()
+        val error = na1.getError(doubleArrayOf(0.0, 1.0).toMatrix())
+        // Change to bias is 0,1, so biases should become 1,2
+        na1.updateBiases(error, 1.0)
+        assertArrayEquals(doubleArrayOf(1.0, 2.0 ), na1DataHolder.biases.toDoubleArray())
+        na1.updateBiases(error, 1.0)
+        assertArrayEquals(doubleArrayOf(1.0, 3.0 ), na1DataHolder.biases.toDoubleArray())
+        na1.updateBiases(error, .1)
+        assertArrayEquals(doubleArrayOf(1.0, 3.1 ), na1DataHolder.biases.toDoubleArray())
+        error.mul(-1.0)
+        na1.updateBiases(error, 1.0)
+        assertArrayEquals(doubleArrayOf(1.0, 2.1 ), na1DataHolder.biases.toDoubleArray())
     }
 
     @Test
@@ -68,24 +86,27 @@ class TrainingUtilsTest {
         repeat(100) {
             wm1.trainCurrentOutputLMS()
         }
-        // println("After: ${wm1.output}")
+        // println("Outputs: ${wm1.output}")
+        // println("Biases: ${wm1.tar.dataHolder as BiasedMatrixData}")
         assertArrayEquals(target, wm1.output.toDoubleArray(), .01)
     }
 
+    // TODO: Separate tests for different clipping types
     @Test
     fun `test backprop`() {
-        val inputs = Matrix.column(doubleArrayOf(-1.0, 1.0))
+        val inputs = doubleArrayOf(-1.0, 1.0).toMatrix()
         // TODO: Blows up for larger targets, like 30
-        val targets = Matrix.column(doubleArrayOf(1.75, -.5))
-        (na3.updateRule as LinearRule).lowerBound = -100.0
-        (na3.updateRule as LinearRule).upperBound = 100.0
+        val targets = Matrix.column(doubleArrayOf(3.5, -.5))
+        (na3.updateRule as LinearRule).clippingType = LinearRule.ClippingType.PiecewiseLinear
         wm1.randomize()
         wm2.randomize()
-        repeat(50) {
+        // na2.randomizeBiases()
+        // na3.randomizeBiases()
+        repeat(10) {
             listOf(wm1, wm2).applyBackprop(inputs, targets, .1)
             // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
         }
-        println("After: ${wm2.output}")
+        println("Outputs: ${wm2.output}, SSE = ${targets sse wm2.output}")
         assertEquals(0.0, targets.toDoubleArray() sse wm2.output.toDoubleArray(), .01)
     }
 

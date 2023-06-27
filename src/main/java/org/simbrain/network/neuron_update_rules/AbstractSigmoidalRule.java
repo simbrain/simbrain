@@ -41,14 +41,10 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
     /**
      * The default squashing function, informs the default upper and lower bounds.
      */
-    public static final SigmoidFunctionEnum DEFAULT_SQUASHING_FUNCTION = SigmoidFunctionEnum.ARCTAN;
-
-    public static final double DEFAULT_UPPER_BOUND = DEFAULT_SQUASHING_FUNCTION.getDefaultUpperBound();
-
-    public static final double DEFAULT_LOWER_BOUND = DEFAULT_SQUASHING_FUNCTION.getDefaultLowerBound();
+    public static final SigmoidFunctionEnum DEFAULT_SIGMOID_TYPE = SigmoidFunctionEnum.LOGISTIC;
 
     @UserParameter(label = "Implementation", order = -10)
-    protected SigmoidFunctionEnum sFunction = SigmoidFunctionEnum.LOGISTIC;
+    protected SigmoidFunctionEnum sFunction = DEFAULT_SIGMOID_TYPE;
 
     @UserParameter(
             label = "Slope",
@@ -74,12 +70,12 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
     /**
      * The upper bound of the activity if clipping is used.
      */
-    protected double upperBound = DEFAULT_UPPER_BOUND;
+    protected double upperBound = sFunction.getDefaultUpperBound();
 
     /**
      * The lower bound of the activity if clipping is used.
      */
-    protected double lowerBound = DEFAULT_LOWER_BOUND;
+    protected double lowerBound = sFunction.getDefaultLowerBound();
 
     /**
      * Bounded update rule is automatically clippable.  It is not needed here since sigmoids automatically respect

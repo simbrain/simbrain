@@ -212,8 +212,9 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     @Override
     public String toString() {
-        return getId() + " with " + activations.size() + " activations: " +
-                Utils.getTruncatedArrayString(getActivations().col(0), 10);
+        return getId() + " with " + activations.size() + " components. " + "\n" +
+                "Activations: " + Utils.getTruncatedArrayString(getActivationArray(), 10) + "\n" +
+                dataHolder;
     }
 
     @Override

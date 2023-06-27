@@ -95,16 +95,16 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
      */
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
+
+    @Override
+    public void apply(Neuron neuron, BiasedScalarData data) {
+        neuron.setActivation(linearRule(neuron.getInput(), data.getBias()));
+    }
     @Override
     public void apply(Layer array, BiasedMatrixData data) {
         for (int i = 0; i < array.getOutputs().nrow() ; i++) {
             array.getOutputs().set(i, 0, linearRule(array.getInputs().get(i, 0), data.getBiases().get(i, 0)));
         }
-    }
-
-    @Override
-    public void apply(Neuron neuron, BiasedScalarData data) {
-        neuron.setActivation(linearRule(neuron.getInput(), data.getBias()));
     }
 
     public double linearRule(double input, double bias) {

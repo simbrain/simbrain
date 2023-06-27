@@ -53,6 +53,8 @@ operator fun Matrix.plusAssign(toAdd: DoubleArray) = add(toAdd)
 
 operator fun Matrix.plusAssign(toAdd: Matrix) { add(toAdd) }
 
+operator fun Matrix.minusAssign(toSubtract: Matrix) { sub(toSubtract) }
+
 fun Matrix.clip(min: Double, max: Double) {
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {

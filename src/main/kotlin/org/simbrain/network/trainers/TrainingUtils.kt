@@ -17,9 +17,11 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.plusAssign
 import org.simbrain.util.sse
+import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix
 
@@ -44,10 +46,12 @@ fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
     outputError.validateSameShape(target.outputs)
 
     // TODO: Can this be replaced by backprop with linear, since derivative is then just source activations
-    // TODO: Bias
-    // TODO: derivative of output activations
-    val weightDeltas = outputError.mm(source.outputs.transpose())
-    weightMatrix.add(weightDeltas.mul(epsilon))
+    val deriv = (tar.updateRule as DifferentiableUpdateRule).getDerivative(tar.inputs)
+    val weightDeltas = outputError.mul(deriv)
+        .mm(source.outputs.transpose())
+        .mul(epsilon)
+    weightMatrix.add(weightDeltas)
+    tar.updateBiases(outputError, epsilon)
     events.updated.fireAndForget()
 }
 
@@ -61,7 +65,6 @@ fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
     applyLMS(targets.sub(actualOutputs), epsilon)
 }
 
-// TODO: For hidden layers don't use epsilon. 
 /**
  * Backpropagate the provided errors through this weight matrix, and return the new error.
  */
@@ -73,11 +76,15 @@ fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix
     return Matrix.column(weightDeltas.mul(weightMatrix).colSums())
 }
 
-fun NeuronArray.updateBiases(layerError: Matrix, epsilon: Double = .1) {
+/**
+ * Change to bias is error vector times epsilon. Compute this and add it to biases.
+ */
+fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
+    activations.validateSameShape(error)
     dataHolder.let{
         if (it is BiasedMatrixData) {
-            val weightDelta = layerError.clone().mul(epsilon)
-            it.biases += weightDelta
+            val biasDelta = error.clone().mul(epsilon)
+            it.biases += biasDelta
             events.updated.fireAndBlock()
         }
     }
@@ -120,8 +127,6 @@ fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, 
     inputVector.validateSameShape(first().src.inputs)
     targetValues.validateSameShape(last().tar.outputs)
 
-    //TODO: activation function derivatives
-
     forwardPass(inputVector)
     val error = last().tar.outputs sse targetValues
 
@@ -129,10 +134,24 @@ fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, 
     var errorVector: Matrix = last().tar.getError(targetValues)
 
     for (wm in this.reversed()) {
-        wm.tar.updateBiases(errorVector, epsilon)
+        val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
+        errorVector.mul(deriv)
+        // TODO: Bias updates destabilizes backprop. See TrainerUtilsTest.
+        // wm.tar.updateBiases(errorVector, epsilon)
         errorVector = wm.applyBackprop(errorVector, epsilon)
     }
-
     return error
+}
 
+// TODO: move somewhere else? Also add user parameter so it can be adjusted (pref?)
+val biasRandomizer = NormalDistribution(0.0, 1.0)
+
+fun NeuronArray.randomizeBiases() {
+    dataHolder.let {
+        if (it is BiasedMatrixData) {
+            for (i in 0 until it.biases.ncol()) {
+                it.biases.set(i, 0, biasRandomizer.sampleDouble())
+            }
+        }
+    }
 }

@@ -21,7 +21,6 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
@@ -36,20 +35,34 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  *
  * @author Zoë Tosi
  */
-public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule, InvertibleUpdateRule, BoundedUpdateRule, NoisyUpdateRule {
+public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule, InvertibleUpdateRule, NoisyUpdateRule {
 
     /**
      * The default squashing function, informs the default upper and lower bounds.
      */
     public static final SigmoidFunctionEnum DEFAULT_SIGMOID_TYPE = SigmoidFunctionEnum.LOGISTIC;
 
-    @UserParameter(label = "Implementation", order = -10)
+    @UserParameter(label = "Implementation", order = 10)
     protected SigmoidFunctionEnum sFunction = DEFAULT_SIGMOID_TYPE;
+
+    @UserParameter(
+            label = "Upper Bound",
+            description = "Ceiling value used to scale upper and lower bound of sigmoid.",
+            order = 20
+    )
+    private double upperBound = DEFAULT_SIGMOID_TYPE.getDefaultUpperBound();
+
+    @UserParameter(
+            label = "Lower Bound",
+            description = "Floor value used to scale lower bound of sigmoid.",
+            order = 30
+    )
+    private double lowerBound = DEFAULT_SIGMOID_TYPE.getDefaultLowerBound();
 
     @UserParameter(
             label = "Slope",
             description = "This represents how steep the sigmoidal is.",
-            increment=.1, order = 3)
+            increment=.1, order = 40)
     protected double slope = 1;
 
     /**
@@ -57,31 +70,7 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
      */
     protected ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
 
-    /**
-     * Adds noise to neuron.
-     */
-    @UserParameter(
-            label = "Add noise",
-            description = "If this is set to true, random values are added to the activation via "
-                    + "a noise generator.",
-             order = 4)
-    protected boolean addNoise;
-
-    /**
-     * The upper bound of the activity if clipping is used.
-     */
-    protected double upperBound = sFunction.getDefaultUpperBound();
-
-    /**
-     * The lower bound of the activity if clipping is used.
-     */
-    protected double lowerBound = sFunction.getDefaultLowerBound();
-
-    /**
-     * Bounded update rule is automatically clippable.  It is not needed here since sigmoids automatically respect
-     * upper and lower bounds but can still be turned on to constrain contextual increment and decrement.
-     */
-    private boolean isClipped = false;
+    protected boolean addNoise = false;
 
     public AbstractSigmoidalRule() {
     }
@@ -148,22 +137,18 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
         return sr;
     }
 
-    @Override
     public final double getUpperBound() {
         return upperBound;
     }
 
-    @Override
     public final double getLowerBound() {
         return lowerBound;
     }
 
-    @Override
     public final void setUpperBound(final double ceiling) {
         this.upperBound = ceiling;
     }
 
-    @Override
     public final void setLowerBound(final double floor) {
         this.lowerBound = floor;
     }
@@ -176,13 +161,4 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
         return sFunction.inverseVal(val, up, lw, diff);
     }
 
-    @Override
-    public boolean isClipped() {
-        return isClipped;
-    }
-
-    @Override
-    public void setClipped(boolean b) {
-        isClipped = b;
-    }
 }

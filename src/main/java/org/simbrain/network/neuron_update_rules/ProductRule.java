@@ -50,7 +50,6 @@ public class ProductRule extends LinearRule {
     public ProductRule deepCopy() {
         ProductRule pr = new ProductRule();
         pr.setUseWeights(getUseWeights());
-        pr.setClipped(isClipped());
         pr.setAddNoise(getAddNoise());
         pr.setUpperBound(getUpperBound());
         pr.setLowerBound(getLowerBound());
@@ -78,10 +77,6 @@ public class ProductRule extends LinearRule {
 
         if (this.getAddNoise()) {
             val += getNoiseGenerator().sampleDouble();
-        }
-
-        if (this.isClipped()) {
-            val = clip(val);
         }
 
         neuron.setActivation(val);

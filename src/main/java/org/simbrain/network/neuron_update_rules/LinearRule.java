@@ -23,13 +23,16 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
+
+import java.util.Map;
+import java.util.function.Function;
 
 import static java.lang.Math.max;
 
@@ -37,7 +40,7 @@ import static java.lang.Math.max;
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
 public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule,
-        BoundedUpdateRule, NoisyUpdateRule {
+        NoisyUpdateRule {
 
     /**
      * The Default upper bound.
@@ -49,10 +52,21 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
      */
     private static final double DEFAULT_LOWER_BOUND = -10.0;
 
-    /**
-     * Default clipping setting.
-     */
-    private static final boolean DEFAULT_CLIPPING = true;
+    @UserParameter(
+            label = "Upper Bound",
+            description = "Upper bound used when type is piecewise linear.",
+            conditionalEnablingMethod = "requiresBounds",
+            order = 20
+    )
+    private double upperBound = DEFAULT_UPPER_BOUND;
+
+    @UserParameter(
+            label = "Lower Bound",
+            description = "Lower bound used when type is piecewise linear (for relu it is set to 0).",
+            conditionalEnablingMethod = "requiresBounds",
+            order = 30
+    )
+    private double lowerBound = DEFAULT_LOWER_BOUND;
 
     @UserParameter(
             label = "Type",
@@ -64,7 +78,27 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
      * Note that Relu case ignores provided bounds, though those bounds are still used by contextual increment and
      * decrement.
      */
-    public enum ClippingType {NoClipping, PiecewiseLinear, Relu}
+    public enum ClippingType {
+        NoClipping {
+            @Override
+            public String toString() {
+                return "No clipping";
+            }
+        },
+        PiecewiseLinear {
+            @Override
+            public String toString() {
+                return "Piecewise Linear";
+            }
+        },
+
+        Relu {
+            @Override
+            public String toString() {
+                return "Relu";
+            }
+        }
+    }
 
     @UserParameter(
             label = "Slope",
@@ -79,22 +113,6 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
      * Add noise to the neuron.
      */
     private boolean addNoise = false;
-
-    /**
-     * Clipping.
-     */
-    private boolean clipping = DEFAULT_CLIPPING;
-
-    /**
-     * The upper bound of the activity if clipping is used.
-     */
-    private double upperBound = DEFAULT_UPPER_BOUND;
-
-    /**
-     * The lower bound of the activity if clipping is used.
-     */
-    private double lowerBound = DEFAULT_LOWER_BOUND;
-
 
     @Override
     public void apply(Neuron neuron, BiasedScalarData data) {
@@ -115,7 +133,7 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
         return switch (clippingType) {
             case NoClipping -> ret;
             case Relu -> max(0, ret);
-            case PiecewiseLinear -> clip(ret);
+            case PiecewiseLinear -> SimbrainMath.clip(ret, lowerBound, upperBound);
         };
     }
 
@@ -138,7 +156,7 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
     public LinearRule deepCopy() {
         LinearRule ln = new LinearRule();
         ln.setSlope(getSlope());
-        ln.setClipped(isClipped());
+        ln.setClippingType(getClippingType());
         ln.setAddNoise(getAddNoise());
         ln.setUpperBound(getUpperBound());
         ln.setLowerBound(getLowerBound());
@@ -188,34 +206,20 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
         return "Linear";
     }
 
-    @Override
     public double getUpperBound() {
         return upperBound;
     }
 
-    @Override
     public double getLowerBound() {
         return lowerBound;
     }
 
-    @Override
     public void setUpperBound(double upperBound) {
         this.upperBound = upperBound;
     }
 
-    @Override
     public void setLowerBound(double lowerBound) {
         this.lowerBound = lowerBound;
-    }
-
-    @Override
-    public boolean isClipped() {
-        return clipping;
-    }
-
-    @Override
-    public void setClipped(boolean clipping) {
-        this.clipping = clipping;
     }
 
     public ClippingType getClippingType() {
@@ -225,4 +229,12 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
     public void setClippingType(ClippingType clippingType) {
         this.clippingType = clippingType;
     }
+
+    /**
+     * Called by reflection via {@link UserParameter#conditionalEnablingMethod()}
+     */
+    public Function<Map<String, Object>, Boolean> requiresBounds() {
+        return  (map) -> map.get("Type") == ClippingType.PiecewiseLinear;
+    }
+
 }

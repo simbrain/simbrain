@@ -34,6 +34,7 @@ import org.simbrain.util.add
  * @author Jeff Yoshimi
  */
 class SigmoidalRule : AbstractSigmoidalRule() {
+
     override fun getTimeType(): Network.TimeType {
         return Network.TimeType.DISCRETE
     }

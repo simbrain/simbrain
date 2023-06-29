@@ -115,6 +115,7 @@ val isopodSim = newSim {
         wrapAround = false
         isObjectsBlockMovement = true
 
+        // World size in pixels is implicitly set by this
         tileMap.updateMapSize(25, 25)
         tileMap.fill("water_1")
 

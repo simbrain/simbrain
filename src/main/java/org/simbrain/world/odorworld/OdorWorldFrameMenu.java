@@ -23,6 +23,7 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.actions.LoadTileMapAction;
 import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
+import org.simbrain.world.odorworld.gui.OdorWorldActions;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -35,12 +36,14 @@ public class OdorWorldFrameMenu extends JMenuBar {
 
     private static final long serialVersionUID = 1L;
 
-    // TODO: Replace all this with actions.
+    // TODO: Replace all this with new actions.
 
     /**
      * Parent frame.
      */
     private OdorWorldDesktopComponent parent;
+
+    private OdorWorldActions odorWorldActions;
 
     /**
      * File menu.
@@ -96,6 +99,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
     public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame, OdorWorld world) {
         parent = frame;
         this.world = world;
+        odorWorldActions = parent.getWorldPanel().getOdorWorldActions();
     }
 
     /**
@@ -152,6 +156,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
         fileMenu.add(loadTileMapMenu);
         fileMenu.addSeparator();
         fileMenu.add(new ShowWorldPrefsAction(parent.getWorldPanel()));
+        fileMenu.add(odorWorldActions.getShowInfoAction());
         fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(parent));
         fileMenu.addSeparator();

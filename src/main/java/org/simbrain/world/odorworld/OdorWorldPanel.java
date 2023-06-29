@@ -500,6 +500,7 @@ public class OdorWorldPanel extends JPanel {
             contextMenu.addSeparator();
         }
         contextMenu.add(new JMenuItem(new ShowWorldPrefsAction(this)));
+        contextMenu.add(new JMenuItem(odorWorldActions.getShowInfoAction()));
         return contextMenu;
     }
 
@@ -605,4 +606,7 @@ public class OdorWorldPanel extends JPanel {
         return manualMovementKeyState > 0;
     }
 
+    public OdorWorldActions getOdorWorldActions() {
+        return odorWorldActions;
+    }
 }

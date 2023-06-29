@@ -13,6 +13,8 @@ import javax.swing.event.DocumentListener
 
 /**
  * Utility to make it easy to set location of a [SimbrainDesktop] component.
+ * Note: these are the width and height of the visible window. In an odor world, for example, the width of the
+ * world itself in pixels might be much larger.
  */
 data class Placement(
     var location: Point? = null,

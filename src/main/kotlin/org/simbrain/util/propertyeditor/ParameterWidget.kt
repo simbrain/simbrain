@@ -189,7 +189,13 @@ class ParameterWidget(
                 val method = clazz.jvmErasure.functions.find { it.name == "values" }
                 // TODO: Not sure the null argument is correct below.
                 val enumValues = method!!.call() as Array<Any>
-                return ChoicesWithNull(enumValues)
+                return ChoicesWithNull(enumValues).also {
+                    it.addActionListener { e ->
+                        SwingUtilities.invokeLater {
+                            parent.onWidgetChanged()
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

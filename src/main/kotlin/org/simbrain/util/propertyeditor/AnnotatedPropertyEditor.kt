@@ -105,12 +105,12 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
      * Call when widget changed to updated conditional enabling.
      */
     fun onWidgetChanged() {
-        val widgetValues = widgets
+        val labelValueMap = widgets
             .filter { it.parameter.hasValue }
             .associate { it.label to it.widgetValue }
 
         widgets.filter { it.parameter.annotation.conditionalEnablingMethod.isNotEmpty() }
-            .forEach { it.checkConditionalEnabling(widgetValues) }
+            .forEach { it.checkConditionalEnabling(labelValueMap) }
 
         // if refresh source is specified, then update the widget based on the value of the specified source
         // only works for embedded objects
@@ -148,9 +148,8 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
         parameters.forEach{p -> widgets.add(ParameterWidget(this, p)) }
 
         // If there are no tab annotations, do not create tab bar
-        val numTabAnnotations = parameters.stream().filter { p -> p.annotation.tab.isNotEmpty() }
-            .count()
-        mainPanel = if (numTabAnnotations == 0L) {
+        val numTabAnnotations = parameters.count { p -> p.annotation.tab.isNotEmpty() }
+        mainPanel = if (numTabAnnotations == 0) {
             LabelledItemPanel()
         } else {
             JTabbedPane()
@@ -159,6 +158,7 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
         // Add parameter widgets after collecting list of params so they're in
         // the right order.
         for (pw in widgets) {
+            // handle widget types that don't use a label
             if (pw.parameter.isObjectType || pw.parameter.isEmbeddedObject) {
                 if (isTabbedPane) {
                     addItemToTabPanel(pw)
@@ -170,7 +170,7 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
                 if (isTabbedPane) {
                     val label = JLabel(pw.parameter.annotation.label)
                     label.toolTipText = pw.toolTipText
-                    addItemToTabPanel(label, pw)
+                    addItemToTabPanel(pw, label)
                 } else {
                     (mainPanel as LabelledItemPanel).addItem(pw.label, pw.component)
                 }
@@ -407,30 +407,23 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
         return widgets.firstOrNull{it.label.equals(label, ignoreCase = true)}
     }
 
+    private fun ParameterWidget.getTabPane(): LabelledItemPanel {
+        val tabName = parameter.annotation.tab.ifEmpty { "Main" }
+        addTabPanel(tabName)
+        return tabPanels[tabName]!!
+    }
+
     /**
      * Add a ParameterWidget to its corresponding tab panel.
      *
      * @param pw the ParameterWidget to add
      */
-    private fun addItemToTabPanel(pw: ParameterWidget) {
-        val parameterWidgetTabName: String = pw.parameter.annotation.tab
-        addTabPanel(parameterWidgetTabName)
-        tabPanels[parameterWidgetTabName]!!.addItem(pw.component)
-    }
-
-    /**
-     * Add a labeled ParameterWidget to its corresponding tab panel.
-     *
-     * @param pw the ParameterWidget to add
-     */
-    private fun addItemToTabPanel(label: JLabel, pw: ParameterWidget) {
-        var parameterWidgetTabName: String = pw.parameter.annotation.tab
-        if (parameterWidgetTabName.isEmpty()) {
-            // Default name when the tab annotation is left blank.
-            parameterWidgetTabName = "Main"
+    private fun addItemToTabPanel(pw: ParameterWidget, label: JLabel? = null) {
+        if (label != null) {
+            pw.getTabPane().addItemLabel(label, pw.component)
+        } else {
+            pw.getTabPane().addItem(pw.component)
         }
-        addTabPanel(parameterWidgetTabName)
-        tabPanels[parameterWidgetTabName]!!.addItemLabel(label, pw.component)
     }
 
     /**

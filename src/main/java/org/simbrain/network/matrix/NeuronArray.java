@@ -85,6 +85,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     @Producible
     public double[] getActivationArray() {return activations.col(0);}
 
+    @Producible
     public Matrix getActivations() {
         return activations;
     }

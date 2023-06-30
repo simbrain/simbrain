@@ -4,6 +4,7 @@ import org.simbrain.workspace.Attribute
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
+import smile.math.matrix.Matrix
 import javax.swing.JMenu
 import javax.swing.JMenuItem
 import javax.swing.JSeparator
@@ -53,6 +54,7 @@ class CouplingMenu(
             when(this) {
                 Double::class.java -> "number"
                 DoubleArray::class.java -> "array"
+                Matrix::class.java -> "matrix"
                 String::class.java -> "text"
                 else -> simpleName
             }

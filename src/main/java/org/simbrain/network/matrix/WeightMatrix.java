@@ -102,6 +102,7 @@ public class WeightMatrix extends Connector {
         updateInhibitoryMask();
     }
 
+    @Producible
     public Matrix getWeightMatrix() {
         return weightMatrix;
     }
@@ -130,6 +131,12 @@ public class WeightMatrix extends Connector {
         for (int i = 0; i < len; i++) {
             weightMatrix.set(i / weightMatrix.ncol(), i % weightMatrix.ncol(), newWeights[i]);
         }
+        getEvents().getUpdated().fireAndForget();
+    }
+
+    @Consumable
+    public void setWeightMatrix(Matrix weightMatrix) {
+        this.weightMatrix = weightMatrix.clone();
         getEvents().getUpdated().fireAndForget();
     }
 

@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
+import kotlin.Pair;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.MismatchedAttributesException;
@@ -25,6 +26,7 @@ import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.CouplingListPanel;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
+import smile.math.matrix.Matrix;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -89,34 +91,20 @@ public class DesktopCouplingManager extends JPanel {
 
         // Legend Panel
         JPanel legend = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        final int dimensions = 20;
-        JLabel blue = new JLabel();
-        JPanel blueBox = new JPanel();
-        blueBox.setBackground(Color.BLUE);
-        blueBox.setSize(dimensions, dimensions);
-        blue.setText("Text Value");
-        blue.setForeground(Color.BLUE);
 
-        JPanel greenBox = new JPanel();
-        greenBox.setBackground(new Color(36, 152, 38));
-        greenBox.setSize(dimensions, dimensions);
-        JLabel green = new JLabel();
-        green.setText("Array Value");
-        green.setForeground(new Color(36, 152, 38));
+        var bluePairs = makeLegend("Text", String.class);
+        var greenPairs = makeLegend("Array", double[].class);
+        var orangePairs = makeLegend("Matrix", Matrix.class);
+        var blackPairs = makeLegend("Number", double.class);
 
-        JPanel blackBox = new JPanel();
-        blackBox.setBackground(Color.BLACK);
-        blackBox.setSize(dimensions, dimensions);
-        JLabel black = new JLabel();
-        black.setText("Number Value");
-        black.setForeground(Color.BLACK);
-
-        legend.add(blueBox);
-        legend.add(blue);
-        legend.add(greenBox);
-        legend.add(green);
-        legend.add(blackBox);
-        legend.add(black);
+        legend.add(bluePairs.getFirst());
+        legend.add(bluePairs.getSecond());
+        legend.add(greenPairs.getFirst());
+        legend.add(greenPairs.getSecond());
+        legend.add(orangePairs.getFirst());
+        legend.add(orangePairs.getSecond());
+        legend.add(blackPairs.getFirst());
+        legend.add(blackPairs.getSecond());
 
         // Bottom Panel
         JPanel bottomPanel = new JPanel();
@@ -146,6 +134,17 @@ public class DesktopCouplingManager extends JPanel {
         centerPanel.setPreferredSize(new Dimension(800, 400));
         this.add("Center", centerPanel);
         this.add("South", bottomPanel);
+    }
+
+    private Pair<JLabel, JPanel> makeLegend(String label, Type dataType) {
+        final int dimensions = 20;
+        JLabel colorLabel = new JLabel();
+        JPanel colorBox = new JPanel();
+        colorBox.setBackground(getColor(dataType));
+        colorBox.setSize(dimensions, dimensions);
+        colorLabel.setText(label);
+        colorLabel.setForeground(getColor(dataType));
+        return new Pair<>(colorLabel, colorBox);
     }
 
     /**
@@ -186,6 +185,8 @@ public class DesktopCouplingManager extends JPanel {
             return Color.green.darker().darker();
         } else if (dataType == String.class) {
             return Color.blue.brighter();
+        } else if (dataType == Matrix.class) {
+            return new Color(255, 140, 0);
         }
         return Color.black;
     }

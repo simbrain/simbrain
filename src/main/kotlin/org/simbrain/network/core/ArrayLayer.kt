@@ -44,6 +44,7 @@ abstract class ArrayLayer(
         addInputs(wtdInputs)
     }
 
+    @Consumable
     override fun addInputs(inputs: Matrix) {
         this.inputs.add(inputs)
     }

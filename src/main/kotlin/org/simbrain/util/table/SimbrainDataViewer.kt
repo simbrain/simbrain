@@ -10,16 +10,16 @@ import org.simbrain.util.cartesianProduct
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.widgets.RowNumberTable
 import smile.math.matrix.Matrix
+import java.awt.AWTEvent
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.event.ActionEvent
-import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
+import java.awt.Toolkit
+import java.awt.event.*
 import java.util.*
 import javax.swing.*
 import javax.swing.table.TableModel
 import javax.swing.text.JTextComponent
+
 
 /**
  * The main Simbrain table visualization. Can be used to represent mutable or immutable data, which can be numeric or
@@ -29,15 +29,19 @@ import javax.swing.text.JTextComponent
  * model is mutable or not, different GUI actions are enabled. These actions can be further customized  depending on
  * the context.
  */
-open class SimbrainDataViewer(
+open class SimbrainDataViewer @JvmOverloads constructor(
     model: SimbrainDataModel,
-    useDefaultToolbarAndMenu: Boolean = true
+    useDefaultToolbarAndMenu: Boolean = true,
+    useHeaders: Boolean = true,
+    usePadding: Boolean = true,
 ) : JPanel() {
 
-    val table = DataViewerTable(model)
-    val toolbar = JToolBar()
+    val table = DataViewerTable(model, useHeaders)
+    val toolbar by lazy {
+        JToolBar().also { add(it, BorderLayout.NORTH) }
+    }
 
-    val scrollPane = DataViewerScrollPane(table)
+    val scrollPane = DataViewerScrollPane(table, useHeaders)
 
     var model:SimbrainDataModel
         get() = table.model
@@ -55,10 +59,13 @@ open class SimbrainDataViewer(
         // Putting the toolbar in the top part of a border layout to avoid problems with horizontal scrollbars in the
         // main panel
         layout = BorderLayout()
-        add(toolbar, BorderLayout.NORTH)
 
-        // The main panel uses the mig layout
-        val mainPanel = JPanel(MigLayout("fillx"))
+        val constraints = buildList {
+            add("fillx")
+            if (!usePadding) add("insets 0")
+        }.joinToString(",")
+
+        val mainPanel = JPanel(MigLayout(constraints))
         add(mainPanel)
 
         if (useDefaultToolbarAndMenu) {
@@ -68,7 +75,7 @@ open class SimbrainDataViewer(
         mainPanel.add(scrollPane, "grow")
 
         model.addTableModelListener {
-            table.tableHeader.revalidate()
+            table.tableHeader?.revalidate()
             scrollPane.updateResizeMode(it.source as TableModel)
         }
     }
@@ -116,15 +123,17 @@ open class SimbrainDataViewer(
 
 }
 
-class DataViewerScrollPane(val table: JTable): JScrollPane(table) {
+class DataViewerScrollPane(val table: JTable, useHeaders: Boolean = true): JScrollPane(table) {
 
     /**
      * Custom table with row numbers shown
      */
-    val rowTable = RowNumberTable(table)
+    val rowTable by lazy { RowNumberTable(table) }
 
     init {
-        setRowHeaderView(rowTable)
+        if (useHeaders) {
+            setRowHeaderView(rowTable)
+        }
         updateResizeMode(table.model)
         setCorner(
             UPPER_LEFT_CORNER,
@@ -148,7 +157,7 @@ class DataViewerScrollPane(val table: JTable): JScrollPane(table) {
 
 }
 
-class DataViewerTable(val model: SimbrainDataModel) : JTable(model), CoroutineScope {
+class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) : JTable(model), CoroutineScope {
 
     private var job = SupervisorJob()
 
@@ -159,9 +168,34 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model), CoroutineSc
     init {
         columnSelectionAllowed = true
 
-        tableHeader = JXTableHeader(columnModel)
+        if (useHeaders) {
+            tableHeader = JXTableHeader(columnModel)
+        }
 
         setGridColor(Color.gray)
+
+        // Manages beginning and endings edits in cells, which is surprisingly hard to get right.
+        val unfocusedEvent = AWTEventListener { event ->
+            if (event is MouseEvent
+                && event.id == MouseEvent.MOUSE_PRESSED
+                && this@DataViewerTable.isEditing) {
+
+                val editor = this@DataViewerTable.editorComponent
+                if (editor != null && event.source !== editor) {
+                    cellEditor.stopCellEditing()
+                }
+            }
+        }
+
+        // Ensure that the AWT Event is unregistered, because the event holds references to instance variables,
+        // and so these table objects won’t be garbage collected
+        addPropertyChangeListener("tableCellEditor") {
+            if (isEditing) {
+                Toolkit.getDefaultToolkit().addAWTEventListener(unfocusedEvent, AWTEvent.MOUSE_EVENT_MASK)
+            } else {
+                Toolkit.getDefaultToolkit().removeAWTEventListener(unfocusedEvent)
+            }
+        }
 
         // mouseListeners.forEach { l -> removeMouseListener(l) }
         addMouseListener(object : MouseAdapter() {
@@ -169,10 +203,6 @@ class DataViewerTable(val model: SimbrainDataModel) : JTable(model), CoroutineSc
                 if (e.isPopupTrigger) {
                     popUpMenu.show(this@DataViewerTable, e.x, e.y)
                 }
-                // We need a way to commit cell contents even clicking outside of the cell.
-                // This won't work because it's local to the window. We don't even know if
-                // stopCEllEditing() will force the commit.
-                // getCellEditor().stopCellEditing()
             }
         })
     }

@@ -18,11 +18,9 @@
  */
 package org.simbrain.util.propertyeditor
 
-import org.simbrain.util.BiMap
-import org.simbrain.util.SimbrainConstants
-import org.simbrain.util.UserParameter
-import org.simbrain.util.callNoArgConstructor
+import org.simbrain.util.*
 import org.simbrain.util.widgets.*
+import smile.math.matrix.Matrix
 import java.awt.Color
 import java.lang.reflect.InvocationTargetException
 import java.util.function.Function
@@ -177,7 +175,10 @@ class ParameterWidget(
             return ColorSelector()
         }
         if (parameter.isDoubleArray) {
-            return DoubleArrayWidget()
+            return MatrixWidget()
+        }
+        if (parameter.isMatrix) {
+            return MatrixWidget()
         }
         if (parameter.isIntArray) {
             return IntArrayWidget()
@@ -286,9 +287,17 @@ class ParameterWidget(
         } else if (parameter.isColor) {
             (component as ColorSelector?)!!.value
         } else if (parameter.isDoubleArray) {
-            (component as DoubleArrayWidget?)!!.values
+            (component as MatrixWidget?)!!.values.transpose().toDoubleArray()
         } else if (parameter.isIntArray) {
             (component as IntArrayWidget?)!!.values
+        } else if (parameter.isMatrix) {
+            (component as MatrixWidget?)!!.values.let {
+                if (it.nrow() == 1) {
+                    it.transpose()
+                } else {
+                    it
+                }
+            }
         } else if (parameter.annotation.isObjectType) {
             (component as ObjectTypeEditor?)!!.value
         } else if (parameter.annotation.isEmbeddedObject) {
@@ -311,9 +320,17 @@ class ParameterWidget(
             } else if (parameter.isColor) {
                 (component as ColorSelector?)!!.value = value as Color?
             } else if (parameter.isDoubleArray) {
-                (component as DoubleArrayWidget?)!!.values = value as DoubleArray?
+                (component as MatrixWidget?)!!.values = (value as DoubleArray).toMatrix().transpose()
             } else if (parameter.isIntArray) {
                 (component as IntArrayWidget?)!!.values = value as IntArray?
+            } else if (parameter.isMatrix) {
+                (component as MatrixWidget?)!!.values = (value as Matrix).let {
+                    if (it.ncol() == 1) {
+                        it.transpose()
+                    } else {
+                        it
+                    }
+                }
             } else if (parameter.isNumeric) {
                 (component as NumericWidget?)!!.value = value
             } else if (parameter.annotation.isObjectType) {

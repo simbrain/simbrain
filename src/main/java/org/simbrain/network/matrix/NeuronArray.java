@@ -30,12 +30,14 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     /**
      * Holds data for prototype rule.
      */
+    @UserParameter(label = "State variables", useSetter = true, isEmbeddedObject = true, order = 99, refreshSource = "updateRule.createMatrixData")
     private MatrixDataHolder dataHolder;
 
     /**
      * Array to hold activation values. These are also the outputs that are consumed by
      * other network components via {@link Layer}.
      */
+    @UserParameter(label = "Activations", description = "Neuron activations", order = 1)
     private Matrix activations;
 
     /**

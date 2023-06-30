@@ -19,6 +19,7 @@
 package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.UserParameter
+import smile.math.matrix.Matrix
 import java.awt.Color
 import java.math.BigDecimal
 import java.util.*
@@ -118,6 +119,12 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
      */
     val isIntArray: Boolean
         get() = type.jvmErasure == IntArray::class
+
+    /**
+     * Returns true if the type of the field or method is double[].
+     */
+    val isMatrix: Boolean
+        get() = type.jvmErasure == Matrix::class
 
     /**
      * Returns true iff the type of the field or method is String.

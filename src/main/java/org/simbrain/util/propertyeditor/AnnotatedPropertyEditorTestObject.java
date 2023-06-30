@@ -5,6 +5,7 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwingKt;
 import org.simbrain.util.UserParameter;
+import smile.math.matrix.Matrix;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -62,7 +63,10 @@ public class AnnotatedPropertyEditorTestObject implements EditableObject {
     // short theShort = 20; // TODO: Figure out about shorts...
 
     @UserParameter(label = "Double Array")
-    double[] doubleArray = new double[]{.1, .2, .3, 4};
+    double[] doubleArray = new double[]{.1, .2, .3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+
+    @UserParameter(label = "Matrix")
+    Matrix matrix = Matrix.eye(3);
 
     @UserParameter(label = "Enum")
 
@@ -98,6 +102,7 @@ public class AnnotatedPropertyEditorTestObject implements EditableObject {
                 + "\n" + "The Integer Object: " + theIntObject
                 + "\n" + "The Double Array: " + Arrays.toString(doubleArray)
                 + "\n" + "The Double Object: " + theDoubleObject + "\n"
+                + "\n" + "The Matrix: " + matrix + "\n"
                 + "The Float Object: " + theFloatObject + "\n" + "The Long Object: " + "\n"
                 + "The int: " + theInt + "\n" + "The double: " + theDouble + "\n"
                 + "The float: " + theFloat + "\n"

@@ -20,6 +20,7 @@ object EmptyMatrixData : MatrixDataHolder {
 }
 
 class BiasedMatrixData(var size: Int) : MatrixDataHolder {
+    @UserParameter(label = "Biases", description = "Biases for each neuron")
     var biases = Matrix(size, 1)
     override fun copy() = BiasedMatrixData(size).also {
         it.biases = biases.clone()

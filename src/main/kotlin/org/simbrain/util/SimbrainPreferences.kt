@@ -14,7 +14,22 @@ import kotlin.reflect.jvm.isAccessible
 /**
  * Marker interface for classes that hold [Preference] objects.
  */
-interface PreferenceHolder: EditableObject
+open class PreferenceHolder: EditableObject {
+
+    val events = mutableSetOf<() -> Unit>()
+
+    fun registerChangeListener(preferenceLoader: () -> Unit) {
+        events.add(preferenceLoader)
+    }
+
+    fun unregisterChangeListener(preferenceLoader: () -> Unit) {
+        events.remove(preferenceLoader)
+    }
+
+    override fun onCommit() {
+        events.forEach { it() }
+    }
+}
 
 val systemPreferences = Preferences.userRoot().node("/org/simbrain")
 
@@ -37,12 +52,12 @@ sealed class Preference<T>(val default: T) {
         systemPreferences.remove(name)
     }
 
-    operator fun getValue(thisRef: Any, property: KProperty<*>): T {
+    operator fun <H: PreferenceHolder> getValue(thisRef: H, property: KProperty<*>): T {
         name = property.name
         return deserialize(systemPreferences.get(property.name, serialize(default)))
     }
 
-    operator fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
+    operator fun <H: PreferenceHolder> setValue(thisRef: H, property: KProperty<*>, value: T) {
         systemPreferences.put(property.name, serialize(value))
     }
 
@@ -114,7 +129,7 @@ fun getPreferenceDialog(prefHolder: PreferenceHolder): StandardDialog {
     }
 }
 
-object TestPrefs: PreferenceHolder {
+object TestPrefs: PreferenceHolder() {
 
     @UserParameter(label = "Test directory")
     var testDir by StringPreference("." + Utils.FS +"simulations")

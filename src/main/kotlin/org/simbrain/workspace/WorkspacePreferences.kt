@@ -5,7 +5,7 @@ import org.simbrain.util.StringPreference
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 
-object WorkspacePreferences: PreferenceHolder {
+object WorkspacePreferences: PreferenceHolder() {
 
     @UserParameter(label = "Workspace base directory")
     var baseDirectory by StringPreference("." + Utils.FS +"simulations")

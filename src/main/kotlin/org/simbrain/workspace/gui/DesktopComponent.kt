@@ -125,7 +125,7 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
         Logger.trace(this.javaClass.canonicalName + " created")
     }
 
-    fun close() {
+    open fun close() {
         if (workspaceComponent.hasChangedSinceLastSave()) {
             val hasCancelled = showHasChangedDialog()
             if (hasCancelled) {

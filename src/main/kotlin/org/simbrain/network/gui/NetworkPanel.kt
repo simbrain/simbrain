@@ -140,6 +140,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fireAndBlock() }
 
+    val preferenceLoader = {
+        canvas.background = NetworkPreferences.backgroundColor
+    }
+
+
     /**
      * Main initialization of the network panel.
      */
@@ -152,7 +157,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
             interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
 
-            background = NetworkPreferences.backgroundColor
+            NetworkPreferences.registerChangeListener(preferenceLoader)
+            preferenceLoader()
 
             // Remove default event listeners
             removeInputEventListener(panEventHandler)

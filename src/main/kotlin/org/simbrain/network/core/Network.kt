@@ -26,11 +26,6 @@ import kotlin.math.ceil
 import kotlin.math.ln
 
 /**
- * The initial time-step for the network.
- */
-private val DEFAULT_TIME_STEP = NetworkPreferences.defaultTimeStep
-
-/**
  * Constant value for Math.log(10); used to approximate log 10.
  */
 private val LOG_10 = ln(10.0)
@@ -116,7 +111,7 @@ class Network: CoroutineScope {
     /**
      * Time step.
      */
-    var timeStep = DEFAULT_TIME_STEP
+    var timeStep = NetworkPreferences.defaultTimeStep
 
     /**
      * Whether this is a discrete or continuous time network.

@@ -21,6 +21,7 @@ package org.simbrain.network.desktop
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.*
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
@@ -63,6 +64,11 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         if (showUncompressedSynapseGroupWarning()) {
             super.save()
         }
+    }
+
+    override fun close() {
+        super.close()
+        NetworkPreferences.unregisterChangeListener(networkPanel.preferenceLoader)
     }
 
     /**

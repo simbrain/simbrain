@@ -4,7 +4,7 @@ import org.simbrain.util.DoublePreference
 import org.simbrain.util.PreferenceHolder
 import org.simbrain.util.UserParameter
 
-object ProjectionPreferences: PreferenceHolder {
+object ProjectionPreferences: PreferenceHolder() {
 
     @UserParameter(label = "Projector tolerance")
     var tolerance by DoublePreference(.1)

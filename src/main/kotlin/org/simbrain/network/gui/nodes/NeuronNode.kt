@@ -114,7 +114,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
 
         // Set up label text
         //priorityText.setFont(PRIORITY_FONT);
-        labelBackground.paint = NetworkPreferences.backgroundColor
+        labelBackground.paint = null
         labelBackground.setBounds(labelText.bounds)
         labelBackground.addChild(labelText)
         addChild(labelBackground)
@@ -493,8 +493,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         if (!customStrokeColor) {
             mainShape.strokePaint = SynapseNode.getLineColor()
         }
-        // TODO: Check if change only?
-        labelBackground.paint = NetworkPreferences.backgroundColor
         updateColor()
     }
 

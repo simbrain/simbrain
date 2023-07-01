@@ -5,7 +5,7 @@ import org.simbrain.util.StringPreference
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 
-object OdorWorldPreferences: PreferenceHolder {
+object OdorWorldPreferences: PreferenceHolder() {
 
     @UserParameter(label = "World directory")
     var directory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "worlds");

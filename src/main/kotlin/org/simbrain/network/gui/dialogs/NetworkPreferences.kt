@@ -3,7 +3,7 @@ package org.simbrain.network.gui.dialogs
 import org.simbrain.util.*
 import java.awt.Color
 
-object NetworkPreferences: PreferenceHolder {
+object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(label = "Network background color", tab = "Colors", order = 10)
     var backgroundColor by ColorPreference(Color.WHITE)
@@ -47,7 +47,7 @@ object NetworkPreferences: PreferenceHolder {
     @UserParameter(label = "Self connection allowed")
     var selfConnectionAllowed by BooleanPreference(false)
 
-    @UserParameter(label = "Network time step", tab = "Model")
+    @UserParameter(label = "Default network time step", tab = "Model")
     var defaultTimeStep by DoublePreference(.1)
 
     @UserParameter(label = "Default learning rate", tab = "Model")

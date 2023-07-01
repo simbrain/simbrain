@@ -141,7 +141,29 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fireAndBlock() }
 
     val preferenceLoader = {
+
         canvas.background = NetworkPreferences.backgroundColor
+        nudgeAmount = NetworkPreferences.nudgeAmount
+        editMode.resetWandCursor()
+
+        NeuronNode.hotColor = NetworkPreferences.hotNodeColor
+        NeuronNode.coolColor = NetworkPreferences.coolNodeColor
+        NeuronNode.spikingColor = NetworkPreferences.spikingColor
+        SynapseNode.setLineColor(NetworkPreferences.lineColor)
+        SynapseNode.setExcitatoryColor(NetworkPreferences.excitatorySynapseColor)
+        SynapseNode.setExcitatoryColor(NetworkPreferences.inhibitorySynapseColor)
+        SynapseNode.setZeroWeightColor(NetworkPreferences.zeroWeightColor)
+        SynapseNode.setMinDiameter(NetworkPreferences.minWeightSize)
+        SynapseNode.setMaxDiameter(NetworkPreferences.maxWeightSize)
+        SynapseNode.setZeroWeightColor(NetworkPreferences.zeroWeightColor)
+
+        network.flatNeuronList.forEach {
+            it.events.colorChanged.fireAndBlock()
+        }
+        network.flatSynapseList.forEach {
+            it.events.colorPreferencesChanged.fireAndBlock()
+        }
+
     }
 
 
@@ -315,7 +337,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun createNode(synapseGroup: SynapseGroup2) = addScreenElement {
         with(synapseGroup.synapses) {
-            if (size < network.synapseGroupExpendedVisibilityThreshold) {
+            if (size < NetworkPreferences.synapseVisibilityThreshold) {
                 forEach {
                     createNode(it)
                 }

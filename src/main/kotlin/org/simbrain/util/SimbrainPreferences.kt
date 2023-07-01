@@ -45,20 +45,27 @@ sealed class Preference<T>(val default: T) {
      */
     private lateinit var name: String
 
+    private var cachedValue: T? = null
+
     /**
      * Revert all preferences to their default value.
      */
     fun revertToDefault() {
         systemPreferences.remove(name)
+        cachedValue = null
     }
 
     operator fun <H: PreferenceHolder> getValue(thisRef: H, property: KProperty<*>): T {
         name = property.name
-        return deserialize(systemPreferences.get(property.name, serialize(default)))
+        if (cachedValue == null) {
+            cachedValue = deserialize(systemPreferences.get(property.name, serialize(default)))
+        }
+        return cachedValue!!
     }
 
     operator fun <H: PreferenceHolder> setValue(thisRef: H, property: KProperty<*>, value: T) {
         systemPreferences.put(property.name, serialize(value))
+        cachedValue = value
     }
 
     /**

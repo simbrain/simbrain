@@ -103,12 +103,6 @@ public abstract class ScreenElement extends PPath.Float {
         return null;
     }
 
-    /**
-     * Supports "reset to default" in
-     * {@link org.simbrain.network.gui.actions.network.ShowNetworkPreferencesAction}.
-     */
-    public void resetToDefault() {};
-
     public final NetworkPanel getNetworkPanel() {
         return networkPanel;
     }

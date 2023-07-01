@@ -50,24 +50,9 @@ public final class EditMode {
     public static final EditMode TEXT = new EditMode("text", "menu_icons/Text.png");
 
     /**
-     * Default wand radius.
-     */
-    private static final int DEFAULT_WAND_RADIUS = 40;
-
-    /**
-     * Default wand radius.
-     */
-    private static final int MINIMUM_WAND_RADIUS = 15;
-
-    /**
      * Wand mode mode.
      */
-    public static final EditMode WAND = new EditMode("wand", DEFAULT_WAND_RADIUS);
-
-    /**
-     * Radius of wand in wand mode.
-     */
-    private static int wandRadius = NetworkPreferences.INSTANCE.getWandRadius();
+    public static final EditMode WAND = new EditMode("wand");
 
     /**
      * The image used for the cursor.
@@ -95,10 +80,8 @@ public final class EditMode {
      * Construct a "wand" edit mode. TODO: Is this the right place for this?
      *
      * @param name   name of edit mode
-     * @param radius radius of wand
      */
-    private EditMode(String name, int radius) {
-        this.wandRadius = radius;
+    private EditMode(String name) {
         resetWandCursor();
     }
 
@@ -140,36 +123,17 @@ public final class EditMode {
     }
 
     /**
-     * @return the current wand radius
-     */
-    public static int getWandRadius() {
-        return wandRadius;
-    }
-
-    /**
-     * Set the new wand radius.
-     *
-     * @param newWandRadius the wandRadius to set
-     */
-    public static void setWandRadius(int newWandRadius) {
-        if (newWandRadius < MINIMUM_WAND_RADIUS) {
-            wandRadius = MINIMUM_WAND_RADIUS;
-        }
-        wandRadius = newWandRadius;
-    }
-
-    /**
      * Reset the wand cursor (must happen when its size is reset).
      */
     public void resetWandCursor() {
-        cursorImage = new BufferedImage(wandRadius + 1, wandRadius + 1, BufferedImage.TYPE_INT_ARGB);
+        cursorImage = new BufferedImage(NetworkPreferences.INSTANCE.getWandRadius() + 1, NetworkPreferences.INSTANCE.getWandRadius() + 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) cursorImage.getGraphics();
 
         // Draw stroke around wand
         int stroke = 1;
         g2.setColor(Color.BLACK);
         g2.setStroke(new BasicStroke(stroke));
-        g2.drawOval(0, 0, wandRadius, wandRadius);
+        g2.drawOval(0, 0, NetworkPreferences.INSTANCE.getWandRadius(), NetworkPreferences.INSTANCE.getWandRadius());
 
         // Draw wand itself
         // Pure yellow is (255, 255,0) but this does not look good when transparent on a white background.
@@ -177,7 +141,7 @@ public final class EditMode {
         g2.setColor(new Color(255, 230, 0, 180));
         g2.setStroke(new BasicStroke(1));
 
-        g2.fillOval(0, 0, wandRadius, wandRadius);
+        g2.fillOval(0, 0, NetworkPreferences.INSTANCE.getWandRadius(), NetworkPreferences.INSTANCE.getWandRadius());
 
         Toolkit tk = Toolkit.getDefaultToolkit();
         Cursor newCursor = tk.createCustomCursor(cursorImage, CENTER_POINT, "wand");

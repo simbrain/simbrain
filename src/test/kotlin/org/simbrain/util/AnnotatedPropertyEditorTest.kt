@@ -9,7 +9,7 @@ import org.simbrain.util.widgets.NumericWidget
 import org.simbrain.util.widgets.TextWithNull
 
 /**
- * Also see [TestObject.java]
+ * Also see [AnnotatedPropertyEditorTestObject.java]
  */
 class AnnotatedPropertyEditorTest {
 

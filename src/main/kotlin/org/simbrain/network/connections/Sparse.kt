@@ -20,6 +20,7 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.sampleWithoutReplacement
@@ -58,7 +59,7 @@ class Sparse @JvmOverloads constructor(
      *  Only applicable if the source and target neuron sets are the same.
      */
     @get:JvmName("isSelfConnectionAllowed")
-    var allowSelfConnection: Boolean = false
+    var allowSelfConnection: Boolean = NetworkPreferences.selfConnectionAllowed
 ) : ConnectionStrategy(), EditableObject {
 
     override fun connectNeurons(

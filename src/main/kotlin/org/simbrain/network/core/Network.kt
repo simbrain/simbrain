@@ -166,8 +166,6 @@ class Network: CoroutineScope {
      */
     val modelsInReconstructionOrder get() = networkModels.allInReconstructionOrder
 
-    var synapseGroupExpendedVisibilityThreshold = 500
-
     /**
      * The core update function of the neural network. Calls the current update function on each neuron, decays all the
      * neurons, and checks their bounds.

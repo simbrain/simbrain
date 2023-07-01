@@ -44,13 +44,14 @@ object NetworkPreferences: PreferenceHolder() {
     @UserParameter(label = "Wand radius", tab = "GUI")
     var wandRadius by IntegerPreference(40)
 
-    @UserParameter(label = "Self connection allowed")
+    @UserParameter(label = "Default self connection allowed")
     var selfConnectionAllowed by BooleanPreference(false)
 
     @UserParameter(label = "Default network time step", tab = "Model")
     var defaultTimeStep by DoublePreference(.1)
 
+    // Of course specific rules can have specific defaults
     @UserParameter(label = "Default learning rate", tab = "Model")
-    var learningRate by DoublePreference(.1)
+    var defaultLearningRate by DoublePreference(.1)
 
 }

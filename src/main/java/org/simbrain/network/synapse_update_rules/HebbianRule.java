@@ -36,7 +36,7 @@ public class HebbianRule extends SynapseUpdateRule {
 
     @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule",
         preferenceKey = "hebbLearningRate",  increment = .1,  order = 1)
-    private double learningRate = NetworkPreferences.INSTANCE.getLearningRate();
+    private double learningRate = NetworkPreferences.INSTANCE.getDefaultLearningRate();
 
     @Override
     public void init(Synapse synapse) {

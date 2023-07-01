@@ -15,6 +15,7 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
 
@@ -36,7 +37,7 @@ class AllToAll(
         description = "Can there exist synapses whose source and target are the same?",
         order = 1
     )
-    var allowSelfConnection: Boolean = false
+    var allowSelfConnection: Boolean = NetworkPreferences.selfConnectionAllowed
 
 ) : ConnectionStrategy() {
 

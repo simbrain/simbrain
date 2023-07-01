@@ -138,7 +138,7 @@ public final class SynapseNode extends ScreenElement {
         updatePosition();
         this.addChild(circle);
         this.addChild(line);
-        line.setStrokePaint(Color.BLACK);
+        line.setStrokePaint(lineColor);
         line.lowerToBottom();
         line.setPaint(null);
 
@@ -155,6 +155,11 @@ public final class SynapseNode extends ScreenElement {
         events.getStrengthUpdated().on(() -> {
             updateColor();
             updateDiameter();
+        });
+        events.getColorPreferencesChanged().on(() -> {
+            updateColor();
+            updateDiameter();
+            updateSpikeColor();
         });
         events.getVisbilityChanged().on((oldVisibility, newVisibility) -> setVisible(newVisibility));
         setVisible(synapse.isVisible());
@@ -476,15 +481,6 @@ public final class SynapseNode extends ScreenElement {
      */
     public void setTarget(final NeuronNode target) {
         this.target = target;
-    }
-
-    /**
-     * @see ScreenElement
-     */
-    public void resetToDefault() {
-        line.setStrokePaint(lineColor);
-        updateColor();
-        updateDiameter();
     }
 
     @Override

@@ -26,6 +26,7 @@ import org.piccolo2d.event.PInputEvent;
 import org.piccolo2d.event.PInputEventFilter;
 import org.piccolo2d.util.PNodeFilter;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.gui.dialogs.NetworkPreferences;
 import org.simbrain.network.gui.nodes.NeuronNode;
 
 import java.awt.event.InputEvent;
@@ -94,7 +95,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
 
         super.drag(event);
 
-        int radius = networkPanel.getEditMode().getWandRadius();
+        int radius = NetworkPreferences.INSTANCE.getWandRadius();
 
         // Create elliptical bounds
         Point2D position = event.getPosition();

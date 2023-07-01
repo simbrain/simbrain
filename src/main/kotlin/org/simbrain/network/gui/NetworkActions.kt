@@ -285,7 +285,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         initBlock = {
             isEnabled = networkPanel.selectionManager.filterSelectedModels<SynapseGroup2>().isNotEmpty() &&
                     networkPanel.selectionManager.filterSelectedModels<SynapseGroup2>().none {
-                        it.synapses.size > networkPanel.network.synapseGroupExpendedVisibilityThreshold
+                        it.synapses.size > NetworkPreferences.synapseVisibilityThreshold
                     }
         }
     ) {

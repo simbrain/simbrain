@@ -260,7 +260,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             addChild(activationText)
             addChild(labelBackground)
             setPriorityView(networkPanel.prioritiesVisible)
-            resetToDefault()
             updateText()
             updateTextLabel()
         } else {
@@ -488,13 +487,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
             globalToLocal(p)
             this.setBounds(p.x, p.y, this.width, this.height)
         }
-
-    override fun resetToDefault() {
-        if (!customStrokeColor) {
-            mainShape.strokePaint = SynapseNode.getLineColor()
-        }
-        updateColor()
-    }
 
     override fun getModel(): Neuron {
         return neuron

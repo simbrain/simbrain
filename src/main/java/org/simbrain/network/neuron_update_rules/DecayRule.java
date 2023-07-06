@@ -22,7 +22,7 @@ import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
@@ -33,7 +33,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
 /**
  * <b>DecayNeuron</b> implements various forms of standard decay.
  */
-public class DecayRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements BoundedUpdateRule, NoisyUpdateRule {
+public class DecayRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements ClippedUpdateRule, NoisyUpdateRule {
 
     /**
      * The Default upper bound.

@@ -25,6 +25,7 @@ import org.simbrain.network.events.NeuronEvents2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
 import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.network.util.SpikingScalarData;
@@ -340,8 +341,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     public void clip() {
-        if (updateRule instanceof BoundedUpdateRule) {
-            activation = ((BoundedUpdateRule) updateRule).clip(activation);
+        if (updateRule instanceof ClippedUpdateRule) {
+            activation = ((ClippedUpdateRule) updateRule).clip(activation);
         }
     }
 
@@ -830,6 +831,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void setUpperBound(final double upperBound) {
         if (updateRule instanceof BoundedUpdateRule) {
             ((BoundedUpdateRule) updateRule).setUpperBound(upperBound);
+        } else {
+            throw new IllegalStateException("Cannot set upper bound on unbounded update rule.");
         }
     }
 
@@ -842,6 +845,8 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void setLowerBound(final double lowerBound) {
         if (updateRule instanceof BoundedUpdateRule) {
             ((BoundedUpdateRule) updateRule).setLowerBound(lowerBound);
+        } else {
+            throw new IllegalStateException("Cannot set lower bound on unbounded update rule.");
         }
     }
 

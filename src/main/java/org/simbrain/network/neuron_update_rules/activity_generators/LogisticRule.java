@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.util.UserParameter;
@@ -31,7 +31,7 @@ import org.simbrain.util.UserParameter;
  * <b>LogisticNeuron</b> updates using the logistic equation, which is chaotic
  * for the default growth rate. Does not use inputs from other neurons.
  */
-public class LogisticRule extends NeuronUpdateRule<EmptyScalarData, EmptyMatrixData> implements ActivityGenerator, BoundedUpdateRule {
+public class LogisticRule extends NeuronUpdateRule<EmptyScalarData, EmptyMatrixData> implements ActivityGenerator, ClippedUpdateRule {
 
     /**
      * Growth rate.

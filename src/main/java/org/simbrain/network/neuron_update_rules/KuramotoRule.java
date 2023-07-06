@@ -5,7 +5,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.EmptyScalarData;
@@ -23,7 +23,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  * TODO: Contextual increment.  Proper randomize and bounds.
  * Remove un-needed overrides.  Finish GUI.   Include time step in gui.
  */
-public class KuramotoRule extends NeuronUpdateRule<EmptyScalarData, EmptyMatrixData> implements DifferentiableUpdateRule, BoundedUpdateRule, NoisyUpdateRule {
+public class KuramotoRule extends NeuronUpdateRule<EmptyScalarData, EmptyMatrixData> implements DifferentiableUpdateRule, ClippedUpdateRule, NoisyUpdateRule {
 
     /**
      * The Default upper bound.

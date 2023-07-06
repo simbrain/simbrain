@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -31,7 +31,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
 /**
  * <b>RandomNeuron</b> produces random activations within specified parameters.
  */
-public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenerator, BoundedUpdateRule, NoisyUpdateRule {
+public class RandomNeuronRule extends NeuronUpdateRule implements ActivityGenerator, ClippedUpdateRule, NoisyUpdateRule {
 
     /**
      * Noise source.

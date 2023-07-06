@@ -21,6 +21,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
@@ -35,7 +36,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  *
  * @author Zoë Tosi
  */
-public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule, InvertibleUpdateRule, NoisyUpdateRule {
+public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule, InvertibleUpdateRule, NoisyUpdateRule, BoundedUpdateRule {
 
     /**
      * The default squashing function, informs the default upper and lower bounds.

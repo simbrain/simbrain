@@ -23,6 +23,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
 import org.simbrain.network.util.BiasedScalarData;
@@ -40,7 +41,7 @@ import static java.lang.Math.max;
  * <b>LinearNeuron</b> is a standard linear neuron.
  */
 public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule,
-        NoisyUpdateRule {
+        NoisyUpdateRule, BoundedUpdateRule {
 
     /**
      * The Default upper bound.

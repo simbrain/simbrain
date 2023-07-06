@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
@@ -32,7 +32,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
 /**
  * <b>SinusoidalNeuron</b> produces a sine wave.
  */
-public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerator, BoundedUpdateRule, NoisyUpdateRule {
+public class SinusoidalRule extends NeuronUpdateRule implements ActivityGenerator, ClippedUpdateRule, NoisyUpdateRule {
 
     /**
      * Phase.

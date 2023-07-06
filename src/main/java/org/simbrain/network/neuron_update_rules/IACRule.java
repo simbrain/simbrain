@@ -22,7 +22,7 @@ import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.EmptyScalarData;
@@ -33,7 +33,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
 /**
  * <b>IACNeuron</b> implements an Interactive Activation and Competition neuron.
  */
-public class IACRule extends NeuronUpdateRule<EmptyScalarData, EmptyMatrixData> implements BoundedUpdateRule, NoisyUpdateRule {
+public class IACRule extends NeuronUpdateRule<EmptyScalarData, EmptyMatrixData> implements ClippedUpdateRule, NoisyUpdateRule {
 
     /**
      * The Default upper bound.

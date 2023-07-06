@@ -22,7 +22,7 @@ import org.simbrain.network.core.Layer;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.NakaMatrixData;
@@ -37,7 +37,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  * model spike rates of real neurons. It is used extensively in Hugh Wilson's
  * Spikes, Decisions, and Action. p. 20-21.
  */
-public class NakaRushtonRule extends NeuronUpdateRule implements BoundedUpdateRule, NoisyUpdateRule {
+public class NakaRushtonRule extends NeuronUpdateRule implements ClippedUpdateRule, NoisyUpdateRule {
 
     /**
      * The default activation ceiling.

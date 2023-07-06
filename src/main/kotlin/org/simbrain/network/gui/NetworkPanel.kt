@@ -151,7 +151,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         NeuronNode.spikingColor = NetworkPreferences.spikingColor
         SynapseNode.setLineColor(NetworkPreferences.lineColor)
         SynapseNode.setExcitatoryColor(NetworkPreferences.excitatorySynapseColor)
-        SynapseNode.setExcitatoryColor(NetworkPreferences.inhibitorySynapseColor)
+        SynapseNode.setInhibitoryColor(NetworkPreferences.inhibitorySynapseColor)
         SynapseNode.setZeroWeightColor(NetworkPreferences.zeroWeightColor)
         SynapseNode.setMinDiameter(NetworkPreferences.minWeightSize)
         SynapseNode.setMaxDiameter(NetworkPreferences.maxWeightSize)

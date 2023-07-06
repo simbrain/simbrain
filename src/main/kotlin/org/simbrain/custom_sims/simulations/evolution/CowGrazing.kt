@@ -29,11 +29,14 @@ import kotlin.random.Random
 
 val grazingCows = newSim { optionString ->
 
+    var numCows = 2
     var maxGenerations = 50
     var iterationsPerRun = 2000
     var populationSize = 100
     var eliminationRatio = .5
     var numFlowers = 10
+    // If not, use min to compute group level fitness across cows
+    var useAverage = false
 
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
         override val random: Random = Random(seed)
@@ -134,7 +137,7 @@ val grazingCows = newSim { optionString ->
 
 
     class CowSim(
-        val cowGenotypes: List<CowGenotype> = List(2) { CowGenotype() },
+        val cowGenotypes: List<CowGenotype> = List(numCows) { CowGenotype() },
         val workspace: Workspace = Workspace()
     ) : EvoSim {
 
@@ -250,7 +253,11 @@ val grazingCows = newSim { optionString ->
             build()
             workspace.iterateSuspend(iterationsPerRun)
             // Determine a fitness for the sim based on the fitness of each cow
-            return cowFitnesses.values.minOrNull() ?: 0.0
+            return if (useAverage) {
+                cowFitnesses.values.average()
+            } else {
+                cowFitnesses.values.minOrNull() ?: 0.0
+            }
         }
     }
 
@@ -310,17 +317,21 @@ val grazingCows = newSim { optionString ->
         workspace.clearWorkspace()
         createControlPanel("Control Panel", 5, 10) {
 
+            val numCowsTf = addTextField("Number of cows", "" + numCows)
             val maxGenTf = addTextField("Max Generations", "" + maxGenerations)
             val iterationsPerRunTf = addTextField("Num iterations per generation", "" + iterationsPerRun)
             val populationSizeTf = addTextField("Population size", "" + populationSize)
             val eliminationRatioTf = addTextField("Elimination ratio", "" + eliminationRatio)
+            val useAverageCB = addCheckBox("Use mean group fitness (else min)", useAverage)
 
             addButton("Evolve") {
                 workspace.removeAllComponents()
+                numCows = numCowsTf.text.toInt();
                 maxGenerations = maxGenTf.text.toInt()
                 iterationsPerRun = iterationsPerRunTf.text.toInt()
                 populationSize = populationSizeTf.text.toInt()
                 eliminationRatio = eliminationRatioTf.text.toDouble()
+                useAverage = useAverageCB.isSelected()
                 runSim()
             }
 
@@ -345,10 +356,14 @@ val grazingCows = newSim { optionString ->
     }
     if (optionString?.isNotEmpty() == true) {
         val options = optionString.split(":")
-        maxGenerations = options[0].toInt()
-        iterationsPerRun = options[1].toInt()
-        populationSize = options[2].toInt()
-        eliminationRatio = options[3].toDouble()
+        numCows = options[0].toInt()
+        maxGenerations = options[1].toInt()
+        iterationsPerRun = options[2].toInt()
+        populationSize = options[3].toInt()
+        eliminationRatio = options[4].toDouble()
+        if (options.size > 5) {
+            useAverage = options[5].toBoolean()
+        }
         runSim()
     }
 

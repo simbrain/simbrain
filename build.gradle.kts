@@ -118,7 +118,8 @@ tasks.test {
 
 // Sample invocation:
 // gradle runSim -PsimName="Test Sim"
-// gradle runSim -PsimName="Evolve Grazing Cows" -PoptionString="20:1000:100:0.5"
+// gradle runSim -PsimName="Evolve Grazing Cows" -PoptionString="2:20:1000:100:0.5:true"
+// Option string: numCows:maxGenerations:iterationsPerRun:populationSize:elimRatio:useAverage
 tasks.register<JavaExec>("runSim") {
     jvmArgs(simbrainJvmArgs)
     classpath = sourceSets["main"].runtimeClasspath

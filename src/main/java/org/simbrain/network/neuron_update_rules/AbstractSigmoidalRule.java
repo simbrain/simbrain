@@ -46,18 +46,8 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
     @UserParameter(label = "Implementation", order = 10)
     protected SigmoidFunctionEnum sFunction = DEFAULT_SIGMOID_TYPE;
 
-    @UserParameter(
-            label = "Upper Bound",
-            description = "Ceiling value used to scale upper and lower bound of sigmoid.",
-            order = 20
-    )
     private double upperBound = DEFAULT_SIGMOID_TYPE.getDefaultUpperBound();
 
-    @UserParameter(
-            label = "Lower Bound",
-            description = "Floor value used to scale lower bound of sigmoid.",
-            order = 30
-    )
     private double lowerBound = DEFAULT_SIGMOID_TYPE.getDefaultLowerBound();
 
     @UserParameter(

@@ -53,20 +53,8 @@ public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixD
      */
     private static final double DEFAULT_LOWER_BOUND = -10.0;
 
-    @UserParameter(
-            label = "Upper Bound",
-            description = "Upper bound used when type is piecewise linear.",
-            conditionalEnablingMethod = "requiresBounds",
-            order = 20
-    )
     private double upperBound = DEFAULT_UPPER_BOUND;
 
-    @UserParameter(
-            label = "Lower Bound",
-            description = "Lower bound used when type is piecewise linear (for relu it is set to 0).",
-            conditionalEnablingMethod = "requiresBounds",
-            order = 30
-    )
     private double lowerBound = DEFAULT_LOWER_BOUND;
 
     @UserParameter(

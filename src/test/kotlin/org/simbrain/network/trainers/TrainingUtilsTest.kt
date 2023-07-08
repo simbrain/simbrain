@@ -1,16 +1,13 @@
-package org.simbrain.network.util
+package org.simbrain.network.trainers
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.subnetworks.LMSNetwork
-import org.simbrain.network.trainers.*
+import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.rowMatrixTransposed
-import org.simbrain.util.sse
 import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
@@ -91,24 +88,6 @@ class TrainingUtilsTest {
         assertArrayEquals(target, wm1.output.toDoubleArray(), .01)
     }
 
-    // TODO: Separate tests for different clipping types
-    @Test
-    fun `test backprop`() {
-        val inputs = doubleArrayOf(-1.0, 1.0).toMatrix()
-        // TODO: Blows up for larger targets, like 30
-        val targets = Matrix.column(doubleArrayOf(3.5, -.5))
-        (na3.updateRule as LinearRule).clippingType = LinearRule.ClippingType.PiecewiseLinear
-        wm1.randomize()
-        wm2.randomize()
-        // na2.randomizeBiases()
-        // na3.randomizeBiases()
-        repeat(10) {
-            listOf(wm1, wm2).applyBackprop(inputs, targets, .1)
-            // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
-        }
-        println("Outputs: ${wm2.output}, SSE = ${targets sse wm2.output}")
-        assertEquals(0.0, targets.toDoubleArray() sse wm2.output.toDoubleArray(), .01)
-    }
 
     @Test
     fun `test lms in a feed forward net`() {

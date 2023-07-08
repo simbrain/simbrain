@@ -148,6 +148,7 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
 
         // Preferences
         add(showNetworkPreferencesAction)
+        add(showNetworkPropertiesAction)
     }
 }
 
@@ -191,6 +192,7 @@ val NetworkPanel.neuronContextMenu
             add(showLayoutDialogAction)
             addSeparator()
             add(showNetworkPreferencesAction)
+            add(showNetworkPropertiesAction)
             addSeparator()
             if (selectionManager.filterSelectedNodes<NeuronNode>().size > 1) {
                 add(alignMenu)

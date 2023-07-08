@@ -21,6 +21,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.sampleWithoutReplacement
@@ -43,6 +44,14 @@ class Sparse @JvmOverloads constructor(
     /**
      * What percent (as a probability) of possible connections to make.
      */
+    @UserParameter(
+        label = "Connection Density",
+        description = "What percent (as a probability) of possible connections to make.",
+        order = 10,
+        minimumValue = 0.0,
+        maximumValue = 1.0,
+        increment = 0.01
+    )
     var connectionDensity: Double = 0.8,
 
     /**
@@ -52,6 +61,11 @@ class Sparse @JvmOverloads constructor(
      * will connect to exactly 5 targets.
      */
     @get:JvmName("isEqualizeEfferents")
+    @UserParameter(
+        label = "Equalize Efferents",
+        description = "Whether or not each source neuron is given an equal number of efferent synapses.",
+        order = 20
+    )
     var equalizeEfferents: Boolean = false,
 
     /**
@@ -59,6 +73,11 @@ class Sparse @JvmOverloads constructor(
      *  Only applicable if the source and target neuron sets are the same.
      */
     @get:JvmName("isSelfConnectionAllowed")
+    @UserParameter(
+        label = "Allow Self Connection",
+        description = "Whether or not connections where the source and target are the same neuron are allowed.",
+        order = 30
+    )
     var allowSelfConnection: Boolean = NetworkPreferences.selfConnectionAllowed
 ) : ConnectionStrategy(), EditableObject {
 

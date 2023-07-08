@@ -3,8 +3,7 @@ package org.simbrain.network.core
 import kotlinx.coroutines.*
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.connections.ConnectionSelector
-import org.simbrain.network.connections.Sparse
+import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.events.NetworkEvents2
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -15,8 +14,10 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.SimpleIdManager
+import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.updater.PerformanceMonitor
 import org.simbrain.workspace.updater.UpdateAction
@@ -40,7 +41,7 @@ private val LOG_10 = ln(10.0)
  * To remove models use [Network.getModels] and call .delete() on the resulting models. Get models can be called with
  * an argument to filter by model type, e.g getModels(Neuron.class)
  */
-class Network: CoroutineScope {
+class Network: CoroutineScope, EditableObject {
 
     @Transient
     private var job = SupervisorJob()
@@ -80,25 +81,50 @@ class Network: CoroutineScope {
      */
     val updateManager = NetworkUpdateManager(this)
 
-    /**
-     * Connection strategy for connecting free neurons.
-     */
-    val neuronConnector = ConnectionSelector(Sparse())
+    @UserParameter(
+        label = "Neuron Connector",
+        description = "Strategy for connecting free neurons.",
+        isObjectType = true,
+        showDetails = false,
+        order = 0
+    )
+    var connectionStrategy = AllToAll()
 
-    /**
-     * Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a weight.
-     */
-    val weightRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 1.0))
+    @UserParameter(
+        label = "Weight Randomizer",
+        description = "Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a neuron.",
+        isObjectType = true,
+        showDetails = false,
+        order = 10
+    )
+    var weightRandomizer = UniformRealDistribution(-1.0, 1.0)
 
-    /**
-     * Randomizer for free excitatory weights.
-     */
-    val excitatoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(0.0, 1.0))
+    @UserParameter(
+        label = "Excitatory Randomizer",
+        description = "Randomizer for all weights from polarized excitatory neurons. Applying it will not change the polarity of a neuron.",
+        isObjectType = true,
+        showDetails = false,
+        order = 20
+    )
+    var excitatoryRandomizer = UniformRealDistribution(0.0, 1.0)
 
-    /**
-     * Randomizer for free inhibitory weights.
-     */
-    val inhibitoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 0.0))
+    @UserParameter(
+        label = "Inhibitory Randomizer",
+        description = "Randomizer for all weights from polarized inhibitory neurons. Applying it will not change the polarity of a neuron.",
+        isObjectType = true,
+        showDetails = false,
+        order = 30
+    )
+    var inhibitoryRandomizer = UniformRealDistribution(-1.0, 0.0)
+
+    @UserParameter(
+        label = "Bias Randomizer",
+        description = "Randomizer for all biases.",
+        isObjectType = true,
+        showDetails = false,
+        order = 40
+    )
+    var biasesRandomizer = NormalDistribution(0.0, 0.01)
 
     /**
      * In iterations or msec.

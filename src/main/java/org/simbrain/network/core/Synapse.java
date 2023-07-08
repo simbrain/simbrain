@@ -567,8 +567,11 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     @Override
     public void randomize() {
-        double newStrength = (getUpperBound() - getLowerBound()) * Math.random() + getLowerBound();
-        forceSetStrength(newStrength);
+        switch (source.getPolarity()) {
+            case EXCITATORY -> forceSetStrength(parentNetwork.getExcitatoryRandomizer().sampleDouble());
+            case INHIBITORY -> forceSetStrength(parentNetwork.getInhibitoryRandomizer().sampleDouble());
+            default -> forceSetStrength(parentNetwork.getWeightRandomizer().sampleDouble());
+        }
     }
 
     /**

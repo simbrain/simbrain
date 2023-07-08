@@ -21,7 +21,6 @@ import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateR
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.plusAssign
 import org.simbrain.util.sse
-import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix
 
@@ -141,17 +140,4 @@ fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, 
         errorVector = wm.applyBackprop(errorVector, epsilon)
     }
     return error
-}
-
-// TODO: move somewhere else? Also add user parameter so it can be adjusted (pref?)
-val biasRandomizer = NormalDistribution(0.0, 1.0)
-
-fun NeuronArray.randomizeBiases() {
-    dataHolder.let {
-        if (it is BiasedMatrixData) {
-            for (i in 0 until it.biases.ncol()) {
-                it.biases.set(i, 0, biasRandomizer.sampleDouble())
-            }
-        }
-    }
 }

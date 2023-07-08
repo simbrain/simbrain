@@ -26,7 +26,6 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
-import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.network.util.SpikingScalarData;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -767,19 +766,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     public void setClamped(final boolean clamped) {
         this.clamped = clamped;
         getEvents().getClampChanged().fireAndForget();
-    }
-
-    /**
-     * If this neuron has a bias field, randomize it within the specified
-     * bounds.
-     *
-     * @param lower lower bound for randomization.
-     * @param upper upper bound for randomization.
-     */
-    public void randomizeBias(double lower, double upper) {
-        if (dataHolder instanceof BiasedScalarData) {
-            ((BiasedScalarData) dataHolder).setBias((upper - lower) * Math.random() + lower);
-        }
     }
 
     /**

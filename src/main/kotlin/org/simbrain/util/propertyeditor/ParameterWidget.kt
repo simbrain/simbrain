@@ -431,7 +431,9 @@ class ParameterWidget(
             // getting the methodName function (usually named `getTypes`)
             val functions = c.staticFunctions.toMutableList()
             c.companionObject?.functions?.let { functions.addAll(it) }
-            val m = functions.first { it.name == methodName }
+            val m = functions.firstOrNull { it.name == methodName } ?: throw IllegalArgumentException(
+                "Could not find method $methodName in class ${c.qualifiedName}"
+            )
 
             // calling the getTypes function which returns a list of classes
             val types = if (m.parameters.isEmpty()) {

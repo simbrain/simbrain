@@ -24,6 +24,7 @@ import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -65,6 +66,19 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
     val pasteAction = PasteAction(networkPanel)
     val randomizeObjectsAction = RandomizeObjectsAction(networkPanel)
+    val randomizeBiasesAction = networkPanel.createAction(
+        name = "Randomize Biases",
+        description = "Randomize biases of selected nodes",
+        iconPath = "menu_icons/Rand.png",
+        keyboardShorcut = CmdOrCtrl + 'B'
+    ) {
+        selectionManager.selectedModels
+            .filterIsInstance<Neuron>()
+            .map { it.randomizeBias() }
+        selectionManager.selectedModels
+            .filterIsInstance<NeuronArray>()
+            .map { it.randomizeBiases() }
+    }
     val selectAllAction = SelectAllAction(networkPanel)
     val selectAllNeuronsAction = SelectAllNeuronsAction(networkPanel)
     val selectAllWeightsAction = SelectAllWeightsAction(networkPanel)
@@ -111,16 +125,19 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val showNetworkPreferencesAction = networkPanel.createAction(
         name = "Network Preferences...",
-        description = "Show the network preference dialog",
+        description = "Show the network preference dialog. These properties apply to all networks in the Simbrain workspace.",
         iconPath = "menu_icons/Prefs.png",
         keyboardShorcut = CmdOrCtrl + ','
     ) {
-        getPreferenceDialog(NetworkPreferences).apply {
-            addClosingTask {
-                // TODO: Temp
-                // networkPanel.canvas.background = NetworkPreferences.networkBackgroundColor
-            }
-        }.display()
+        getPreferenceDialog(NetworkPreferences).display()
+    }
+
+    val showNetworkPropertiesAction = networkPanel.createAction(
+        name = "Network Properties...",
+        description = " These are properties that are different for each network in the Simbrain workspace.",
+        iconPath = "menu_icons/Properties.png"
+    ) {
+        network.createDialog().display()
     }
 
     val iterateNetworkAction = networkPanel.createAction(
@@ -222,9 +239,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         createSynapseAdjustmentPanel(
             network.getModels<Synapse>().toList(),
-            network.weightRandomizer,
-            network.excitatoryRandomizer,
-            network.inhibitoryRandomizer
+            ProbabilityDistribution.Randomizer(network.weightRandomizer),
+            ProbabilityDistribution.Randomizer(network.excitatoryRandomizer),
+            ProbabilityDistribution.Randomizer(network.inhibitoryRandomizer)
         )?.displayInDialog()
     }
 
@@ -274,7 +291,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val editConnectionStrategy = networkPanel.createAction(
         name = "Edit connection strategy...",
     ) {
-        ConnectionStrategyPanel(network.neuronConnector).displayInDialog {
+        ConnectionStrategyPanel(ConnectionSelector(network.connectionStrategy)).displayInDialog {
             commitChanges()
         }
     }

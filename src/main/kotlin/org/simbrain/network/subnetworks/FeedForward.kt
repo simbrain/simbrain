@@ -45,7 +45,7 @@ open class FeedForward(
     /**
      * Ordered reference to [NeuronArray]'s maintained in [Subnetwork.modelList]
      */
-    protected val layerList: MutableList<NeuronArray> = ArrayList()
+    val layerList: MutableList<NeuronArray> = ArrayList()
 
     val wmList: MutableList<WeightMatrix> = ArrayList()
 

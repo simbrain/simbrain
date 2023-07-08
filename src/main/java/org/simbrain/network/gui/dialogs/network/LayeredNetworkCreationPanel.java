@@ -170,30 +170,19 @@ public class LayeredNetworkCreationPanel extends JPanel {
         }
 
         // Create network
-        FeedForward net;
-        switch (type) {
-            case "Backprop":
-                net = new BackpropNetwork(panel.getNetwork(), topology,
-                        panel.getNetwork().getPlacementManager().getLastClickedLocation());
-                break;
-            case "FeedForward":
-                net = new FeedForward(panel.getNetwork(), topology,
-                        panel.getNetwork().getPlacementManager().getLastClickedLocation());
-                break;
-            default:
-                net = new FeedForward(panel.getNetwork(), topology,
-                        panel.getNetwork().getPlacementManager().getLastClickedLocation());
-                break;
-        }
+        FeedForward net = switch (type) {
+            case "Backprop" -> new BackpropNetwork(panel.getNetwork(), topology,
+                    panel.getNetwork().getPlacementManager().getLastClickedLocation());
+            case "FeedForward" -> new FeedForward(panel.getNetwork(), topology,
+                    panel.getNetwork().getPlacementManager().getLastClickedLocation());
+            default -> new FeedForward(panel.getNetwork(), topology,
+                    panel.getNetwork().getPlacementManager().getLastClickedLocation());
+        };
 
         // Set neuron types
-        // i = layerList.size() - 1;
-        // if (!net.isUseNeuronArrays()) {
-        //     for (LayerCreationPanel layer : layerList) {
-        //         net.getNeuronGroup(i).setNeuronType(layer.getNeuronType());
-        //         i--;
-        //     }
-        // }
+        for (int j = 0; j < net.getLayerList().size(); j++) {
+            net.getLayerList().get(j).setUpdateRule(layerList.get(net.getLayerList().size() - 1 - j).getNeuronType());
+        }
 
         // Add the new network
         panel.getNetwork().addNetworkModelAsync(net);

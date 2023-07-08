@@ -70,7 +70,7 @@ fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
 fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix {
     layerError.validateSameShape(target.outputs)
     val weightDeltas = layerError.mm(source.outputs.transpose())
-    weightMatrix.add(weightDeltas.clone().mul(epsilon))
+    weightMatrix.add(weightDeltas.mul(epsilon))
     events.updated.fireAndBlock()
     return Matrix.column(weightDeltas.mul(weightMatrix).colSums())
 }
@@ -135,8 +135,7 @@ fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, 
     for (wm in this.reversed()) {
         val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
         errorVector.mul(deriv)
-        // TODO: Bias updates destabilizes backprop. See TrainerUtilsTest.
-        // wm.tar.updateBiases(errorVector, epsilon)
+        wm.tar.updateBiases(errorVector, epsilon)
         errorVector = wm.applyBackprop(errorVector, epsilon)
     }
     return error

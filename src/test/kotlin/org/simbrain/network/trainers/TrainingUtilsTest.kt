@@ -31,9 +31,9 @@ class TrainingUtilsTest {
 
     @Test
     fun `test neuron array error`() {
-        na1.setActivations(doubleArrayOf(-1.0, 1.0))
-        val error = na1.getError(doubleArrayOf(1.0, 1.0).toMatrix())
-        assertArrayEquals(doubleArrayOf(2.0, 0.0 ), error.toDoubleArray())
+        na1.setActivations(doubleArrayOf(-1.0, 1.0, 1.0))
+        val error = na1.getError(doubleArrayOf(1.0, 1.0, -1.0).toMatrix())
+        assertArrayEquals(doubleArrayOf(2.0, 0.0, -2.0), error.toDoubleArray())
     }
 
     @Test

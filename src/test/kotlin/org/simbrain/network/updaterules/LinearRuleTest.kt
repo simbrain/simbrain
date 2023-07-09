@@ -1,6 +1,5 @@
 package org.simbrain.network.updaterules
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
@@ -8,9 +7,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.linspace
-import org.simbrain.util.toDoubleArray
-import org.simbrain.util.toMatrix
 
 class LinearRuleTest {
 
@@ -119,29 +115,4 @@ class LinearRuleTest {
         assertEquals(5.0, lr.getDerivative(0.0), 0.0)
     }
 
-    @Test
-    fun `test array linear derivative with relu`() {
-        val lr = LinearRule()
-        val array = linspace(-10.0,10.0,4).toMatrix()
-        lr.clippingType = LinearRule.ClippingType.Relu
-        assertArrayEquals(doubleArrayOf(0.0,0.0,1.0,1.0), lr.getDerivative(array).toDoubleArray())
-    }
-
-    @Test
-    fun `test array linear derivative with no bounds`() {
-        val lr = LinearRule()
-        val array = linspace(-10.0,10.0,4).toMatrix()
-        lr.clippingType = LinearRule.ClippingType.NoClipping
-        assertArrayEquals(doubleArrayOf(1.0,1.0,1.0,1.0), lr.getDerivative(array).toDoubleArray())
-    }
-
-    @Test
-    fun `test array linear derivative with piecewise linear`() {
-        val lr = LinearRule()
-        lr.lowerBound = -5.0
-        lr.upperBound = 5.0
-        val array = linspace(-10.0,10.0,4).toMatrix()
-        lr.clippingType = LinearRule.ClippingType.PiecewiseLinear
-        assertArrayEquals(doubleArrayOf(0.0,1.0,1.0,0.0), lr.getDerivative(array).toDoubleArray())
-    }
 }

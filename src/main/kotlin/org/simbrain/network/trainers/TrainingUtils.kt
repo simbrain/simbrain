@@ -72,7 +72,9 @@ fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix
     val weightDeltas = layerError.mm(source.outputs.transpose())
     weightMatrix.add(weightDeltas.mul(epsilon))
     events.updated.fireAndBlock()
-    return Matrix.column(weightDeltas.mul(weightMatrix).colSums())
+    // Backpropagated errors are layer errors times weights then columns summed
+    return Matrix.column(layerError.transpose().mm(weightMatrix).colSums())
+
 }
 
 /**
@@ -109,8 +111,8 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
 /**
  * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
  */
-fun List<WeightMatrix>.forwardPass(inputs: Matrix) {
-    first().src.activations = inputs
+fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
+    first().src.activations = inputVector
     for (wm in this) {
         wm.target.updateInputs()
         wm.target.update()

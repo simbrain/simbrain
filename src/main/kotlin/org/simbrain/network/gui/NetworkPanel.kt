@@ -26,6 +26,7 @@ import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.trainCurrentOutputLMS
+import org.simbrain.util.cartesianProduct
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
@@ -604,7 +605,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 dialog.isVisible = true
             } else {
                 // TODO: Ability to set defaults for weight matrix that is added
-                sources.zip(targets) { s, t ->
+                sources.cartesianProduct(targets).mapNotNull { (s, t) ->
                     network.addNetworkModelAsync(WeightMatrix(network, s, t))
                 }
             }

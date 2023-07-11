@@ -20,7 +20,6 @@ package org.simbrain.network.neuron_update_rules;
 
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.InvertibleUpdateRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
 import org.simbrain.network.util.BiasedMatrixData;
@@ -36,7 +35,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution;
  *
  * @author Zoë Tosi
  */
-public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule, InvertibleUpdateRule, NoisyUpdateRule, BoundedUpdateRule {
+public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule, NoisyUpdateRule, BoundedUpdateRule {
 
     /**
      * The default squashing function, informs the default upper and lower bounds.
@@ -46,9 +45,9 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
     @UserParameter(label = "Implementation", order = 10)
     protected SigmoidFunctionEnum sFunction = DEFAULT_SIGMOID_TYPE;
 
-    private double upperBound = DEFAULT_SIGMOID_TYPE.getDefaultUpperBound();
+    private double upperBound = 1.0;
 
-    private double lowerBound = DEFAULT_SIGMOID_TYPE.getDefaultLowerBound();
+    private double lowerBound = 0.0;
 
     @UserParameter(
             label = "Slope",
@@ -82,8 +81,6 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
 
     public final void setType(SigmoidFunctionEnum type) {
         this.sFunction = type;
-        setUpperBound(type.getDefaultUpperBound());
-        setLowerBound(type.getDefaultLowerBound());
     }
 
     public double getSlope() {
@@ -142,14 +139,6 @@ public abstract class AbstractSigmoidalRule extends NeuronUpdateRule<BiasedScala
 
     public final void setLowerBound(final double floor) {
         this.lowerBound = floor;
-    }
-
-    @Override
-    public final double getInverse(final double val) {
-        double up = getUpperBound();
-        double lw = getLowerBound();
-        double diff = up - lw;
-        return sFunction.inverseVal(val, up, lw, diff);
     }
 
 }

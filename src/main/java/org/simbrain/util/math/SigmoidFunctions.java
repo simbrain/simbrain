@@ -151,19 +151,6 @@ public class SigmoidFunctions {
         return Math.log((1 + z)) / (1 - z);
     }
 
-    // public static void invTanh(Matrix in, Matrix out, double ceil, double floor, double slope) {
-    //     if (in != out) {
-    //         out = in.dup();
-    //     }
-    //     out.addi(-floor);
-    //     out.rdivi(ceil - floor);
-    //     out.addi(-0.5);
-    //     out.muli(0.5);
-    //     // One matrix allocation here could be expensive
-    //     Matrix denom = out.rsub(1);
-    //     out = Transforms.log(out.addi(1)).divi(denom);
-    // }
-
     /**
      * Returns the results of the inverse of the standard sigmoidal (logistic)
      * function.
@@ -182,12 +169,6 @@ public class SigmoidFunctions {
         double diff = ceil - floor;
         return diff * -Math.log(diff / (val - floor) - 1) / slope;
     }
-
-    // public static void invLogistic(Matrix in, Matrix out, double ceil, double floor, double slope) {
-    //     for (int i = 0; i < in.length(); ++i) {
-    //         out.putScalar(i, invLogistic(in.getDouble(i), ceil, floor, slope));
-    //     }
-    // }
 
     /**
      * Returns the result of the inverse arctangent or tangent function.
@@ -208,12 +189,6 @@ public class SigmoidFunctions {
         double z = ((val - ((ceil + floor) / 2)) * (Math.PI / diff));
         return Math.tan(z) / a;
     }
-
-    // public static void invAtan(Matrix in, Matrix out, double ceil, double floor, double slope) {
-    //     for (int i = 0; i < in.length(); ++i) {
-    //         out.putScalar(i, invAtan(in.getDouble(i), ceil, floor, slope));
-    //     }
-    // }
 
     /*
      * ****************************************************************
@@ -242,16 +217,6 @@ public class SigmoidFunctions {
         return slope * t * t;
     }
 
-    public static Matrix derivTanh(Matrix in, double ceil, double floor, double slope) {
-        double diff = ceil - floor;
-        double a = (2 * slope) / diff;
-        in.mul(in);
-        return in;
-        // out = Transforms.cosh(out, false).rdivi(1);
-        // out = Transforms.pow(out, 2, false);
-        // out.muli(a * diff / 2);
-    }
-
     /**
      * The derivative of the logistic function given the original function's
      * upper and lower bounds, and slope for a given value.
@@ -273,45 +238,6 @@ public class SigmoidFunctions {
     }
 
     /**
-     * Calculate the derivative of the logistic function at each value in the input array.
-     *
-     * @param in    The input array, will not be modified.
-     * @param out   The output array.
-     * @param ceil  The upper bound on the logistic function.
-     * @param floor The lower bound on the logistic function.
-     * @param slope The slope of the logistic function.
-     */
-    // public static void derivLogistic(Matrix in, Matrix out, double ceil, double floor, double slope) {
-    //     logistic(in, out, ceil, floor, slope);
-    //     Matrix temp = out.sub(floor);
-    //     double scalar = (4 * slope) / ((ceil - floor) * (ceil - floor));
-    //     out.rsubi(ceil, out);
-    //     out.muli(temp, out);
-    //     out.muli(scalar, out);
-    // }
-
-    /**
-     * Calculate the logistic function and its derivative on each value of the input array. Makes use of an
-     * optimization to avoid recomputing the logistic.
-     *
-     * @param in    The input array, will not be modified.
-     * @param out   The output array.
-     * @param deriv The derivative array.
-     * @param ceil  The upper bound of the logistic function.
-     * @param floor The lower bound of the logistic function.
-     * @param slope The slope of the logistic function.
-     */
-    // public static void logisticWithDerivative(Matrix in, Matrix out, Matrix deriv, double ceil, double floor, double slope) {
-    //     logistic(in, out, ceil, floor, slope);
-    //     // To avoid the use of a temp array (memory allocation), use out to hold one term temporarily
-    //     out.rsubi(ceil, deriv); // <-- main source of blowup
-    //     out.subi(floor);
-    //     deriv.muli(out).muli((4 * slope) / ((ceil - floor) * (ceil - floor)));
-    //     // Restore out after calculating the derivative
-    //     out.addi(floor);
-    // }
-
-    /**
      * The derivative of the arc tangent given the original function's upper and
      * lower bounds, and slope for a given value.
      *
@@ -330,11 +256,5 @@ public class SigmoidFunctions {
         double a = (Math.PI * slope) / diff;
         return a * (diff / Math.PI) * (1 / (1 + Math.pow(a * val, 2)));
     }
-
-    // public static void derivAtan(Matrix in, Matrix out, double ceil, double floor, double slope) {
-    //     for (int i = 0; i < in.length(); ++i) {
-    //         out.putScalar(i, derivAtan(in.getDouble(i), ceil, floor, slope));
-    //     }
-    // }
 
 }

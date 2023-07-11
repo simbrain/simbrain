@@ -154,8 +154,13 @@ annotation class UserParameter(
      */
     val isEmbeddedObject: Boolean = false,
     /**
-     * A string in the format of `object.function`.  When the object type editor is updated, this field is udpated
-     * using the provided function. If this is used, [isEmbeddedObject] must be true.
+     * Used when the state of this field should be updated based on the state of another field, which must be an enum or
+     * object type editor which changed its state.  Specifies a method called by reflection when that state change occurs.
+     *
+     * The method is specified in the format of `updateRule.createMatrixData`. In this example, when updateRule was changed,
+     * the annotated field will be updated to the value provided by `updateRule.createMatrixData()`.
+     *
+     * If this is used, [isEmbeddedObject] must be true.
      */
     val refreshSource: String = "",
 )

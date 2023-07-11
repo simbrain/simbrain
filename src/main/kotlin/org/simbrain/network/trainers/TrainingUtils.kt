@@ -72,9 +72,8 @@ fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix
     val weightDeltas = layerError.mm(source.outputs.transpose())
     weightMatrix.add(weightDeltas.mul(epsilon))
     events.updated.fireAndBlock()
-    // Backpropagated errors are layer errors times weights then columns summed
-    return Matrix.column(layerError.transpose().mm(weightMatrix).colSums())
-
+    // Backpropagate the layer error through the weights to get new error
+    return weightMatrix.transpose().mm(layerError)
 }
 
 /**

@@ -203,7 +203,7 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
                     try {
                         s.call(theObject, initVal)
                     } catch (e: IllegalArgumentException) {
-                        throw IllegalArgumentException("Error setting value for parameter $name: expected type ${s.parameters.first()::class.simpleName}, got ${theObject::class.simpleName}")
+                        throw IllegalArgumentException("Error setting value for parameter $name: expected type ${s.valueParameters.first().type}, got ${initVal::class.simpleName}")
                     }
                 } ?: setKotlinProperty()
             } else {

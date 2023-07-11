@@ -297,24 +297,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     }
 
     /**
-     * Sets the update rule using a String description. The provided description
-     * must match the class name. E.g. "BinaryNeuron" for "BinaryNeuron.java".
-     *
-     * @param name the "simple name" of the class associated with the neuron rule
-     *             to set.
-     */
-    public void setUpdateRule(String name) {
-        try {
-            NeuronUpdateRule newRule = (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + name).newInstance();
-            setUpdateRule(newRule);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalArgumentException("The provided neuron rule name, \"" + name + "\", does not correspond to a known neuron type." + "\n Could not find " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Set a new update rule. Essentially like changing the type of the network.
      *
      * @param updateRule the neuronUpdateRule to set

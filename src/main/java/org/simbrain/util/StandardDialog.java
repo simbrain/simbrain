@@ -213,9 +213,9 @@ public class StandardDialog extends GenericJDialog {
         addWindowListener(windowAdapter);
 
         this.getRootPane().registerKeyboardAction(actionListener,
-            KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_DOWN_MASK), 0);
+            KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
         this.getRootPane().registerKeyboardAction(actionListener,
-            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), 0);
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         // this.setAlwaysOnTop(true); //BREAKS SOME VERSIONS
         pack();

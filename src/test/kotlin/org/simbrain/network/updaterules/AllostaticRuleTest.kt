@@ -17,9 +17,7 @@ class AllostaticRuleTest {
     val externalInput = Neuron(net).apply{
         upperBound = 10.0
     }
-    val reservoirInput = Neuron(net, AllostaticUpdateRule()).apply{
-        upperBound = 10.0
-    }
+    val reservoirInput = Neuron(net, AllostaticUpdateRule())
     val externalWeight = Synapse(externalInput, n)
     val resWeight = Synapse(reservoirInput, n)
 

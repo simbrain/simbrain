@@ -73,7 +73,7 @@ class LinearRuleArrayTest {
         input1.activations = doubleArrayOf(10.0, 10.0).toMatrix()
         // reminder: input 2 = (-1,1)
         (output.updateRule as LinearRule).apply {
-            clippingType = LinearRule.ClippingType.Relu
+            clippingType = LinearRule.ClippingType.NoClipping
         }
         net.update()
         assertArrayEquals(doubleArrayOf(9.0,11.0), output.activationArray)

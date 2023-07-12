@@ -105,7 +105,7 @@ val actorCritic = newSim {
 
     // Outputs
     val outputs = WinnerTakeAll(network, 4).apply{
-        network.addNetworkModelAsync(this)
+        network.addNetworkModel(this)
         isUseRandom = true
         randomProb = epsilon
         winValue = tileSize

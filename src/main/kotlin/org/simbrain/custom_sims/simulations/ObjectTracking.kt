@@ -58,7 +58,7 @@ val objectTrackingSim = newSim {
     }
     network.addNetworkModelsAsync(resNeurons)
     val reservoir = NeuronCollection(network, resNeurons)
-    network.addNetworkModelAsync(reservoir)
+    network.addNetworkModel(reservoir)
     reservoir.label = "Reservoir"
     reservoir.layout(GridLayout())
     reservoir.location = point(0, 0)

@@ -65,7 +65,19 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         network.selectModels(listOf(neuron))
     }
     val pasteAction = PasteAction(networkPanel)
-    val randomizeObjectsAction = RandomizeObjectsAction(networkPanel)
+    val randomizeObjectsAction = networkPanel.createAction(
+        name = "Randomize selection",
+        description = "Randomize Selected Weights and Nodes (r)",
+        iconPath = "menu_icons/Rand.png",
+        keyboardShorcut = KeyCombination('R')
+    ) {
+        selectionManager.selectedModels
+            .filterIsInstance<Neuron>()
+            .map { it.randomize() }
+        selectionManager.selectedModels
+            .filterIsInstance<NeuronArray>()
+            .map { it.randomize() }
+    }
     val randomizeBiasesAction = networkPanel.createAction(
         name = "Randomize Biases",
         description = "Randomize biases of selected nodes",

@@ -23,6 +23,7 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
+import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.events.NeuronArrayEvents2
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.actions.edit.CopyAction
@@ -30,6 +31,7 @@ import org.simbrain.network.gui.actions.edit.CutAction
 import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
@@ -65,6 +67,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         mainNode.addChild(this)
     }
 
+    protected val biasImage = PImage()
 
     /**
      * Text corresponding to neuron's (optional) label.
@@ -81,6 +84,20 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
      */
     private var gridMode = false
         set(value) {
+            field = value
+            updateActivationImage()
+            updateBorder()
+        }
+
+    private var showBias = false
+        set(value) {
+            if (value != field) {
+                if (value) {
+                    mainNode.addChild(biasImage)
+                } else {
+                    mainNode.removeChild(biasImage)
+                }
+            }
             field = value
             updateActivationImage()
             updateBorder()
@@ -148,6 +165,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     private fun updateActivationImage() {
         activationImage.removeAllChildren()
+        biasImage.removeAllChildren()
         val activations = neuronArray.outputs.toDoubleArray()
         if (gridMode) {
             // "Grid" case
@@ -158,6 +176,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 0.0, 0.0,
                 infoText.width, infoText.width
             )
+            activationImage.addBorder()
             if (neuronArray.updateRule.isSpikingRule) {
                 val spikes = (neuronArray.dataHolder as SpikingMatrixData).spikes
                 spikeImage.image = spikes.toOverlay(len, len, NeuronNode.spikingColor)
@@ -165,6 +184,15 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     0.0, 0.0,
                     infoText.width, infoText.width
                 )
+            }
+            if (showBias && neuronArray.dataHolder is BiasedMatrixData) {
+                val biases = (neuronArray.dataHolder as BiasedMatrixData).biases
+                biasImage.image = biases.toDoubleArray().toSimbrainColorImage(len, len)
+                biasImage.setBounds(
+                    0.0, infoText.width + infoText.height + margin,
+                    infoText.width, infoText.width
+                )
+                biasImage.addBorder()
             }
         } else {
             // "Flat" case
@@ -183,13 +211,22 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     infoText.width, flatPixelArrayHeight.toDouble()
                 )
             }
+            if (showBias && neuronArray.dataHolder is BiasedMatrixData) {
+                val biases = (neuronArray.dataHolder as BiasedMatrixData).biases
+                biasImage.image = biases.toDoubleArray().toSimbrainColorImage(activations.size, 1)
+                biasImage.setBounds(
+                    0.0, flatPixelArrayHeight.toDouble() + infoText.height + margin,
+                    infoText.width, flatPixelArrayHeight.toDouble()
+                )
+                biasImage.addBorder()
+            }
         }
         updateTextLabel()
     }
 
     private fun computeInfoText() = """
-            ${neuronArray.id}    nodes: ${neuronArray.size()} ${if (neuronArray.targetValues != null) "T" else ""}
-            mean activation: ${neuronArray.activations.toDoubleArray().average().format(4)}
+            ${neuronArray.id}    Nodes: ${neuronArray.size()} ${if (neuronArray.targetValues != null) "T" else ""}
+            Mean activation: ${neuronArray.activations.toDoubleArray().average().format(4)}
             """.trimIndent()
 
     /**
@@ -229,6 +266,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             neuronArray.isGridMode = !neuronArray.isGridMode
         }
         contextMenu.add(switchStyle)
+        val toggleShowBias: Action = networkPanel.createAction(
+            name = "Toggle bias visibility",
+            description = "Toggle whether biases are visible"
+        ) {
+            showBias = !showBias
+        }
+        contextMenu.add(toggleShowBias)
         contextMenu.addSeparator()
 
         val setTargetValues: Action = networkPanel.createAction(
@@ -270,17 +314,24 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         contextMenu.addSeparator()
 
         // Randomize Action
-        val randomizeAction: Action = object : AbstractAction("Randomize") {
-            init {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"))
-                putValue(SHORT_DESCRIPTION, "Randomize neuron array")
-            }
-
-            override fun actionPerformed(event: ActionEvent) {
-                neuronArray.randomize()
-            }
+        val randomizeAction = networkPanel.createAction(
+            name = "Randomize",
+            description = "Randomize neuron array",
+            iconPath = "menu_icons/Rand.png"
+        ) {
+            neuronArray.randomize()
         }
         contextMenu.add(randomizeAction)
+        if (neuronArray.dataHolder is BiasedMatrixData) {
+            val randomizeBiasesAction = networkPanel.createAction(
+                name = "Randomize Biases",
+                description = "Randomize the biases of this neuron array",
+                iconPath = "menu_icons/Rand.png"
+            ) {
+                neuronArray.randomizeBiases()
+            }
+            contextMenu.add(randomizeBiasesAction)
+        }
         contextMenu.addSeparator()
         val editComponents: Action = object : AbstractAction("Edit Components...") {
             override fun actionPerformed(event: ActionEvent) {

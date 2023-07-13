@@ -193,7 +193,11 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
                 if (it is KMutableProperty<*>) {
                     val isAccessible = it.isAccessible
                     it.isAccessible = true
-                    it.setter.call(theObject, initVal)
+                    try {
+                        it.setter.call(theObject, initVal)
+                    } catch (e: IllegalArgumentException) {
+                        throw IllegalArgumentException("Error setting value for parameter $name: expected type ${it.setter.valueParameters.first().type}, got ${initVal::class.simpleName}")
+                    }
                     it.isAccessible = isAccessible
                 }
             }

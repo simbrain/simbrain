@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents2
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
@@ -17,6 +18,7 @@ import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.updater.PerformanceMonitor
@@ -88,7 +90,7 @@ class Network: CoroutineScope, EditableObject {
         showDetails = false,
         order = 0
     )
-    var connectionStrategy = AllToAll()
+    var connectionStrategy: ConnectionStrategy = AllToAll()
 
     @UserParameter(
         label = "Weight Randomizer",
@@ -97,7 +99,7 @@ class Network: CoroutineScope, EditableObject {
         showDetails = false,
         order = 10
     )
-    var weightRandomizer = UniformRealDistribution(-1.0, 1.0)
+    var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)
 
     @UserParameter(
         label = "Excitatory Randomizer",
@@ -106,7 +108,7 @@ class Network: CoroutineScope, EditableObject {
         showDetails = false,
         order = 20
     )
-    var excitatoryRandomizer = UniformRealDistribution(0.0, 1.0)
+    var excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0)
 
     @UserParameter(
         label = "Inhibitory Randomizer",
@@ -115,7 +117,7 @@ class Network: CoroutineScope, EditableObject {
         showDetails = false,
         order = 30
     )
-    var inhibitoryRandomizer = UniformRealDistribution(-1.0, 0.0)
+    var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
 
     @UserParameter(
         label = "Bias Randomizer",
@@ -124,7 +126,7 @@ class Network: CoroutineScope, EditableObject {
         showDetails = false,
         order = 40
     )
-    var biasesRandomizer = NormalDistribution(0.0, 0.01)
+    var biasesRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 0.01)
 
     /**
      * In iterations or msec.

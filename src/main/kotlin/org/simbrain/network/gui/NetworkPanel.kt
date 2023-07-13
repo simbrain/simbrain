@@ -9,6 +9,7 @@ import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.*
+import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.*
 import org.simbrain.network.groups.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
@@ -585,7 +586,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            network.connectionStrategy.connectNeurons(network, sourceNeurons, targetNeurons)
+            AllToAll().apply { percentExcitatory = 100.0 }.connectNeurons(network, sourceNeurons, targetNeurons)
         }
 
     }

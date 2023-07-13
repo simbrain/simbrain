@@ -25,7 +25,8 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
-import org.simbrain.network.trainers.trainCurrentOutputLMS
+import org.simbrain.network.trainers.applyBackprop
+import org.simbrain.network.trainers.getConnectorChain
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
@@ -764,21 +765,28 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         undoManager.redo()
     }
 
+    fun getNode(model: NetworkModel) = modelNodeMap[model]
+
 
     /**
      * Apply "hot key" based one-shot learning, which uses current activations (which may have been hand-set) to
      * train (for now) selected weight matrices.
      */
     fun applyImmediateLearning() {
-        filterScreenElements<WeightMatrixNode>().forEach {
-            it.model.let { wm ->
-                if (wm is WeightMatrix) {
-                    wm.trainCurrentOutputLMS()
-                }
-            }
-        }
-    }
+        val source = selectionManager.filterSelectedSourceModels<NeuronArray>().firstOrNull()
+        val target = selectionManager.filterSelectedModels<NeuronArray>().firstOrNull()
 
-    fun getNode(model: NetworkModel) = modelNodeMap[model]
+        if (source == null || target == null) {
+            return
+        }
+
+        if (target.targetValues == null) {
+            target.targetValues = target.activations.clone()
+        }
+
+        val connectors = getConnectorChain(source, target)
+        connectors.forEach { it.select() }
+        connectors.filterIsInstance<WeightMatrix>().applyBackprop(source.activations, target.targetValues, 0.01)
+    }
 
 }

@@ -141,6 +141,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         activationImage.addBorder()
         updateBorder()
 
+        // call once to make sure all the actions are registered
+        contextMenu
+
     }
 
     private fun updateActivationImage() {
@@ -185,7 +188,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     }
 
     private fun computeInfoText() = """
-            ${neuronArray.id}    nodes: ${neuronArray.size()}
+            ${neuronArray.id}    nodes: ${neuronArray.size()} ${if (neuronArray.targetValues != null) "T" else ""}
             mean activation: ${neuronArray.activations.toDoubleArray().average().format(4)}
             """.trimIndent()
 
@@ -226,6 +229,44 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             neuronArray.isGridMode = !neuronArray.isGridMode
         }
         contextMenu.add(switchStyle)
+        contextMenu.addSeparator()
+
+        val setTargetValues: Action = networkPanel.createAction(
+            name = "Set Target",
+            description = "Use current activation as target for immediate training",
+            keyboardShorcut = CmdOrCtrl + 'T'
+        ) {
+            neuronArray.targetValues = neuronArray.activations.clone()
+        }
+        contextMenu.add(setTargetValues)
+
+        val clearTargetValues: Action = networkPanel.createAction(
+            name = "Clear Target",
+            description = "Clear target values",
+            keyboardShorcut = Shift + CmdOrCtrl + 'T'
+        ) {
+            neuronArray.targetValues = null
+        }
+        contextMenu.add(clearTargetValues)
+
+        val applyLearning: Action = networkPanel.createAction(
+            name = "Apply Learning",
+            description = "Train source to target weights using backprop",
+            keyboardShortcut = 'L',
+            initBlock = {
+                fun updateAction() {
+                    isEnabled = networkPanel.selectionManager.selectedModels.contains(neuronArray)
+                            && neuronArray.targetValues != null
+                }
+                updateAction()
+                networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+                networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+            }
+        ) {
+            networkPanel.applyImmediateLearning()
+        }
+        contextMenu.add(applyLearning)
+
         contextMenu.addSeparator()
 
         // Randomize Action

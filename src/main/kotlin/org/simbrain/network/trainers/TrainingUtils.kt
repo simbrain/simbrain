@@ -15,6 +15,8 @@
 package org.simbrain.network.trainers
 
 import org.simbrain.network.core.ArrayLayer
+import org.simbrain.network.core.Connector
+import org.simbrain.network.core.Layer
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule
@@ -23,6 +25,7 @@ import org.simbrain.util.plusAssign
 import org.simbrain.util.sse
 import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix
+import java.util.*
 
 // TODO: Need a way to generalize across NeuronArrays and NeuronCollections
 val WeightMatrix.src get()= source as NeuronArray
@@ -140,4 +143,55 @@ fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, 
         errorVector = wm.applyBackprop(errorVector, epsilon)
     }
     return error
+}
+
+
+fun getConnectorChain(start: Layer, end: Layer): List<Connector> {
+
+    // special case for recurrent connections from a layer to itself
+    if (start === end) {
+        return listOf(start.outgoingConnectors.first { it.target === end })
+    }
+
+    fun reconstructPath(start: Layer, end: Layer, path: Map<Layer, Connector>): List<Connector> {
+        val result = mutableListOf<Connector>()
+        var currentLayer: Layer? = end
+        while (currentLayer != null && currentLayer != start) {
+            result.add(path[currentLayer]!!)
+            currentLayer = path[currentLayer]!!.source
+        }
+
+        result.reverse()
+        return result
+    }
+
+    val visited = mutableSetOf<Layer>()
+    val queue = ArrayDeque<Layer>()
+    val path = mutableMapOf<Layer, Connector>()
+
+    queue.add(start)
+
+    while (queue.isNotEmpty()) {
+        val currentLayer = queue.removeFirst()
+
+        if (currentLayer == end) {
+            // We've found the end node, so we'll now reconstruct the path.
+            return reconstructPath(start, end, path)
+        }
+
+        if (currentLayer in visited) {
+            continue
+        }
+
+        visited.add(currentLayer)
+        for (neighbor in currentLayer.outgoingConnectors) {
+            if (neighbor.target !in visited) {
+                queue.add(neighbor.target)
+                path[neighbor.target] = neighbor
+            }
+        }
+    }
+
+    // If there's no path, return an empty list.
+    return emptyList()
 }

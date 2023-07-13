@@ -9,6 +9,7 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.events.NeuronArrayEvents2;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.util.SmileUtilsKt;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.math.SimbrainMath;
@@ -39,6 +40,8 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
      */
     @UserParameter(label = "Activations", description = "Neuron activations", order = 1)
     private Matrix activations;
+
+    private Matrix targets = null;
 
     /**
      * Render an image showing each activation when true.
@@ -88,6 +91,18 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     @Producible
     public Matrix getActivations() {
         return activations;
+    }
+
+    public Matrix getTargetValues() {
+        return targets;
+    }
+
+    public void setTargetValues(Matrix targets) {
+        if (targets != null) {
+            SmileUtilsKt.validateSameShape(this.activations, targets);
+        }
+        this.targets = targets;
+        events.getUpdated().fireAndBlock();
     }
 
     @Override

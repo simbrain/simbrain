@@ -26,8 +26,8 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
+import org.simbrain.network.trainers.WeightMatrixTree
 import org.simbrain.network.trainers.applyBackprop
-import org.simbrain.network.trainers.getConnectorChain
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
@@ -774,10 +774,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      * train (for now) selected weight matrices.
      */
     fun applyImmediateLearning() {
-        val source = selectionManager.filterSelectedSourceModels<NeuronArray>().firstOrNull()
+        val sources = selectionManager.filterSelectedSourceModels<NeuronArray>()
         val target = selectionManager.filterSelectedModels<NeuronArray>().firstOrNull()
 
-        if (source == null || target == null) {
+        if (sources.isEmpty() || target == null) {
             return
         }
 
@@ -785,9 +785,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             target.targetValues = target.activations.clone()
         }
 
-        val connectors = getConnectorChain(source, target)
-        connectors.forEach { it.select() }
-        connectors.filterIsInstance<WeightMatrix>().applyBackprop(source.activations, target.targetValues, 0.01)
+        val weightMatrixTree = WeightMatrixTree(sources, target)
+        weightMatrixTree.tree.flatten().forEach { it.select() }
+        weightMatrixTree.applyBackprop(sources.map { it.activations }, target.targetValues, 0.0001)
     }
 
 }

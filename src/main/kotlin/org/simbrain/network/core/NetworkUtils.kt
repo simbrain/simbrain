@@ -11,6 +11,7 @@ import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.awt.geom.Point2D
 
 /**
@@ -123,6 +124,7 @@ fun getNetworkXStream(): XStream {
     xstream.registerConverter(NetworkModelListConverter())
     xstream.registerConverter(DoubleArrayConverter())
     xstream.registerConverter(MatrixConverter())
+    xstream.registerConverter(createConstructorCallingConverter(ProbabilityDistribution::class.java, xstream.mapper, xstream.reflectionProvider))
     return xstream
 }
 

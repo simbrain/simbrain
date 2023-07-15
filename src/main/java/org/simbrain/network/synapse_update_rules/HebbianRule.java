@@ -24,15 +24,15 @@ import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.dialogs.NetworkPreferences;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
-import org.simbrain.network.util.MatrixDataHolder;
-import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.util.UserParameter;
 import smile.math.matrix.Matrix;
 
 /**
  * <b>Hebbian</b> implements a standard Hebbian learning rule.
  */
-public class HebbianRule extends SynapseUpdateRule {
+public class HebbianRule extends SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
     @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule",
         preferenceKey = "hebbLearningRate",  increment = .1,  order = 1)
@@ -55,18 +55,17 @@ public class HebbianRule extends SynapseUpdateRule {
     }
 
     @Override
-    public void apply(Connector connector, MatrixDataHolder data) {
+    public void apply(Connector connector, EmptyMatrixData data) {
         if (connector instanceof  WeightMatrix) {
             Matrix wm = ((WeightMatrix)connector).getWeightMatrix();
             Matrix src = ((NeuronArray)connector.getSource()).getActivations();
             Matrix tar = ((NeuronArray)connector.getTarget()).getActivations();
-            // weights += Learning rate * outer-product(src,tar)
             wm.add(src.mt(tar).mul(learningRate));
         }
     }
 
     @Override
-    public void apply(Synapse synapse, ScalarDataHolder data) {
+    public void apply(Synapse synapse, EmptyScalarData data) {
         double input = synapse.getSource().getActivation();
         double output = synapse.getTarget().getActivation();
         double strength = synapse.clip(synapse.getStrength() + (learningRate * input * output));

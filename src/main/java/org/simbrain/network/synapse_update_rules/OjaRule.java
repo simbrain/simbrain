@@ -18,22 +18,26 @@
  */
 package org.simbrain.network.synapse_update_rules;
 
+import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.util.ScalarDataHolder;
+import org.simbrain.network.gui.dialogs.NetworkPreferences;
+import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.util.EmptyMatrixData;
+import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.util.UserParameter;
 
 /**
  * <b>OjaSynapse</b> is a synapse which asymptotically normalizes the sum of
  * squares of the weights attaching to a neuron to a user-defined value.
  */
-public class OjaRule extends SynapseUpdateRule {
+public class OjaRule extends SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
     /**
      * Learning rate.
      */
     @UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", increment = .1, order = 1)
-    private double learningRate;
+    private double learningRate = NetworkPreferences.INSTANCE.getDefaultLearningRate();
 
     // TODO: check description
     /**
@@ -60,14 +64,25 @@ public class OjaRule extends SynapseUpdateRule {
     }
 
     @Override
-    public void apply(Synapse synapse, ScalarDataHolder data) {
+    public void apply(Synapse synapse, EmptyScalarData data) {
 
         double input = synapse.getSource().getActivation();
         double output = synapse.getTarget().getActivation();
 
-        double strength = synapse.getStrength() + (learningRate * ((input * output) - ((output * output * synapse.getStrength()) / normalizationFactor)));
+        double strength = synapse.getStrength() +
+                (learningRate * ((input * output) - ((output * output * synapse.getStrength())
+                        / normalizationFactor)));
         synapse.setStrength(synapse.clip(strength));
     }
+
+    @Override
+    public void apply(Connector connector, EmptyMatrixData data) {
+
+        if (connector instanceof WeightMatrix) {
+            // TODO
+        }
+    }
+
 
     public double getLearningRate() {
         return learningRate;

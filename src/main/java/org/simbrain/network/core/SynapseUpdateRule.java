@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public abstract class SynapseUpdateRule implements CopyableObject {
+public abstract class SynapseUpdateRule<DS extends ScalarDataHolder, DM extends MatrixDataHolder>  implements CopyableObject {
 
     /**
      * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
@@ -76,13 +76,13 @@ public abstract class SynapseUpdateRule implements CopyableObject {
      * @param synapse a reference to a synapse with its parameters and access to source and target neurons, etc.
      * @param data a scalar data holder that can hold data that must be updated with this rule.
      */
-    public abstract void apply(Synapse synapse, ScalarDataHolder data);
+    public abstract void apply(Synapse synapse, DS data);
 
     /**
      * Override to return an appropriate data holder for a given rule.
      */
-    public ScalarDataHolder createScalarData() {
-        return DEFAULT_SCALAR_DATA;
+    public DS createScalarData() {
+        return (DS) DEFAULT_SCALAR_DATA;
     }
 
     /**
@@ -93,13 +93,13 @@ public abstract class SynapseUpdateRule implements CopyableObject {
      * @param connector reference to a weight matrix or other connector and its matrix-valued data
      * @param dataHolder a holder for mutable data used in matrix versions of an update rule
      */
-    public void apply(Connector connector, MatrixDataHolder dataHolder) {}
+    public void apply(Connector connector, DM dataHolder) {}
 
     /**
      * Override to return an appropriate data holder for a given rule.
      */
-    public MatrixDataHolder createMatrixData(int size) {
-        return DEFAULT_MATRIX_DATA;
+    public DM createMatrixData(int size) {
+        return (DM) DEFAULT_MATRIX_DATA;
     }
 
     /**

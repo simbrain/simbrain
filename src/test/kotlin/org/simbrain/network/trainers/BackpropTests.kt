@@ -122,4 +122,19 @@ class BackpropTests {
         assertEquals(0.0, targetVector sse na4.activations, .01)
     }
 
+    @Test
+    fun `test backprop on weight matrix tree`() {
+        wm1.randomize()
+        wm2.randomize()
+        na2.randomizeBiases()
+        na3.randomizeBiases()
+        val wmTree = WeightMatrixTree(listOf(na1), na3)
+        repeat(100) {
+            wmTree.applyBackprop(listOf(inputVector), targetVector, .1)
+        }
+        assertEquals(0.0, targetVector sse na3.activations, .01)
+
+    }
+
+
 }

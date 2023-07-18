@@ -1,6 +1,6 @@
 package org.simbrain.network.trainers
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.NeuronArray
@@ -101,6 +101,42 @@ class TrainingUtilsTest {
         val error = target.sub(outputs)
         // TODO: Make an actual test; this was just to recreate a crash
         ff.weightMatrix.applyLMS(error, .1)
+    }
+
+    @Test
+    fun `test connector chain`() {
+        // Should return [wm1, wm2]
+        val chain = getConnectorChain(na1, na3)
+        assertEquals(2, chain.size)
+        assertEquals(wm1, chain[0])
+        assertEquals(wm2, chain[1])
+    }
+
+    @Test
+    fun `test weight matrix tree on a simple chain`() {
+        // na1 - wm1 - na2 - wm2 - na3
+        // This is represented by [[wm1],[wm2]]
+        val wmTree = WeightMatrixTree(listOf(na1), na3)
+        assertEquals(2, wmTree.tree.size)
+        assertEquals(1, wmTree.tree[0].size)
+        assertEquals(wm1, wmTree.tree[0].first())
+        assertEquals(1, wmTree.tree[1].size)
+        assertEquals(wm2, wmTree.tree[1].first())
+    }
+
+    @Test
+    fun `test weight matrix tree with a branch`() {
+        // [[wm1, wm1_2],[wm2]]
+        val na1_2 = NeuronArray(net, 3)
+        val wm1_2 = WeightMatrix(net, na1_2, na2)
+        net.addNetworkModelsAsync(na1_2, wm1_2)
+        val wmTree = WeightMatrixTree(listOf(na1, na1_2), na3)
+        assertEquals(2, wmTree.tree.size)
+        assertEquals(2, wmTree.tree[0].size)
+        assertEquals(1, wmTree.tree[1].size)
+        assertTrue(wmTree.tree[0].contains(wm1))
+        assertTrue(wmTree.tree[0].contains(wm1_2))
+        assertTrue(wmTree.tree[1].first() == wm2)
     }
 
 }

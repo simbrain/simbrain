@@ -126,6 +126,9 @@ public final class EditMode {
      * Reset the wand cursor (must happen when its size is reset).
      */
     public void resetWandCursor() {
+        if (!isWand()) {
+            return;
+        }
         cursorImage = new BufferedImage(NetworkPreferences.INSTANCE.getWandRadius() + 1, NetworkPreferences.INSTANCE.getWandRadius() + 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) cursorImage.getGraphics();
 

@@ -89,13 +89,13 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     var editMode: EditMode = EditMode.SELECTION
         set(newEditMode) {
-            val oldEditMode = editMode
+            val oldEditMode = field
             field = newEditMode
-            if (editMode == EditMode.WAND) {
-                editMode.resetWandCursor()
+            if (newEditMode == EditMode.WAND) {
+                newEditMode.resetWandCursor()
             }
-            firePropertyChange("editMode", oldEditMode, editMode)
-            cursor = editMode.cursor
+            firePropertyChange("editMode", oldEditMode, newEditMode)
+            cursor = newEditMode.cursor
         }
 
     var showTime = true
@@ -142,6 +142,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fireAndBlock() }
 
+    /**
+     * Called when preferences are updated.
+     */
     val preferenceLoader = {
 
         canvas.background = NetworkPreferences.backgroundColor

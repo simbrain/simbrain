@@ -5,6 +5,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.LMSNetworkNode
 import org.simbrain.network.subnetworks.LMSNetwork
+import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.Trainable2
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createDialog
@@ -13,25 +14,14 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSeparator
 
+
 /**
- * Creation dialog for [LMSNetwork]
+ * Generic training dialog for supervised learning.
  */
-fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
-
-    val creator = LMSNetwork.LMSCreator(
-        network.idManager.getProposedId(LMSNetwork::class.java),
-        network.placementManager.lastClickedLocation
-    )
-    return creator.createDialog {
-        network.addNetworkModelAsync(creator.create(network))
-    }
-
-}
-
 fun Trainable2.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
-        title = "Train LMS Network"
+        title = "Train Network"
         contentPane = JPanel()
         layout = MigLayout("gap 0px 0px, ins 0")
 
@@ -58,6 +48,30 @@ fun Trainable2.getTrainingDialog(): StandardDialog {
     }
 }
 
+fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
+
+    val creator = SRNNetwork.SRNCreator(
+        network.idManager.getProposedId(SRNNetwork::class.java),
+        network.placementManager.lastClickedLocation
+    )
+    return creator.createDialog {
+        network.addNetworkModelAsync(creator.create(network))
+    }
+
+}
+
+// fun main() {
+//     val networkComponent = NetworkComponent("")
+//     val np = NetworkPanel(networkComponent)
+//     val result = with(networkComponent.network) {
+//         val lmsNet = LMSNetwork(this, 5, 5)
+//         addNetworkModelAsync(lmsNet)
+//         lmsNet
+//     }
+//     LMSNetworkNode(np,result ).propertyDialog.run { makeVisible() }
+// }
+
+
 fun main() {
     val networkComponent = NetworkComponent("")
     val np = NetworkPanel(networkComponent)
@@ -67,4 +81,20 @@ fun main() {
         lmsNet
     }
     LMSNetworkNode(np,result ).propertyDialog.run { makeVisible() }
+}
+
+
+/**
+ * Creation dialog for [LMSNetwork]
+ */
+fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
+
+    val creator = LMSNetwork.LMSCreator(
+        network.idManager.getProposedId(LMSNetwork::class.java),
+        network.placementManager.lastClickedLocation
+    )
+    return creator.createDialog {
+        network.addNetworkModelAsync(creator.create(network))
+    }
+
 }

@@ -15,7 +15,9 @@ package org.simbrain.network.trainers
 
 import org.simbrain.network.matrix.NeuronArray
 
-
+/**
+ * Interface for networks that can be trained using standard supervised learning methods.
+ */
 interface Trainable2 {
 
     val trainer: IterableTrainer2

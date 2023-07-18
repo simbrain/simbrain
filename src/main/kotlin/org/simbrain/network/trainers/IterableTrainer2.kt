@@ -17,6 +17,7 @@ import kotlinx.coroutines.withContext
 import org.simbrain.network.events.TrainerEvents2
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.LMSNetwork
+import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.rowMatrixTransposed
@@ -103,21 +104,36 @@ class LMSTrainer2(val lmsNet: LMSNetwork) : IterableTrainer2(lmsNet) {
 
 }
 
-
 class BackpropTrainer2(val bp: BackpropNetwork) : IterableTrainer2(bp) {
 
     override fun trainRow(rowNum: Int) {
-
-        // TODO: Repeated in lms
         bp.inputLayer.setActivations(bp.trainingSet.inputs.row(rowNum))
-        bp.update()
-
         val targetVec = bp.trainingSet.targets.rowMatrixTransposed(rowNum)
         error = bp.wmList.applyBackprop(bp.inputLayer.activations, targetVec)
     }
 
     override fun randomize() {
         bp.randomize()
+    }
+
+}
+
+class SRNTrainer(val srn: SRNNetwork) : IterableTrainer2(srn) {
+
+    val weightMatrixTree = WeightMatrixTree(listOf(srn.inputLayer, srn.contextLayer), srn.outputLayer)
+
+    override fun trainRow(rowNum: Int) {
+
+        srn.inputLayer.setActivations(srn.trainingSet.inputs.row(rowNum))
+        srn.update()
+
+        val targetVec = srn.trainingSet.targets.rowMatrixTransposed(rowNum)
+        error = weightMatrixTree.applyBackprop(
+            listOf(srn.inputLayer.activations, srn.contextLayer.activations), targetVec)
+    }
+
+    override fun randomize() {
+        srn.randomize()
     }
 
 }

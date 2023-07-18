@@ -183,6 +183,9 @@ fun WeightMatrixTree.applyBackprop(inputVectors: List<Matrix>, targetValues: Mat
     return error
 }
 
+/**
+ * Returns a list or chain of connectors from input (start) to output (end).
+ */
 fun getConnectorChain(start: Layer, end: Layer): List<Connector> {
 
     // special case for recurrent connections from a layer to itself

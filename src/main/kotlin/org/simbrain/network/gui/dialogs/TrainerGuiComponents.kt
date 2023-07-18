@@ -22,6 +22,9 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JProgressBar
 
+/**
+ * Controls used by Supervised learning dialogs.
+ */
 class TrainerControls(trainer: IterableTrainer2, errorText: String = "Error") : JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()

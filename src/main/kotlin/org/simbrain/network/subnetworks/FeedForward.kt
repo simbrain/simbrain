@@ -14,13 +14,12 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNeuronGroup
-import org.simbrain.util.randomize
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.geom.Point2D
 
@@ -102,10 +101,7 @@ open class FeedForward(
 
     override fun randomize() {
         wmList.forEach { wm -> wm.randomize() }
-        (layerList - inputLayer)
-            .map { it.dataHolder }
-            .filterIsInstance<BiasedMatrixData>()
-            .forEach { it.biases.randomize(randomizer)}
+        (layerList - inputLayer).forEach { it.randomizeBiases() }
     }
 
     override fun update() {

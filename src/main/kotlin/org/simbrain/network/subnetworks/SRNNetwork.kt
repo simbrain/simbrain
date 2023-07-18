@@ -16,8 +16,8 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.trainers.BackpropTrainer2
 import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.SRNTrainer
 import org.simbrain.network.trainers.Trainable2
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNeuronGroup
@@ -39,28 +39,25 @@ open class SRNNetwork(
     numHiddenNodes: Int = 10,
     numOutputNodes: Int = 10,
     initialPosition: Point2D = point(0, 0)) :
-        BackpropNetwork(network,
+        FeedForward(network,
             intArrayOf(numInputNodes, numHiddenNodes, numOutputNodes),
             initialPosition), Trainable2 {
 
-    //TODO: Extend Feed forward?
-
-    var hiddenLayer: NeuronArray = NeuronArray(network, numHiddenNodes)
+    var hiddenLayer: NeuronArray = layerList[1]
 
     var contextLayer: NeuronArray = NeuronArray(network, numHiddenNodes)
 
     override var trainingSet: MatrixDataset = MatrixDataset(numInputNodes, numOutputNodes)
 
     override val trainer by lazy {
-        BackpropTrainer2(this)
+        SRNTrainer(this)
     }
 
     init {
         label = "SRN"
 
-        hiddenLayer = NeuronArray(network, numHiddenNodes)
         contextLayer = NeuronArray(network, numHiddenNodes)
-        addModels(inputLayer, hiddenLayer, contextLayer, outputLayer)
+        addModels(contextLayer)
 
         offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH,
             (betweenLayerInterval / 2).toDouble(), 100.0, 200.0 )
@@ -69,13 +66,8 @@ open class SRNNetwork(
         offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST,
             100.0, 100.0, 200.0 )
 
-        val wmInHidden = WeightMatrix(parentNetwork, inputLayer, hiddenLayer)
-        wmInHidden.randomize()
         val wmCopy = WeightMatrix(parentNetwork, contextLayer, hiddenLayer)
-        wmInHidden.clear()
-        val wmHiddenOut = WeightMatrix(parentNetwork, hiddenLayer, outputLayer)
-        wmHiddenOut.randomize()
-        addModels(wmInHidden, wmCopy, wmHiddenOut)
+        addModels(wmCopy)
 
         setLocation(initialPosition.x, initialPosition.y)
     }
@@ -90,7 +82,7 @@ open class SRNNetwork(
         inputLayer.update()
         hiddenLayer.updateInputs()
         hiddenLayer.update()
-        contextLayer.activations = hiddenLayer.activations
+        contextLayer.activations = hiddenLayer.activations.clone()
         outputLayer.updateInputs()
         outputLayer.update()
     }

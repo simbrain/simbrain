@@ -170,8 +170,8 @@ fun WeightMatrixTree.applyBackprop(inputVectors: List<Matrix>, targetValues: Mat
     forwardPass(inputVectors)
     val error = outputWeightLayer.tar.outputs sse targetValues
 
-    tree.forEach { wms ->
-        var errorVector: Matrix = outputWeightLayer.tar.getError(targetValues)
+    var errorVector: Matrix = outputWeightLayer.tar.getError(targetValues)
+    tree.reversed().forEach { wms ->
         wms.forEach { wm ->
             val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
             errorVector.mul(deriv)

@@ -47,6 +47,8 @@ open class SRNNetwork(
 
     var contextLayer: NeuronArray = NeuronArray(network, numHiddenNodes)
 
+    val contextToHidden: WeightMatrix
+
     override var trainingSet: MatrixDataset = MatrixDataset(numInputNodes, numOutputNodes)
 
     override val trainer by lazy {
@@ -66,8 +68,8 @@ open class SRNNetwork(
         offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST,
             100.0, 100.0, 200.0 )
 
-        val wmCopy = WeightMatrix(parentNetwork, contextLayer, hiddenLayer)
-        addModels(wmCopy)
+        contextToHidden = WeightMatrix(parentNetwork, contextLayer, hiddenLayer)
+        addModels(contextToHidden)
 
         setLocation(initialPosition.x, initialPosition.y)
     }
@@ -97,6 +99,11 @@ open class SRNNetwork(
     @Consumable
     open fun addInputs(inputs: DoubleArray) {
         inputLayer.addInputs(inputs)
+    }
+
+    override fun randomize() {
+        super.randomize()
+        contextToHidden.randomize()
     }
 
     /**

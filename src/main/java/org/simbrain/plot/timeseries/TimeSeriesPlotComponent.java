@@ -78,21 +78,22 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
             }
         });
 
-        model.addPropertyChangeListener(evt -> {
-            if ("changeArrayMode".equals(evt.getPropertyName())) {
-                if (model.isArrayMode()) {
-                    // Changed from scalar to array mode
-                    // No action
-                } else {
-                    // Changed from array to scalar mode
-                    fireAttributeContainerRemoved(model);
-                }
-            } else if ("scalarTimeSeriesAdded".equals(evt.getPropertyName())) {
-                fireAttributeContainerAdded((AttributeContainer) evt.getNewValue());
-            } else if ("scalarTimeSeriesRemoved".equals(evt.getPropertyName())) {
-                fireAttributeContainerRemoved((AttributeContainer) evt.getOldValue());
+        model.getEvents().getChangeArrayMode().on(() -> {
+            // Array mode has been changed
+            if (model.isArrayMode()) {
+                // Changed from scalar to array mode
+                // No action
+            } else {
+                // Changed from array to scalar mode
+                fireAttributeContainerRemoved(model);
             }
         });
+
+        // A new scalar time series has been added
+        model.getEvents().getScalarTimeSeriesAdded().on(this::fireAttributeContainerAdded);
+
+        // A scalar time series has been removed
+        model.getEvents().getScalarTimeSeriesRemoved().on(this::fireAttributeContainerRemoved);
     }
 
     @Override

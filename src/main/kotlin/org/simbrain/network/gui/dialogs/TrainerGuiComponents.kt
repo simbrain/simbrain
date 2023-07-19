@@ -122,9 +122,9 @@ class ErrorTimeSeries(trainer: IterableTrainer2, errorText: String = "Error") : 
         model.rangeLowerBound = 0.0
         model.rangeUpperBound = 5.0
         model.isFixedWidth = true
-        model.isAutoRange = false
+        model.isAutoRange = true
+        model.fixedRangeThreshold = 5.0
         graphPanel = TimeSeriesPlotPanel(model)
-        graphPanel.updateChartSettings() // TODO
         graphPanel.chartPanel.chart.setTitle("")
         graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"
         graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = "Error"

@@ -21,17 +21,18 @@ package org.simbrain.plot.timeseries;
 import org.jetbrains.annotations.Nullable;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.simbrain.plot.TimeSeriesEvents;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
 import javax.swing.*;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -52,36 +53,38 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      */
     private transient Supplier<Integer> timeSupplier;
 
-    /**
-     * Should the range automatically change to reflect the data.
-     */
-    @UserParameter(label = "Auto Range", order = 3)
+    @UserParameter(label = "Auto Range", description = "If true, automatically adjusts the range of the time series data " +
+            "based on the maximum and minimum values present at a given time",  order = 10)
     private boolean autoRange = true;
 
     /**
-     * Upper bound of the chart range.
+     * When this is true the chart uses a fixed range, even though auto-range is on
+     * (this is true when the time series max value < fixedRangeThreshold)
      */
-    @UserParameter(label = "Range upper Bound", order = 10)
+    private boolean useFixedRangeWindow = false;
+
+    @UserParameter(label = "Fixed range threshold", description = "When the time series values fall below this " +
+            "threshold a fixed range is used. (use 0 to effectively disable this)", conditionalEnablingMethod = "usesAutoRange", order = 20)
+    private double fixedRangeThreshold = 0;
+
+    @UserParameter(label = "Range upper bound", description = "Range upper bound in fixed range mode (auto-range " +
+            "turned off)", conditionalEnablingMethod = "usesFixedRange", order = 30)
     private double rangeUpperBound = 1;
 
-    /**
-     * Lower bound of the chart range.
-     */
-    @UserParameter(label = "Range Lower Bound", order = 20)
+    @UserParameter(label = "Range lower bound", description = "Range lower bound in fixed range mode (auto-range " +
+            "turned off)", conditionalEnablingMethod = "usesFixedRange", order = 40)
     private double rangeLowerBound = 0;
 
-    /**
-     * Whether this chart if fixed width or not.
-     */
-    @UserParameter(label = "Fixed Width", description = "If set, the time series window never " +
-            "extends beyond a fixed with", useSetter = true, order = 50)
+    @UserParameter(label = "Fixed Width", description = "If true, the time series window never " +
+            "extends beyond a fixed with", useSetter = true, order = 60)
     private boolean fixedWidth = false;
 
     /**
      * Size of window when fixed width is being used.
      */
     @UserParameter(label = "Window Size", description = "Number of time points to restrict window to, " +
-            "when fixedWidth is turned on", minimumValue = 10, useSetter = true, increment = 10, order = 60)
+            "when fixedWidth is turned on", minimumValue = 10, conditionalEnablingMethod = "usesFixedWidth",
+            useSetter = true, increment = 10, order = 70)
     private int windowSize = 100;
 
     /**
@@ -95,11 +98,6 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     private List<ScalarTimeSeries> timeSeriesList = new ArrayList<ScalarTimeSeries>();
 
     /**
-     * Support for property change events.
-     */
-    private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
-    /**
      * If true, the plot is receiving an array coupling.  If false, scalar
      * couplings are being used, via {@link ScalarTimeSeries} objects. When a
      * time series is added or removed (e.g. from the GUI or a script) array
@@ -107,6 +105,8 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * created, all time series objects are removed and array mode is true.
      */
     private boolean isArrayMode = false;
+
+    private transient TimeSeriesEvents events = new TimeSeriesEvents();
 
     /**
      * Construct a time series model.
@@ -150,7 +150,9 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      */
     public void addData(int seriesIndex, double time, double value) {
         if (seriesIndex < dataset.getSeriesCount()) {
-            dataset.getSeries(seriesIndex).add(time, value);
+            var currentSeries = dataset.getSeries(seriesIndex);
+            currentSeries.add(time, value);
+            revalidateUseFixedRangeWindow(currentSeries.getMaxY());
         }
     }
 
@@ -175,7 +177,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         }
         ScalarTimeSeries sts = new ScalarTimeSeries(addXYSeries(description));
         timeSeriesList.add(sts);
-        changeSupport.firePropertyChange("scalarTimeSeriesAdded", null, sts);
+        events.getScalarTimeSeriesAdded().fireAndBlock(sts);
         return sts;
     }
 
@@ -205,6 +207,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         for (int i = 0; i < vector.length; i++) {
             dataset.getSeries(i).add(timeSupplier.get(), (Double) vector[i]);
         }
+        revalidateUseFixedRangeWindow(dataset.getRangeUpperBound(false));
     }
 
     /**
@@ -230,7 +233,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         this.isArrayMode = isArrayMode;
         dataset.removeAllSeries();
         removeAllScalarTimeSeries();
-        changeSupport.firePropertyChange("changeArrayMode", null, null);
+        events.getChangeArrayMode().fireAndBlock();
         if (isArrayMode) {
             // No action
         } else {
@@ -262,7 +265,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     public void removeAllScalarTimeSeries() {
         for (ScalarTimeSeries ts : timeSeriesList) {
             dataset.removeSeries(ts.getSeries());
-            changeSupport.firePropertyChange("scalarTimeSeriesRemoved", ts, null);
+            events.getScalarTimeSeriesRemoved().fireAndBlock(ts);
         }
         timeSeriesList.clear();
     }
@@ -275,7 +278,7 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     private void removeTimeSeries(ScalarTimeSeries ts) {
         dataset.removeSeries(ts.getSeries());
         timeSeriesList.remove(ts);
-        changeSupport.firePropertyChange("scalarTimeSeriesRemoved", ts, null);
+        events.getScalarTimeSeriesRemoved().fireAndBlock(ts);
     }
 
     /**
@@ -313,6 +316,42 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
 
     public void setAutoRange(final boolean autoRange) {
         this.autoRange = autoRange;
+    }
+
+    public boolean isUseFixedRangeWindow() {
+        return useFixedRangeWindow;
+    }
+
+    private void setUseFixedRangeWindow(final boolean disableAutoRange) {
+        var oldValue = this.useFixedRangeWindow;
+        this.useFixedRangeWindow = disableAutoRange;
+        if (oldValue != disableAutoRange) {
+            events.getPropertyChanged().fireAndBlock();
+        }
+    }
+
+    private void revalidateUseFixedRangeWindow(double maxValue) {
+        setUseFixedRangeWindow(fixedRangeThreshold != 0 && maxValue < fixedRangeThreshold);
+    }
+
+    public double getFixedRangeThreshold() {
+        return fixedRangeThreshold;
+    }
+
+    public void setFixedRangeThreshold(double fixedRangeThreshold) {
+        this.fixedRangeThreshold = fixedRangeThreshold;
+    }
+
+    public Function<Map<String, Object>, Boolean> usesFixedRange() {
+        return (map) -> !(Boolean) map.get("Auto Range");
+    }
+
+    public Function<Map<String, Object>, Boolean> usesAutoRange() {
+        return (map) -> (Boolean) map.get("Auto Range");
+    }
+
+    public Function<Map<String, Object>, Boolean> usesFixedWidth() {
+        return (map) -> (Boolean) map.get("Fixed Width");
     }
 
     public double getRangeUpperBound() {
@@ -359,18 +398,15 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private Object readResolve() {
-        changeSupport = new PropertyChangeSupport(this);
+        events = new TimeSeriesEvents();
         dataset = new XYSeriesCollection();
         timeSeriesList.forEach(ts -> dataset.addSeries(ts.series));
         return this;
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
-    }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
+    public TimeSeriesEvents getEvents() {
+        return events;
     }
 
     @Nullable
@@ -410,7 +446,10 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
         @Consumable()
         public void setValue(double value) {
             try {
-                SwingUtilities.invokeAndWait(() -> series.add(timeSupplier.get(), (Number) value));
+                SwingUtilities.invokeAndWait(() -> {
+                    series.add(timeSupplier.get(), (Number) value);
+                    revalidateUseFixedRangeWindow(series.getMaxY());
+                });
             } catch (InterruptedException | InvocationTargetException e) {
                 e.printStackTrace();
             }

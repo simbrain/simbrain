@@ -99,8 +99,11 @@ public class TimeSeriesPlotPanel extends JPanel {
         add("Center", chartPanel);
         add("South", buttonPanel);
 
+        model.getEvents().getPropertyChanged().on(this::updateChartSettings);
+
         init();
 
+        updateChartSettings();
     }
 
     /**
@@ -145,11 +148,17 @@ public class TimeSeriesPlotPanel extends JPanel {
         // No idea why this is needed, but it makes the width get updated upon closing the settings dialog
         model.setFixedWidth(model.isFixedWidth());
 
-        chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
-        if (!model.isAutoRange()) {
+        if (model.isAutoRange()) {
+            if (model.isUseFixedRangeWindow()) {
+                chart.getXYPlot().getRangeAxis().setAutoRange(false);
+                chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getFixedRangeThreshold());
+            } else {
+                chart.getXYPlot().getRangeAxis().setAutoRange(true);
+            }
+        } else {
+            chart.getXYPlot().getRangeAxis().setAutoRange(false);
             chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
         }
-        chart.getXYPlot().getDomainAxis().setAutoRange(true);
     }
 
 

@@ -62,9 +62,13 @@ abstract class IterableTrainer2(val net: Trainable2): EditableObject {
 
     suspend fun iterate() {
         iteration++
-        // TODO: Other update types
         if (updateType == UpdateMethod.STOCHASTIC) {
             trainRow(Random.nextInt(net.trainingSet.inputs.nrow()))
+        } else if (updateType == UpdateMethod.EPOCH) {
+            // TODO: Batch updating
+            for (i in 0..net.trainingSet.size) {
+                trainRow(i)
+            }
         }
         events.errorUpdated.fire(error)
     }
@@ -124,10 +128,10 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer2(srn) {
 
     override fun trainRow(rowNum: Int) {
 
+        val targetVec = srn.trainingSet.targets.rowMatrixTransposed(rowNum)
+
         srn.inputLayer.setActivations(srn.trainingSet.inputs.row(rowNum))
         srn.update()
-
-        val targetVec = srn.trainingSet.targets.rowMatrixTransposed(rowNum)
         error = weightMatrixTree.applyBackprop(
             listOf(srn.inputLayer.activations, srn.contextLayer.activations), targetVec)
     }

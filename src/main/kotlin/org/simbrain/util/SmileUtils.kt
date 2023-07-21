@@ -73,3 +73,16 @@ else sequence {
         yield(this@Matrix.get(i, 0))
     }
 }
+
+/**
+ * Returns a new matrix whose entries are shifted to the right by the indicated amount.
+ */
+fun Matrix.shiftRight(shiftAmount: Int = 1): Matrix {
+    val shiftedMatrix = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            shiftedMatrix[i,j] = this[i, (j + ncol() - shiftAmount) % ncol()]
+        }
+    }
+    return shiftedMatrix
+}

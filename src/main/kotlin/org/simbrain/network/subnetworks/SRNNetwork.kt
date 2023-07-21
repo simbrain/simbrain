@@ -19,6 +19,7 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SRNTrainer
 import org.simbrain.network.trainers.Trainable2
+import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNeuronGroup
 import org.simbrain.util.UserParameter
@@ -49,7 +50,7 @@ open class SRNNetwork(
 
     val contextToHidden: WeightMatrix
 
-    override var trainingSet: MatrixDataset = MatrixDataset(numInputNodes, numOutputNodes)
+    override var trainingSet: MatrixDataset = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
 
     override val trainer by lazy {
         SRNTrainer(this)

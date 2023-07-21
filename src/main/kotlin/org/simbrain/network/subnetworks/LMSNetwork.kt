@@ -19,6 +19,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.trainers.LMSTrainer2
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable2
+import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.geom.Point2D
@@ -39,7 +40,7 @@ class LMSNetwork(network: Network, nInputs: Int, nOutputs: Int, initialPosition:
 
     init {
         layerList.forEach { it.updateRule = LinearRule() }
-        trainingSet = MatrixDataset(nInputs, nOutputs, 5)
+        trainingSet = createDiagonalDataset(nInputs, nOutputs)
         label = "LMS"
     }
 

@@ -18,6 +18,7 @@ import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.trainers.BackpropTrainer2
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable2
+import org.simbrain.network.trainers.createDiagonalDataset
 import java.awt.geom.Point2D
 import kotlin.math.min
 
@@ -40,7 +41,7 @@ open class BackpropNetwork(network: Network, nodesPerLayer: IntArray, initialPos
         inputLayer.isClamped = true
         val nin = nodesPerLayer.first()
         val nout = nodesPerLayer.last()
-        trainingSet = MatrixDataset(nin, nout, min(nin,nout))
+        trainingSet = createDiagonalDataset(nin, nout, min(nin,nout))
         label = "Backprop"
     }
 }

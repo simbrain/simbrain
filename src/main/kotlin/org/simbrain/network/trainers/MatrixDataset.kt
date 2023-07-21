@@ -1,17 +1,14 @@
 package org.simbrain.network.trainers
 
+import org.simbrain.util.shiftRight
 import smile.math.matrix.Matrix
+import kotlin.math.min
 
 class MatrixDataset(val inputs: Matrix, val targets: Matrix) {
 
-    // TODO: Validate same rows for inputs and targets on primary constructor
-
-    constructor(nInputs: Int, nOutputs: Int, nrows: Int = 10)
-            : this(Matrix.eye(nrows+1, nInputs), Matrix.eye(nrows+1, nOutputs))
-
     init {
         if (inputs.nrow() != targets.nrow()) {
-            throw IllegalArgumentException("inputs and targets must be the same siz")
+            throw IllegalArgumentException("inputs and targets must be the same size")
         }
         if (inputs.nrow() == 0) {
             throw IllegalArgumentException("tables should not be empty")
@@ -20,4 +17,15 @@ class MatrixDataset(val inputs: Matrix, val targets: Matrix) {
 
     val size get() = inputs.nrow()
 
+}
+
+/**
+ * Creates a dataset where the inputs and targets are both diagonal matrices of appropriate sizes.
+ * A shift amount can be provided to shift the target array to the right.
+ *
+ * Provides a simple default training set
+ */
+fun createDiagonalDataset(nInputs: Int, nOutputs: Int, shiftAmount: Int = 0): MatrixDataset {
+    val nrows = min(nInputs, nOutputs)
+    return MatrixDataset(Matrix.eye(nrows+1, nInputs), Matrix.eye(nrows+1, nOutputs).shiftRight(shiftAmount))
 }

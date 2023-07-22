@@ -30,7 +30,7 @@ import org.simbrain.workspace.Producible
 import java.awt.geom.Point2D
 
 /**
- * A standard feed-forward network, as a succession of [NeuronArray] and [WeightMatrix] objects.
+ *  Implements a simple recurrent network (See, e.g, Elman 1991).
  *
  * @author Jeff Yoshimi
  */

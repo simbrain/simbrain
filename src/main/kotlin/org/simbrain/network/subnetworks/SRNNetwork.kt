@@ -62,6 +62,8 @@ open class SRNNetwork(
         contextLayer = NeuronArray(network, numHiddenNodes)
         addModels(contextLayer)
 
+        inputLayer.isClamped = true
+
         offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH,
             (betweenLayerInterval / 2).toDouble(), 100.0, 200.0 )
         offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH,
@@ -122,7 +124,7 @@ open class SRNNetwork(
         var nhidden = 5
 
         @UserParameter(label = "Number of outputs",  order = 30)
-        var nout = 4
+        var nout = 5
 
         //TODO: Node type
 

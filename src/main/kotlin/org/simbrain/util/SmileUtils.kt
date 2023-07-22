@@ -19,10 +19,11 @@ infix fun Matrix.sse(other: Matrix) = (this.toDoubleArray() sse other.toDoubleAr
 
 /**
  * Returns the matrix at a row, transposed.
+ * A common requirement because Simbrain generally assumes column vectors.
  * A minor performance improvement, but originates in an effort to work around a bug with the MKL implementation.
  */
-fun Matrix.rowMatrixTransposed(rowIndex: Int): Matrix {
-    if (rowIndex !in 0..nrow()) {
+fun Matrix.rowVectorTransposed(rowIndex: Int): Matrix {
+    if (rowIndex !in 0 until nrow()) {
         throw IllegalArgumentException("Invalid row index $rowIndex")
     }
     val ret = Matrix(ncol(),1)

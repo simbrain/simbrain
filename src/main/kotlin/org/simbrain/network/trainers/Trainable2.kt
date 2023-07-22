@@ -22,10 +22,12 @@ interface Trainable2 {
 
     val trainer: IterableTrainer2
 
-    val trainingSet: MatrixDataset
+    var trainingSet: MatrixDataset
 
     val inputLayer: NeuronArray
 
     val outputLayer: NeuronArray
+
+    fun update()
 
 }

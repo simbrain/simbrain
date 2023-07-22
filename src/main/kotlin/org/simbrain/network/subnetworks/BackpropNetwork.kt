@@ -30,7 +30,7 @@ import kotlin.math.min
 open class BackpropNetwork(network: Network, nodesPerLayer: IntArray, initialPosition: Point2D?) :
     FeedForward(network, nodesPerLayer, initialPosition), Trainable2 {
 
-    override val trainingSet: MatrixDataset
+    override lateinit var trainingSet: MatrixDataset
 
     override val trainer by lazy {
         BackpropTrainer2(this)

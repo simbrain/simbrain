@@ -20,7 +20,7 @@ import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.rowMatrixTransposed
+import org.simbrain.util.rowVectorTransposed
 import kotlin.random.Random
 
 
@@ -32,10 +32,10 @@ import kotlin.random.Random
 abstract class IterableTrainer2(val net: Trainable2): EditableObject {
 
     @UserParameter(label = "Learning Rate", order = 1)
-    val learningRate = .01
+    var learningRate = .01
 
     @UserParameter(label = "Update type", order = 1)
-    val updateType = UpdateMethod.STOCHASTIC
+    var updateType = UpdateMethod.STOCHASTIC
 
     var iteration = 0
 
@@ -66,14 +66,22 @@ abstract class IterableTrainer2(val net: Trainable2): EditableObject {
             trainRow(Random.nextInt(net.trainingSet.inputs.nrow()))
         } else if (updateType == UpdateMethod.EPOCH) {
             // TODO: Batch updating
-            for (i in 0..net.trainingSet.size) {
+            var totalError = 0.0
+            for (i in 0 until net.trainingSet.size) {
                 trainRow(i)
+                totalError += error
             }
+            error = totalError
         }
         events.errorUpdated.fire(error)
     }
 
     abstract fun trainRow(rowNum: Int)
+
+    open fun applyInputs(rowNum: Int) {
+        net.inputLayer.activations = net.trainingSet.inputs.rowVectorTransposed(rowNum)
+        net.update()
+    }
 
     abstract fun randomize()
 
@@ -92,7 +100,7 @@ class LMSTrainer2(val lmsNet: LMSNetwork) : IterableTrainer2(lmsNet) {
         if (rowNum !in 0 until lmsNet.trainingSet.inputs.nrow()) {
             throw IllegalArgumentException("Trying to train invalid row number $rowNum")
         }
-        val targetVec = lmsNet.trainingSet.targets.rowMatrixTransposed(rowNum)
+        val targetVec = lmsNet.trainingSet.targets.rowVectorTransposed(rowNum)
         lmsNet.inputLayer.isClamped = true
         lmsNet.inputLayer.setActivations(lmsNet.trainingSet.inputs.row(rowNum))
         lmsNet.update()
@@ -112,7 +120,7 @@ class BackpropTrainer2(val bp: BackpropNetwork) : IterableTrainer2(bp) {
 
     override fun trainRow(rowNum: Int) {
         bp.inputLayer.setActivations(bp.trainingSet.inputs.row(rowNum))
-        val targetVec = bp.trainingSet.targets.rowMatrixTransposed(rowNum)
+        val targetVec = bp.trainingSet.targets.rowVectorTransposed(rowNum)
         error = bp.wmList.applyBackprop(bp.inputLayer.activations, targetVec)
     }
 
@@ -126,14 +134,19 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer2(srn) {
 
     val weightMatrixTree = WeightMatrixTree(listOf(srn.inputLayer, srn.contextLayer), srn.outputLayer)
 
+    init {
+        updateType = UpdateMethod.EPOCH
+    }
+
     override fun trainRow(rowNum: Int) {
 
-        val targetVec = srn.trainingSet.targets.rowMatrixTransposed(rowNum)
+        val targetVec = srn.trainingSet.targets.rowVectorTransposed(rowNum)
+        val inputVec = srn.trainingSet.inputs.rowVectorTransposed(rowNum)
 
-        srn.inputLayer.setActivations(srn.trainingSet.inputs.row(rowNum))
+        srn.inputLayer.activations = inputVec
         srn.update()
         error = weightMatrixTree.applyBackprop(
-            listOf(srn.inputLayer.activations, srn.contextLayer.activations), targetVec)
+            listOf(inputVec, srn.contextLayer.activations), targetVec)
     }
 
     override fun randomize() {

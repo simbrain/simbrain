@@ -7,7 +7,7 @@ import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.util.rowMatrixTransposed
+import org.simbrain.util.rowVectorTransposed
 import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
@@ -92,7 +92,7 @@ class TrainingUtilsTest {
     @Test
     fun `test lms in a feed forward net`() {
         val ff = LMSNetwork(net, 5, 5)
-        val target =  ff.trainingSet.targets.rowMatrixTransposed(1)
+        val target =  ff.trainingSet.targets.rowVectorTransposed(1)
 
         ff.inputLayer.isClamped = true
         ff.inputLayer.setActivations(ff.trainingSet.inputs.row(1))

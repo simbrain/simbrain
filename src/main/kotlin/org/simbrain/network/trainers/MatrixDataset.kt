@@ -27,5 +27,5 @@ class MatrixDataset(val inputs: Matrix, val targets: Matrix) {
  */
 fun createDiagonalDataset(nInputs: Int, nOutputs: Int, shiftAmount: Int = 0): MatrixDataset {
     val nrows = min(nInputs, nOutputs)
-    return MatrixDataset(Matrix.eye(nrows+1, nInputs), Matrix.eye(nrows+1, nOutputs).shiftRight(shiftAmount))
+    return MatrixDataset(Matrix.eye(nrows, nInputs), Matrix.eye(nrows, nOutputs).shiftRight(shiftAmount))
 }

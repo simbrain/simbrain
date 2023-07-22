@@ -167,6 +167,7 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
 
     init {
         columnSelectionAllowed = true
+        rowSelectionAllowed = true
 
         if (useHeaders) {
             tableHeader = JXTableHeader(columnModel)
@@ -205,6 +206,20 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
                 }
             }
         })
+    }
+
+    fun setSelectedRow(row: Int) {
+        if (row < 0 || row >= rowCount) {
+            throw IllegalArgumentException("Invalid row index $row")
+        }
+        selectAll()
+        setRowSelectionInterval(row, row)
+    }
+
+    fun incrementSelectedRow() {
+        // if none selected, select first row (because selectedRow returns -1 in that case)
+        val nextRow = (selectedRow + 1) % rowCount
+        selectedRow = nextRow
     }
 
     override fun isCellEditable(row: Int, column: Int): Boolean {

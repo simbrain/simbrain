@@ -3,13 +3,16 @@ package org.simbrain.network.gui.dialogs
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.nodes.LMSNetworkNode
+import org.simbrain.network.gui.nodes.SRNNode
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
+import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable2
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.createAction
 import org.simbrain.util.createDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.table.MatrixDataWrapper
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSeparator
@@ -28,6 +31,14 @@ fun Trainable2.getTrainingDialog(): StandardDialog {
         val trainerProps = AnnotatedPropertyEditor(trainer)
         val trainerControls = TrainerControls(trainer)
         val inputs = MatrixEditor(trainingSet.inputs)
+        inputs.toolbar.add(createAction(
+            name = "Apply Inputs",
+            description = "select the current row, apply that input to network, and iterate the network to see what the output is",
+            iconPath = "menu_icons/Step.png",
+        ) {
+            inputs.table.incrementSelectedRow()
+            trainer.applyInputs(inputs.table.selectedRow)
+        })
         val targets = MatrixEditor(trainingSet.targets)
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
 
@@ -45,6 +56,11 @@ fun Trainable2.getTrainingDialog(): StandardDialog {
         contentPane.add(targets, "wrap")
         contentPane.add(JLabel("Add / Remove rows:"), "split 2")
         contentPane.add(addRemoveRows)
+
+        addClosingTask {
+            trainerProps.commitChanges()
+            trainingSet = MatrixDataset((inputs.table.model as MatrixDataWrapper).data, (targets.table.model as MatrixDataWrapper).data)
+        }
     }
 }
 
@@ -76,11 +92,11 @@ fun main() {
     val networkComponent = NetworkComponent("")
     val np = NetworkPanel(networkComponent)
     val result = with(networkComponent.network) {
-        val lmsNet = LMSNetwork(this, 5, 5)
-        addNetworkModelAsync(lmsNet)
-        lmsNet
+        val srnNetwork = SRNNetwork(this, 5, 5)
+        addNetworkModelAsync(srnNetwork)
+        srnNetwork
     }
-    LMSNetworkNode(np,result ).propertyDialog.run { makeVisible() }
+    SRNNode(np,result ).propertyDialog.run { makeVisible() }
 }
 
 

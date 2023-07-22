@@ -32,7 +32,7 @@ import java.awt.geom.Point2D
 class LMSNetwork(network: Network, nInputs: Int, nOutputs: Int, initialPosition: Point2D? = null) :
     FeedForward(network, intArrayOf(nInputs, nOutputs), initialPosition), Trainable2 {
 
-    override val trainingSet: MatrixDataset
+    override lateinit var trainingSet: MatrixDataset
 
     override val trainer by lazy {
         LMSTrainer2(this)

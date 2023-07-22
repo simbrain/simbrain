@@ -329,7 +329,7 @@ public class SubnetworkNode extends ScreenElement {
 
         @Override
         public JPopupMenu getContextMenu() {
-            return contextMenu;
+            return SubnetworkNode.this.getContextMenu();
         }
 
         @Override

@@ -27,7 +27,7 @@ class SmileUtilsTest {
 
     @Test
     fun `test row matrix transposed`() {
-        val rmt = testMatrix.rowMatrixTransposed(1)
+        val rmt = testMatrix.rowVectorTransposed(1)
         assertEquals(3, rmt.nrow())
         assertEquals(1, rmt.ncol())
     }

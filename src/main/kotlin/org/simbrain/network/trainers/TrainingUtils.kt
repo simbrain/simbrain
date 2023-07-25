@@ -169,7 +169,6 @@ fun WeightMatrixTree.applyBackprop(inputVectors: List<Matrix>, targetValues: Mat
 
     forwardPass(inputVectors)
     val error = outputWeightLayer.tar.outputs sse targetValues
-
     var errorVector: Matrix = outputWeightLayer.tar.getError(targetValues)
     tree.reversed().forEach { wms ->
         wms.forEach { wm ->

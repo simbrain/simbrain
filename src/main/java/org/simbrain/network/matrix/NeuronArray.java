@@ -197,12 +197,17 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
         getEvents().getUpdated().fireAndForget();
     }
 
-
     public void setActivations(Matrix newActivations) {
         activations = newActivations;
         getEvents().getUpdated().fireAndForget();
     }
 
+    /**
+     * Set activations to the provided Smile matrix object.
+     *
+     * Note: Pass by reference, in part because we are often passing in copies anyway. Any changes made to
+     * newActivations outside this method will affect activations.
+     */
     public void setActivations(double[] newActivations) {
         setActivations(Matrix.column(newActivations));
     }

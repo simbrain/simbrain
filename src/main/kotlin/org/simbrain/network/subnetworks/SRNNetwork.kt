@@ -20,6 +20,7 @@ import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SRNTrainer
 import org.simbrain.network.trainers.Trainable2
 import org.simbrain.network.trainers.createDiagonalDataset
+import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNeuronGroup
 import org.simbrain.util.UserParameter
@@ -63,6 +64,9 @@ open class SRNNetwork(
         addModels(contextLayer)
 
         inputLayer.isClamped = true
+        contextLayer.isClamped = true
+
+        outputLayer.updateRule = SigmoidalRule()
 
         offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH,
             (betweenLayerInterval / 2).toDouble(), 100.0, 200.0 )
@@ -72,6 +76,7 @@ open class SRNNetwork(
             100.0, 100.0, 200.0 )
 
         contextToHidden = WeightMatrix(parentNetwork, contextLayer, hiddenLayer)
+        contextToHidden.randomize()
         addModels(contextToHidden)
 
         setLocation(initialPosition.x, initialPosition.y)
@@ -90,6 +95,8 @@ open class SRNNetwork(
         contextLayer.activations = hiddenLayer.activations.clone()
         outputLayer.updateInputs()
         outputLayer.update()
+        wmList.forEach { it.update() }
+        contextToHidden.update()
     }
 
     // Forwarded from output layer

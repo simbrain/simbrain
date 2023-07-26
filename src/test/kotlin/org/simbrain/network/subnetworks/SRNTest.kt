@@ -15,14 +15,14 @@ class SRNTest {
 
     @Test
     fun `test`() {
+        srn.randomize()
         srn.update()
         print(srn.outputLayer.activations)
+        srn.trainer.learningRate = 0.01
         runBlocking {
-            repeat(1000) {
-                srn.trainer.iterate()
-            }
+            srn.trainer.iterate(5000)
         }
-        srn.inputLayer.setActivations(doubleArrayOf(1.0, 0.0, 0.0))
+        srn.inputLayer.setActivations(DoubleArray(3) { 0.0 }.also { it[0] = 1.0 })
         srn.update()
         // Expecting 0,1,0
         print(srn.outputLayer.activations)

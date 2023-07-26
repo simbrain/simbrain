@@ -60,6 +60,12 @@ abstract class IterableTrainer2(val net: Trainable2): EditableObject {
         events.endTraining.fireAndForget()
     }
 
+    suspend fun iterate(iterations: Int) {
+        repeat(iterations) {
+            iterate()
+        }
+    }
+
     suspend fun iterate() {
         iteration++
         if (updateType == UpdateMethod.STOCHASTIC) {
@@ -146,7 +152,11 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer2(srn) {
         srn.inputLayer.activations = inputVec
         srn.update()
         error = weightMatrixTree.applyBackprop(
-            listOf(inputVec, srn.contextLayer.activations), targetVec)
+            listOf(),
+            targetVec,
+            epsilon = learningRate,
+            forwardPass = false
+        )
     }
 
     override fun randomize() {

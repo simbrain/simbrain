@@ -162,20 +162,24 @@ fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, 
  *
  * Weight matrices are updated one “weight layer” at a time. See [WeightMatrixTree] for more information.
  */
-fun WeightMatrixTree.applyBackprop(inputVectors: List<Matrix>, targetValues: Matrix, epsilon: Double = .0001): Double  {
-    if (inputVectors.size != inputWeightLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
+fun WeightMatrixTree.applyBackprop(inputVectors: List<Matrix>, targetValues: Matrix, epsilon: Double = .0001, forwardPass: Boolean = true): Double  {
+    if (forwardPass && inputVectors.size != inputWeightLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputVectors.zip(inputWeightLayers).forEach { (a, b) -> a.validateSameShape(b.src.inputs) }
     targetValues.validateSameShape(outputWeightLayer.tar.outputs)
 
-    forwardPass(inputVectors)
+    if (forwardPass) {
+        forwardPass(inputVectors)
+    }
     val error = outputWeightLayer.tar.outputs sse targetValues
-    var errorVector: Matrix = outputWeightLayer.tar.getError(targetValues)
+    var errorVectors: Map<NeuronArray, Matrix> = mapOf(outputWeightLayer.tar to outputWeightLayer.tar.getError(targetValues))
     tree.reversed().forEach { wms ->
-        wms.forEach { wm ->
+        errorVectors = wms.associate { wm ->
+            val tar = wm.tar
+            val errorVector = errorVectors[tar]!!
             val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
             errorVector.mul(deriv)
             wm.tar.updateBiases(errorVector, epsilon)
-            errorVector = wm.applyBackprop(errorVector, epsilon)
+            wm.src to wm.applyBackprop(errorVector, epsilon)
         }
 
     }

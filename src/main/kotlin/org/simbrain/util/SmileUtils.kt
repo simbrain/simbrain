@@ -87,3 +87,22 @@ fun Matrix.shiftRight(shiftAmount: Int = 1): Matrix {
     }
     return shiftedMatrix
 }
+
+
+/**
+ * Element-wise multiplication that broadcasts across columns.
+ *
+ * Assumes vector is a column vector and that it has as many rows as the matrix.
+ */
+fun Matrix.broadcastMultiplication(vector: Matrix): Matrix {
+    if (nrow() != vector.nrow() || vector.ncol() != 1) {
+        throw IllegalArgumentException("Size of vector does not match number of rows in matrix or vector has more than one column.")
+    }
+    val result = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            result[i, j] = this[i, j] * vector[i, 0]
+        }
+    }
+    return result
+}

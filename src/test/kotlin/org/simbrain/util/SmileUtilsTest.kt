@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -30,5 +31,13 @@ class SmileUtilsTest {
         val rmt = testMatrix.rowVectorTransposed(1)
         assertEquals(3, rmt.nrow())
         assertEquals(1, rmt.ncol())
+    }
+
+    @Test
+    fun `test broadcasting multiplication`() {
+        val vector = doubleArrayOf(0.0, 1.0, 2.0).toMatrix()
+        assertArrayEquals(doubleArrayOf(0.0, 4.0, 14.0), testMatrix.broadcastMultiplication(vector).col(0))
+        assertArrayEquals(doubleArrayOf(0.0, 5.0, 16.0), testMatrix.broadcastMultiplication(vector).col(1))
+        assertArrayEquals(doubleArrayOf(0.0, 6.0, 18.0), testMatrix.broadcastMultiplication(vector).col(2))
     }
 }

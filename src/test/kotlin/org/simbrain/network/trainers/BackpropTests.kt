@@ -85,7 +85,8 @@ class BackpropTests {
         na2.randomizeBiases()
         na3.randomizeBiases()
         repeat(100) {
-            listOf(wm1, wm2).applyBackprop(inputVector, targetVector, .1)
+            listOf(wm1, wm2).forwardPass(inputVector)
+            listOf(wm1, wm2).backpropError(targetVector, .1)
             // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
         }
         println("Outputs: ${na3.activations}, SSE = ${targetVector sse na3.activations}")
@@ -103,7 +104,8 @@ class BackpropTests {
         wm1.randomize()
         na2.randomizeBiases()
         repeat(100) {
-            listOf(wm1).applyBackprop(inputVector, targetVector, .1)
+            listOf(wm1).forwardPass(inputVector)
+            listOf(wm1).backpropError(targetVector, .1)
         }
         println("Outputs: ${na2.activations}, SSE = ${targetVector sse na2.activations}")
         assertEquals(0.0, targetVector sse na2.activations, .01)
@@ -115,7 +117,8 @@ class BackpropTests {
         val wm3 = WeightMatrix(net, na3, na4)
         net.addNetworkModelsAsync(wm3, na4)
         repeat(100) {
-            listOf(wm1, wm2, wm3).applyBackprop(inputVector, targetVector, .1)
+            listOf(wm1, wm2, wm3).forwardPass(inputVector)
+            listOf(wm1, wm2, wm3).backpropError(targetVector, .1)
             // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
         }
         println("Outputs: ${na4.activations}, SSE = ${targetVector sse na4.activations}")
@@ -130,7 +133,8 @@ class BackpropTests {
         na3.randomizeBiases()
         val wmTree = WeightMatrixTree(listOf(na1), na3)
         repeat(100) {
-            wmTree.applyBackprop(listOf(inputVector), targetVector, .1)
+            wmTree.forwardPass(listOf(inputVector))
+            wmTree.backpropError(targetVector, .1)
         }
         assertEquals(0.0, targetVector sse na3.activations, .01)
 

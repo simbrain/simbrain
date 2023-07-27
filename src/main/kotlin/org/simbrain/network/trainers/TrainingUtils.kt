@@ -70,7 +70,7 @@ fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
 /**
  * Backpropagate the provided errors through this weight matrix, and return the new error.
  */
-fun WeightMatrix.applyBackprop(layerError: Matrix, epsilon: Double = .1): Matrix {
+fun WeightMatrix.backpropError(layerError: Matrix, epsilon: Double = .1): Matrix {
     layerError.validateSameShape(target.outputs)
     val weightDeltas = layerError.mm(source.outputs.transpose())
     weightMatrix.add(weightDeltas.mul(epsilon))
@@ -114,6 +114,7 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
  * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
  */
 fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
+    inputVector.validateSameShape(first().src.inputs)
     first().src.activations = inputVector
     for (wm in this) {
         wm.target.updateInputs()
@@ -121,27 +122,14 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
     }
 }
 
-fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
-    inputWeightLayers.zip(inputVectors).forEach { (wm, iv) -> wm.src.activations = iv }
-    val allNeuronArrays = LinkedHashSet(tree.flatMap { it.map { it.target } })
-
-    allNeuronArrays.forEach {
-        it.updateInputs()
-        it.update()
-    }
-}
-
-
 /**
  * Apply backprop algorithm to this list of matrices, for the provided input/target pair. Assumes weight matrices are
  * stored in a sequence from input to output layers
  */
-fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, epsilon: Double = .1): Double  {
+fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1): Double  {
 
-    inputVector.validateSameShape(first().src.inputs)
     targetValues.validateSameShape(last().tar.outputs)
 
-    forwardPass(inputVector)
     val error = last().tar.outputs sse targetValues
 
     // printActivationsAndWeights()
@@ -151,9 +139,22 @@ fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, 
         val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
         errorVector.mul(deriv)
         wm.tar.updateBiases(errorVector, epsilon)
-        errorVector = wm.applyBackprop(errorVector, epsilon)
+        errorVector = wm.backpropError(errorVector, epsilon)
     }
     return error
+}
+
+fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
+    if (inputVectors.size != inputWeightLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
+    inputVectors.zip(inputWeightLayers).forEach { (a, b) -> a.validateSameShape(b.src.inputs) }
+
+    inputWeightLayers.zip(inputVectors).forEach { (wm, iv) -> wm.src.activations = iv }
+    val allNeuronArrays = LinkedHashSet(tree.flatMap { it.map { it.target } })
+
+    allNeuronArrays.forEach {
+        it.updateInputs()
+        it.update()
+    }
 }
 
 /**
@@ -162,16 +163,13 @@ fun List<WeightMatrix>.applyBackprop(inputVector: Matrix, targetValues: Matrix, 
  *
  * Weight matrices are updated one “weight layer” at a time. See [WeightMatrixTree] for more information.
  */
-fun WeightMatrixTree.applyBackprop(inputVectors: List<Matrix>, targetValues: Matrix, epsilon: Double = .0001, forwardPass: Boolean = true): Double  {
-    if (forwardPass && inputVectors.size != inputWeightLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
-    inputVectors.zip(inputWeightLayers).forEach { (a, b) -> a.validateSameShape(b.src.inputs) }
+fun WeightMatrixTree.backpropError(targetValues: Matrix, epsilon: Double = .0001): Double  {
+
     targetValues.validateSameShape(outputWeightLayer.tar.outputs)
 
-    if (forwardPass) {
-        forwardPass(inputVectors)
-    }
     val error = outputWeightLayer.tar.outputs sse targetValues
     var errorVectors: Map<NeuronArray, Matrix> = mapOf(outputWeightLayer.tar to outputWeightLayer.tar.getError(targetValues))
+    // TODO: Creating a map every iteration is a potential performance drain.
     tree.reversed().forEach { wms ->
         errorVectors = wms.associate { wm ->
             val tar = wm.tar
@@ -179,7 +177,7 @@ fun WeightMatrixTree.applyBackprop(inputVectors: List<Matrix>, targetValues: Mat
             val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
             errorVector.mul(deriv)
             wm.tar.updateBiases(errorVector, epsilon)
-            wm.src to wm.applyBackprop(errorVector, epsilon)
+            wm.src to wm.backpropError(errorVector, epsilon)
         }
 
     }

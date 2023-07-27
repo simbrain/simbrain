@@ -127,7 +127,8 @@ class BackpropTrainer2(val bp: BackpropNetwork) : IterableTrainer2(bp) {
     override fun trainRow(rowNum: Int) {
         bp.inputLayer.setActivations(bp.trainingSet.inputs.row(rowNum))
         val targetVec = bp.trainingSet.targets.rowVectorTransposed(rowNum)
-        error = bp.wmList.applyBackprop(bp.inputLayer.activations, targetVec)
+        bp.wmList.forwardPass(bp.inputLayer.activations)
+        error = bp.wmList.backpropError(targetVec)
     }
 
     override fun randomize() {
@@ -151,12 +152,7 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer2(srn) {
 
         srn.inputLayer.activations = inputVec
         srn.update()
-        error = weightMatrixTree.applyBackprop(
-            listOf(),
-            targetVec,
-            epsilon = learningRate,
-            forwardPass = false
-        )
+        error = weightMatrixTree.backpropError(targetVec, epsilon = learningRate)
     }
 
     override fun randomize() {

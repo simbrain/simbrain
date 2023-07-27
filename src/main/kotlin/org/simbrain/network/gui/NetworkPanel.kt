@@ -27,7 +27,8 @@ import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.WeightMatrixTree
-import org.simbrain.network.trainers.applyBackprop
+import org.simbrain.network.trainers.backpropError
+import org.simbrain.network.trainers.forwardPass
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.complement
 import org.simbrain.util.genericframe.GenericJDialog
@@ -790,7 +791,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
         val weightMatrixTree = WeightMatrixTree(sources, target)
         weightMatrixTree.tree.flatten().forEach { it.select() }
-        weightMatrixTree.applyBackprop(sources.map { it.activations }, target.targetValues, 0.0001)
+        weightMatrixTree.forwardPass(sources.map { it.activations })
+        weightMatrixTree.backpropError(target.targetValues, 0.0001)
     }
 
 }

@@ -126,7 +126,11 @@ fun <T : Any> createConstructorCallingConverter(
         }
 
         override fun canConvert(type: Class<*>?): Boolean {
-            return super.canConvert(type) || type?.kotlin?.isSubclassOf(clazz.kotlin) == true
+            return super.canConvert(type) || try {
+                type?.kotlin?.isSubclassOf(clazz.kotlin) == true
+            } catch (e: Error) {
+                false
+            }
         }
     }
 }

@@ -54,6 +54,9 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
             order = 10)
     private boolean gridMode = false;
 
+    @UserParameter(label = "Biases Visible", useSetter = true, description = "If true, show biases.", order = 11)
+    private boolean showBias = false;
+
     private transient NeuronArrayEvents2 events = new NeuronArrayEvents2();
 
     /**
@@ -278,11 +281,20 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
 
     public void setGridMode(boolean gridMode) {
         this.gridMode = gridMode;
-        getEvents().getGridModeChanged().fireAndBlock();
+        getEvents().getVisualPropertiesChanged().fireAndBlock();
     }
 
     public boolean isGridMode() {
         return gridMode;
+    }
+
+    public boolean isShowBias() {
+        return showBias;
+    }
+
+    public void setShowBias(boolean showBias) {
+        this.showBias = showBias;
+        getEvents().getVisualPropertiesChanged().fireAndBlock();
     }
 
     /**

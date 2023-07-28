@@ -13,7 +13,6 @@ import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.matrix.ZoeConnector;
 import org.simbrain.util.ImageKt;
-import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.table.BasicDataWrapperKt;
@@ -169,30 +168,8 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         contextMenu.add(getNetworkPanel().getNetworkActions().getDeleteAction());
 
         contextMenu.addSeparator();
-        Action randomizeAction = new AbstractAction("Randomize") {
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Rand.png"));
-                putValue(SHORT_DESCRIPTION, "Randomize neuron array");
-            }
-
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                weightMatrix.randomize();
-            }
-        };
+        Action randomizeAction = networkPanel.getNetworkActions().getRandomizeObjectsAction();
         contextMenu.add(randomizeAction);
-
-        Action clearAction = new AbstractAction("Clear") {
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
-                putValue(SHORT_DESCRIPTION, "Clear neuron array");
-            }
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                weightMatrix.clear();
-            }
-        };
-        contextMenu.add(clearAction);
 
         Action diagAction = new AbstractAction("Diagonalize") {
             {
@@ -201,10 +178,9 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
             }
             @Override
             public void actionPerformed(final ActionEvent event) {
-                // TODO: Clean up instanceof checks and casts
-                if (weightMatrix instanceof WeightMatrix) {
-                    ((WeightMatrix) weightMatrix).diagonalize();
-                }
+                networkPanel.getSelectionManager()
+                        .filterSelectedModels(WeightMatrix.class)
+                        .forEach(WeightMatrix::diagonalize);
             }
         };
         contextMenu.add(diagAction);

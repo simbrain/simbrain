@@ -251,8 +251,7 @@ public class WeightMatrix extends Connector {
     }
 
     @Override
-    public void
-    randomize() {
+    public void randomize() {
         weightMatrix = Matrix.rand(getTarget().inputSize(), getSource().outputSize(),
                 new GaussianDistribution(0, 1));
         getEvents().getUpdated().fireAndForget();

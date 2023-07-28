@@ -130,10 +130,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         // TODO: fixed events type on override
         val events = neuronArray.events as NeuronArrayEvents2
 
-        events.gridModeChanged.on {
+        events.visualPropertiesChanged.on {
             gridMode = neuronArray.isGridMode
+            showBias = neuronArray.isShowBias
         }
         gridMode = neuronArray.isGridMode
+        showBias = neuronArray.isShowBias
 
         // TODO: Link to network preferences
         labelBackground.paint = Color.white
@@ -263,14 +265,18 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             iconPath = "menu_icons/grid.png",
             description = "Toggle line / grid style"
         ) {
-            neuronArray.isGridMode = !neuronArray.isGridMode
+            networkPanel.selectionManager
+                .filterSelectedModels<NeuronArray>()
+                .forEach { it.isGridMode = !it.isGridMode }
         }
         contextMenu.add(switchStyle)
         val toggleShowBias: Action = networkPanel.createAction(
             name = "Toggle bias visibility",
             description = "Toggle whether biases are visible"
         ) {
-            showBias = !showBias
+            networkPanel.selectionManager
+                .filterSelectedModels<NeuronArray>()
+                .forEach { it.isShowBias = !it.isShowBias }
         }
         contextMenu.add(toggleShowBias)
         contextMenu.addSeparator()
@@ -314,13 +320,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         contextMenu.addSeparator()
 
         // Randomize Action
-        val randomizeAction = networkPanel.createAction(
-            name = "Randomize",
-            description = "Randomize neuron array",
-            iconPath = "menu_icons/Rand.png"
-        ) {
-            neuronArray.randomize()
-        }
+        val randomizeAction = networkPanel.networkActions.randomizeObjectsAction
+
         contextMenu.add(randomizeAction)
         if (neuronArray.dataHolder is BiasedMatrixData) {
             val randomizeBiasesAction = networkPanel.createAction(
@@ -328,7 +329,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 description = "Randomize the biases of this neuron array",
                 iconPath = "menu_icons/Rand.png"
             ) {
-                neuronArray.randomizeBiases()
+                networkPanel.selectionManager
+                    .filterSelectedModels<NeuronArray>()
+                    .forEach { it.randomizeBiases() }
             }
             contextMenu.add(randomizeBiasesAction)
         }

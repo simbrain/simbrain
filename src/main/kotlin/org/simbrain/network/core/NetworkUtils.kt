@@ -289,6 +289,7 @@ fun NeuronArray.randomizeBiases() {
             for (i in 0 until it.biases.nrow()) {
                 it.biases.set(i, 0, network.biasesRandomizer.sampleDouble())
             }
+            events.updated.fireAndBlock()
         }
     }
 }

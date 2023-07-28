@@ -88,13 +88,14 @@ class HebbTest {
         na1.activations = inputs
         na2.activations = outputs
         net.update()
-        // Expecting [[2,1],[6,3]]
-        assertArrayEquals(doubleArrayOf(2.0,1.0), wm12.weightMatrix.row(0))
-        assertArrayEquals(doubleArrayOf(6.0,3.0), wm12.weightMatrix.row(1))
+        // Weights start at 0
+        // Expecting [[2,6],[1,3]]
+        assertArrayEquals(doubleArrayOf(2.0,6.0), wm12.weightMatrix.row(0))
+        assertArrayEquals(doubleArrayOf(1.0,3.0), wm12.weightMatrix.row(1))
         net.update()
-        // Expecting [[4,2],[12,6]]
-        assertArrayEquals(doubleArrayOf(4.0,2.0), wm12.weightMatrix.row(0))
-        assertArrayEquals(doubleArrayOf(12.0,6.0), wm12.weightMatrix.row(1))
+        // Expecting [[4,12],[2,6]]
+        assertArrayEquals(doubleArrayOf(4.0,12.0), wm12.weightMatrix.row(0))
+        assertArrayEquals(doubleArrayOf(2.0,6.0), wm12.weightMatrix.row(1))
     }
 
     @Test
@@ -105,22 +106,32 @@ class HebbTest {
         na2.activations = outputs
         (wm12.prototypeRule as HebbianRule).learningRate = .1
         net.update()
-        // Expecting [[.2,.1],[.6,.3]]
-        assertArrayEquals(doubleArrayOf(.2,.1), wm12.weightMatrix.row(0), .01)
-        assertArrayEquals(doubleArrayOf(.6,.3), wm12.weightMatrix.row(1), .01)
+        // Expecting [[.2,.6],[.1,.3]]
+        assertArrayEquals(doubleArrayOf(.2,.6), wm12.weightMatrix.row(0), .01)
+        assertArrayEquals(doubleArrayOf(.1,.3), wm12.weightMatrix.row(1), .01)
     }
 
     @Test
-    fun `test vectorized rule for 2-to-3 case`() {
-        val inputs = doubleArrayOf(1.0,3.0).toMatrix()
-        val outputs = doubleArrayOf(2.0,1.0).toMatrix()
-        na1.activations = inputs
+    fun `test vectorized rule for 3-to-2 case`() {
+        val inputs = doubleArrayOf(2.0, 0.0, -1.0).toMatrix()
+        val outputs = doubleArrayOf(.5, -.5).toMatrix()
+        val na1_v2 = NeuronArray(net, 3)
+        val wm_v2 = WeightMatrix(net, na1_v2, na2).apply {
+            prototypeRule = HebbianRule().apply {
+                learningRate = 1.0
+            }
+        }
+        wm_v2.hardClear()
+        net.addNetworkModelsAsync(na1_v2, wm_v2)
+        na1_v2.isClamped = true
+        na1_v2.activations = inputs
         na2.activations = outputs
-        (wm12.prototypeRule as HebbianRule).learningRate = .1
         net.update()
-        // Expecting [[.2,.1],[.6,.3]]
-        assertArrayEquals(doubleArrayOf(.2,.1), wm12.weightMatrix.row(0), .01)
-        assertArrayEquals(doubleArrayOf(.6,.3), wm12.weightMatrix.row(1), .01)
+        // Expecting [[1.0, 0.0, -.5],[-1.0, 0.0, .5]]
+        print(wm_v2.weightMatrix)
+        assertArrayEquals(doubleArrayOf(1.0, 0.0, -.5), wm_v2.weightMatrix.row(0), .01)
+        assertArrayEquals(doubleArrayOf(-1.0, 0.0, .5), wm_v2.weightMatrix.row(1), .01)
     }
 
 }
+

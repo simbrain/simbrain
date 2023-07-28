@@ -44,6 +44,7 @@ fun Trainable2.getTrainingDialog(): StandardDialog {
 
         trainer.events.beginTraining.on {
             trainerProps.commitChanges()
+            trainingSet = MatrixDataset((inputs.table.model as MatrixDataWrapper).data, (targets.table.model as MatrixDataWrapper).data)
         }
 
         contentPane.add(trainerProps, "span, wrap")

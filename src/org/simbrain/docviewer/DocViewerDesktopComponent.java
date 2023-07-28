@@ -113,7 +113,7 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
                         br = new BufferedReader(new InputStreamReader(fis,
                                 Charset.forName("UTF-8")));
                         htmlEditor.read(br, null);
-                        textArea.setText(htmlEditor.getText().replaceAll("file:", "file:" + System.getProperty("user.dir") + "/"));
+                        textArea.setText(htmlEditor.getText().replaceAll("file:", "file:" + fixedUserDir() + "/"));
                         DocViewerDesktopComponent.this.getWorkspaceComponent()
                                 .setText(htmlEditor.getText());
                         htmlEditor.setCaretPosition(0);
@@ -140,7 +140,7 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
         textArea.setContentType("text/html");
         textArea.setEditable(false);
         textArea.setText(((DocViewerComponent) this.getWorkspaceComponent())
-                .getText().replaceAll("file:", "file:" + System.getProperty("user.dir") + "/"));
+                .getText().replaceAll("file:", "file:" + fixedUserDir() + "/"));
 
         final JScrollPane sp = new JScrollPane(textArea);
 
@@ -168,7 +168,7 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
                 int index = sourceTabbedPane.getSelectedIndex();
                 // Assumes index of view tab is 0
                 if (index == 0) {
-                    textArea.setText(htmlEditor.getText().replaceAll("file:", "file:" + System.getProperty("user.dir") + "/"));
+                    textArea.setText(htmlEditor.getText().replaceAll("file:", "file:" + fixedUserDir() + "/"));
                     DocViewerDesktopComponent.this.getWorkspaceComponent()
                             .setText(htmlEditor.getText());
                 }
@@ -236,5 +236,9 @@ public class DocViewerDesktopComponent extends GuiComponent<DocViewerComponent> 
 
     @Override
     protected void update() {
+    }
+
+    private static String fixedUserDir() {
+        return System.getProperty("user.dir").replaceAll("\\\\", "\\\\\\\\");
     }
 }

@@ -12,7 +12,7 @@ import org.simbrain.workspace.Producible;
 import smile.math.matrix.Matrix;
 import smile.stat.distribution.GaussianDistribution;
 
-import java.util.Arrays;
+import static org.simbrain.util.SmileUtilsKt.flatten;
 
 /**
  * A dense weight matrix that connects a source and target {@link Layer} object. A default way of linking arbitrary
@@ -109,9 +109,7 @@ public class WeightMatrix extends Connector {
 
     @Producible
     public double[] getWeights() {
-        return Arrays.stream(weightMatrix.toArray())
-                .flatMapToDouble(Arrays::stream)
-                .toArray();
+        return flatten(weightMatrix);
     }
 
     /**

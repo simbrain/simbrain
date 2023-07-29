@@ -1,5 +1,7 @@
 package org.simbrain.util
 
+import org.simbrain.plot.histogram.HistogramModel
+import org.simbrain.plot.histogram.HistogramPanel
 import smile.math.matrix.Matrix
 
 /**
@@ -105,4 +107,19 @@ fun Matrix.broadcastMultiplication(vector: Matrix): Matrix {
         }
     }
     return result
+}
+
+fun Matrix.flatten(): DoubleArray = flattenArray(toArray())
+
+/**
+ * Display a histogram for the (flattened) matrix.
+ * Returns an updater function so that the histogram can be updated when the matrix changes.  That function takes a
+ * matrix as an argument in case the matrix to be rendered changes (example: randomizing a weight matrix create a new matrix).
+ */
+@JvmOverloads
+fun Matrix.showHistogram(title: String = "Show Histogram", label: String = ""): (Matrix) -> Unit {
+    val histogramPanel = HistogramPanel(HistogramModel())
+    histogramPanel.model.resetData(mutableListOf(this.flatten()), mutableListOf(label))
+    histogramPanel.displayInDialog().apply { this.title = title }
+    return { matrix -> histogramPanel.model.resetData(mutableListOf(matrix.flatten()), mutableListOf(label)) }
 }

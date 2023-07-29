@@ -354,9 +354,39 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
         contextMenu.add(editComponents)
 
+        val showActivationHistogram = networkPanel.createAction(
+            name = "Show Activation Histogram",
+            description = "Show a histogram of the activations of this neuron array",
+            iconPath = "menu_icons/BarChart.png"
+        ) {
+            val updater = neuronArray.activations.showHistogram(title = "Activation Histogram", label = "Activations")
+            neuronArray.events.updated.on {
+                updater(neuronArray.activations)
+            }
+        }
+        contextMenu.add(showActivationHistogram)
+
+        if (neuronArray.dataHolder is BiasedMatrixData) {
+            val showBiasesHistogram = networkPanel.createAction(
+                name = "Show Biases Histogram",
+                description = "Show a histogram of the biases of this neuron array",
+                iconPath = "menu_icons/BarChart.png"
+            ) {
+                neuronArray.dataHolder.let {
+                    if (it is BiasedMatrixData) {
+                        val updater = it.biases.showHistogram(title = "Bias Histogram", label = "Biases")
+                        neuronArray.events.updated.on {
+                            updater(it.biases)
+                        }
+                    }
+                }
+            }
+            contextMenu.add(showBiasesHistogram)
+        }
+
         // Projection Plot Action
         contextMenu.addSeparator()
-        contextMenu.add(actionManager.createCoupledProjectionPlotAction(neuronArray))
+        contextMenu.add(actionManager.createCoupledProjectionPlotAction(neuronArray, "Activation Projection Plot"))
 
         // Coupling menu
         contextMenu.addSeparator()

@@ -263,7 +263,7 @@ class WorkspaceActions {
         description = "Create Coupled Projection Plot",
         coroutineScope = workspace
     ) {
-        val projectionComponent = ProjectionComponent2("Projection")
+        val projectionComponent = ProjectionComponent2(name)
         workspace.addWorkspaceComponent(projectionComponent)
         with(workspace.couplingManager) {
             container couple projectionComponent

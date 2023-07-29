@@ -31,14 +31,32 @@ fun Trainable2.getTrainingDialog(): StandardDialog {
         val trainerProps = AnnotatedPropertyEditor(trainer)
         val trainerControls = TrainerControls(trainer)
         val inputs = MatrixEditor(trainingSet.inputs)
+        inputs.toolbar.addSeparator()
         inputs.toolbar.add(createAction(
-            name = "Apply Inputs",
-            description = "select the current row, apply that input to network, and iterate the network to see what the output is",
+            name = "Apply Input",
+            description = "Apply current row as input to network",
             iconPath = "menu_icons/Step.png",
         ) {
-            inputs.table.incrementSelectedRow()
+            inputs.table.initRowSelection()
             trainer.applyInputs(inputs.table.selectedRow)
         })
+        inputs.toolbar.add(createAction(
+            name = "Advance Row",
+            description = "Increment the current row",
+            iconPath = "menu_icons/Plus.png",
+        ) {
+            inputs.table.incrementSelectedRow()
+        })
+        inputs.toolbar.add(createAction(
+            name = "Apply and Advance",
+            description = "Apply current row as input and increment selected row",
+            iconPath = "menu_icons/Step.png",
+        ) {
+            inputs.table.initRowSelection()
+            trainer.applyInputs(inputs.table.selectedRow)
+            inputs.table.incrementSelectedRow()
+        })
+
         val targets = MatrixEditor(trainingSet.targets)
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
 

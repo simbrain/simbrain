@@ -216,6 +216,10 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
         setRowSelectionInterval(row, row)
     }
 
+    fun initRowSelection() {
+        if (selectedRow == -1) selectedRow = 0
+    }
+
     fun incrementSelectedRow() {
         // if none selected, select first row (because selectedRow returns -1 in that case)
         val nextRow = (selectedRow + 1) % rowCount

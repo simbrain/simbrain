@@ -33,7 +33,7 @@ public class WeightMatrix extends Connector {
     private double increment = .1;
 
     @UserParameter(label = "Learning Rule", useSetter = true, isObjectType = true, order = 100)
-    SynapseUpdateRule prototypeRule = new StaticSynapseRule();
+    SynapseUpdateRule learningRule = new StaticSynapseRule();
 
     /**
      * Only used if source connector's rule is spiking.
@@ -152,8 +152,8 @@ public class WeightMatrix extends Connector {
 
         // TODO: Check for clamping and enabling
 
-        if (!(prototypeRule instanceof StaticSynapseRule)){
-            prototypeRule.apply(this, dataHolder);
+        if (!(learningRule instanceof StaticSynapseRule)){
+            learningRule.apply(this, dataHolder);
             getEvents().getUpdated().fireAndForget();
         }
     }
@@ -240,12 +240,12 @@ public class WeightMatrix extends Connector {
     }
 
 
-    public SynapseUpdateRule getPrototypeRule() {
-        return prototypeRule;
+    public SynapseUpdateRule getLearningRule() {
+        return learningRule;
     }
 
-    public void setPrototypeRule(SynapseUpdateRule prototypeRule) {
-        this.prototypeRule = prototypeRule;
+    public void setLearningRule(SynapseUpdateRule learningRule) {
+        this.learningRule = learningRule;
     }
 
     @Override

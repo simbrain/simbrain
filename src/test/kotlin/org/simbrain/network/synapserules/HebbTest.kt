@@ -36,7 +36,7 @@ class HebbTest {
         na1.isClamped = true
         na2.isClamped = true
         wm12.hardClear()
-        wm12.prototypeRule = HebbianRule().apply {
+        wm12.learningRule = HebbianRule().apply {
             learningRate = 1.0
         }
     }
@@ -104,7 +104,7 @@ class HebbTest {
         val outputs = doubleArrayOf(2.0,1.0).toMatrix()
         na1.activations = inputs
         na2.activations = outputs
-        (wm12.prototypeRule as HebbianRule).learningRate = .1
+        (wm12.learningRule as HebbianRule).learningRate = .1
         net.update()
         // Expecting [[.2,.6],[.1,.3]]
         assertArrayEquals(doubleArrayOf(.2,.6), wm12.weightMatrix.row(0), .01)
@@ -117,7 +117,7 @@ class HebbTest {
         val outputs = doubleArrayOf(.5, -.5).toMatrix()
         val na1_v2 = NeuronArray(net, 3)
         val wm_v2 = WeightMatrix(net, na1_v2, na2).apply {
-            prototypeRule = HebbianRule().apply {
+            learningRule = HebbianRule().apply {
                 learningRate = 1.0
             }
         }

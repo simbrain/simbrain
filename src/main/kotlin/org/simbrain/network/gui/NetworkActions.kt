@@ -8,7 +8,6 @@ import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
 import org.simbrain.network.gui.actions.connection.ClearSourceNeurons
 import org.simbrain.network.gui.actions.connection.SetSourceNeurons
-import org.simbrain.network.gui.actions.dl4j.AddNeuronArrayAction
 import org.simbrain.network.gui.actions.edit.*
 import org.simbrain.network.gui.actions.modelgroups.AddGroupAction
 import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction
@@ -36,7 +35,6 @@ import javax.swing.JOptionPane
 class NetworkActions(val networkPanel: NetworkPanel) {
 
     // TODO: Convert these to inline actions as below.
-    val addNeuronArrayAction = AddNeuronArrayAction(networkPanel)
     val addNeuronsAction = AddNeuronsAction(networkPanel)
     val alignHorizontalAction = AlignHorizontalAction(networkPanel)
     val alignVerticalAction = AlignVerticalAction(networkPanel)
@@ -44,6 +42,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val clearSourceNeurons = ClearSourceNeurons(networkPanel)
     val copyAction = CopyAction(networkPanel)
     val cutAction = CutAction(networkPanel)
+    val addNeuronArrayAction = networkPanel.createAction(
+        name = "Add Neuron Array...",
+        description = "Add a neuron array to the network",
+        keyboardShortcut = KeyCombination('Y')
+    ) {
+        showNeuronArrayCreationDialog()
+    }
     val deleteAction = networkPanel.createConditionallyEnabledAction(
         name = "Delete",
         description = """Delete selected node(s) ("Backspace" or "Delete")""",
@@ -58,7 +63,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Add Neuron",
         description = """Add or "put" new node (p)""",
         iconPath = "menu_icons/AddNeuron.png",
-        keyboardShorcut = KeyCombination('P')
+        keyboardShortcut = KeyCombination('P')
     ) {
         val neuron = Neuron(network)
         network.addNetworkModel(neuron)
@@ -69,7 +74,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Randomize selection",
         description = "Randomize Selected Elements (r)",
         iconPath = "menu_icons/Rand.png",
-        keyboardShorcut = KeyCombination('R')
+        keyboardShortcut = KeyCombination('R')
     ) {
         selectionManager.selectedModels.map { it.randomize() }
     }
@@ -77,7 +82,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Randomize Biases",
         description = "Randomize biases of selected nodes",
         iconPath = "menu_icons/Rand.png",
-        keyboardShorcut = CmdOrCtrl + 'B'
+        keyboardShortcut = CmdOrCtrl + 'B'
     ) {
         selectionManager.selectedModels
             .filterIsInstance<Neuron>()
@@ -112,7 +117,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Add Text",
         description = """Add text to the network""",
         iconPath = "menu_icons/Text.png",
-        keyboardShorcut = KeyCombination('T')
+        keyboardShortcut = KeyCombination('T')
     ) {
         textEntryDialog("", "Enter text to add to the network") {
             if (it.isNotEmpty()) {
@@ -134,7 +139,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Network Preferences...",
         description = "Show the network preference dialog. These properties apply to all networks in the Simbrain workspace.",
         iconPath = "menu_icons/Prefs.png",
-        keyboardShorcut = CmdOrCtrl + ','
+        keyboardShortcut = CmdOrCtrl + ','
     ) {
         getPreferenceDialog(NetworkPreferences).display()
     }
@@ -151,7 +156,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Iterate network",
         description = "Step network update algorithm (\"spacebar\")",
         iconPath = "menu_icons/Step.png",
-        keyboardShorcut = KeyCombination(KeyEvent.VK_SPACE)
+        keyboardShortcut = KeyCombination(KeyEvent.VK_SPACE)
     ) {
         networkPanel.network.update()
     }
@@ -160,7 +165,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.createAction(
             name = "Add Deep Network...",
             description = "Deep Network is not currently supported on M1 Macs",
-            keyboardShorcut = CmdOrCtrl + Shift + 'D'
+            keyboardShortcut = CmdOrCtrl + Shift + 'D'
         ) {
             JOptionPane.showConfirmDialog(
                 null,
@@ -171,7 +176,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.createAction(
             name = "Add Deep Network...",
             description = "Create a new deep network",
-            keyboardShorcut = CmdOrCtrl + Shift + 'D'
+            keyboardShortcut = CmdOrCtrl + Shift + 'D'
         ) {
             showDeepNetCreationDialog()
         }
@@ -183,7 +188,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val toggleFreeWeightVisibility = networkPanel.createAction(
         name = "Toggle Weight Visibility",
         description = "Toggle visibilty of free weights",
-        keyboardShorcut = KeyCombination('5')
+        keyboardShortcut = KeyCombination('5')
     ) { event ->
         event.source.let {
             if (it is JCheckBoxMenuItem) {
@@ -197,7 +202,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val addSmileClassifier = networkPanel.createAction(
         name = "Add Smile Classifier...",
         description = "Create a new Smile classifier",
-        keyboardShorcut = CmdOrCtrl + Shift + 'S'
+        keyboardShortcut = CmdOrCtrl + Shift + 'S'
     ) {
         showClassifierCreationDialog()
     }
@@ -305,7 +310,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     fun createSynapseGroupVisibilityAction() = networkPanel.createAction(
         name = "Toggle visibility of selected synapse groups",
-        keyboardShorcut = CmdOrCtrl + 'T',
+        keyboardShortcut = CmdOrCtrl + 'T',
         initBlock = {
             isEnabled = networkPanel.selectionManager.filterSelectedModels<SynapseGroup2>().isNotEmpty() &&
                     networkPanel.selectionManager.filterSelectedModels<SynapseGroup2>().none {

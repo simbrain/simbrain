@@ -29,7 +29,7 @@ val DataViewerTable.randomizeAction
         name = "Randomize",
         description = "Randomize selected cells",
         iconPath = "menu_icons/Rand.png",
-        keyboardShorcut = CmdOrCtrl + 'R'
+        keyboardShortcut = CmdOrCtrl + 'R'
     ) {
         randomizeSelectedCells()
     }

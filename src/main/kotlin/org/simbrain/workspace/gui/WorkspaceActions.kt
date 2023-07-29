@@ -44,7 +44,7 @@ class WorkspaceActions {
     val clearWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
         name = "Clear desktop",
         description = "Remove all windows from the desktop",
-        keyboardShorcut = CmdOrCtrl + 'K',
+        keyboardShortcut = CmdOrCtrl + 'K',
         coroutineScope = workspace
     ) {
         SimbrainDesktop.clearDesktop()
@@ -63,7 +63,7 @@ class WorkspaceActions {
         iconPath = "menu_icons/Save.png",
         name = "Save workspace",
         description = "Save current workspace file",
-        keyboardShorcut = CmdOrCtrl + 'S',
+        keyboardShortcut = CmdOrCtrl + 'S',
         coroutineScope = workspace
     ) {
         SimbrainDesktop.save()
@@ -81,7 +81,7 @@ class WorkspaceActions {
     val quitWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
         name = "Quit Simbrain",
         description = "Quit Simbrain",
-        keyboardShorcut = CmdOrCtrl + 'Q',
+        keyboardShortcut = CmdOrCtrl + 'Q',
         coroutineScope = workspace
     ) {
         SimbrainDesktop.quit(false)
@@ -183,7 +183,7 @@ class WorkspaceActions {
             name = name,
             iconPath = iconPath,
             description = "Create $name",
-            keyboardShorcut = keyboardShortcut,
+            keyboardShortcut = keyboardShortcut,
             coroutineScope = workspace
         ) {
             workspace.componentFactory.createWorkspaceComponent(name)
@@ -212,7 +212,7 @@ class WorkspaceActions {
         name = "Import from xml...",
         iconPath = "menu_icons/Open.png",
         description = "Import from xml",
-        keyboardShorcut = CmdOrCtrl + 'O',
+        keyboardShortcut = CmdOrCtrl + 'O',
         coroutineScope = workspace
     ) {
         desktopComponent.showImportDialog()
@@ -222,7 +222,7 @@ class WorkspaceActions {
         name = "Export to xml...",
         iconPath = "menu_icons/Save.png",
         description = "Export to xml",
-        keyboardShorcut = CmdOrCtrl + 'S',
+        keyboardShortcut = CmdOrCtrl + 'S',
         coroutineScope = workspace
     ) {
         desktopComponent.showExportDialog()
@@ -232,7 +232,7 @@ class WorkspaceActions {
         .createAction(
         name = "Close",
         description = "Close component",
-        keyboardShorcut = CmdOrCtrl + 'W',
+        keyboardShortcut = CmdOrCtrl + 'W',
         coroutineScope = workspace
     ) {
         desktopComponent.workspaceComponent.tryClosing()

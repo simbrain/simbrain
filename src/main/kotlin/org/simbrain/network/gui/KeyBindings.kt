@@ -2,7 +2,6 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.gui.nodes.NeuronNode
-import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.util.*
@@ -41,9 +40,6 @@ fun NetworkPanel.addKeyBindings() {
     }
     bind(Ctrl + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
-    //TODO Make default settable (same with neuron?)
-    bind("Y") { network.addNetworkModelAsync(NeuronArray(network,50)) }
-    bind(Shift +'Y') { showNeuronArrayCreationDialog() }
     bind(CmdOrCtrl + 'Y') { redo() }
     bind(Shift + 'Z') { network.addNetworkModelAsync(ZoeLayer(network, 10)) } // TODO: Temp testing key command
     bind(CmdOrCtrl + 'Z') { undo() }

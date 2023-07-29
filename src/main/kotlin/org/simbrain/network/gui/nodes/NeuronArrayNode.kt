@@ -284,7 +284,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val setTargetValues: Action = networkPanel.createAction(
             name = "Set Target",
             description = "Use current activation as target for immediate training",
-            keyboardShorcut = CmdOrCtrl + 'T'
+            keyboardShortcut = CmdOrCtrl + 'T'
         ) {
             neuronArray.targetValues = neuronArray.activations.clone()
         }
@@ -293,7 +293,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val clearTargetValues: Action = networkPanel.createAction(
             name = "Clear Target",
             description = "Clear target values",
-            keyboardShorcut = Shift + CmdOrCtrl + 'T'
+            keyboardShortcut = Shift + CmdOrCtrl + 'T'
         ) {
             neuronArray.targetValues = null
         }

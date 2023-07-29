@@ -149,11 +149,11 @@ fun <T : JComponent> T.createAction(
     name: String? = null,
     description: String? = null,
     iconPath: String? = null,
-    keyboardShorcut: KeyCombination? = null,
+    keyboardShortcut: KeyCombination? = null,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
     block: suspend T.(e: ActionEvent) -> Unit
-) = createAction(name, description, iconPath, keyboardShorcut?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
+) = createAction(name, description, iconPath, keyboardShortcut?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
 
 /**
  * Create an action when no JComponent available. Keyboard shortcuts are not possible.

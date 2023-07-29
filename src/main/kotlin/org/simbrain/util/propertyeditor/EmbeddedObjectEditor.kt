@@ -162,9 +162,9 @@ class EmbeddedObjectEditor(
         // the type editor is just being used to set a type, just remove
         // everything from the panel, and hide the detail triangle.
         if (editorPanel!!.widgets.size == 0) {
-            detailTriangle!!.isVisible = false
-            editorPanel!!.removeAll()
+            isVisible = false
         } else {
+            isVisible = true
             detailTriangle!!.isVisible = true
         }
     }

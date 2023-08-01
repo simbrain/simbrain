@@ -172,7 +172,8 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
                     label.toolTipText = pw.toolTipText
                     addItemToTabPanel(pw, label)
                 } else {
-                    (mainPanel as LabelledItemPanel).addItem(pw.label, pw.component)
+                    val label = (mainPanel as LabelledItemPanel).addItem(pw.label, pw.component)
+                    label.toolTipText = pw.toolTipText
                 }
             }
         }

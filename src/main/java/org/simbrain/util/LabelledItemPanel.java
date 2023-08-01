@@ -72,8 +72,9 @@ public class LabelledItemPanel extends JPanel {
      *
      * @param labelText The label text for the item.
      * @param item      The item to be added.
+     * @return The label created for the item.
      */
-    public void addItem(final String labelText, final JComponent item) {
+    public JLabel addItem(final String labelText, final JComponent item) {
         // Create the label and its constraints
         JLabel label = new JLabel(labelText);
 
@@ -100,6 +101,8 @@ public class LabelledItemPanel extends JPanel {
         add(item, itemConstraints);
 
         myNextItemRow++;
+
+        return label;
     }
 
     /**

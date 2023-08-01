@@ -271,7 +271,9 @@ class ParameterWidget(
             }
             return if (tips.isEmpty()) {
                 ""
-            } else "<html>" + tips.stream().collect(Collectors.joining("<br/>")) + "</html>"
+            } else {
+                "<html>${tips.joinToString("<br />")}</html>"
+            }
         }
 
     var widgetValue: Any?

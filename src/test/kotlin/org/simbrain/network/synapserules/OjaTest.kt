@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.synapse_update_rules.OjaRule
+import org.simbrain.network.learningrules.OjaRule
+import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.util.toMatrix
 
 class OjaTest {
 
@@ -15,8 +18,14 @@ class OjaTest {
     val output = Neuron(net)
     var weight = Synapse(input,output)
 
+    // For array based tests
+    val na1 = NeuronArray(net, 2)
+    val na2 = NeuronArray(net, 3)
+    var wm12 = WeightMatrix(net, na1, na2)
+
+
     init {
-        net.addNetworkModelsAsync(input, output, weight)
+        net.addNetworkModelsAsync(input, output, weight, na1, na2, wm12)
         weight.learningRule = OjaRule().apply {
             learningRate = 1.0
             normalizationFactor = 1.0
@@ -26,6 +35,14 @@ class OjaTest {
         weight.lowerBound = -10.0
         input.isClamped = true
         output.isClamped = true
+
+        na1.isClamped = true
+        na2.isClamped = true
+        wm12.hardClear()
+        wm12.learningRule = OjaRule().apply {
+            learningRate = 1.0
+            normalizationFactor = 1.0
+        }
     }
 
     @Test
@@ -106,6 +123,20 @@ class OjaTest {
         }
         assertEquals(-.33, weight.strength, .01)
 
+    }
+
+    @Test
+    fun `test vectorized rule`() {
+        val inputs = doubleArrayOf(1.0, -1.0).toMatrix()
+        val outputs = doubleArrayOf(1.0, 2.0, -1.0).toMatrix()
+        na1.activations = inputs
+        na2.activations = outputs
+        net.update()
+        // Only uses Hebbian part
+        // Expecting [[1, -1],[2,-2],[-1,1]]
+        print(wm12.weightMatrix)
+        // Assertions.assertArrayEquals(doubleArrayOf(1.0, 0.0, -.5), wm_v2.weightMatrix.row(0), .01)
+        // Assertions.assertArrayEquals(doubleArrayOf(-1.0, 0.0, .5), wm_v2.weightMatrix.row(1), .01)
     }
 
 }

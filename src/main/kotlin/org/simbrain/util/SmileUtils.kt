@@ -96,9 +96,13 @@ fun Matrix.shiftRight(shiftAmount: Int = 1): Matrix {
  *
  * Assumes vector is a column vector and that it has as many rows as the matrix.
  */
-fun Matrix.broadcastMultiplication(vector: Matrix): Matrix {
-    if (nrow() != vector.nrow() || vector.ncol() != 1) {
-        throw IllegalArgumentException("Size of vector does not match number of rows in matrix or vector has more than one column.")
+fun Matrix.broadcastMultiply(vector: Matrix): Matrix {
+    if (vector.ncol() != 1) {
+        throw IllegalArgumentException("Vector is ${vector.shapeString}, but it must be a column vector")
+    }
+    if (nrow() != vector.nrow()) {
+        throw IllegalArgumentException("Matrix and vector must have the same number of rows. Matrix has ${nrow()} " +
+                "rows, vector has ${vector.nrow()} rows .")
     }
     val result = Matrix(nrow(), ncol())
     for (i in 0 until nrow()) {

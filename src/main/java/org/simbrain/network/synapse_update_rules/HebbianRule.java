@@ -58,10 +58,10 @@ public class HebbianRule extends SynapseUpdateRule<EmptyScalarData, EmptyMatrixD
     public void apply(Connector connector, EmptyMatrixData data) {
         if (connector instanceof  WeightMatrix) {
             Matrix wm = ((WeightMatrix)connector).getWeightMatrix();
-            Matrix output = ((NeuronArray)connector.getSource()).getActivations();
-            Matrix input = ((NeuronArray)connector.getTarget()).getActivations();
-            // input * output^T
-            wm.add(input.mt(output).mul(learningRate));
+            Matrix input = ((NeuronArray)connector.getSource()).getActivations();
+            Matrix output = ((NeuronArray)connector.getTarget()).getActivations();
+            // delta = rate * (input * output^T)
+            wm.add(output.mt(input).mul(learningRate));
         }
     }
 

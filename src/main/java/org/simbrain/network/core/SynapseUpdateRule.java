@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.core;
 
+import org.simbrain.network.learningrules.OjaRule;
 import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.EmptyScalarData;

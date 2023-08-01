@@ -36,8 +36,8 @@ class SmileUtilsTest {
     @Test
     fun `test broadcasting multiplication`() {
         val vector = doubleArrayOf(0.0, 1.0, 2.0).toMatrix()
-        assertArrayEquals(doubleArrayOf(0.0, 4.0, 14.0), testMatrix.broadcastMultiplication(vector).col(0))
-        assertArrayEquals(doubleArrayOf(0.0, 5.0, 16.0), testMatrix.broadcastMultiplication(vector).col(1))
-        assertArrayEquals(doubleArrayOf(0.0, 6.0, 18.0), testMatrix.broadcastMultiplication(vector).col(2))
+        assertArrayEquals(doubleArrayOf(0.0, 4.0, 14.0), testMatrix.broadcastMultiply(vector).col(0))
+        assertArrayEquals(doubleArrayOf(0.0, 5.0, 16.0), testMatrix.broadcastMultiply(vector).col(1))
+        assertArrayEquals(doubleArrayOf(0.0, 6.0, 18.0), testMatrix.broadcastMultiply(vector).col(2))
     }
 }

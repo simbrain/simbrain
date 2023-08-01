@@ -15,12 +15,12 @@ class HebbTest {
 
     var net = Network()
 
-    // Scalar based tests
+    // For scalar based tests
     val n1 = Neuron(net)
     val n2 = Neuron(net)
     var s12 = Synapse(n1,n2)
 
-    // Array based tests
+    // For array based tests
     val na1 = NeuronArray(net, 2)
     val na2 = NeuronArray(net, 2)
     var wm12 = WeightMatrix(net, na1, na2)

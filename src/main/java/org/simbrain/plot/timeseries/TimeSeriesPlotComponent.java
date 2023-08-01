@@ -72,20 +72,14 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
         getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(c -> {
             // A new array coupling is being added to this time series
             if (c.getConsumer().getBaseObject() == model) {
-
                 // Initialize series with provided names, e.g neuron labels
-                model.initializeArrayMode(c.getProducer().getLabelArray());
-            }
-        });
-
-        model.getEvents().getChangeArrayMode().on(() -> {
-            // Array mode has been changed
-            if (model.isArrayMode()) {
-                // Changed from scalar to array mode
-                // No action
-            } else {
-                // Changed from array to scalar mode
-                fireAttributeContainerRemoved(model);
+                var labels = c.getProducer().getLabelArray();
+                if (labels != null) {
+                    model.removeAllScalarTimeSeries();
+                    for (int i = 0; i < labels.length; i++) {
+                        model.addScalarTimeSeries(labels[i]);
+                    }
+                }
             }
         });
 
@@ -99,11 +93,8 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        if (model.isArrayMode()) {
-            containers.add(model);
-        } else {
-            containers.addAll(model.getTimeSeriesList());
-        }
+        containers.add(model);
+        containers.addAll(model.getTimeSeriesList());
         return containers;
     }
 

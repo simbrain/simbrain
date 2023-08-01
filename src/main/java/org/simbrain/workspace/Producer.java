@@ -66,7 +66,7 @@ public class Producer extends Attribute {
      */
     public String[] getLabelArray() {
         if (arrayDescriptionMethod == null) {
-            return null;
+            return new String[]{};
         } else {
             try {
                 return (String[]) arrayDescriptionMethod.invoke(baseObject);

@@ -97,15 +97,6 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      */
     private List<ScalarTimeSeries> timeSeriesList = new ArrayList<ScalarTimeSeries>();
 
-    /**
-     * If true, the plot is receiving an array coupling.  If false, scalar
-     * couplings are being used, via {@link ScalarTimeSeries} objects. When a
-     * time series is added or removed (e.g. from the GUI or a script) array
-     * mode ceases and array couplings are removed. When an array coupling is
-     * created, all time series objects are removed and array mode is true.
-     */
-    private boolean isArrayMode = false;
-
     private transient TimeSeriesEvents events = new TimeSeriesEvents();
 
     /**
@@ -172,80 +163,18 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
      * @return a reference to the series, or null if the model is in scalar mode
      */
     public ScalarTimeSeries addScalarTimeSeries(String description) {
-        if (isArrayMode) {
-            return null;
-        }
         ScalarTimeSeries sts = new ScalarTimeSeries(addXYSeries(description));
         timeSeriesList.add(sts);
         events.getScalarTimeSeriesAdded().fireAndBlock(sts);
         return sts;
     }
 
-    /**
-     * Called by coupling producers via reflection.  Each component of a vector
-     * is applied to a separate time series.
-     */
     @Consumable()
-    public void addValues(double[] vector) {
-
-        // If there is a size mismatch (for example, after removing neurons from
-        // a neuron group sending activations), clear and start over.
-        // Resets labels for all time series
-        if (vector.length != dataset.getSeriesCount()) {
-            dataset.removeAllSeries();
-            timeSeriesList.clear();
-            for (int i = 0; i < vector.length; i++) {
-                if (i < seriesNames.length) {
-                    addXYSeries(seriesNames[i]);
-                } else {
-                    addXYSeries("" + i);
-                }
-            }
-        }
-
-        // Write the data
-        for (int i = 0; i < vector.length; i++) {
-            dataset.getSeries(i).add(timeSupplier.get(), (Double) vector[i]);
+    public void setValues(double[] array) {
+        for (int i = 0; i < array.length && i < timeSeriesList.size() ; i++) {
+            timeSeriesList.get(i).setValue(array[i]);
         }
         revalidateUseFixedRangeWindow(dataset.getRangeUpperBound(false));
-    }
-
-    /**
-     * Initialize array mode.
-     *
-     * @param names names for new series
-     */
-    public void initializeArrayMode(String[] names) {
-        isArrayMode = true;
-        dataset.removeAllSeries();
-        this.seriesNames = names;
-        int i = 0;
-        for (String name : names) {
-            addXYSeries(names[i] + 1);
-            i++;
-        }
-    }
-
-    /**
-     * Turn off array mode. Remove all scalar time series.
-     */
-    public void setArrayMode(boolean isArrayMode) {
-        this.isArrayMode = isArrayMode;
-        dataset.removeAllSeries();
-        removeAllScalarTimeSeries();
-        events.getChangeArrayMode().fireAndBlock();
-        if (isArrayMode) {
-            // No action
-        } else {
-            addScalarTimeSeries(3); // Add default time series
-            // If a scalar coupling is added when an array coupling is in place,
-            // remove all lingering aspects of the array coupling
-        }
-
-    }
-
-    public boolean isArrayMode() {
-        return isArrayMode;
     }
 
     /**

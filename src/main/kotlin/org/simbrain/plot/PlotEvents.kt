@@ -10,5 +10,4 @@ open class PlotEvents: Events2() {
 class TimeSeriesEvents: PlotEvents() {
     val scalarTimeSeriesAdded = AddedEvent<TimeSeriesModel.ScalarTimeSeries>()
     val scalarTimeSeriesRemoved = RemovedEvent<TimeSeriesModel.ScalarTimeSeries>()
-    val changeArrayMode = NoArgEvent()
 }

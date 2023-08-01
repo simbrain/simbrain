@@ -41,7 +41,7 @@ public class TimeSeriesPlotActions {
             // Initialize
             {
                 putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
-                // putValue(NAME, "Preferences...");
+                putValue(NAME, "Preferences...");
                 putValue(SHORT_DESCRIPTION, "Show time series graph properties");
             }
 

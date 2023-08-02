@@ -13,5 +13,5 @@ JVM_ARGS+="--add-opens=java.desktop/java.awt=ALL-UNNAMED "
 JVM_ARGS+="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED "
 
 jpackage --input ../build/main/	 --main-jar Simbrain.jar --dest ../dist --name "Simbrain" \
-	 --app-version 3.06 --icon simbrain.icns \
+	 --app-version 3.07 --icon simbrain.icns \
 	 --java-options $JVM_ARGS --type app-image

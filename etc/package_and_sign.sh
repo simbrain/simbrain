@@ -1,4 +1,4 @@
-VERSION="Simbrain-3.06"
+VERSION="Simbrain-3.07"
 DIST_DIR="$(cd "$(dirname "$0")/.." && pwd)/dist/"
 
 codesign -fs "$CERT_NAME" "$DIST_DIR"/Simbrain.app

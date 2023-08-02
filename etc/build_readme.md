@@ -1,18 +1,17 @@
 ## Mac build process
-- Use terminal from `simbrain` dir to run `ant build`
+- Use terminal from `simbrain` home dir to run `ant build`
 - Got to `etc` and run `zsh make_app.sh` or press the play button at the top of the file
 
 ## PC build process 
-- Same as mac but .exe installer produced in `dist`
-- Rename resulting file to `Simbrain-installer.exe`
+- Follow directions in `make_app.ps1`
 
 ## Linux build process
 - Linux just uses the zip in `dist` so the push downloads script takes care of that after the build is run
 
-## Package and sign
+## Package and sign (Mac)
 - `zsh package_and_sign.sh`
 
-## Push downloads to website
+## Push downloads to website 
 - `zsh put_downloads.sh`
 
 ## Debug

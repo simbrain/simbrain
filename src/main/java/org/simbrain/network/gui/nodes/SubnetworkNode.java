@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.nodes;
 
 import kotlinx.coroutines.Dispatchers;
+import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
@@ -195,6 +196,12 @@ public class SubnetworkNode extends ScreenElement {
             }
         };
         return dialog;
+    }
+
+    @Nullable
+    @Override
+    public JPopupMenu getContextMenu() {
+        return contextMenu;
     }
 
     /**

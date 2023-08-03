@@ -16,7 +16,7 @@ import org.simbrain.util.ImageKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.table.BasicDataWrapperKt;
+import org.simbrain.util.table.MatrixDataWrapper;
 import org.simbrain.util.table.SimbrainDataViewer;
 import org.simbrain.util.table.TableActionsKt;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -227,10 +227,13 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
 
         // Weight matrix
         if (weightMatrix instanceof WeightMatrix) {
-            var wm = BasicDataWrapperKt.createFromMatrix(((WeightMatrix) weightMatrix).getWeightMatrix());
+            var wm = new MatrixDataWrapper(((WeightMatrix) weightMatrix).getWeightMatrix());
             var wmViewer = new SimbrainDataViewer(wm, false);
             TableActionsKt.addSimpleDefaults(wmViewer);
             tabs.addTab("Weight Matrix", wmViewer);
+            weightMatrix.getEvents().getUpdated().on(() -> {
+                wmViewer.getModel().fireTableDataChanged();
+            });
             dialog.addClosingTask(() -> {
                 ((WeightMatrix) weightMatrix).setWeights(wm.get2DDoubleArray());
                 weightMatrix.getEvents().getUpdated().fireAndForget();

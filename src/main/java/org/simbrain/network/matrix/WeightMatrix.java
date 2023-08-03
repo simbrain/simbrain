@@ -6,11 +6,11 @@ import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.util.SmileUtilsKt;
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.workspace.Producible;
 import smile.math.matrix.Matrix;
-import smile.stat.distribution.GaussianDistribution;
 
 import static org.simbrain.util.SmileUtilsKt.flatten;
 
@@ -54,7 +54,8 @@ public class WeightMatrix extends Connector {
     public MatrixDataHolder spikeResponseData = EmptyMatrixData.INSTANCE;
 
     /**
-     * The weight matrix object.
+     * The weight matrix object. Overwriting this causes unexpected behavior in GUI elements so best practice is to
+     * create a new matrix and copy its value to this one.
      */
     private Matrix weightMatrix;
 
@@ -133,8 +134,8 @@ public class WeightMatrix extends Connector {
     }
 
     @Consumable
-    public void setWeightMatrix(Matrix weightMatrix) {
-        this.weightMatrix = weightMatrix.clone();
+    public void setMatrixValues(Matrix otherWeightMatrix) {
+        SmileUtilsKt.copy(weightMatrix, otherWeightMatrix);
         getEvents().getUpdated().fireAndForget();
     }
 
@@ -143,7 +144,8 @@ public class WeightMatrix extends Connector {
      */
     public void diagonalize() {
         clear();
-        weightMatrix = Matrix.eye(target.inputSize(), source.outputSize());
+        var diag = Matrix.eye(target.inputSize(), source.outputSize());
+        SmileUtilsKt.copy(weightMatrix, diag);
         getEvents().getUpdated().fireAndForget();
     }
 
@@ -250,8 +252,11 @@ public class WeightMatrix extends Connector {
 
     @Override
     public void randomize() {
-        weightMatrix = Matrix.rand(getTarget().inputSize(), getSource().outputSize(),
-                new GaussianDistribution(0, 1));
+        for (int i = 0; i < weightMatrix.nrow(); i++) {
+            for (int j = 0; j < weightMatrix.ncol(); j++) {
+                weightMatrix.set(i,j, parent.getWeightRandomizer().sampleDouble());
+            }
+        }
         getEvents().getUpdated().fireAndForget();
     }
 
@@ -271,7 +276,7 @@ public class WeightMatrix extends Connector {
      * Set all entries to 0.
      */
     public void hardClear() {
-        weightMatrix = new Matrix(weightMatrix.nrow(), weightMatrix.ncol());
+        SmileUtilsKt.copy(weightMatrix, new Matrix(weightMatrix.nrow(), weightMatrix.ncol()));
         getEvents().getUpdated().fireAndForget();
     }
 

@@ -6,7 +6,7 @@ import smile.math.matrix.Matrix
 /**
  * Wraps a Smile Matrix.
  */
-class MatrixDataWrapper(
+class MatrixDataWrapper @JvmOverloads constructor(
     var data: Matrix,
     override var columns: MutableList<Column> = List(data.ncol()) { colNum ->
         Column("Column ${colNum + 1}", Column.DataType.DoubleType)

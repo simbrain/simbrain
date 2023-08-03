@@ -14,6 +14,15 @@ fun Matrix.validateSameShape(target: Matrix) {
     }
 }
 
+fun Matrix.copy(toCopy: Matrix) {
+    this.validateSameShape(toCopy)
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            set(i,j, toCopy.get(i,j))
+        }
+    }
+}
+
 val Matrix.shapeString get() = "(${nrow()},${ncol()})"
 
 // TODO: Flatten the two arrays so that this can be used for arbitrary matrices (currently works only on vectors)
@@ -89,7 +98,6 @@ fun Matrix.shiftRight(shiftAmount: Int = 1): Matrix {
     }
     return shiftedMatrix
 }
-
 
 /**
  * Element-wise multiplication that broadcasts across columns.

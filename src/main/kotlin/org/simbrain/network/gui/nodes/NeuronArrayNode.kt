@@ -167,6 +167,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     private fun updateActivationImage() {
         activationImage.removeAllChildren()
+        spikeImage.removeAllChildren()
         biasImage.removeAllChildren()
         val activations = neuronArray.outputs.toDoubleArray()
         if (gridMode) {
@@ -186,6 +187,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     0.0, 0.0,
                     infoText.width, infoText.width
                 )
+                spikeImage.addBorder()
             }
             if (showBias && neuronArray.dataHolder is BiasedMatrixData) {
                 val biases = (neuronArray.dataHolder as BiasedMatrixData).biases
@@ -212,6 +214,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     0.0, 0.0,
                     infoText.width, flatPixelArrayHeight.toDouble()
                 )
+                spikeImage.addBorder()
             }
             if (showBias && neuronArray.dataHolder is BiasedMatrixData) {
                 val biases = (neuronArray.dataHolder as BiasedMatrixData).biases

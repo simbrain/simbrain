@@ -5,7 +5,7 @@ hdiutil create -volname $VERSION -srcfolder "$DIST_DIR"/Simbrain.app -ov -format
 rm -rf "$DIST_DIR"/Simbrain.app
 
 # submit + wait .dmg for notarization and acceptance.
-output=$(xcrun notarytool submit "$DIST_DIR"/"$VERSION".dmg -p "simbrain" --wait | tee /dev/tty)
+output=$(xcrun notarytool submit "$DIST_DIR"/"$VERSION".dmg -p "jyoshimi" --wait | tee /dev/tty)
 # if accepted, staple ticket to dmg file for distribution
 if echo "$output" | grep -q "status: Accepted"; then
   echo "Application has been accepted for notarization. Stapling ticket to .dmg and application is ready for distribution."

@@ -774,9 +774,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
 
     /**
-     * Apply "hot key" based one-shot learning, which uses current activations (which may have been hand-set) to
-     * train (for now) selected weight matrices.
-     */
+     * Apply one iteration of backprop to selected arrays, for a kind of live training with current inputs.
+     * Current activations are used for input and the target values on the output can be se using a drop down menu.      */
     fun applyImmediateLearning() {
         val sources = selectionManager.filterSelectedSourceModels<NeuronArray>()
         val target = selectionManager.filterSelectedModels<NeuronArray>().firstOrNull()

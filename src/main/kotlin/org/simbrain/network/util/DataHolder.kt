@@ -4,6 +4,8 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.toDoubleArray
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.util.*
 
@@ -19,9 +21,14 @@ object EmptyMatrixData : MatrixDataHolder {
     override fun toString(): String = ""
 }
 
-class BiasedMatrixData(var size: Int) : MatrixDataHolder {
+class BiasedMatrixData(var size: Int) : MatrixDataHolder, AttributeContainer {
     @UserParameter(label = "Biases", description = "Biases for each neuron")
     var biases = Matrix(size, 1)
+
+    @get:Producible
+    val biasesArray: DoubleArray
+        get() = biases.toDoubleArray()
+
     override fun copy() = BiasedMatrixData(size).also {
         it.biases = biases.clone()
     }
@@ -30,6 +37,8 @@ class BiasedMatrixData(var size: Int) : MatrixDataHolder {
         return "Biases: ${Utils.getTruncatedArrayString(biases.toDoubleArray(), 10)}"
     }
 
+    override val id: String
+        get() = "Biases"
 }
 
 open class SpikingMatrixData(var size: Int) : MatrixDataHolder {

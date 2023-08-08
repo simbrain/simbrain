@@ -5,10 +5,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
+import org.simbrain.workspace.gui.SimbrainDesktop
 import java.lang.reflect.Method
-import kotlin.reflect.KFunction
-import kotlin.reflect.KMutableProperty0
-import kotlin.reflect.KProperty0
+import kotlin.reflect.*
 import kotlin.reflect.jvm.javaMethod
 
 const val HIGH_PRIORITY = 1
@@ -334,4 +333,19 @@ class CouplingManager(val workspace: Workspace) {
         attributeContainerCouplings.remove(attributeContainer)
     }
 
+}
+
+
+/**
+ * Find the first [Producer] in an [AttributeContainer] which has the given method name
+ */
+fun <T: AttributeContainer, R> T.getProducer(methodName: KFunction1<T, R>) = with(SimbrainDesktop.workspace.couplingManager) {
+    getProducer(methodName)
+}
+
+/**
+ * Find the first [Producer] in an [AttributeContainer] which has the given method name
+ */
+fun <T: AttributeContainer, R> T.getProducer(methodName: KProperty1<T, R>) = with(SimbrainDesktop.workspace.couplingManager) {
+    getProducer(methodName.getter.javaMethod?.name ?: methodName.getter.name)
 }

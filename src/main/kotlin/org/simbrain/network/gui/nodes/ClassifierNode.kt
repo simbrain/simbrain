@@ -11,6 +11,7 @@ import org.simbrain.util.Utils
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toSimbrainColorImage
+import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
@@ -102,18 +103,16 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
                 propertyDialog.run { makeVisible() }
             } })
             addSeparator()
-            with(SimbrainDesktop.workspace.couplingManager) {
-                add(SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
-                        smileClassifier.getProducer("getInputActivations"),
-                        name = "Input Projection"
-                    )
-                )
-                add(SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
-                        smileClassifier.getProducer("getOutputActivations"),
-                        name = "Output Projection"
-                    )
-                )
-            }
+            add(SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
+                smileClassifier.getProducer(SmileClassifier::getInputActivations),
+                objectName = "${smileClassifier.id ?: "Smile Classifier"} Inputs"
+            )
+            )
+            add(SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
+                smileClassifier.getProducer(SmileClassifier::outputActivations),
+                objectName = "${smileClassifier.id ?: "Smile Classifier"} Outputs"
+            )
+            )
         }
     }
 

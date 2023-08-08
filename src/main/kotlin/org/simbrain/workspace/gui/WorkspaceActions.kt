@@ -18,16 +18,28 @@
  */
 package org.simbrain.workspace.gui
 
+import org.simbrain.plot.histogram.HistogramComponent
+import org.simbrain.plot.histogram.HistogramModel
+import org.simbrain.plot.piechart.PieChartComponent
+import org.simbrain.plot.piechart.PieChartModel
+import org.simbrain.plot.pixelplot.EmitterMatrix
+import org.simbrain.plot.pixelplot.PixelPlotComponent
 import org.simbrain.plot.projection.ProjectionComponent2
+import org.simbrain.plot.rasterchart.RasterModel
+import org.simbrain.plot.rasterchart.RasterPlotComponent
+import org.simbrain.plot.timeseries.TimeSeriesModel
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
 import org.simbrain.util.displayInDialog
-import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import javax.swing.Action
+import javax.swing.JMenu
 import javax.swing.JOptionPane
 
 /**
@@ -253,35 +265,109 @@ class WorkspaceActions {
             workspaceComponent.name = newTitle
         }
 
-    /**
-     * Uses the default producer of the attribute container
-     */
-    @JvmOverloads
-    fun createCoupledProjectionPlotAction(container: AttributeContainer, name: String = "Projection Plot") = SimbrainDesktop.desktopPane.createAction(
-        name = name,
-        iconPath = "menu_icons/ProjectionIcon.png",
-        description = "Create Coupled Projection Plot",
+    private fun <T: WorkspaceComponent> createCoupledPlotAction(
+        producer: Producer,
+        plotType: String,
+        objectName: String,
+        iconPath: String,
+        description: String = "Create Coupled $plotType",
+        componentCreator: (componentName: String) -> T,
+        consumerProvider: CouplingManager.(T) -> Consumer
+    ) = SimbrainDesktop.desktopPane.createAction(
+        name = plotType,
+        iconPath = iconPath,
+        description = description,
         coroutineScope = workspace
     ) {
-        val projectionComponent = ProjectionComponent2(name)
-        workspace.addWorkspaceComponent(projectionComponent)
+        val component = componentCreator("$plotType of $objectName")
+        workspace.addWorkspaceComponent(component)
         with(workspace.couplingManager) {
-            container couple projectionComponent
+            producer couple consumerProvider(component)
         }
     }
 
     @JvmOverloads
-    fun createCoupledProjectionPlotAction(producer: Producer, name: String = "Projection Plot") = SimbrainDesktop.desktopPane.createAction(
-        name = name,
+    fun createCoupledProjectionPlotAction(producer: Producer, objectName: String, plotType: String = "Projection Plot") = createCoupledPlotAction(
+        producer = producer,
+        plotType = plotType,
+        objectName = objectName,
         iconPath = "menu_icons/ProjectionIcon.png",
-        description = "Create Coupled Projection Plot",
-        coroutineScope = workspace
-    ) {
-        val projectionComponent = ProjectionComponent2("Projection")
-        workspace.addWorkspaceComponent(projectionComponent)
-        with(workspace.couplingManager) {
-            producer couple projectionComponent.getConsumer("addPoint")
+        componentCreator = { name -> ProjectionComponent2(name) },
+        consumerProvider = {
+            it.getConsumer("addPoint")
         }
+    )
+
+    @JvmOverloads
+    fun createCoupledTimeSeriesPlotAction(producer: Producer, objectName: String, plotType: String = "Time Series Plot") = createCoupledPlotAction(
+        producer = producer,
+        plotType = plotType,
+        objectName = objectName,
+        iconPath = "menu_icons/CurveChart.png",
+        componentCreator = { name -> TimeSeriesPlotComponent(name) },
+        consumerProvider = {
+            it.model.getConsumer(TimeSeriesModel::setValues)
+        }
+    )
+
+    @JvmOverloads
+    fun createCoupledHistogramPlotAction(producer: Producer, objectName: String, plotType: String = "Histogram Plot") = createCoupledPlotAction(
+        producer = producer,
+        plotType = plotType,
+        objectName = objectName,
+        iconPath = "menu_icons/BarChart.png",
+        componentCreator = { name -> HistogramComponent(name) },
+        consumerProvider = {
+            it.model.getConsumer(HistogramModel::addData.name)
+        }
+    )
+
+    @JvmOverloads
+    fun createCoupledPieChartAction(producer: Producer, objectName: String, plotType: String = "Pie Chart") = createCoupledPlotAction(
+        producer = producer,
+        plotType = plotType,
+        objectName = objectName,
+        iconPath = "menu_icons/PieChart.png",
+        componentCreator = { name -> PieChartComponent(name) },
+        consumerProvider = {
+            it.model.getConsumer(PieChartModel::setValues)
+        }
+    )
+
+    @JvmOverloads
+    fun createCoupledRasterPlotAction(producer: Producer, objectName: String, plotType: String = "Raster Plot") = createCoupledPlotAction(
+        producer = producer,
+        plotType = plotType,
+        objectName = objectName,
+        iconPath = "menu_icons/ScatterIcon.png",
+        componentCreator = { name -> RasterPlotComponent(name) },
+        consumerProvider = {
+            it.model.rasterConsumerList.first().getConsumer(RasterModel.RasterConsumer::setValues)
+        }
+    )
+
+    @JvmOverloads
+    fun createCoupledPixelPlotAction(producer: Producer, objectName: String, plotType: String = "Pixel Plot") = createCoupledPlotAction(
+        producer = producer,
+        plotType = plotType,
+        objectName = objectName,
+        iconPath = "menu_icons/grid.png",
+        componentCreator = { name -> PixelPlotComponent(name) },
+        consumerProvider = {
+            it.emitter.getConsumer(EmitterMatrix::setBrightness)
+        }
+    )
+
+    @JvmOverloads
+    fun createCoupledPlotMenu(producer: Producer, objectName: String, menuTitle: String = "Couple Plots"): JMenu {
+        val menu = JMenu(menuTitle)
+        menu.add(createCoupledProjectionPlotAction(producer, objectName))
+        menu.add(createCoupledTimeSeriesPlotAction(producer, objectName))
+        menu.add(createCoupledHistogramPlotAction(producer, objectName))
+        menu.add(createCoupledPieChartAction(producer, objectName))
+        menu.add(createCoupledRasterPlotAction(producer, objectName))
+        menu.add(createCoupledPixelPlotAction(producer, objectName))
+        return menu
     }
 
 }

@@ -13,7 +13,6 @@ import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.matrix.ZoeConnector;
 import org.simbrain.util.ImageKt;
-import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.table.MatrixDataWrapper;
@@ -28,9 +27,9 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
-import static org.simbrain.util.SmileUtilsKt.showHistogram;
 
 /**
  * A visual representation of a weight matrix
@@ -188,20 +187,18 @@ public class WeightMatrixNode extends ScreenElement implements PropertyChangeLis
         };
         contextMenu.add(diagAction);
 
-        Action showHistogram = new AbstractAction("Show Histogram") {
-            {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/BarChart.png"));
-                putValue(SHORT_DESCRIPTION, "Show histogram");
-            }
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                var updateHistogram = showHistogram(((WeightMatrix) weightMatrix).getWeightMatrix(), "Weight Histogram", "Strengths");
-                weightMatrix.getEvents().getUpdated().on(() -> updateHistogram.invoke(((WeightMatrix) weightMatrix).getWeightMatrix()));
-            }
-        };
-        contextMenu.add(showHistogram);
+        contextMenu.addSeparator();
 
-        contextMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCoupledProjectionPlotAction(weightMatrix, "Weight Projection Plot"));
+        contextMenu.add(
+                SimbrainDesktop.INSTANCE.getActionManager()
+                        .createCoupledPlotMenu(
+                                SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(
+                                        weightMatrix, "getWeights"
+                                ),
+                                Objects.requireNonNull(weightMatrix.getId()),
+                                "Plot Weight Matrix"
+                        )
+        );
 
         // Coupling menu
         contextMenu.addSeparator();

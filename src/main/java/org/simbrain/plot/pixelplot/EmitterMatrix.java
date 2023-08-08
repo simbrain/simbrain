@@ -87,10 +87,13 @@ public class EmitterMatrix implements AttributeContainer {
 
     @Consumable
     public void setBrightness(double[] values) {
-        int length = Math.min(values.length, image.getWidth() * image.getHeight());
-        System.arraycopy(values, 0, channels[0], 0, length);
-        System.arraycopy(values, 0, channels[1], 0, length);
-        System.arraycopy(values, 0, channels[2], 0, length);
+        int length = (int) Math.ceil(Math.sqrt(values.length));
+        if (image.getWidth() != length || image.getHeight() != length) {
+            setSize(length, length);
+        }
+        System.arraycopy(values, 0, channels[0], 0, values.length);
+        System.arraycopy(values, 0, channels[1], 0, values.length);
+        System.arraycopy(values, 0, channels[2], 0, values.length);
         emitImage();
     }
 

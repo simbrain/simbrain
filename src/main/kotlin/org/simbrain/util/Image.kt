@@ -9,6 +9,7 @@ import javax.swing.ImageIcon
 import javax.swing.JLabel
 import javax.swing.JPanel
 import kotlin.math.floor
+import kotlin.math.min
 import kotlin.math.pow
 
 /**
@@ -34,20 +35,22 @@ fun DoubleArray.toSimbrainColor() = map { value ->
  *
  * Width * height must be less than the array size.
  */
-fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor().let {
+fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width * height).let {
+    System.arraycopy(toSimbrainColor(), 0, it, 0, min(size, width * height))
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)
-    val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, it.size), null)
+    val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, width * height), null)
     BufferedImage(colorModel, raster, false, null)
 }
 
 /**
  * Converts a float array to a matrix image as in [DoubleArray.toSimbrainColorImage]
  */
-fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = toSimbrainColor().let {
+fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width * height).let {
+    System.arraycopy(toSimbrainColor(), 0, it, 0, min(size, width * height))
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)
-    val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, it.size), null)
+    val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, width * height), null)
     BufferedImage(colorModel, raster, false, null)
 }
 

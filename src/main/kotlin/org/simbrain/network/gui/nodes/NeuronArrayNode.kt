@@ -38,6 +38,7 @@ import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.NumericTable
 import org.simbrain.util.table.SimbrainJTable
 import org.simbrain.util.table.SimbrainJTableScrollPanel
+import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import smile.math.matrix.Matrix
@@ -45,6 +46,7 @@ import java.awt.Color
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.*
+import kotlin.math.ceil
 import kotlin.math.sqrt
 
 /**
@@ -173,7 +175,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val activations = neuronArray.outputs.toDoubleArray()
         if (gridMode) {
             // "Grid" case
-            val len = sqrt(activations.size.toDouble()).toInt()
+            val len = ceil(sqrt(activations.size.toDouble())).toInt()
             val img = activations.toSimbrainColorImage(len, len)
             activationImage.image = img
             activationImage.setBounds(
@@ -376,6 +378,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 )
             }
         }
+        contextMenu.add(actionManager.createImageInput(
+            neuronArray.getConsumer(NeuronArray::addInputsMismatched),
+            ceil(sqrt(neuronArray.size().toDouble())).toInt(),
+            menuTitle = "Add coupled image world",
+            postActionBlock = { neuronArray.isGridMode = true }
+        ))
 
         // Coupling menu
         contextMenu.addSeparator()

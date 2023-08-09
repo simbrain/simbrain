@@ -201,7 +201,7 @@ public class NeuronArray extends ArrayLayer implements EditableObject, Attribute
     }
 
     public void setActivations(Matrix newActivations) {
-        activations = newActivations;
+        SmileUtilsKt.copy(newActivations, activations);
         getEvents().getUpdated().fireAndForget();
     }
 

@@ -3,6 +3,7 @@ package org.simbrain.util
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import smile.math.matrix.Matrix
+import kotlin.math.min
 
 /**
  * Make sure the two matrices have the same shape
@@ -14,14 +15,33 @@ fun Matrix.validateSameShape(target: Matrix) {
     }
 }
 
-fun Matrix.copy(toCopy: Matrix) {
-    this.validateSameShape(toCopy)
-    for (i in 0 until nrow()) {
-        for (j in 0 until ncol()) {
+/**
+ * @param allowShapeMismatch If true, then smaller arrays are copied into larger ones (and the other entries in the
+ *          larger one are ignored), and larger arrays are trimmed and copied to smaller arrays.
+ */
+@JvmOverloads
+fun Matrix.copy(toCopy: Matrix, allowShapeMismatch: Boolean = false) {
+    if (!allowShapeMismatch) {
+        validateSameShape(toCopy)
+    }
+    val nrow = min(this.nrow(), toCopy.nrow())
+    val ncol = min(this.ncol(), toCopy.ncol())
+    for (i in 0 until nrow) {
+        for (j in 0 until ncol) {
             set(i,j, toCopy.get(i,j))
         }
     }
 }
+
+/**
+ * Returns a matrix reshaped to an indicated size, trimming or padding as needed.
+ */
+fun Matrix.reshape(newNrows: Int, newNcols: Int): Matrix {
+    val newMatrix = Matrix(newNrows, newNcols)
+    newMatrix.copy(this, allowShapeMismatch = true)
+    return newMatrix
+}
+
 
 val Matrix.shapeString get() = "(${nrow()},${ncol()})"
 

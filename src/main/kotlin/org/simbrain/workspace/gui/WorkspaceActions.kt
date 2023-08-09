@@ -37,7 +37,10 @@ import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.couplings.CouplingManager
+import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
+import org.simbrain.world.imageworld.ImageWorldComponent
+import org.simbrain.world.imageworld.filters.Filter
 import javax.swing.Action
 import javax.swing.JMenu
 import javax.swing.JOptionPane
@@ -368,6 +371,22 @@ class WorkspaceActions {
         menu.add(createCoupledRasterPlotAction(producer, objectName))
         menu.add(createCoupledPixelPlotAction(producer, objectName))
         return menu
+    }
+
+    fun createImageInput(consumer: Consumer, length: Int, menuTitle: String = "Create Image Input", postActionBlock: () -> Unit = {}) = SimbrainDesktop.desktopPane.createAction(
+        name = menuTitle,
+        iconPath = "menu_icons/photo.png",
+        description = "Create Image Input",
+        coroutineScope = workspace
+    ) {
+        val component = ImageWorldComponent("Image Input for ${consumer.baseObject.id}")
+        component.world.resetImageAlbum(length, length)
+        workspace.addWorkspaceComponent(component)
+        val producer = component.world.currentFilter.getProducer(Filter::getBrightness)
+        with(workspace.couplingManager) {
+            producer couple consumer
+        }
+        postActionBlock()
     }
 
 }

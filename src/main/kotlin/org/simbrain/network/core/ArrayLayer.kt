@@ -1,9 +1,7 @@
 package org.simbrain.network.core
 
-import org.simbrain.util.UserParameter
-import org.simbrain.util.randomize
+import org.simbrain.util.*
 import org.simbrain.util.stats.distributions.UniformRealDistribution
-import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
@@ -52,6 +50,14 @@ abstract class ArrayLayer(
     @Consumable
     fun addInputs(inputs: DoubleArray?) {
         addInputs(Matrix.column(inputs))
+    }
+
+    /**
+     * Add input array even if size is mismatched, in which case the input is reshaped. See [reshape]
+     */
+    @Consumable
+    fun addInputsMismatched(inputs: DoubleArray) {
+        addInputs(inputs.toMatrix().reshape(this.inputs.nrow(), this.inputs.ncol()))
     }
 
     override fun randomize() {

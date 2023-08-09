@@ -140,10 +140,14 @@ class CouplingManager(val workspace: Workspace) {
         getConsumer(methodName)
     }
 
+    fun AttributeContainer.getConsumer(method: Method): Consumer = with(couplingCache) {
+        getConsumer(method)
+    }
+
     /**
      * getConsumer but using function reference which is preferable to using strings
      */
-    fun AttributeContainer.getConsumer(kFunction: KFunction<Unit>): Consumer = getConsumer(kFunction.name)
+    fun AttributeContainer.getConsumer(kFunction: KFunction<Unit>): Consumer = getConsumer(kFunction.javaMethod!!)
 
     /**
      * getConsumer but using property reference which is preferable to using strings
@@ -337,15 +341,29 @@ class CouplingManager(val workspace: Workspace) {
 
 
 /**
- * Find the first [Producer] in an [AttributeContainer] which has the given method name
+ * Find the first [Producer] in an [AttributeContainer] which has the method name matches the given function
  */
-fun <T: AttributeContainer, R> T.getProducer(methodName: KFunction1<T, R>) = with(SimbrainDesktop.workspace.couplingManager) {
-    getProducer(methodName)
+fun <T: AttributeContainer, R> T.getProducer(function: KFunction1<T, R>) = with(SimbrainDesktop.workspace.couplingManager) {
+    getProducer(function)
 }
 
 /**
- * Find the first [Producer] in an [AttributeContainer] which has the given method name
+ * Find the first [Producer] in an [AttributeContainer] which has the method name of the getter of the given property
  */
-fun <T: AttributeContainer, R> T.getProducer(methodName: KProperty1<T, R>) = with(SimbrainDesktop.workspace.couplingManager) {
-    getProducer(methodName.getter.javaMethod?.name ?: methodName.getter.name)
+fun <T: AttributeContainer, R> T.getProducer(property: KProperty1<T, R>) = with(SimbrainDesktop.workspace.couplingManager) {
+    getProducer(property.getter.javaMethod?.name ?: property.getter.name)
+}
+
+/**
+ * Find the [Consumer] in an [AttributeContainer] which has the method of the given function
+ */
+fun <T: AttributeContainer, U> T.getConsumer(function: KFunction2<T, U, Unit>) = with(SimbrainDesktop.workspace.couplingManager) {
+    getConsumer(function)
+}
+
+/**
+ * Find the first [Consumer] in an [AttributeContainer] which has the method name of the setter of the given property
+ */
+fun <T: AttributeContainer> T.getConsumer(property: KMutableProperty0<T>) = with(SimbrainDesktop.workspace.couplingManager) {
+    getConsumer(property.setter.javaMethod?.name ?: property.setter.name)
 }

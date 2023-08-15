@@ -7,37 +7,14 @@ import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.isAccessible
 
-class UpdateFunctionContext<O, T>(
-    private val baseObject: O,
-    val updateEventProperty: KProperty<*>,
-    private val enableWidgetProvider: (Boolean) -> Unit
-) {
-    fun widgetValue(property: KMutableProperty1<O, T>): T {
-        property.isAccessible = true
-        val delegate = property.getDelegate(baseObject)
-        return if (delegate is UserParameter2<*, *>) {
-            delegate.widgetValue as T
-        } else {
-            property.get(baseObject)
-        }
-    }
-
-    fun onChange(property: KProperty<*>, block: () -> Unit) {
-        if (this.updateEventProperty == property) {
-            block()
-        }
-    }
-
-    fun enableWidget(enabled: Boolean) {
-        enableWidgetProvider(enabled)
-    }
-}
 
 /**
  * A special kind of value that can be parsed by an annotated property editor.
+ *
  * Example activation = UserParameter<Neuron, Double>(0.0)
- * @param T the type of the value of a property on a base object.
- * @param O the type of the base object
+ *
+ * @param O the type of the base object that holds the parameter
+ * @param T the type of the value of this property
  */
 class UserParameter2<O: Any, T>(
     initValue: T,
@@ -103,6 +80,46 @@ class UserParameter2<O: Any, T>(
 
 }
 
+/**
+ * Provides a context for the update function.
+ * O and T must match O and T of the parent user parameter.
+ */
+class UpdateFunctionContext<O, T>(
+    private val baseObject: O,
+    val updateEventProperty: KProperty<*>,
+    private val enableWidgetProvider: (Boolean) -> Unit
+) {
+
+    /**
+     * Provides the value of a widget that can be used inside the update function.
+     * Example: `widgetValue(Neuron::activation)` returns the current value of the text field used to edit activation
+     * (NOT the actual activation of the model neuron).
+     */
+    fun widgetValue(property: KMutableProperty1<O, T>): T {
+        property.isAccessible = true
+        val delegate = property.getDelegate(baseObject)
+        return if (delegate is UserParameter2<*, *>) {
+            delegate.widgetValue as T
+        } else {
+            property.get(baseObject)
+        }
+    }
+
+    fun onChange(property: KProperty<*>, block: () -> Unit) {
+        if (this.updateEventProperty == property) {
+            block()
+        }
+    }
+
+    fun enableWidget(enabled: Boolean) {
+        enableWidgetProvider(enabled)
+    }
+}
+
+/**
+ * Events to fire when the property dialog changes. Changing boolean values, editing text, etc. will fire this event.
+ * Allows some dialog entries to respond to others.
+ */
 class ParameterEvents<O: Any, T>: Events2() {
 
     val valueChanged = AddedEvent<KMutableProperty1<O, T>>()
@@ -153,8 +170,6 @@ class BooleanWidget<O: Any>(
         set(value) {
             widget.isSelected = value
         }
-
-
 
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(

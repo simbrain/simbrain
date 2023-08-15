@@ -8,15 +8,15 @@ class AnnotatedPropertyEditorTestObject2 {
     //     initValue = 1
     // )
 
-    var intControl by UserParameter2(
+    var testBoolean by UserParameter2(
         initValue = true
     )
 
-    var conditionallyEnabledInt by UserParameter2(
+    var conditionallyEnabledBoolean by UserParameter2(
         initValue = true,
         onUpdate = {
-            if (updateEventProperty == AnnotatedPropertyEditorTestObject2::intControl) {
-                enableWidget(widgetValue(AnnotatedPropertyEditorTestObject2::intControl))
+            if (updateEventProperty == AnnotatedPropertyEditorTestObject2::testBoolean) {
+                enableWidget(widgetValue(AnnotatedPropertyEditorTestObject2::testBoolean))
             }
         }
     )
@@ -25,7 +25,7 @@ class AnnotatedPropertyEditorTestObject2 {
 
 fun main() {
     val editingObject = AnnotatedPropertyEditorTestObject2()
-    editingObject.intControl = false
+    editingObject.testBoolean = false
     val editor = AnnotatedPropertyEditor2(listOf(editingObject))
     editor.displayInDialog()
 }

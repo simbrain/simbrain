@@ -35,15 +35,18 @@ import org.simbrain.workspace.WorkspaceComponent;
 public class DocViewerComponent extends WorkspaceComponent {
 
     /** Default string. */
-    private String text = "<html>\n<body>\nUse this text to explain how a simulation works,\n"
+    private String text = "<html>\n<body>\n"
+            + "<h1>Document Viewer</h1><br>\n"
+            + "Use this text to explain how a simulation works,\n"
             + "and save it with the workspace so that\n"
             + "when it is re-opened other users will know how to use it.\n<br><br>\n"
-            + "Uses simple html for formatting, e.g. <b>bold text</b>.\n Click on the "
-            + "Edit tab to edit the html \n or import from pre-edited html "
-            + "using the File menu.<br><br>"
-            + "Example of a local image: <img src = \"file:docs/Images/simbrainlogo.gif\"><br><br>\n"
-            + "Example of a local link: <a href = \"file:docs/SimbrainDocs.html\">docs</a>\n"
-            + " \n</body>\n</html>\n";
+            + "Uses simple html for formatting, e.g. <b>bold text</b>.\n"
+            + "Click on the edit tab to edit the html \n or import pre-edited html "
+            + "using the File menu.<br><br>\n"
+            + "Example of a local image: <img src = \"file:docs/Images/Mouse.gif\"><br><br>\n"
+            + "Example of a local link: <a href = \"file:docs/SimbrainDocs.html\">docs</a><br><br>\n"
+            + "Note: Remote url's are not guaranteed to work.\n"
+            + "</body>\n</html>\n";
 
     /**
      * Construct a new document viewer component.

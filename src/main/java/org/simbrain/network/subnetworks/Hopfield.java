@@ -21,11 +21,9 @@ package org.simbrain.network.subnetworks;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.network.trainers.TrainingSet;
@@ -34,6 +32,7 @@ import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -42,18 +41,12 @@ import java.util.List;
 public class Hopfield extends Subnetwork implements Trainable {
 
     /**
-     * Default update mechanism.
+     * Custom update rule for Hopfield.
      */
     public static final HopfieldUpdate DEFAULT_UPDATE = HopfieldUpdate.SYNC;
 
-    /**
-     * The neurons.
-     */
     private NeuronGroup neuronGroup;
 
-    /**
-     * The weights.
-     */
     private SynapseGroup2 weights;
 
     /**
@@ -66,7 +59,6 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     @UserParameter(label = "Update function")
     private HopfieldUpdate updateFunc = DEFAULT_UPDATE;
-
 
     /**
      * Training set.
@@ -84,7 +76,7 @@ public class Hopfield extends Subnetwork implements Trainable {
         setLabel("Hopfield network");
 
         // In this case the network object is being used by to store default
-        // values for the hopfield network creation panel
+        // values for the Hopfield network creation panel
         if (root == null) {
             return;
         }
@@ -104,16 +96,19 @@ public class Hopfield extends Subnetwork implements Trainable {
         neuronGroup.setIncrement(1);
 
         // Connect the neurons together
-        weights = SynapseGroup.createSynapseGroup(neuronGroup, neuronGroup);
+        weights = new SynapseGroup2(neuronGroup, neuronGroup);
+        weights.setDisplaySynapses(false);
         addModel(weights);
+
+        // Symmetric randomization
+        randomize();
 
     }
 
     @Override
     public void randomize() {
-        weights.randomize();
+        getSynapseGroup().randomizeSymmetric();
     }
-    // TODO: Get back old code that did this symmetrically
 
     @Override
     public void update() {
@@ -158,13 +153,14 @@ public class Hopfield extends Subnetwork implements Trainable {
      * main training algorithm, which directly makes use of the input data.
      */
     public void trainOnCurrentPattern() {
-        for (Synapse w : this.getSynapseGroup().getSynapses()) {
-            Neuron src = w.getSource();
-            Neuron tar = w.getTarget();
-            // TODO
-            // getSynapseGroup().setSynapseStrength(w, w.getStrength() + bipolar(src.getActivation()) * bipolar(tar.getActivation()));
-        }
-        // TODO: Should an event be fired?
+        neuronGroup.getNeuronList().forEach(src -> {
+            src.getFanIn().forEach(s -> {
+                var tar = s.getSource();
+                var deltaW = bipolar(src.getActivation()) * bipolar(tar.getActivation());
+                s.setStrength(s.getStrength() + deltaW);
+            });
+        });
+        getEvents().getUpdated().fireAndForget();
     }
 
     /**
@@ -183,6 +179,9 @@ public class Hopfield extends Subnetwork implements Trainable {
      */
     public enum HopfieldUpdate {
         RAND {
+            /**
+             * Update neurons in random order
+             */
             @Override
             public void update(Hopfield hop) {
                 List<Neuron> copy = new ArrayList<>(hop.getNeuronGroup().getNeuronList());
@@ -194,79 +193,48 @@ public class Hopfield extends Subnetwork implements Trainable {
             }
 
             @Override
-            public String getDescription() {
-                return "Randomly ordered sequential update (different every" + " time)";
-            }
-
-            @Override
-            public String getName() {
+            public String toString() {
                 return "Random";
             }
 
         }, SEQ {
+            /**
+             * Sequential update of neurons (same sequence every time)
+             */
             @Override
             public void update(Hopfield hop) {
-                List<Neuron> copy = new ArrayList<>(hop.getNeuronGroup().getNeuronList());
-                // TODO: Sort by priority
-                copy.forEach(n -> {
-                    n.updateInputs();
-                    n.update();
-                });
+                // TODO: Cache the sorted list
+                hop.neuronGroup.getNeuronList()
+                        .stream().sorted(Comparator.comparing(Neuron::getUpdatePriority))
+                        .forEach(n -> {
+                            n.updateInputs();
+                            n.update();
+                        });
             }
 
-            @Override
-            public String getDescription() {
-                return "Sequential update of neurons (same seqence every time)";
-            }
 
             @Override
-            public String getName() {
+            public String toString() {
                 return "Sequential";
             }
 
         }, SYNC {
             @Override
             public void update(Hopfield hop) {
-                hop.getNeuronGroup().getNeuronList().forEach(n -> {
-                    n.updateInputs();
-                    n.update();
-                });
+                hop.getNeuronGroup().getNeuronList().forEach(Neuron::updateInputs);
+                hop.getNeuronGroup().getNeuronList().forEach(Neuron::update);
             }
 
             @Override
-            public String getDescription() {
-                return "Synchronous update of neurons";
-            }
-
-            @Override
-            public String getName() {
+            public String toString() {
                 return "Synchronous";
             }
 
         };
 
-        public static HopfieldUpdate getUpdateFuncFromName(String name) {
-            for (HopfieldUpdate hu : HopfieldUpdate.values()) {
-                if (name.equals(hu.getName())) {
-                    return hu;
-                }
-            }
-            throw new IllegalArgumentException("No such Hopfield update" + "function");
-        }
-
-        public static String[] getUpdateFuncNames() {
-            String[] names = new String[HopfieldUpdate.values().length];
-            for (int i = 0; i < HopfieldUpdate.values().length; i++) {
-                names[i] = HopfieldUpdate.values()[i].getName();
-            }
-            return names;
-        }
 
         public abstract void update(Hopfield hop);
 
-        public abstract String getDescription();
-
-        public abstract String getName();
     }
 
     /**

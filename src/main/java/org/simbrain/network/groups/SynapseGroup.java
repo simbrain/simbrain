@@ -153,7 +153,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      */
     private boolean recurrent;
 
-    // TODO: Temporay rewrite to make t
+    // TODO: "For backwards compatibility while we phase out Synapse Group 1"
     /**
      * Creates a synapse group with the desired parameters. Last argument is variable argument.
      *
@@ -164,6 +164,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      *               used to determine the weights of inhibitory synapses.
      * @return a synapse group with the above parameters.
      */
+    @Deprecated()
     public static SynapseGroup2 createSynapseGroup(
             final NeuronGroup source,
             final NeuronGroup target,

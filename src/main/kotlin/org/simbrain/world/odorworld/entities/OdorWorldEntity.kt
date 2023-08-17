@@ -6,6 +6,7 @@ import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Producible
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
@@ -308,6 +309,16 @@ class OdorWorldEntity @JvmOverloads constructor(
             movement.dtheta = value
         }
 
+    /**
+     * Returns the name of the first object encountered in the provided radius, or an empty string if none is found.
+     */
+    @Producible
+    @JvmOverloads
+    fun getNearbyObjectName(radius: Int = 10): String? {
+        return (world.entityList - this).firstOrNull() {
+            this.location.distance(it.location) < radius
+        }?.entityType?.description
+    }
 
     override val childrenContainers: List<AttributeContainer>
         get() = sensors + effectors

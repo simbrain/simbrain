@@ -15,7 +15,8 @@ import org.simbrain.workspace.AttributeContainer
 import smile.math.matrix.Matrix
 
 /**
- * Lightweight collection of synapses
+ * Lightweight collection of synapses. Contains references to a source and target layer, a connection strategy, and a
+ * list of synapses.
  */
 class SynapseGroup2 @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
@@ -30,6 +31,8 @@ class SynapseGroup2 @JvmOverloads constructor(
     // TODO: When passing in synapses check all source are in source and all target are in target
     // reuse this in addsynapse
 
+    // TODO: Should the randomizers and connection strategy be editable?
+
     /**
      * Randomizer for all weights, regardless of polarity. Applying it can change the polarity of a weight.
      */
@@ -43,7 +46,7 @@ class SynapseGroup2 @JvmOverloads constructor(
     /**
      * Randomizer for inhibitory weights.
      */
-    val inhibitoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 0.0))
+    var inhibitoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 0.0))
 
     @Transient
     override var events = SynapseGroup2Events2()
@@ -106,6 +109,13 @@ class SynapseGroup2 @JvmOverloads constructor(
 
     fun size(): Int = this.synapses.size
 
+    // TODO: Not using the sg randomizers
+    fun randomizeSymmetric() {
+        // Inefficient but good enough
+        this.synapses.forEach { it.randomizeSymmetric() }
+    }
+
+    // TODO: Not using the sg randomizers
     override fun randomize() {
         this.synapses.forEach { it.randomize() }
     }

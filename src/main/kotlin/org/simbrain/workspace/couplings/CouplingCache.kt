@@ -224,6 +224,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
         .isAnnotationPresent(Consumable::class.java) }.first{it.name == name}
 
     private fun Class<AttributeContainer>.findProducibleMethod(name: String): Method? = methods.filter { it
-        .isAnnotationPresent(Producible::class.java) }.first{it.name == name}
+        .isAnnotationPresent(Producible::class.java) }
+        .first{(it.name == name) && (it.parameterCount == 0)}
 
 }

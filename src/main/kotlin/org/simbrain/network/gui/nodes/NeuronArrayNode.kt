@@ -380,7 +380,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
         contextMenu.add(actionManager.createImageInput(
             neuronArray.getConsumer(NeuronArray::addInputsMismatched),
-            ceil(sqrt(neuronArray.size().toDouble())).toInt(),
+            neuronArray.size(),
             menuTitle = "Add coupled image world",
             postActionBlock = { neuronArray.isGridMode = true }
         ))

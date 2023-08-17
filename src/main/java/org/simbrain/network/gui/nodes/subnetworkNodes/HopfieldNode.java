@@ -23,9 +23,11 @@ import org.simbrain.network.gui.dialogs.network.HopfieldEditTrainDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 /**
  * PNode representation of Hopfield Network.
@@ -88,6 +90,25 @@ public class HopfieldNode extends SubnetworkNode {
             }
         };
         menu.add(clearWeights);
+        menu.addSeparator();
+
+        var sd =  SimbrainDesktop.INSTANCE;
+        Action couplingProjection =
+                sd.getActionManager().createCoupledProjectionPlotAction(
+                        sd.getWorkspace().getCouplingManager().getProducer(
+                                hopfield.getNeuronGroup(), "getActivations"
+                        ),
+                        Objects.requireNonNull(hopfield.getId()),
+                        "Projection");
+        menu.add(couplingProjection);
+        Action imageInput =
+                sd.getActionManager().createImageInput(
+                        sd.getWorkspace().getCouplingManager().getConsumer(
+                                hopfield.getNeuronGroup(), "addInputs"
+                        ),
+                        hopfield.getNeuronGroup().getNeuronList().size());
+        menu.add(imageInput);
+
         setContextMenu(menu);
     }
 

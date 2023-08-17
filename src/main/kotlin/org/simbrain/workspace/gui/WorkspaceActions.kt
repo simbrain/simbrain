@@ -41,6 +41,8 @@ import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.imageworld.filters.Filter
+import java.lang.Math.ceil
+import java.lang.Math.sqrt
 import javax.swing.Action
 import javax.swing.JMenu
 import javax.swing.JOptionPane
@@ -373,13 +375,20 @@ class WorkspaceActions {
         return menu
     }
 
-    fun createImageInput(consumer: Consumer, length: Int, menuTitle: String = "Create Image Input", postActionBlock: () -> Unit = {}) = SimbrainDesktop.desktopPane.createAction(
+    /**
+     * Create an action that couples an image world to a consumer (e.g. neuron group or array) with the specified
+     * number of units.
+     */
+    @JvmOverloads
+    fun createImageInput(consumer: Consumer, numUnits: Int, menuTitle: String = "Create Image Input", postActionBlock:
+        () -> Unit = {}) = SimbrainDesktop.desktopPane.createAction(
         name = menuTitle,
         iconPath = "menu_icons/photo.png",
         description = "Create Image Input",
         coroutineScope = workspace
     ) {
         val component = ImageWorldComponent("Image Input for ${consumer.baseObject.id}")
+        val length = ceil(sqrt(numUnits.toDouble())).toInt()
         component.world.resetImageAlbum(length, length)
         workspace.addWorkspaceComponent(component)
         val producer = component.world.currentFilter.getProducer(Filter::getBrightness)

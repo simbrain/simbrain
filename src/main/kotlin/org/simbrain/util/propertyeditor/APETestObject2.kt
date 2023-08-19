@@ -1,5 +1,6 @@
 package org.simbrain.util.propertyeditor
 
+import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.displayInDialog
 
 class APETestObject2 {
@@ -7,6 +8,10 @@ class APETestObject2 {
     // var simpleInt by UserParameter2(
     //     initValue = 1
     // )
+
+    var testString by UserParameter2(
+        initValue = "test"
+    )
 
     var testBoolean by UserParameter2(
         initValue = true
@@ -57,7 +62,7 @@ class APETestObject2 {
         }
 
         override fun toString(): String {
-            return "TestInnerObject1(test1Int=$test1Int)"
+            return "TestInnerObject1(${allPropertiesToString(", ")})"
         }
 
     }
@@ -77,12 +82,12 @@ class APETestObject2 {
         }
 
         override fun toString(): String {
-            return "TestInnerObject2(test2Boolean=$test2Boolean, test2Int=$test2Int)"
+            return "TestInnerObject2(${allPropertiesToString(", ")}})"
         }
     }
 
     override fun toString(): String {
-        return "AnnotatedPropertyEditorTestObject2(testBoolean=$testBoolean, conditionallyEnabledBoolean=$conditionallyEnabledBoolean, conditionallyEnabledInt=$conditionallyEnabledInt, testDouble=$testDouble, testObject=$testObject)"
+        return "APETestObject2(${allPropertiesToString(", ")})"
     }
 
 }
@@ -93,6 +98,7 @@ fun main() {
     editingObject.first().apply {
         testBoolean = false
         testDouble = 2.3
+        testString = "test1"
         // (testObject as AnnotatedPropertyEditorTestObject2.TestInnerObject1).test1Int = 3
         testObject = APETestObject2.TestInnerObject2(3, false)
     }

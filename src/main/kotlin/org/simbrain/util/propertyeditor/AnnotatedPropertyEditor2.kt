@@ -42,6 +42,13 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
 
     fun <T> makeWidget(userParameter: UserParameter2<O, T>, isConsistent: Boolean): ParameterWidget2<O, T> {
         return when (userParameter.value) {
+
+            is String -> StringWidget(
+                this@AnnotatedPropertyEditor2,
+                userParameter as UserParameter2<O, String>,
+                isConsistent
+            ) as ParameterWidget2<O, T>
+
             is Boolean -> BooleanWidget(
                 this@AnnotatedPropertyEditor2,
                 userParameter as UserParameter2<O, Boolean>,

@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import javax.swing.*
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 import kotlin.reflect.KClass
@@ -288,6 +290,59 @@ class NumericWidget2<O: Any, T>(
         ))
     }
 
+}
+
+class StringWidget<O: Any>(
+    val editor: AnnotatedPropertyEditor2<O>,
+    parameter: UserParameter2<O, String>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, String>(parameter, isConsistent) {
+
+    override val widget by lazy {
+        JTextField().also {
+            it.text = if (this@StringWidget.isConsistent) parameter.value else NULL_STRING
+        }.also {
+            it.document.addDocumentListener(object : DocumentListener {
+                fun update() {
+                    events.valueChanged.fireAndBlock(parameter.property)
+                    this@StringWidget.isConsistent = true
+                }
+
+                override fun insertUpdate(e: DocumentEvent) {
+                    update()
+                }
+
+                override fun removeUpdate(e: DocumentEvent?) {
+                    update()
+                }
+
+                override fun changedUpdate(e: DocumentEvent?) {
+                    update()
+                }
+            })
+        }
+    }
+
+    override var value: String
+        get() = widget.text
+        set(value) {
+            widget.text = value
+            isConsistent = true
+        }
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
 }
 
 

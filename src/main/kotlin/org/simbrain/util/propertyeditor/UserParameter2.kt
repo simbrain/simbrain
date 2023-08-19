@@ -1,10 +1,24 @@
 package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.Events2
+import org.simbrain.util.SimbrainConstants.NULL_STRING
+import org.simbrain.util.callNoArgConstructor
 import org.simbrain.util.widgets.YesNoNull
-import javax.swing.JComponent
+import java.awt.Dimension
+import java.awt.event.ActionEvent
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import javax.swing.*
+import javax.swing.text.DefaultFormatterFactory
+import javax.swing.text.NumberFormatter
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.superclasses
 import kotlin.reflect.jvm.isAccessible
 
 
@@ -19,11 +33,13 @@ import kotlin.reflect.jvm.isAccessible
 class UserParameter2<O: Any, T>(
     initValue: T,
     label: String? = null,
+    val min: T? = null,
+    val max: T? = null,
+    val step: T? = null,
     val onUpdate: UpdateFunctionContext<O, T>.() -> Unit = { }
 ) {
 
     var value: T = initValue
-    var widgetValue: T by makeWidget()
 
     private var _baseObject: O? = null
     val baseObject: O
@@ -60,6 +76,9 @@ class UserParameter2<O: Any, T>(
         return value
     }
 
+    @JvmName("getValueNoArgs")
+    fun getValue(): T = getValue(baseObject, property)
+
     operator fun setValue(
         baseObject: O,
         property: KProperty<*>,
@@ -84,10 +103,12 @@ class UserParameter2<O: Any, T>(
  * Provides a context for the update function.
  * O and T must match O and T of the parent user parameter.
  */
-class UpdateFunctionContext<O, T>(
-    private val baseObject: O,
+class UpdateFunctionContext<O: Any, T>(
+    private val editor: AnnotatedPropertyEditor2<O>,
+    private val parameter: UserParameter2<O, T>,
     val updateEventProperty: KProperty<*>,
-    private val enableWidgetProvider: (Boolean) -> Unit
+    private val enableWidgetProvider: (Boolean) -> Unit,
+    private val widgetVisibilityProvider: (Boolean) -> Unit
 ) {
 
     /**
@@ -95,13 +116,13 @@ class UpdateFunctionContext<O, T>(
      * Example: `widgetValue(Neuron::activation)` returns the current value of the text field used to edit activation
      * (NOT the actual activation of the model neuron).
      */
-    fun widgetValue(property: KMutableProperty1<O, T>): T {
+    fun <WT> widgetValue(property: KMutableProperty1<O, WT>): WT {
         property.isAccessible = true
-        val delegate = property.getDelegate(baseObject)
-        return if (delegate is UserParameter2<*, *>) {
-            delegate.widgetValue as T
+        val parameter = property.getDelegate(parameter.baseObject)
+        return if (parameter is UserParameter2<*, *>) {
+            editor.widgets[parameter]!!.value as WT
         } else {
-            property.get(baseObject)
+            throw IllegalArgumentException("Property $property is not a user parameter")
         }
     }
 
@@ -113,6 +134,11 @@ class UpdateFunctionContext<O, T>(
 
     fun enableWidget(enabled: Boolean) {
         enableWidgetProvider(enabled)
+    }
+
+    fun showWidget(visible: Boolean) {
+        widgetVisibilityProvider(visible)
+        editor.parameterJLabels[parameter]?.isVisible = visible
     }
 }
 
@@ -148,6 +174,7 @@ sealed class ParameterWidget2<O: Any, T>(val parameter: UserParameter2<O, T>, va
 }
 
 class BooleanWidget<O: Any>(
+    val editor: AnnotatedPropertyEditor2<O>,
     parameter: UserParameter2<O, Boolean>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, Boolean>(parameter, isConsistent) {
@@ -159,8 +186,10 @@ class BooleanWidget<O: Any>(
                 it.setNull()
             }
         }.also {
-            it.addActionListener {
+            it.addActionListener { _ ->
                 events.valueChanged.fireAndBlock(parameter.property)
+                this@BooleanWidget.isConsistent = true
+                it.removeNull()
             }
         }
     }
@@ -169,23 +198,194 @@ class BooleanWidget<O: Any>(
         get() = widget.isSelected
         set(value) {
             widget.isSelected = value
+            isConsistent = true
         }
 
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(
-            parameter.baseObject,
+            editor,
+            parameter,
             property,
             enableWidgetProvider = { enabled ->
                 widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
             }
         ))
     }
 }
 
-fun <O: Any, T, > UserParameter2<O, T>.makeWidget(isConsistent: Boolean = true): ParameterWidget2<O, T> {
-    return when (value) {
-        is Boolean? -> BooleanWidget(this as UserParameter2<O, Boolean>, isConsistent) as ParameterWidget2<O, T>
-        is Int? -> TODO()
-        else -> throw IllegalArgumentException("Unsupported type: ${value!!::class.simpleName}")
+class NumericWidget2<O: Any, T>(
+    val editor: AnnotatedPropertyEditor2<O>,
+    parameter: UserParameter2<O, T>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, T>(parameter, isConsistent) {
+
+    val type = parameter.property.returnType.classifier as KClass<*>
+
+    override val widget by lazy {
+        val defaultStepSize = when(type) {
+            Int::class -> 1
+            Short::class -> 1
+            Long::class -> 1
+            Float::class -> 0.1f
+            Double::class -> 0.1
+            else -> throw IllegalArgumentException("Unsupported type $type")
+        }
+
+        val step = parameter.step ?: defaultStepSize as T
+
+        val model = when(type) {
+            Int::class -> SpinnerNumberModel(parameter.value as Int, parameter.min as Int?, parameter.max as Int?, step as Int)
+            Short::class -> SpinnerNumberModel(parameter.value as Short, parameter.min as Short?, parameter.max as Short?, step as Short)
+            Long::class -> SpinnerNumberModel(parameter.value as Long, parameter.min as Long?, parameter.max as Long?, step as Long)
+            Float::class -> SpinnerNumberModel(parameter.value as Float, parameter.min as Float?, parameter.max as Float?, step as Float)
+            Double::class -> SpinnerNumberModel(parameter.value as Double, parameter.min as Double?, parameter.max as Double?, step as Double)
+            else -> throw IllegalArgumentException("Unsupported type $type")
+        }
+        JSpinner(model).also {
+            val format = if (type == Int::class || type == Long::class || type == Short::class) {
+                NumberFormat.getIntegerInstance(it.getLocale())
+            } else {
+                NumberFormat.getNumberInstance(it.getLocale()).apply { maximumFractionDigits = 12 }
+            } as DecimalFormat
+            val formatterEditor = NumberFormatter(format)
+            formatterEditor.valueClass = type.javaObjectType
+            val factory = DefaultFormatterFactory(formatterEditor)
+            val ftf: JFormattedTextField = (it.editor as JSpinner.DefaultEditor).textField
+            ftf.isEditable = true
+            ftf.setFormatterFactory(factory)
+            if (!isConsistent) {
+                (it.editor as JSpinner.DefaultEditor).textField?.text = NULL_STRING
+            }
+        }.also {
+            it.addChangeListener {
+                events.valueChanged.fireAndBlock(parameter.property)
+                this@NumericWidget2.isConsistent = true
+            }
+        }
     }
+
+    override var value: T
+        get() = widget.value as T
+        set(value) {
+            widget.value = value
+            this.isConsistent = true
+        }
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+
+}
+
+
+class ObjectWidget<O: Any, T: CopyableObject>(
+    private val editor: AnnotatedPropertyEditor2<O>,
+    private val objectList: List<T>,
+    parameter: UserParameter2<O, T>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, T>(parameter, isConsistent) {
+
+    private var _prototypeObject: T? = null
+
+    override var value: T
+        get() = _prototypeObject ?: objectList.first()
+        set(value) {
+            _prototypeObject = value
+        }
+
+    private val typeMap = (value::class.superclasses.asSequence()
+        .mapNotNull {
+            val property = it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
+            property?.get(it.companionObjectInstance) as? List<KClass<*>>
+        }.first()).associateBy { it.simpleName!! }
+
+    private val editorPanelContainer = JPanel()
+
+    lateinit var objectTypeEditor: AnnotatedPropertyEditor2<T>
+        private set
+
+    private val dropDown: JComboBox<String> = JComboBox<String>().apply {
+        typeMap.keys.forEach {
+            addItem(it)
+        }
+        addActionListener { e: ActionEvent? ->
+
+            // Create the prototype object and refresh editor panel
+            try {
+                val clazz = typeMap[selectedItem as String]
+                if (clazz != null) {
+                    val prototypeObject = clazz.callNoArgConstructor() as T
+                    objectTypeEditor = AnnotatedPropertyEditor2(listOf(prototypeObject))
+                    this@ObjectWidget.value = prototypeObject
+                    editorPanelContainer.removeAll()
+                    editorPanelContainer.add(objectTypeEditor)
+                    this@ObjectWidget.isConsistent = true
+                    removeItem(NULL_STRING)
+                    revalidate()
+                    events.valueChanged.fireAndBlock(parameter.property)
+                    SwingUtilities.getWindowAncestor(this)?.pack()
+                }
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
+        }
+    }
+
+
+    override val widget = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        val padding = BorderFactory.createEmptyBorder(5, 5, 5, 5)
+
+        // Top Panel contains the combo box and detail triangle
+        val topPanel = JPanel()
+        topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
+        val tb = BorderFactory.createTitledBorder(parameter.label)
+        border = tb
+        topPanel.alignmentX = JPanel.CENTER_ALIGNMENT
+        topPanel.border = padding
+        this.add(Box.createRigidArea(Dimension(0, 5)))
+        this.add(topPanel)
+
+        topPanel.add(dropDown)
+
+        if (!isConsistent) {
+            dropDown.apply {
+                addItem(NULL_STRING)
+                setSelectedIndex(itemCount - 1)
+            }
+        } else {
+            AnnotatedPropertyEditor2(objectList)
+            editorPanelContainer.add(objectTypeEditor)
+        }
+
+        add(editorPanelContainer)
+    }
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+
 }

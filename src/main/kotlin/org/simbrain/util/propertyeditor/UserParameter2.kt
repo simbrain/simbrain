@@ -2,7 +2,9 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.Events2
 import org.simbrain.util.SimbrainConstants.NULL_STRING
+import org.simbrain.util.UserParameter
 import org.simbrain.util.callNoArgConstructor
+import org.simbrain.util.convertCamelCaseToSpaces
 import org.simbrain.util.widgets.YesNoNull
 import java.awt.Dimension
 import java.awt.event.ActionEvent
@@ -65,16 +67,7 @@ class UserParameter2<O: Any, T>(
         }
 
     operator fun getValue(baseObject: O, property: KProperty<*>): T {
-        val kMutableProperty1 = property as KMutableProperty1<O, T>
-        if (_baseObject == null) {
-            _baseObject = baseObject
-        }
-        if (_property == null) {
-            _property = kMutableProperty1
-        }
-        if (_label == null) {
-            _label = property.name
-        }
+        initInternalValues(baseObject, property)
         return value
     }
 
@@ -86,19 +79,52 @@ class UserParameter2<O: Any, T>(
         property: KProperty<*>,
         value: T
     ) {
-        val kMutableProperty1 = property as KMutableProperty1<O, T>
+        initInternalValues(baseObject, property)
+        this.value = value
+    }
+
+    private fun initInternalValues(
+        baseObject: O,
+        property: KProperty<*>,
+    ) {
         if (_baseObject == null) {
             _baseObject = baseObject
         }
         if (_property == null) {
+            val kMutableProperty1 = property as KMutableProperty1<O, T>
             _property = kMutableProperty1
         }
         if (_label == null) {
-            _label = property.name
+            _label = property.name.convertCamelCaseToSpaces()
         }
-        this.value = value
     }
 
+}
+
+fun UserParameter.toDelegate(initValue: Any): UserParameter2<Any, Any> {
+
+    fun Any.matchDataTypeTo(match: Any): Any? {
+        val thisNumber = this as Double
+        if (thisNumber.isNaN()) return null
+        return when (match) {
+            is Int -> thisNumber.toInt()
+            is Short -> thisNumber.toInt().toShort()
+            is Long -> this.toLong()
+            is Float -> this.toFloat()
+            else -> this
+        }
+    }
+
+    return UserParameter2(
+        initValue = initValue,
+        label = label,
+        min = minimumValue.matchDataTypeTo(initValue),
+        max = maximumValue.matchDataTypeTo(initValue),
+        step = increment.matchDataTypeTo(initValue),
+        onUpdate = {
+
+        }
+    )
 }
 
 /**

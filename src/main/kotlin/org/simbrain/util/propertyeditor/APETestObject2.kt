@@ -1,5 +1,6 @@
 package org.simbrain.util.propertyeditor
 
+import org.simbrain.util.UserParameter
 import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.displayInDialog
 
@@ -8,6 +9,9 @@ class APETestObject2 {
     // var simpleInt by UserParameter2(
     //     initValue = 1
     // )
+
+    @UserParameter(label = "Annotated Int", description = "Annotated Int Description")
+    var annotatedInt = 1
 
     var testString by UserParameter2(
         initValue = "test"

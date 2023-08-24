@@ -2,6 +2,7 @@ package org.simbrain.util
 
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
+import java.util.*
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
@@ -211,6 +212,13 @@ fun textEntryDialog(initialString: String, title: String = "Edit Text", columns:
     }
 
     return dialog
+}
+
+fun String.convertCamelCaseToSpaces(): String {
+    val regex = "(?<=\\w)([A-Z])".toRegex()
+    return regex.replace(this) { " ${it.value}" }
+        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        .trim()
 }
 
 // Test main

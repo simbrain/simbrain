@@ -1,8 +1,10 @@
 package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.LabelledItemPanel
+import org.simbrain.util.UserParameter
 import javax.swing.JPanel
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
@@ -10,13 +12,24 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
 
     val widgets = editingObjects.first().let { obj ->
 
-        obj::class.memberProperties
+        val delegated = obj::class.memberProperties
             .asSequence()
             .filterIsInstance<KMutableProperty1<O, *>>()
             .onEach { it.isAccessible = true }
             .mapNotNull { property -> property.getDelegate(obj)?.also { property.get(obj) } }
             .filterIsInstance<UserParameter2<O, *>>()
-            .map { parameter ->
+
+        val annotated = obj::class.memberProperties
+            .asSequence()
+            .mapNotNull {
+                (it.annotations
+                    .filterIsInstance<UserParameter>()
+                    .firstOrNull()
+                    ?.toDelegate((it as KProperty1<O, *>).getValue(obj, it)!!) as? UserParameter2<O, *>)
+                    ?.also { up -> up.getValue(obj, it) }
+            }
+
+        (delegated + annotated).map { parameter ->
                 parameter to makeWidget(
                     parameter,
                     if (parameter.value is CopyableObject) {

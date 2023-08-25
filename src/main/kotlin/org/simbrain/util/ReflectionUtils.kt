@@ -1,7 +1,6 @@
 package org.simbrain.util
 
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 
 fun <T : Any> KClass<T>.callNoArgConstructor(): T = constructors.asSequence().mapNotNull {
@@ -12,4 +11,15 @@ fun <T : Any> KClass<T>.callNoArgConstructor(): T = constructors.asSequence().ma
     }
 }.first()
 
-fun Any.allPropertiesToString(separator: String = "\n") = this::class.declaredMemberProperties.joinToString(separator) { "${it.name} = ${(it as KProperty1<Any, Any>).get(this)}" }
+fun Any.allPropertiesToString(separator: String = "\n") = this::class.declaredMemberProperties.joinToString(separator) {
+    val name = it.name
+    val valueString = when(val value = it.getter.call(this)) {
+        is String -> value
+        is List<*> -> value.joinToString(", ")
+        is Array<*> -> value.contentDeepToString()
+        is DoubleArray -> value.joinToString(", ")
+        is FloatArray -> value.joinToString(", ")
+        else -> value.toString()
+    }
+    "$name = $valueString"
+}

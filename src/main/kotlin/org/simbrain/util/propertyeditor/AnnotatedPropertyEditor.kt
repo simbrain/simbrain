@@ -305,7 +305,7 @@ class AnnotatedPropertyEditor(objects: List<EditableObject>) : EditablePanel() {
 
         // Commit each widget's value to all objects in list
         for (pw in widgets) {
-            if (!pw.parameter.isEditable) {
+            if (pw.parameter.isDisplayOnly) {
                 continue
             }
             val widgetValue = pw.widgetValue ?: continue

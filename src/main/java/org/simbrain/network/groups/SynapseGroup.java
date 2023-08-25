@@ -114,7 +114,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
      * ratio of the source neurons <b>not<b> this variable. The group will however attempt to get as close to this ratio
      * as possible without ever assigning a synapse to a source neuron of opposing polarity.
      */
-    @UserParameter(label = "Excitatory ratio", editable = false, order = 50)
+    @UserParameter(label = "Excitatory ratio", displayOnly = true, order = 50)
     private double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
     @UserParameter(label = "Excitatory Learning Rule", useSetter = true,

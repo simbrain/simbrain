@@ -138,7 +138,7 @@ annotation class UserParameter(
     /**
      * Set to false to make this a "display" type.
      */
-    val editable: Boolean = true,
+    val displayOnly: Boolean = false,
     /**
      * Name of a method whose value determines whether this component is visible or not. Only called once when the
      * editor is opened.

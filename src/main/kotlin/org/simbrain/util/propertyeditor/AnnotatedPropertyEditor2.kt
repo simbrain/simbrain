@@ -63,15 +63,25 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
 
     val labelledItemPanel = LabelledItemPanel().also { add(it) }
 
-    val parameterJLabels = widgets.map { (parameter, widget) ->
-        val label = labelledItemPanel.addItem(parameter.label, widget.widget)
-        widget.events.valueChanged.on {
-            widgets.forEach { (_, w) -> w.refresh(widget.parameter.property) }
+    val parameterJLabels =
+        widgets.entries.sortedBy { (parameter) -> parameter.order }.associate { (parameter, widget) ->
+            val label = labelledItemPanel.addItem(parameter.label, widget.widget)
+            label.toolTipText = parameter.description
+            widget.events.valueChanged.on {
+                widgets.forEach { (_, w) -> w.refresh(widget.parameter.property) }
+            }
+            parameter to label
         }
-        parameter to label
-    }.toMap()
 
     fun <T> makeWidget(userParameter: UserParameter2<O, T>, isConsistent: Boolean): ParameterWidget2<O, T> {
+        if (userParameter.displayOnly) {
+            return DisplayOnlyWidget(
+                this@AnnotatedPropertyEditor2,
+                userParameter as UserParameter2<O, Any>,
+                isConsistent
+            ) as ParameterWidget2<O, T>
+        }
+
         return when (userParameter.value) {
 
             is String -> StringWidget(

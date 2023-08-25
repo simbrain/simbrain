@@ -52,7 +52,7 @@ public abstract class Effector implements PeripheralAttribute {
      * The id of this smell effector.
      */
     @UserParameter(label = "Effector ID", description = "A unique id for this effector",
-            order = 0, editable = false)
+            order = 0, displayOnly = true)
     private String id;
 
     /**

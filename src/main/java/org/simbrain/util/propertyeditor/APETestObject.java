@@ -18,13 +18,13 @@ import java.awt.*;
 public class APETestObject implements EditableObject {
 
     // Not working
-    @UserParameter(label = "Non editable item", editable = false)
+    @UserParameter(label = "Non editable item", displayOnly = true, order = 0)
     private String theLabel = "I'm a label";
 
-    @UserParameter(label = "Color")
+    @UserParameter(label = "Color", order = 1)
     Color theColor = Color.red;
 
-    @UserParameter(label = "Boolean primitive")
+    @UserParameter(label = "Boolean primitive", order = 2)
     boolean theBool = true;
 
     // @UserParameter(label = "Boolean object")
@@ -79,8 +79,7 @@ public class APETestObject implements EditableObject {
     private TestEnum theEnum = TestEnum.FOUR;
 
 
-    // @UserParameter(label = "Object type", isObjectType = true)
-
+    @UserParameter(label = "Object type")
     private Layout theLayout = new LineLayout();
 
     public enum TestEnum {

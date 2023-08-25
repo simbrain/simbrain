@@ -51,7 +51,7 @@ public abstract class Sensor implements PeripheralAttribute {
      * The id of this smell sensor.
      */
     @UserParameter(label = "Sensor ID", description = "A unique id for this sensor",
-            order = 0, editable = false)
+            order = 0, displayOnly = true)
     private String id;
 
     /**

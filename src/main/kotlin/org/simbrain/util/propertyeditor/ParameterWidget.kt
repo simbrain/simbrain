@@ -159,7 +159,7 @@ class ParameterWidget(
                 parameter.annotation.showDetails
             )
         }
-        if (!parameter.isEditable) {
+        if (parameter.isDisplayOnly) {
             return JLabel()
         }
         if (parameter.isBoolean) {
@@ -277,7 +277,7 @@ class ParameterWidget(
         }
 
     var widgetValue: Any?
-        get() = if (!parameter.isEditable) {
+        get() = if (parameter.isDisplayOnly) {
             (component as JLabel).text
         } else if (parameter.isString) {
             if ((component as TextWithNull?)!!.isNull()) null else component!!.text
@@ -316,7 +316,7 @@ class ParameterWidget(
             throw IllegalArgumentException("Trying to retrieve a value from an unsupported widget type")
         }
         set(value) {
-            if (!parameter.isEditable) {
+            if (parameter.isDisplayOnly) {
                 // non-editable widgets are represented with JLabels
                 (component as JLabel).text = value?.toString() ?: SimbrainConstants.NULL_STRING
             } else if (parameter.isBoolean) {

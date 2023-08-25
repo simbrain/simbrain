@@ -18,6 +18,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
+import kotlin.math.min
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
@@ -38,9 +39,12 @@ import kotlin.reflect.jvm.jvmErasure
 class UserParameter2<O: Any, T>(
     initValue: T,
     label: String? = null,
+    val description: String? = null,
     val min: T? = null,
     val max: T? = null,
-    val step: T? = null,
+    val increment: T? = null,
+    val order: Int = 0,
+    val displayOnly: Boolean = false,
     val onUpdate: UpdateFunctionContext<O, T>.() -> Unit = { }
 ) {
 
@@ -119,9 +123,12 @@ fun UserParameter.toDelegate(initValue: Any): UserParameter2<Any, Any> {
     return UserParameter2(
         initValue = initValue,
         label = label,
+        description = description.ifEmpty { null },
         min = minimumValue.matchDataTypeTo(initValue),
         max = maximumValue.matchDataTypeTo(initValue),
-        step = increment.matchDataTypeTo(initValue),
+        increment = increment.matchDataTypeTo(initValue),
+        order = order,
+        displayOnly = displayOnly,
         onUpdate = {
 
         }
@@ -187,41 +194,32 @@ sealed class ParameterWidget2<O: Any, T>(val parameter: UserParameter2<O, T>, va
 
     abstract val widget: JComponent
 
-    operator fun getValue(userParameter2: UserParameter2<O, T>, property: KProperty<*>): T {
-        return value
-    }
-
-    operator fun setValue(userParameter2: UserParameter2<O, T>, property: KProperty<*>, value: T) {
-        this.value = value
-        events.valueChanged.fireAndBlock(parameter.property)
-    }
-
-    abstract var value: T
+    abstract val value: T
 
     abstract fun refresh(property: KProperty<*>)
 
 }
 
-class EnumWidget<O: Any>(
+class EnumWidget<O: Any, T: Enum<*>>(
     val editor: AnnotatedPropertyEditor2<O>,
-    parameter: UserParameter2<O, Enum<*>>,
+    parameter: UserParameter2<O, T>,
     isConsistent: Boolean
-) : ParameterWidget2<O, Enum<*>>(parameter, isConsistent) {
+) : ParameterWidget2<O, T>(parameter, isConsistent) {
 
     override val widget by lazy {
 
         val clazz = parameter.property.returnType
         val method = clazz.jvmErasure.functions.find { it.name == "values" }
         val enumValues = method!!.call()
-        ChoicesWithNull(enumValues as Array<*>).also {
+        ChoicesWithNull(enumValues as Array<T>).also {
             if (!isConsistent) {
                 it.setNull()
             }
         }
     }
 
-    override var value: Enum<*>
-        get() = widget.selectedItem as Enum<*>
+    override var value: T
+        get() = widget.selectedItem as T
         set(value) {
             // Not used
         }
@@ -262,12 +260,8 @@ class BooleanWidget<O: Any>(
         }
     }
 
-    override var value: Boolean
+    override val value: Boolean
         get() = widget.isSelected
-        set(value) {
-            widget.isSelected = value
-            isConsistent = true
-        }
 
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(
@@ -302,7 +296,7 @@ class NumericWidget2<O: Any, T>(
             else -> throw IllegalArgumentException("Unsupported type $type")
         }
 
-        val step = parameter.step ?: defaultStepSize as T
+        val step = parameter.increment ?: defaultStepSize as T
 
         val model = when(type) {
             Int::class -> SpinnerNumberModel(parameter.value as Int, parameter.min as Int?, parameter.max as Int?, step as Int)
@@ -335,12 +329,8 @@ class NumericWidget2<O: Any, T>(
         }
     }
 
-    override var value: T
+    override val value: T
         get() = widget.value as T
-        set(value) {
-            widget.value = value
-            this.isConsistent = true
-        }
 
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(
@@ -356,6 +346,34 @@ class NumericWidget2<O: Any, T>(
         ))
     }
 
+}
+
+class DisplayOnlyWidget<O: Any, T>(
+    val editor: AnnotatedPropertyEditor2<O>,
+    parameter: UserParameter2<O, T>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, T>(parameter, isConsistent) {
+
+    override val widget by lazy {
+        JLabel().also {
+            it.text = if (this.isConsistent) parameter.value.toString() else NULL_STRING
+        }
+    }
+
+    override val value: T
+        get() = parameter.value
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = {},
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
 }
 
 class StringWidget<O: Any>(
@@ -389,12 +407,8 @@ class StringWidget<O: Any>(
         }
     }
 
-    override var value: String
+    override val value: String
         get() = widget.text
-        set(value) {
-            widget.text = value
-            isConsistent = true
-        }
 
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(
@@ -425,13 +439,8 @@ class ColorWidget<O: Any>(
         }
     }
 
-    override var value: Color
+    override val value: Color
         get() = widget.value
-        set(value) {
-            widget.value = value
-            isConsistent = true
-        }
-
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(
             editor,
@@ -454,33 +463,23 @@ class DoubleArrayWidget<O: Any>(
     isConsistent: Boolean
 ) : ParameterWidget2<O, DoubleArray>(parameter, isConsistent) {
 
-    private val panel = JPanel().also {
-        it.layout = BorderLayout()
-    }
-
     private var model = MatrixDataWrapper(parameter.value.toMatrix().transpose())
 
     override val widget by lazy {
-        SimbrainDataViewer(model, useDefaultToolbarAndMenu = false, useHeaders = false,
-            usePadding = false).also {
-            it.table.tableHeader = null
-            panel.add(it)
-            // TODO: Manually adding space in case a horizontal scrollbar is present.
-            //       Need to figure out a way to have the tables pack automatically to correct size.
-            // panel.minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-            // panel.preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-            // TODO
-            panel.preferredSize = Dimension(200, 150)
+        JPanel().apply {
+            layout = BorderLayout()
+            SimbrainDataViewer(model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                usePadding = false).also {
+                it.table.tableHeader = null
+                add(it)
+                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+            }
         }
-
     }
 
-    override var value: DoubleArray
-        get() = model.getDoubleColumn(0)
-        set(value) {
-            // Not used
-        }
-
+    override val value: DoubleArray
+        get() = model.get2DDoubleArray().first()
 
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(
@@ -506,21 +505,23 @@ class ObjectWidget<O: Any, T: CopyableObject>(
 
     private var _prototypeObject: T? = null
 
-    override var value: T
+    override val value: T
         get() = _prototypeObject ?: objectList.first()
-        set(value) {
-            _prototypeObject = value
-        }
 
     private val typeMap = (value::class.superclasses.asSequence()
         .mapNotNull {
-            val property = it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
-            property?.get(it.companionObjectInstance) as? List<KClass<*>>
+            val fromJava = (it.staticFunctions.firstOrNull { it.name == "getTypes" }?.call() as? List<Class<*>>)?.map { it.kotlin }
+            if (fromJava != null) {
+                fromJava
+            } else {
+                val property = it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
+                property?.get(it.companionObjectInstance) as? List<KClass<*>>
+            }
         }.first()).associateBy { it.simpleName!! }
 
     private val editorPanelContainer = JPanel()
 
-    lateinit var objectTypeEditor: AnnotatedPropertyEditor2<T>
+    var objectTypeEditor: AnnotatedPropertyEditor2<T> = AnnotatedPropertyEditor2(objectList)
         private set
 
     private val dropDown: JComboBox<String> = JComboBox<String>().apply {
@@ -535,7 +536,7 @@ class ObjectWidget<O: Any, T: CopyableObject>(
                 if (clazz != null) {
                     val prototypeObject = clazz.callNoArgConstructor() as T
                     objectTypeEditor = AnnotatedPropertyEditor2(listOf(prototypeObject))
-                    this@ObjectWidget.value = prototypeObject
+                    _prototypeObject = prototypeObject
                     editorPanelContainer.removeAll()
                     editorPanelContainer.add(objectTypeEditor)
                     this@ObjectWidget.isConsistent = true

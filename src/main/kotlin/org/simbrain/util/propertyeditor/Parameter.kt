@@ -51,8 +51,8 @@ class Parameter(property: KProperty1<*, *>) : Comparable<Parameter> {
     val type: KType
         get() = property!!.returnType
 
-    val isEditable: Boolean
-        get() = annotation.editable
+    val isDisplayOnly: Boolean
+        get() = annotation.displayOnly
 
     /**
      * If this parameter type does not return a value (as with embedded objects) return false

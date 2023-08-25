@@ -11,7 +11,7 @@ import org.simbrain.util.propertyeditor.EditableObject
  * Simbrain wrapper for a [TileMap] tile.
  */
 @XStreamAlias("tile")
-class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, editable = false) val id: Int) : EditableObject {
+class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, displayOnly = true) val id: Int) : EditableObject {
 
     /**
      * Type of this tile. This way multiple tiles can be associated with the same type.

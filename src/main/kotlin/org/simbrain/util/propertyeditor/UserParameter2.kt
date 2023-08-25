@@ -1,11 +1,14 @@
 package org.simbrain.util.propertyeditor
 
-import org.simbrain.util.Events2
+import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.NULL_STRING
-import org.simbrain.util.UserParameter
-import org.simbrain.util.callNoArgConstructor
-import org.simbrain.util.convertCamelCaseToSpaces
+import org.simbrain.util.table.MatrixDataWrapper
+import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.widgets.ChoicesWithNull
+import org.simbrain.util.widgets.ColorSelector
 import org.simbrain.util.widgets.YesNoNull
+import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.text.DecimalFormat
@@ -19,11 +22,9 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
-import kotlin.reflect.full.companionObject
-import kotlin.reflect.full.companionObjectInstance
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.full.superclasses
+import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.jvmErasure
 
 
 /**
@@ -201,6 +202,45 @@ sealed class ParameterWidget2<O: Any, T>(val parameter: UserParameter2<O, T>, va
 
 }
 
+class EnumWidget<O: Any>(
+    val editor: AnnotatedPropertyEditor2<O>,
+    parameter: UserParameter2<O, Enum<*>>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, Enum<*>>(parameter, isConsistent) {
+
+    override val widget by lazy {
+
+        val clazz = parameter.property.returnType
+        val method = clazz.jvmErasure.functions.find { it.name == "values" }
+        val enumValues = method!!.call()
+        ChoicesWithNull(enumValues as Array<*>).also {
+            if (!isConsistent) {
+                it.setNull()
+            }
+        }
+    }
+
+    override var value: Enum<*>
+        get() = widget.selectedItem as Enum<*>
+        set(value) {
+            // Not used
+        }
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
 class BooleanWidget<O: Any>(
     val editor: AnnotatedPropertyEditor2<O>,
     parameter: UserParameter2<O, Boolean>,
@@ -371,6 +411,91 @@ class StringWidget<O: Any>(
     }
 }
 
+class ColorWidget<O: Any>(
+    val editor: AnnotatedPropertyEditor2<O>,
+    parameter: UserParameter2<O, Color>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, Color>(parameter, isConsistent) {
+
+    override val widget by lazy {
+        ColorSelector().also {
+            if (isConsistent) {
+                it.value = parameter.value
+            }
+        }
+    }
+
+    override var value: Color
+        get() = widget.value
+        set(value) {
+            widget.value = value
+            isConsistent = true
+        }
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
+
+class DoubleArrayWidget<O: Any>(
+    val editor: AnnotatedPropertyEditor2<O>,
+    parameter: UserParameter2<O, DoubleArray>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, DoubleArray>(parameter, isConsistent) {
+
+    private val panel = JPanel().also {
+        it.layout = BorderLayout()
+    }
+
+    private var model = MatrixDataWrapper(parameter.value.toMatrix().transpose())
+
+    override val widget by lazy {
+        SimbrainDataViewer(model, useDefaultToolbarAndMenu = false, useHeaders = false,
+            usePadding = false).also {
+            it.table.tableHeader = null
+            panel.add(it)
+            // TODO: Manually adding space in case a horizontal scrollbar is present.
+            //       Need to figure out a way to have the tables pack automatically to correct size.
+            // panel.minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+            // panel.preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+            // TODO
+            panel.preferredSize = Dimension(200, 150)
+        }
+
+    }
+
+    override var value: DoubleArray
+        get() = model.getDoubleColumn(0)
+        set(value) {
+            // Not used
+        }
+
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
 
 class ObjectWidget<O: Any, T: CopyableObject>(
     private val editor: AnnotatedPropertyEditor2<O>,

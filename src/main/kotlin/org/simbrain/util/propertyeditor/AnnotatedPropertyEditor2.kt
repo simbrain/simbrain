@@ -2,6 +2,7 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.UserParameter
+import java.awt.Color
 import javax.swing.JPanel
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
@@ -12,6 +13,14 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
 
     val widgets = editingObjects.first().let { obj ->
 
+        /**
+         * Properties using UserParameters with delegation.
+         *
+         * Ex:
+         * ```
+         * var testString by UserParameter2(initValue = "test")
+         * ````
+         */
         val delegated = obj::class.memberProperties
             .asSequence()
             .filterIsInstance<KMutableProperty1<O, *>>()
@@ -19,6 +28,15 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
             .mapNotNull { property -> property.getDelegate(obj)?.also { property.get(obj) } }
             .filterIsInstance<UserParameter2<O, *>>()
 
+        /**
+         * Properties using UserParameter annotations
+         *
+         * Ex:
+         * ```
+         * @UserParameter()
+         * var testString = initValue
+         * ```
+         */
         val annotated = obj::class.memberProperties
             .asSequence()
             .mapNotNull {
@@ -71,6 +89,24 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
             is Int, is Short, is Long, is Double, is Float -> NumericWidget2(
                 this@AnnotatedPropertyEditor2,
                 userParameter as UserParameter2<O, *>,
+                isConsistent
+            ) as ParameterWidget2<O, T>
+
+            is Color -> ColorWidget(
+                this@AnnotatedPropertyEditor2,
+                userParameter as UserParameter2<O, Color>,
+                isConsistent
+            ) as ParameterWidget2<O, T>
+
+            is Enum<*> -> EnumWidget(
+                this@AnnotatedPropertyEditor2,
+                userParameter as UserParameter2<O, Enum<*>>,
+                isConsistent
+            ) as ParameterWidget2<O, T>
+
+            is DoubleArray -> DoubleArrayWidget(
+                this@AnnotatedPropertyEditor2,
+                userParameter as UserParameter2<O, DoubleArray>,
                 isConsistent
             ) as ParameterWidget2<O, T>
 

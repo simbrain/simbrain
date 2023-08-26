@@ -13,15 +13,15 @@ class APETestObject2 {
     @UserParameter(label = "Annotated Int", description = "Annotated Int Description")
     var annotatedInt = 1
 
-    var testString by UserParameter2(
+    var testString by GuiEditable(
         initValue = "test"
     )
 
-    var testBoolean by UserParameter2(
+    var testBoolean by GuiEditable(
         initValue = true
     )
 
-    var conditionallyEnabledBoolean by UserParameter2(
+    var conditionallyEnabledBoolean by GuiEditable(
         initValue = true,
         onUpdate = {
             if (updateEventProperty == APETestObject2::testBoolean) {
@@ -30,7 +30,7 @@ class APETestObject2 {
         }
     )
 
-    var conditionallyEnabledInt by UserParameter2(
+    var conditionallyEnabledInt by GuiEditable(
         initValue = 1,
         onUpdate = {
             if (updateEventProperty == APETestObject2::testBoolean) {
@@ -39,11 +39,11 @@ class APETestObject2 {
         }
     )
 
-    var testDouble by UserParameter2(
+    var testDouble by GuiEditable(
         initValue = 1.3,
     )
 
-    var testObject: TestObjectBase by UserParameter2(
+    var testObject: TestObjectBase by GuiEditable(
         initValue = TestInnerObject1(1),
     )
 
@@ -57,7 +57,7 @@ class APETestObject2 {
     }
 
     class TestInnerObject1(testInt: Int = 1): TestObjectBase() {
-        var test1Int by UserParameter2(
+        var test1Int by GuiEditable(
             initValue = testInt,
         )
 
@@ -73,11 +73,11 @@ class APETestObject2 {
 
     class TestInnerObject2(testInt: Int = 2, testBoolean: Boolean = true): TestObjectBase() {
 
-        var test2Boolean by UserParameter2(
+        var test2Boolean by GuiEditable(
             initValue = testBoolean,
         )
 
-        var test2Int by UserParameter2(
+        var test2Int by GuiEditable(
             initValue = testInt,
         )
 
@@ -95,7 +95,6 @@ class APETestObject2 {
     }
 
 }
-
 
 fun main() {
     val editingObject = List(2) { APETestObject2() }

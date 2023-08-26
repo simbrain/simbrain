@@ -35,17 +35,18 @@ public class APETestObject implements EditableObject {
 
     @UserParameter(label = "Int object")
     Integer theIntObject = 1;
+
     @UserParameter(label = "Double object")
     Double theDoubleObject = 1.1;
 
     @UserParameter(label = "Float object")
     Float theFloatObject = .123213f;
 
-    // @UserParameter(label = "Long object")
-    // Long theLongObject = 12321L;
-    //
-    // @UserParameter(label = "Short object")
-    // Short theShortObject = 20;
+    @UserParameter(label = "Long object")
+    Long theLongObject = 12321L;
+
+    @UserParameter(label = "Short object")
+    Short theShortObject = 20;
 
     // Primitive number tests
     @UserParameter(label = "Int primitive", description = "The int", minimumValue = -10, maximumValue = 10, order = 1)
@@ -58,8 +59,7 @@ public class APETestObject implements EditableObject {
     @UserParameter(label = "Float primitive")
     float theFloat = 0;
 
-    // TODO: Min, max not working
-    @UserParameter(label = "The long", description = "The long")
+    @UserParameter(label = "The long", description = "The long", minimumValue = 5L, maximumValue = 40L, increment = 5L)
     long theLong = 20L;
 
     @UserParameter(label = "The short", description = "The short")
@@ -78,8 +78,7 @@ public class APETestObject implements EditableObject {
 
     private TestEnum theEnum = TestEnum.FOUR;
 
-
-    @UserParameter(label = "Object type")
+    @UserParameter(label = "Object type", showDetails = false)
     private Layout theLayout = new LineLayout();
 
     public enum TestEnum {

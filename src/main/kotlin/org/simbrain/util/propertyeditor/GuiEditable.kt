@@ -6,11 +6,14 @@ import org.simbrain.util.table.MatrixDataWrapper
 import org.simbrain.util.table.SimbrainDataViewer
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
+import org.simbrain.util.widgets.DropDownTriangle
 import org.simbrain.util.widgets.YesNoNull
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.ActionEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import javax.swing.*
@@ -27,7 +30,6 @@ import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
-
 /**
  * A special kind of value that can be parsed by an annotated property editor.
  *
@@ -36,7 +38,7 @@ import kotlin.reflect.jvm.jvmErasure
  * @param O the type of the base object that holds the parameter
  * @param T the type of the value of this property
  */
-class UserParameter2<O: Any, T>(
+class GuiEditable<O: Any, T>(
     initValue: T,
     label: String? = null,
     val description: String? = null,
@@ -45,6 +47,7 @@ class UserParameter2<O: Any, T>(
     val increment: T? = null,
     val order: Int = 0,
     val displayOnly: Boolean = false,
+    val showDetails: Boolean = true,
     val onUpdate: UpdateFunctionContext<O, T>.() -> Unit = { }
 ) {
 
@@ -106,7 +109,10 @@ class UserParameter2<O: Any, T>(
 
 }
 
-fun UserParameter.toDelegate(initValue: Any): UserParameter2<Any, Any> {
+/**
+ * Converts [UserParameter] annotation to [GuiEditable].
+ */
+fun <O: Any> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
 
     fun Any.matchDataTypeTo(match: Any): Any? {
         val thisNumber = this as Double
@@ -120,7 +126,7 @@ fun UserParameter.toDelegate(initValue: Any): UserParameter2<Any, Any> {
         }
     }
 
-    return UserParameter2(
+    return GuiEditable(
         initValue = initValue,
         label = label,
         description = description.ifEmpty { null },
@@ -129,8 +135,8 @@ fun UserParameter.toDelegate(initValue: Any): UserParameter2<Any, Any> {
         increment = increment.matchDataTypeTo(initValue),
         order = order,
         displayOnly = displayOnly,
+        showDetails = showDetails,
         onUpdate = {
-
         }
     )
 }
@@ -141,7 +147,7 @@ fun UserParameter.toDelegate(initValue: Any): UserParameter2<Any, Any> {
  */
 class UpdateFunctionContext<O: Any, T>(
     private val editor: AnnotatedPropertyEditor2<O>,
-    private val parameter: UserParameter2<O, T>,
+    private val parameter: GuiEditable<O, T>,
     val updateEventProperty: KProperty<*>,
     private val enableWidgetProvider: (Boolean) -> Unit,
     private val widgetVisibilityProvider: (Boolean) -> Unit
@@ -155,7 +161,7 @@ class UpdateFunctionContext<O: Any, T>(
     fun <WT> widgetValue(property: KMutableProperty1<O, WT>): WT {
         property.isAccessible = true
         val parameter = property.getDelegate(parameter.baseObject)
-        return if (parameter is UserParameter2<*, *>) {
+        return if (parameter is GuiEditable<*, *>) {
             editor.widgets[parameter]!!.value as WT
         } else {
             throw IllegalArgumentException("Property $property is not a user parameter")
@@ -188,7 +194,7 @@ class ParameterEvents<O: Any, T>: Events2() {
 
 }
 
-sealed class ParameterWidget2<O: Any, T>(val parameter: UserParameter2<O, T>, var isConsistent: Boolean) {
+sealed class ParameterWidget2<O: Any, T>(val parameter: GuiEditable<O, T>, var isConsistent: Boolean) {
 
     val events = ParameterEvents<O, T>()
 
@@ -202,7 +208,7 @@ sealed class ParameterWidget2<O: Any, T>(val parameter: UserParameter2<O, T>, va
 
 class EnumWidget<O: Any, T: Enum<*>>(
     val editor: AnnotatedPropertyEditor2<O>,
-    parameter: UserParameter2<O, T>,
+    parameter: GuiEditable<O, T>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, T>(parameter, isConsistent) {
 
@@ -241,7 +247,7 @@ class EnumWidget<O: Any, T: Enum<*>>(
 
 class BooleanWidget<O: Any>(
     val editor: AnnotatedPropertyEditor2<O>,
-    parameter: UserParameter2<O, Boolean>,
+    parameter: GuiEditable<O, Boolean>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, Boolean>(parameter, isConsistent) {
 
@@ -280,7 +286,7 @@ class BooleanWidget<O: Any>(
 
 class NumericWidget2<O: Any, T>(
     val editor: AnnotatedPropertyEditor2<O>,
-    parameter: UserParameter2<O, T>,
+    parameter: GuiEditable<O, T>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, T>(parameter, isConsistent) {
 
@@ -350,7 +356,7 @@ class NumericWidget2<O: Any, T>(
 
 class DisplayOnlyWidget<O: Any, T>(
     val editor: AnnotatedPropertyEditor2<O>,
-    parameter: UserParameter2<O, T>,
+    parameter: GuiEditable<O, T>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, T>(parameter, isConsistent) {
 
@@ -378,7 +384,7 @@ class DisplayOnlyWidget<O: Any, T>(
 
 class StringWidget<O: Any>(
     val editor: AnnotatedPropertyEditor2<O>,
-    parameter: UserParameter2<O, String>,
+    parameter: GuiEditable<O, String>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, String>(parameter, isConsistent) {
 
@@ -427,7 +433,7 @@ class StringWidget<O: Any>(
 
 class ColorWidget<O: Any>(
     val editor: AnnotatedPropertyEditor2<O>,
-    parameter: UserParameter2<O, Color>,
+    parameter: GuiEditable<O, Color>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, Color>(parameter, isConsistent) {
 
@@ -459,7 +465,7 @@ class ColorWidget<O: Any>(
 
 class DoubleArrayWidget<O: Any>(
     val editor: AnnotatedPropertyEditor2<O>,
-    parameter: UserParameter2<O, DoubleArray>,
+    parameter: GuiEditable<O, DoubleArray>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, DoubleArray>(parameter, isConsistent) {
 
@@ -499,11 +505,13 @@ class DoubleArrayWidget<O: Any>(
 class ObjectWidget<O: Any, T: CopyableObject>(
     private val editor: AnnotatedPropertyEditor2<O>,
     private val objectList: List<T>,
-    parameter: UserParameter2<O, T>,
+    parameter: GuiEditable<O, T>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, T>(parameter, isConsistent) {
 
     private var _prototypeObject: T? = null
+
+    private var detailTriangle: DropDownTriangle? = null
 
     override val value: T
         get() = _prototypeObject ?: objectList.first()
@@ -521,7 +529,7 @@ class ObjectWidget<O: Any, T: CopyableObject>(
 
     private val editorPanelContainer = JPanel()
 
-    var objectTypeEditor: AnnotatedPropertyEditor2<T> = AnnotatedPropertyEditor2(objectList)
+    lateinit var objectTypeEditor: AnnotatedPropertyEditor2<T>
         private set
 
     private val dropDown: JComboBox<String> = JComboBox<String>().apply {
@@ -551,7 +559,6 @@ class ObjectWidget<O: Any, T: CopyableObject>(
         }
     }
 
-
     override val widget = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
         val padding = BorderFactory.createEmptyBorder(5, 5, 5, 5)
@@ -574,7 +581,23 @@ class ObjectWidget<O: Any, T: CopyableObject>(
                 setSelectedIndex(itemCount - 1)
             }
         } else {
-            AnnotatedPropertyEditor2(objectList)
+            val window = SwingUtilities.getWindowAncestor(this)
+            // Set up detail triangle
+            detailTriangle =
+                DropDownTriangle(DropDownTriangle.UpDirection.LEFT, parameter.showDetails, "Settings", "Settings",
+                    window)
+            detailTriangle!!.addMouseListener(object : MouseAdapter() {
+                override fun mouseClicked(arg0: MouseEvent) {
+                    editorPanelContainer.isVisible = detailTriangle!!.isDown
+                    repaint()
+                    window?.pack()
+                }
+            })
+            editorPanelContainer.isVisible = detailTriangle!!.isDown
+            topPanel.add(Box.createHorizontalStrut(30))
+            topPanel.add(Box.createHorizontalGlue())
+            topPanel.add(detailTriangle)
+            objectTypeEditor = AnnotatedPropertyEditor2(objectList)
             editorPanelContainer.add(objectTypeEditor)
         }
 

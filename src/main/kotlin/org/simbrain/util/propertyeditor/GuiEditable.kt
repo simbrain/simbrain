@@ -38,7 +38,7 @@ import kotlin.reflect.jvm.jvmErasure
  * @param O the type of the base object that holds the parameter
  * @param T the type of the value of this property
  */
-class GuiEditable<O: Any, T>(
+class GuiEditable<O : Any, T>(
     initValue: T,
     label: String? = null,
     val description: String? = null,
@@ -112,7 +112,7 @@ class GuiEditable<O: Any, T>(
 /**
  * Converts [UserParameter] annotation to [GuiEditable].
  */
-fun <O: Any> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
+fun <O : Any> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
 
     fun Any.matchDataTypeTo(match: Any): Any? {
         val thisNumber = this as Double
@@ -145,12 +145,13 @@ fun <O: Any> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
  * Provides a context for the update function.
  * O and T must match O and T of the parent user parameter.
  */
-class UpdateFunctionContext<O: Any, T>(
+class UpdateFunctionContext<O : Any, T>(
     private val editor: AnnotatedPropertyEditor2<O>,
     private val parameter: GuiEditable<O, T>,
     val updateEventProperty: KProperty<*>,
     private val enableWidgetProvider: (Boolean) -> Unit,
-    private val widgetVisibilityProvider: (Boolean) -> Unit
+    private val widgetVisibilityProvider: (Boolean) -> Unit,
+    private val refreshSourceProvider: (T) -> Unit = {},
 ) {
 
     /**
@@ -182,19 +183,23 @@ class UpdateFunctionContext<O: Any, T>(
         widgetVisibilityProvider(visible)
         editor.parameterJLabels[parameter]?.isVisible = visible
     }
+
+    fun refreshValue(newValue: T) {
+        refreshSourceProvider(newValue)
+    }
 }
 
 /**
  * Events to fire when the property dialog changes. Changing boolean values, editing text, etc. will fire this event.
  * Allows some dialog entries to respond to others.
  */
-class ParameterEvents<O: Any, T>: Events2() {
+class ParameterEvents<O : Any, T> : Events2() {
 
     val valueChanged = AddedEvent<KMutableProperty1<O, T>>()
 
 }
 
-sealed class ParameterWidget2<O: Any, T>(val parameter: GuiEditable<O, T>, var isConsistent: Boolean) {
+sealed class ParameterWidget2<O : Any, T>(val parameter: GuiEditable<O, T>, var isConsistent: Boolean) {
 
     val events = ParameterEvents<O, T>()
 
@@ -206,7 +211,7 @@ sealed class ParameterWidget2<O: Any, T>(val parameter: GuiEditable<O, T>, var i
 
 }
 
-class EnumWidget<O: Any, T: Enum<*>>(
+class EnumWidget<O : Any, T : Enum<*>>(
     val editor: AnnotatedPropertyEditor2<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
@@ -245,7 +250,7 @@ class EnumWidget<O: Any, T: Enum<*>>(
     }
 }
 
-class BooleanWidget<O: Any>(
+class BooleanWidget<O : Any>(
     val editor: AnnotatedPropertyEditor2<O>,
     parameter: GuiEditable<O, Boolean>,
     isConsistent: Boolean
@@ -284,7 +289,7 @@ class BooleanWidget<O: Any>(
     }
 }
 
-class NumericWidget2<O: Any, T>(
+class NumericWidget2<O : Any, T>(
     val editor: AnnotatedPropertyEditor2<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
@@ -293,7 +298,7 @@ class NumericWidget2<O: Any, T>(
     val type = parameter.property.returnType.classifier as KClass<*>
 
     override val widget by lazy {
-        val defaultStepSize = when(type) {
+        val defaultStepSize = when (type) {
             Int::class -> 1
             Short::class -> 1
             Long::class -> 1
@@ -304,12 +309,42 @@ class NumericWidget2<O: Any, T>(
 
         val step = parameter.increment ?: defaultStepSize as T
 
-        val model = when(type) {
-            Int::class -> SpinnerNumberModel(parameter.value as Int, parameter.min as Int?, parameter.max as Int?, step as Int)
-            Short::class -> SpinnerNumberModel(parameter.value as Short, parameter.min as Short?, parameter.max as Short?, step as Short)
-            Long::class -> SpinnerNumberModel(parameter.value as Long, parameter.min as Long?, parameter.max as Long?, step as Long)
-            Float::class -> SpinnerNumberModel(parameter.value as Float, parameter.min as Float?, parameter.max as Float?, step as Float)
-            Double::class -> SpinnerNumberModel(parameter.value as Double, parameter.min as Double?, parameter.max as Double?, step as Double)
+        val model = when (type) {
+            Int::class -> SpinnerNumberModel(
+                parameter.value as Int,
+                parameter.min as Int?,
+                parameter.max as Int?,
+                step as Int
+            )
+
+            Short::class -> SpinnerNumberModel(
+                parameter.value as Short,
+                parameter.min as Short?,
+                parameter.max as Short?,
+                step as Short
+            )
+
+            Long::class -> SpinnerNumberModel(
+                parameter.value as Long,
+                parameter.min as Long?,
+                parameter.max as Long?,
+                step as Long
+            )
+
+            Float::class -> SpinnerNumberModel(
+                parameter.value as Float,
+                parameter.min as Float?,
+                parameter.max as Float?,
+                step as Float
+            )
+
+            Double::class -> SpinnerNumberModel(
+                parameter.value as Double,
+                parameter.min as Double?,
+                parameter.max as Double?,
+                step as Double
+            )
+
             else -> throw IllegalArgumentException("Unsupported type $type")
         }
         JSpinner(model).also {
@@ -354,7 +389,7 @@ class NumericWidget2<O: Any, T>(
 
 }
 
-class DisplayOnlyWidget<O: Any, T>(
+class DisplayOnlyWidget<O : Any, T>(
     val editor: AnnotatedPropertyEditor2<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
@@ -382,7 +417,7 @@ class DisplayOnlyWidget<O: Any, T>(
     }
 }
 
-class StringWidget<O: Any>(
+class StringWidget<O : Any>(
     val editor: AnnotatedPropertyEditor2<O>,
     parameter: GuiEditable<O, String>,
     isConsistent: Boolean
@@ -431,7 +466,7 @@ class StringWidget<O: Any>(
     }
 }
 
-class ColorWidget<O: Any>(
+class ColorWidget<O : Any>(
     val editor: AnnotatedPropertyEditor2<O>,
     parameter: GuiEditable<O, Color>,
     isConsistent: Boolean
@@ -447,6 +482,7 @@ class ColorWidget<O: Any>(
 
     override val value: Color
         get() = widget.value
+
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(
             editor,
@@ -463,7 +499,7 @@ class ColorWidget<O: Any>(
 }
 
 
-class DoubleArrayWidget<O: Any>(
+class DoubleArrayWidget<O : Any>(
     val editor: AnnotatedPropertyEditor2<O>,
     parameter: GuiEditable<O, DoubleArray>,
     isConsistent: Boolean
@@ -474,8 +510,10 @@ class DoubleArrayWidget<O: Any>(
     override val widget by lazy {
         JPanel().apply {
             layout = BorderLayout()
-            SimbrainDataViewer(model, useDefaultToolbarAndMenu = false, useHeaders = false,
-                usePadding = false).also {
+            SimbrainDataViewer(
+                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                usePadding = false
+            ).also {
                 it.table.tableHeader = null
                 add(it)
                 minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
@@ -502,7 +540,7 @@ class DoubleArrayWidget<O: Any>(
     }
 }
 
-class ObjectWidget<O: Any, T: CopyableObject>(
+class ObjectWidget<O : Any, T : CopyableObject>(
     private val editor: AnnotatedPropertyEditor2<O>,
     private val objectList: List<T>,
     parameter: GuiEditable<O, T>,
@@ -516,45 +554,58 @@ class ObjectWidget<O: Any, T: CopyableObject>(
     override val value: T
         get() = _prototypeObject ?: objectList.first()
 
+    /**
+     * Finds first superclass with a getTypes method, and if one is found a dropdown is provided that allows the
+     * object’s type to be edited. Otherwise, simply embed the object with its own APE.
+     */
     private val typeMap = (value::class.superclasses.asSequence()
         .mapNotNull {
-            val fromJava = (it.staticFunctions.firstOrNull { it.name == "getTypes" }?.call() as? List<Class<*>>)?.map { it.kotlin }
+            val fromJava =
+                (it.staticFunctions.firstOrNull { it.name == "getTypes" }?.call() as? List<Class<*>>)?.map { it.kotlin }
             if (fromJava != null) {
                 fromJava
             } else {
-                val property = it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
+                val property =
+                    it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
                 property?.get(it.companionObjectInstance) as? List<KClass<*>>
             }
-        }.first()).associateBy { it.simpleName!! }
+        }.firstOrNull()
+    )?.associateBy { it.simpleName!! }
 
     private val editorPanelContainer = JPanel()
 
     lateinit var objectTypeEditor: AnnotatedPropertyEditor2<T>
         private set
 
-    private val dropDown: JComboBox<String> = JComboBox<String>().apply {
-        typeMap.keys.forEach {
-            addItem(it)
-        }
-        addActionListener { e: ActionEvent? ->
+    /**
+     * if null, then the object type is not editable
+     */
+    private val dropDown: JComboBox<String>? = typeMap?.run {
+        JComboBox<String>().apply {
+            typeMap.keys.forEach {
+                addItem(it)
+            }
+            selectedItem = value::class.simpleName
+            addActionListener { e: ActionEvent? ->
 
-            // Create the prototype object and refresh editor panel
-            try {
-                val clazz = typeMap[selectedItem as String]
-                if (clazz != null) {
-                    val prototypeObject = clazz.callNoArgConstructor() as T
-                    objectTypeEditor = AnnotatedPropertyEditor2(listOf(prototypeObject))
-                    _prototypeObject = prototypeObject
-                    editorPanelContainer.removeAll()
-                    editorPanelContainer.add(objectTypeEditor)
-                    this@ObjectWidget.isConsistent = true
-                    removeItem(NULL_STRING)
-                    revalidate()
-                    events.valueChanged.fireAndBlock(parameter.property)
-                    SwingUtilities.getWindowAncestor(this)?.pack()
+                // Create the prototype object and refresh editor panel
+                try {
+                    val clazz = typeMap[selectedItem as String]
+                    if (clazz != null) {
+                        val prototypeObject = clazz.callNoArgConstructor() as T
+                        objectTypeEditor = AnnotatedPropertyEditor2(listOf(prototypeObject))
+                        _prototypeObject = prototypeObject
+                        editorPanelContainer.removeAll()
+                        editorPanelContainer.add(objectTypeEditor)
+                        this@ObjectWidget.isConsistent = true
+                        removeItem(NULL_STRING)
+                        revalidate()
+                        events.valueChanged.fireAndBlock(parameter.property)
+                        SwingUtilities.getWindowAncestor(this)?.pack()
+                    }
+                } catch (exception: Exception) {
+                    exception.printStackTrace()
                 }
-            } catch (exception: Exception) {
-                exception.printStackTrace()
             }
         }
     }
@@ -573,32 +624,39 @@ class ObjectWidget<O: Any, T: CopyableObject>(
         this.add(Box.createRigidArea(Dimension(0, 5)))
         this.add(topPanel)
 
-        topPanel.add(dropDown)
+        dropDown?.let { topPanel.add(it) }
 
         if (!isConsistent) {
-            dropDown.apply {
+            dropDown?.apply {
                 addItem(NULL_STRING)
                 setSelectedIndex(itemCount - 1)
             }
         } else {
             val window = SwingUtilities.getWindowAncestor(this)
-            // Set up detail triangle
-            detailTriangle =
-                DropDownTriangle(DropDownTriangle.UpDirection.LEFT, parameter.showDetails, "Settings", "Settings",
-                    window)
-            detailTriangle!!.addMouseListener(object : MouseAdapter() {
-                override fun mouseClicked(arg0: MouseEvent) {
-                    editorPanelContainer.isVisible = detailTriangle!!.isDown
-                    repaint()
-                    window?.pack()
-                }
-            })
-            editorPanelContainer.isVisible = detailTriangle!!.isDown
-            topPanel.add(Box.createHorizontalStrut(30))
-            topPanel.add(Box.createHorizontalGlue())
-            topPanel.add(detailTriangle)
+            if (dropDown != null) {
+                // Set up detail triangle
+                detailTriangle =
+                    DropDownTriangle(
+                        DropDownTriangle.UpDirection.LEFT, parameter.showDetails, "Settings", "Settings",
+                        window
+                    )
+                detailTriangle!!.addMouseListener(object : MouseAdapter() {
+                    override fun mouseClicked(arg0: MouseEvent) {
+                        editorPanelContainer.isVisible = detailTriangle!!.isDown
+                        repaint()
+                        window?.pack()
+                    }
+                })
+                editorPanelContainer.isVisible = detailTriangle!!.isDown
+                topPanel.add(Box.createHorizontalStrut(30))
+                topPanel.add(Box.createHorizontalGlue())
+                topPanel.add(detailTriangle)
+            }
             objectTypeEditor = AnnotatedPropertyEditor2(objectList)
             editorPanelContainer.add(objectTypeEditor)
+            if (objectTypeEditor.widgets.isEmpty()) {
+                isVisible = false
+            }
         }
 
         add(editorPanelContainer)
@@ -614,6 +672,18 @@ class ObjectWidget<O: Any, T: CopyableObject>(
             },
             widgetVisibilityProvider = { visible ->
                 widget.isVisible = visible
+            },
+            refreshSourceProvider = { newValue ->
+                _prototypeObject = newValue
+                objectTypeEditor = AnnotatedPropertyEditor2(listOf(newValue))
+                editorPanelContainer.removeAll()
+                editorPanelContainer.add(objectTypeEditor)
+                if (objectTypeEditor.widgets.isEmpty()) {
+                    widget.isVisible = false
+                } else {
+                    widget.isVisible = true
+                }
+                SwingUtilities.getWindowAncestor(editorPanelContainer)?.pack()
             }
         ))
     }

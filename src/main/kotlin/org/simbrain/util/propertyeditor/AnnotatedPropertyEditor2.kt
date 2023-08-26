@@ -53,7 +53,7 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
                     ?.also { up -> up.getValue(obj, it) })
             }
 
-        (delegated + annotated).map { parameter ->
+        (delegated + annotated).map { parameter ->x
                 parameter to makeWidget(
                     parameter,
                     if (parameter.value is CopyableObject) {
@@ -68,15 +68,25 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
 
     val labelledItemPanel = LabelledItemPanel().also { add(it) }
 
-    val parameterJLabels =
-        widgets.entries.sortedBy { (parameter) -> parameter.order }.associate { (parameter, widget) ->
-            val label = labelledItemPanel.addItem(parameter.label, widget.widget)
-            label.toolTipText = parameter.description
-            widget.events.valueChanged.on {
-                widgets.forEach { (_, w) -> w.refresh(widget.parameter.property) }
+    val parameterJLabels = widgets.entries
+        .sortedBy { (parameter) -> parameter.order }
+        .mapNotNull { (parameter, widget) ->
+            // object widgets span the dialog and don’t use labels
+            if (widget is ObjectWidget<*, *>) {
+                labelledItemPanel.addItem(widget.widget)
+                widget.events.valueChanged.on {
+                    widgets.forEach { (_, w) -> w.refresh(widget.parameter.property) }
+                }
+                null
+            } else {
+                val label = labelledItemPanel.addItem(parameter.label, widget.widget)
+                label.toolTipText = parameter.description
+                widget.events.valueChanged.on {
+                    widgets.forEach { (_, w) -> w.refresh(widget.parameter.property) }
+                }
+                parameter to label
             }
-            parameter to label
-        }
+        }.toMap()
 
     fun <T> makeWidget(userParameter: GuiEditable<O, T>, isConsistent: Boolean): ParameterWidget2<O, T> {
         if (userParameter.displayOnly) {

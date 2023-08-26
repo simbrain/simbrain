@@ -1,5 +1,9 @@
 package org.simbrain.util.propertyeditor
 
+import org.simbrain.network.core.NeuronUpdateRule
+import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.displayInDialog
@@ -35,6 +39,20 @@ class APETestObject2 {
         onUpdate = {
             if (updateEventProperty == APETestObject2::testBoolean) {
                 showWidget(widgetValue(APETestObject2::testBoolean))
+            }
+        }
+    )
+
+    var neuronUpdateRule: NeuronUpdateRule<*, *> by GuiEditable(
+        initValue = LinearRule()
+    )
+
+    var dataHolder: ScalarDataHolder by GuiEditable(
+        initValue = BiasedScalarData(1.0),
+        onUpdate = {
+            if (updateEventProperty == APETestObject2::neuronUpdateRule) {
+                refreshValue(widgetValue(APETestObject2::neuronUpdateRule).createScalarData())
+                // showWidget(widgetValue(APETestObject2::testBoolean))
             }
         }
     )

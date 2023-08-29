@@ -43,6 +43,14 @@ class SynapseGroup2 @JvmOverloads constructor(
      */
     val excitatoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(0.0, 1.0))
 
+    // TODO. Grab stuff from SynapseAdjustPanel.kt. Expand to all randomizers
+    fun randomizeExcitatory() {
+        this.synapses.forEach {  it.forceSetStrength(excitatoryRandomizer.sampleDouble()) }
+        // this.synapses
+        //     .filter { s -> s.target.polarity == SimbrainConstants.Polarity.EXCITATORY }
+        //     .forEach { it.forceSetStrength(excitatoryRandomizer.sampleDouble()) }
+    }
+
     /**
      * Randomizer for inhibitory weights.
      */

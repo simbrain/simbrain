@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import kotlinx.coroutines.*
+import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.BorderLayout
@@ -41,6 +42,13 @@ fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, placement: Pla
 fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
     val desktopComponent = getDesktopComponent(workspaceComponent)
     desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+}
+
+suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
+    withGui {
+        val desktopComponent = getDesktopComponent(workspaceComponent)
+        desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+    }
 }
 
 class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, true, true), CoroutineScope {

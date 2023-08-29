@@ -17,6 +17,7 @@ import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
 import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity
+import org.simbrain.custom_sims.simulations.patterns_of_activity.edgeOfChaosThreeObjects
 import org.simbrain.custom_sims.simulations.sorn.SORN
 import org.simbrain.custom_sims.simulations.test.ConvertSim
 import org.simbrain.custom_sims.simulations.test.lstmBlock
@@ -44,6 +45,7 @@ val simulations = dir<Any>("Simulations") {
         dir("Cognitive Maps") {
             item("Agent Trails") { kAgentTrails }
             item("RandomizedPursuer") { RandomizedPursuer() }
+            item("Edge of chaos 3 objects") { edgeOfChaosThreeObjects }
             // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
             item("KuramotoOscillators") { KuramotoOscillators() }
         }

@@ -31,7 +31,7 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 /**
- * A special kind of value that can be parsed by an annotated property editor.
+ * A special kind of value that can be parsed by an [AnnotatedPropertyEditor2].
  *
  * Example activation = UserParameter<Neuron, Double>(0.0)
  *

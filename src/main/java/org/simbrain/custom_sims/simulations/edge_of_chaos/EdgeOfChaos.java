@@ -125,7 +125,7 @@ public class EdgeOfChaos extends Simulation {
         net.addNetworkModelAsync(flowersToRes);
     }
 
-    static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
+    public static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
         NeuronGroup ng = new NeuronGroup(parentNet, numNeurons);
         BinaryRule thresholdUnit = new BinaryRule();

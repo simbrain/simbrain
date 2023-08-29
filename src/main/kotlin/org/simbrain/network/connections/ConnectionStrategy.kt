@@ -21,7 +21,6 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.ConnectionStrategyPanel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.displayInDialog
@@ -37,8 +36,7 @@ import org.simbrain.util.stats.distributions.NormalDistribution
  *
  * Note that connections are generally made in the following order.
  * 1) Weights are made using this class
- * 2) Their excitatory / inhibitory ratio is set using [ConnectionUtilities.polarizeSynapses]
- * for free synapses, or [SynapseGroup.setExcitatoryRatio] in synapse groups
+ * 2) Their excitatory / inhibitory ratio is set using [percentExcitatory]
  * 3) The two sets of weights are then randomized using probability distributions.
  *
  * @author Zoë Tosi

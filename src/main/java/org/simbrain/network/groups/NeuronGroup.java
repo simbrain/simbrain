@@ -198,6 +198,10 @@ public class NeuronGroup extends AbstractNeuronCollection {
         setNeuronType(rule);
     }
 
+    public NeuronUpdateRule getPrototypeRule() {
+        return prototypeRule;
+    }
+
     @Override
     public void clear() {
         super.clear();

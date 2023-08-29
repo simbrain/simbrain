@@ -14,11 +14,17 @@ class APETestObject2 {
     //     initValue = 1
     // )
 
-    @UserParameter(label = "Annotated Int", description = "Annotated Int Description")
+    var name by GuiEditable(
+        initValue = "test",
+        displayOnly = true,
+    )
+
+    @UserParameter(label = "Annotated Int", description = "Annotated Int Description", tab = "Test Tab", order = 10)
     var annotatedInt = 1
 
     var testString by GuiEditable(
-        initValue = "test"
+        initValue = "test",
+        tab = "Test Tab",
     )
 
     var testBoolean by GuiEditable(
@@ -120,6 +126,7 @@ fun main() {
         testBoolean = false
         testDouble = 2.3
         testString = "test1"
+        name = "test1"
         // (testObject as AnnotatedPropertyEditorTestObject2.TestInnerObject1).test1Int = 3
         testObject = APETestObject2.TestInnerObject2(3, false)
     }

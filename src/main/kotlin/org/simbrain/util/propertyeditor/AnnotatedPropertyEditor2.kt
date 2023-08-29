@@ -4,8 +4,10 @@ import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.UserParameter
 import java.awt.Color
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
 import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.allSuperclasses
+import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
 
 // TODO: Adapt javadoc from APE
@@ -17,7 +19,7 @@ import kotlin.reflect.jvm.isAccessible
  */
 class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() {
 
-    val widgets = editingObjects.first().let { obj ->
+    val parameterWidgetMap = editingObjects.first().let { obj ->
 
         /**
          * Properties using [GuiEditable].
@@ -27,7 +29,9 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
          * var testString by GuiEditable(initValue = "test")
          * ````
          */
-        val delegated = obj::class.memberProperties
+        val delegated = (obj::class.allSuperclasses + obj::class)
+            .map { it.declaredMemberProperties }
+            .flatten()
             .asSequence()
             .filterIsInstance<KMutableProperty1<O, *>>()
             .onEach { it.isAccessible = true }
@@ -43,7 +47,9 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
          * var testString = initValue
          * ```
          */
-        val annotated = obj::class.memberProperties
+        val annotated = (obj::class.allSuperclasses + obj::class)
+            .map { it.declaredMemberProperties }
+            .flatten()
             .asSequence()
             .mapNotNull {
                 (it.annotations
@@ -53,7 +59,7 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
                     ?.also { up -> up.getValue(obj, it) })
             }
 
-        (delegated + annotated).map { parameter ->x
+        (delegated + annotated).map { parameter ->
                 parameter to makeWidget(
                     parameter,
                     if (parameter.value is CopyableObject) {
@@ -66,27 +72,43 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
 
     }
 
-    val labelledItemPanel = LabelledItemPanel().also { add(it) }
+    val labelledItemPanelsByTab = LinkedHashMap<String?, LabelledItemPanel>()
 
-    val parameterJLabels = widgets.entries
+    private fun getLabelledItemPanel(tab: String?): LabelledItemPanel {
+        return labelledItemPanelsByTab.getOrPut(tab) {
+            LabelledItemPanel()
+        }
+    }
+
+    val parameterJLabels = parameterWidgetMap.entries
         .sortedBy { (parameter) -> parameter.order }
         .mapNotNull { (parameter, widget) ->
             // object widgets span the dialog and don’t use labels
             if (widget is ObjectWidget<*, *>) {
-                labelledItemPanel.addItem(widget.widget)
+                getLabelledItemPanel(parameter.tab).addItem(widget.widget)
                 widget.events.valueChanged.on {
-                    widgets.forEach { (_, w) -> w.refresh(widget.parameter.property) }
+                    parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
                 }
                 null
             } else {
-                val label = labelledItemPanel.addItem(parameter.label, widget.widget)
+                val label = getLabelledItemPanel(parameter.tab).addItem(parameter.label, widget.widget)
                 label.toolTipText = parameter.description
                 widget.events.valueChanged.on {
-                    widgets.forEach { (_, w) -> w.refresh(widget.parameter.property) }
+                    parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
                 }
                 parameter to label
             }
         }.toMap()
+
+    val mainPanel = if (labelledItemPanelsByTab.size == 1) {
+        labelledItemPanelsByTab.values.first()
+    } else {
+        JTabbedPane().also {
+            labelledItemPanelsByTab.forEach { (tab, panel) ->
+                it.addTab(if (tab.isNullOrEmpty()) "Main" else tab, panel)
+            }
+        }
+    }.also { add(it) }
 
     fun <T> makeWidget(userParameter: GuiEditable<O, T>, isConsistent: Boolean): ParameterWidget2<O, T> {
         if (userParameter.displayOnly) {
@@ -147,7 +169,7 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
     }
 
     fun commit() {
-        widgets.forEach { (parameter, widget) ->
+        parameterWidgetMap.forEach { (parameter, widget) ->
             editingObjects.forEach { eo ->
                 if (widget.isConsistent) {
                     if (widget is ObjectWidget<*, *>) {
@@ -163,7 +185,7 @@ class AnnotatedPropertyEditor2<O : Any>(val editingObjects: List<O>) : JPanel() 
     }
 
     init {
-        widgets.map { (_, widget) -> widgets.forEach { (_, w) -> w.refresh(widget.parameter.property) } }
+        parameterWidgetMap.map { (_, widget) -> parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) } }
     }
 
 }

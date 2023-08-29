@@ -48,6 +48,7 @@ class GuiEditable<O : Any, T>(
     val order: Int = 0,
     val displayOnly: Boolean = false,
     val showDetails: Boolean = true,
+    val tab: String? = null,
     val onUpdate: UpdateFunctionContext<O, T>.() -> Unit = { }
 ) {
 
@@ -136,6 +137,7 @@ fun <O : Any> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
         order = order,
         displayOnly = displayOnly,
         showDetails = showDetails,
+        tab = tab,
         onUpdate = {
         }
     )
@@ -163,7 +165,7 @@ class UpdateFunctionContext<O : Any, T>(
         property.isAccessible = true
         val parameter = property.getDelegate(parameter.baseObject)
         return if (parameter is GuiEditable<*, *>) {
-            editor.widgets[parameter]!!.value as WT
+            editor.parameterWidgetMap[parameter]!!.value as WT
         } else {
             throw IllegalArgumentException("Property $property is not a user parameter")
         }
@@ -357,6 +359,7 @@ class NumericWidget2<O : Any, T>(
             formatterEditor.valueClass = type.javaObjectType
             val factory = DefaultFormatterFactory(formatterEditor)
             val ftf: JFormattedTextField = (it.editor as JSpinner.DefaultEditor).textField
+            ftf.columns = 10
             ftf.isEditable = true
             ftf.setFormatterFactory(factory)
             if (!isConsistent) {
@@ -654,7 +657,7 @@ class ObjectWidget<O : Any, T : CopyableObject>(
             }
             objectTypeEditor = AnnotatedPropertyEditor2(objectList)
             editorPanelContainer.add(objectTypeEditor)
-            if (objectTypeEditor.widgets.isEmpty()) {
+            if (objectTypeEditor.parameterWidgetMap.isEmpty()) {
                 isVisible = false
             }
         }
@@ -678,7 +681,7 @@ class ObjectWidget<O : Any, T : CopyableObject>(
                 objectTypeEditor = AnnotatedPropertyEditor2(listOf(newValue))
                 editorPanelContainer.removeAll()
                 editorPanelContainer.add(objectTypeEditor)
-                if (objectTypeEditor.widgets.isEmpty()) {
+                if (objectTypeEditor.parameterWidgetMap.isEmpty()) {
                     widget.isVisible = false
                 } else {
                     widget.isVisible = true

@@ -75,15 +75,7 @@ annotation class UserParameter(
      * of field name is capitalized. E.g. activation -> setActivation.
      */
     val useSetter: Boolean = false,
-    /**
-     * A string to indicate a user preference stored in [SimbrainPreferences].
-     * If this optional field is set a restore defaults button will appear in the
-     * property editor which, if pressed, will restore a fields value using
-     * this key.
-     *
-     * TODO: Note that "restore defaults" has not yet been implemented.
-     */
-    val preferenceKey: String = "",
+
     /**
      * The probability distribution to use when generating random values for
      * this parameter. For options see [ProbabilityDistribution]

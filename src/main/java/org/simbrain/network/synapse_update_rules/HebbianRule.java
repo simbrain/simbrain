@@ -34,8 +34,7 @@ import smile.math.matrix.Matrix;
  */
 public class HebbianRule extends SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
-    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule",
-        preferenceKey = "hebbLearningRate",  increment = .1,  order = 1)
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule",  increment = .1,  order = 1)
     private double learningRate = NetworkPreferences.INSTANCE.getDefaultLearningRate();
 
     @Override
